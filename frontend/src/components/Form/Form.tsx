@@ -6,6 +6,7 @@ import Patient, { patientSchema } from '~/models/Patient';
 import SelectField from './SelectField';
 import TextField from './TextField';
 import SubmitButton from './SubmitButton';
+import DateField from './DateField';
 
 type FormValues = Partial<Patient>;
 
@@ -39,6 +40,7 @@ const Form = () => {
         <Field label='First Name' name='firstName' component={TextField} />
         <Field label='Last Name' name='lastName' component={TextField} />
         <Field as='select' label='Sex' name='sex' options={sexOptions} component={SelectField} />
+        <Field label='Date of Birth' name='dateOfBirth' component={DateField} />
         <SubmitButton />
       </FormikForm>
     </Formik>

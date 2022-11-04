@@ -15,7 +15,6 @@ const SelectField: React.FunctionComponent<SelectFieldProps> = ({
   options,
   ...props
 }) => {
-  console.log(field, form, props);
   return (
     <div className='form-group mb-3'>
       <label htmlFor={field.name}>{label}</label>
