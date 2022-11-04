@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 
 import Layout from '~/components/Layout';
-import { type Patient } from '~/models';
+import Patient from '~/models/Patient';
 
 const ViewPatientsPage = () => {
 
