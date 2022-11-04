@@ -1,9 +1,11 @@
 import yup from 'yup';
 
+type Sex = 'male' | 'female';
+
 const patientSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
-  sex: yup.mixed().oneOf(['male', 'female', 'other']).defined(),
+  sex: yup.mixed<Sex>().oneOf(['male', 'female']).defined(),
   dateOfBirth: yup.date().required(),
 });
 
