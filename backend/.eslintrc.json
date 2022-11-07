@@ -27,7 +27,17 @@
           "caseInsensitive": true,
           "order": "asc"
         },
-        "newlines-between": "always"
+        "newlines-between": "always",
+        "pathGroups": [
+          {
+            "group": "external",
+            "pattern": "express",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": [
+          "express"
+        ]
       }
     ],
     "indent": [
