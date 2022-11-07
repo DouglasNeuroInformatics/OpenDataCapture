@@ -1,22 +1,11 @@
 import type { RequestHandler } from 'express';
 
 import HttpError from '../models/HttpError';
+import Patient from '../models/Patient';
 
 const dummyPatients = [
-  {
-    id: 1,
-    firstName: 'John',
-    lastName: 'Smith',
-    dateOfBirth: new Date(),
-    sex: 'Male'
-  },
-  {
-    id: 2,
-    firstName: 'Jane',
-    lastName: 'Doe',
-    dateOfBirth: new Date(),
-    sex: 'Female'
-  }
+  new Patient('John', 'Smith', new Date(1950, 11, 1), 'Male'),
+  new Patient('Jane', 'Doe', new Date(1965, 7, 14), 'Female')
 ];
 
 export const getAllPatients: RequestHandler = (req, res) => {
@@ -36,16 +25,8 @@ export const getPatientById: RequestHandler = (req, res, next) => {
 };
 
 export const addNewPatient: RequestHandler = ((req, res) => {
-  const data = req.body;
-  const patient = {
-    id: Math.random(),
-    firstName: data.firstName,
-    lastName: data.lastName,
-    sex: data.sex,
-    dateOfBirth: data.dateOfBirth,
-    dateAdded: new Date(),
-    dateUpdated: new Date()
-  };
+  const { firstName, lastName, dateOfBirth, sex } = req.body;
+  const patient = new Patient(firstName, lastName, dateOfBirth, sex);
   dummyPatients.push(patient);
   return res.status(201).json({
     patient: patient
