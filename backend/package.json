@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon src/index.ts"
+    "start": "nodemon src/app.ts"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.2",
