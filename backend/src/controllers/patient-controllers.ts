@@ -3,17 +3,14 @@ import type { RequestHandler } from 'express';
 import HttpError from '../models/HttpError';
 import Patient from '../models/Patient';
 
-const dummyPatients = [
-  new Patient('John', 'Smith', new Date(1950, 11, 1), 'Male'),
-  new Patient('Jane', 'Doe', new Date(1965, 7, 14), 'Female')
-];
-
-export const getAllPatients: RequestHandler = (req, res) => {
-  console.log('GET request');
-  res.json(dummyPatients);
+export const getAllPatients: RequestHandler = async (req, res) => {
+  const allPatients = await Patient.find();
+  console.log(allPatients);
+  return res.json(allPatients);
 };
 
 export const getPatientById: RequestHandler = (req, res, next) => {
+  /*
   console.log('GET request');
   const patientId = req.params.id;
   console.log(patientId);
@@ -21,14 +18,24 @@ export const getPatientById: RequestHandler = (req, res, next) => {
   if (!patient) {
     return next(new HttpError(404, `Could not find patient with id ${patientId}`));
   }
+  */
+  const patient = {};
   return res.status(200).json(patient);
 };
 
-export const addNewPatient: RequestHandler = ((req, res) => {
+export const addNewPatient: RequestHandler = async (req, res, next) => {
   const { firstName, lastName, dateOfBirth, sex } = req.body;
-  const patient = new Patient(firstName, lastName, dateOfBirth, sex);
-  dummyPatients.push(patient);
-  return res.status(201).json({
-    patient: patient
+  const patient = new Patient({
+    firstName: firstName,
+    lastName: lastName,
+    dateOfBirth: new Date(dateOfBirth),
+    sex: sex
   });
-});
+  console.log(patient);
+  try {
+    await patient.save();
+  } catch (error) {
+    console.log(error);
+    return next(new HttpError(500, 'Failed to save patient'));
+  }
+};

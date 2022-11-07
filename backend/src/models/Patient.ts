@@ -1,18 +1,26 @@
-type Sex = 'Male' | 'Female';
+import { model, Schema, InferSchemaType } from 'mongoose';
 
-
-export default class Patient {
-  id: number;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
-  sex: Sex;
-
-  constructor(firstName: string, lastName: string, dateOfBirth: Date, sex: Sex) {
-    this.id = Math.random(),
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.dateOfBirth = dateOfBirth;
-    this.sex = sex;
+const patientSchema = new Schema({
+  firstName: {
+    required: true,
+    type: String
+  },
+  lastName: {
+    required: true,
+    type: String
+  },
+  dateOfBirth: {
+    required: true,
+    type: Date
+  },
+  sex: {
+    required: true,
+    type: String
   }
-}
+});
+
+type PatientType = InferSchemaType<typeof patientSchema>;
+
+const Patient = model('Patient', patientSchema);
+
+export { Patient as default, PatientType };

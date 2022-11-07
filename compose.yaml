@@ -44,9 +44,6 @@ services:
       - express-mongo
     expose:
       - 27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
 networks:
   react-express:
   express-mongo:
