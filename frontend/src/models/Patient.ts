@@ -3,10 +3,11 @@ import * as yup from 'yup';
 type Sex = 'male' | 'female';
 
 const patientSchema = yup.object({
+  id: yup.string().notRequired(),
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   sex: yup.mixed<Sex>().oneOf(['male', 'female']).defined(),
-  dateOfBirth: yup.date().required(),
+  dateOfBirth: yup.date().required()
 });
 
 

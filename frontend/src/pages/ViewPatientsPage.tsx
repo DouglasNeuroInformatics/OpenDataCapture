@@ -28,6 +28,7 @@ const ViewPatientsPage = () => {
       <Table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Date of Birth</th>
@@ -37,6 +38,7 @@ const ViewPatientsPage = () => {
         <tbody>
           {patients?.map((patient, i) => (
             <tr key={i}>
+              <td>{patient.id || 'NA'}</td>
               <td>{patient.firstName}</td>
               <td>{patient.lastName}</td>
               <td>{patient.dateOfBirth.toString()}</td>
