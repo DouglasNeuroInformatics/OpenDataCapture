@@ -12,7 +12,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className='d-flex vh-100'>
       <Sidebar />
-      <Container as='main' className='bg-light text-dark p-md-5'>
+      <Container as='main' className='bg-light text-dark p-md-5 overflow-scroll'>
         {children}
       </Container>
     </div>
