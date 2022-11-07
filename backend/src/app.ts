@@ -1,11 +1,20 @@
-import bodyParser from 'body-parser';
 import express from 'express';
-import { MongoClient } from 'mongodb';
 
-import router from './router';
+import { errorRequestHandler } from './controllers/error-controllers';
+import patientRoutes from './routes/patient-routes';
+
+const app = express();
+const port = 3000;
+
+app.use('/api/patient', patientRoutes);
+app.use(errorRequestHandler);
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
 
 
-
+/*
 async function main() {
   const client = new MongoClient('mongodb://mongo:27017');
   try {
@@ -22,7 +31,7 @@ async function main() {
 
 main();
 
-/*
+
 
 const database = client.db('development');
 const patients = database.collection('patients');
@@ -30,14 +39,10 @@ const patients = database.collection('patients');
 patients.insertOne({
   firstName: 'John'
 });
-*/
 
-const app = express();
-const port = 3000;
 
 app.use(bodyParser.json());
-app.use('/api', router);
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+
+
+*/

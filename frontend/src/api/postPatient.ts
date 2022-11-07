@@ -1,7 +1,7 @@
 import type Patient from '~/models/Patient';
 
 export default async function postPatient(patient: Patient) {
-  const response = await fetch('/api/patients', {
+  const response = await fetch('/api/patient', {
     method: 'POST',
     credentials: 'same-origin',
     headers: {

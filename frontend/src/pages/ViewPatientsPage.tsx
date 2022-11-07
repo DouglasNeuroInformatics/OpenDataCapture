@@ -10,7 +10,7 @@ const ViewPatientsPage = () => {
   const [patients, setPatients] = useState<Patient[]>();
 
   const getPatients = async () => {
-    const response = await fetch('/api/patients');
+    const response = await fetch('/api/patient');
     if (!response.ok) {
       console.error(response.status, response.statusText);
       return;

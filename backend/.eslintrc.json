@@ -17,6 +17,7 @@
     "import"
   ],
   "rules": {
+    "@typescript-eslint/explicit-function-return-type": "warn",
     "import/exports-last": "warn",
     "import/newline-after-import": "warn",
     "import/order": [

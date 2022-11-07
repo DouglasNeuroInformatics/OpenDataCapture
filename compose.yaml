@@ -39,11 +39,14 @@ services:
     restart: always
     image: mongo:4.2.0
     volumes:
-      - ./data:/data/db
+      - ./data:/data
     networks:
       - express-mongo
     expose:
       - 27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
 networks:
   react-express:
   express-mongo:
