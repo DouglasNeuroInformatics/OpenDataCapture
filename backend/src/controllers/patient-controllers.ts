@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import type { RequestHandler } from 'express';
 
 import HttpError from '../models/HttpError';
