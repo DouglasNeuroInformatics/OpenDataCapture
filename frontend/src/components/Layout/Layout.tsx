@@ -10,9 +10,9 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className='d-flex vh-100'>
+    <div className='d-flex bg-light text-dark vh-100'>
       <Sidebar />
-      <Container as='main' className='bg-light text-dark p-md-5 overflow-scroll'>
+      <Container as='main' className='p-md-5 overflow-scroll'>
         {children}
       </Container>
     </div>
