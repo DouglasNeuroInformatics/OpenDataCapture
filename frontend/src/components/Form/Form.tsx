@@ -18,7 +18,7 @@ const formValues: FormValues = {
   firstName: '',
   lastName: '',
   sex: undefined,
-  dateOfBirth: new Date()
+  dateOfBirth: undefined
 };
 
 const sexOptions = {

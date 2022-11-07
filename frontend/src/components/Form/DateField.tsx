@@ -18,6 +18,8 @@ export const DateField = (props: DateFieldProps) => {
         {...field}
         {...props}
         className='form-control w-100'
+        dateFormat='yyyy-MM-dd'
+        placeholderText="Please select"
         selected={(field.value && new Date(field.value)) || null}
         onChange={value => {
           setFieldValue(field.name, value);
