@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import type { RequestHandler } from 'express';
 
 import HttpError from '../models/HttpError';
@@ -35,8 +37,19 @@ export const getPatientById: RequestHandler = (req, res, next) => {
   return res.status(200).json(patient);
 };
 
-export const postNewPatient: RequestHandler = ((req, res) => {
-  console.log('POST request');
+export const addNewPatient: RequestHandler = ((req, res) => {
   const data = req.body;
-  console.log(data);
+  const patient = {
+    id: Math.random(),
+    firstName: data.firstName,
+    lastName: data.lastName,
+    sex: data.sex,
+    dateOfBirth: data.dateOfBirth,
+    dateAdded: new Date(),
+    dateUpdated: new Date()
+  };
+  dummyPatients.push(patient);
+  return res.status(201).json({
+    patient: patient
+  });
 });
