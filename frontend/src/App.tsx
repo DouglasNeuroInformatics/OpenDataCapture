@@ -12,7 +12,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index element={<HomePage />} />
+        <Route index element={<HomePage />} path='/' />
         <Route element={<AddPatientPage />} path="/add-patient" />
         <Route element={<ViewPatientsPage />} path="/view-patients" />
         <Route element={<ErrorPage status="404" message="Not Found" />} path="*" />

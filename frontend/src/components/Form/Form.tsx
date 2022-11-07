@@ -1,14 +1,14 @@
 import React from 'react';
 
-import { Formik, Field, Form as FormikForm, FormikHelpers } from 'formik';
+import { Field, Form as FormikForm, Formik, FormikHelpers } from 'formik';
 import Patient, { patientSchema } from '~/models/Patient';
 
-import SelectField from './SelectField';
-import TextField from './TextField';
-import SubmitButton from './SubmitButton';
 import DateField from './DateField';
+import SelectField from './SelectField';
+import SubmitButton from './SubmitButton';
+import TextField from './TextField';
 
-import Modal from '~/components/Modal';
+import postPatient from '~/api/postPatient';
 
 type FormValues = Partial<Patient>;
 
@@ -28,26 +28,21 @@ const sexOptions = {
 
 const Form = () => {
 
-  const [data, setData] = React.useState<Patient>();
-
   const handleSubmit: FormSubmitHandler = (values, { resetForm, setSubmitting }) => {
-    setTimeout(() => {
-      alert(JSON.stringify(values, null, 2));
-      resetForm();
-      setSubmitting(false);
-      setData(values as Patient);
-    }, 400);
+    postPatient(values as Patient) // check properly
+      .then(() => alert('Success!'));
+    resetForm();
+    setSubmitting(false);
   };
 
   return (
     <React.Fragment>
-      { data && <Modal patientData={data} />}
       <Formik initialValues={formValues} validationSchema={patientSchema} onSubmit={handleSubmit}>
-        <FormikForm>
+        <FormikForm autoComplete='off'>
           <Field label='First Name' name='firstName' component={TextField} />
           <Field label='Last Name' name='lastName' component={TextField} />
           <Field as='select' label='Sex' name='sex' options={sexOptions} component={SelectField} />
-          <Field label='Date of Birth' name='dateOfBirth' component={DateField} />
+          <DateField name='dateOfBirth' label='Date of Birth' />
           <SubmitButton />
         </FormikForm>
       </Formik>

@@ -1,27 +1,28 @@
 import React from 'react';
-
-import ReactDatePicker from 'react-datepicker';
+import { useField, useFormikContext } from 'formik';
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { type FieldProps } from 'formik';
-
-interface DateFieldProps extends FieldProps<string> {
+interface DateFieldProps {
+  name: string,
   label: string
-  startDate: Date
 }
 
-const DateField: React.FunctionComponent<DateFieldProps> = ({
-  field,
-  form,
-  label,
-  ...props
-}) => {
-  const selected = new Date(field.value);
-
+export const DateField = (props: DateFieldProps) => {
+  const { setFieldValue } = useFormikContext();
+  const [field] = useField(props);
   return (
     <div className='form-group mb-3'>
-      <label htmlFor={field.name}>{label}</label>
-      <ReactDatePicker selected={selected} className='form-control w-100' {...field} {...props} />
+      <label htmlFor={field.name}>{props.label}</label>
+      <DatePicker
+        {...field}
+        {...props}
+        className='form-control w-100'
+        selected={(field.value && new Date(field.value)) || null}
+        onChange={value => {
+          setFieldValue(field.name, value);
+        }}
+      />
     </div>
   );
 };

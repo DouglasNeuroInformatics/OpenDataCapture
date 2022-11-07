@@ -20,4 +20,10 @@ router.get('/patients', (req, res) => {
   ]);
 });
 
+router.post('/patients', (req, res) => {
+  console.log('POST request');
+  const data = req.body;
+  console.log(data);
+});
+
 export default router;
