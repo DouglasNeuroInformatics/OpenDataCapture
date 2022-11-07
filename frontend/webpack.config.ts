@@ -58,6 +58,7 @@ const config: Configuration = {
     extensions: ['.tsx', '.ts', '.js']
   },
   devServer: {
+    allowedHosts: process.env.DEMO_MODE ? 'all' : 'auto',
     historyApiFallback: true,
     port: 3000,
     proxy: {
