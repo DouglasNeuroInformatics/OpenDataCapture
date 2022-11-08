@@ -1,5 +1,7 @@
 import type { RequestHandler } from 'express';
 
+import type { MongoServerError } from 'mongodb';
+
 import Patient from '../models/Patient';
 import createPatientId from '../utils/createPatientId';
 import { HttpError } from '../utils/exceptions';
@@ -47,7 +49,10 @@ export const addNewPatient: RequestHandler = async (req, res, next) => {
   try {
     await patient.save();
   } catch (error) {
-    console.log(error);
+    const isDuplicateId = (error as MongoServerError).code === 11000;
+    if (isDuplicateId) {
+      return next(new HttpError(409, 'Patient with id already exists'));
+    }
     return next(new HttpError(500, 'Failed to save patient'));
   }
 };

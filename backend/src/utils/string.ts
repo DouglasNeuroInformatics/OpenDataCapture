@@ -6,6 +6,7 @@ export function sanitize(
   validSpecialChars = /[-\s]/g
 ): string {
   s = s
+    .toUpperCase()
     .replace(validSpecialChars, '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
