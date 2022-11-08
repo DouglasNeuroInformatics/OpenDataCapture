@@ -4,8 +4,8 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 
 import { errorRequestHandler } from './controllers/error-controllers';
-import HttpError from './models/HttpError';
 import patientRoutes from './routes/patient-routes';
+import { HttpError } from './utils/exceptions';
 
 async function main(): Promise<void> {
   const app = express();
