@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { faHome, faPlus, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faPlus, faFaceSmile, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon, type FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 import { NavLink } from 'react-router-dom';
 
@@ -20,6 +20,11 @@ const sidebarItems: SidebarItem[] = [
     label: 'Add Patient',
     icon: faPlus,
     to: '/add-patient',
+  },
+  {
+    label: 'Happiness Scale',
+    icon: faFaceSmile,
+    to: '/happiness-scale'
   },
   {
     label: 'View Patients',

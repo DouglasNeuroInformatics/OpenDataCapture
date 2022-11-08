@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import AddPatientPage from '@/pages/AddPatientPage';
 import ErrorPage from '@/pages/ErrorPage';
+import HappinessScalePage from '@/pages/HappinessScalePage';
 import HomePage from '@/pages/HomePage';
 import ViewPatientsPage from '@/pages/ViewPatientsPage';
 
@@ -13,6 +14,7 @@ const App = () => {
       <Routes>
         <Route index element={<HomePage />} path="/" />
         <Route element={<AddPatientPage />} path="/add-patient" />
+        <Route element={<HappinessScalePage />} path="/happiness-scale" />
         <Route element={<ViewPatientsPage />} path="/view-patients" />
         <Route element={<ErrorPage status="404" message="Not Found" />} path="*" />
       </Routes>
