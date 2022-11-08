@@ -7,6 +7,7 @@ import Patient from '@/models/Patient';
 
 const ViewPatientsPage = () => {
   const [patients, setPatients] = useState<Patient[]>();
+  const [updateRequired, setUpdateRequired] = useState(false);
 
   const getPatients = async () => {
     const response = await fetch('/api/patient');
@@ -25,16 +26,19 @@ const ViewPatientsPage = () => {
       console.error(response.status, response.statusText);
       return;
     }
-    return await response.json();
+    setUpdateRequired(true)
   };
 
-  const updatePatients = () => getPatients().then((data) => setPatients(data));
+  const updatePatients = () => getPatients().then((data) => {
+    setPatients(data)
+    setUpdateRequired(false);
+  });
 
   useEffect(() => {
     updatePatients();
     const intervalId = setInterval(updatePatients, 5000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [updateRequired]);
 
   return (
     <Layout>

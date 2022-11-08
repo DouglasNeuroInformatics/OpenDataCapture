@@ -28,10 +28,10 @@ export const deletePatientById: RequestHandler = async (req, res, next) => {
   try {
     await Patient.deleteOne({ _id: req.params.id });
     console.log(`Deleted patient with id: ${req.params.id}`)
-    return res.status(204);
+    return res.status(204).end();
   } catch (error) {
     console.error(error);
-    return res.status(500);
+    return res.status(500).end();
   }
 }
 
@@ -48,7 +48,7 @@ export const addNewPatient: RequestHandler = async (req, res, next) => {
   console.log(patient);
   try {
     await patient.save();
-    return res.status(201).json({})
+    return res.status(201).end()
   } catch (error) {
     const isDuplicateId = (error as MongoServerError).code === 11000;
     if (isDuplicateId) {
