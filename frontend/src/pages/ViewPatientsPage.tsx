@@ -44,6 +44,7 @@ const ViewPatientsPage = () => {
     });
   
   useEffect(() => {
+    console.log(modalPatientId)
     fetch(`/api/instrument/happiness-scale/${modalPatientId}`)
       .then(data => data.json())
       .then(data => setModalData(data))
