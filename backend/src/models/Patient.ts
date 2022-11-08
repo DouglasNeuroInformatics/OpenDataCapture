@@ -3,28 +3,28 @@ import { model, Schema, InferSchemaType } from 'mongoose';
 const patientSchema = new Schema({
   firstName: {
     required: true,
-    type: String
+    type: String,
   },
   lastName: {
     required: true,
-    type: String
+    type: String,
   },
   dateOfBirth: {
     required: true,
-    type: Date
+    type: Date,
   },
   sex: {
     required: true,
-    type: String
+    type: String,
   },
   dateAdded: {
     default: Date.now,
     type: Date,
-    required: true
-  }
+    required: true,
+  },
 });
 
-patientSchema.methods.printFullName = function(): void {
+patientSchema.methods.printFullName = function (): void {
   console.log(this.firstName + ' ' + this.lastName);
 };
 

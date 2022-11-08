@@ -6,6 +6,6 @@ export const errorRequestHandler: ErrorRequestHandler = (error, req, res, next) 
   }
   console.error(error);
   return res.status(error.code || 500).json({
-    message: error.message || 'An unknown error occured'
+    message: error.message || 'An unknown error occured',
   });
 };

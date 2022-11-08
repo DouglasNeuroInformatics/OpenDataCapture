@@ -1,8 +1,7 @@
 import type { RequestHandler } from 'express';
 
-import { HttpError } from '../utils/exceptions';
 import Patient from '../models/Patient';
-import { extractNonAlphabeticChars } from '../utils/string';
+import { HttpError } from '../utils/exceptions';
 
 export const getAllPatients: RequestHandler = async (req, res) => {
   const allPatients = await Patient.find();
@@ -31,7 +30,7 @@ export const addNewPatient: RequestHandler = async (req, res, next) => {
     firstName: firstName,
     lastName: lastName,
     dateOfBirth: new Date(dateOfBirth),
-    sex: sex
+    sex: sex,
   });
   console.log(patient);
   try {
