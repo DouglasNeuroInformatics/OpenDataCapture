@@ -48,6 +48,7 @@ export const addNewPatient: RequestHandler = async (req, res, next) => {
   console.log(patient);
   try {
     await patient.save();
+    return res.status(201).json({})
   } catch (error) {
     const isDuplicateId = (error as MongoServerError).code === 11000;
     if (isDuplicateId) {

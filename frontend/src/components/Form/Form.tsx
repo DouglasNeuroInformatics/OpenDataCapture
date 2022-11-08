@@ -7,7 +7,6 @@ import SelectField from './SelectField';
 import SubmitButton from './SubmitButton';
 import TextField from './TextField';
 
-import postPatient from '@/api/postPatient';
 import Patient, { patientSchema } from '@/models/Patient';
 
 type FormValues = Partial<Patient>;
@@ -27,9 +26,23 @@ const sexOptions = {
 };
 
 const Form = () => {
-  const handleSubmit: FormSubmitHandler = (values, { resetForm, setSubmitting }) => {
-    postPatient(values as Patient) // check properly
-      .then(() => alert('Success!'));
+  const handleSubmit: FormSubmitHandler = async (values, { resetForm, setSubmitting }) => {
+    const response = await fetch('/api/patient', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(values),
+    
+    });
+    console.log(response.ok)
+    if (response.ok) {
+      console.log('Okay')
+      alert('Success!')
+    } else {
+      alert(`An Error Occurred: ${response.status} ${response.statusText}`)
+    }
     resetForm();
     setSubmitting(false);
   };
