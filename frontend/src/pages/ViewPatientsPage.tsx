@@ -29,8 +29,12 @@ const ViewPatientsPage = () => {
     return await response.json();
   };
 
+  const updatePatients = () => getPatients().then((data) => setPatients(data));
+
   useEffect(() => {
-    getPatients().then((data) => setPatients(data));
+    updatePatients();
+    const intervalId = setInterval(updatePatients, 5000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
