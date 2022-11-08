@@ -1,6 +1,10 @@
 import { model, Schema, InferSchemaType } from 'mongoose';
 
 const patientSchema = new Schema({
+  _id: {
+    required: true,
+    type: String
+  },
   firstName: {
     required: true,
     type: String,
@@ -24,11 +28,15 @@ const patientSchema = new Schema({
   },
 });
 
+type PatientType = InferSchemaType<typeof patientSchema>;
+
+patientSchema.statics.deleteById = function (_id): PatientType {
+  return this.deleteOne({ _id: _id })
+};
+
 patientSchema.methods.printFullName = function (): void {
   console.log(this.firstName + ' ' + this.lastName);
 };
-
-type PatientType = InferSchemaType<typeof patientSchema>;
 
 const Patient = model('Patient', patientSchema);
 

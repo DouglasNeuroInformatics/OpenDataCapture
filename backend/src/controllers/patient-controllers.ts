@@ -1,12 +1,11 @@
 import type { RequestHandler } from 'express';
 
 import Patient from '../models/Patient';
+import createPatientId from '../utils/createPatientId';
 import { HttpError } from '../utils/exceptions';
 
 export const getAllPatients: RequestHandler = async (req, res) => {
-  const allPatients = await Patient.find();
-  console.log(allPatients);
-  return res.json(allPatients);
+  return res.json(await Patient.find());
 };
 
 export const getPatientById: RequestHandler = (req, res, next) => {
@@ -23,10 +22,22 @@ export const getPatientById: RequestHandler = (req, res, next) => {
   return res.status(200).json(patient);
 };
 
+export const deletePatientById: RequestHandler = async (req, res, next) => {
+  try {
+    await Patient.deleteOne({ _id: req.params.id });
+    console.log(`Deleted patient with id: ${req.params.id}`)
+    return res.status(204);
+  } catch (error) {
+    console.error(error);
+    return res.status(500);
+  }
+}
+
 export const addNewPatient: RequestHandler = async (req, res, next) => {
   const { firstName, lastName, dateOfBirth, sex } = req.body;
-  // check if any contain
+  const patientId = createPatientId(firstName, lastName, new Date(dateOfBirth));
   const patient = new Patient({
+    _id: patientId,
     firstName: firstName,
     lastName: lastName,
     dateOfBirth: new Date(dateOfBirth),
