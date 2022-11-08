@@ -14,17 +14,18 @@ const patientIdDataSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   dateOfBirth: yup.date().required(),
-});
+  happinessScore: yup.number().integer().min(0).max(10).required()
+})
 
 type PatientIdData = yup.InferType<typeof patientIdDataSchema>;
 
-type FormValues = Partial<PatientIdData>;
-
+type FormValues = Partial<PatientIdData>
 
 const formValues: FormValues = {
   firstName: '',
   lastName: '',
   dateOfBirth: undefined,
+  happinessScore: undefined
 };
 
 
@@ -32,7 +33,7 @@ type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>
 
 const HappinessForm = () => {
   const handleSubmit: FormSubmitHandler = async (values, { resetForm, setSubmitting }) => {
-    alert('Submit!')
+    alert('Submit!' + JSON.stringify(values))
     /*
     const response = await fetch('/api/patient', {
       method: 'POST',
