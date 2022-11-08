@@ -7,22 +7,14 @@
     "moduleResolution": "node",
     "outDir": "./dist/",
     "paths": {
-      "~/*": [
-        "*"
-      ]
+      "@/*": ["*"]
     },
     "sourceMap": true,
     "strict": true,
     "target": "es6",
-    "typeRoots": [
-      "node_modules/@types",
-      "src/typing"
-    ]
+    "typeRoots": ["node_modules/@types", "src/typing"]
   },
-  "include": [
-    "src/**/*",
-    "webpack.config.ts"
-  ],
+  "include": ["src/**/*", "webpack.config.ts"],
   "ts-node": {
     "compilerOptions": {
       "esModuleInterop": true,

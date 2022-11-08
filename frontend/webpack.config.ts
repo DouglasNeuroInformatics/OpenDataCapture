@@ -16,54 +16,47 @@ const config: Configuration = {
     rules: [
       {
         test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-        ]
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(jpeg|svg|ttf)$/,
-        type: 'asset/resource'
+        type: 'asset/resource',
       },
       {
         test: /\.scss$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'sass-loader'
-        ]
+        use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
         exclude: /node_modules/,
         test: /\.tsx?$/,
-        use: 'ts-loader'
-      }
-    ]
+        use: 'ts-loader',
+      },
+    ],
   },
   output: {
     clean: true,
     filename: '[name].bundle.js',
-    path: path.join(__dirname, 'dist')
+    path: path.join(__dirname, 'dist'),
   },
   plugins: [
     new HtmlWebpackPlugin({
       favicon: path.join(__dirname, 'src', 'assets', 'favicon.png'),
-      title: 'Douglas Neuroinformatics Platform'
-    })
+      title: 'Douglas Neuroinformatics Platform',
+    }),
   ],
   resolve: {
     alias: {
-      '~': path.join(__dirname, 'src'),
+      '@': path.join(__dirname, 'src'),
     },
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
   },
   devServer: {
     allowedHosts: process.env.DEMO_MODE ? 'all' : 'auto',
     historyApiFallback: true,
     port: 3000,
     proxy: {
-      '/api': 'http://backend:3000'
-    }
+      '/api': 'http://backend:3000',
+    },
   },
 };
 

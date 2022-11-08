@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 
 import Table from 'react-bootstrap/Table';
 
-import Layout from '~/components/Layout';
-import Patient from '~/models/Patient';
+import Layout from '@/components/Layout';
+import Patient from '@/models/Patient';
 
 const ViewPatientsPage = () => {
-
   const [patients, setPatients] = useState<Patient[]>();
 
   const getPatients = async () => {
@@ -20,7 +19,7 @@ const ViewPatientsPage = () => {
 
   const deletePatient = async (id: string) => {
     const response = await fetch(`/api/patient/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
     if (!response.ok) {
       console.error(response.status, response.statusText);
@@ -39,7 +38,7 @@ const ViewPatientsPage = () => {
 
   return (
     <Layout>
-      <h1 className='text-center py-4'>View Patients</h1>
+      <h1 className="text-center py-4">View Patients</h1>
       <Table>
         <thead>
           <tr>
@@ -60,8 +59,11 @@ const ViewPatientsPage = () => {
               <td>{patient.dateOfBirth.toString()}</td>
               <td>{patient.sex}</td>
               <td>
-                <button type="button" className="btn-close"
-                  onClick={() => patient._id && deletePatient(patient._id)} />
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => patient._id && deletePatient(patient._id)}
+                />
               </td>
             </tr>
           ))}

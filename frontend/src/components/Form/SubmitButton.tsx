@@ -1,6 +1,6 @@
 import React from 'react';
-import { ButtonProps } from 'react-bootstrap';
 
+import { ButtonProps } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 
 const SubmitButton: React.FunctionComponent<ButtonProps> = (props) => {

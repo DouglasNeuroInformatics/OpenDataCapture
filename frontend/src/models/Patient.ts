@@ -7,9 +7,8 @@ const patientSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   sex: yup.mixed<Sex>().oneOf(['male', 'female']).defined(),
-  dateOfBirth: yup.date().required()
+  dateOfBirth: yup.date().required(),
 });
-
 
 type Patient = yup.InferType<typeof patientSchema>;
 
