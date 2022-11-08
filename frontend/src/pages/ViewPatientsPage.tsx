@@ -7,8 +7,13 @@ import Table from 'react-bootstrap/Table';
 import Layout from '@/components/Layout';
 import Patient from '@/models/Patient';
 
+interface HappinessQuestionnaire {
+  score: number
+}
+
 const ViewPatientsPage = () => {
   const [modalPatientId, setModalPatientId] = useState<string | null>(null);
+  const [modalData, setModalData] = useState<HappinessQuestionnaire[]>();
   const [patients, setPatients] = useState<Patient[]>();
   const [updateRequired, setUpdateRequired] = useState(false);
 
@@ -37,9 +42,11 @@ const ViewPatientsPage = () => {
       setPatients(data);
       setUpdateRequired(false);
     });
-
+  
   useEffect(() => {
-    console.log(modalPatientId);
+    fetch(`/api/instrument/happiness-scale/${modalPatientId}`)
+      .then(data => data.json())
+      .then(data => setModalData(data))
   }, [modalPatientId]);
 
   useEffect(() => {
@@ -47,6 +54,10 @@ const ViewPatientsPage = () => {
     const intervalId = setInterval(updatePatients, 5000);
     return () => clearInterval(intervalId);
   }, [updateRequired]);
+
+  const handleRowClick = (patientId: string | null) => {
+    setModalPatientId(patientId)
+  };
 
   return (
     <Layout>
@@ -64,11 +75,7 @@ const ViewPatientsPage = () => {
         </thead>
         <tbody>
           {patients?.map((patient, i) => (
-            <tr
-              className="patients-table-row"
-              key={i}
-              onClick={() => setModalPatientId(patient._id || null)}
-            >
+            <tr className="patients-table-row" key={i} onClick={() => handleRowClick(patient._id || null)}>
               <td>{patient._id?.slice(0, 6) || 'NA'}</td>
               <td>{patient.firstName}</td>
               <td>{patient.lastName}</td>
@@ -90,7 +97,7 @@ const ViewPatientsPage = () => {
           <Modal.Title>Happiness Scores for Patient {modalPatientId?.slice(0, 6)}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <span>You have successfully submitted a new patient into our database.</span>
+          <span>{ JSON.stringify(modalData) }</span>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger">Delete</Button>{' '}

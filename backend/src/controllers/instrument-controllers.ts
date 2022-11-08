@@ -3,11 +3,10 @@ import type { RequestHandler } from 'express';
 import createPatientId from '../utils/createPatientId';
 
 export const getHappinessQuestionnairesForPatient: RequestHandler = async (req, res) => {
-  const { firstName, lastName, dateOfBirth } = req.body;
-  const patientId = createPatientId(firstName, lastName, dateOfBirth)
+  const { patientId } = req.body;
   console.log(patientId)
   return res.status(200).json({
-    msg: 'happy'
+    score: -1
   })
 }
 
