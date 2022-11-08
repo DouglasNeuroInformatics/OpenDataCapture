@@ -12,4 +12,4 @@ const patientSchema = yup.object({
 
 type Patient = yup.InferType<typeof patientSchema>;
 
-export { Patient as default, patientSchema };
+export { Patient as default, patientSchema, Sex };
