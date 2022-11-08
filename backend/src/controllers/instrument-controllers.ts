@@ -1,5 +1,6 @@
 import type { RequestHandler } from 'express';
 
+import HappinessQuestionnaire from '../models/HappinessQuestionnaire';
 import createPatientId from '../utils/createPatientId';
 
 export const getHappinessQuestionnairesForPatient: RequestHandler = async (req, res) => {
@@ -11,5 +12,12 @@ export const getHappinessQuestionnairesForPatient: RequestHandler = async (req, 
 }
 
 export const addHappinessQuestionnaire: RequestHandler = async (req, res) => {
+  const { firstName, lastName, dateOfBirth, score } = req.body;
+  const patientId = createPatientId(firstName, lastName, new Date(dateOfBirth));
+  const questionnaire = new HappinessQuestionnaire({
+    patientId: patientId,
+    score: score
+  });
+  console.log(questionnaire);
   return res.status(200).end()
 }

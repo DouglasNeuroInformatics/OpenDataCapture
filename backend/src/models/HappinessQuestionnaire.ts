@@ -1,8 +1,7 @@
-import { ObjectId } from 'mongodb';
 import { model, Schema } from 'mongoose';
 
 const happinessQuestionnaireSchema = new Schema({
-  patient: ObjectId,
+  patient: String,
   score: Number
 }, {
   timestamps: true

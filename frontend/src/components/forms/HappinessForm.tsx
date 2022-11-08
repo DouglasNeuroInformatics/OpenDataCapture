@@ -31,9 +31,7 @@ type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>
 
 const HappinessForm = () => {
   const handleSubmit: FormSubmitHandler = async (values, { resetForm, setSubmitting }) => {
-    alert('Submit!' + JSON.stringify(values));
-    /*
-    const response = await fetch('/api/patient', {
+    const response = await fetch('/api/instrument/happiness-scale', {
       method: 'POST',
       credentials: 'same-origin',
       headers: {
@@ -42,14 +40,12 @@ const HappinessForm = () => {
       body: JSON.stringify(values),
     
     });
-    console.log(response.ok)
     if (response.ok) {
       console.log('Okay')
       alert('Success!')
     } else {
       alert(`An Error Occurred: ${response.status} ${response.statusText}`)
     }
-    */
     resetForm();
     setSubmitting(false);
   };
