@@ -16,8 +16,17 @@ const patientSchema = new Schema({
   sex: {
     required: true,
     type: String
+  },
+  dateAdded: {
+    default: Date.now,
+    type: Date,
+    required: true
   }
 });
+
+patientSchema.methods.printFullName = function(): void {
+  console.log(this.firstName + ' ' + this.lastName);
+};
 
 type PatientType = InferSchemaType<typeof patientSchema>;
 

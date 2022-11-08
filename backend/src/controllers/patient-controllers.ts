@@ -1,7 +1,8 @@
 import type { RequestHandler } from 'express';
 
-import HttpError from '../models/HttpError';
+import { HttpError } from '../utils/exceptions';
 import Patient from '../models/Patient';
+import { extractNonAlphabeticChars } from '../utils/string';
 
 export const getAllPatients: RequestHandler = async (req, res) => {
   const allPatients = await Patient.find();
@@ -25,6 +26,7 @@ export const getPatientById: RequestHandler = (req, res, next) => {
 
 export const addNewPatient: RequestHandler = async (req, res, next) => {
   const { firstName, lastName, dateOfBirth, sex } = req.body;
+  // check if any contain
   const patient = new Patient({
     firstName: firstName,
     lastName: lastName,
