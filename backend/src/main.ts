@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 
 import { errorRequestHandler } from './controllers/error-controllers';
+import instrumentRoutes from './routes/instrument-routes';
 import patientRoutes from './routes/patient-routes';
 import { HttpError } from './utils/exceptions';
 
@@ -12,6 +13,7 @@ async function main(): Promise<void> {
   const port = 3000;
 
   app.use(bodyParser.json());
+  app.use('/api/instrument', instrumentRoutes);
   app.use('/api/patient', patientRoutes);
 
   app.use(() => {
