@@ -1,29 +1,34 @@
 import React from 'react';
 
 import { Field, Form as FormikForm, Formik, FormikHelpers } from 'formik';
+import * as yup from 'yup';
 
 import DateField from './DateField';
-import SelectField from './SelectField';
+import FieldsGroup from './FieldsGroup';
+import RangeField from './RangeField';
 import SubmitButton from './SubmitButton';
 import TextField from './TextField';
 
-import Patient, { patientSchema } from '@/models/Patient';
 
-type FormValues = Partial<Patient>;
+const patientIdDataSchema = yup.object({
+  firstName: yup.string().required(),
+  lastName: yup.string().required(),
+  dateOfBirth: yup.date().required(),
+});
 
-type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>) => void;
+type PatientIdData = yup.InferType<typeof patientIdDataSchema>;
+
+type FormValues = Partial<PatientIdData>;
+
 
 const formValues: FormValues = {
   firstName: '',
   lastName: '',
-  sex: undefined,
   dateOfBirth: undefined,
 };
 
-const sexOptions = {
-  Male: 'male',
-  Female: 'female',
-};
+
+type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>) => void;
 
 const HappinessForm = () => {
   const handleSubmit: FormSubmitHandler = async (values, { resetForm, setSubmitting }) => {
@@ -52,12 +57,16 @@ const HappinessForm = () => {
 
   return (
     <React.Fragment>
-      <Formik initialValues={formValues} validationSchema={patientSchema} onSubmit={handleSubmit}>
+      <Formik initialValues={formValues} validationSchema={patientIdDataSchema} onSubmit={handleSubmit}>
         <FormikForm autoComplete="off">
-          <Field label="First Name" name="firstName" component={TextField} />
-          <Field label="Last Name" name="lastName" component={TextField} />
-          <Field as="select" label="Sex" name="sex" options={sexOptions} component={SelectField} />
-          <DateField name="dateOfBirth" label="Date of Birth" />
+          <FieldsGroup title='Demographics Questions'>
+            <Field label="First Name" name="firstName" component={TextField} />
+            <Field label="Last Name" name="lastName" component={TextField} />
+            <DateField name="dateOfBirth" label="Date of Birth" />
+          </FieldsGroup>
+          <FieldsGroup title='Happiness Questionnaire'>
+            <Field label="Happiness Score" name="happinessScore" component={RangeField} />
+          </FieldsGroup>
           <SubmitButton />
         </FormikForm>
       </Formik>
