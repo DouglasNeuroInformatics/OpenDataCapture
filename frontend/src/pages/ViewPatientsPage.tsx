@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 import Table from 'react-bootstrap/Table';
 
 import Layout from '@/components/Layout';
 import Patient from '@/models/Patient';
 
 const ViewPatientsPage = () => {
+  const [modalPatientId, setModalPatientId] = useState<string | null>(null);
   const [patients, setPatients] = useState<Patient[]>();
   const [updateRequired, setUpdateRequired] = useState(false);
 
@@ -26,13 +29,18 @@ const ViewPatientsPage = () => {
       console.error(response.status, response.statusText);
       return;
     }
-    setUpdateRequired(true)
+    setUpdateRequired(true);
   };
 
-  const updatePatients = () => getPatients().then((data) => {
-    setPatients(data)
-    setUpdateRequired(false);
-  });
+  const updatePatients = () =>
+    getPatients().then((data) => {
+      setPatients(data);
+      setUpdateRequired(false);
+    });
+
+  useEffect(() => {
+    console.log(modalPatientId);
+  }, [modalPatientId]);
 
   useEffect(() => {
     updatePatients();
@@ -56,7 +64,11 @@ const ViewPatientsPage = () => {
         </thead>
         <tbody>
           {patients?.map((patient, i) => (
-            <tr key={i}>
+            <tr
+              className="patients-table-row"
+              key={i}
+              onClick={() => setModalPatientId(patient._id || null)}
+            >
               <td>{patient._id?.slice(0, 6) || 'NA'}</td>
               <td>{patient.firstName}</td>
               <td>{patient.lastName}</td>
@@ -73,6 +85,18 @@ const ViewPatientsPage = () => {
           ))}
         </tbody>
       </Table>
+      <Modal centered size="lg" show={modalPatientId !== null}>
+        <Modal.Header>
+          <Modal.Title>Happiness Scores for Patient {modalPatientId?.slice(0, 6)}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <span>You have successfully submitted a new patient into our database.</span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger">Delete</Button>{' '}
+          <Button onClick={() => setModalPatientId(null)} variant="secondary">Close</Button>
+        </Modal.Footer>
+      </Modal>
     </Layout>
   );
 };

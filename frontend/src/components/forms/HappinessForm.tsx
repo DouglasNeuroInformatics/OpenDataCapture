@@ -9,31 +9,29 @@ import RangeField from './RangeField';
 import SubmitButton from './SubmitButton';
 import TextField from './TextField';
 
-
 const patientIdDataSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   dateOfBirth: yup.date().required(),
-  happinessScore: yup.number().integer().min(0).max(10).required()
-})
+  happinessScore: yup.number().integer().min(0).max(10).required(),
+});
 
 type PatientIdData = yup.InferType<typeof patientIdDataSchema>;
 
-type FormValues = Partial<PatientIdData>
+type FormValues = Partial<PatientIdData>;
 
 const formValues: FormValues = {
   firstName: '',
   lastName: '',
   dateOfBirth: undefined,
-  happinessScore: undefined
+  happinessScore: undefined,
 };
-
 
 type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>) => void;
 
 const HappinessForm = () => {
   const handleSubmit: FormSubmitHandler = async (values, { resetForm, setSubmitting }) => {
-    alert('Submit!' + JSON.stringify(values))
+    alert('Submit!' + JSON.stringify(values));
     /*
     const response = await fetch('/api/patient', {
       method: 'POST',
@@ -58,14 +56,18 @@ const HappinessForm = () => {
 
   return (
     <React.Fragment>
-      <Formik initialValues={formValues} validationSchema={patientIdDataSchema} onSubmit={handleSubmit}>
+      <Formik
+        initialValues={formValues}
+        validationSchema={patientIdDataSchema}
+        onSubmit={handleSubmit}
+      >
         <FormikForm autoComplete="off">
-          <FieldsGroup title='Demographics Questions'>
+          <FieldsGroup title="Demographics Questions">
             <Field label="First Name" name="firstName" component={TextField} />
             <Field label="Last Name" name="lastName" component={TextField} />
             <DateField name="dateOfBirth" label="Date of Birth" />
           </FieldsGroup>
-          <FieldsGroup title='Happiness Questionnaire'>
+          <FieldsGroup title="Happiness Questionnaire">
             <Field label="Happiness Score" name="happinessScore" component={RangeField} />
           </FieldsGroup>
           <SubmitButton />

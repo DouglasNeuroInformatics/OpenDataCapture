@@ -24,7 +24,7 @@ const sidebarItems: SidebarItem[] = [
   {
     label: 'Happiness Scale',
     icon: faFaceSmile,
-    to: '/happiness-scale'
+    to: '/happiness-scale',
   },
   {
     label: 'View Patients',

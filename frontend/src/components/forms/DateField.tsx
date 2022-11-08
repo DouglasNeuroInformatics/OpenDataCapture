@@ -26,9 +26,7 @@ export const DateField = (props: DateFieldProps) => {
           setFieldValue(field.name, value);
         }}
       />
-      {meta.touched && meta.error && (
-        <div className="alert alert-danger">{meta.error}</div>
-      )}
+      {meta.touched && meta.error && <div className="alert alert-danger">{meta.error}</div>}
     </div>
   );
 };

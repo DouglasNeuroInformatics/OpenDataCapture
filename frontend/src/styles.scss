@@ -1,1 +1,7 @@
 @import 'bootstrap/scss/bootstrap';
+
+.patients-table {
+  &-row:hover {
+    background-color: lightgray !important;
+  }
+}

@@ -34,14 +34,13 @@ const Form = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(values),
-    
     });
-    console.log(response.ok)
+    console.log(response.ok);
     if (response.ok) {
-      console.log('Okay')
-      alert('Success!')
+      console.log('Okay');
+      alert('Success!');
     } else {
-      alert(`An Error Occurred: ${response.status} ${response.statusText}`)
+      alert(`An Error Occurred: ${response.status} ${response.statusText}`);
     }
     resetForm();
     setSubmitting(false);
