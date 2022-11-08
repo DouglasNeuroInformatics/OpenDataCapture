@@ -28,6 +28,9 @@ const SelectField: React.FunctionComponent<SelectFieldProps> = ({
           </option>
         ))}
       </select>
+      {form.touched[field.name] && form.errors[field.name] && (
+        <div className="alert alert-danger">{form.errors[field.name] as string}</div>
+      )}
     </div>
   );
 };

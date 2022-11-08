@@ -11,7 +11,7 @@ interface DateFieldProps {
 
 export const DateField = (props: DateFieldProps) => {
   const { setFieldValue } = useFormikContext();
-  const [field] = useField(props);
+  const [field, meta] = useField(props);
   return (
     <div className="form-group mb-3">
       <label htmlFor={field.name}>{props.label}</label>
@@ -26,6 +26,9 @@ export const DateField = (props: DateFieldProps) => {
           setFieldValue(field.name, value);
         }}
       />
+      {meta.touched && meta.error && (
+        <div className="alert alert-danger">{meta.error}</div>
+      )}
     </div>
   );
 };
