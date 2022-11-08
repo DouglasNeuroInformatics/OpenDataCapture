@@ -1,6 +1,9 @@
 import { Router } from 'express';
 
-import { addHappinessQuestionnaire, getHappinessQuestionnairesForPatient } from '../controllers/instrument-controllers';
+import {
+  addHappinessQuestionnaire,
+  getHappinessQuestionnairesForPatient,
+} from '../controllers/instrument-controllers';
 
 const router = Router();
 

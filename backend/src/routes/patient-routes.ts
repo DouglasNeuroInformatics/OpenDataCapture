@@ -1,6 +1,11 @@
 import { Router } from 'express';
 
-import { deletePatientById, getAllPatients, getPatientById, addNewPatient } from '../controllers/patient-controllers';
+import {
+  deletePatientById,
+  getAllPatients,
+  getPatientById,
+  addNewPatient,
+} from '../controllers/patient-controllers';
 
 const router = Router();
 

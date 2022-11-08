@@ -3,7 +3,7 @@ import { model, Schema, InferSchemaType } from 'mongoose';
 const patientSchema = new Schema({
   _id: {
     required: true,
-    type: String
+    type: String,
   },
   firstName: {
     required: true,
@@ -31,7 +31,7 @@ const patientSchema = new Schema({
 type PatientType = InferSchemaType<typeof patientSchema>;
 
 patientSchema.statics.deleteById = function (_id): PatientType {
-  return this.deleteOne({ _id: _id })
+  return this.deleteOne({ _id: _id });
 };
 
 patientSchema.methods.printFullName = function (): void {

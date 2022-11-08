@@ -10,7 +10,7 @@ export const getAllPatients: RequestHandler = async (req, res) => {
   return res.json(await Patient.find());
 };
 
-export const getPatientById: RequestHandler = (req, res, next) => {
+export const getPatientById: RequestHandler = (req, res) => {
   /*
   console.log('GET request');
   const patientId = req.params.id;
@@ -24,16 +24,16 @@ export const getPatientById: RequestHandler = (req, res, next) => {
   return res.status(200).json(patient);
 };
 
-export const deletePatientById: RequestHandler = async (req, res, next) => {
+export const deletePatientById: RequestHandler = async (req, res) => {
   try {
     await Patient.deleteOne({ _id: req.params.id });
-    console.log(`Deleted patient with id: ${req.params.id}`)
+    console.log(`Deleted patient with id: ${req.params.id}`);
     return res.status(204).end();
   } catch (error) {
     console.error(error);
     return res.status(500).end();
   }
-}
+};
 
 export const addNewPatient: RequestHandler = async (req, res, next) => {
   const { firstName, lastName, dateOfBirth, sex } = req.body;
@@ -48,7 +48,7 @@ export const addNewPatient: RequestHandler = async (req, res, next) => {
   console.log(patient);
   try {
     await patient.save();
-    return res.status(201).end()
+    return res.status(201).end();
   } catch (error) {
     const isDuplicateId = (error as MongoServerError).code === 11000;
     if (isDuplicateId) {
