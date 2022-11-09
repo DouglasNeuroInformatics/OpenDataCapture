@@ -49,6 +49,7 @@ export const addNewPatient: AsyncController = async (req, res, next) => {
     await patient.save();
     res.status(201).end();
   } catch (error) {
+    console.log(error)
     const isDuplicateId = (error as MongoServerError).code === 11000;
     if (isDuplicateId) {
       next(new HttpError(409, 'Patient with id already exists'));

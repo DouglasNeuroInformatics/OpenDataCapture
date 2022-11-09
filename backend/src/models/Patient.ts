@@ -20,7 +20,7 @@ const patientSchema = new Schema({
   sex: {
     required: true,
     type: String,
-    enum: ['Male', 'Female']
+    enum: ['male', 'female']
   },
   dateAdded: {
     default: Date.now,
