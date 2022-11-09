@@ -1,15 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
-
+import { ErrorController } from '../interfaces';
 import { HttpError } from '../utils/exceptions';
 
-type ErrorRequestHandler = (
-  error: unknown,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void;
-
-export const errorRequestHandler: ErrorRequestHandler = (error, req, res, next) => {
+export const errorRequestHandler: ErrorController = (error, req, res, next) => {
   if (res.headersSent) {
     return next(error);
   } else if (error instanceof HttpError) {

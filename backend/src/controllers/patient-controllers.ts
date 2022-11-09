@@ -1,16 +1,15 @@
-import type { RequestHandler } from 'express';
-
 import type { MongoServerError } from 'mongodb';
 
-import Patient from '../models/Patient';
+import { AsyncController, Controller } from '../interfaces';
+import Patient, { PatientType } from '../models/Patient';
 import createPatientId from '../utils/createPatientId';
 import { HttpError } from '../utils/exceptions';
 
-export const getAllPatients: RequestHandler = async (req, res) => {
-  return res.json(await Patient.find());
+export const getAllPatients: AsyncController = async (req, res) => {
+  res.json(await Patient.find());
 };
 
-export const getPatientById: RequestHandler = (req, res) => {
+export const getPatientById: Controller = (req, res) => {
   /*
   console.log('GET request');
   const patientId = req.params.id;
@@ -24,19 +23,19 @@ export const getPatientById: RequestHandler = (req, res) => {
   return res.status(200).json(patient);
 };
 
-export const deletePatientById: RequestHandler = async (req, res) => {
+export const deletePatientById: AsyncController = async (req, res) => {
   try {
     await Patient.deleteOne({ _id: req.params.id });
     console.log(`Deleted patient with id: ${req.params.id}`);
-    return res.status(204).end();
+    res.status(204).end();
   } catch (error) {
     console.error(error);
-    return res.status(500).end();
+    res.status(500).end();
   }
 };
 
-export const addNewPatient: RequestHandler = async (req, res, next) => {
-  const { firstName, lastName, dateOfBirth, sex } = req.body;
+export const addNewPatient: AsyncController = async (req, res, next) => {
+  const { firstName, lastName, dateOfBirth, sex } = req.body as PatientType; // VALIDATE
   const patientId = createPatientId(firstName, lastName, new Date(dateOfBirth));
   const patient = new Patient({
     _id: patientId,
@@ -48,12 +47,12 @@ export const addNewPatient: RequestHandler = async (req, res, next) => {
   console.log(patient);
   try {
     await patient.save();
-    return res.status(201).end();
+    res.status(201).end();
   } catch (error) {
     const isDuplicateId = (error as MongoServerError).code === 11000;
     if (isDuplicateId) {
-      return next(new HttpError(409, 'Patient with id already exists'));
+      next(new HttpError(409, 'Patient with id already exists'));
     }
-    return next(new HttpError(500, 'Failed to save patient'));
+    next(new HttpError(500, 'Failed to save patient'));
   }
 };
