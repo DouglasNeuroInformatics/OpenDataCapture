@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 
 const happinessQuestionnaireSchema = new Schema(
   {
-    patient: String,
+    patientId: String,
     score: Number,
   },
   {

@@ -16,12 +16,9 @@ export const getHappinessQuestionnairesForPatient: AsyncController = async (req,
   if (!req.params.id) {
     next(new HttpError(404, ''))
   }
-  console.log(req.params.id);
-  const results = await HappinessQuestionnaire.find({ _id: req.params.id }).exec();
-  console.log(results)
-  res.status(200).json({
-    score: -1,
-  });
+  const results = await HappinessQuestionnaire.findOne({ patientId: req.params.id }).exec();
+  console.log("Results", results)
+  res.status(200).json(results);
 };
 
 export const addHappinessQuestionnaire: AsyncController = async (req, res, next) => {
@@ -42,6 +39,6 @@ export const addHappinessQuestionnaire: AsyncController = async (req, res, next)
     await questionnaire.save();
     res.status(201).end();
   } catch (error) {
-    next(new HttpError(500, 'Failed to save patient'));
+    next(new HttpError(500, 'Failed to save response'));
   }
 };
