@@ -16,7 +16,7 @@ export const getHappinessQuestionnairesForPatient: AsyncController = async (req,
   if (!req.params.id) {
     next(new HttpError(404, ''))
   }
-  const results = await HappinessQuestionnaire.findOne({ patientId: req.params.id }).exec();
+  const results = await HappinessQuestionnaire.find({ patientId: req.params.id }).exec();
   console.log("Results", results)
   res.status(200).json(results);
 };

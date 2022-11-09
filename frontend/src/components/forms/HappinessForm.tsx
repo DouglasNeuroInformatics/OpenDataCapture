@@ -13,18 +13,21 @@ const patientIdDataSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   dateOfBirth: yup.date().required(),
-  happinessScore: yup.number().integer().min(0).max(10).required(),
+ score: yup.number().integer().min(0).max(10).required(),
 });
 
-type PatientIdData = yup.InferType<typeof patientIdDataSchema>;
-
-type FormValues = Partial<PatientIdData>;
+interface FormValues {
+  firstName?: string
+  lastName?: string
+  dateOfBirth?: string
+ score?: string
+}
 
 const formValues: FormValues = {
   firstName: '',
   lastName: '',
   dateOfBirth: undefined,
-  happinessScore: undefined,
+ score: '',
 };
 
 type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>) => void;
@@ -41,7 +44,7 @@ const HappinessForm = () => {
     
     });
     if (response.ok) {
-      console.log('Okay')
+      console.log('Okay', values)
       alert('Success!')
     } else {
       alert(`An Error Occurred: ${response.status} ${response.statusText}`)
@@ -64,7 +67,7 @@ const HappinessForm = () => {
             <DateField name="dateOfBirth" label="Date of Birth" />
           </FieldsGroup>
           <FieldsGroup title="Happiness Questionnaire">
-            <Field label="Happiness Score" name="happinessScore" component={RangeField} />
+            <Field label="Happiness Score" name="score" component={RangeField} />
           </FieldsGroup>
           <SubmitButton />
         </FormikForm>

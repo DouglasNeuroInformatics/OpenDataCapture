@@ -8,6 +8,8 @@ import Layout from '@/components/Layout';
 import Patient from '@/models/Patient';
 
 interface HappinessQuestionnaire {
+  _id: string
+  createdAt: string
   score: number
 }
 
@@ -44,7 +46,6 @@ const ViewPatientsPage = () => {
     });
   
   useEffect(() => {
-    console.log(modalPatientId)
     fetch(`/api/instrument/happiness-scale/${modalPatientId}`)
       .then(data => data.json())
       .then(data => setModalData(data))
@@ -98,7 +99,19 @@ const ViewPatientsPage = () => {
           <Modal.Title>Happiness Scores for Patient {modalPatientId?.slice(0, 6)}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <span>{ JSON.stringify(modalData) }</span>
+          {modalData?.map(value => (
+            <div className='mb-3' key={value._id}>
+              <h5>Entry ID: {value._id}</h5>
+              <div>
+                <span className='fw-bold'>Added: </span>
+                <span>{new Date(value.createdAt).toString()}</span>
+              </div>
+              <div>
+                <span className='fw-bold'>Score: </span>
+                <span>{value.score}</span>
+              </div>
+            </div>
+          ))}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger">Delete</Button>{' '}
