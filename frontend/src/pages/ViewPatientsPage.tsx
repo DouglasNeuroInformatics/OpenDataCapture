@@ -80,7 +80,7 @@ const ViewPatientsPage = () => {
               <td>{patient._id?.slice(0, 6) || 'NA'}</td>
               <td>{patient.firstName}</td>
               <td>{patient.lastName}</td>
-              <td>{patient.dateOfBirth.toString()}</td>
+              <td>{new Date(patient.dateOfBirth).toDateString()}</td>
               <td>{patient.sex}</td>
             </tr>
           ))}
