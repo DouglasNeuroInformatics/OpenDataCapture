@@ -27,9 +27,7 @@ export const addHappinessQuestionnaire: AsyncController = async (req, res, next)
   console.log(patientId);
   const isPatient = (await Patient.findById(patientId)) !== null;
   if (!isPatient) {
-    res.status(400).json({
-      message: 'Patient does not exist',
-    });
+    next(new HttpError(400, 'Patient does not exist'))
   }
   const questionnaire = new HappinessQuestionnaire({
     patientId: patientId,
