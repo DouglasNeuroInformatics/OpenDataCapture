@@ -9,6 +9,6 @@ export class HttpError extends Error {
 
 export class InvalidCharacterError extends Error {
   constructor(invalidChars: string[]) {
-    super(`The following characters are invalid: ${invalidChars}`);
+    super(`The following characters are invalid: ${invalidChars.join(', ')}`);
   }
 }

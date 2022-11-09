@@ -20,6 +20,7 @@ const patientSchema = new Schema({
   sex: {
     required: true,
     type: String,
+    enum: ['Male', 'Female']
   },
   dateAdded: {
     default: Date.now,
@@ -29,14 +30,6 @@ const patientSchema = new Schema({
 });
 
 type PatientType = InferSchemaType<typeof patientSchema>;
-
-patientSchema.statics.deleteById = function (_id): PatientType {
-  return this.deleteOne({ _id: _id });
-};
-
-patientSchema.methods.printFullName = function (): void {
-  console.log(this.firstName + ' ' + this.lastName);
-};
 
 const Patient = model('Patient', patientSchema);
 
