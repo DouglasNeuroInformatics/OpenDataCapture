@@ -31,7 +31,7 @@ services:
     networks:
       - express-mongo
       - react-express
-    expose: 
+    expose:
       - 3000
     environment:
       - PORT=3000
@@ -43,8 +43,8 @@ services:
       - ./data:/data
     networks:
       - express-mongo
-    expose:
-      - 27017
+    ports:
+      - "27017:27017"
 networks:
   react-express:
   express-mongo:
