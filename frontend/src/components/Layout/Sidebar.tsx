@@ -36,7 +36,7 @@ const sidebarItems: SidebarItem[] = [
 const Sidebar = () => {
   return (
     <div className="d-flex flex-column p-3 text-light bg-dark" style={{ width: '280px' }}>
-      <span className="fs-4 text-center">DNP Portal</span>
+      <span className="fs-4 text-center">Douglas Data Capture Platform</span>
       <hr />
       <ul className="nav nav-pills flex-column mb-auto">
         {sidebarItems.map((item) => (

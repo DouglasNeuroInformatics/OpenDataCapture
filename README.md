@@ -1,8 +1,8 @@
-# Douglas Neuroinformatics Platform
+# Douglas Data Capture Platform
 
 ## About
 
-This is a prototype of a planned Douglas Neuroinformatics Platform portal. It is a work in progress.
+This is a prototype of the Douglas Data Capture Platform.
 
 ## Deployment
 
