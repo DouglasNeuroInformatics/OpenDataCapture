@@ -72,7 +72,6 @@ const ViewPatientsPage = () => {
             <th>Last Name</th>
             <th>Date of Birth</th>
             <th>Sex</th>
-            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -83,13 +82,6 @@ const ViewPatientsPage = () => {
               <td>{patient.lastName}</td>
               <td>{patient.dateOfBirth.toString()}</td>
               <td>{patient.sex}</td>
-              <td>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => patient._id && deletePatient(patient._id)}
-                />
-              </td>
             </tr>
           ))}
         </tbody>
@@ -114,7 +106,10 @@ const ViewPatientsPage = () => {
           ))}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger">Delete</Button>{' '}
+          <Button onClick={() => {
+            modalPatientId && deletePatient(modalPatientId)
+            setModalPatientId(null)
+          }} variant="danger">Delete</Button>
           <Button onClick={() => setModalPatientId(null)} variant="secondary">Close</Button>
         </Modal.Footer>
       </Modal>

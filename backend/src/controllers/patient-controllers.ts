@@ -1,5 +1,6 @@
 import type { MongoServerError } from 'mongodb';
 
+import HappinessQuestionnaire from '../models/HappinessQuestionnaire';
 import { AsyncController, Controller } from '../interfaces';
 import Patient, { PatientType } from '../models/Patient';
 import createPatientId from '../utils/createPatientId';
@@ -26,6 +27,7 @@ export const getPatientById: Controller = (req, res) => {
 export const deletePatientById: AsyncController = async (req, res) => {
   try {
     await Patient.deleteOne({ _id: req.params.id });
+    await HappinessQuestionnaire.deleteMany({ patientId: req.params.id }).exec()
     console.log(`Deleted patient with id: ${req.params.id}`);
     res.status(204).end();
   } catch (error) {
