@@ -81,7 +81,7 @@ const ViewPatientsPage = () => {
               <td>{patient.firstName}</td>
               <td>{patient.lastName}</td>
               <td>{new Date(patient.dateOfBirth).toDateString()}</td>
-              <td>{patient.sex}</td>
+              <td className='text-capitalize'>{patient.sex}</td>
             </tr>
           ))}
         </tbody>

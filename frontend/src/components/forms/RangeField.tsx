@@ -14,7 +14,7 @@ const RangeField: React.FunctionComponent<RangeFieldProps> = ({ field, form, lab
 
   const tooltip = (
     <Tooltip id={`tooltip-field`}>
-      {field.value || "Slide to set your happiness score"}
+      {field.value || "NA"}
     </Tooltip>
   )
 
@@ -22,7 +22,7 @@ const RangeField: React.FunctionComponent<RangeFieldProps> = ({ field, form, lab
     <div className="form-group mb-3">
       <Form.Label htmlFor={field.name}>{label}</Form.Label>
       <OverlayTrigger placement="bottom-start" overlay={tooltip}>
-        <Form.Range min="0" max="10" {...field} {...props} />
+        <Form.Range min="1" max="10" {...field} {...props} />
       </OverlayTrigger>
       {form.touched[field.name] && form.errors[field.name] && (
         <div className="alert alert-danger">{form.errors[field.name] as string}</div>
