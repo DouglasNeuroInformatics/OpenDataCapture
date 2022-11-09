@@ -12,12 +12,23 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
-    "project": ["./tsconfig.json"],
+    "project": [
+      "./tsconfig.json"
+    ],
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "import"],
+  "plugins": [
+    "@typescript-eslint",
+    "import"
+  ],
   "rules": {
     "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": false
+      }
+    ],
     "import/exports-last": "warn",
     "import/newline-after-import": "warn",
     "import/order": [
@@ -35,14 +46,20 @@
             "position": "before"
           }
         ],
-        "pathGroupsExcludedImportTypes": ["express"]
+        "pathGroupsExcludedImportTypes": [
+          "express"
+        ]
       }
     ]
   },
   "settings": {
-    "import/extensions": [".ts"],
+    "import/extensions": [
+      ".ts"
+    ],
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts"]
+      "@typescript-eslint/parser": [
+        ".ts"
+      ]
     },
     "import/resolver": {
       "typescript": true
