@@ -1,4 +1,4 @@
-# Douglas Data Capture Platform
+# The Douglas Data Capture Platform
 
 ## About
 
