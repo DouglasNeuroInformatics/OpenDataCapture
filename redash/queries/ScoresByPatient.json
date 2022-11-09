@@ -1,0 +1,22 @@
+{
+  "collection": "happinessquestionnaires",
+  "aggregate": [
+    {
+      "$group": {
+        "_id": "$patientId",
+        "count": { "$sum": 1 }
+      }
+    },
+    {
+      "$addFields": {
+        "shortId": {
+          "$substr": [
+            "$_id",
+            0,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}

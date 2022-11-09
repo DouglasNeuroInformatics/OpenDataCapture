@@ -1,0 +1,16 @@
+{
+  "collection": "patients",
+  "aggregate": [
+    {
+      "$addFields": {
+        "shortId": {
+          "$substr": [
+            "$_id",
+            0,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}

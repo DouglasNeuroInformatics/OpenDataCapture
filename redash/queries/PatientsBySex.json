@@ -1,0 +1,14 @@
+{
+  "collection": "patients",
+  "aggregate": [
+    {
+      "$group": {
+        "_id": "$sex",
+        "avgScore": {
+          "$avg": "$score"
+        },
+        "count": { "$sum": 1 }
+      }
+    }
+  ]
+}

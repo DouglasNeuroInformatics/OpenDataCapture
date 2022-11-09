@@ -1,0 +1,16 @@
+{
+  "collection": "happinessquestionnaires",
+  "aggregate": [
+    {
+      "$addFields": {
+        "shortPatientId": {
+          "$substr": [
+            "$patientId",
+            0,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}
