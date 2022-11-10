@@ -22,8 +22,14 @@ for (let i = 0; i < 10; i++) {
       sex: 'male',
       dateOfBirth: getRandomBirthday()
     })
+    dummyPatients.push({
+      firstName: femaleNames[j],
+      lastName: lastNames[i],
+      sex: 'female',
+      dateOfBirth: getRandomBirthday()
+    })
   }
 }
 
-
-console.log(dummyPatients)
+db = connect('mongodb://mongo:27017/main');
+db.patients.insertMany(dummyPatients);
