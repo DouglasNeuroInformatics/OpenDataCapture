@@ -1,50 +1,50 @@
+networks:
+  express-mongo: null
+  react-express: null
 services:
-  frontend:
+  client:
     build:
-      context: frontend
+      context: client
       target: development
-    ports:
-      - 3000:3000
-    stdin_open: true
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
-    container_name: frontend
-    restart: always
-    networks:
-      - react-express
+    container_name: client
     depends_on:
-      - backend
+      - server
     environment:
       - DEMO_MODE=1
-  backend:
-    container_name: backend
-    restart: always
-    build:
-      context: backend
-      target: development
-    volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
-    depends_on:
-      - mongo
     networks:
-      - express-mongo
       - react-express
-    expose:
-      - 3000
-    environment:
-      - PORT=3000
+    ports:
+      - '3000:3000'
+    restart: always
+    stdin_open: true
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
   mongo:
     container_name: mongo
-    restart: always
     image: mongo:4.2.0
-    volumes:
-      - ./data:/data
     networks:
       - express-mongo
     ports:
-      - "27017:27017"
-networks:
-  react-express:
-  express-mongo:
+      - '27017:27017'
+    restart: always
+    volumes:
+      - ./data:/data
+  server:
+    build:
+      context: server
+      target: development
+    container_name: server
+    depends_on:
+      - mongo
+    environment:
+      - PORT=3000
+    expose:
+      - 3000
+    networks:
+      - express-mongo
+      - react-express
+    restart: always
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules

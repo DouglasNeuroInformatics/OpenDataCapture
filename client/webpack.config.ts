@@ -55,7 +55,7 @@ const config: Configuration = {
     historyApiFallback: true,
     port: 3000,
     proxy: {
-      '/api': 'http://backend:3000',
+      '/api': 'http://server:3000',
     },
   },
 };
