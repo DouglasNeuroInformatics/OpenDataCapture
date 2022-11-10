@@ -13,24 +13,24 @@ const patientIdDataSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   dateOfBirth: yup.date().required(),
- score: yup.number().integer().min(0).max(10).required(),
+  score: yup.number().integer().min(0).max(10).required(),
 });
 
 interface FormValues {
-  firstName?: string
-  lastName?: string
-  dateOfBirth?: string
- score?: string
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  score?: string;
 }
 
 const formValues: FormValues = {
   firstName: '',
   lastName: '',
   dateOfBirth: undefined,
- score: '',
+  score: '',
 };
 
-type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>) => void;
+type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>) => Promise<void>;
 
 const HappinessForm = () => {
   const handleSubmit: FormSubmitHandler = async (values, { resetForm, setSubmitting }) => {
@@ -41,13 +41,12 @@ const HappinessForm = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(values),
-    
     });
     if (response.ok) {
-      console.log('Okay', values)
-      alert('Success!')
+      console.log('Okay', values);
+      alert('Success!');
     } else {
-      alert(`An Error Occurred: ${response.status} ${response.statusText}`)
+      alert(`An Error Occurred: ${response.status} ${response.statusText}`);
     }
     resetForm();
     setSubmitting(false);

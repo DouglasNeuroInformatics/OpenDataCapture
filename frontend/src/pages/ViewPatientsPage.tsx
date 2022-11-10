@@ -8,9 +8,9 @@ import Layout from '@/components/Layout';
 import Patient from '@/models/Patient';
 
 interface HappinessQuestionnaire {
-  _id: string
-  createdAt: string
-  score: number
+  _id: string;
+  createdAt: string;
+  score: number;
 }
 
 const ViewPatientsPage = () => {
@@ -25,7 +25,7 @@ const ViewPatientsPage = () => {
       console.error(response.status, response.statusText);
       return;
     }
-    return await response.json();
+    return (await response.json()) as unknown;
   };
 
   const deletePatient = async (id: string) => {
@@ -44,21 +44,25 @@ const ViewPatientsPage = () => {
       setPatients(data);
       setUpdateRequired(false);
     });
-  
+
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     fetch(`/api/instrument/happiness-scale/${modalPatientId}`)
-      .then(data => data.json())
-      .then(data => setModalData(data))
+      .then((data) => data.json())
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      .then((data) => setModalData(data))
+      .catch((error) => console.error(error));
   }, [modalPatientId]);
 
   useEffect(() => {
-    updatePatients();
+    void updatePatients();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     const intervalId = setInterval(updatePatients, 5000);
     return () => clearInterval(intervalId);
   }, [updateRequired]);
 
   const handleRowClick = (patientId: string | null) => {
-    setModalPatientId(patientId)
+    setModalPatientId(patientId);
   };
 
   return (
@@ -76,12 +80,16 @@ const ViewPatientsPage = () => {
         </thead>
         <tbody>
           {patients?.map((patient, i) => (
-            <tr className="patients-table-row" key={i} onClick={() => handleRowClick(patient._id || null)}>
+            <tr
+              className="patients-table-row"
+              key={i}
+              onClick={() => handleRowClick(patient._id || null)}
+            >
               <td>{patient._id?.slice(0, 6) || 'NA'}</td>
               <td>{patient.firstName}</td>
               <td>{patient.lastName}</td>
               <td>{new Date(patient.dateOfBirth).toDateString()}</td>
-              <td className='text-capitalize'>{patient.sex}</td>
+              <td className="text-capitalize">{patient.sex}</td>
             </tr>
           ))}
         </tbody>
@@ -91,26 +99,33 @@ const ViewPatientsPage = () => {
           <Modal.Title>Happiness Scores for Patient {modalPatientId?.slice(0, 6)}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {modalData?.map(value => (
-            <div className='mb-3' key={value._id}>
+          {modalData?.map((value) => (
+            <div className="mb-3" key={value._id}>
               <h5>Entry ID: {value._id}</h5>
               <div>
-                <span className='fw-bold'>Added: </span>
+                <span className="fw-bold">Added: </span>
                 <span>{new Date(value.createdAt).toString()}</span>
               </div>
               <div>
-                <span className='fw-bold'>Score: </span>
+                <span className="fw-bold">Score: </span>
                 <span>{value.score}</span>
               </div>
             </div>
           ))}
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => {
-            modalPatientId && deletePatient(modalPatientId)
-            setModalPatientId(null)
-          }} variant="danger">Delete</Button>
-          <Button onClick={() => setModalPatientId(null)} variant="secondary">Close</Button>
+          <Button
+            onClick={() => {
+              modalPatientId && deletePatient(modalPatientId);
+              setModalPatientId(null);
+            }}
+            variant="danger"
+          >
+            Delete
+          </Button>
+          <Button onClick={() => setModalPatientId(null)} variant="secondary">
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     </Layout>

@@ -5,18 +5,12 @@ import Form from 'react-bootstrap/Form';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 
-
 interface RangeFieldProps extends FieldProps<string> {
   label: string;
 }
 
 const RangeField: React.FunctionComponent<RangeFieldProps> = ({ field, form, label, ...props }) => {
-
-  const tooltip = (
-    <Tooltip id={`tooltip-field`}>
-      {field.value || "NA"}
-    </Tooltip>
-  )
+  const tooltip = <Tooltip id={`tooltip-field`}>{field.value || 'NA'}</Tooltip>;
 
   return (
     <div className="form-group mb-3">

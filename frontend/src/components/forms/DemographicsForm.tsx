@@ -11,7 +11,7 @@ import Patient, { patientSchema } from '@/models/Patient';
 
 type FormValues = Partial<Patient>;
 
-type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>) => void;
+type FormSubmitHandler = (values: FormValues, helpers: FormikHelpers<FormValues>) => Promise<void>;
 
 const formValues: FormValues = {
   firstName: '',

@@ -21,6 +21,7 @@ export const DateField = (props: DateFieldProps) => {
         className="form-control w-100"
         dateFormat="yyyy-MM-dd"
         placeholderText="YYYY-MM-DD"
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
         selected={(field.value && new Date(field.value)) || null}
         onChange={(value) => {
           setFieldValue(field.name, value);
