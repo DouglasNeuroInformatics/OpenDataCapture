@@ -30,6 +30,7 @@ services:
     restart: always
     volumes:
       - ./data:/data
+      - ./scripts:/scripts
   server:
     build:
       context: server
