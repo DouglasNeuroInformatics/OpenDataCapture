@@ -8,10 +8,12 @@ const patientSchema = new Schema(
     },
     firstName: {
       required: true,
+      trim: true,
       type: String,
     },
     lastName: {
       required: true,
+      trim: true,
       type: String,
     },
     dateOfBirth: {
