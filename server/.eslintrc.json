@@ -16,6 +16,7 @@
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "import"],
+  "ignorePatterns": ["*.js"],
   "rules": {
     "@typescript-eslint/explicit-function-return-type": "warn",
     "@typescript-eslint/no-misused-promises": [
