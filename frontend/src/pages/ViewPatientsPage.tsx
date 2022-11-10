@@ -25,7 +25,7 @@ const ViewPatientsPage = () => {
       console.error(response.status, response.statusText);
       return;
     }
-    return (await response.json()) as unknown;
+    return (await response.json()) as Patient[]; // set this to unknown later
   };
 
   const deletePatient = async (id: string) => {
