@@ -67,7 +67,7 @@ const ViewPatientsPage = () => {
 
   return (
     <Layout>
-      <h1 className="text-center py-4">View Patients</h1>
+      <h1 className="text-center py-4">View Patients (N={patients?.length})</h1>
       <Table>
         <thead>
           <tr>
