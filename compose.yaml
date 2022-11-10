@@ -22,7 +22,7 @@ services:
       - /usr/src/app/node_modules
   mongo:
     container_name: mongo
-    image: mongo:4.2.0
+    image: mongo:6.0.2
     networks:
       - express-mongo
     ports:
