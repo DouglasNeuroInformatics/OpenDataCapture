@@ -90,7 +90,11 @@ for (let i = 0; i < 10; i++) {
   }
 }
 
-db = connect("mongodb://mongo:27017/main");
+try {
+  db = connect("mongodb://mongo:27017/main");
+} catch {
+  db = connect("mongodb://localhost:27017/main");
+}
 db.patients.drop();
 db.happinessquestionnaires.drop();
 db.patients.insertMany(dummyPatients);
