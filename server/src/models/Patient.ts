@@ -1,33 +1,34 @@
 import { model, Schema, InferSchemaType } from 'mongoose';
 
-const patientSchema = new Schema({
-  _id: {
-    required: true,
-    type: String,
+const patientSchema = new Schema(
+  {
+    _id: {
+      required: true,
+      type: String,
+    },
+    firstName: {
+      required: true,
+      type: String,
+    },
+    lastName: {
+      required: true,
+      type: String,
+    },
+    dateOfBirth: {
+      required: true,
+      type: Date,
+    },
+    sex: {
+      required: true,
+      type: String,
+      enum: ['male', 'female'],
+    },
   },
-  firstName: {
-    required: true,
-    type: String,
-  },
-  lastName: {
-    required: true,
-    type: String,
-  },
-  dateOfBirth: {
-    required: true,
-    type: Date,
-  },
-  sex: {
-    required: true,
-    type: String,
-    enum: ['male', 'female']
-  },
-  dateAdded: {
-    default: Date.now,
-    type: Date,
-    required: true,
-  },
-});
+  {
+    strict: 'throw',
+    timestamps: true,
+  }
+);
 
 type PatientType = InferSchemaType<typeof patientSchema>;
 
