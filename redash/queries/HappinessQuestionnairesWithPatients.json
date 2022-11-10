@@ -11,6 +11,14 @@
           ]
         }
       }
+    },
+    {
+      "$lookup": {
+        "from": "patients",
+        "localField": "patientId",
+        "foreignField": "_id",
+        "as": "patient"
+      }
     }
   ]
 }
