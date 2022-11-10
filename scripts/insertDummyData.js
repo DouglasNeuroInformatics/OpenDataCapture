@@ -1,3 +1,5 @@
+const { createHash } = require('crypto')
+
 const maleNames = ['James', 'Robert', 'John', 'Michael', 'David', 'William', 'Richard', 'Joseph', 'Thomas', 'Charles'];
 const femaleNames = ['Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan', 'Jessica', 'Sarah', 'Karen'];
 const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
@@ -17,12 +19,14 @@ const dummyPatients = []
 for (let i = 0; i < 10; i++) {
   for (let j = 0; j < 10; j++) {
     dummyPatients.push({
+      _id: createHash('sha256').update(maleNames[j] + lastNames[i]).digest('hex'),
       firstName: maleNames[j],
       lastName: lastNames[i],
       sex: 'male',
       dateOfBirth: getRandomBirthday()
     })
     dummyPatients.push({
+      _id: createHash('sha256').update(femaleNames[j] + lastNames[i]).digest('hex'),
       firstName: femaleNames[j],
       lastName: lastNames[i],
       sex: 'female',
