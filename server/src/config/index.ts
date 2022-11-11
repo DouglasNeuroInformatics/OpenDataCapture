@@ -16,7 +16,7 @@ class Config {
   port: number;
 
   constructor() {
-    this.mongoUri = this.getEnvironmentVariable('MONGO_URI');
+    this.mongoUri = `${this.getEnvironmentVariable('MONGO_URI')}/main`;
     this.port = this.getIntegerEnvironmentVariable('PORT');
   }
 
