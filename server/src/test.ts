@@ -16,16 +16,27 @@ beforeAll(async () => {
 
 test('GET /api/patient', async () => {
   const response = await request(app).get('/api/patient');
-  expect(response.statusCode).toBe(lengthDummyPatients);
+  expect(response.statusCode).toBe(200);
   expect(response.body.length).toBe(lengthDummyPatients);
 });
 
+test('POST /api/patient', async () => {
+  const patient = new Patient({
+    firstName: 'Jane',
+    lastName: 'Doe',
+    dateOfBirth: new Date(1950, 0),
+    sex: 'female'
+  })
+  const response = await request(app).post('/api/patient').send(patient.toJSON())
+  expect(response.statusCode).toBe(201);
+  expect((await Patient.find({})).length).toBe(lengthDummyPatients + 1);
+})
+
 test('DELETE /api/patient/:id', async () => {
   const allPatients = await Patient.find({});
-  expect(allPatients.length).toBe(lengthDummyPatients);
   const response = await request(app).delete(`/api/patient/${allPatients[0]._id}`);
   expect(response.statusCode).toBe(204);
-  expect((await Patient.find({})).length).toBe(lengthDummyPatients - 1);
+  expect((await Patient.find({})).length).toBe(lengthDummyPatients);
 });
 
 afterAll(async () => {
