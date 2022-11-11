@@ -5,6 +5,13 @@ abstract class BaseError extends Error {
   }
 }
 
+// General Errors
+export class ValueError extends BaseError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 // Config Errors
 export class MissingEnvironmentVariableError extends BaseError {
   constructor(variableName: string) {
@@ -13,7 +20,9 @@ export class MissingEnvironmentVariableError extends BaseError {
 }
 
 export class InvalidEnvironmentVariableError extends BaseError {
-  constructor(variableName: string, explanation: string) {
-    super(`Environment variable '${variableName}' is invalid. ${explanation}`);
+  constructor(variableName: string, value: string) {
+    super(`Invalid value '${value}' for environment variable '${variableName}'`);
   }
 }
+
+// Utility errors
