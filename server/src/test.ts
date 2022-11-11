@@ -25,12 +25,12 @@ test('POST /api/patient', async () => {
     firstName: 'Jane',
     lastName: 'Doe',
     dateOfBirth: new Date(1950, 0),
-    sex: 'female'
-  })
-  const response = await request(app).post('/api/patient').send(patient.toJSON())
+    sex: 'female',
+  });
+  const response = await request(app).post('/api/patient').send(patient.toJSON());
   expect(response.statusCode).toBe(201);
   expect((await Patient.find({})).length).toBe(lengthDummyPatients + 1);
-})
+});
 
 test('DELETE /api/patient/:id', async () => {
   const allPatients = await Patient.find({});

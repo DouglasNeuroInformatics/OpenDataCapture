@@ -29,7 +29,7 @@ export const addNewPatient: AsyncController = async (req, res) => {
     await patient.save();
     return res.status(201).end();
   } catch (error) {
-    console.log(error)
+    console.log(error);
     if (error instanceof MongoServerError && error.code === 11000) {
       return res.status(400).end(); // Duplicate ID
     }
