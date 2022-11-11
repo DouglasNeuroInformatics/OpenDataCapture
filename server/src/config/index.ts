@@ -12,7 +12,7 @@ dotenv.config();
  * exist and are in the correct format, and casting them to the correct type.
  */
 class Config {
-  private environments = ['development', 'testing'];
+  private environments = ['development', 'test'];
   mongoUri: string;
   port: number;
 
