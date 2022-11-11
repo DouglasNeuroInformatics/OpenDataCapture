@@ -3,7 +3,7 @@ import process from 'process';
 import dotenv from 'dotenv';
 
 import { MissingEnvironmentVariableError, InvalidEnvironmentVariableError } from '../exceptions';
-import StringUtils from '../utils/StringUtils';
+import { isInteger } from '../utils/string';
 
 dotenv.config();
 
@@ -24,9 +24,9 @@ class Config {
   private getMongoUri(): string {
     const env = this.getEnvironmentVariable('NODE_ENV');
     if (!this.environments.includes(env)) {
-      throw new InvalidEnvironmentVariableError('NODE_ENV', env)
+      throw new InvalidEnvironmentVariableError('NODE_ENV', env);
     }
-    return `${this.getEnvironmentVariable('MONGO_URI')}/${env}`
+    return `${this.getEnvironmentVariable('MONGO_URI')}/${env}`;
   }
 
   private getEnvironmentVariable(key: string): string {
@@ -39,7 +39,7 @@ class Config {
 
   private getIntegerEnvironmentVariable(key: string): number {
     const value = this.getEnvironmentVariable(key);
-    if (!StringUtils.isInteger(value)) {
+    if (!isInteger(value)) {
       throw new InvalidEnvironmentVariableError(key, value);
     }
     return parseInt(value);
@@ -49,3 +49,4 @@ class Config {
 const config = new Config();
 
 export default config;
+
