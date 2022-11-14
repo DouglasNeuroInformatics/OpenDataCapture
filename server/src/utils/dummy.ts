@@ -42,6 +42,10 @@ const lastNames = [
   'Martinez',
 ];
 
+export async function purgeDatabase(): Promise<void> {
+  await Patient.deleteMany({})
+}
+
 export async function createDummyPatients(): Promise<void> {
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
