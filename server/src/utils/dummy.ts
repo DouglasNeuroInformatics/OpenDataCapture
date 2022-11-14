@@ -43,7 +43,7 @@ const lastNames = [
 ];
 
 export async function purgeDatabase(): Promise<void> {
-  await Patient.deleteMany({})
+  await Patient.deleteMany({});
 }
 
 export async function createDummyPatients(): Promise<void> {

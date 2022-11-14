@@ -6,7 +6,7 @@ import { createDummyPatients, purgeDatabase } from './utils/dummy';
 async function main(): Promise<void> {
   await connectToDatabase(config.mongoUri);
   if (config.env === 'demo') {
-    await purgeDatabase()
+    await purgeDatabase();
     await createDummyPatients();
   }
   app.listen(config.port, () => {
@@ -15,4 +15,3 @@ async function main(): Promise<void> {
 }
 
 void main();
-

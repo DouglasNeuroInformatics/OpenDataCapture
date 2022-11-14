@@ -1,34 +1,34 @@
 module.exports = {
-  extends: ["@joshunrau/eslint-config/node", "prettier"],
+  extends: ['@joshunrau/eslint-config/node', 'prettier'],
   parserOptions: {
-    project: ["./tsconfig.json"],
+    project: ['./tsconfig.json'],
     tsconfigRootDir: __dirname,
   },
-  ignorePatterns: ["*.js"],
+  ignorePatterns: ['*.js'],
   rules: {
-    "@typescript-eslint/explicit-function-return-type": "warn",
-    "@typescript-eslint/no-misused-promises": [
-      "error",
+    '@typescript-eslint/explicit-function-return-type': 'warn',
+    '@typescript-eslint/no-misused-promises': [
+      'error',
       {
         checksVoidReturn: false,
       },
     ],
-    "import/order": [
-      "warn",
+    'import/order': [
+      'warn',
       {
         alphabetize: {
           caseInsensitive: true,
-          order: "asc",
+          order: 'asc',
         },
-        "newlines-between": "always",
+        'newlines-between': 'always',
         pathGroups: [
           {
-            group: "external",
-            pattern: "express",
-            position: "before",
+            group: 'external',
+            pattern: 'express',
+            position: 'before',
           },
         ],
-        pathGroupsExcludedImportTypes: ["express"],
+        pathGroupsExcludedImportTypes: ['express'],
       },
     ],
   },

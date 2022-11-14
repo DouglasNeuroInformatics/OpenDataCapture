@@ -13,12 +13,11 @@ export const getHappinessQuestionnairesForPatient: AsyncController = async (req,
   return res.status(200).json(results);
 };
 
-
 export const addHappinessQuestionnaire: AsyncController = async (req, res) => {
   const data = req.body as unknown;
   if (typeof data !== 'object' || data === null) {
-    res.statusMessage = 'Invalid format of request body, must be object'
-    return res.status(400).end()
+    res.statusMessage = 'Invalid format of request body, must be object';
+    return res.status(400).end();
   }
 
   const fields = ['firstName', 'lastName', 'dateOfBirth', 'score'];
@@ -28,16 +27,16 @@ export const addHappinessQuestionnaire: AsyncController = async (req, res) => {
       props[field] = data[field];
     } else {
       res.statusMessage = `Invalid format of request body, must contain key '${field}'`;
-      return res.status(400).end()
+      return res.status(400).end();
     }
   }
-  
+
   const { firstName, lastName, dateOfBirth, score } = props as HappinessQuestionnaireResponse;
   const patientId = createPatientId(firstName, lastName, new Date(dateOfBirth));
   const isPatient = (await Patient.findById(patientId)) !== null;
   if (!isPatient) {
-    res.statusMessage = "Patient does not exist";
-    return res.status(400).end()
+    res.statusMessage = 'Patient does not exist';
+    return res.status(400).end();
   }
   const questionnaire = new HappinessQuestionnaire({
     patientId: patientId,
@@ -49,6 +48,6 @@ export const addHappinessQuestionnaire: AsyncController = async (req, res) => {
     return res.status(201).end();
   } catch (error) {
     res.statusMessage = 'Failed to save response';
-    return res.status(500).end()
+    return res.status(500).end();
   }
 };

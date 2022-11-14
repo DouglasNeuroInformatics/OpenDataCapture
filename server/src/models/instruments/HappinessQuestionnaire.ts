@@ -1,4 +1,4 @@
-import { model, Schema, InferSchemaType } from 'mongoose';
+import { Schema } from 'mongoose';
 
 import Instrument, { instrumentOptions } from './Instrument';
 
