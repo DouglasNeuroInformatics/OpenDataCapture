@@ -5,3 +5,10 @@ export type AsyncController = (
   res: Response,
   next: NextFunction
 ) => Promise<Response>;
+
+export interface HappinessQuestionnaireResponse {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  score: string;
+}
