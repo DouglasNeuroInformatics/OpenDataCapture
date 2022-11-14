@@ -1,5 +1,7 @@
 import { model, Schema, InferSchemaType } from 'mongoose';
 
+import Instrument, { instrumentOptions } from './Instrument';
+
 const happinessQuestionnaireSchema = new Schema(
   {
     score: {
@@ -7,15 +9,12 @@ const happinessQuestionnaireSchema = new Schema(
       type: Number,
     },
   },
-  {
-    discriminatorKey: 'name',
-    strict: 'throw',
-    timestamps: true,
-  }
+  instrumentOptions
 );
 
-type HappinessQuestionnaireType = InferSchemaType<typeof happinessQuestionnaireSchema>;
+const HappinessQuestionnaire = Instrument.discriminator(
+  'HappinessQuestionnaire',
+  happinessQuestionnaireSchema
+);
 
-const HappinessQuestionnaire = model('HappinessQuestionnaire', happinessQuestionnaireSchema);
-
-export { HappinessQuestionnaire as default, HappinessQuestionnaireType };
+export default HappinessQuestionnaire;

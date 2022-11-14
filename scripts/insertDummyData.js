@@ -52,7 +52,6 @@ function getRandomBirthday() {
 }
 
 const dummyPatients = [];
-const dummyHappinessQuestionnaires = [];
 for (let i = 0; i < 10; i++) {
   for (let j = 0; j < 10; j++) {
     const malePatientId = createHash("sha256")
@@ -75,6 +74,7 @@ for (let i = 0; i < 10; i++) {
       sex: "female",
       dateOfBirth: getRandomBirthday(),
     });
+    /*
     for (let n = 0; n < getRandomInteger(0, 5); n++) {
       dummyHappinessQuestionnaires.push({
         patientId: malePatientId,
@@ -87,14 +87,25 @@ for (let i = 0; i < 10; i++) {
         createdAt: getRandomDate(new Date(2022, 0), new Date()),
       });
     }
+    */
   }
 }
 
-try {
-  db = connect("mongodb://mongo:27017/main");
-} catch {
-  db = connect("mongodb://localhost:27017/main");
-}
+const dummyHappinessQuestionnaires = [];
+dummyPatients.forEach((patient) => {
+  for (let i = 0; i < 5; i++) {
+    const maxScore = 5 + i;
+    dummyHappinessQuestionnaires.push({
+      patientId: patient._id,
+      score: getRandomInteger(1, maxScore),
+      createdAt: getRandomDate(new Date(2022, 0), new Date()),
+    });
+  }
+})
+
+
+console.log(dummyHappinessQuestionnaires)
+db = connect("mongodb://mongo:27017/main");
 db.patients.drop();
 db.happinessquestionnaires.drop();
 db.patients.insertMany(dummyPatients);
