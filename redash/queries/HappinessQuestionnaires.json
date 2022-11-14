@@ -1,26 +1,61 @@
 {
   "collection": "instruments",
-  "query": {
-		"kind": "HappinessQuestionnaire"
-	},
   "aggregate": [
-    {
-      "$addFields": {
-        "shortPatientId": {
-          "$substr": [
-            "$patientId",
-            0,
-            5
-          ]
-        }
-      }
-    },
     {
       "$lookup": {
         "from": "patients",
         "localField": "patientId",
         "foreignField": "_id",
         "as": "patient"
+      }
+    },
+    {
+      "$unwind": "$patient"
+    },
+    {
+      "$addFields": {
+        "sex": "$patient.sex",
+        "date": {
+          "$dateToString": {
+            "date": {
+              "$toDate": "$createdAt"
+            },
+            "format": "%Y-%m"
+          }
+        }
+      }
+    },
+    {
+      "$group": {
+        "_id": "$date",
+        "meanScore": {
+          "$avg": "$score"
+        },
+        "stdScore": {
+          "$stdDevSamp": "$score"
+        },
+        "meanScoreMale": {
+          "$avg": {
+            "$cond": [
+              {
+                "$eq": ["$sex", "male"]
+              },
+              "$score",
+              null
+            ]
+          }
+        },
+        "meanScoreFemale": {
+          "$avg": {
+            "$cond": [
+              {
+                "$eq": ["$sex", "female"]
+              },
+              "$score",
+              null
+            ]
+          }
+        }
       }
     }
   ]
