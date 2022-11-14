@@ -1,5 +1,8 @@
 {
-  "collection": "happinessquestionnaires",
+  "collection": "instruments",
+  "query": {
+		"kind": "HappinessQuestionnaire"
+	},
   "aggregate": [
     {
       "$addFields": {

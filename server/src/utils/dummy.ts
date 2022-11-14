@@ -2,7 +2,7 @@ import HappinessQuestionnaire from '../models/instruments/HappinessQuestionnaire
 import Patient from '../models/Patient';
 
 import createPatientId from './createPatientId';
-import { getRandomDate, getRandomBirthday } from './random';
+import { getRandomDate, getRandomInteger, getRandomBirthday } from './random';
 
 const maleNames = [
   'James',
@@ -45,7 +45,7 @@ const lastNames = [
 
 export async function purgeDatabase(): Promise<void> {
   await Patient.deleteMany({});
-  await HappinessQuestionnaire.deleteMany({})
+  await HappinessQuestionnaire.deleteMany({});
 }
 
 export async function createDummyPatients(): Promise<void> {
@@ -67,8 +67,8 @@ export async function createDummyPatients(): Promise<void> {
         for (let n = 0; n < 5; n++) {
           const questionnaire = new HappinessQuestionnaire({
             patientId: patientId,
-            score: n + 1,
-            createdAt: getRandomDate(new Date(2022, 0), new Date())
+            score: getRandomInteger(n, n + 3),
+            createdAt: getRandomDate(new Date(2022, 0 + n), new Date(2022, 6)),
           });
           await questionnaire.save();
         }
