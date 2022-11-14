@@ -1,6 +1,3 @@
-networks:
-  express-mongo: null
-  react-express: null
 services:
   client:
     build:
@@ -20,17 +17,6 @@ services:
     volumes:
       - ./client:/usr/src/app
       - ./client/node_modules:/usr/src/app/node_modules
-  mongo:
-    container_name: mongo
-    image: mongo:6.0.2
-    networks:
-      - express-mongo
-    ports:
-      - '27017:27017'
-    restart: always
-    volumes:
-      - ./data:/data
-      - ./scripts:/scripts
   server:
     build:
       context: server
@@ -50,3 +36,17 @@ services:
     volumes:
       - ./server:/usr/src/app
       - ./server/node_modules:/usr/src/app/node_modules
+  mongo:
+    container_name: mongo
+    image: mongo:6.0.2
+    networks:
+      - express-mongo
+    ports:
+      - '27017:27017'
+    restart: always
+    volumes:
+      - ./data:/data
+      - ./scripts:/scripts
+networks:
+  express-mongo: null
+  react-express: null
