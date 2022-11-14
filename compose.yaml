@@ -19,7 +19,7 @@ services:
     stdin_open: true
     volumes:
       - ./client:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./client/node_modules:/usr/src/app/node_modules
   mongo:
     container_name: mongo
     image: mongo:6.0.2
@@ -49,4 +49,4 @@ services:
     restart: always
     volumes:
       - ./server:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./server/node_modules:/usr/src/app/node_modules
