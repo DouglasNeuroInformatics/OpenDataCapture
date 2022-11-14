@@ -11,23 +11,12 @@ dotenv.config();
  * The config class is used to get environment variables, checking that they
  * exist and are in the correct format, and casting them to the correct type.
  */
+
+// Find way to merge with attribute
+type Environment = 'demo' | 'development' | 'test';
+
 class Config {
-  private environments = ['development', 'test'];
-  mongoUri: string;
-  port: number;
-
-  constructor() {
-    this.mongoUri = this.getMongoUri();
-    this.port = this.getIntegerEnvironmentVariable('PORT');
-  }
-
-  private getMongoUri(): string {
-    const env = this.getEnvironmentVariable('NODE_ENV');
-    if (!this.environments.includes(env)) {
-      throw new InvalidEnvironmentVariableError('NODE_ENV', env);
-    }
-    return `${this.getEnvironmentVariable('MONGO_URI')}/${env}`;
-  }
+  private environments = ['demo', 'development', 'test'];
 
   private getEnvironmentVariable(key: string): string {
     const value = process.env[key];
@@ -43,6 +32,22 @@ class Config {
       throw new InvalidEnvironmentVariableError(key, value);
     }
     return parseInt(value);
+  }
+
+  get env(): Environment {
+    const env = this.getEnvironmentVariable('NODE_ENV');
+    if (this.environments.includes(env)) {
+      return env as Environment;
+    }
+    throw new InvalidEnvironmentVariableError('NODE_ENV', env);
+  }
+
+  get mongoUri(): string {
+    return `${this.getEnvironmentVariable('MONGO_URI')}/${this.env}`;
+  }
+
+  get port(): number {
+    return this.getIntegerEnvironmentVariable('PORT');
   }
 }
 
