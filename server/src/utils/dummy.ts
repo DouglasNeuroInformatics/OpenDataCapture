@@ -49,9 +49,18 @@ export async function purgeDatabase(): Promise<void> {
 }
 
 export async function createDummyPatients(): Promise<void> {
+
+  // score is computed to generate fake trend where females increase over time
+  const computeScore = (timepoint: number, sex: 'male' | 'female'): number => {
+    if (sex === 'female') {
+      return Math.min(getRandomInteger(1 + timepoint * 2, 11), 10);
+    }
+    return getRandomInteger(1, 11)
+  }
+
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
-      for (const sex of ['male', 'female']) {
+      for (const sex of ['male', 'female'] as const) {
         const firstName = sex === 'male' ? maleNames[j] : femaleNames[j];
         const lastName = lastNames[i];
         const dateOfBirth = getRandomBirthday();
@@ -64,10 +73,10 @@ export async function createDummyPatients(): Promise<void> {
           dateOfBirth: dateOfBirth,
         });
         await patient.save();
-        for (let n = 0; n < 5; n++) {
+        for (let n = 0; n < 4; n++) {
           const questionnaire = new HappinessQuestionnaire({
             patientId: patientId,
-            score: getRandomInteger(n, n + 3),
+            score: computeScore(n, sex),
             createdAt: getRandomDate(new Date(2022, 0 + n), new Date(2022, 6)),
           });
           await questionnaire.save();
