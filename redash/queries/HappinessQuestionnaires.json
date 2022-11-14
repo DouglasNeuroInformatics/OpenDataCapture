@@ -45,8 +45,30 @@
             ]
           }
         },
+        "stdScoreMale": {
+          "$stdDevSamp": {
+            "$cond": [
+              {
+                "$eq": ["$sex", "male"]
+              },
+              "$score",
+              null
+            ]
+          }
+        },
         "meanScoreFemale": {
           "$avg": {
+            "$cond": [
+              {
+                "$eq": ["$sex", "female"]
+              },
+              "$score",
+              null
+            ]
+          }
+        },
+        "stdScoreFemale": {
+          "$stdDevSamp": {
             "$cond": [
               {
                 "$eq": ["$sex", "female"]
