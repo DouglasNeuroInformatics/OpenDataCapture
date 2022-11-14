@@ -40,6 +40,7 @@ services:
       - mongo
     environment:
       - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017
     expose:
       - 3000
     networks:
