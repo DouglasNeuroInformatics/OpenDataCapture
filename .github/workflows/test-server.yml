@@ -12,4 +12,6 @@ jobs:
         with:
           node-version: 18
       - name: install dependencies
-        run: ls
+        run: npm ci --prefix server
+      - name: run tests
+        run: npm test --prefix server
