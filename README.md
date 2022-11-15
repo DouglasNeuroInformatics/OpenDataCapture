@@ -1,6 +1,5 @@
 # The Douglas Data Capture Platform
 ![tests](https://github.com/joshunrau/DouglasDataCapturePlatform/actions/workflows/tests.yml/badge.svg)
-[![Vulnerabilities](https://snyk.io/test/github/joshunrau/DouglasDataCapturePlatform/badge.svg)]
 
 ## About
 
