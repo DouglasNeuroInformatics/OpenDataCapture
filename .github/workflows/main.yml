@@ -10,8 +10,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container:
-      image: mongo:6.0.2
+    container: 
+      image: node:lts-buster-slim
+    services:
+      mongo:
+        image: mongo:6.0.2
+      ports:
+        - '27017:27017'
+    env:
+      PORT: 3000
+      MONGO_URI: mongodb://127.0.0.1:27017
     steps:
       - name: download code
         uses: actions/checkout@v3
@@ -23,10 +31,3 @@ jobs:
         run: npm ci --prefix server 
       - name: run tests
         run: npm test --prefix server
-  build:
-    needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: build
-        run: echo build
-  
