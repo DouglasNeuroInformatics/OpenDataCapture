@@ -23,10 +23,6 @@ jobs:
     steps:
       - name: download code
         uses: actions/checkout@v3
-      - name: install node v18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
       - name: install dependencies
         run: npm ci --prefix server 
       - name: run tests
