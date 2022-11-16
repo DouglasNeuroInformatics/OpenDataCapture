@@ -4,11 +4,14 @@ on:
     branches:
       - main
     paths:
+      - ".github/**"
       - "client/**"
       - "server/**"
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: mongo:6.0.2
     steps:
       - name: download code
         uses: actions/checkout@v3
