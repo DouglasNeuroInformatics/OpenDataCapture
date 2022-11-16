@@ -19,7 +19,7 @@ jobs:
       mongo:
         image: mongo:6.0.2
       ports:
-        - 27017:27017
+        - "27017:27017"
     steps:
       - name: download code
         uses: actions/checkout@v3
