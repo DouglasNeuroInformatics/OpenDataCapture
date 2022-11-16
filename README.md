@@ -1,5 +1,5 @@
 # The Douglas Data Capture Platform
-![tests](https://github.com/joshunrau/DouglasDataCapturePlatform/actions/workflows/tests.yml/badge.svg)
+![tests](https://github.com/joshunrau/DouglasDataCapturePlatform/actions/workflows/main.yml/badge.svg)
 
 ## About
 
