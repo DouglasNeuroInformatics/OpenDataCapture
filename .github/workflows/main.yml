@@ -1,8 +1,13 @@
-name: Tests
+name: build
 on:
   push:
+    branches:
+      - main
+    paths:
+      - "client/**"
+      - "server/**"
 jobs:
-  first-job:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: download code
@@ -12,6 +17,13 @@ jobs:
         with:
           node-version: 18
       - name: install dependencies
-        run: npm ci --prefix server
+        run: npm ci --prefix server 
       - name: run tests
         run: npm test --prefix server
+  build:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: build
+        run: echo build
+  
