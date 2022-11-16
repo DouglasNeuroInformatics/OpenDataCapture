@@ -14,7 +14,7 @@ jobs:
       image: node:lts-buster-slim
     env:
       PORT: 3000
-      MONGO_URI: mongodb://127.0.0.1:27017
+      MONGO_URI: mongodb://mongo:27017
     services:
       mongo:
         image: mongo:6.0.2
