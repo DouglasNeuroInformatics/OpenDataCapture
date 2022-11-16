@@ -16,7 +16,7 @@ jobs:
       mongo:
         image: mongo:6.0.2
       ports:
-        - '27017:27017'
+        - 27017:27017
     env:
       PORT: 3000
       MONGO_URI: mongodb://127.0.0.1:27017
