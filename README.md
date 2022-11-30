@@ -1,6 +1,9 @@
 # The Douglas Data Capture Platform
-![tests](https://github.com/joshunrau/DouglasDataCapturePlatform/actions/workflows/main.yml/badge.svg)
-
+![tests](https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/actions/workflows/main.yml/badge.svg)
+![license](https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform)
+![react-version](https://img.shields.io/github/package-json/dependency-version/DouglasNeuroinformatics/DouglasDataCapturePlatform/react?filename=apps%2Fclient%2Fpackage.json)
+![next-version](https://img.shields.io/github/package-json/dependency-version/DouglasNeuroinformatics/DouglasDataCapturePlatform/next?filename=apps%2Fclient%2Fpackage.json)
+![express-version](https://img.shields.io/github/package-json/dependency-version/DouglasNeuroInformatics/DouglasDataCapturePlatform/express?filename=apps%2Fserver%2Fpackage.json)
 
 ## About
 
