@@ -34,3 +34,8 @@ yarn-error.log*
 
 # turbo
 .turbo
+
+# docusaurus
+.docusaurus
+.cache-loader
+
