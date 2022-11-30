@@ -1,0 +1,22 @@
+import { type FormikValues } from 'formik';
+
+export type FormFieldVariant = 'date' | 'text' | 'select';
+
+export interface FormFieldProps {
+  name: string;
+  label: string;
+  options?: { [key: string]: string };
+}
+
+export interface FormField extends FormFieldProps {
+  name: string;
+  label: string;
+  variant: FormFieldVariant;
+}
+
+export type FormSubmitHandler = (values: FormikValues) => Promise<void>;
+
+export interface FormProps {
+  fields: FormField[];
+  onSubmit: FormSubmitHandler;
+}

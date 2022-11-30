@@ -1,0 +1,47 @@
+version: '3'
+services:
+  client:
+    build:
+      context: .
+      dockerfile: ./apps/client/Dockerfile
+    container_name: client
+    depends_on:
+      - server
+    environment:
+      - DEMO_MODE=1
+    expose:
+      - 3000
+    networks:
+      - react-express
+    ports:
+      - '3000:3000'
+    restart: always
+  server:
+    build:
+      context: .
+      dockerfile: ./apps/server/Dockerfile
+    container_name: server
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=demo
+      - MONGO_URI=mongodb://mongo:27017
+      - PORT=5000
+    expose:
+      - 5000
+    networks:
+      - express-mongo
+      - react-express
+    ports:
+      - '5000:5000'
+    restart: always
+  mongo:
+    container_name: mongo
+    image: mongo:6.0.2
+    networks:
+      - express-mongo
+    ports:
+      - '27017:27017'
+networks:
+  express-mongo: null
+  react-express: null

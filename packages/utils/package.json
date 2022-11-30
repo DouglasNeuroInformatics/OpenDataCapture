@@ -1,0 +1,20 @@
+{
+  "name": "utils",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc -w"
+  },
+  "devDependencies": {
+    "tsconfig": "*",
+    "typescript": "^4.7.4"
+  }
+}

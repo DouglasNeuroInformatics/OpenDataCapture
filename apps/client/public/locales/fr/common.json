@@ -1,0 +1,14 @@
+{
+  "welcomeMessage": "Bienvenue au Douglas Data Capture Platform",
+  "description": "Il s'agit d'un premier prototype de notre futur portail web. Ici, vous pouvez ajouter de nouveaux patients à notre base de données et afficher un tableau simple de tous les patients. Séparément, nous avons également déployé un tableau de bord avec Redash, qui est connecté à notre API.",
+  "addNewPatientMessage": "Essayez d'ajouter un nouveau patient",
+  "changeLanguage": "English",
+  "signOut": "Se déconnecter",
+  "sidebarLinks": {
+    "/": "Accueil",
+    "/add-patient": "Ajouter un patient",
+    "/view-patients": "Voir les patients",
+    "/add-instrument": "Ajouter un instrument",
+    "/happiness-scale": "Échelle du bonheur"
+  }
+}

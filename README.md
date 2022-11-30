@@ -1,19 +1,37 @@
 # The Douglas Data Capture Platform
 ![tests](https://github.com/joshunrau/DouglasDataCapturePlatform/actions/workflows/main.yml/badge.svg)
 
+
 ## About
 
-This is a prototype of the Douglas Data Capture Platform.
+The Douglas Data Capture Platform aims to provide a unified method of clinical research data collection across all clinics at the DRC. This will be achieved through a web interface that will include a number of different instruments, including cognitive assessments (e.g., MoCA) and symptom scales (e.g., SANS). This may include inputting the results of clinical instruments, or completing these instruments directly on the platform. These instruments may be completed by clinicians, researchers, or patients, at the discretion of individual clinics. Additional instruments will be implemented upon request.
 
-## Deployment
+## Local Development Setup
 
-To deploy the entire application with Docker Compose:
+### Install Dependencies
 
 ```
-$ docker compose up
+$ npm install
 ```
 
-The application should now be running on port 3000
+### Set Environment Variables For Server
+
+```
+$ echo MONGO_URI=mongodb://localhost:27017 >> apps/server/.env
+$ echo PORT=5000 >> apps/server/.env
+```
+
+### Run Tests
+
+```
+$ npm test
+```
+
+### Serve
+
+```
+$ npm run dev
+```
 
 ## License
 
@@ -28,6 +46,3 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.

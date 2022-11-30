@@ -1,0 +1,33 @@
+$sidebar-width: 300px;
+
+.sidebar {
+  position: absolute;
+  top: 0;
+  transition: transform 300ms;
+  width: $sidebar-width;
+  z-index: 1;
+}
+
+.main {
+  height: 100vh;
+  left: $sidebar-width;
+  overflow: scroll;
+  position: absolute;
+  width: calc(100vw - $sidebar-width);
+  @include media-breakpoint-down(md) {
+    width: 100%
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .main {
+    left: 0;
+  }
+
+  .sidebar {
+    &-collapsed {
+      transform: translateX(-$sidebar-width);
+      transition: none !important;
+    }
+  }
+}

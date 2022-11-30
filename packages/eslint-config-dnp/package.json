@@ -1,0 +1,22 @@
+{
+  "name": "eslint-config-dnp",
+  "version": "0.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": ">= 8.0.0",
+    "eslint-config-next": "^12.0.8",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-turbo": "latest",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-plugin-import": "^2.26.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
