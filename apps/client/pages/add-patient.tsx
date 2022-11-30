@@ -12,12 +12,12 @@ const demographicsFields: FormField[] = [
   {
     name: 'firstName',
     label: 'First Name',
-    variant: 'text',
+    variant: 'text'
   },
   {
     name: 'lastName',
     label: 'Last Name',
-    variant: 'text',
+    variant: 'text'
   },
   {
     name: 'sex',
@@ -25,21 +25,21 @@ const demographicsFields: FormField[] = [
     variant: 'select',
     options: {
       Male: 'male',
-      Female: 'female',
-    },
+      Female: 'female'
+    }
   },
   {
     name: 'dateOfBirth',
     label: 'Date of Birth',
-    variant: 'date',
-  },
+    variant: 'date'
+  }
 ];
 
 const AddPatientPage = () => {
   const handleSubmit: FormSubmitHandler = (values) => API.addPatient(values);
   return (
     <Layout>
-      <h1 className='text-center py-2'>Add Patient</h1>
+      <h1 className="text-center py-2">Add Patient</h1>
       <Form fields={demographicsFields} onSubmit={handleSubmit} />;
     </Layout>
   );

@@ -58,5 +58,4 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   };
 };
 
-
 export default HappinessScalePage;

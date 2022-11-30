@@ -10,17 +10,17 @@ import Layout from '../components/Layout';
 const AddInstrumentsPage = () => {
   return (
     <Layout>
-      <h1 className='text-center py-2'>Add Instrument</h1>
+      <h1 className="text-center py-2">Add Instrument</h1>
       <Form
         fields={[
           {
             name: 'name',
             label: 'Instrument Name',
-            variant: 'text',
+            variant: 'text'
           }
         ]}
         onSubmit={() => {
-          return new Promise(() => null)
+          return new Promise(() => null);
         }}
       />
     </Layout>

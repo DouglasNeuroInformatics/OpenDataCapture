@@ -1,4 +1,5 @@
 # The Douglas Data Capture Platform
+
 ![tests](https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/actions/workflows/main.yml/badge.svg)
 ![license](https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform)
 ![react-version](https://img.shields.io/github/package-json/dependency-version/DouglasNeuroinformatics/DouglasDataCapturePlatform/react?filename=apps%2Fclient%2Fpackage.json)
@@ -47,5 +48,5 @@ the Free Software Foundation, either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.

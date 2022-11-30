@@ -18,7 +18,7 @@ const patientSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   sex: yup.mixed<Sex>().oneOf(['male', 'female']).defined(),
-  dateOfBirth: yup.date().required(),
+  dateOfBirth: yup.date().required()
 });
 
 type Patient = yup.InferType<typeof patientSchema>;
@@ -43,10 +43,11 @@ const ViewPatientsPage = () => {
     });
 
   useEffect(() => {
-    modalPatientId && API.getHappinessScalesForPatient(modalPatientId)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      .then((data) => setModalData(data))
-      .catch((error) => console.error(error));
+    modalPatientId &&
+      API.getHappinessScalesForPatient(modalPatientId)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        .then((data) => setModalData(data))
+        .catch((error) => console.error(error));
   }, [modalPatientId]);
 
   useEffect(() => {
@@ -73,11 +74,7 @@ const ViewPatientsPage = () => {
         </thead>
         <tbody>
           {patients?.map((patient, i) => (
-            <tr
-              className="patients-table-row"
-              key={i}
-              onClick={() => handleRowClick(patient._id || null)}
-            >
+            <tr className="patients-table-row" key={i} onClick={() => handleRowClick(patient._id || null)}>
               <td>{patient._id?.slice(0, 6) || 'NA'}</td>
               <td>{new Date(patient.dateOfBirth).toDateString()}</td>
               <td className="text-capitalize">{patient.sex}</td>

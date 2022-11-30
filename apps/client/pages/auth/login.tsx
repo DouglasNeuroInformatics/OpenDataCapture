@@ -3,10 +3,9 @@ import React from 'react';
 import Image from 'next/image';
 
 const LoginPage = () => {
-
   const handleSubmitLogin: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    alert('Not Implemented!')
+    alert('Not Implemented!');
   };
 
   return (
