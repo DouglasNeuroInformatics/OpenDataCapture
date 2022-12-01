@@ -22,7 +22,7 @@ $ yarn install
 
 ```
 $ echo MONGO_URI=mongodb://localhost:27017 >> apps/server/.env
-$ echo PORT=5000 >> apps/server/.env
+$ echo PORT=5500 >> apps/server/.env
 ```
 
 ### Run Tests
@@ -50,3 +50,6 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
+
+## Redash Setup Docker
+

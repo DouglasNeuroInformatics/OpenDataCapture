@@ -1,7 +1,7 @@
 type Data = { [key: string]: string };
 
 export default class API {
-  private static host = 'http://localhost:5000';
+  private static host = 'http://localhost:5500';
 
   static async addPatient(data: Data) {
     const response = await fetch(`${this.host}/api/patient`, {
