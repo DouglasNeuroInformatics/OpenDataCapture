@@ -25,9 +25,11 @@ const Layout = ({ children }: LayoutProps) => {
       <Navbar onToggleClick={() => setCollapseSidebarMobile(false)} />
       <div className="d-md-flex bg-light text-dark vh-100">
         <Sidebar collapsed={collapseSidebarMobile} onClose={() => setCollapseSidebarMobile(true)} />
-        <Container as="main" className="main p-3 p-md-5">
-          {children}
-        </Container>
+        <main className="main">
+          <Container className='h-100'>
+            {children}
+          </Container>
+        </main>
       </div>
     </React.Fragment>
   );
