@@ -9,6 +9,7 @@ services:
       - server
     environment:
       - DEMO_MODE=1
+      - NEXT_PUBLIC_API_HOST=http://server:5500
     expose:
       - 3000
     networks:
