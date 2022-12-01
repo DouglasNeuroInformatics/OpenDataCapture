@@ -27,34 +27,16 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: [
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'internal',
-        path: 'internal',
-        routeBasePath: 'internal',
-        sidebarPath: require.resolve('./sidebars-internal.js'),
-        editUrl: 'https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/tree/main/docs',
-      },
-    ],
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'user',
-        path: 'user',
-        routeBasePath: 'user',
-        sidebarPath: require.resolve('./sidebars-user.js'),
-      },
-    ],
-  ],
-
   presets: [
     [
-      '@docusaurus/preset-classic',
+      'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         blog: false,
+        docs: {
+          editUrl: "https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/tree/main/docs",
+          sidebarPath: require.resolve('./sidebars.js'),
+        },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
