@@ -8,8 +8,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Douglas Data Capture Platform',
   tagline: 'Documentation for the Douglas Data Capture Platform',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://douglasneuroinformatics.github.io',
+  baseUrl: 'DouglasDataCapturePlatform',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
