@@ -1,7 +1,14 @@
 type Data = { [key: string]: string };
 
 export default class API {
-  private static host = 'http://localhost:5500';
+
+  private static get host() {
+    const host = process.env['NEXT_PUBLIC_API_HOST']
+    if (!host) {
+      throw new Error('NEXT_PUBLIC_API_HOST must be defined!')
+    }
+    return host;
+  }
 
   static async addPatient(data: Data) {
     const response = await fetch(`${this.host}/api/patient`, {
