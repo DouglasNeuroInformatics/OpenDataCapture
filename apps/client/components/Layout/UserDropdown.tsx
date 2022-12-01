@@ -29,7 +29,7 @@ const UserDropdown = () => {
     <Dropdown>
       <Dropdown.Toggle className="d-flex align-items-center text-white text-decoration-none" variant="link">
         <UserCircleIcon className="me-2" height="32" width="32" />
-        <strong>TBD</strong>
+        <strong>Admin</strong>
       </Dropdown.Toggle>
       <Dropdown.Menu className="text-small shadow" variant="dark">
         <Dropdown.Item as="button" onClick={changeLocale}>
