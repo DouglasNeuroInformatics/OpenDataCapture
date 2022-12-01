@@ -15,7 +15,7 @@ The Douglas Data Capture Platform aims to provide a unified method of clinical r
 ### Install Dependencies
 
 ```
-$ npm install
+$ yarn install
 ```
 
 ### Set Environment Variables For Server
