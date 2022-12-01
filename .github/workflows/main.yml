@@ -4,9 +4,9 @@ on:
     branches:
       - main
     paths:
-      - ".github/**"
-      - "client/**"
-      - "server/**"
+      - "apps/**"
+      - "packages/**"
+  workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
