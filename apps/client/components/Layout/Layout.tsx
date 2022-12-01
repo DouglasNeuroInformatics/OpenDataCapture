@@ -26,9 +26,7 @@ const Layout = ({ children }: LayoutProps) => {
       <div className="d-md-flex bg-light text-dark vh-100">
         <Sidebar collapsed={collapseSidebarMobile} onClose={() => setCollapseSidebarMobile(true)} />
         <main className="main">
-          <Container className='h-100'>
-            {children}
-          </Container>
+          <Container className="p-3 p-md-5">{children}</Container>
         </main>
       </div>
     </React.Fragment>
