@@ -4,3 +4,19 @@
 .btn-collapse {
   transition: transform 0.35s ease;
 }
+
+.patients-table {
+  &-row:hover {
+    background-color: lightgray !important;
+  }
+}
+
+// Chrome, Safari and Opera
+main::-webkit-scrollbar {
+  display: none;
+}
+
+main {
+  -ms-overflow-style: none; // Edge
+  scrollbar-width: none; // Firefox
+}
