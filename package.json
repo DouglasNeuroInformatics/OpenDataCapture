@@ -12,7 +12,8 @@
     "dev": "turbo run dev --parallel",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/node": "18.11.9",
@@ -20,7 +21,8 @@
     "eslint-config-dnp": "*",
     "prettier": "2.8.0",
     "turbo": "1.6.3",
-    "typescript": "4.9.3"
+    "typescript": "4.9.3",
+    "husky": "^8.0.0"
   },
   "engines": {
     "node": ">=18.0.0 <19.0.0",
