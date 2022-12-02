@@ -40,7 +40,7 @@ const AddPatientPage = () => {
   return (
     <Layout>
       <h1 className="text-center py-2">Add Patient</h1>
-      <Form fields={demographicsFields} onSubmit={handleSubmit} />;
+      <Form fields={demographicsFields} onSubmit={handleSubmit} />
     </Layout>
   );
 };
