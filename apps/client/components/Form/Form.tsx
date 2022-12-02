@@ -47,7 +47,7 @@ const Form = ({ fields, onSubmit }: FormProps) => {
   checkFieldNamesUnique(fields);
   return (
     <Formik initialValues={getInitialValues(fields)} onSubmit={handleSubmit}>
-      <FormikForm>
+      <FormikForm autoComplete='off'>
         {fields.map((field) => {
           switch (field.variant) {
             case 'date':
