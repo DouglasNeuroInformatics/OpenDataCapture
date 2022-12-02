@@ -1,6 +1,6 @@
 import { type FormikValues } from 'formik';
 
-export type FormFieldVariant = 'date' | 'text' | 'select';
+export type FormFieldVariant = 'date' | 'text' | 'select' | 'range';
 
 export interface FormFieldProps {
   name: string;

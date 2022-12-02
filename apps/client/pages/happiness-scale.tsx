@@ -41,7 +41,7 @@ const HappinessScalePage = () => {
           {
             name: 'score',
             label: 'Happiness Today',
-            variant: 'text'
+            variant: 'range'
           }
         ]}
         onSubmit={(values) => API.addHappinessScale(values)}

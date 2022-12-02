@@ -4,6 +4,7 @@ import { Formik, Form as FormikForm, type FormikHelpers, type FormikValues } fro
 import { Validation } from 'utils';
 
 import DateField from './DateField';
+import RangeField from './RangeField';
 import SelectField from './SelectField';
 import SubmitButton from './SubmitButton';
 import TextField from './TextField';
@@ -25,6 +26,8 @@ function getInitialValues(fields: FormField[]) {
         case 'select':
           return [field.name, ''];
         case 'text':
+          return [field.name, ''];
+        case 'range':
           return [field.name, ''];
       }
     })
@@ -49,6 +52,8 @@ const Form = ({ fields, onSubmit }: FormProps) => {
           switch (field.variant) {
             case 'date':
               return <DateField key={field.name} {...field} />;
+            case 'range':
+              return <RangeField key={field.name} {...field} />;
             case 'select':
               return <SelectField key={field.name} {...field} />;
             case 'text':
