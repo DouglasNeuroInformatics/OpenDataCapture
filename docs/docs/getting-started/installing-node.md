@@ -1,4 +1,6 @@
-## Installing Node
+# Installing Node
+
+## Installing NVM
 
 It is recommended to install Node using a version management system, such as Node Version Manager (nvm). Instructions for doing so are provided by the nvm project on [GitHub](https://github.com/nvm-sh/nvm).
 

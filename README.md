@@ -10,36 +10,9 @@
 
 The Douglas Data Capture Platform aims to provide a unified method of clinical research data collection across all clinics at the DRC. This will be achieved through a web interface that will include a number of different instruments, including cognitive assessments (e.g., MoCA) and symptom scales (e.g., SANS). This may include inputting the results of clinical instruments, or completing these instruments directly on the platform. These instruments may be completed by clinicians, researchers, or patients, at the discretion of individual clinics. Additional instruments will be implemented upon request.
 
-## Local Development Setup
+## Documentation
 
-### Install Dependencies
-
-```
-$ yarn install
-```
-
-### Set Environment Variables For Client
-
-echo NEXT_PUBLIC_API_HOST=http://localhost:5500 > apps/client/.env
-
-### Set Environment Variables For Server
-
-```
-$ echo MONGO_URI=mongodb://localhost:27017 > apps/server/.env
-$ echo PORT=5500 >> apps/server/.env
-```
-
-### Run Tests
-
-```
-$ npm test
-```
-
-### Serve
-
-```
-$ npm run dev
-```
+Documentation for developers interested in contributing to the project is provided on [our website](https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/).
 
 ## License
 
@@ -54,6 +27,3 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
-
-## Redash Setup Docker
-
