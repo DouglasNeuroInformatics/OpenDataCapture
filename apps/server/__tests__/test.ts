@@ -3,39 +3,39 @@ import request from 'supertest';
 
 import app from '../src/app';
 import config from '../src/config';
-import Patient from '../src/models/Patient';
-import { createDummyPatients } from '../src/utils/dummy';
+import Subject from '../src/models/Subject';
+import { createDummySubjects } from '../src/utils/dummy';
 
-const lengthDummyPatients = 200;
+const lengthDummySubjects = 200;
 
 beforeAll(async () => {
   await mongoose.connect(config.mongoUri);
-  await createDummyPatients();
+  await createDummySubjects();
 });
 
-test('GET /api/patient', async () => {
-  const response = await request(app).get('/api/patient');
+test('GET /api/subject', async () => {
+  const response = await request(app).get('/api/subject');
   expect(response.statusCode).toBe(200);
-  expect(response.body.length).toBe(lengthDummyPatients);
+  expect(response.body.length).toBe(lengthDummySubjects);
 });
 
-test('POST /api/patient', async () => {
-  const patient = new Patient({
+test('POST /api/subject', async () => {
+  const subject = new Subject({
     firstName: 'Jane',
     lastName: 'Doe',
     dateOfBirth: new Date(1950, 0),
     sex: 'female'
   });
-  const response = await request(app).post('/api/patient').send(patient.toJSON());
+  const response = await request(app).post('/api/subject').send(subject.toJSON());
   expect(response.statusCode).toBe(201);
-  expect((await Patient.find({})).length).toBe(lengthDummyPatients + 1);
+  expect((await Subject.find({})).length).toBe(lengthDummySubjects + 1);
 });
 
-test('DELETE /api/patient/:id', async () => {
-  const allPatients = await Patient.find({});
-  const response = await request(app).delete(`/api/patient/${allPatients[0]._id}`);
+test('DELETE /api/subject/:id', async () => {
+  const allSubjects = await Subject.find({});
+  const response = await request(app).delete(`/api/subject/${allSubjects[0]._id}`);
   expect(response.statusCode).toBe(204);
-  expect((await Patient.find({})).length).toBe(lengthDummyPatients);
+  expect((await Subject.find({})).length).toBe(lengthDummySubjects);
 });
 
 afterAll(async () => {

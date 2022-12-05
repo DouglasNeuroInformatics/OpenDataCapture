@@ -17,8 +17,8 @@ const HomePage = () => {
           <h1 className="display-5 fw-bold">{t('welcomeMessage')}</h1>
           <p className="lead mb-4">{t('description')}</p>
           <div>
-            <Link className="btn btn-primary btn-lg" href="/add-patient">
-              {t('addNewPatientMessage')}
+            <Link className="btn btn-primary btn-lg" href="/add-subject">
+              {t('addNewSubjectMessage')}
             </Link>
           </div>
         </div>

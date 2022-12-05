@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 type Sex = 'male' | 'female';
 
-const patientSchema = yup.object({
+const subjectSchema = yup.object({
   _id: yup.string().notRequired(),
   firstName: yup.string().required(),
   lastName: yup.string().required(),
@@ -10,6 +10,6 @@ const patientSchema = yup.object({
   dateOfBirth: yup.date().required(),
 });
 
-type PatientType = yup.InferType<typeof patientSchema>;
+type SubjectType = yup.InferType<typeof subjectSchema>;
 
-export { patientSchema, type PatientType, type Sex };
+export { subjectSchema, type SubjectType, type Sex };

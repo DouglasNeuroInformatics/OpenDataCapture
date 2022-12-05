@@ -8,7 +8,7 @@ const instrumentOptions: SchemaOptions = {
 
 const instrumentSchema = new Schema(
   {
-    patientId: {
+    subjectId: {
       required: true,
       type: String
     }

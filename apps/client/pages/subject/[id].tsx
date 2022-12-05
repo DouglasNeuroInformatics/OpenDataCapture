@@ -2,10 +2,9 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-const PatientPage = () => {
+const SubjectPage = () => {
   const router = useRouter();
-
-  return <h1>Patient {router.query.id}</h1>;
+  return <h1>Subject {router.query.id}</h1>;
 };
 
-export default PatientPage;
+export default SubjectPage;

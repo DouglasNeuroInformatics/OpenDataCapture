@@ -8,7 +8,7 @@
 
 ## About
 
-The Douglas Data Capture Platform aims to provide a unified method of clinical research data collection across all clinics at the DRC. This will be achieved through a web interface that will include a number of different instruments, including cognitive assessments (e.g., MoCA) and symptom scales (e.g., SANS). This may include inputting the results of clinical instruments, or completing these instruments directly on the platform. These instruments may be completed by clinicians, researchers, or patients, at the discretion of individual clinics. Additional instruments will be implemented upon request.
+The Douglas Data Capture Platform aims to provide a unified method of clinical research data collection across all clinics at the DRC. This will be achieved through a web interface that will include a number of different instruments, including cognitive assessments (e.g., MoCA) and symptom scales (e.g., SANS). This may include inputting the results of clinical instruments, or completing these instruments directly on the platform. These instruments may be completed by clinicians, researchers, or subjects, at the discretion of individual clinics. Additional instruments will be implemented upon request.
 
 ## Documentation
 

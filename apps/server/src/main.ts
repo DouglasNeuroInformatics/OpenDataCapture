@@ -1,13 +1,13 @@
 import app from './app';
 import config from './config';
 import connectToDatabase from './services/connectToDatabase';
-import { createDummyPatients, purgeDatabase } from './utils/dummy';
+import { createDummySubjects, purgeDatabase } from './utils/dummy';
 
 async function main(): Promise<void> {
   await connectToDatabase(config.mongoUri);
-  if (config.env === 'demo') {
+  if (config.env === 'development') {
     await purgeDatabase();
-    await createDummyPatients();
+    await createDummySubjects();
   }
   app.listen(config.port, () => {
     console.log(`Application listening on port ${config.port}`);

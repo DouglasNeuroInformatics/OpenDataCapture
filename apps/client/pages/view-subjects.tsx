@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import type { GetStaticProps } from 'next';
 
-import { PatientType } from 'models';
+import { SubjectType } from 'models';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -18,41 +18,41 @@ interface HappinessQuestionnaire {
   score: number;
 }
 
-const ViewPatientsPage = () => {
-  const [modalPatientId, setModalPatientId] = useState<string | null>(null);
+const ViewSubjectsPage = () => {
+  const [modalSubjectId, setModalSubjectId] = useState<string | null>(null);
   const [modalData, setModalData] = useState<HappinessQuestionnaire[]>();
-  const [patients, setPatients] = useState<PatientType[]>();
+  const [subjects, setSubjects] = useState<SubjectType[]>();
   const [updateRequired, setUpdateRequired] = useState(false);
 
-  const updatePatients = () =>
-    API.getPatients().then((data) => {
+  const updateSubjects = () =>
+    API.getSubjects().then((data) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      setPatients(data);
+      setSubjects(data);
       setUpdateRequired(false);
     });
 
   useEffect(() => {
-    modalPatientId &&
-      API.getHappinessScalesForPatient(modalPatientId)
+    modalSubjectId &&
+      API.getHappinessScalesForSubject(modalSubjectId)
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         .then((data) => setModalData(data))
         .catch((error) => console.error(error));
-  }, [modalPatientId]);
+  }, [modalSubjectId]);
 
   useEffect(() => {
-    void updatePatients();
+    void updateSubjects();
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    const intervalId = setInterval(updatePatients, 5000);
+    const intervalId = setInterval(updateSubjects, 5000);
     return () => clearInterval(intervalId);
   }, [updateRequired]);
 
-  const handleRowClick = (patientId: string | null) => {
-    setModalPatientId(patientId);
+  const handleRowClick = (subjectId: string | null) => {
+    setModalSubjectId(subjectId);
   };
 
   return (
     <Layout>
-      <h1 className="text-center py-2">View Patients (N={patients?.length})</h1>
+      <h1 className="text-center py-2">View Subjects (N={subjects?.length})</h1>
       <Table>
         <thead>
           <tr>
@@ -62,18 +62,18 @@ const ViewPatientsPage = () => {
           </tr>
         </thead>
         <tbody>
-          {patients?.map((patient, i) => (
-            <tr className="patients-table-row" key={i} onClick={() => handleRowClick(patient._id || null)}>
-              <td>{patient._id?.slice(0, 6) || 'NA'}</td>
-              <td>{new Date(patient.dateOfBirth).toDateString()}</td>
-              <td className="text-capitalize">{patient.sex}</td>
+          {subjects?.map((subject, i) => (
+            <tr className="subjects-table-row" key={i} onClick={() => handleRowClick(subject._id || null)}>
+              <td>{subject._id?.slice(0, 6) || 'NA'}</td>
+              <td>{new Date(subject.dateOfBirth).toDateString()}</td>
+              <td className="text-capitalize">{subject.sex}</td>
             </tr>
           ))}
         </tbody>
       </Table>
-      <Modal centered show={modalPatientId !== null} size="lg">
+      <Modal centered show={modalSubjectId !== null} size="lg">
         <Modal.Header>
-          <Modal.Title>Happiness Scores for Patient {modalPatientId?.slice(0, 6)}</Modal.Title>
+          <Modal.Title>Happiness Scores for Subject {modalSubjectId?.slice(0, 6)}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {modalData?.map((value) => (
@@ -94,13 +94,13 @@ const ViewPatientsPage = () => {
           <Button
             variant="danger"
             onClick={() => {
-              modalPatientId && API.deletePatient(modalPatientId);
-              setModalPatientId(null);
+              modalSubjectId && API.deleteSubject(modalSubjectId);
+              setModalSubjectId(null);
             }}
           >
             Delete
           </Button>
-          <Button variant="secondary" onClick={() => setModalPatientId(null)}>
+          <Button variant="secondary" onClick={() => setModalSubjectId(null)}>
             Close
           </Button>
         </Modal.Footer>
@@ -117,4 +117,4 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   };
 };
 
-export default ViewPatientsPage;
+export default ViewSubjectsPage;

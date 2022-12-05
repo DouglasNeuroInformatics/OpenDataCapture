@@ -1,6 +1,6 @@
 import { model, Schema, InferSchemaType } from 'mongoose';
 
-const patientSchema = new Schema(
+const subjectSchema = new Schema(
   {
     _id: {
       required: true,
@@ -32,8 +32,8 @@ const patientSchema = new Schema(
   }
 );
 
-type PatientType = InferSchemaType<typeof patientSchema>;
+type SubjectType = InferSchemaType<typeof subjectSchema>;
 
-const Patient = model('Patient', patientSchema);
+const Subject = model('Subject', subjectSchema);
 
-export { Patient as default, type PatientType };
+export { Subject as default, type SubjectType };

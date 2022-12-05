@@ -35,11 +35,11 @@ const demographicsFields: FormField[] = [
   }
 ];
 
-const AddPatientPage = () => {
-  const handleSubmit: FormSubmitHandler = (values) => API.addPatient(values);
+const AddSubjectPage = () => {
+  const handleSubmit: FormSubmitHandler = (values) => API.addSubject(values);
   return (
     <Layout>
-      <h1 className="text-center py-2">Add Patient</h1>
+      <h1 className="text-center py-2">Add Subject</h1>
       <Form fields={demographicsFields} onSubmit={handleSubmit} />
     </Layout>
   );
@@ -53,4 +53,4 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   };
 };
 
-export default AddPatientPage;
+export default AddSubjectPage;

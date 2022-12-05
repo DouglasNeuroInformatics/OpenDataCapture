@@ -36,8 +36,8 @@ const Sidebar = ({ collapsed, onClose }: SidebarProps) => {
       <hr />
       <nav className="nav nav-pills flex-column mb-auto">
         <SidebarLink HeroIcon={HomeIcon} href="/" />
-        <SidebarLink HeroIcon={UserPlusIcon} href="/add-patient" />
-        <SidebarLink HeroIcon={EyeIcon} href="/view-patients" />
+        <SidebarLink HeroIcon={UserPlusIcon} href="/add-subject" />
+        <SidebarLink HeroIcon={EyeIcon} href="/view-subjects" />
         <SidebarLink HeroIcon={PlusIcon} href="/add-instrument" />
         <SidebarLink HeroIcon={FaceSmileIcon} href="/happiness-scale" />
       </nav>

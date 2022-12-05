@@ -22,8 +22,8 @@ export default class API {
     }
   }
 
-  static async addPatient(data: Data) {
-    const response = await fetch(`${this.host}/api/patient`, {
+  static async addSubject(data: Data) {
+    const response = await fetch(`${this.host}/api/subject`, {
       method: 'POST',
       credentials: 'same-origin',
       headers: {
@@ -34,15 +34,15 @@ export default class API {
     this.checkResponse(response);
   }
 
-  static async deletePatient(id: string) {
-    const response = await fetch(`${this.host}/api/patient/${id}`, {
+  static async deleteSubject(id: string) {
+    const response = await fetch(`${this.host}/api/subject/${id}`, {
       method: 'DELETE'
     });
     this.checkResponse(response);
   }
 
-  static async getPatients() {
-    const response = await fetch(`${this.host}/api/patient`);
+  static async getSubjects() {
+    const response = await fetch(`${this.host}/api/subject`);
     if (!response.ok) {
       console.error(response.status, response.statusText);
       return;
@@ -62,7 +62,7 @@ export default class API {
     this.checkResponse(response);
   }
 
-  static async getHappinessScalesForPatient(id: string) {
+  static async getHappinessScalesForSubject(id: string) {
     const response = await fetch(`${this.host}/api/instrument/happiness-scale/${id}`);
     if (!response.ok) {
       console.error(response.status, response.statusText);
