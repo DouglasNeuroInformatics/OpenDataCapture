@@ -2,26 +2,15 @@ import React, { useEffect, useState } from 'react';
 
 import type { GetStaticProps } from 'next';
 
+import { PatientType } from 'models';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Table from 'react-bootstrap/Table';
-import * as yup from 'yup';
+
 
 import API from '../api/API';
 import Layout from '../components/Layout';
-
-type Sex = 'male' | 'female';
-
-const patientSchema = yup.object({
-  _id: yup.string().notRequired(),
-  firstName: yup.string().required(),
-  lastName: yup.string().required(),
-  sex: yup.mixed<Sex>().oneOf(['male', 'female']).defined(),
-  dateOfBirth: yup.date().required()
-});
-
-type Patient = yup.InferType<typeof patientSchema>;
 
 interface HappinessQuestionnaire {
   _id: string;
@@ -32,7 +21,7 @@ interface HappinessQuestionnaire {
 const ViewPatientsPage = () => {
   const [modalPatientId, setModalPatientId] = useState<string | null>(null);
   const [modalData, setModalData] = useState<HappinessQuestionnaire[]>();
-  const [patients, setPatients] = useState<Patient[]>();
+  const [patients, setPatients] = useState<PatientType[]>();
   const [updateRequired, setUpdateRequired] = useState(false);
 
   const updatePatients = () =>

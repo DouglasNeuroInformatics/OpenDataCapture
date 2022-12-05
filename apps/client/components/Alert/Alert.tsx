@@ -25,4 +25,4 @@ const Alert = ({ title, message, error, handleClose }: AlertProps) => {
   );
 };
 
-export { Alert as default, AlertProps }
+export { Alert as default, type AlertProps }
