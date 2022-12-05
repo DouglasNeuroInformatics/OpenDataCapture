@@ -25,15 +25,6 @@ const HappinessScalePage = () => {
             variant: 'text'
           },
           {
-            name: 'sex',
-            label: 'Sex',
-            variant: 'select',
-            options: {
-              Male: 'male',
-              Female: 'female'
-            }
-          },
-          {
             name: 'dateOfBirth',
             label: 'Date of Birth',
             variant: 'date'
