@@ -8,7 +8,7 @@ interface AlertProps {
   title: string;
   message: string;
   error?: Error;
-  handleClose: () => void;
+  handleClose?: () => void;
 }
 
 const Alert = ({ title, message, error, handleClose }: AlertProps) => {
