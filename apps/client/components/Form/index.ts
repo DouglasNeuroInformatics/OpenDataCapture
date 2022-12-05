@@ -1,2 +1,2 @@
-export { default, type FormSubmitHandler } from './Form';
+export { default } from './Form';
 export * from './types';
