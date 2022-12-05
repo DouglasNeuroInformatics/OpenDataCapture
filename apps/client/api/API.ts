@@ -1,13 +1,25 @@
 type Data = { [key: string]: string };
 
-export default class API {
+class APIError extends Error {
+  constructor(public status: number, public statusText: string) {
+    super(`${status}: ${statusText}`);
+    this.name = 'APIError';
+  }
+}
 
+export default class API {
   private static get host() {
-    const host = process.env['NEXT_PUBLIC_API_HOST']
+    const host = process.env['NEXT_PUBLIC_API_HOST'];
     if (!host) {
-      throw new Error('NEXT_PUBLIC_API_HOST must be defined!')
+      throw new Error('NEXT_PUBLIC_API_HOST must be defined!');
     }
     return host;
+  }
+
+  private static checkResponse(response: Response) {
+    if (!response.ok) {
+      throw new APIError(response.status, response.statusText);
+    }
   }
 
   static async addPatient(data: Data) {
@@ -19,14 +31,14 @@ export default class API {
       },
       body: JSON.stringify(data)
     });
-    this.alertUser(response);
+    this.checkResponse(response);
   }
 
   static async deletePatient(id: string) {
     const response = await fetch(`${this.host}/api/patient/${id}`, {
       method: 'DELETE'
     });
-    this.alertUser(response);
+    this.checkResponse(response);
   }
 
   static async getPatients() {
@@ -47,7 +59,7 @@ export default class API {
       },
       body: JSON.stringify(data)
     });
-    this.alertUser(response);
+    this.checkResponse(response);
   }
 
   static async getHappinessScalesForPatient(id: string) {
@@ -57,9 +69,5 @@ export default class API {
       return;
     }
     return response.json();
-  }
-
-  private static alertUser(response: Response) {
-    response.ok ? alert('Success!') : alert(`An Error Occurred: ${response.status} ${response.statusText}`);
   }
 }

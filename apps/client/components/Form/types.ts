@@ -14,7 +14,7 @@ export interface FormField extends FormFieldProps {
   variant: FormFieldVariant;
 }
 
-export type FormSubmitHandler = (values: FormikValues) => Promise<string>;
+export type FormSubmitHandler = (values: FormikValues) => Promise<void>;
 
 export interface FormProps {
   fields: FormField[];
