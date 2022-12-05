@@ -24,7 +24,13 @@ const Sidebar = ({ collapsed, onClose }: SidebarProps) => {
     >
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
-          <Image alt="logo" className="img-fluid me-2" height={60} src="/logo.png" width={60} />
+          <Image
+            alt="logo"
+            className="img-fluid me-2"
+            height={60}
+            src={process.env['NEXT_PUBLIC_LOGO_PATH'] as string}
+            width={60}
+          />
           <div className="d-flex flex-column lh-sm text-uppercase">
             <span>{t('platformTitle')}</span>
           </div>

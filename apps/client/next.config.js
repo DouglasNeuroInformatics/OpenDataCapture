@@ -10,5 +10,8 @@ module.exports = {
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../')
   },
-  i18n: i18n
+  i18n: i18n,
+  env: {
+    NEXT_PUBLIC_LOGO_PATH: "/logo.png"
+  }
 };
