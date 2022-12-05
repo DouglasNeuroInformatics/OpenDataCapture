@@ -4,6 +4,7 @@ import Image from 'next/image';
 
 import { HomeIcon, UserPlusIcon, EyeIcon, XMarkIcon, PlusIcon, FaceSmileIcon } from '@heroicons/react/24/solid';
 import classNames from 'classnames';
+import { useTranslation } from 'next-i18next';
 
 import SidebarLink from './SidebarLink';
 import UserDropdown from './UserDropdown';
@@ -14,6 +15,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ collapsed, onClose }: SidebarProps) => {
+  const { t } = useTranslation('common');
   return (
     <div
       className={classNames('sidebar d-flex flex-column vh-100 p-3 bg-dark text-light overflow-scroll', {
@@ -24,9 +26,7 @@ const Sidebar = ({ collapsed, onClose }: SidebarProps) => {
         <div className="d-flex align-items-center">
           <Image alt="logo" className="img-fluid me-2" height={60} src="/logo.png" width={60} />
           <div className="d-flex flex-column lh-sm text-uppercase">
-            <span>Douglas</span>
-            <span>Data Capture</span>
-            <span>Platform</span>
+            <span>{t('platformTitle')}</span>
           </div>
         </div>
         <button className="btn btn-link text-light d-md-none" type="button" onClick={onClose}>
