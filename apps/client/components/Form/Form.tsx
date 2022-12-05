@@ -37,7 +37,7 @@ function getInitialValues(fields: FormField[]) {
 }
 
 const Form = ({ fields, onSubmit }: FormProps) => {
-  const [alertProps, setAlertProps] = useState<AlertProps>({
+  const [alertProps, setAlertProps] = useState<Partial<AlertProps>>({
     title: '',
     message: ''
   });
