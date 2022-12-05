@@ -27,7 +27,7 @@ services:
     environment:
       - NODE_ENV=demo
       - MONGO_URI=mongodb://mongo:27017
-      - PORT=5500
+      - SERVER_PORT=5500
     expose:
       - 5500
     networks:
