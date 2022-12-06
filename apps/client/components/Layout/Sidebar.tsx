@@ -31,7 +31,7 @@ const Sidebar = ({ collapsed, onClose }: SidebarProps) => {
             src={process.env['NEXT_PUBLIC_LOGO_PATH'] as string}
             width={60}
           />
-          <div className="d-flex flex-column lh-sm text-uppercase">
+          <div className="d-flex flex-column lh-sm text-uppercase" style={{ maxWidth: '7.5em' }}>
             <span>{t('platformTitle')}</span>
           </div>
         </div>
