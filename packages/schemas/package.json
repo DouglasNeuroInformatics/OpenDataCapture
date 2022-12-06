@@ -6,7 +6,8 @@
   "source": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist/**"
+    "dist/**",
+    "spec/**"
   ],
   "scripts": {
     "build": "tsc",
