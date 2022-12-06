@@ -11,12 +11,10 @@
   }
 }
 
-// Chrome, Safari and Opera
-main::-webkit-scrollbar {
-  display: none;
-}
-
-main {
+.scrollbar-hidden {
   -ms-overflow-style: none; // Edge
   scrollbar-width: none; // Firefox
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari and Opera
+  }
 }

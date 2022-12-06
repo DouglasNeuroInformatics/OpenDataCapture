@@ -25,7 +25,7 @@ const Layout = ({ children }: LayoutProps) => {
       <Navbar onToggleClick={() => setCollapseSidebarMobile(false)} />
       <div className="d-md-flex bg-light text-dark vh-100">
         <Sidebar collapsed={collapseSidebarMobile} onClose={() => setCollapseSidebarMobile(true)} />
-        <main className="main">
+        <main className="main scrollbar-hidden">
           <Container className="p-3 p-md-5 h-100">{children}</Container>
         </main>
       </div>
