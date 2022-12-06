@@ -1,4 +1,9 @@
-type Data = { [key: string]: string };
+import {
+  happinessQuestionnaireArraySchema,
+  subjectArraySchema,
+  type HappinessQuestionnaireSchema,
+  type SubjectSchema
+} from 'schemas';
 
 class APIError extends Error {
   constructor(public status: number, public statusText: string) {
@@ -22,7 +27,7 @@ export default class API {
     }
   }
 
-  static async addSubject(data: Data) {
+  static async addSubject(data: SubjectSchema) {
     const response = await fetch(`${this.host}/api/subject`, {
       method: 'POST',
       credentials: 'same-origin',
@@ -47,10 +52,10 @@ export default class API {
       console.error(response.status, response.statusText);
       return;
     }
-    return response.json();
+    return subjectArraySchema.validate(await response.json());
   }
 
-  static async addHappinessScale(data: Data) {
+  static async addHappinessScale(data: HappinessQuestionnaireSchema) {
     const response = await fetch(`${this.host}/api/instrument/happiness-scale`, {
       method: 'POST',
       credentials: 'same-origin',
@@ -68,6 +73,6 @@ export default class API {
       console.error(response.status, response.statusText);
       return;
     }
-    return response.json();
+    return happinessQuestionnaireArraySchema.validate(await response.json());
   }
 }

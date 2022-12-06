@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { GetStaticProps } from 'next';
 
+import { SubjectSchema } from 'schemas';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import API from '../api/API';
@@ -36,11 +37,12 @@ const demographicsFields: FormField[] = [
 ];
 
 const AddSubjectPage = () => {
-  const handleSubmit: FormSubmitHandler = (values) => API.addSubject(values);
   return (
     <Layout>
       <h1 className="text-center py-2">Add Subject</h1>
-      <Form fields={demographicsFields} onSubmit={handleSubmit} />
+      <Form
+        fields={demographicsFields}
+        onSubmit={(values) => API.addSubject(values)} />
     </Layout>
   );
 };
