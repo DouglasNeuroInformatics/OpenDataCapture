@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 
 import type { GetStaticProps } from 'next';
 
-import { type SubjectArraySchema, type HappinessQuestionnaireArraySchema } from 'models';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Table from 'react-bootstrap/Table';
+import { type SubjectArraySchema, type HappinessQuestionnaireArraySchema } from 'schemas';
 
 import API from '../api/API';
 import Layout from '../components/Layout';
