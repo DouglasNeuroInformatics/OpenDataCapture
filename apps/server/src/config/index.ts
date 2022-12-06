@@ -47,7 +47,7 @@ class Config {
   }
 
   get port(): number {
-    return this.getIntegerEnvironmentVariable('PORT');
+    return this.getIntegerEnvironmentVariable('SERVER_PORT');
   }
 }
 
