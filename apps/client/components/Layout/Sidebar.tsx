@@ -18,9 +18,12 @@ const Sidebar = ({ collapsed, onClose }: SidebarProps) => {
   const { t } = useTranslation('common');
   return (
     <div
-      className={classNames('sidebar d-flex flex-column vh-100 p-3 bg-dark text-light overflow-scroll', {
-        'sidebar-collapsed': collapsed
-      })}
+      className={classNames(
+        'sidebar d-flex flex-column vh-100 p-3 bg-dark text-light overflow-scroll scrollbar-hidden',
+        {
+          'sidebar-collapsed': collapsed
+        }
+      )}
     >
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
