@@ -24,6 +24,7 @@
     "tsconfig": "*"
   },
   "dependencies": {
+    "@trpc/server": "^10.4.3",
     "cors": "^2.8.5",
     "dotenv": "16.0.3",
     "express": "4.18.2",
