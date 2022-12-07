@@ -1,12 +1,13 @@
 {
-  "name": "models",
+  "name": "schemas",
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
   "source": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist/**"
+    "dist/**",
+    "spec/**"
   ],
   "scripts": {
     "build": "tsc",

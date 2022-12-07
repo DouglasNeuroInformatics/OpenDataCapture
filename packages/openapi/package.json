@@ -1,0 +1,8 @@
+{
+  "name": "openapi",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "spec.json"
+  ]
+}

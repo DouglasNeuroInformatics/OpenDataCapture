@@ -8,7 +8,7 @@ Welcome to the Douglas Data Capture Platform technical documentation. These docs
 
 ## How to Use These Docs
 
-If you are someone who is planning on making major contributions to many parts of the codebase (e.g., adding an interactive task to the site with associated API routes and database schemas), then it is highly recommended that you read through the docs like a book, skipping sections that you are already familiar with. On the other hand, if you are planning to work on a simple, specific, and isolated feature (e.g., changing the color of a button) then you can probably skip to the relevant sections. 
+If you are someone who is planning on making major contributions to many parts of the codebase (e.g., adding an interactive task to the site with associated API routes and database schemas), then it is highly recommended that you read through the docs like a book, skipping sections that you are already familiar with. On the other hand, if you are planning to work on a simple, specific, and isolated feature (e.g., changing the color of a button) then you can probably skip to the relevant sections.
 
 ## Prerequisites
 

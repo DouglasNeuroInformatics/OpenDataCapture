@@ -2,31 +2,23 @@ import React, { useEffect, useState } from 'react';
 
 import type { GetStaticProps } from 'next';
 
-import { SubjectType } from 'models';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Table from 'react-bootstrap/Table';
-
+import { type SubjectArraySchema, type HappinessQuestionnaireArraySchema } from 'schemas';
 
 import API from '../api/API';
 import Layout from '../components/Layout';
 
-interface HappinessQuestionnaire {
-  _id: string;
-  createdAt: string;
-  score: number;
-}
-
 const ViewSubjectsPage = () => {
   const [modalSubjectId, setModalSubjectId] = useState<string | null>(null);
-  const [modalData, setModalData] = useState<HappinessQuestionnaire[]>();
-  const [subjects, setSubjects] = useState<SubjectType[]>();
+  const [modalData, setModalData] = useState<HappinessQuestionnaireArraySchema>();
+  const [subjects, setSubjects] = useState<SubjectArraySchema>();
   const [updateRequired, setUpdateRequired] = useState(false);
 
   const updateSubjects = () =>
     API.getSubjects().then((data) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       setSubjects(data);
       setUpdateRequired(false);
     });
@@ -34,15 +26,13 @@ const ViewSubjectsPage = () => {
   useEffect(() => {
     modalSubjectId &&
       API.getHappinessScalesForSubject(modalSubjectId)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         .then((data) => setModalData(data))
         .catch((error) => console.error(error));
   }, [modalSubjectId]);
 
   useEffect(() => {
     void updateSubjects();
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    const intervalId = setInterval(updateSubjects, 5000);
+    const intervalId = setInterval(() => void updateSubjects(), 5000);
     return () => clearInterval(intervalId);
   }, [updateRequired]);
 
@@ -81,7 +71,7 @@ const ViewSubjectsPage = () => {
               <h5>Entry ID: {value._id}</h5>
               <div>
                 <span className="fw-bold">Added: </span>
-                <span>{new Date(value.createdAt).toString()}</span>
+                <span>{value.createdAt && new Date(value.createdAt).toString()}</span>
               </div>
               <div>
                 <span className="fw-bold">Score: </span>

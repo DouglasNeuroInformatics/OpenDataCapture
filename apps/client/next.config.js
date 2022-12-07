@@ -12,6 +12,6 @@ module.exports = {
   },
   i18n: i18n,
   env: {
-    NEXT_PUBLIC_LOGO_PATH: "/logo.png"
+    NEXT_PUBLIC_LOGO_PATH: '/logo.png'
   }
 };

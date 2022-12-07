@@ -3,9 +3,10 @@ import React from 'react';
 import type { GetStaticProps } from 'next';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { SubjectSchema } from 'schemas';
 
 import API from '../api/API';
-import Form, { type FormField, type FormSubmitHandler } from '../components/Form';
+import Form, { type FormField } from '../components/Form';
 import Layout from '../components/Layout';
 
 const demographicsFields: FormField[] = [
@@ -35,12 +36,12 @@ const demographicsFields: FormField[] = [
   }
 ];
 
+// VERY BAD TYPE ASSERTION - FIX THIS WHEN TIME TO REWRITE
 const AddSubjectPage = () => {
-  const handleSubmit: FormSubmitHandler = (values) => API.addSubject(values);
   return (
     <Layout>
       <h1 className="text-center py-2">Add Subject</h1>
-      <Form fields={demographicsFields} onSubmit={handleSubmit} />
+      <Form fields={demographicsFields} onSubmit={(values) => API.addSubject(values as SubjectSchema)} />
     </Layout>
   );
 };

@@ -4,13 +4,13 @@ on:
     branches:
       - main
     paths:
-      - "apps/**"
-      - "packages/**"
+      - 'apps/**'
+      - 'packages/**'
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: node:18
     env:
       PORT: 3000
@@ -24,6 +24,6 @@ jobs:
       - name: download code
         uses: actions/checkout@v3
       - name: install dependencies
-        run: npm ci --prefix server 
+        run: npm ci --prefix server
       - name: run tests
         run: npm test --prefix server
