@@ -1,94 +1,53 @@
 openapi: 3.0.0
-servers:
-  - url: //petstore.swagger.io/v2
-    description: Default server
-  - url: //petstore.swagger.io/sandbox
-    description: Sandbox server
 info:
   description: |
-    This is a sample server Petstore server.
-    You can find out more about Swagger at
-    [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
-    For this sample, you can use the api key `special-key` to test the authorization filters.
-
-    # Introduction
-    This API is documented in **OpenAPI format** and is based on
-    [Petstore sample](http://petstore.swagger.io/) provided by [swagger.io](http://swagger.io) team.
-    It was **extended** to illustrate features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo)
-    tool and [ReDoc](https://github.com/Redocly/redoc) documentation. In addition to standard
-    OpenAPI syntax we use a few [vendor extensions](https://github.com/Redocly/redoc/blob/main/docs/redoc-vendor-extensions.md).
-
-    # OpenAPI Specification
-    This API is documented in **OpenAPI format** and is based on
-    [Petstore sample](http://petstore.swagger.io/) provided by [swagger.io](http://swagger.io) team.
-    It was **extended** to illustrate features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo)
-    tool and [ReDoc](https://github.com/Redocly/redoc) documentation. In addition to standard
-    OpenAPI syntax we use a few [vendor extensions](https://github.com/Redocly/redoc/blob/main/docs/redoc-vendor-extensions.md).
-
-    # Cross-Origin Resource Sharing
-    This API features Cross-Origin Resource Sharing (CORS) implemented in compliance with  [W3C spec](https://www.w3.org/TR/cors/).
-    And that allows cross-domain communication from the browser.
-    All responses have a wildcard same-origin which makes them completely public and accessible to everyone, including any code on any site.
-
-    # Authentication
-
-    Petstore offers two forms of authentication:
-      - API Key
-      - OAuth2
-    OAuth2 - an open protocol to allow secure authorization in a simple
-    and standard method from web, mobile and desktop applications.
-
-    <SecurityDefinitions />
-
+    This is the REST API implemented for the Douglas Data Capture Platform. This API is 
+    documented in **OpenAPI format**.
   version: 1.0.0
-  title: Swagger Petstore
-  termsOfService: 'http://swagger.io/terms/'
+  title: Douglas Data Capture Platform
   contact:
-    name: API Support
-    email: apiteam@swagger.io
-    url: https://github.com/Redocly/redoc
+    name: Douglas Neuroinformatics Platform
+    url: https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform
   x-logo:
-    url: 'https://redocly.github.io/redoc/petstore-logo.png'
-    altText: Petstore logo
+    url: 'https://raw.githubusercontent.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/main/apps/client/public/logo.png'
+    altText: logo
   license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name: GNU General Public License v3.0
+    url: https://www.gnu.org/licenses/gpl-3.0-standalone.html
 externalDocs:
-  description: Find out how to create Github repo for your OpenAPI spec.
-  url: 'https://github.com/Rebilly/generator-openapi-repo'
+  description: If you're interested in contributing to the project, please refer to our technical documentation.
+  url: https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/
 tags:
-  - name: pet
-    description: Everything about your Pets
-  - name: store
-    description: Access to Petstore orders
-  - name: user
-    description: Operations about user
-  - name: pet_model
-    x-displayName: The Pet Model
-    description: |
-      <SchemaDefinition schemaRef="#/components/schemas/Pet" />
-  - name: store_model
-    x-displayName: The Order Model
-    description: |
-      <SchemaDefinition schemaRef="#/components/schemas/Order" exampleRef="#/components/examples/Order" showReadOnly={true} showWriteOnly={true} />
+  - name: subject
+    description: Access to subject-level information
+  - name: instruments
+    description: Access to instrument-level information
 x-tagGroups:
   - name: General
     tags:
-      - pet
-      - store
-  - name: User Management
-    tags:
-      - user
-  - name: Models
-    tags:
-      - pet_model
-      - store_model
+      - subject
+      - instruments
 paths:
+  /subject:
+    get:
+      tags:
+        - subject
+      responses:
+        '200':
+          description: successful operation
+    post:
+      tags:
+        - subject
+      responses:
+        '200':
+          description: successful operation
+    delete:
+      
   /pet:
     parameters:
       - name: Accept-Language
         in: header
-        description: "The language you prefer for messages. Supported values are en-AU, en-CA, en-GB, en-US"
+        description: 'The language you prefer for messages. Supported values are en-AU, en-CA, en-GB, en-US'
         example: en-US
         required: false
         schema:
@@ -115,6 +74,9 @@ paths:
             - 'write:pets'
             - 'read:pets'
       x-codeSamples:
+        - lang: Python
+          source: |
+            print("hello world")
         - lang: 'C#'
           source: |
             PetStore.v1.Pet pet = new PetStore.v1.Pet();
@@ -254,7 +216,7 @@ paths:
           required: false
           schema:
             type: string
-          example: "Bearer <TOKEN>"
+          example: 'Bearer <TOKEN>'
         - name: petId
           in: path
           description: Pet id to delete
@@ -430,7 +392,7 @@ paths:
             application/json:
               example:
                 status: 400
-                message: "Invalid Order"
+                message: 'Invalid Order'
       requestBody:
         content:
           application/json:
@@ -1028,8 +990,8 @@ components:
       properties:
         id:
           externalDocs:
-            description: "Find more info here"
-            url: "https://example.com"
+            description: 'Find more info here'
+            url: 'https://example.com'
           description: Pet ID
           allOf:
             - $ref: '#/components/schemas/Id'
@@ -1222,7 +1184,7 @@ x-webhooks:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Pet"
+              $ref: '#/components/schemas/Pet'
       responses:
-        "200":
+        '200':
           description: Return a 200 status to indicate that the data was received successfully

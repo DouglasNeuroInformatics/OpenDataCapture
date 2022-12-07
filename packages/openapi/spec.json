@@ -1,0 +1,48 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "This is the REST API implemented for the Douglas Data Capture Platform. This API is \ndocumented in **OpenAPI format**.\n",
+    "version": "1.0.0",
+    "title": "Douglas Data Capture Platform API",
+    "contact": {
+      "name": "Douglas Neuroinformatics Platform",
+      "url": "https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform"
+    },
+    "x-logo": {
+      "url": "https://raw.githubusercontent.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/main/apps/client/public/logo.png",
+      "altText": "logo"
+    },
+    "license": {
+      "name": "GNU General Public License v3.0",
+      "url": "https://www.gnu.org/licenses/gpl-3.0-standalone.html"
+    }
+  },
+  "externalDocs": {
+    "description": "If you're interested in contributing to the project, please refer to our technical documentation.",
+    "url": "https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/"
+  },
+  "tags": [
+    {
+      "name": "subject",
+      "description": "Access to subject-level information"
+    },
+    {
+      "name": "instruments",
+      "description": "Access to instrument-level information"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "General",
+      "tags": [
+        "subject",
+        "instruments"
+      ]
+    }
+  ],
+  "paths": {
+    "/subject": {
+      "$ref": "./paths/subject.json"
+    }
+  }
+}
