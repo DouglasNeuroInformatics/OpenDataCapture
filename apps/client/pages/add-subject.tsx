@@ -2,11 +2,10 @@ import React from 'react';
 
 import type { GetStaticProps } from 'next';
 
-import { SubjectSchema } from 'schemas';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import API from '../api/API';
-import Form, { type FormField, type FormSubmitHandler } from '../components/Form';
+import Form, { type FormField } from '../components/Form';
 import Layout from '../components/Layout';
 
 const demographicsFields: FormField[] = [
