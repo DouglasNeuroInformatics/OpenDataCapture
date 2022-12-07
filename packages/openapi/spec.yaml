@@ -42,7 +42,7 @@ paths:
         '200':
           description: successful operation
     delete:
-      
+
   /pet:
     parameters:
       - name: Accept-Language

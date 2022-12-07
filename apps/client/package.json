@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "check-types": "tsc --noemit",
     "dev": "next dev",
-    "lint": "next lint",
+    "lint": "next lint --dir . --fix",
     "start": "next start"
   },
   "dependencies": {

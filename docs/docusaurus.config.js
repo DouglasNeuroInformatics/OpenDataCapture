@@ -24,7 +24,7 @@ const config = {
   // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en']
   },
 
   presets: [
@@ -34,14 +34,14 @@ const config = {
       ({
         blog: false,
         docs: {
-          editUrl: "https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/tree/main/docs",
-          sidebarPath: require.resolve('./sidebars.js'),
+          editUrl: 'https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/tree/main/docs',
+          sidebarPath: require.resolve('./sidebars.js')
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
-      }),
-    ],
+          customCss: require.resolve('./src/css/custom.css')
+        }
+      })
+    ]
   ],
 
   themeConfig:
@@ -51,31 +51,31 @@ const config = {
         title: 'DDCP',
         logo: {
           alt: 'logo',
-          src: 'img/logo.png',
+          src: 'img/logo.png'
         },
         items: [
           {
             type: 'doc',
             docId: 'introduction',
             position: 'left',
-            label: 'Docs',
+            label: 'Docs'
           },
           {
             href: 'https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform',
             label: 'GitHub',
-            position: 'right',
-          },
-        ],
+            position: 'right'
+          }
+        ]
       },
       footer: {
         style: 'dark',
-        copyright: `Copyright © ${new Date().getFullYear()} Douglas NeuroInformatics Platform`,
+        copyright: `Copyright © ${new Date().getFullYear()} Douglas NeuroInformatics Platform`
       },
       prism: {
         theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
-      },
-    }),
+        darkTheme: darkCodeTheme
+      }
+    })
 };
 
 module.exports = config;

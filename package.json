@@ -10,7 +10,7 @@
     "build": "dotenv -- turbo run build",
     "clean": "turbo run clean",
     "dev": "dotenv -- turbo run dev",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write .",
     "lint": "turbo run lint",
     "test": "dotenv -- turbo run test",
     "prepare": "husky install"

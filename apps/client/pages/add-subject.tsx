@@ -39,9 +39,7 @@ const AddSubjectPage = () => {
   return (
     <Layout>
       <h1 className="text-center py-2">Add Subject</h1>
-      <Form
-        fields={demographicsFields}
-        onSubmit={(values) => API.addSubject(values)} />
+      <Form fields={demographicsFields} onSubmit={(values) => API.addSubject(values)} />
     </Layout>
   );
 };

@@ -34,10 +34,7 @@
   "x-tagGroups": [
     {
       "name": "General",
-      "tags": [
-        "subject",
-        "instruments"
-      ]
+      "tags": ["subject", "instruments"]
     }
   ],
   "paths": {

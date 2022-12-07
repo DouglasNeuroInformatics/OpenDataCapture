@@ -4,11 +4,7 @@
     {
       "$addFields": {
         "shortId": {
-          "$substr": [
-            "$_id",
-            0,
-            5
-          ]
+          "$substr": ["$_id", 0, 5]
         }
       }
     }

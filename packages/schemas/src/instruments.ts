@@ -5,7 +5,7 @@ import { baseSchema } from './base';
 export const happinessQuestionnaireSchema = yup.object({
   ...baseSchema.fields,
   score: yup.number().integer().min(0).max(10).required()
-})
+});
 
 export type HappinessQuestionnaireSchema = yup.InferType<typeof happinessQuestionnaireSchema>;
 

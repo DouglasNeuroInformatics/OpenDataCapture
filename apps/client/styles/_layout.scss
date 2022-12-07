@@ -15,7 +15,7 @@ $sidebar-width: 300px;
   position: absolute;
   width: calc(100vw - $sidebar-width);
   @include media-breakpoint-down(md) {
-    width: 100%
+    width: 100%;
   }
 }
 

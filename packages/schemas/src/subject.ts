@@ -25,10 +25,10 @@ export const subjectArraySchema = yup.array().of(subjectSchema).defined();
 export type SubjectArraySchema = yup.InferType<typeof subjectArraySchema>;
 
 const subject = {
-  firstName: "Joshua",
-  lastName: "Unrau",
+  firstName: 'Joshua',
+  lastName: 'Unrau',
   dateOfBirth: new Date(),
   sex: 'male'
-}
+};
 
-subjectSchema.validate(subject)
+subjectSchema.validate(subject);

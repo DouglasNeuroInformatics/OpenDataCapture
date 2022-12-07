@@ -1,10 +1,10 @@
 # Authentication
 
-The user will enter their login credentials into a form, a request is sent with these credentials to the server, on the server, we validate this data against our database, then send back a response indicating whether the authentication was successful. 
+The user will enter their login credentials into a form, a request is sent with these credentials to the server, on the server, we validate this data against our database, then send back a response indicating whether the authentication was successful.
 
-Once authenticated, the user can access protected routes and submit requests to endpoints on our server requiring authentication. 
+Once authenticated, the user can access protected routes and submit requests to endpoints on our server requiring authentication.
 
-There are two common approaches for this: server-side sessions and authentication tokens. 
+There are two common approaches for this: server-side sessions and authentication tokens.
 
 ## Server-Side Sessions
 
