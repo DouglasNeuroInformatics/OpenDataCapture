@@ -6,7 +6,7 @@
     "build": "next build",
     "check-types": "tsc --noemit",
     "dev": "next dev",
-    "lint": "next lint --dir . --fix",
+    "lint": "yarn check-types && next lint --dir . --fix",
     "start": "next start"
   },
   "dependencies": {
