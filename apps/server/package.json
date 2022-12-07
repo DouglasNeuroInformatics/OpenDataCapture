@@ -6,7 +6,7 @@
     "build": "tsc",
     "clean": "rm -rf dist",
     "dev": "NODE_ENV=development nodemon src/main.ts",
-    "lint": "tsc --noEmit && TIMING=1 eslint \"src/**/*.ts*\"",
+    "lint": "tsc --noEmit && TIMING=1 eslint src/**/* --fix",
     "test": "jest"
   },
   "license": "GPL-3.0-or-later",
