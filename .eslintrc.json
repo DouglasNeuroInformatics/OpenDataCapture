@@ -27,6 +27,13 @@
   },
   "overrides": [
     {
+      "files": ["**/*.cjs"],
+      "env": {
+        "commonjs": true,
+        "node": true
+      }
+    },
+    {
       "files": ["**/*.{ts,tsx}"],
       "extends": [
         "plugin:@typescript-eslint/recommended",
