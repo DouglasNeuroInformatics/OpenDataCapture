@@ -1,5 +1,5 @@
 {
-  "name": "@douglas-data-capture-platform/server",
+  "name": "server",
   "version": "0.0.0",
   "private": true,
   "license": "AGPL-3.0",
@@ -19,8 +19,10 @@
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
+    "joi": "^17.7.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"
   },

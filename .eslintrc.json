@@ -1,12 +1,7 @@
 {
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": "latest"
+  "extends": ["eslint:recommended"],
+  "env": {
+    "es6": true
   },
   "plugins": ["import"],
   "rules": {
@@ -29,5 +24,15 @@
         "ignoreDeclarationSort": true
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{ts,tsx}"],
+      "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+      ],
+      "parser": "@typescript-eslint/parser"
+    }
+  ]
 }

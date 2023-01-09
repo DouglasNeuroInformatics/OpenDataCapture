@@ -9,9 +9,9 @@
   ],
   "license": "AGPL-3.0",
   "scripts": {
-    "build": "env-cmd turbo run build",
+    "build": "env-cmd  NODE_ENV=production turbo run build",
     "clean": "turbo run clean",
-    "dev": "env-cmd turbo run dev",
+    "dev": "env-cmd env-cmd -f .env.local cross-env NODE_ENV=development turbo run dev",
     "format": "turbo run format",
     "lint": "turbo run lint",
     "test": "env-cmd turbo run test"
@@ -20,6 +20,7 @@
     "@types/node": "^18.11.18",
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "@typescript-eslint/parser": "^5.48.0",
+    "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
     "eslint": "^8.31.0",
     "eslint-plugin-import": "^2.26.0",
