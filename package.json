@@ -1,35 +1,36 @@
 {
   "name": "douglas-data-capture-platform",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "client",
+    "common",
+    "server"
   ],
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0",
   "scripts": {
-    "build": "dotenv -- turbo run build",
+    "build": "env-cmd turbo run build",
     "clean": "turbo run clean",
-    "dev": "dotenv -- turbo run dev",
-    "format": "prettier --write .",
+    "dev": "env-cmd turbo run dev",
+    "format": "turbo run format",
     "lint": "turbo run lint",
-    "test": "dotenv -- turbo run test",
-    "prepare": "husky install"
+    "test": "env-cmd turbo run test"
   },
   "devDependencies": {
-    "@types/node": "^18.11.9",
-    "dotenv-cli": "^6.0.0",
-    "eslint": "^8.28.0",
-    "eslint-config-dnp": "*",
-    "husky": "^8.0.0",
-    "prettier": "^2.8.0",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/parser": "^5.48.0",
+    "env-cmd": "^10.1.0",
+    "eslint": "^8.31.0",
+    "eslint-plugin-import": "^2.26.0",
+    "prettier": "^2.8.2",
+    "ts-node": "^10.9.1",
     "turbo": "^1.6.3",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.4"
   },
   "engines": {
     "node": ">=18.0.0 <19.0.0",
     "npm": ">=9.0.0 <10.0.0"
   },
   "packageManager": "yarn@1.22.19"
-  
 }

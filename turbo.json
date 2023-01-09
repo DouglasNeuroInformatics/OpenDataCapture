@@ -4,23 +4,12 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_API_HOST"],
-      "outputs": ["dist/**", ".next/**", "public/dist/**"]
+      "outputs": ["dist/**"]
     },
-    "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
-    },
-    "lint": {
-      "dependsOn": ["^build"],
-      "outputs": []
-    },
-    "dev": {
-      "cache": false,
-      "dependsOn": ["^build"]
-    },
-    "clean": {
-      "cache": false
-    }
+    "clean": {},
+    "dev": {},
+    "format": {},
+    "lint": {},
+    "test": {}
   }
 }
