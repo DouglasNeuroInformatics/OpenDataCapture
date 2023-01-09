@@ -9,6 +9,7 @@
     "outDir": "dist",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "strictPropertyInitialization": false
   }
 }

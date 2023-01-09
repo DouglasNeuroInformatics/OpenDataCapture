@@ -1,3 +1,6 @@
-export function sayHello(name: string) {
-  console.log('hello', name);
+
+// User 
+export enum UserRole {
+  Admin = 'ADMIN',
+  User = 'USER'
 }
