@@ -10,11 +10,12 @@
   "license": "AGPL-3.0",
   "scripts": {
     "build": "env-cmd  NODE_ENV=production turbo run build",
-    "clean": "turbo run clean",
+    "clean": "fd -H -I --prune \".turbo|dist|node_modules\" --exec rm -rf",
     "dev": "env-cmd env-cmd -f .env.local cross-env NODE_ENV=development turbo run dev",
     "format": "turbo run format",
     "lint": "turbo run lint",
-    "test": "env-cmd turbo run test"
+    "test": "env-cmd turbo run test",
+    "ws": "yarn workspace"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
