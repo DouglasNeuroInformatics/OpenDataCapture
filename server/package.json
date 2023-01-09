@@ -13,8 +13,7 @@
     "start": "node dist/main",
     "test": "jest",
     "test:cov": "jest --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test:unit": "jest --testPathPattern src/*"
+    "test:e2e": "jest --config ./test/jest-e2e.config.cjs"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -30,6 +29,7 @@
     "class-validator": "^0.14.0",
     "common": "*",
     "joi": "^17.7.0",
+    "js-yaml": "^4.1.0",
     "mongoose": "^6.8.3",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
@@ -44,6 +44,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.13",
     "@types/jest": "29.2.4",
+    "@types/js-yaml": "^4.0.5",
     "@types/passport": "^1.0.11",
     "@types/passport-jwt": "^3.0.7",
     "@types/supertest": "^2.0.11",

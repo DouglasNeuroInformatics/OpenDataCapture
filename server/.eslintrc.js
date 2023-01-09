@@ -5,7 +5,7 @@ const projectRoot = path.resolve(__dirname, '..');
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
   extends: path.resolve(projectRoot, '.eslintrc.json'),
-  ignorePatterns: ['dist'],
+  ignorePatterns: ['dist/**/*', 'test/**/*'],
   env: {
     node: true
   },

@@ -9,6 +9,7 @@
     "moduleResolution": "Node",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
+    "preserveWatchOutput": true,
     "removeComments": true,
     "skipLibCheck": true,
     "sourceMap": true,

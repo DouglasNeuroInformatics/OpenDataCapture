@@ -2,7 +2,7 @@
   "extends": ["eslint:recommended"],
   "ignorePatterns": ["**/dist/*"],
   "env": {
-    "es6": true
+    "es2017": true
   },
   "plugins": ["import"],
   "rules": {
@@ -28,6 +28,7 @@
   },
   "overrides": [
     {
+      "extends": ["eslint:recommended"],
       "files": ["**/*.cjs"],
       "env": {
         "commonjs": true,

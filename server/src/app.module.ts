@@ -1,12 +1,18 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 
 import Joi from 'joi';
 
+import { AuthModule } from './auth/auth.module';
+import { AccessTokenGuard } from './auth/guards/access-token.guard';
+import { DatabaseModule } from './database/database.module';
+import { DocsModule } from './docs/docs.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
@@ -18,7 +24,15 @@ import { UsersModule } from './users/users.module';
       })
     }),
     ConfigModule,
+    DocsModule,
+    DatabaseModule,
     UsersModule
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard
+    }
   ]
 })
 export class AppModule {}
