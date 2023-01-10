@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { FaGithub } from 'react-icons/fa';
@@ -7,16 +7,24 @@ import { ActionFunction, useActionData } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import Form from '@/components/Form';
 import LanguageToggle from '@/components/LanguageToggle';
+import useFormData from '@/hooks/useFormData';
+import loginRequestSchema from '@/schemas/loginRequestSchema';
 
 const loginAction: ActionFunction = async ({ request }) => {
-  const data = Object.fromEntries(await request.formData());
-  console.log('action!');
-  return data;
+  return Object.fromEntries(await request.formData());
 };
 
 const LoginPage = () => {
-  const actionData = useActionData(); // AuthRequestDto | ValidationError | null | undefined;
+  const formData = useFormData(loginRequestSchema);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (formData) {
+      console.log({
+        formData
+      });
+    }
+  }, [formData]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-100">
