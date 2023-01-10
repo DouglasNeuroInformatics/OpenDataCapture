@@ -2,6 +2,7 @@ import React from 'react';
 
 import { createBrowserRouter } from 'react-router-dom';
 
+import ErrorElement from './components/ErrorElement';
 import HomePage from './routes/home';
 import LoginPage, { loginAction } from './routes/login';
 import Root, { rootLoader } from './routes/root';
@@ -14,6 +15,7 @@ const router = createBrowserRouter([
         <Root />
       </React.Suspense>
     ),
+    errorElement: <ErrorElement />,
     loader: rootLoader,
     children: [
       {
@@ -29,7 +31,8 @@ const router = createBrowserRouter([
         <LoginPage />
       </React.Suspense>
     ),
-    action: loginAction
+    action: loginAction,
+    errorElement: <ErrorElement />
   }
 ]);
 

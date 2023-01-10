@@ -2,30 +2,44 @@ import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { FaGithub } from 'react-icons/fa';
-import { ActionFunction } from 'react-router-dom';
+import { ActionFunction, useActionData } from 'react-router-dom';
 import { z } from 'zod';
 
+import AuthAPI from '@/api/auth.api';
 import logo from '@/assets/logo.png';
 import Form from '@/components/Form';
 import LanguageToggle from '@/components/LanguageToggle';
-
-const loginAction: ActionFunction = async ({ request }) => {
-  return Object.fromEntries(await request.formData());
-};
 
 const loginSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1)
 });
 
+type LoginError = z.inferFlattenedErrors<typeof loginSchema> | undefined;
+
+const loginAction: ActionFunction = async ({ request }) => {
+  const data = Object.fromEntries(await request.formData());
+  const result = loginSchema.safeParse(data);
+  if (result.success) {
+    const results = await AuthAPI.login(result.data);
+    console.log('results', results);
+    return null;
+  }
+  return result.error;
+};
+
 const LoginPage = () => {
+  const formError = useActionData() as LoginError;
   const { t } = useTranslation();
+
+  console.log(formError?.fieldErrors.password);
+
   return (
     <div className="flex h-screen items-center justify-center bg-slate-100">
       <div className="flex flex-col items-center rounded-lg bg-slate-50 p-8">
         <img alt="logo" className="m-1 w-16" src={logo} />
         <h1 className="text-2xl font-bold">{t('login.pageTitle')}</h1>
-        <Form schema={loginSchema}>
+        <Form>
           <Form.TextField label={t('login.form.username')} name="username" />
           <Form.TextField label={t('login.form.password')} name="password" />
           <Form.SubmitButton label={t('login.form.submitBtnLabel')} />

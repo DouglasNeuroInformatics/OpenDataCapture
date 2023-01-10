@@ -2,18 +2,13 @@ import React from 'react';
 
 import classNames from 'classnames';
 import { Form as ReactRouterForm } from 'react-router-dom';
-import { ZodType } from 'zod';
 
-import useFormAction from '@/hooks/useFormAction';
-
-interface FormProps<T> {
+interface FormProps {
   children: React.ReactNode;
-  schema: ZodType<T>;
   className?: string;
 }
 
-const Form = <T,>({ children, schema, className }: FormProps<T>) => {
-  const result = useFormAction(schema);
+const Form = ({ children, className }: FormProps) => {
   return (
     <ReactRouterForm autoComplete="off" className={classNames('w-full', className)} method="post">
       {children}
