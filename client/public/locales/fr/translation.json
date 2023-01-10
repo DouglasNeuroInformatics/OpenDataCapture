@@ -1,6 +1,12 @@
 {
   "login": {
-    "pageTitle": "Se connecter"
+    "pageTitle": "Se connecter",
+    "form": {
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe",
+      "submitBtnLabel": "Se connecter"
+    },
+    "sourceCodeLinkLabel": "Voir le code source"
   },
   "home": {
     "pageTitle": "Voici le Douglas Data Capture Platform",

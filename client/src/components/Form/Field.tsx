@@ -5,7 +5,7 @@ interface FieldProps {
 }
 
 const Field = ({ children }: FieldProps) => {
-  return <div className="relative z-50 my-3">{children}</div>;
+  return <div className="relative z-50 my-4 w-full">{children}</div>;
 };
 
 export { Field as default, type FieldProps };

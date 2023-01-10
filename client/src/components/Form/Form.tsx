@@ -10,7 +10,7 @@ interface FormProps {
 
 const Form = ({ children, className }: FormProps) => {
   return (
-    <ReactRouterForm autoComplete="off" className={classNames('max-w-lg', className)} method="post">
+    <ReactRouterForm autoComplete="off" className={classNames('w-full', className)} method="post">
       {children}
     </ReactRouterForm>
   );

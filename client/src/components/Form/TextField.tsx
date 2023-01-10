@@ -27,7 +27,7 @@ const TextField = ({ name, label, id, variant = 'text' }: TextFieldProps) => {
   return (
     <Field>
       <input
-        className="border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none"
+        className="w-full border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none"
         id={id ?? name}
         name={name}
         type={variant}
@@ -36,7 +36,7 @@ const TextField = ({ name, label, id, variant = 'text' }: TextFieldProps) => {
       />
       <label
         className={classNames('absolute left-0 -z-50 my-2 text-gray-600 transition-all', {
-          '-translate-y-6 text-sm text-indigo-800': isFloatingLabel
+          '-translate-y-5 text-sm text-indigo-800': isFloatingLabel
         })}
         htmlFor={name}
       >

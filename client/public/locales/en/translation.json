@@ -2,7 +2,13 @@
   "platformTitle": "Douglas Data Capture Platform",
   "organizationName": "Douglas Neuroinformatics Platform",
   "login": {
-    "pageTitle": "Login"
+    "pageTitle": "Login",
+    "form": {
+      "username": "Username",
+      "password": "Password",
+      "submitBtnLabel": "Login"
+    },
+    "sourceCodeLinkLabel": "View Source Code"
   },
   "home": {
     "pageTitle": "Welcome to the Douglas Data Capture Platform",
