@@ -54,5 +54,11 @@
     "ts-jest": "29.0.3",
     "ts-loader": "^9.2.3",
     "tsconfig-paths": "4.1.1"
+  },
+  "lint-staged": {
+    "*.{ts,js,cjs,mjs,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

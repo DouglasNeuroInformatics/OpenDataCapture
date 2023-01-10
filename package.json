@@ -15,7 +15,8 @@
     "format": "turbo run format",
     "lint": "turbo run lint",
     "test": "env-cmd env-cmd -f .env.local turbo run test",
-    "ws": "yarn workspace"
+    "ws": "yarn workspace",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
@@ -26,6 +27,8 @@
     "eslint": "^8.31.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^27.2.1",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.1.0",
     "prettier": "^2.8.2",
     "ts-node": "^10.9.1",
     "turbo": "^1.6.3",
