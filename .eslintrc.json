@@ -2,7 +2,8 @@
   "extends": ["eslint:recommended"],
   "ignorePatterns": ["**/dist/*"],
   "env": {
-    "es2020": true
+    "es2020": true,
+    "shared-node-browser": true
   },
   "parserOptions": {
     "sourceType": "module"

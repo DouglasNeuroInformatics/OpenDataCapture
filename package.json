@@ -1,6 +1,7 @@
 {
   "name": "douglas-data-capture-platform",
   "version": "0.0.1",
+  "type": "module",
   "private": true,
   "workspaces": [
     "client",
@@ -35,16 +36,12 @@
     "turbo": "^1.6.3",
     "typescript": "^4.9.4"
   },
+  "dependencies": {
+    "zod": "^3.20.2"
+  },
   "engines": {
     "node": ">=18.0.0 <19.0.0",
     "npm": ">=9.0.0 <10.0.0"
   },
-  "packageManager": "yarn@1.22.19",
-  "lint-staged": {
-    "*.{ts,js,cjs,mjs}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.json": "prettier --write"
-  }
+  "packageManager": "yarn@1.22.19"
 }

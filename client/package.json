@@ -10,8 +10,18 @@
     "lint": "eslint --fix src"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.7",
+    "classnames": "^2.3.2",
+    "common": "*",
+    "i18next": "^22.4.6",
+    "i18next-browser-languagedetector": "^7.0.1",
+    "i18next-http-backend": "^2.1.1",
+    "jwt-decode": "^3.1.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-i18next": "^12.1.1",
+    "react-icons": "^4.7.1",
+    "react-router-dom": "^6.4.5"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.8",

@@ -1,0 +1,29 @@
+{
+  "platformTitle": "Douglas Data Capture Platform",
+  "organizationName": "Douglas Neuroinformatics Platform",
+  "login": {
+    "pageTitle": "Login"
+  },
+  "home": {
+    "pageTitle": "Welcome to the Douglas Data Capture Platform",
+    "platformDescription": "The Douglas Data Capture Platform is build from the ground up to serve the needs of clinical researchers. The platform enables you to continuously collect and store data about your clients in a streamlined, secure, reliable, and structured manner. This structured data drives a live dashboard with query interfaces to easily visualize summary information regarding your clients. Optionally, at your request, we can provide you with a subset of this data for research purposes."
+  },
+  "sidebar": {
+    "links": {
+      "/home": "Home",
+      "/subjects/add-subject": "Add Subject",
+      "/subjects/view-subjects": "View Subjects",
+      "/instruments/add-instrument": "Add Instrument",
+      "/instruments/view-instruments": "View Instruments"
+    }
+  },
+  "userDropup": {
+    "logout": "Logout"
+  },
+  "footer": {
+    "viewSourceCode": "View Source Code"
+  },
+  "httpErrors": {
+    "404": "This page could not be found"
+  }
+}
