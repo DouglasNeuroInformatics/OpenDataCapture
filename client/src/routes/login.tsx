@@ -1,37 +1,31 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { FaGithub } from 'react-icons/fa';
-import { ActionFunction, useActionData } from 'react-router-dom';
+import { ActionFunction } from 'react-router-dom';
+import { z } from 'zod';
 
 import logo from '@/assets/logo.png';
 import Form from '@/components/Form';
 import LanguageToggle from '@/components/LanguageToggle';
-import useFormData from '@/hooks/useFormData';
-import loginRequestSchema from '@/schemas/loginRequestSchema';
 
 const loginAction: ActionFunction = async ({ request }) => {
   return Object.fromEntries(await request.formData());
 };
 
+const loginSchema = z.object({
+  username: z.string().min(1),
+  password: z.string().min(1)
+});
+
 const LoginPage = () => {
-  const formData = useFormData(loginRequestSchema);
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (formData) {
-      console.log({
-        formData
-      });
-    }
-  }, [formData]);
-
   return (
     <div className="flex h-screen items-center justify-center bg-slate-100">
       <div className="flex flex-col items-center rounded-lg bg-slate-50 p-8">
         <img alt="logo" className="m-1 w-16" src={logo} />
         <h1 className="text-2xl font-bold">{t('login.pageTitle')}</h1>
-        <Form>
+        <Form schema={loginSchema}>
           <Form.TextField label={t('login.form.username')} name="username" />
           <Form.TextField label={t('login.form.password')} name="password" />
           <Form.SubmitButton label={t('login.form.submitBtnLabel')} />
