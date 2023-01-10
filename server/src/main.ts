@@ -24,8 +24,6 @@ async function bootstrap(): Promise<void> {
 
   await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);
-
-  const x = 'foo';
 }
 
 void bootstrap();

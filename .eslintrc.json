@@ -2,7 +2,10 @@
   "extends": ["eslint:recommended"],
   "ignorePatterns": ["**/dist/*"],
   "env": {
-    "es2017": true
+    "es2020": true
+  },
+  "parserOptions": {
+    "sourceType": "module"
   },
   "plugins": ["import"],
   "rules": {
