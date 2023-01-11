@@ -3,7 +3,7 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
 import Layout from '@/components/Layout';
-import useAuth from '@/hooks/useAccessToken';
+import useAuth from '@/hooks/useAuth';
 
 function rootLoader() {
   console.log('loading root!');

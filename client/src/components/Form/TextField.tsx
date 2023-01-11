@@ -25,7 +25,7 @@ const TextField = ({ name, label, id, variant = 'text' }: TextFieldProps) => {
   };
 
   return (
-    <Field>
+    <Field name={name}>
       <input
         className="w-full border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none"
         id={id ?? name}
