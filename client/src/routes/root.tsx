@@ -13,7 +13,7 @@ function rootLoader() {
 const Root = () => {
   const auth = useAuth();
 
-  return auth ? (
+  return auth.currentUser ? (
     <Layout>
       <Outlet />
     </Layout>

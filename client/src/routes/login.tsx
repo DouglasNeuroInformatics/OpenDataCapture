@@ -1,60 +1,69 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { AuthTokens, LoginCredentials } from 'common';
+import { LoginCredentials } from 'common';
 import { useTranslation } from 'react-i18next';
 import { FaGithub } from 'react-icons/fa';
 import { ActionFunction, useActionData } from 'react-router-dom';
 import { z } from 'zod';
 
-import AuthAPI from '@/api/auth.api';
 import logo from '@/assets/logo.png';
 import Form, { type FormErrors } from '@/components/Form';
 import LanguageToggle from '@/components/LanguageToggle';
 import useAuth from '@/hooks/useAuth';
 
-const loginSchema = z.object({
+const loginCredentialsSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1)
 });
 
+interface ValidationErrors {
+  [key: string]: string[];
+}
+
 interface LoginActionData {
-  authTokens: AuthTokens | null;
-  formErrors: FormErrors | null;
+  loginCredentials: LoginCredentials | null;
+  validationErrors: ValidationErrors | null;
 }
 
 const loginAction: ActionFunction = async ({ request }): Promise<LoginActionData> => {
-  let authTokens: AuthTokens | null = null;
-  let formErrors: FormErrors | null = null;
+  let loginCredentials: LoginCredentials | null = null;
+  let validationErrors: ValidationErrors | null = null;
 
   const data = Object.fromEntries(await request.formData());
-  const result = await loginSchema.safeParseAsync(data);
+  const result = await loginCredentialsSchema.safeParseAsync(data);
 
   if (!result.success) {
     const { fieldErrors } = result.error.flatten();
-    formErrors = { fields: fieldErrors };
+    validationErrors = fieldErrors;
   } else {
-    try {
-      authTokens = await AuthAPI.login(result.data as LoginCredentials);
-    } catch (error) {
-      if (error instanceof Response) {
-        formErrors = { submission: [`${error.status}: ${error.statusText}`] };
-      } else {
-        formErrors = { submission: ['An unknown error occurred '] };
-      }
-    }
+    loginCredentials = result.data;
   }
-  return { authTokens, formErrors };
+
+  return { loginCredentials, validationErrors };
 };
 
 const LoginPage = () => {
   const actionData = useActionData() as LoginActionData | undefined;
   const auth = useAuth();
   const { t } = useTranslation();
+  const [loginErrors, setLoginErrors] = useState<string[]>([]);
+
+  const formErrors: FormErrors = {
+    fields: actionData?.validationErrors ?? undefined,
+    submission: loginErrors
+  };
+
+  const handleLogin = async (credentials: LoginCredentials) => {
+    await auth.login(credentials).catch((error) => {
+      if (error instanceof Error) {
+        setLoginErrors([error.message]);
+      }
+    });
+  };
 
   useEffect(() => {
-    if (actionData?.authTokens) {
-      console.log(actionData.authTokens.accessToken);
-      auth.setAccessToken(actionData.authTokens.accessToken);
+    if (actionData?.loginCredentials) {
+      void handleLogin(actionData.loginCredentials);
     }
   }, [actionData]);
 
@@ -63,9 +72,9 @@ const LoginPage = () => {
       <div className="flex w-full flex-col items-center rounded-lg bg-slate-50 p-8 sm:w-96">
         <img alt="logo" className="m-1 w-16" src={logo} />
         <h1 className="text-2xl font-bold">{t('login.pageTitle')}</h1>
-        <Form errors={actionData?.formErrors ?? null}>
+        <Form errors={formErrors}>
           <Form.TextField label={t('login.form.username')} name="username" />
-          <Form.TextField label={t('login.form.password')} name="password" />
+          <Form.TextField label={t('login.form.password')} name="password" variant="password" />
           <Form.SubmitButton label={t('login.form.submitBtnLabel')} />
         </Form>
         <div className="mt-3">

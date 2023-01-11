@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import { FormErrors } from '@/components/Form/Form';
+import { FormErrors } from '@/components/Form';
 
 interface FormContextInterface {
   errors: FormErrors | null;
