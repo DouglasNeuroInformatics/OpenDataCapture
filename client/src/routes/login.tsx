@@ -59,8 +59,8 @@ const LoginPage = () => {
   }, [actionData]);
 
   return (
-    <div className="flex h-screen items-center justify-center bg-slate-100">
-      <div className="flex flex-col items-center rounded-lg bg-slate-50 p-8">
+    <div className="flex h-screen items-center justify-center bg-slate-50 sm:bg-slate-100">
+      <div className="flex w-full flex-col items-center rounded-lg bg-slate-50 p-8 sm:w-96">
         <img alt="logo" className="m-1 w-16" src={logo} />
         <h1 className="text-2xl font-bold">{t('login.pageTitle')}</h1>
         <Form errors={actionData?.formErrors ?? null}>
