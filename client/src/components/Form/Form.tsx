@@ -27,7 +27,7 @@ const Form = ({ children, className, errors }: FormProps) => {
         {children}
       </ReactRouterForm>
       {errors?.submission?.map((error) => (
-        <FormErrorMessage>{error}</FormErrorMessage>
+        <FormErrorMessage key={error}>{error}</FormErrorMessage>
       ))}
     </FormContext.Provider>
   );

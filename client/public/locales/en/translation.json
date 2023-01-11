@@ -31,5 +31,8 @@
   },
   "httpErrors": {
     "404": "This page could not be found"
+  },
+  "validationErrors": {
+    "requiredField": "This is a required field"
   }
 }

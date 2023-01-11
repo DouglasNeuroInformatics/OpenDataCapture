@@ -37,7 +37,7 @@ const loginAction: ActionFunction = async ({ request }): Promise<LoginActionData
       authTokens = await AuthAPI.login(result.data as LoginCredentials);
     } catch (error) {
       if (error instanceof Response) {
-        formErrors = { submission: ['An error occurred during submission'] };
+        formErrors = { submission: [`${error.status}: ${error.statusText}`] };
       } else {
         formErrors = { submission: ['An unknown error occurred '] };
       }

@@ -1,18 +1,19 @@
-import i18n from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import Backend from 'i18next-http-backend';
-import { initReactI18next } from 'react-i18next';
+import { z } from 'zod';
 
-void i18n
-  .use(Backend)
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false
-    },
-    supportedLngs: ['en', 'fr']
-  });
+import i18n from './i18n';
+
+const customErrorMap: z.ZodErrorMap = (error, ctx) => {
+  console.log(error, ctx);
+  switch (error.code) {
+    case z.ZodIssueCode.too_small: {
+      if (error.minimum === 1) {
+        return { message: i18n.t('validationErrors.requiredField') };
+      }
+    }
+  }
+  return { message: ctx.defaultError };
+};
+
+z.setErrorMap(customErrorMap);
 
 export default i18n;

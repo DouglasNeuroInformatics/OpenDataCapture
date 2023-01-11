@@ -29,5 +29,8 @@
   },
   "httpErrors": {
     "404": "Cette page ne peut être trouvée"
+  },
+  "validationErrors": {
+    "requiredField": "Ce champ est obligatoire"
   }
 }
