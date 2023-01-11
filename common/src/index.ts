@@ -16,7 +16,6 @@ export interface JwtPayload {
 }
 
 // User
-export enum UserRole {
-  Admin = 'ADMIN',
-  User = 'USER'
-}
+export const userRoles = ['admin', 'user'] as const;
+
+export type UserRole = (typeof userRoles)[number];

@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import { UserRole } from 'common';
 
 import { User } from '@/users/schemas/user.schema';
 
@@ -10,7 +9,7 @@ export const mockAdminHashedPassport = bcrypt.hashSync(mockAdminPlainTextPasswor
 export const mockAdmin: User = Object.freeze({
   username: 'admin',
   password: mockAdminHashedPassport,
-  role: UserRole.Admin,
+  role: 'admin',
   refreshToken: 'token'
 });
 
@@ -21,5 +20,5 @@ export const mockUserHashedPassport = mockAdminHashedPassport;
 export const mockUser: User = Object.freeze({
   username: 'user',
   password: mockUserHashedPassport,
-  role: UserRole.User
+  role: 'user'
 });

@@ -3,10 +3,21 @@
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsup src/index.ts --clean --dts --format cjs,esm",
+    "dev": "tsup src/index.ts --dts --format cjs,esm --watch",
     "lint": "eslint --fix src"
+  },
+  "devDependencies": {
+    "tsup": "^6.5.0"
   }
 }
