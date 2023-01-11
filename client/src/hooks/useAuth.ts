@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 
 import { AuthTokens, LoginCredentials, userRoles } from 'common';
 import jwtDecode from 'jwt-decode';
@@ -18,8 +18,7 @@ type CurrentUser = z.infer<typeof currentUserSchema>;
 interface Auth {
   currentUser: CurrentUser | null;
   login: (credentials: LoginCredentials) => Promise<void>;
-  //loginDev: () => Promise<void>;
-  //logout: () => void;
+  logout: () => void;
 }
 
 export default function useAuth(): Auth {
@@ -36,20 +35,34 @@ export default function useAuth(): Auth {
       console.error(result.error);
     }
     return null;
-  }, [context.accessToken]);
+  }, [context]);
 
-  const login = async (credentials: LoginCredentials): Promise<void> => {
-    let authTokens: AuthTokens;
-    try {
-      authTokens = await AuthAPI.login(credentials);
-      context.setAccessToken(authTokens.accessToken);
-    } catch (error) {
-      if (error instanceof Response) {
-        throw new Error(`${error.status}: ${error.statusText}`);
+  const login = useCallback(
+    async (credentials: LoginCredentials): Promise<void> => {
+      let authTokens: AuthTokens;
+      try {
+        authTokens = await AuthAPI.login(credentials);
+        context.setAccessToken(authTokens.accessToken);
+      } catch (error) {
+        if (error instanceof Response) {
+          throw new Error(`${error.status}: ${error.statusText}`);
+        }
+        throw new Error('An unknown error occurred');
       }
-      throw new Error('An unknown error occurred');
-    }
-  };
+    },
+    [context]
+  );
+
+  const loginDev = useCallback(() => {
+    void login({
+      username: import.meta.env.VITE_DEV_USERNAME!,
+      password: import.meta.env.VITE_DEV_PASSWORD!
+    });
+  }, [login]);
+
+  const logout = useCallback(() => {
+    context.setAccessToken(null);
+  }, [context]);
 
   useEffect(() => {
     if (currentUser) {
@@ -57,8 +70,15 @@ export default function useAuth(): Auth {
     }
   }, [currentUser]);
 
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      loginDev();
+    }
+  }, []);
+
   return {
     currentUser,
-    login
+    login,
+    logout
   };
 }

@@ -16,7 +16,7 @@ const router = createBrowserRouter([
       </React.Suspense>
     ),
     errorElement: <ErrorElement />,
-    // loader: rootLoader,
+    loader: rootLoader,
     children: [
       {
         path: '/home',
