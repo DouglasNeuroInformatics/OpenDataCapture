@@ -19,7 +19,7 @@ const ViewInstrumentsPage = () => {
     });
     return z.array(instrumentSchema).parseAsync(await response.json());
   });
-
+  
   if (error) {
     console.error(error);
   }

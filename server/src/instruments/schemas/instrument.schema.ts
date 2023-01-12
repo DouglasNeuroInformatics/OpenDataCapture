@@ -37,6 +37,9 @@ export class Instrument implements InstrumentInterface {
   @Prop({ required: false })
   estimatedDuration: number;
 
+  @Prop({ required: false })
+  version: number;
+  
   @Prop({ required: true })
   fields: InstrumentField[];
 }

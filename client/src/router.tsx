@@ -4,6 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import ErrorElement from './components/ErrorElement';
 import HomePage from './routes/home';
+import InstrumentPage from './routes/instruments/:instrument';
 import AddInstrumentPage from './routes/instruments/add-instrument';
 import ViewInstrumentsPage from './routes/instruments/view-instruments';
 import LoginPage from './routes/login';
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: '/instruments/view-instruments',
         element: <ViewInstrumentsPage />
+      },
+      {
+        path: '/instruments/:id',
+        element: <InstrumentPage />,
       }
     ]
   },

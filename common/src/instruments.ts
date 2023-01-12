@@ -19,6 +19,7 @@ export const instrumentSchema = z.object({
   description: z.string(),
   instructions: z.string(),
   estimatedDuration: z.number(),
+  version: z.number(),
   fields: z.array(instrumentFieldSchema)
 });
 

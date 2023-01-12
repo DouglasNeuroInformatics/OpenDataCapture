@@ -70,4 +70,9 @@ export class InstrumentDto implements InstrumentInterface {
   })
   @ValidateNested()
   fields: InstrumentFieldDto[];
+
+  @ApiProperty({
+    description: 'The version of the instrument'
+  })
+  version: number;
 }

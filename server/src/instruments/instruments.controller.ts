@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { Instrument } from 'common';
@@ -25,5 +25,10 @@ export class InstrumentsController {
   @ApiOkResponse({ description: 'Success' })
   getAll(): Promise<Instrument[]> {
     return this.instrumentsService.getAll();
+  }
+
+  @Get(':id')
+  getById(@Param('id') id: string): Promise<Instrument> {
+    return this.instrumentsService.getById(id);
   }
 }
