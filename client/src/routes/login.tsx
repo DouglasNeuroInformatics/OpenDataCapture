@@ -35,23 +35,33 @@ const LoginPage = () => {
     submission: [...(actionData?.error?.formErrors ?? []), ...loginErrors]
   };
 
-  const handleLogin = async (credentials: LoginCredentials) => {
-    await auth.login(credentials).catch((error) => {
-      if (error instanceof Error) {
-        setLoginErrors([error.message]);
-      }
-    });
+  const handleLogin = (credentials: LoginCredentials) => {
+    void auth
+      .login(credentials)
+      .catch((error) => {
+        if (error instanceof Error) {
+          setLoginErrors([error.message]);
+        }
+      })
+      .then(() => {
+        navigate('/home');
+      });
   };
 
   useEffect(() => {
-    if (actionData?.data) {
-      void handleLogin(actionData.data).then(() => {
-        navigate('/home');
+    if (import.meta.env.VITE_DEV_BYPASS_AUTH) {
+      void handleLogin({
+        username: import.meta.env.VITE_DEV_USERNAME!,
+        password: import.meta.env.VITE_DEV_PASSWORD!
       });
     }
-  }, [actionData]);
+  }, []);
 
-  console.log(auth);
+  useEffect(() => {
+    if (actionData?.data) {
+      void handleLogin(actionData.data);
+    }
+  }, [actionData]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50 sm:bg-slate-100">
