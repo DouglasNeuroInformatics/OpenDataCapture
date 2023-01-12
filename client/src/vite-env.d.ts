@@ -5,6 +5,7 @@ interface ImportMetaDevEnv {
   readonly VITE_DEV_USERNAME?: string;
   readonly VITE_DEV_PASSWORD?: string;
   readonly VITE_DEV_SERVER_PORT?: number;
+  readonly VITE_DEV_BYPASS_AUTH?: boolean;
 }
 
 interface ImportMetaEnv extends ImportMetaDevEnv {

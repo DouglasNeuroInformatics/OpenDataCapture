@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { UserRole, userRoles } from 'common';
+import { UserRole, userRoleOptions } from 'common';
 import { HydratedDocument } from 'mongoose';
 
 @Schema({ strict: true, timestamps: true })
@@ -11,7 +11,7 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ enum: userRoles, required: true, type: String })
+  @Prop({ enum: userRoleOptions, required: true, type: String })
   role: UserRole;
 
   @Prop()

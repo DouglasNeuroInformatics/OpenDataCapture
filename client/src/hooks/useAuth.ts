@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useMemo } from 'react';
 
-import { AuthTokens, LoginCredentials, userRoles } from 'common';
+import { AuthTokens, LoginCredentials, userRoleOptions } from 'common';
 import jwtDecode from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -10,7 +10,7 @@ import AuthContext, { AuthContextInterface } from '@/context/AuthContext';
 
 const currentUserSchema = z.object({
   username: z.string(),
-  role: z.enum(userRoles)
+  role: z.enum(userRoleOptions)
 });
 
 type CurrentUser = z.infer<typeof currentUserSchema>;
@@ -54,10 +54,12 @@ export default function useAuth(): Auth {
   );
 
   const loginDev = useCallback(() => {
-    void login({
-      username: import.meta.env.VITE_DEV_USERNAME!,
-      password: import.meta.env.VITE_DEV_PASSWORD!
-    });
+    if (import.meta.env.VITE_DEV_BYPASS_AUTH) {
+      void login({
+        username: import.meta.env.VITE_DEV_USERNAME!,
+        password: import.meta.env.VITE_DEV_PASSWORD!
+      });
+    }
   }, [login]);
 
   const logout = useCallback(() => {

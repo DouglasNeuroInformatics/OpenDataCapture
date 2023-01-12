@@ -10,36 +10,17 @@ import logo from '@/assets/logo.png';
 import Form, { type FormErrors } from '@/components/Form';
 import LanguageToggle from '@/components/LanguageToggle';
 import useAuth from '@/hooks/useAuth';
+import parseActionRequest, { ParsedActionRequest } from '@/utils/parseActionRequest';
 
 const loginCredentialsSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1)
 });
 
-interface ValidationErrors {
-  [key: string]: string[];
-}
+type LoginActionData = ParsedActionRequest<LoginCredentials>;
 
-interface LoginActionData {
-  loginCredentials: LoginCredentials | null;
-  validationErrors: ValidationErrors | null;
-}
-
-const loginAction: ActionFunction = async ({ request }): Promise<LoginActionData> => {
-  let loginCredentials: LoginCredentials | null = null;
-  let validationErrors: ValidationErrors | null = null;
-
-  const data = Object.fromEntries(await request.formData());
-  const result = await loginCredentialsSchema.safeParseAsync(data);
-
-  if (!result.success) {
-    const { fieldErrors } = result.error.flatten();
-    validationErrors = fieldErrors;
-  } else {
-    loginCredentials = result.data;
-  }
-
-  return { loginCredentials, validationErrors };
+const loginAction: ActionFunction = async ({ request }) => {
+  return parseActionRequest(request, loginCredentialsSchema);
 };
 
 const LoginPage = () => {
@@ -49,8 +30,8 @@ const LoginPage = () => {
   const [loginErrors, setLoginErrors] = useState<string[]>([]);
 
   const formErrors: FormErrors = {
-    fields: actionData?.validationErrors ?? undefined,
-    submission: loginErrors
+    fields: actionData?.error?.fieldErrors,
+    submission: [...(actionData?.error?.formErrors ?? []), ...loginErrors]
   };
 
   const handleLogin = async (credentials: LoginCredentials) => {
@@ -62,8 +43,8 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (actionData?.loginCredentials) {
-      void handleLogin(actionData.loginCredentials);
+    if (actionData?.data) {
+      void handleLogin(actionData.data);
     }
   }, [actionData]);
 

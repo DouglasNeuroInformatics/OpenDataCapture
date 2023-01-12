@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { DatabaseModule } from './database/database.module';
 import { DocsModule } from './docs/docs.module';
+import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule,
     DocsModule,
     DatabaseModule,
+    SubjectsModule,
     UsersModule
   ],
   providers: [
