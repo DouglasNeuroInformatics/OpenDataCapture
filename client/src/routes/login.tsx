@@ -1,76 +1,74 @@
 import React, { useEffect, useState } from 'react';
 
-import { LoginCredentials } from 'common';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { LoginCredentials, loginCredentialsSchema } from 'common';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FaGithub } from 'react-icons/fa';
-import { ActionFunction, useActionData, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
 
 import logo from '@/assets/logo.png';
-import Form, { type FormErrors } from '@/components/Form';
+import Form from '@/components/Form';
 import LanguageToggle from '@/components/LanguageToggle';
 import useAuth from '@/hooks/useAuth';
-import parseActionRequest, { ParsedActionRequest } from '@/utils/parseActionRequest';
-
-const loginCredentialsSchema = z.object({
-  username: z.string().min(1),
-  password: z.string().min(1)
-});
-
-type LoginActionData = ParsedActionRequest<LoginCredentials>;
-
-const loginAction: ActionFunction = async ({ request }) => {
-  return parseActionRequest(request, loginCredentialsSchema);
-};
 
 const LoginPage = () => {
-  const actionData = useActionData() as LoginActionData | undefined;
   const auth = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [loginErrors, setLoginErrors] = useState<string[]>([]);
+  const [loginError, setLoginError] = useState<string>();
 
-  const formErrors: FormErrors = {
-    fields: actionData?.error?.fieldErrors,
-    submission: [...(actionData?.error?.formErrors ?? []), ...loginErrors]
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<LoginCredentials>({
+    resolver: zodResolver(loginCredentialsSchema)
+  });
 
-  const handleLogin = (credentials: LoginCredentials) => {
-    void auth
-      .login(credentials)
-      .catch((error) => {
-        if (error instanceof Error) {
-          setLoginErrors([error.message]);
-        }
-      })
-      .then(() => {
-        navigate('/home');
-      });
+  const onSubmit = async (credentials: LoginCredentials) => {
+    try {
+      await auth.login(credentials);
+      navigate('/home');
+    } catch (error) {
+      if (error instanceof Error) {
+        setLoginError(error.message);
+      } else {
+        setLoginError('An unknown error occurred');
+      }
+    }
   };
 
   useEffect(() => {
     if (import.meta.env.VITE_DEV_BYPASS_AUTH) {
-      void handleLogin({
-        username: import.meta.env.VITE_DEV_USERNAME!,
-        password: import.meta.env.VITE_DEV_PASSWORD!
-      });
+      void auth
+        .login({
+          username: import.meta.env.VITE_DEV_USERNAME!,
+          password: import.meta.env.VITE_DEV_PASSWORD!
+        })
+        .then(() => navigate('/home'));
     }
   }, []);
-
-  useEffect(() => {
-    if (actionData?.data) {
-      void handleLogin(actionData.data);
-    }
-  }, [actionData]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50 sm:bg-slate-100">
       <div className="flex w-full flex-col items-center rounded-lg bg-slate-50 p-8 sm:w-96">
         <img alt="logo" className="m-1 w-16" src={logo} />
         <h1 className="text-2xl font-bold">{t('login.pageTitle')}</h1>
-        <Form errors={formErrors}>
-          <Form.TextField label={t('login.form.username')} name="username" />
-          <Form.TextField label={t('login.form.password')} name="password" variant="password" />
+        <Form error={loginError} onSubmit={handleSubmit(onSubmit)}>
+          <Form.TextField
+            error={errors.username?.message}
+            label={t('login.form.username')}
+            name="username"
+            register={register}
+          />
+          <Form.TextField
+            error={errors.password?.message}
+            label={t('login.form.password')}
+            name="password"
+            register={register}
+            variant="password"
+          />
           <Form.SubmitButton label={t('login.form.submitBtnLabel')} />
         </Form>
         <div className="mt-3">
@@ -98,4 +96,4 @@ const LoginPage = () => {
   );
 };
 
-export { LoginPage as default, loginAction };
+export { LoginPage as default };

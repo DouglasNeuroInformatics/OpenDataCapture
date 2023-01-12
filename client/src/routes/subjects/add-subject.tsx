@@ -1,14 +1,62 @@
 import React from 'react';
 
-import { ActionFunction } from 'react-router-dom';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { sexOptions } from 'common';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-const addSubjectAction: ActionFunction = ({ request }) => {
-  console.log(request);
-  return null;
-};
+import Form from '@/components/Form';
+
+const formDataSchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  sex: z.enum(sexOptions),
+  dateOfBirth: z.coerce.date()
+});
+
+type FormData = z.infer<typeof formDataSchema>;
 
 const AddSubjectPage = () => {
-  return <h1>Subjects</h1>;
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors }
+  } = useForm<FormData>({
+    resolver: zodResolver(formDataSchema)
+  });
+
+  const onSubmit = (data: any) => {
+    alert(JSON.stringify(data));
+    reset();
+  };
+
+  return (
+    <div className="flex flex-col items-center">
+      <h1>Add Subject</h1>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form.TextField error={errors.firstName?.message} label="First Name" name="firstName" register={register} />
+        <Form.TextField error={errors.lastName?.message} label="Last Name" name="lastName" register={register} />
+        <Form.TextField
+          error={errors.dateOfBirth?.message}
+          label="Date of Birth"
+          name="dateOfBirth"
+          register={register}
+          variant="date"
+        />
+        <Form.SelectField
+          control={control}
+          error={errors.sex?.message}
+          label="Sex"
+          name="sex"
+          options={sexOptions}
+          register={register}
+        />
+        <Form.SubmitButton />
+      </Form>
+    </div>
+  );
 };
 
-export { AddSubjectPage as default, addSubjectAction };
+export { AddSubjectPage as default };

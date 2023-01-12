@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 
 import classNames from 'classnames';
+import { UseFormRegister } from 'react-hook-form';
 
 import Field from './Field';
 
 interface TextFieldProps {
   name: string;
   label: string;
-  id?: string;
-  variant?: 'text' | 'password';
+  register: UseFormRegister<any>;
+  error?: string;
+  variant?: 'date' | 'text' | 'password';
 }
 
-const TextField = ({ name, label, id, variant = 'text' }: TextFieldProps) => {
+const TextField = ({ name, label, register, error, variant = 'text' }: TextFieldProps) => {
   const [isFloatingLabel, setIsFloatingLabel] = useState(false);
 
   const handleBlur: React.FocusEventHandler<HTMLInputElement> = (event) => {
@@ -25,14 +27,12 @@ const TextField = ({ name, label, id, variant = 'text' }: TextFieldProps) => {
   };
 
   return (
-    <Field name={name}>
+    <Field error={error}>
       <input
         className="w-full border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none"
-        id={id ?? name}
-        name={name}
         type={variant}
-        onBlur={handleBlur}
         onFocus={handleFocus}
+        {...register(name, { onBlur: handleBlur })}
       />
       <label
         className={classNames('absolute left-0 -z-50 my-2 text-gray-600 transition-all', {

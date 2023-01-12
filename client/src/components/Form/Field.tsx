@@ -1,21 +1,17 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
 import FormErrorMessage from './FormErrorMessage';
 
-import FormContext from '@/context/FormContext';
-
 interface FieldProps {
   children: React.ReactNode;
-  name: string;
+  error?: string;
 }
 
-const Field = ({ children, name }: FieldProps) => {
-  const formContext = useContext(FormContext);
-  const errors = formContext.errors?.fields?.[name];
+const Field = ({ children, error }: FieldProps) => {
   return (
     <React.Fragment>
-      <div className="relative z-50 mt-4 mb-2 w-full">{children}</div>
-      {errors && errors.map((error) => <FormErrorMessage key={error}>{error}</FormErrorMessage>)}
+      <div className="relative z-50 mt-4 mb-2 flex w-full flex-col">{children}</div>
+      {error && <FormErrorMessage>{error}</FormErrorMessage>}
     </React.Fragment>
   );
 };

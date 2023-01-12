@@ -1,3 +1,47 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  h1 {
+    @apply mt-0 mb-2 text-5xl font-medium leading-tight text-slate-900;
+  }
+  h2 {
+    @apply mt-0 mb-2 text-4xl font-medium leading-tight text-slate-900;
+  }
+  h3 {
+    @apply mt-0 mb-2 text-3xl font-medium leading-tight text-slate-900;
+  }
+  h4 {
+    @apply mt-0 mb-2 text-2xl font-medium leading-tight text-slate-900;
+  }
+  h5 {
+    @apply mt-0 mb-2 text-xl font-medium leading-tight text-slate-900;
+  }
+  h6 {
+    @apply mt-0 mb-2 text-base font-medium leading-tight text-slate-900;
+  }
+
+  input[type='date']::-webkit-input-placeholder {
+    color: transparent;
+  }
+
+  input[type='date'] {
+    appearance: none;
+    color: transparent;
+  }
+
+  input[type='date']::-webkit-datetime-edit {
+    color: transparent;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply w-20 rounded-lg bg-indigo-500 p-2 text-center font-medium text-white;
+  }
+
+  .card {
+    @apply flex flex-col rounded-lg bg-white py-4 px-8 shadow-lg;
+  }
+}

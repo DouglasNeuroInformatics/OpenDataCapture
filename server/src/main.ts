@@ -8,6 +8,7 @@ import { DocsService } from './docs/docs.service';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.enableCors();
   app.setGlobalPrefix('/api');
   app.useGlobalPipes(
     new ValidationPipe({

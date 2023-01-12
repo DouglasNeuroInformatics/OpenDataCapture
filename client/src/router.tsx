@@ -6,9 +6,9 @@ import ErrorElement from './components/ErrorElement';
 import HomePage from './routes/home';
 import AddInstrumentPage from './routes/instruments/add-instrument';
 import ViewInstrumentsPage from './routes/instruments/view-instruments';
-import LoginPage, { loginAction } from './routes/login';
+import LoginPage from './routes/login';
 import Root from './routes/root';
-import AddSubjectPage, { addSubjectAction } from './routes/subjects/add-subject';
+import AddSubjectPage from './routes/subjects/add-subject';
 import ViewSubjectsPage from './routes/subjects/view-subjects';
 
 const router = createBrowserRouter([
@@ -27,8 +27,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/subjects/add-subject',
-        element: <AddSubjectPage />,
-        action: addSubjectAction
+        element: <AddSubjectPage />
       },
       {
         path: '/subjects/view-subjects',
@@ -51,7 +50,6 @@ const router = createBrowserRouter([
         <LoginPage />
       </React.Suspense>
     ),
-    action: loginAction,
     errorElement: <ErrorElement />
   }
 ]);

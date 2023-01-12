@@ -1,36 +1,25 @@
 import React from 'react';
 
 import classNames from 'classnames';
-import { Form as ReactRouterForm } from 'react-router-dom';
 
 import FormErrorMessage from './FormErrorMessage';
 
-import FormContext from '@/context/FormContext';
-
-interface FormErrors {
-  fields?: {
-    [key: string]: string[];
-  };
-  submission?: string[];
-}
-
-interface FormProps {
+interface FormProps extends React.HTMLProps<HTMLFormElement> {
   children: React.ReactNode;
   className?: string;
-  errors: FormErrors | null;
+  error?: string;
 }
 
-const Form = ({ children, className, errors }: FormProps) => {
+const Form = ({ children, className, error, ...props }: FormProps) => {
+  console.log('form', error);
   return (
-    <FormContext.Provider value={{ errors }}>
-      <ReactRouterForm autoComplete="off" className={classNames('w-full', className)} method="post">
+    <React.Fragment>
+      <form autoComplete="off" className={classNames('w-full', className)} {...props}>
         {children}
-      </ReactRouterForm>
-      {errors?.submission?.map((error) => (
-        <FormErrorMessage key={error}>{error}</FormErrorMessage>
-      ))}
-    </FormContext.Provider>
+      </form>
+      {error && <FormErrorMessage>{error}</FormErrorMessage>}
+    </React.Fragment>
   );
 };
 
-export { Form as default, type FormProps, type FormErrors };
+export { Form as default, type FormProps };
