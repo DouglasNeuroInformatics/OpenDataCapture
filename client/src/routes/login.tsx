@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { LoginCredentials } from 'common';
 import { useTranslation } from 'react-i18next';
 import { FaGithub } from 'react-icons/fa';
-import { ActionFunction, useActionData } from 'react-router-dom';
+import { ActionFunction, useActionData, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 import logo from '@/assets/logo.png';
@@ -26,6 +26,7 @@ const loginAction: ActionFunction = async ({ request }) => {
 const LoginPage = () => {
   const actionData = useActionData() as LoginActionData | undefined;
   const auth = useAuth();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [loginErrors, setLoginErrors] = useState<string[]>([]);
 
@@ -44,9 +45,13 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (actionData?.data) {
-      void handleLogin(actionData.data);
+      void handleLogin(actionData.data).then(() => {
+        navigate('/home');
+      });
     }
   }, [actionData]);
+
+  console.log(auth);
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50 sm:bg-slate-100">

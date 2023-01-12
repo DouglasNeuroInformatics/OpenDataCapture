@@ -1,12 +1,9 @@
-import { useCallback, useContext, useEffect, useMemo } from 'react';
-
 import { AuthTokens, LoginCredentials, userRoleOptions } from 'common';
 import jwtDecode from 'jwt-decode';
-import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { create } from 'zustand';
 
 import AuthAPI from '@/api/auth.api';
-import AuthContext, { AuthContextInterface } from '@/context/AuthContext';
 
 const currentUserSchema = z.object({
   username: z.string(),
@@ -22,6 +19,33 @@ interface Auth {
   logout: () => void;
 }
 
+const useAuth = create<Auth>((set) => ({
+  accessToken: null,
+  login: async (credentials) => {
+    let authTokens: AuthTokens;
+    let currentUser: CurrentUser;
+    try {
+      authTokens = await AuthAPI.login(credentials);
+      currentUser = await currentUserSchema.parseAsync(jwtDecode(authTokens.accessToken));
+    } catch (error) {
+      if (error instanceof Response) {
+        throw new Error(`${error.status}: ${error.statusText}`);
+      } else if (error instanceof z.ZodError) {
+        throw new Error('Failed to validate current user schema', {
+          cause: error
+        });
+      }
+      throw new Error('An unknown error occurred');
+    }
+    set({ accessToken: authTokens.accessToken, currentUser });
+  },
+  currentUser: null,
+  logout: () => set({ accessToken: null, currentUser: null })
+}));
+
+export default useAuth;
+
+/*
 export default function useAuth(): Auth {
   const context = useContext(AuthContext) as AuthContextInterface;
   const navigate = useNavigate();
@@ -89,3 +113,4 @@ export default function useAuth(): Auth {
     logout
   };
 }
+*/
