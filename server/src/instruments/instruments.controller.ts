@@ -3,6 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { Instrument } from 'common';
 
+import { InstrumentRecordDto } from './dto/instrument-record.dto';
 import { InstrumentDto } from './dto/instrument.dto';
 import { InstrumentsService } from './instruments.service';
 
@@ -30,5 +31,10 @@ export class InstrumentsController {
   @Get(':id')
   getById(@Param('id') id: string): Promise<Instrument> {
     return this.instrumentsService.getById(id);
+  }
+
+  @Post(':id')
+  insertRecord(@Param('id') id: string, @Body() dto: InstrumentRecordDto): Promise<any> {
+    return this.instrumentsService.insertRecord(id, dto);
   }
 }

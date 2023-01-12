@@ -24,3 +24,10 @@ export const instrumentSchema = z.object({
 });
 
 export type Instrument = z.infer<typeof instrumentSchema>;
+
+export const instrumentRecordSchema = z.object({
+  subject: z.any(), // ref to object id
+  responses: z.record(z.string(), z.any())
+});
+
+export type InstrumentRecord = z.infer<typeof instrumentRecordSchema>;

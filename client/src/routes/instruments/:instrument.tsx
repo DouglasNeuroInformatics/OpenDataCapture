@@ -1,37 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { instrumentSchema } from 'common';
+import { Instrument, instrumentSchema, sexOptions } from 'common';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 
-import Form from '@/components/Form';
+import DemographicsForm, { DemographicsFormSchema } from '@/components/DemographicsForm';
+import InstrumentOverview from '@/components/InstrumentOverview';
+import InstrumentRecordForm, { InstrumentRecordFormSchema } from '@/components/InstrumentRecordForm';
 import useAuth from '@/hooks/useAuth';
 
-const InstrumentPage = () => {
+const InstrumentQuestions = () => {
   const auth = useAuth();
-  const params = useParams();
-
-  const { data, error } = useQuery(`Instrument`, async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/${params.id!}`, {
-      headers: {
-        Authorization: 'Bearer ' + auth.accessToken!
-      }
-    });
-    return instrumentSchema.parseAsync(await response.json());
-  });
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    formState: { errors }
-  } = useForm<FormData>({
-    resolver: zodResolver()
-  });
+  const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data: any) => {
     const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/subjects`, {
@@ -48,46 +30,86 @@ const InstrumentPage = () => {
     }
   };
 
+  return (
+    <div>
+      <h3>Demographics Questions</h3>
+    </div>
+  );
+};
+
+const InstrumentPage = () => {
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const params = useParams();
+  const [step, setStep] = useState(0);
+  const [demographicsData, setDemographicsData] = useState<DemographicsFormSchema>();
+  const [instrumentRecordData, setInstrumentRecordData] = useState<InstrumentRecordFormSchema>();
+
+  const { data, error } = useQuery(`Instrument`, async () => {
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/${params.id!}`, {
+      headers: {
+        Authorization: 'Bearer ' + auth.accessToken!
+      }
+    });
+    return instrumentSchema.parseAsync(await response.json());
+  });
+
+  const submitInstrumentRecord = async (responses: InstrumentRecordFormSchema) => {
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/${params.id!}`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + auth.accessToken!,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        subjectDemographics: demographicsData,
+        responses: responses
+      })
+    });
+
+    if (!response.ok) {
+      alert(`${response.status}: ${response.statusText}`);
+      return null;
+    }
+
+    alert('Success!');
+    navigate('/home');
+  };
+
   if (!data) {
     return null;
   }
 
-
   return (
     <div className="container" style={{ maxWidth: 900 }}>
       <h1 className="text-center">{data.name}</h1>
-      <hr className="my-5" />
-      <h2>About This Instrument</h2>
-      <div className="mt-2">
-        <h5>Description</h5>
-        <span>{data.description}</span>
-      </div>
-      <div className="mt-2">
-        <h5>Instructions</h5>
-        <span>{data.instructions}</span>
+      <hr className="my-5 border-slate-300" />
+      <div className="flex rounded-xl bg-indigo-800 p-3 text-white shadow-xl">
+        <div className="flex w-full justify-center rounded-xl">
+          <span className="mx-2">Overview</span>
+        </div>
+        <div className="flex w-full justify-center rounded-xl">
+          <span className="mx-2">Demographics Questions</span>
+        </div>
+        <div className="flex w-full justify-center">
+          <span className="mx-2">Instrument Questions</span>
+        </div>
       </div>
       <div>
-        <h5>Estimated Completion</h5>
-        <span>{data.estimatedDuration} Minute(s)</span>
+        {step === 0 && <InstrumentOverview instrument={data} onConfirm={() => setStep(1)} />}
+        {step === 1 && (
+          <DemographicsForm
+            submitLabel="Next"
+            onSubmit={(data) => {
+              setDemographicsData(data);
+              setStep(2);
+            }}
+          />
+        )}
+        {step === 2 && (
+          <InstrumentRecordForm fields={data.fields} title={data.name} onSubmit={submitInstrumentRecord} />
+        )}
       </div>
-      <hr className="my-5" style={{ color: 'black' }} />
-      <h2>Questions</h2>
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        {data.fields.map((field) => {
-          if (field.type === 'text') {
-            return (
-              <Form.TextField
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                error={errors[field.name]?.message}
-                label={field.label}
-                name={field.name}
-                register={register}
-              />
-            );
-          }
-        })}
-        <Form.SubmitButton />
-      </Form>
     </div>
   );
 };

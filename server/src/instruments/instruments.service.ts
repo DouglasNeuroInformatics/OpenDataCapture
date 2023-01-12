@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Model } from 'mongoose';
+import { InstrumentRecordDto } from './dto/instrument-record.dto';
 
 import { InstrumentDto } from './dto/instrument.dto';
 import { Instrument, InstrumentDocument } from './schemas/instrument.schema';
@@ -18,11 +19,16 @@ export class InstrumentsService {
     return this.instrumentModel.find({}).exec();
   }
 
-  async getById(id : string): Promise<Instrument> {
+  async getById(id: string): Promise<Instrument> {
     const instrument = await this.instrumentModel.findById(id);
     if (!instrument) {
       throw new NotFoundException();
     }
     return instrument;
+  }
+
+  async insertRecord(id: string, dto: InstrumentRecordDto): Promise<any> {
+    console.log(id, dto);
+    return Promise.resolve();
   }
 }
