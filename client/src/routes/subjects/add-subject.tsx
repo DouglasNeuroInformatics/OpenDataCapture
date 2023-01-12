@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import Form from '@/components/Form';
+import useAuth from '@/hooks/useAuth';
 
 const formDataSchema = z.object({
   firstName: z.string().min(1),
@@ -17,6 +18,7 @@ const formDataSchema = z.object({
 type FormData = z.infer<typeof formDataSchema>;
 
 const AddSubjectPage = () => {
+  const auth = useAuth();
   const {
     register,
     handleSubmit,
@@ -27,34 +29,53 @@ const AddSubjectPage = () => {
     resolver: zodResolver(formDataSchema)
   });
 
-  const onSubmit = (data: any) => {
-    alert(JSON.stringify(data));
+  const onSubmit = async (data: FormData) => {
+    console.log(JSON.stringify(data));
+
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/subjects`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + auth.accessToken!,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      console.error(response);
+      alert(`${response.status}: ${response.statusText}`);
+      return;
+    }
+
+    alert('Success');
     reset();
   };
 
   return (
     <div className="flex flex-col items-center">
       <h1>Add Subject</h1>
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <Form.TextField error={errors.firstName?.message} label="First Name" name="firstName" register={register} />
-        <Form.TextField error={errors.lastName?.message} label="Last Name" name="lastName" register={register} />
-        <Form.TextField
-          error={errors.dateOfBirth?.message}
-          label="Date of Birth"
-          name="dateOfBirth"
-          register={register}
-          variant="date"
-        />
-        <Form.SelectField
-          control={control}
-          error={errors.sex?.message}
-          label="Sex"
-          name="sex"
-          options={sexOptions}
-          register={register}
-        />
-        <Form.SubmitButton />
-      </Form>
+      <div style={{ width: 500 }}>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Form.TextField error={errors.firstName?.message} label="First Name" name="firstName" register={register} />
+          <Form.TextField error={errors.lastName?.message} label="Last Name" name="lastName" register={register} />
+          <Form.TextField
+            error={errors.dateOfBirth?.message}
+            label="Date of Birth"
+            name="dateOfBirth"
+            register={register}
+            variant="date"
+          />
+          <Form.SelectField
+            control={control}
+            error={errors.sex?.message}
+            label="Sex"
+            name="sex"
+            options={sexOptions}
+            register={register}
+          />
+          <Form.SubmitButton />
+        </Form>
+      </div>
     </div>
   );
 };

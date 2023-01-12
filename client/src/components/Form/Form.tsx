@@ -11,7 +11,6 @@ interface FormProps extends React.HTMLProps<HTMLFormElement> {
 }
 
 const Form = ({ children, className, error, ...props }: FormProps) => {
-  console.log('form', error);
   return (
     <React.Fragment>
       <form autoComplete="off" className={classNames('w-full', className)} {...props}>
