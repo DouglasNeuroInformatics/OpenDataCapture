@@ -14,6 +14,7 @@ export const instrumentFieldSchema = z.object({
 export type InstrumentField = z.infer<typeof instrumentFieldSchema>;
 
 export const instrumentSchema = z.object({
+  _id: z.string().optional(),
   name: z.string(),
   description: z.string(),
   instructions: z.string(),

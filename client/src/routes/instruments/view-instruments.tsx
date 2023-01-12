@@ -2,6 +2,7 @@ import React from 'react';
 
 import { instrumentSchema } from 'common';
 import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
 import { z } from 'zod';
 
 import useAuth from '@/hooks/useAuth';
@@ -28,9 +29,20 @@ const ViewInstrumentsPage = () => {
   }
 
   return (
-    <div>
-      <h1>View Instruments</h1>
-    </div>
+    data && (
+      <div>
+        <h1 className="text-center">View Instruments</h1>
+        {data.map((instrument, i) => (
+          <div className="card my-5" key={i}>
+            <h3>{instrument.name}</h3>
+            <p>{instrument.description}</p>
+            <Link className="btn-primary mt-2" to={`/instruments/${instrument._id!}`}>
+              Start
+            </Link>
+          </div>
+        ))}
+      </div>
+    )
   );
 };
 
