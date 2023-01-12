@@ -8,6 +8,7 @@ import AddInstrumentPage from './routes/instruments/add-instrument';
 import ViewInstrumentsPage from './routes/instruments/view-instruments';
 import LoginPage from './routes/login';
 import Root from './routes/root';
+import SubjectPage from './routes/subjects/:subject';
 import AddSubjectPage from './routes/subjects/add-subject';
 import ViewSubjectsPage from './routes/subjects/view-subjects';
 
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: '/subjects/view-subjects',
         element: <ViewSubjectsPage />
+      },
+      {
+        path: '/subjects/view-subjects/:id',
+        element: <SubjectPage />
       },
       {
         path: '/instruments/add-instrument',

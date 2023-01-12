@@ -2,6 +2,7 @@ import React from 'react';
 
 import { subjectSchema } from 'common';
 import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
 import { z } from 'zod';
 
 import useAuth from '@/hooks/useAuth';
@@ -49,7 +50,9 @@ const ViewSubjectsPage = () => {
                   <tbody>
                     {data.map((subject) => (
                       <tr className="border-b" key={subject._id}>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{subject._id}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                          <Link to={subject._id!}>{subject._id}</Link>
+                        </td>
                         <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                           {subject.createdAt?.toDateString()}
                         </td>
