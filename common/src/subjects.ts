@@ -4,7 +4,6 @@ export const sexOptions = ['male', 'female'] as const;
 export type Sex = (typeof sexOptions)[number];
 
 export const subjectSchema = z.object({
-  _id: z.string(),
   dateOfBirth: z.date(),
   sex: z.enum(sexOptions),
   firstName: z.string().optional(),

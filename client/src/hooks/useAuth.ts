@@ -16,6 +16,7 @@ const currentUserSchema = z.object({
 type CurrentUser = z.infer<typeof currentUserSchema>;
 
 interface Auth {
+  accessToken: string | null;
   currentUser: CurrentUser | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
@@ -24,6 +25,8 @@ interface Auth {
 export default function useAuth(): Auth {
   const context = useContext(AuthContext) as AuthContextInterface;
   const navigate = useNavigate();
+
+  const accessToken = context.accessToken;
 
   const currentUser: CurrentUser | null = useMemo(() => {
     if (context.accessToken) {
@@ -67,6 +70,7 @@ export default function useAuth(): Auth {
   }, [context]);
 
   useEffect(() => {
+    // QUICK FIX FOR DEMO - FIX THIS BUG ASAP
     if (currentUser) {
       navigate('/home');
     }
@@ -79,6 +83,7 @@ export default function useAuth(): Auth {
   }, []);
 
   return {
+    accessToken,
     currentUser,
     login,
     logout

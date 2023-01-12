@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { SubjectsRepository } from '../subjects.repository';
 import { SubjectsService } from '../subjects.service';
 
-import { mockCreateSubjectDto } from './stubs/subjects.stubs';
+import { mockRegisterSubjectDto } from './stubs/subjects.stubs';
 
 const MockSubjectsRepository = createMock<SubjectsRepository>({
   exists: () => Promise.resolve(false)
@@ -29,10 +29,10 @@ describe('SubjectsService', () => {
 
   describe('create', () => {
     it('should call subjectsRepository with the expected ID', async () => {
-      await subjectsService.create(mockCreateSubjectDto);
+      await subjectsService.create(mockRegisterSubjectDto);
       expect(subjectsRepository.create).toBeCalledWith({
         _id: '565125d8a77334ab8ddd9be95308a67885f5230fda8dd5755c6d9f1490225075',
-        ...mockCreateSubjectDto
+        ...mockRegisterSubjectDto
       });
     });
   });

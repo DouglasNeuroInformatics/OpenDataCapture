@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 
 import { ConflictException, Injectable } from '@nestjs/common';
 
-import { CreateSubjectDto } from './dto/create-subject.dto';
+import { RegisterSubjectDto } from './dto/register-subject.dto';
 import { Subject } from './schemas/subject.schema';
 import { SubjectsRepository } from './subjects.repository';
 
@@ -10,7 +10,7 @@ import { SubjectsRepository } from './subjects.repository';
 export class SubjectsService {
   constructor(private readonly subjectsRepository: SubjectsRepository) {}
 
-  async create(dto: CreateSubjectDto): Promise<Subject> {
+  async create(dto: RegisterSubjectDto): Promise<Subject> {
     const subjectId = this.generateSubjectId(dto.firstName, dto.lastName, dto.dateOfBirth);
     if (await this.subjectsRepository.exists({ _id: subjectId })) {
       throw new ConflictException('A subject with the provided demographic information already exists');

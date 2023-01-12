@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { CreateSubjectDto } from './dto/create-subject.dto';
+import { RegisterSubjectDto } from './dto/register-subject.dto';
 import { Subject } from './schemas/subject.schema';
 import { SubjectsService } from './subjects.service';
 
@@ -15,7 +15,7 @@ export class SubjectsController {
     summary: 'Create'
   })
   @Post()
-  create(@Body() dto: CreateSubjectDto): Promise<Subject> {
+  register(@Body() dto: RegisterSubjectDto): Promise<Subject> {
     return this.subjectsService.create(dto);
   }
 

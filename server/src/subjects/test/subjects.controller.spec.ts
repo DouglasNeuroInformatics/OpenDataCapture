@@ -5,7 +5,7 @@ import { createMock } from '@golevelup/ts-jest';
 import { SubjectsController } from '../subjects.controller';
 import { SubjectsService } from '../subjects.service';
 
-import { mockCreateSubjectDto } from './stubs/subjects.stubs';
+import { mockRegisterSubjectDto } from './stubs/subjects.stubs';
 
 describe('SubjectsController', () => {
   let subjectsController: SubjectsController;
@@ -26,9 +26,9 @@ describe('SubjectsController', () => {
     subjectsService = moduleRef.get(SubjectsService);
   });
 
-  describe('create', () => {
-    it('should call subjectsService.create', async () => {
-      await subjectsController.create(mockCreateSubjectDto);
+  describe('register', () => {
+    it('should call subjectsService.register', async () => {
+      await subjectsController.register(mockRegisterSubjectDto);
       expect(subjectsService.create).toBeCalled();
     });
   });

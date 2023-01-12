@@ -13,7 +13,6 @@ const AuthContext = createContext<AuthContextInterface | undefined>(undefined);
 
 const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  console.log(accessToken);
   return <AuthContext.Provider value={{ accessToken, setAccessToken }}>{children}</AuthContext.Provider>;
 };
 

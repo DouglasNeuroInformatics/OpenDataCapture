@@ -1,6 +1,6 @@
-import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
+import { RegisterSubjectDto } from '@/subjects/dto/register-subject.dto';
 
-export const mockCreateSubjectDto: CreateSubjectDto = Object.freeze({
+export const mockRegisterSubjectDto: RegisterSubjectDto = Object.freeze({
   firstName: 'Jane',
   lastName: 'Doe',
   dateOfBirth: new Date(1980, 0),
