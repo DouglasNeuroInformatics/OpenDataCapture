@@ -9,6 +9,7 @@ import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { ExceptionFilter } from './core/exception.filter';
 import { DatabaseModule } from './database/database.module';
 import { DocsModule } from './docs/docs.module';
+import { InstrumentsModule } from './instruments/instruments.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
 
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule,
     DocsModule,
     DatabaseModule,
+    InstrumentsModule,
     SubjectsModule,
     UsersModule
   ],
