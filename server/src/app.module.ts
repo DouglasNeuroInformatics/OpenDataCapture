@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 
 import Joi from 'joi';
 
 import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
+import { ExceptionFilter } from './core/exception.filter';
 import { DatabaseModule } from './database/database.module';
 import { DocsModule } from './docs/docs.module';
 import { SubjectsModule } from './subjects/subjects.module';
@@ -31,6 +32,10 @@ import { UsersModule } from './users/users.module';
     UsersModule
   ],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: ExceptionFilter
+    },
     {
       provide: APP_GUARD,
       useClass: AccessTokenGuard
