@@ -2,8 +2,6 @@ import React from 'react';
 
 import classNames from 'classnames';
 
-import FormErrorMessage from './FormErrorMessage';
-
 interface FormProps extends React.HTMLProps<HTMLFormElement> {
   children: React.ReactNode;
   className?: string;
@@ -16,7 +14,7 @@ const Form = ({ children, className, error, ...props }: FormProps) => {
       <form autoComplete="off" className={classNames('w-full', className)} {...props}>
         {children}
       </form>
-      {error && <FormErrorMessage>{error}</FormErrorMessage>}
+      {error && <span className="text-red-700">{children}</span>}
     </React.Fragment>
   );
 };

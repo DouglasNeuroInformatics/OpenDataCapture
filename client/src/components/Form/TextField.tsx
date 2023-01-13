@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import classNames from 'classnames';
 import { UseFormRegister } from 'react-hook-form';
 
 import Field from './Field';
@@ -27,16 +26,8 @@ const TextField = ({ name, label, register, error, variant = 'text' }: TextField
   };
 
   return (
-    <Field error={error}>
+    <Field error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
       <input className="input" type={variant} onFocus={handleFocus} {...register(name, { onBlur: handleBlur })} />
-      <label
-        className={classNames('absolute left-0 -z-50 my-2 text-gray-600 transition-all', {
-          '-translate-y-5 text-sm text-indigo-800': isFloatingLabel
-        })}
-        htmlFor={name}
-      >
-        {label}
-      </label>
     </Field>
   );
 };

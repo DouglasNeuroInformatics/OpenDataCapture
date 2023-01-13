@@ -1,41 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { Instrument, instrumentSchema, sexOptions } from 'common';
-import { useForm } from 'react-hook-form';
+import { instrumentSchema } from 'common';
 import { useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { z } from 'zod';
 
 import DemographicsForm, { DemographicsFormSchema } from '@/components/DemographicsForm';
 import InstrumentOverview from '@/components/InstrumentOverview';
 import InstrumentRecordForm, { InstrumentRecordFormSchema } from '@/components/InstrumentRecordForm';
 import useAuth from '@/hooks/useAuth';
-
-const InstrumentQuestions = () => {
-  const auth = useAuth();
-  const { register, handleSubmit } = useForm();
-
-  const onSubmit = async (data: any) => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/subjects`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + auth.accessToken!,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (!response.ok) {
-      alert(`${response.status}: ${response.statusText}`);
-    }
-  };
-
-  return (
-    <div>
-      <h3>Demographics Questions</h3>
-    </div>
-  );
-};
 
 const InstrumentPage = () => {
   const auth = useAuth();
@@ -43,7 +15,6 @@ const InstrumentPage = () => {
   const params = useParams();
   const [step, setStep] = useState(0);
   const [demographicsData, setDemographicsData] = useState<DemographicsFormSchema>();
-  const [instrumentRecordData, setInstrumentRecordData] = useState<InstrumentRecordFormSchema>();
 
   const { data, error } = useQuery(`Instrument`, async () => {
     const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/schemas/${params.id!}`, {
@@ -69,13 +40,17 @@ const InstrumentPage = () => {
 
     if (!response.ok) {
       const body = await response.json();
-      alert(`${response.status}: ${response.statusText}; ${body.message }`);
+      alert(`${response.status}: ${response.statusText}; ${body.message}`);
       return null;
     }
 
     alert('Success!');
     navigate('/home');
   };
+
+  if (error) {
+    alert(error);
+  }
 
   if (!data) {
     return null;

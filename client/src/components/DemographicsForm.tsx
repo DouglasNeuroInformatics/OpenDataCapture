@@ -24,7 +24,6 @@ const DemographicsForm = ({ onSubmit, submitLabel }: DemographicsFormProps) => {
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors }
   } = useForm<DemographicsFormSchema>({
     resolver: zodResolver(demographicsFormSchema)
