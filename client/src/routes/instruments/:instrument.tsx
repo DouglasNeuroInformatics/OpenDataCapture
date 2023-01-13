@@ -46,7 +46,7 @@ const InstrumentPage = () => {
   const [instrumentRecordData, setInstrumentRecordData] = useState<InstrumentRecordFormSchema>();
 
   const { data, error } = useQuery(`Instrument`, async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/${params.id!}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/schemas/${params.id!}`, {
       headers: {
         Authorization: 'Bearer ' + auth.accessToken!
       }
@@ -55,7 +55,7 @@ const InstrumentPage = () => {
   });
 
   const submitInstrumentRecord = async (responses: InstrumentRecordFormSchema) => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/${params.id!}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/records/${params.id!}`, {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + auth.accessToken!,

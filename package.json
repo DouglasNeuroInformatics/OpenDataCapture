@@ -12,6 +12,7 @@
   "scripts": {
     "build": "env-cmd env-cmd -f .env.local  NODE_ENV=production turbo run build",
     "clean": "fd -H -I --prune \".turbo|dist|node_modules\" --exec rm -rf",
+    "debug": "env-cmd env-cmd -f .env.local cross-env NODE_ENV=development yarn ws server debug",
     "dev": "env-cmd env-cmd -f .env.local cross-env NODE_ENV=development turbo run dev",
     "format": "turbo run format",
     "lint": "turbo run lint",

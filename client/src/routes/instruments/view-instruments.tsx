@@ -12,14 +12,14 @@ import useAuth from '@/hooks/useAuth';
 const ViewInstrumentsPage = () => {
   const auth = useAuth();
   const { data, error } = useQuery('ViewInstruments', async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments`, {
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/schemas`, {
       headers: {
         Authorization: 'Bearer ' + auth.accessToken!
       }
     });
     return z.array(instrumentSchema).parseAsync(await response.json());
   });
-  
+
   if (error) {
     console.error(error);
   }

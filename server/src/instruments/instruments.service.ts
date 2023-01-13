@@ -7,6 +7,7 @@ import { InstrumentsRepository } from './repositories/instruments.repository';
 import { Instrument } from './schemas/instrument.schema';
 
 import { SubjectsService } from '@/subjects/subjects.service';
+import { InstrumentRecord } from './schemas/instrument-record.schema';
 
 @Injectable()
 export class InstrumentsService {
@@ -32,17 +33,18 @@ export class InstrumentsService {
     return instrument;
   }
 
-  async insertRecord(id: string, dto: InstrumentRecordDto): Promise<any> {
+  async insertRecord(id: string, dto: InstrumentRecordDto): Promise<InstrumentRecord> {
     const { firstName, lastName, dateOfBirth } = dto.subjectDemographics;
     const subjectId = this.subjectsService.generateSubjectId(firstName, lastName, dateOfBirth);
 
-    await this.instrumentRecordsRepository.create({
+    return this.instrumentRecordsRepository.create({
       instrument: await this.instrumentsRepository.findById(id),
       subject: await this.subjectsService.findById(subjectId),
       responses: dto.responses
     });
-    
-    console.log(id, dto);
-    return Promise.resolve();
+  }
+
+  getRecords(): void {
+    console.log('RECORDS');
   }
 }

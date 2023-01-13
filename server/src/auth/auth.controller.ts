@@ -1,8 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
-import { JwtPayload } from 'common';
-
 import { AuthService } from './auth.service';
 import { Auth } from './decorators/auth.decorator';
 import { RequestUser } from './decorators/request-user.decorator';

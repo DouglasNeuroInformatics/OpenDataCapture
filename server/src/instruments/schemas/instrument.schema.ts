@@ -39,8 +39,8 @@ export class Instrument implements InstrumentInterface {
 
   @Prop({ required: false })
   version: number;
-  
-  @Prop({ required: true })
+
+  @Prop({ required: true, type: Array })
   fields: InstrumentField[];
 }
 

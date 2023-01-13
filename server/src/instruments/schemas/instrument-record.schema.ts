@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { Instrument, InstrumentRecord as InstrumentRecordInterface, Subject } from 'common';
+import { InstrumentRecord as InstrumentRecordInterface } from 'common';
 import mongoose from 'mongoose';
+
+import { Instrument } from './instrument.schema';
+
+import { Subject } from '@/subjects/schemas/subject.schema';
 
 @Schema({ strict: true })
 export class InstrumentRecord implements InstrumentRecordInterface {

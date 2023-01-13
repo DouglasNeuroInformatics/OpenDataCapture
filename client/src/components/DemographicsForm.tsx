@@ -46,12 +46,12 @@ const DemographicsForm = ({ onSubmit, submitLabel }: DemographicsFormProps) => {
           name="lastName"
           register={register}
         />
-        <Form.TextField
-          error={errors.dateOfBirth?.message as string}
+        <Form.DateField
+          control={control}
+          error={errors.dateOfBirth?.message}
           label="Date of Birth"
           name="dateOfBirth"
           register={register}
-          variant="date"
         />
         <Form.SubmitButton label={submitLabel} />
       </Form>
