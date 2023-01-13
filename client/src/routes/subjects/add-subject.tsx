@@ -58,12 +58,12 @@ const AddSubjectPage = () => {
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Form.TextField error={errors.firstName?.message} label="First Name" name="firstName" register={register} />
           <Form.TextField error={errors.lastName?.message} label="Last Name" name="lastName" register={register} />
-          <Form.TextField
+          <Form.DateField
+            control={control}
             error={errors.dateOfBirth?.message}
             label="Date of Birth"
             name="dateOfBirth"
             register={register}
-            variant="date"
           />
           <Form.SelectField
             control={control}

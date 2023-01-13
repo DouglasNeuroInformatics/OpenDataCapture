@@ -68,7 +68,8 @@ const InstrumentPage = () => {
     });
 
     if (!response.ok) {
-      alert(`${response.status}: ${response.statusText}`);
+      const body = await response.json();
+      alert(`${response.status}: ${response.statusText}; ${body.message }`);
       return null;
     }
 

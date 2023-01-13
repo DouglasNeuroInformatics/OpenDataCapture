@@ -44,4 +44,12 @@
   .card {
     @apply flex flex-col rounded-lg bg-white py-4 px-8 shadow-lg;
   }
+
+  .input {
+    @apply w-full border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none;
+  }
+}
+
+.react-datepicker {
+  z-index: 9999 !important;
 }
