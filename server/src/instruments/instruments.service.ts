@@ -8,6 +8,7 @@ import { Instrument } from './schemas/instrument.schema';
 
 import { SubjectsService } from '@/subjects/subjects.service';
 import { InstrumentRecord } from './schemas/instrument-record.schema';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class InstrumentsService {
@@ -39,12 +40,29 @@ export class InstrumentsService {
 
     return this.instrumentRecordsRepository.create({
       instrument: await this.instrumentsRepository.findById(id),
-      subject: await this.subjectsService.findById(subjectId),
+      subjectId: await this.subjectsService.findById(subjectId),
       responses: dto.responses
     });
   }
 
-  getRecords(): void {
-    console.log('RECORDS');
+  // Fix after demo
+  async getRecords(instrumentId?: string, subjectId?: string): Promise<InstrumentRecord[]> {
+    let records = await this.instrumentRecordsRepository.find({});
+
+    if (instrumentId) {
+      records = records.filter(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        (record) => record.instrument._id.toString() === instrumentId
+      );
+    }
+
+    if (subjectId) {
+      records = records.filter(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        (record) => record.subjectId === subjectId
+      );
+    }
+
+    return records;
   }
 }
