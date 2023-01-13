@@ -19,6 +19,7 @@ class SubjectDemographicsDto {
 
 export class InstrumentRecordDto implements InstrumentRecord {
   @ValidateNested()
+  @Type(() => SubjectDemographicsDto)
   subjectDemographics: SubjectDemographicsDto;
 
   @IsDefined()

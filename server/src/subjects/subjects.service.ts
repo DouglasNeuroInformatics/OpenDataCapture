@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { RegisterSubjectDto } from './dto/register-subject.dto';
 import { Subject } from './schemas/subject.schema';
@@ -22,8 +22,6 @@ export class SubjectsService {
     return this.subjectsRepository.findAll();
   }
 
-  /*
-
   async findById(id: string): Promise<Subject> {
     const subject = await this.subjectsRepository.findById(id);
     if (!subject) {
@@ -31,6 +29,9 @@ export class SubjectsService {
     }
     return subject;
   }
+
+  /*
+
 
 
   async deleteById(id: string): Promise<void> {
@@ -40,8 +41,8 @@ export class SubjectsService {
     }
   }
   */
-
-  private generateSubjectId(firstName: string, lastName: string, dateOfBirth: Date): string {
+  
+  generateSubjectId(firstName: string, lastName: string, dateOfBirth: Date): string {
     const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
     const source = this.sanitizeStr(firstName + lastName) + this.sanitizeStr(shortDateOfBirth, true);
     return createHash('sha256').update(source).digest('hex');

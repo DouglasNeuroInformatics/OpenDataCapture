@@ -1,33 +1,47 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 
-import { Model } from 'mongoose';
 import { InstrumentRecordDto } from './dto/instrument-record.dto';
-
 import { InstrumentDto } from './dto/instrument.dto';
-import { Instrument, InstrumentDocument } from './schemas/instrument.schema';
+import { InstrumentRecordsRepository } from './repositories/instrument-records.repository';
+import { InstrumentsRepository } from './repositories/instruments.repository';
+import { Instrument } from './schemas/instrument.schema';
+
+import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
 export class InstrumentsService {
-  constructor(@InjectModel(Instrument.name) private instrumentModel: Model<InstrumentDocument>) {}
+  constructor(
+    private readonly instrumentsRepository: InstrumentsRepository,
+    private readonly instrumentRecordsRepository: InstrumentRecordsRepository,
+    private readonly subjectsService: SubjectsService
+  ) {}
 
   create(dto: InstrumentDto): Promise<Instrument> {
-    return this.instrumentModel.create(dto);
+    return this.instrumentsRepository.create(dto);
   }
 
   getAll(): Promise<Instrument[]> {
-    return this.instrumentModel.find({}).exec();
+    return this.instrumentsRepository.findAll();
   }
 
   async getById(id: string): Promise<Instrument> {
-    const instrument = await this.instrumentModel.findById(id);
+    const instrument = await this.instrumentsRepository.findById(id);
     if (!instrument) {
-      throw new NotFoundException();
+      throw new NotFoundException(`Instrument with ID ${id} not found`);
     }
     return instrument;
   }
 
   async insertRecord(id: string, dto: InstrumentRecordDto): Promise<any> {
+    const { firstName, lastName, dateOfBirth } = dto.subjectDemographics;
+    const subjectId = this.subjectsService.generateSubjectId(firstName, lastName, dateOfBirth);
+
+    await this.instrumentRecordsRepository.create({
+      instrument: await this.instrumentsRepository.findById(id),
+      subject: await this.subjectsService.findById(subjectId),
+      responses: dto.responses
+    });
+    
     console.log(id, dto);
     return Promise.resolve();
   }
