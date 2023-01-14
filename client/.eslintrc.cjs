@@ -11,7 +11,7 @@ module.exports = {
   parserOptions: {
     project: path.resolve(__dirname, 'tsconfig.json')
   },
-  plugins: ['react'],
+  plugins: ['import', 'react'],
   rules: {
     '@typescript-eslint/no-misused-promises': [
       'error',
@@ -57,6 +57,14 @@ module.exports = {
       }
     ]
   },
+  overrides: [
+    {
+      "files": ["**/*/*.stories.tsx"],
+      "rules": {
+        "import/exports-last": "off"
+      }
+    }
+  ],
   settings: {
     'import/extensions': ['.ts', '.tsx'],
     'import/parsers': {

@@ -23,6 +23,7 @@ const DateField = ({ name, label, control, error }: DateFieldProps) => {
         name={name}
         render={({ field: { onChange, value } }) => (
           <DatePicker
+            showYearDropdown
             className="input"
             dateFormat="yyyy-MM-dd"
             name={name}
