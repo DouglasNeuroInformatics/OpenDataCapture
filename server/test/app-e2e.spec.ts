@@ -4,7 +4,7 @@ import request from 'supertest';
 
 import { mockAdmin, mockAdminPlainTextPassword, mockUser } from '@/users/test/stubs/user.stubs';
 
-console.log('about to access TestSetup...')
+console.log('about to access TestSetup...');
 
 const { app, db, spec, server } = TestSetup;
 
@@ -21,15 +21,14 @@ afterAll(async () => {
 
 Object.entries(spec.paths).forEach(([path, fields]) => {
   console.log(path, fields.description);
-})
-
+});
 
 for (let i = 0; i < 5; i++) {
   describe(i.toString(), () => {
     it('should be defined', () => {
-      expect(i).toBeDefined()
-    })
-  })
+      expect(i).toBeDefined();
+    });
+  });
 }
 
 /*

@@ -6,4 +6,4 @@ import { DocsService } from './docs.service';
   providers: [DocsService],
   exports: [DocsService]
 })
-export class DocsModule { }
+export class DocsModule {}

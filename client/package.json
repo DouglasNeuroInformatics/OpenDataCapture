@@ -14,7 +14,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.7",
     "@hookform/resolvers": "^2.9.10",
-    "classnames": "^2.3.2",
+    "clsx": "^1.2.1",
     "common": "*",
     "i18next": "^22.4.6",
     "i18next-browser-languagedetector": "^7.0.1",
@@ -23,6 +23,7 @@
     "react": "^18.2.0",
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
+    "react-error-boundary": "^3.1.4",
     "react-hook-form": "^7.41.5",
     "react-i18next": "^12.1.1",
     "react-icons": "^4.7.1",

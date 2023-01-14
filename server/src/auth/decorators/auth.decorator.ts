@@ -1,7 +1,7 @@
 import { SetMetadata, applyDecorators } from '@nestjs/common';
 
 interface AuthOptions {
-  isPublic?: boolean
+  isPublic?: boolean;
 }
 
 export const enum AuthKeys {

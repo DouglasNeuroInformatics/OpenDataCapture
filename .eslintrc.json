@@ -12,6 +12,7 @@
   "rules": {
     "import/exports-last": "error",
     "import/newline-after-import": "error",
+    "import/no-default-export": "error",
     "import/no-duplicates": "error",
     "import/order": [
       "error",
@@ -48,7 +49,8 @@
       "parser": "@typescript-eslint/parser",
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-non-null-assertion": "off"
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/restrict-plus-operands": "off"
       }
     },
     {

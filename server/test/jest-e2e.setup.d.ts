@@ -9,5 +9,5 @@ declare global {
     db: Connection;
     server: any;
     spec: OpenAPIObject;
-  }
+  };
 }

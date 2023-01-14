@@ -59,9 +59,10 @@ module.exports = {
   },
   overrides: [
     {
-      "files": ["**/*/*.stories.tsx"],
-      "rules": {
-        "import/exports-last": "off"
+      files: ['**/*/*.stories.tsx'],
+      rules: {
+        'import/exports-last': 'off',
+        'import/no-default-export': 'off'
       }
     }
   ],
