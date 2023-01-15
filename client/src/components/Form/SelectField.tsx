@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import { Control, Controller, UseFormRegister } from 'react-hook-form';
 import Select from 'react-select';
 
-import Field from './Field';
+import { FieldElement } from './FieldElement';
 
-interface SelectFieldProps {
+export interface SelectFieldProps {
   name: string;
   label: string;
   options: readonly string[];
@@ -15,11 +15,11 @@ interface SelectFieldProps {
   error?: string;
 }
 
-const SelectField = ({ name, label, options, control, error }: SelectFieldProps) => {
+export const SelectField = ({ name, label, options, control, error }: SelectFieldProps) => {
   const [isFloatingLabel, setIsFloatingLabel] = useState(false);
   const selectOptions = options.map((option) => ({ value: option, label: option }));
   return (
-    <Field error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
+    <FieldElement error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
       <Controller
         control={control}
         name={name}
@@ -48,8 +48,6 @@ const SelectField = ({ name, label, options, control, error }: SelectFieldProps)
           />
         )}
       />
-    </Field>
+    </FieldElement>
   );
 };
-
-export { SelectField as default, type SelectFieldProps };

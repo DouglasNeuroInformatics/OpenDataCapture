@@ -4,9 +4,9 @@ import DatePicker from 'react-datepicker';
 import { Control, Controller, UseFormRegister } from 'react-hook-form';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import Field from './Field';
+import { FieldElement } from './FieldElement';
 
-interface DateFieldProps {
+export interface DateFieldProps {
   name: string;
   label: string;
   register: UseFormRegister<any>;
@@ -14,10 +14,10 @@ interface DateFieldProps {
   error?: string;
 }
 
-const DateField = ({ name, label, control, error }: DateFieldProps) => {
+export const DateField = ({ name, label, control, error }: DateFieldProps) => {
   const [isFloatingLabel, setIsFloatingLabel] = useState(false);
   return (
-    <Field error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
+    <FieldElement error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
       <Controller
         control={control}
         name={name}
@@ -37,8 +37,6 @@ const DateField = ({ name, label, control, error }: DateFieldProps) => {
           />
         )}
       />
-    </Field>
+    </FieldElement>
   );
 };
-
-export { DateField as default, type DateFieldProps };
