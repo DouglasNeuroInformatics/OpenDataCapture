@@ -1,25 +1,17 @@
 import React from 'react';
 
-import { subjectSchema } from 'common';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { z } from 'zod';
 
-import { useAuthStore } from '@/features/auth';
+import { SubjectsAPI } from '../api/subjects.api';
+
+import { Spinner } from '@/components/core';
 
 export const ViewSubjectsPage = () => {
-  const auth = useAuthStore();
-  const { data, error } = useQuery('ViewSubjects', async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/subjects`, {
-      headers: {
-        Authorization: 'Bearer ' + auth.accessToken!
-      }
-    });
-    return z.array(subjectSchema).parseAsync(await response.json());
-  });
+  const { data, isLoading } = useQuery('ViewSubjects', () => SubjectsAPI.getSubjects());
 
-  if (error) {
-    console.error(error);
+  if (isLoading) {
+    return <Spinner />;
   }
 
   return (
@@ -72,4 +64,3 @@ export const ViewSubjectsPage = () => {
     )
   );
 };
-

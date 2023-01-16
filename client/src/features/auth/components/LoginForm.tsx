@@ -5,7 +5,7 @@ import { LoginCredentials, loginCredentialsSchema } from 'common';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { login } from '../api/auth.login';
+import { AuthAPI } from '../api/auth.api';
 
 import { Form } from '@/components/form';
 
@@ -26,7 +26,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const { errors } = formState;
 
   const onSubmit = async (credentials: LoginCredentials) => {
-    const { accessToken } = await login(credentials);
+    const { accessToken } = await AuthAPI.login(credentials);
     await auth.setAccessToken(accessToken);
     onSuccess();
   };

@@ -3,32 +3,25 @@ import React from 'react';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
-import { useAuthStore } from '@/features/auth';
+import { SubjectsAPI } from '../api/subjects.api';
+
+import { Spinner } from '@/components/core';
 
 export const SubjectPage = () => {
-  const auth = useAuthStore();
   const params = useParams();
+  const { data, isLoading } = useQuery('Subject', () => SubjectsAPI.getSubjectInstrumentRecords(params.id!));
 
-  const { data, error } = useQuery('Subject', async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/records?subject=${params.id!}`, {
-      headers: {
-        Authorization: 'Bearer ' + auth.accessToken!
-      }
-    });
-    return await response.json();
-  });
-
-  if (error) {
-    alert(JSON.stringify(error));
+  if (isLoading) {
+    return <Spinner />;
   }
 
-  return (
+  return data ? (
     <div className="text-center">
       <h1>Subject Data</h1>
       <p>Subject ID: {params.id}</p>
       <p>{JSON.stringify(data)}</p>
     </div>
-  );
+  ) : null;
 };
 
 export default SubjectPage;

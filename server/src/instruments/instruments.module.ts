@@ -5,10 +5,11 @@ import { InstrumentsController } from './instruments.controller';
 import { InstrumentsService } from './instruments.service';
 import { InstrumentRecordsRepository } from './repositories/instrument-records.repository';
 import { InstrumentsRepository } from './repositories/instruments.repository';
-import { InstrumentRecord, InstrumentRecordSchema } from './schemas/instrument-record.schema';
-import { Instrument, InstrumentSchema } from './schemas/instrument.schema';
 
 import { SubjectsModule } from '@/subjects/subjects.module';
+
+import { InstrumentRecord, InstrumentRecordSchema } from './schemas/instrument-record.schema';
+import { Instrument, InstrumentSchema } from './schemas/instrument.schema';
 
 @Module({
   imports: [

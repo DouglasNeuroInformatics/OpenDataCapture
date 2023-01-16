@@ -1,63 +1,28 @@
 import React, { useState } from 'react';
 
-import { instrumentSchema } from 'common';
 import { useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { InstrumentsAPI } from '../api/instruments.api';
 import { DemographicsForm, DemographicsFormSchema } from '../components/DemographicsForm';
 import { InstrumentOverview } from '../components/InstrumentOverview';
 import { InstrumentRecordForm, InstrumentRecordFormSchema } from '../components/InstrumentRecordForm';
 
-import { useAuthStore } from '@/features/auth';
-
 export const InstrumentPage = () => {
-  const auth = useAuthStore();
   const navigate = useNavigate();
   const params = useParams();
   const [step, setStep] = useState(0);
   const [demographicsData, setDemographicsData] = useState<DemographicsFormSchema>();
 
-  const { data, error } = useQuery(`Instrument`, async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/schemas/${params.id!}`, {
-      headers: {
-        Authorization: 'Bearer ' + auth.accessToken!
-      }
-    });
-    return instrumentSchema.parseAsync(await response.json());
-  });
+  const { data } = useQuery(`Instrument`, () => InstrumentsAPI.getSchema(params.id!));
 
   const submitInstrumentRecord = async (responses: InstrumentRecordFormSchema) => {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/instruments/records/${params.id!}`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + auth.accessToken!,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        subjectDemographics: demographicsData,
-        responses: responses
-      })
-    });
-
-    if (!response.ok) {
-      const body = await response.json();
-      alert(`${response.status}: ${response.statusText}; ${body.message}`);
-      return null;
-    }
-
+    await InstrumentsAPI.submitRecord(params.id!, demographicsData!, responses);
     alert('Success!');
     navigate('/home');
   };
 
-  if (error) {
-    alert(error);
-  }
-
-  if (!data) {
-    return null;
-  }
-
-  return (
+  return data ? (
     <div className="container" style={{ maxWidth: 900 }}>
       <h1 className="text-center">{data.name}</h1>
       <hr className="my-5 border-slate-300" />
@@ -88,6 +53,5 @@ export const InstrumentPage = () => {
         )}
       </div>
     </div>
-  );
+  ) : null;
 };
-
