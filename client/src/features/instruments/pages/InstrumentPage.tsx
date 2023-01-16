@@ -8,7 +8,7 @@ import { DemographicsForm, DemographicsFormSchema } from '../components/Demograp
 import { InstrumentOverview } from '../components/InstrumentOverview';
 import { InstrumentRecordForm, InstrumentRecordFormSchema } from '../components/InstrumentRecordForm';
 
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/features/auth';
 
 export const InstrumentPage = () => {
   const auth = useAuthStore();

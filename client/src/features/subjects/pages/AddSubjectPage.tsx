@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Form } from '@/components/form';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/features/auth';
 
 const formDataSchema = z.object({
   firstName: z.string().min(1),

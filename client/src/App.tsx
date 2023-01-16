@@ -5,7 +5,8 @@ import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { RouterProvider } from 'react-router-dom';
 
-import { Button, Notifications, Spinner } from '@/components/core';
+import { Button, Spinner } from '@/components/core';
+import { Notifications } from '@/features/notifications';
 import { queryClient } from '@/services/react-query';
 
 import { router } from './router';

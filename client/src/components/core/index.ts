@@ -4,5 +4,4 @@ export * from './Dialog';
 export * from './Drawer';
 export * from './LanguageToggle';
 export * from './Link';
-export * from './Notifications';
 export * from './Spinner';

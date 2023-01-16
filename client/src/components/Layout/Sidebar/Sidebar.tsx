@@ -6,7 +6,7 @@ import { HiEye, HiHome, HiPlus, HiUserPlus } from 'react-icons/hi2';
 import { NavLink } from 'react-router-dom';
 
 import logo from '@/assets/logo.png';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/features/auth';
 
 import { UserDropup } from './UserDropup';
 

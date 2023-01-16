@@ -7,8 +7,8 @@ import { HiUserCircle } from 'react-icons/hi2';
 import { IoIosArrowUp } from 'react-icons/io';
 
 import { LanguageToggle } from '@/components/core';
+import { useAuthStore } from '@/features/auth';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
-import { useAuthStore } from '@/stores/auth';
 
 export const UserDropup = ({ username }: { username?: string }) => {
   const auth = useAuthStore();

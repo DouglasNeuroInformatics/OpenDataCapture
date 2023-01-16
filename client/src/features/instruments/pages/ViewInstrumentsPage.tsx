@@ -5,7 +5,7 @@ import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
 
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/features/auth';
 
 export const ViewInstrumentsPage = () => {
   const auth = useAuthStore();

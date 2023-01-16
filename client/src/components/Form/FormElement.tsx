@@ -14,7 +14,7 @@ export const FormElement = ({ children, className, error, ...props }: FormElemen
       <form autoComplete="off" className={classNames('w-full', className)} {...props}>
         {children}
       </form>
-      {error && <span className="text-red-700">{children}</span>}
+      {error && <span className="text-red-700">{error}</span>}
     </React.Fragment>
   );
 };
