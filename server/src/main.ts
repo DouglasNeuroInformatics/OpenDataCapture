@@ -20,6 +20,7 @@ async function bootstrap(): Promise<void> {
 
   const docsService = app.get(DocsService);
   docsService.buildSpec(app);
+  docsService.buildDocs();
 
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('SERVER_PORT');

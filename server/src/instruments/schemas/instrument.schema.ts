@@ -40,6 +40,12 @@ export class Instrument implements InstrumentInterface {
   @Prop({ required: false })
   version: number;
 
+  // PyMongo docs
+  // Date collected vs added
+
+  // Clinic for instrument records
+  // Data instead of fields
+  // Type - Form or
   @Prop({ required: true, type: Array })
   fields: InstrumentField[];
 }
