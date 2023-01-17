@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useLayoutEffect, useRef } from 'react';
 
 // MediaQueryList Event based useEventListener interface
-function useEventListener<K extends keyof MediaQueryListEventMap>(
+export function useEventListener<K extends keyof MediaQueryListEventMap>(
   eventName: K,
   handler: (event: MediaQueryListEventMap[K]) => void,
   element: RefObject<MediaQueryList>,
@@ -9,7 +9,7 @@ function useEventListener<K extends keyof MediaQueryListEventMap>(
 ): void;
 
 // Window Event based useEventListener interface
-function useEventListener<K extends keyof WindowEventMap>(
+export function useEventListener<K extends keyof WindowEventMap>(
   eventName: K,
   handler: (event: WindowEventMap[K]) => void,
   element?: undefined,
@@ -17,7 +17,7 @@ function useEventListener<K extends keyof WindowEventMap>(
 ): void;
 
 // Element Event based useEventListener interface
-function useEventListener<K extends keyof HTMLElementEventMap, T extends HTMLElement = HTMLDivElement>(
+export function useEventListener<K extends keyof HTMLElementEventMap, T extends HTMLElement = HTMLDivElement>(
   eventName: K,
   handler: (event: HTMLElementEventMap[K]) => void,
   element: RefObject<T>,
@@ -25,14 +25,14 @@ function useEventListener<K extends keyof HTMLElementEventMap, T extends HTMLEle
 ): void;
 
 // Document Event based useEventListener interface
-function useEventListener<K extends keyof DocumentEventMap>(
+export function useEventListener<K extends keyof DocumentEventMap>(
   eventName: K,
   handler: (event: DocumentEventMap[K]) => void,
   element: RefObject<Document>,
   options?: boolean | AddEventListenerOptions
 ): void;
 
-function useEventListener<
+export function useEventListener<
   KW extends keyof WindowEventMap,
   KH extends keyof HTMLElementEventMap,
   KM extends keyof MediaQueryListEventMap,
@@ -68,4 +68,3 @@ function useEventListener<
   }, [eventName, element, options]);
 }
 
-export default useEventListener;

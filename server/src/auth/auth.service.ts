@@ -6,9 +6,11 @@ import bcrypt from 'bcrypt';
 import { JwtPayload } from 'common';
 
 import { AuthTokensDto } from './dto/auth-tokens.dto';
-import { LoginCredentialsDto } from './dto/login-credentials.dto';
 
 import { User } from '@/users/schemas/user.schema';
+
+import { LoginCredentialsDto } from './dto/login-credentials.dto';
+
 import { UsersService } from '@/users/users.service';
 
 @Injectable()

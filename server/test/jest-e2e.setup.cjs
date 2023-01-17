@@ -20,5 +20,5 @@ module.exports = async function () {
   const server = app.getHttpServer();
 
   global.TestSetup = { app, db, spec, server };
-  console.log('finished setup...')
+  console.log('finished setup...');
 };

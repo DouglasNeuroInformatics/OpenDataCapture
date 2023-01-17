@@ -41,7 +41,7 @@ export class SubjectsService {
     }
   }
   */
-  
+
   generateSubjectId(firstName: string, lastName: string, dateOfBirth: Date): string {
     const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
     const source = this.sanitizeStr(firstName + lastName) + this.sanitizeStr(shortDateOfBirth, true);

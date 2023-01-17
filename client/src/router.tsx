@@ -1,27 +1,29 @@
 import React from 'react';
 
-import { createBrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
 
-import ErrorElement from './components/ErrorElement';
-import HomePage from './routes/home';
-import InstrumentPage from './routes/instruments/:instrument';
-import AddInstrumentPage from './routes/instruments/add-instrument';
-import ViewInstrumentsPage from './routes/instruments/view-instruments';
-import LoginPage from './routes/login';
-import Root from './routes/root';
-import SubjectPage from './routes/subjects/:subject';
-import AddSubjectPage from './routes/subjects/add-subject';
-import ViewSubjectsPage from './routes/subjects/view-subjects';
+import { Layout } from './components/layout';
+import { LoginPage, useAuthStore } from './features/auth';
+import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
+import { ErrorPage, HomePage } from './features/misc';
+import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
 
-const router = createBrowserRouter([
+const Root = () => {
+  const auth = useAuthStore();
+  return auth.currentUser ? (
+    <Layout>
+      <Outlet />
+    </Layout>
+  ) : (
+    <Navigate to="/login" />
+  );
+};
+
+export const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <React.Suspense>
-        <Root />
-      </React.Suspense>
-    ),
-    errorElement: <ErrorElement />,
+    element: <Root />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: '/home',
@@ -55,13 +57,6 @@ const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: (
-      <React.Suspense>
-        <LoginPage />
-      </React.Suspense>
-    ),
-    errorElement: <ErrorElement />
+    element: <LoginPage />
   }
 ]);
-
-export default router;

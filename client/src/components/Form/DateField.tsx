@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 
-import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
 import { Control, Controller, UseFormRegister } from 'react-hook-form';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import Field from './Field';
+import { FieldElement } from './FieldElement';
 
-interface DateFieldProps {
+export interface DateFieldProps {
   name: string;
   label: string;
   register: UseFormRegister<any>;
@@ -15,53 +14,29 @@ interface DateFieldProps {
   error?: string;
 }
 
-const DateField = ({ name, label, register, control, error }: DateFieldProps) => {
-  const [isFilled, setIsFilled] = useState(false);
-
+export const DateField = ({ name, label, control, error }: DateFieldProps) => {
+  const [isFloatingLabel, setIsFloatingLabel] = useState(false);
   return (
-    <Field error={error}>
+    <FieldElement error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
       <Controller
         control={control}
         name={name}
         render={({ field: { onChange, value } }) => (
           <DatePicker
+            showYearDropdown
             className="input"
             dateFormat="yyyy-MM-dd"
+            name={name}
             popperPlacement="bottom-start"
             selected={value as Date}
             startDate={null}
             value={value as string}
-            onChange={(field) => {
-              setIsFilled(true);
-              onChange(field);
-            }}
+            onBlur={() => (value ? null : setIsFloatingLabel(false))}
+            onChange={onChange}
+            onFocus={() => setIsFloatingLabel(true)}
           />
         )}
       />
-      <label
-        className={classNames('absolute left-0 -z-50 my-2 text-gray-600 transition-all', {
-          '-translate-y-5 text-sm text-indigo-800': isFilled
-        })}
-        htmlFor={name}
-      >
-        {label}
-      </label>
-    </Field>
+    </FieldElement>
   );
 };
-
-/*
-const DateField = ({ name, label, register, error }: DateFieldProps) => {
-  return (
-    <Field error={error}>
-      <input
-        className="w-full border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none"
-        type="date"
-        {...register(name)}
-      />
-      <label htmlFor={name}>{label}</label>
-    </Field>
-  );
-};
-*/
-export { DateField as default, type DateFieldProps };

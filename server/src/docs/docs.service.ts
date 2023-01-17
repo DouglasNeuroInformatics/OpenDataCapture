@@ -1,3 +1,4 @@
+import cp from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -12,6 +13,9 @@ export class DocsService {
   private buildDir = path.join(__dirname, 'build');
   private resourcesDir = path.join(__dirname, 'resources');
 
+  private docsFilepath = path.join(this.buildDir, 'index.html');
+  private specFilepath = path.join(this.buildDir, 'api-spec.json');
+
   buildSpec(app: NestExpressApplication): void {
     const document = this.createDocument(app);
 
@@ -19,8 +23,11 @@ export class DocsService {
       fs.mkdirSync(this.buildDir);
     }
 
-    const specFilepath = path.join(this.buildDir, 'api-spec.json');
-    fs.writeFileSync(specFilepath, JSON.stringify(document, null, 2));
+    fs.writeFileSync(this.specFilepath, JSON.stringify(document, null, 2));
+  }
+
+  buildDocs(): void {
+    cp.execSync(`redocly build-docs ${this.specFilepath} -o ${this.docsFilepath}`);
   }
 
   createDocument(app: NestExpressApplication): OpenAPIObject {

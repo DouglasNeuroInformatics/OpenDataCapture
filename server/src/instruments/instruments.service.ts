@@ -3,12 +3,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InstrumentRecordDto } from './dto/instrument-record.dto';
 import { InstrumentDto } from './dto/instrument.dto';
 import { InstrumentRecordsRepository } from './repositories/instrument-records.repository';
-import { InstrumentsRepository } from './repositories/instruments.repository';
-import { Instrument } from './schemas/instrument.schema';
 
 import { SubjectsService } from '@/subjects/subjects.service';
+
+import { InstrumentsRepository } from './repositories/instruments.repository';
 import { InstrumentRecord } from './schemas/instrument-record.schema';
-import mongoose from 'mongoose';
+import { Instrument } from './schemas/instrument.schema';
 
 @Injectable()
 export class InstrumentsService {

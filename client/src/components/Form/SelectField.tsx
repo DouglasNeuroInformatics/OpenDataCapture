@@ -4,14 +4,9 @@ import classNames from 'classnames';
 import { Control, Controller, UseFormRegister } from 'react-hook-form';
 import Select from 'react-select';
 
-import Field from './Field';
+import { FieldElement } from './FieldElement';
 
-interface SelectOption {
-  value: string;
-  label: string;
-}
-
-interface SelectFieldProps {
+export interface SelectFieldProps {
   name: string;
   label: string;
   options: readonly string[];
@@ -20,69 +15,39 @@ interface SelectFieldProps {
   error?: string;
 }
 
-const SelectField = ({ name, label, options, control, register, error }: SelectFieldProps) => {
+export const SelectField = ({ name, label, options, control, error }: SelectFieldProps) => {
   const [isFloatingLabel, setIsFloatingLabel] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [value, setValue] = useState<string>('');
-
-  const handleBlur: React.FocusEventHandler<HTMLSelectElement> = (event) => {
-    if (!event.currentTarget.value) {
-      setIsFloatingLabel(false);
-    }
-  };
-
-  const handleFocus: React.FocusEventHandler<HTMLSelectElement> = () => {
-    setIsFloatingLabel(true);
-    setIsDropdownOpen(true);
-  };
-
   const selectOptions = options.map((option) => ({ value: option, label: option }));
-
   return (
-    <Field error={error}>
+    <FieldElement error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
       <Controller
         control={control}
         name={name}
         render={({ field: { onChange, value } }) => (
           <Select
+            unstyled
+            classNames={{
+              control: ({ isFocused, menuIsOpen }) => {
+                return classNames('w-full border-b-2 bg-transparent py-2 text-gray-900', {
+                  'border-indigo-800 outline-none': isFocused || menuIsOpen,
+                  'hover:border-gray-300': !menuIsOpen
+                });
+              },
+              menu: () => classNames('mt-1 bg-slate-100 shadow-xl rounded-md'),
+              option: () => 'p-2 hover:bg-slate-200 capitalize'
+            }}
+            name={name}
             options={selectOptions}
+            placeholder={null}
             value={selectOptions.find((c) => c.value === value)}
+            onBlur={() => (value ? null : setIsFloatingLabel(false))}
             onChange={(selectedOption) => {
               selectedOption && onChange(selectedOption.value);
             }}
+            onFocus={() => setIsFloatingLabel(true)}
           />
         )}
       />
-    </Field>
+    </FieldElement>
   );
-
-  /*
-
-
-  return (
-    <Field error={error}>
-      <select
-        className="w-full border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none"
-        onFocus={handleFocus}
-        {...register(name, { onBlur: handleBlur })}
-      >
-        {options.map((option) => (
-          <option key={option} value={value}>
-            {option}
-          </option>
-        ))}
-      </select>
-      <label
-        className={classNames('absolute left-0 -z-50 my-2 text-gray-600 transition-all', {
-          '-translate-y-5 text-sm text-indigo-800': isFloatingLabel
-        })}
-        htmlFor={name}
-      >
-        {label}
-      </label>
-    </Field>
-  );
-  */
 };
-
-export { SelectField as default, type SelectFieldProps };
