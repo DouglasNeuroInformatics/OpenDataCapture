@@ -11,4 +11,3 @@ export const SubmitButton = ({ label = 'Submit' }: SubmitButtonProps) => {
     </button>
   );
 };
-

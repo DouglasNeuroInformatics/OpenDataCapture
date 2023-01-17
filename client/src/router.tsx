@@ -51,7 +51,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/instruments/:id',
-        element: <InstrumentPage />,
+        element: <InstrumentPage />
       }
     ]
   },
