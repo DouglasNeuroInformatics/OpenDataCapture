@@ -8,16 +8,19 @@ import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 
 import yaml from 'js-yaml';
 
+import { ResourcesService } from '@/resources/resources.service';
+
 @Injectable()
 export class DocsService {
   private buildDir = path.join(__dirname, 'build');
-  private resourcesDir = path.join(__dirname, 'resources');
 
   private docsFilepath = path.join(this.buildDir, 'index.html');
   private specFilepath = path.join(this.buildDir, 'api-spec.json');
 
-  buildSpec(app: NestExpressApplication): void {
-    const document = this.createDocument(app);
+  constructor(private readonly resourcesService: ResourcesService) {}
+
+  async buildSpec(app: NestExpressApplication): Promise<void> {
+    const document = await this.createDocument(app);
 
     if (!fs.existsSync(this.buildDir)) {
       fs.mkdirSync(this.buildDir);
@@ -30,16 +33,13 @@ export class DocsService {
     cp.execSync(`redocly build-docs ${this.specFilepath} -o ${this.docsFilepath}`);
   }
 
-  createDocument(app: NestExpressApplication): OpenAPIObject {
-    const config = this.loadConfig();
+  async createDocument(app: NestExpressApplication): Promise<OpenAPIObject> {
+    const config = await this.loadConfig();
     return SwaggerModule.createDocument(app, config);
   }
 
-  private loadConfig(): Omit<OpenAPIObject, 'paths'> {
-    return yaml.load(this.loadResourceAsTxt('swagger.config.yaml')) as Omit<OpenAPIObject, 'paths'>;
-  }
-
-  private loadResourceAsTxt(filename: string): string {
-    return fs.readFileSync(path.join(this.resourcesDir, filename), 'utf-8');
+  private async loadConfig(): Promise<Omit<OpenAPIObject, 'paths'>> {
+    const contents = await this.resourcesService.load('docs/swagger.config.yaml');
+    return yaml.load(contents) as Omit<OpenAPIObject, 'paths'>;
   }
 }

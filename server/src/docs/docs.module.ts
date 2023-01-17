@@ -5,8 +5,11 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { DocsService } from './docs.service';
 
+import { ResourcesModule } from '@/resources/resources.module';
+
 @Module({
   imports: [
+    ResourcesModule,
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, 'build')
     })

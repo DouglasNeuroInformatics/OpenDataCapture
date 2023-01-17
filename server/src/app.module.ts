@@ -8,8 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { ExceptionFilter } from './core/exception.filter';
 import { DatabaseModule } from './database/database.module';
+import { DemoModule } from './demo/demo.module';
 import { DocsModule } from './docs/docs.module';
 import { InstrumentsModule } from './instruments/instruments.module';
+import { ResourcesModule } from './resources/resources.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
 
@@ -27,9 +29,10 @@ import { UsersModule } from './users/users.module';
         SECRET_KEY: Joi.string().required()
       })
     }),
-    ConfigModule,
-    DocsModule,
     DatabaseModule,
+    DemoModule,
+    DocsModule,
+    ResourcesModule,
     InstrumentsModule,
     SubjectsModule,
     UsersModule

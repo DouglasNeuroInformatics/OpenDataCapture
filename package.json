@@ -19,7 +19,7 @@
     "prepare": "husky install",
     "storybook": "yarn ws client storybook",
     "test": "env-cmd env-cmd -f .env.local turbo run test",
-    "ws": "yarn workspace"
+    "ws": "env-cmd env-cmd -f .env.local yarn workspace"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",

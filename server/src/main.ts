@@ -9,6 +9,7 @@ import { DocsService } from './docs/docs.service';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
+  app.enableShutdownHooks();
   app.setGlobalPrefix('/api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -19,7 +20,7 @@ async function bootstrap(): Promise<void> {
   );
 
   const docsService = app.get(DocsService);
-  docsService.buildSpec(app);
+  await docsService.buildSpec(app);
   docsService.buildDocs();
 
   const configService = app.get(ConfigService);

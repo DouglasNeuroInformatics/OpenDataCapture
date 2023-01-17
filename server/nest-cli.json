@@ -5,7 +5,7 @@
   "compilerOptions": {
     "assets": [
       {
-        "include": "docs/resources/**/*",
+        "include": "resources/data/**/*",
         "watchAssets": true
       }
     ],

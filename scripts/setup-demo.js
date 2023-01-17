@@ -2,20 +2,6 @@ import { createHash } from 'crypto';
 
 import { MongoClient, ObjectId } from 'mongodb';
 
-class Random {
-  static int(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
-
-  static date(start, end) {
-    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-  }
-
-  static birthday() {
-    return this.date(new Date(1950, 0), new Date(2000, 0));
-  }
-}
-
 class StringUtils {
   static isInt(s) {
     return s ? parseInt(s).toString().length === s.length : false;

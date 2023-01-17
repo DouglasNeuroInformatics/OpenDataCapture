@@ -6,8 +6,8 @@
   "scripts": {
     "build": "nest build",
     "debug": "nest start --debug --watch",
-    "demo": "yarn build && yarn start",
-    "dev": "nest start --watch",
+    "demo": "nest start --watch",
+    "dev": "NODE_ENV=development nest start --watch",
     "format": "prettier --write .",
     "lint": "eslint --fix src",
     "prebuild": "rm -rf dist",
