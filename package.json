@@ -16,9 +16,10 @@
     "dev": "env-cmd env-cmd -f .env.local cross-env NODE_ENV=development turbo run dev",
     "format": "turbo run format",
     "lint": "turbo run lint",
+    "prepare": "husky install",
+    "storybook": "yarn ws client storybook",
     "test": "env-cmd env-cmd -f .env.local turbo run test",
-    "ws": "yarn workspace",
-    "prepare": "husky install"
+    "ws": "yarn workspace"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
