@@ -43,7 +43,6 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@RequestUser('username') username: string): Promise<void> {
-    // console.log(username);
     return this.authService.logout(username);
   }
 

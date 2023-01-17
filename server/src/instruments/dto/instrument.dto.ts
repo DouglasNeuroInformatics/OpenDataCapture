@@ -22,8 +22,7 @@ class InstrumentFieldDto implements InstrumentFieldInterface {
   label: string;
 
   @ApiProperty({
-    description:
-      'The type of the field, which is designed to be as close as possible, though not equivalent to, the JavaScript runtime type it will be represented as',
+    description: 'The type of the field, which is used to determine the form UI',
     enum: instrumentFieldTypeOptions
   })
   type: InstrumentFieldType;
@@ -66,7 +65,8 @@ export class InstrumentDto implements InstrumentInterface {
   estimatedDuration: number;
 
   @ApiProperty({
-    description: 'A list of fields that compose the instrument'
+    description: 'A list of fields that compose the instrument',
+    type: [InstrumentFieldDto]
   })
   @ValidateNested()
   fields: InstrumentFieldDto[];

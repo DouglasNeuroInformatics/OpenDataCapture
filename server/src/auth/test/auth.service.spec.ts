@@ -1,4 +1,4 @@
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
@@ -83,22 +83,22 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw an UnauthorizedException if the user does not exist', async () => {
+    it('should throw an ForbiddenException if the user does not exist', async () => {
       await expect(
         authService.login({
           username: 'attacker',
           password: 'foo'
         })
-      ).rejects.toBeInstanceOf(UnauthorizedException);
+      ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
-    it('should throw an UnauthorizedException if the user provides an incorrect password', async () => {
+    it('should throw an ForbiddenException if the user provides an incorrect password', async () => {
       await expect(
         authService.login({
           username: mockAdmin.username,
           password: mockAdmin.password + ' '
         })
-      ).rejects.toBeInstanceOf(UnauthorizedException);
+      ).rejects.toBeInstanceOf(ForbiddenException);
     });
   });
 
@@ -108,18 +108,18 @@ describe('AuthService', () => {
       expect(usersService.updateUser).toBeCalledWith(mockAdmin.username, { refreshToken: undefined });
     });
 
-    it('should throw an UnauthorizedException if the user does not exist', async () => {
-      await expect(authService.logout('foo')).rejects.toBeInstanceOf(UnauthorizedException);
+    it('should throw an ForbiddenException if the user does not exist', async () => {
+      await expect(authService.logout('foo')).rejects.toBeInstanceOf(ForbiddenException);
     });
 
     it('should throw a BadRequestException if the user does not have a refresh token', async () => {
-      await expect(authService.logout('user')).rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(authService.logout('user')).rejects.toBeInstanceOf(ForbiddenException);
     });
   });
 
   describe('refresh', () => {
-    it('should throw an UnauthorizedException if the user does not exist', async () => {
-      await expect(authService.refresh('foo', 'token')).rejects.toBeInstanceOf(UnauthorizedException);
+    it('should throw an ForbiddenException if the user does not exist', async () => {
+      await expect(authService.refresh('foo', 'token')).rejects.toBeInstanceOf(ForbiddenException);
     });
   });
 });

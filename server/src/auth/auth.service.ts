@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
@@ -26,7 +26,7 @@ export class AuthService {
 
     const isAuth = await bcrypt.compare(password, user.password);
     if (!isAuth) {
-      throw new UnauthorizedException();
+      throw new ForbiddenException('Invalid login credentials')
     }
 
     const tokens = await this.getTokens(user);
@@ -37,22 +37,22 @@ export class AuthService {
   async logout(username: string): Promise<void> {
     const user = await this.getUser(username);
     if (!user.refreshToken) {
-      throw new UnauthorizedException('User is already logged out');
+      throw new ForbiddenException('User is already logged out');
     }
     await this.usersService.updateUser(username, { refreshToken: undefined }); // change to null later
   }
 
   async refresh(username: string, refreshToken?: string): Promise<AuthTokensDto> {
     if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token is undefined');
+      throw new ForbiddenException('Refresh token is undefined');
     }
     const user = await this.getUser(username);
     if (!user.refreshToken) {
-      throw new UnauthorizedException();
+      throw new ForbiddenException('User does not possess valid refresh token');
     }
     const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
     if (!isValid) {
-      throw new UnauthorizedException();
+      throw new ForbiddenException('Failed to validate provided refresh token');
     }
     const tokens = await this.getTokens(user);
     await this.updateUserRefreshToken(user.username, tokens.refreshToken);
@@ -65,7 +65,7 @@ export class AuthService {
       user = await this.usersService.findUser(username);
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw new UnauthorizedException();
+        throw new ForbiddenException('Failed to find user');
       }
       throw new InternalServerErrorException('Internal Server Error', {
         cause: error instanceof Error ? error : undefined

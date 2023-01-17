@@ -1,4 +1,4 @@
-import { ExecutionContext, UnauthorizedException, createParamDecorator } from '@nestjs/common';
+import { ExecutionContext, ForbiddenException, createParamDecorator } from '@nestjs/common';
 
 import { JwtPayload, userRoleOptions } from 'common';
 import { Request } from 'express';
@@ -17,7 +17,7 @@ export const RequestUser = createParamDecorator((key: keyof JwtPayload | undefin
   });
 
   if (error) {
-    throw new UnauthorizedException(error.message);
+    throw new ForbiddenException(error.message);
   }
   return key ? value[key] : value;
 });
