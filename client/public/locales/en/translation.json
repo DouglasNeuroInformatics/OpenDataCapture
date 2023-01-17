@@ -16,11 +16,11 @@
   },
   "sidebar": {
     "links": {
-      "/home": "Home",
-      "/subjects/add-subject": "Add Subject",
-      "/subjects/view-subjects": "View Subjects",
-      "/instruments/add-instrument": "Add Instrument",
-      "/instruments/view-instruments": "View Instruments"
+      "home": "Home",
+      "addSubject": "Add Subject",
+      "viewSubjects": "View Subjects",
+      "addInstrument": "Add Instrument",
+      "viewInstruments": "View Instruments"
     }
   },
   "userDropup": {

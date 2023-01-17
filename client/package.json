@@ -5,10 +5,12 @@
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "tsc && NODE_ENV=production vite build",
     "build-storybook": "build-storybook",
+    "demo": "yarn build && yarn preview",
     "dev": "vite",
     "lint": "eslint --fix src",
+    "preview": "vite preview --host --port 3000",
     "storybook": "start-storybook -p 6006"
   },
   "dependencies": {

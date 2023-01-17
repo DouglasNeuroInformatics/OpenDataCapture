@@ -1,5 +1,6 @@
-const { createHash } = require('crypto');
-const { MongoClient, ObjectId } = require ('mongodb');
+import { createHash } from 'crypto';
+
+import { MongoClient, ObjectId } from 'mongodb';
 
 class Random {
   static int(min, max) {
@@ -79,7 +80,7 @@ function computeScore(timepoint, sex) {
 }
 
 async function main() {
-  const uri = "mongodb://localhost:27017/development";
+  const uri = "mongodb://localhost:27017/demo";
   const client = new MongoClient(uri);
   await client.connect();
   console.log('success!')

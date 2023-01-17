@@ -6,6 +6,7 @@
   "scripts": {
     "build": "nest build",
     "debug": "nest start --debug --watch",
+    "demo": "yarn build && yarn start",
     "dev": "nest start --watch",
     "format": "prettier --write .",
     "lint": "eslint --fix src",

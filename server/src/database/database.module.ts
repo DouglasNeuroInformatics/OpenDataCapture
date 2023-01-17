@@ -9,9 +9,11 @@ import { DatabaseService } from './database.service';
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        switch (configService.get('NODE_ENV')) {
+        switch (configService.getOrThrow('NODE_ENV')) {
           case 'development':
-            return { uri: configService.get<string>('MONGO_DEV_CONNECTION_URI') };
+            return { uri: configService.getOrThrow<string>('MONGO_DEV_CONNECTION_URI') };
+          case 'demo':
+            return { uri: configService.getOrThrow<string>('MONGO_DEMO_CONNECTION_URI') };
           case 'test':
             return { uri: configService.get<string>('MONGO_TEST_CONNECTION_URI') };
           default:

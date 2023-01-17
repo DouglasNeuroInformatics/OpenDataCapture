@@ -14,11 +14,11 @@
   },
   "sidebar": {
     "links": {
-      "/home": "Accueil",
-      "/subjects/add-subject": "Ajouter une personne",
-      "/subjects/view-subjects": "Voir toutes les personnes",
-      "/instruments/add-instrument": "Ajouter un instrument",
-      "/instruments/view-instruments": "Voir tous les instruments"
+      "home": "Accueil",
+      "addSubject": "Ajouter une personne",
+      "viewSubjects": "Voir toutes les personnes",
+      "addInstrument": "Ajouter un instrument",
+      "viewInstruments": "Voir tous les instruments"
     }
   },
   "userDropup": {
