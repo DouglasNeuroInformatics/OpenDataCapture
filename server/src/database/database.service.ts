@@ -10,4 +10,8 @@ export class DatabaseService {
   getDbHandle(): Connection {
     return this.connection;
   }
+
+  async purgeDb(): Promise<void> {
+    await this.connection.db.dropDatabase();
+  }
 }

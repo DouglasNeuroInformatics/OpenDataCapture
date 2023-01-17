@@ -16,6 +16,9 @@ export class InstrumentField implements InstrumentFieldInterface {
   @Prop({ required: true })
   label: string;
 
+  @Prop({ required: false })
+  description: string;
+
   @Prop({ required: true })
   isRequired: boolean;
 
@@ -33,6 +36,9 @@ export class Instrument implements InstrumentInterface {
 
   @Prop({ required: true })
   instructions: string;
+
+  @Prop({ required: true })
+  language: 'en' | 'fr';
 
   @Prop({ required: false })
   estimatedDuration: number;

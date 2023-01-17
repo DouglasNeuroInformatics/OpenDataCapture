@@ -26,6 +26,7 @@ import { Instrument, InstrumentSchema } from './schemas/instrument.schema';
     SubjectsModule
   ],
   controllers: [InstrumentsController],
-  providers: [InstrumentsService, InstrumentsRepository, InstrumentRecordsRepository]
+  providers: [InstrumentsService, InstrumentsRepository, InstrumentRecordsRepository],
+  exports: [InstrumentsService]
 })
 export class InstrumentsModule {}

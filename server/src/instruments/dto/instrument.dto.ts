@@ -1,11 +1,13 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { IsString, ValidateNested } from 'class-validator';
 import {
   InstrumentField as InstrumentFieldInterface,
   InstrumentFieldType,
   Instrument as InstrumentInterface,
-  instrumentFieldTypeOptions
+  InstrumentLanguage,
+  instrumentFieldTypeOptions,
+  instrumentLanguageOptions
 } from 'common';
 
 class InstrumentFieldDto implements InstrumentFieldInterface {
@@ -20,6 +22,12 @@ class InstrumentFieldDto implements InstrumentFieldInterface {
     example: 'Overall Happiness Rating'
   })
   label: string;
+
+  @ApiPropertyOptional({
+    description: 'A description of the field',
+    example: 'Your overall happiness'
+  })
+  description?: string;
 
   @ApiProperty({
     description: 'The type of the field, which is used to determine the form UI',
@@ -63,6 +71,12 @@ export class InstrumentDto implements InstrumentInterface {
     description: 'The estimated time to complete the instrument (minutes)'
   })
   estimatedDuration: number;
+
+  @ApiProperty({
+    description: 'The language of the instrument',
+    enum: instrumentLanguageOptions
+  })
+  language: InstrumentLanguage;
 
   @ApiProperty({
     description: 'A list of fields that compose the instrument',

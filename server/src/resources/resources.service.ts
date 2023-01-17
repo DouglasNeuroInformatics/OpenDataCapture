@@ -10,4 +10,9 @@ export class ResourcesService {
   load(filename: string): Promise<string> {
     return fs.readFile(path.resolve(this.dataDir, filename), 'utf-8');
   }
+
+  async loadAll(dir: string): Promise<string[]> {
+    const filepaths = await fs.readdir(path.resolve(this.dataDir, dir));
+    return Promise.all(filepaths.map((file) => fs.readFile(path.resolve(this.dataDir, dir, file), 'utf-8')));
+  }
 }
