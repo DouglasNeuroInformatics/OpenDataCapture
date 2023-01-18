@@ -1,4 +1,10 @@
-# The Douglas Data Capture Platform
+<div style="display: flex; flex-direction: column; align-items: center">
+  <img
+    src="https://raw.githubusercontent.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/main/.github/assets/logo.png"
+    alt="logo"
+  />
+</div>
+<h1 style="text-align: center;">The Douglas Data Capture Platform</h1>
 
 ![license](https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform)
 ![version](https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/DouglasDataCapturePlatform)
@@ -9,7 +15,7 @@ The Douglas Data Capture Platform was created to standardize the collection of c
 
 ## Setup
 
-###  Prerequisites
+### Prerequisites
 
 To follow this procedure, you should have Node installed on your machine. Recent versions of Node include the Yarn package manager, but it is disabled by default. To enable it, run the following command:
 
@@ -36,7 +42,6 @@ $ yarn install
 ```shell
 $ echo SECRET_KEY=foo > .env.local
 ```
-
 
 ## License
 
