@@ -27,13 +27,18 @@ export const InstrumentRecordForm = ({ onSubmit, submitLabel, title, fields }: I
 
   return (
     <div>
-      <h3>{title}</h3>
+      <h3 className="mt-8 mb-5 font-semibold">{title}</h3>
       <Form onSubmit={handleSubmit(onSubmit)}>
         {fields.map((field) => {
           const error = errors[field.name]?.message as string | undefined; // Check later
           switch (field.variant) {
             case 'text':
-              return <Form.TextField error={error} label={field.label} name={field.name} register={register} />;
+              return (
+                <React.Fragment>
+                  <Form.TextField error={error} label={field.label} name={field.name} register={register} />
+                  <small className="mb-7">{field.description}</small>
+                </React.Fragment>
+              );
           }
         })}
         <Form.SubmitButton label={submitLabel} />

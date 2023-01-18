@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useState } from 'react';
 
 import { useQuery } from 'react-query';
@@ -27,14 +28,22 @@ export const InstrumentPage = () => {
     <div className="container" style={{ maxWidth: 900 }}>
       <h1 className="text-center">{data.title}</h1>
       <hr className="my-5 border-slate-300" />
-      <div className="flex rounded-xl bg-indigo-800 p-3 text-white shadow-xl">
-        <div className="flex w-full justify-center rounded-xl">
+      <div className="flex">
+        <div className={'flex w-full justify-center rounded-xl bg-indigo-800 p-3 text-white shadow-xl'}>
           <span className="mx-2">Overview</span>
         </div>
-        <div className="flex w-full justify-center rounded-xl">
+        <div
+          className={clsx('mx-5 flex w-full justify-center rounded-xl bg-indigo-800 p-3 text-white shadow-xl', {
+            'opacity-50': 1 > step
+          })}
+        >
           <span className="mx-2">Demographics Questions</span>
         </div>
-        <div className="flex w-full justify-center">
+        <div
+          className={clsx('flex w-full justify-center rounded-xl bg-indigo-800 p-3 text-white shadow-xl', {
+            'opacity-50': 2 > step
+          })}
+        >
           <span className="mx-2">Instrument Questions</span>
         </div>
       </div>

@@ -31,7 +31,7 @@ export const DemographicsForm = ({ onSubmit, submitLabel }: DemographicsFormProp
 
   return (
     <div>
-      <h3>Demographics Form</h3>
+      <h3 className="mt-8 mb-5 font-semibold">Demographics Form</h3>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.TextField
           error={errors.firstName?.message as string}

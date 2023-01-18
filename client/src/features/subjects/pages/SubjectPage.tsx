@@ -15,13 +15,21 @@ export const SubjectPage = () => {
     return <Spinner />;
   }
 
-  console.log(data)
-
   return data ? (
-    <div className="text-center">
-      <h1>Subject Data</h1>
-      <p>Subject ID: {params.id}</p>
-      <p>{JSON.stringify(data)}</p>
+    <div>
+      <h1 className="text-center">Subject Data</h1>
+      <p>
+        <span className="font-semibold">Subject ID:</span> {params.id}
+      </p>
+      <div>
+        <h3 className="mt-5">Measures</h3>
+        {data &&
+          Object.values(data).map((value) => (
+            <span key={data.instrument}>
+              {JSON.stringify(value)}
+            </span>
+          ))}
+      </div>
     </div>
   ) : null;
 };
