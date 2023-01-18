@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn lint
-yarn test
-yarn format
+yarn test && npx lint-staged --verbose
