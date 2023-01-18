@@ -1,6 +1,7 @@
 # The Douglas Data Capture Platform
 
 ![license](https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform)
+![version](https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/DouglasDataCapturePlatform)
 
 ## About
 
