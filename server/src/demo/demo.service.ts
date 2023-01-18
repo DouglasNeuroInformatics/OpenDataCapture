@@ -81,6 +81,8 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
 
     for (const subject of subjects) {
       for (const timepoint of timepoints) {
+        const t = timepoint.getMonth() / 10;
+
         const { firstName, lastName, dateOfBirth } = subject;
         await this.instrumentsService.createRecord(instrument.title, {
           dateCollected: timepoint,
@@ -89,7 +91,15 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
             lastName: lastName!,
             dateOfBirth
           },
-          data: Object.fromEntries(instrument.data.map((field) => [field.name, 1]))
+          data: Object.fromEntries(
+            instrument.data.map((field) => {
+              let subtract = 0;
+              if (subject.sex === 'male' && Random.int(0, 5) === 0) {
+                subtract = Math.max(0, timepoint.getMonth() - 8);
+              }
+              return [field.name, Math.ceil(Random.int(1, 7) - subtract)];
+            })
+          )
         });
       }
     }

@@ -49,7 +49,7 @@ export class InstrumentsService {
       dateCollected: dto.dateCollected || new Date(),
       instrument,
       subject,
-      data: dto.data
+      data: Object.fromEntries(Object.entries(dto.data).map(([key, value]) => [key, parseInt(value as string)]))
     });
   }
 
