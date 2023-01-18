@@ -81,8 +81,6 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
 
     for (const subject of subjects) {
       for (const timepoint of timepoints) {
-        const t = timepoint.getMonth() / 10;
-
         const { firstName, lastName, dateOfBirth } = subject;
         await this.instrumentsService.createRecord(instrument.title, {
           dateCollected: timepoint,
@@ -110,6 +108,11 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
       username: 'admin',
       password: 'password',
       role: 'admin'
+    });
+    await this.usersService.create({
+      username: 'user',
+      password: 'password',
+      role: 'user'
     });
   }
 }
