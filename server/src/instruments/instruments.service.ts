@@ -46,6 +46,7 @@ export class InstrumentsService {
     const subject = await this.subjectsService.findById(subjectId);
 
     return this.instrumentRecordsRepository.create({
+      dateCollected: dto.dateCollected || new Date(),
       instrument,
       subject,
       data: dto.data

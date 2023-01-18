@@ -4,7 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { Random, sexOptions } from 'common';
 
 import { DatabaseService } from '@/database/database.service';
+import { FormInstrumentDto } from '@/instruments/dto/form-instrument.dto';
 import { InstrumentsService } from '@/instruments/instruments.service';
+import { FormInstrument } from '@/instruments/schemas/form-instrument.schema';
 import { ResourcesService } from '@/resources/resources.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
@@ -28,9 +30,9 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
     if (this.isDemo()) {
       console.log('Init Demo...');
       await this.databaseService.purgeDb();
-      // await this.createInstruments();
+      await this.createInstruments();
       await this.createSubjects();
-      // await this.createInstrumentRecords();
+      await this.createInstrumentRecords();
       await this.createUsers();
     }
   }
@@ -41,14 +43,12 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
     }
   }
 
-  /*
-
   private async createInstruments(): Promise<void> {
     const instruments = await this.resourcesService.loadAll('instruments');
     for (const instrument of instruments) {
-      await this.instrumentsService.create(JSON.parse(instrument) as InstrumentDto);
+      await this.instrumentsService.createForm(JSON.parse(instrument) as FormInstrumentDto);
     }
-  } */
+  }
 
   private async createSubjects(): Promise<void> {
     const maleNames = ['James', 'Robert', 'John', 'Michael', 'David', 'William', 'Richard', 'Joseph'];
@@ -69,33 +69,31 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
     }
   }
 
-  /*
-
   private async createInstrumentRecords(): Promise<void> {
     const lastYear = new Date().getFullYear() - 1;
     const timepoints = Array.from({ length: 12 }, (_, i) => new Date(lastYear, i));
     const subjects = await this.subjectsService.findAll();
 
-    const instrument = await this.instrumentsService.getByName('The Brief Psychiatric Rating Scale');
+    // Fix type
+    const instrument = (await this.instrumentsService.getInstrument(
+      'The Brief Psychiatric Rating Scale'
+    )) as FormInstrument;
 
     for (const subject of subjects) {
       for (const timepoint of timepoints) {
         const { firstName, lastName, dateOfBirth } = subject;
-
-        await this.instrumentsService.createRecord(instrument.name, {
+        await this.instrumentsService.createRecord(instrument.title, {
           dateCollected: timepoint,
           subjectDemographics: {
             firstName: firstName!,
             lastName: lastName!,
             dateOfBirth
           },
-          responses: [
-            {}
-          ]
+          data: Object.fromEntries(instrument.data.map((field) => [field.name, 1]))
         });
       }
     }
-  } */
+  }
 
   private async createUsers(): Promise<void> {
     await this.usersService.create({

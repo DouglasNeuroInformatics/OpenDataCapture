@@ -25,10 +25,10 @@ describe('InstrumentsController', () => {
     instrumentsService = moduleRef.get(InstrumentsService);
   });
 
-  describe('create', () => {
-    it('should call instrumentsService.create', async () => {
-      await instrumentsController.create(mockFormInstrumentDto);
-      expect(instrumentsService.create).toBeCalled();
+  describe('createForm', () => {
+    it('should call instrumentsService.createForm', async () => {
+      await instrumentsController.createForm(mockFormInstrumentDto);
+      expect(instrumentsService.createForm).toBeCalledWith(mockFormInstrumentDto);
     });
   });
 });

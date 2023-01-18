@@ -4,20 +4,20 @@ import { useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { InstrumentsAPI } from '../api/instruments.api';
-import { DemographicsForm, DemographicsFormSchema } from '../components/DemographicsForm';
+import { DemographicsForm, DemographicsFormData } from '../components/DemographicsForm';
 import { InstrumentOverview } from '../components/InstrumentOverview';
-import { InstrumentRecordForm, InstrumentRecordFormSchema } from '../components/InstrumentRecordForm';
+import { InstrumentRecordForm, InstrumentRecordFormData } from '../components/InstrumentRecordForm';
 
 export const InstrumentPage = () => {
   const navigate = useNavigate();
   const params = useParams();
   const [step, setStep] = useState(0);
-  const [demographicsData, setDemographicsData] = useState<DemographicsFormSchema>();
+  const [demographicsData, setDemographicsData] = useState<DemographicsFormData>();
 
   const { data } = useQuery(`Instrument`, () => InstrumentsAPI.getInstrument(params.id!));
   console.log(data);
 
-  const submitInstrumentRecord = async (responses: InstrumentRecordFormSchema) => {
+  const submitInstrumentRecord = async (responses: InstrumentRecordFormData) => {
     await InstrumentsAPI.submitRecord(params.id!, demographicsData!, responses);
     alert('Success!');
     navigate('/home');
@@ -49,9 +49,7 @@ export const InstrumentPage = () => {
             }}
           />
         )}
-        {step === 2 && (
-          <InstrumentRecordForm fields={data.data} title={data.title} onSubmit={submitInstrumentRecord} />
-        )}
+        {step === 2 && <InstrumentRecordForm fields={data.data} title={data.title} onSubmit={submitInstrumentRecord} />}
       </div>
     </div>
   ) : null;

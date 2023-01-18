@@ -8,7 +8,10 @@ import { Subject } from '@/subjects/schemas/subject.schema';
 
 @Schema({ strict: true })
 export class InstrumentRecord {
-  @Prop({ required: true, ref: 'Instrument' , type: mongoose.Schema.Types.ObjectId})
+  @Prop({ default: new Date(), required: true })
+  dateCollected: Date;
+
+  @Prop({ required: true, ref: 'Instrument', type: mongoose.Schema.Types.ObjectId })
   instrument: Instrument;
 
   @Prop({ required: true, ref: Subject.name, type: String })
