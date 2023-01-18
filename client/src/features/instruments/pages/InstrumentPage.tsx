@@ -14,7 +14,8 @@ export const InstrumentPage = () => {
   const [step, setStep] = useState(0);
   const [demographicsData, setDemographicsData] = useState<DemographicsFormSchema>();
 
-  const { data } = useQuery(`Instrument`, () => InstrumentsAPI.getSchema(params.id!));
+  const { data } = useQuery(`Instrument`, () => InstrumentsAPI.getInstrument(params.id!));
+  console.log(data);
 
   const submitInstrumentRecord = async (responses: InstrumentRecordFormSchema) => {
     await InstrumentsAPI.submitRecord(params.id!, demographicsData!, responses);
@@ -24,7 +25,7 @@ export const InstrumentPage = () => {
 
   return data ? (
     <div className="container" style={{ maxWidth: 900 }}>
-      <h1 className="text-center">{data.name}</h1>
+      <h1 className="text-center">{data.title}</h1>
       <hr className="my-5 border-slate-300" />
       <div className="flex rounded-xl bg-indigo-800 p-3 text-white shadow-xl">
         <div className="flex w-full justify-center rounded-xl">
@@ -49,7 +50,7 @@ export const InstrumentPage = () => {
           />
         )}
         {step === 2 && (
-          <InstrumentRecordForm fields={data.fields} title={data.name} onSubmit={submitInstrumentRecord} />
+          <InstrumentRecordForm fields={data.data} title={data.title} onSubmit={submitInstrumentRecord} />
         )}
       </div>
     </div>

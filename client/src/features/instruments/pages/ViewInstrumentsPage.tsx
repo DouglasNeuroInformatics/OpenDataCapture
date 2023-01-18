@@ -8,8 +8,9 @@ import { InstrumentsAPI } from '../api/instruments.api';
 import { Spinner } from '@/components/core';
 
 export const ViewInstrumentsPage = () => {
-  const { data, isLoading } = useQuery('ViewInstruments', () => InstrumentsAPI.getAllSchemas());
-
+  const { data, isLoading } = useQuery('ViewInstruments', () => InstrumentsAPI.getAvailableInstruments());
+  console.log(data);
+  
   if (isLoading) {
     return <Spinner />;
   }
@@ -19,9 +20,9 @@ export const ViewInstrumentsPage = () => {
       <h1 className="text-center">View Instruments</h1>
       {data.map((instrument, i) => (
         <div className="card my-5" key={i}>
-          <h3>{instrument.name}</h3>
-          <p>{instrument.description}</p>
-          <Link className="btn-primary mt-2" to={`/instruments/${instrument._id!}`}>
+          <h3>{instrument.title}</h3>
+          <p>{instrument.details.description}</p>
+          <Link className="btn-primary mt-2" to={`/instruments/${instrument.title}`}>
             Start
           </Link>
         </div>

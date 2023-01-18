@@ -18,7 +18,7 @@ export const FieldElement = ({ children, name, label, error, isFloatingLabel }: 
         {children}
         <label
           className={classNames('absolute left-0 my-2 text-gray-600 transition-all', {
-            '-translate-y-5 text-sm text-indigo-800': isFloatingLabel
+            '-translate-y-5 text-sm z-10 text-indigo-800': isFloatingLabel
           })}
           htmlFor={name}
         >

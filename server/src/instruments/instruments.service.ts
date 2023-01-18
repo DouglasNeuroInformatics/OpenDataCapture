@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
+import { FormInstrumentDto } from './dto/form-instrument.dto';
 import { InstrumentRecordDto } from './dto/instrument-record.dto';
-import { InstrumentDto } from './dto/instrument.dto';
 import { InstrumentRecordsRepository } from './repositories/instrument-records.repository';
 
 import { SubjectsService } from '@/subjects/subjects.service';
@@ -18,51 +18,41 @@ export class InstrumentsService {
     private readonly subjectsService: SubjectsService
   ) {}
 
-  create(dto: InstrumentDto): Promise<Instrument> {
+  async createForm(dto: FormInstrumentDto): Promise<Instrument> {
+    if (await this.instrumentsRepository.exists({ title: dto.title })) {
+      throw new ConflictException(`An instrument entitled '${dto.title}' already exists`);
+    }
     return this.instrumentsRepository.create(dto);
   }
 
-  getAll(): Promise<Instrument[]> {
-    return this.instrumentsRepository.findAll();
+  // Should subset data with select
+  async getAvailableInstruments(): Promise<Omit<Instrument, 'data'>[]> {
+    return await this.instrumentsRepository.findAll();
   }
 
-  async getById(id: string): Promise<Instrument> {
-    const instrument = await this.instrumentsRepository.findById(id);
+  async getInstrument(title: string): Promise<Instrument> {
+    const instrument = await this.instrumentsRepository.findOne({ title });
     if (!instrument) {
-      throw new NotFoundException(`Instrument with ID ${id} not found`);
+      throw new NotFoundException(`Failed to find an instrument entitled ${title}`);
     }
     return instrument;
   }
 
-  async insertRecord(id: string, dto: InstrumentRecordDto): Promise<InstrumentRecord> {
+  async createRecord(title: string, dto: InstrumentRecordDto): Promise<InstrumentRecord> {
     const { firstName, lastName, dateOfBirth } = dto.subjectDemographics;
     const subjectId = this.subjectsService.generateSubjectId(firstName, lastName, dateOfBirth);
 
+    const instrument = await this.instrumentsRepository.findOne({ title });
+    const subject = await this.subjectsService.findById(subjectId);
+
     return this.instrumentRecordsRepository.create({
-      instrument: await this.instrumentsRepository.findById(id),
-      subjectId: await this.subjectsService.findById(subjectId),
-      responses: dto.responses
+      instrument,
+      subject,
+      data: dto.data
     });
   }
 
-  // Fix after demo
-  async getRecords(instrumentId?: string, subjectId?: string): Promise<InstrumentRecord[]> {
-    let records = await this.instrumentRecordsRepository.find({});
-
-    if (instrumentId) {
-      records = records.filter(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        (record) => record.instrument._id.toString() === instrumentId
-      );
-    }
-
-    if (subjectId) {
-      records = records.filter(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        (record) => record.subjectId === subjectId
-      );
-    }
-
-    return records;
+  async getRecords(instrumentTitle?: string, subjectId?: string): Promise<InstrumentRecord[]> {
+    return this.instrumentRecordsRepository.find({ title: instrumentTitle || {}, subject: subjectId });
   }
 }

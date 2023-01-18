@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Type } from 'class-transformer';
-import { IsDate, IsDefined, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { InstrumentRecord } from 'common';
+import { IsDate, IsDefined, IsNotEmpty, IsNotEmptyObject, IsString, ValidateNested } from 'class-validator';
+import { InstrumentRecordInterface } from 'common';
 
 class SubjectDemographicsDto {
   @ApiProperty()
@@ -22,13 +22,18 @@ class SubjectDemographicsDto {
   dateOfBirth: Date;
 }
 
-export class InstrumentRecordDto implements InstrumentRecord {
+export class InstrumentRecordDto implements InstrumentRecordInterface {
+  dateCollected: Date;
+  instrumentName: string;
+  clinic: undefined;
+
   @ApiProperty({ type: SubjectDemographicsDto })
+  @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => SubjectDemographicsDto)
   subjectDemographics: SubjectDemographicsDto;
 
   @ApiProperty()
   @IsDefined()
-  responses: Record<string, any>;
+  data: Record<string, any>;
 }

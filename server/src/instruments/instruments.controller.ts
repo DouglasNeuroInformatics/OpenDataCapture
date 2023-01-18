@@ -1,52 +1,52 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { FormInstrumentDto } from './dto/form-instrument.dto';
 import { InstrumentRecordDto } from './dto/instrument-record.dto';
-import { InstrumentDto } from './dto/instrument.dto';
 import { InstrumentsService } from './instruments.service';
 import { InstrumentRecord } from './schemas/instrument-record.schema';
+import { Instrument } from './schemas/instrument.schema';
 
 @ApiTags('Instruments')
 @Controller('instruments')
 export class InstrumentsController {
-  constructor(private readonly instrumentsService: InstrumentsService) { }
+  constructor(private readonly instrumentsService: InstrumentsService) {}
 
-  @ApiOperation({ summary: 'Create a New Instrument' })
+  @ApiOperation({ summary: 'Create a New Form Instrument' })
   @ApiCreatedResponse({ description: 'Successfully created new instrument' })
-  @Post('schemas')
-  create(@Body() dto: InstrumentDto): Promise<InstrumentDto> {
-    return this.instrumentsService.create(dto);
+  @Post('create-form')
+  createForm(@Body() dto: FormInstrumentDto): Promise<Instrument> {
+    return this.instrumentsService.createForm(dto);
   }
 
-  @ApiOperation({ summary: 'Get All Instruments' })
-  @ApiOkResponse({ description: 'Success', type: [InstrumentDto] })
-  @Get('schemas')
-  getAll(): Promise<InstrumentDto[]> {
-    return this.instrumentsService.getAll();
+  @ApiOperation({ summary: 'Get Available Instruments' })
+  @ApiOkResponse({ description: 'Success', type: [Instrument] })
+  @Get('available')
+  getAvailableInstruments(): Promise<Omit<Instrument, 'data'>[]> {
+    return this.instrumentsService.getAvailableInstruments();
   }
 
-  @ApiOperation({ summary: 'Get Instrument by ID' })
-  @ApiOkResponse({ description: 'Success', type: InstrumentDto })
-  @Get('schemas/:id')
-  getById(@Param('id') id: string): Promise<InstrumentDto> {
-    return this.instrumentsService.getById(id);
+  @ApiOperation({ summary: 'Get Instrument' })
+  @ApiOkResponse({ description: 'Success', type: Instrument })
+  @Get('archive/:title')
+  getInstrument(@Param('title') title: string): Promise<Instrument> {
+    return this.instrumentsService.getInstrument(title);
   }
 
-  @ApiOperation({ summary: 'Add Instrument Record' })
+  @ApiOperation({ summary: 'Insert Record' })
   @ApiCreatedResponse({ description: 'Successfully inserted new record' })
-  @Post('records/:id')
-  insertRecord(@Param('id') id: string, @Body() dto: InstrumentRecordDto): Promise<InstrumentRecord> {
-    return this.instrumentsService.insertRecord(id, dto);
+  @Post('records/:title')
+  createRecord(@Param('title') title: string, @Body() dto: InstrumentRecordDto): Promise<InstrumentRecord> {
+    return this.instrumentsService.createRecord(title, dto);
   }
 
-  // Need to verify query
   @ApiOperation({ summary: 'Get Instrument Records' })
   @ApiOkResponse({ description: 'Success' })
   @Get('records')
   getRecords(
-    @Query('instrument') instrumentId?: string,
+    @Query('instrument') instrumentTitle?: string,
     @Query('subject') subjectId?: string
   ): Promise<InstrumentRecord[]> {
-    return this.instrumentsService.getRecords(instrumentId, subjectId);
+    return this.instrumentsService.getRecords(instrumentTitle, subjectId);
   }
 }

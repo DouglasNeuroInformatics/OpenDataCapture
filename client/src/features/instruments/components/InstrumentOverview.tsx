@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { Instrument } from 'common';
+import { InstrumentInterface } from 'common';
 
 export interface InstrumentOverviewProps {
-  instrument: Instrument;
+  instrument: InstrumentInterface;
   onConfirm: () => void;
 }
 
@@ -13,15 +13,15 @@ export const InstrumentOverview = ({ instrument, onConfirm }: InstrumentOverview
       <h3>Overview</h3>
       <div className="mt-3">
         <h5 className="font-semibold">Description</h5>
-        <span>{instrument.description}</span>
+        <span>{instrument.details.description}</span>
       </div>
       <div className="mt-3">
         <h5 className="font-semibold">Instructions</h5>
-        <span>{instrument.instructions}</span>
+        <span>{instrument.details.instructions}</span>
       </div>
       <div className="mt-3">
         <h5 className="font-semibold">Estimated Completion</h5>
-        <span>{instrument.estimatedDuration} Minute(s)</span>
+        <span>{instrument.details.estimatedDuration} Minute(s)</span>
       </div>
       <button className="btn-primary mt-3" type="button" onClick={onConfirm}>
         Next

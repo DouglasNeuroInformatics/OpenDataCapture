@@ -12,11 +12,11 @@ export const demographicsFormSchema = z.object({
   dateOfBirth: z.coerce.date()
 });
 
-export type DemographicsFormSchema = z.infer<typeof demographicsFormSchema>;
+export type DemographicsFormData = z.infer<typeof demographicsFormSchema>;
 
 export interface DemographicsFormProps {
   submitLabel?: string;
-  onSubmit: SubmitHandler<DemographicsFormSchema>;
+  onSubmit: SubmitHandler<DemographicsFormData>;
 }
 
 export const DemographicsForm = ({ onSubmit, submitLabel }: DemographicsFormProps) => {
@@ -25,7 +25,7 @@ export const DemographicsForm = ({ onSubmit, submitLabel }: DemographicsFormProp
     handleSubmit,
     control,
     formState: { errors }
-  } = useForm<DemographicsFormSchema>({
+  } = useForm<DemographicsFormData>({
     resolver: zodResolver(demographicsFormSchema)
   });
 

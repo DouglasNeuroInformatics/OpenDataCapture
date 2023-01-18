@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { InstrumentField } from 'common';
+import { FormInstrumentFieldInterface } from 'common';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -9,17 +9,17 @@ import { Form } from '@/components/form';
 
 export const instrumentRecordFormSchema = z.record(z.string(), z.any());
 
-export type InstrumentRecordFormSchema = z.infer<typeof instrumentRecordFormSchema>;
+export type InstrumentRecordFormData = z.infer<typeof instrumentRecordFormSchema>;
 
 export interface InstrumentRecordFormProps {
   title: string;
-  fields: InstrumentField[];
+  fields: FormInstrumentFieldInterface[];
   submitLabel?: string;
-  onSubmit: SubmitHandler<InstrumentRecordFormSchema>;
+  onSubmit: SubmitHandler<InstrumentRecordFormData>;
 }
 
 export const InstrumentRecordForm = ({ onSubmit, submitLabel, title, fields }: InstrumentRecordFormProps) => {
-  const { register, handleSubmit, formState } = useForm<InstrumentRecordFormSchema>({
+  const { register, handleSubmit, formState } = useForm<InstrumentRecordFormData>({
     resolver: zodResolver(instrumentRecordFormSchema)
   });
 
@@ -31,7 +31,7 @@ export const InstrumentRecordForm = ({ onSubmit, submitLabel, title, fields }: I
       <Form onSubmit={handleSubmit(onSubmit)}>
         {fields.map((field) => {
           const error = errors[field.name]?.message as string | undefined; // Check later
-          switch (field.type) {
+          switch (field.variant) {
             case 'text':
               return <Form.TextField error={error} label={field.label} name={field.name} register={register} />;
           }

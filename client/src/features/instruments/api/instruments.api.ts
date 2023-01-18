@@ -1,29 +1,30 @@
 import axios from 'axios';
-import { Instrument, instrumentSchema } from 'common';
+import { BaseInstrumentInterface, InstrumentInterface, baseInstrumentSchema, instrumentSchema } from 'common';
 import { z } from 'zod';
 
-import { DemographicsFormSchema } from '../components/DemographicsForm';
-import { InstrumentRecordFormSchema } from '../components/InstrumentRecordForm';
+import { DemographicsFormData } from '../components/DemographicsForm';
+import { InstrumentRecordFormData } from '../components/InstrumentRecordForm';
 
+instrumentSchema;
 export class InstrumentsAPI {
-  static async getAllSchemas(): Promise<Instrument[]> {
-    const response = await axios.get('/api/instruments/schemas');
-    return z.array(instrumentSchema).parseAsync(response.data);
+  static async getAvailableInstruments(): Promise<BaseInstrumentInterface[]> {
+    const response = await axios.get('/api/instruments/available');
+    return z.array(baseInstrumentSchema).parseAsync(response.data);
   }
 
-  static async getSchema(id: string): Promise<Instrument> {
-    const response = await axios.get(`/api/instruments/schemas/${id}`);
+  static async getInstrument(name: string): Promise<InstrumentInterface> {
+    const response = await axios.get(`/api/instruments/archive/${name}`);
     return instrumentSchema.parseAsync(response.data);
   }
 
-  static async submitRecord(
-    id: string,
-    subjectDemographics: DemographicsFormSchema,
-    responses: InstrumentRecordFormSchema
-  ) {
-    await axios.post(`/api/instruments/records/${id}`, {
+  static async submitRecord(title: string, subjectDemographics: DemographicsFormData, data: InstrumentRecordFormData) {
+    await axios.post(`/api/instruments/records/${title}`, {
       subjectDemographics,
-      responses: responses
+      data
     });
   }
+
+  /*
+
+  */
 }
