@@ -1,7 +1,3 @@
-![license][license-shield]
-![version][version-shield]
-
-<br />
 <div align="center">
   <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">
     <img src=".github/assets/logo.png" alt="Logo" width="100" >
@@ -23,6 +19,14 @@
     <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/issues">Request Feature</a>
   </p>
 </div>
+
+<div align="center">
+
+  ![license][license-shield]
+  ![version][version-shield]
+
+</div>
+<hr />
 
 ## About
 
