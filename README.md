@@ -1,10 +1,11 @@
+<!-- PROJECT LOGO -->
 <div align="center">
   <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">
     <img src=".github/assets/logo.png" alt="Logo" width="100" >
   </a>
   <h3 align="center">The Douglas Data Capture Platform</h3>
   <p align="center">
-    A modern, user-friendly, web application for standardized data capture in medical research.
+    A modern, user-friendly, web application for standardized data capture in medical research
     <br />
     <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">
       <strong>Explore the docs »
@@ -20,6 +21,7 @@
   </p>
 </div>
 
+<!-- PROJECT SHIELDS -->
 <div align="center">
 
   ![license][license-shield]
@@ -31,6 +33,13 @@
 ## About
 
 The Douglas Data Capture Platform was created to standardize the collection of clinical research data across all clinics at the Douglas Research Centre. This repository includes the source code for the REST API and single page application that make up the platform.
+
+## Features
+
+- Fast
+- Secure
+- Modern
+- Easy-to-Use
 
 ## Setup
 
