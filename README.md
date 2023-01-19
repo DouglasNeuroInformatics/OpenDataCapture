@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">
-    <img src=".github/assets/logo.png" alt="Logo" width="80" >
+    <img src=".github/assets/logo.png" alt="Logo" width="100" >
   </a>
   <h3 align="center">The Douglas Data Capture Platform</h3>
   <p align="center">
