@@ -1,13 +1,28 @@
-<div style="display: flex; flex-direction: column; align-items: center">
-  <img
-    src="https://raw.githubusercontent.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/main/.github/assets/logo.png"
-    alt="logo"
-  />
-</div>
-<h1 style="text-align: center;">The Douglas Data Capture Platform</h1>
+![license][license-shield]
+![version][version-shield]
 
-![license](https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform)
-![version](https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/DouglasDataCapturePlatform)
+<br />
+<div align="center">
+  <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">
+    <img src=".github/assets/logo.png" alt="Logo" width="80" >
+  </a>
+  <h3 align="center">The Douglas Data Capture Platform</h3>
+  <p align="center">
+    A modern, user-friendly, web application for standardized data capture in medical research.
+    <br />
+    <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">
+      <strong>Explore the docs »
+      </strong>
+    </a>
+    <br />
+    <br />
+    <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">View Demo</a>
+    ·
+    <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/issues">Request Feature</a>
+  </p>
+</div>
 
 ## About
 
@@ -51,3 +66,7 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[license-shield]: https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform
+[version-shield]: https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/DouglasDataCapturePlatform
