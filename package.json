@@ -10,16 +10,16 @@
   ],
   "license": "AGPL-3.0",
   "scripts": {
-    "build": "env-cmd env-cmd -f .env.local  NODE_ENV=production turbo run build",
+    "build": "env-cmd  NODE_ENV=production turbo run build",
     "clean": "fd -H -I --prune \".turbo|dist|node_modules\" --exec rm -rf",
-    "demo": "env-cmd env-cmd -f .env.local cross-env NODE_ENV=demo turbo run demo",
-    "dev": "env-cmd env-cmd -f .env.local cross-env NODE_ENV=development turbo run dev",
+    "demo": "env-cmd cross-env NODE_ENV=demo turbo run demo",
+    "dev": "env-cmd cross-env NODE_ENV=development turbo run dev",
     "format": "turbo run format",
     "lint": "turbo run lint",
     "prepare": "husky install",
     "storybook": "yarn ws client storybook",
-    "test": "env-cmd env-cmd -f .env.local turbo run test",
-    "ws": "env-cmd env-cmd -f .env.local yarn workspace"
+    "test": "env-cmd turbo run test",
+    "ws": "env-cmd yarn workspace"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
