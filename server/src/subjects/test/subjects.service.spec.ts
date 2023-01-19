@@ -31,7 +31,7 @@ describe('SubjectsService', () => {
     it('should call subjectsRepository with the expected ID', async () => {
       await subjectsService.create(mockRegisterSubjectDto);
       expect(subjectsRepository.create).toBeCalledWith({
-        _id: '565125d8a77334ab8ddd9be95308a67885f5230fda8dd5755c6d9f1490225075',
+        identifier: '565125d8a77334ab8ddd9be95308a67885f5230fda8dd5755c6d9f1490225075',
         ...mockRegisterSubjectDto
       });
     });

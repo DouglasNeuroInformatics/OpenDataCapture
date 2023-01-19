@@ -6,7 +6,7 @@ import { HydratedDocument } from 'mongoose';
 @Schema({ strict: true, timestamps: true })
 export class Subject implements SubjectInterface {
   @Prop({ required: true })
-  _id: string;
+  identifier: string;
 
   @Prop({ required: true })
   dateOfBirth: Date;

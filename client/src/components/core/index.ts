@@ -5,3 +5,4 @@ export * from './Drawer';
 export * from './LanguageToggle';
 export * from './Link';
 export * from './Spinner';
+export * from './Table';

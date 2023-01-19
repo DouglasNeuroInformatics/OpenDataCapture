@@ -6,10 +6,9 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { AuthAPI } from '../api/auth.api';
+import { useAuthStore } from '../stores/auth.store';
 
 import { Form } from '@/components/form';
-
-import { useAuthStore } from '../stores/auth.store';
 
 export interface LoginFormProps {
   onSuccess: () => void;

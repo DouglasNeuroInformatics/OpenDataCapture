@@ -21,6 +21,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        INIT_DEMO_DB: Joi.boolean().optional(),
         MONGO_DEV_CONNECTION_URI: Joi.string().required(),
         MONGO_DEMO_CONNECTION_URI: Joi.string().required(),
         MONGO_TEST_CONNECTION_URI: Joi.string().required(),

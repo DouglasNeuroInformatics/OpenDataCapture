@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { DatabaseModule } from '@/database/database.module';
-
 import { DemoService } from './demo.service';
 
+import { DatabaseModule } from '@/database/database.module';
 import { InstrumentsModule } from '@/instruments/instruments.module';
 import { ResourcesModule } from '@/resources/resources.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
