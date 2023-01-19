@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginCredentials, loginCredentialsSchema } from 'common';
@@ -22,16 +22,25 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     resolver: zodResolver(loginCredentialsSchema)
   });
 
+  useEffect(() => {
+    if (import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH) {
+      void login({
+        username: import.meta.env.VITE_DEV_USERNAME!,
+        password: import.meta.env.VITE_DEV_PASSWORD!
+      });
+    }
+  }, []);
+
   const { errors } = formState;
 
-  const onSubmit = async (credentials: LoginCredentials) => {
+  const login = async (credentials: LoginCredentials) => {
     const { accessToken } = await AuthAPI.login(credentials);
     await auth.setAccessToken(accessToken);
     onSuccess();
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(login)}>
       <Form.TextField
         error={errors.username?.message}
         label={t('login.form.username')}
