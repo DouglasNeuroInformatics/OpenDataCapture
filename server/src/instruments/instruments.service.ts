@@ -3,12 +3,11 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { FormInstrumentDto } from './dto/form-instrument.dto';
 import { InstrumentRecordDto } from './dto/instrument-record.dto';
 import { InstrumentRecordsRepository } from './repositories/instrument-records.repository';
-
-import { SubjectsService } from '@/subjects/subjects.service';
-
 import { InstrumentsRepository } from './repositories/instruments.repository';
 import { InstrumentRecord } from './schemas/instrument-record.schema';
 import { Instrument } from './schemas/instrument.schema';
+
+import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
 export class InstrumentsService {
@@ -40,10 +39,10 @@ export class InstrumentsService {
 
   async createRecord(title: string, dto: InstrumentRecordDto): Promise<InstrumentRecord> {
     const { firstName, lastName, dateOfBirth } = dto.subjectDemographics;
-    const subjectId = this.subjectsService.generateSubjectId(firstName, lastName, dateOfBirth);
+    const subjectIdentifier = this.subjectsService.generateIdentifier(firstName, lastName, dateOfBirth);
 
     const instrument = await this.instrumentsRepository.findOne({ title });
-    const subject = await this.subjectsService.findById(subjectId);
+    const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
 
     return this.instrumentRecordsRepository.create({
       dateCollected: dto.dateCollected || new Date(),
@@ -53,7 +52,7 @@ export class InstrumentsService {
     });
   }
 
-  async getRecords(instrumentTitle?: string, subjectId?: string): Promise<InstrumentRecord[]> {
-    return this.instrumentRecordsRepository.find({ title: instrumentTitle || {}, subject: subjectId });
+  async getRecords(instrumentTitle?: string, subjectIdentifier?: string): Promise<InstrumentRecord[]> {
+    return this.instrumentRecordsRepository.find({ title: instrumentTitle || {}, subject: subjectIdentifier });
   }
 }

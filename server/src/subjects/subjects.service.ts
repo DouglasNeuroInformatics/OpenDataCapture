@@ -11,38 +11,26 @@ export class SubjectsService {
   constructor(private readonly subjectsRepository: SubjectsRepository) {}
 
   async create(dto: RegisterSubjectDto): Promise<Subject> {
-    const subjectId = this.generateSubjectId(dto.firstName, dto.lastName, dto.dateOfBirth);
-    if (await this.subjectsRepository.exists({ _id: subjectId })) {
+    const identifier = this.generateIdentifier(dto.firstName, dto.lastName, dto.dateOfBirth);
+    if (await this.subjectsRepository.exists({ identifier })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
     }
-    return this.subjectsRepository.create({ _id: subjectId, ...dto });
+    return this.subjectsRepository.create({ identifier, ...dto });
   }
 
   async findAll(): Promise<Subject[]> {
     return this.subjectsRepository.findAll();
   }
 
-  async findById(id: string): Promise<Subject> {
-    const subject = await this.subjectsRepository.findById(id);
+  async findByIdentifier(identifier: string): Promise<Subject> {
+    const subject = await this.subjectsRepository.findOne({ identifier });
     if (!subject) {
-      throw new NotFoundException(`Subject with ID ${id} not found`);
+      throw new NotFoundException(`Subject with identifier ${identifier} not found`);
     }
     return subject;
   }
 
-  /*
-
-
-
-  async deleteById(id: string): Promise<void> {
-    const deleted = await this.subjectsRepository.deleteById(id);
-    if (!deleted) {
-      throw new NotFoundException();
-    }
-  }
-  */
-
-  generateSubjectId(firstName: string, lastName: string, dateOfBirth: Date): string {
+  generateIdentifier(firstName: string, lastName: string, dateOfBirth: Date): string {
     const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
     const source = this.sanitizeStr(firstName + lastName) + this.sanitizeStr(shortDateOfBirth, true);
     return createHash('sha256').update(source).digest('hex');

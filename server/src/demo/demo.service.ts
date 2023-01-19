@@ -22,13 +22,16 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
     private readonly usersService: UsersService
   ) {}
 
+  get initDb(): boolean {
+    return this.isDemo() || (this.configService.get('INIT_DEMO_DB') ?? false);
+  }
+
   isDemo(): boolean {
     return this.configService.getOrThrow('NODE_ENV') === 'demo';
   }
 
   async onApplicationBootstrap(): Promise<void> {
-    if (this.isDemo()) {
-      console.log('Init Demo...');
+    if (this.initDb) {
       await this.databaseService.purgeDb();
       await this.createInstruments();
       await this.createSubjects();

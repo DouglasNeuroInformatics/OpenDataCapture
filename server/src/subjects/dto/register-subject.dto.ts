@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { IsDate, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Sex, Subject, sexOptions } from 'common';
 
-export class RegisterSubjectDto implements Omit<Subject, '_id'> {
+export class RegisterSubjectDto implements Omit<Subject, 'identifier'> {
   @IsString()
   @IsNotEmpty()
   firstName: string;

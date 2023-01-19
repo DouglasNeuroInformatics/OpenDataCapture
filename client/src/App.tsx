@@ -5,11 +5,12 @@ import { QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { RouterProvider } from 'react-router-dom';
 
+import { router } from './router';
+
 import { Button, Spinner } from '@/components/core';
 import { Notifications } from '@/features/notifications';
 import { queryClient } from '@/services/react-query';
 
-import { router } from './router';
 import './services/axios';
 import './services/18n';
 

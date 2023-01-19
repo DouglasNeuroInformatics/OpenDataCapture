@@ -5,10 +5,10 @@ import { IconType } from 'react-icons';
 import { HiEye, HiHome, HiPlus, HiUserPlus } from 'react-icons/hi2';
 import { NavLink } from 'react-router-dom';
 
+import { UserDropup } from './UserDropup';
+
 import logo from '@/assets/logo.png';
 import { useAuthStore } from '@/features/auth';
-
-import { UserDropup } from './UserDropup';
 
 const SidebarNavLink = ({ Icon, href, label }: { Icon: IconType; href: string; label: string }) => {
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface TableColumn<T> {
+export interface TableColumn<T> {
   title: string;
   field: keyof T;
 }
@@ -10,7 +10,7 @@ export interface TableProps<T> {
   columns: TableColumn<T>[];
 }
 
-export const Table = <T extends Record<string, string>>({ data, columns }: TableProps<T>) => {
+export const Table = <T extends Record<string, string | number | Date>>({ data, columns }: TableProps<T>) => {
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -32,14 +32,14 @@ export const Table = <T extends Record<string, string>>({ data, columns }: Table
               </thead>
               <tbody>
                 {data.map((entry, entryIndex) => (
-                  <tr className="odd:bg-white even:bg-gray-100" key={entry._id ?? entryIndex}>
+                  <tr className="odd:bg-white even:bg-gray-100" key={entryIndex}>
                     {columns.map(({ field, title }, columnIndex) => {
                       return (
                         <td
                           className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900"
                           key={title + columnIndex}
                         >
-                          <span>{entry[field]}</span>
+                          <span>{entry[field].toString()}</span>
                         </td>
                       );
                     })}

@@ -45,8 +45,8 @@ export class InstrumentsController {
   @Get('records')
   getRecords(
     @Query('instrument') instrumentTitle?: string,
-    @Query('subject') subjectId?: string
+    @Query('subject') subjectIdentifier?: string
   ): Promise<InstrumentRecord[]> {
-    return this.instrumentsService.getRecords(instrumentTitle, subjectId);
+    return this.instrumentsService.getRecords(instrumentTitle, subjectIdentifier);
   }
 }
