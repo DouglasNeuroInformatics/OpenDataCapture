@@ -7,7 +7,8 @@ import { RouterProvider } from 'react-router-dom';
 
 import { router } from './router';
 
-import { Button, Notifications, Spinner } from '@/components/core';
+import { Button } from '@/components/base';
+import { Notifications, Spinner } from '@/components/core';
 import { queryClient } from '@/services/react-query';
 
 import './services/axios';
@@ -22,7 +23,7 @@ const SuspenseFallback = () => (
 const ErrorFallback = () => {
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center text-red-500" role="alert">
-      <h2 className="text-lg font-semibold">Ooops, something went wrong</h2>
+      <h2 className="text-lg font-semibold">Uh oh, something went wrong</h2>
       <Button className="mt-4" onClick={() => window.location.assign(window.location.origin)}>
         Refresh
       </Button>

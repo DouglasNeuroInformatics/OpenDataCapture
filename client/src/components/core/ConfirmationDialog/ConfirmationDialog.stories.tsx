@@ -2,15 +2,15 @@ import React from 'react';
 
 import { Meta, Story } from '@storybook/react';
 
-import { Button } from '../Button';
-
 import { ConfirmationDialog, ConfirmationDialogProps } from './ConfirmationDialog';
+
+import { Button } from '@/components/base';
 
 const meta: Meta = {
   component: ConfirmationDialog,
   parameters: {
-    controls: { expanded: true },
-  },
+    controls: { expanded: true }
+  }
 };
 
 export default meta;
@@ -23,7 +23,7 @@ Danger.args = {
   title: 'Confirmation',
   body: 'Hello World',
   confirmButton: <Button className="bg-red-500">Confirm</Button>,
-  triggerButton: <Button>Open</Button>,
+  triggerButton: <Button>Open</Button>
 };
 
 export const Info = Template.bind({});
@@ -32,5 +32,5 @@ Info.args = {
   title: 'Confirmation',
   body: 'Hello World',
   confirmButton: <Button>Confirm</Button>,
-  triggerButton: <Button>Open</Button>,
+  triggerButton: <Button>Open</Button>
 };

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 
-import { Spinner } from '../Spinner';
+import { Spinner } from '@/components/core';
 
 const variants = {
   primary: 'bg-indigo-800 text-white',

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { InstrumentInterface } from 'common';
 
-import { Button } from '@/components/core';
+import { Button } from '@/components/base';
 
 export interface InstrumentOverviewProps {
   instrument: InstrumentInterface;

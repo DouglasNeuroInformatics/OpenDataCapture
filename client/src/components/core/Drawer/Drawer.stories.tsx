@@ -2,10 +2,9 @@ import React from 'react';
 
 import { Meta, Story } from '@storybook/react';
 
-import { Button } from '../Button';
-
 import { Drawer } from './Drawer';
 
+import { Button } from '@/components/base';
 import { useDisclosure } from '@/hooks/useDisclosure';
 
 const meta: Meta = {
