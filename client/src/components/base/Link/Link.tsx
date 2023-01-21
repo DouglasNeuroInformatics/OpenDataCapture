@@ -1,11 +1,26 @@
 import React from 'react';
 
-import { clsx } from 'clsx';
-import { LinkProps, Link as RouterLink } from 'react-router-dom';
+import clsx from 'clsx';
+import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 
-export const Link = ({ className, children, ...props }: LinkProps) => {
+export interface LinkProps extends RouterLinkProps {
+  variant: 'default' | 'btn-dark' | 'btn-light';
+}
+
+export const Link = ({ className, children, variant = 'default', ...props }: LinkProps) => {
   return (
-    <RouterLink className={clsx('text-indigo-600 hover:text-indigo-900', className)} {...props}>
+    <RouterLink
+      className={clsx(
+        'py-2 px-6',
+        {
+          'text-cello-600 hover:text-cello-900': variant === 'default',
+          'btn btn-dark': variant === 'btn-dark',
+          'btn btn-light': variant === 'btn-light'
+        },
+        className
+      )}
+      {...props}
+    >
       {children}
     </RouterLink>
   );

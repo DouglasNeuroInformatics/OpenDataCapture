@@ -1,26 +1,32 @@
 import React from 'react';
 
-import { Meta, Story } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 
 import { Link } from './Link';
 
-const meta: Meta = {
-  component: Link,
-  parameters: {
-    controls: { expanded: true }
-  }
-};
+export default {
+  component: Link
+} as ComponentMeta<typeof Link>;
 
-export default meta;
-
-const Template: Story = (props) => (
+const Template: ComponentStory<typeof Link> = (props) => (
   <MemoryRouter>
-    <Link to="/" {...props}>
-      Hello
-    </Link>
+    <Link {...props}>Hello</Link>
   </MemoryRouter>
 );
 
 export const Default = Template.bind({});
+
 Default.args = {};
+
+export const BtnDark = Template.bind({});
+
+BtnDark.args = {
+  variant: 'btn-dark'
+};
+
+export const BtnLight = Template.bind({});
+
+BtnLight.args = {
+  variant: 'btn-light'
+};

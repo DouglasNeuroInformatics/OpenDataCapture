@@ -25,9 +25,7 @@ export const InstrumentOverview = ({ instrument, onConfirm }: InstrumentOverview
         <h5 className="font-semibold">Estimated Completion</h5>
         <span>{instrument.details.estimatedDuration} Minute(s)</span>
       </div>
-      <Button className="mt-3" type="button" onClick={onConfirm}>
-        Next
-      </Button>
+      <Button className="mt-3" label="Next" type="button" onClick={onConfirm} />
     </div>
   );
 };

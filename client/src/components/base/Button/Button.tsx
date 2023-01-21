@@ -2,65 +2,27 @@ import React from 'react';
 
 import { clsx } from 'clsx';
 
-import { Spinner } from '@/components/core';
+export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button'>, 'children'> {
+  icon?: React.ReactElement;
+  label: string;
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'dark' | 'light';
+}
 
-const variants = {
-  primary: 'bg-indigo-800 text-white',
-  inverse: 'bg-white text-indigo-800',
-  danger: 'bg-red-600 text-white'
+export const Button = ({ className, icon, label, size = 'md', variant = 'dark', ...props }: ButtonProps) => {
+  return (
+    <button
+      className={clsx(className, 'btn', {
+        'py-2 px-4 text-sm': size === 'sm',
+        'text-md py-2 px-6': size === 'md',
+        'py-3 px-8 text-lg': size === 'lg',
+        'btn-dark': variant === 'dark',
+        'btn-light': variant === 'light'
+      })}
+      {...props}
+    >
+      {icon}
+      {label}
+    </button>
+  );
 };
-
-const sizes = {
-  sm: 'py-2 px-4 text-sm',
-  md: 'py-2 px-6 text-md',
-  lg: 'py-3 px-8 text-lg'
-};
-
-type IconProps =
-  | { startIcon: React.ReactElement; endIcon?: never }
-  | { endIcon: React.ReactElement; startIcon?: never }
-  | { endIcon?: undefined; startIcon?: undefined };
-
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: keyof typeof variants;
-  size?: keyof typeof sizes;
-  isLoading?: boolean;
-} & IconProps;
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      type = 'button',
-      className = '',
-      variant = 'primary',
-      size = 'md',
-      isLoading = false,
-      startIcon,
-      endIcon,
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <button
-        className={clsx(
-          'flex items-center justify-center rounded-md border border-gray-300 font-medium shadow-sm hover:opacity-80 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70',
-          variants[variant],
-          sizes[size],
-          className
-        )}
-        ref={ref}
-        type={type}
-        {...props}
-      >
-        {isLoading && <Spinner className="text-current" size="sm" />}
-        {!isLoading && startIcon}
-        <span className="mx-2">{props.children}</span> {!isLoading && endIcon}
-      </button>
-    );
-  }
-);
-
-Button.displayName = 'Button';
-
-export { Button, type ButtonProps };

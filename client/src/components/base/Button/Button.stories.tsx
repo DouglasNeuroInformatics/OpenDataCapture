@@ -1,34 +1,23 @@
 import React from 'react';
 
-import { Meta, Story } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 
-import { Button, ButtonProps } from './Button';
+import { Button } from './Button';
 
-const meta: Meta = {
-  component: Button,
-  parameters: {
-    controls: { expanded: true }
-  }
+export default { component: Button } as ComponentMeta<typeof Button>;
+
+const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
+
+export const Dark = Template.bind({});
+
+Dark.args = {
+  label: 'Dark Button',
+  variant: 'dark'
 };
 
-export default meta;
+export const Light = Template.bind({});
 
-const Template: Story<ButtonProps> = (props) => <Button {...props} />;
-
-export const Primary = Template.bind({});
-Primary.args = {
-  children: 'Primary Button',
-  variant: 'primary'
-};
-
-export const Inverse = Template.bind({});
-Inverse.args = {
-  children: 'Inverse Button',
-  variant: 'inverse'
-};
-
-export const Danger = Template.bind({});
-Danger.args = {
-  children: 'Danger Button',
-  variant: 'danger'
+Light.args = {
+  label: 'Light Button',
+  variant: 'light'
 };
