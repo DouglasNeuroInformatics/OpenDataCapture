@@ -35,11 +35,11 @@
   }
 
   .btn-dark {
-    @apply bg-cello-900 text-white;
+    @apply bg-cello-900 text-peppermint-50;
   }
 
   .btn-light {
-    @apply text-cello-900 border-2 bg-white;
+    @apply text-cello-900 bg-peppermint-50 border-2;
   }
 
   .input {
