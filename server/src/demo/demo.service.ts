@@ -1,7 +1,7 @@
 import { Injectable, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { Random, sexOptions } from 'common';
+import { Random, demographicOptions } from 'common';
 
 import { DatabaseService } from '@/database/database.service';
 import { FormInstrumentDto } from '@/instruments/dto/form-instrument.dto';
@@ -60,9 +60,9 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
 
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        for (const sex of sexOptions) {
+        for (const sex of demographicOptions.sex) {
           await this.subjectsService.create({
-            firstName: sex === 'male' ? maleNames[j] : femaleNames[j],
+            firstName: sex === 'Male' ? maleNames[j] : femaleNames[j],
             lastName: lastNames[i],
             dateOfBirth: Random.birthday(),
             sex: sex
@@ -84,7 +84,7 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
 
     for (const subject of subjects) {
       for (const timepoint of timepoints) {
-        const { firstName, lastName, dateOfBirth } = subject;
+        const { firstName, lastName, dateOfBirth } = subject.demographics;
         await this.instrumentsService.createRecord(instrument.title, {
           dateCollected: timepoint,
           subjectDemographics: {
@@ -95,7 +95,7 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
           data: Object.fromEntries(
             instrument.data.map((field) => {
               let subtract = 0;
-              if (subject.sex === 'male' && Random.int(0, 5) === 0) {
+              if (subject.demographics.sex === 'Male' && Random.int(0, 5) === 0) {
                 subtract = Math.max(0, timepoint.getMonth() - 8);
               }
               return [field.name, Math.ceil(Random.int(1, 7) - subtract)];
