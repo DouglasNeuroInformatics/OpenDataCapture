@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-import { useAuthStore } from '@/features/auth';
-import { useNotificationsStore } from '@/features/notifications';
+import { useAuthStore } from '@/stores/auth-store';
+import { useNotificationsStore } from '@/stores/notifications-store';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_HOST;
 

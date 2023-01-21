@@ -7,8 +7,7 @@ import { RouterProvider } from 'react-router-dom';
 
 import { router } from './router';
 
-import { Button, Spinner } from '@/components/core';
-import { Notifications } from '@/features/notifications';
+import { Button, Notifications, Spinner } from '@/components/core';
 import { queryClient } from '@/services/react-query';
 
 import './services/axios';
