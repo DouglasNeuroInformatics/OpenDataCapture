@@ -15,8 +15,8 @@ export const ViewSubjectsPage = () => {
   }
 
   return data ? (
-    <div className="text-center">
-      <h1>View Subjects</h1>
+    <div>
+      <h1 className="text-center">View Subjects</h1>
       <SubjectsTable data={data} />
     </div>
   ) : null;

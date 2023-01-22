@@ -2,19 +2,36 @@ import React, { useState } from 'react';
 
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 
-import { PaginationButton } from './PaginationButton';
+import { Button, Link } from '@/components/base';
+
+function formatValue(value: unknown): string {
+  if (typeof value === 'string') {
+    return value;
+  } else if (typeof value === 'bigint' || typeof value === 'number') {
+    return value.toString();
+  } else if (typeof value === 'undefined') {
+    return 'NA';
+  }
+
+  if (value instanceof Date) {
+    return value.toDateString();
+  }
+
+  return JSON.stringify(value);
+}
 
 export interface TableColumn<T> {
-  title: string;
-  field: keyof T;
+  name: string;
+  field: keyof T | ((entry: T) => unknown);
 }
 
 export interface TableProps<T> {
-  data: T[];
   columns: TableColumn<T>[];
+  data: T[];
+  entryLinkFactory?: (entry: T) => string;
 }
 
-export const Table = <T extends Record<string, string | number | Date>>({ data, columns }: TableProps<T>) => {
+export const Table = <T extends Record<string, unknown>>({ columns, data, entryLinkFactory }: TableProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
 
@@ -22,53 +39,55 @@ export const Table = <T extends Record<string, string | number | Date>>({ data, 
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
 
   const currentEntries = data.slice(indexOfFirstEntry, indexOfLastEntry);
-
   const pageCount = Math.ceil(data.length / entriesPerPage);
-
   const pageNumbers = [...Array(pageCount).keys()].map((i) => i + 1);
-  console.log(currentEntries, pageCount);
 
   return (
-    <div className="h-full p-3">
-      <table className="divide-y divide-slate-200">
-        <thead className="bg-gray-50">
-          <tr>
-            {columns.map((column, index) => (
-              <th
-                className="whitespace-nowrap px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500"
-                key={index}
-              >
-                {column.title}
-              </th>
-            ))}
-          </tr>
+    <div>
+      <div className="flex justify-end">
+        <Button disabled label="Filters" />
+        <Button disabled label="Export" />
+      </div>
+      <table className="block w-full table-auto overflow-x-scroll border-2">
+        <thead>
+          {columns.map((column, i) => (
+            <th className="whitespace-nowrap p-2" key={i}>
+              {column.name}
+            </th>
+          ))}
         </thead>
-        <tbody className="overflow-scroll">
-          {currentEntries.map((entry, entryIndex) => (
-            <tr className="odd:bg-white even:bg-slate-100" key={entryIndex}>
-              {columns.map(({ field, title }, columnIndex) => {
+        <tbody>
+          {currentEntries.map((entry, i) => (
+            <tr key={i}>
+              {columns.map(({ field }, j) => {
+                const value = typeof field === 'function' ? field(entry) : entry[field];
                 return (
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium" key={title + columnIndex}>
-                    <span>{entry[field].toString()}</span>
+                  <td className="whitespace-nowrap p-2" key={j}>
+                    <span>{formatValue(value)}</span>
                   </td>
                 );
               })}
+              {entryLinkFactory && (
+                <td className="whitespace-nowrap p-2">
+                  <Link to={entryLinkFactory(entry)}>View</Link>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="my-3 flex">
-        <PaginationButton>
+      <div>
+        <button>
           <HiArrowLeft />
-        </PaginationButton>
+        </button>
         {pageNumbers.map((page) => (
-          <PaginationButton active={currentPage === page} className="mx-1" onClick={() => setCurrentPage(page)}>
+          <button className="mx-1" onClick={() => setCurrentPage(page)}>
             {page}
-          </PaginationButton>
+          </button>
         ))}
-        <PaginationButton>
+        <button>
           <HiArrowRight />
-        </PaginationButton>
+        </button>
       </div>
     </div>
   );

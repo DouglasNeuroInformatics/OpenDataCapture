@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 
 export interface LinkProps extends RouterLinkProps {
-  variant: 'default' | 'btn-dark' | 'btn-light';
+  variant?: 'default' | 'btn-dark' | 'btn-light';
 }
 
 export const Link = ({ className, children, variant = 'default', ...props }: LinkProps) => {

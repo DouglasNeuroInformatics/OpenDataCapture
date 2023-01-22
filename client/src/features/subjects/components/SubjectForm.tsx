@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { sexOptions } from 'common';
+import { demographicOptions } from 'common';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -12,7 +12,7 @@ import { Form } from '@/components/form';
 export const subjectFormSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  sex: z.enum(sexOptions),
+  sex: z.enum(demographicOptions.sex),
   dateOfBirth: z.coerce.date()
 });
 
@@ -55,7 +55,7 @@ export const SubjectForm = ({ onSuccess }: SubjectFormProps) => {
         error={errors.sex?.message}
         label="Sex"
         name="sex"
-        options={sexOptions}
+        options={demographicOptions.sex}
         register={register}
       />
       <Form.SubmitButton />

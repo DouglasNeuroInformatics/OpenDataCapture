@@ -1,64 +1,53 @@
 import React from 'react';
 
-import { Meta, Story } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Random, SubjectInterface, range } from 'common';
+import { MemoryRouter } from 'react-router-dom';
 
-import { Table, TableProps } from './Table';
+import { Table, TableColumn } from './Table';
 
-const meta: Meta = {
-  component: Table,
-  parameters: {
-    controls: { expanded: true }
-  }
-};
-
-export default meta;
-
-type User = {
-  id: string;
-  name: string;
-  title: string;
-  role: string;
-  email: string;
-};
-
-const data: User[] = [
+const columns: TableColumn<SubjectInterface>[] = [
   {
-    id: '1',
-    name: 'Jane Cooper',
-    title: 'Regional Paradigm Technician',
-    role: 'Admin',
-    email: 'jane.cooper@example.com'
+    name: 'ID',
+    field: 'identifier'
   },
   {
-    id: '2',
-    name: 'Cody Fisher',
-    title: 'Product Directives Officer',
-    role: 'Owner',
-    email: 'cody.fisher@example.com'
+    name: 'Date of Birth',
+    field: (subject) => subject.demographics.dateOfBirth
+  },
+  {
+    name: 'Sex',
+    field: (subject) => subject.demographics.sex
+  },
+  {
+    name: 'Ethnicity',
+    field: (subject) => subject.demographics.ethnicity
   }
 ];
 
-const Template: Story<TableProps<User>> = (props) => <Table<User> {...props} />;
+const data: SubjectInterface[] = range(25).map((i) => ({
+  identifier: i.toString(),
+  demographics: {
+    dateOfBirth: Random.birthday(),
+    sex: Random.int(0, 1) === 0 ? 'Male' : 'Female'
+  }
+}));
+
+export default {
+  component: Table,
+  args: {
+    columns,
+    data,
+    entryLinkFactory: () => 'foo'
+  }
+} as ComponentMeta<typeof Table<SubjectInterface>>;
+
+const Template: ComponentStory<typeof Table> = (args) => (
+  <MemoryRouter>
+    <Table {...args} />
+  </MemoryRouter>
+);
 
 export const Default = Template.bind({});
-Default.args = {
-  data,
-  columns: [
-    {
-      title: 'Name',
-      field: 'name'
-    },
-    {
-      title: 'Title',
-      field: 'title'
-    },
-    {
-      title: 'Role',
-      field: 'role'
-    },
-    {
-      title: 'Email',
-      field: 'email'
-    }
-  ]
-};
+
+Default.args = {};

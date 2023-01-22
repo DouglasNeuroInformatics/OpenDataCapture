@@ -16,12 +16,6 @@ export class SubjectsAPI {
 
   static async getSubjectInstrumentRecords(id: string) {
     const response = await axios.get(`/api/instruments/records?subject=${id}`);
-    return response.data as {
-      dateCollected: string;
-      instrument: string;
-      subject: string;
-      data: Record<string, string>;
-    }[];
-    // return z.array(instrumentRecordSchema).parseAsync(response.data);
+    return z.array(instrumentRecordSchema).parseAsync(response.data);
   }
 }
