@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { Type } from 'class-transformer';
-import { IsDate, IsIn, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsDate, IsIn, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 import { SubjectDemographicsInterface, demographicOptions } from 'common';
 
 export class RegisterSubjectDto implements SubjectDemographicsInterface {
@@ -28,31 +28,37 @@ export class RegisterSubjectDto implements SubjectDemographicsInterface {
   sex: SubjectDemographicsInterface['sex'];
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @Length(3)
   forwardSortationArea?: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @IsIn(demographicOptions.ethnicity)
   ethnicity?: SubjectDemographicsInterface['ethnicity'];
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @IsIn(demographicOptions.gender)
   gender?: SubjectDemographicsInterface['gender'];
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @IsIn(demographicOptions.employmentStatus)
   employmentStatus?: SubjectDemographicsInterface['employmentStatus'];
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @IsIn(demographicOptions.maritalStatus)
   maritalStatus?: SubjectDemographicsInterface['maritalStatus'];
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @IsIn(demographicOptions.firstLanguage)
   firstLanguage?: SubjectDemographicsInterface['firstLanguage'];
