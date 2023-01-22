@@ -42,6 +42,10 @@ export class InstrumentsService {
     const subjectIdentifier = this.subjectsService.generateIdentifier(firstName, lastName, dateOfBirth);
 
     const instrument = await this.instrumentsRepository.findOne({ title });
+    if (!instrument) {
+      throw new NotFoundException('Cannot create record for instrument that does not exist!');
+    }
+
     const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
 
     return this.instrumentRecordsRepository.create({

@@ -11,11 +11,11 @@ export class InstrumentRecord {
   @Prop({ default: new Date(), required: true })
   dateCollected: Date;
 
-  @Prop({ required: true, ref: 'Instrument', type: mongoose.Schema.Types.ObjectId })
+  @Prop({ required: true, ref: Instrument.name, type: mongoose.Schema.Types.ObjectId })
   instrument: Instrument;
 
-  @Prop({ required: true, ref: Subject.name, type: String })
-  subject: string;
+  @Prop({ required: true, ref: Subject.name, type: mongoose.Schema.Types.ObjectId })
+  subject: Subject;
 
   @Prop({ required: true, type: Object })
   data: Record<string, any>;

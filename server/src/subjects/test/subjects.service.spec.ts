@@ -32,7 +32,7 @@ describe('SubjectsService', () => {
       await subjectsService.create(mockRegisterSubjectDto);
       expect(subjectsRepository.create).toBeCalledWith({
         identifier: '565125d8a77334ab8ddd9be95308a67885f5230fda8dd5755c6d9f1490225075',
-        ...mockRegisterSubjectDto
+        demographics: mockRegisterSubjectDto
       });
     });
   });

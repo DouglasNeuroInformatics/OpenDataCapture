@@ -15,7 +15,7 @@ export class SubjectsService {
     if (await this.subjectsRepository.exists({ identifier })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
     }
-    return this.subjectsRepository.create({ identifier, ...dto });
+    return this.subjectsRepository.create({ identifier, demographics: dto });
   }
 
   async findAll(): Promise<Subject[]> {

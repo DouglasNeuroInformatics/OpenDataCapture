@@ -8,7 +8,7 @@ import { InstrumentRecord, InstrumentRecordDocument } from '../schemas/instrumen
 import { EntityRepository } from '@/abstract/entity.repository';
 
 @Injectable()
-export class InstrumentRecordsRepository extends EntityRepository<InstrumentRecordDocument> {
+export class InstrumentRecordsRepository extends EntityRepository<InstrumentRecord, InstrumentRecordDocument> {
   constructor(@InjectModel(InstrumentRecord.name) instrumentRecordModel: Model<InstrumentRecordDocument>) {
     super(instrumentRecordModel);
   }
