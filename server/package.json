@@ -5,6 +5,7 @@
   "license": "AGPL-3.0",
   "scripts": {
     "build": "nest build",
+    "check-types": "tsc --noEmit",
     "debug": "nest start --debug --watch",
     "demo": "nest start --watch",
     "dev": "NODE_ENV=development nest start --watch",
