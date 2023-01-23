@@ -8,7 +8,7 @@ import { NavLink } from 'react-router-dom';
 import { UserDropup } from './UserDropup';
 
 import logo from '@/assets/logo.png';
-import { useAuthStore } from '@/features/auth';
+import { useAuthStore } from '@/stores/auth-store';
 
 const SidebarNavLink = ({ Icon, href, label }: { Icon: IconType; href: string; label: string }) => {
   return (

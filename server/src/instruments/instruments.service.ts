@@ -42,6 +42,10 @@ export class InstrumentsService {
     const subjectIdentifier = this.subjectsService.generateIdentifier(firstName, lastName, dateOfBirth);
 
     const instrument = await this.instrumentsRepository.findOne({ title });
+    if (!instrument) {
+      throw new NotFoundException('Cannot create record for instrument that does not exist!');
+    }
+
     const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
 
     return this.instrumentRecordsRepository.create({
@@ -53,6 +57,10 @@ export class InstrumentsService {
   }
 
   async getRecords(instrumentTitle?: string, subjectIdentifier?: string): Promise<InstrumentRecord[]> {
-    return this.instrumentRecordsRepository.find({ title: instrumentTitle || {}, subject: subjectIdentifier });
+    const subject = subjectIdentifier ? await this.subjectsService.findByIdentifier(subjectIdentifier) : undefined;
+    return this.instrumentRecordsRepository.find({
+      title: instrumentTitle || {},
+      subject
+    });
   }
 }

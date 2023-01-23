@@ -10,4 +10,8 @@ export class Random {
   static birthday() {
     return this.date(new Date(1950, 0), new Date(2000, 0));
   }
+
+  static value<T>(arr: T[]) {
+    return arr[Random.int(0, arr.length)];
+  }
 }

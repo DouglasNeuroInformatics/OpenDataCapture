@@ -30,11 +30,27 @@
 }
 
 @layer components {
-  .card {
-    @apply flex flex-col rounded-lg bg-white py-4 px-8 shadow-lg;
+  .btn {
+    @apply flex w-fit items-center justify-center rounded-md font-medium shadow-sm hover:opacity-80 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70;
+  }
+
+  .btn-dark {
+    @apply bg-cello-900 text-peppermint-50;
+  }
+
+  .btn-light {
+    @apply text-cello-900 bg-peppermint-50 border-2;
   }
 
   .input {
     @apply z-40 w-full border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none;
   }
+
+  .card {
+    @apply flex flex-col rounded-lg bg-white py-4 px-8 shadow-lg;
+  }
+}
+
+.react-datepicker-wrapper {
+  z-index: 9999;
 }

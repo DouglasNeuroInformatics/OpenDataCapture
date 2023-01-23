@@ -1,27 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { type Sex, Subject as SubjectInterface, sexOptions } from 'common';
+import { SubjectDemographicsInterface, SubjectInterface } from 'common';
 import { HydratedDocument } from 'mongoose';
+
+import { SubjectDemographicsSchema } from './subject-demographics.schema';
 
 @Schema({ strict: true, timestamps: true })
 export class Subject implements SubjectInterface {
   @Prop({ required: true })
   identifier: string;
 
-  @Prop({ required: true })
-  dateOfBirth: Date;
-
-  @Prop({ enum: sexOptions, required: true })
-  sex: Sex;
-
-  @Prop({ trim: true })
-  firstName?: string;
-
-  @Prop({ trim: true })
-  lastName?: string;
-
-  @Prop({ length: 3 })
-  forwardSortationArea?: string;
+  @Prop({ required: true, type: SubjectDemographicsSchema })
+  demographics: SubjectDemographicsInterface;
 }
 
 export type SubjectDocument = HydratedDocument<Subject>;

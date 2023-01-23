@@ -3,10 +3,11 @@ import React from 'react';
 import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
 
 import { Layout } from './components/layout';
-import { LoginPage, useAuthStore } from './features/auth';
+import { LoginPage } from './features/auth';
 import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
 import { ErrorPage, HomePage } from './features/misc';
 import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
+import { useAuthStore } from './stores/auth-store';
 
 const Root = () => {
   const auth = useAuthStore();

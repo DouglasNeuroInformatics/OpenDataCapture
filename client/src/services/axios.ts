@@ -1,19 +1,17 @@
 import axios from 'axios';
 
-import { useAuthStore } from '@/features/auth';
-import { useNotificationsStore } from '@/features/notifications';
+import { useAuthStore } from '@/stores/auth-store';
+import { useNotificationsStore } from '@/stores/notifications-store';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_HOST;
 
 axios.interceptors.request.use((config) => {
   const auth = useAuthStore.getState();
 
-  config.headers = {
-    Accept: 'application/json'
-  };
+  config.headers.setAccept('application/json');
 
   if (auth.accessToken) {
-    config.headers['Authorization'] = `Bearer ${auth.accessToken}`;
+    config.headers.set('Authorization', `Bearer ${auth.accessToken}`);
   }
 
   return config;

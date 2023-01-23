@@ -1,42 +1,22 @@
-import { Document, FilterQuery, Model, UpdateQuery } from 'mongoose';
+import { Document, FilterQuery, Model } from 'mongoose';
 
-export abstract class EntityRepository<T extends Document> {
-  constructor(protected readonly entityModel: Model<T>) {}
+export abstract class EntityRepository<T, U extends Document> {
+  constructor(protected readonly entityModel: Model<U>) {}
 
-  async create(entityDoc: unknown): Promise<T> {
+  async create(entityDoc: T): Promise<U> {
     return this.entityModel.create(entityDoc);
   }
 
-  async find(filterQuery: FilterQuery<T>, projection?: Record<string, unknown>): Promise<T[]> {
+  async find(filterQuery: FilterQuery<T>, projection?: Record<string, unknown>): Promise<U[]> {
     return this.entityModel.find(filterQuery, projection).exec();
   }
 
-  async findOne(filterQuery: FilterQuery<T>, projection?: Record<string, unknown>): Promise<T | null> {
+  async findOne(filterQuery: FilterQuery<T>, projection?: Record<string, unknown>): Promise<U | null> {
     return this.entityModel.findOne(filterQuery, projection).exec();
   }
 
-  async findAll(): Promise<T[]> {
+  async findAll(): Promise<U[]> {
     return this.entityModel.find().exec();
-  }
-
-  async findById(id: string): Promise<T | null> {
-    return this.entityModel.findById(id);
-  }
-
-  async updateById(id: string, updateQuery: UpdateQuery<unknown>): Promise<T | null> {
-    return this.entityModel.findByIdAndUpdate(id, updateQuery, {
-      new: true
-    });
-  }
-
-  async deleteById(id: string): Promise<boolean> {
-    const deletedEntity = await this.entityModel.findByIdAndDelete(id);
-    return deletedEntity !== null;
-  }
-
-  async deleteOne(filterQuery: FilterQuery<T>): Promise<boolean> {
-    const deletedEntity = await this.entityModel.findOneAndDelete(filterQuery);
-    return deletedEntity !== null;
   }
 
   async exists(filterQuery: FilterQuery<T>): Promise<boolean> {

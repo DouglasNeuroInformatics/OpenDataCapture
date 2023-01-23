@@ -14,6 +14,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --clean --dts --format cjs,esm",
+    "check-types": "tsc --noEmit",
     "dev": "tsup src/index.ts --dts --format cjs,esm --watch",
     "lint": "eslint --fix src"
   },
