@@ -76,7 +76,7 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
           ))}
         </tbody>
       </table>
-      <div>
+      <div className="mt-2 flex justify-center">
         <button>
           <HiArrowLeft />
         </button>

@@ -29,18 +29,18 @@ export const InstrumentPage = () => {
       <h1 className="text-center">{data.title}</h1>
       <hr className="my-5 border-slate-300" />
       <div className="flex">
-        <div className={'flex w-full justify-center rounded-xl bg-indigo-800 p-3 text-white shadow-xl'}>
+        <div className={'bg-cello-900 flex w-full justify-center rounded-xl p-3 text-white shadow-xl'}>
           <span className="mx-2">Overview</span>
         </div>
         <div
-          className={clsx('mx-5 flex w-full justify-center rounded-xl bg-indigo-800 p-3 text-white shadow-xl', {
+          className={clsx('bg-cello-900 mx-5 flex w-full justify-center rounded-xl p-3 text-white shadow-xl', {
             'opacity-50': 1 > step
           })}
         >
           <span className="mx-2">Demographics Questions</span>
         </div>
         <div
-          className={clsx('flex w-full justify-center rounded-xl bg-indigo-800 p-3 text-white shadow-xl', {
+          className={clsx('bg-cello-900 flex w-full justify-center rounded-xl p-3 text-white shadow-xl', {
             'opacity-50': 2 > step
           })}
         >
