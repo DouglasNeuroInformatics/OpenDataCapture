@@ -57,6 +57,10 @@ export class InstrumentsService {
   }
 
   async getRecords(instrumentTitle?: string, subjectIdentifier?: string): Promise<InstrumentRecord[]> {
-    return this.instrumentRecordsRepository.find({ title: instrumentTitle || {}, subject: subjectIdentifier });
+    const subject = subjectIdentifier ? await this.subjectsService.findByIdentifier(subjectIdentifier) : undefined;
+    return this.instrumentRecordsRepository.find({
+      title: instrumentTitle || {},
+      subject
+    });
   }
 }

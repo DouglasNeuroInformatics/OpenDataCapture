@@ -24,7 +24,7 @@ export const DateField = ({ name, label, control, error }: DateFieldProps) => {
         render={({ field: { onChange, value } }) => (
           <DatePicker
             showYearDropdown
-            className="input "
+            className="input"
             dateFormat="yyyy-MM-dd"
             name={name}
             popperPlacement="bottom-start"

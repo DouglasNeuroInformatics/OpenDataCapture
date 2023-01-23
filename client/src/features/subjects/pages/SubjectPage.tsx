@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 
 import { SubjectsAPI } from '../api/subjects.api';
 
-import { Spinner } from '@/components/core';
+import { Spinner, Table } from '@/components/core';
 
 export const SubjectPage = () => {
   const params = useParams();
@@ -24,20 +24,20 @@ export const SubjectPage = () => {
         <span className="font-semibold">Subject ID:</span> {params.id}
       </p>
       <div>
-        <h3 className="mt-5">Measures</h3>
-        {data.map((value) => (
-          <div>
-            <h5 className="mt-3">Brief Psychiatric Rating Scale</h5>
-            <span>
-              <span className="block">Date Collected: {value.dateCollected}</span>
-              {Object.entries(value.data).map(([key, value]) => (
-                <span className="block">
-                  {key}: {value}
-                </span>
-              ))}
-            </span>
-          </div>
-        ))}
+        <h3 className="mt-5">Brief Psychiatric Rating Scale</h3>
+        <Table<{ dateCollected: string; data: Record<string, number> }>
+          columns={[
+            {
+              name: 'Date Collected',
+              field: (data) => new Date(data.dateCollected)
+            },
+            {
+              name: 'Average Score',
+              field: (data) => Object.values(data.data).reduce((a, b) => a + b) / Object.values(data.data).length
+            }
+          ]}
+          data={data}
+        />
       </div>
     </div>
   ) : null;

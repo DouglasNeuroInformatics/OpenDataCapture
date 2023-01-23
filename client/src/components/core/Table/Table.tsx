@@ -7,14 +7,14 @@ import { Button, Link } from '@/components/base';
 function formatValue(value: unknown): string {
   if (typeof value === 'string') {
     return value;
-  } else if (typeof value === 'bigint' || typeof value === 'number') {
-    return value.toString();
+  } else if (typeof value === 'number') {
+    return value.toFixed(2).toString();
   } else if (typeof value === 'undefined') {
     return 'NA';
   }
 
   if (value instanceof Date) {
-    return value.toDateString();
+    return value.toISOString().split('T')[0];
   }
 
   return JSON.stringify(value);
@@ -45,8 +45,8 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
   return (
     <div>
       <div className="flex justify-end">
-        <Button disabled label="Filters" />
-        <Button disabled label="Export" />
+        <Button disabled className="mx-2 my-1" label="Filters" />
+        <Button disabled className="my-1" label="Export" />
       </div>
       <table className="block w-full table-auto overflow-x-scroll border-2">
         <thead>
@@ -81,7 +81,7 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
           <HiArrowLeft />
         </button>
         {pageNumbers.map((page) => (
-          <button className="mx-1" onClick={() => setCurrentPage(page)}>
+          <button className="mx-1" key={page} onClick={() => setCurrentPage(page)}>
             {page}
           </button>
         ))}
