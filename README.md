@@ -33,43 +33,13 @@
 
 ## About
 
-The Douglas Data Capture Platform was created to standardize the collection of clinical research data across all clinics at the Douglas Research Centre. This repository includes the source code for the REST API and single page application that make up the platform.
+The Douglas Data Capture Platform is a modern, easy-to-use web application designed to enable the continuous collection and storage of research data. It was developed to meet the specific needs of clinical researchers at the Douglas Research Centre, one of the world’s leading mental health research institutions. However, it is fully open-source and can be easily adapted for use by other research institutions and organizations. This repository is a monorepo containing all source code for the application. 
 
-## Features
-
-- Fast
-- Secure
-- Modern
-- Easy-to-Use
-
-## Setup
-
-### Prerequisites
-
-To follow this procedure, you should have Node installed on your machine. Recent versions of Node include the Yarn package manager, but it is disabled by default. To enable it, run the following command:
+## Quick Start
 
 ```shell
-$ corepack enable
-```
-
-### Steps
-
-1. Clone this repository
-
-```shell
-$ git clone https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform.git
-```
-
-2. Install Dependencies
-
-```shell
-$ yarn install
-```
-
-3. Set Private Environment Variables
-
-```shell
-$ echo SECRET_KEY=foo > .env.local
+cat .env.template <(python -c "import secrets; print(secrets.token_hex(32))") > .env
+docker compose up
 ```
 
 ## License
