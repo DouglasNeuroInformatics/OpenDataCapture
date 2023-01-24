@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>The Douglas Data Capture Platform Documentation</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="Description" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
+    <link
+      rel="stylesheet"
+      media="(prefers-color-scheme: dark)"
+      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css"
+    />
+    <link
+      rel="stylesheet"
+      media="(prefers-color-scheme: light)"
+      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
+    />
+    <style>
+      :root {
+        --theme-color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <!-- Plugins -->
+    <script defer src="./docsify-glossary.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify-edit-on-github"></script>
+    <script>
+      window.$docsify = {
+        name: 'The Douglas Data Capture Platform',
+        repo: 'DouglasNeuroInformatics/DouglasDataCapturePlatform',
+        loadSidebar: true,
+        subMaxLevel: 2,
+        plugins: [
+          EditOnGithubPlugin.create(
+            'https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/tree/main/client',
+            'https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/tree/main/client',
+            'Edit'
+          )
+        ],
+        glossify: {
+          debug: true,
+          terminologyHeading: '###'
+        }
+      };
+    </script>
+    <!-- Required -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
+
+    <!-- Recommended -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
+  </body>
+</html>
