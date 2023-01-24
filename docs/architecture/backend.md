@@ -1,6 +1,6 @@
 ## Introduction
 
-The backend architecture of the web application is built using NestJS, a framework for building efficient and scalable server-side applications.
+The backend architecture of the web application is built using NestJS, a framework for building efficient and scalable server-side applications. For a quick introduction to NestJS, we recommend [this video](https://www.youtube.com/watch?v=0M8AYU_hPas).
 
 ## Dependency Injection
 
