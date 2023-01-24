@@ -1,32 +1,18 @@
-- [Introduction](pages/introduction.md)
-- [Key Features](pages/key-features.md)
+- **Introduction**
+* [Background](introduction/background.md)
+* [Scope](introduction/scope.md)
+* [Key Features](introduction/key-features.md)
 
-* Architecture
-  - [Monorepo](architecture/monorepo.md)
-  - [Frontend](architecture/frontend.md)
-  - [Backend](architecture/backend.md)
+- **Architecture**
+* [Monorepo](architecture/monorepo.md)
+* [Frontend](architecture/frontend.md)
+* [Backend](architecture/backend.md)
 
-- [Code Style and Conventions]()
-<!--
+- **Development**
+* [Setup](development/setup.md)
+* [Coding Conventions](development/coding_conventions.md)
+* [Testing](development/testing.md)
+* [Continuous Integration](development/continuous_integration.md)
 
-* Code Style
-* [Naming Conventions](#)
-* [File Structure](#)
-* [Commenting Standards](#)
-
-* Development Environment
-
-  - [Version Control](#)
-  - [Continuous Integration](#)
-  - [Testing](#)
-
-* Deployment
-* [Logging](#)
-
-* Testing
-
-* Troubleshooting
-* [Common Issues](#)
-
-* Additional Resources
-  -->
+- **Deployment**
+* [Logging](deployment/logging.md)
