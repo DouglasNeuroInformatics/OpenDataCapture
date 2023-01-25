@@ -17,7 +17,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.7",
     "@hookform/resolvers": "^2.9.10",
-    "axios": "^1.2.3",
+    "axios": "^1.2.4",
     "clsx": "^1.2.1",
     "common": "*",
     "i18next": "^22.4.6",
