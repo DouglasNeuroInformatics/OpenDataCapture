@@ -7,7 +7,7 @@
   <p align="center">
     A modern, user-friendly, web application for standardized data capture in medical research
     <br />
-    <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">
+    <a href="https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform">
       <strong>Explore the docs »
       </strong>
     </a>
