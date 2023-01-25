@@ -1,6 +1,7 @@
 - **Introduction**
 * [Background](introduction/background.md)
-* [Scope](introduction/scope.md)
+* [Project Scope](introduction/project-scope.md)
+* [Design Principles](introduction/design-principles.md)
 * [Key Features](introduction/key-features.md)
 
 - **Architecture**
