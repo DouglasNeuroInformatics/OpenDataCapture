@@ -8,6 +8,7 @@
 * [Subject Registration](features/subject-registration.md)
 * [Creating Instruments](features/creating-instruments.md)
 * [Administering Instruments](features/administering-instruments.md)
+* [Diagnostic Tracking](features/diagnostic-tracking.md)
 * [Data Extraction](features/data-extraction.md)
 * [Date Visualization](features/data-visualization.md)
 

@@ -21,3 +21,6 @@ If an instrument is a "form", then the data is an array of objects which define 
 - Description
 - Variant
 
+## Aggregate Instrument
+
+*If an instrument is an "aggregate", then the data is an array of instruments, which may themselves be of any valid kind, with the possible exception of aggregate.*
