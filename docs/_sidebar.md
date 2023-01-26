@@ -9,6 +9,7 @@
 * [Creating Instruments](features/creating-instruments.md)
 * [Administering Instruments](features/administering-instruments.md)
 * [Diagnostic Tracking](features/diagnostic-tracking.md)
+* [Medication Tracking](features/medication-tracking.md)
 * [Data Extraction](features/data-extraction.md)
 * [Date Visualization](features/data-visualization.md)
 
