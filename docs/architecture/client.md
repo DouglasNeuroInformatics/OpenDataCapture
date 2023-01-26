@@ -30,6 +30,8 @@ const element = <div className="my-class">Hello World!</div>;
 
 [Vite](https://vitejs.dev/) is a build tool that enables us to use technologies such as JSX and TypeScript that are not supported by browsers. 
 
+The app is transpiled to ES6 (ECMAScript 6) and is designed to be compatible with all major modern browsers, including Chrome, Firefox, Safari, Edge. Legacy browsers including all versions of Internet Explorer are not supported.
+
 ### Tailwind CSS
 
 [Tailwind CSS](https://tailwindcss.com/) is a utility-first CSS framework that provides a set of pre-defined CSS classes. Especially when combined with React, it is a very powerful tool to build reusable, modern interfaces.
