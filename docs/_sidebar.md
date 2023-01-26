@@ -16,7 +16,7 @@
 
 - **Architecture**
 * [Overview](architecture/overview.md)
-* [Frontend](architecture/frontend.md)
+* [Client](architecture/client.md)
 * [Backend](architecture/backend.md)
 
 - **Development**
