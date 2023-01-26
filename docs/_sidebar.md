@@ -15,7 +15,7 @@
 * [Date Visualization](features/data-visualization.md)
 
 - **Architecture**
-* [Monorepo](architecture/monorepo.md)
+* [Overview](architecture/overview.md)
 * [Frontend](architecture/frontend.md)
 * [Backend](architecture/backend.md)
 
