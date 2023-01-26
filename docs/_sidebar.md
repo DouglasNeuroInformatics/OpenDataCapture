@@ -14,16 +14,16 @@
 * [Data Extraction](features/data-extraction.md)
 * [Date Visualization](features/data-visualization.md)
 
+- **Development**
+* [Setup](development/setup.md)
+* [Coding Conventions](development/coding-conventions.md)
+* [Continuous Integration](development/continuous-integration.md)
+
 - **Architecture**
 * [Overview](architecture/overview.md)
 * [Client](architecture/client.md)
+* [Server](architecture/server.md)
 * [Backend](architecture/backend.md)
 
-- **Development**
-* [Setup](development/setup.md)
-* [Coding Conventions](development/coding_conventions.md)
-* [Testing](development/testing.md)
-* [Continuous Integration](development/continuous_integration.md)
-
 - **Deployment**
-* [Logging](deployment/logging.md)
+
