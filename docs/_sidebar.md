@@ -1,6 +1,7 @@
 - **Introduction**
 * [Background](introduction/background.md)
 * [Project Scope](introduction/project-scope.md)
+* [Target Users](introduction/target-users.md)
 * [Design Principles](introduction/design-principles.md)
 
 - **Features**
