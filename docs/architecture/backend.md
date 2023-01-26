@@ -2,15 +2,6 @@
 
 The backend architecture of the web application is built using NestJS, a framework for building efficient and scalable server-side applications. For a quick introduction to NestJS, we recommend [this video](https://www.youtube.com/watch?v=0M8AYU_hPas).
 
-## Dependency Injection
-
-NestJS leverages dependency injection (DI) to manage the dependencies of the different parts of the application. DI is a design pattern that allows the application to be more loosely coupled, making it easier to test and maintain.
-
-In NestJS, when a class is decorated with the @Injectable() decorator, it is eligible to be injected as a dependency. These classes are typically services or providers that encapsulate specific functionality of the application. The classes that depend on these services or providers, such as controllers or pipes, can then have them injected into their constructors. For example:
-
-When the NestJS application is bootstrapped, it scans for all the classes decorated with @Injectable() and creates instances of them. These instances are then stored in a container, which is responsible for managing the lifecycle of the instances and providing them when they are needed by other parts of the application.
-
-By using DI, NestJS allows for a separation of concerns and encapsulation of functionality, making the application more maintainable and testable. The application becomes more flexible, as it is easy to replace dependencies with mock or mock-like objects in test environments. Also, it is easier to manage the lifecycle of the services and providers, which makes it easy to handle resources such as database connections.
 
 ## Built-In Features
 
@@ -20,6 +11,7 @@ NestJS provides several built-in features that are leveraged in the application,
 - A guard, which is used to handle the authorization and authentication of the application. It is used to restrict access to certain routes or controllers based on the user's roles or permissions. This ensures that only authorized users can access the protected routes or controllers.
 
 ## Modular Structure
+
 
 NestJS organizes all of the controllers, services, pipes, guards, and filters in a modular structure, making it easy to maintain and test the application.
 
