@@ -2,7 +2,14 @@
 * [Background](introduction/background.md)
 * [Project Scope](introduction/project-scope.md)
 * [Design Principles](introduction/design-principles.md)
-* [Key Features](introduction/key-features.md)
+
+- **Features**
+* [Authentication](features/authentication.md)
+* [Subject Registration](features/subject-registration.md)
+* [Creating Instruments](features/creating-instruments.md)
+* [Administering Instruments](features/administering-instruments.md)
+* [Data Extraction](features/data-extraction.md)
+* [Date Visualization](features/data-visualization.md)
 
 - **Architecture**
 * [Monorepo](architecture/monorepo.md)

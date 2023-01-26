@@ -1,0 +1,3 @@
+# Data Extraction
+
+*Users will be permitted to request a data dump on demand. The exact process for this is yet to be determined. It is likely to include filtering capabilities based on major demographic characteristics (e.g., age, sex). Users will be able to download their data in a number of formats. The first format that will be implemented will be CSV or JSON. However, other formats might include Excel, RData, or SPSS.*
