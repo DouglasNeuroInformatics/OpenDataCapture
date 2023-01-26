@@ -1,6 +1,7 @@
 - **Introduction**
 * [Background](introduction/background.md)
 * [Project Scope](introduction/project-scope.md)
+* [Target Users](introduction/target-users.md)
 * [Design Principles](introduction/design-principles.md)
 
 - **Features**
@@ -8,12 +9,14 @@
 * [Subject Registration](features/subject-registration.md)
 * [Creating Instruments](features/creating-instruments.md)
 * [Administering Instruments](features/administering-instruments.md)
+* [Diagnostic Tracking](features/diagnostic-tracking.md)
+* [Medication Tracking](features/medication-tracking.md)
 * [Data Extraction](features/data-extraction.md)
 * [Date Visualization](features/data-visualization.md)
 
 - **Architecture**
-* [Monorepo](architecture/monorepo.md)
-* [Frontend](architecture/frontend.md)
+* [Overview](architecture/overview.md)
+* [Client](architecture/client.md)
 * [Backend](architecture/backend.md)
 
 - **Development**
