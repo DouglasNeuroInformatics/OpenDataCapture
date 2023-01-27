@@ -87,3 +87,14 @@ request all the instruments they are authorized to use. There is also functional
 instruments and store them in the database. However, at present, this functionality is reserved
 for administrators.
 
+## Database
+
+The database is accessed using Mongoose, an Object Data Modeling (ODM) library for MongoDB. This is implemented via repository classes, which inherit from the abstract `EntityRepository` class. This allows us to define the generic type parameters of the repository and obtain type safety. This pattern allows for a separation of concerns and encapsulation of database logic, making the application more maintainable and testable.
+
+Database schemas are defined using strict mode, which means that any properties not defined in the schema will not be allowed to be saved in the database. This helps to ensure that the data in the database is consistent and in the expected format.
+
+## OpenAPI
+
+NestJS swagger is a module that allows for the integration of the OpenAPI specification (formerly known as Swagger) into a NestJS application. This allows for the automatic generation of an API documentation in the form of an `openapi.json` file.
+
+In this application, NestJS swagger is used to generate an openapi spec, but instead of the default swagger interface, the application is using redoc. Redoc is an open-source tool that allows for the creation of beautiful and interactive API documentation. This is implemented in the docs module using the NestJS serve static module, which allows for the serving of static files from a given folder. This way the redoc interface can be accessed by visiting the default endpoint on the server (e.g., localhost 5500)

@@ -23,7 +23,6 @@
 * [Overview](architecture/overview.md)
 * [Client](architecture/client.md)
 * [Server](architecture/server.md)
-* [Backend](architecture/backend.md)
 
 - **Deployment**
 
