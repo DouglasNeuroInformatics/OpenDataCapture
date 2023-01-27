@@ -4,6 +4,6 @@ The Douglas Data Capture Platform aims to provide a method for safe and efficien
 
 > **Important Note:** The Douglas Data Capture Platform is not an Electronic Health Record (EHR) and therefore it is not designed to capture or store qualitative notes.
 
-As a consequence of the collection of this structured data, the platform will also achieve two additional objectives:
-1. To provide authorized users with real-time access to a dashboard that displays summary information about clients
-2. To provide authorized users with an easy way to extract collected data, including filtering by date collected, age, and sex
+As a consequence of the collection of this structured data, the platform also aims to:
+1. Provide authorized users with real-time access to a dashboard that displays summary information about clients
+2. Provide authorized users with an easy way to extract collected data, including filtering by date collected, age, and sex

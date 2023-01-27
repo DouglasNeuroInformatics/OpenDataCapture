@@ -6,7 +6,7 @@ The platform is designed primarily for clinical personnel, including doctors, nu
 
 ## Research Subjects
 
-*The platform will eventually enable subjects to self-enter data on any device, including mobile phones, tablets, laptops, and desktop computers. In some cases, these users may suffer from cognitive impairments that affect their attention or memory. Therefore, any functionalities provided to this user class must be designed with accessibility in mind.* 
+*The platform will eventually enable subjects to self-enter data on any device, including mobile phones, tablets, laptops, and desktop computers. In some cases, these users may suffer from cognitive impairments that affect their attention or memory. Therefore, any functionalities provided to this user class will be designed with accessibility in mind.* 
 
 ## Researchers
 
