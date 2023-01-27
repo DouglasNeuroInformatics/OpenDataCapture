@@ -19,9 +19,9 @@ async function bootstrap(): Promise<void> {
     })
   );
 
-  const docsService = app.get(DocsService);
-  await docsService.buildSpec(app);
-  docsService.buildDocs();
+  // const docsService = app.get(DocsService);
+  // await docsService.buildSpec(app);
+  // docsService.buildDocs();
 
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('SERVER_PORT');

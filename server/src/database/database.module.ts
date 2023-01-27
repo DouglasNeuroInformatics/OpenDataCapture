@@ -12,8 +12,8 @@ import { DatabaseService } from './database.service';
         switch (configService.getOrThrow('NODE_ENV')) {
           case 'development':
             return { uri: configService.getOrThrow<string>('MONGO_DEV_CONNECTION_URI') };
-          case 'demo':
-            return { uri: configService.getOrThrow<string>('MONGO_DEMO_CONNECTION_URI') };
+          case 'production':
+            return { uri: configService.getOrThrow<string>('MONGO_PROD_CONNECTION_URI') };
           case 'test':
             return { uri: configService.get<string>('MONGO_TEST_CONNECTION_URI') };
           default:
