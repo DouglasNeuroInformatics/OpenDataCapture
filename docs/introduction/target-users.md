@@ -2,7 +2,7 @@
 
 ## Clinical Staff
 
-The platform is designed primarily for clinical personnel, including doctors, nurses, and administrative assistants. These users will likely access the platform through Chrome browser on a desktop computer. It is safe to assume that the vast majority of these users will prefer a graphical user interface and will have little/no experience with the command line.
+The platform is designed primarily for clinical personnel, including doctors, nurses, and administrative assistants. These users will likely access the platform using Google Chrome on a desktop computer. It is safe to assume that the vast majority of these users will prefer a graphical user interface and will have little/no experience with the command line.
 
 ## Research Subjects
 

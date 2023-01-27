@@ -17,4 +17,7 @@ Users, on the other hand, may access the following functionality:
 - Data Visualization*
 - Administering Instruments*
 
-> **Important Note:** For items marked with an asterisk, the specific data/instruments available to the user are determined by the clinic(s) to which they belong. Each user may belong to one or more clinics, which determines the data and instruments they are permitted to access. *When a user affiliated with multiple clinics attempts to log into the platform, they will be prompted to select the clinic for the current session.* The permissions of the user are then determined by the clinic associated with the current login session.
+> **Important Note:** For items marked with an asterisk, the specific data/instruments available to the user are determined by the clinic(s) to which they belong. 
+
+However, unlike admins, users are not permitted to access all data associated with a given feature. Rather, users are associated with one or more clinics, which determine their access permissions. *When a user affiliated with multiple clinics attempts to log into the platform, they will be prompted to select the clinic for the current session. The permissions of the user are then determined by the clinic associated with the current login session.*
+

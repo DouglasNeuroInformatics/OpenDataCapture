@@ -6,6 +6,7 @@
 
 - **Features**
 * [Authentication](features/authentication.md)
+* [Internationalization](features/internationalization.md)
 * [Subject Registration](features/subject-registration.md)
 * [Creating Instruments](features/creating-instruments.md)
 * [Administering Instruments](features/administering-instruments.md)

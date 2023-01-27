@@ -1,6 +1,6 @@
 # Subject Registration
 
-Before administering any instruments, subjects must be registered in our database. For the end user, this entails filling out a form with a number of required and optional fields.
+Before administering any instruments, subjects must be registered in our database. This entails completing a  form with a number of required and optional fields.
 
 ## Required Data
 
