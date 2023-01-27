@@ -12,7 +12,7 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
-export class DemoService implements OnApplicationBootstrap, OnApplicationShutdown {
+export class DemoService implements OnApplicationBootstrap {
   constructor(
     private readonly configService: ConfigService,
     private readonly databaseService: DatabaseService,
@@ -23,11 +23,7 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
   ) {}
 
   get initDb(): boolean {
-    return this.isDemo() || (this.configService.get('INIT_DEMO_DB') ?? false);
-  }
-
-  isDemo(): boolean {
-    return this.configService.getOrThrow('NODE_ENV') === 'demo';
+    return this.configService.get('INIT_DEMO_DB') ?? false;
   }
 
   async onApplicationBootstrap(): Promise<void> {
@@ -37,12 +33,6 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
       await this.createSubjects();
       await this.createInstrumentRecords();
       await this.createUsers();
-    }
-  }
-
-  onApplicationShutdown(): void {
-    if (this.isDemo()) {
-      console.log('Shutdown demo...');
     }
   }
 

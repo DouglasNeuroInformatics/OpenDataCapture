@@ -8,7 +8,6 @@
     "build": "tsc && NODE_ENV=production vite build",
     "build-storybook": "build-storybook",
     "check-types": "tsc --noEmit",
-    "demo": "yarn build && yarn preview",
     "dev": "vite",
     "lint": "eslint --fix src",
     "preview": "vite preview --host --port 3000",

@@ -23,9 +23,9 @@ import { UsersModule } from './users/users.module';
       validationSchema: Joi.object({
         INIT_DEMO_DB: Joi.boolean().optional(),
         MONGO_DEV_CONNECTION_URI: Joi.string().required(),
-        MONGO_DEMO_CONNECTION_URI: Joi.string().required(),
+        MONGO_PROD_CONNECTION_URI: Joi.string().required(),
         MONGO_TEST_CONNECTION_URI: Joi.string().required(),
-        NODE_ENV: Joi.string().valid('development', 'demo', 'test').required(),
+        NODE_ENV: Joi.string().valid('development', 'production', 'test').required(),
         SERVER_PORT: Joi.number().required(),
         SECRET_KEY: Joi.string().required()
       })
