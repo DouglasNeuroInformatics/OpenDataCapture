@@ -9,7 +9,6 @@ import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { ExceptionFilter } from './core/exception.filter';
 import { DatabaseModule } from './database/database.module';
 import { DemoModule } from './demo/demo.module';
-import { DocsModule } from './docs/docs.module';
 import { InstrumentsModule } from './instruments/instruments.module';
 import { ResourcesModule } from './resources/resources.module';
 import { SubjectsModule } from './subjects/subjects.module';
@@ -22,9 +21,7 @@ import { UsersModule } from './users/users.module';
       isGlobal: true,
       validationSchema: Joi.object({
         INIT_DEMO_DB: Joi.boolean().optional(),
-        MONGO_DEV_CONNECTION_URI: Joi.string().required(),
-        MONGO_PROD_CONNECTION_URI: Joi.string().required(),
-        MONGO_TEST_CONNECTION_URI: Joi.string().required(),
+        MONGO_URI: Joi.string().required(),
         NODE_ENV: Joi.string().valid('development', 'production', 'test').required(),
         SERVER_PORT: Joi.number().required(),
         SECRET_KEY: Joi.string().required()
@@ -32,7 +29,7 @@ import { UsersModule } from './users/users.module';
     }),
     DatabaseModule,
     DemoModule,
-    DocsModule,
+    // DocsModule,
     ResourcesModule,
     InstrumentsModule,
     SubjectsModule,

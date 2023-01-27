@@ -9,16 +9,9 @@ import { DatabaseService } from './database.service';
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        switch (configService.getOrThrow('NODE_ENV')) {
-          case 'development':
-            return { uri: configService.getOrThrow<string>('MONGO_DEV_CONNECTION_URI') };
-          case 'production':
-            return { uri: configService.getOrThrow<string>('MONGO_PROD_CONNECTION_URI') };
-          case 'test':
-            return { uri: configService.get<string>('MONGO_TEST_CONNECTION_URI') };
-          default:
-            throw new Error();
-        }
+        const env = configService.getOrThrow<string>('NODE_ENV');
+        const mongoUri = configService.getOrThrow<string>('MONGO_URI');
+        return { uri: `${mongoUri}/${env}` };
       }
     })
   ],

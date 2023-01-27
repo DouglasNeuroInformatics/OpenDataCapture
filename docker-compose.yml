@@ -1,0 +1,49 @@
+version: '3'
+services:
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    container_name: client
+    depends_on:
+      - server
+    environment:
+      - NODE_ENV=production
+      - VITE_API_HOST=http://server:5500
+      - VITE_DEV_SERVER_PORT
+    expose:
+      - "${VITE_DEV_SERVER_PORT}"
+    networks:
+      - client-server
+    ports:
+      - "${VITE_DEV_SERVER_PORT}:${VITE_DEV_SERVER_PORT}"
+    restart: always
+  server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017
+      - SERVER_PORT
+      - SECRET_KEY
+    expose:
+      - "${SERVER_PORT}"
+    networks:
+      - server-mongo
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    restart: always
+  mongo:
+    container_name: mongo
+    image: mongo:6.0.2
+    networks:
+      - server-mongo
+    ports:
+      - '27017:27017'
+networks:
+  server-mongo: null
+  client-server: null
