@@ -1,5 +1,23 @@
 version: '3'
 services:
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    container_name: client
+    depends_on:
+      - server
+    environment:
+      - NODE_ENV=production
+      - VITE_API_HOST=http://server:5500
+      - VITE_DEV_SERVER_PORT
+    expose:
+      - "${VITE_DEV_SERVER_PORT}"
+    networks:
+      - client-server
+    ports:
+      - "${VITE_DEV_SERVER_PORT}:${VITE_DEV_SERVER_PORT}"
+    restart: always
   server:
     build:
       context: .
@@ -28,3 +46,4 @@ services:
       - '27017:27017'
 networks:
   server-mongo: null
+  client-server: null
