@@ -15,6 +15,10 @@ COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN yarn install --frozen-lockfile
 
 # Compile the workspace
+ARG NODE_ENV
+ARG VITE_API_HOST
+ENV NODE_ENV=${NODE_ENV}
+ENV VITE_API_HOST=${VITE_API_HOST}
 COPY --from=builder /app/out/full/ .
 RUN yarn turbo run build --filter=client
 
@@ -23,4 +27,8 @@ FROM node:18 AS runner
 WORKDIR /app
 COPY --from=installer /app .
 
+ARG NODE_ENV
+ARG VITE_API_HOST
+ENV NODE_ENV=${NODE_ENV}
+ENV VITE_API_HOST=${VITE_API_HOST}
 CMD ["yarn", "workspace", "client", "preview"]
