@@ -4,13 +4,13 @@ services:
     build:
       context: .
       dockerfile: ./client/Dockerfile
+      args:
+        - NODE_ENV=production
+        - VITE_API_HOST=http://server:5500
+        - VITE_DEV_SERVER_PORT=${VITE_DEV_SERVER_PORT}
     container_name: client
     depends_on:
       - server
-    environment:
-      - NODE_ENV=production
-      - VITE_API_HOST=http://server:5500
-      - VITE_DEV_SERVER_PORT
     expose:
       - "${VITE_DEV_SERVER_PORT}"
     networks:
@@ -33,6 +33,7 @@ services:
     expose:
       - "${SERVER_PORT}"
     networks:
+      - client-server
       - server-mongo
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
