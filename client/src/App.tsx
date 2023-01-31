@@ -8,7 +8,7 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 
 import { Button } from '@/components/base';
-import { Notifications, Spinner } from '@/components/core';
+import { ActiveSubject, Notifications, Spinner } from '@/components/core';
 import { queryClient } from '@/services/react-query';
 
 import './services/axios';
@@ -34,7 +34,8 @@ const App = () => {
     <React.Suspense fallback={<SuspenseFallback />}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools initialIsOpen={false} position="top-right" />
+          <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+          <ActiveSubject />
           <Notifications />
           <RouterProvider router={router} />
         </QueryClientProvider>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { demographicOptions } from 'common';
@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { SubjectsAPI } from '../api/subjects.api';
 
 import { Form } from '@/components/form';
+import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
 export const subjectFormSchema = z.object({
   firstName: z.string().min(1),
@@ -23,6 +24,8 @@ export interface SubjectFormProps {
 }
 
 export const SubjectForm = ({ onSuccess }: SubjectFormProps) => {
+  const { setActiveSubject } = useActiveSubjectStore();
+
   const {
     register,
     handleSubmit,
@@ -35,6 +38,7 @@ export const SubjectForm = ({ onSuccess }: SubjectFormProps) => {
 
   const onSubmit = async (data: SubjectFormSchema) => {
     await SubjectsAPI.addSubject(data);
+    setActiveSubject(data);
     reset();
     onSuccess();
   };

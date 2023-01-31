@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Form } from '@/components/form';
+import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
 export const demographicsFormSchema = z.object({
   firstName: z.string().min(1),
@@ -20,14 +21,26 @@ export interface DemographicsFormProps {
 }
 
 export const DemographicsForm = ({ onSubmit, submitLabel }: DemographicsFormProps) => {
+  const { activeSubject } = useActiveSubjectStore();
   const {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors }
   } = useForm<DemographicsFormData>({
     resolver: zodResolver(demographicsFormSchema)
   });
+
+  useEffect(() => {
+    activeSubject
+      ? reset(activeSubject)
+      : reset({
+          firstName: '',
+          lastName: '',
+          dateOfBirth: undefined
+        });
+  }, [activeSubject]);
 
   return (
     <div>

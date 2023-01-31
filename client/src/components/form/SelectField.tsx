@@ -23,30 +23,35 @@ export const SelectField = ({ name, label, options, control, error }: SelectFiel
       <Controller
         control={control}
         name={name}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            unstyled
-            classNames={{
-              control: ({ isFocused, menuIsOpen }) => {
-                return classNames('w-full border-b-2 bg-transparent py-2 text-gray-900', {
-                  'border-indigo-800 outline-none': isFocused || menuIsOpen,
-                  'hover:border-gray-300': !menuIsOpen
-                });
-              },
-              menu: () => classNames('mt-1 bg-slate-100 shadow-xl rounded-md'),
-              option: () => 'p-2 hover:bg-slate-200 capitalize'
-            }}
-            name={name}
-            options={selectOptions}
-            placeholder={null}
-            value={selectOptions.find((c) => c.value === value)}
-            onBlur={() => (value ? null : setIsFloatingLabel(false))}
-            onChange={(selectedOption) => {
-              selectedOption && onChange(selectedOption.value);
-            }}
-            onFocus={() => setIsFloatingLabel(true)}
-          />
-        )}
+        render={({ field: { onChange, value } }) => {
+          if (value) {
+            setIsFloatingLabel(true);
+          }
+          return (
+            <Select
+              unstyled
+              classNames={{
+                control: ({ isFocused, menuIsOpen }) => {
+                  return classNames('w-full border-b-2 bg-transparent py-2 text-gray-900', {
+                    'border-indigo-800 outline-none': isFocused || menuIsOpen,
+                    'hover:border-gray-300': !menuIsOpen
+                  });
+                },
+                menu: () => classNames('mt-1 bg-slate-100 shadow-xl rounded-md'),
+                option: () => 'p-2 hover:bg-slate-200 capitalize'
+              }}
+              name={name}
+              options={selectOptions}
+              placeholder={null}
+              value={selectOptions.find((c) => c.value === value)}
+              onBlur={() => (value ? null : setIsFloatingLabel(false))}
+              onChange={(selectedOption) => {
+                selectedOption && onChange(selectedOption.value);
+              }}
+              onFocus={() => setIsFloatingLabel(true)}
+            />
+          );
+        }}
       />
     </FieldElement>
   );
