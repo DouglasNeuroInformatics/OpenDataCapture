@@ -7,9 +7,15 @@
       "outputs": ["dist/**"]
     },
     "check-types": {},
-    "dev": {},
+    "dev": {
+      "dependsOn": ["^build"]
+    },
     "format": {},
-    "lint": {},
-    "test": {}
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    }
   }
 }
