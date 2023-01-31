@@ -11,7 +11,11 @@ const languages = {
   }
 };
 
-export const LanguageToggle = ({ onClick, ...props }: React.ComponentPropsWithoutRef<'button'>) => {
+interface LanguageToggleProps extends React.ComponentPropsWithoutRef<'button'> {
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+}
+
+export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
   const inactiveLanguage = Object.keys(languages).find((l) => l !== i18next.resolvedLanguage) as
     | keyof typeof languages
     | undefined;
@@ -34,4 +38,3 @@ export const LanguageToggle = ({ onClick, ...props }: React.ComponentPropsWithou
     </button>
   );
 };
-

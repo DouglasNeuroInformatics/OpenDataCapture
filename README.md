@@ -27,7 +27,8 @@
   ![license][license-shield]
   ![version][version-shield]
   ![vulnerabilities][vulnerabilities-shield]
-
+  ![tests][tests-shield]
+  
 </div>
 <hr />
 
@@ -55,3 +56,4 @@ the Free Software Foundation, either version 3 of the License, or
 [license-shield]: https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform
 [version-shield]: https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/DouglasDataCapturePlatform
 [vulnerabilities-shield]: https://img.shields.io/snyk/vulnerabilities/github/DouglasNeuroInformatics/DouglasDataCapturePlatform
+[tests-shield]: https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/actions/workflows/main.yml/badge.svg
