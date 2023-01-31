@@ -28,7 +28,7 @@
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^3.1.4",
-    "react-hook-form": "^7.41.5",
+    "react-hook-form": "^7.43.0",
     "react-i18next": "^12.1.1",
     "react-icons": "^4.7.1",
     "react-query": "^3.39.3",
