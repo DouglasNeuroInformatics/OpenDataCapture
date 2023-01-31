@@ -33,10 +33,14 @@ export const DemographicsForm = ({ onSubmit, submitLabel }: DemographicsFormProp
   });
 
   useEffect(() => {
-    if (activeSubject) {
-      reset(activeSubject);
-    }
-  }, []);
+    activeSubject
+      ? reset(activeSubject)
+      : reset({
+          firstName: '',
+          lastName: '',
+          dateOfBirth: undefined
+        });
+  }, [activeSubject]);
 
   return (
     <div>
