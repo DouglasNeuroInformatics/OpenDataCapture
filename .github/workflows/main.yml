@@ -1,0 +1,30 @@
+name: tests
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "client/**"
+      - "common/**"
+      - "server/**"
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: 
+      image: node:18
+    env:
+      PORT: 3000
+      MONGO_URI: mongodb://mongo:27017
+    services:
+      mongo:
+        image: mongo:6.0.2
+        ports:
+          - 27017:27017
+    steps:
+      - name: download code
+        uses: actions/checkout@v3
+      - name: install dependencies
+        run: yarn --frozen-lockfile install
+      - name: run tests
+        run: yarn test
