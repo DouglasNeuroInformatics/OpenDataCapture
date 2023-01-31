@@ -16,7 +16,7 @@ export const Layout = ({ children }: LayoutProps) => {
         <Navbar onToggleClick={() => setShowSidebarMobile(true)} />
       </div>
       <div
-        className="absolute top-0 -left-72 z-50 h-screen w-72 md:left-0"
+        className="absolute top-0 -left-72 h-screen w-72 md:left-0"
         style={showSidebarMobile ? { left: 0 } : undefined}
       >
         <Sidebar />

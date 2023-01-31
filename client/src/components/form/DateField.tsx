@@ -21,21 +21,26 @@ export const DateField = ({ name, label, control, error }: DateFieldProps) => {
       <Controller
         control={control}
         name={name}
-        render={({ field: { onChange, value } }) => (
-          <DatePicker
-            showYearDropdown
-            className="input"
-            dateFormat="yyyy-MM-dd"
-            name={name}
-            popperPlacement="bottom-start"
-            selected={value as Date}
-            startDate={null}
-            value={value as string}
-            onBlur={() => (value ? null : setIsFloatingLabel(false))}
-            onChange={onChange}
-            onFocus={() => setIsFloatingLabel(true)}
-          />
-        )}
+        render={({ field: { onChange, value } }) => {
+          if (value) {
+            setIsFloatingLabel(true);
+          }
+          return (
+            <DatePicker
+              showYearDropdown
+              className="input"
+              dateFormat="yyyy-MM-dd"
+              name={name}
+              popperPlacement="bottom-start"
+              selected={value as Date}
+              startDate={null}
+              value={value as string}
+              onBlur={() => (value ? null : setIsFloatingLabel(false))}
+              onChange={onChange}
+              onFocus={() => setIsFloatingLabel(true)}
+            />
+          );
+        }}
       />
     </FieldElement>
   );
