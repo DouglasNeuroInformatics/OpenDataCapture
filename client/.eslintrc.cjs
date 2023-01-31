@@ -55,7 +55,8 @@ module.exports = {
         callbacksLast: true,
         shorthandFirst: true
       }
-    ]
+    ],
+    'react/prop-types': 'off' // to fix bug - this is okay as ts will enforce anyways
   },
   overrides: [
     {

@@ -30,16 +30,16 @@ export const demographicOptions = {
 
 // Also consider living status (do they live alone?)
 export const subjectDemographicsSchema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
+  firstName: z.optional(z.string().min(1)),
+  lastName: z.optional(z.string().min(1)),
   dateOfBirth: z.coerce.date(),
   sex: z.enum(demographicOptions.sex),
-  forwardSortationArea: z.string().optional(),
-  ethnicity: z.enum(demographicOptions.ethnicity).optional(),
-  gender: z.enum(demographicOptions.gender).optional(),
-  employmentStatus: z.enum(demographicOptions.employmentStatus).optional(),
-  maritalStatus: z.enum(demographicOptions.maritalStatus).optional(),
-  firstLanguage: z.enum(demographicOptions.firstLanguage).optional()
+  forwardSortationArea: z.optional(z.string().length(3)).or(z.literal('').transform(() => undefined)),
+  ethnicity: z.optional(z.enum(demographicOptions.ethnicity)),
+  gender: z.optional(z.enum(demographicOptions.gender)),
+  employmentStatus: z.optional(z.enum(demographicOptions.employmentStatus)),
+  maritalStatus: z.optional(z.enum(demographicOptions.maritalStatus)),
+  firstLanguage: z.optional(z.enum(demographicOptions.firstLanguage))
 });
 
 export const subjectSchema = z.object({

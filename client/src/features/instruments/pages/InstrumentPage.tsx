@@ -9,6 +9,8 @@ import { DemographicsForm, DemographicsFormData } from '../components/Demographi
 import { InstrumentOverview } from '../components/InstrumentOverview';
 import { InstrumentRecordForm, InstrumentRecordFormData } from '../components/InstrumentRecordForm';
 
+import { Divider } from '@/components/base';
+
 export const InstrumentPage = () => {
   const navigate = useNavigate();
   const params = useParams();
@@ -27,7 +29,7 @@ export const InstrumentPage = () => {
   return data ? (
     <div className="container" style={{ maxWidth: 900 }}>
       <h1 className="text-center">{data.title}</h1>
-      <hr className="my-5 border-slate-300" />
+      <Divider />
       <div className="flex">
         <div className={'bg-cello-900 flex w-full justify-center rounded-xl p-3 text-white shadow-xl'}>
           <span className="mx-2">Overview</span>
