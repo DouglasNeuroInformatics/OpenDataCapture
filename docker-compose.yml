@@ -33,6 +33,7 @@ services:
     expose:
       - "${SERVER_PORT}"
     networks:
+      - client-server
       - server-mongo
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
