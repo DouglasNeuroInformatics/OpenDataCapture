@@ -4,12 +4,21 @@ import { clsx } from 'clsx';
 
 export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button'>, 'children'> {
   icon?: React.ReactElement;
+  iconPosition?: 'left' | 'right';
   label: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'dark' | 'light';
 }
 
-export const Button = ({ className, icon, label, size = 'md', variant = 'dark', ...props }: ButtonProps) => {
+export const Button = ({
+  className,
+  icon,
+  label,
+  iconPosition = 'left',
+  size = 'md',
+  variant = 'dark',
+  ...props
+}: ButtonProps) => {
   return (
     <button
       className={clsx(className, 'btn', {
@@ -21,8 +30,9 @@ export const Button = ({ className, icon, label, size = 'md', variant = 'dark', 
       })}
       {...props}
     >
-      {icon}
+      {iconPosition === 'left' && icon}
       {label}
+      {iconPosition === 'right' && icon}
     </button>
   );
 };
