@@ -5,7 +5,7 @@
   </a>
   <h3 align="center">The Douglas Data Capture Platform</h3>
   <p align="center">
-    A modern, user-friendly, web application for standardized data capture in medical research
+    A modern, user-friendly web application for standardized data capture in medical research
     <br />
     <a href="https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform">
       <strong>Explore the docs »
