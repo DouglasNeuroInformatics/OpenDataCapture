@@ -42,6 +42,12 @@ module.exports = {
         pathGroupsExcludedImportTypes: ['react']
       }
     ],
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        packageDir: [__dirname, projectRoot]
+      }
+    ],
     'react/function-component-definition': [
       'error',
       {

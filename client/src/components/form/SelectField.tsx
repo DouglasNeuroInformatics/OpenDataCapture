@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import classNames from 'classnames';
+import clsx from 'clsx';
 import { Control, Controller, UseFormRegister } from 'react-hook-form';
 import Select from 'react-select';
 
@@ -32,12 +32,12 @@ export const SelectField = ({ name, label, options, control, error }: SelectFiel
               unstyled
               classNames={{
                 control: ({ isFocused, menuIsOpen }) => {
-                  return classNames('w-full border-b-2 bg-transparent py-2 text-gray-900', {
+                  return clsx('w-full border-b-2 bg-transparent py-2 text-gray-900', {
                     'border-indigo-800 outline-none': isFocused || menuIsOpen,
                     'hover:border-gray-300': !menuIsOpen
                   });
                 },
-                menu: () => classNames('mt-1 bg-slate-100 shadow-xl rounded-md'),
+                menu: () => clsx('mt-1 bg-slate-100 shadow-xl rounded-md'),
                 option: () => 'p-2 hover:bg-slate-200 capitalize'
               }}
               name={name}

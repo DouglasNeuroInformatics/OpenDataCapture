@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 
 import { Transition } from '@headlessui/react';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { HiUserCircle } from 'react-icons/hi2';
 import { IoIosArrowUp } from 'react-icons/io';
@@ -49,7 +49,7 @@ export const UserDropup = ({ username }: { username?: string }) => {
         <HiUserCircle className="mr-2 h-8 w-8" />
         <span>{username}</span>
         <IoIosArrowUp
-          className={classNames('mx-1', {
+          className={clsx('mx-1', {
             'rotate-90': !isOpen
           })}
         />
