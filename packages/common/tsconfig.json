@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "@douglas-data-capture-platform/tsconfig/base.json",
   "include": ["src/**/*"],
   "compilerOptions": {
     "outDir": "dist"
