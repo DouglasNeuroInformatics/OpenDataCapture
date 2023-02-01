@@ -1,10 +1,8 @@
 const path = require('path');
 
-const projectRoot = path.resolve(__dirname, '..');
-
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: path.resolve(projectRoot, '.eslintrc.json'),
+  extends: ['@douglas-data-capture-platform'],
   ignorePatterns: ['dist/**/*', 'test/**/*'],
   env: {
     node: true

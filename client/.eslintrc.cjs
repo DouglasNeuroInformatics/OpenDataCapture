@@ -1,10 +1,8 @@
 const path = require('path');
 
-const projectRoot = path.resolve(__dirname, '..');
-
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: [path.resolve(projectRoot, '.eslintrc.json'), 'plugin:react/recommended'],
+  extends: ['@douglas-data-capture-platform', 'plugin:react/recommended'],
   env: {
     browser: true
   },
@@ -40,12 +38,6 @@ module.exports = {
           }
         ],
         pathGroupsExcludedImportTypes: ['react']
-      }
-    ],
-    'import/no-extraneous-dependencies': [
-      'error',
-      {
-        packageDir: [__dirname, projectRoot]
       }
     ],
     'react/function-component-definition': [
