@@ -4,9 +4,8 @@ on:
     branches:
       - main
     paths:
-      - "client/**"
-      - "common/**"
-      - "server/**"
+      - "apps/**"
+      - "packages/**"
   workflow_dispatch:
 jobs:
   test:
