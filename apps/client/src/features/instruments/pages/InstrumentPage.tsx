@@ -18,7 +18,6 @@ export const InstrumentPage = () => {
   const [demographicsData, setDemographicsData] = useState<DemographicsFormData>();
 
   const { data } = useQuery(`Instrument`, () => InstrumentsAPI.getInstrument(params.id!));
-  console.log(data);
 
   const submitInstrumentRecord = async (responses: InstrumentRecordFormData) => {
     await InstrumentsAPI.submitRecord(params.id!, demographicsData!, responses);

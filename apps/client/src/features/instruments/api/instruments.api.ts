@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { DemographicsFormData } from '../components/DemographicsForm';
 import { InstrumentRecordFormData } from '../components/InstrumentRecordForm';
 
-instrumentSchema;
 export class InstrumentsAPI {
   static async getAvailableInstruments(): Promise<BaseInstrumentInterface[]> {
     const response = await axios.get('/api/instruments/available');

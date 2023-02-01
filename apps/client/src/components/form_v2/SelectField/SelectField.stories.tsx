@@ -8,6 +8,8 @@ export default {
   component: SelectField,
   args: {
     name: 'painkiller',
+    options: ['Ibuprofen', 'Acetaminophen']
+    /*
     options: [
       {
         name: 'Ibuprofen',
@@ -17,7 +19,7 @@ export default {
         name: 'Acetaminophen',
         altNames: ['Tylenol', 'Paracetamol']
       }
-    ]
+    ] */
   }
 } as ComponentMeta<typeof SelectField>;
 

@@ -15,8 +15,6 @@ export const SubjectPage = () => {
     return <Spinner />;
   }
 
-  console.log(data);
-
   return data ? (
     <div>
       <h1 className="text-center">Subject Data</h1>

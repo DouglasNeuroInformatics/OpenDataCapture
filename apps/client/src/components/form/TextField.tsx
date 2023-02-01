@@ -21,10 +21,6 @@ export const TextField = ({ name, label, register, error, variant = 'text' }: Te
     }
   }, []);
 
-  useEffect(() => {
-    console.log(inputRef);
-  }, []);
-
   const handleBlur: React.FocusEventHandler<HTMLInputElement> = (event) => {
     if (!event.currentTarget.value) {
       setIsFloatingLabel(false);
