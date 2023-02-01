@@ -1,0 +1,15 @@
+{
+  "extends": "@douglas-data-capture-platform/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "incremental": true,
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "strictPropertyInitialization": false
+  }
+}

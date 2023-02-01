@@ -4,9 +4,8 @@
   "type": "module",
   "private": true,
   "workspaces": [
-    "client",
     "common",
-    "server",
+    "apps/*",
     "packages/*"
   ],
   "license": "AGPL-3.0",
@@ -24,6 +23,7 @@
   },
   "devDependencies": {
     "@douglas-data-capture-platform/eslint-config": "*",
+    "@douglas-data-capture-platform/tsconfig": "*",
     "@types/node": "^18.11.18",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
