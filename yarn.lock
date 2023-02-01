@@ -1086,7 +1086,12 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@babel/parser@^7.1.0", "@babel/parser@^7.12.11", "@babel/parser@^7.12.7", "@babel/parser@^7.14.7", "@babel/parser@^7.20.7":
+"@babel/parser@^7.1.0", "@babel/parser@^7.20.7":
+  version "7.20.13"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.20.13.tgz#ddf1eb5a813588d2fb1692b70c6fce75b945c088"
+  integrity sha512-gFDLKMfpiXCsjt4za2JA9oTMn70CeseCehb11kRZgvd7+F67Hih3OHOK24cRrWECJ/ljfPGac6ygXAs/C8kIvw==
+
+"@babel/parser@^7.12.11", "@babel/parser@^7.12.7", "@babel/parser@^7.14.7":
   version "7.20.7"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.20.7.tgz#66fe23b3c8569220817d5feb8b9dcdc95bb4f71b"
   integrity sha512-T3Z9oHybU+0vZlY9CiDSJQTD5ZapcW18ZctFMi0MOAl/4BjFF4ul7NVSARLdbGO5vDqy9eQiGTV0LtKfvCYvcg==
@@ -5404,9 +5409,9 @@ babel-plugin-istanbul@^6.0.0, babel-plugin-istanbul@^6.1.1:
     test-exclude "^6.0.0"
 
 babel-plugin-jest-hoist@^29.2.0:
-  version "29.2.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-jest-hoist/-/babel-plugin-jest-hoist-29.2.0.tgz#23ee99c37390a98cfddf3ef4a78674180d823094"
-  integrity sha512-TnspP2WNiR3GLfCsUNHqeXw0RoQ2f9U5hQ5L3XFpwuO8htQmSrhh8qsB6vi5Yi8+kuynN1yjDjQsPfkebmB6ZA==
+  version "29.4.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-jest-hoist/-/babel-plugin-jest-hoist-29.4.0.tgz#3fd3dfcedf645932df6d0c9fc3d9a704dd860248"
+  integrity sha512-a/sZRLQJEmsmejQ2rPEUe35nO1+C9dc9O1gplH1SXmJxveQSRUYdBk8yGZG/VOUuZs1u2aHZJusEGoRMbhhwCg==
   dependencies:
     "@babel/template" "^7.3.3"
     "@babel/types" "^7.3.3"
