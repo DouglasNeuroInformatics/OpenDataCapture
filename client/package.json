@@ -41,7 +41,7 @@
     "@storybook/addon-actions": "^6.5.15",
     "@storybook/addon-essentials": "^6.5.15",
     "@storybook/addon-interactions": "^6.5.15",
-    "@storybook/addon-links": "^6.5.15",
+    "@storybook/addon-links": "^6.5.16",
     "@storybook/builder-vite": "^0.2.7",
     "@storybook/react": "^6.5.15",
     "@storybook/testing-library": "^0.0.13",
