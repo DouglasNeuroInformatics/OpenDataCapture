@@ -6,7 +6,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { Link } from './Link';
 
 export default {
-  component: Link
+  component: Link,
+  args: {
+    to: '#'
+  }
 } as ComponentMeta<typeof Link>;
 
 const Template: ComponentStory<typeof Link> = (props) => (
