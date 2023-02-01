@@ -1,3 +1,4 @@
+const headlessUi = require('@headlessui/tailwindcss');
 const colors = require('tailwindcss/colors');
 const defaultTheme = require('tailwindcss/defaultTheme');
 
@@ -83,5 +84,6 @@ module.exports = {
       }
     },
     fontFamily: ['Roboto']
-  }
+  },
+  plugins: [headlessUi]
 };

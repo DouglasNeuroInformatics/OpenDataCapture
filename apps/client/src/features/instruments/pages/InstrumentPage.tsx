@@ -39,7 +39,7 @@ export const InstrumentPage = () => {
             'opacity-50': 1 > step
           })}
         >
-          <span className="mx-2">Demographics Questions</span>
+          <span className="mx-2">Subject Identification</span>
         </div>
         <div
           className={clsx('bg-cello-900 flex w-full justify-center rounded-xl p-3 text-white shadow-xl', {
