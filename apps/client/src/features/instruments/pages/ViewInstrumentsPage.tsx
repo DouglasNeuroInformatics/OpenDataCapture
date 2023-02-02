@@ -9,7 +9,6 @@ import { Spinner } from '@/components/core';
 
 export const ViewInstrumentsPage = () => {
   const { data, isLoading } = useQuery('ViewInstruments', () => InstrumentsAPI.getAvailableInstruments());
-  console.log(data);
 
   if (isLoading) {
     return <Spinner />;

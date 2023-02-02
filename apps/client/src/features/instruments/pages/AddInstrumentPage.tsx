@@ -3,7 +3,7 @@ import React from 'react';
 export const AddInstrumentPage = () => {
   return (
     <div>
-      <h1>Add Instrument</h1>
+      <h1 className="text-center">Add Instrument</h1>
     </div>
   );
 };

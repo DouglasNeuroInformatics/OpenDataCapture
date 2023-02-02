@@ -1,5 +1,22 @@
 import React, { useMemo, useState } from 'react';
 
+export interface SelectFieldProps {
+  name: string;
+  options: readonly string[];
+  autocompleteValues?: {
+    [key: string]: string[];
+  };
+}
+
+export const SelectField = ({ name }: SelectFieldProps) => {
+  return (
+    <div>
+      <input className="input" name={name} type="text" />
+    </div>
+  );
+};
+
+/*
 import { Combobox } from '@headlessui/react';
 
 import { ErrorBox } from '../ErrorBox';
@@ -80,5 +97,5 @@ export const SelectField = ({ name, options }: SelectFieldProps) => {
     </div>
   );
 
-  */
 };
+*/

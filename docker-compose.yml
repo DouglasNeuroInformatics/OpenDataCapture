@@ -3,40 +3,40 @@ services:
   client:
     build:
       context: .
-      dockerfile: ./client/Dockerfile
+      dockerfile: ./apps/client/Dockerfile
       args:
         - NODE_ENV=production
         - VITE_API_HOST=http://server:5500
-        - VITE_DEV_SERVER_PORT=${VITE_DEV_SERVER_PORT}
+        - VITE_DEV_SERVER_PORT=3000
     container_name: client
     depends_on:
       - server
     expose:
-      - "${VITE_DEV_SERVER_PORT}"
+      - 3000
     networks:
       - client-server
     ports:
-      - "${VITE_DEV_SERVER_PORT}:${VITE_DEV_SERVER_PORT}"
+      - '3000:3000'
     restart: always
   server:
     build:
       context: .
-      dockerfile: ./server/Dockerfile
+      dockerfile: ./apps/server/Dockerfile
     container_name: server
     depends_on:
       - mongo
     environment:
       - NODE_ENV=production
       - MONGO_URI=mongodb://mongo:27017
-      - SERVER_PORT
+      - SERVER_PORT=5500
       - SECRET_KEY
     expose:
-      - "${SERVER_PORT}"
+      - 5500
     networks:
-      - client-server
       - server-mongo
+      - client-server
     ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+      - '5500:5500'
     restart: always
   mongo:
     container_name: mongo

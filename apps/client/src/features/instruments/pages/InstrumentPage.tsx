@@ -10,6 +10,7 @@ import { InstrumentOverview } from '../components/InstrumentOverview';
 import { InstrumentRecordForm, InstrumentRecordFormData } from '../components/InstrumentRecordForm';
 
 import { Divider } from '@/components/base';
+import { Spinner } from '@/components/core';
 
 export const InstrumentPage = () => {
   const navigate = useNavigate();
@@ -17,14 +18,17 @@ export const InstrumentPage = () => {
   const [step, setStep] = useState(0);
   const [demographicsData, setDemographicsData] = useState<DemographicsFormData>();
 
-  const { data } = useQuery(`Instrument`, () => InstrumentsAPI.getInstrument(params.id!));
-  console.log(data);
+  const { data, isLoading } = useQuery(`Instrument`, () => InstrumentsAPI.getInstrument(params.id!));
 
   const submitInstrumentRecord = async (responses: InstrumentRecordFormData) => {
     await InstrumentsAPI.submitRecord(params.id!, demographicsData!, responses);
     alert('Success!');
     navigate('/home');
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return data ? (
     <div className="container" style={{ maxWidth: 900 }}>

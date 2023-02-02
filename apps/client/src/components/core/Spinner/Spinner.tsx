@@ -22,7 +22,7 @@ export type SpinnerProps = {
 
 export const Spinner = ({ size = 'md', variant = 'primary', className = '' }: SpinnerProps) => {
   return (
-    <>
+    <div className="flex h-full w-full items-center justify-center">
       <svg
         className={clsx('animate-spin', sizes[size], variants[variant], className)}
         data-testid="loading"
@@ -38,6 +38,6 @@ export const Spinner = ({ size = 'md', variant = 'primary', className = '' }: Sp
         ></path>
       </svg>
       <span className="sr-only">Loading</span>
-    </>
+    </div>
   );
 };
