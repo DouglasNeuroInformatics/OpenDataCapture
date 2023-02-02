@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 
 import { SubjectsAPI } from '../api/subjects.api';
 
+import { Divider } from '@/components/base';
 import { Spinner, Table } from '@/components/core';
 
 export const SubjectPage = () => {
@@ -17,12 +18,10 @@ export const SubjectPage = () => {
 
   return data ? (
     <div>
-      <h1 className="text-center">Subject Data</h1>
-      <p>
-        <span className="font-semibold">Subject ID:</span> {params.id}
-      </p>
+      <h1 className="text-center">Instruments for Subject: {params.id?.slice(0, 6)}</h1>
+      <Divider />
       <div>
-        <h3 className="mt-5">Brief Psychiatric Rating Scale</h3>
+        <h3 className="mt-5 text-center">Brief Psychiatric Rating Scale</h3>
         <Table<{ dateCollected: string; data: Record<string, number> }>
           columns={[
             {

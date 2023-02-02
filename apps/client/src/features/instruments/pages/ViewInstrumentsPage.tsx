@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 
 import { InstrumentsAPI } from '../api/instruments.api';
 
-import { Link } from '@/components/base';
+import { Divider, Link } from '@/components/base';
 import { Spinner } from '@/components/core';
 
 export const ViewInstrumentsPage = () => {
@@ -17,6 +17,7 @@ export const ViewInstrumentsPage = () => {
   return data ? (
     <div>
       <h1 className="text-center">View Instruments</h1>
+      <Divider />
       {data.map((instrument, i) => (
         <div className="card my-5" key={i}>
           <h3 className="font-medium">{instrument.title}</h3>

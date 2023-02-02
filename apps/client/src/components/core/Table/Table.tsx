@@ -47,9 +47,17 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
 
   return (
     <div>
-      <div className="flex justify-end">
-        <Button disabled className="mx-2 my-1" label="Filters" />
-        <Button disabled className="my-1" label="Export" />
+      <div className="my-2 flex justify-between">
+        <input
+          required
+          className="block w-full rounded-lg border border-gray-300 p-4 pl-2 text-sm"
+          placeholder="Search..."
+          type="search"
+        />
+        <div className="flex">
+          <Button disabled className="mx-2" label="Filters" />
+          <Button disabled label="Export" />
+        </div>
       </div>
       <div className="overflow-x-scroll">
         <table className="relative w-full table-auto border">

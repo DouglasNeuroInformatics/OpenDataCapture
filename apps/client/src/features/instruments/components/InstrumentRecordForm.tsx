@@ -1,11 +1,26 @@
 import React from 'react';
 
+import { Popover } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormInstrumentFieldInterface } from 'common';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { IoMdHelpCircle } from 'react-icons/io';
 import { z } from 'zod';
 
 import { Form } from '@/components/form';
+
+const MyPopover = ({ text }: { text: string }) => {
+  return (
+    <Popover className="relative">
+      <Popover.Button>
+        <IoMdHelpCircle />
+      </Popover.Button>
+      <Popover.Panel className="absolute z-10 bg-white">
+        <p>{text}</p>
+      </Popover.Panel>
+    </Popover>
+  );
+};
 
 export const instrumentRecordFormSchema = z.record(z.string(), z.any());
 
@@ -34,10 +49,12 @@ export const InstrumentRecordForm = ({ onSubmit, submitLabel, title, fields }: I
           switch (field.variant) {
             case 'text':
               return (
-                <React.Fragment>
+                <div className="flex">
                   <Form.TextField error={error} label={field.label} name={field.name} register={register} />
-                  <small className="mb-7">{field.description}</small>
-                </React.Fragment>
+                  <div className="flex w-12 items-center justify-center">
+                    <MyPopover text={field.description} />
+                  </div>
+                </div>
               );
           }
         })}
