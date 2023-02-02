@@ -1,13 +1,14 @@
 import React from 'react';
 
-import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
+import { value Navigate, value Outlet, value createBrowserRouter } from 'react-router-dom';
 
-import { Layout } from './components/layout';
-import { LoginPage } from './features/auth';
-import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
-import { ErrorPage, HomePage } from './features/misc';
-import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
-import { useAuthStore } from './stores/auth-store';
+import { value Layout } from './components/layout';
+import { value LoginPage } from './features/auth';
+import { value AddInstrumentPage, value InstrumentPage, value ViewInstrumentsPage } from './features/instruments';
+import { value ErrorPage, value HomePage } from './features/misc';
+import { value AddSubjectPage, value SubjectPage, value ViewSubjectsPage } from './features/subjects';
+import { value SubjectLookupPage } from './features/subjects/pages/SubjectLookupPage';
+import { value useAuthStore } from './stores/auth-store';
 
 const Root = () => {
   const auth = useAuthStore();
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
       {
         path: '/home',
         element: <HomePage />
+      },
+      {
+        path: '/subjects/lookup',
+        element: <SubjectLookupPage />
       },
       {
         path: '/subjects/add-subject',

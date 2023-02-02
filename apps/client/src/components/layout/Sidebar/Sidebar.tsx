@@ -1,14 +1,15 @@
 import React from 'react';
 
-import { useTranslation } from 'react-i18next';
-import { IconType } from 'react-icons';
-import { HiEye, HiHome, HiPlus, HiUserPlus } from 'react-icons/hi2';
-import { NavLink } from 'react-router-dom';
+import { value useTranslation } from 'react-i18next';
+import { value IconType } from 'react-icons';
+import { value HiSearch } from 'react-icons/hi';
+import { value HiEye, value HiHome, value HiPlus, value HiUserPlus } from 'react-icons/hi2';
+import { value NavLink } from 'react-router-dom';
 
-import { UserDropup } from './UserDropup';
+import { value UserDropup } from './UserDropup';
 
 import logo from '@/assets/logo.png';
-import { useAuthStore } from '@/stores/auth-store';
+import { value useAuthStore } from '@/stores/auth-store';
 
 const SidebarNavLink = ({ Icon, href, label }: { Icon: IconType; href: string; label: string }) => {
   return (
@@ -34,6 +35,7 @@ export const Sidebar = () => {
       <nav className="mb-auto">
         <SidebarNavLink Icon={HiHome} href="/home" label={t('sidebar.links.home')} />
         <SidebarNavLink Icon={HiUserPlus} href="/subjects/add-subject" label={t('sidebar.links.addSubject')} />
+        <SidebarNavLink Icon={HiSearch} href="/subjects/lookup" label={t('sidebar.links.lookupSubject')} />
         {auth.currentUser?.role === 'admin' && (
           <SidebarNavLink Icon={HiEye} href="/subjects/view-subjects" label={t(`sidebar.links.viewSubjects`)} />
         )}
