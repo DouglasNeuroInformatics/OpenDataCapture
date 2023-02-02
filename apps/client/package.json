@@ -8,7 +8,7 @@
     "build": "tsc && NODE_ENV=production vite build",
     "build-storybook": "build-storybook",
     "check-types": "tsc --noEmit",
-    "dev": "vite",
+    "dev": "vite --host",
     "lint": "eslint --fix src",
     "preview": "vite preview --host --port 3000",
     "storybook": "NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 6006"
