@@ -76,16 +76,20 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
           ))}
         </tbody>
       </table>
-      <div className="mt-2 flex justify-center">
-        <button>
+      <div className="mt-3 flex justify-center">
+        <button className="flex h-8 w-8 items-center justify-center rounded-full border">
           <HiArrowLeft />
         </button>
         {pageNumbers.map((page) => (
-          <button className="mx-1" key={page} onClick={() => setCurrentPage(page)}>
+          <button
+            className="mx-1 flex h-8 w-8 items-center justify-center rounded-full border"
+            key={page}
+            onClick={() => setCurrentPage(page)}
+          >
             {page}
           </button>
         ))}
-        <button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full border">
           <HiArrowRight />
         </button>
       </div>
