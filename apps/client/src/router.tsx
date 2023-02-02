@@ -1,14 +1,14 @@
 import React from 'react';
 
-import { value Navigate, value Outlet, value createBrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
 
-import { value Layout } from './components/layout';
-import { value LoginPage } from './features/auth';
-import { value AddInstrumentPage, value InstrumentPage, value ViewInstrumentsPage } from './features/instruments';
-import { value ErrorPage, value HomePage } from './features/misc';
-import { value AddSubjectPage, value SubjectPage, value ViewSubjectsPage } from './features/subjects';
-import { value SubjectLookupPage } from './features/subjects/pages/SubjectLookupPage';
-import { value useAuthStore } from './stores/auth-store';
+import { Layout } from './components/layout';
+import { LoginPage } from './features/auth';
+import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
+import { ErrorPage, HomePage } from './features/misc';
+import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
+import { SubjectLookupPage } from './features/subjects/pages/SubjectLookupPage';
+import { useAuthStore } from './stores/auth-store';
 
 const Root = () => {
   const auth = useAuthStore();

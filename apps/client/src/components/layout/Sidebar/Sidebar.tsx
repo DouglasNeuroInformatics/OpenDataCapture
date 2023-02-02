@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { value useTranslation } from 'react-i18next';
-import { value IconType } from 'react-icons';
-import { value HiSearch } from 'react-icons/hi';
-import { value HiEye, value HiHome, value HiPlus, value HiUserPlus } from 'react-icons/hi2';
-import { value NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { IconType } from 'react-icons';
+import { HiSearch } from 'react-icons/hi';
+import { HiEye, HiHome, HiPlus, HiUserPlus } from 'react-icons/hi2';
+import { NavLink } from 'react-router-dom';
 
-import { value UserDropup } from './UserDropup';
+import { UserDropup } from './UserDropup';
 
 import logo from '@/assets/logo.png';
-import { value useAuthStore } from '@/stores/auth-store';
+import { useAuthStore } from '@/stores/auth-store';
 
 const SidebarNavLink = ({ Icon, href, label }: { Icon: IconType; href: string; label: string }) => {
   return (
