@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
+import clsx from 'clsx';
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
 
 import { Button, Link } from '@/components/base';
 
@@ -34,6 +36,7 @@ export interface TableProps<T> {
 export const Table = <T extends Record<string, unknown>>({ columns, data, entryLinkFactory }: TableProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const navigate = useNavigate();
 
   const indexOfLastEntry = currentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
@@ -48,41 +51,50 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
         <Button disabled className="mx-2 my-1" label="Filters" />
         <Button disabled className="my-1" label="Export" />
       </div>
-      <table className="block w-full table-auto overflow-x-scroll border-2">
-        <thead>
-          {columns.map((column, i) => (
-            <th className="whitespace-nowrap p-2" key={i}>
-              {column.name}
-            </th>
-          ))}
-        </thead>
-        <tbody>
-          {currentEntries.map((entry, i) => (
-            <tr key={i}>
-              {columns.map(({ field }, j) => {
-                const value = typeof field === 'function' ? field(entry) : entry[field];
-                return (
-                  <td className="whitespace-nowrap p-2" key={j}>
-                    <span>{formatValue(value)}</span>
-                  </td>
-                );
-              })}
-              {entryLinkFactory && (
-                <td className="whitespace-nowrap p-2">
-                  <Link to={entryLinkFactory(entry)}>View</Link>
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-3 flex justify-center">
+      <div className="overflow-x-scroll">
+        <table className="relative w-full table-auto border">
+          <thead>
+            {columns.map((column, i) => (
+              <th className="whitespace-nowrap px-6 py-4 text-left" key={i}>
+                {column.name}
+              </th>
+            ))}
+          </thead>
+          <tbody>
+            {currentEntries.map((entry, i) => (
+              <tr
+                className="odd:bg-slate-100 hover:bg-zinc-200"
+                key={i}
+                onClick={() => {
+                  if (!entryLinkFactory) {
+                    return;
+                  }
+                  navigate(entryLinkFactory(entry));
+                }}
+              >
+                {columns.map(({ field }, j) => {
+                  const value = typeof field === 'function' ? field(entry) : entry[field];
+                  return (
+                    <td className="whitespace-nowrap px-6 py-4" key={j}>
+                      <span>{formatValue(value)}</span>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="my-3 flex justify-center">
         <button className="flex h-8 w-8 items-center justify-center rounded-full border">
           <HiArrowLeft />
         </button>
         {pageNumbers.map((page) => (
           <button
-            className="mx-1 flex h-8 w-8 items-center justify-center rounded-full border"
+            className={clsx('mx-1 flex h-8 w-8 items-center justify-center rounded-full border', {
+              'bg-slate-600 text-slate-100': currentPage === page,
+              'hover:bg-slate-200': currentPage !== page
+            })}
             key={page}
             onClick={() => setCurrentPage(page)}
           >
