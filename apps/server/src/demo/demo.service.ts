@@ -55,7 +55,13 @@ export class DemoService implements OnApplicationBootstrap {
             firstName: sex === 'Male' ? maleNames[j] : femaleNames[j],
             lastName: lastNames[i],
             dateOfBirth: Random.birthday(),
-            sex: sex
+            sex: sex,
+            forwardSortationArea: Random.value(['H1A', 'H1B', 'H1C']),
+            ethnicity: Random.value([...demographicOptions.ethnicity]),
+            gender: Random.value([...demographicOptions.gender]),
+            employmentStatus: Random.value([...demographicOptions.employmentStatus]),
+            maritalStatus: Random.value([...demographicOptions.maritalStatus]),
+            firstLanguage: Random.value([...demographicOptions.firstLanguage])
           });
         }
       }
