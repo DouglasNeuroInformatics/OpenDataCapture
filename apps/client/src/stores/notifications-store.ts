@@ -6,6 +6,7 @@ export interface Notification {
   type: 'info' | 'warning' | 'success' | 'error';
   title?: string;
   message?: string;
+  variant?: 'critical' | 'standard';
 }
 
 export interface NotificationsStore {
