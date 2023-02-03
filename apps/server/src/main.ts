@@ -8,13 +8,11 @@ import { AppModule } from './app.module';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
-  app.enableShutdownHooks();
   app.setGlobalPrefix('/api');
   app.useGlobalPipes(
     new ValidationPipe({
-      //forbidNonWhitelisted: true,
-      transform: true,
-      forbidUnknownValues: false // For demo only
+      forbidNonWhitelisted: true,
+      transform: true
     })
   );
 
