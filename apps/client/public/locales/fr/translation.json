@@ -15,10 +15,11 @@
   "sidebar": {
     "links": {
       "home": "Accueil",
-      "addSubject": "Ajouter une personne",
-      "viewSubjects": "Voir toutes les personnes",
+      "addSubject": "Ajouter un client",
+      "lookupSubject": "Trouver un client",
+      "viewSubjects": "Afficher tous les clients",
       "addInstrument": "Ajouter un instrument",
-      "viewInstruments": "Voir tous les instruments"
+      "viewInstruments": "Afficher tous les instruments"
     }
   },
   "userDropup": {

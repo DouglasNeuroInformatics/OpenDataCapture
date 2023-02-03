@@ -40,7 +40,8 @@ The Douglas Data Capture Platform is a modern, easy-to-use web application desig
 
 ```shell
 cat .env.template <(python -c "import secrets; print(secrets.token_hex(16))") > .env
-docker compose up
+yarn install
+yarn dev
 ```
 
 ## License

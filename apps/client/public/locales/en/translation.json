@@ -18,6 +18,7 @@
     "links": {
       "home": "Home",
       "addSubject": "Add Subject",
+      "lookupSubject": "Lookup Subject",
       "viewSubjects": "View Subjects",
       "addInstrument": "Add Instrument",
       "viewInstruments": "View Instruments"
