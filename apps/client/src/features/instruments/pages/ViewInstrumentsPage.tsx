@@ -4,8 +4,8 @@ import { useQuery } from 'react-query';
 
 import { InstrumentsAPI } from '../api/instruments.api';
 
-import { Divider, Link } from '@/components/base';
-import { Spinner } from '@/components/core';
+import { Link } from '@/components/base';
+import { PageHeader, Spinner } from '@/components/core';
 
 export const ViewInstrumentsPage = () => {
   const { data, isLoading } = useQuery('ViewInstruments', () => InstrumentsAPI.getAvailableInstruments());
@@ -16,8 +16,7 @@ export const ViewInstrumentsPage = () => {
 
   return data ? (
     <div>
-      <h1 className="text-center">View Instruments</h1>
-      <Divider />
+      <PageHeader title="View Instruments" />
       {data.map((instrument, i) => (
         <div className="card my-5" key={i}>
           <h3 className="font-medium">{instrument.title}</h3>

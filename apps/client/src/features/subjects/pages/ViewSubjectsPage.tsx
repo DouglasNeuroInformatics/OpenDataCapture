@@ -6,7 +6,7 @@ import { SubjectsAPI } from '../api/subjects.api';
 import { SubjectsTable } from '../components/SubjectsTable';
 
 import { Divider } from '@/components/base';
-import { Spinner } from '@/components/core';
+import { PageHeader, Spinner } from '@/components/core';
 
 export const ViewSubjectsPage = () => {
   const { data, isLoading } = useQuery('ViewSubjects', () => SubjectsAPI.getSubjects());
@@ -17,8 +17,7 @@ export const ViewSubjectsPage = () => {
 
   return data ? (
     <div>
-      <h1 className="text-center">View Subjects</h1>
-      <Divider />
+      <PageHeader title="View Subjects" />
       <SubjectsTable data={data} />
     </div>
   ) : null;
