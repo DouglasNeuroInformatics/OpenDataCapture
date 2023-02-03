@@ -11,8 +11,8 @@
     "sourceCodeLinkLabel": "View Source Code"
   },
   "home": {
-    "pageTitle": "Welcome to the Douglas Data Capture Platform",
-    "platformDescription": "The Douglas Data Capture Platform is build from the ground up to serve the needs of clinical researchers. The platform enables you to continuously collect and store data about your clients in a streamlined, secure, reliable, and structured manner. This structured data drives a live dashboard with query interfaces to easily visualize summary information regarding your clients. Optionally, at your request, we can provide you with a subset of this data for research purposes.",
+    "pageTitle": "The Douglas Data Capture Platform",
+    "platformDescription": "A modern, user-friendly web application for standardized data capture in medical research",
     "disclaimer": {
       "title": "Disclaimer",
       "message": "The Douglas Data Capture Platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
