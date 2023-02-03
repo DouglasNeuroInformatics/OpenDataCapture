@@ -7,6 +7,7 @@ import { LoginPage } from './features/auth';
 import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
 import { ErrorPage, HomePage } from './features/misc';
 import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
+import { SubjectLookupPage } from './features/subjects/pages/SubjectLookupPage';
 import { useAuthStore } from './stores/auth-store';
 
 const Root = () => {
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
       {
         path: '/home',
         element: <HomePage />
+      },
+      {
+        path: '/subjects/lookup',
+        element: <SubjectLookupPage />
       },
       {
         path: '/subjects/add-subject',
