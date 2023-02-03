@@ -40,6 +40,7 @@ module.exports = {
         pathGroupsExcludedImportTypes: ['react']
       }
     ],
+    'no-alert': 'error',
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'react/function-component-definition': [
       'error',
@@ -62,7 +63,8 @@ module.exports = {
       files: ['**/*/*.stories.tsx'],
       rules: {
         'import/exports-last': 'off',
-        'import/no-default-export': 'off'
+        'import/no-default-export': 'off',
+        'no-alert': 'off'
       }
     }
   ],

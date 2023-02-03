@@ -1,26 +1,27 @@
 import { nanoid } from 'nanoid';
 import { create } from 'zustand';
 
-export type Notification = {
+export interface Notification {
   id: string;
   type: 'info' | 'warning' | 'success' | 'error';
-  title: string;
+  title?: string;
   message?: string;
-};
+  variant?: 'critical' | 'standard';
+}
 
-export type NotificationsStore = {
+export interface NotificationsStore {
   notifications: Notification[];
-  addNotification: (notification: Omit<Notification, 'id'>) => void;
-  dismissNotification: (id: string) => void;
-};
+  add: (notification: Omit<Notification, 'id'>) => void;
+  dismiss: (id: string) => void;
+}
 
 export const useNotificationsStore = create<NotificationsStore>((set) => ({
   notifications: [],
-  addNotification: (notification) =>
+  add: (notification) =>
     set((state) => ({
       notifications: [...state.notifications, { id: nanoid(), ...notification }]
     })),
-  dismissNotification: (id) =>
+  dismiss: (id) =>
     set((state) => ({
       notifications: state.notifications.filter((notification) => notification.id !== id)
     }))
