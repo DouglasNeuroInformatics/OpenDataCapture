@@ -2,6 +2,8 @@ import React from 'react';
 
 import i18next from 'i18next';
 
+import { useNotificationsStore } from '@/stores/notifications-store';
+
 const languages = {
   en: {
     nativeName: 'English'
@@ -16,6 +18,8 @@ interface LanguageToggleProps extends React.ComponentPropsWithoutRef<'button'> {
 }
 
 export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
+  const notifications = useNotificationsStore();
+
   const inactiveLanguage = Object.keys(languages).find((l) => l !== i18next.resolvedLanguage) as
     | keyof typeof languages
     | undefined;
@@ -25,7 +29,7 @@ export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
       await i18next.changeLanguage(inactiveLanguage);
     } catch (error) {
       console.error(error);
-      alert('An error occurred while attempting to change languages!');
+      notifications.add({ type: 'error', message: 'Failed to change languages' });
     }
     if (onClick) {
       onClick(event);

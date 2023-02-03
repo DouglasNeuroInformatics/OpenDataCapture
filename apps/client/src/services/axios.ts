@@ -22,7 +22,7 @@ axios.interceptors.response.use(
   (error) => {
     const notifications = useNotificationsStore.getState();
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
-    notifications.addNotification({
+    notifications.add({
       type: 'error',
       title: 'Error',
       message

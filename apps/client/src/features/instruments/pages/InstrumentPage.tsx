@@ -11,8 +11,10 @@ import { InstrumentRecordForm, InstrumentRecordFormData } from '../components/In
 
 import { Divider } from '@/components/base';
 import { Spinner } from '@/components/core';
+import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const InstrumentPage = () => {
+  const notifications = useNotificationsStore();
   const navigate = useNavigate();
   const params = useParams();
   const [step, setStep] = useState(0);
@@ -22,7 +24,7 @@ export const InstrumentPage = () => {
 
   const submitInstrumentRecord = async (responses: InstrumentRecordFormData) => {
     await InstrumentsAPI.submitRecord(params.id!, demographicsData!, responses);
-    alert('Success!');
+    notifications.add({ type: 'success' });
     navigate('/home');
   };
 

@@ -40,6 +40,7 @@ module.exports = {
         pathGroupsExcludedImportTypes: ['react']
       }
     ],
+    'no-alert': 'error',
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'react/function-component-definition': [
       'error',

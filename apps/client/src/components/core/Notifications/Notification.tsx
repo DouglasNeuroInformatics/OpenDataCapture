@@ -14,13 +14,14 @@ export type NotificationProps = {
   notification: {
     id: string;
     type: keyof typeof icons;
-    title: string;
+    title?: string;
     message?: string;
   };
   onDismiss: (id: string) => void;
 };
 
 export const Notification = ({ notification: { id, type, title, message }, onDismiss }: NotificationProps) => {
+  title = title ?? type.charAt(0).toUpperCase() + type.slice(1);
   return (
     <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
       <Transition
