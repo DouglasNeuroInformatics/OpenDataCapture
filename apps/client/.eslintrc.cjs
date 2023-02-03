@@ -63,7 +63,8 @@ module.exports = {
       files: ['**/*/*.stories.tsx'],
       rules: {
         'import/exports-last': 'off',
-        'import/no-default-export': 'off'
+        'import/no-default-export': 'off',
+        'no-alert': 'off'
       }
     }
   ],

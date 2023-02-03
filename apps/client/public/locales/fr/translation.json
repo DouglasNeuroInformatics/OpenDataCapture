@@ -10,7 +10,13 @@
   },
   "home": {
     "pageTitle": "Voici le Douglas Data Capture Platform",
-    "platformDescription": "Le Douglas Data Capture Platform a été conçu pour répondre aux besoins des chercheurs cliniques. Le site plateforme vous permet de collecter et de sauvegarder en permanence les données de vos clients de manière simplifiée, sécurisée, fiable et structurée. Ces données structurées alimentent un tableau de bord en direct avec des interfaces d'interrogation permettant de visualiser facilement des informations synthétiques concernant vos clients. En option, à votre demande, nous pouvons vous fournir un sous-ensemble de ces données à des fins de recherche."
+    "platformDescription": "Le Douglas Data Capture Platform a été conçu pour répondre aux besoins des chercheurs cliniques. Le site plateforme vous permet de collecter et de sauvegarder en permanence les données de vos clients de manière simplifiée, sécurisée, fiable et structurée. Ces données structurées alimentent un tableau de bord en direct avec des interfaces d'interrogation permettant de visualiser facilement des informations synthétiques concernant vos clients. En option, à votre demande, nous pouvons vous fournir un sous-ensemble de ces données à des fins de recherche.",
+    "disclaimer": {
+      "title": "Avis",
+      "message": "Le Douglas Data Capture Platform n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques.",
+      "accept": "Accepter",
+      "decline": "Refuser"
+    }
   },
   "sidebar": {
     "links": {
