@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Link } from '@/components/base';
+import { Button } from '@/components/base';
 
 function formatValue(value: unknown): string {
   if (typeof value === 'string') {
@@ -50,7 +50,7 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
       <div className="my-2 flex justify-between">
         <input
           required
-          className="block w-full rounded-lg border border-gray-300 p-4 pl-2 text-sm"
+          className="block w-full rounded-lg border border-gray-300 px-4 py-3 pl-2 text-sm"
           placeholder="Search..."
           type="search"
         />
@@ -63,7 +63,7 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
         <table className="relative w-full table-auto border">
           <thead>
             {columns.map((column, i) => (
-              <th className="whitespace-nowrap px-6 py-4 text-left" key={i}>
+              <th className="whitespace-nowrap px-6 py-3 text-left" key={i}>
                 {column.name}
               </th>
             ))}
@@ -83,7 +83,7 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
                 {columns.map(({ field }, j) => {
                   const value = typeof field === 'function' ? field(entry) : entry[field];
                   return (
-                    <td className="whitespace-nowrap px-6 py-4" key={j}>
+                    <td className="whitespace-nowrap px-6 py-3" key={j}>
                       <span>{formatValue(value)}</span>
                     </td>
                   );

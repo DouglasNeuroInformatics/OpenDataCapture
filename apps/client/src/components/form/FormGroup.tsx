@@ -8,7 +8,7 @@ export interface FormGroupProps extends React.ComponentPropsWithoutRef<'div'> {
 export const FormGroup = ({ children, title, ...props }: FormGroupProps) => {
   return (
     <div {...props}>
-      <h3>{title}</h3>
+      <h3 className="text-xl font-bold text-slate-700">{title}</h3>
       {children}
     </div>
   );
