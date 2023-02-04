@@ -3,6 +3,7 @@ import React from 'react';
 import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
 
 import { Layout } from './components/layout';
+import { AdminPage } from './features/admin';
 import { LoginPage } from './features/auth';
 import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
 import { ErrorPage, HomePage } from './features/misc';
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
+      {
+        path: '/admin',
+        element: <AdminPage />
+      },
       {
         path: '/home',
         element: <HomePage />
