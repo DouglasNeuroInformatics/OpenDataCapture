@@ -35,7 +35,6 @@ export const Sidebar = () => {
       <nav className="mb-auto">
         <SidebarNavLink Icon={HiHome} href="/home" label={t('sidebar.links.home')} />
         <SidebarNavLink Icon={HiUserPlus} href="/subjects/add-subject" label={t('sidebar.links.addSubject')} />
-        <SidebarNavLink Icon={HiSearch} href="/subjects/lookup" label={t('sidebar.links.lookupSubject')} />
         <SidebarNavLink Icon={HiEye} href="/subjects/view-subjects" label={t(`sidebar.links.viewSubjects`)} />
         <SidebarNavLink Icon={HiPlus} href="/instruments/add-instrument" label={t('sidebar.links.addInstrument')} />
         <SidebarNavLink Icon={HiEye} href="/instruments/view-instruments" label={t('sidebar.links.viewInstruments')} />
