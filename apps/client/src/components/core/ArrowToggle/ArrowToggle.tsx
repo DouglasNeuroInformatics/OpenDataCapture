@@ -1,7 +1,7 @@
-import React, { value useState } from 'react';
+import React, { useState } from 'react';
 
 import clsx from 'clsx';
-import { value HiChevronDown } from 'react-icons/hi2';
+import { HiChevronDown } from 'react-icons/hi2';
 
 export interface ArrowToggleProps extends React.ComponentPropsWithoutRef<'button'> {
   startPosition: 'up' | 'down';

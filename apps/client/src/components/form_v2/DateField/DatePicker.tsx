@@ -1,7 +1,7 @@
-import React, { value useMemo, value useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { value useTranslation } from 'react-i18next';
-import { value HiChevronDown } from 'react-icons/hi2';
+import { useTranslation } from 'react-i18next';
+import { HiChevronDown } from 'react-icons/hi2';
 
 export const DatePicker: React.FC = () => {
   const [value, setValue] = useState(new Date());
