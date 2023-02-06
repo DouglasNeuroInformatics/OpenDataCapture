@@ -10,7 +10,7 @@ export interface TransitionOpacityProps {
 export const TransitionOpacity = ({ children, show }: TransitionOpacityProps) => {
   return (
     <Transition
-      enter="transition-opacity duration-75"
+      enter="transition-opacity duration-100"
       enterFrom="opacity-0"
       enterTo="opacity-100"
       leave="transition-opacity duration-150"

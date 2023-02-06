@@ -1,18 +1,13 @@
-import React from 'react';
-
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { DateField } from './DateField';
 
-export default {
-  component: DateField,
+type Story = StoryObj<typeof DateField>;
+
+export default { component: DateField } as Meta<typeof DateField>;
+
+export const Default: Story = {
   args: {
     name: 'dateOfBirth'
   }
-} as ComponentMeta<typeof DateField>;
-
-const Template: ComponentStory<typeof DateField> = (args) => <DateField {...args} />;
-
-export const Default = Template.bind({});
-
-Default.args = {};
+};
