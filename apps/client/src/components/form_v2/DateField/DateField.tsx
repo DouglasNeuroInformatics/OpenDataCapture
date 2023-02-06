@@ -42,7 +42,6 @@ export const DateField = ({ name }: DateFieldProps) => {
         onChange={handleChange}
         onFocus={handleFocus}
       />
-      <DatePicker show={showDatePicker} />
     </div>
   );
 };
