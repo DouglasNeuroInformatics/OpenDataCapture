@@ -42,6 +42,7 @@
     "requiredField": "Ce champ est obligatoire"
   },
   "datetime": {
-    "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "juillet", "Septembre", "Novembre", "Décembre"]
+    "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "juillet", "Septembre", "Novembre", "Décembre"],
+    "days": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
   }
 }
