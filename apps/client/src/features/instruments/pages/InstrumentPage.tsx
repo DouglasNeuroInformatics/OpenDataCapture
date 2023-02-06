@@ -10,7 +10,7 @@ import { InstrumentOverview } from '../components/InstrumentOverview';
 import { InstrumentRecordForm, InstrumentRecordFormData } from '../components/InstrumentRecordForm';
 
 import { Divider } from '@/components/base';
-import { Spinner } from '@/components/core';
+import { PageHeader, Spinner } from '@/components/core';
 import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const InstrumentPage = () => {
@@ -34,8 +34,7 @@ export const InstrumentPage = () => {
 
   return data ? (
     <div className="container" style={{ maxWidth: 900 }}>
-      <h1 className="text-center">{data.title}</h1>
-      <Divider />
+      <PageHeader title={data.title} />
       <div className="flex">
         <div className={'bg-cello-900 flex w-full justify-center rounded-xl p-3 text-white shadow-xl'}>
           <span className="mx-2">Overview</span>

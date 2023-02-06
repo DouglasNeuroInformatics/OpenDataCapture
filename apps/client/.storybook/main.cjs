@@ -11,7 +11,12 @@ module.exports = {
       files: '**/*.stories.@(mdx|tsx|ts|jsx|js)'
     }
   ],
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-interactions'],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
+    'storybook-react-i18next'
+  ],
   framework: '@storybook/react',
   core: {
     builder: '@storybook/builder-vite'

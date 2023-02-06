@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { Divider } from '@/components/base';
+import { PageHeader } from '@/components/core';
 
 export const AddInstrumentPage = () => {
   return (
     <div>
-      <h1 className="text-center">Add Instrument</h1>
-      <Divider />
+      <PageHeader title="Add Instrument" />
     </div>
   );
 };

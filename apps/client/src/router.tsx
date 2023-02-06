@@ -3,11 +3,11 @@ import React from 'react';
 import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
 
 import { Layout } from './components/layout';
+import { AdminPage } from './features/admin';
 import { LoginPage } from './features/auth';
 import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
 import { ErrorPage, HomePage } from './features/misc';
 import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
-import { SubjectLookupPage } from './features/subjects/pages/SubjectLookupPage';
 import { useAuthStore } from './stores/auth-store';
 
 const Root = () => {
@@ -28,12 +28,12 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: '/home',
-        element: <HomePage />
+        path: '/admin',
+        element: <AdminPage />
       },
       {
-        path: '/subjects/lookup',
-        element: <SubjectLookupPage />
+        path: '/home',
+        element: <HomePage />
       },
       {
         path: '/subjects/add-subject',

@@ -1,4 +1,5 @@
 import '../src/styles.css';
+import '../src/services/18n.ts';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

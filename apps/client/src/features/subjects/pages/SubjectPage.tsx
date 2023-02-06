@@ -8,7 +8,7 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { SubjectsAPI } from '../api/subjects.api';
 
 import { Divider } from '@/components/base';
-import { Spinner } from '@/components/core';
+import { PageHeader, Spinner } from '@/components/core';
 
 export const SubjectPage = () => {
   const params = useParams();
@@ -26,8 +26,7 @@ export const SubjectPage = () => {
 
   return data ? (
     <div>
-      <h1 className="text-center">Instruments for Subject: {params.id?.slice(0, 6)}</h1>
-      <Divider />
+      <PageHeader title={`Instruments for Subject: ${params.id!.slice(0, 6)}`} />
       <div>
         <h3 className="mt-5 text-center">Brief Psychiatric Rating Scale</h3>
         <ResponsiveContainer height={400} width="100%">
