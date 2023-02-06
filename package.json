@@ -23,13 +23,16 @@
   "devDependencies": {
     "@douglas-data-capture-platform/eslint-config": "*",
     "@douglas-data-capture-platform/tsconfig": "*",
+    "@types/jest": "29.4.0",
     "@types/node": "^18.11.18",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
     "eslint": "^8.31.0",
     "husky": "^8.0.0",
+    "jest": "29.4.1",
     "lint-staged": "^13.1.0",
     "prettier": "^2.8.2",
+    "ts-jest": "29.0.3",
     "ts-node": "^10.9.1",
     "turbo": "^1.7.2",
     "typescript": "^4.9.4"
