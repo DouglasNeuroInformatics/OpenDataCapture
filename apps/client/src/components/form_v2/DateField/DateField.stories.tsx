@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { value ComponentMeta, value ComponentStory } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 
-import { value DateField } from './DateField';
+import { DateField } from './DateField';
 
 export default {
   component: DateField,

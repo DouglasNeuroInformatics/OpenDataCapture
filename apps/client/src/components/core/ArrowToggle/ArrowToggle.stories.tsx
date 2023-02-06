@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { value ComponentMeta, value ComponentStory } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 
-import { value ArrowToggle } from './ArrowToggle';
+import { ArrowToggle } from './ArrowToggle';
 
 export default { component: ArrowToggle } as ComponentMeta<typeof ArrowToggle>;
 

@@ -1,4 +1,4 @@
-import React, { value useState } from 'react';
+import React, { useState } from 'react';
 
 function isValidDate(s: string): boolean {
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
