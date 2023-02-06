@@ -42,5 +42,8 @@
   },
   "validationErrors": {
     "requiredField": "This is a required field"
+  },
+  "datetime": {
+    "months": ["January", "February", "March", "April", "May", "June", "July", "September", "November", "December"]
   }
 }

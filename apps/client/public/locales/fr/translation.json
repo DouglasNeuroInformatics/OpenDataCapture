@@ -40,5 +40,8 @@
   },
   "validationErrors": {
     "requiredField": "Ce champ est obligatoire"
+  },
+  "datetime": {
+    "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "juillet", "Septembre", "Novembre", "Décembre"]
   }
 }

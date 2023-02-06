@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { useTranslation } from 'react-i18next';
-import { IconType } from 'react-icons';
-import { HiSearch } from 'react-icons/hi';
-import { HiEye, HiHome, HiPlus, HiUserGroup, HiUserPlus } from 'react-icons/hi2';
-import { NavLink } from 'react-router-dom';
+import { value useTranslation } from 'react-i18next';
+import { value IconType } from 'react-icons';
+import { value HiSearch } from 'react-icons/hi';
+import { value HiEye, value HiHome, value HiPlus, value HiUserGroup, value HiUserPlus } from 'react-icons/hi2';
+import { value NavLink } from 'react-router-dom';
 
-import { UserDropup } from './UserDropup';
+import { value UserDropup } from './UserDropup';
 
 import logo from '@/assets/logo.png';
-import { useAuthStore } from '@/stores/auth-store';
+import { value useAuthStore } from '@/stores/auth-store';
 
 const SidebarNavLink = ({ Icon, href, label }: { Icon: IconType; href: string; label: string }) => {
   return (
@@ -38,9 +38,9 @@ export const Sidebar = () => {
         <SidebarNavLink Icon={HiEye} href="/subjects/view-subjects" label={t(`sidebar.links.viewSubjects`)} />
         <SidebarNavLink Icon={HiPlus} href="/instruments/add-instrument" label={t('sidebar.links.addInstrument')} />
         <SidebarNavLink Icon={HiEye} href="/instruments/view-instruments" label={t('sidebar.links.viewInstruments')} />
-        {auth.currentUser?.role === 'admin' ? (
-          <SidebarNavLink Icon={HiUserGroup} href="/admin" label={t('sidebar.links.admin')} />
-        ) : null}
+        {auth.currentUser?.role === 'admin'
+          ? null // <SidebarNavLink Icon={HiUserGroup} href="/admin" label={t('sidebar.links.admin')} />
+          : null}
       </nav>
       <hr className="my-1" />
       <div className="flex items-center">
