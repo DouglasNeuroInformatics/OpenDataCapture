@@ -2,7 +2,7 @@ import React from 'react';
 
 import clsx from 'clsx';
 
-interface DividerProps extends React.ComponentPropsWithoutRef<'div'> {
+export interface DividerProps extends React.ComponentPropsWithoutRef<'div'> {
   variant?: 'light' | 'dark';
 }
 
