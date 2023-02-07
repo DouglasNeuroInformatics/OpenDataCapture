@@ -2,19 +2,32 @@ import React from 'react';
 
 import clsx from 'clsx';
 
-export interface FormElementProps extends React.HTMLProps<HTMLFormElement> {
-  children: React.ReactNode;
+import { FormFieldDataType, FormSchemaType } from './types';
+
+export interface FormProps<T extends Record<string, FormFieldDataType>>
+  extends Omit<React.ComponentPropsWithoutRef<'form'>, 'children'> {
   className?: string;
-  error?: string;
+  schema: FormSchemaType<T>;
 }
 
-export const FormElement = ({ children, className, error, ...props }: FormElementProps) => {
+export const Form = <T extends Record<string, any>>({ className, schema, ...props }: FormProps<T>) => {
   return (
     <React.Fragment>
       <form autoComplete="off" className={clsx('w-full', className)} {...props}>
-        {children}
+        {Object.entries(schema.properties).map(([name, { type }]) => {
+          switch (type) {
+            case 'string':
+              return (
+                <div className="flex">
+                  <input name={name} type="text" />
+                  <label htmlFor={name}>{name}</label>
+                </div>
+              );
+            default:
+              return 'ERROR';
+          }
+        })}
       </form>
-      {error && <span className="text-red-700">{error}</span>}
     </React.Fragment>
   );
 };
