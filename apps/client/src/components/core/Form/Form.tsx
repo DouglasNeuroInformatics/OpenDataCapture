@@ -5,12 +5,12 @@ import { type JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { SubmitButton } from '../SubmitButton';
-import { TextField, TextFieldInputType } from '../TextField/TextField';
+import { SubmitButton } from './SubmitButton';
+import { TextField, TextFieldInputType } from './TextField';
 
-type FormDataType = Record<string, any>;
+export type FormDataType = Record<string, any>;
 
-type InputType = TextFieldInputType;
+export type InputType = TextFieldInputType;
 
 export type FormFields<T extends FormDataType> = {
   [K in keyof T]: {

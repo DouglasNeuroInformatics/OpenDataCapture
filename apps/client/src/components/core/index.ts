@@ -1,5 +1,6 @@
 export * from './ActiveSubject';
 export * from './ArrowToggle';
+export * from './Form';
 export * from './LanguageToggle';
 export * from './Modal';
 export * from './Notifications';
