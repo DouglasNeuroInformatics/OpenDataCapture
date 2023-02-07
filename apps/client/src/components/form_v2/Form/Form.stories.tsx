@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { JSONSchemaType } from 'ajv';
 
-import { Form, FormSchemaType } from './Form';
+import { Form, FormFields } from './Form';
 
 interface LoginFormData {
   username: string;
@@ -9,7 +10,18 @@ interface LoginFormData {
 
 type Story = StoryObj<typeof Form<LoginFormData>>;
 
-const schema: FormSchemaType<LoginFormData> = {
+const fields: FormFields<LoginFormData> = {
+  username: {
+    label: 'Username',
+    inputType: 'text'
+  },
+  password: {
+    label: 'Password',
+    inputType: 'password'
+  }
+};
+
+const schema: JSONSchemaType<LoginFormData> = {
   type: 'object',
   properties: {
     username: {
@@ -17,7 +29,8 @@ const schema: FormSchemaType<LoginFormData> = {
       minLength: 1
     },
     password: {
-      type: 'string'
+      type: 'string',
+      minLength: 1
     }
   },
   additionalProperties: false,
@@ -28,7 +41,8 @@ export default { component: Form } as Meta<typeof Form>;
 
 export const LoginForm: Story = {
   args: {
-    schema: schema,
+    fields,
+    schema,
     onSubmit: (data) => alert(JSON.stringify(data))
   }
 };
