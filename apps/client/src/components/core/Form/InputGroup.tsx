@@ -1,19 +1,19 @@
 import React, { useCallback, useState } from 'react';
 
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { useFormContext } from 'react-hook-form';
 
 import { ErrorMessage } from './ErrorMessage';
 
-export type TextFieldInputType = Extract<React.HTMLInputTypeAttribute, 'text' | 'password'>;
+export type InputType = Extract<React.HTMLInputTypeAttribute, 'text' | 'password'>;
 
-export interface TextFieldProps {
+export interface InputGroupProps {
   name: string;
   label: string;
-  type: TextFieldInputType;
+  type: InputType;
 }
 
-export const TextField = ({ name, label, type = 'text' }: TextFieldProps) => {
+export const InputGroup = ({ name, label, type }: InputGroupProps) => {
   const { register, formState } = useFormContext();
   const [isFloatingLabel, setIsFloatingLabel] = useState(false);
 
@@ -38,6 +38,7 @@ export const TextField = ({ name, label, type = 'text' }: TextFieldProps) => {
   return (
     <div className="relative my-6 flex w-full flex-col">
       <input
+        autoComplete="off"
         className="input"
         type={type}
         onFocus={handleFocus}

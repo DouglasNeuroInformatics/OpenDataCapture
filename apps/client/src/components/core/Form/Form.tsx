@@ -5,12 +5,10 @@ import { type JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { InputGroup, type InputType } from './InputGroup';
 import { SubmitButton } from './SubmitButton';
-import { TextField, TextFieldInputType } from './TextField';
 
 export type FormDataType = Record<string, any>;
-
-export type InputType = TextFieldInputType;
 
 export type FormFields<T extends FormDataType> = {
   [K in keyof T]: {
@@ -38,9 +36,9 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
         {Object.entries(fields).map(([name, { label, inputType }]) => {
           switch (inputType) {
             case 'text':
-              return <TextField key={name} label={label} name={name} type="text" />;
+              return <InputGroup key={name} label={label} name={name} type="text" />;
             case 'password':
-              return <TextField key={name} label={label} name={name} type="password" />;
+              return <InputGroup key={name} label={label} name={name} type="password" />;
           }
         })}
         <SubmitButton />

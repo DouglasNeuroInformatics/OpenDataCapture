@@ -42,6 +42,7 @@ export const DateField = ({ name }: DateFieldProps) => {
         onChange={handleChange}
         onFocus={handleFocus}
       />
+      <DatePicker show={showDatePicker} onSelection={(selection) => setValue(selection.toISOString())} />
     </div>
   );
 };
