@@ -1,33 +1,43 @@
 import React from 'react';
 
+import { ajvResolver } from '@hookform/resolvers/ajv';
+import { type JSONSchemaType } from 'ajv';
 import clsx from 'clsx';
+import { FormProvider, useForm } from 'react-hook-form';
 
-import { FormFieldDataType, FormSchemaType } from './types';
+import { SubmitButton } from '../SubmitButton';
+import { TextField } from '../TextField/TextField';
 
-export interface FormProps<T extends Record<string, FormFieldDataType>>
-  extends Omit<React.ComponentPropsWithoutRef<'form'>, 'children'> {
+export type FormSchemaType<T extends Record<string, any>> = JSONSchemaType<T> & {
+  properties: {
+    [K in keyof T]: JSONSchemaType<T[K]>;
+  };
+};
+
+export interface FormProps<T extends Record<string, any>> {
   className?: string;
   schema: FormSchemaType<T>;
+  onSubmit: (data: T) => void;
 }
 
-export const Form = <T extends Record<string, any>>({ className, schema, ...props }: FormProps<T>) => {
+export const Form = <T extends Record<string, any>>({ className, schema, onSubmit }: FormProps<T>) => {
+  const methods = useForm<T>({
+    resolver: ajvResolver<T>(schema)
+  });
+
   return (
-    <React.Fragment>
-      <form autoComplete="off" className={clsx('w-full', className)} {...props}>
+    <FormProvider {...methods}>
+      <form autoComplete="off" className={clsx('w-full', className)} onSubmit={methods.handleSubmit(onSubmit)}>
         {Object.entries(schema.properties).map(([name, { type }]) => {
           switch (type) {
             case 'string':
-              return (
-                <div className="flex">
-                  <input name={name} type="text" />
-                  <label htmlFor={name}>{name}</label>
-                </div>
-              );
+              return <TextField key={name} name={name} />;
             default:
               return 'ERROR';
           }
         })}
+        <SubmitButton />
       </form>
-    </React.Fragment>
+    </FormProvider>
   );
 };

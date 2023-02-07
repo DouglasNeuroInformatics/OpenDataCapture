@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Form } from './Form';
-import { FormSchemaType } from './types';
+import { Form, FormSchemaType } from './Form';
 
 interface LoginFormData {
   username: string;
@@ -14,7 +13,8 @@ const schema: FormSchemaType<LoginFormData> = {
   type: 'object',
   properties: {
     username: {
-      type: 'string'
+      type: 'string',
+      minLength: 1
     },
     password: {
       type: 'string'
@@ -26,9 +26,9 @@ const schema: FormSchemaType<LoginFormData> = {
 
 export default { component: Form } as Meta<typeof Form>;
 
-schema.properties?.password;
 export const LoginForm: Story = {
   args: {
-    schema: schema
+    schema: schema,
+    onSubmit: (data) => alert(JSON.stringify(data))
   }
 };
