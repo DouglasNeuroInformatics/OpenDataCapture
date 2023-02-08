@@ -7,7 +7,7 @@ import { ErrorMessage } from '../ErrorMessage';
 
 import { TransitionOpacity } from '@/components/transitions';
 
-export type InputType = Extract<React.HTMLInputTypeAttribute, 'text' | 'password' | 'button'>;
+type InputType = Extract<React.HTMLInputTypeAttribute, 'text' | 'password' | 'button'>;
 
 export interface InputGroupProps extends React.ComponentPropsWithoutRef<'input'> {
   name: string;

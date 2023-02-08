@@ -3,38 +3,47 @@ import { JSONSchemaType } from 'ajv';
 
 import { Form, FormFields } from './Form';
 
-interface LoginFormData {
-  username: string;
-  password: string;
+interface DemographicsFormData {
+  firstName: string;
+  lastName: string;
+  sex: 'Male' | 'Female';
 }
 
-type Story = StoryObj<typeof Form<LoginFormData>>;
+type Story = StoryObj<typeof Form<DemographicsFormData>>;
 
-const fields: FormFields<LoginFormData> = {
-  username: {
-    label: 'Username',
-    inputType: 'text'
+const fields: FormFields<DemographicsFormData> = {
+  firstName: {
+    label: 'First Name',
+    fieldType: 'text'
   },
-  password: {
-    label: 'Password',
-    inputType: 'password'
+  lastName: {
+    label: 'Last Name',
+    fieldType: 'text'
+  },
+  sex: {
+    label: 'Sex',
+    fieldType: 'text'
   }
 };
 
-const schema: JSONSchemaType<LoginFormData> = {
+const schema: JSONSchemaType<DemographicsFormData> = {
   type: 'object',
   properties: {
-    username: {
+    firstName: {
       type: 'string',
       minLength: 1
     },
-    password: {
+    lastName: {
       type: 'string',
       minLength: 1
+    },
+    sex: {
+      type: 'string',
+      enum: ['Male', 'Female']
     }
   },
   additionalProperties: false,
-  required: ['username', 'password']
+  required: ['firstName', 'lastName', 'sex']
 };
 
 export default { component: Form } as Meta<typeof Form>;

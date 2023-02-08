@@ -5,16 +5,18 @@ import { type JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { InputGroup, type InputType } from '../InputGroup';
+import { InputGroup } from '../InputGroup';
 import { SubmitButton } from '../SubmitButton';
 
 export type FormDataType = Record<string, any>;
+
+export type FormFieldType = 'text' | 'password' | 'options';
 
 export type FormFields<T extends FormDataType> = {
   [K in keyof T]: {
     label: string;
     description?: string;
-    inputType: InputType;
+    fieldType: FormFieldType;
   };
 };
 
@@ -33,8 +35,8 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
   return (
     <FormProvider {...methods}>
       <form autoComplete="off" className={clsx('w-full', className)} onSubmit={methods.handleSubmit(onSubmit)}>
-        {Object.entries(fields).map(([name, { label, inputType }]) => {
-          switch (inputType) {
+        {Object.entries(fields).map(([name, { label, fieldType }]) => {
+          switch (fieldType) {
             case 'text':
               return <InputGroup key={name} label={label} name={name} type="text" />;
             case 'password':
