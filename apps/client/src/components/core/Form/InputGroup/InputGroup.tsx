@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { clsx } from 'clsx';
 import { useFormContext } from 'react-hook-form';
 
-import { ErrorMessage } from './ErrorMessage';
+import { ErrorMessage } from '../ErrorMessage';
 
 export type InputType = Extract<React.HTMLInputTypeAttribute, 'text' | 'password'>;
 
@@ -11,6 +11,7 @@ export interface InputGroupProps {
   name: string;
   label: string;
   type: InputType;
+  selector?: JSX.Element;
 }
 
 export const InputGroup = ({ name, label, type }: InputGroupProps) => {

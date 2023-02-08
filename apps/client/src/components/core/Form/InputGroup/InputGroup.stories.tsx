@@ -14,7 +14,7 @@ export default {
       const methods = useForm();
       return (
         <FormProvider {...methods}>
-          <Story />;
+          <Story />
         </FormProvider>
       );
     }

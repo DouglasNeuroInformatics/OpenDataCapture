@@ -5,8 +5,8 @@ import { type JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { InputGroup, type InputType } from './InputGroup';
-import { SubmitButton } from './SubmitButton';
+import { InputGroup, type InputType } from '../InputGroup';
+import { SubmitButton } from '../SubmitButton';
 
 export type FormDataType = Record<string, any>;
 
