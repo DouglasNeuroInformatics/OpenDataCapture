@@ -5,16 +5,29 @@ import { useFormContext } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
 
-export type InputType = Extract<React.HTMLInputTypeAttribute, 'text' | 'password'>;
+import { TransitionOpacity } from '@/components/transitions';
 
-export interface InputGroupProps {
+export type InputType = Extract<React.HTMLInputTypeAttribute, 'text' | 'password' | 'button'>;
+
+export interface InputGroupProps extends React.ComponentPropsWithoutRef<'input'> {
   name: string;
   label: string;
   type: InputType;
   selector?: JSX.Element;
+  showSelector?: boolean;
 }
 
-export const InputGroup = ({ name, label, type }: InputGroupProps) => {
+export const InputGroup = ({
+  className,
+  name,
+  label,
+  type,
+  selector,
+  showSelector,
+  onBlur,
+  onFocus,
+  ...props
+}: InputGroupProps) => {
   const { register, formState } = useFormContext();
   const [isFloatingLabel, setIsFloatingLabel] = useState(false);
 
@@ -28,10 +41,16 @@ export const InputGroup = ({ name, label, type }: InputGroupProps) => {
     if (!event.currentTarget.value) {
       setIsFloatingLabel(false);
     }
+    if (onBlur) {
+      onBlur(event);
+    }
   };
 
-  const handleFocus: React.FocusEventHandler<HTMLInputElement> = () => {
+  const handleFocus: React.FocusEventHandler<HTMLInputElement> = (event) => {
     setIsFloatingLabel(true);
+    if (onFocus) {
+      onFocus(event);
+    }
   };
 
   const { ref, ...rest } = register(name, { onBlur: handleBlur });
@@ -40,7 +59,7 @@ export const InputGroup = ({ name, label, type }: InputGroupProps) => {
     <div className="relative my-6 flex w-full flex-col">
       <input
         autoComplete="off"
-        className="input"
+        className={clsx('input', className)}
         type={type}
         onFocus={handleFocus}
         {...rest}
@@ -48,6 +67,7 @@ export const InputGroup = ({ name, label, type }: InputGroupProps) => {
           ref(e);
           inputRef(e);
         }}
+        {...props}
       />
       <label
         className={clsx('pointer-events-none absolute left-0 my-2 text-gray-600 transition-all', {
@@ -57,6 +77,7 @@ export const InputGroup = ({ name, label, type }: InputGroupProps) => {
       >
         {label}
       </label>
+      {selector && <TransitionOpacity show={showSelector}>{selector}</TransitionOpacity>}
       <ErrorMessage error={formState.errors[name]} />
     </div>
   );

@@ -39,6 +39,8 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
               return <InputGroup key={name} label={label} name={name} type="text" />;
             case 'password':
               return <InputGroup key={name} label={label} name={name} type="password" />;
+            default:
+              throw new Error('Not Implemented!');
           }
         })}
         <SubmitButton />
