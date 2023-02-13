@@ -25,7 +25,7 @@ export const Text: Story = {
   args: {
     name: 'text',
     label: 'Text',
-    type: 'text'
+    variant: 'short'
   }
 };
 
@@ -33,6 +33,6 @@ export const Password: Story = {
   args: {
     name: 'password',
     label: 'Password',
-    type: 'password'
+    variant: 'password'
   }
 };

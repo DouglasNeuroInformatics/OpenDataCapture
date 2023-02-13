@@ -1,19 +1,22 @@
-import React, { useCallback, useState } from 'react';
+import React, { HTMLInputTypeAttribute, useCallback, useState } from 'react';
 
 import { clsx } from 'clsx';
 import { useFormContext } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
 
-export interface TextFieldProps extends React.ComponentPropsWithoutRef<'input'> {
+export interface TextFieldProps {
+  kind: 'text';
   name: string;
   label: string;
-  type: 'text' | 'password';
+  variant: 'short' | 'password';
 }
 
-export const TextField = ({ className, name, label, type, onBlur, onFocus, ...props }: TextFieldProps) => {
+export const TextField = ({ name, label, variant }: TextFieldProps) => {
   const { register, formState } = useFormContext();
   const [isFloatingLabel, setIsFloatingLabel] = useState(false);
+
+  const type = (variant === 'short' ? 'text' : 'password') satisfies HTMLInputTypeAttribute;
 
   const inputRef = useCallback((e: HTMLInputElement | null) => {
     if (e && e.value) {
@@ -25,16 +28,10 @@ export const TextField = ({ className, name, label, type, onBlur, onFocus, ...pr
     if (!event.currentTarget.value) {
       setIsFloatingLabel(false);
     }
-    if (onBlur) {
-      onBlur(event);
-    }
   };
 
-  const handleFocus: React.FocusEventHandler<HTMLInputElement> = (event) => {
+  const handleFocus: React.FocusEventHandler<HTMLInputElement> = () => {
     setIsFloatingLabel(true);
-    if (onFocus) {
-      onFocus(event);
-    }
   };
 
   const { ref, ...rest } = register(name, { onBlur: handleBlur });
@@ -43,7 +40,7 @@ export const TextField = ({ className, name, label, type, onBlur, onFocus, ...pr
     <div className="field-container">
       <input
         autoComplete="off"
-        className={clsx('field-input', className)}
+        className="field-input"
         type={type}
         onFocus={handleFocus}
         {...rest}
@@ -51,7 +48,6 @@ export const TextField = ({ className, name, label, type, onBlur, onFocus, ...pr
           ref(e);
           inputRef(e);
         }}
-        {...props}
       />
       <label
         className={clsx('field-label', {

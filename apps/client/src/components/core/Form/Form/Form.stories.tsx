@@ -13,16 +13,19 @@ type Story = StoryObj<typeof Form<DemographicsFormData>>;
 
 const fields: FormFields<DemographicsFormData> = {
   firstName: {
+    kind: 'text',
     label: 'First Name',
-    fieldType: 'text'
+    variant: 'short'
   },
   lastName: {
+    kind: 'text',
     label: 'Last Name',
-    fieldType: 'text'
+    variant: 'short'
   },
   sex: {
+    kind: 'select',
     label: 'Sex',
-    fieldType: 'text'
+    options: ['Male', 'F']
   }
 };
 
