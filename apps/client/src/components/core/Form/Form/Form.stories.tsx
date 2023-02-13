@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { JSONSchemaType } from 'ajv';
 
-import { FormFields } from '../types';
+import { FormDataType, FormFields } from '../types';
 
 import { Form } from './Form';
 
-interface DemographicsFormData {
+interface DemographicsFormData extends FormDataType {
   firstName: string;
   lastName: string;
   sex: 'Male' | 'Female';
