@@ -12,7 +12,7 @@ import { TextField, TextFieldProps } from '../TextField';
 export type FormDataType = Record<string, any>;
 
 export type FormFields<T extends FormDataType> = {
-  [K in keyof T]: Omit<TextFieldProps, 'name'> | Omit<SelectFieldProps, 'name'>;
+  [K in keyof T]: Omit<TextFieldProps, 'name'> | Omit<SelectFieldProps<T[K]>, 'name'>;
 };
 
 export interface FormProps<T extends FormDataType> {
@@ -27,21 +27,16 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
     resolver: ajvResolver<T>(schema)
   });
 
-  methods.formState.errors;
-
   return (
     <FormProvider {...methods}>
       <form autoComplete="off" className={clsx('w-full', className)} onSubmit={methods.handleSubmit(onSubmit)}>
-        {Object.entries(fields).map(([name, props]) => {
+        {Object.keys(fields).map((name) => {
+          const props = fields[name];
           switch (props.kind) {
             case 'text':
-              return <TextField key={name} kind={props.kind} label={props.label} name={name} variant={props.variant} />;
+              return <TextField key={name} name={name} {...props} />;
             case 'select':
-              return (
-                <SelectField key={name} kind={props.kind} label={props.label} name={name} options={props.options} />
-              );
-            default:
-              throw new Error('Not Implemented!');
+              return <SelectField key={name} name={name} {...props} />;
           }
         })}
         <SubmitButton />

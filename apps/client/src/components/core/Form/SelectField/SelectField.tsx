@@ -1,19 +1,19 @@
 import React from 'react';
 
-import { Listbox } from '@headlessui/react';
+import { Listbox, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
 
-export interface SelectFieldProps {
+export interface SelectFieldProps<T> {
   kind: 'select';
   name: string;
   label: string;
-  options: readonly string[];
+  options: T[];
 }
 
-export const SelectField = ({ name, label, options }: SelectFieldProps) => {
+export const SelectField = <T extends string = string>({ name, label, options }: SelectFieldProps<T>) => {
   const { field, formState } = useController<Record<string, string>>({ name });
 
   return (
@@ -27,13 +27,21 @@ export const SelectField = ({ name, label, options }: SelectFieldProps) => {
         >
           {label}
         </Listbox.Label>
-        <Listbox.Options>
-          {options.map((option) => (
-            <Listbox.Option key={option} value={option}>
-              {option}
-            </Listbox.Option>
-          ))}
-        </Listbox.Options>
+        <Transition
+          as="div"
+          className="relative inline-block"
+          leave="transition ease-in duration-100"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <Listbox.Options className="absolute z-10 mt-1 w-full rounded-lg bg-slate-50 shadow-md">
+            {options.map((option) => (
+              <Listbox.Option className="p-2 hover:bg-slate-200" key={option} value={option}>
+                {option}
+              </Listbox.Option>
+            ))}
+          </Listbox.Options>
+        </Transition>
       </Listbox>
       <ErrorMessage error={formState.errors[name]} />
     </React.Fragment>

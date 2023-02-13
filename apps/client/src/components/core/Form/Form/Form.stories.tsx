@@ -25,7 +25,7 @@ const fields: FormFields<DemographicsFormData> = {
   sex: {
     kind: 'select',
     label: 'Sex',
-    options: ['Male', 'F']
+    options: ['Male', 'Female']
   }
 };
 
