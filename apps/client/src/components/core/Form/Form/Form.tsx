@@ -5,12 +5,18 @@ import { type JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { InputGroup } from '../InputGroup';
 import { SubmitButton } from '../SubmitButton';
+import { TextField } from '../TextField';
 
 export type FormDataType = Record<string, any>;
 
-export type FormFieldType = 'text' | 'password' | 'options';
+export type FormFieldType = 'text' | 'password' | 'select';
+
+export interface BaseFormField {
+  label: string;
+  description?: string;
+  fieldType: FormFieldType;
+}
 
 export type FormFields<T extends FormDataType> = {
   [K in keyof T]: {
@@ -38,9 +44,9 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
         {Object.entries(fields).map(([name, { label, fieldType }]) => {
           switch (fieldType) {
             case 'text':
-              return <InputGroup key={name} label={label} name={name} type="text" />;
+              return <TextField key={name} label={label} name={name} type="text" />;
             case 'password':
-              return <InputGroup key={name} label={label} name={name} type="password" />;
+              return <TextField key={name} label={label} name={name} type="password" />;
             default:
               throw new Error('Not Implemented!');
           }

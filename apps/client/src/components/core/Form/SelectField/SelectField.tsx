@@ -1,23 +1,7 @@
 import React, { useState } from 'react';
 
-import { InputGroup } from '../InputGroup';
-
-interface OptionsDropdownProps {
-  options: readonly string[];
-  onSelection: (option: string) => void;
-}
-
-const OptionsDropdown = ({ options, onSelection }: OptionsDropdownProps) => {
-  return (
-    <ul>
-      {options.map((option) => (
-        <li key={option}>
-          <button onClick={() => onSelection(option)}>{option}</button>
-        </li>
-      ))}
-    </ul>
-  );
-};
+import { Listbox } from '@headlessui/react';
+import { clsx } from 'clsx';
 
 export interface SelectFieldProps {
   name: string;
@@ -26,26 +10,25 @@ export interface SelectFieldProps {
 }
 
 export const SelectField = ({ name, label, options }: SelectFieldProps) => {
-  const [selected, setSelected] = useState(options[0]);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleBlur: React.FocusEventHandler<HTMLInputElement> = () => {
-    setIsOpen(false);
-  };
-
-  const handleFocus: React.FocusEventHandler<HTMLInputElement> = () => {
-    setIsOpen(true);
-  };
+  const [selectedOption, setSelectedOption] = useState('');
 
   return (
-    <InputGroup
-      label={label}
-      name={name}
-      selector={<OptionsDropdown options={options} onSelection={setSelected} />}
-      showSelector={isOpen}
-      type="button"
-      onBlur={handleBlur}
-      onFocus={handleFocus}
-    />
+    <Listbox as="div" className="field-container" name={name} value={selectedOption} onChange={setSelectedOption}>
+      <Listbox.Button className="field-input">{selectedOption}</Listbox.Button>
+      <Listbox.Label
+        className={clsx('field-label ui-open:field-label-floating', {
+          'field-label-floating': selectedOption
+        })}
+      >
+        {label}
+      </Listbox.Label>
+      <Listbox.Options>
+        {options.map((option) => (
+          <Listbox.Option key={option} value={option}>
+            {option}
+          </Listbox.Option>
+        ))}
+      </Listbox.Options>
+    </Listbox>
   );
 };

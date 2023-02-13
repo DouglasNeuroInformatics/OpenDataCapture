@@ -38,8 +38,21 @@
     @apply text-cello-900 bg-peppermint-50 border-2;
   }
 
-  .input {
-    @apply z-40 w-full border-b-2 bg-transparent py-2 text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none;
+  .field-container {
+    @apply relative my-6 flex w-full flex-col;
+  }
+
+  .field-input {
+    @apply z-40 w-full border-b-2 bg-transparent py-2 text-left text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none;
+    min-height: 42px;
+  }
+
+  .field-label {
+    @apply pointer-events-none absolute left-0 my-2 text-gray-600 transition-all;
+  }
+
+  .field-label-floating {
+    @apply z-10 -translate-y-5 text-sm text-indigo-800;
   }
 
   .card {

@@ -3,12 +3,12 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { InputGroup } from './InputGroup';
+import { TextField } from './TextField';
 
-type Story = StoryObj<typeof InputGroup>;
+type Story = StoryObj<typeof TextField>;
 
 export default {
-  component: InputGroup,
+  component: TextField,
   decorators: [
     (Story) => {
       const methods = useForm();
@@ -19,7 +19,7 @@ export default {
       );
     }
   ]
-} as Meta<typeof InputGroup>;
+} as Meta<typeof TextField>;
 
 export const Text: Story = {
   args: {

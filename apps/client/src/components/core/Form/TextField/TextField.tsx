@@ -5,29 +5,13 @@ import { useFormContext } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
 
-import { TransitionOpacity } from '@/components/transitions';
-
-type InputType = Extract<React.HTMLInputTypeAttribute, 'text' | 'password' | 'button'>;
-
-export interface InputGroupProps extends React.ComponentPropsWithoutRef<'input'> {
+export interface TextFieldProps extends React.ComponentPropsWithoutRef<'input'> {
   name: string;
   label: string;
-  type: InputType;
-  selector?: JSX.Element;
-  showSelector?: boolean;
+  type: 'text' | 'password';
 }
 
-export const InputGroup = ({
-  className,
-  name,
-  label,
-  type,
-  selector,
-  showSelector,
-  onBlur,
-  onFocus,
-  ...props
-}: InputGroupProps) => {
+export const TextField = ({ className, name, label, type, onBlur, onFocus, ...props }: TextFieldProps) => {
   const { register, formState } = useFormContext();
   const [isFloatingLabel, setIsFloatingLabel] = useState(false);
 
@@ -56,10 +40,10 @@ export const InputGroup = ({
   const { ref, ...rest } = register(name, { onBlur: handleBlur });
 
   return (
-    <div className="relative my-6 flex w-full flex-col">
+    <div className="field-container">
       <input
         autoComplete="off"
-        className={clsx('input', className)}
+        className={clsx('field-input', className)}
         type={type}
         onFocus={handleFocus}
         {...rest}
@@ -70,14 +54,13 @@ export const InputGroup = ({
         {...props}
       />
       <label
-        className={clsx('pointer-events-none absolute left-0 my-2 text-gray-600 transition-all', {
-          'z-10 -translate-y-5 text-sm text-indigo-800': isFloatingLabel
+        className={clsx('field-label', {
+          'field-label-floating': isFloatingLabel
         })}
         htmlFor={name}
       >
         {label}
       </label>
-      {selector && <TransitionOpacity show={showSelector}>{selector}</TransitionOpacity>}
       <ErrorMessage error={formState.errors[name]} />
     </div>
   );
