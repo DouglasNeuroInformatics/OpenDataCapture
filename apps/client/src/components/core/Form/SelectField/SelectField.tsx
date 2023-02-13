@@ -5,6 +5,7 @@ import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
+import { FormDataType } from '../types';
 
 export interface SelectFieldProps<T> {
   kind: 'select';
@@ -14,7 +15,7 @@ export interface SelectFieldProps<T> {
 }
 
 export const SelectField = <T extends string = string>({ name, label, options }: SelectFieldProps<T>) => {
-  const { field, formState } = useController<Record<string, string>>({ name });
+  const { field, formState } = useController<FormDataType>({ name });
 
   return (
     <React.Fragment>
