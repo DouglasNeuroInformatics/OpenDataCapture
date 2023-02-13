@@ -5,15 +5,10 @@ import { type JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { SelectField, SelectFieldProps } from '../SelectField';
+import { SelectField } from '../SelectField';
 import { SubmitButton } from '../SubmitButton';
-import { TextField, TextFieldProps } from '../TextField';
-
-export type FormDataType = Record<string, any>;
-
-export type FormFields<T extends FormDataType> = {
-  [K in keyof T]: Omit<TextFieldProps, 'name'> | Omit<SelectFieldProps<T[K]>, 'name'>;
-};
+import { TextField } from '../TextField';
+import { FormDataType, FormFields } from '../types';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
@@ -27,9 +22,18 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
     resolver: ajvResolver<T>(schema)
   });
 
+  const handleFormSubmission = (data: T) => {
+    methods.reset();
+    onSubmit(data);
+  };
+
   return (
     <FormProvider {...methods}>
-      <form autoComplete="off" className={clsx('w-full', className)} onSubmit={methods.handleSubmit(onSubmit)}>
+      <form
+        autoComplete="off"
+        className={clsx('w-full', className)}
+        onSubmit={methods.handleSubmit(handleFormSubmission)}
+      >
         {Object.keys(fields).map((name) => {
           const props = fields[name];
           switch (props.kind) {

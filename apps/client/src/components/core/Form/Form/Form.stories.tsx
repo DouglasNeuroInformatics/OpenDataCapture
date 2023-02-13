@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { JSONSchemaType } from 'ajv';
 
-import { Form, FormFields } from './Form';
+import { FormFields } from '../types';
+
+import { Form } from './Form';
 
 interface DemographicsFormData {
   firstName: string;
