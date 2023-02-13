@@ -4,12 +4,10 @@ import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
-import { FormDataType } from '../types';
+import { BaseFieldProps, FormDataType } from '../types';
 
-export interface TextFieldProps {
+export interface TextFieldProps extends BaseFieldProps {
   kind: 'text';
-  name: string;
-  label: string;
   variant: 'short' | 'password';
 }
 

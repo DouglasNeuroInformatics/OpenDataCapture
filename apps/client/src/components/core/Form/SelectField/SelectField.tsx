@@ -5,12 +5,10 @@ import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
-import { FormDataType } from '../types';
+import { BaseFieldProps, FormDataType } from '../types';
 
-export interface SelectFieldProps<T> {
+export interface SelectFieldProps<T> extends BaseFieldProps {
   kind: 'select';
-  name: string;
-  label: string;
   options: T[];
 }
 

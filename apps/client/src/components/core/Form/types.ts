@@ -1,6 +1,12 @@
 import { SelectFieldProps } from './SelectField';
 import { TextFieldProps } from './TextField';
 
+export interface BaseFieldProps {
+  kind: unknown;
+  name: string;
+  label: string;
+}
+
 export interface FormDataType {
   [key: string]: string;
 }
