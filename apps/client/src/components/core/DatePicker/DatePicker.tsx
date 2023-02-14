@@ -9,8 +9,6 @@ import { YearSelector } from './YearSelector';
 
 import { TransitionOpacity } from '@/components/transitions';
 
-type DisplayItem = 'calendar' | 'year-selector';
-
 interface IncrementAction {
   type: 'increment';
 }
@@ -47,7 +45,7 @@ export interface DatePickerProps {
 
 export const DatePicker = ({ onSelection }: DatePickerProps) => {
   const [date, dispatch] = useReducer(reducer, new Date());
-  const [displayItem, setDisplayItem] = useState<DisplayItem>('calendar');
+  const [showYearSelector, setShowYearSelector] = useState(false);
   const { t } = useTranslation();
 
   const monthName = t('datetime.months')[date.getMonth()];
@@ -61,7 +59,7 @@ export const DatePicker = ({ onSelection }: DatePickerProps) => {
             className="mx-1 flex items-center justify-center rounded-full p-1 hover:bg-slate-200"
             position="up"
             rotation={180}
-            onClick={() => setDisplayItem(displayItem === 'calendar' ? 'year-selector' : 'calendar')}
+            onClick={() => setShowYearSelector(!showYearSelector)}
           />
         </div>
         <div className="flex">
@@ -79,10 +77,10 @@ export const DatePicker = ({ onSelection }: DatePickerProps) => {
           />
         </div>
       </div>
-      <TransitionOpacity show={displayItem === 'calendar'}>
+      <TransitionOpacity show={!showYearSelector}>
         <Calendar month={date.getMonth()} year={date.getFullYear()} onSelection={onSelection} />
       </TransitionOpacity>
-      <TransitionOpacity show={displayItem === 'year-selector'}>
+      <TransitionOpacity show={showYearSelector}>
         <YearSelector
           currentDate={date}
           onSelection={(date) => dispatch({ type: 'set-year', value: date.getFullYear() })}
