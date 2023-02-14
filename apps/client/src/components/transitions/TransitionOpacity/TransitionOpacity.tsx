@@ -4,7 +4,7 @@ import { Transition } from '@headlessui/react';
 
 export interface TransitionOpacityProps {
   children: React.ReactNode;
-  show?: boolean;
+  show: boolean;
 }
 
 export const TransitionOpacity = ({ children, show }: TransitionOpacityProps) => {

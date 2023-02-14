@@ -1,48 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { DatePicker } from './DatePicker';
+import DatePicker from 'react-datepicker';
+import { useController } from 'react-hook-form';
 
-function isValidDate(s: string): boolean {
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  return dateRegex.test(s);
-}
+import { FormDataType } from '../types';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 export interface DateFieldProps {
   name: string;
+  label: string;
 }
 
 export const DateField = ({ name }: DateFieldProps) => {
-  const [value, setValue] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const { field, formState } = useController<FormDataType>({ name, defaultValue: '' });
 
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    setValue(event.target.value);
+  const handleChange = () => {
+    field.onChange;
   };
 
-  const handleFocus = () => {
-    setShowDatePicker(true);
-  };
-
-  const handleBlur = () => {
-    setShowDatePicker(false);
-    if (!isValidDate(value)) {
-      setValue('');
-    }
-  };
-
-  return (
-    <div>
-      <input
-        autoComplete="off"
-        className="input"
-        name={name}
-        type="text"
-        value={value}
-        onBlur={handleBlur}
-        onChange={handleChange}
-        onFocus={handleFocus}
-      />
-      <DatePicker show={showDatePicker} onSelection={(selection) => setValue(selection.toISOString())} />
-    </div>
-  );
+  return <DatePicker className="field-input" dateFormat="yyyy-MM-dd" value={field.value} onChange={field.onChange} />;
 };
