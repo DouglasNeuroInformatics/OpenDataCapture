@@ -30,9 +30,9 @@ export const Button = ({
       })}
       {...props}
     >
-      {iconPosition === 'left' && icon}
+      {iconPosition === 'left' && icon && <div className="mr-2">{icon}</div>}
       {label}
-      {iconPosition === 'right' && icon}
+      {iconPosition === 'right' && icon && <div className="ml-2">{icon}</div>}
     </button>
   );
 };

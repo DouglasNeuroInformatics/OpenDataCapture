@@ -13,8 +13,8 @@ export const ActiveSubject = () => {
   }
 
   return (
-    <div className="pointer-events-none fixed top-0 right-0 z-50 px-4 py-6 opacity-95">
-      <div className="flex flex-col rounded-lg bg-slate-900 p-3 text-slate-300">
+    <div className="pointer-events-none fixed top-0 right-0 z-50 px-4 py-6">
+      <div className="flex flex-col rounded-lg bg-slate-900/75 p-3 text-slate-300 backdrop-blur-sm">
         <div className="pointer-events-auto mb-1 flex justify-end">
           <button onClick={() => setIsHidden(!isHidden)}>
             <IoMdRemoveCircle />
