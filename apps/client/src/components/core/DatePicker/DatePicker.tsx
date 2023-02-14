@@ -1,5 +1,6 @@
 import React, { useReducer, useState } from 'react';
 
+import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 import { ArrowToggle } from '../ArrowToggle';
@@ -67,7 +68,7 @@ export const DatePicker = ({ onSelection }: DatePickerProps) => {
             onClick={() => setShowYearSelector(!showYearSelector)}
           />
         </div>
-        <div className="flex">
+        <div className={clsx('flex', { hidden: showYearSelector })}>
           <ArrowToggle
             className="mx-1 flex items-center justify-center rounded-full p-1 hover:bg-slate-200"
             position="left"
