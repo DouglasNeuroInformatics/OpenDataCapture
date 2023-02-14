@@ -3,11 +3,10 @@ import React, { useReducer, useState } from 'react';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
-import { ArrowToggle } from '../ArrowToggle';
-
 import { Calendar } from './Calendar';
 import { YearSelector } from './YearSelector';
 
+import { ArrowToggle } from '@/components/core';
 import { TransitionOpacity } from '@/components/transitions';
 
 interface IncrementAction {
