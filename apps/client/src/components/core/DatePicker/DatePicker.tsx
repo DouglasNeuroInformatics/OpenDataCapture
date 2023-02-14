@@ -50,6 +50,11 @@ export const DatePicker = ({ onSelection }: DatePickerProps) => {
 
   const monthName = t('datetime.months')[date.getMonth()];
 
+  const handleYearSelection = (date: Date) => {
+    dispatch({ type: 'set-year', value: date.getFullYear() });
+    setShowYearSelector(false);
+  };
+
   return (
     <div className="w-fit bg-slate-50 p-3 shadow-lg">
       <div className="mb-3 flex items-center justify-between">
@@ -81,10 +86,7 @@ export const DatePicker = ({ onSelection }: DatePickerProps) => {
         <Calendar month={date.getMonth()} year={date.getFullYear()} onSelection={onSelection} />
       </TransitionOpacity>
       <TransitionOpacity show={showYearSelector}>
-        <YearSelector
-          currentDate={date}
-          onSelection={(date) => dispatch({ type: 'set-year', value: date.getFullYear() })}
-        />
+        <YearSelector currentDate={date} onSelection={handleYearSelection} />
       </TransitionOpacity>
     </div>
   );
