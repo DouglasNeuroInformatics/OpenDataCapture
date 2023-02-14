@@ -10,6 +10,7 @@ import { FormDataType } from '../types';
 import { DatePicker } from './DatePicker';
 
 export interface DateFieldProps {
+  kind: 'date';
   name: string;
   label: string;
 }

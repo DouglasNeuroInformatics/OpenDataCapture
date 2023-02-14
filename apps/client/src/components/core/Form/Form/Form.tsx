@@ -5,6 +5,7 @@ import { type JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { DateField } from '../DateField';
 import { SelectField } from '../SelectField';
 import { SubmitButton } from '../SubmitButton';
 import { TextField } from '../TextField';
@@ -41,6 +42,8 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
               return <TextField key={name} name={name} {...props} />;
             case 'select':
               return <SelectField key={name} name={name} {...props} />;
+            case 'date':
+              return <DateField key={name} name={name} {...props} />;
           }
         })}
         <SubmitButton />

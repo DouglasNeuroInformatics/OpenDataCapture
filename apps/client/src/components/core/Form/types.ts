@@ -1,3 +1,4 @@
+import { DateFieldProps } from './DateField';
 import { SelectFieldProps } from './SelectField';
 import { TextFieldProps } from './TextField';
 
@@ -12,5 +13,5 @@ export interface FormDataType {
 }
 
 export type FormFields<T extends FormDataType> = {
-  [K in keyof T]: Omit<TextFieldProps, 'name'> | Omit<SelectFieldProps<T[K]>, 'name'>;
+  [K in keyof T]: Omit<TextFieldProps, 'name'> | Omit<SelectFieldProps<T[K]>, 'name'> | Omit<DateFieldProps, 'name'>;
 };
