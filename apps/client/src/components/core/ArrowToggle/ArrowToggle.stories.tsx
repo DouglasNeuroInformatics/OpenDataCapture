@@ -1,13 +1,21 @@
-import React from 'react';
-
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { ArrowToggle } from './ArrowToggle';
 
-export default { component: ArrowToggle } as ComponentMeta<typeof ArrowToggle>;
+type Story = StoryObj<typeof ArrowToggle>;
 
-const Template: ComponentStory<typeof ArrowToggle> = (args) => <ArrowToggle {...args} />;
+export default { component: ArrowToggle } as Meta<typeof ArrowToggle>;
 
-export const Default = Template.bind({});
+export const UpToDown: Story = {
+  args: {
+    position: 'up',
+    rotation: 180
+  }
+};
 
-Default.args = {};
+export const LeftToDown: Story = {
+  args: {
+    position: 'left',
+    rotation: -90
+  }
+};

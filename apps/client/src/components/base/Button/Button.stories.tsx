@@ -1,23 +1,21 @@
-import React from 'react';
-
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { Button } from './Button';
 
-export default { component: Button } as ComponentMeta<typeof Button>;
+type Story = StoryObj<typeof Button>;
 
-const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
+export default { component: Button } as Meta<typeof Button>;
 
-export const Dark = Template.bind({});
-
-Dark.args = {
-  label: 'Dark Button',
-  variant: 'dark'
+export const Dark: Story = {
+  args: {
+    label: 'Dark Button',
+    variant: 'dark'
+  }
 };
 
-export const Light = Template.bind({});
-
-Light.args = {
-  label: 'Light Button',
-  variant: 'light'
+export const Light: Story = {
+  args: {
+    label: 'Light Button',
+    variant: 'light'
+  }
 };
