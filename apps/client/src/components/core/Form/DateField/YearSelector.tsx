@@ -18,6 +18,7 @@ export const YearSelector = ({ currentDate, onSelection }: YearSelectorProps) =>
             className={clsx('rounded-full p-2 hover:bg-indigo-200', {
               'bg-indigo-800 text-white': year === currentDate.getFullYear()
             })}
+            type="button"
             onClick={() => onSelection(new Date(year, 0))}
           >
             {year}

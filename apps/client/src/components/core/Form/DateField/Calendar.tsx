@@ -29,6 +29,7 @@ export const Calendar = ({ year, month, onSelection }: CalendarProps) => {
         <button
           className="flex h-8 w-8 items-center justify-center rounded-full text-sm hover:bg-slate-200"
           key={day}
+          type="button"
           onClick={() => onSelection(new Date(year, month, day))}
         >
           {day}
