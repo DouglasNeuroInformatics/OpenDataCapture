@@ -7,7 +7,7 @@ import { useController } from 'react-hook-form';
 import { ErrorMessage } from '../ErrorMessage';
 import { BaseFieldProps, FormDataType } from '../types';
 
-export interface SelectFieldProps<T> extends BaseFieldProps {
+export interface SelectFieldProps<T extends string> extends BaseFieldProps {
   kind: 'select';
   options: T[];
 }
