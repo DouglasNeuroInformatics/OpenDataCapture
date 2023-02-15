@@ -30,7 +30,7 @@ export const ActiveSubject = () => {
             <hr className="mb-2" />
             <span>First Name: {activeSubject.firstName}</span>
             <span>Last Name: {activeSubject.lastName}</span>
-            <span>Date of Birth: {DateUtils.toBasicISOString(activeSubject.dateOfBirth)}</span>
+            <span>Date of Birth: {activeSubject.dateOfBirth}</span>
             <span>Sex: {activeSubject.sex}</span>
           </React.Fragment>
         )}

@@ -1,9 +1,11 @@
-import { SubjectInterface } from 'common';
 import { create } from 'zustand';
 
-export type ActiveSubject = Required<
-  Pick<SubjectInterface['demographics'], 'firstName' | 'lastName' | 'dateOfBirth' | 'sex'>
->;
+export interface ActiveSubject {
+  firstName: string;
+  lastName: string;
+  sex: 'Male' | 'Female';
+  dateOfBirth: string;
+}
 
 export interface ActiveSubjectStore {
   activeSubject: ActiveSubject | null;

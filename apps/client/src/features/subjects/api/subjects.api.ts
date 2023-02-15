@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { instrumentRecordSchema, subjectSchema } from 'common';
+import { subjectSchema } from 'common';
 import { z } from 'zod';
 
-import { SubjectFormSchema } from '../components/SubjectForm';
+import { IdentificationFormData } from '@/components/core';
 
 export class SubjectsAPI {
-  static async addSubject(data: SubjectFormSchema) {
+  static async addSubject(data: IdentificationFormData) {
     await axios.post('/api/subjects', data);
   }
 
@@ -17,7 +17,5 @@ export class SubjectsAPI {
   static async getSubjectInstrumentRecords(id: string) {
     const response = await axios.get(`/api/instruments/records?subject=${id}`);
     return response.data as { dateCollected: string; data: Record<string, number> }[];
-    // console.log(response.data);
-    // return z.array(instrumentRecordSchema).parseAsync(response.data);
   }
 }
