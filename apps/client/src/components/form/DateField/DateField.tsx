@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { clsx } from 'clsx';
 import { DateUtils } from 'common';
@@ -18,39 +18,36 @@ export interface DateFieldProps {
 }
 
 export const DateField = ({ name, label }: DateFieldProps) => {
-  const { field, formState } = useController<FormDataType>({ name, defaultValue: '' });
+  const [inputFocused, setInputFocused] = useState(false);
+  const [mouseInDatePicker, setMouseInDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    field.onChange(event.target.value);
-  };
+  const { field, formState } = useController<FormDataType>({ name, defaultValue: '' });
+
+  useEffect(() => {
+    setShowDatePicker(inputFocused || mouseInDatePicker);
+  }, [inputFocused, mouseInDatePicker]);
 
   const handleDatePickerSelection = (date: Date) => {
     field.onChange(DateUtils.toBasicISOString(date));
-  };
-
-  const handleInputFocus: React.FocusEventHandler = () => {
-    setShowDatePicker(true);
-  };
-
-  const handleInputBlur: React.FocusEventHandler = () => {
     setShowDatePicker(false);
   };
+
+  const isFloatingLabel = showDatePicker || field.value;
 
   return (
     <React.Fragment>
       <div className="field-container">
         <input
           autoComplete="off"
-          className="field-input peer"
+          className="field-input"
           value={field.value}
-          onBlur={handleInputBlur}
-          onChange={onChange}
-          onFocus={handleInputFocus}
+          onBlur={() => setInputFocused(false)}
+          onFocus={() => setInputFocused(true)}
         />
         <label
-          className={clsx('field-label peer-focus:field-label-floating', {
-            'field-label-floating': field.value
+          className={clsx('field-label', {
+            'field-label-floating': isFloatingLabel
           })}
           htmlFor={name}
         >
@@ -58,7 +55,11 @@ export const DateField = ({ name, label }: DateFieldProps) => {
         </label>
         <ErrorMessage error={formState.errors[name]} />
         <TransitionOpacity show={showDatePicker}>
-          <DatePicker onSelection={handleDatePickerSelection} />
+          <DatePicker
+            onMouseEnter={() => setMouseInDatePicker(true)}
+            onMouseLeave={() => setMouseInDatePicker(false)}
+            onSelection={handleDatePickerSelection}
+          />
         </TransitionOpacity>
       </div>
     </React.Fragment>

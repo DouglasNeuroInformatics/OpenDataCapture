@@ -32,7 +32,7 @@ export const ArrowToggle = ({ position, rotation, onClick, ...props }: ArrowTogg
   };
 
   return (
-    <button onClick={handleClick} {...props}>
+    <button type="button" onClick={handleClick} {...props}>
       <HiChevronUp
         className="transform-gpu transition-transform"
         data-testid="arrow-up-icon"

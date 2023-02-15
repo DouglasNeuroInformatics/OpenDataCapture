@@ -41,9 +41,11 @@ const reducer = (previousDate: Date, action: ReducerAction) => {
 
 export interface DatePickerProps {
   onSelection: (value: Date) => void;
+  onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
 }
 
-export const DatePicker = ({ onSelection }: DatePickerProps) => {
+export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
   const [date, dispatch] = useReducer(reducer, new Date());
   const [showYearSelector, setShowYearSelector] = useState(false);
   const { t } = useTranslation();
@@ -56,7 +58,7 @@ export const DatePicker = ({ onSelection }: DatePickerProps) => {
   };
 
   return (
-    <div className="w-fit bg-slate-50 p-3 shadow-lg">
+    <div className="w-fit bg-slate-50 p-3 shadow-lg" {...props}>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex">
           <span className="font-semibold">{`${monthName} ${date.getFullYear()}`}</span>
