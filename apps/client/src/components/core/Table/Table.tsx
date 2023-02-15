@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 
-import clsx from 'clsx';
+import { clsx } from 'clsx';
+import { DateUtils } from 'common';
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
-
-import { Button } from '@/components/base';
 
 function formatValue(value: unknown): string {
   if (typeof value === 'string') {
@@ -16,7 +15,7 @@ function formatValue(value: unknown): string {
   }
 
   if (value instanceof Date) {
-    return value.toISOString().split('T')[0];
+    return DateUtils.toBasicISOString(value);
   }
 
   return JSON.stringify(value);

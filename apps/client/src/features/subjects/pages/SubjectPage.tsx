@@ -1,13 +1,12 @@
 import React from 'react';
 
-import { Stats } from 'common';
+import { DateUtils, Stats } from 'common';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { SubjectsAPI } from '../api/subjects.api';
 
-import { Divider } from '@/components/base';
 import { PageHeader, Spinner } from '@/components/core';
 
 export const SubjectPage = () => {

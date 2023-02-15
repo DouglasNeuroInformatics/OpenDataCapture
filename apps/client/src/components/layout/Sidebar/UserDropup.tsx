@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 
 import { Transition } from '@headlessui/react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { HiUserCircle } from 'react-icons/hi2';
 import { IoIosArrowUp } from 'react-icons/io';

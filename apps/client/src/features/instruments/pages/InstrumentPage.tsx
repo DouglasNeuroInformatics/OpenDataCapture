@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -9,7 +9,6 @@ import { DemographicsForm, DemographicsFormData } from '../components/Demographi
 import { InstrumentOverview } from '../components/InstrumentOverview';
 import { InstrumentRecordForm, InstrumentRecordFormData } from '../components/InstrumentRecordForm';
 
-import { Divider } from '@/components/base';
 import { PageHeader, Spinner } from '@/components/core';
 import { useNotificationsStore } from '@/stores/notifications-store';
 

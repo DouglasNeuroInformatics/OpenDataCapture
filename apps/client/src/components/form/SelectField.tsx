@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { Control, Controller, UseFormRegister } from 'react-hook-form';
 import Select from 'react-select';
 

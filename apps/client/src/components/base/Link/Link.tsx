@@ -1,6 +1,6 @@
 import React from 'react';
 
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 
 export interface LinkProps extends RouterLinkProps {
