@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { clsx } from 'clsx';
+import { DateUtils } from 'common';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
@@ -18,16 +19,14 @@ export interface DateFieldProps {
 
 export const DateField = ({ name, label }: DateFieldProps) => {
   const { field, formState } = useController<FormDataType>({ name, defaultValue: '' });
-  const [value, setValue] = useState(field.value);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     field.onChange(event.target.value);
-    setValue(event.target.value);
   };
 
   const handleDatePickerSelection = (date: Date) => {
-    setValue(date.toISOString());
+    field.onChange(DateUtils.toBasicISOString(date));
   };
 
   const handleInputFocus: React.FocusEventHandler = () => {
@@ -44,14 +43,14 @@ export const DateField = ({ name, label }: DateFieldProps) => {
         <input
           autoComplete="off"
           className="field-input peer"
-          value={value}
+          value={field.value}
           onBlur={handleInputBlur}
           onChange={onChange}
           onFocus={handleInputFocus}
         />
         <label
           className={clsx('field-label peer-focus:field-label-floating', {
-            'field-label-floating': value
+            'field-label-floating': field.value
           })}
           htmlFor={name}
         >
