@@ -2,6 +2,7 @@ import React from 'react';
 
 import { ajvResolver } from '@hookform/resolvers/ajv';
 import { type JSONSchemaType } from 'ajv';
+import { fullFormats } from 'ajv-formats/dist/formats';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -20,7 +21,9 @@ export interface FormProps<T extends FormDataType> {
 
 export const Form = <T extends FormDataType>({ className, fields, schema, onSubmit }: FormProps<T>) => {
   const methods = useForm<T>({
-    resolver: ajvResolver<T>(schema)
+    resolver: ajvResolver<T>(schema, {
+      formats: fullFormats
+    })
   });
 
   const handleFormSubmission = (data: T) => {

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
@@ -8,6 +7,8 @@ import { ErrorMessage } from '../ErrorMessage';
 import { FormDataType } from '../types';
 
 import { DatePicker } from './DatePicker';
+
+import { TransitionOpacity } from '@/components/transitions';
 
 export interface DateFieldProps {
   kind: 'date';
@@ -57,9 +58,9 @@ export const DateField = ({ name, label }: DateFieldProps) => {
           {label}
         </label>
         <ErrorMessage error={formState.errors[name]} />
-        <Transition show={showDatePicker}>
+        <TransitionOpacity show={showDatePicker}>
           <DatePicker onSelection={handleDatePickerSelection} />
-        </Transition>
+        </TransitionOpacity>
       </div>
     </React.Fragment>
   );

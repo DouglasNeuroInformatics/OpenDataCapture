@@ -9,6 +9,7 @@ interface DemographicsFormData extends FormDataType {
   firstName: string;
   lastName: string;
   sex: 'Male' | 'Female';
+  dateOfBirth: string;
 }
 
 type Story = StoryObj<typeof Form<DemographicsFormData>>;
@@ -28,6 +29,10 @@ const fields: FormFields<DemographicsFormData> = {
     kind: 'select',
     label: 'Sex',
     options: ['Male', 'Female']
+  },
+  dateOfBirth: {
+    kind: 'date',
+    label: 'Date of Birth'
   }
 };
 
@@ -45,10 +50,14 @@ const schema: JSONSchemaType<DemographicsFormData> = {
     sex: {
       type: 'string',
       enum: ['Male', 'Female']
+    },
+    dateOfBirth: {
+      type: 'string',
+      format: 'date'
     }
   },
   additionalProperties: false,
-  required: ['firstName', 'lastName', 'sex']
+  required: ['firstName', 'lastName', 'sex', 'dateOfBirth']
 };
 
 export default { component: Form } as Meta<typeof Form>;
