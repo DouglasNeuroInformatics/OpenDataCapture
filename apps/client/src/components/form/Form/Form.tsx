@@ -6,16 +6,14 @@ import { fullFormats } from 'ajv-formats/dist/formats';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { DateField } from '../DateField';
-import { SelectField } from '../SelectField';
 import { SubmitButton } from '../SubmitButton';
-import { TextField } from '../TextField';
-import { FormDataType, FormFieldGroup, FormFields } from '../types';
+import { FormDataType, FormFields, GroupedFormFields } from '../types';
+
+import { FormGroup } from './FormGroup';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
-  fields: FormFields<T>;
-  groups?: FormFieldGroup<T>[];
+  fields: FormFields<T> | GroupedFormFields<T>;
   schema: JSONSchemaType<T>;
   onSubmit: (data: T) => void;
 }
@@ -39,17 +37,11 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
         className={clsx('w-full', className)}
         onSubmit={methods.handleSubmit(handleFormSubmission)}
       >
-        {Object.keys(fields).map((name) => {
-          const props = fields[name];
-          switch (props.kind) {
-            case 'text':
-              return <TextField key={name} name={name} {...props} />;
-            case 'select':
-              return <SelectField key={name} name={name} {...props} />;
-            case 'date':
-              return <DateField key={name} name={name} {...props} />;
-          }
-        })}
+        {fields instanceof Array ? (
+          fields.map((props) => <FormGroup key={props.title} {...props} />)
+        ) : (
+          <FormGroup fields={fields} />
+        )}
         <SubmitButton />
       </form>
     </FormProvider>
