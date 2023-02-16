@@ -14,7 +14,7 @@ interface DemographicsFormData extends FormDataType {
 
 type Story = StoryObj<typeof Form<DemographicsFormData>>;
 
-const fields: FormFields<DemographicsFormData> = {
+const demographicsFields: FormFields<DemographicsFormData> = {
   firstName: {
     kind: 'text',
     label: 'First Name',
@@ -36,7 +36,7 @@ const fields: FormFields<DemographicsFormData> = {
   }
 };
 
-const schema: JSONSchemaType<DemographicsFormData> = {
+const demographicsSchema: JSONSchemaType<DemographicsFormData> = {
   type: 'object',
   properties: {
     firstName: {
@@ -62,10 +62,10 @@ const schema: JSONSchemaType<DemographicsFormData> = {
 
 export default { component: Form } as Meta<typeof Form>;
 
-export const LoginForm: Story = {
+export const DemographicsForm: Story = {
   args: {
-    fields,
-    schema,
+    fields: demographicsFields,
+    schema: demographicsSchema,
     onSubmit: (data) => alert(JSON.stringify(data))
   }
 };
