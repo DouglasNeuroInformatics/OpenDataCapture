@@ -2,14 +2,14 @@ import React from 'react';
 
 import { JSONSchemaType } from 'ajv';
 
-import { Form, FormDataType, FormFields } from '@/components/form';
+import { Form, FormFields } from '@/components/form';
 
-export interface IdentificationFormData extends FormDataType {
+export type IdentificationFormData = {
   firstName: string;
   lastName: string;
   sex: 'Male' | 'Female';
   dateOfBirth: string;
-}
+};
 
 export const identificationFormFields: FormFields<IdentificationFormData> = {
   firstName: {

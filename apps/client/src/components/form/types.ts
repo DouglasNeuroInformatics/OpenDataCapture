@@ -3,7 +3,6 @@ import { SelectFieldProps } from './SelectField';
 import { TextFieldProps } from './TextField';
 
 export interface BaseFieldProps {
-  kind: unknown;
   name: string;
   label: string;
 }
@@ -22,3 +21,8 @@ export type FormDateFieldType = Omit<DateFieldProps, 'name'>;
 export type FormFields<T extends FormDataType> = {
   [K in keyof T]: FormTextFieldType | FormSelectFieldType<T[K]> | FormDateFieldType;
 };
+
+export interface FormFieldGroup<T extends FormDataType> {
+  title: string;
+  fields: Array<keyof T>;
+}

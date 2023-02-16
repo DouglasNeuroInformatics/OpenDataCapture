@@ -1,16 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { JSONSchemaType } from 'ajv';
 
-import { FormDataType, FormFields } from '../types';
+import { FormFieldGroup, FormFields } from '../types';
 
 import { Form } from './Form';
 
-interface DemographicsFormData extends FormDataType {
+type DemographicsFormData = {
   firstName: string;
   lastName: string;
   sex: 'Male' | 'Female';
   dateOfBirth: string;
-}
+  countryOfBirth: string;
+};
 
 type Story = StoryObj<typeof Form<DemographicsFormData>>;
 
@@ -33,8 +34,20 @@ const demographicsFields: FormFields<DemographicsFormData> = {
   dateOfBirth: {
     kind: 'date',
     label: 'Date of Birth'
+  },
+  countryOfBirth: {
+    kind: 'text',
+    label: 'Country of Birth',
+    variant: 'short'
   }
 };
+
+const demographicsFieldGroups: FormFieldGroup<DemographicsFormData>[] = [
+  {
+    title: 'Required Fields',
+    fields: ['firstName', 'lastName', 'sex', 'dateOfBirth']
+  }
+];
 
 const demographicsSchema: JSONSchemaType<DemographicsFormData> = {
   type: 'object',
@@ -54,6 +67,9 @@ const demographicsSchema: JSONSchemaType<DemographicsFormData> = {
     dateOfBirth: {
       type: 'string',
       format: 'date'
+    },
+    countryOfBirth: {
+      type: 'string'
     }
   },
   additionalProperties: false,
@@ -65,6 +81,7 @@ export default { component: Form } as Meta<typeof Form>;
 export const DemographicsForm: Story = {
   args: {
     fields: demographicsFields,
+    groups: demographicsFieldGroups,
     schema: demographicsSchema,
     onSubmit: (data) => alert(JSON.stringify(data))
   }

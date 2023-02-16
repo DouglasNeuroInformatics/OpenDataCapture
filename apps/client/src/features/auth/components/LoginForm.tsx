@@ -4,13 +4,13 @@ import { JSONSchemaType } from 'ajv';
 
 import { AuthAPI } from '../api/auth.api';
 
-import { Form, FormDataType, FormFields } from '@/components/form';
+import { Form, FormFields } from '@/components/form';
 import { useAuthStore } from '@/stores/auth-store';
 
-interface LoginFormData extends FormDataType {
+type LoginFormData = {
   username: string;
   password: string;
-}
+};
 
 const loginFormFields: FormFields<LoginFormData> = {
   username: {

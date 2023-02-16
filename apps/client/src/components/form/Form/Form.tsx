@@ -10,11 +10,12 @@ import { DateField } from '../DateField';
 import { SelectField } from '../SelectField';
 import { SubmitButton } from '../SubmitButton';
 import { TextField } from '../TextField';
-import { FormDataType, FormFields } from '../types';
+import { FormDataType, FormFieldGroup, FormFields } from '../types';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
   fields: FormFields<T>;
+  groups?: FormFieldGroup<T>[];
   schema: JSONSchemaType<T>;
   onSubmit: (data: T) => void;
 }
