@@ -20,7 +20,7 @@ const loginFormFields: FormFields<LoginFormData> = {
   },
   password: {
     kind: 'text',
-    label: 'Username',
+    label: 'Password',
     variant: 'password'
   }
 };
