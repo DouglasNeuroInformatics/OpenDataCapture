@@ -7,6 +7,9 @@ interface ImportMetaDevEnv {
   readonly VITE_DEV_PASSWORD?: string;
   readonly VITE_DEV_SERVER_PORT?: number;
   readonly VITE_DEV_BYPASS_AUTH?: boolean;
+  readonly VITE_DEV_GIT_BRANCH?: string;
+  readonly VITE_DEV_GIT_COMMIT?: string;
+  readonly VITE_DEV_GIT_COMMIT_DATE?: string;
 }
 
 interface ImportMetaEnv extends ImportMetaDevEnv {
