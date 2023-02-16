@@ -6,10 +6,9 @@ import { fullFormats } from 'ajv-formats/dist/formats';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { FormGroup } from '../FormGroup';
 import { SubmitButton } from '../SubmitButton';
 import { FormDataType, FormFields, GroupedFormFields } from '../types';
-
-import { FormGroup } from './FormGroup';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
