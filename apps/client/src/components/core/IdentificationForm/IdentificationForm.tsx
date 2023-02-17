@@ -2,7 +2,7 @@ import React from 'react';
 
 import { JSONSchemaType } from 'ajv';
 
-import { Form, FormFields } from '@/components/form';
+import { Form, FormStructure } from '@/components/form';
 
 export type IdentificationFormData = {
   firstName: string;
@@ -11,7 +11,7 @@ export type IdentificationFormData = {
   dateOfBirth: string;
 };
 
-export const identificationFormFields: FormFields<IdentificationFormData> = [
+export const identificationFormStructure: FormStructure<IdentificationFormData> = [
   {
     fields: {
       firstName: {
@@ -66,5 +66,5 @@ export interface IdentificationFormProps {
 }
 
 export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
-  return <Form fields={identificationFormFields} schema={identificationFormSchema} onSubmit={onSubmit} />;
+  return <Form schema={identificationFormSchema} structure={identificationFormStructure} onSubmit={onSubmit} />;
 };

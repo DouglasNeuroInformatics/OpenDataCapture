@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { JSONSchemaType } from 'ajv';
 
-import { FormFields } from '../types';
+import { FormStructure } from '../types';
 
 import { Form } from './Form';
 
@@ -15,7 +15,7 @@ type FormValues = {
 
 type Story = StoryObj<typeof Form<FormValues>>;
 
-const fields: FormFields<FormValues> = [
+const structure: FormStructure<FormValues> = [
   {
     fields: {
       firstName: {
@@ -82,7 +82,7 @@ export default { component: Form } as Meta<typeof Form>;
 
 export const ExampleForm: Story = {
   args: {
-    fields,
+    structure,
     schema,
     onSubmit: (data) => alert(JSON.stringify(data))
   }

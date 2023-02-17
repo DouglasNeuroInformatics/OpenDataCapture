@@ -7,7 +7,7 @@ import { FormDataType, FormFields } from '../types';
 
 export interface FormGroupProps<T extends FormDataType> {
   title?: string;
-  fields: FormFields<T>[0]['fields'];
+  fields: FormFields<T>;
 }
 
 export const FormGroup = <T extends FormDataType>({ title, fields }: FormGroupProps<T>) => {

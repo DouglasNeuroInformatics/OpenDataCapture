@@ -16,9 +16,11 @@ export interface FormDataType {
   [key: string]: string;
 }
 
-export type FormFields<T extends FormDataType = FormDataType> = Array<{
+export type FormFields<T extends FormDataType> = {
+  [K in keyof T]?: FormFieldType<T[K]>;
+};
+
+export type FormStructure<T extends FormDataType = FormDataType> = Array<{
   title?: string;
-  fields: {
-    [K in keyof T]?: FormFieldType<T[K]>;
-  };
+  fields: FormFields<T>;
 }>;

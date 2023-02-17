@@ -4,7 +4,7 @@ import { JSONSchemaType } from 'ajv';
 
 import { AuthAPI } from '../api/auth.api';
 
-import { Form, FormFields } from '@/components/form';
+import { Form, FormStructure } from '@/components/form';
 import { useAuthStore } from '@/stores/auth-store';
 
 type LoginFormData = {
@@ -12,7 +12,7 @@ type LoginFormData = {
   password: string;
 };
 
-const loginFormFields: FormFields<LoginFormData> = [
+const loginFormStructure: FormStructure<LoginFormData> = [
   {
     fields: {
       username: {
@@ -67,5 +67,5 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     onSuccess();
   };
 
-  return <Form fields={loginFormFields} schema={loginFormSchema} onSubmit={login} />;
+  return <Form<LoginFormData> schema={loginFormSchema} structure={loginFormStructure} onSubmit={login} />;
 };

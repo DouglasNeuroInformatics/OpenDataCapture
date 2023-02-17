@@ -1,12 +1,3 @@
-import React from 'react';
-
-import { ajvResolver } from '@hookform/resolvers/ajv';
-import { type JSONSchemaType } from 'ajv';
-import { fullFormats } from 'ajv-formats/dist/formats';
-import { FormProvider, useForm } from 'react-hook-form';
-
-import { FormFields, FormGroup, SubmitButton } from '@/components/form';
-
 /*
 type CoreFormData = {
   title: string;

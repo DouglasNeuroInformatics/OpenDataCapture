@@ -8,16 +8,16 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import { FormGroup } from '../FormGroup';
 import { SubmitButton } from '../SubmitButton';
-import { FormDataType, FormFields } from '../types';
+import { FormDataType, FormStructure } from '../types';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
-  fields: FormFields<T>;
+  structure: FormStructure<T>;
   schema: JSONSchemaType<T>;
   onSubmit: (data: T) => void;
 }
 
-export const Form = <T extends FormDataType>({ className, fields, schema, onSubmit }: FormProps<T>) => {
+export const Form = <T extends FormDataType>({ className, structure, schema, onSubmit }: FormProps<T>) => {
   const methods = useForm<T>({
     resolver: ajvResolver<T>(schema, {
       formats: fullFormats
@@ -36,7 +36,7 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
         className={clsx('w-full', className)}
         onSubmit={methods.handleSubmit(handleFormSubmission)}
       >
-        {fields.map((props) => (
+        {structure.map((props) => (
           <FormGroup key={props.title} {...props} />
         ))}
         <SubmitButton />
