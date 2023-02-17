@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
+import { expect } from 'vitest';
 
 import { ArrowToggle } from './ArrowToggle';
 
