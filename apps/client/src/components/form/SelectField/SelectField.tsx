@@ -18,7 +18,7 @@ export const SelectField = <T extends string = string>({ name, label, options }:
   return (
     <React.Fragment>
       <Listbox as="div" className="field-container" name={name} value={field.value} onChange={field.onChange}>
-        <Listbox.Button className="field-input">{field.value}</Listbox.Button>
+        <Listbox.Button className="field-input">{field.value as string}</Listbox.Button>
         <Listbox.Label
           className={clsx('field-label ui-open:field-label-floating', {
             'field-label-floating': field.value

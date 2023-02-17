@@ -21,7 +21,7 @@ export const TextField = ({ name, label, variant }: TextFieldProps) => {
         autoComplete="off"
         className="field-input peer"
         type={type}
-        value={field.value}
+        value={field.value as string}
         onChange={field.onChange}
       />
       <label

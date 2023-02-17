@@ -39,7 +39,7 @@ export const DateField = ({ name, label }: DateFieldProps) => {
         <input
           autoComplete="off"
           className="field-input"
-          value={field.value}
+          value={field.value as string}
           onBlur={() => setInputFocused(false)}
           onFocus={() => setInputFocused(true)}
         />

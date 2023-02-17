@@ -14,12 +14,10 @@ export interface BaseFieldProps {
 
 export type FormFieldValue = string;
 
-export interface FormDataType {
-  [key: string]: FormFieldValue;
-}
+export type FormDataType = Record<PropertyKey, FormFieldValue | Record<PropertyKey, FormFieldValue>[]>;
 
 export type FormFields<T extends FormDataType> = {
-  [K in keyof T]?: FormFieldType<T[K]>;
+  [K in keyof T]?: T extends Record<PropertyKey, FormFieldValue> ? FormFieldType<T[K]> : never;
 };
 
 export type FormStructure<T extends FormDataType = FormDataType> = Array<{
