@@ -12,8 +12,10 @@ export interface BaseFieldProps {
   label: string;
 }
 
+export type FormFieldValue = string;
+
 export interface FormDataType {
-  [key: string]: string;
+  [key: string]: FormFieldValue;
 }
 
 export type FormFields<T extends FormDataType> = {
