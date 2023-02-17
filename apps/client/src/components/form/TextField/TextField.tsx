@@ -12,8 +12,7 @@ export interface TextFieldProps extends BaseFieldProps {
 }
 
 export const TextField = ({ name, label, variant }: TextFieldProps) => {
-  const { field, formState } = useController<FormDataType>({ name, defaultValue: '' });
-
+  const { field, fieldState } = useController<FormDataType>({ name, defaultValue: '' });
   const type = (variant === 'short' ? 'text' : 'password') satisfies HTMLInputTypeAttribute;
 
   return (
@@ -33,7 +32,7 @@ export const TextField = ({ name, label, variant }: TextFieldProps) => {
       >
         {label}
       </label>
-      <ErrorMessage error={formState.errors[name]} />
+      <ErrorMessage error={fieldState.error} />
     </div>
   );
 };

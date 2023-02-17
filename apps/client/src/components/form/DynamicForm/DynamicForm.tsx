@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { ajvResolver } from '@hookform/resolvers/ajv';
+import { JSONSchemaType } from 'ajv';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 
 import { TextField } from '../TextField';
@@ -13,16 +15,33 @@ type FormValues = {
   }[];
 };
 
+const schema: JSONSchemaType<FormValues> = {
+  type: 'object',
+  properties: {
+    cart: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            minLength: 1
+          },
+          amount: {
+            type: 'string',
+            minLength: 1
+          }
+        },
+        required: ['name', 'amount']
+      }
+    }
+  },
+  required: ['cart']
+};
+
 export const DynamicForm = () => {
   const methods = useForm<FormValues>({
-    defaultValues: {
-      cart: [
-        {
-          name: '',
-          amount: ''
-        }
-      ]
-    }
+    resolver: ajvResolver(schema)
   });
 
   const { fields, append, remove } = useFieldArray({

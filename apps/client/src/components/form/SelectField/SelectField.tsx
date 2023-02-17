@@ -13,7 +13,7 @@ export interface SelectFieldProps<T extends string> extends BaseFieldProps {
 }
 
 export const SelectField = <T extends string = string>({ name, label, options }: SelectFieldProps<T>) => {
-  const { field, formState } = useController<FormDataType>({ name });
+  const { field, fieldState } = useController<FormDataType>({ name });
 
   return (
     <React.Fragment>
@@ -42,7 +42,7 @@ export const SelectField = <T extends string = string>({ name, label, options }:
           </Listbox.Options>
         </Transition>
       </Listbox>
-      <ErrorMessage error={formState.errors[name]} />
+      <ErrorMessage error={fieldState.error} />
     </React.Fragment>
   );
 };

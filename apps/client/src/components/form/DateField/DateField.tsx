@@ -5,16 +5,14 @@ import { DateUtils } from 'common';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
-import { FormDataType } from '../types';
+import { BaseFieldProps, FormDataType } from '../types';
 
 import { DatePicker } from './DatePicker';
 
 import { TransitionOpacity } from '@/components/transitions';
 
-export interface DateFieldProps {
+export interface DateFieldProps extends BaseFieldProps {
   kind: 'date';
-  name: string;
-  label: string;
 }
 
 export const DateField = ({ name, label }: DateFieldProps) => {
@@ -22,7 +20,7 @@ export const DateField = ({ name, label }: DateFieldProps) => {
   const [mouseInDatePicker, setMouseInDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const { field, formState } = useController<FormDataType>({ name, defaultValue: '' });
+  const { field, fieldState } = useController<FormDataType>({ name, defaultValue: '' });
 
   useEffect(() => {
     setShowDatePicker(inputFocused || mouseInDatePicker);
@@ -53,7 +51,7 @@ export const DateField = ({ name, label }: DateFieldProps) => {
         >
           {label}
         </label>
-        <ErrorMessage error={formState.errors[name]} />
+        <ErrorMessage error={fieldState.error} />
         <TransitionOpacity show={showDatePicker}>
           <DatePicker
             onMouseEnter={() => setMouseInDatePicker(true)}
