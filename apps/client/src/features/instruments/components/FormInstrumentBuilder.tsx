@@ -7,6 +7,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import { FormFields, FormGroup, SubmitButton } from '@/components/form';
 
+/*
 type CoreFormData = {
   title: string;
 };
@@ -30,8 +31,10 @@ const coreFormSchema: JSONSchemaType<CoreFormData> = {
   additionalProperties: false,
   required: ['title']
 };
-
+*/
 export const FormInstrumentBuilder = () => {
+  return null;
+  /*
   const methods = useForm<CoreFormData>({
     resolver: ajvResolver<CoreFormData>(coreFormSchema, {
       formats: fullFormats
@@ -52,4 +55,5 @@ export const FormInstrumentBuilder = () => {
       </form>
     </FormProvider>
   );
+  */
 };

@@ -12,18 +12,22 @@ type LoginFormData = {
   password: string;
 };
 
-const loginFormFields: FormFields<LoginFormData> = {
-  username: {
-    kind: 'text',
-    label: 'Username',
-    variant: 'short'
-  },
-  password: {
-    kind: 'text',
-    label: 'Password',
-    variant: 'password'
+const loginFormFields: FormFields<LoginFormData> = [
+  {
+    fields: {
+      username: {
+        kind: 'text',
+        label: 'Username',
+        variant: 'short'
+      },
+      password: {
+        kind: 'text',
+        label: 'Password',
+        variant: 'password'
+      }
+    }
   }
-};
+];
 
 const loginFormSchema: JSONSchemaType<LoginFormData> = {
   type: 'object',

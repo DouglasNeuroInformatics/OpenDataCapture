@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { JSONSchemaType } from 'ajv';
 
-import { GroupedFormFields } from '../types';
+import { FormFields } from '../types';
 
 import { Form } from './Form';
 
-type DemographicsFormData = {
+type FormValues = {
   firstName: string;
   lastName: string;
   sex: 'Male' | 'Female';
@@ -13,11 +13,10 @@ type DemographicsFormData = {
   countryOfBirth: string;
 };
 
-type Story = StoryObj<typeof Form<DemographicsFormData>>;
+type Story = StoryObj<typeof Form<FormValues>>;
 
-const demographicsFields: GroupedFormFields<DemographicsFormData> = [
+const fields: FormFields<FormValues> = [
   {
-    title: 'Required Fields',
     fields: {
       firstName: {
         kind: 'text',
@@ -52,7 +51,7 @@ const demographicsFields: GroupedFormFields<DemographicsFormData> = [
   }
 ];
 
-const demographicsSchema: JSONSchemaType<DemographicsFormData> = {
+const schema: JSONSchemaType<FormValues> = {
   type: 'object',
   properties: {
     firstName: {
@@ -81,10 +80,10 @@ const demographicsSchema: JSONSchemaType<DemographicsFormData> = {
 
 export default { component: Form } as Meta<typeof Form>;
 
-export const DemographicsForm: Story = {
+export const ExampleForm: Story = {
   args: {
-    fields: demographicsFields,
-    schema: demographicsSchema,
+    fields,
+    schema,
     onSubmit: (data) => alert(JSON.stringify(data))
   }
 };

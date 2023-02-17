@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DateUtils, Stats } from 'common';
+import { Stats } from 'common';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';

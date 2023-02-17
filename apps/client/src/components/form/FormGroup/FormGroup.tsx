@@ -3,11 +3,11 @@ import React from 'react';
 import { DateField } from '../DateField';
 import { SelectField } from '../SelectField';
 import { TextField } from '../TextField';
-import { FormDataType, PartialFormFields } from '../types';
+import { FormDataType, FormFields } from '../types';
 
 export interface FormGroupProps<T extends FormDataType> {
   title?: string;
-  fields: PartialFormFields<T>;
+  fields: FormFields<T>[0]['fields'];
 }
 
 export const FormGroup = <T extends FormDataType>({ title, fields }: FormGroupProps<T>) => {

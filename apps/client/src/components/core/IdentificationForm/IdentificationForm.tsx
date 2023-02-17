@@ -11,27 +11,31 @@ export type IdentificationFormData = {
   dateOfBirth: string;
 };
 
-export const identificationFormFields: FormFields<IdentificationFormData> = {
-  firstName: {
-    kind: 'text',
-    label: 'First Name',
-    variant: 'short'
-  },
-  lastName: {
-    kind: 'text',
-    label: 'Last Name',
-    variant: 'short'
-  },
-  sex: {
-    kind: 'select',
-    label: 'Sex',
-    options: ['Male', 'Female']
-  },
-  dateOfBirth: {
-    kind: 'date',
-    label: 'Date of Birth'
+export const identificationFormFields: FormFields<IdentificationFormData> = [
+  {
+    fields: {
+      firstName: {
+        kind: 'text',
+        label: 'First Name',
+        variant: 'short'
+      },
+      lastName: {
+        kind: 'text',
+        label: 'Last Name',
+        variant: 'short'
+      },
+      sex: {
+        kind: 'select',
+        label: 'Sex',
+        options: ['Male', 'Female']
+      },
+      dateOfBirth: {
+        kind: 'date',
+        label: 'Date of Birth'
+      }
+    }
   }
-};
+];
 
 export const identificationFormSchema: JSONSchemaType<IdentificationFormData> = {
   type: 'object',

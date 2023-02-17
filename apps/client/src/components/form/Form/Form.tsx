@@ -8,11 +8,11 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import { FormGroup } from '../FormGroup';
 import { SubmitButton } from '../SubmitButton';
-import { FormDataType, FormFields, GroupedFormFields } from '../types';
+import { FormDataType, FormFields } from '../types';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
-  fields: FormFields<T> | GroupedFormFields<T>;
+  fields: FormFields<T>;
   schema: JSONSchemaType<T>;
   onSubmit: (data: T) => void;
 }
@@ -36,11 +36,9 @@ export const Form = <T extends FormDataType>({ className, fields, schema, onSubm
         className={clsx('w-full', className)}
         onSubmit={methods.handleSubmit(handleFormSubmission)}
       >
-        {fields instanceof Array ? (
-          fields.map((props) => <FormGroup key={props.title} {...props} />)
-        ) : (
-          <FormGroup fields={fields} />
-        )}
+        {fields.map((props) => (
+          <FormGroup key={props.title} {...props} />
+        ))}
         <SubmitButton />
       </form>
     </FormProvider>
