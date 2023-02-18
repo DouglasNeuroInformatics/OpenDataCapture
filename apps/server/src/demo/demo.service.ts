@@ -52,7 +52,7 @@ export class DemoService implements OnApplicationBootstrap {
       for (let j = 0; j < 8; j++) {
         for (const sex of demographicOptions.sex) {
           await this.subjectsService.create({
-            firstName: sex === 'Male' ? maleNames[j] : femaleNames[j],
+            firstName: sex === 'male' ? maleNames[j] : femaleNames[j],
             lastName: lastNames[i],
             dateOfBirth: Random.birthday(),
             sex: sex,
@@ -91,7 +91,7 @@ export class DemoService implements OnApplicationBootstrap {
           data: Object.fromEntries(
             instrument.data.map((field) => {
               let subtract = 0;
-              if (subject.demographics.sex === 'Male' && Random.int(0, 5) === 0) {
+              if (subject.demographics.sex === 'male' && Random.int(0, 5) === 0) {
                 subtract = Math.max(0, timepoint.getMonth() - 8);
               }
               return [field.name, Math.ceil(Random.int(1, 7) - subtract)];
