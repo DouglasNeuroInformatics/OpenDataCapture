@@ -42,7 +42,7 @@ export const Form = <T extends FormDataType>({ className, structure, validationS
         >
           {structure.map(({ title, fields }, i) => (
             <div key={i}>
-              {title && <h3>{title}</h3>}
+              {title && <h3 className="text-xl font-bold text-gray-800">{title}</h3>}
               {Object.keys(fields).map((name) => {
                 const props = fields[name];
                 if (!props) {

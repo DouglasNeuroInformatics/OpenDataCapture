@@ -34,6 +34,7 @@ export const ArrayField = ({ name, itemFields }: ArrayFieldProps) => {
     <React.Fragment>
       {fields.map(({ id, ...entries }, index) => (
         <section key={id}>
+          <h5 className="mt-5 text-lg font-semibold italic">Item {index + 1}</h5>
           {Object.keys(entries).map((key) => {
             const props = itemFields[key]!;
             return <PrimitiveField key={key} name={`${name}.${index}.${key}`} {...props} />;
