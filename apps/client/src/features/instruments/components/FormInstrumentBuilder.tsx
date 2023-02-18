@@ -26,12 +26,12 @@ const structure: FormStructure<FormValues> = [
       description: {
         kind: 'text',
         label: 'Instrument Description',
-        variant: 'short'
+        variant: 'long'
       },
       instructions: {
         kind: 'text',
         label: 'Instrument Instructions',
-        variant: 'short'
+        variant: 'long'
       }
     }
   },
