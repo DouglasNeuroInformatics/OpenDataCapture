@@ -6,6 +6,7 @@ import { fullFormats } from 'ajv-formats/dist/formats';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { ArrayField } from '../ArrayField';
 import { DateField } from '../DateField';
 import { SelectField } from '../SelectField';
 import { SubmitButton } from '../SubmitButton';
@@ -53,7 +54,7 @@ export const Form = <T extends FormDataType>({ className, structure, schema, onS
                 case 'date':
                   return <DateField key={name} name={name} {...props} />;
                 case 'array':
-                  return 'array';
+                  return <ArrayField key={name} name={name} {...props} />;
               }
             })}
           </div>

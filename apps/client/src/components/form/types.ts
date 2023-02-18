@@ -24,11 +24,6 @@ type PrimitiveFieldType<T extends FieldValue> =
 /** A higher-order field containing an arbitrary number of primitive fields */
 type ArrayFieldType<T extends FormDataRecord[]> = Omit<ArrayFieldProps<T>, 'name'>;
 
-/*
-  {
-  [K in keyof T[number]]: PrimitiveFieldType<T[number][K]>;
-}; */
-
 /** Discriminates whether the field is a primitive or array type */
 type FormFieldType<T> = [T] extends [FieldValue]
   ? PrimitiveFieldType<T>
