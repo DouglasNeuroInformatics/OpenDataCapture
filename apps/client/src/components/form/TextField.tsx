@@ -3,8 +3,8 @@ import React, { type HTMLInputTypeAttribute } from 'react';
 import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
-import { ErrorMessage } from '../ErrorMessage';
-import { BaseFieldProps, FormDataRecord } from '../types';
+import { ErrorMessage } from './ErrorMessage';
+import { BaseFieldProps, FormDataRecord } from './types';
 
 export interface TextFieldProps extends BaseFieldProps {
   kind: 'text';

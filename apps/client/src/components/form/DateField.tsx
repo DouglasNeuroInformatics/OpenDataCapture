@@ -4,11 +4,10 @@ import { clsx } from 'clsx';
 import { DateUtils } from 'common';
 import { useController } from 'react-hook-form';
 
-import { ErrorMessage } from '../ErrorMessage';
-import { BaseFieldProps, FormDataRecord } from '../types';
+import { ErrorMessage } from './ErrorMessage';
+import { BaseFieldProps, FormDataRecord } from './types';
 
-import { DatePicker } from './DatePicker';
-
+import { DatePicker } from '@/components/core';
 import { TransitionOpacity } from '@/components/transitions';
 
 export interface DateFieldProps extends BaseFieldProps {

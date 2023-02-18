@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { JSONSchemaType } from 'ajv';
 
-import { FormStructure } from '../types';
-
 import { Form } from './Form';
+import { FormStructure } from './types';
 
 type FormValues = {
   firstName: string;

@@ -6,12 +6,13 @@ import { fullFormats } from 'ajv-formats/dist/formats';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { ArrayField } from '../ArrayField';
-import { DateField } from '../DateField';
-import { SelectField } from '../SelectField';
-import { SubmitButton } from '../SubmitButton';
-import { TextField } from '../TextField';
-import { FormDataType, FormStructure } from '../types';
+import { ArrayField } from './ArrayField';
+import { DateField } from './DateField';
+import { SelectField } from './SelectField';
+import { TextField } from './TextField';
+import { FormDataType, FormStructure } from './types';
+
+import { Button } from '@/components/base';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
@@ -59,7 +60,7 @@ export const Form = <T extends FormDataType>({ className, structure, schema, onS
             })}
           </div>
         ))}
-        <SubmitButton />
+        <Button label="Submit" type="submit" />
       </form>
     </FormProvider>
   );

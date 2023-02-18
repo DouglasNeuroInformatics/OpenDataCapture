@@ -2,8 +2,8 @@ import React from 'react';
 
 import { useFieldArray } from 'react-hook-form';
 
-import { TextField } from '../TextField';
-import { FormDataRecord, FormFields } from '../types';
+import { TextField } from './TextField';
+import { FormDataRecord, FormFields } from './types';
 
 import { Button } from '@/components/base';
 

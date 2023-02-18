@@ -1,5 +1,6 @@
 export * from './ActiveSubject';
 export * from './ArrowToggle';
+export * from './DatePicker';
 export * from './Dropdown';
 export * from './IdentificationForm';
 export * from './LanguageToggle';
