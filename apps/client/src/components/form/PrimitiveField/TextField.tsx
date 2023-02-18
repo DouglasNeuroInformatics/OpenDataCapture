@@ -1,11 +1,8 @@
-import React, { type HTMLInputTypeAttribute } from 'react';
+import React from 'react';
 
 import { clsx } from 'clsx';
-import { useController } from 'react-hook-form';
 
-import { BaseFieldProps, FormDataRecord } from '../types';
-
-import { ErrorMessage } from './ErrorMessage';
+import { BaseFieldProps, FieldValue } from '../types';
 
 type TextFieldVariant = 'short' | 'long' | 'password';
 
@@ -20,28 +17,26 @@ const TextAreaElement = ({ value, onChange }: React.HTMLProps<HTMLTextAreaElemen
 export interface TextFieldProps extends BaseFieldProps {
   kind: 'text';
   variant: TextFieldVariant;
+  onChange: React.ChangeEventHandler<any>;
+  value: FieldValue;
 }
 
-export const TextField = ({ name, label, variant }: TextFieldProps) => {
-  const { field, fieldState } = useController<FormDataRecord>({ name, defaultValue: '' });
-  const type = (variant === 'short' ? 'text' : 'password') satisfies HTMLInputTypeAttribute;
-
+export const TextField = ({ name, label, variant, value, onChange }: TextFieldProps) => {
   return (
     <div className="field-container">
       {variant === 'short' || variant === 'password' ? (
-        <InputElement type={type} value={field.value} onChange={field.onChange} />
+        <InputElement type={variant === 'short' ? 'text' : 'password'} value={value} onChange={onChange} />
       ) : (
-        <TextAreaElement value={field.value} onChange={field.onChange} />
+        <TextAreaElement value={value} onChange={onChange} />
       )}
       <label
         className={clsx('field-label peer-focus:field-label-floating', {
-          'field-label-floating': field.value
+          'field-label-floating': value
         })}
         htmlFor={name}
       >
         {label}
       </label>
-      <ErrorMessage error={fieldState.error} />
     </div>
   );
 };

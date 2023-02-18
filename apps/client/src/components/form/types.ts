@@ -48,6 +48,7 @@ type FormStructure<T extends FormDataType = FormDataType> = Array<{
 
 export {
   BaseFieldProps,
+  DistributiveOmit,
   FieldValue,
   FieldKind,
   PrimitiveFieldType,

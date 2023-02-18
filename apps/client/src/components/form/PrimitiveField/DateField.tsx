@@ -1,66 +1,71 @@
 import React, { useEffect, useState } from 'react';
 
+import { Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 import { DateUtils } from 'common';
-import { useController } from 'react-hook-form';
 
-import { BaseFieldProps, FormDataRecord } from '../types';
-
-import { ErrorMessage } from './ErrorMessage';
+import { BaseFieldProps, FieldValue } from '../types';
 
 import { DatePicker } from '@/components/core';
-import { TransitionOpacity } from '@/components/transitions';
 
 export interface DateFieldProps extends BaseFieldProps {
   kind: 'date';
+  value: FieldValue;
+  onChange: (value: FieldValue) => void;
 }
 
-export const DateField = ({ name, label }: DateFieldProps) => {
+export const DateField = ({ name, label, value, onChange }: DateFieldProps) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [mouseInDatePicker, setMouseInDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-
-  const { field, fieldState } = useController<FormDataRecord>({ name, defaultValue: '' });
 
   useEffect(() => {
     setShowDatePicker(inputFocused || mouseInDatePicker);
   }, [inputFocused, mouseInDatePicker]);
 
   const handleDatePickerSelection = (date: Date) => {
-    field.onChange(DateUtils.toBasicISOString(date));
+    onChange(DateUtils.toBasicISOString(date));
     setShowDatePicker(false);
   };
 
-  const isFloatingLabel = showDatePicker || field.value;
+  const isFloatingLabel = showDatePicker || value;
 
   return (
     <React.Fragment>
-      <div className="field-container">
-        <input
-          autoComplete="off"
-          className="field-input"
-          value={field.value}
-          onBlur={() => setInputFocused(false)}
-          onChange={field.onChange}
-          onFocus={() => setInputFocused(true)}
-        />
-        <label
-          className={clsx('field-label', {
-            'field-label-floating': isFloatingLabel
-          })}
-          htmlFor={name}
-        >
-          {label}
-        </label>
-        <ErrorMessage error={fieldState.error} />
-        <TransitionOpacity show={showDatePicker}>
+      <input
+        autoComplete="off"
+        className="field-input"
+        value={value}
+        onBlur={() => setInputFocused(false)}
+        onChange={(event) => onChange(event.target.value)}
+        onFocus={() => setInputFocused(true)}
+      />
+      <label
+        className={clsx('field-label', {
+          'field-label-floating': isFloatingLabel
+        })}
+        htmlFor={name}
+      >
+        {label}
+      </label>
+      <Transition
+        className="relative"
+        enter="transition-opacity duration-100"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity duration-150"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+        show={showDatePicker}
+      >
+        <div className="absolute">
           <DatePicker
             onMouseEnter={() => setMouseInDatePicker(true)}
             onMouseLeave={() => setMouseInDatePicker(false)}
             onSelection={handleDatePickerSelection}
           />
-        </TransitionOpacity>
-      </div>
+        </div>
+      </Transition>
     </React.Fragment>
   );
 };
