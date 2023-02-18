@@ -54,7 +54,7 @@ const structure: FormStructure<FormValues> = [
     fields: {
       arrayField: {
         kind: 'array',
-        itemFields: {
+        fieldset: {
           f1: {
             kind: 'text',
             label: 'Field 1',
