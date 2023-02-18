@@ -5,7 +5,7 @@ import { DateUtils } from 'common';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
-import { BaseFieldProps, FormDataType } from '../types';
+import { BaseFieldProps, FormDataRecord } from '../types';
 
 import { DatePicker } from './DatePicker';
 
@@ -20,7 +20,7 @@ export const DateField = ({ name, label }: DateFieldProps) => {
   const [mouseInDatePicker, setMouseInDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const { field, fieldState } = useController<FormDataType>({ name, defaultValue: '' });
+  const { field, fieldState } = useController<FormDataRecord>({ name, defaultValue: '' });
 
   useEffect(() => {
     setShowDatePicker(inputFocused || mouseInDatePicker);
@@ -39,7 +39,7 @@ export const DateField = ({ name, label }: DateFieldProps) => {
         <input
           autoComplete="off"
           className="field-input"
-          value={field.value as string}
+          value={field.value}
           onBlur={() => setInputFocused(false)}
           onFocus={() => setInputFocused(true)}
         />

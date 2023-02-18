@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
-import { BaseFieldProps, FormDataType } from '../types';
+import { BaseFieldProps, FormDataRecord } from '../types';
 
 export interface TextFieldProps extends BaseFieldProps {
   kind: 'text';
@@ -12,7 +12,7 @@ export interface TextFieldProps extends BaseFieldProps {
 }
 
 export const TextField = ({ name, label, variant }: TextFieldProps) => {
-  const { field, fieldState } = useController<FormDataType>({ name, defaultValue: '' });
+  const { field, fieldState } = useController<FormDataRecord>({ name, defaultValue: '' });
   const type = (variant === 'short' ? 'text' : 'password') satisfies HTMLInputTypeAttribute;
 
   return (
@@ -21,7 +21,7 @@ export const TextField = ({ name, label, variant }: TextFieldProps) => {
         autoComplete="off"
         className="field-input peer"
         type={type}
-        value={field.value as string}
+        value={field.value}
         onChange={field.onChange}
       />
       <label

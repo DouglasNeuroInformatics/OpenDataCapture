@@ -6,8 +6,10 @@ import { fullFormats } from 'ajv-formats/dist/formats';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { FormGroup } from '../FormGroup';
+import { DateField } from '../DateField';
+import { SelectField } from '../SelectField';
 import { SubmitButton } from '../SubmitButton';
+import { TextField } from '../TextField';
 import { FormDataType, FormStructure } from '../types';
 
 export interface FormProps<T extends FormDataType> {
@@ -36,8 +38,25 @@ export const Form = <T extends FormDataType>({ className, structure, schema, onS
         className={clsx('w-full', className)}
         onSubmit={methods.handleSubmit(handleFormSubmission)}
       >
-        {structure.map((props) => (
-          <FormGroup key={props.title} {...props} />
+        {structure.map(({ title, fields }, i) => (
+          <div key={i}>
+            {title && <h3>{title}</h3>}
+            {Object.keys(fields).map((name) => {
+              const props = fields[name];
+              switch (props?.kind) {
+                case undefined:
+                  return null;
+                case 'text':
+                  return <TextField key={name} name={name} {...props} />;
+                case 'select':
+                  return <SelectField key={name} name={name} {...props} />;
+                case 'date':
+                  return <DateField key={name} name={name} {...props} />;
+                case 'array':
+                  return 'array';
+              }
+            })}
+          </div>
         ))}
         <SubmitButton />
       </form>

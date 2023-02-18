@@ -5,7 +5,7 @@ import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
 import { ErrorMessage } from '../ErrorMessage';
-import { BaseFieldProps, FormDataType } from '../types';
+import { BaseFieldProps, FormDataRecord } from '../types';
 
 export interface SelectFieldProps<T extends string> extends BaseFieldProps {
   kind: 'select';
@@ -13,12 +13,12 @@ export interface SelectFieldProps<T extends string> extends BaseFieldProps {
 }
 
 export const SelectField = <T extends string = string>({ name, label, options }: SelectFieldProps<T>) => {
-  const { field, fieldState } = useController<FormDataType>({ name });
+  const { field, fieldState } = useController<FormDataRecord>({ name });
 
   return (
     <React.Fragment>
       <Listbox as="div" className="field-container" name={name} value={field.value} onChange={field.onChange}>
-        <Listbox.Button className="field-input">{field.value as string}</Listbox.Button>
+        <Listbox.Button className="field-input">{field.value}</Listbox.Button>
         <Listbox.Label
           className={clsx('field-label ui-open:field-label-floating', {
             'field-label-floating': field.value
