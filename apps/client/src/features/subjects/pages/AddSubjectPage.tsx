@@ -1,16 +1,25 @@
 import React from 'react';
 
-import { SubjectForm } from '../components/SubjectForm';
+import { SubjectsAPI } from '../api/subjects.api';
 
-import { PageHeader } from '@/components/core';
+import { IdentificationForm, IdentificationFormData, PageHeader } from '@/components/core';
+import { useActiveSubjectStore } from '@/stores/active-subject-store';
 import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const AddSubjectPage = () => {
+  const { setActiveSubject } = useActiveSubjectStore();
   const notifications = useNotificationsStore();
+
+  const handleSubmit = async (data: IdentificationFormData) => {
+    await SubjectsAPI.addSubject(data);
+    setActiveSubject(data);
+    notifications.add({ type: 'success' });
+  };
+
   return (
     <div className="mx-auto flex max-w-screen-sm flex-col items-center">
       <PageHeader title="Add Subject" />
-      <SubjectForm onSuccess={() => notifications.add({ type: 'success' })} />
+      <IdentificationForm onSubmit={handleSubmit} />
     </div>
   );
 };

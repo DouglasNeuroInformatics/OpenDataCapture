@@ -7,7 +7,6 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 
 import { SubjectsAPI } from '../api/subjects.api';
 
-import { Divider } from '@/components/base';
 import { PageHeader, Spinner } from '@/components/core';
 
 export const SubjectPage = () => {

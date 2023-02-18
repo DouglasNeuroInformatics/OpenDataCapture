@@ -1,47 +1,65 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import DatePicker from 'react-datepicker';
-import { Control, Controller, UseFormRegister } from 'react-hook-form';
+import { clsx } from 'clsx';
+import { DateUtils } from 'common';
+import { useController } from 'react-hook-form';
 
-import 'react-datepicker/dist/react-datepicker.css';
-import { FieldElement } from './FieldElement';
+import { ErrorMessage } from './ErrorMessage';
+import { BaseFieldProps, FormDataRecord } from './types';
 
-export interface DateFieldProps {
-  name: string;
-  label: string;
-  register: UseFormRegister<any>;
-  control: Control<any>;
-  error?: string;
+import { DatePicker } from '@/components/core';
+import { TransitionOpacity } from '@/components/transitions';
+
+export interface DateFieldProps extends BaseFieldProps {
+  kind: 'date';
 }
 
-export const DateField = ({ name, label, control, error }: DateFieldProps) => {
-  const [isFloatingLabel, setIsFloatingLabel] = useState(false);
+export const DateField = ({ name, label }: DateFieldProps) => {
+  const [inputFocused, setInputFocused] = useState(false);
+  const [mouseInDatePicker, setMouseInDatePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const { field, fieldState } = useController<FormDataRecord>({ name, defaultValue: '' });
+
+  useEffect(() => {
+    setShowDatePicker(inputFocused || mouseInDatePicker);
+  }, [inputFocused, mouseInDatePicker]);
+
+  const handleDatePickerSelection = (date: Date) => {
+    field.onChange(DateUtils.toBasicISOString(date));
+    setShowDatePicker(false);
+  };
+
+  const isFloatingLabel = showDatePicker || field.value;
+
   return (
-    <FieldElement error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
-      <Controller
-        control={control}
-        name={name}
-        render={({ field: { onChange, value } }) => {
-          if (value) {
-            setIsFloatingLabel(true);
-          }
-          return (
-            <DatePicker
-              showYearDropdown
-              className="input"
-              dateFormat="yyyy-MM-dd"
-              name={name}
-              popperPlacement="bottom-start"
-              selected={value as Date}
-              startDate={null}
-              value={value as string}
-              onBlur={() => (value ? null : setIsFloatingLabel(false))}
-              onChange={onChange}
-              onFocus={() => setIsFloatingLabel(true)}
-            />
-          );
-        }}
-      />
-    </FieldElement>
+    <React.Fragment>
+      <div className="field-container">
+        <input
+          autoComplete="off"
+          className="field-input"
+          value={field.value}
+          onBlur={() => setInputFocused(false)}
+          onChange={field.onChange}
+          onFocus={() => setInputFocused(true)}
+        />
+        <label
+          className={clsx('field-label', {
+            'field-label-floating': isFloatingLabel
+          })}
+          htmlFor={name}
+        >
+          {label}
+        </label>
+        <ErrorMessage error={fieldState.error} />
+        <TransitionOpacity show={showDatePicker}>
+          <DatePicker
+            onMouseEnter={() => setMouseInDatePicker(true)}
+            onMouseLeave={() => setMouseInDatePicker(false)}
+            onSelection={handleDatePickerSelection}
+          />
+        </TransitionOpacity>
+      </div>
+    </React.Fragment>
   );
 };

@@ -1,58 +1,48 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import clsx from 'clsx';
-import { Control, Controller, UseFormRegister } from 'react-hook-form';
-import Select from 'react-select';
+import { Listbox, Transition } from '@headlessui/react';
+import { clsx } from 'clsx';
+import { useController } from 'react-hook-form';
 
-import { FieldElement } from './FieldElement';
+import { ErrorMessage } from './ErrorMessage';
+import { BaseFieldProps, FormDataRecord } from './types';
 
-export interface SelectFieldProps {
-  name: string;
-  label: string;
-  options: readonly string[];
-  control: Control<any>;
-  register: UseFormRegister<any>;
-  error?: string;
+export interface SelectFieldProps<T extends string> extends BaseFieldProps {
+  kind: 'select';
+  options: T[];
 }
 
-export const SelectField = ({ name, label, options, control, error }: SelectFieldProps) => {
-  const [isFloatingLabel, setIsFloatingLabel] = useState(false);
-  const selectOptions = options.map((option) => ({ value: option, label: option }));
+export const SelectField = <T extends string = string>({ name, label, options }: SelectFieldProps<T>) => {
+  const { field, fieldState } = useController<FormDataRecord>({ name });
+
   return (
-    <FieldElement error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
-      <Controller
-        control={control}
-        name={name}
-        render={({ field: { onChange, value } }) => {
-          if (value) {
-            setIsFloatingLabel(true);
-          }
-          return (
-            <Select
-              unstyled
-              classNames={{
-                control: ({ isFocused, menuIsOpen }) => {
-                  return clsx('w-full border-b-2 bg-transparent py-2 text-gray-900', {
-                    'border-indigo-800 outline-none': isFocused || menuIsOpen,
-                    'hover:border-gray-300': !menuIsOpen
-                  });
-                },
-                menu: () => clsx('mt-1 bg-slate-100 shadow-xl rounded-md'),
-                option: () => 'p-2 hover:bg-slate-200 capitalize'
-              }}
-              name={name}
-              options={selectOptions}
-              placeholder={null}
-              value={selectOptions.find((c) => c.value === value)}
-              onBlur={() => (value ? null : setIsFloatingLabel(false))}
-              onChange={(selectedOption) => {
-                selectedOption && onChange(selectedOption.value);
-              }}
-              onFocus={() => setIsFloatingLabel(true)}
-            />
-          );
-        }}
-      />
-    </FieldElement>
+    <React.Fragment>
+      <Listbox as="div" className="field-container" name={name} value={field.value} onChange={field.onChange}>
+        <Listbox.Button className="field-input">{field.value}</Listbox.Button>
+        <Listbox.Label
+          className={clsx('field-label ui-open:field-label-floating', {
+            'field-label-floating': field.value
+          })}
+        >
+          {label}
+        </Listbox.Label>
+        <Transition
+          as="div"
+          className="relative inline-block"
+          leave="transition ease-in duration-100"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <Listbox.Options className="absolute z-10 mt-1 w-full rounded-lg bg-slate-50 shadow-md">
+            {options.map((option) => (
+              <Listbox.Option className="p-2 hover:bg-slate-200" key={option} value={option}>
+                {option}
+              </Listbox.Option>
+            ))}
+          </Listbox.Options>
+        </Transition>
+      </Listbox>
+      <ErrorMessage error={fieldState.error} />
+    </React.Fragment>
   );
 };

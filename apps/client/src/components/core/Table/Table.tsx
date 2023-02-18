@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 
-import clsx from 'clsx';
+import { clsx } from 'clsx';
+import { DateUtils } from 'common';
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
-
-import { Button } from '@/components/base';
 
 function formatValue(value: unknown): string {
   if (typeof value === 'string') {
@@ -16,7 +15,7 @@ function formatValue(value: unknown): string {
   }
 
   if (value instanceof Date) {
-    return value.toISOString().split('T')[0];
+    return DateUtils.toBasicISOString(value);
   }
 
   return JSON.stringify(value);
@@ -50,11 +49,13 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
       <div className="overflow-x-scroll">
         <table className="relative w-full table-auto border">
           <thead>
-            {columns.map((column, i) => (
-              <th className="whitespace-nowrap px-6 py-3 text-left" key={i}>
-                {column.name}
-              </th>
-            ))}
+            <tr>
+              {columns.map((column, i) => (
+                <th className="whitespace-nowrap px-6 py-3 text-left" key={i}>
+                  {column.name}
+                </th>
+              ))}
+            </tr>
           </thead>
           <tbody>
             {currentEntries.map((entry, i) => (

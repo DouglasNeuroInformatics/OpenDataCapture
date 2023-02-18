@@ -1,50 +1,38 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { type HTMLInputTypeAttribute } from 'react';
 
-import { UseFormRegister } from 'react-hook-form';
+import { clsx } from 'clsx';
+import { useController } from 'react-hook-form';
 
-import { FieldElement } from './FieldElement';
+import { ErrorMessage } from './ErrorMessage';
+import { BaseFieldProps, FormDataRecord } from './types';
 
-export interface TextFieldProps {
-  name: string;
-  label: string;
-  register: UseFormRegister<any>;
-  error?: string;
-  variant?: 'date' | 'text' | 'password';
+export interface TextFieldProps extends BaseFieldProps {
+  kind: 'text';
+  variant: 'short' | 'password';
 }
 
-export const TextField = ({ name, label, register, error, variant = 'text' }: TextFieldProps) => {
-  const [isFloatingLabel, setIsFloatingLabel] = useState(false);
-
-  const inputRef = useCallback((e: HTMLInputElement | null) => {
-    if (e && e.value) {
-      setIsFloatingLabel(true);
-    }
-  }, []);
-
-  const handleBlur: React.FocusEventHandler<HTMLInputElement> = (event) => {
-    if (!event.currentTarget.value) {
-      setIsFloatingLabel(false);
-    }
-  };
-
-  const handleFocus: React.FocusEventHandler<HTMLInputElement> = () => {
-    setIsFloatingLabel(true);
-  };
-
-  const { ref, ...rest } = register(name, { onBlur: handleBlur });
+export const TextField = ({ name, label, variant }: TextFieldProps) => {
+  const { field, fieldState } = useController<FormDataRecord>({ name, defaultValue: '' });
+  const type = (variant === 'short' ? 'text' : 'password') satisfies HTMLInputTypeAttribute;
 
   return (
-    <FieldElement {...rest} error={error} isFloatingLabel={isFloatingLabel} label={label} name={name}>
+    <div className="field-container">
       <input
-        className="input"
-        type={variant}
-        onFocus={handleFocus}
-        {...rest}
-        ref={(e) => {
-          ref(e);
-          inputRef(e);
-        }}
+        autoComplete="off"
+        className="field-input peer"
+        type={type}
+        value={field.value}
+        onChange={field.onChange}
       />
-    </FieldElement>
+      <label
+        className={clsx('field-label peer-focus:field-label-floating', {
+          'field-label-floating': field.value
+        })}
+        htmlFor={name}
+      >
+        {label}
+      </label>
+      <ErrorMessage error={fieldState.error} />
+    </div>
   );
 };

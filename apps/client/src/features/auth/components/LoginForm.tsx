@@ -1,14 +1,49 @@
 import React, { useEffect } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginCredentials, loginCredentialsSchema } from 'common';
-import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { JSONSchemaType } from 'ajv';
 
 import { AuthAPI } from '../api/auth.api';
 
-import { Form } from '@/components/form';
+import { Form, FormStructure } from '@/components/form';
 import { useAuthStore } from '@/stores/auth-store';
+
+type LoginFormData = {
+  username: string;
+  password: string;
+};
+
+const structure: FormStructure<LoginFormData> = [
+  {
+    fields: {
+      username: {
+        kind: 'text',
+        label: 'Username',
+        variant: 'short'
+      },
+      password: {
+        kind: 'text',
+        label: 'Password',
+        variant: 'password'
+      }
+    }
+  }
+];
+
+const validationSchema: JSONSchemaType<LoginFormData> = {
+  type: 'object',
+  properties: {
+    username: {
+      type: 'string',
+      minLength: 1
+    },
+    password: {
+      type: 'string',
+      minLength: 1
+    }
+  },
+  additionalProperties: false,
+  required: ['username', 'password']
+};
 
 export interface LoginFormProps {
   onSuccess: () => void;
@@ -16,11 +51,6 @@ export interface LoginFormProps {
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const auth = useAuthStore();
-  const { t } = useTranslation();
-
-  const { register, handleSubmit, formState } = useForm<LoginCredentials>({
-    resolver: zodResolver(loginCredentialsSchema)
-  });
 
   useEffect(() => {
     if (import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH) {
@@ -31,30 +61,11 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     }
   }, []);
 
-  const { errors } = formState;
-
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (credentials: LoginFormData) => {
     const { accessToken } = await AuthAPI.login(credentials);
     await auth.setAccessToken(accessToken);
     onSuccess();
   };
 
-  return (
-    <Form onSubmit={handleSubmit(login)}>
-      <Form.TextField
-        error={errors.username?.message}
-        label={t('login.form.username')}
-        name="username"
-        register={register}
-      />
-      <Form.TextField
-        error={errors.password?.message}
-        label={t('login.form.password')}
-        name="password"
-        register={register}
-        variant="password"
-      />
-      <Form.SubmitButton label={t('login.form.submitBtnLabel')} />
-    </Form>
-  );
+  return <Form<LoginFormData> structure={structure} validationSchema={validationSchema} onSubmit={login} />;
 };
