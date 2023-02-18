@@ -1,28 +1,27 @@
 import React from 'react';
 
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 
-import { TextField } from './TextField';
+import { PrimitiveField } from './PrimitiveField';
 import { FormDataRecord, FormFields } from './types';
 
 import { Button } from '@/components/base';
 
-export interface ArrayFieldProps<T extends FormDataRecord[]> {
+export interface ArrayFieldProps {
   kind: 'array';
   name: string;
-  itemFields: FormFields<T[number]>;
+  itemFields: FormFields<FormDataRecord>;
 }
 
-export const ArrayField = <T extends FormDataRecord[]>({ name }: ArrayFieldProps<T>) => {
+export const ArrayField = ({ name, itemFields }: ArrayFieldProps) => {
+  const { control } = useFormContext<Record<PropertyKey, FormDataRecord[]>>();
   const { fields, append, remove } = useFieldArray({
+    control,
     name: name
   });
 
   const appendField = () => {
-    append({
-      name: '',
-      amount: ''
-    });
+    append(Object.fromEntries(Object.keys(itemFields).map((key) => [key, ''])));
   };
 
   const removeLastField = () => {
@@ -33,10 +32,12 @@ export const ArrayField = <T extends FormDataRecord[]>({ name }: ArrayFieldProps
 
   return (
     <React.Fragment>
-      {fields.map((field, index) => (
-        <section key={field.id}>
-          <TextField kind="text" label="Name" name={`cart.${index}.name`} variant="short" />
-          <TextField kind="text" label="Amount" name={`cart.${index}.amount`} variant="short" />
+      {fields.map(({ id, ...entries }, index) => (
+        <section key={id}>
+          {Object.keys(entries).map((key) => {
+            const props = itemFields[key]!;
+            return <PrimitiveField key={key} name={`${name}.${index}.${key}`} {...props} />;
+          })}
         </section>
       ))}
       <div className="mb-5 flex gap-5">

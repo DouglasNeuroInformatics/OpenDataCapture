@@ -10,7 +10,7 @@ type FormValues = {
   sex: 'Male' | 'Female';
   dateOfBirth: string;
   countryOfBirth: string;
-  cart: Array<{ name: string; amount: string }>;
+  arrayField: Array<{ f1: string; f2: string }>;
 };
 
 type Story = StoryObj<typeof Form<FormValues>>;
@@ -52,17 +52,17 @@ const structure: FormStructure<FormValues> = [
   {
     title: 'Dynamic Fields',
     fields: {
-      cart: {
+      arrayField: {
         kind: 'array',
         itemFields: {
-          name: {
+          f1: {
             kind: 'text',
-            label: 'Name',
+            label: 'Field 1',
             variant: 'short'
           },
-          amount: {
+          f2: {
             kind: 'text',
-            label: 'Amount',
+            label: 'Field 2',
             variant: 'short'
           }
         }
@@ -93,26 +93,26 @@ const validationSchema: JSONSchemaType<FormValues> = {
     countryOfBirth: {
       type: 'string'
     },
-    cart: {
+    arrayField: {
       type: 'array',
       items: {
         type: 'object',
         properties: {
-          name: {
+          f1: {
             type: 'string',
             minLength: 1
           },
-          amount: {
+          f2: {
             type: 'string',
             minLength: 1
           }
         },
-        required: ['name', 'amount']
+        required: ['f1', 'f2']
       }
     }
   },
   additionalProperties: false,
-  required: ['firstName', 'lastName', 'sex', 'dateOfBirth', 'cart']
+  required: ['firstName', 'lastName', 'sex', 'dateOfBirth', 'arrayField']
 };
 
 export default { component: Form } as Meta<typeof Form>;

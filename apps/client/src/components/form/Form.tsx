@@ -7,13 +7,11 @@ import { fullFormats } from 'ajv-formats/dist/formats';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { ArrayField } from './ArrayField';
-import { DateField } from './DateField';
-import { SelectField } from './SelectField';
-import { TextField } from './TextField';
-import { FormDataType, FormStructure } from './types';
+import { Button } from '../base';
 
-import { Button } from '@/components/base';
+import { ArrayField } from './ArrayField';
+import { PrimitiveField } from './PrimitiveField';
+import { FormDataType, FormStructure } from './types';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
@@ -47,17 +45,12 @@ export const Form = <T extends FormDataType>({ className, structure, validationS
               {title && <h3>{title}</h3>}
               {Object.keys(fields).map((name) => {
                 const props = fields[name];
-                switch (props?.kind) {
-                  case undefined:
-                    return null;
-                  case 'text':
-                    return <TextField key={name} name={name} {...props} />;
-                  case 'select':
-                    return <SelectField key={name} name={name} {...props} />;
-                  case 'date':
-                    return <DateField key={name} name={name} {...props} />;
-                  case 'array':
-                    return <ArrayField key={name} name={name} {...props} />;
+                if (!props) {
+                  return null;
+                } else if (props?.kind === 'array') {
+                  return <ArrayField key={name} name={name} {...props} />;
+                } else {
+                  return <PrimitiveField key={name} name={name} {...props} />;
                 }
               })}
             </div>
