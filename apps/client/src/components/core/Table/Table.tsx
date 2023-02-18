@@ -49,11 +49,13 @@ export const Table = <T extends Record<string, unknown>>({ columns, data, entryL
       <div className="overflow-x-scroll">
         <table className="relative w-full table-auto border">
           <thead>
-            {columns.map((column, i) => (
-              <th className="whitespace-nowrap px-6 py-3 text-left" key={i}>
-                {column.name}
-              </th>
-            ))}
+            <tr>
+              {columns.map((column, i) => (
+                <th className="whitespace-nowrap px-6 py-3 text-left" key={i}>
+                  {column.name}
+                </th>
+              ))}
+            </tr>
           </thead>
           <tbody>
             {currentEntries.map((entry, i) => (

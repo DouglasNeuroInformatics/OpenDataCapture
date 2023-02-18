@@ -40,6 +40,7 @@ export const DateField = ({ name, label }: DateFieldProps) => {
           className="field-input"
           value={field.value}
           onBlur={() => setInputFocused(false)}
+          onChange={field.onChange}
           onFocus={() => setInputFocused(true)}
         />
         <label

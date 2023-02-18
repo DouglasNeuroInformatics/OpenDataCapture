@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
@@ -29,6 +29,13 @@ export const ArrayField = ({ name, itemFields }: ArrayFieldProps) => {
       remove(fields.length - 1);
     }
   };
+
+  // This is probably a bad way of doing this, consider changing later
+  useLayoutEffect(() => {
+    if (fields.length === 0) {
+      appendField();
+    }
+  }, []);
 
   return (
     <React.Fragment>
