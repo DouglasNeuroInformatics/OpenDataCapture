@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { DevTool } from '@hookform/devtools';
 import { ajvResolver } from '@hookform/resolvers/ajv';
 import { type JSONSchemaType } from 'ajv';
 import { fullFormats } from 'ajv-formats/dist/formats';
@@ -17,13 +18,13 @@ import { Button } from '@/components/base';
 export interface FormProps<T extends FormDataType> {
   className?: string;
   structure: FormStructure<T>;
-  schema: JSONSchemaType<T>;
+  validationSchema: JSONSchemaType<T>;
   onSubmit: (data: T) => void;
 }
 
-export const Form = <T extends FormDataType>({ className, structure, schema, onSubmit }: FormProps<T>) => {
+export const Form = <T extends FormDataType>({ className, structure, validationSchema, onSubmit }: FormProps<T>) => {
   const methods = useForm<T>({
-    resolver: ajvResolver<T>(schema, {
+    resolver: ajvResolver<T>(validationSchema, {
       formats: fullFormats
     })
   });
@@ -34,34 +35,37 @@ export const Form = <T extends FormDataType>({ className, structure, schema, onS
   };
 
   return (
-    <FormProvider {...methods}>
-      <form
-        autoComplete="off"
-        className={clsx('w-full', className)}
-        onSubmit={methods.handleSubmit(handleFormSubmission)}
-      >
-        {structure.map(({ title, fields }, i) => (
-          <div key={i}>
-            {title && <h3>{title}</h3>}
-            {Object.keys(fields).map((name) => {
-              const props = fields[name];
-              switch (props?.kind) {
-                case undefined:
-                  return null;
-                case 'text':
-                  return <TextField key={name} name={name} {...props} />;
-                case 'select':
-                  return <SelectField key={name} name={name} {...props} />;
-                case 'date':
-                  return <DateField key={name} name={name} {...props} />;
-                case 'array':
-                  return <ArrayField key={name} name={name} {...props} />;
-              }
-            })}
-          </div>
-        ))}
-        <Button label="Submit" type="submit" />
-      </form>
-    </FormProvider>
+    <React.Fragment>
+      <FormProvider {...methods}>
+        <form
+          autoComplete="off"
+          className={clsx('w-full', className)}
+          onSubmit={methods.handleSubmit(handleFormSubmission)}
+        >
+          {structure.map(({ title, fields }, i) => (
+            <div key={i}>
+              {title && <h3>{title}</h3>}
+              {Object.keys(fields).map((name) => {
+                const props = fields[name];
+                switch (props?.kind) {
+                  case undefined:
+                    return null;
+                  case 'text':
+                    return <TextField key={name} name={name} {...props} />;
+                  case 'select':
+                    return <SelectField key={name} name={name} {...props} />;
+                  case 'date':
+                    return <DateField key={name} name={name} {...props} />;
+                  case 'array':
+                    return <ArrayField key={name} name={name} {...props} />;
+                }
+              })}
+            </div>
+          ))}
+          <Button label="Submit" type="submit" />
+        </form>
+      </FormProvider>
+      <DevTool control={methods.control} />
+    </React.Fragment>
   );
 };

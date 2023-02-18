@@ -12,7 +12,7 @@ type LoginFormData = {
   password: string;
 };
 
-const loginFormStructure: FormStructure<LoginFormData> = [
+const structure: FormStructure<LoginFormData> = [
   {
     fields: {
       username: {
@@ -29,7 +29,7 @@ const loginFormStructure: FormStructure<LoginFormData> = [
   }
 ];
 
-const loginFormSchema: JSONSchemaType<LoginFormData> = {
+const validationSchema: JSONSchemaType<LoginFormData> = {
   type: 'object',
   properties: {
     username: {
@@ -67,5 +67,5 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     onSuccess();
   };
 
-  return <Form<LoginFormData> schema={loginFormSchema} structure={loginFormStructure} onSubmit={login} />;
+  return <Form<LoginFormData> structure={structure} validationSchema={validationSchema} onSubmit={login} />;
 };

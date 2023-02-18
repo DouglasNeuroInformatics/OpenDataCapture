@@ -4,14 +4,14 @@ import { JSONSchemaType } from 'ajv';
 
 import { Form, FormStructure } from '@/components/form';
 
-export type IdentificationFormData = {
+type IdentificationFormData = {
   firstName: string;
   lastName: string;
   sex: 'Male' | 'Female';
   dateOfBirth: string;
 };
 
-export const identificationFormStructure: FormStructure<IdentificationFormData> = [
+const structure: FormStructure<IdentificationFormData> = [
   {
     fields: {
       firstName: {
@@ -37,7 +37,7 @@ export const identificationFormStructure: FormStructure<IdentificationFormData> 
   }
 ];
 
-export const identificationFormSchema: JSONSchemaType<IdentificationFormData> = {
+const validationSchema: JSONSchemaType<IdentificationFormData> = {
   type: 'object',
   properties: {
     firstName: {
@@ -66,5 +66,7 @@ export interface IdentificationFormProps {
 }
 
 export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
-  return <Form schema={identificationFormSchema} structure={identificationFormStructure} onSubmit={onSubmit} />;
+  return <Form structure={structure} validationSchema={validationSchema} onSubmit={onSubmit} />;
 };
+
+export type { IdentificationFormData };

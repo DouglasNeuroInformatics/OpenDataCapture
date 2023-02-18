@@ -71,7 +71,7 @@ const structure: FormStructure<FormValues> = [
   }
 ];
 
-const schema: JSONSchemaType<FormValues> = {
+const validationSchema: JSONSchemaType<FormValues> = {
   type: 'object',
   properties: {
     firstName: {
@@ -120,7 +120,7 @@ export default { component: Form } as Meta<typeof Form>;
 export const ExampleForm: Story = {
   args: {
     structure,
-    schema,
+    validationSchema,
     onSubmit: (data) => alert(JSON.stringify(data))
   }
 };
