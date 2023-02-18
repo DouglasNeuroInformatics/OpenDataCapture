@@ -5,6 +5,7 @@ import { PrimitiveFieldProps } from './PrimitiveField';
 type BaseFieldProps = {
   name: string;
   label: string;
+  description?: string;
 };
 
 /** The primitive values for in used when defining forms */

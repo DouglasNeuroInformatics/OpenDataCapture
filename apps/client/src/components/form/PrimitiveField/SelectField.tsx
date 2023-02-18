@@ -4,8 +4,9 @@ import { Listbox, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 import { useController } from 'react-hook-form';
 
+import { BaseFieldProps, FormDataRecord } from '../types';
+
 import { ErrorMessage } from './ErrorMessage';
-import { BaseFieldProps, FormDataRecord } from './types';
 
 export interface SelectFieldProps<T extends string> extends BaseFieldProps {
   kind: 'select';

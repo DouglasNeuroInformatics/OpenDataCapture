@@ -1,9 +1,10 @@
 import React from 'react';
 
+import { FieldValue } from '../types';
+
 import { DateField, DateFieldProps } from './DateField';
 import { SelectField, SelectFieldProps } from './SelectField';
 import { TextField, TextFieldProps } from './TextField';
-import { FieldValue } from './types';
 
 export type PrimitiveFieldProps<T extends FieldValue = FieldValue> =
   | DateFieldProps
