@@ -2,7 +2,7 @@ import React from 'react';
 
 import { JSONSchemaType } from 'ajv';
 
-import { Form, type FormStructure } from '@/components/form';
+import { FieldKind, Form, type FormStructure } from '@/components/form';
 
 type FormValues = {
   name: string;
@@ -10,6 +10,7 @@ type FormValues = {
   instructions: string;
   data: Array<{
     name: string;
+    kind: FieldKind;
     label: string;
   }>;
 };
@@ -46,6 +47,11 @@ const structure: FormStructure<FormValues> = [
             label: 'Field Name',
             variant: 'short'
           },
+          kind: {
+            kind: 'select',
+            label: 'Type of Field',
+            options: ['date', 'select', 'text']
+          },
           label: {
             kind: 'text',
             label: 'Field Label',
@@ -80,6 +86,10 @@ const validationSchema: JSONSchemaType<FormValues> = {
           name: {
             type: 'string',
             minLength: 1
+          },
+          kind: {
+            type: 'string',
+            enum: ['date', 'select', 'text']
           },
           label: {
             type: 'string',

@@ -7,10 +7,10 @@ import { FormDataRecord, FormFields } from './types';
 
 import { Button } from '@/components/base';
 
-export interface ArrayFieldProps {
+export interface ArrayFieldProps<T extends FormDataRecord[] = FormDataRecord[]> {
   kind: 'array';
   name: string;
-  fieldset: FormFields<FormDataRecord>;
+  fieldset: FormFields<T[number]>;
 }
 
 export const ArrayField = ({ name, fieldset }: ArrayFieldProps) => {
