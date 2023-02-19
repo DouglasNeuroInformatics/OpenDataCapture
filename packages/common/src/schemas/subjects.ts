@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const demographicOptions = {
-  sex: ['Male', 'Female'],
+  sex: ['male', 'female'],
   ethnicity: [
     'White',
     'South Asian (e.g., East Indian, Pakistani, Sri Lankan)',
@@ -16,7 +16,7 @@ export const demographicOptions = {
     'Japanese',
     'Other'
   ],
-  gender: ['Male', 'Female', 'Non-Binary'],
+  gender: ['male', 'female', 'non-binary'],
   employmentStatus: ['Full-Time', 'Part-Time', 'Student', 'Unemployed'],
   maritalStatus: [
     'Married (and not separated)',

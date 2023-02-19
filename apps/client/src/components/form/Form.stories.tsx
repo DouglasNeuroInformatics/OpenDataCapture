@@ -7,7 +7,7 @@ import { FormStructure } from './types';
 type FormValues = {
   firstName: string;
   lastName: string;
-  sex: 'Male' | 'Female';
+  sex: 'male' | 'female';
   dateOfBirth: string;
   countryOfBirth: string;
   arrayField: Array<{ f1: string; f2: string }>;
@@ -31,7 +31,7 @@ const structure: FormStructure<FormValues> = [
       sex: {
         kind: 'select',
         label: 'Sex',
-        options: ['Male', 'Female']
+        options: ['male', 'female']
       },
       dateOfBirth: {
         kind: 'date',
@@ -84,7 +84,7 @@ const validationSchema: JSONSchemaType<FormValues> = {
     },
     sex: {
       type: 'string',
-      enum: ['Male', 'Female']
+      enum: ['male', 'female']
     },
     dateOfBirth: {
       type: 'string',

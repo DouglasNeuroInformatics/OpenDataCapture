@@ -3,7 +3,7 @@ import { create } from 'zustand';
 export interface ActiveSubject {
   firstName: string;
   lastName: string;
-  sex: 'Male' | 'Female';
+  sex: 'male' | 'female';
   dateOfBirth: string;
 }
 

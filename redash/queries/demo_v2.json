@@ -2,12 +2,12 @@
   "collection": "instrumentrecords",
   "aggregate": [
     {
-			"$lookup": {
-				"from": "subjects",
-				"localField": "subject",
-				"foreignField": "_id",
-				"as": "subject"
-			}
+      "$lookup": {
+        "from": "subjects",
+        "localField": "subject",
+        "foreignField": "_id",
+        "as": "subject"
+      }
     },
     {
       "$unwind": "$subject"
@@ -37,7 +37,7 @@
         "stdTotalScore": {
           "$stdDevSamp": "$totalScore"
         },
-        "meanTotalScoreMale": {
+        "meanTotalScoremale": {
           "$avg": {
             "$cond": [
               {
@@ -48,7 +48,7 @@
             ]
           }
         },
-        "meanTotalScoreFemale": {
+        "meanTotalScorefemale": {
           "$avg": {
             "$cond": [
               {

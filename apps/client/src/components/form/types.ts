@@ -5,6 +5,7 @@ import { PrimitiveFieldProps } from './PrimitiveField';
 type BaseFieldProps = {
   name: string;
   label: string;
+  description?: string;
 };
 
 /** The primitive values for in used when defining forms */
@@ -20,14 +21,16 @@ type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : nev
 type PrimitiveFieldType<T extends FieldValue> = DistributiveOmit<PrimitiveFieldProps<T>, 'name'>;
 
 /** A higher-order field containing an arbitrary number of primitive fields */
-type ArrayFieldType = Omit<ArrayFieldProps, 'name'>;
+type ArrayFieldType<T extends FormDataRecord[]> = Omit<ArrayFieldProps<T>, 'name'>;
 
 /** Discriminates whether the field is a primitive or array type */
 type FormFieldType<T> = [T] extends [FieldValue]
   ? PrimitiveFieldType<T>
   : T extends FormDataRecord[]
-  ? ArrayFieldType
+  ? ArrayFieldType<T>
   : never;
+
+type FieldKind = PrimitiveFieldType<FieldValue>['kind'] | ArrayFieldProps['kind'];
 
 /** The fundamental data structure of the form, which informs the structure of the fields and schema */
 type FormDataType = Record<PropertyKey, FieldValue | FormDataRecord[]>;
@@ -43,4 +46,14 @@ type FormStructure<T extends FormDataType = FormDataType> = Array<{
   fields: FormFields<T>;
 }>;
 
-export { BaseFieldProps, FieldValue, PrimitiveFieldType, FormDataRecord, FormDataType, FormFields, FormStructure };
+export {
+  BaseFieldProps,
+  DistributiveOmit,
+  FieldValue,
+  FieldKind,
+  PrimitiveFieldType,
+  FormDataRecord,
+  FormDataType,
+  FormFields,
+  FormStructure
+};

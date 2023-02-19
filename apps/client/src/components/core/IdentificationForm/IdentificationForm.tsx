@@ -7,7 +7,7 @@ import { Form, FormStructure } from '@/components/form';
 type IdentificationFormData = {
   firstName: string;
   lastName: string;
-  sex: 'Male' | 'Female';
+  sex: 'male' | 'female';
   dateOfBirth: string;
 };
 
@@ -17,21 +17,25 @@ const structure: FormStructure<IdentificationFormData> = [
       firstName: {
         kind: 'text',
         label: 'First Name',
-        variant: 'short'
+        variant: 'short',
+        description: "The subject's first name, as provided by their birth certificate"
       },
       lastName: {
         kind: 'text',
         label: 'Last Name',
-        variant: 'short'
+        variant: 'short',
+        description: "The subject's last name, as provided by their birth certificate"
       },
       sex: {
         kind: 'select',
         label: 'Sex',
-        options: ['Male', 'Female']
+        options: ['male', 'female'],
+        description: "The subject's biological sex, as assigned at birth"
       },
       dateOfBirth: {
         kind: 'date',
-        label: 'Date of Birth'
+        label: 'Date of Birth',
+        description: "The subject's date of birth"
       }
     }
   }
@@ -50,7 +54,7 @@ const validationSchema: JSONSchemaType<IdentificationFormData> = {
     },
     sex: {
       type: 'string',
-      enum: ['Male', 'Female']
+      enum: ['male', 'female']
     },
     dateOfBirth: {
       type: 'string',

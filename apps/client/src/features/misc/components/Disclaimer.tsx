@@ -15,12 +15,10 @@ export const Disclaimer = () => {
 
   const handleClose = () => setIsAccepted(true, currentUser!.username);
 
+  const show = (!isAccepted || currentUser?.username !== username) && currentUser?.role !== 'admin';
+
   return (
-    <Modal
-      open={!isAccepted || currentUser?.username !== username}
-      title={t('home.disclaimer.title')}
-      onClose={handleClose}
-    >
+    <Modal open={show} title={t('home.disclaimer.title')} onClose={handleClose}>
       <p>{t('home.disclaimer.message')}</p>
       <div className="mt-3 flex">
         <Button className="mr-2" label={t('home.disclaimer.accept')} size="sm" onClick={handleClose} />

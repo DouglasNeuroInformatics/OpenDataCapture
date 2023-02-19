@@ -29,7 +29,7 @@ const data: SubjectInterface[] = range(25).map((i) => ({
   identifier: i.toString(),
   demographics: {
     dateOfBirth: Random.birthday(),
-    sex: Random.int(0, 1) === 0 ? 'Male' : 'Female'
+    sex: Random.int(0, 1) === 0 ? 'male' : 'female'
   }
 }));
 
