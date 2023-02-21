@@ -2690,10 +2690,10 @@
     iterare "1.2.1"
     tslib "2.5.0"
 
-"@nestjs/config@^2.2.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/config/-/config-2.3.0.tgz#b54e60ad90a894b67a87b766cdbbb6d60f4d18bb"
-  integrity sha512-VSAqoIagIrc0A3apaqC2O3a8VtQ+asw8xILmxvjK/eHW9m1rmhJ5NqkGf7m+uSv3Yxini4bzyb74Mk62+tB/cA==
+"@nestjs/config@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/config/-/config-2.3.1.tgz#6ac151f818db4ccf987c7ff8ef5b2c1f4eeec913"
+  integrity sha512-Ckzel0NZ9CWhNsLfE1hxfDuxJuEbhQvGxSlmZ1/X8awjRmAA/g3kT6M1+MO1SHj1wMtPyUfd9WpwkiqFbiwQgA==
   dependencies:
     dotenv "16.0.3"
     dotenv-expand "10.0.0"
