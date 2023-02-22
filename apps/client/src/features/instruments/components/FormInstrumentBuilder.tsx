@@ -12,6 +12,7 @@ type FormValues = {
     name: string;
     kind: FieldKind;
     label: string;
+    variant: string;
   }>;
 };
 
@@ -56,6 +57,11 @@ const structure: FormStructure<FormValues> = [
             kind: 'text',
             label: 'Field Label',
             variant: 'short'
+          },
+          variant: {
+            kind: 'text',
+            label: 'Field Variant',
+            variant: 'short'
           }
         }
       }
@@ -94,9 +100,26 @@ const validationSchema: JSONSchemaType<FormValues> = {
           label: {
             type: 'string',
             minLength: 1
+          },
+          variant: {
+            type: 'string'
           }
         },
-        required: ['name', 'label']
+        if: {
+          properties: {
+            kind: {
+              const: 'text'
+            }
+          }
+        },
+        then: {
+          properties: {
+            variant: {
+              enum: ['short', 'long', 'password']
+            }
+          }
+        },
+        required: ['name', 'kind', 'label', 'variant']
       }
     }
   },

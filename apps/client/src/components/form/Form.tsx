@@ -23,7 +23,8 @@ export interface FormProps<T extends FormDataType> {
 export const Form = <T extends FormDataType>({ className, structure, validationSchema, onSubmit }: FormProps<T>) => {
   const methods = useForm<T>({
     resolver: ajvResolver<T>(validationSchema, {
-      formats: fullFormats
+      formats: fullFormats,
+      strict: true
     })
   });
 
