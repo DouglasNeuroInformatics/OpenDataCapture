@@ -6,6 +6,8 @@ import { FaGithub } from 'react-icons/fa';
 
 const currentYear = new Date().getFullYear();
 
+const projectRepoLink = 'https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform';
+
 export interface FooterProps {
   className?: string;
 }
@@ -27,14 +29,15 @@ export const Footer = ({ className }: FooterProps) => {
               </span>
               <span className="@lg/footer:block hidden">|</span>
               <span className="@lg/footer:w-auto w-full text-center">
-                Last Commit on {import.meta.env.VITE_DEV_GIT_COMMIT_DATE}: &apos;{import.meta.env.VITE_DEV_GIT_COMMIT}
+                Last Commit on {import.meta.env.VITE_DEV_GIT_COMMIT_DATE}: &apos;
+                {import.meta.env.VITE_DEV_GIT_COMMIT?.slice(0, 7)}
               </span>
               <span className="@lg/footer:block hidden"> |</span>
             </>
           )}
           <a
             className="@lg/footer:w-auto flex w-full items-center justify-center"
-            href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform"
+            href={`${projectRepoLink}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT!}`}
             rel="noreferrer"
             target="_blank"
           >
