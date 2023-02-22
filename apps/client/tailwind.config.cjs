@@ -1,5 +1,3 @@
-const headlessUi = require('@headlessui/tailwindcss');
-const colors = require('tailwindcss/colors');
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 /** @type {import('tailwindcss').Config} */
@@ -88,5 +86,5 @@ module.exports = {
       sans: ['Inter var', ...defaultTheme.fontFamily.sans]
     }
   },
-  plugins: [headlessUi]
+  plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/container-queries')]
 };
