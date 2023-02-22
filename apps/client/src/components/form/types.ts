@@ -9,7 +9,7 @@ type BaseFieldProps = {
 };
 
 /** The primitive values for in used when defining forms */
-type FieldValue = string;
+type FieldValue = string | number;
 
 /** An object within the FormData structure, which may or may not contain nested records corresponding higher-order fields */
 type FormDataRecord = Record<PropertyKey, FieldValue>;

@@ -3,16 +3,16 @@ import React from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 
-import { BaseFieldProps } from '../types';
+import { BaseFieldProps, FieldValue } from '../types';
 
-export interface SelectFieldProps<T extends string> extends BaseFieldProps {
+export interface SelectFieldProps<T extends FieldValue> extends BaseFieldProps {
   kind: 'select';
   options: T[];
   value: T;
   onChange: (value: T) => void;
 }
 
-export const SelectField = <T extends string = string>({
+export const SelectField = <T extends FieldValue = string>({
   name,
   label,
   options,
