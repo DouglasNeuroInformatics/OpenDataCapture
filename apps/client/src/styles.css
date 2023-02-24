@@ -55,7 +55,3 @@
     @apply flex flex-col rounded-lg bg-white py-4 px-8 shadow-lg;
   }
 }
-
-.react-datepicker-wrapper {
-  z-index: 9999;
-}
