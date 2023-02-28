@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { JSONSchemaType } from 'ajv';
+import Ajv, { JSONSchemaType } from 'ajv';
 
 import { DistributiveOmit, FieldChangeHandler, FormValues } from '../types';
 
@@ -9,6 +9,15 @@ import { TextField, TextFieldProps } from './TextField';
 import { Button } from '@/components/base';
 
 type TextFieldType = DistributiveOmit<TextFieldProps, 'name' | 'value' | 'onChange'>;
+
+type FormErrors<T extends FormValues> = {
+  [K in keyof T]?: string;
+};
+
+const ajv = new Ajv({
+  allErrors: true,
+  strict: true
+});
 
 export interface FormProps<T extends FormValues> {
   structure: Array<{
@@ -22,6 +31,8 @@ export interface FormProps<T extends FormValues> {
 }
 
 export const Form = <T extends FormValues = FormValues>({ structure, validationSchema, onSubmit }: FormProps<T>) => {
+  const [errors, setErrors] = useState<FormErrors<T>>({});
+
   const [values, setValues] = useState<T>(
     Object.fromEntries(
       structure.flatMap((group) =>
@@ -41,7 +52,21 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    onSubmit(values);
+    const validate = ajv.compile<T>(validationSchema);
+    const valid = validate(values);
+    if (valid) {
+      onSubmit(values);
+    } else if (validate.errors) {
+      const errors = Object.fromEntries(
+        validate.errors.map((error) => [
+          error.instancePath.split('/').filter((s) => s)[0] as keyof T,
+          `${error.keyword}: ${error.message!}`
+        ])
+      ) as FormErrors<T>;
+      setErrors(errors);
+    } else {
+      console.error('An unexpected error occurred during form validation', validate);
+    }
   };
 
   return (
@@ -57,8 +82,9 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
                 fieldElement = <TextField value={values[name] as string} onChange={handleChange} {...props} />;
             }
             return (
-              <div className="relative my-6 flex w-full" key={name}>
+              <div className="relative my-6 flex w-full flex-col" key={name}>
                 {fieldElement}
+                <span className="block text-red-600">{errors[name]}</span>
               </div>
             );
           })}
