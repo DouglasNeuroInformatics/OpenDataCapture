@@ -6,6 +6,8 @@ import { DistributiveOmit, FieldChangeHandler, FormValues } from '../types';
 
 import { TextField, TextFieldProps } from './TextField';
 
+import { Button } from '@/components/base';
+
 type TextFieldType = DistributiveOmit<TextFieldProps, 'name' | 'value' | 'onChange'>;
 
 export interface FormProps<T extends FormValues> {
@@ -16,10 +18,11 @@ export interface FormProps<T extends FormValues> {
     };
   }>;
   validationSchema: JSONSchemaType<T>;
+  onSubmit: (values: T) => void;
 }
 
-export const Form = <T extends FormValues = FormValues>({ structure, validationSchema }: FormProps<T>) => {
-  const [values, setValues] = useState<FormValues>(
+export const Form = <T extends FormValues = FormValues>({ structure, validationSchema, onSubmit }: FormProps<T>) => {
+  const [values, setValues] = useState<T>(
     Object.fromEntries(
       structure.flatMap((group) =>
         Object.keys(group.fields).map((field: keyof T) => {
@@ -36,8 +39,13 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
     setValues((prevValues) => ({ ...prevValues, [key]: value }));
   };
 
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    onSubmit(values);
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       {structure.map(({ title, fields }, i) => (
         <div key={i}>
           {title && <h3 className="text-xl font-bold text-gray-800">{title}</h3>}
@@ -56,6 +64,7 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
           })}
         </div>
       ))}
+      <Button label="Submit" type="submit" />
     </form>
   );
 };

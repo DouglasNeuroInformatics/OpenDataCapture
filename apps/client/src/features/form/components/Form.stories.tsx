@@ -49,6 +49,7 @@ export const DemoForm: StoryObj<typeof Form<FormValues>> = {
         }
       },
       required: ['shortText', 'longText']
-    }
+    },
+    onSubmit: (values) => alert(JSON.stringify(values))
   }
 };
