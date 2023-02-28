@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 
 import Ajv, { JSONSchemaType } from 'ajv';
+import { fullFormats } from 'ajv-formats/dist/formats';
 
 import { FormContext } from '../context/FormContext';
 import { DistributiveOmit, FieldValue, FormErrors, FormValues } from '../types';
 
+import { DateField, DateFieldProps } from './DateField';
 import { TextField, TextFieldProps } from './TextField';
 
 import { Button } from '@/components/base';
 
-type TextFieldType = DistributiveOmit<TextFieldProps, 'name'>;
+type FieldType = DistributiveOmit<TextFieldProps | DateFieldProps, 'name'>;
 
 const ajv = new Ajv({
   allErrors: true,
+  formats: fullFormats,
   strict: true
 });
 
@@ -20,7 +23,7 @@ export interface FormProps<T extends FormValues> {
   structure: Array<{
     title?: string;
     fields: {
-      [K in keyof T]?: T[K] extends string ? TextFieldType : never;
+      [K in keyof T]?: T[K] extends string ? FieldType : never;
     };
   }>;
   validationSchema: JSONSchemaType<T>;
@@ -34,6 +37,8 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
         Object.keys(group.fields).map((field: keyof T) => {
           switch (group.fields[field]!.kind) {
             case 'text':
+              return [field, ''] as const;
+            case 'date':
               return [field, ''] as const;
           }
         })
@@ -79,6 +84,9 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
               switch (props.kind) {
                 case 'text':
                   fieldElement = <TextField {...props} />;
+                  break;
+                case 'date':
+                  fieldElement = <DateField {...props} />;
               }
               return (
                 <div className="relative my-6 flex w-full flex-col" key={name}>

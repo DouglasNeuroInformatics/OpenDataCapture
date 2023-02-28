@@ -6,6 +6,7 @@ type FormValues = {
   shortText: string;
   longText: string;
   passwordText: string;
+  date: string;
   range: number;
 };
 
@@ -35,6 +36,15 @@ export const DemoForm: StoryObj<typeof Form<FormValues>> = {
         }
       },
       {
+        title: 'Date Fields',
+        fields: {
+          date: {
+            kind: 'date',
+            label: 'Date Field'
+          }
+        }
+      },
+      {
         title: 'Numeric Fields',
         fields: {}
       }
@@ -54,11 +64,15 @@ export const DemoForm: StoryObj<typeof Form<FormValues>> = {
           type: 'string',
           minLength: 1
         },
+        date: {
+          type: 'string',
+          format: 'date'
+        },
         range: {
           type: 'integer'
         }
       },
-      required: ['shortText', 'longText']
+      required: ['shortText', 'longText', 'passwordText']
     },
     onSubmit: (values) => alert(JSON.stringify(values))
   }

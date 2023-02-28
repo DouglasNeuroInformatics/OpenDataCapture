@@ -11,18 +11,18 @@ export interface TextFieldProps extends BaseFieldProps {
 }
 
 export const TextField = ({ name, label, variant }: TextFieldProps) => {
-  const field = useField<string>(name);
+  const { props, helpers } = useField<HTMLInputElement | HTMLTextAreaElement, string>(name);
 
   return (
     <>
       {variant === 'long' ? (
-        <textarea autoComplete="off" className="field-input" rows={5} {...field} />
+        <textarea autoComplete="off" className="field-input" rows={5} {...props} />
       ) : (
-        <input autoComplete="off" className="field-input" type={variant} {...field} />
+        <input autoComplete="off" className="field-input" type={variant} {...props} />
       )}
       <label
         className={clsx('field-label', {
-          'field-label-floating': field.value || field.isFocused
+          'field-label-floating': props.value || helpers.isFocused
         })}
         htmlFor={name}
       >

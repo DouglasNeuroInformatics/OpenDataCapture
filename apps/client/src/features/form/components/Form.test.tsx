@@ -18,6 +18,6 @@ describe('Form', () => {
     const headings = await screen.findAllByRole('heading');
 
     // 3 - Assert that the component is doing what is expected
-    expect(headings).toHaveLength(2);
+    expect(headings).toHaveLength(3);
   });
 });

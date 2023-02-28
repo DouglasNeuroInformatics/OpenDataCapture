@@ -2,7 +2,7 @@
 export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
 
 /** The primitive values for in used when defining forms */
-export type FieldValue = string | number | boolean | Date;
+export type FieldValue = string | number;
 
 /** Common props for all field components */
 export type BaseFieldProps = {
