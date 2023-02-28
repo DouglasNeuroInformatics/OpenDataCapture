@@ -1,21 +1,17 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { clsx } from 'clsx';
 
-import { FormContext } from '../context/FormContext';
 import { BaseFieldProps } from '../types';
 
-export interface TextFieldProps extends BaseFieldProps {
+export interface TextFieldProps extends BaseFieldProps<string> {
   kind: 'text';
   variant: 'short' | 'long' | 'password';
 }
 
-export const TextField = ({ name, label, variant }: TextFieldProps) => {
-  const formContext = useContext(FormContext);
-  const value = formContext.values[name] as string;
-
+export const TextField = ({ name, label, variant, value, onChange }: TextFieldProps) => {
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
-    return;
+    onChange(name, event.target.value);
   };
 
   return (

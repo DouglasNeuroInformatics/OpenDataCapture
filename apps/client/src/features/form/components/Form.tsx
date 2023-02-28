@@ -2,16 +2,11 @@ import React, { useState } from 'react';
 
 import { JSONSchemaType } from 'ajv';
 
-import { FormContext } from '../context/FormContext';
-import { DistributiveOmit, FormValues } from '../types';
+import { DistributiveOmit, FieldChangeHandler, FormValues } from '../types';
 
 import { TextField, TextFieldProps } from './TextField';
 
 type TextFieldType = DistributiveOmit<TextFieldProps, 'name' | 'value' | 'onChange'>;
-
-const fieldComponents = {
-  text: (props: TextFieldProps) => <TextField {...props} />
-};
 
 export interface FormProps<T extends FormValues> {
   structure: Array<{
@@ -37,22 +32,30 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
     ) as T
   );
 
+  const handleChange: FieldChangeHandler<T> = (key, value) => {
+    setValues((prevValues) => ({ ...prevValues, [key]: value }));
+  };
+
   return (
-    <FormContext.Provider value={{ values, setValues }}>
-      <form>
-        {structure.map(({ title, fields }, i) => (
-          <div key={i}>
-            {title && <h3 className="text-xl font-bold text-gray-800">{title}</h3>}
-            {Object.keys(fields).map((name) => {
-              return (
-                <div className="relative my-6 flex w-full" key={name}>
-                  {fieldComponents[fields[name]!.kind]({ name, ...fields[name]! })}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </form>
-    </FormContext.Provider>
+    <form>
+      {structure.map(({ title, fields }, i) => (
+        <div key={i}>
+          {title && <h3 className="text-xl font-bold text-gray-800">{title}</h3>}
+          {Object.keys(fields).map((name) => {
+            let fieldElement: JSX.Element;
+            const props = { name, ...fields[name]! };
+            switch (props.kind) {
+              case 'text':
+                fieldElement = <TextField value={values[name] as string} onChange={handleChange} {...props} />;
+            }
+            return (
+              <div className="relative my-6 flex w-full" key={name}>
+                {fieldElement}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </form>
   );
 };
