@@ -14,3 +14,8 @@ export type BaseFieldProps = {
 
 /** A record of the field names and the types of their values */
 export type FormValues = Record<PropertyKey, FieldValue>;
+
+/** An object mapping field names to error messages, if applicable */
+export type FormErrors<T extends FormValues = FormValues> = {
+  [K in keyof T]?: string;
+};

@@ -3,17 +3,13 @@ import React, { useState } from 'react';
 import Ajv, { JSONSchemaType } from 'ajv';
 
 import { FormContext } from '../context/FormContext';
-import { DistributiveOmit, FieldValue, FormValues } from '../types';
+import { DistributiveOmit, FieldValue, FormErrors, FormValues } from '../types';
 
 import { TextField, TextFieldProps } from './TextField';
 
 import { Button } from '@/components/base';
 
 type TextFieldType = DistributiveOmit<TextFieldProps, 'name' | 'value' | 'onChange'>;
-
-type FormErrors<T extends FormValues> = {
-  [K in keyof T]?: string;
-};
 
 const ajv = new Ajv({
   allErrors: true,
@@ -71,7 +67,7 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
   };
 
   return (
-    <FormContext.Provider value={{ values, onChange: handleChange }}>
+    <FormContext.Provider value={{ errors, values, onChange: handleChange }}>
       <form onSubmit={handleSubmit}>
         {structure.map(({ title, fields }, i) => (
           <div key={i}>
