@@ -68,7 +68,7 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
   };
 
   return (
-    <FormContext.Provider value={{ errors, values, onChange: handleChange }}>
+    <FormContext.Provider value={{ errors, values, setValue: handleChange }}>
       <form onSubmit={handleSubmit}>
         {structure.map(({ title, fields }, i) => (
           <div key={i}>

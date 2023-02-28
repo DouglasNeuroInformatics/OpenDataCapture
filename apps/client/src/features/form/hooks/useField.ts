@@ -11,10 +11,9 @@ export function useField<T extends FieldValue>(name: string) {
 
   return {
     isFocused,
-    // setIsFocused,
     value: ctx.values[name] as T,
     onBlur: () => setIsFocused(false),
-    onChange: (event: ChangeEvent<FieldElement>) => ctx.onChange(name, event.target.value),
+    onChange: (event: ChangeEvent<FieldElement>) => ctx.setValue(name, event.target.value),
     onFocus: () => setIsFocused(true)
   };
 }
