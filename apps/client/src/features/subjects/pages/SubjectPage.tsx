@@ -3,7 +3,6 @@ import React from 'react';
 import { Stats } from 'common';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { SubjectsAPI } from '../api/subjects.api';
 
@@ -29,7 +28,7 @@ export const SubjectPage = () => {
       <PageHeader title={`Instruments for Subject: ${params.id!.slice(0, 6)}`} />
       <div>
         <h3 className="mt-5 text-center">Brief Psychiatric Rating Scale</h3>
-        <LineGraph data={graphData!} />
+        <LineGraph data={graphData!} xAxis={{ label: 'Timepoint' }} yAxis={{ label: 'Total Score' }} />
       </div>
     </div>
   ) : null;
