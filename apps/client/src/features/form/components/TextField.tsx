@@ -2,14 +2,17 @@ import React from 'react';
 
 import { clsx } from 'clsx';
 
+import { useField } from '../hooks/useField';
 import { BaseFieldProps } from '../types';
 
-export interface TextFieldProps extends BaseFieldProps<string> {
+export interface TextFieldProps extends BaseFieldProps {
   kind: 'text';
   variant: 'short' | 'long' | 'password';
 }
 
-export const TextField = ({ name, label, variant, value, onChange }: TextFieldProps) => {
+export const TextField = ({ name, label, variant }: TextFieldProps) => {
+  const { value, onChange } = useField<string>(name);
+
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
     onChange(name, event.target.value);
   };

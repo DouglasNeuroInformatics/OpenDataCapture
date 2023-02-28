@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 
 import Ajv, { JSONSchemaType } from 'ajv';
 
-import { DistributiveOmit, FieldChangeHandler, FormValues } from '../types';
+import { FormContext } from '../context/FormContext';
+import { DistributiveOmit, FieldValue, FormValues } from '../types';
 
 import { TextField, TextFieldProps } from './TextField';
 
@@ -46,7 +47,7 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
     ) as T
   );
 
-  const handleChange: FieldChangeHandler<T> = (key, value) => {
+  const handleChange = (key: keyof T, value: FieldValue) => {
     setValues((prevValues) => ({ ...prevValues, [key]: value }));
   };
 
@@ -70,27 +71,29 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {structure.map(({ title, fields }, i) => (
-        <div key={i}>
-          {title && <h3 className="text-xl font-bold text-gray-800">{title}</h3>}
-          {Object.keys(fields).map((name) => {
-            let fieldElement: JSX.Element;
-            const props = { name, ...fields[name]! };
-            switch (props.kind) {
-              case 'text':
-                fieldElement = <TextField value={values[name] as string} onChange={handleChange} {...props} />;
-            }
-            return (
-              <div className="relative my-6 flex w-full flex-col" key={name}>
-                {fieldElement}
-                <span className="block text-red-600">{errors[name]}</span>
-              </div>
-            );
-          })}
-        </div>
-      ))}
-      <Button label="Submit" type="submit" />
-    </form>
+    <FormContext.Provider value={{ values, onChange: handleChange }}>
+      <form onSubmit={handleSubmit}>
+        {structure.map(({ title, fields }, i) => (
+          <div key={i}>
+            {title && <h3 className="text-xl font-bold text-gray-800">{title}</h3>}
+            {Object.keys(fields).map((name) => {
+              let fieldElement: JSX.Element;
+              const props = { name, ...fields[name]! };
+              switch (props.kind) {
+                case 'text':
+                  fieldElement = <TextField value={values[name] as string} onChange={handleChange} {...props} />;
+              }
+              return (
+                <div className="relative my-6 flex w-full flex-col" key={name}>
+                  {fieldElement}
+                  <span className="block text-red-600">{errors[name]}</span>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+        <Button label="Submit" type="submit" />
+      </form>
+    </FormContext.Provider>
   );
 };
