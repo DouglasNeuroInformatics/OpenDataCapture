@@ -8,6 +8,7 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { SubjectsAPI } from '../api/subjects.api';
 
 import { PageHeader, Spinner } from '@/components/core';
+import { LineGraph } from '@/components/graph';
 
 export const SubjectPage = () => {
   const params = useParams();
@@ -18,7 +19,7 @@ export const SubjectPage = () => {
   }
 
   const graphData = data?.map((record) => ({
-    timepoint: record.dateCollected.split('T')[0],
+    label: record.dateCollected.split('T')[0],
     mean: Stats.mean(Object.values(record.data), 2),
     std: Stats.std(Object.values(record.data), 2)
   }));
@@ -28,17 +29,7 @@ export const SubjectPage = () => {
       <PageHeader title={`Instruments for Subject: ${params.id!.slice(0, 6)}`} />
       <div>
         <h3 className="mt-5 text-center">Brief Psychiatric Rating Scale</h3>
-        <ResponsiveContainer height={400} width="100%">
-          <LineChart data={graphData} margin={{ bottom: 20 }}>
-            <Line dataKey="mean" stroke="#8884d8" type="monotone" />
-            <Line dataKey="std" stroke="#8884d8" type="monotone" />
-            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-            <XAxis dataKey="timepoint" label={{ offset: -15, position: 'insideBottom', value: 'Timepoint' }} />
-            <YAxis label={{ angle: -90, value: 'Total Score' }} />
-            <Tooltip />
-            <Legend height={36} verticalAlign="top" />
-          </LineChart>
-        </ResponsiveContainer>
+        <LineGraph data={graphData!} />
       </div>
     </div>
   ) : null;
