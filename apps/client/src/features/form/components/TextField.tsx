@@ -11,22 +11,18 @@ export interface TextFieldProps extends BaseFieldProps {
 }
 
 export const TextField = ({ name, label, variant }: TextFieldProps) => {
-  const { value, setValue } = useField<string>(name);
-
-  const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
-    setValue(event.target.value);
-  };
+  const field = useField<string>(name);
 
   return (
     <>
       {variant === 'long' ? (
-        <textarea autoComplete="off" className="field-input peer" rows={5} value={value} onChange={handleChange} />
+        <textarea autoComplete="off" className="field-input" rows={5} {...field} />
       ) : (
-        <input autoComplete="off" className="field-input peer" type={variant} value={value} onChange={handleChange} />
+        <input autoComplete="off" className="field-input" type={variant} {...field} />
       )}
       <label
-        className={clsx('field-label peer-focus:field-label-floating', {
-          'field-label-floating': value
+        className={clsx('field-label', {
+          'field-label-floating': field.value || field.isFocused
         })}
         htmlFor={name}
       >

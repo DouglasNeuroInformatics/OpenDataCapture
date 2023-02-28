@@ -1,12 +1,20 @@
-import { useContext } from 'react';
+import { ChangeEvent, useContext, useState } from 'react';
 
 import { FormContext } from '../context/FormContext';
 import { FieldValue } from '../types';
 
+type FieldElement = HTMLInputElement & HTMLTextAreaElement;
+
 export function useField<T extends FieldValue>(name: string) {
   const ctx = useContext(FormContext);
+  const [isFocused, setIsFocused] = useState(false);
+
   return {
+    isFocused,
+    // setIsFocused,
     value: ctx.values[name] as T,
-    setValue: (value: T) => ctx.onChange(name, value)
+    onBlur: () => setIsFocused(false),
+    onChange: (event: ChangeEvent<FieldElement>) => ctx.onChange(name, event.target.value),
+    onFocus: () => setIsFocused(true)
   };
 }

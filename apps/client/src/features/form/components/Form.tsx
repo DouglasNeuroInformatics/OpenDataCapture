@@ -9,7 +9,7 @@ import { TextField, TextFieldProps } from './TextField';
 
 import { Button } from '@/components/base';
 
-type TextFieldType = DistributiveOmit<TextFieldProps, 'name' | 'value' | 'onChange'>;
+type TextFieldType = DistributiveOmit<TextFieldProps, 'name'>;
 
 const ajv = new Ajv({
   allErrors: true,
@@ -77,7 +77,7 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
               const props = { name, ...fields[name]! };
               switch (props.kind) {
                 case 'text':
-                  fieldElement = <TextField value={values[name] as string} onChange={handleChange} {...props} />;
+                  fieldElement = <TextField {...props} />;
               }
               return (
                 <div className="relative my-6 flex w-full flex-col" key={name}>
