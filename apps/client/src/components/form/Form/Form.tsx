@@ -7,11 +7,11 @@ import { fullFormats } from 'ajv-formats/dist/formats';
 import { clsx } from 'clsx';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { Button } from '../base';
+import { ArrayField } from '../ArrayField';
+import { PrimitiveField } from '../PrimitiveField';
+import { FormDataType, FormStructure } from '../types';
 
-import { ArrayField } from './ArrayField';
-import { PrimitiveField } from './PrimitiveField';
-import { FormDataType, FormStructure } from './types';
+import { Button } from '@/components/base';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;
