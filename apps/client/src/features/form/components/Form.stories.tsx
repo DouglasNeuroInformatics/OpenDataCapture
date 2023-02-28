@@ -5,6 +5,7 @@ import { Form } from './Form';
 type FormValues = {
   shortText: string;
   longText: string;
+  passwordText: string;
   range: number;
 };
 
@@ -25,6 +26,11 @@ export const DemoForm: StoryObj<typeof Form<FormValues>> = {
             kind: 'text',
             label: 'Long Text Field',
             variant: 'long'
+          },
+          passwordText: {
+            kind: 'text',
+            label: 'Password Text Field',
+            variant: 'password'
           }
         }
       },
@@ -41,6 +47,10 @@ export const DemoForm: StoryObj<typeof Form<FormValues>> = {
           minLength: 1
         },
         longText: {
+          type: 'string',
+          minLength: 1
+        },
+        passwordText: {
           type: 'string',
           minLength: 1
         },
