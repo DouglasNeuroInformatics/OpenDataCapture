@@ -28,9 +28,7 @@ export interface FormProps<T extends FormValues> {
 }
 
 export const Form = <T extends FormValues = FormValues>({ structure, validationSchema, onSubmit }: FormProps<T>) => {
-  const [errors, setErrors] = useState<FormErrors<T>>({});
-
-  const [values, setValues] = useState<T>(
+  const getDefaultValues = () =>
     Object.fromEntries(
       structure.flatMap((group) =>
         Object.keys(group.fields).map((field: keyof T) => {
@@ -40,8 +38,10 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
           }
         })
       )
-    ) as T
-  );
+    ) as T;
+
+  const [errors, setErrors] = useState<FormErrors<T>>({});
+  const [values, setValues] = useState<T>(getDefaultValues());
 
   const handleChange = (key: keyof T, value: FieldValue) => {
     setValues((prevValues) => ({ ...prevValues, [key]: value }));
@@ -53,6 +53,7 @@ export const Form = <T extends FormValues = FormValues>({ structure, validationS
     const valid = validate(values);
     if (valid) {
       onSubmit(values);
+      setValues(getDefaultValues());
     } else if (validate.errors) {
       const errors = Object.fromEntries(
         validate.errors.map((error) => [
