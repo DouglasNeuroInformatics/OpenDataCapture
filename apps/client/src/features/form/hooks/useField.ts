@@ -7,6 +7,6 @@ export function useField<T extends FieldValue>(name: string) {
   const ctx = useContext(FormContext);
   return {
     value: ctx.values[name] as T,
-    onChange: (key: PropertyKey, value: T) => ctx.onChange(key, value)
+    setValue: (value: T) => ctx.onChange(name, value)
   };
 }

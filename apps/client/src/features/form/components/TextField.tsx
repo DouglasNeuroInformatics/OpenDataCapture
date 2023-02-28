@@ -11,10 +11,10 @@ export interface TextFieldProps extends BaseFieldProps {
 }
 
 export const TextField = ({ name, label, variant }: TextFieldProps) => {
-  const { value, onChange } = useField<string>(name);
+  const { value, setValue } = useField<string>(name);
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
-    onChange(name, event.target.value);
+    setValue(event.target.value);
   };
 
   return (
