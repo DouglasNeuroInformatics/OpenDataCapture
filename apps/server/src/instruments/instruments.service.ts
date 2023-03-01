@@ -56,11 +56,18 @@ export class InstrumentsService {
     });
   }
 
-  async getTitlesForInstrumentRecords(subjectIdentifier: string): Promise<any> {
+  async getAvailableInstrumentRecords(subjectIdentifier: string): Promise<any> {
     const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
     const records = await this.instrumentRecordsRepository.find({ subject }, 'instrument', ['instrument']);
-    // There is certainly a more efficient way of doing this at the db level
-    return [...new Set(records.map((record) => record.instrument.title))];
+    const summary: Record<string, { count: number }> = {};
+    for (let i = 0; i < records.length; i++) {
+      const title = records[i].instrument.title;
+      if (!Object.keys(summary).includes(title)) {
+        summary[title] = { count: 0 };
+      }
+      summary[title].count++;
+    }
+    return summary;
   }
 
   async getRecords(instrumentTitle?: string, subjectIdentifier?: string): Promise<InstrumentRecord[]> {
