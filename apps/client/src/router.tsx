@@ -44,11 +44,11 @@ export const router = createBrowserRouter([
         element: <ViewSubjectsPage />
       },
       {
-        path: '/subjects/view-subjects/:id',
+        path: '/subjects/view-subjects/:subjectId',
         element: <SubjectPage />
       },
       {
-        path: '/subjects/view-subjects/:id/records/:instrumentTitle',
+        path: '/subjects/view-subjects/:subjectId/records/:instrumentTitle',
         element: <SubjectRecordsPage />
       },
       {

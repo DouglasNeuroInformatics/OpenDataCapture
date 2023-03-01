@@ -1,5 +1,9 @@
 import React from 'react';
 
+import { useParams } from 'react-router-dom';
+
 export const SubjectRecordsPage = () => {
-  return <h1>Subject Records</h1>;
+  const params = useParams();
+
+  return <h1>Subject Records {JSON.stringify(params)}</h1>;
 };

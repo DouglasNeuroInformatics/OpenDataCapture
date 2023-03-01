@@ -13,7 +13,7 @@ export const SubjectPage = () => {
   const params = useParams();
 
   const { data } = useQuery('Instrument Record Titles for Subject', () =>
-    SubjectsAPI.geAvailableInstrumentRecords(params.id!)
+    SubjectsAPI.geAvailableInstrumentRecords(params.subjectId!)
   );
 
   if (!data) {
@@ -22,7 +22,7 @@ export const SubjectPage = () => {
 
   return (
     <div>
-      <PageHeader title={`Instruments for Subject: ${params.id!.slice(0, 6)}`} />
+      <PageHeader title={`Instruments for Subject: ${params.subjectId!.slice(0, 6)}`} />
       <Table
         columns={[
           { name: 'Title', field: 'title' },
