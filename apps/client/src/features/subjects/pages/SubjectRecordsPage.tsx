@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import { SubjectsAPI } from '../api/subjects.api';
 
 import { PageHeader } from '@/components/core';
+import { LineGraph } from '@/components/graph';
 
 export const SubjectRecordsPage = () => {
   const params = useParams();
@@ -17,13 +18,17 @@ export const SubjectRecordsPage = () => {
     return null;
   }
 
-  const instrumentFields = data[0].data;
+  const instrumentFields = Object.keys(data[0].data);
+  const graphData = data.map(({ dateCollected, data }) => ({ dateCollected, ...data }));
 
   return (
     <div>
       <PageHeader title={`${params.instrumentTitle!}: Records for Subject ${params.subjectId!.slice(0, 6)}`} />
-      <p>{JSON.stringify(instrumentFields)}</p>
-      <p>Subject Records {JSON.stringify(data, null, 2)}</p>
+      <LineGraph
+        data={graphData}
+        xAxis={{ key: 'dateCollected', label: 'Date Collected' }}
+        yAxis={{ label: 'Score' }}
+      />
     </div>
   );
 };

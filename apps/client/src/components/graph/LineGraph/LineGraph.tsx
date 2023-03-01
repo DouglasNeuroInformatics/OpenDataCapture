@@ -2,30 +2,39 @@ import React from 'react';
 
 import { CartesianGrid, ErrorBar, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-export interface LineGraphProps {
-  data: Array<{
-    label: string;
-    mean: number;
-    std: number;
-  }>;
-  xAxis?: {
-    label?: string;
+type LineGraphDataEntry = Record<PropertyKey, any>;
+
+export interface LineGraphProps<T extends LineGraphDataEntry> {
+  data: T[];
+  colors?: {
+    grid?: string;
+    lines?: Record<keyof T, string>;
   };
-  yAxis?: {
-    label?: string;
+  xAxis: {
+    key: keyof T & (string | number);
+    label: string;
+  };
+  yAxis: {
+    label: string;
   };
 }
 
-export const LineGraph = ({ data, xAxis = { label: 'X' }, yAxis = { label: 'Y' } }: LineGraphProps) => {
+export const LineGraph = <T extends LineGraphDataEntry = LineGraphDataEntry>({
+  data,
+  colors,
+  xAxis,
+  yAxis
+}: LineGraphProps<T>) => {
+  const yAxisKeys = Object.keys(data[0]).filter((item) => item !== xAxis.key);
   return (
     <ResponsiveContainer height={400} width="100%">
       <LineChart data={data} margin={{ bottom: 20 }}>
-        <Line dataKey="mean" label="Foo" stroke="#312E81" type="monotone">
-          <ErrorBar dataKey="std" direction="y" stroke="#6366F1" strokeWidth={2} width={4} />
-        </Line>
-        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+        {yAxisKeys.map((key) => (
+          <Line dataKey={key} key={key} label={key} stroke={colors?.lines?.[key] ?? 'black'} type="monotone"></Line>
+        ))}
+        <CartesianGrid stroke={colors?.grid ?? '#ccc'} strokeDasharray="5 5" />
         <XAxis
-          dataKey="label"
+          dataKey={xAxis.key}
           label={{ offset: -15, position: 'insideBottom', value: xAxis.label }}
           padding={{ left: 20, right: 20 }}
         />
