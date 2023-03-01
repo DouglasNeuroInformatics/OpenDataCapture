@@ -14,8 +14,13 @@ export class SubjectsAPI {
     return z.array(subjectSchema).parseAsync(response.data);
   }
 
-  static async getSubjectInstrumentRecords(id: string) {
-    const response = await axios.get(`/api/instruments/records?subject=${id}`);
+  static async geAvailableInstrumentRecords(subjectId: string) {
+    const response = await axios.get(`/api/instruments/records/available?subject=${subjectId}`);
+    return response.data as Array<{ title: string; count: number }>;
+  }
+
+  static async getSubjectInstrumentRecords(subjectId: string) {
+    const response = await axios.get(`/api/instruments/records?subject=${subjectId}`);
     return response.data as { dateCollected: string; data: Record<string, number> }[];
   }
 }

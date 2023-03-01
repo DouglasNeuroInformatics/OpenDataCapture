@@ -67,7 +67,7 @@ export class InstrumentsService {
       }
       summary[title].count++;
     }
-    return summary;
+    return Object.entries(summary).map(([title, info]) => ({ title, ...info }));
   }
 
   async getRecords(instrumentTitle?: string, subjectIdentifier?: string): Promise<InstrumentRecord[]> {

@@ -6,11 +6,34 @@ import { useParams } from 'react-router-dom';
 
 import { SubjectsAPI } from '../api/subjects.api';
 
-import { PageHeader, Spinner } from '@/components/core';
+import { PageHeader, Spinner, Table } from '@/components/core';
 import { LineGraph } from '@/components/graph';
 
 export const SubjectPage = () => {
   const params = useParams();
+
+  const { data } = useQuery('Instrument Record Titles for Subject', () =>
+    SubjectsAPI.geAvailableInstrumentRecords(params.id!)
+  );
+
+  if (!data) {
+    return null;
+  }
+
+  return (
+    <div>
+      <PageHeader title={`Instruments for Subject: ${params.id!.slice(0, 6)}`} />
+      <Table
+        columns={[
+          { name: 'Title', field: 'title' },
+          { name: 'Number of Records', field: 'count' }
+        ]}
+        data={data}
+      />
+    </div>
+  );
+
+  /*
   const { data, isLoading } = useQuery('Subject', () => SubjectsAPI.getSubjectInstrumentRecords(params.id!));
 
   if (isLoading) {
@@ -32,6 +55,7 @@ export const SubjectPage = () => {
       </div>
     </div>
   ) : null;
+  */
 };
 
 export default SubjectPage;
