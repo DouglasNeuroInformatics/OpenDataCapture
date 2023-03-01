@@ -40,6 +40,13 @@ export class InstrumentsController {
     return this.instrumentsService.createRecord(title, dto);
   }
 
+  @ApiOperation({ summary: 'Get Instruments with Records' })
+  @ApiOkResponse({ description: 'Success' })
+  @Get('records/available-titles')
+  async getTitlesForInstrumentRecords(@Query('subject') subjectIdentifier: string): Promise<any> {
+    return this.instrumentsService.getTitlesForInstrumentRecords(subjectIdentifier);
+  }
+
   @ApiOperation({ summary: 'Get Instrument Records' })
   @ApiOkResponse({ description: 'Success' })
   @Get('records')

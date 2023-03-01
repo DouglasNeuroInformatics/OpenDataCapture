@@ -2,7 +2,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { Type } from 'class-transformer';
 import { IsDate, IsDefined, IsNotEmpty, IsNotEmptyObject, IsString, ValidateNested } from 'class-validator';
-import { InstrumentRecordInterface } from 'common';
 
 class SubjectDemographicsDto {
   @ApiProperty()
