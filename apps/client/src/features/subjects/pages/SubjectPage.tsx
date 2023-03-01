@@ -29,6 +29,7 @@ export const SubjectPage = () => {
           { name: 'Number of Records', field: 'count' }
         ]}
         data={data}
+        entryLinkFactory={(entry) => `records/${entry.title}`}
       />
     </div>
   );

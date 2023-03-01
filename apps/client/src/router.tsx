@@ -7,7 +7,7 @@ import { AdminPage } from './features/admin';
 import { LoginPage } from './features/auth';
 import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
 import { ErrorPage, HomePage } from './features/misc';
-import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
+import { AddSubjectPage, SubjectPage, SubjectRecordsPage, ViewSubjectsPage } from './features/subjects';
 import { useAuthStore } from './stores/auth-store';
 
 const Root = () => {
@@ -46,6 +46,10 @@ export const router = createBrowserRouter([
       {
         path: '/subjects/view-subjects/:id',
         element: <SubjectPage />
+      },
+      {
+        path: '/subjects/view-subjects/:id/records/:instrumentTitle',
+        element: <SubjectRecordsPage />
       },
       {
         path: '/instruments/add-instrument',
