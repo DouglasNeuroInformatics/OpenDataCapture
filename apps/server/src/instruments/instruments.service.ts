@@ -76,6 +76,12 @@ export class InstrumentsService {
           subject: await this.subjectsService.findByIdentifier(subjectIdentifier)
         }
       : {};
-    return this.instrumentRecordsRepository.find({ title: instrumentTitle || {}, ...subjectQuery });
+    const instrumentQuery = instrumentTitle
+      ? {
+          instrument: await this.getInstrument(instrumentTitle)
+        }
+      : {};
+    console.log({ instrumentTitle, subjectIdentifier });
+    return this.instrumentRecordsRepository.find({ ...instrumentQuery, ...subjectQuery });
   }
 }
