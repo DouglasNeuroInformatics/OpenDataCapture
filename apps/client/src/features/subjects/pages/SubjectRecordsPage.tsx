@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 
 import { Listbox, Transition } from '@headlessui/react';
-import { useQuery } from '@tanstack/react-query';
 import { HiCheck } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
-
-import { SubjectsAPI } from '../api/subjects.api';
 
 import { Button } from '@/components/base';
 import { PageHeader } from '@/components/core';
 import { LineGraph } from '@/components/graph';
+import { useFetch } from '@/hooks/useFetch';
 
 export const SubjectRecordsPage = () => {
   const params = useParams();
-  const { data } = useQuery({
-    queryKey: ['SubjectRecords'],
-    queryFn: () => SubjectsAPI.getInstrumentRecords(params.instrumentTitle!, params.subjectId!)
-  });
+
+  const { data } = useFetch<{ dateCollected: string; data: Record<string, number> }[]>(
+    `/api/instruments/records?instrument=${params.instrumentTitle!}&subject=${params.subjectId!}`
+  );
 
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
 

@@ -1,19 +1,16 @@
 import React from 'react';
 
-import { useQuery } from '@tanstack/react-query';
+import { SubjectInterface } from 'common';
 
-import { SubjectsAPI } from '../api/subjects.api';
 import { SubjectsTable } from '../components/SubjectsTable';
 
 import { PageHeader, Spinner } from '@/components/core';
+import { useFetch } from '@/hooks/useFetch';
 
 export const ViewSubjectsPage = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ['ViewSubjects'],
-    queryFn: () => SubjectsAPI.getSubjects()
-  });
+  const { data } = useFetch<SubjectInterface[]>('/api/subjects');
 
-  if (isLoading) {
+  if (!data) {
     return <Spinner />;
   }
 
