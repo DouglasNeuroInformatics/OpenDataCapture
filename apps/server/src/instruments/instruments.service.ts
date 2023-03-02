@@ -1,7 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
+import { DateUtils } from 'common';
+
 import { FormInstrumentDto } from './dto/form-instrument.dto';
-import { InstrumentRecordDto } from './dto/instrument-record.dto';
+import { InstrumentRecordDto, InstrumentRecordExportDto } from './dto/instrument-record.dto';
 import { InstrumentRecordsRepository } from './repositories/instrument-records.repository';
 import { InstrumentsRepository } from './repositories/instruments.repository';
 import { InstrumentRecord } from './schemas/instrument-record.schema';
@@ -68,6 +70,29 @@ export class InstrumentsService {
       summary[title].count++;
     }
     return Object.entries(summary).map(([title, info]) => ({ title, ...info }));
+  }
+
+  async exportRecords(): Promise<InstrumentRecordExportDto[]> {
+    const subjects = await this.subjectsService.findAll();
+    const data: InstrumentRecordExportDto[] = [];
+    for (let i = 0; i < subjects.length; i++) {
+      const subject = subjects[i];
+      const records = await this.instrumentRecordsRepository.find({ subject }, undefined, ['instrument']);
+      for (let j = 0; j < records.length; j++) {
+        const record = records[j];
+        for (const measure of Object.keys(record.data)) {
+          data.push({
+            subjectId: subject.identifier,
+            subjectAge: DateUtils.yearsPassed(subject.demographics.dateOfBirth),
+            subjectSex: subject.demographics.sex,
+            instrument: record.instrument.title,
+            measure: measure,
+            value: record.data[measure] as string
+          });
+        }
+      }
+    }
+    return data;
   }
 
   async getRecords(instrumentTitle?: string, subjectIdentifier?: string): Promise<InstrumentRecord[]> {
