@@ -9,6 +9,11 @@ import { PageHeader, Spinner } from '@/components/core';
 import { LineGraph } from '@/components/graph';
 import { useFetch } from '@/hooks/useFetch';
 
+function camelToTitleCase(s: string) {
+  const result = s.replace(/([A-Z])/g, ' $1');
+  return result.charAt(0).toUpperCase() + result.slice(1);
+}
+
 export const SubjectRecordsPage = () => {
   const params = useParams();
 
@@ -46,11 +51,15 @@ export const SubjectRecordsPage = () => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute right-0 z-10 bg-slate-100">
+            <Listbox.Options className="absolute right-0 z-10 mt-1 max-h-80 w-auto overflow-scroll rounded-lg bg-slate-100">
               {fields.map((field) => (
-                <Listbox.Option className="flex items-center p-2" key={field} value={field}>
-                  <HiCheck className="ui-selected:block mr-2 hidden" />
-                  {field}
+                <Listbox.Option
+                  className="flex items-center whitespace-nowrap p-2 first:rounded-t-lg last:rounded-b-lg hover:bg-slate-200"
+                  key={field}
+                  value={field}
+                >
+                  <HiCheck className="ui-selected:visible invisible mr-2" />
+                  {camelToTitleCase(field)}
                 </Listbox.Option>
               ))}
             </Listbox.Options>
