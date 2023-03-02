@@ -95,6 +95,13 @@ export class InstrumentsService {
     return data;
   }
 
+  async exportRecordsAsCSV(): Promise<string> {
+    const exportRecords = await this.exportRecords();
+    const columnNames = Object.keys(exportRecords[0]);
+    const rows = exportRecords.map((record) => Object.values(record).join(',')).join('\n');
+    return columnNames + '\n' + rows;
+  }
+
   async getRecords(instrumentTitle?: string, subjectIdentifier?: string): Promise<InstrumentRecord[]> {
     const subjectQuery = subjectIdentifier
       ? {

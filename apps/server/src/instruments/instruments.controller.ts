@@ -52,6 +52,11 @@ export class InstrumentsController {
     return this.instrumentsService.exportRecords();
   }
 
+  @Get('records/export-csv')
+  exportRecordsAsCSV(): Promise<string> {
+    return this.instrumentsService.exportRecordsAsCSV();
+  }
+
   @ApiOperation({ summary: 'Get Instrument Records' })
   @ApiOkResponse({ description: 'Success' })
   @Get('records')
