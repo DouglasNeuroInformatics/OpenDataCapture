@@ -5,13 +5,27 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 
 const baseURL = import.meta.env.VITE_API_HOST;
 
+interface GetRequestOptions {
+  method: 'GET';
+}
+
+interface PostRequestOptions {
+  body: unknown;
+  method: 'POST';
+}
+
+type UseFetchOptions = GetRequestOptions | PostRequestOptions;
+
 /** Common hook used throughout the application to request data from our API. The
  * base URL used for requests is set in the Vite config.
  * @example
  * useFetch('/api/get-data')
  */
 export function useFetch<T = unknown>(
-  resourceURL: string
+  resourceURL: string,
+  options: UseFetchOptions = {
+    method: 'GET'
+  }
 ): {
   data: T | null;
 } {
@@ -22,6 +36,8 @@ export function useFetch<T = unknown>(
 
   useEffect(() => {
     fetch(baseURL + resourceURL, {
+      body: options.method === 'POST' ? JSON.stringify(options.body) : null,
+      method: options.method,
       headers: {
         Accept: 'application/json',
         Authorization: `Bearer ${auth.accessToken!}`
