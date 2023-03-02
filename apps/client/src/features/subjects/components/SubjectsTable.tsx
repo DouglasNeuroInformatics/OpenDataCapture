@@ -3,14 +3,17 @@ import React from 'react';
 import { SubjectInterface } from 'common';
 
 import { Dropdown, Table } from '@/components/core';
+import { useDownload } from '@/hooks/useDownload';
 
 export interface SubjectTableProps {
   data: SubjectInterface[];
 }
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
+  const download = useDownload('/api/subjects');
+
   const handleExportSelection = (option: string) => {
-    return null; // alert(option);
+    download();
   };
 
   return (

@@ -5,26 +5,26 @@ import { HiCheck } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
 import { Button } from '@/components/base';
-import { PageHeader } from '@/components/core';
+import { PageHeader, Spinner } from '@/components/core';
 import { LineGraph } from '@/components/graph';
 import { useFetch } from '@/hooks/useFetch';
 
 export const SubjectRecordsPage = () => {
   const params = useParams();
 
-  const { data } = useFetch<{ dateCollected: string; data: Record<string, number> }[]>(
+  const subjectRecords = useFetch<{ dateCollected: string; data: Record<string, number> }[]>(
     `/api/instruments/records?instrument=${params.instrumentTitle!}&subject=${params.subjectId!}`
   );
 
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
 
-  if (!data) {
-    return null;
+  if (!subjectRecords.data) {
+    return <Spinner />;
   }
 
-  const fields = Object.keys(data[0].data);
+  const fields = Object.keys(subjectRecords.data[0].data);
 
-  const graphData = data.map(({ dateCollected, data }) => {
+  const graphData = subjectRecords.data.map(({ dateCollected, data }) => {
     const filteredData = Object.fromEntries(
       Object.entries(data).filter((entries) => {
         return selectedFields.includes(entries[0]);
