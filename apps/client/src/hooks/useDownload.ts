@@ -5,7 +5,7 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 
 const baseURL = import.meta.env.VITE_API_HOST;
 
-export function useDownload(resourceURL: string) {
+export function useDownload(resourceURL: string, filename: string) {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
   const [trigger, setTrigger] = useState(false);
@@ -30,7 +30,7 @@ export function useDownload(resourceURL: string) {
         .then((blob) => {
           const objectURL = URL.createObjectURL(blob);
           anchor.href = objectURL;
-          anchor.download = 'foo';
+          anchor.download = filename;
           anchor.click();
           URL.revokeObjectURL(objectURL);
         })

@@ -47,7 +47,7 @@ export class InstrumentsController {
     return this.instrumentsService.getAvailableInstrumentRecords(subjectIdentifier);
   }
 
-  @Get('records/export')
+  @Get('records/export-json')
   exportRecords(): Promise<InstrumentRecordExportDto[]> {
     return this.instrumentsService.exportRecords();
   }

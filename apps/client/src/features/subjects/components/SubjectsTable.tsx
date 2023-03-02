@@ -10,10 +10,13 @@ export interface SubjectTableProps {
 }
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
-  const download = useDownload('/api/subjects');
+  const downloadJson = useDownload('/api/instruments/records/export-json', 'records.json');
 
-  const handleExportSelection = (option: string) => {
-    download();
+  const handleExportSelection = (option: string | ('JSON' | 'CSV')) => {
+    switch (option) {
+      case 'JSON':
+        downloadJson();
+    }
   };
 
   return (
@@ -27,7 +30,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         />
         <div className="flex gap-2">
           <Dropdown options={[]} title="Filters" onSelection={() => null} />
-          <Dropdown options={['CSV']} title="Export" onSelection={handleExportSelection} />
+          <Dropdown options={['CSV', 'JSON']} title="Export" onSelection={handleExportSelection} />
         </div>
       </div>
       <Table
