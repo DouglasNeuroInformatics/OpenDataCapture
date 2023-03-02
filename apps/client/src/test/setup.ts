@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom';
+import { setGlobalConfig } from '@storybook/testing-react';
+
+import globalStorybookConfig from '../../.storybook/preview';
 
 import { server } from './mocks/server';
+
+setGlobalConfig(globalStorybookConfig);
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterAll(() => server.close());

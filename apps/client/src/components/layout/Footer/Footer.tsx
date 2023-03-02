@@ -1,26 +1,43 @@
 import React from 'react';
 
+import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { FaGithub } from 'react-icons/fa';
 
-import { DevInfo } from './DevInfo';
-
 const currentYear = new Date().getFullYear();
 
-export const Footer = () => {
+const projectRepoLink = 'https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform';
+
+export interface FooterProps {
+  className?: string;
+}
+
+export const Footer = ({ className }: FooterProps) => {
   const { t } = useTranslation();
   return (
-    <footer className="container mx-auto text-sm text-gray-500">
+    <footer className={clsx('@container/footer container mx-auto text-sm text-gray-500', className)}>
       <hr />
-      <div className="p-5">
-        <p className="text-center">
+      <div className="w-full py-5">
+        <p className="mb-1 text-center">
           &copy; {currentYear} {t('organizationName')}
         </p>
-        <div className="flex items-center justify-center">
-          {import.meta.env.DEV && <DevInfo />}
+        <div className="@lg/footer:gap-3 flex flex-wrap items-center justify-center">
+          {import.meta.env.DEV && (
+            <>
+              <span className="@lg/footer:w-auto w-full text-center">
+                Branch: &apos;{import.meta.env.VITE_DEV_GIT_BRANCH}&apos;
+              </span>
+              <span className="@lg/footer:block hidden">|</span>
+              <span className="@lg/footer:w-auto w-full text-center">
+                Last Commit on {import.meta.env.VITE_DEV_GIT_COMMIT_DATE}: &apos;
+                {import.meta.env.VITE_DEV_GIT_COMMIT?.slice(0, 7)}
+              </span>
+              <span className="@lg/footer:block hidden"> |</span>
+            </>
+          )}
           <a
-            className="flex items-center justify-center"
-            href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform"
+            className="@lg/footer:w-auto flex w-full items-center justify-center"
+            href={`${projectRepoLink}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT!}`}
             rel="noreferrer"
             target="_blank"
           >

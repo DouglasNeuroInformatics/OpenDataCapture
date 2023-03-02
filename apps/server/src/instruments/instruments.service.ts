@@ -56,11 +56,32 @@ export class InstrumentsService {
     });
   }
 
+  async getAvailableInstrumentRecords(subjectIdentifier: string): Promise<any> {
+    const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
+    const records = await this.instrumentRecordsRepository.find({ subject }, 'instrument', ['instrument']);
+    const summary: Record<string, { count: number }> = {};
+    for (let i = 0; i < records.length; i++) {
+      const title = records[i].instrument.title;
+      if (!Object.keys(summary).includes(title)) {
+        summary[title] = { count: 0 };
+      }
+      summary[title].count++;
+    }
+    return Object.entries(summary).map(([title, info]) => ({ title, ...info }));
+  }
+
   async getRecords(instrumentTitle?: string, subjectIdentifier?: string): Promise<InstrumentRecord[]> {
-    const subject = subjectIdentifier ? await this.subjectsService.findByIdentifier(subjectIdentifier) : undefined;
-    return this.instrumentRecordsRepository.find({
-      title: instrumentTitle || {},
-      subject
-    });
+    const subjectQuery = subjectIdentifier
+      ? {
+          subject: await this.subjectsService.findByIdentifier(subjectIdentifier)
+        }
+      : {};
+    const instrumentQuery = instrumentTitle
+      ? {
+          instrument: await this.getInstrument(instrumentTitle)
+        }
+      : {};
+    console.log({ instrumentTitle, subjectIdentifier });
+    return this.instrumentRecordsRepository.find({ ...instrumentQuery, ...subjectQuery });
   }
 }

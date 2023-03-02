@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { InstrumentsAPI } from '../api/instruments.api';
 
@@ -8,7 +8,10 @@ import { Link } from '@/components/base';
 import { PageHeader, Spinner } from '@/components/core';
 
 export const ViewInstrumentsPage = () => {
-  const { data, isLoading } = useQuery('ViewInstruments', () => InstrumentsAPI.getAvailableInstruments());
+  const { data, isLoading } = useQuery({
+    queryKey: ['ViewInstruments'],
+    queryFn: () => InstrumentsAPI.getAvailableInstruments()
+  });
 
   if (isLoading) {
     return <Spinner />;

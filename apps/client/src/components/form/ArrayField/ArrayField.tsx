@@ -2,8 +2,8 @@ import React, { useLayoutEffect } from 'react';
 
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
-import { PrimitiveField } from './PrimitiveField';
-import { FormDataRecord, FormFields } from './types';
+import { PrimitiveField } from '../PrimitiveField';
+import { FormDataRecord, FormFields } from '../types';
 
 import { Button } from '@/components/base';
 

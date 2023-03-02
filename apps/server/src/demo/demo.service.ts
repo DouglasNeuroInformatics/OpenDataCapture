@@ -74,14 +74,25 @@ export class DemoService implements OnApplicationBootstrap {
     const subjects = await this.subjectsService.findAll();
 
     // Fix type
-    const instrument = (await this.instrumentsService.getInstrument(
-      'The Brief Psychiatric Rating Scale'
-    )) as FormInstrument;
+    const bprs = (await this.instrumentsService.getInstrument('The Brief Psychiatric Rating Scale')) as FormInstrument;
+
+    const hq = await this.instrumentsService.getInstrument('The Happiness Questionnaire');
 
     for (const subject of subjects) {
       for (const timepoint of timepoints) {
         const { firstName, lastName, dateOfBirth } = subject.demographics;
-        await this.instrumentsService.createRecord(instrument.title, {
+        await this.instrumentsService.createRecord(hq.title, {
+          dateCollected: timepoint,
+          subjectDemographics: {
+            firstName: firstName!,
+            lastName: lastName!,
+            dateOfBirth
+          },
+          data: {
+            overallScore: Random.int(0, 5)
+          }
+        });
+        await this.instrumentsService.createRecord(bprs.title, {
           dateCollected: timepoint,
           subjectDemographics: {
             firstName: firstName!,
@@ -89,7 +100,7 @@ export class DemoService implements OnApplicationBootstrap {
             dateOfBirth
           },
           data: Object.fromEntries(
-            instrument.data.map((field) => {
+            bprs.data.map((field) => {
               let subtract = 0;
               if (subject.demographics.sex === 'male' && Random.int(0, 5) === 0) {
                 subtract = Math.max(0, timepoint.getMonth() - 8);
