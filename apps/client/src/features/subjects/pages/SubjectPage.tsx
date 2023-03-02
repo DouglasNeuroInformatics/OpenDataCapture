@@ -1,23 +1,23 @@
 import React from 'react';
 
+import { useQuery } from '@tanstack/react-query';
 import { Stats } from 'common';
-import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 import { SubjectsAPI } from '../api/subjects.api';
 
 import { PageHeader, Spinner, Table } from '@/components/core';
-import { LineGraph } from '@/components/graph';
 
 export const SubjectPage = () => {
   const params = useParams();
 
-  const { data } = useQuery('Instrument Record Titles for Subject', () =>
-    SubjectsAPI.geAvailableInstrumentRecords(params.subjectId!)
-  );
+  const { data } = useQuery({
+    queryKey: ['Instrument Record Titles for Subject'],
+    queryFn: () => SubjectsAPI.geAvailableInstrumentRecords(params.subjectId!)
+  });
 
   if (!data) {
-    return null;
+    return <Spinner />;
   }
 
   return (

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 import { Listbox, Transition } from '@headlessui/react';
+import { useQuery } from '@tanstack/react-query';
 import { HiCheck } from 'react-icons/hi2';
-import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 import { SubjectsAPI } from '../api/subjects.api';
@@ -13,9 +13,11 @@ import { LineGraph } from '@/components/graph';
 
 export const SubjectRecordsPage = () => {
   const params = useParams();
-  const { data } = useQuery('SubjectRecords', () =>
-    SubjectsAPI.getInstrumentRecords(params.instrumentTitle!, params.subjectId!)
-  );
+  const { data } = useQuery({
+    queryKey: ['SubjectRecords'],
+    queryFn: () => SubjectsAPI.getInstrumentRecords(params.instrumentTitle!, params.subjectId!)
+  });
+
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
 
   if (!data) {
