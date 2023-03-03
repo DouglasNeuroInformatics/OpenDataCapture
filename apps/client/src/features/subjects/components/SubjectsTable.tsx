@@ -3,14 +3,25 @@ import React from 'react';
 import { SubjectInterface } from 'common';
 
 import { Dropdown, Table } from '@/components/core';
+import { useDownload } from '@/hooks/useDownload';
 
 export interface SubjectTableProps {
   data: SubjectInterface[];
 }
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
-  const handleExportSelection = (option: string) => {
-    return null; // alert(option);
+  const downloadJSON = useDownload('/api/v0/instruments/records/export-json', 'records.json');
+  const downloadCSV = useDownload('/api/v0/instruments/records/export-csv', 'records.csv');
+
+  const handleExportSelection = (option: string | ('JSON' | 'CSV')) => {
+    switch (option) {
+      case 'JSON':
+        downloadJSON();
+        break;
+      case 'CSV':
+        downloadCSV();
+        break;
+    }
   };
 
   return (
@@ -24,7 +35,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         />
         <div className="flex gap-2">
           <Dropdown options={[]} title="Filters" onSelection={() => null} />
-          <Dropdown options={['CSV']} title="Export" onSelection={handleExportSelection} />
+          <Dropdown options={['CSV', 'JSON']} title="Export" onSelection={handleExportSelection} />
         </div>
       </div>
       <Table

@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RouterProvider } from 'react-router-dom';
 
@@ -9,7 +7,6 @@ import { router } from './router';
 
 import { Button } from '@/components/base';
 import { ActiveSubject, Notifications, Spinner } from '@/components/core';
-import { queryClient } from '@/services/react-query';
 
 import './services/axios';
 import './services/18n';
@@ -33,12 +30,9 @@ const App = () => {
   return (
     <React.Suspense fallback={<SuspenseFallback />}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools panelPosition="right" position="bottom-right" />
-          <ActiveSubject />
-          <Notifications />
-          <RouterProvider router={router} />
-        </QueryClientProvider>
+        <ActiveSubject />
+        <Notifications />
+        <RouterProvider router={router} />
       </ErrorBoundary>
     </React.Suspense>
   );

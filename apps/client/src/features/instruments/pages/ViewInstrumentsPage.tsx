@@ -1,23 +1,19 @@
 import React from 'react';
 
-import { useQuery } from '@tanstack/react-query';
-
-import { InstrumentsAPI } from '../api/instruments.api';
+import { BaseInstrumentInterface } from 'common';
 
 import { Link } from '@/components/base';
 import { PageHeader, Spinner } from '@/components/core';
+import { useFetch } from '@/hooks/useFetch';
 
 export const ViewInstrumentsPage = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ['ViewInstruments'],
-    queryFn: () => InstrumentsAPI.getAvailableInstruments()
-  });
+  const { data } = useFetch<BaseInstrumentInterface[]>('/api/v0/instruments/available');
 
-  if (isLoading) {
+  if (!data) {
     return <Spinner />;
   }
 
-  return data ? (
+  return (
     <div>
       <PageHeader title="View Instruments" />
       {data.map((instrument, i) => (
@@ -30,5 +26,5 @@ export const ViewInstrumentsPage = () => {
         </div>
       ))}
     </div>
-  ) : null;
+  );
 };

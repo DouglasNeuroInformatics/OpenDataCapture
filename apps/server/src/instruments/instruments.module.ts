@@ -5,7 +5,7 @@ import { InstrumentsController } from './instruments.controller';
 import { InstrumentsService } from './instruments.service';
 import { InstrumentRecordsRepository } from './repositories/instrument-records.repository';
 import { InstrumentsRepository } from './repositories/instruments.repository';
-import { FormInstrument, FormInstrumentSchema } from './schemas/form-instrument.schema';
+import { FormInstrumentSchema } from './schemas/form-instrument.schema';
 import { InstrumentRecord, InstrumentRecordSchema } from './schemas/instrument-record.schema';
 import { Instrument, InstrumentSchema } from './schemas/instrument.schema';
 

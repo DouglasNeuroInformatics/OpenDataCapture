@@ -1,20 +1,16 @@
 import React from 'react';
 
-import { useQuery } from '@tanstack/react-query';
-import { Stats } from 'common';
 import { useParams } from 'react-router-dom';
 
-import { SubjectsAPI } from '../api/subjects.api';
-
 import { PageHeader, Spinner, Table } from '@/components/core';
+import { useFetch } from '@/hooks/useFetch';
 
 export const SubjectPage = () => {
   const params = useParams();
 
-  const { data } = useQuery({
-    queryKey: ['Instrument Record Titles for Subject'],
-    queryFn: () => SubjectsAPI.geAvailableInstrumentRecords(params.subjectId!)
-  });
+  const { data } = useFetch<Array<{ title: string; count: number }>>(
+    `/api/v0/instruments/records/available?subject=${params.subjectId!}`
+  );
 
   if (!data) {
     return <Spinner />;
@@ -33,30 +29,6 @@ export const SubjectPage = () => {
       />
     </div>
   );
-
-  /*
-  const { data, isLoading } = useQuery('Subject', () => SubjectsAPI.getSubjectInstrumentRecords(params.id!));
-
-  if (isLoading) {
-    return <Spinner />;
-  }
-
-  const graphData = data?.map((record) => ({
-    label: record.dateCollected.split('T')[0],
-    mean: Stats.mean(Object.values(record.data), 2),
-    std: Stats.std(Object.values(record.data), 2)
-  }));
-
-  return data ? (
-    <div>
-      <PageHeader title={`Instruments for Subject: ${params.id!.slice(0, 6)}`} />
-      <div>
-        <h3 className="mt-5 text-center">Brief Psychiatric Rating Scale</h3>
-        <LineGraph data={graphData!} xAxis={{ label: 'Timepoint' }} yAxis={{ label: 'Total Score' }} />
-      </div>
-    </div>
-  ) : null;
-  */
 };
 
 export default SubjectPage;

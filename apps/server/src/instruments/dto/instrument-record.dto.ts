@@ -35,3 +35,12 @@ export class InstrumentRecordDto {
   @IsDefined()
   data: Record<string, any>;
 }
+
+export class InstrumentRecordExportDto {
+  subjectId: string;
+  subjectAge: number;
+  subjectSex: string;
+  instrument: string;
+  measure: string;
+  value: any;
+}

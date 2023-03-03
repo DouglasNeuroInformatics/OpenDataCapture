@@ -2,13 +2,13 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { FormInstrumentDto } from './dto/form-instrument.dto';
-import { InstrumentRecordDto } from './dto/instrument-record.dto';
+import { InstrumentRecordDto, InstrumentRecordExportDto } from './dto/instrument-record.dto';
 import { InstrumentsService } from './instruments.service';
 import { InstrumentRecord } from './schemas/instrument-record.schema';
 import { Instrument } from './schemas/instrument.schema';
 
 @ApiTags('Instruments')
-@Controller('instruments')
+@Controller({ path: 'instruments', version: '0' })
 export class InstrumentsController {
   constructor(private readonly instrumentsService: InstrumentsService) {}
 
@@ -45,6 +45,16 @@ export class InstrumentsController {
   @Get('records/available')
   async getAvailableInstrumentRecords(@Query('subject') subjectIdentifier: string): Promise<any> {
     return this.instrumentsService.getAvailableInstrumentRecords(subjectIdentifier);
+  }
+
+  @Get('records/export-json')
+  exportRecords(): Promise<InstrumentRecordExportDto[]> {
+    return this.instrumentsService.exportRecords();
+  }
+
+  @Get('records/export-csv')
+  exportRecordsAsCSV(): Promise<string> {
+    return this.instrumentsService.exportRecordsAsCSV();
   }
 
   @ApiOperation({ summary: 'Get Instrument Records' })
