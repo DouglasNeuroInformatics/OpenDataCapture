@@ -9,7 +9,7 @@ export const SubjectPage = () => {
   const params = useParams();
 
   const { data } = useFetch<Array<{ title: string; count: number }>>(
-    `/api/instruments/records/available?subject=${params.subjectId!}`
+    `/api/v0/instruments/records/available?subject=${params.subjectId!}`
   );
 
   if (!data) {

@@ -7,7 +7,7 @@ import { PageHeader, Spinner } from '@/components/core';
 import { useFetch } from '@/hooks/useFetch';
 
 export const ViewInstrumentsPage = () => {
-  const { data } = useFetch<BaseInstrumentInterface[]>('/api/instruments/available');
+  const { data } = useFetch<BaseInstrumentInterface[]>('/api/v0/instruments/available');
 
   if (!data) {
     return <Spinner />;

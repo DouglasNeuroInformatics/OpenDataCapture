@@ -18,7 +18,7 @@ export const SubjectRecordsPage = () => {
   const params = useParams();
 
   const subjectRecords = useFetch<{ dateCollected: string; data: Record<string, number> }[]>(
-    `/api/instruments/records?instrument=${params.instrumentTitle!}&subject=${params.subjectId!}`
+    `/api/v0/instruments/records?instrument=${params.instrumentTitle!}&subject=${params.subjectId!}`
   );
 
   const [selectedFields, setSelectedFields] = useState<string[]>([]);

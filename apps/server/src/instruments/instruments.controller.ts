@@ -8,7 +8,7 @@ import { InstrumentRecord } from './schemas/instrument-record.schema';
 import { Instrument } from './schemas/instrument.schema';
 
 @ApiTags('Instruments')
-@Controller('instruments')
+@Controller({ path: 'instruments', version: '0' })
 export class InstrumentsController {
   constructor(private readonly instrumentsService: InstrumentsService) {}
 

@@ -10,8 +10,8 @@ export interface SubjectTableProps {
 }
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
-  const downloadJSON = useDownload('/api/instruments/records/export-json', 'records.json');
-  const downloadCSV = useDownload('/api/instruments/records/export-csv', 'records.csv');
+  const downloadJSON = useDownload('/api/v0/instruments/records/export-json', 'records.json');
+  const downloadCSV = useDownload('/api/v0/instruments/records/export-csv', 'records.csv');
 
   const handleExportSelection = (option: string | ('JSON' | 'CSV')) => {
     switch (option) {
