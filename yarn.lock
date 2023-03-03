@@ -3374,6 +3374,14 @@
     "@storybook/client-logger" "7.0.0-beta.54"
     "@storybook/preview-api" "7.0.0-beta.54"
 
+"@storybook/core-client@7.0.0-beta.60":
+  version "7.0.0-beta.60"
+  resolved "https://registry.yarnpkg.com/@storybook/core-client/-/core-client-7.0.0-beta.60.tgz#87f4e4e7d72358134d7014a1f961d9d508bc54d9"
+  integrity sha512-c4C8g8c8gQ6J1qHR87jQLhj6SOFz+K/H5xheWW0jPbnJApdA8F7KQ6CR4LctdC8R/xi9oo6AtgVyXa6dwpH8Ow==
+  dependencies:
+    "@storybook/client-logger" "7.0.0-beta.60"
+    "@storybook/preview-api" "7.0.0-beta.60"
+
 "@storybook/core-common@7.0.0-beta.54":
   version "7.0.0-beta.54"
   resolved "https://registry.yarnpkg.com/@storybook/core-common/-/core-common-7.0.0-beta.54.tgz#6e26b85378006f91f80aaa2d3bee4a24b784600f"
@@ -3526,6 +3534,19 @@
     "@storybook/core-common" "7.0.0-beta.54"
     "@storybook/preview-api" "7.0.0-beta.54"
     "@storybook/types" "7.0.0-beta.54"
+    "@types/doctrine" "^0.0.3"
+    doctrine "^3.0.0"
+    lodash "^4.17.21"
+
+"@storybook/docs-tools@7.0.0-beta.60":
+  version "7.0.0-beta.60"
+  resolved "https://registry.yarnpkg.com/@storybook/docs-tools/-/docs-tools-7.0.0-beta.60.tgz#b74de106acab835ef29568497d08b95d5282bd71"
+  integrity sha512-MSJbMTTw9PNbw1bjDz4ag8SnRlwTqS4m4LJh2PxXvkofHE1HDwh8FXLCHAI1FIDCJiQY5QpWhIfrj1jYYP9X5g==
+  dependencies:
+    "@babel/core" "^7.12.10"
+    "@storybook/core-common" "7.0.0-beta.60"
+    "@storybook/preview-api" "7.0.0-beta.60"
+    "@storybook/types" "7.0.0-beta.60"
     "@types/doctrine" "^0.0.3"
     doctrine "^3.0.0"
     lodash "^4.17.21"
@@ -3688,6 +3709,11 @@
   resolved "https://registry.yarnpkg.com/@storybook/react-dom-shim/-/react-dom-shim-7.0.0-beta.54.tgz#c44a32c63968651dd76c468cecc4544b3b5adb38"
   integrity sha512-Gh5UFxKrYuM0j6fYIYZVcJcsdIdgMMfnh7gMbtIb95YtpMnaFGTxYxHpiyeGBOIY/BuZiHVEPPC+N2sT+TC1Cg==
 
+"@storybook/react-dom-shim@7.0.0-beta.60":
+  version "7.0.0-beta.60"
+  resolved "https://registry.yarnpkg.com/@storybook/react-dom-shim/-/react-dom-shim-7.0.0-beta.60.tgz#a86265a9aa370ebcfd0cb86e2d94c7a961e45ca0"
+  integrity sha512-LoE8w3VyRfAz5yTuEUIkDUNVHWD/hdi3oGhSpI/apTjckRpzYKBj2RZS4sCWkffqu33bjl5aIftWbfgkRtBsJQ==
+
 "@storybook/react-vite@^7.0.0-beta.54":
   version "7.0.0-beta.54"
   resolved "https://registry.yarnpkg.com/@storybook/react-vite/-/react-vite-7.0.0-beta.54.tgz#459ff563e1f536c8e2b36ac4b81393fa137d699a"
@@ -3702,7 +3728,7 @@
     magic-string "^0.27.0"
     react-docgen "6.0.0-alpha.3"
 
-"@storybook/react@7.0.0-beta.54", "@storybook/react@^7.0.0-beta.54":
+"@storybook/react@7.0.0-beta.54":
   version "7.0.0-beta.54"
   resolved "https://registry.yarnpkg.com/@storybook/react/-/react-7.0.0-beta.54.tgz#858adb94e05622aa5f2b70f9d40c9e70419bc65e"
   integrity sha512-rDV0+m/3jnL5Vxf9/6l2gUh8majSxLhbaDIMzzBIxFJZPrWgbwnSwUybvZUp+hyKjXNMrBu1DQXSZ5gXcGBp6g==
@@ -3714,6 +3740,33 @@
     "@storybook/preview-api" "7.0.0-beta.54"
     "@storybook/react-dom-shim" "7.0.0-beta.54"
     "@storybook/types" "7.0.0-beta.54"
+    "@types/escodegen" "^0.0.6"
+    "@types/estree" "^0.0.51"
+    "@types/node" "^16.0.0"
+    acorn "^7.4.1"
+    acorn-jsx "^5.3.1"
+    acorn-walk "^7.2.0"
+    escodegen "^2.0.0"
+    html-tags "^3.1.0"
+    lodash "^4.17.21"
+    prop-types "^15.7.2"
+    react-element-to-jsx-string "^15.0.0"
+    ts-dedent "^2.0.0"
+    type-fest "^2.19.0"
+    util-deprecate "^1.0.2"
+
+"@storybook/react@^7.0.0-beta.60":
+  version "7.0.0-beta.60"
+  resolved "https://registry.yarnpkg.com/@storybook/react/-/react-7.0.0-beta.60.tgz#a3f1c568bb58f4ec8d2d8d38343e605da57b0fd8"
+  integrity sha512-XCbD77Z3MFUhaqwKCEuJuHZjW6LsrUAuMm73hTsyGU+9HxQoN5+6qNwkPOY71FdLx+cBooKxQ9cg8NK5dxYiuw==
+  dependencies:
+    "@storybook/client-logger" "7.0.0-beta.60"
+    "@storybook/core-client" "7.0.0-beta.60"
+    "@storybook/docs-tools" "7.0.0-beta.60"
+    "@storybook/global" "^5.0.0"
+    "@storybook/preview-api" "7.0.0-beta.60"
+    "@storybook/react-dom-shim" "7.0.0-beta.60"
+    "@storybook/types" "7.0.0-beta.60"
     "@types/escodegen" "^0.0.6"
     "@types/estree" "^0.0.51"
     "@types/node" "^16.0.0"
