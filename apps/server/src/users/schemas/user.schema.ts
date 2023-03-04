@@ -2,8 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { HydratedDocument } from 'mongoose';
 
+import { UserInterface } from '../interfaces/user.interface';
+
 @Schema({ strict: true, timestamps: true })
-export class User {
+export class User implements UserInterface {
   @Prop({ required: true, unique: true })
   username: string;
 
