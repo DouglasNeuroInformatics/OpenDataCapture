@@ -1,8 +1,10 @@
 import { VersioningType } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import { AppModule } from './app.module';
+import { AjvValidationPipe } from './core/ajv-validation.pipe';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -11,7 +13,12 @@ async function bootstrap(): Promise<void> {
     type: VersioningType.URI
   });
   app.setGlobalPrefix('/api');
-  await app.listen(5500);
+  app.useGlobalPipes(new AjvValidationPipe());
+
+  const configService = app.get(ConfigService);
+  const port = configService.getOrThrow<number>('SERVER_PORT');
+
+  await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
