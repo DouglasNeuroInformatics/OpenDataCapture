@@ -2,6 +2,12 @@ import { Logger } from '@nestjs/common';
 
 import { FilterQuery, HydratedDocument, Model, ProjectionType, Query, QueryOptions } from 'mongoose';
 
+interface FindMethodArgs<Entity, EntityDocument = HydratedDocument<Entity>> {
+  filter?: FilterQuery<EntityDocument>;
+  projection?: ProjectionType<EntityDocument>;
+  options?: QueryOptions<EntityDocument>;
+}
+
 /**
  * The EntityRepository abstract class is inherited by the repository classes
  * in each module. It defines a core set of behavior common across the application
@@ -20,12 +26,12 @@ export abstract class EntityRepository<Entity, EntityDocument = HydratedDocument
     return this.entityModel.create(entity);
   }
 
-  find(
-    filter?: FilterQuery<EntityDocument>,
-    projection?: ProjectionType<EntityDocument>,
-    options?: QueryOptions<EntityDocument>
-  ): Query<EntityDocument[], EntityDocument> {
-    return this.entityModel.find({ filter, projection, options });
+  find(args: FindMethodArgs<Entity> = {}): Query<EntityDocument[], EntityDocument> {
+    return this.entityModel.find(args.filter ?? {}, args.projection, args.options);
+  }
+
+  findOne(args: FindMethodArgs<Entity> = {}): Query<EntityDocument | null, EntityDocument> {
+    return this.entityModel.findOne(args.filter ?? {}, args.projection, args.options);
   }
 
   async exists(filterQuery: FilterQuery<Entity>): Promise<boolean> {

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import bcrypt from 'bcrypt';
 
@@ -11,6 +11,7 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
+  /** Creates a new user with hashed password, throws if username already exists. */
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user: User = createUserDto;
     if (await this.usersRepository.exists({ username: user.username })) {
@@ -20,12 +21,18 @@ export class UsersService {
     return this.usersRepository.create(user);
   }
 
+  /** Returns an array of all users */
   async findAll(): Promise<User[]> {
     return this.usersRepository.find().exec();
   }
 
-  findOne(id: number): any {
-    return `This action returns a #${id} user`;
+  /** Returns user with provided username or throws */
+  async findByUsername(username: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ filter: { username } });
+    if (!user) {
+      throw new NotFoundException(`Failed to find user with username: ${username}`);
+    }
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto): any {

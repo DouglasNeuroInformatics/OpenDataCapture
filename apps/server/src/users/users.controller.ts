@@ -19,9 +19,9 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): any {
-    return this.usersService.findOne(+id);
+  @Get(':username')
+  findByUsername(@Param('username') username: string): Promise<User> {
+    return this.usersService.findByUsername(username);
   }
 
   @Patch(':id')
