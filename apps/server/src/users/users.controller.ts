@@ -30,7 +30,7 @@ export class UsersController {
   }
 
   @Delete(':username')
-  deleteByUsername(@Param('username') username: string): any {
+  deleteByUsername(@Param('username') username: string): Promise<User> {
     return this.usersService.deleteByUsername(username);
   }
 }

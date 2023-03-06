@@ -28,7 +28,7 @@ export class UsersService {
     return this.usersRepository.find().exec();
   }
 
-  /** Returns user with provided username or throws */
+  /** Returns user with provided username if found, otherwise throws */
   async findByUsername(username: string): Promise<User> {
     const user = await this.usersRepository.findOne({ filter: { username } });
     if (!user) {
@@ -41,9 +41,13 @@ export class UsersService {
     throw new NotImplementedException();
   }
 
-  deleteByUsername(username: string): Promise<unknown> {
-    this.logger.verbose(`Received request to delete user: ${username}`);
-    return this.usersRepository.deleteOne({ username });
+  /** Deletes the user with provided username if found, otherwise throws */
+  async deleteByUsername(username: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ filter: { username } });
+    if (!user) {
+      throw new NotFoundException(`Failed to find user with username: ${username}`);
+    }
+    return user.deleteOne({ new: true });
   }
 
   private async hashPassword(password: string): Promise<string> {
