@@ -6,6 +6,7 @@ import { ValidationSchema } from '@/core/validation-schema.decorator';
 
 @ValidationSchema<Partial<CreateUserData>>({
   type: 'object',
+  minProperties: 1,
   properties: {
     username: {
       type: 'string',

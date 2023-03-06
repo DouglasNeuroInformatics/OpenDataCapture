@@ -108,6 +108,13 @@ describe('/users', () => {
       const response = await request(server).patch('/users/foo');
       //expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
+
+    it('should throw if the request body is empty', async () => {
+      await db.collection('users').insertOne(UserStubs.mockStandardUser);
+      const response = await request(server).patch(`/users/${UserStubs.mockStandardUser.username}`).send();
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      await db.collection('users').deleteOne({ username: UserStubs.mockStandardUser.username });
+    });
   });
 
   describe('DELETE /users/:username', () => {
