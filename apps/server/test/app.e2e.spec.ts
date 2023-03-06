@@ -3,7 +3,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 import request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseService } from '@/database/database.service';
 import { Connection } from 'mongoose';
 
@@ -85,5 +84,18 @@ describe('POST /users', () => {
         role: 'standard-user'
       })
       .expect(HttpStatus.CREATED);
+  });
+});
+
+describe('GET /users/:username', () => {
+  it('should throw if the user does not exist', async () => {
+    const response = await request(server).get('/users/foo');
+    expect(response.status).toBe(HttpStatus.NOT_FOUND);
+  });
+
+  it('should return the user object if they exist', async () => {
+    const response = await request(server).get(`/users/${UserStubs.mockSystemAdmin.username}`);
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body).toMatchObject(UserStubs.mockSystemAdmin);
   });
 });
