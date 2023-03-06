@@ -1,10 +1,6 @@
 import { Logger } from '@nestjs/common';
 
-import { FilterQuery, HydratedDocument, Model } from 'mongoose';
-
-interface CreateEntityOptions {
-  requireUnique: boolean;
-}
+import { FilterQuery, HydratedDocument, Model, ProjectionType, Query, QueryOptions } from 'mongoose';
 
 /**
  * The EntityRepository abstract class is inherited by the repository classes
@@ -22,6 +18,30 @@ export abstract class EntityRepository<Entity, EntityDocument = HydratedDocument
   create(entity: Entity): Promise<EntityDocument> {
     this.logger.verbose(`Creating document with the following data: ${JSON.stringify(entity)}`);
     return this.entityModel.create(entity);
+  }
+
+  /*
+  find(
+    filter: FilterQuery<EntityDocument>,
+    projection?: ProjectionType<EntityDocument> | null | undefined,
+    options?: QueryOptions<EntityDocument> | null | undefined
+  ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
+  find<ResultDoc = THydratedDocumentType>(
+    filter: FilterQuery<TRawDocType>,
+    projection?: ProjectionType<TRawDocType> | null | undefined
+  ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
+  find<ResultDoc = THydratedDocumentType>(
+    filter: FilterQuery<TRawDocType>
+  ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
+  find<ResultDoc = THydratedDocumentType>(): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
+  */
+
+  find(
+    filter?: FilterQuery<EntityDocument>,
+    projection?: ProjectionType<EntityDocument>,
+    options?: QueryOptions<EntityDocument>
+  ): Query<EntityDocument[], EntityDocument> {
+    return this.entityModel.find({ filter, projection, options });
   }
 
   async exists(filterQuery: FilterQuery<Entity>): Promise<boolean> {

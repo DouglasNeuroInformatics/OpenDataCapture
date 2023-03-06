@@ -36,6 +36,14 @@ afterAll(async () => {
   await app.close();
 });
 
+describe('GET /users', () => {
+  it('should return the default admin user as an array', async () => {
+    const response = await request(server).get('/users');
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body).toMatchObject([UserStubs.mockSystemAdmin]);
+  });
+});
+
 describe('POST /users', () => {
   it('should reject a request with an empty body', () => {
     return request(server).post('/users').send().expect(HttpStatus.BAD_REQUEST);

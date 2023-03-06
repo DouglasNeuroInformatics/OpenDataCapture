@@ -20,8 +20,8 @@ export class UsersService {
     return this.usersRepository.create(user);
   }
 
-  findAll(): any {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find().exec();
   }
 
   findOne(id: number): any {
