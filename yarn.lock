@@ -3140,7 +3140,7 @@
     memoizerific "^1.11.3"
     prop-types "^15.7.2"
 
-"@storybook/blocks@7.0.0-beta.61":
+"@storybook/blocks@7.0.0-beta.61", "@storybook/blocks@^7.0.0-beta.61":
   version "7.0.0-beta.61"
   resolved "https://registry.yarnpkg.com/@storybook/blocks/-/blocks-7.0.0-beta.61.tgz#7a85b7eb73bd16d783fdf8892976e7e1166aea04"
   integrity sha512-203JsFe1ZpjwRBb5RxSuudFZkJNvsPDJObdK5z6b00lI+z/48ZeJOEYe5zXGLvCk0/lGqCJdWDiVyPTuIDUpHQ==
@@ -3156,34 +3156,6 @@
     "@storybook/preview-api" "7.0.0-beta.61"
     "@storybook/theming" "7.0.0-beta.61"
     "@storybook/types" "7.0.0-beta.61"
-    "@types/lodash" "^4.14.167"
-    color-convert "^2.0.1"
-    dequal "^2.0.2"
-    lodash "^4.17.21"
-    markdown-to-jsx "^7.1.8"
-    memoizerific "^1.11.3"
-    polished "^4.2.2"
-    react-colorful "^5.1.2"
-    telejson "^7.0.3"
-    ts-dedent "^2.0.0"
-    util-deprecate "^1.0.2"
-
-"@storybook/blocks@^7.0.0-beta.50":
-  version "7.0.0-beta.54"
-  resolved "https://registry.yarnpkg.com/@storybook/blocks/-/blocks-7.0.0-beta.54.tgz#be977f99c46b6c2bfbdf7bd7a75ff8635a2639a1"
-  integrity sha512-/C29iUtY2p3bzoEczZJj2jkFMdp+fwniytzWB1oDemUx4uhBel2plzdi6yrmGFoIFTrHsX0PYvSSckik/lKnqg==
-  dependencies:
-    "@storybook/channels" "7.0.0-beta.54"
-    "@storybook/client-logger" "7.0.0-beta.54"
-    "@storybook/components" "7.0.0-beta.54"
-    "@storybook/core-events" "7.0.0-beta.54"
-    "@storybook/csf" next
-    "@storybook/docs-tools" "7.0.0-beta.54"
-    "@storybook/global" "^5.0.0"
-    "@storybook/manager-api" "7.0.0-beta.54"
-    "@storybook/preview-api" "7.0.0-beta.54"
-    "@storybook/theming" "7.0.0-beta.54"
-    "@storybook/types" "7.0.0-beta.54"
     "@types/lodash" "^4.14.167"
     color-convert "^2.0.1"
     dequal "^2.0.2"
@@ -3389,20 +3361,6 @@
     prettier "^2.8.0"
     recast "^0.23.1"
     util "^0.12.4"
-
-"@storybook/components@7.0.0-beta.54":
-  version "7.0.0-beta.54"
-  resolved "https://registry.yarnpkg.com/@storybook/components/-/components-7.0.0-beta.54.tgz#3d4769e10e9655f6e8b06323f621ad81e2ad26e4"
-  integrity sha512-fZYwZZuQE4cwXJZDaTtwiAgGvhpIyDXXXI6UQc633yJMa2V8eZddYDFsbBDxa+eZFIJU5ccNHZ/kWMVE/3/jFQ==
-  dependencies:
-    "@storybook/client-logger" "7.0.0-beta.54"
-    "@storybook/csf" next
-    "@storybook/global" "^5.0.0"
-    "@storybook/theming" "7.0.0-beta.54"
-    "@storybook/types" "7.0.0-beta.54"
-    memoizerific "^1.11.3"
-    use-resize-observer "^9.1.0"
-    util-deprecate "^1.0.2"
 
 "@storybook/components@7.0.0-beta.60":
   version "7.0.0-beta.60"
