@@ -1,38 +1,39 @@
 import {
   ArgumentMetadata,
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
-  PipeTransform,
-  Type
+  PipeTransform
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import Ajv from 'ajv';
-import { JSONSchemaType, SomeJSONSchema } from 'ajv/dist/types/json-schema';
+import { JSONSchemaType } from 'ajv/dist/types/json-schema';
 
 @Injectable()
 export class AjvValidationPipe implements PipeTransform {
-  private readonly ajv = new Ajv({ strict: true });
+  private readonly ajv = new Ajv({ allErrors: true, strict: true });
   private readonly logger = new Logger(AjvValidationPipe.name);
   private readonly reflector = new Reflector();
 
-  transform<T>(value: T, { data, metatype, type }: ArgumentMetadata): T {
-    this.logger.verbose(`Validating value: ${JSON.stringify(value)}`);
-
-    const toValidate = type === 'body';
-    if (!toValidate) {
+  transform<T>(value: T, { metatype, type }: ArgumentMetadata): T {
+    if (type !== 'body') {
       return value;
     }
-    const validationSchema = this.extractValidationSchema<T>(metatype);
-    if (!validationSchema) {
-      throw new InternalServerErrorException('Failed to extract validation schema for request body');
+    if (!metatype) {
+      throw new InternalServerErrorException('Metatype must be defined!');
     }
-    console.log(validationSchema);
+
+    this.logger.verbose(`Attempting to validate value: ${JSON.stringify(value)}`);
+    const schema = this.reflector.get<JSONSchemaType<T>>('ValidationSchema', metatype);
+    const isValid = this.ajv.validate(schema, value);
+
+    if (!isValid) {
+      throw new BadRequestException(this.ajv.errors);
+    }
+
+    this.logger.verbose('Success!');
     return value;
   }
-
-  private extractValidationSchema = <T, U = JSONSchemaType<T>>(metatype?: Type<unknown>): U | null => {
-    return metatype ? this.reflector.get<U>('ValidationSchema', metatype) : null;
-  };
 }
