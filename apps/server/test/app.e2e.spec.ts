@@ -104,15 +104,20 @@ describe('/users', () => {
   });
 
   describe('PATCH', () => {
+    beforeAll(async () => {
+      await db.collection('users').insertOne(UserStubs.mockStandardUser);
+    });
     it('should throw if the user does not exist', async () => {
-      const response = await request(server).patch('/users/foo');
-      //expect(response.status).toBe(HttpStatus.NOT_FOUND);
+      const response = await request(server).patch('/users/foo').send({ username: 'bar' });
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     it('should throw if the request body is empty', async () => {
-      await db.collection('users').insertOne(UserStubs.mockStandardUser);
       const response = await request(server).patch(`/users/${UserStubs.mockStandardUser.username}`).send();
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
+    afterAll(async () => {
       await db.collection('users').deleteOne({ username: UserStubs.mockStandardUser.username });
     });
   });

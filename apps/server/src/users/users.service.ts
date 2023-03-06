@@ -37,7 +37,11 @@ export class UsersService {
     return user;
   }
 
-  updateByUsername(username: string, updateUserDto: UpdateUserDto): never {
+  async updateByUsername(username: string, updateUserDto: UpdateUserDto): Promise<never> {
+    const user = await this.findByUsername(username);
+    if (!user) {
+      throw new NotFoundException(`Failed to find user with username: ${username}`);
+    }
     throw new NotImplementedException();
   }
 
