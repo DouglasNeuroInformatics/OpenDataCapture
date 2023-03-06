@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException, NotImplementedException } from '@nestjs/common';
 
 import bcrypt from 'bcrypt';
 
@@ -9,6 +9,8 @@ import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(private readonly usersRepository: UsersRepository) {}
 
   /** Creates a new user with hashed password, throws if username already exists. */
@@ -35,12 +37,13 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto): any {
-    return `This action updates a #${id} user`;
+  updateByUsername(username: string, updateUserDto: UpdateUserDto): never {
+    throw new NotImplementedException();
   }
 
-  remove(id: number): any {
-    return `This action removes a #${id} user`;
+  deleteByUsername(username: string): Promise<unknown> {
+    this.logger.verbose(`Received request to delete user: ${username}`);
+    return this.usersRepository.deleteOne({ username });
   }
 
   private async hashPassword(password: string): Promise<string> {

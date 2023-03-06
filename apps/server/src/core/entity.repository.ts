@@ -34,6 +34,12 @@ export abstract class EntityRepository<Entity, EntityDocument = HydratedDocument
     return this.entityModel.findOne(args.filter ?? {}, args.projection, args.options);
   }
 
+  async deleteOne(filter: FilterQuery<EntityDocument>, options?: QueryOptions<EntityDocument>): Promise<boolean> {
+    this.logger.verbose(`Attempting to delete entity based on the following filter query: ${JSON.stringify(filter)}`);
+    const result = await this.entityModel.deleteOne(filter, options).exec();
+    return result.acknowledged && result.deletedCount === 1;
+  }
+
   async exists(filterQuery: FilterQuery<Entity>): Promise<boolean> {
     this.logger.verbose(`Checking for document matching the following query: ${JSON.stringify(filterQuery)}`);
     const result = (await this.entityModel.exists(filterQuery).exec()) !== null;

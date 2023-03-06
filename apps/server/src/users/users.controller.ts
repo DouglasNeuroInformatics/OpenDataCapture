@@ -24,13 +24,13 @@ export class UsersController {
     return this.usersService.findByUsername(username);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): any {
-    return this.usersService.update(+id, updateUserDto);
+  @Patch(':username')
+  update(@Param('username') username: string, @Body() updateUserDto: UpdateUserDto): any {
+    this.usersService.updateByUsername(username, updateUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string): any {
-    return this.usersService.remove(+id);
+  @Delete(':username')
+  deleteByUsername(@Param('username') username: string): any {
+    return this.usersService.deleteByUsername(username);
   }
 }
