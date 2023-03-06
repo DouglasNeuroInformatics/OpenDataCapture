@@ -12,8 +12,8 @@ export class User implements UserInterface {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ enum: ['system-admin', 'group-admin', 'standard-user'], required: true, type: String })
-  role: 'system-admin' | 'group-admin' | 'standard-user';
+  @Prop({ enum: ['system-admin', 'group-manager', 'standard-user'], required: true, type: String })
+  role: 'system-admin' | 'group-manager' | 'standard-user';
 
   @Prop()
   refreshToken?: string;

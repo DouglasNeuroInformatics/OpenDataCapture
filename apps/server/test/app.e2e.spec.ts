@@ -2,11 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
 import { HttpStatus } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseService } from '@/database/database.service';
 import { Connection } from 'mongoose';
+
+import { AppModule } from './../src/app.module';
+import { UserStubs } from '@/users/test/users.stubs';
 
 let app: NestExpressApplication;
 let db: Connection;
@@ -22,6 +24,8 @@ beforeAll(async () => {
 
   db = moduleFixture.get(DatabaseService).getDbHandle();
   server = app.getHttpServer();
+
+  await db.collection('users').insertOne(UserStubs.mockSystemAdmin);
 });
 
 afterAll(async () => {
@@ -57,6 +61,11 @@ describe('POST /users', () => {
         role: 'standard-user'
       })
       .expect(HttpStatus.BAD_REQUEST);
+  });
+
+  it('should reject a request to create a user that already exists', () => {
+    const mockSystemAdminDto = Object.assign(UserStubs.mockSystemAdmin, { password: UserStubs.mockPlainTextPassword });
+    return request(server).post('/users').send(mockSystemAdminDto).expect(HttpStatus.CONFLICT);
   });
 
   it('should create a new user when the correct data is provided', () => {

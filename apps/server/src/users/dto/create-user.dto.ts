@@ -20,7 +20,7 @@ const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
     },
     role: {
       type: 'string',
-      enum: ['system-admin', 'group-admin', 'standard-user']
+      enum: ['system-admin', 'group-manager', 'standard-user']
     }
   },
   required: ['username', 'password', 'role']
