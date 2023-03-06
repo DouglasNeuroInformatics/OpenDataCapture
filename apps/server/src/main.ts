@@ -4,7 +4,6 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import { AppModule } from './app.module';
-import { AjvValidationPipe } from './core/ajv-validation.pipe';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -13,7 +12,6 @@ async function bootstrap(): Promise<void> {
     type: VersioningType.URI
   });
   app.setGlobalPrefix('/api');
-  app.useGlobalPipes(new AjvValidationPipe());
 
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('SERVER_PORT');

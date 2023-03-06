@@ -4,6 +4,9 @@ import { ValidationSchema } from '@/core/validation-schema.decorator';
 
 type CreateUserData = Omit<UserInterface, 'refreshToken'>;
 
+// Matches string with 8 or more characters, minimum one upper case, lowercase, and number
+const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
 @ValidationSchema<CreateUserData>({
   type: 'object',
   properties: {
@@ -13,7 +16,7 @@ type CreateUserData = Omit<UserInterface, 'refreshToken'>;
     },
     password: {
       type: 'string',
-      minLength: 1
+      pattern: isStrongPassword.source
     },
     role: {
       type: 'string',
