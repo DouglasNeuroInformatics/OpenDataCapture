@@ -25,10 +25,14 @@ export class AjvValidationPipe implements PipeTransform {
       throw new InternalServerErrorException('Metatype must be defined!');
     }
 
-    this.logger.verbose(`Attempting to validate value: ${JSON.stringify(value)}`);
-    const schema = this.reflector.get<JSONSchemaType<T>>('ValidationSchema', metatype);
-    const isValid = this.ajv.validate(schema, value);
+    const schema = this.reflector.get<JSONSchemaType<T | undefined>>('ValidationSchema', metatype);
+    if (!schema) {
+      throw new InternalServerErrorException('Schema must be defined!');
+    }
 
+    this.logger.verbose(`Attempting to validate value: ${JSON.stringify(value)}`);
+
+    const isValid = this.ajv.validate(schema, value);
     if (!isValid) {
       throw new BadRequestException(this.ajv.errors);
     }

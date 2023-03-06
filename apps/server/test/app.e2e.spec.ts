@@ -103,6 +103,13 @@ describe('/users', () => {
     });
   });
 
+  describe('PATCH', () => {
+    it('should throw if the user does not exist', async () => {
+      const response = await request(server).patch('/users/foo');
+      //expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+  });
+
   describe('DELETE /users/:username', () => {
     it('should throw if the user does not exist', async () => {
       const response = await request(server).delete('/users/foo');
