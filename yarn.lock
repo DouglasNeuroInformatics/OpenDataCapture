@@ -4818,6 +4818,15 @@
     "@vitest/utils" "0.28.5"
     chai "^4.3.7"
 
+"@vitest/expect@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@vitest/expect/-/expect-0.29.2.tgz#7503aabd72764612b0bc8258bafa3232ccb81586"
+  integrity sha512-wjrdHB2ANTch3XKRhjWZN0UueFocH0cQbi2tR5Jtq60Nb3YOSmakjdAvUa2JFBu/o8Vjhj5cYbcMXkZxn1NzmA==
+  dependencies:
+    "@vitest/spy" "0.29.2"
+    "@vitest/utils" "0.29.2"
+    chai "^4.3.7"
+
 "@vitest/runner@0.28.5":
   version "0.28.5"
   resolved "https://registry.yarnpkg.com/@vitest/runner/-/runner-0.28.5.tgz#4a18fe0e40b25569763f9f1f64b799d1629b3026"
@@ -4827,10 +4836,26 @@
     p-limit "^4.0.0"
     pathe "^1.1.0"
 
+"@vitest/runner@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@vitest/runner/-/runner-0.29.2.tgz#bbc7b239758de4158392bb343e48ee5a4aa507e1"
+  integrity sha512-A1P65f5+6ru36AyHWORhuQBJrOOcmDuhzl5RsaMNFe2jEkoj0faEszQS4CtPU/LxUYVIazlUtZTY0OEZmyZBnA==
+  dependencies:
+    "@vitest/utils" "0.29.2"
+    p-limit "^4.0.0"
+    pathe "^1.1.0"
+
 "@vitest/spy@0.28.5":
   version "0.28.5"
   resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-0.28.5.tgz#b69affa0786200251b9e5aac5c58bbfb1b3273c9"
   integrity sha512-7if6rsHQr9zbmvxN7h+gGh2L9eIIErgf8nSKYDlg07HHimCxp4H6I/X/DPXktVPPLQfiZ1Cw2cbDIx9fSqDjGw==
+  dependencies:
+    tinyspy "^1.0.2"
+
+"@vitest/spy@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-0.29.2.tgz#4210d844fabd9a68a1d2932d6a26c051bd089021"
+  integrity sha512-Hc44ft5kaAytlGL2PyFwdAsufjbdOvHklwjNy/gy/saRbg9Kfkxfh+PklLm1H2Ib/p586RkQeNFKYuJInUssyw==
   dependencies:
     tinyspy "^1.0.2"
 
@@ -4849,6 +4874,17 @@
   version "0.28.5"
   resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-0.28.5.tgz#7b82b528df86adfbd4a1f6a3b72c39790e81de0d"
   integrity sha512-UyZdYwdULlOa4LTUSwZ+Paz7nBHGTT72jKwdFSV4IjHF1xsokp+CabMdhjvVhYwkLfO88ylJT46YMilnkSARZA==
+  dependencies:
+    cli-truncate "^3.1.0"
+    diff "^5.1.0"
+    loupe "^2.3.6"
+    picocolors "^1.0.0"
+    pretty-format "^27.5.1"
+
+"@vitest/utils@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-0.29.2.tgz#8990794a6855de19b59da80413dc5a1e1991da4d"
+  integrity sha512-F14/Uc+vCdclStS2KEoXJlOLAEyqRhnw0gM27iXw9bMTcyKRPJrQ+rlC6XZ125GIPvvKYMPpVxNhiou6PsEeYQ==
   dependencies:
     cli-truncate "^3.1.0"
     diff "^5.1.0"
@@ -13532,6 +13568,18 @@ vite-node@0.28.5:
     source-map-support "^0.5.21"
     vite "^3.0.0 || ^4.0.0"
 
+vite-node@0.29.2:
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/vite-node/-/vite-node-0.29.2.tgz#463626197e248971774075faf3d6896c29cf8062"
+  integrity sha512-5oe1z6wzI3gkvc4yOBbDBbgpiWiApvuN4P55E8OI131JGrSuo4X3SOZrNmZYo4R8Zkze/dhi572blX0zc+6SdA==
+  dependencies:
+    cac "^6.7.14"
+    debug "^4.3.4"
+    mlly "^1.1.0"
+    pathe "^1.1.0"
+    picocolors "^1.0.0"
+    vite "^3.0.0 || ^4.0.0"
+
 "vite@^3.0.0 || ^4.0.0", vite@^4.1.0:
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/vite/-/vite-4.1.4.tgz#170d93bcff97e0ebc09764c053eebe130bfe6ca0"
@@ -13544,7 +13592,7 @@ vite-node@0.28.5:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@0.28.5, vitest@^0.28.4:
+vitest@0.28.5:
   version "0.28.5"
   resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.28.5.tgz#94410a8924cd7189e4f1adffa8c5cde809cbf2f9"
   integrity sha512-pyCQ+wcAOX7mKMcBNkzDwEHRGqQvHUl0XnoHR+3Pb1hytAHISgSxv9h0gUiSiYtISXUU3rMrKiKzFYDrI6ZIHA==
@@ -13572,6 +13620,36 @@ vitest@0.28.5, vitest@^0.28.4:
     tinyspy "^1.0.2"
     vite "^3.0.0 || ^4.0.0"
     vite-node "0.28.5"
+    why-is-node-running "^2.2.2"
+
+vitest@^0.29.2:
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.29.2.tgz#0376b547169ddefbde3fbc040b48569ec61d6179"
+  integrity sha512-ydK9IGbAvoY8wkg29DQ4ivcVviCaUi3ivuPKfZEVddMTenFHUfB8EEDXQV8+RasEk1ACFLgMUqAaDuQ/Nk+mQA==
+  dependencies:
+    "@types/chai" "^4.3.4"
+    "@types/chai-subset" "^1.3.3"
+    "@types/node" "*"
+    "@vitest/expect" "0.29.2"
+    "@vitest/runner" "0.29.2"
+    "@vitest/spy" "0.29.2"
+    "@vitest/utils" "0.29.2"
+    acorn "^8.8.1"
+    acorn-walk "^8.2.0"
+    cac "^6.7.14"
+    chai "^4.3.7"
+    debug "^4.3.4"
+    local-pkg "^0.4.2"
+    pathe "^1.1.0"
+    picocolors "^1.0.0"
+    source-map "^0.6.1"
+    std-env "^3.3.1"
+    strip-literal "^1.0.0"
+    tinybench "^2.3.1"
+    tinypool "^0.3.1"
+    tinyspy "^1.0.2"
+    vite "^3.0.0 || ^4.0.0"
+    vite-node "0.29.2"
     why-is-node-running "^2.2.2"
 
 void-elements@3.1.0:
