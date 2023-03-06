@@ -20,22 +20,6 @@ export abstract class EntityRepository<Entity, EntityDocument = HydratedDocument
     return this.entityModel.create(entity);
   }
 
-  /*
-  find(
-    filter: FilterQuery<EntityDocument>,
-    projection?: ProjectionType<EntityDocument> | null | undefined,
-    options?: QueryOptions<EntityDocument> | null | undefined
-  ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
-  find<ResultDoc = THydratedDocumentType>(
-    filter: FilterQuery<TRawDocType>,
-    projection?: ProjectionType<TRawDocType> | null | undefined
-  ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
-  find<ResultDoc = THydratedDocumentType>(
-    filter: FilterQuery<TRawDocType>
-  ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
-  find<ResultDoc = THydratedDocumentType>(): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType>;
-  */
-
   find(
     filter?: FilterQuery<EntityDocument>,
     projection?: ProjectionType<EntityDocument>,
