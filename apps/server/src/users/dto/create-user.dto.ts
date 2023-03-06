@@ -1,4 +1,6 @@
-import { UserInterface, UserRole } from '../interfaces/user.interface';
+import { UserInterface } from '../interfaces/user.interface';
+
+import { BaseUserDto } from './base-user.dto';
 
 import { ValidationSchema } from '@/core/validation-schema.decorator';
 
@@ -25,8 +27,4 @@ const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
   },
   required: ['username', 'password', 'role']
 })
-export class CreateUserDto implements CreateUserData {
-  username: string;
-  password: string;
-  role: UserRole;
-}
+export class CreateUserDto extends BaseUserDto implements CreateUserData {}
