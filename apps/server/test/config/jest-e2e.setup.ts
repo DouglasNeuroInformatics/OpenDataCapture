@@ -5,7 +5,6 @@ import { Connection } from 'mongoose';
 
 import { AppModule } from '@/app.module';
 import { DatabaseService } from '@/database/database.service';
-import { UserStubs } from '@/users/test/users.stubs';
 
 let app: NestExpressApplication;
 let db: Connection;
@@ -21,15 +20,9 @@ beforeAll(async () => {
 
   db = moduleFixture.get(DatabaseService).getDbHandle();
   server = app.getHttpServer();
-
-  await db.collection('users').insertOne(UserStubs.mockSystemAdmin);
 });
 
 afterAll(async () => {
-  if (db.name !== 'test') {
-    throw new Error(`Unexpected database name ${db.name}`);
-  }
-  await db.dropDatabase();
   await app.close();
 });
 

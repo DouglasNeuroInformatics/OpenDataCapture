@@ -1,10 +1,8 @@
-import bcrypt from 'bcrypt';
-
 import { User } from '@/users/schemas/user.schema';
 
 export class UserStubs {
   static mockPlainTextPassword = 'Password123';
-  static mockHashedPassword = bcrypt.hashSync(UserStubs.mockPlainTextPassword, 10);
+  static mockHashedPassword = '$2b$10$hwA0g1yoj8u22Xn.gwoGQ.h9UlvIUtJPHuHzPDxuTRulIw5mlk1uu';
 
   static get mockSystemAdmin(): User {
     return {
