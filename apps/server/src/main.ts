@@ -20,6 +20,11 @@ async function bootstrap(): Promise<void> {
     .setDescription('Documentation for the REST API for Douglas Data Capture Platform')
     .setLicense('AGPL-3.0', 'https://www.gnu.org/licenses/agpl-3.0.txt')
     .setVersion('1.0')
+    .setExternalDoc(
+      'Additional Technical Documentation',
+      'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/'
+    )
+    .addTag('Users')
     .build();
 
   const document = SwaggerModule.createDocument(app, documentBuilder);
