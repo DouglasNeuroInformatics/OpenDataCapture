@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, NotFoundException, NotImplementedException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import bcrypt from 'bcrypt';
 
