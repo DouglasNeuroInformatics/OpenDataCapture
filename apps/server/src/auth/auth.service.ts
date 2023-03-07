@@ -10,9 +10,9 @@ import { JwtService } from '@nestjs/jwt';
 
 import bcrypt from 'bcrypt';
 
+import { JwtPayload } from './auth.types';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 import { User } from '@/users/schemas/user.schema';
 import { UsersService } from '@/users/users.service';

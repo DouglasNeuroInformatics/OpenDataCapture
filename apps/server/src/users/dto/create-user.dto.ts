@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { UserInterface, UserRole } from '../interfaces/user.interface';
+import { UserInterface, UserRole } from '../users.types';
 
 import { ValidationSchema } from '@/core/validation-schema.decorator';
 
