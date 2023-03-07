@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
@@ -12,6 +12,7 @@ export class AuthController {
 
   @ApiOperation({ description: 'Request a JSON Web Token from the server', summary: 'Login' })
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   login(@Body() credentials: LoginCredentialsDto): Promise<AuthTokensDto> {
     return this.authService.login(credentials);
   }

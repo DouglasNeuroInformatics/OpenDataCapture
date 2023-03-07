@@ -51,4 +51,16 @@ describe('POST /auth/login', () => {
     expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(response.body.message).toBe('Invalid password');
   });
+
+  it('should return two JSON web tokens when provided the correct credentials', async () => {
+    const response = await request(server).post('/auth/login').send({
+      username: UserStubs.mockSystemAdmin.username,
+      password: UserStubs.mockPlainTextPassword
+    });
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body).toEqual({
+      accessToken: expect.any(String),
+      refreshToken: expect.any(String)
+    });
+  });
 });

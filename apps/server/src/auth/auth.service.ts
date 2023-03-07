@@ -12,6 +12,7 @@ import bcrypt from 'bcrypt';
 
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 import { User } from '@/users/schemas/user.schema';
 import { UsersService } from '@/users/users.service';
@@ -30,7 +31,8 @@ export class AuthService {
   async login({ username, password }: LoginCredentialsDto): Promise<AuthTokensDto> {
     const user = await this.getUser(username);
     await this.validatePassword(user, password);
-    return Promise.resolve({ accessToken: '', refreshToken: '' });
+    const tokens = await this.getTokens(user);
+    return tokens;
   }
 
   /** Wraps UserService.getByUsername with appropriate exception handling */
@@ -55,5 +57,25 @@ export class AuthService {
     if (!isAuth) {
       throw new UnauthorizedException('Invalid password');
     }
+  }
+
+  /** Generates the JWTs encoding the username and role */
+  private async getTokens(user: User): Promise<AuthTokensDto> {
+    const payload: JwtPayload = {
+      username: user.username,
+      role: user.role
+    };
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        expiresIn: '15m',
+        secret: this.config.getOrThrow<string>('SECRET_KEY')
+      }),
+      this.jwtService.signAsync(payload, {
+        expiresIn: '1d',
+        secret: this.config.getOrThrow<string>('SECRET_KEY')
+      })
+    ]);
+    return { accessToken, refreshToken };
   }
 }
