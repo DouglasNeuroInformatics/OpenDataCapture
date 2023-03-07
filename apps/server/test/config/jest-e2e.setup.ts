@@ -7,8 +7,6 @@ import { AppModule } from '@/app.module';
 import { DatabaseService } from '@/database/database.service';
 import { UserStubs } from '@/users/test/users.stubs';
 
-const mockUsers = Object.freeze([UserStubs.mockSystemAdmin, UserStubs.mockGroupManager, UserStubs.mockStandardUser]);
-
 let app: NestExpressApplication;
 let db: Connection;
 let server: any;
@@ -26,7 +24,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await db.collection('users').insertMany(structuredClone([...mockUsers]));
+  await db.collection('users').insertMany([...UserStubs.mockUsersWithoutTokens]);
 });
 
 afterEach(async () => {
@@ -40,4 +38,4 @@ afterAll(async () => {
   await app.close();
 });
 
-export { app, db, mockUsers, server };
+export { app, db, server };

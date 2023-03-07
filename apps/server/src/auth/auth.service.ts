@@ -60,11 +60,8 @@ export class AuthService {
   }
 
   /** Generates the JWTs encoding the username and role */
-  private async getTokens(user: User): Promise<AuthTokensDto> {
-    const payload: JwtPayload = {
-      username: user.username,
-      role: user.role
-    };
+  private async getTokens({ username, role }: Pick<User, 'username' | 'role'>): Promise<AuthTokensDto> {
+    const payload: JwtPayload = { username, role };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {

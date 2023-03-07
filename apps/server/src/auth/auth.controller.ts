@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
+import { Auth } from './decorators/auth.decorator';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 
@@ -10,6 +11,8 @@ import { LoginCredentialsDto } from './dto/login-credentials.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // @Auth({ authorizedRoles: ['system-admin'] })
+  @Auth({ access: 'public' })
   @ApiOperation({ description: 'Request a JSON Web Token from the server', summary: 'Login' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
