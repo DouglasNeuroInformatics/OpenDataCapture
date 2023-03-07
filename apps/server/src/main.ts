@@ -24,7 +24,10 @@ async function bootstrap(): Promise<void> {
       'Additional Technical Documentation',
       'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/'
     )
-    .addTag('Users')
+    .addTag(
+      'Users',
+      "The following methods for adding, modifying, and deleting users are exclusively available to 'system-admin' users. As a result, they are not implemented in our web app and can only be accessed through programmatic use."
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, documentBuilder);
