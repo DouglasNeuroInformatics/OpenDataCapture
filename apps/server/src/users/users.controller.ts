@@ -7,7 +7,7 @@ import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
-@Controller({ path: 'users', version: '1' })
+@Controller({ path: 'users' })
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

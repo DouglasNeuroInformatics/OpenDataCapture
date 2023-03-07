@@ -10,6 +10,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
   app.enableVersioning({
+    defaultVersion: '1',
     type: VersioningType.URI
   });
   app.setGlobalPrefix('/api');
@@ -19,11 +20,12 @@ async function bootstrap(): Promise<void> {
     .setContact('Joshua Unrau', '', 'joshua.unrau@mail.mcgill.ca')
     .setDescription('Documentation for the REST API for Douglas Data Capture Platform')
     .setLicense('AGPL-3.0', 'https://www.gnu.org/licenses/agpl-3.0.txt')
-    .setVersion('1.0')
+    .setVersion('1')
     .setExternalDoc(
       'Additional Technical Documentation',
       'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/'
     )
+    .addTag('Authentication')
     .addTag(
       'Users',
       "The following methods for adding, modifying, and deleting users are exclusively available to 'system-admin' users. As a result, they are not implemented in our web app and can only be accessed through programmatic use."
