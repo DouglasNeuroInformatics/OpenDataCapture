@@ -1,7 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
+import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 
 @ApiTags('Authentication')
@@ -9,8 +10,9 @@ import { LoginCredentialsDto } from './dto/login-credentials.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({ description: 'Request a JSON Web Token from the server', summary: 'Login' })
   @Post('login')
-  login(@Body() credentials: LoginCredentialsDto): Promise<any> {
+  login(@Body() credentials: LoginCredentialsDto): Promise<AuthTokensDto> {
     return this.authService.login(credentials);
   }
 }
