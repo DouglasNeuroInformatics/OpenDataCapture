@@ -20,5 +20,7 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest'
   },
+  // setupFiles: [path.resolve(__dirname, 'jest-e2e.setup.cjs')],
+  setupFilesAfterEnv: [path.resolve(__dirname, 'jest-e2e.setup.ts')],
   verbose: true
 };
