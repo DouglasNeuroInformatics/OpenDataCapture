@@ -107,6 +107,7 @@ describe('/users', () => {
     beforeAll(async () => {
       await db.collection('users').insertOne(UserStubs.mockStandardUser);
     });
+
     it('should throw if the user does not exist', async () => {
       const response = await request(server).patch('/users/foo').send({ username: 'bar' });
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
@@ -115,6 +116,15 @@ describe('/users', () => {
     it('should throw if the request body is empty', async () => {
       const response = await request(server).patch(`/users/${UserStubs.mockStandardUser.username}`).send();
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
+    it('should modify the patched properties of the user in the database', async () => {
+      const modifiedUser = { ...UserStubs.mockStandardUser, role: 'group-manager' };
+      const response = await request(server).patch(`/users/${UserStubs.mockStandardUser.username}`).send({
+        role: 'group-manager'
+      });
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body).toMatchObject(modifiedUser);
     });
 
     afterAll(async () => {

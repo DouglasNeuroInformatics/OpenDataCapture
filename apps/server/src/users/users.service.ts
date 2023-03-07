@@ -37,21 +37,22 @@ export class UsersService {
     return user;
   }
 
-  async updateByUsername(username: string, updateUserDto: UpdateUserDto): Promise<never> {
-    const user = await this.findByUsername(username);
-    if (!user) {
+  async updateByUsername(username: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const updatedUser = await this.usersRepository.findOneAndUpdate({ username }, updateUserDto);
+    if (!updatedUser) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
-    throw new NotImplementedException();
+    return updatedUser;
   }
 
   /** Deletes the user with provided username if found, otherwise throws */
   async deleteByUsername(username: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ filter: { username } });
-    if (!user) {
+    const deletedUser = await this.usersRepository.findOneAndDelete({ username });
+    console.log(deletedUser);
+    if (!deletedUser) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
-    return user.deleteOne({ new: true });
+    return deletedUser;
   }
 
   private async hashPassword(password: string): Promise<string> {
