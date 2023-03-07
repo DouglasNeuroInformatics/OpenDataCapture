@@ -7,17 +7,6 @@ import { db, server } from './config/jest-e2e.setup';
 
 const mockUsers = [UserStubs.mockSystemAdmin, UserStubs.mockGroupManager, UserStubs.mockStandardUser];
 
-beforeEach(async () => {
-  await db.collection('users').insertMany(structuredClone(mockUsers));
-});
-
-afterEach(async () => {
-  if (db.name !== 'test') {
-    throw new Error(`Unexpected database name ${db.name}`);
-  }
-  await db.dropDatabase();
-});
-
 describe('GET /users', () => {
   it('should return the mock users as an array', async () => {
     const response = await request(server).get('/users');

@@ -34,5 +34,21 @@ describe('POST /auth/login', () => {
     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   });
 
-  it('should allow a request that contains a password of length one', async () => {});
+  it('should reject a request that contains an invalid username', async () => {
+    const response = await request(server).post('/auth/login').send({
+      username: 'foo',
+      password: 'bar'
+    });
+    expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+    expect(response.body.message).toBe('Invalid username');
+  });
+
+  it('should reject a request that contains an invalid password', async () => {
+    const response = await request(server).post('/auth/login').send({
+      username: UserStubs.mockSystemAdmin.username,
+      password: 'foo'
+    });
+    expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+    expect(response.body.message).toBe('Invalid password');
+  });
 });
