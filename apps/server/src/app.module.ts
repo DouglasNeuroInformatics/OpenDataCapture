@@ -4,11 +4,12 @@ import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
-import { AjvValidationPipe } from './core/ajv-validation.pipe';
 import { ExceptionFilter } from './core/exception.filter';
 import { LoggerMiddleware } from './core/logger.middleware';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
+import { ValidationModule } from './validation/validation.module';
+import { ValidationPipe } from './validation/validation.pipe';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { UsersModule } from './users/users.module';
       isGlobal: true
     }),
     DatabaseModule,
-    UsersModule
+    UsersModule,
+    ValidationModule
   ],
   providers: [
     {
@@ -30,7 +32,7 @@ import { UsersModule } from './users/users.module';
     },
     {
       provide: APP_PIPE,
-      useClass: AjvValidationPipe
+      useClass: ValidationPipe
     }
   ]
 })

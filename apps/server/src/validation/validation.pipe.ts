@@ -9,12 +9,12 @@ import {
 import { Reflector } from '@nestjs/core';
 
 import Ajv from 'ajv';
-import { JSONSchemaType } from 'ajv/dist/types/json-schema';
+import type { JSONSchemaType } from 'ajv/dist/types/json-schema';
 
 @Injectable()
-export class AjvValidationPipe implements PipeTransform {
+export class ValidationPipe implements PipeTransform {
   private readonly ajv = new Ajv({ allErrors: true, strict: true });
-  private readonly logger = new Logger(AjvValidationPipe.name);
+  private readonly logger = new Logger(ValidationPipe.name);
   private readonly reflector = new Reflector();
 
   transform<T>(value: T, { metatype, type }: ArgumentMetadata): T {
