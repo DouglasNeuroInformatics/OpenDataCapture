@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 
@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { AjvValidationPipe } from './core/ajv-validation.pipe';
 import { ExceptionFilter } from './core/exception.filter';
+import { LoggerMiddleware } from './core/logger.middleware';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 
@@ -33,4 +34,8 @@ import { UsersModule } from './users/users.module';
     }
   ]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
