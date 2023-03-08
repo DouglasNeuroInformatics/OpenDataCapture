@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { AjvValidationPipe } from './core/ajv-validation.pipe';
+import { ExceptionFilter } from './core/exception.filter';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 
@@ -18,6 +19,10 @@ import { UsersModule } from './users/users.module';
     UsersModule
   ],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: ExceptionFilter
+    },
     {
       provide: APP_GUARD,
       useClass: AccessTokenGuard
