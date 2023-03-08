@@ -16,7 +16,9 @@ beforeAll(async () => {
     imports: [AppModule]
   }).compile();
 
-  app = moduleFixture.createNestApplication();
+  app = moduleFixture.createNestApplication({
+    logger: false
+  });
   await app.init();
 
   db = moduleFixture.get(DatabaseService).getDbHandle();
