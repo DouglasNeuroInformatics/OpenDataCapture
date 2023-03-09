@@ -10,7 +10,12 @@ export class ExceptionFilter extends BaseExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
     const request = context.getRequest<Request>();
-    this.logger.error(request, exception);
+    this.logger.error(
+      JSON.stringify({
+        method: request.method,
+        error: exception
+      })
+    );
     super.catch(exception, host);
   }
 }

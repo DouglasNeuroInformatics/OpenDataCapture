@@ -8,14 +8,16 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import Ajv from 'ajv';
 import type { JSONSchemaType } from 'ajv/dist/types/json-schema';
+
+import { AjvService } from '@/ajv/ajv.service';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform {
-  private readonly ajv = new Ajv({ allErrors: true, strict: true });
   private readonly logger = new Logger(ValidationPipe.name);
   private readonly reflector = new Reflector();
+
+  constructor(private readonly ajvService: AjvService) {}
 
   transform<T>(value: T, { metatype, type }: ArgumentMetadata): T {
     if (type !== 'body') {
@@ -32,12 +34,11 @@ export class ValidationPipe implements PipeTransform {
 
     this.logger.verbose(`Attempting to validate value: ${JSON.stringify(value)}`);
 
-    const isValid = this.ajv.validate(schema, value);
-    if (!isValid) {
-      throw new BadRequestException(this.ajv.errors);
-    }
+    const data = this.ajvService.validate<T>(value, schema, (errorMessage) => {
+      throw new BadRequestException(errorMessage);
+    });
 
     this.logger.verbose('Success!');
-    return value;
+    return data;
   }
 }
