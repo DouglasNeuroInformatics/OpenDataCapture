@@ -4,10 +4,31 @@ import { HttpStatus } from '@nestjs/common';
 import { UserStubs } from '@/users/test/users.stubs';
 
 import { server } from './config/jest-e2e.setup';
-import { User } from '@/users/schemas/user.schema';
 
 describe('GET /users', () => {
-  it('should return the mock users as an array', async () => {
+  it('should reject a request from a user with no credentials', async () => {
+    const response = await request(server).get('/users');
+    expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
+
+  /*
+
+  it('should reject a request from a standard user', async () => {
+    const response = await request(server)
+      .get('/users')
+      .auth(UserStubs.mockStandardUser.accessToken, { type: 'bearer' });
+    expect(response.status).toBe(HttpStatus.FORBIDDEN);
+  });
+
+  it('should reject a request from a group manager', async () => {
+    const response = await request(server)
+      .get('/users')
+      .auth(UserStubs.mockGroupManager.accessToken, { type: 'bearer' });
+    expect(response.status).toBe(HttpStatus.FORBIDDEN);
+  });
+  */
+
+  it('should return the mock users as an array for a sysadmin', async () => {
     const response = await request(server)
       .get('/users')
       .auth(UserStubs.mockSystemAdmin.accessToken, { type: 'bearer' });

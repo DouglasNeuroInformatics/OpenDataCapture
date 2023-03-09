@@ -6,10 +6,9 @@ import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { ExceptionFilter } from './core/exception.filter';
 import { LoggerMiddleware } from './core/logger.middleware';
+import { ValidationPipe } from './core/validation.pipe';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
-import { ValidationModule } from './validation/validation.module';
-import { ValidationPipe } from './validation/validation.pipe';
 
 @Module({
   imports: [
@@ -18,8 +17,7 @@ import { ValidationPipe } from './validation/validation.pipe';
       isGlobal: true
     }),
     DatabaseModule,
-    UsersModule,
-    ValidationModule
+    UsersModule
   ],
   providers: [
     {
