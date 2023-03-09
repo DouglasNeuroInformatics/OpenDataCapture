@@ -1,11 +1,12 @@
-import { ExecutionContext, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
-import { Request } from 'express';
+import { Observable } from 'rxjs';
 
 import { AuthKeys } from '../decorators/auth.decorator';
-import { JwtPayloadDto } from '../dto/jwt-payload.dto';
+
+import { User } from '@/users/schemas/user.schema';
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard('jwt') {
@@ -15,44 +16,26 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
     super();
   }
 
-  async canActivate(context: ExecutionContext): Promise<any> {
-    const isPublic = this.reflector.getAllAndOverride<boolean | undefined>(AuthKeys.IsPublic, [
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(AuthKeys.IsPublic, [
       context.getHandler(),
       context.getClass()
     ]);
 
+    this.logger.verbose(`isPublic: ${isPublic}`);
     if (isPublic) {
       return true;
     }
 
-    // Will throw if the JWT is invalid, otherwise will populate request.user
-    await super.canActivate(context);
+    this.logger.verbose('Will invoke super');
 
-    const request = this.getRequest(context);
-    const user = this.getUser(request);
-
-    const jwtPayloadSchema = this.reflector.getAllAndMerge('ValidationSchema', [JwtPayloadDto]);
-    this.logger.log(request.user, jwtPayloadSchema);
-
-    return true;
+    return super.canActivate(context);
   }
 
-  private getRequest(context: ExecutionContext): Request {
-    return context.switchToHttp().getRequest();
-  }
-
-  /** This validation should never fail, but it is better to be safe than sorry */
-  private getUser(request: Request): unknown {
-    const user: unknown = request.user;
-    if (!user) {
-      throw new InternalServerErrorException('User must be defined');
-    } else if (!(user instanceof Object)) {
-      throw new InternalServerErrorException('User must be object');
+  handleRequest<T = User>(error: unknown, user?: T): T {
+    if (error || !user) {
+      throw error || new UnauthorizedException();
     }
-
-    if (!(request.user instanceof Object)) {
-      throw new InternalServerErrorException('User must be defined');
-    }
-    return request.user;
+    return user;
   }
 }

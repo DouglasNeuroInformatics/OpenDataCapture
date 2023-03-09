@@ -159,4 +159,11 @@ describe('DELETE /users/:username', () => {
     expect(response.status).toBe(HttpStatus.OK);
     expect(response.body).toMatchObject(expectedData);
   });
+
+  it('should not allow the admin to delete himself twice', async () => {
+    const { accessToken, username } = UserStubs.mockSystemAdmin;
+    await request(server).delete(`/users/${username}`).auth(accessToken, { type: 'bearer' });
+    const response = await request(server).delete(`/users/${username}`).auth(accessToken, { type: 'bearer' });
+    expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
 });
