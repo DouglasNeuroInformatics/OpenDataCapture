@@ -16,11 +16,6 @@ import { ValidationSchema } from '@/core/validation-schema.decorator';
       type: 'string',
       pattern: isStrongPassword.source,
       nullable: true
-    },
-    role: {
-      type: 'string',
-      enum: ['system-admin', 'group-manager', 'standard-user'],
-      nullable: true
     }
   }
 })

@@ -6,6 +6,8 @@ import type { GroupInterface } from '../groups.types';
 
 @Schema({ strict: true, timestamps: true })
 export class Group implements GroupInterface {
+  static readonly modelName = 'Group';
+
   @Prop({ required: true, unique: true })
   name: string;
 }

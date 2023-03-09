@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { UserInterface, UserRole } from '../users.types';
+import { UserInterface } from '../users.types';
 
 import { ValidationSchema } from '@/core/validation-schema.decorator';
 
@@ -19,13 +19,9 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
     password: {
       type: 'string',
       pattern: isStrongPassword.source
-    },
-    role: {
-      type: 'string',
-      enum: ['system-admin', 'group-manager', 'standard-user']
     }
   },
-  required: ['username', 'password', 'role']
+  required: ['username', 'password']
 })
 export class CreateUserDto implements CreateUserData {
   @ApiProperty({ description: 'A unique descriptive name associated with this user', example: 'JaneDoeMemoryClinic' })
@@ -37,6 +33,8 @@ export class CreateUserDto implements CreateUserData {
   })
   password: string;
 
+  /*
+
   @ApiProperty({
     description: "Determines the user's base permissions. Further information is provided in the standard docs.",
     enum: ['system-admin', 'group-manager', 'standard-user'] satisfies UserRole[],
@@ -46,5 +44,5 @@ export class CreateUserDto implements CreateUserData {
       url: 'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/features/authentication'
     }
   })
-  role: UserRole;
+  role: UserRole; */
 }

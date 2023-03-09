@@ -1,6 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../schemas/user.schema';
-import { UserRole } from '../users.types';
 
 export class UserStubs {
   private static readonly jwtService = new JwtService({
@@ -16,27 +15,26 @@ export class UserStubs {
   }
 
   static get mockUsersWithoutTokens(): readonly User[] {
-    return this.mockUsers.map(({ username, role, password }) => ({ username, role, password }));
+    return this.mockUsers.map(({ username, password }) => ({ username, password }));
   }
 
   static get mockSystemAdmin() {
-    return this.createMockUser('mock-system-admin', 'system-admin');
+    return this.createMockUser('mock-system-admin');
   }
 
   static get mockGroupManager() {
-    return this.createMockUser('mock-group-manager', 'group-manager');
+    return this.createMockUser('mock-group-manager');
   }
 
   static get mockStandardUser() {
-    return this.createMockUser('mock-standard-user', 'standard-user');
+    return this.createMockUser('mock-standard-user');
   }
 
-  private static createMockUser<T extends string, U extends UserRole>(username: T, role: U) {
+  private static createMockUser<T extends string>(username: T) {
     return {
       username,
-      role,
       password: this.mockHashedPassword,
-      accessToken: this.jwtService.sign({ username, role })
+      accessToken: this.jwtService.sign({ username })
     };
   }
 }

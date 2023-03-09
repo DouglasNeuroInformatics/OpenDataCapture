@@ -1,10 +1,8 @@
 import { SetMetadata, applyDecorators } from '@nestjs/common';
 
-import { UserRole } from '@/users/users.types';
-
 const enum AuthKeys {
-  AuthorizedRoles,
-  IsPublic
+  IsPublic,
+  Permissions
 }
 
 interface PublicRouteOptions {
@@ -13,7 +11,7 @@ interface PublicRouteOptions {
 
 interface ProtectedRouteOptions {
   access?: 'protected';
-  authorizedRoles: UserRole[];
+  permissions: any[];
 }
 
 type AuthOptions = PublicRouteOptions | ProtectedRouteOptions;
@@ -22,7 +20,7 @@ const Auth = (options: AuthOptions): any => {
   if (options.access === 'public') {
     return SetMetadata(AuthKeys.IsPublic, true);
   }
-  return applyDecorators(SetMetadata(AuthKeys.AuthorizedRoles, options.authorizedRoles));
+  return applyDecorators(SetMetadata(AuthKeys.Permissions, options.permissions));
 };
 
 export { Auth, AuthKeys };
