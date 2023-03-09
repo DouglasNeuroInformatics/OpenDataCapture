@@ -9,6 +9,7 @@ import { ExceptionFilter } from './core/exception.filter';
 import { LoggerMiddleware } from './core/logger.middleware';
 import { ValidationPipe } from './core/validation.pipe';
 import { DatabaseModule } from './database/database.module';
+import { GroupsModule } from './groups/groups.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
       isGlobal: true
     }),
     DatabaseModule,
+    GroupsModule,
     UsersModule
   ],
   providers: [

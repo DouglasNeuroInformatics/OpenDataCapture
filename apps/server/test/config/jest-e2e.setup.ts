@@ -33,7 +33,7 @@ afterEach(async () => {
   if (db.name !== 'test') {
     throw new Error(`Unexpected database name ${db.name}`);
   }
-  await db.dropCollection('users');
+  await db.dropDatabase();
 });
 
 afterAll(async () => {
