@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, SchemaFactory } from '@nestjs/mongoose';
 
-import { User, UserSchema } from './schemas/user.schema';
+import { User } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
@@ -11,7 +11,7 @@ import { UsersService } from './users.service';
     MongooseModule.forFeature([
       {
         name: User.name,
-        schema: UserSchema
+        schema: SchemaFactory.createForClass(User)
       }
     ])
   ],

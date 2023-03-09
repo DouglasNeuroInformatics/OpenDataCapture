@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema } from '@nestjs/mongoose';
 
 import { HydratedDocument } from 'mongoose';
 
@@ -19,5 +19,3 @@ export class User implements UserInterface {
 }
 
 export type UserDocument = HydratedDocument<User>;
-
-export const UserSchema = SchemaFactory.createForClass(User);

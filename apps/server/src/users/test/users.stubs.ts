@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../schemas/user.schema';
+import { User } from '../entities/user.entity';
 
 export class UserStubs {
   private static readonly jwtService = new JwtService({
