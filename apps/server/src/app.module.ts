@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 
+import { AjvModule } from './ajv/ajv.module';
 import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { ExceptionFilter } from './core/exception.filter';
@@ -12,6 +13,7 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    AjvModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true
