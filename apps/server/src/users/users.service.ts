@@ -15,7 +15,11 @@ export class UsersService {
 
   /** Creates a new user with hashed password, throws if username already exists. */
   async create({ username, password, isAdmin, groupNames }: CreateUserDto): Promise<User> {
-    if (await this.usersRepository.exists({ username })) {
+    const userExists = await this.usersRepository.exists({ username });
+    this.logger.debug(`User exists: ${userExists}`);
+
+    if (userExists) {
+      this.logger.debug(`Will throw`);
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 

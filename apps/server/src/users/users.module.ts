@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule, SchemaFactory } from '@nestjs/mongoose';
 
+import { CreateUserCommand } from './commands/create-user.command';
 import { User } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
@@ -16,7 +17,7 @@ import { UsersService } from './users.service';
     ])
   ],
   controllers: [UsersController],
-  providers: [UsersRepository, UsersService],
+  providers: [CreateUserCommand, UsersRepository, UsersService],
   exports: [UsersService]
 })
 export class UsersModule {}
