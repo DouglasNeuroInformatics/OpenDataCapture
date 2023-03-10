@@ -22,12 +22,9 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
       context.getClass()
     ]);
 
-    this.logger.verbose(`isPublic: ${isPublic}`);
     if (isPublic) {
       return true;
     }
-
-    this.logger.verbose('Will invoke super');
 
     return super.canActivate(context);
   }

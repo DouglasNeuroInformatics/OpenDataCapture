@@ -68,8 +68,7 @@ describe('POST /users', () => {
       .auth(UserStubs.mockSystemAdmin.accessToken, { type: 'bearer' })
       .send({
         username: 'user',
-        password: 'password',
-        role: 'standard-user'
+        password: 'password'
       });
     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   });
@@ -91,8 +90,7 @@ describe('POST /users', () => {
       .auth(UserStubs.mockSystemAdmin.accessToken, { type: 'bearer' })
       .send({
         username: 'user',
-        password: 'Password123',
-        role: 'standard-user'
+        password: 'Password123'
       });
     expect(response.status).toBe(HttpStatus.CREATED);
   });

@@ -16,6 +16,18 @@ import { ValidationSchema } from '@/core/validation-schema.decorator';
       type: 'string',
       pattern: isStrongPassword.source,
       nullable: true
+    },
+    isAdmin: {
+      type: 'boolean',
+      nullable: true
+    },
+    groupNames: {
+      type: 'array',
+      items: {
+        type: 'string',
+        minLength: 1
+      },
+      nullable: true
     }
   }
 })

@@ -14,13 +14,18 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   /** Creates a new user with hashed password, throws if username already exists. */
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const user: User = createUserDto;
-    if (await this.usersRepository.exists({ username: user.username })) {
-      throw new ConflictException(`User with username '${user.username}' already exists!`);
+  async create({ username, password, isAdmin, groupNames }: CreateUserDto): Promise<User> {
+    if (await this.usersRepository.exists({ username })) {
+      throw new ConflictException(`User with username '${username}' already exists!`);
     }
-    user.password = await this.hashPassword(user.password);
-    return this.usersRepository.create(user);
+
+    this.logger.debug(groupNames);
+    const hashedPassword = await this.hashPassword(password);
+    return this.usersRepository.create({
+      username,
+      password: hashedPassword,
+      isAdmin
+    });
   }
 
   /** Returns an array of all users */
