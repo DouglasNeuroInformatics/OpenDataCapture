@@ -5,7 +5,7 @@ import { UserInterface } from '../users.types';
 import { ValidationSchema } from '@/core/validation-schema.decorator';
 
 export type CreateUserData = Omit<UserInterface, 'refreshToken' | 'groups'> & {
-  groupNames: string[];
+  groupNames?: string[];
 };
 
 // Matches string with 8 or more characters, minimum one upper case, lowercase, and number
@@ -31,7 +31,8 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
       items: {
         type: 'string',
         minLength: 1
-      }
+      },
+      nullable: true
     }
   },
   required: ['username', 'password']
@@ -56,7 +57,7 @@ export class CreateUserDto implements CreateUserData {
     description: 'The names of the group(s) to which the user belongs',
     example: ['Memory Clinic', 'Depression Clinic']
   })
-  groupNames: string[];
+  groupNames?: string[];
 
   /*
 

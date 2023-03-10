@@ -4,7 +4,11 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import { Command } from 'commander';
+
 import { AppModule } from './app.module';
+import { DatabaseService } from './database/database.service';
+import { UsersService } from './users/users.service';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,4 +46,29 @@ async function bootstrap(): Promise<void> {
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
-void bootstrap();
+async function setup(username: string, password: string): Promise<void> {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  await app.get(DatabaseService).purgeDb();
+  await app.get(UsersService).create({ username, password, isAdmin: true });
+  await app.close();
+}
+
+const program = new Command();
+
+program
+  .command('run')
+  .description('run the application')
+  .action(() => {
+    void bootstrap();
+  });
+
+program
+  .command('setup')
+  .description('setup the application with an admin account')
+  .requiredOption('--username <string>', 'the username for the first admin')
+  .requiredOption('--password <string>', 'the password for the first admin')
+  .action(({ username, password }: Record<string, string>) => {
+    void setup(username, password);
+  });
+
+program.parse();
