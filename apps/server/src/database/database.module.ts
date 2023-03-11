@@ -4,8 +4,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { DatabaseService } from './database.service';
 
+import { FakerModule } from '@/faker/faker.module';
+
 @Module({
   imports: [
+    FakerModule,
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
