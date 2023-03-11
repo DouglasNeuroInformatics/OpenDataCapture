@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { getConnectionToken } from '@nestjs/mongoose';
 
 import { Connection } from 'mongoose';
 
 import { AppModule } from '@/app.module';
-import { DatabaseService } from '@/database/database.service';
 import { UserStubs } from '@/users/test/users.stubs';
 
 let app: NestExpressApplication;
@@ -21,7 +21,7 @@ beforeAll(async () => {
   });
   await app.init();
 
-  db = moduleFixture.get(DatabaseService).getDbHandle();
+  db = moduleFixture.get(getConnectionToken());
   server = app.getHttpServer();
 });
 
