@@ -7,6 +7,8 @@ import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
+import { GroupsModule } from '@/groups/groups.module';
+
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -14,7 +16,8 @@ import { UsersService } from './users.service';
         name: User.name,
         schema: SchemaFactory.createForClass(User)
       }
-    ])
+    ]),
+    GroupsModule
   ],
   controllers: [UsersController],
   providers: [CreateUserCommand, UsersRepository, UsersService],

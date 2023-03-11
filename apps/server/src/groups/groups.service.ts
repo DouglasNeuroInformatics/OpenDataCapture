@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -16,15 +16,20 @@ export class GroupsService {
     return this.groupsRepository.create(createGroupDto);
   }
 
-  findAll(): Promise<Group[]> {
+  async findAll(): Promise<Group[]> {
     return this.groupsRepository.find().exec();
+  }
+
+  async findByName(name: string): Promise<Group> {
+    const group = await this.groupsRepository.findOne({ filter: { name } }).exec();
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with name: ${name}`);
+    }
+    return group;
   }
 
   /*
 
-  findOne(id: number) {
-    return `This action returns a #${id} group`;
-  }
 
   update(id: number, updateGroupDto: UpdateGroupDto) {
     return `This action updates a #${id} group`;

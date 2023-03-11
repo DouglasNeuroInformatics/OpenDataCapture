@@ -7,28 +7,33 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 
+import { Group } from '@/groups/entities/group.entity';
+import { GroupsService } from '@/groups/groups.service';
+
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly groupsService: GroupsService, private readonly usersRepository: UsersRepository) {}
 
   /** Creates a new user with hashed password, throws if username already exists. */
   async create({ username, password, isAdmin, groupNames }: CreateUserDto): Promise<User> {
     const userExists = await this.usersRepository.exists({ username });
-    this.logger.debug(`User exists: ${userExists}`);
-
     if (userExists) {
-      this.logger.debug(`Will throw`);
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
-    this.logger.debug(groupNames);
+    // Will throw 404 if not found
+    const groups = groupNames
+      ? await Promise.all(groupNames.map(async (name) => await this.groupsService.findByName(name)))
+      : undefined;
+
     const hashedPassword = await this.hashPassword(password);
     return this.usersRepository.create({
       username,
       password: hashedPassword,
-      isAdmin
+      isAdmin,
+      groups
     });
   }
 

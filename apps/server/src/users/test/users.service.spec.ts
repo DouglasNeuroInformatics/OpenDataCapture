@@ -1,3 +1,4 @@
+import { GroupsService } from '@/groups/groups.service';
 import { createMock } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRepository } from '../users.repository';
@@ -6,6 +7,8 @@ import { UsersService } from '../users.service';
 const MockUsersRepository = createMock<UsersRepository>({
   exists: () => Promise.resolve(false)
 });
+
+const MockGroupsService = createMock<GroupsService>();
 
 describe('UsersService', () => {
   let usersService: UsersService;
@@ -18,6 +21,10 @@ describe('UsersService', () => {
         {
           provide: UsersRepository,
           useValue: MockUsersRepository
+        },
+        {
+          provide: GroupsService,
+          useValue: MockGroupsService
         }
       ]
     }).compile();

@@ -19,7 +19,7 @@ export class User implements UserInterface {
   @Prop()
   isAdmin?: boolean;
 
-  @Prop({ ref: Group.name, type: MongooseSchema.Types.ObjectId })
+  @Prop({ ref: Group.name, type: [MongooseSchema.Types.ObjectId] })
   groups?: Group[];
 
   @Prop()
