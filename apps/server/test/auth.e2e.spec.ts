@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import { HttpStatus } from '@nestjs/common';
 
-import { db, server } from './config/jest-e2e.setup';
+import { server } from './config/jest-e2e.setup';
 import { UserStubs } from '@/users/test/users.stubs';
 
 describe('POST /auth/login', () => {
