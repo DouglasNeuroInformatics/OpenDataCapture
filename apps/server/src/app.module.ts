@@ -9,6 +9,7 @@ import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { ExceptionFilter } from './core/exception.filter';
 import { LoggerMiddleware } from './core/logger.middleware';
 import { ValidationPipe } from './core/validation.pipe';
+import { DemoModule } from './demo/demo.module';
 import { GroupsModule } from './groups/groups.module';
 import { UsersModule } from './users/users.module';
 
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({
       isGlobal: true
     }),
+    DemoModule,
     GroupsModule,
     MongooseModule.forRootAsync({
       inject: [ConfigService],
