@@ -3,7 +3,7 @@ import { UserKind } from '../enums/user-kind.enum';
 import { Dto } from '@/core/dto.decorator';
 
 interface CreateUserData {
-  kind: UserKind;
+  kind?: UserKind;
   username: string;
   password: string;
 }
@@ -16,8 +16,8 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
   properties: {
     kind: {
       type: 'string',
-      default: UserKind.Standard,
-      enum: [UserKind.Admin, UserKind.Standard]
+      enum: [UserKind.Admin, UserKind.Standard],
+      nullable: true
     },
     username: {
       type: 'string',
@@ -31,7 +31,7 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
   required: ['username', 'password']
 })
 export class CreateUserDto {
-  kind: UserKind;
+  kind?: UserKind;
   username: string;
   password: string;
 }

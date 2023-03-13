@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule, SchemaFactory } from '@nestjs/mongoose';
 
-// import { CreateUserCommand } from './commands/create-user.command';
+import { CreateUserCommand } from './commands/create-user.command';
 import { AdminUser, StandardUser, User } from './entities/user.entity';
 import { UserKind } from './enums/user-kind.enum';
 import { UsersController } from './users.controller';
@@ -9,6 +9,7 @@ import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
 import { GroupsModule } from '@/groups/groups.module';
+import { PermissionsModule } from '@/permissions/permissions.module';
 
 @Module({
   imports: [
@@ -28,10 +29,11 @@ import { GroupsModule } from '@/groups/groups.module';
         ]
       }
     ]),
-    GroupsModule
+    GroupsModule,
+    PermissionsModule
   ],
   controllers: [UsersController],
-  providers: [UsersRepository, UsersService],
+  providers: [CreateUserCommand, UsersRepository, UsersService],
   exports: [UsersService]
 })
 export class UsersModule {}

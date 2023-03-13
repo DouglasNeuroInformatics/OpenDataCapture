@@ -8,12 +8,17 @@ import { UserKind } from './enums/user-kind.enum';
 import { UsersRepository } from './users.repository';
 
 import { GroupsService } from '@/groups/groups.service';
+import { PermissionsFactory } from '@/permissions/permissions.factory';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(private readonly groupsService: GroupsService, private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly groupsService: GroupsService,
+    private readonly permissionsFactory: PermissionsFactory,
+    private readonly usersRepository: UsersRepository
+  ) {}
 
   async create({ kind, username, password }: CreateUserDto): Promise<User> {
     this.logger.verbose(`Attempting to create user: ${username}`);
@@ -21,6 +26,9 @@ export class UsersService {
     if (userExists) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
+
+    const permissions = this.permissionsFactory.createForUser({ username, kind });
+    console.log(permissions.rules);
 
     return this.usersRepository.create({
       kind: kind || UserKind.Standard,
