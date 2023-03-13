@@ -2,6 +2,7 @@ import request from 'supertest';
 
 import { HttpStatus } from '@nestjs/common';
 import { admin, server } from './config/jest-e2e.setup';
+import { UserKind } from '@/users/enums/user-kind.enum';
 
 describe('POST /users', () => {
   it('should reject a request with an empty body', async () => {
@@ -34,12 +35,29 @@ describe('POST /users', () => {
     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   });
 
-  it('should create a new user when the correct data is provided', async () => {
+  it('should create a new standard user when the correct data is provided', async () => {
     const response = await request(server).post('/users').auth(admin.accessToken, { type: 'bearer' }).send({
       username: 'user',
       password: 'Password123'
     });
     expect(response.status).toBe(HttpStatus.CREATED);
+    expect(response.body).toMatchObject({
+      username: 'user',
+      kind: UserKind.Standard
+    });
+  });
+
+  it('should create a new admin when the correct data is provided', async () => {
+    const response = await request(server).post('/users').auth(admin.accessToken, { type: 'bearer' }).send({
+      kind: UserKind.Admin,
+      username: 'user',
+      password: 'Password123'
+    });
+    expect(response.status).toBe(HttpStatus.CREATED);
+    expect(response.body).toMatchObject({
+      username: 'user',
+      kind: UserKind.Admin
+    });
   });
 });
 

@@ -15,7 +15,7 @@ export class UsersService {
 
   constructor(private readonly groupsService: GroupsService, private readonly usersRepository: UsersRepository) {}
 
-  async create({ username, password }: CreateUserDto): Promise<User> {
+  async create({ kind, username, password }: CreateUserDto): Promise<User> {
     this.logger.verbose(`Attempting to create user: ${username}`);
     const userExists = await this.usersRepository.exists({ username });
     if (userExists) {
@@ -23,7 +23,7 @@ export class UsersService {
     }
 
     return this.usersRepository.create({
-      kind: UserKind.Admin,
+      kind: kind || UserKind.Standard,
       username,
       password: await this.hashPassword(password)
     });
