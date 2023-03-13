@@ -3,11 +3,10 @@ import { ConflictException, Injectable, Logger, NotFoundException } from '@nestj
 import bcrypt from 'bcrypt';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { UserKind } from './enums/user-kind.enum';
 import { UsersRepository } from './users.repository';
 
-import { Group } from '@/groups/entities/group.entity';
 import { GroupsService } from '@/groups/groups.service';
 
 @Injectable()
@@ -16,24 +15,17 @@ export class UsersService {
 
   constructor(private readonly groupsService: GroupsService, private readonly usersRepository: UsersRepository) {}
 
-  /** Creates a new user with hashed password, throws if username already exists. */
-  async create({ username, password, isAdmin, groupNames }: CreateUserDto): Promise<User> {
+  async create({ username, password }: CreateUserDto): Promise<User> {
+    this.logger.verbose(`Attempting to create user: ${username}`);
     const userExists = await this.usersRepository.exists({ username });
     if (userExists) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
-    // Will throw 404 if not found
-    const groups = groupNames
-      ? await Promise.all(groupNames.map(async (name) => await this.groupsService.findByName(name)))
-      : undefined;
-
-    const hashedPassword = await this.hashPassword(password);
     return this.usersRepository.create({
+      kind: UserKind.Admin,
       username,
-      password: hashedPassword,
-      isAdmin,
-      groups
+      password: await this.hashPassword(password)
     });
   }
 
@@ -49,23 +41,6 @@ export class UsersService {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
     return user;
-  }
-
-  async updateByUsername(username: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const updatedUser = await this.usersRepository.findOneAndUpdate({ username }, updateUserDto);
-    if (!updatedUser) {
-      throw new NotFoundException(`Failed to find user with username: ${username}`);
-    }
-    return updatedUser;
-  }
-
-  /** Deletes the user with provided username if found, otherwise throws */
-  async deleteByUsername(username: string): Promise<User> {
-    const deletedUser = await this.usersRepository.findOneAndDelete({ username });
-    if (!deletedUser) {
-      throw new NotFoundException(`Failed to find user with username: ${username}`);
-    }
-    return deletedUser;
   }
 
   private async hashPassword(password: string): Promise<string> {

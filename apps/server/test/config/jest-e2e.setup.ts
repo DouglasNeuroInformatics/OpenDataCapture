@@ -1,15 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { getConnectionToken } from '@nestjs/mongoose';
-
-import { Connection } from 'mongoose';
 
 import { AppModule } from '@/app.module';
-import { UserStubs } from '@/users/test/users.stubs';
+import { DemoService } from '@/demo/demo.service';
+import { JwtService } from '@nestjs/jwt';
 
 let app: NestExpressApplication;
-let db: Connection;
+let demoService: DemoService;
 let server: any;
+
+const jwtService = new JwtService({
+  secret: process.env['SECRET_KEY'],
+  signOptions: { expiresIn: '15m' }
+});
+
+const admin = Object.freeze({
+  username: 'admin',
+  password: 'Password123',
+  get accessToken() {
+    return jwtService.sign({ username: this.username });
+  }
+});
 
 beforeAll(async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -21,23 +32,16 @@ beforeAll(async () => {
   });
   await app.init();
 
-  db = moduleFixture.get(getConnectionToken());
+  demoService = moduleFixture.get(DemoService);
   server = app.getHttpServer();
 });
 
 beforeEach(async () => {
-  await db.collection('users').insertMany([...UserStubs.mockUsersWithoutTokens]);
-});
-
-afterEach(async () => {
-  if (db.name !== 'test') {
-    throw new Error(`Unexpected database name ${db.name}`);
-  }
-  await db.dropDatabase();
+  await demoService.initDemo({ defaultAdmin: admin });
 });
 
 afterAll(async () => {
   await app.close();
 });
 
-export { app, server };
+export { admin, app, server };

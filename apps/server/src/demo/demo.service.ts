@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { faker } from '@faker-js/faker';
@@ -9,9 +9,17 @@ import { UsersService } from '@/users/users.service';
 
 faker.seed(123);
 
+export interface InitDemoOptions {
+  defaultAdmin: {
+    username: string;
+    password: string;
+  };
+}
+
 @Injectable()
 export class DemoService {
   private readonly demoDbNames = ['development', 'test'];
+  private readonly logger = new Logger(DemoService.name);
 
   constructor(
     @InjectConnection() private readonly connection: Connection,
@@ -19,22 +27,27 @@ export class DemoService {
     private readonly usersService: UsersService
   ) {}
 
-  async initDemo(): Promise<void> {
+  async initDemo(options: InitDemoOptions): Promise<void> {
+    this.logger.verbose(`Initializing demo database: '${this.connection.name}'`);
     await this.dropDatabase();
-    await this.createDemoAdmin();
-    await this.createDemoGroupsWithUsers({ groups: 2, users: 2 });
+    await this.createDemoAdmin(options.defaultAdmin);
+    // await this.createDemoGroupsWithUsers({ groups: 2, users: 2 });
   }
 
   private async dropDatabase(): Promise<void> {
+    this.logger.verbose('Dropping previous database...');
     if (!this.demoDbNames.includes(this.connection.name)) {
       throw new Error(`Unexpected database name: ${this.connection.name}`);
     }
     return this.connection.dropDatabase();
   }
 
-  private async createDemoAdmin(username = 'admin', password = 'password'): Promise<void> {
-    await this.usersService.create({ username, password, isAdmin: true });
+  private async createDemoAdmin({ username, password }: { username: string; password: string }): Promise<void> {
+    this.logger.verbose(`Creating default admin user '${username}' with password '${password}'...`);
+    await this.usersService.create({ username, password });
   }
+
+  /*
 
   private async createDemoGroupsWithUsers(n: { groups: number; users: number }): Promise<void> {
     for (let i = 0; i < n.groups; i++) {
@@ -49,4 +62,5 @@ export class DemoService {
       }
     }
   }
+  */
 }

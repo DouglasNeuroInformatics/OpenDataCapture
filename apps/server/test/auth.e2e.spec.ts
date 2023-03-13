@@ -2,8 +2,7 @@ import request from 'supertest';
 
 import { HttpStatus } from '@nestjs/common';
 
-import { server } from './config/jest-e2e.setup';
-import { UserStubs } from '@/users/test/users.stubs';
+import { admin, server } from './config/jest-e2e.setup';
 
 describe('POST /auth/login', () => {
   it('should reject a request with an empty body', async () => {
@@ -13,22 +12,22 @@ describe('POST /auth/login', () => {
 
   it('should reject a request with a valid username but no password', async () => {
     const response = await request(server).post('/auth/login').send({
-      username: UserStubs.mockSystemAdmin.username
+      username: admin.username
     });
     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   });
 
   it('should reject a request with a password but no username', async () => {
     const response = await request(server).post('/auth/login').send({
-      password: UserStubs.mockSystemAdmin.password
+      password: admin.password
     });
     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   });
 
   it('should reject a request with valid credentials but an additional property', async () => {
     const response = await request(server).post('/auth/login').send({
-      username: UserStubs.mockSystemAdmin.username,
-      password: UserStubs.mockPlainTextPassword,
+      username: admin.username,
+      password: admin.password,
       foo: 'bar'
     });
     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
@@ -45,7 +44,7 @@ describe('POST /auth/login', () => {
 
   it('should reject a request that contains an invalid password', async () => {
     const response = await request(server).post('/auth/login').send({
-      username: UserStubs.mockSystemAdmin.username,
+      username: admin.username,
       password: 'foo'
     });
     expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
@@ -54,8 +53,8 @@ describe('POST /auth/login', () => {
 
   it('should return two JSON web tokens when provided the correct credentials', async () => {
     const response = await request(server).post('/auth/login').send({
-      username: UserStubs.mockSystemAdmin.username,
-      password: UserStubs.mockPlainTextPassword
+      username: admin.username,
+      password: admin.password
     });
     expect(response.status).toBe(HttpStatus.OK);
     expect(response.body).toEqual({

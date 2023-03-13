@@ -12,6 +12,11 @@ export class InitDemoCommand extends CommandRunner {
   }
 
   run(): Promise<void> {
-    return this.demoService.initDemo();
+    return this.demoService.initDemo({
+      defaultAdmin: {
+        username: 'admin',
+        password: 'password'
+      }
+    });
   }
 }
