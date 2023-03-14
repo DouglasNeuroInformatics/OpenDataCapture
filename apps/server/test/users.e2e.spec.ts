@@ -35,7 +35,7 @@ describe('POST /users', () => {
     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   });
 
-  it('should create a new standard user when the correct data is provided', async () => {
+  it('should create a new standard user when the correct data is provided with no role', async () => {
     const response = await request(server).post('/users').auth(admin.accessToken, { type: 'bearer' }).send({
       username: 'user',
       password: 'Password123'
@@ -43,7 +43,7 @@ describe('POST /users', () => {
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({
       username: 'user',
-      permissions: expect.anything() // would be good to be more specific once permissions is finished
+      permissions: []
     });
   });
 
