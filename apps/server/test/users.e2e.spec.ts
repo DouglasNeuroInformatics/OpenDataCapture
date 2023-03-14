@@ -56,7 +56,12 @@ describe('POST /users', () => {
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({
       username: 'user',
-      permissions: expect.anything() // would be good to be more specific once permissions is finished
+      permissions: [
+        {
+          action: 'manage',
+          subject: 'all'
+        }
+      ]
     });
   });
 });
