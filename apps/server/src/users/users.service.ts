@@ -28,12 +28,11 @@ export class UsersService {
     }
 
     const permissions = this.permissionsFactory.createForUser({ username, kind });
-    console.log(permissions.rules);
 
     return this.usersRepository.create({
-      kind: kind || UserKind.Standard,
       username,
-      password: await this.hashPassword(password)
+      password: await this.hashPassword(password),
+      permissions: permissions.rules
     });
   }
 

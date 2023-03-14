@@ -43,7 +43,7 @@ describe('POST /users', () => {
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({
       username: 'user',
-      kind: UserKind.Standard
+      permissions: expect.anything() // would be good to be more specific once permissions is finished
     });
   });
 
@@ -56,7 +56,7 @@ describe('POST /users', () => {
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({
       username: 'user',
-      kind: UserKind.Admin
+      permissions: expect.anything() // would be good to be more specific once permissions is finished
     });
   });
 });
