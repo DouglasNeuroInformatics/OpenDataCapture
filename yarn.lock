@@ -1101,6 +1101,11 @@
   dependencies:
     "@ucast/mongo2js" "^1.3.0"
 
+"@casl/mongoose@^7.1.2":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@casl/mongoose/-/mongoose-7.1.2.tgz#61e86839ee19df8443158f44b10cbbe5137ed1fb"
+  integrity sha512-YiY5gQlr5J0jsn0ZbjtDJEhqKviPyPj0ErZ2bnOh7li+ENvFMnfp5ZeF2wN7ZVcqK9mn4MCqWH56EzafRF3i+g==
+
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.npmjs.org/@colors/colors/-/colors-1.5.0.tgz"
