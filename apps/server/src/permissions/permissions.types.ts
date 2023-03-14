@@ -1,7 +1,7 @@
 import { InferSubjects, MongoQuery, PureAbility } from '@casl/ability';
 
-import { Group } from '@/groups/entities/group.entity';
-import { User } from '@/users/entities/user.entity';
+import { Group } from '@/groups/schemas/group.schema';
+import { User } from '@/users/schemas/user.schema';
 
 export type Action = 'manage' | 'create' | 'read' | 'update' | 'delete';
 

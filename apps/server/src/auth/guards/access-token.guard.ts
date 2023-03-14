@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 
 import { AuthKeys } from '../decorators/auth.decorator';
 
-import { User } from '@/users/entities/user.entity';
+import { User } from '@/users/schemas/user.schema';
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard('jwt') {

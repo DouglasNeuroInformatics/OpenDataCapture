@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule, SchemaFactory } from '@nestjs/mongoose';
 
 import { CreateUserCommand } from './commands/create-user.command';
-import { User } from './entities/user.entity';
+import { User, UserSchema } from './schemas/user.schema';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
@@ -15,7 +15,7 @@ import { PermissionsModule } from '@/permissions/permissions.module';
     MongooseModule.forFeature([
       {
         name: User.name,
-        schema: SchemaFactory.createForClass(User)
+        schema: UserSchema
       }
     ]),
     GroupsModule,

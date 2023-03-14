@@ -14,7 +14,7 @@ import { JwtPayload } from './auth.types';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 
-import { User } from '@/users/entities/user.entity';
+import { User } from '@/users/schemas/user.schema';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()

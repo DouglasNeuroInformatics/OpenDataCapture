@@ -1,4 +1,4 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { HydratedDocument } from 'mongoose';
 
@@ -13,3 +13,5 @@ export class Group implements GroupInterface {
 }
 
 export type GroupDocument = HydratedDocument<Group>;
+
+export const GroupSchema = SchemaFactory.createForClass(Group);

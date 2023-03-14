@@ -1,4 +1,4 @@
-import { Group } from '../entities/group.entity';
+import { Group } from '../schemas/group.schema';
 
 export class GroupStubs {
   static get myClinic(): Group {
