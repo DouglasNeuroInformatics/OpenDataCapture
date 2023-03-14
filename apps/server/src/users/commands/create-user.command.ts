@@ -1,6 +1,6 @@
 import { Command, CommandRunner, Option } from 'nest-commander';
 
-import { UserKind } from '../enums/user-kind.enum';
+import { UserRole } from '../enums/user-role.enum';
 import { UsersService } from '../users.service';
 
 type CommandArgs = [string, string];
@@ -19,7 +19,7 @@ export class CreateUserCommand extends CommandRunner {
     const user = await this.usersService.create({
       username,
       password,
-      kind: isAdmin ? UserKind.Admin : UserKind.Standard
+      role: isAdmin ? UserRole.Admin : UserRole.Standard
     });
     console.log(`Successfully created user: ${user.username}`);
   }

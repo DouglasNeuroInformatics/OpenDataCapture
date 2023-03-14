@@ -5,7 +5,7 @@ import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
-import { UserKind } from '@/users/enums/user-kind.enum';
+import { UserRole } from '@/users/enums/user-role.enum';
 import { UsersService } from '@/users/users.service';
 
 faker.seed(123);
@@ -45,7 +45,7 @@ export class DemoService {
 
   private async createDemoAdmin({ username, password }: { username: string; password: string }): Promise<void> {
     this.logger.verbose(`Creating default admin user '${username}' with password '${password}'...`);
-    await this.usersService.create({ kind: UserKind.Admin, username, password });
+    await this.usersService.create({ role: UserRole.Admin, username, password });
   }
 
   /*

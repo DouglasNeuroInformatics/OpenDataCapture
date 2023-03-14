@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
-import { UserKind } from './enums/user-kind.enum';
+import { UserRole } from './enums/user-role.enum';
 import { UsersRepository } from './users.repository';
 
 import { GroupsService } from '@/groups/groups.service';
@@ -20,14 +20,14 @@ export class UsersService {
     private readonly usersRepository: UsersRepository
   ) {}
 
-  async create({ kind, username, password }: CreateUserDto): Promise<User> {
+  async create({ role, username, password }: CreateUserDto): Promise<User> {
     this.logger.verbose(`Attempting to create user: ${username}`);
     const userExists = await this.usersRepository.exists({ username });
     if (userExists) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
-    const permissions = this.permissionsFactory.createForUser({ username, kind });
+    const permissions = this.permissionsFactory.createForUser({ username, role });
 
     return this.usersRepository.create({
       username,

@@ -5,23 +5,23 @@ import { AbilityBuilder, PureAbility } from '@casl/ability';
 import { AppAbility } from './permissions.types';
 
 import { CreateUserDto } from '@/users/dto/create-user.dto';
-import { UserKind } from '@/users/enums/user-kind.enum';
+import { UserRole } from '@/users/enums/user-role.enum';
 
 @Injectable()
 export class PermissionsFactory {
   private readonly logger = new Logger(PermissionsFactory.name);
 
-  createForUser(user: Pick<CreateUserDto, 'username' | 'kind'>): AppAbility {
-    this.logger.verbose(`Creating permissions for user '${user.username}' with kind '${user.kind!}'`);
+  createForUser(user: Pick<CreateUserDto, 'username' | 'role'>): AppAbility {
+    this.logger.verbose(`Creating permissions for user '${user.username}' with role '${user.role!}'`);
     const permissions = new AbilityBuilder<AppAbility>(PureAbility);
-    switch (user.kind) {
-      case UserKind.Admin:
+    switch (user.role) {
+      case UserRole.Admin:
         permissions.can('manage', 'all');
         break;
-      case UserKind.GroupManager:
+      case UserRole.GroupManager:
         permissions.can('manage', 'all');
         break;
-      case UserKind.Standard:
+      case UserRole.Standard:
         permissions.can('read', 'all');
         break;
     }

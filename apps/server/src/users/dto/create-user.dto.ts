@@ -1,9 +1,9 @@
-import { UserKind } from '../enums/user-kind.enum';
+import { UserRole } from '../enums/user-role.enum';
 
 import { Dto } from '@/core/dto.decorator';
 
 interface CreateUserData {
-  kind?: UserKind;
+  role?: UserRole;
   username: string;
   password: string;
 }
@@ -14,9 +14,9 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
 @Dto<CreateUserData>({
   type: 'object',
   properties: {
-    kind: {
+    role: {
       type: 'string',
-      enum: [UserKind.Admin, UserKind.Standard],
+      enum: [UserRole.Admin, UserRole.Standard],
       nullable: true
     },
     username: {
@@ -31,7 +31,7 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
   required: ['username', 'password']
 })
 export class CreateUserDto {
-  kind?: UserKind;
+  role?: UserRole;
   username: string;
   password: string;
 }
