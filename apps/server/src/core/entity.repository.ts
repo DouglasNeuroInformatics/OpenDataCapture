@@ -1,7 +1,15 @@
 import { Logger } from '@nestjs/common';
 
 import { AccessibleModel } from '@casl/mongoose';
-import { FilterQuery, HydratedDocument, Model, ProjectionType, Query, QueryOptions, UpdateQuery } from 'mongoose';
+import {
+  FilterQuery,
+  HydratedDocument,
+  Model,
+  ProjectionType,
+  QueryOptions,
+  QueryWithHelpers,
+  UpdateQuery
+} from 'mongoose';
 
 interface FindMethodArgs<Entity, EntityDocument = HydratedDocument<Entity>> {
   filter?: FilterQuery<EntityDocument>;
@@ -27,11 +35,15 @@ export abstract class EntityRepository<Entity, EntityDocument = HydratedDocument
     return this.entityModel.create(entity);
   }
 
-  find(args: FindMethodArgs<Entity> = {}): Query<EntityDocument[], EntityDocument> {
+  find(
+    args: FindMethodArgs<Entity> = {}
+  ): QueryWithHelpers<EntityDocument[], EntityDocument, AccessibleModel<EntityDocument>> {
     return this.entityModel.find(args.filter ?? {}, args.projection, args.options);
   }
 
-  findOne(args: FindMethodArgs<Entity> = {}): Query<EntityDocument | null, EntityDocument> {
+  findOne(
+    args: FindMethodArgs<Entity> = {}
+  ): QueryWithHelpers<EntityDocument | null, EntityDocument, AccessibleModel<EntityDocument>> {
     return this.entityModel.findOne(args.filter ?? {}, args.projection, args.options);
   }
 
