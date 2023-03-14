@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 
+import { AccessibleModel } from '@casl/mongoose';
 import { FilterQuery, HydratedDocument, Model, ProjectionType, Query, QueryOptions, UpdateQuery } from 'mongoose';
 
 interface FindMethodArgs<Entity, EntityDocument = HydratedDocument<Entity>> {
@@ -17,7 +18,7 @@ interface FindMethodArgs<Entity, EntityDocument = HydratedDocument<Entity>> {
 export abstract class EntityRepository<Entity, EntityDocument = HydratedDocument<Entity>> {
   protected readonly logger: Logger;
 
-  constructor(protected readonly entityModel: Model<EntityDocument>) {
+  constructor(protected readonly entityModel: Model<EntityDocument, AccessibleModel<EntityDocument>>) {
     this.logger = new Logger(`${EntityRepository.name}: ${entityModel.modelName}`);
   }
 
