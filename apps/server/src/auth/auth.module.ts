@@ -5,10 +5,11 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 
+import { CryptoModule } from '@/crypto/crypto.module';
 import { UsersModule } from '@/users/users.module';
 
 @Module({
-  imports: [JwtModule.register({}), UsersModule],
+  imports: [CryptoModule, JwtModule.register({}), UsersModule],
   controllers: [AuthController],
   providers: [AuthService, AccessTokenStrategy]
 })

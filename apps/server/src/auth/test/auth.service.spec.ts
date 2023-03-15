@@ -7,6 +7,8 @@ import { createMock } from '@golevelup/ts-jest';
 
 import { AuthService } from '../auth.service';
 
+import { CryptoService } from '@/crypto/crypto.service';
+import { MockCryptoService } from '@/crypto/test/mocks/crypto.service.mock';
 import { UsersService } from '@/users/users.service';
 
 const MockConfigService = createMock<ConfigService>({
@@ -49,6 +51,10 @@ describe('AuthService', () => {
         {
           provide: ConfigService,
           useValue: MockConfigService
+        },
+        {
+          provide: CryptoService,
+          useValue: MockCryptoService
         },
         {
           provide: JwtService,

@@ -8,12 +8,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import bcrypt from 'bcrypt';
-
 import { JwtPayload } from './auth.types';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 
+import { CryptoService } from '@/crypto/crypto.service';
 import { User } from '@/users/schemas/user.schema';
 import { UsersService } from '@/users/users.service';
 
@@ -22,7 +21,8 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private readonly config: ConfigService,
+    private readonly configService: ConfigService,
+    private readonly cryptoService: CryptoService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService
   ) {}
@@ -30,7 +30,12 @@ export class AuthService {
   /** Validate the provided credentials and return the JWTs if valid, otherwise throw appropriate HTTP error */
   async login({ username, password }: LoginCredentialsDto): Promise<AuthTokensDto> {
     const user = await this.getUser(username);
-    await this.validatePassword(user, password);
+
+    const isAuth = await this.cryptoService.compare(password, user.password);
+    if (!isAuth) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
     const tokens = await this.getTokens(user);
     return tokens;
   }
@@ -51,14 +56,6 @@ export class AuthService {
     return user;
   }
 
-  /** Throws if the provided plain-text password does not correspond to the hash in the db */
-  private async validatePassword(user: User, password: string): Promise<void> {
-    const isAuth = await bcrypt.compare(password, user.password);
-    if (!isAuth) {
-      throw new UnauthorizedException('Invalid password');
-    }
-  }
-
   /** Generates the JWTs encoding the username and role */
   private async getTokens({ username }: Pick<User, 'username'>): Promise<AuthTokensDto> {
     const payload: JwtPayload = { username };
@@ -66,11 +63,11 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         expiresIn: '15m',
-        secret: this.config.getOrThrow<string>('SECRET_KEY')
+        secret: this.configService.getOrThrow<string>('SECRET_KEY')
       }),
       this.jwtService.signAsync(payload, {
         expiresIn: '1d',
-        secret: this.config.getOrThrow<string>('SECRET_KEY')
+        secret: this.configService.getOrThrow<string>('SECRET_KEY')
       })
     ]);
     return { accessToken, refreshToken };

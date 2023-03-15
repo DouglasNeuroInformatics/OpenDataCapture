@@ -1,11 +1,10 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
-import bcrypt from 'bcrypt';
-
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
 import { UsersRepository } from './users.repository';
 
+import { CryptoService } from '@/crypto/crypto.service';
 import { GroupsService } from '@/groups/groups.service';
 import { Group } from '@/groups/schemas/group.schema';
 import { PermissionsFactory } from '@/permissions/permissions.factory';
@@ -15,6 +14,7 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(
+    private readonly cryptoService: CryptoService,
     private readonly groupsService: GroupsService,
     private readonly permissionsFactory: PermissionsFactory,
     private readonly usersRepository: UsersRepository
@@ -35,7 +35,7 @@ export class UsersService {
     }
 
     const permissions = this.permissionsFactory.createForUser({ username, role });
-    const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = await this.cryptoService.hash(password);
 
     return this.usersRepository.create({
       username: username,
@@ -57,9 +57,5 @@ export class UsersService {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
     return user;
-  }
-
-  private async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, await bcrypt.genSalt());
   }
 }

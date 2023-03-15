@@ -5,7 +5,7 @@
 * [Design Principles](introduction/design-principles.md)
 
 - **Features**
-* [Authentication](features/authentication.md)
+* [Security](features/security.md)
 * [Internationalization](features/internationalization.md)
 * [Subject Registration](features/subject-registration.md)
 * [Creating Instruments](features/creating-instruments.md)
