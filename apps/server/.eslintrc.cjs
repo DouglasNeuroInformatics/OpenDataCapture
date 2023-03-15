@@ -3,7 +3,7 @@ const path = require('path');
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
   extends: ['@douglas-data-capture-platform'],
-  ignorePatterns: ['dist/**/*', 'test/**/*'],
+  ignorePatterns: ['dist/**/*'],
   env: {
     node: true
   },

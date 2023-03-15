@@ -1,12 +1,13 @@
+import { NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { createMock } from '@golevelup/ts-jest';
 
 import { AuthService } from '../auth.service';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+
 import { UsersService } from '@/users/users.service';
-import { NotFoundException } from '@nestjs/common';
 
 const MockConfigService = createMock<ConfigService>({
   getOrThrow(property: string) {
