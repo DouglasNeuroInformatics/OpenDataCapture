@@ -5,11 +5,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
 import { AuthKeys } from '../decorators/auth.decorator';
+import { StrategyName } from '../enum/strategy-name.enum';
 
 import { User } from '@/users/schemas/user.schema';
 
 @Injectable()
-export class AccessTokenGuard extends AuthGuard('jwt') {
+export class AccessTokenGuard extends AuthGuard(StrategyName.AccessToken) {
   private readonly logger = new Logger(AccessTokenGuard.name);
 
   constructor(private readonly reflector: Reflector) {
