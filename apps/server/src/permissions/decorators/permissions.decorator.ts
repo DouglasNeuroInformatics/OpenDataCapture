@@ -4,6 +4,6 @@ import { RawRuleOf } from '@casl/ability';
 
 import { AppAbility } from '../permissions.types';
 
-export function Permissions(value: RawRuleOf<AppAbility>): CustomDecorator {
+export function Permissions(value: RawRuleOf<AppAbility> | RawRuleOf<AppAbility>[]): CustomDecorator {
   return SetMetadata('Permissions', value);
 }

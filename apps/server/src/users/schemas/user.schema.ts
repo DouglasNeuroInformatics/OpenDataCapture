@@ -8,6 +8,8 @@ import { AppAbility } from '@/permissions/permissions.types';
 
 @Schema({ strict: true, timestamps: true })
 export class User {
+  static readonly modelName = 'User';
+
   @Prop({ required: true, unique: true })
   username: string;
 
