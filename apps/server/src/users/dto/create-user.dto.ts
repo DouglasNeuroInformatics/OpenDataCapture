@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { UserRole } from '../enums/user-role.enum';
 
-import { Dto } from '@/core/dto.decorator';
+import { Dto } from '@/core/decorators/dto.decorator';
 
 interface CreateUserData {
   username: string;

@@ -1,4 +1,4 @@
-import { Dto } from '@/core/dto.decorator';
+import { Dto } from '@/core/decorators/dto.decorator';
 
 interface JwtPayload {
   username: string;

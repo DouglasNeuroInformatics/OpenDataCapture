@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Dto } from '@/core/dto.decorator';
+import { Dto } from '@/core/decorators/dto.decorator';
 
 interface LoginCredentials {
   username: string;
