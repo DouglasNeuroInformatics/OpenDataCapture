@@ -29,14 +29,20 @@ JWT compromised due to malware running on client. Since JWT is stored in memory 
 
 ## Authentication
 
-The API uses JSON Web Tokens (JWTs) to identify and authorize users. When a client sends a request to `/auth/login`, their password is compared to a hashed and salted version stored in our database. If the password is valid, the server creates an access and refresh token. These tokens are signed using a secret key stored in the environment `SECRET_KEY`.
+The API uses JSON Web Tokens (JWTs) to identify and authorize users. When a client sends a request to `/auth/login`, their password is compared to a hashed and salted version stored in our database. If the password is valid, the server issues an access and refresh token. These tokens are signed using a secret key stored in the environment `SECRET_KEY`.
 
 The validity of both tokens is time-limited: the access token is set to expire in 15 minutes, whereas the refresh token is set to expire in 24 hours.
 
-Following [web standards](https://www.rfc-editor.org/rfc/rfc6750)
+Following [web standards](https://www.rfc-editor.org/rfc/rfc6750), the access token is attached to each request.
 
+As [documented](https://www.rfc-editor.org/rfc/rfc6749#section-1.2), the workflow is as follows:
 
-
+1. The client requests an access token by authenticating with the authorization server and presenting an authorization grant.
+2. The authorization server authenticates the client and validates the authorization grant, and if valid, issues an access token and a refresh token.
+3. The client makes a protected resource request to the resource server by presenting the access token.
+4. The resource server validates the access token, and if valid, serves the request.
+5. Steps (C) and (D) repeat until the access token expires. If the client knows the access token expired, it skips to step (G); otherwise, it makes another protected resource request.
+6. Since the access token is invalid, the resource server returns an invalid token error.
 ## Authorization
 
 Once a user is authenticated, attribute-based access control is used to determine access to protected resources. When creating a user, a default set of permissions _may_ be assigned based on the following roles:

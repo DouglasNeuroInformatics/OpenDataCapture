@@ -4,13 +4,10 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { Observable } from 'rxjs';
 
-import { AuthKeys } from '../decorators/auth.decorator';
-import { StrategyName } from '../enum/strategy-name.enum';
-
 import { User } from '@/users/schemas/user.schema';
 
 @Injectable()
-export class AccessTokenGuard extends AuthGuard(StrategyName.AccessToken) {
+export class AccessTokenGuard extends AuthGuard('jwt') {
   private readonly logger = new Logger(AccessTokenGuard.name);
 
   constructor(private readonly reflector: Reflector) {
@@ -18,11 +15,12 @@ export class AccessTokenGuard extends AuthGuard(StrategyName.AccessToken) {
   }
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(AuthKeys.IsPublic, [
+    const isPublic = this.reflector.getAllAndOverride<boolean | undefined>('isPublic', [
       context.getHandler(),
       context.getClass()
     ]);
 
+    this.logger.verbose(`Public: ${Boolean(isPublic)}`);
     if (isPublic) {
       return true;
     }

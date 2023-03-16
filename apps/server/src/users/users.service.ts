@@ -35,7 +35,7 @@ export class UsersService {
     }
 
     const permissions = this.permissionsFactory.createForUser({ username, role });
-    const hashedPassword = await this.cryptoService.hash(password);
+    const hashedPassword = await this.cryptoService.hashPassword(password);
 
     return this.usersRepository.create({
       username: username,

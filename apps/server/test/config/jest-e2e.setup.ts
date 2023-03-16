@@ -1,13 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { HttpServer } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { Request, Response } from 'express';
 
 import { AppModule } from '@/app.module';
 import { DemoService } from '@/demo/demo.service';
-import { JwtService } from '@nestjs/jwt';
+
+type AppServer = HttpServer<Request, Response>;
 
 let app: NestExpressApplication;
 let demoService: DemoService;
-let server: any;
+let server: AppServer;
 
 const jwtService = new JwtService({
   secret: process.env['SECRET_KEY'],
@@ -33,7 +38,7 @@ beforeAll(async () => {
   await app.init();
 
   demoService = moduleFixture.get(DemoService);
-  server = app.getHttpServer();
+  server = app.getHttpServer() as AppServer;
 });
 
 beforeEach(async () => {

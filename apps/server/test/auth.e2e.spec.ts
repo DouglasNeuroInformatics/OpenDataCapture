@@ -1,6 +1,6 @@
-import request from 'supertest';
-
 import { HttpStatus } from '@nestjs/common';
+
+import request from 'supertest';
 
 import { admin, server } from './config/jest-e2e.setup';
 
@@ -57,9 +57,8 @@ describe('POST /auth/login', () => {
       password: admin.password
     });
     expect(response.status).toBe(HttpStatus.OK);
-    expect(response.body).toEqual({
-      accessToken: expect.any(String),
-      refreshToken: expect.any(String)
+    expect(response.body).toMatchObject({
+      accessToken: expect.any(String)
     });
   });
 });

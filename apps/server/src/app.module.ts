@@ -8,8 +8,8 @@ import { Connection } from 'mongoose';
 
 import { AjvModule } from './ajv/ajv.module';
 import { AuthModule } from './auth/auth.module';
-import { AccessTokenGuard } from './auth/guards/access-token.guard';
 import { ExceptionFilter } from './core/exception.filter';
+import { AccessTokenGuard } from './core/guards/access-token.guard';
 import { LoggerMiddleware } from './core/logger.middleware';
 import { ValidationPipe } from './core/validation.pipe';
 import { DemoModule } from './demo/demo.module';

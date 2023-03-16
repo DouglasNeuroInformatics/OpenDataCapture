@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { ValidationSchema } from '@/core/validation-schema.decorator';
+import { Dto } from '@/core/dto.decorator';
 
 interface LoginCredentials {
   username: string;
   password: string;
 }
 
-@ValidationSchema<LoginCredentials>({
+@Dto<LoginCredentials>({
   type: 'object',
   properties: {
     username: {
@@ -20,7 +20,7 @@ interface LoginCredentials {
   additionalProperties: false,
   required: ['username', 'password']
 })
-export class LoginCredentialsDto implements LoginCredentials {
+export class LoginCredentialsDto {
   @ApiProperty({ example: 'admin' })
   username: string;
 

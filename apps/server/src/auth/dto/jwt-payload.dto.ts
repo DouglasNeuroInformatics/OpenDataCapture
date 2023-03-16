@@ -1,8 +1,10 @@
-import { JwtPayload } from '../auth.types';
+import { Dto } from '@/core/dto.decorator';
 
-import { ValidationSchema } from '@/core/validation-schema.decorator';
+interface JwtPayload {
+  username: string;
+}
 
-@ValidationSchema<JwtPayload>({
+@Dto<JwtPayload>({
   type: 'object',
   properties: {
     username: {
@@ -13,6 +15,6 @@ import { ValidationSchema } from '@/core/validation-schema.decorator';
   additionalProperties: true,
   required: ['username']
 })
-export class JwtPayloadDto implements JwtPayload {
+export class JwtPayloadDto {
   username: string;
 }

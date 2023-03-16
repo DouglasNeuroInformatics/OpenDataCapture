@@ -27,10 +27,9 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should return an access token and refresh token', async () => {
+    it('should return an access token', async () => {
       await expect(authController.login({ username: 'user', password: 'password' })).resolves.toMatchObject({
-        accessToken: expect.any(String),
-        refreshToken: expect.any(String)
+        accessToken: expect.any(String)
       });
     });
   });
