@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { GroupInterface } from '../groups.types';
 
-import { ValidationSchema } from '@/core/validation-schema.decorator';
+import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
 @ValidationSchema<GroupInterface>({
   type: 'object',
