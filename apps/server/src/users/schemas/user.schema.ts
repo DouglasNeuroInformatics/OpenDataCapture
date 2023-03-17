@@ -21,9 +21,6 @@ export class User {
 
   @Prop({ required: true, type: [{ ref: Group.name, type: MongooseSchema.Types.ObjectId }] })
   groups: Group[];
-
-  @Prop()
-  refreshToken?: string;
 }
 
 export type UserDocument = HydratedDocument<User>;
