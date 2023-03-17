@@ -16,4 +16,19 @@ describe('PermissionsFactory', () => {
   it('should be defined', () => {
     expect(permissionsFactory).toBeDefined();
   });
+
+  describe('createDefaultPermissions', () => {
+    it('should return an empty array when no level is provided', () => {
+      expect(permissionsFactory.createDefaultPermissions()).toEqual([]);
+    });
+
+    it('should return an array with a single rule when level is admin', () => {
+      expect(permissionsFactory.createDefaultPermissions('admin')).toEqual([
+        {
+          action: 'manage',
+          subject: 'all'
+        }
+      ]);
+    });
+  });
 });
