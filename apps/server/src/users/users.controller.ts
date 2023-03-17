@@ -5,15 +5,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
 
-import { Permissions } from '@/permissions/decorators/permissions.decorator';
-
 @ApiTags('Users')
 @Controller({ path: 'users' })
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @Permissions({ action: 'create', subject: 'User' })
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }

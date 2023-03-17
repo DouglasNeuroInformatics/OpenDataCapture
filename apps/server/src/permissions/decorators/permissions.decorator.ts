@@ -1,9 +1,7 @@
 import { CustomDecorator, SetMetadata } from '@nestjs/common';
 
-import { RawRuleOf } from '@casl/ability';
+import { type Permissions } from '../permissions.types';
 
-import { AppAbility } from '../permissions.types';
-
-export function Permissions(value: RawRuleOf<AppAbility> | RawRuleOf<AppAbility>[]): CustomDecorator {
-  return SetMetadata('Permissions', value);
+export function Permissions(permissions: Permissions): CustomDecorator {
+  return SetMetadata('Permissions', permissions);
 }

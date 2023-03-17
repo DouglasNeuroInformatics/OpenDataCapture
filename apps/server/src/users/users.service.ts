@@ -41,7 +41,7 @@ export class UsersService {
       username: username,
       password: hashedPassword,
       groups: groups,
-      permissions: permissions.rules
+      permissions: permissions
     });
   }
 
