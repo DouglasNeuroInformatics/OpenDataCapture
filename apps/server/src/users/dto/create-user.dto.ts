@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { UserRole } from '../enums/user-role.enum';
-
 import { Dto } from '@/core/decorators/dto.decorator';
+import { DefaultPermissionLevel } from '@/permissions/permissions.types';
 
 interface CreateUserData {
   username: string;
   password: string;
-  role?: UserRole;
+  defaultPermissionLevel?: DefaultPermissionLevel;
   groupNames?: string[];
 }
 
@@ -25,9 +24,9 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
       type: 'string',
       pattern: isStrongPassword.source
     },
-    role: {
+    defaultPermissionLevel: {
       type: 'string',
-      enum: Object.values(UserRole),
+      enum: ['admin', 'group-manager', 'standard'],
       nullable: true
     },
     groupNames: {
@@ -53,9 +52,9 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
-    enum: UserRole
+    enum: ['admin', 'group-manager', 'standard']
   })
-  role?: UserRole;
+  defaultPermissionLevel?: DefaultPermissionLevel;
 
   @ApiProperty({
     description: 'The names of the group(s) to which the user belongs',

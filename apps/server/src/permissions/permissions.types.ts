@@ -10,3 +10,5 @@ export type Subject = InferSubjects<typeof Group | typeof User | 'all', true>;
 export type AppAbility = PureAbility<[Action, Subject], MongoQuery>;
 
 export type Permissions = RawRuleOf<AppAbility>[];
+
+export type DefaultPermissionLevel = 'admin' | 'group-manager' | 'standard';

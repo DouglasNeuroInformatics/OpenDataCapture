@@ -2,30 +2,28 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { AbilityBuilder, PureAbility } from '@casl/ability';
 
+import { DefaultPermissionLevel } from './permissions.types';
 import { AppAbility, type Permissions } from './permissions.types';
 
-import { CreateUserDto } from '@/users/dto/create-user.dto';
-import { UserRole } from '@/users/enums/user-role.enum';
+import { Group } from '@/groups/schemas/group.schema';
 
 @Injectable()
 export class PermissionsFactory {
   private readonly logger = new Logger(PermissionsFactory.name);
 
-  createForUser(user: Pick<CreateUserDto, 'username' | 'role'>): Permissions {
-    this.logger.verbose(`Creating permissions for user '${user.username}' with role '${user.role!}'`);
+  createDefaultPermissions(
+    level?: DefaultPermissionLevel,
+    options?: {
+      groups?: Group[];
+    }
+  ): Permissions {
+    this.logger.verbose('Creating default permissions for level: ' + level);
     const ability = new AbilityBuilder<AppAbility>(PureAbility);
-    switch (user.role) {
-      case UserRole.Admin:
+    switch (level) {
+      case 'admin':
         ability.can('manage', 'all');
-        break;
-      case UserRole.GroupManager:
-        ability.can('manage', 'all');
-        break;
-      case UserRole.Standard:
-        ability.can('read', 'all');
         break;
     }
-    const x = ability.build();
-    return x.rules;
+    return ability.build().rules;
   }
 }

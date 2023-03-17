@@ -1,8 +1,8 @@
+import { HttpStatus } from '@nestjs/common';
+
 import request from 'supertest';
 
-import { HttpStatus } from '@nestjs/common';
 import { admin, server } from './config/jest-e2e.setup';
-import { UserRole } from '@/users/enums/user-role.enum';
 
 describe('POST /users', () => {
   it('should reject a request with an empty body', async () => {
@@ -49,9 +49,9 @@ describe('POST /users', () => {
 
   it('should create a new admin when the correct data is provided', async () => {
     const response = await request(server).post('/users').auth(admin.accessToken, { type: 'bearer' }).send({
-      role: UserRole.Admin,
       username: 'user',
-      password: 'Password123'
+      password: 'Password123',
+      defaultPermissionLevel: 'admin'
     });
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({
