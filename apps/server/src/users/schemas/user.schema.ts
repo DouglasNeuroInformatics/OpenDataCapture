@@ -6,7 +6,7 @@ import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { Group } from '@/groups/schemas/group.schema';
 import { AppAbility } from '@/permissions/permissions.types';
 
-@Schema({ strict: true, timestamps: true })
+@Schema({ strict: 'throw', timestamps: true })
 export class User {
   static readonly modelName = 'User';
 

@@ -4,7 +4,7 @@ import { HydratedDocument } from 'mongoose';
 
 import type { GroupInterface } from '../groups.types';
 
-@Schema({ strict: true, timestamps: true })
+@Schema({ strict: 'throw', timestamps: true })
 export class Group implements GroupInterface {
   static readonly modelName = 'Group';
 
