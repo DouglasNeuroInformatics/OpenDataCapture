@@ -5,7 +5,7 @@ import { UsersService } from '../users.service';
 
 import { MockUsersService } from './mocks/users.service.mock';
 
-describe('AuthController', () => {
+describe('UsersController', () => {
   let usersController: UsersController;
 
   beforeEach(async () => {
