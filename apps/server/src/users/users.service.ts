@@ -7,7 +7,6 @@ import { UsersRepository } from './users.repository';
 import { CryptoService } from '@/crypto/crypto.service';
 import { GroupsService } from '@/groups/groups.service';
 import { Group } from '@/groups/schemas/group.schema';
-import { PermissionsFactory } from '@/permissions/permissions.factory';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +15,6 @@ export class UsersService {
   constructor(
     private readonly cryptoService: CryptoService,
     private readonly groupsService: GroupsService,
-    private readonly permissionsFactory: PermissionsFactory,
     private readonly usersRepository: UsersRepository
   ) {}
 
