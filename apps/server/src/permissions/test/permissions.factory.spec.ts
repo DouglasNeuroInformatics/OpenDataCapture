@@ -17,18 +17,20 @@ describe('PermissionsFactory', () => {
     expect(permissionsFactory).toBeDefined();
   });
 
-  describe('createDefaultPermissions', () => {
-    it('should return an empty array when no level is provided', () => {
-      expect(permissionsFactory.createDefaultPermissions()).toEqual([]);
+  describe('createForUser', () => {
+    it('should return an empty rule set when the user has no basePermissionLevel', () => {
+      const permissions = permissionsFactory.createForUser({ username: 'user', password: 'Password123', groups: [] });
+      expect(permissions.rules).toEqual([]);
     });
 
-    it('should return an array with a single rule when level is admin', () => {
-      expect(permissionsFactory.createDefaultPermissions('admin')).toEqual([
-        {
-          action: 'manage',
-          subject: 'all'
-        }
-      ]);
+    it('should return a rule set with a single rule when the user has a basePermissionLevel of admin', () => {
+      const permissions = permissionsFactory.createForUser({
+        username: 'admin',
+        password: 'Password123',
+        groups: [],
+        basePermissionLevel: 'admin'
+      });
+      expect(permissions.rules).toEqual([{ action: 'manage', subject: 'all' }]);
     });
   });
 });

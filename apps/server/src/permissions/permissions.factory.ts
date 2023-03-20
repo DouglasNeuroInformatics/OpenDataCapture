@@ -2,32 +2,28 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
 
-import { BasePermissionLevel } from './permissions.types';
-import { AppAbility, type Permissions } from './permissions.types';
+import { AppAbility } from './permissions.types';
 
-import { Group } from '@/groups/schemas/group.schema';
+import { User } from '@/users/schemas/user.schema';
 
 @Injectable()
 export class PermissionsFactory {
   private readonly logger = new Logger(PermissionsFactory.name);
 
-  createDefaultPermissions<T extends BasePermissionLevel | undefined>(
-    level?: T,
-    options?: T extends 'admin' ? never : { groups: Group[] } | undefined
-  ): Permissions {
-    this.logger.verbose('Creating default permissions for level: ' + level);
+  createForUser(user: User): AppAbility {
+    this.logger.verbose('Creating permissions for user: ' + user.username);
     const ability = new AbilityBuilder<AppAbility>(createMongoAbility);
-    switch (level) {
+    switch (user.basePermissionLevel) {
       case 'admin':
         ability.can('manage', 'all');
         break;
       case 'group-manager':
-        ability.can('manage', 'Group', { name: { $in: options?.groups.map((group) => group.name) } });
+        ability.can('manage', 'Group', { name: { $in: user.groups.map((group) => group.name) } });
         break;
       case 'standard':
         ability.can('read', 'all');
         break;
     }
-    return ability.build().rules;
+    return ability.build();
   }
 }
