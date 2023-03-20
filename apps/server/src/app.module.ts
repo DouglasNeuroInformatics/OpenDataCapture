@@ -14,6 +14,7 @@ import { LoggerMiddleware } from './core/middleware/logger.middleware';
 import { ValidationPipe } from './core/pipes/validation.pipe';
 import { DemoModule } from './demo/demo.module';
 import { GroupsModule } from './groups/groups.module';
+import { PermissionsModule } from './permissions/permissions.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -40,6 +41,7 @@ import { UsersModule } from './users/users.module';
         };
       }
     }),
+    PermissionsModule,
     UsersModule
   ],
   providers: [

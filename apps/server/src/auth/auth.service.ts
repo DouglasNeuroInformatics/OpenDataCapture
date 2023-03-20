@@ -49,7 +49,7 @@ export class AuthService {
 
   private async signToken(payload: object): Promise<string> {
     return this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '7d',
       secret: this.configService.getOrThrow<string>('SECRET_KEY')
     });
   }
