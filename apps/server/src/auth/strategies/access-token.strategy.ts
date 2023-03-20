@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-  UnauthorizedException
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 
@@ -26,26 +20,17 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   /** This method is called after the token is validated by passport  */
-  validate(payload: JwtPayload): Promise<User> {
-    this.logger.verbose(`Payload: ${JSON.stringify(payload)}`);
-    return this.getUser(payload.username);
-  }
-
-  /** It is possible for a token to be valid for a user that does not exist if they are deleted */
-  private async getUser(username: string): Promise<User> {
+  async validate({ username }: JwtPayload): Promise<User> {
     let user: User;
     try {
       user = await this.usersService.findByUsername(username);
-      this.logger.debug(user);
     } catch (error) {
-      this.logger.debug(error);
       if (error instanceof NotFoundException) {
-        throw new UnauthorizedException(`User does not exist: ${username}`);
+        throw new UnauthorizedException(`Token is valid, but user does not exist: ${username}`);
       }
-      throw new InternalServerErrorException('Internal Server Error', {
-        cause: error instanceof Error ? error : undefined
-      });
+      throw error;
     }
+    this.logger.verbose(`Validated Token for User: ${username}`);
     return user;
   }
 }

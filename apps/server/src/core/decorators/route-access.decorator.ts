@@ -4,7 +4,7 @@ import { Action, Subject } from '@/permissions/permissions.types';
 
 type PublicRouteAccess = 'public';
 
-type ProtectedRouteAccess = {
+export type ProtectedRouteAccess = {
   action: Action;
   subject: Subject;
 };

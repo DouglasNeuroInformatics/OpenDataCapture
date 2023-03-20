@@ -8,8 +8,9 @@ import { Connection } from 'mongoose';
 
 import { AjvModule } from './ajv/ajv.module';
 import { AuthModule } from './auth/auth.module';
+import { AuthenticationGuard } from './auth/guards/authentication.guard';
+import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { ExceptionFilter } from './core/exception.filter';
-import { AccessTokenGuard } from './core/guards/access-token.guard';
 import { LoggerMiddleware } from './core/middleware/logger.middleware';
 import { ValidationPipe } from './core/pipes/validation.pipe';
 import { DemoModule } from './demo/demo.module';
@@ -51,7 +52,11 @@ import { UsersModule } from './users/users.module';
     },
     {
       provide: APP_GUARD,
-      useClass: AccessTokenGuard
+      useClass: AuthenticationGuard
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthorizationGuard
     },
     {
       provide: APP_PIPE,
