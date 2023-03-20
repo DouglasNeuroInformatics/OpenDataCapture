@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { AccessTokenStrategy } from './strategies/access-token.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 import { CryptoModule } from '@/crypto/crypto.module';
 import { UsersModule } from '@/users/users.module';
@@ -21,6 +21,6 @@ import { UsersModule } from '@/users/users.module';
     UsersModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenStrategy]
+  providers: [AuthService, JwtStrategy]
 })
 export class AuthModule {}

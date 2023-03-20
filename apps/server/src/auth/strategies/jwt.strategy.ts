@@ -9,8 +9,8 @@ import { User } from '@/users/schemas/user.schema';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
-export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
-  private readonly logger = new Logger(AccessTokenStrategy.name);
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  private readonly logger = new Logger(JwtStrategy.name);
 
   constructor(config: ConfigService, private readonly usersService: UsersService) {
     super({
