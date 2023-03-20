@@ -44,7 +44,7 @@ export class DemoService {
 
   private async createDemoAdmin({ username, password }: { username: string; password: string }): Promise<void> {
     this.logger.verbose(`Creating default admin user '${username}' with password '${password}'...`);
-    await this.usersService.create({ username, password, defaultPermissionLevel: 'admin' });
+    await this.usersService.create({ username, password, basePermissionLevel: 'admin' });
   }
 
   /*

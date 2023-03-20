@@ -51,7 +51,7 @@ describe('POST /users', () => {
     const response = await request(server).post('/users').auth(admin.accessToken, { type: 'bearer' }).send({
       username: 'user',
       password: 'Password123',
-      defaultPermissionLevel: 'admin'
+      basePermissionLevel: 'admin'
     });
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
 
-import { DefaultPermissionLevel } from './permissions.types';
+import { BasePermissionLevel } from './permissions.types';
 import { AppAbility, type Permissions } from './permissions.types';
 
 import { Group } from '@/groups/schemas/group.schema';
@@ -11,7 +11,7 @@ import { Group } from '@/groups/schemas/group.schema';
 export class PermissionsFactory {
   private readonly logger = new Logger(PermissionsFactory.name);
 
-  createDefaultPermissions<T extends DefaultPermissionLevel | undefined>(
+  createDefaultPermissions<T extends BasePermissionLevel | undefined>(
     level?: T,
     options?: T extends 'admin' ? never : { groups: Group[] } | undefined
   ): Permissions {

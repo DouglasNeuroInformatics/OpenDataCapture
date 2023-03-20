@@ -21,7 +21,7 @@ export class UsersService {
   ) {}
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
-  async create({ username, password, defaultPermissionLevel, groupNames }: CreateUserDto): Promise<User> {
+  async create({ username, password, basePermissionLevel, groupNames }: CreateUserDto): Promise<User> {
     this.logger.verbose(`Attempting to create user: ${username}`);
 
     const userExists = await this.usersRepository.exists({ username: username });
@@ -34,7 +34,7 @@ export class UsersService {
       groups.push(await this.groupsService.findByName(groupNames![i]));
     }
 
-    const permissions = this.permissionsFactory.createDefaultPermissions(defaultPermissionLevel, {
+    const permissions = this.permissionsFactory.createDefaultPermissions(basePermissionLevel, {
       groups: groups
     });
 

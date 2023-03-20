@@ -11,4 +11,4 @@ export type AppAbility = MongoAbility<[Action, Subject]>;
 
 export type Permissions = RawRuleOf<AppAbility>[];
 
-export type DefaultPermissionLevel = 'admin' | 'group-manager' | 'standard';
+export type BasePermissionLevel = 'admin' | 'group-manager' | 'standard';

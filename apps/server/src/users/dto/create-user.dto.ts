@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Dto } from '@/core/decorators/dto.decorator';
-import { DefaultPermissionLevel } from '@/permissions/permissions.types';
+import { BasePermissionLevel } from '@/permissions/permissions.types';
 
 interface CreateUserData {
   username: string;
   password: string;
-  defaultPermissionLevel?: DefaultPermissionLevel;
+  basePermissionLevel?: BasePermissionLevel;
   groupNames?: string[];
 }
 
@@ -24,7 +24,7 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
       type: 'string',
       pattern: isStrongPassword.source
     },
-    defaultPermissionLevel: {
+    basePermissionLevel: {
       type: 'string',
       enum: ['admin', 'group-manager', 'standard'],
       nullable: true
@@ -54,7 +54,7 @@ export class CreateUserDto {
     description: "Determines the user's base permissions, which may later be modified by an admin",
     enum: ['admin', 'group-manager', 'standard']
   })
-  defaultPermissionLevel?: DefaultPermissionLevel;
+  basePermissionLevel?: BasePermissionLevel;
 
   @ApiProperty({
     description: 'The names of the group(s) to which the user belongs',

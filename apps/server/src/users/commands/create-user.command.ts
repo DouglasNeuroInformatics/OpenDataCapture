@@ -18,7 +18,7 @@ export class CreateUserCommand extends CommandRunner {
     const user = await this.usersService.create({
       username,
       password,
-      defaultPermissionLevel: isAdmin ? 'admin' : 'standard'
+      basePermissionLevel: isAdmin ? 'admin' : 'standard'
     });
     console.log(`Successfully created user: ${user.username}`);
   }
