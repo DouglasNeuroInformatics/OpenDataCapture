@@ -42,8 +42,7 @@ describe('POST /users', () => {
     });
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({
-      username: 'user',
-      permissions: []
+      username: 'user'
     });
   });
 
@@ -56,12 +55,7 @@ describe('POST /users', () => {
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({
       username: 'user',
-      permissions: [
-        {
-          action: 'manage',
-          subject: 'all'
-        }
-      ]
+      basePermissionLevel: 'admin'
     });
   });
 });

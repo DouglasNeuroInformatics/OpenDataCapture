@@ -34,17 +34,13 @@ export class UsersService {
       groups.push(await this.groupsService.findByName(groupNames![i]));
     }
 
-    const permissions = this.permissionsFactory.createDefaultPermissions(basePermissionLevel, {
-      groups: groups
-    });
-
     const hashedPassword = await this.cryptoService.hashPassword(password);
 
     return this.usersRepository.create({
       username: username,
       password: hashedPassword,
       groups: groups,
-      permissions: permissions
+      basePermissionLevel: basePermissionLevel
     });
   }
 
