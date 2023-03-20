@@ -9,8 +9,6 @@ import { CryptoService } from '@/crypto/crypto.service';
 import { MockCryptoService } from '@/crypto/test/mocks/crypto.service.mock';
 import { GroupsService } from '@/groups/groups.service';
 import { MockGroupsService } from '@/groups/test/mocks/groups.service.mock';
-import { PermissionsFactory } from '@/permissions/permissions.factory';
-import { MockPermissionsFactory } from '@/permissions/test/mocks/permissions.factory.mock';
 
 describe('UsersService', () => {
   let usersService: UsersService;
@@ -30,10 +28,6 @@ describe('UsersService', () => {
         {
           provide: CryptoService,
           useValue: MockCryptoService
-        },
-        {
-          provide: PermissionsFactory,
-          useValue: MockPermissionsFactory
         }
       ]
     }).compile();

@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 import { CryptoModule } from '@/crypto/crypto.module';
+import { PermissionsModule } from '@/permissions/permissions.module';
 import { UsersModule } from '@/users/users.module';
 
 @Module({
@@ -18,6 +19,7 @@ import { UsersModule } from '@/users/users.module';
         secret: configService.getOrThrow<string>('SECRET_KEY')
       })
     }),
+    PermissionsModule,
     UsersModule
   ],
   controllers: [AuthController],
