@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 
 import { Group, GroupDocument } from './schemas/group.schema';
 
-import { EntityRepository } from '@/core/entity.repository';
+import { EntityRepository } from '@/core/abstract/entity.repository';
 
 @Injectable()
 export class GroupsRepository extends EntityRepository<Group> {

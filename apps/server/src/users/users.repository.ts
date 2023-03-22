@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 
 import { User, UserDocument } from './schemas/user.schema';
 
-import { EntityRepository } from '@/core/entity.repository';
+import { EntityRepository } from '@/core/abstract/entity.repository';
 
 @Injectable()
 export class UsersRepository extends EntityRepository<User> {
