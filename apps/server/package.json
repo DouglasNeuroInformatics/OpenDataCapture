@@ -33,7 +33,7 @@
     "common": "*",
     "joi": "^17.7.0",
     "js-yaml": "^4.1.0",
-    "mongoose": "^6.9.0",
+    "mongoose": "^6.10.4",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "reflect-metadata": "^0.1.13",
