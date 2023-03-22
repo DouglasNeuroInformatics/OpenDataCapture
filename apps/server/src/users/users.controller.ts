@@ -5,13 +5,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
 
-import { CurrentUser } from '@/core/decorators/current-user.decorator';
+import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import { Group } from '@/groups/schemas/group.schema';
 
 @ApiTags('Users')
 @Controller({ path: 'users' })
-export class UsersController {
+export class UsersController implements EntityController<User> {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
@@ -22,8 +21,7 @@ export class UsersController {
 
   @Get()
   @RouteAccess({ action: 'read', subject: 'User' })
-  findAll(@CurrentUser('groups') groups: Group[]): Promise<User[]> {
-    console.log(groups);
+  findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 

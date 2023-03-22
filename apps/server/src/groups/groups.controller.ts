@@ -5,8 +5,10 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupsService } from './groups.service';
 import { Group } from './schemas/group.schema';
 
+import { EntityController } from '@/core/abstract/entity.controller';
+
 @Controller('groups')
-export class GroupsController {
+export class GroupsController implements EntityController<Group> {
   constructor(private readonly groupsService: GroupsService) {}
 
   @Post()
