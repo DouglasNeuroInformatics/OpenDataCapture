@@ -1,4 +1,5 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger, Type, mixin } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
 import {
@@ -68,4 +69,20 @@ export abstract class EntityRepository<Entity, EntityDocument = HydratedDocument
     this.logger.verbose(`Result: ${result}`);
     return result;
   }
+}
+
+export interface IRepository<T extends Type, TDoc extends HydratedDocument<T>> {
+  create(entity: T): Promise<TDoc>;
+}
+
+export function Repository<T extends Type, TDoc extends HydratedDocument<T>>(Entity: T): Type<IRepository<T, TDoc>> {
+  class Repository {
+    constructor(@InjectModel(Entity.name) protected model: Model<TDoc, AccessibleModel<TDoc>>) {}
+
+    create(entity: T): Promise<TDoc> {
+      return this.model.create(entity);
+    }
+  }
+
+  return mixin(Repository);
 }

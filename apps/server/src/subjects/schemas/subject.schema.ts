@@ -2,8 +2,12 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { HydratedDocument } from 'mongoose';
 
+import { Sex } from '../enums/sex.enum';
+
 @Schema({ strict: 'throw', timestamps: true })
 export class Subject {
+  static readonly modelName = 'Subject';
+
   @Prop({ required: true })
   identifier: string;
 
@@ -16,8 +20,8 @@ export class Subject {
   @Prop({ required: true })
   dateOfBirth: Date;
 
-  @Prop({ enum: ['male', 'female'], required: true, type: String })
-  sex: 'male' | 'female';
+  @Prop({ enum: Sex, required: true, type: String })
+  sex: Sex;
 }
 
 export type SubjectDocument = HydratedDocument<Subject>;

@@ -16,6 +16,7 @@ import { ValidationPipe } from './core/pipes/validation.pipe';
 import { DemoModule } from './demo/demo.module';
 import { GroupsModule } from './groups/groups.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -43,6 +44,7 @@ import { UsersModule } from './users/users.module';
       }
     }),
     PermissionsModule,
+    SubjectsModule,
     UsersModule
   ],
   providers: [
