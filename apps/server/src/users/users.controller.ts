@@ -5,7 +5,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
 
+import { CurrentUser } from '@/core/decorators/current-user.decorator';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { Group } from '@/groups/schemas/group.schema';
 
 @ApiTags('Users')
 @Controller({ path: 'users' })
@@ -20,7 +22,8 @@ export class UsersController {
 
   @Get()
   @RouteAccess({ action: 'read', subject: 'User' })
-  findAll(): Promise<User[]> {
+  findAll(@CurrentUser('groups') groups: Group[]): Promise<User[]> {
+    console.log(groups);
     return this.usersService.findAll();
   }
 
