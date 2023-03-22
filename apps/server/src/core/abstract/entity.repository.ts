@@ -1,5 +1,4 @@
-import { Injectable, Logger, Type, mixin } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Logger } from '@nestjs/common';
 
 import { AccessibleModel } from '@casl/mongoose';
 import {
@@ -12,10 +11,10 @@ import {
   UpdateQuery
 } from 'mongoose';
 
-interface FindMethodArgs<Entity, EntityDocument = HydratedDocument<Entity>> {
-  filter?: FilterQuery<EntityDocument>;
-  projection?: ProjectionType<EntityDocument>;
-  options?: QueryOptions<EntityDocument>;
+interface FindMethodArgs<T, TDoc = HydratedDocument<T>> {
+  filter?: FilterQuery<TDoc>;
+  projection?: ProjectionType<TDoc>;
+  options?: QueryOptions<TDoc>;
 }
 
 /**
@@ -24,65 +23,42 @@ interface FindMethodArgs<Entity, EntityDocument = HydratedDocument<Entity>> {
  * and if implements breaking changes, or we want to migrate away from
  * we can modify this class instead of the code in each module.
  */
-export abstract class EntityRepository<Entity, EntityDocument = HydratedDocument<Entity>> {
+export abstract class EntityRepository<T, TDoc = HydratedDocument<T>> {
   protected readonly logger: Logger;
 
-  constructor(protected readonly entityModel: Model<EntityDocument, AccessibleModel<EntityDocument>>) {
-    this.logger = new Logger(`${EntityRepository.name}: ${entityModel.modelName}`);
+  constructor(protected readonly model: Model<TDoc, AccessibleModel<TDoc>>) {
+    this.logger = new Logger(`${EntityRepository.name}: ${model.modelName}`);
   }
 
-  create(entity: Entity): Promise<EntityDocument> {
+  create(entity: T): Promise<TDoc> {
     this.logger.verbose(`Creating document with the following data: ${JSON.stringify(entity)}`);
-    return this.entityModel.create(entity);
+    return this.model.create(entity);
   }
 
-  find(
-    args: FindMethodArgs<Entity> = {}
-  ): QueryWithHelpers<EntityDocument[], EntityDocument, AccessibleModel<EntityDocument>> {
-    return this.entityModel.find(args.filter ?? {}, args.projection, args.options);
+  find(args: FindMethodArgs<T> = {}): QueryWithHelpers<TDoc[], TDoc, AccessibleModel<TDoc>> {
+    return this.model.find(args.filter ?? {}, args.projection, args.options);
   }
 
-  findOne(
-    args: FindMethodArgs<Entity> = {}
-  ): QueryWithHelpers<EntityDocument | null, EntityDocument, AccessibleModel<EntityDocument>> {
-    return this.entityModel.findOne(args.filter ?? {}, args.projection, args.options);
+  findOne(args: FindMethodArgs<T> = {}): QueryWithHelpers<TDoc | null, TDoc, AccessibleModel<TDoc>> {
+    return this.model.findOne(args.filter ?? {}, args.projection, args.options);
   }
 
   findOneAndUpdate(
-    filter: FilterQuery<EntityDocument>,
-    update: UpdateQuery<EntityDocument>,
-    options: Omit<QueryOptions<EntityDocument>, 'new'> = {}
-  ): Promise<EntityDocument | null> {
-    return this.entityModel.findOneAndUpdate(filter, update, { ...options, new: true });
+    filter: FilterQuery<TDoc>,
+    update: UpdateQuery<TDoc>,
+    options: Omit<QueryOptions<TDoc>, 'new'> = {}
+  ): Promise<TDoc | null> {
+    return this.model.findOneAndUpdate(filter, update, { ...options, new: true });
   }
 
-  findOneAndDelete(
-    filter: FilterQuery<EntityDocument>,
-    options: Omit<QueryOptions<EntityDocument>, 'new'> = {}
-  ): Promise<EntityDocument | null> {
-    return this.entityModel.findOneAndDelete(filter, { ...options, new: true });
+  findOneAndDelete(filter: FilterQuery<TDoc>, options: Omit<QueryOptions<TDoc>, 'new'> = {}): Promise<TDoc | null> {
+    return this.model.findOneAndDelete(filter, { ...options, new: true });
   }
 
-  async exists(filterQuery: FilterQuery<Entity>): Promise<boolean> {
+  async exists(filterQuery: FilterQuery<T>): Promise<boolean> {
     this.logger.verbose(`Checking for document matching the following query: ${JSON.stringify(filterQuery)}`);
-    const result = (await this.entityModel.exists(filterQuery).exec()) !== null;
+    const result = (await this.model.exists(filterQuery).exec()) !== null;
     this.logger.verbose(`Result: ${result}`);
     return result;
   }
-}
-
-export interface IRepository<T extends Type, TDoc extends HydratedDocument<T>> {
-  create(entity: T): Promise<TDoc>;
-}
-
-export function Repository<T extends Type, TDoc extends HydratedDocument<T>>(Entity: T): Type<IRepository<T, TDoc>> {
-  class Repository {
-    constructor(@InjectModel(Entity.name) protected model: Model<TDoc, AccessibleModel<TDoc>>) {}
-
-    create(entity: T): Promise<TDoc> {
-      return this.model.create(entity);
-    }
-  }
-
-  return mixin(Repository);
 }
