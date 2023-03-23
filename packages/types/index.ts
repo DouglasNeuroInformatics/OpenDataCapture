@@ -1,5 +1,2 @@
-export interface Foo {
-  foo: any;
-}
-
-export type Any = any;
+export * from './lib/common';
+export * from './lib/instrument';

@@ -1,8 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { FormFieldVariant } from '../enums/form-field-variant.enum';
-import { InstrumentKind } from '../enums/instrument-kind.enum';
-import { BaseInstrument } from '../interfaces/base-instrument.interface';
+import { FormFieldVariant, InstrumentDetails, Instrument as InstrumentInterface, InstrumentKind } from '@ddcp/types';
 
 @Schema({ strict: 'throw' })
 export class FormField {
@@ -15,7 +13,7 @@ export class FormField {
   @Prop({ required: false })
   description?: string;
 
-  @Prop({ enum: FormFieldVariant, required: true, type: String })
+  @Prop({ enum: ['TEXT'] satisfies FormFieldVariant[], required: true, type: String })
   variant: FormFieldVariant;
 
   @Prop({ required: true })
@@ -25,10 +23,10 @@ export class FormField {
 export const FormFieldSchema = SchemaFactory.createForClass(FormField);
 
 @Schema({ strict: 'throw' })
-export class Form implements BaseInstrument {
-  kind: InstrumentKind.Form;
+export class Form implements InstrumentInterface {
+  kind: InstrumentKind & 'FORM';
   title: string;
-  details: BaseInstrument['details'];
+  details: InstrumentDetails;
 
   @Prop({ required: true, type: [FormFieldSchema] })
   data: FormField[];

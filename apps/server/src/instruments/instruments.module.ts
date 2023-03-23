@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { InstrumentKind } from './enums/instrument-kind.enum';
+import { InstrumentKind } from '@ddcp/types';
+import { Schema } from 'mongoose';
+
 import { InstrumentsController } from './instruments.controller';
 import { InstrumentsRepository } from './instruments.repository';
 import { InstrumentsService } from './instruments.service';
@@ -9,6 +11,11 @@ import { FormSchema } from './schemas/form.schema';
 import { Instrument, InstrumentSchema } from './schemas/instrument.schema';
 
 import { SubjectsModule } from '@/subjects/subjects.module';
+
+interface InstrumentDiscriminator {
+  name: InstrumentKind;
+  schema: Schema;
+}
 
 @Module({
   imports: [
@@ -18,10 +25,10 @@ import { SubjectsModule } from '@/subjects/subjects.module';
         schema: InstrumentSchema,
         discriminators: [
           {
-            name: InstrumentKind.Form,
+            name: 'FORM',
             schema: FormSchema
           }
-        ]
+        ] satisfies InstrumentDiscriminator[]
       }
     ]),
     SubjectsModule

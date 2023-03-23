@@ -1,19 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+import {
+  InstrumentDetails as InstrumentDetailsInterface,
+  Instrument as InstrumentInterface,
+  InstrumentKind,
+  InstrumentLanguage
+} from '@ddcp/types';
 import { HydratedDocument } from 'mongoose';
 
-import { InstrumentKind } from '../enums/instrument-kind.enum';
-import { InstrumentLanguage } from '../enums/instrument-language.enum';
-import { BaseInstrument } from '../interfaces/base-instrument.interface';
-
-type InstrumentDetailsType = BaseInstrument['details'];
-
 @Schema({ strict: 'throw', timestamps: true })
-class InstrumentDetails implements InstrumentDetailsType {
+class InstrumentDetails implements InstrumentDetailsInterface {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true, enum: InstrumentLanguage, type: String })
+  @Prop({ required: true, enum: ['EN', 'FR'] satisfies InstrumentLanguage[], type: String })
   language: InstrumentLanguage;
 
   @Prop({ required: true })
@@ -29,10 +29,10 @@ class InstrumentDetails implements InstrumentDetailsType {
 const InstrumentDetailsSchema = SchemaFactory.createForClass(InstrumentDetails);
 
 @Schema({ discriminatorKey: 'kind', strict: 'throw', timestamps: true })
-export class Instrument implements Omit<BaseInstrument, 'data'> {
+export class Instrument implements InstrumentInterface {
   static readonly modelName = 'Instrument';
 
-  @Prop({ enum: InstrumentKind, required: true, type: String })
+  @Prop({ enum: ['FORM'] satisfies InstrumentKind[], required: true, type: String })
   kind: InstrumentKind;
 
   @Prop({ required: true, unique: true })
@@ -40,6 +40,8 @@ export class Instrument implements Omit<BaseInstrument, 'data'> {
 
   @Prop({ required: true, type: InstrumentDetailsSchema })
   details: InstrumentDetails;
+
+  data: any;
 }
 
 export type InstrumentDocument = HydratedDocument<Instrument>;

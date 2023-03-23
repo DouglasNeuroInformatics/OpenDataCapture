@@ -1,9 +1,12 @@
+import {
+  FormFieldVariant,
+  InstrumentDetails as InstrumentDetailsInterface,
+  Instrument as InstrumentInterface,
+  InstrumentKind,
+  InstrumentLanguage
+} from '@ddcp/types';
 import { JSONSchemaType } from 'ajv';
 
-import { FormFieldVariant } from '../enums/form-field-variant.enum';
-import { InstrumentKind } from '../enums/instrument-kind.enum';
-import { InstrumentLanguage } from '../enums/instrument-language.enum';
-import { BaseInstrument } from '../interfaces/base-instrument.interface';
 import { Form, FormField } from '../schemas/form.schema';
 
 import { Dto } from '@/core/decorators/dto.decorator';
@@ -26,7 +29,7 @@ const formFieldSchema: JSONSchemaType<FormField> = {
     },
     variant: {
       type: 'string',
-      enum: Object.values(FormFieldVariant)
+      enum: ['TEXT'] satisfies FormFieldVariant[]
     },
     isRequired: {
       type: 'boolean'
@@ -35,7 +38,7 @@ const formFieldSchema: JSONSchemaType<FormField> = {
   required: ['name', 'label', 'variant', 'isRequired']
 };
 
-const instrumentDetailsSchema: JSONSchemaType<BaseInstrument['details']> = {
+const instrumentDetailsSchema: JSONSchemaType<InstrumentDetailsInterface> = {
   type: 'object',
   properties: {
     description: {
@@ -44,7 +47,7 @@ const instrumentDetailsSchema: JSONSchemaType<BaseInstrument['details']> = {
     },
     language: {
       type: 'string',
-      enum: Object.values(InstrumentLanguage)
+      enum: ['EN', 'FR'] satisfies InstrumentLanguage[]
     },
     instructions: {
       type: 'string',
@@ -65,7 +68,7 @@ export const instrumentSchema: JSONSchemaType<Form> = {
   properties: {
     kind: {
       type: 'string',
-      enum: Object.values(InstrumentKind)
+      enum: ['FORM'] satisfies InstrumentKind[]
     },
     title: {
       type: 'string',
@@ -81,7 +84,7 @@ export const instrumentSchema: JSONSchemaType<Form> = {
 };
 
 @Dto<Form>(instrumentSchema)
-export class CreateInstrumentDto {
+export class CreateInstrumentDto implements InstrumentInterface {
   kind: InstrumentKind;
   title: string;
   details: {
