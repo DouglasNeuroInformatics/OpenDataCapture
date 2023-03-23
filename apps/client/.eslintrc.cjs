@@ -2,12 +2,7 @@ const path = require('path');
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: [
-    '@douglas-data-capture-platform',
-    'plugin:cypress/recommended',
-    'plugin:react/recommended',
-    'plugin:jsx-a11y/recommended'
-  ],
+  extends: ['@ddcp', 'plugin:cypress/recommended', 'plugin:react/recommended', 'plugin:jsx-a11y/recommended'],
   env: {
     browser: true
   },

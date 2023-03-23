@@ -2,7 +2,7 @@ const path = require('path');
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: ['@douglas-data-capture-platform'],
+  extends: ['@ddcp'],
   ignorePatterns: ['dist/**/*'],
   env: {
     node: true

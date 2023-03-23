@@ -1,5 +1,5 @@
 {
-  "extends": "@douglas-data-capture-platform/tsconfig/base.json",
+  "extends": "@ddcp/tsconfig/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "declaration": true,
