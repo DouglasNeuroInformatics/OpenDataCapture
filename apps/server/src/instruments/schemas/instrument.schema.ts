@@ -30,6 +30,8 @@ const InstrumentDetailsSchema = SchemaFactory.createForClass(InstrumentDetails);
 
 @Schema({ discriminatorKey: 'kind', strict: 'throw', timestamps: true })
 export class Instrument implements Omit<BaseInstrument, 'data'> {
+  static readonly modelName = 'Instrument';
+
   @Prop({ enum: InstrumentKind, required: true, type: String })
   kind: InstrumentKind;
 
