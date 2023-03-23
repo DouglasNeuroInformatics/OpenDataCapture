@@ -4,7 +4,7 @@ import {
   Instrument as InstrumentInterface,
   InstrumentKind,
   InstrumentLanguage
-} from '@ddcp/types';
+} from '@ddcp/common/types';
 import { JSONSchemaType } from 'ajv';
 
 import { Form, FormField } from '../schemas/form.schema';

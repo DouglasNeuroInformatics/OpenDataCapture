@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { InstrumentKind } from '@ddcp/types';
+import { InstrumentKind } from '@ddcp/common/types';
 import { Schema } from 'mongoose';
 
 import { InstrumentsController } from './instruments.controller';

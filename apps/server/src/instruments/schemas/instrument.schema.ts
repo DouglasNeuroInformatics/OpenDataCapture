@@ -5,7 +5,7 @@ import {
   Instrument as InstrumentInterface,
   InstrumentKind,
   InstrumentLanguage
-} from '@ddcp/types';
+} from '@ddcp/common/types';
 import { HydratedDocument } from 'mongoose';
 
 @Schema({ strict: 'throw', timestamps: true })

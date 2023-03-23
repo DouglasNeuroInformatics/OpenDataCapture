@@ -1,5 +1,5 @@
 {
-  "name": "@ddcp/common",
+  "name": "common",
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
@@ -10,17 +10,12 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
-    },
-    "./types": {
-      "require": "./dist/types/index.js",
-      "import": "./dist/types/index.mjs",
-      "types": "./dist/types/index.d.ts"
     }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup src/index.ts --clean --dts --format cjs,esm",
     "check-types": "tsc --noEmit",
-    "dev": "tsup --watch",
+    "dev": "tsup src/index.ts --dts --format cjs,esm --watch",
     "lint": "eslint --fix src"
   },
   "devDependencies": {

@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { FormFieldVariant, InstrumentDetails, Instrument as InstrumentInterface, InstrumentKind } from '@ddcp/types';
+import {
+  FormFieldVariant,
+  InstrumentDetails,
+  Instrument as InstrumentInterface,
+  InstrumentKind
+} from '@ddcp/common/types';
 
 @Schema({ strict: 'throw' })
 export class FormField {
