@@ -12,7 +12,7 @@ import { EntityController } from '@/core/abstract/entity.controller';
 export class InstrumentsController implements EntityController<Instrument> {
   constructor(private readonly instrumentsService: InstrumentsService) {}
 
-  @ApiOperation({ summary: 'Create a New Form Instrument' })
+  @ApiOperation({ summary: 'Create a New Instrument' })
   @Post()
   create(@Body() createInstrumentDto: CreateInstrumentDto): Promise<Instrument> {
     return this.instrumentsService.create(createInstrumentDto);

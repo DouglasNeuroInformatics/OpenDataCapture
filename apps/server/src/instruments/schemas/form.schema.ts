@@ -1,9 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { FormFieldVariant } from '../enums/form-field-variant.enum';
+import { InstrumentKind } from '../enums/instrument-kind.enum';
 import { BaseInstrument } from '../interfaces/base-instrument.interface';
-
-import { Instrument } from './instrument.schema';
 
 @Schema({ strict: 'throw' })
 export class FormField {
@@ -23,9 +22,15 @@ export class FormField {
   isRequired: boolean;
 }
 
+export const FormFieldSchema = SchemaFactory.createForClass(FormField);
+
 @Schema({ strict: 'throw' })
-export class Form extends Instrument implements BaseInstrument {
-  @Prop({ required: true, type: [FormField] })
+export class Form implements BaseInstrument {
+  kind: InstrumentKind.Form;
+  title: string;
+  details: BaseInstrument['details'];
+
+  @Prop({ required: true, type: [FormFieldSchema] })
   data: FormField[];
 }
 

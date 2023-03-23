@@ -15,6 +15,7 @@ import { LoggerMiddleware } from './core/middleware/logger.middleware';
 import { ValidationPipe } from './core/pipes/validation.pipe';
 import { DemoModule } from './demo/demo.module';
 import { GroupsModule } from './groups/groups.module';
+import { InstrumentsModule } from './instruments/instruments.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
     }),
     DemoModule,
     GroupsModule,
+    InstrumentsModule,
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
