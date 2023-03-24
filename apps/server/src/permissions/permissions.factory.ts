@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
-
-import { AppAbility } from './permissions.types';
+import { AppAbility } from '@ddcp/common/auth';
 
 import { User } from '@/users/entities/user.entity';
 
@@ -11,6 +10,8 @@ export class PermissionsFactory {
   private readonly logger = new Logger(PermissionsFactory.name);
 
   createForUser(user: User): AppAbility {
+    user.groups.map((group) => group.name);
+
     this.logger.verbose('Creating permissions for user: ' + user.username);
     const ability = new AbilityBuilder<AppAbility>(createMongoAbility);
     switch (user.basePermissionLevel) {

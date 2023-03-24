@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { Group } from '@ddcp/common';
+import { Group } from '@ddcp/common/groups';
 import { HydratedDocument } from 'mongoose';
 
 @Schema({ strict: 'throw', timestamps: true })

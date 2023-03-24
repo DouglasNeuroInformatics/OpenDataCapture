@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+import { BasePermissionLevel } from '@ddcp/common/auth';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';
-import { BasePermissionLevel } from '@/permissions/permissions.types';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class User {

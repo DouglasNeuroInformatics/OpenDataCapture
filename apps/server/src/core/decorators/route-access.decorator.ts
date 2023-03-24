@@ -1,6 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
 
-import { Action, Subject } from '@/permissions/permissions.types';
+import { Action, Subject } from '@ddcp/common/auth';
 
 type PublicRouteAccess = 'public';
 

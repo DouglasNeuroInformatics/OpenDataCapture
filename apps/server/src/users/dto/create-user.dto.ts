@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { BasePermissionLevel } from '@ddcp/common/auth';
+
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
-import { BasePermissionLevel } from '@/permissions/permissions.types';
 
 interface CreateUserData {
   username: string;

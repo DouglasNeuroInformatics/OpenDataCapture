@@ -5,8 +5,8 @@ import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';
-import { GroupsService } from '@/groups/groups.service';
 import { GroupEntity } from '@/groups/entities/group.entity';
+import { GroupsService } from '@/groups/groups.service';
 
 @Injectable()
 export class UsersService {

@@ -19,7 +19,6 @@
     "test:unit": "jest"
   },
   "dependencies": {
-    "@casl/ability": "^6.3.3",
     "@casl/mongoose": "^7.1.2",
     "@ddcp/common": "*",
     "@faker-js/faker": "^7.6.0",
