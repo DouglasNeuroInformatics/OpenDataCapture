@@ -59,7 +59,6 @@ export const Form = <T extends FormDataType>({ className, structure, validationS
           <Button className="mt-5 w-full" label="Submit" type="submit" />
         </form>
       </FormProvider>
-      <DevTool control={methods.control} />
     </React.Fragment>
   );
 };

@@ -1,41 +1,37 @@
 import React from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
-import { RouterProvider } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
-import { router } from './router';
-
-import { Button } from '@/components/base';
-import { ActiveSubject, Notifications, Spinner } from '@/components/core';
+import { ActiveSubject, Notifications } from '@/components/core';
+import { LoginPage } from '@/features/auth';
+import { ErrorFallback, HomePage, SuspenseFallback } from '@/features/misc';
+import { useAuthStore } from '@/stores/auth-store';
 
 import './services/axios';
 import './services/18n';
 
-const SuspenseFallback = () => (
-  <div className="flex h-screen w-screen items-center justify-center">
-    <Spinner size="xl" />
-  </div>
-);
-
-const ErrorFallback = () => {
-  return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center text-red-500" role="alert">
-      <h2 className="text-lg font-semibold">Uh oh, something went wrong</h2>
-      <Button className="mt-4" label="Refresh" onClick={() => window.location.assign(window.location.origin)} />
-    </div>
-  );
-};
-
-const App = () => {
+export const App = () => {
+  const auth = useAuthStore();
   return (
     <React.Suspense fallback={<SuspenseFallback />}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <ActiveSubject />
         <Notifications />
-        <RouterProvider router={router} />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<LoginPage />} path="login" />
+            {auth.accessToken ? (
+              <>
+                <Route index element={<HomePage />} path="/home" />
+              </>
+            ) : (
+              <Route element={<Navigate to="login" />} path="*" />
+            )}
+          </Routes>
+        </BrowserRouter>
       </ErrorBoundary>
     </React.Suspense>
   );
 };
 
-export default App;

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 
-import { JSONSchemaType } from 'ajv';
+import { loginCredentialsSchema } from '@ddcp/common';
 
-import { AuthAPI } from '../api/auth.api';
+import { AuthAPI } from '../api/auth-api';
 
 import { Form, FormStructure } from '@/components/form';
 import { useAuthStore } from '@/stores/auth-store';
@@ -29,22 +29,6 @@ const structure: FormStructure<LoginFormData> = [
   }
 ];
 
-const validationSchema: JSONSchemaType<LoginFormData> = {
-  type: 'object',
-  properties: {
-    username: {
-      type: 'string',
-      minLength: 1
-    },
-    password: {
-      type: 'string',
-      minLength: 1
-    }
-  },
-  additionalProperties: false,
-  required: ['username', 'password']
-};
-
 export interface LoginFormProps {
   onSuccess: () => void;
 }
@@ -63,9 +47,9 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
 
   const login = async (credentials: LoginFormData) => {
     const { accessToken } = await AuthAPI.login(credentials);
-    await auth.setAccessToken(accessToken);
+    auth.setAccessToken(accessToken);
     onSuccess();
   };
 
-  return <Form<LoginFormData> structure={structure} validationSchema={validationSchema} onSubmit={login} />;
+  return <Form<LoginFormData> structure={structure} validationSchema={loginCredentialsSchema} onSubmit={login} />;
 };
