@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { Disclaimer } from '../components/Disclaimer';
 
-import { Button } from '@/components/base';
+import { Button, Link } from '@/components/base';
 
 export const HomePage = () => {
   const { t } = useTranslation();
+  console.log(import.meta.env.VITE_DOCS_URL);
 
   return (
     <React.Fragment>
@@ -20,7 +21,9 @@ export const HomePage = () => {
           <p className="mx-auto mt-5 text-lg text-slate-600 ">{t('home.platformDescription')}</p>
           <div className="my-5 flex">
             <Button className="mr-2" label="Get Started" />
-            <Button label="Learn More" variant="light" />
+            <Link target="_blank" to={import.meta.env.VITE_DOCS_URL} variant="btn-light">
+              Learn More
+            </Link>
           </div>
         </div>
       </div>
