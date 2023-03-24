@@ -2,9 +2,8 @@ import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@n
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 
+import { JwtPayload } from '@ddcp/common/auth';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-
-import { JwtPayloadDto } from '../dto/jwt-payload.dto';
 
 import { User } from '@/users/schemas/user.schema';
 import { UsersService } from '@/users/users.service';
@@ -21,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   /** This method is called after the token is validated by passport  */
-  async validate({ username }: JwtPayloadDto): Promise<User> {
+  async validate({ username }: JwtPayload): Promise<User> {
     let user: User;
     try {
       user = await this.usersService.findByUsername(username);
