@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 
+import { Group } from '@ddcp/common';
+
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupsService } from './groups.service';
-import { Group } from './entities/group.entity';
 
 import { EntityController } from '@/core/abstract/entity.controller';
 

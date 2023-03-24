@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { Group } from '@/groups/entities/group.entity';
+import { GroupEntity } from '@/groups/entities/group.entity';
 import { BasePermissionLevel } from '@/permissions/permissions.types';
 
 @Schema({ strict: 'throw', timestamps: true })
@@ -15,8 +15,8 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true, type: [{ ref: Group.name, type: MongooseSchema.Types.ObjectId }] })
-  groups: Group[];
+  @Prop({ required: true, type: [{ ref: GroupEntity.name, type: MongooseSchema.Types.ObjectId }] })
+  groups: GroupEntity[];
 
   @Prop({ enum: ['admin', 'group-manager', 'standard'], type: String })
   basePermissionLevel?: BasePermissionLevel;

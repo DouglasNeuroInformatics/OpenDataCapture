@@ -3,7 +3,6 @@ import request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
 
 import { server } from './config/jest-e2e.setup';
-import { GroupStubs } from '@/groups/test/group.stubs';
 
 it('should do nothing', () => {
   expect(true).toBeTruthy();

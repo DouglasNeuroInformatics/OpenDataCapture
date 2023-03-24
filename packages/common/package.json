@@ -15,6 +15,16 @@
       "require": "./dist/auth/index.js",
       "import": "./dist/auth/index.mjs",
       "types": "./dist/auth/index.d.ts"
+    },
+    "./core": {
+      "require": "./dist/core/index.js",
+      "import": "./dist/core/index.mjs",
+      "types": "./dist/core/index.d.ts"
+    },
+    "./groups": {
+      "require": "./dist/groups/index.js",
+      "import": "./dist/groups/index.mjs",
+      "types": "./dist/groups/index.d.ts"
     }
   },
   "scripts": {

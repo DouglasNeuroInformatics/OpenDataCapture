@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule, SchemaFactory } from '@nestjs/mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 
+import { GroupEntity, GroupSchema } from './entities/group.entity';
 import { GroupsController } from './groups.controller';
 import { GroupsRepository } from './groups.repository';
 import { GroupsService } from './groups.service';
-import { Group, GroupSchema } from './entities/group.entity';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: Group.name,
+        name: GroupEntity.name,
         schema: GroupSchema
       }
     ])

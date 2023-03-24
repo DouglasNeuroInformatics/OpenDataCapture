@@ -1,7 +1,14 @@
-import { CustomDecorator, SetMetadata } from '@nestjs/common';
-
 import type { JSONSchemaType } from 'ajv';
 
-export function ValidationSchema<T>(value: JSONSchemaType<T>): CustomDecorator {
-  return SetMetadata('ValidationSchema', value);
+/**
+ * Decorator to define the validation schema for DTO objects. Modifies the default
+ * AJV behavior such that if not defined, additional properties are prohibited.
+ */
+export function ValidationSchema<T extends object>(schema: JSONSchemaType<T>) {
+  return (target: new (...args: any[]) => T): void => {
+    if (!schema.additionalProperties) {
+      schema.additionalProperties = false;
+    }
+    Reflect.defineMetadata('ValidationSchema', schema, target);
+  };
 }

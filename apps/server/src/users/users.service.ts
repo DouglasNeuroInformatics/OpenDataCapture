@@ -6,7 +6,7 @@ import { UsersRepository } from './users.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';
 import { GroupsService } from '@/groups/groups.service';
-import { Group } from '@/groups/entities/group.entity';
+import { GroupEntity } from '@/groups/entities/group.entity';
 
 @Injectable()
 export class UsersService {
@@ -27,7 +27,7 @@ export class UsersService {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
-    const groups: Group[] = [];
+    const groups: GroupEntity[] = [];
     for (let i = 0; i < (groupNames?.length ?? 0); i++) {
       groups.push(await this.groupsService.findByName(groupNames![i]));
     }
