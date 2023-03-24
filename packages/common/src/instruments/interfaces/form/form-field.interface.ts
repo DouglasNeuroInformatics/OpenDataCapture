@@ -1,4 +1,6 @@
 import { FormFieldKind } from '@/instruments/enums/form-field-kind.enum';
+import { NumberFieldVariant } from '@/instruments/enums/number-field-variant.enum';
+import { StringFieldVariant } from '@/instruments/enums/string-field-variant.enum';
 
 export interface BaseFormField {
   /** Discriminator key */
@@ -16,12 +18,12 @@ export interface BaseFormField {
 
 export interface StringFormField extends BaseFormField {
   kind: FormFieldKind.String;
-  variant: 'short' | 'long' | 'password';
+  variant: StringFieldVariant;
 }
 
 export interface NumberFormField extends BaseFormField {
   kind: FormFieldKind.Number;
-  variant: 'slider';
+  variant: NumberFieldVariant;
 }
 
 export interface SelectField extends BaseFormField {
