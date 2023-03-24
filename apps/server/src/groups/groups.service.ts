@@ -3,7 +3,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupsRepository } from './groups.repository';
-import { Group } from './schemas/group.schema';
+import { Group } from './entities/group.entity';
 
 @Injectable()
 export class GroupsService {

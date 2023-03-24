@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { Subject, SubjectSchema } from './schemas/subject.schema';
+import { Subject, SubjectSchema } from './entities/subject.entity';
 import { SubjectsController } from './subjects.controller';
 import { SubjectsRepository } from './subjects.repository';
 import { SubjectsService } from './subjects.service';

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { CreateUserCommand } from './commands/create-user.command';
-import { User, UserSchema } from './schemas/user.schema';
+import { User, UserSchema } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';

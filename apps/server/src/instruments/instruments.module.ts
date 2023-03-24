@@ -7,8 +7,8 @@ import { Schema } from 'mongoose';
 import { InstrumentsController } from './instruments.controller';
 import { InstrumentsRepository } from './instruments.repository';
 import { InstrumentsService } from './instruments.service';
-import { FormSchema } from './schemas/form.schema';
-import { Instrument, InstrumentSchema } from './schemas/instrument.schema';
+import { FormSchema } from './entities/form.entity';
+import { Instrument, InstrumentSchema } from './entities/instrument.entity';
 
 import { SubjectsModule } from '@/subjects/subjects.module';
 

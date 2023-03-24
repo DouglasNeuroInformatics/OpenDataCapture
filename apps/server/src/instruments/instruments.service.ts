@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { InstrumentsRepository } from './instruments.repository';
-import { Instrument } from './schemas/instrument.schema';
+import { Instrument } from './entities/instrument.entity';
 
 @Injectable()
 export class InstrumentsService {

@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
-import { Subject } from './schemas/subject.schema';
+import { Subject } from './entities/subject.entity';
 import { SubjectsService } from './subjects.service';
 
 import { EntityController } from '@/core/abstract/entity.controller';

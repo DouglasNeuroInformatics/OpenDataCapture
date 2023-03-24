@@ -1,9 +1,9 @@
 import { InferSubjects, MongoAbility, RawRuleOf } from '@casl/ability';
 
-import { Group } from '@/groups/schemas/group.schema';
-import { Instrument } from '@/instruments/schemas/instrument.schema';
-import { Subject as SubjectClass } from '@/subjects/schemas/subject.schema';
-import { User } from '@/users/schemas/user.schema';
+import { Group } from '@/groups/entities/group.entity';
+import { Instrument } from '@/instruments/entities/instrument.entity';
+import { Subject as SubjectClass } from '@/subjects/entities/subject.entity';
+import { User } from '@/users/entities/user.entity';
 
 export type Action = 'manage' | 'create' | 'read' | 'update' | 'delete';
 

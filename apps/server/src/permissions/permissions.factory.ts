@@ -4,7 +4,7 @@ import { AbilityBuilder, createMongoAbility } from '@casl/ability';
 
 import { AppAbility } from './permissions.types';
 
-import { User } from '@/users/schemas/user.schema';
+import { User } from '@/users/entities/user.entity';
 
 @Injectable()
 export class PermissionsFactory {

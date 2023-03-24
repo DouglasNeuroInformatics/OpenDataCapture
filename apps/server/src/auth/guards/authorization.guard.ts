@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 
 import { RouteAccessType } from '@/core/decorators/route-access.decorator';
 import { PermissionsFactory } from '@/permissions/permissions.factory';
-import { User } from '@/users/schemas/user.schema';
+import { User } from '@/users/entities/user.entity';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {

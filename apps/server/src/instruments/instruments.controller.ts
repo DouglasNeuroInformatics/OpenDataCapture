@@ -3,7 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { InstrumentsService } from './instruments.service';
-import { Instrument } from './schemas/instrument.schema';
+import { Instrument } from './entities/instrument.entity';
 
 import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';

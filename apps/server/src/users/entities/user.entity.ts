@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { Group } from '@/groups/schemas/group.schema';
+import { Group } from '@/groups/entities/group.entity';
 import { BasePermissionLevel } from '@/permissions/permissions.types';
 
 @Schema({ strict: 'throw', timestamps: true })

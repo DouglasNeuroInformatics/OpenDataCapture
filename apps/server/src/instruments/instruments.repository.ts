@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AccessibleModel } from '@casl/mongoose';
 import { Model } from 'mongoose';
 
-import { Instrument, InstrumentDocument } from './schemas/instrument.schema';
+import { Instrument, InstrumentDocument } from './entities/instrument.entity';
 
 import { EntityRepository } from '@/core/abstract/entity.repository';
 

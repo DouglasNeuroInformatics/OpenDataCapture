@@ -2,7 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { Sex } from './enums/sex.enum';
-import { Subject } from './schemas/subject.schema';
+import { Subject } from './entities/subject.entity';
 import { SubjectsRepository } from './subjects.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';

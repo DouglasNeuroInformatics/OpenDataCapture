@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupsService } from './groups.service';
-import { Group } from './schemas/group.schema';
+import { Group } from './entities/group.entity';
 
 import { EntityController } from '@/core/abstract/entity.controller';
 

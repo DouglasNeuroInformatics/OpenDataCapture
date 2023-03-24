@@ -1,12 +1,12 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './schemas/user.schema';
+import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';
 import { GroupsService } from '@/groups/groups.service';
-import { Group } from '@/groups/schemas/group.schema';
+import { Group } from '@/groups/entities/group.entity';
 
 @Injectable()
 export class UsersService {

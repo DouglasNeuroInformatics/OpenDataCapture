@@ -7,7 +7,7 @@ import {
 } from '@ddcp/common/types';
 import { JSONSchemaType } from 'ajv';
 
-import { Form, FormField } from '../schemas/form.schema';
+import { Form, FormField } from '../entities/form.entity';
 
 import { Dto } from '@/core/decorators/dto.decorator';
 

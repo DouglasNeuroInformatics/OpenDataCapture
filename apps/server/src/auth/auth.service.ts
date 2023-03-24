@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import { CryptoService } from '@/crypto/crypto.service';
-import { User } from '@/users/schemas/user.schema';
+import { User } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
