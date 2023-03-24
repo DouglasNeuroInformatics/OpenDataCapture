@@ -7,7 +7,7 @@ import { formFieldSchema } from './form-field.schema';
 
 import { FormInstrument } from '@/instruments/interfaces/form-instrument.interface';
 
-export const formInstrumentSchema: JSONSchemaType<FormInstrument<Record<string, any>>> = {
+export const formInstrumentSchema: JSONSchemaType<FormInstrument> = {
   type: 'object',
   properties: {
     kind: {

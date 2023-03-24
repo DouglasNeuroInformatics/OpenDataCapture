@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Dto } from '@/core/decorators/dto.decorator';
+import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 import { BasePermissionLevel } from '@/permissions/permissions.types';
 
 interface CreateUserData {
@@ -13,7 +13,7 @@ interface CreateUserData {
 // Matches string with 8 or more characters, minimum one upper case, lowercase, and number
 export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
-@Dto<CreateUserData>({
+@ValidationSchema<CreateUserData>({
   type: 'object',
   properties: {
     username: {

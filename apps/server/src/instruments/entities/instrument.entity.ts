@@ -1,47 +1,25 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import {
-  InstrumentDetails as InstrumentDetailsInterface,
-  Instrument as InstrumentInterface,
-  InstrumentKind,
-  InstrumentLanguage
-} from '@ddcp/common/types';
+import { BaseInstrument, InstrumentKind } from '@ddcp/common';
 import { HydratedDocument } from 'mongoose';
 
-@Schema({ strict: 'throw', timestamps: true })
-class InstrumentDetails implements InstrumentDetailsInterface {
-  @Prop({ required: true })
-  description: string;
-
-  @Prop({ required: true, enum: ['EN', 'FR'] satisfies InstrumentLanguage[], type: String })
-  language: InstrumentLanguage;
-
-  @Prop({ required: true })
-  instructions: string;
-
-  @Prop({ required: true })
-  estimatedDuration: number;
-
-  @Prop({ required: true })
-  version: number;
-}
-
-const InstrumentDetailsSchema = SchemaFactory.createForClass(InstrumentDetails);
-
 @Schema({ discriminatorKey: 'kind', strict: 'throw', timestamps: true })
-export class Instrument implements InstrumentInterface {
+export class Instrument implements BaseInstrument {
   static readonly modelName = 'Instrument';
 
-  @Prop({ enum: ['FORM'] satisfies InstrumentKind[], required: true, type: String })
+  @Prop({ enum: InstrumentKind, required: true, type: String })
   kind: InstrumentKind;
 
   @Prop({ required: true, unique: true })
-  title: string;
+  name: string;
 
-  @Prop({ required: true, type: InstrumentDetailsSchema })
-  details: InstrumentDetails;
+  @Prop({ required: true })
+  tags: string[];
 
-  data: any;
+  @Prop({ required: true })
+  version: number;
+
+  content: any;
 }
 
 export type InstrumentDocument = HydratedDocument<Instrument>;

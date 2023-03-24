@@ -2,10 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { LoginCredentials, loginCredentialsSchema } from '@ddcp/common/auth';
 
-import { Dto } from '@/core/decorators/dto.decorator';
+import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
-@Dto<LoginCredentials>(loginCredentialsSchema)
-export class LoginCredentialsDto {
+@ValidationSchema<LoginCredentials>(loginCredentialsSchema)
+export class LoginCredentialsDto implements LoginCredentials {
   @ApiProperty({ example: 'admin' })
   username: string;
 

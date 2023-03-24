@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { InstrumentKind } from '@ddcp/common/types';
+import { InstrumentKind } from '@ddcp/common';
 import { Schema } from 'mongoose';
 
-import { InstrumentsController } from './instruments.controller';
-import { InstrumentsRepository } from './instruments.repository';
-import { InstrumentsService } from './instruments.service';
-import { FormSchema } from './entities/form.entity';
+import { FormsController } from './controllers/forms.controller';
+import { FormInstrumentSchema } from './entities/form-instrument.entity';
 import { Instrument, InstrumentSchema } from './entities/instrument.entity';
+import { InstrumentsRepository } from './instruments.repository';
 
 import { SubjectsModule } from '@/subjects/subjects.module';
 
@@ -25,16 +24,16 @@ interface InstrumentDiscriminator {
         schema: InstrumentSchema,
         discriminators: [
           {
-            name: 'FORM',
-            schema: FormSchema
+            name: InstrumentKind.Form,
+            schema: FormInstrumentSchema
           }
         ] satisfies InstrumentDiscriminator[]
       }
     ]),
     SubjectsModule
   ],
-  controllers: [InstrumentsController],
-  providers: [InstrumentsService, InstrumentsRepository],
-  exports: [InstrumentsService]
+  controllers: [FormsController],
+  providers: [InstrumentsRepository],
+  exports: []
 })
 export class InstrumentsModule {}
