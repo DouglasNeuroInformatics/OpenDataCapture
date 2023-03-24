@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 
+import { Outlet } from 'react-router-dom';
+
 import { Footer } from '../Footer';
 import { Navbar } from '../Navbar';
 import { Sidebar } from '../Sidebar';
 
-export interface LayoutProps {
-  children: React.ReactNode;
-}
-
-export const Layout = ({ children }: LayoutProps) => {
+export const Layout = () => {
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   return (
     <React.Fragment>
@@ -22,7 +20,9 @@ export const Layout = ({ children }: LayoutProps) => {
         <Sidebar />
       </div>
       <div className="absolute left-0 flex h-screen w-full flex-col overflow-scroll pt-5 md:left-72 md:w-[calc(100vw-theme(spacing.72))]">
-        <main className="flex-grow sm:container">{children}</main>
+        <main className="flex-grow sm:container">
+          <Outlet />
+        </main>
         <Footer />
       </div>
     </React.Fragment>
