@@ -13,6 +13,7 @@ import './services/18n';
 
 export const App = () => {
   const auth = useAuthStore();
+  console.log(auth);
   return (
     <React.Suspense fallback={<SuspenseFallback />}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -34,4 +35,3 @@ export const App = () => {
     </React.Suspense>
   );
 };
-

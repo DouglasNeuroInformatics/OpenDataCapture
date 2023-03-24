@@ -2,7 +2,10 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unauthoriz
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
+import { AuthPayload, JwtPayload } from '@ddcp/common';
+
 import { CryptoService } from '@/crypto/crypto.service';
+import { PermissionsFactory } from '@/permissions/permissions.factory';
 import { User } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
@@ -12,11 +15,12 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly cryptoService: CryptoService,
     private readonly jwtService: JwtService,
+    private readonly permissionsFactory: PermissionsFactory,
     private readonly usersService: UsersService
   ) {}
 
   /** Validates the provided credentials and returns an access token */
-  async login(username: string, password: string): Promise<{ accessToken: string }> {
+  async login(username: string, password: string): Promise<AuthPayload> {
     const user = await this.getUser(username);
 
     const isAuth = await this.cryptoService.comparePassword(password, user.password);
@@ -24,9 +28,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
-    const accessToken = await this.signToken({
-      username: user.username
-    });
+    const payload: JwtPayload = {
+      username: user.username,
+      permissions: this.permissionsFactory.createForUser(user).rules
+    };
+
+    const accessToken = await this.signToken(payload);
 
     return { accessToken };
   }
