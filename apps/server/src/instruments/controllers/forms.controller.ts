@@ -1,9 +1,8 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { FormInstrumentEntity } from '../entities/form-instrument.entity';
+import { CreateFormDto } from '../dto/create-form.dto';
 
-import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 @ApiTags('Instruments', 'Forms')
@@ -12,8 +11,8 @@ export class FormsController {
   @ApiOperation({ summary: 'Create a New Form' })
   @RouteAccess({ action: 'create', subject: 'Instrument' })
   @Post()
-  create(): Promise<any> {
-    return Promise.resolve('foo');
+  create(@Body() createFormDto: CreateFormDto): Promise<any> {
+    return Promise.resolve(createFormDto);
   }
 
   @ApiOperation({ summary: 'Get All Forms' })

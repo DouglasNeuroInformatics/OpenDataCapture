@@ -12,7 +12,7 @@ export class AjvService {
     addFormats(this.ajv);
   }
 
-  validate<T>(data: unknown, schema: JSONSchemaType<T>, onError: (message: string) => never): T {
+  validate<T>(data: unknown, schema: JSONSchemaType<T>, onError: (message: unknown) => never): T {
     const validateFunction = this.ajv.compile(schema);
     const isValid = validateFunction(data);
     if (!isValid) {
@@ -21,10 +21,12 @@ export class AjvService {
     return data;
   }
 
-  private formatErrorMessage(errors?: ErrorObject<string, Record<string, any>, unknown>[] | null): string {
+  private formatErrorMessage(
+    errors?: ErrorObject<string, Record<string, any>, unknown>[] | null
+  ): string | Record<string, any> {
     if (!errors) {
       return 'Schema validation failed, yet errors is ' + errors;
     }
-    return JSON.stringify(errors);
+    return errors;
   }
 }
