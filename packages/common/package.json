@@ -2,16 +2,19 @@
   "name": "@ddcp/common",
   "version": "0.0.0",
   "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "./enum": {
-      "require": "./dist/enum.js",
-      "import": "./dist/enum.mjs",
-      "types": "./dist/enum.d.ts"
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
     },
-    "./types": {
-      "require": "./dist/types.js",
-      "import": "./dist/types.mjs",
-      "types": "./dist/types.d.ts"
+    "./auth": {
+      "require": "./dist/auth/index.js",
+      "import": "./dist/auth/index.mjs",
+      "types": "./dist/auth/index.d.ts"
     }
   },
   "scripts": {

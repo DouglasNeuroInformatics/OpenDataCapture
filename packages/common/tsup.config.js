@@ -3,7 +3,7 @@ import path from 'path';
 import { defineConfig } from 'tsup';
 
 const indexFiles = [path.resolve('.', 'src', 'index.ts')];
-for (const dirname of ['types']) {
+for (const dirname of ['auth']) {
   indexFiles.push(path.resolve('.', 'src', dirname, 'index.ts'));
 }
 
