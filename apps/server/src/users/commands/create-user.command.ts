@@ -6,7 +6,9 @@ import { UsersService } from '../users.service';
 type CommandArgs = [string, string];
 
 interface CommandOptions {
-  basePermissionLevel: BasePermissionLevel;
+  basePermissionLevel?: BasePermissionLevel;
+  firstName?: string;
+  lastName?: string;
 }
 
 @Command({ arguments: '<username> <password>', name: 'create-user', description: 'add a new user to the database' })
@@ -24,8 +26,25 @@ export class CreateUserCommand extends CommandRunner {
     console.log(`Successfully created user: ${user.username}`);
   }
 
-  @Option({ flags: '-p', name: 'basePermissionLevel', required: false, choices: Object.values(BasePermissionLevel) })
-  parseBasePermissionLevel(value: BasePermissionLevel): BasePermissionLevel {
+  @Option({
+    flags: '--basePermissionLevel <string>',
+    required: false,
+    choices: Object.values(BasePermissionLevel)
+  })
+  parseBasePermissionLevel(value?: unknown): BasePermissionLevel | undefined {
+    if (value === undefined || Object.values(BasePermissionLevel).includes(value as BasePermissionLevel)) {
+      return value as BasePermissionLevel | undefined;
+    }
+    throw new Error('Invalid option: ' + value);
+  }
+
+  @Option({ flags: '--firstName <string>', required: false })
+  parseFirstName(value?: string): string | undefined {
+    return value;
+  }
+
+  @Option({ flags: '--lastName <string>', required: false })
+  parseLastName(value?: string): string | undefined {
     return value;
   }
 }
