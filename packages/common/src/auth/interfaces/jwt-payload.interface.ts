@@ -1,4 +1,4 @@
-import { Permissions } from '@/auth/types/permissions.type';
+import { Permissions } from '../types/permissions.type';
 
 export interface JwtPayload {
   username: string;

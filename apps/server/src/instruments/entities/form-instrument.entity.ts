@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { FormDetails, FormField, FormInstrument, InstrumentKind } from '@ddcp/common';
-import { JSONSchemaType } from 'ajv';
+import { type FormDetails, FormField, FormInstrument, InstrumentKind } from '@ddcp/common';
+import { type JSONSchemaType } from 'ajv';
 
 import { FormDetailsSchema } from './form-details-entity';
 import { FormFieldSchema } from './form-field.entity';

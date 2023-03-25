@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
+import { BasePermissionLevel } from '@ddcp/common';
 import { AppAbility } from '@ddcp/common/auth';
 
 import { UserEntity } from '@/users/entities/user.entity';
@@ -15,13 +16,13 @@ export class PermissionsFactory {
     this.logger.verbose('Creating permissions for user: ' + user.username);
     const ability = new AbilityBuilder<AppAbility>(createMongoAbility);
     switch (user.basePermissionLevel) {
-      case 'admin':
+      case BasePermissionLevel.Admin:
         ability.can('manage', 'all');
         break;
-      case 'group-manager':
+      case BasePermissionLevel.GroupManager:
         ability.can('manage', 'Group', { name: { $in: user.groups.map((group) => group.name) } });
         break;
-      case 'standard':
+      case BasePermissionLevel.Standard:
         ability.can('read', 'all');
         break;
     }

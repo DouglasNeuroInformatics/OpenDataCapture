@@ -1,6 +1,6 @@
-import { FormFieldKind } from '@/instruments/enums/form-field-kind.enum';
-import { NumberFieldVariant } from '@/instruments/enums/number-field-variant.enum';
-import { StringFieldVariant } from '@/instruments/enums/string-field-variant.enum';
+import { FormFieldKind } from '../enums/form-field-kind.enum';
+import { NumberFieldVariant } from '../enums/number-field-variant.enum';
+import { StringFieldVariant } from '../enums/string-field-variant.enum';
 
 export interface BaseFormField {
   /** Discriminator key */

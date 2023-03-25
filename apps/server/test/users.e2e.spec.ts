@@ -1,3 +1,4 @@
+import { BasePermissionLevel } from '@ddcp/common';
 import { HttpStatus } from '@nestjs/common';
 
 import request from 'supertest';
@@ -50,12 +51,12 @@ describe('POST /users', () => {
     const response = await request(server).post('/users').auth(admin.accessToken, { type: 'bearer' }).send({
       username: 'user',
       password: 'Password123',
-      basePermissionLevel: 'admin'
+      basePermissionLevel: BasePermissionLevel.Admin
     });
     expect(response.status).toBe(HttpStatus.CREATED);
     expect(response.body).toMatchObject({
       username: 'user',
-      basePermissionLevel: 'admin'
+      basePermissionLevel: BasePermissionLevel.Admin
     });
   });
 });

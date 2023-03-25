@@ -1,9 +1,9 @@
 import { JSONSchemaType } from 'ajv';
 import { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
-import { FormFieldKind } from '@/instruments/enums/form-field-kind.enum';
-import { StringFieldVariant } from '@/instruments/enums/string-field-variant.enum';
-import { BaseFormField, FormField, StringFormField } from '@/instruments/interfaces/form-field.interface';
+import { FormFieldKind } from '../enums/form-field-kind.enum';
+import { StringFieldVariant } from '../enums/string-field-variant.enum';
+import { BaseFormField, FormField, StringFormField } from '../interfaces/form-field.interface';
 
 const baseProperties: PropertiesSchema<Omit<BaseFormField, 'kind'>> = {
   name: {

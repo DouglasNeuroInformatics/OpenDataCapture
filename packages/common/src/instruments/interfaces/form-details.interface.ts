@@ -1,4 +1,4 @@
-import { Language } from '@/core';
+import { Language } from '../../core';
 
 export interface FormDetails {
   /** The title of the instrument in the language it is written, omitting the definite article */

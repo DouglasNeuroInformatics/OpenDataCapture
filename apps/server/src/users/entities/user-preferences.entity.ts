@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { UserPreferences } from '@ddcp/common';
+import { type UserPreferences } from '@ddcp/common';
 
 @Schema({ strict: 'throw' })
 export class UserPreferencesEntity implements UserPreferences {

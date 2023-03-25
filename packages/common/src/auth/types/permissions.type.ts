@@ -1,6 +1,6 @@
 import { MongoAbility, RawRuleOf } from '@casl/ability';
 
-import { Group } from '@/groups';
+import { Group } from '../../groups';
 
 export type Action = 'create' | 'read' | 'update' | 'delete' | 'manage';
 

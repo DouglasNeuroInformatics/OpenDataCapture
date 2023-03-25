@@ -4,7 +4,7 @@ import { JSONSchemaType } from 'ajv';
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
 @ValidationSchema<FormInstrument>(formInstrumentSchema)
-export class CreateFormDto implements FormInstrument {
+export class CreateFormDto {
   kind: InstrumentKind.Form;
   name: string;
   tags: string[];

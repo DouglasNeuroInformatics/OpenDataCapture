@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
+import { BasePermissionLevel } from '@ddcp/common';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 
@@ -44,7 +45,7 @@ export class DemoService {
 
   private async createDemoAdmin({ username, password }: { username: string; password: string }): Promise<void> {
     this.logger.verbose(`Creating default admin user '${username}' with password '${password}'...`);
-    await this.usersService.create({ username, password, basePermissionLevel: 'admin' });
+    await this.usersService.create({ username, password, basePermissionLevel: BasePermissionLevel.Admin });
   }
 
   /*

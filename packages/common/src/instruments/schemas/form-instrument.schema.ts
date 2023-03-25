@@ -1,11 +1,11 @@
 import { JSONSchemaType } from 'ajv';
 
 import { InstrumentKind } from '../enums/instrument-kind.enum';
+import { FormInstrument } from '../interfaces/form-instrument.interface';
 
 import { formDetailsSchema } from './form-details.schema';
 import { formFieldSchema } from './form-field.schema';
 
-import { FormInstrument } from '@/instruments/interfaces/form-instrument.interface';
 
 export const formInstrumentSchema: JSONSchemaType<FormInstrument> = {
   type: 'object',

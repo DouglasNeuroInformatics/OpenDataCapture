@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PermissionsFactory } from '@/permissions/permissions.factory';
+import { BasePermissionLevel } from '@ddcp/common';
 
 describe('PermissionsFactory', () => {
   let permissionsFactory: PermissionsFactory;
@@ -28,7 +29,7 @@ describe('PermissionsFactory', () => {
         username: 'admin',
         password: 'Password123',
         groups: [],
-        basePermissionLevel: 'admin'
+        basePermissionLevel: BasePermissionLevel.Admin
       });
       expect(permissions.rules).toEqual([{ action: 'manage', subject: 'all' }]);
     });

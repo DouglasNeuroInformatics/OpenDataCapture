@@ -2,10 +2,6 @@
   "extends": "@ddcp/tsconfig/base.json",
   "include": ["src/**/*"],
   "compilerOptions": {
-    "baseUrl": "src",
-    "outDir": "dist",
-    "paths": {
-      "@/*": ["*"]
-    }
+    "declaration": false,
   }
 }

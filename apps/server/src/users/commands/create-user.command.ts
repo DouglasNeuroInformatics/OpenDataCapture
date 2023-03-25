@@ -1,3 +1,4 @@
+import { BasePermissionLevel } from '@ddcp/common';
 import { Command, CommandRunner, Option } from 'nest-commander';
 
 import { UsersService } from '../users.service';
@@ -5,7 +6,7 @@ import { UsersService } from '../users.service';
 type CommandArgs = [string, string];
 
 interface CommandOptions {
-  isAdmin: boolean;
+  basePermissionLevel: BasePermissionLevel;
 }
 
 @Command({ arguments: '<username> <password>', name: 'create-user', description: 'add a new user to the database' })
@@ -14,17 +15,17 @@ export class CreateUserCommand extends CommandRunner {
     super();
   }
 
-  async run([username, password]: CommandArgs, { isAdmin }: CommandOptions): Promise<void> {
+  async run([username, password]: CommandArgs, options: CommandOptions): Promise<void> {
     const user = await this.usersService.create({
       username,
       password,
-      basePermissionLevel: isAdmin ? 'admin' : 'standard'
+      ...options
     });
     console.log(`Successfully created user: ${user.username}`);
   }
 
-  @Option({ flags: '--admin', name: 'isAdmin', required: false })
-  parseIsAdmin(value: string): boolean {
-    return Boolean(value);
+  @Option({ flags: '-p', name: 'basePermissionLevel', required: false, choices: Object.values(BasePermissionLevel) })
+  parseBasePermissionLevel(value: BasePermissionLevel): BasePermissionLevel {
+    return value;
   }
 }

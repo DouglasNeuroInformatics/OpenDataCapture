@@ -1,8 +1,7 @@
 import { JSONSchemaType } from 'ajv';
 
+import { Language } from '../../core';
 import { FormDetails } from '../interfaces/form-details.interface';
-
-import { Language } from '@/core';
 
 export const formDetailsSchema: JSONSchemaType<FormDetails> = {
   type: 'object',

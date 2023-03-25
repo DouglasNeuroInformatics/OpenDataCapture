@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { User } from '@ddcp/common';
-import { BasePermissionLevel } from '@ddcp/common/auth';
+import { BasePermissionLevel, type User } from '@ddcp/common/users';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
@@ -25,7 +24,7 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
     },
     basePermissionLevel: {
       type: 'string',
-      enum: ['admin', 'group-manager', 'standard'],
+      // enum: []
       nullable: true
     },
     groupNames: {
@@ -49,7 +48,7 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
   },
   required: ['username', 'password']
 })
-export class CreateUserDto implements CreateUserData {
+export class CreateUserDto {
   @ApiProperty({ description: 'A unique descriptive name associated with this user', example: 'JaneDoeMemoryClinic' })
   username: string;
 
@@ -61,7 +60,8 @@ export class CreateUserDto implements CreateUserData {
 
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
-    enum: ['admin', 'group-manager', 'standard']
+    enum: BasePermissionLevel,
+    type: String
   })
   basePermissionLevel?: BasePermissionLevel;
 
@@ -75,9 +75,9 @@ export class CreateUserDto implements CreateUserData {
   })
   groupNames?: string[];
 
-  @ApiProperty()
+  @ApiProperty({ description: 'First Name ' })
   firstName?: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Last Name' })
   lastName?: string;
 }
