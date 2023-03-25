@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { Router } from './router';
+import { Router } from './Router';
 
 import { ActiveSubject, Notifications } from '@/components/core';
 import { ErrorFallback, SuspenseFallback } from '@/features/misc';

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { IconType } from 'react-icons';
-import { HiEye, HiHome, HiPlus, HiUserPlus } from 'react-icons/hi2';
+import { HiChartBar, HiEye, HiHome, HiPlus, HiUserPlus } from 'react-icons/hi2';
 import { NavLink } from 'react-router-dom';
 
 import { UserDropup } from './UserDropup';
@@ -32,6 +32,7 @@ export const Sidebar = () => {
       </div>
       <hr className="my-1" />
       <nav className="mb-auto">
+        <SidebarNavLink Icon={HiChartBar} href="/overview" label="Overview" />
         <SidebarNavLink Icon={HiHome} href="/home" label={t('sidebar.links.home')} />
         <SidebarNavLink Icon={HiUserPlus} href="/subjects/add-subject" label={t('sidebar.links.addSubject')} />
         <SidebarNavLink Icon={HiEye} href="/subjects/view-subjects" label={t(`sidebar.links.viewSubjects`)} />

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForm';
 
 import logo from '@/assets/logo.png';
-import { Footer } from '@/components/layout';
+import { Footer } from '@/components/Layout';
 
 export const LoginPage = () => {
   const navigate = useNavigate();

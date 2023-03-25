@@ -5,6 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/layout';
 import { LoginPage } from './features/auth';
 import { HomePage } from './features/misc';
+import { OverviewPage } from './features/overview/pages/OverviewPage';
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
 
@@ -16,7 +17,8 @@ export const Router = () => {
         <Route element={<LoginPage />} path="login" />
         {accessToken ? (
           <Route element={<Layout />}>
-            <Route index element={<HomePage />} path="home" />
+            <Route index element={<OverviewPage />} path="overview" />
+            <Route element={<HomePage />} path="home" />
             <Route element={<UserPage />} path="user" />
           </Route>
         ) : (
