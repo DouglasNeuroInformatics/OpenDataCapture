@@ -47,10 +47,19 @@ export const UserDropup = () => {
           </div>
         </Transition>
       </div>
-      <button className="flex w-full items-center p-2" onClick={() => setIsOpen(!isOpen)}>
-        <HiUserCircle className="mr-2 h-8 w-8" />
-        <ArrowToggle content={auth.currentUser?.username} contentPosition="left" position="right" rotation={-90} />
-      </button>
+      <ArrowToggle
+        className="flex w-full items-center p-2"
+        content={
+          <div className="flex items-center">
+            <HiUserCircle className="mr-2 h-8 w-8" />
+            <span>{auth.currentUser?.username}</span>
+          </div>
+        }
+        contentPosition="left"
+        position="right"
+        rotation={-90}
+        onClick={() => setIsOpen(!isOpen)}
+      />
     </div>
   );
 };

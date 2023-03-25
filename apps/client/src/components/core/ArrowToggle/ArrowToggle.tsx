@@ -5,7 +5,7 @@ import { HiChevronUp } from 'react-icons/hi2';
 export interface ArrowToggleProps extends React.ComponentPropsWithoutRef<'button'> {
   position: 'up' | 'right' | 'down' | 'left';
   rotation: number;
-  content?: string;
+  content?: React.ReactNode;
   contentPosition?: 'left' | 'right';
 }
 

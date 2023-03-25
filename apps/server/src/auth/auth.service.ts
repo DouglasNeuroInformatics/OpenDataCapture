@@ -30,7 +30,9 @@ export class AuthService {
 
     const payload: JwtPayload = {
       username: user.username,
-      permissions: this.permissionsFactory.createForUser(user).rules
+      permissions: this.permissionsFactory.createForUser(user).rules,
+      firstName: user.firstName,
+      lastName: user.lastName
     };
 
     const accessToken = await this.signToken(payload);

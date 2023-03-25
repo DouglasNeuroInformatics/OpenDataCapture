@@ -2,14 +2,10 @@ import { JwtPayload } from '@ddcp/common';
 import jwtDecode from 'jwt-decode';
 import { create } from 'zustand';
 
-type CurrentUser = {
-  username: string;
-};
-
 export interface AuthStore {
   accessToken: string | null;
   setAccessToken: (accessToken: string) => void;
-  currentUser: CurrentUser | null;
+  currentUser: JwtPayload | null;
   logout: () => void;
 }
 
