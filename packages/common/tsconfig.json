@@ -2,6 +2,6 @@
   "extends": "@ddcp/tsconfig/base.json",
   "include": ["src/**/*"],
   "compilerOptions": {
-    "declaration": false,
+    "declarationMap": true,
   }
 }
