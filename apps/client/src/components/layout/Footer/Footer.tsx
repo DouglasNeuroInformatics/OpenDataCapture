@@ -37,7 +37,7 @@ export const Footer = ({ className }: FooterProps) => {
           )}
           <a
             className="@lg/footer:w-auto flex w-full items-center justify-center"
-            href={`${projectRepoLink}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT!}`}
+            href={`${import.meta.env.VITE_PROJECT_URL}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT!}`}
             rel="noreferrer"
             target="_blank"
           >
