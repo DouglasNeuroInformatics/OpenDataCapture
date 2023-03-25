@@ -8,14 +8,18 @@ import { Button } from '@/components/base';
 import { Modal } from '@/components/core';
 import { useAuthStore } from '@/stores/auth-store';
 
-export const Disclaimer = () => {
+export interface DisclaimerProps {
+  isRequired: boolean;
+}
+
+export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProps) => {
   const { currentUser, logout } = useAuthStore();
   const { isAccepted, username, setIsAccepted } = useDisclaimerStore();
   const { t } = useTranslation();
 
   const handleClose = () => setIsAccepted(true, currentUser!.username);
 
-  const show = (!isAccepted || currentUser?.username !== username) && currentUser?.role !== 'admin';
+  const show = (!isAccepted || currentUser?.username !== username) && isRequired;
 
   return (
     <Modal open={show} title={t('home.disclaimer.title')} onClose={handleClose}>
