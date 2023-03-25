@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import { Footer } from '../Footer';
-import { Navbar } from '../Navbar';
-import { Sidebar } from '../Sidebar';
+
+import { Navbar } from './Navbar';
+import { Sidebar } from './Sidebar';
 
 export const Layout = () => {
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);

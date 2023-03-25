@@ -6,8 +6,6 @@ import { FaGithub } from 'react-icons/fa';
 
 const currentYear = new Date().getFullYear();
 
-const projectRepoLink = 'https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform';
-
 export interface FooterProps {
   className?: string;
 }
