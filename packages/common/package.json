@@ -25,6 +25,11 @@
       "require": "./dist/groups/index.js",
       "import": "./dist/groups/index.mjs",
       "types": "./dist/groups/index.d.ts"
+    },
+    "./users": {
+      "require": "./dist/users/index.js",
+      "import": "./dist/users/index.mjs",
+      "types": "./dist/users/index.d.ts"
     }
   },
   "scripts": {
