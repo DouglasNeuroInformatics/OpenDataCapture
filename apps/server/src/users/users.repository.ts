@@ -10,7 +10,7 @@ import { EntityRepository } from '@/core/abstract/entity.repository';
 
 @Injectable()
 export class UsersRepository extends EntityRepository<UserEntity> {
-  constructor(@InjectModel(UserEntity.name) userModel: Model<UserDocument, AccessibleModel<UserDocument>>) {
+  constructor(@InjectModel(UserEntity.modelName) userModel: Model<UserDocument, AccessibleModel<UserDocument>>) {
     super(userModel);
   }
 }

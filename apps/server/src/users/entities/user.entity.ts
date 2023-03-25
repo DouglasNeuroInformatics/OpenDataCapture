@@ -8,6 +8,8 @@ import { GroupEntity } from '@/groups/entities/group.entity';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class UserEntity implements User {
+  static readonly modelName = 'User';
+  
   @Prop({ required: true, unique: true })
   username: string;
 

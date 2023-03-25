@@ -16,7 +16,7 @@ import { PermissionsModule } from '@/permissions/permissions.module';
     CryptoModule,
     MongooseModule.forFeature([
       {
-        name: UserEntity.name,
+        name: UserEntity.modelName,
         schema: UserSchema
       }
     ]),

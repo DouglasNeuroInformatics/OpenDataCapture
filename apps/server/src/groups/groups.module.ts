@@ -10,7 +10,7 @@ import { GroupsService } from './groups.service';
   imports: [
     MongooseModule.forFeature([
       {
-        name: GroupEntity.name,
+        name: GroupEntity.modelName,
         schema: GroupSchema
       }
     ])

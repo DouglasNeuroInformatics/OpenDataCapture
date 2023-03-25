@@ -10,7 +10,7 @@ import { EntityRepository } from '@/core/abstract/entity.repository';
 
 @Injectable()
 export class GroupsRepository extends EntityRepository<GroupEntity> {
-  constructor(@InjectModel(GroupEntity.name) groupModel: Model<GroupDocument, AccessibleModel<GroupDocument>>) {
+  constructor(@InjectModel(GroupEntity.modelName) groupModel: Model<GroupDocument, AccessibleModel<GroupDocument>>) {
     super(groupModel);
   }
 }
