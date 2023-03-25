@@ -1,16 +1,15 @@
 import React, { useRef, useState } from 'react';
 
 import { Transition } from '@headlessui/react';
-import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { HiUserCircle } from 'react-icons/hi2';
-import { IoIosArrowUp } from 'react-icons/io';
+import { Link } from 'react-router-dom';
 
-import { LanguageToggle } from '@/components/core';
+import { ArrowToggle, LanguageToggle } from '@/components/core';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useAuthStore } from '@/stores/auth-store';
 
-export const UserDropup = ({ username }: { username?: string }) => {
+export const UserDropup = () => {
   const auth = useAuthStore();
   const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -42,17 +41,15 @@ export const UserDropup = ({ username }: { username?: string }) => {
               {t('userDropup.logout')}
             </button>
             <LanguageToggle className="w-full p-2 hover:bg-slate-700" onClick={closeDropup} />
+            <Link className="block w-full p-2 text-center hover:bg-slate-700" to="/user" onClick={closeDropup}>
+              {t('userDropup.preferences')}
+            </Link>
           </div>
         </Transition>
       </div>
       <button className="flex w-full items-center p-2" onClick={() => setIsOpen(!isOpen)}>
         <HiUserCircle className="mr-2 h-8 w-8" />
-        <span>{username}</span>
-        <IoIosArrowUp
-          className={clsx('mx-1', {
-            'rotate-90': !isOpen
-          })}
-        />
+        <ArrowToggle content={auth.currentUser?.username} contentPosition="left" position="right" rotation={-90} />
       </button>
     </div>
   );

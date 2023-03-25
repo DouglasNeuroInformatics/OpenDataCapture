@@ -32,7 +32,8 @@
     }
   },
   "userDropup": {
-    "logout": "Logout"
+    "logout": "Logout",
+    "preferences": "Preferences"
   },
   "footer": {
     "viewSourceCode": "View Source Code"

@@ -43,7 +43,7 @@ export const Sidebar = () => {
       </nav>
       <hr className="my-1" />
       <div className="flex items-center">
-        <UserDropup username={auth.currentUser?.username} />
+        <UserDropup />
       </div>
     </div>
   );

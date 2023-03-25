@@ -30,7 +30,8 @@
     }
   },
   "userDropup": {
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "preferences": "Préférences"
   },
   "footer": {
     "viewSourceCode": "Voir le code source"
