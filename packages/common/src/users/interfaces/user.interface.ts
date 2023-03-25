@@ -4,7 +4,7 @@ import { Group } from '@/groups';
 export interface User {
   username: string;
   password: string;
-  groups: Group;
+  groups: Group[];
   basePermissionLevel?: BasePermissionLevel;
   firstName?: string;
   lastName?: string;

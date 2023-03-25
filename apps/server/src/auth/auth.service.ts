@@ -6,7 +6,7 @@ import { AuthPayload, JwtPayload } from '@ddcp/common';
 
 import { CryptoService } from '@/crypto/crypto.service';
 import { PermissionsFactory } from '@/permissions/permissions.factory';
-import { User } from '@/users/entities/user.entity';
+import { UserEntity } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
@@ -39,8 +39,8 @@ export class AuthService {
   }
 
   /** Wraps UserService.getByUsername with appropriate exception handling */
-  private async getUser(username: string): Promise<User> {
-    let user: User;
+  private async getUser(username: string): Promise<UserEntity> {
+    let user: UserEntity;
     try {
       user = await this.usersService.findByUsername(username);
     } catch (error) {

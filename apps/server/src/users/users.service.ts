@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';
@@ -19,7 +19,7 @@ export class UsersService {
   ) {}
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
-  async create({ username, password, basePermissionLevel, groupNames }: CreateUserDto): Promise<User> {
+  async create({ username, password, basePermissionLevel, groupNames }: CreateUserDto): Promise<UserEntity> {
     this.logger.verbose(`Attempting to create user: ${username}`);
 
     const userExists = await this.usersRepository.exists({ username: username });
@@ -43,12 +43,12 @@ export class UsersService {
   }
 
   /** Returns an array of all users */
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserEntity[]> {
     return this.usersRepository.find().exec();
   }
 
   /** Returns user with provided username if found, otherwise throws */
-  async findByUsername(username: string): Promise<User> {
+  async findByUsername(username: string): Promise<UserEntity> {
     const user = await this.usersRepository.findOne({ filter: { username } });
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);

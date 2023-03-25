@@ -5,8 +5,6 @@ import { HydratedDocument } from 'mongoose';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class GroupEntity implements Group {
-  static readonly modelName = 'Group';
-
   @Prop({ required: true, unique: true })
   name: string;
 }

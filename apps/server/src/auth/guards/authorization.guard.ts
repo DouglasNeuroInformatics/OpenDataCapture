@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 
 import { RouteAccessType } from '@/core/decorators/route-access.decorator';
 import { PermissionsFactory } from '@/permissions/permissions.factory';
-import { User } from '@/users/entities/user.entity';
+import { UserEntity } from '@/users/entities/user.entity';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
@@ -29,7 +29,7 @@ export class AuthorizationGuard implements CanActivate {
       return false;
     }
 
-    const ability = this.permissionsFactory.createForUser(request.user as User);
+    const ability = this.permissionsFactory.createForUser(request.user as UserEntity);
     return ability.can(routeAccess.action, routeAccess.subject);
   }
 }
