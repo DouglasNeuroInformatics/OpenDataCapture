@@ -1,13 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { User } from '@ddcp/common';
 import { BasePermissionLevel } from '@ddcp/common/auth';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
-interface CreateUserData {
-  username: string;
-  password: string;
-  basePermissionLevel?: BasePermissionLevel;
+interface CreateUserData extends Omit<User, 'preferences' | 'groups'> {
   groupNames?: string[];
 }
 
@@ -37,11 +35,21 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
         minLength: 1
       },
       nullable: true
+    },
+    firstName: {
+      type: 'string',
+      minLength: 1,
+      nullable: true
+    },
+    lastName: {
+      type: 'string',
+      minLength: 1,
+      nullable: true
     }
   },
   required: ['username', 'password']
 })
-export class CreateUserDto {
+export class CreateUserDto implements CreateUserData {
   @ApiProperty({ description: 'A unique descriptive name associated with this user', example: 'JaneDoeMemoryClinic' })
   username: string;
 
@@ -66,4 +74,10 @@ export class CreateUserDto {
     }
   })
   groupNames?: string[];
+
+  @ApiProperty()
+  firstName?: string;
+
+  @ApiProperty()
+  lastName?: string;
 }

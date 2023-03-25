@@ -10,6 +10,8 @@ import { AuthService } from '../auth.service';
 import { CryptoService } from '@/crypto/crypto.service';
 import { MockCryptoService } from '@/crypto/test/mocks/crypto.service.mock';
 import { UsersService } from '@/users/users.service';
+import { PermissionsFactory } from '@/permissions/permissions.factory';
+import { MockPermissionsFactory } from '@/permissions/test/mocks/permissions.factory.mock';
 
 const MockConfigService = createMock<ConfigService>({
   getOrThrow(property: string) {
@@ -59,6 +61,10 @@ describe('AuthService', () => {
         {
           provide: JwtService,
           useValue: MockJwtService
+        },
+        {
+          provide: PermissionsFactory,
+          useValue: MockPermissionsFactory
         },
         {
           provide: UsersService,
