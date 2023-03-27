@@ -9,6 +9,7 @@ export * from './Form';
 export * from './IdentificationForm';
 export * from './LanguageToggle';
 export * from './Layout';
+export * from './LineGraph';
 export * from './Link';
 export * from './Modal';
 export * from './Notifications';

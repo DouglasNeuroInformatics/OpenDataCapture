@@ -4,6 +4,6 @@ import { IdentificationFormData } from '@/components';
 
 export class SubjectsAPI {
   static async addSubject(data: IdentificationFormData) {
-    await axios.post('/api/subjects', data);
+    await axios.post('/subjects', data);
   }
 }

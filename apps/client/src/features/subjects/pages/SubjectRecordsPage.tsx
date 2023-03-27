@@ -4,8 +4,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import { HiCheck } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
-import { Button, PageHeader, Spinner } from '@/components';
-import { LineGraph } from '@/components/graph';
+import { Button, LineGraph, PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 function camelToTitleCase(s: string) {

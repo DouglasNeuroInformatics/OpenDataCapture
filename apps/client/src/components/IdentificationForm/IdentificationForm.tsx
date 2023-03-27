@@ -1,13 +1,14 @@
 import React from 'react';
 
+import { Sex } from '@ddcp/common';
 import { JSONSchemaType } from 'ajv';
 
-import { Form, FormStructure } from '@/components/form';
+import { Form, FormStructure } from '@/components';
 
 type IdentificationFormData = {
   firstName: string;
   lastName: string;
-  sex: 'male' | 'female';
+  sex: Sex;
   dateOfBirth: string;
 };
 
@@ -29,7 +30,7 @@ const structure: FormStructure<IdentificationFormData> = [
       sex: {
         kind: 'select',
         label: 'Sex',
-        options: ['male', 'female'],
+        options: Object.values(Sex),
         description: "The subject's biological sex, as assigned at birth"
       },
       dateOfBirth: {
@@ -54,7 +55,7 @@ const validationSchema: JSONSchemaType<IdentificationFormData> = {
     },
     sex: {
       type: 'string',
-      enum: ['male', 'female']
+      enum: Object.values(Sex)
     },
     dateOfBirth: {
       type: 'string',

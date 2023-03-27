@@ -6,11 +6,12 @@ import { Layout } from './components';
 import { LoginPage } from './features/auth';
 import { ContactPage } from './features/contact';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
+import { AddSubjectPage, ViewSubjectsPage } from './features/subjects';
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
 
 export const Router = () => {
-  const { accessToken } = useAuthStore();
+  const { accessToken, currentUser } = useAuthStore();
   return (
     <BrowserRouter>
       <Routes>
@@ -20,6 +21,10 @@ export const Router = () => {
             <Route index element={<OverviewPage />} path="overview" />
             <Route element={<ContactPage />} path="contact" />
             <Route element={<UserPage />} path="user" />
+            <Route path="subjects">
+              <Route element={<AddSubjectPage />} path="add-subject" />
+              <Route element={<ViewSubjectsPage />} path="view-subjects" />
+            </Route>
           </Route>
         ) : (
           <Route element={<Navigate to="login" />} path="*" />
@@ -39,16 +44,6 @@ import { ErrorPage, HomePage } from './features/misc';
 import { AddSubjectPage, SubjectPage, SubjectRecordsPage, ViewSubjectsPage } from './features/subjects';
 import { useAuthStore } from './stores/auth-store';
 
-const Root = () => {
-  const auth = useAuthStore();
-  return auth.currentUser ? (
-    <Layout>
-      <Outlet />
-    </Layout>
-  ) : (
-    <Navigate to="/login" />
-  );
-};
 
 export const router = createBrowserRouter([
   {
@@ -56,22 +51,9 @@ export const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
-      {
-        path: '/admin',
-        element: <AdminPage />
-      },
-      {
-        path: '/home',
-        element: <HomePage />
-      },
-      {
-        path: '/subjects/add-subject',
-        element: <AddSubjectPage />
-      },
-      {
-        path: '/subjects/view-subjects',
-        element: <ViewSubjectsPage />
-      },
+
+
+
       {
         path: '/subjects/view-subjects/:subjectId',
         element: <SubjectPage />
@@ -94,10 +76,6 @@ export const router = createBrowserRouter([
       }
     ]
   },
-  {
-    path: '/login',
-    element: <LoginPage />,
-    errorElement: <ErrorPage />
-  }
+
 ]);
 */
