@@ -20,8 +20,7 @@
   },
   "sidebar": {
     "links": {
-      "admin": "Outils administratifs",
-      "home": "Accueil",
+      "overview": "Vue d'ensemble",
       "addSubject": "Ajouter un client",
       "lookupSubject": "Trouver un client",
       "viewSubjects": "Afficher tous les clients",

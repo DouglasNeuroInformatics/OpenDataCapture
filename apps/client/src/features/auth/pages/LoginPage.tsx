@@ -18,7 +18,7 @@ export const LoginPage = () => {
         <img alt="logo" className="m-1 w-16" src={logo} />
         <h1 className="text-2xl font-bold">{t('login.pageTitle')}</h1>
         <div className="mt-3 w-full">
-          <LoginForm onSuccess={() => navigate('/home')} />
+          <LoginForm onSuccess={() => navigate('/overview')} />
         </div>
         <br className="my-2" />
         <Footer showOrgInfo={false} />

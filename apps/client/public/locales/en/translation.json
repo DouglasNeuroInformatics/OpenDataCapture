@@ -22,8 +22,7 @@
   },
   "sidebar": {
     "links": {
-      "admin": "Admin",
-      "home": "Home",
+      "overview": "Overview",
       "addSubject": "Add Subject",
       "lookupSubject": "Lookup Subject",
       "viewSubjects": "View Subjects",

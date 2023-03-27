@@ -2,15 +2,14 @@ import React from 'react';
 
 import { HiBars3 } from 'react-icons/hi2';
 
-export interface NavbarProps {
-  onToggleClick: React.MouseEventHandler<HTMLButtonElement>;
-}
+import { Branding } from './Branding';
 
-export const Navbar = ({ onToggleClick }: NavbarProps) => {
+export const Navbar = () => {
   return (
-    <div className="flex w-full bg-slate-900 p-2 text-slate-300">
-      <button onClick={onToggleClick}>
-        <HiBars3 className="h-7 w-7" />
+    <div className="flex w-full justify-between bg-slate-900 p-2 text-slate-300">
+      <Branding />
+      <button>
+        <HiBars3 className="h-9 w-9" />
       </button>
     </div>
   );
