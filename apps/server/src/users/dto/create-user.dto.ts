@@ -22,9 +22,13 @@ export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
       type: 'string',
       pattern: isStrongPassword.source
     },
+    isAdmin: {
+      type: 'boolean',
+      nullable: true
+    },
     basePermissionLevel: {
       type: 'string',
-      // enum: []
+      enum: Object.values(BasePermissionLevel),
       nullable: true
     },
     groupNames: {
@@ -58,6 +62,12 @@ export class CreateUserDto {
   })
   password: string;
 
+  @ApiProperty({
+    description:
+      'Whether the user is an admin, in which case the frontend will render content for all groups the user has permission to access'
+  })
+  isAdmin?: boolean;
+  
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
     enum: BasePermissionLevel,

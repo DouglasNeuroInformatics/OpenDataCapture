@@ -20,6 +20,9 @@ export class UserEntity implements User {
   @Prop({ required: true, type: [{ ref: GroupEntity.name, type: MongooseSchema.Types.ObjectId }] })
   groups: GroupEntity[];
 
+  @Prop({ required: false })
+  isAdmin?: boolean;
+
   @Prop({ enum: BasePermissionLevel, type: String })
   basePermissionLevel?: BasePermissionLevel;
 

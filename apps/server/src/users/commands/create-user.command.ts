@@ -7,6 +7,7 @@ type CommandArgs = [string, string];
 
 interface CommandOptions {
   basePermissionLevel?: BasePermissionLevel;
+  isAdmin?: boolean;
   firstName?: string;
   lastName?: string;
 }
@@ -18,6 +19,7 @@ export class CreateUserCommand extends CommandRunner {
   }
 
   async run([username, password]: CommandArgs, options: CommandOptions): Promise<void> {
+    console.log(options);
     const user = await this.usersService.create({
       username,
       password,
@@ -27,23 +29,31 @@ export class CreateUserCommand extends CommandRunner {
   }
 
   @Option({
-    flags: '--basePermissionLevel <string>',
+    flags: '--isAdmin [boolean]',
+    required: false
+  })
+  parseIsAdmin(value: unknown): boolean {
+    return Boolean(value);
+  }
+
+  @Option({
+    flags: '--basePermissionLevel [string]',
     required: false,
     choices: Object.values(BasePermissionLevel)
   })
-  parseBasePermissionLevel(value?: unknown): BasePermissionLevel | undefined {
+  parseBasePermissionLevel(value?: string): BasePermissionLevel | undefined {
     if (value === undefined || Object.values(BasePermissionLevel).includes(value as BasePermissionLevel)) {
       return value as BasePermissionLevel | undefined;
     }
     throw new Error('Invalid option: ' + value);
   }
 
-  @Option({ flags: '--firstName <string>', required: false })
+  @Option({ flags: '--firstName [string]', required: false })
   parseFirstName(value?: string): string | undefined {
     return value;
   }
 
-  @Option({ flags: '--lastName <string>', required: false })
+  @Option({ flags: '--lastName [string]', required: false })
   parseLastName(value?: string): string | undefined {
     return value;
   }

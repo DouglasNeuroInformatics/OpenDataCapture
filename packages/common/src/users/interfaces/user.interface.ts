@@ -8,7 +8,8 @@ export interface User {
   password: string;
   groups: Group[];
   basePermissionLevel?: BasePermissionLevel;
+  isAdmin?: boolean;
   firstName?: string;
   lastName?: string;
-  preferences?: UserPreferences
+  preferences?: UserPreferences;
 }
