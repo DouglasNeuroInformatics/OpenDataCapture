@@ -4,7 +4,7 @@ import { Sex } from '@ddcp/common';
 import unidecode from 'unidecode';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
-import { Subject } from './entities/subject.entity';
+import { SubjectEntity } from './entities/subject.entity';
 import { SubjectsRepository } from './subjects.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';
@@ -13,7 +13,7 @@ import { CryptoService } from '@/crypto/crypto.service';
 export class SubjectsService {
   constructor(private readonly cryptoService: CryptoService, private readonly subjectsRepository: SubjectsRepository) {}
 
-  async create({ firstName, lastName, dateOfBirth, sex }: CreateSubjectDto): Promise<Subject> {
+  async create({ firstName, lastName, dateOfBirth, sex }: CreateSubjectDto): Promise<SubjectEntity> {
     const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
     if (await this.subjectsRepository.exists({ identifier })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
@@ -21,7 +21,7 @@ export class SubjectsService {
     return this.subjectsRepository.create({ identifier, firstName, lastName, dateOfBirth: new Date(dateOfBirth), sex });
   }
 
-  async findAll(): Promise<Subject[]> {
+  async findAll(): Promise<SubjectEntity[]> {
     return this.subjectsRepository.find();
   }
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FallbackProps } from 'react-error-boundary';
 
-import { Button } from '@/components/base';
+import { Button } from '@/components';
 
 export const ErrorFallback = ({ error }: FallbackProps) => {
   return (

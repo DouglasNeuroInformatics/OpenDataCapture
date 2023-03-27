@@ -4,7 +4,7 @@ import { ComponentMeta, ComponentStory } from '@storybook/react';
 
 import { Modal } from './Modal';
 
-import { Button } from '@/components/base';
+import { Button } from '@/components';
 
 export default {
   component: Modal,

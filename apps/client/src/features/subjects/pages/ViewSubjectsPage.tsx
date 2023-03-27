@@ -1,14 +1,14 @@
 import React from 'react';
 
-import { SubjectInterface } from 'common';
+import { Subject } from '@ddcp/common';
 
 import { SubjectsTable } from '../components/SubjectsTable';
 
-import { PageHeader, Spinner } from '@/components/core';
+import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 export const ViewSubjectsPage = () => {
-  const { data } = useFetch<SubjectInterface[]>('/api/subjects');
+  const { data } = useFetch<Subject[]>('/api/subjects');
 
   if (!data) {
     return <Spinner />;

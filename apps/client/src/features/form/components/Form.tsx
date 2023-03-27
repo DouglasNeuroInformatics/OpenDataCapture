@@ -9,7 +9,7 @@ import { DistributiveOmit, FieldValue, FormErrors, FormValues } from '../types';
 import { DateField, DateFieldProps } from './DateField';
 import { TextField, TextFieldProps } from './TextField';
 
-import { Button } from '@/components/base';
+import { Button } from '@/components';
 
 type FieldType = DistributiveOmit<TextFieldProps | DateFieldProps, 'name'>;
 

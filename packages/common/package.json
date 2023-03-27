@@ -28,6 +28,10 @@
     "./users": {
       "require": "./dist/cjs/users/index.js",
       "import": "./dist/mjs/users/index.js"
+    },
+    "./utils": {
+      "require": "./dist/cjs/utils/index.js",
+      "import": "./dist/mjs/utils/index.js"
     }
   },
   "scripts": {

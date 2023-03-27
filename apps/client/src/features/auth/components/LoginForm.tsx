@@ -4,7 +4,7 @@ import { loginCredentialsSchema } from '@ddcp/common';
 
 import { AuthAPI } from '../api/auth-api';
 
-import { Form, FormStructure } from '@/components/form';
+import { Form, FormStructure } from '@/components';
 import { useAuthStore } from '@/stores/auth-store';
 
 type LoginFormData = {

@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { range } from '@ddcp/common';
 import { clsx } from 'clsx';
-import { range } from 'common';
 
 export interface YearSelectorProps {
   currentDate: Date;

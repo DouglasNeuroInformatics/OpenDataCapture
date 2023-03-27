@@ -2,7 +2,7 @@ import React from 'react';
 
 import { JSONSchemaType } from 'ajv';
 
-import { FieldKind, Form, type FormStructure } from '@/components/form';
+import { FieldKind, Form, type FormStructure } from '@/components';
 
 type FormValues = {
   name: string;

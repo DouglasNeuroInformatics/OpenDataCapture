@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { SubjectInterface } from 'common';
+import { Subject } from '@ddcp/common';
 
-import { Dropdown, Table } from '@/components/core';
+import { Dropdown, Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 
 export interface SubjectTableProps {
-  data: SubjectInterface[];
+  data: Subject[];
 }
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
@@ -38,7 +38,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
           <Dropdown options={['CSV', 'JSON']} title="Export" onSelection={handleExportSelection} />
         </div>
       </div>
-      <Table
+      <Table<Subject>
         columns={[
           {
             name: 'Subject',
@@ -46,35 +46,11 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
           },
           {
             name: 'Date of Birth',
-            field: (subject) => subject.demographics.dateOfBirth
+            field: (subject) => subject.dateOfBirth
           },
           {
             name: 'Sex',
-            field: (subject) => subject.demographics.sex
-          },
-          {
-            name: 'Forward Sortation Area',
-            field: (subject) => subject.demographics.forwardSortationArea
-          },
-          {
-            name: 'Ethnicity',
-            field: (subject) => subject.demographics.ethnicity
-          },
-          {
-            name: 'Gender',
-            field: (subject) => subject.demographics.gender
-          },
-          {
-            name: 'Employment Status',
-            field: (subject) => subject.demographics.employmentStatus
-          },
-          {
-            name: 'Marital Status',
-            field: (subject) => subject.demographics.maritalStatus
-          },
-          {
-            name: 'First Language',
-            field: (subject) => subject.demographics.firstLanguage
+            field: (subject) => subject.sex
           }
         ]}
         data={data}

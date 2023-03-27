@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { Subject, SubjectSchema } from './entities/subject.entity';
+import { SubjectEntity, SubjectSchema } from './entities/subject.entity';
 import { SubjectsController } from './subjects.controller';
 import { SubjectsRepository } from './subjects.repository';
 import { SubjectsService } from './subjects.service';
@@ -13,7 +13,7 @@ import { CryptoModule } from '@/crypto/crypto.module';
     CryptoModule,
     MongooseModule.forFeature([
       {
-        name: Subject.name,
+        name: SubjectEntity.modelName,
         schema: SubjectSchema
       }
     ])

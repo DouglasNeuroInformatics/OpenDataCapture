@@ -1,12 +1,12 @@
 import { SetMetadata } from '@nestjs/common';
 
-import { Action, Subject } from '@ddcp/common/auth';
+import { AppAction, AppSubject } from '@ddcp/common/auth';
 
 type PublicRouteAccess = 'public';
 
 export type ProtectedRouteAccess = {
-  action: Action;
-  subject: Subject;
+  action: AppAction;
+  subject: AppSubject;
 };
 
 export type RouteAccessType = PublicRouteAccess | ProtectedRouteAccess;

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { DevTool } from '@hookform/devtools';
 import { ajvResolver } from '@hookform/resolvers/ajv';
 import { type JSONSchemaType } from 'ajv';
 import { fullFormats } from 'ajv-formats/dist/formats';
@@ -11,7 +10,7 @@ import { ArrayField } from '../ArrayField';
 import { PrimitiveField } from '../PrimitiveField';
 import { FormDataType, FormStructure } from '../types';
 
-import { Button } from '@/components/base';
+import { Button } from '@/components';
 
 export interface FormProps<T extends FormDataType> {
   className?: string;

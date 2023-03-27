@@ -4,11 +4,11 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import { Router } from './Router';
 
-import { ActiveSubject, Notifications } from '@/components/core';
+import { ActiveSubject, Notifications } from '@/components';
 import { ErrorFallback, SuspenseFallback } from '@/features/misc';
 
-import './services/axios';
 import './services/18n';
+import './services/axios';
 
 export const App = () => {
   return (

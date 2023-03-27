@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useDisclaimerStore } from '../stores/disclaimer-store';
 
-import { Button } from '@/components/base';
-import { Modal } from '@/components/core';
+import { Button, Modal } from '@/components';
 import { useAuthStore } from '@/stores/auth-store';
 
 export interface DisclaimerProps {

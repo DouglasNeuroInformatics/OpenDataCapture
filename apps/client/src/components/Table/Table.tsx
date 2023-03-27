@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
+import { DateUtils } from '@ddcp/common';
 import { clsx } from 'clsx';
-import { DateUtils } from 'common';
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,7 +32,7 @@ export interface TableProps<T> {
   entryLinkFactory?: (entry: T) => string;
 }
 
-export const Table = <T extends Record<string, unknown>>({ columns, data, entryLinkFactory }: TableProps<T>) => {
+export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, entryLinkFactory }: TableProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const navigate = useNavigate();

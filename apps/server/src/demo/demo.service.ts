@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
+import { Sex } from '@ddcp/common';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 
 import { CreateGroupDto } from '@/groups/dto/create-group.dto';
 import { GroupsService } from '@/groups/groups.service';
-import { Sex } from '@ddcp/common';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UsersService } from '@/users/users.service';

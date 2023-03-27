@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { IdentificationFormData } from '@/components/core';
+import { IdentificationFormData } from '@/components';
 
 export class SubjectsAPI {
   static async addSubject(data: IdentificationFormData) {

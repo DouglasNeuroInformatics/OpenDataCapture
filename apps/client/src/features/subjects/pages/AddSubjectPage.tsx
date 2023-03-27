@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { SubjectsAPI } from '../api/subjects.api';
+import { SubjectsAPI } from '../api/subjects-api';
 
-import { IdentificationForm, IdentificationFormData, PageHeader } from '@/components/core';
+import { IdentificationForm, IdentificationFormData, PageHeader } from '@/components';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 import { useNotificationsStore } from '@/stores/notifications-store';
 

@@ -1,9 +1,8 @@
 import React from 'react';
 
 import { composeStories } from '@storybook/testing-react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { expect } from 'vitest';
 
 import * as stories from './Form.stories';
 

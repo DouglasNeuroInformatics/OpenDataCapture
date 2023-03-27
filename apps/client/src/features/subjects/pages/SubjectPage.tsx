@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useParams } from 'react-router-dom';
 
-import { PageHeader, Spinner, Table } from '@/components/core';
+import { PageHeader, Spinner, Table } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 export const SubjectPage = () => {

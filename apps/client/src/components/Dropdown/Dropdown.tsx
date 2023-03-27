@@ -3,7 +3,7 @@ import React from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { HiChevronDown } from 'react-icons/hi2';
 
-import { Button } from '@/components/base';
+import { Button } from '@/components';
 
 export interface DropdownProps {
   title: string;

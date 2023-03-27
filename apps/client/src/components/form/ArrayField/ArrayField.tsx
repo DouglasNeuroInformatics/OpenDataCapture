@@ -5,7 +5,7 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { PrimitiveField } from '../PrimitiveField';
 import { FormDataRecord, FormFields } from '../types';
 
-import { Button } from '@/components/base';
+import { Button } from '@/components';
 
 export interface ArrayFieldProps<T extends FormDataRecord[] = FormDataRecord[]> {
   kind: 'array';

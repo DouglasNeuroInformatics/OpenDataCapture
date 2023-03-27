@@ -6,8 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Calendar } from './Calendar';
 import { YearSelector } from './YearSelector';
 
-import { ArrowToggle } from '@/components/core';
-import { TransitionOpacity } from '@/components/transitions';
+import { ArrowToggle, TransitionOpacity } from '@/components';
 
 interface IncrementAction {
   type: 'increment';

@@ -1,36 +1,30 @@
 import React from 'react';
 
+import { Random, Sex, Subject, range } from '@ddcp/common';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { Random, SubjectInterface, range } from 'common';
 import { MemoryRouter } from 'react-router-dom';
 
 import { Table, TableColumn } from './Table';
 
-const columns: TableColumn<SubjectInterface>[] = [
+const columns: TableColumn<Subject>[] = [
   {
     name: 'ID',
     field: 'identifier'
   },
   {
     name: 'Date of Birth',
-    field: (subject) => subject.demographics.dateOfBirth
+    field: (subject) => subject.dateOfBirth
   },
   {
     name: 'Sex',
-    field: (subject) => subject.demographics.sex
-  },
-  {
-    name: 'Ethnicity',
-    field: (subject) => subject.demographics.ethnicity
+    field: (subject) => subject.sex
   }
 ];
 
-const data: SubjectInterface[] = range(25).map((i) => ({
+const data: Subject[] = range(25).map((i) => ({
   identifier: i.toString(),
-  demographics: {
-    dateOfBirth: Random.birthday(),
-    sex: Random.int(0, 1) === 0 ? 'male' : 'female'
-  }
+  dateOfBirth: Random.birthday(),
+  sex: Random.int(0, 1) === 0 ? Sex.Male : Sex.Female
 }));
 
 export default {
@@ -40,7 +34,7 @@ export default {
     data,
     entryLinkFactory: () => 'foo'
   }
-} as ComponentMeta<typeof Table<SubjectInterface>>;
+} as ComponentMeta<typeof Table<Subject>>;
 
 const Template: ComponentStory<typeof Table> = (args) => (
   <MemoryRouter>

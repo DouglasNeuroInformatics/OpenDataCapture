@@ -2,10 +2,10 @@ import { MongoAbility, RawRuleOf } from '@casl/ability';
 
 import { Group } from '../../groups';
 
-export type Action = 'create' | 'read' | 'update' | 'delete' | 'manage';
+export type AppAction = 'create' | 'read' | 'update' | 'delete' | 'manage';
 
-export type Subject = 'Group' | Group | 'User' | 'Subject' | 'Instrument' | 'all';
+export type AppSubject = 'Group' | Group | 'User' | 'Subject' | 'Instrument' | 'all';
 
-export type AppAbility = MongoAbility<[Action, Subject]>;
+export type AppAbility = MongoAbility<[AppAction, AppSubject]>;
 
 export type Permissions = RawRuleOf<AppAbility>[];

@@ -4,7 +4,7 @@ import { HiUsers } from 'react-icons/hi2';
 
 import { StatisticCard } from '../components/StatisticCard';
 
-import { PageHeader } from '@/components/core';
+import { PageHeader } from '@/components';
 import { useAuthStore } from '@/stores/auth-store';
 
 export const OverviewPage = () => {

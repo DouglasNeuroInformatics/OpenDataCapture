@@ -4,8 +4,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import { HiCheck } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
-import { Button } from '@/components/base';
-import { PageHeader, Spinner } from '@/components/core';
+import { Button, PageHeader, Spinner } from '@/components';
 import { LineGraph } from '@/components/graph';
 import { useFetch } from '@/hooks/useFetch';
 

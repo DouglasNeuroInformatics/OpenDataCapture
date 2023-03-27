@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
+import { DateUtils } from '@ddcp/common';
 import { Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
-import { DateUtils } from 'common';
 
 import { useField } from '../hooks/useField';
 import { BaseFieldProps } from '../types';
 
-import { DatePicker } from '@/components/core';
+import { DatePicker } from '@/components';
 
 export interface DateFieldProps extends BaseFieldProps {
   kind: 'date';
