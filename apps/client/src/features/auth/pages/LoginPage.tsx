@@ -20,7 +20,8 @@ export const LoginPage = () => {
         <div className="mt-3 w-full">
           <LoginForm onSuccess={() => navigate('/home')} />
         </div>
-        <Footer className="p-0" />
+        <br className="my-2" />
+        <Footer showOrgInfo={false} />
       </div>
     </div>
   );
