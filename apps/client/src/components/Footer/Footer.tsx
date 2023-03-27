@@ -18,25 +18,28 @@ const GIT_COMMIT_DATE = import.meta.env.VITE_DEV_GIT_COMMIT_DATE;
 
 export interface FooterProps {
   showDevInfo?: boolean;
+  showLinks?: boolean;
 }
 
-export const Footer = ({ showDevInfo = DEV }: FooterProps) => {
+export const Footer = ({ showDevInfo = DEV, showLinks = true }: FooterProps) => {
   const { t } = useTranslation();
 
   return (
     <footer className="py-4 text-slate-600">
-      <div className="mb-3 flex justify-center gap-8">
-        <a href={DOCS_URL} rel="noreferrer" target="_blank">
-          Documentation
-        </a>
-        <a href={LICENSE_URL} rel="noreferrer" target="_blank">
-          License
-        </a>
-        <a href={SOURCE_URL} rel="noreferrer" target="_blank">
-          Source Code
-        </a>
-        <Link to="/contact">Contact</Link>
-      </div>
+      {showLinks && (
+        <div className="mb-3 flex justify-center gap-8">
+          <a href={DOCS_URL} rel="noreferrer" target="_blank">
+            Documentation
+          </a>
+          <a href={LICENSE_URL} rel="noreferrer" target="_blank">
+            License
+          </a>
+          <a href={SOURCE_URL} rel="noreferrer" target="_blank">
+            Source Code
+          </a>
+          <Link to="/contact">Contact</Link>
+        </div>
+      )}
       <p className="text-center text-sm text-slate-500">
         &copy; {CURRENT_YEAR} {t('organizationName')}
       </p>

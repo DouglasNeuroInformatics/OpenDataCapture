@@ -21,7 +21,7 @@ export const LoginPage = () => {
           <LoginForm onSuccess={() => navigate('/overview')} />
         </div>
         <br className="my-2" />
-        <Footer showOrgInfo={false} />
+        <Footer showLinks={false} />
       </div>
     </div>
   );
