@@ -16,9 +16,13 @@ export const Layout = () => {
       <div className="hidden md:flex md:flex-shrink-0">
         <Sidebar />
       </div>
-      <main className="container flex-grow overflow-scroll">
-        <Outlet />
-      </main>
+      <div className="container flex flex-grow flex-col overflow-scroll">
+        <main>
+          <Outlet />
+        </main>
+        <hr className="mt-auto" />
+        <Footer />
+      </div>
     </div>
   );
 };

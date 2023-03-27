@@ -4,7 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { Layout } from './components';
 import { LoginPage } from './features/auth';
-import { HomePage } from './features/misc';
+import { ContactPage } from './features/contact';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
@@ -18,7 +18,7 @@ export const Router = () => {
         {accessToken ? (
           <Route element={<Layout />}>
             <Route index element={<OverviewPage />} path="overview" />
-            <Route element={<HomePage />} path="home" />
+            <Route element={<ContactPage />} path="contact" />
             <Route element={<UserPage />} path="user" />
           </Route>
         ) : (
