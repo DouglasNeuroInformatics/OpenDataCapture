@@ -1,11 +1,8 @@
 import React from 'react';
 
-import { useTranslation } from 'react-i18next';
-
 import { Branding } from './Branding';
 import { Navigation } from './Navigation';
 import { UserDropup } from './UserDropup';
-
 
 export const Sidebar = () => {
   return (

@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 
 const NavigationLink = ({ href, label, icon }: { href: string; label: string; icon: React.ReactElement }) => {
   return (
-    <NavLink className="flex items-center p-2 hover:bg-slate-800" to={href}>
+    <NavLink className="flex items-center p-2 text-sm hover:bg-slate-800 md:text-base" to={href}>
       {icon}
       <span className="ml-2">{label}</span>
     </NavLink>
