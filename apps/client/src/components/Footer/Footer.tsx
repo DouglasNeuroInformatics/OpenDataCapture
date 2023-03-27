@@ -1,48 +1,53 @@
 import React from 'react';
 
-import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
-import { FaGithub } from 'react-icons/fa';
+import { FaEnvelope, FaGithub, FaGlobe } from 'react-icons/fa';
+
+import { DevInfo } from './DevInfo';
+import { IconLink } from './IconLink';
 
 const currentYear = new Date().getFullYear();
 
 export interface FooterProps {
-  className?: string;
+  showDevInfo: boolean;
+  docsURL: string;
+  licenseURL: string;
+  sourceURL: string;
+  ghRepoURL: string;
+  ghOrgURL: string;
+  contactEmail: string;
+  orgWebsite: string;
 }
 
-export const Footer = ({ className }: FooterProps) => {
+export const Footer = ({
+  showDevInfo = import.meta.env.DEV,
+  docsURL = import.meta.env.VITE_DOCS_URL,
+  licenseURL = import.meta.env.VITE_LICENSE_URL,
+  sourceURL = import.meta.env.DEV
+    ? `${import.meta.env.VITE_GITHUB_REPO_URL}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT!}`
+    : import.meta.env.VITE_GITHUB_REPO_URL,
+  ghOrgURL = import.meta.env.VITE_GITHUB_ORG_URL,
+  contactEmail = import.meta.env.VITE_CONTACT_EMAIL,
+  orgWebsite = import.meta.env.VITE_ORG_WEBSITE
+}: FooterProps) => {
   const { t } = useTranslation();
   return (
-    <footer className={clsx('@container/footer container mx-auto text-sm text-gray-500', className)}>
-      <hr />
-      <div className="w-full py-5">
-        <p className="mb-1 text-center">
+    <footer>
+      <div className="flex justify-center gap-5 text-lg">
+        <IconLink href={ghOrgURL} icon={<FaGithub />} />
+        <IconLink href={orgWebsite} icon={<FaGlobe />} />
+        <IconLink href={`mailto:${contactEmail}`} icon={<FaEnvelope />} />
+      </div>
+      <div className="my-2 flex justify-center gap-5 text-sm">
+        <a href={docsURL}>Documentation</a>
+        <a href={licenseURL}>License</a>
+        <a href={sourceURL}>Source Code</a>
+      </div>
+      {showDevInfo && <DevInfo />}
+      <div className="text-sm">
+        <p className="text-center">
           &copy; {currentYear} {t('organizationName')}
         </p>
-        <div className="@lg/footer:gap-3 flex flex-wrap items-center justify-center">
-          {import.meta.env.DEV && (
-            <>
-              <span className="@lg/footer:w-auto w-full text-center">
-                Branch: &apos;{import.meta.env.VITE_DEV_GIT_BRANCH}&apos;
-              </span>
-              <span className="@lg/footer:block hidden">|</span>
-              <span className="@lg/footer:w-auto w-full text-center">
-                Last Commit on {import.meta.env.VITE_DEV_GIT_COMMIT_DATE}: &apos;
-                {import.meta.env.VITE_DEV_GIT_COMMIT?.slice(0, 7)}
-              </span>
-              <span className="@lg/footer:block hidden"> |</span>
-            </>
-          )}
-          <a
-            className="@lg/footer:w-auto flex w-full items-center justify-center"
-            href={`${import.meta.env.VITE_PROJECT_URL}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT!}`}
-            rel="noreferrer"
-            target="_blank"
-          >
-            <span className="text-center">{t('footer.viewSourceCode')}</span>
-            <FaGithub className="ml-1" />
-          </a>
-        </div>
       </div>
     </footer>
   );
