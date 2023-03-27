@@ -30,6 +30,7 @@ export class AuthService {
 
     const payload: JwtPayload = {
       username: user.username,
+      isAdmin: user.isAdmin,
       permissions: this.permissionsFactory.createForUser(user).rules,
       firstName: user.firstName,
       lastName: user.lastName

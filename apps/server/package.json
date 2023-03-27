@@ -37,7 +37,8 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "unidecode": "^0.1.8"
   },
   "devDependencies": {
     "@golevelup/ts-jest": "^0.3.4",
@@ -50,6 +51,7 @@
     "@types/passport": "^1.0.12",
     "@types/passport-jwt": "^3.0.8",
     "@types/supertest": "^2.0.11",
+    "@types/unidecode": "^0.1.1",
     "jest": "29.3.1",
     "source-map-support": "^0.5.20",
     "supertest": "^6.1.3",

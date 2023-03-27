@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+import { Sex } from '@ddcp/common';
 import { HydratedDocument } from 'mongoose';
 
-import { Sex } from '../enums/sex.enum';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class Subject {

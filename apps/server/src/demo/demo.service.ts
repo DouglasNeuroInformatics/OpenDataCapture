@@ -1,20 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
-import { BasePermissionLevel } from '@ddcp/common';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 
+import { CreateGroupDto } from '@/groups/dto/create-group.dto';
 import { GroupsService } from '@/groups/groups.service';
+import { Sex } from '@ddcp/common';
+import { SubjectsService } from '@/subjects/subjects.service';
+import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UsersService } from '@/users/users.service';
 
 faker.seed(123);
 
 export interface InitDemoOptions {
-  defaultAdmin: {
-    username: string;
-    password: string;
-  };
+  groups: CreateGroupDto[];
+  users: CreateUserDto[];
+  nSubjects: number;
 }
 
 @Injectable()
@@ -25,14 +27,27 @@ export class DemoService {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     private readonly groupsService: GroupsService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly subjectsService: SubjectsService
   ) {}
 
-  async initDemo(options: InitDemoOptions): Promise<void> {
+  async initDemo({ groups, users, nSubjects }: InitDemoOptions): Promise<void> {
     this.logger.verbose(`Initializing demo database: '${this.connection.name}'`);
     await this.dropDatabase();
-    await this.createDemoAdmin(options.defaultAdmin);
-    // await this.createDemoGroupsWithUsers({ groups: 2, users: 2 });
+    for (const group of groups) {
+      await this.groupsService.create(group);
+    }
+    for (const user of users) {
+      await this.usersService.create(user);
+    }
+    for (let i = 0; i < nSubjects; i++) {
+      await this.subjectsService.create({
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+        dateOfBirth: faker.date.birthdate().toISOString(),
+        sex: faker.name.sexType() === 'female' ? Sex.Female : Sex.Male
+      });
+    }
   }
 
   private async dropDatabase(): Promise<void> {
@@ -43,12 +58,16 @@ export class DemoService {
     return this.connection.dropDatabase();
   }
 
-  private async createDemoAdmin({ username, password }: { username: string; password: string }): Promise<void> {
-    this.logger.verbose(`Creating default admin user '${username}' with password '${password}'...`);
-    await this.usersService.create({ username, password, basePermissionLevel: BasePermissionLevel.Admin });
+  /*
+
+
+
+  private async createDemoGroups(groupNames: string[]): Promise<void> {
+    for (const name of groupNames) {
+      await this.groupsService.create({ name });
+    }
   }
 
-  /*
 
   private async createDemoGroupsWithUsers(n: { groups: number; users: number }): Promise<void> {
     for (let i = 0; i < n.groups; i++) {

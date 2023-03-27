@@ -1,4 +1,4 @@
-import { Sex } from '../enums/sex.enum';
+import { Sex } from '@ddcp/common';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 

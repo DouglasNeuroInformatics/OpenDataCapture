@@ -1,8 +1,10 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 
+import { Sex } from '@ddcp/common';
+import unidecode from 'unidecode';
+
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { Subject } from './entities/subject.entity';
-import { Sex } from './enums/sex.enum';
 import { SubjectsRepository } from './subjects.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';
@@ -25,21 +27,11 @@ export class SubjectsService {
 
   generateIdentifier(firstName: string, lastName: string, dateOfBirth: Date, sex: Sex): string {
     const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
-    const source = this.sanitizeStr(firstName + lastName) + this.sanitizeStr(shortDateOfBirth, true) + sex;
+    const source = this.sanitizeStr(firstName + lastName + shortDateOfBirth + sex);
     return this.cryptoService.hash(source);
   }
 
-  private sanitizeStr(s: string, allowNumericChars = false, validSpecialChars = /[-\s]/g): string {
-    s = s
-      .toUpperCase()
-      .replace(validSpecialChars, '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-    const invalidRegExp = allowNumericChars ? /[^A-Z0-9]/g : /[^A-Z]/g;
-    const invalidChars = s.toUpperCase().match(invalidRegExp);
-    if (invalidChars) {
-      throw new Error(`The following characters are invalid: ${invalidChars.join(', ')}`);
-    }
-    return s;
+  private sanitizeStr(s: string): string {
+    return unidecode(s.toUpperCase().replaceAll('-', ''));
   }
 }
