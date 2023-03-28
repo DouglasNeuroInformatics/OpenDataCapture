@@ -7,7 +7,7 @@ import { Schema as MongooseSchema } from 'mongoose';
 import { FormDetailsSchema } from './form-details-entity';
 import { FormFieldSchema } from './form-field.entity';
 
-@Schema({ strict: 'throw' })
+@Schema()
 export class FormInstrumentEntity implements FormInstrument {
   kind: InstrumentKind.Form;
   name: string;

@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BaseInstrument, InstrumentKind } from '@ddcp/common';
 import { HydratedDocument } from 'mongoose';
 
-@Schema({ discriminatorKey: 'kind', strict: 'throw', timestamps: true })
+@Schema({ discriminatorKey: 'kind', strict: false, timestamps: true })
 export class InstrumentEntity implements BaseInstrument {
   static readonly modelName = 'Instrument';
 

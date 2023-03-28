@@ -2,11 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { Sex } from '@ddcp/common';
+import { happinessQuestionnaire } from '@ddcp/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 
 import { CreateGroupDto } from '@/groups/dto/create-group.dto';
 import { GroupsService } from '@/groups/groups.service';
+import { FormInstrumentsService } from '@/instruments/services/form-instruments.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UsersService } from '@/users/users.service';
@@ -28,7 +30,8 @@ export class DemoService {
     @InjectConnection() private readonly connection: Connection,
     private readonly groupsService: GroupsService,
     private readonly usersService: UsersService,
-    private readonly subjectsService: SubjectsService
+    private readonly subjectsService: SubjectsService,
+    private readonly formInstrumentsService: FormInstrumentsService
   ) {}
 
   async initDemo({ groups, users, nSubjects }: InitDemoOptions): Promise<void> {
@@ -48,6 +51,7 @@ export class DemoService {
         sex: faker.name.sexType() === 'female' ? Sex.Female : Sex.Male
       });
     }
+    await this.formInstrumentsService.create(happinessQuestionnaire);
   }
 
   private async dropDatabase(): Promise<void> {
@@ -57,30 +61,4 @@ export class DemoService {
     }
     return this.connection.dropDatabase();
   }
-
-  /*
-
-
-
-  private async createDemoGroups(groupNames: string[]): Promise<void> {
-    for (const name of groupNames) {
-      await this.groupsService.create({ name });
-    }
-  }
-
-
-  private async createDemoGroupsWithUsers(n: { groups: number; users: number }): Promise<void> {
-    for (let i = 0; i < n.groups; i++) {
-      const name = faker.company.name();
-      await this.groupsService.create({ name });
-      for (let j = 0; j < n.users; j++) {
-        await this.usersService.create({
-          username: faker.internet.userName(),
-          password: faker.internet.password(),
-          groupNames: [name]
-        });
-      }
-    }
-  }
-  */
 }

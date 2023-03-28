@@ -11,7 +11,8 @@ import { EntityRepository } from '@/core/abstract/entity.repository';
 @Injectable()
 export class InstrumentsRepository extends EntityRepository<InstrumentEntity, InstrumentDocument> {
   constructor(
-    @InjectModel(InstrumentEntity.modelName) instrumentModel: Model<InstrumentDocument, AccessibleModel<InstrumentDocument>>
+    @InjectModel(InstrumentEntity.modelName)
+    instrumentModel: Model<InstrumentDocument, AccessibleModel<InstrumentDocument>>
   ) {
     super(instrumentModel);
   }
