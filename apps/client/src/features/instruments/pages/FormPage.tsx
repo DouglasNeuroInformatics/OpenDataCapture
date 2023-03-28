@@ -1,15 +1,43 @@
 import React from 'react';
 
+import { FormInstrument } from '@ddcp/common';
+import { HiOutlineDocumentCheck, HiOutlinePrinter, HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
+import { PageHeader, Spinner, Stepper } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 export const FormPage = () => {
   const params = useParams();
 
-  const { data } = useFetch(`/instruments/forms/${params.id!}`);
+  const { data } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
 
-  console.log(data);
+  if (!data) {
+    return <Spinner />;
+  }
 
-  return <h1>Work in Progress!</h1>;
+  return (
+    <div>
+      <PageHeader title={data.details.title} />
+      <Stepper
+        steps={[
+          {
+            element: <span>1</span>,
+            label: 'Overview',
+            icon: <HiOutlineDocumentCheck />
+          },
+          {
+            element: <span>2</span>,
+            label: 'Questions',
+            icon: <HiOutlineQuestionMarkCircle />
+          },
+          {
+            element: <span>3</span>,
+            label: 'Summary',
+            icon: <HiOutlinePrinter />
+          }
+        ]}
+      />
+    </div>
+  );
 };

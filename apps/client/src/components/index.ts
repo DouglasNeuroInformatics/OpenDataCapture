@@ -15,5 +15,6 @@ export * from './Modal';
 export * from './Notifications';
 export * from './PageHeader';
 export * from './Spinner';
+export * from './Stepper';
 export * from './Table';
 export * from './TransitionOpacity';
