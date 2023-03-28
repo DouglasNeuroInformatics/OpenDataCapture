@@ -5,7 +5,7 @@ import { CreateFormDto } from '../dto/create-form.dto';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-@ApiTags('Instruments', 'Forms')
+@ApiTags('Forms')
 @Controller('instruments/forms')
 export class FormsController {
   @ApiOperation({ summary: 'Create a New Form' })
