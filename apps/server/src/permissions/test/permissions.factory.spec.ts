@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { PermissionsFactory } from '@/permissions/permissions.factory';
 import { BasePermissionLevel } from '@ddcp/common';
+
+import { PermissionsFactory } from '@/permissions/permissions.factory';
 
 describe('PermissionsFactory', () => {
   let permissionsFactory: PermissionsFactory;
