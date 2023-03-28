@@ -1,9 +1,13 @@
 import React from 'react';
 
+import { PageHeader } from '@/components';
+
 export const ContactPage = () => {
   return (
     <div>
-      <h1>Contact</h1>
+      <PageHeader
+        title="Contact Us"
+      />
     </div>
-  )
-}
+  );
+};

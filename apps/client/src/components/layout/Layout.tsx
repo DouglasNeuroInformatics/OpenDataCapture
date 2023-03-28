@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { Outlet } from 'react-router-dom';
 
@@ -8,15 +8,17 @@ import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 
 export const Layout = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">
       <div className="md:hidden">
-        <Navbar />
+        <Navbar containerRef={containerRef} />
       </div>
       <div className="hidden md:flex md:flex-shrink-0">
         <Sidebar />
       </div>
-      <div className="container flex flex-grow flex-col overflow-scroll">
+      <div className="container flex flex-grow flex-col overflow-scroll" ref={containerRef}>
         <main>
           <Outlet />
         </main>

@@ -29,7 +29,7 @@ export class UsersService {
 
     const groups: GroupEntity[] = [];
     for (let i = 0; i < (groupNames?.length ?? 0); i++) {
-      groups.push(await this.groupsService.findByName(groupNames![i]));
+      groups.push(await this.groupsService.findOne(groupNames![i]));
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(password);
@@ -50,7 +50,7 @@ export class UsersService {
 
   /** Returns user with provided username if found, otherwise throws */
   async findByUsername(username: string): Promise<UserEntity> {
-    const user = await this.usersRepository.findOne({ filter: { username } });
+    const user = await this.usersRepository.findOne({ username });
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }

@@ -1,9 +1,8 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { AuthPayload } from '@ddcp/common';
-
 import { AuthService } from './auth.service';
+import { AccessTokenDto } from './dto/access-token.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -13,11 +12,11 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ description: 'Request an access token using credentials', summary: 'Login' })
+  @ApiOperation({ description: 'Request an access token using credentials' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @RouteAccess('public')
-  login(@Body() { username, password }: LoginCredentialsDto): Promise<AuthPayload> {
+  login(@Body() { username, password }: LoginCredentialsDto): Promise<AccessTokenDto> {
     return this.authService.login(username, password);
   }
 }

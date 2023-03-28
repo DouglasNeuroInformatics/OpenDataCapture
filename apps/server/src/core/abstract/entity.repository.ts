@@ -11,12 +11,6 @@ import {
   UpdateQuery
 } from 'mongoose';
 
-interface FindMethodArgs<T, TDoc = HydratedDocument<T>> {
-  filter?: FilterQuery<TDoc>;
-  projection?: ProjectionType<TDoc>;
-  options?: QueryOptions<TDoc>;
-}
-
 /**
  * The EntityRepository abstract class is inherited by the repository classes
  * in each module. It defines a core set of behavior common across the application
@@ -30,17 +24,28 @@ export abstract class EntityRepository<T, TDoc = HydratedDocument<T>> {
     this.logger = new Logger(`${EntityRepository.name}: ${model.modelName}`);
   }
 
+  /** Inserts a new entity into the database  */
   create(entity: T): Promise<TDoc> {
     this.logger.verbose(`Creating document with the following data: ${JSON.stringify(entity)}`);
     return this.model.create(entity);
   }
 
-  find(args: FindMethodArgs<T> = {}): QueryWithHelpers<TDoc[], TDoc, AccessibleModel<TDoc>> {
-    return this.model.find(args.filter ?? {}, args.projection, args.options);
+  /** Returns all matching entities */
+  find(
+    filter?: FilterQuery<TDoc>,
+    projection?: ProjectionType<TDoc>,
+    options?: QueryOptions<TDoc>
+  ): QueryWithHelpers<TDoc[], TDoc, AccessibleModel<TDoc>> {
+    return this.model.find(filter ?? {}, projection, options);
   }
 
-  findOne(args: FindMethodArgs<T> = {}): QueryWithHelpers<TDoc | null, TDoc, AccessibleModel<TDoc>> {
-    return this.model.findOne(args.filter ?? {}, args.projection, args.options);
+  /** Returns the first matching entity or null */
+  findOne(
+    filter: FilterQuery<TDoc>,
+    projection?: ProjectionType<TDoc>,
+    options?: QueryOptions<TDoc>
+  ): QueryWithHelpers<TDoc | null, TDoc, AccessibleModel<TDoc>> {
+    return this.model.findOne(filter, projection, options);
   }
 
   findOneAndUpdate(

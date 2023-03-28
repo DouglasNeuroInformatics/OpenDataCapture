@@ -5,7 +5,11 @@ import { HiBars3 } from 'react-icons/hi2';
 import { Branding } from './Branding';
 import { Navigation } from './Navigation';
 
-export const Navbar = () => {
+export interface NavbarProps {
+  containerRef: React.RefObject<HTMLDivElement>;
+}
+
+export const Navbar = ({ containerRef }: NavbarProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownHeight, setDropdownHeight] = useState(0);
@@ -20,10 +24,14 @@ export const Navbar = () => {
       });
       setDropdownHeight(sum);
     }
+    if (containerRef.current) {
+      containerRef.current.style.overflow = 'hidden';
+      containerRef.current.classList.add('backdrop-blur-3xl');
+    }
   }, [isOpen]);
 
   return (
-    <div className="flex flex-col bg-slate-900 text-slate-300 duration-700 px-2">
+    <div className="flex flex-col bg-slate-900 px-2 text-slate-300 duration-700">
       <div className="flex w-full justify-between py-2">
         <Branding />
         <button type="button" onClick={() => setIsOpen(!isOpen)}>

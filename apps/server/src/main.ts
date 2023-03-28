@@ -26,6 +26,7 @@ async function bootstrap(): Promise<void> {
       'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/'
     )
     .addTag('Authentication')
+    .addTag('Groups')
     .addTag(
       'Users',
       "The following methods for adding, modifying, and deleting users are exclusively available to 'system-admin' users. As a result, they are not implemented in our web app and can only be accessed through programmatic use."
