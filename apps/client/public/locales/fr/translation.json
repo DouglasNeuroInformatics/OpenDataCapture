@@ -25,7 +25,7 @@
       "lookupSubject": "Trouver un client",
       "viewSubjects": "Afficher tous les clients",
       "create": "Ajouter un instrument",
-      "forms": "Afficher tous les instruments"
+      "available": "Afficher tous les instruments"
     }
   },
   "userDropup": {

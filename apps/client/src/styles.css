@@ -4,27 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  h1 {
-    @apply mt-0 mb-2 text-5xl font-medium leading-tight text-slate-900;
-  }
-  h2 {
-    @apply mt-0 mb-2 text-4xl font-medium leading-tight text-slate-900;
-  }
-  h3 {
-    @apply mt-0 mb-2 text-3xl font-medium leading-tight text-slate-900;
-  }
-  h4 {
-    @apply mt-0 mb-2 text-2xl font-medium leading-tight text-slate-900;
-  }
-  h5 {
-    @apply mt-0 mb-2 text-xl font-medium leading-tight text-slate-900;
-  }
-  h6 {
-    @apply mt-0 mb-2 text-base font-medium leading-tight text-slate-900;
-  }
-}
-
 @layer components {
   .btn {
     @apply flex w-fit items-center justify-center rounded-md font-medium shadow-sm hover:opacity-80 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70;
