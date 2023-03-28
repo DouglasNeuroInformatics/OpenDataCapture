@@ -12,7 +12,7 @@ export class FormInstrumentEntity implements FormInstrument {
   name: string;
   tags: string[];
   version: number;
-
+  
   @Prop({ required: true, type: FormDetailsSchema })
   details: FormDetails;
 

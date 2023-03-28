@@ -10,7 +10,7 @@ export class InstrumentEntity implements BaseInstrument {
   @Prop({ enum: InstrumentKind, required: true, type: String })
   kind: InstrumentKind;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })

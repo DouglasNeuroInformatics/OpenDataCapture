@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { InstrumentKind } from '@ddcp/common';
 import { Schema } from 'mongoose';
 
-import { FormsController } from './controllers/forms.controller';
+import { InstrumentsController } from './controllers/instruments.controller';
 import { FormInstrumentRecordSchema } from './entities/form-instrument-record.entity';
 import { FormInstrumentSchema } from './entities/form-instrument.entity';
 import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity';
@@ -45,7 +45,7 @@ interface InstrumentDiscriminator {
     ]),
     SubjectsModule
   ],
-  controllers: [FormsController],
+  controllers: [InstrumentsController],
   providers: [InstrumentsRepository, InstrumentRecordsRepository],
   exports: []
 })
