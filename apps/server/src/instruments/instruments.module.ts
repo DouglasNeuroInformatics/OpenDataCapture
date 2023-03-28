@@ -5,7 +5,9 @@ import { InstrumentKind } from '@ddcp/common';
 import { Schema } from 'mongoose';
 
 import { FormsController } from './controllers/forms.controller';
+import { FormInstrumentRecordSchema } from './entities/form-instrument-record.entity';
 import { FormInstrumentSchema } from './entities/form-instrument.entity';
+import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity';
 import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
 import { InstrumentsRepository } from './instruments.repository';
 
@@ -26,6 +28,16 @@ interface InstrumentDiscriminator {
           {
             name: InstrumentKind.Form,
             schema: FormInstrumentSchema
+          }
+        ] satisfies InstrumentDiscriminator[]
+      },
+      {
+        name: InstrumentRecordEntity.modelName,
+        schema: InstrumentRecordSchema,
+        discriminators: [
+          {
+            name: InstrumentKind.Form,
+            schema: FormInstrumentRecordSchema
           }
         ] satisfies InstrumentDiscriminator[]
       }
