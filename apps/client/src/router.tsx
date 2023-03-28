@@ -5,7 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components';
 import { LoginPage } from './features/auth';
 import { ContactPage } from './features/contact';
-import { AddInstrumentPage, InstrumentPage, ViewInstrumentsPage } from './features/instruments';
+import { AvailableFormsPage, CreateInstrumentPage, FormPage } from './features/instruments';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
 import { AddSubjectPage, SubjectPage, SubjectRecordsPage, ViewSubjectsPage } from './features/subjects';
 import { UserPage } from './features/user';
@@ -31,9 +31,11 @@ export const Router = () => {
               </Route>
             </Route>
             <Route path="instruments">
-              <Route element={<AddInstrumentPage />} path="add-instrument" />
-              <Route element={<ViewInstrumentsPage />} path="view-instruments" />
-              <Route element={<InstrumentPage />} path=":id" />
+              <Route element={<CreateInstrumentPage />} path="create" />
+              <Route path="forms">
+                <Route index element={<AvailableFormsPage />} />
+                <Route element={<FormPage />} path=":id" />
+              </Route>
             </Route>
           </Route>
         ) : (

@@ -4,10 +4,10 @@ import { FormInstrumentBuilder } from '../components/FormInstrumentBuilder';
 
 import { PageHeader } from '@/components';
 
-export const AddInstrumentPage = () => {
+export const CreateInstrumentPage = () => {
   return (
     <div>
-      <PageHeader title="Add Instrument" />
+      <PageHeader title="Create Instrument" />
       <FormInstrumentBuilder />
     </div>
   );

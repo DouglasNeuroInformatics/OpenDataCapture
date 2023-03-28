@@ -26,18 +26,8 @@ export const Navigation = (props: NavigationProps) => {
         label={t(`sidebar.links.viewSubjects`)}
         {...props}
       />
-      <NavigationLink
-        href="/instruments/add-instrument"
-        icon={<HiPlus />}
-        label={t('sidebar.links.addInstrument')}
-        {...props}
-      />
-      <NavigationLink
-        href="/instruments/view-instruments"
-        icon={<HiEye />}
-        label={t('sidebar.links.viewInstruments')}
-        {...props}
-      />
+      <NavigationLink href="/instruments/create" icon={<HiPlus />} label={t('sidebar.links.create')} {...props} />
+      <NavigationLink href="/instruments/forms" icon={<HiEye />} label={t('sidebar.links.forms')} {...props} />
     </nav>
   );
 };

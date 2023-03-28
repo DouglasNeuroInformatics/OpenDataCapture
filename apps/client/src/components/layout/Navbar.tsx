@@ -24,10 +24,6 @@ export const Navbar = ({ containerRef }: NavbarProps) => {
       });
       setDropdownHeight(sum);
     }
-    if (containerRef.current) {
-      containerRef.current.style.overflow = 'hidden';
-      containerRef.current.classList.add('backdrop-blur-3xl');
-    }
   }, [isOpen]);
 
   return (

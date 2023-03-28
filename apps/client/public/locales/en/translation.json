@@ -26,8 +26,8 @@
       "addSubject": "Add Subject",
       "lookupSubject": "Lookup Subject",
       "viewSubjects": "View Subjects",
-      "addInstrument": "Add Instrument",
-      "viewInstruments": "View Instruments"
+      "create": "Add Instrument",
+      "forms": "View Instruments"
     }
   },
   "userDropup": {
