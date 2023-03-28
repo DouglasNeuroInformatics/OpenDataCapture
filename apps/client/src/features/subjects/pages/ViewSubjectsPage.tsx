@@ -8,7 +8,7 @@ import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 export const ViewSubjectsPage = () => {
-  const { data } = useFetch<Subject[]>('/api/subjects');
+  const { data } = useFetch<Subject[]>('/subjects');
 
   if (!data) {
     return <Spinner />;

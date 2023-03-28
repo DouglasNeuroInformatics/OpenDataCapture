@@ -7,6 +7,7 @@ export * from './interfaces/base-instrument.interface';
 export * from './interfaces/form-details.interface';
 export * from './interfaces/form-field.interface';
 export * from './interfaces/form-instrument.interface';
+export * from './interfaces/instrument-record.interface';
 export * from './interfaces/json-instrument.interface';
 
 export * from './schemas/form-details.schema';

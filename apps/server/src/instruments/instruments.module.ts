@@ -6,7 +6,7 @@ import { Schema } from 'mongoose';
 
 import { FormsController } from './controllers/forms.controller';
 import { FormInstrumentSchema } from './entities/form-instrument.entity';
-import { Instrument, InstrumentSchema } from './entities/instrument.entity';
+import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
 import { InstrumentsRepository } from './instruments.repository';
 
 import { SubjectsModule } from '@/subjects/subjects.module';
@@ -20,7 +20,7 @@ interface InstrumentDiscriminator {
   imports: [
     MongooseModule.forFeature([
       {
-        name: Instrument.name,
+        name: InstrumentEntity.modelName,
         schema: InstrumentSchema,
         discriminators: [
           {

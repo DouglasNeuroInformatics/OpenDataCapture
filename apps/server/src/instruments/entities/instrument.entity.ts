@@ -4,7 +4,7 @@ import { BaseInstrument, InstrumentKind } from '@ddcp/common';
 import { HydratedDocument } from 'mongoose';
 
 @Schema({ discriminatorKey: 'kind', strict: 'throw', timestamps: true })
-export class Instrument implements BaseInstrument {
+export class InstrumentEntity implements BaseInstrument {
   static readonly modelName = 'Instrument';
 
   @Prop({ enum: InstrumentKind, required: true, type: String })
@@ -22,6 +22,6 @@ export class Instrument implements BaseInstrument {
   content: any;
 }
 
-export type InstrumentDocument = HydratedDocument<Instrument>;
+export type InstrumentDocument = HydratedDocument<InstrumentEntity>;
 
-export const InstrumentSchema = SchemaFactory.createForClass(Instrument);
+export const InstrumentSchema = SchemaFactory.createForClass(InstrumentEntity);
