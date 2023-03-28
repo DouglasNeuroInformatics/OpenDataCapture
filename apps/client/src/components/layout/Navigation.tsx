@@ -2,29 +2,41 @@ import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { HiChartBar, HiEye, HiPlus, HiUserPlus } from 'react-icons/hi2';
-import { NavLink } from 'react-router-dom';
 
-const NavigationLink = ({ href, label, icon }: { href: string; label: string; icon: React.ReactElement }) => {
-  return (
-    <NavLink className="flex items-center p-2 text-sm hover:bg-slate-800 md:text-base" to={href}>
-      {icon}
-      <span className="ml-2">{label}</span>
-    </NavLink>
-  );
-};
+import { NavigationLink } from './NavigationLink';
 
-export const Navigation = () => {
+export interface NavigationProps {
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+}
+
+export const Navigation = (props: NavigationProps) => {
   const { t } = useTranslation();
   return (
     <nav>
-      <NavigationLink href="/overview" icon={<HiChartBar />} label={t('sidebar.links.overview')} />
-      <NavigationLink href="/subjects/add-subject" icon={<HiUserPlus />} label={t('sidebar.links.addSubject')} />
-      <NavigationLink href="/subjects/view-subjects" icon={<HiEye />} label={t(`sidebar.links.viewSubjects`)} />
-      <NavigationLink href="/instruments/add-instrument" icon={<HiPlus />} label={t('sidebar.links.addInstrument')} />
+      <NavigationLink href="/overview" icon={<HiChartBar />} label={t('sidebar.links.overview')} {...props} />
+      <NavigationLink
+        href="/subjects/add-subject"
+        icon={<HiUserPlus />}
+        label={t('sidebar.links.addSubject')}
+        {...props}
+      />
+      <NavigationLink
+        href="/subjects/view-subjects"
+        icon={<HiEye />}
+        label={t(`sidebar.links.viewSubjects`)}
+        {...props}
+      />
+      <NavigationLink
+        href="/instruments/add-instrument"
+        icon={<HiPlus />}
+        label={t('sidebar.links.addInstrument')}
+        {...props}
+      />
       <NavigationLink
         href="/instruments/view-instruments"
         icon={<HiEye />}
         label={t('sidebar.links.viewInstruments')}
+        {...props}
       />
     </nav>
   );

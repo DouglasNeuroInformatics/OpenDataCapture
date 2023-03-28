@@ -23,20 +23,20 @@ export const Navbar = () => {
   }, [isOpen]);
 
   return (
-    <div className="flex flex-col bg-slate-900 p-2 text-slate-300 duration-700">
-      <div className="flex w-full justify-between">
+    <div className="flex flex-col bg-slate-900 text-slate-300 duration-700">
+      <div className="flex w-full justify-between p-2">
         <Branding />
         <button type="button" onClick={() => setIsOpen(!isOpen)}>
           <HiBars3 className="h-9 w-9" />
         </button>
       </div>
       <div
-        className="overflow-hidden transition-all duration-500"
+        className="overflow-hidden px-2 transition-all duration-500"
         ref={dropdownRef}
         style={{ height: isOpen ? dropdownHeight : 0 }}
       >
-        <hr className="py-1" />
-        <Navigation />
+        <hr />
+        <Navigation onClick={() => setIsOpen(false)} />
       </div>
     </div>
   );
