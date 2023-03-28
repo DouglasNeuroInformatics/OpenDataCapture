@@ -4,6 +4,8 @@ import { FormInstrument } from '@ddcp/common';
 import { HiOutlineDocumentCheck, HiOutlinePrinter, HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
+import { FormOverview } from '../components/FormOverview';
+
 import { PageHeader, Spinner, Stepper } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
@@ -22,7 +24,7 @@ export const FormPage = () => {
       <Stepper
         steps={[
           {
-            element: <span>1</span>,
+            element: <FormOverview details={data.details} />,
             label: 'Overview',
             icon: <HiOutlineDocumentCheck />
           },

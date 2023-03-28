@@ -35,8 +35,9 @@ const Stepper = ({ steps }: StepperProps) => {
           </>
         ))}
       </div>
+      <h3>{steps[index].label}</h3>
       <div>{steps[index].element}</div>
-      <div className="mx-auto flex max-w-lg justify-between">
+      <div className="mx-auto my-8 flex max-w-lg justify-between">
         <Button label="Previous" onClick={() => updateIndex('decrement')} />
         <Button label="Next" onClick={() => updateIndex('increment')} />
       </div>
