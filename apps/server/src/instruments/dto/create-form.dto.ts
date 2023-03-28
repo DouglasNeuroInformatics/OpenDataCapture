@@ -1,4 +1,11 @@
-import { FormDetails, FormField, FormInstrument, InstrumentKind, formInstrumentSchema } from '@ddcp/common';
+import {
+  FormDetails,
+  FormField,
+  FormInstrument,
+  FormInstrumentData,
+  InstrumentKind,
+  formInstrumentSchema
+} from '@ddcp/common';
 import { JSONSchemaType } from 'ajv';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
@@ -10,6 +17,8 @@ export class CreateFormDto {
   tags: string[];
   version: number;
   details: FormDetails;
-  content: FormField[];
-  validationSchema: JSONSchemaType<Record<string, any>>;
+  content: {
+    [key: string]: FormField;
+  };
+  validationSchema: JSONSchemaType<FormInstrumentData>;
 }

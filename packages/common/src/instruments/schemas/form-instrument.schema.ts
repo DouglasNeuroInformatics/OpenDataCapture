@@ -1,11 +1,10 @@
 import { JSONSchemaType } from 'ajv';
 
 import { InstrumentKind } from '../enums/instrument-kind.enum';
-import { FormInstrument } from '../interfaces/form-instrument.interface';
+import { FormInstrument } from '../interfaces/form/form-instrument.interface';
 
 import { formDetailsSchema } from './form-details.schema';
 import { formFieldSchema } from './form-field.schema';
-
 
 export const formInstrumentSchema: JSONSchemaType<FormInstrument> = {
   type: 'object',
@@ -31,8 +30,11 @@ export const formInstrumentSchema: JSONSchemaType<FormInstrument> = {
     },
     details: formDetailsSchema,
     content: {
-      type: 'array',
-      items: formFieldSchema
+      type: 'object',
+      patternProperties: {
+        '^S+$': formFieldSchema
+      },
+      required: []
     },
     validationSchema: {
       type: 'object'

@@ -1,0 +1,8 @@
+{
+  "extends": "@ddcp/tsconfig/base.json",
+  "include": ["forms/**/*"],
+  "compilerOptions": {
+    "declarationMap": true,
+    "outDir": "dist"
+  }
+}

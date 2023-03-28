@@ -1,8 +1,14 @@
 {
   "name": "@ddcp/instruments",
   "version": "0.0.0",
-  "license": "AGPL-3.0",
-  "files": [
-    "forms"
-  ]
+  "private": true,
+  "main": "./dist/index.js",
+  "dependencies": {
+    "@ddcp/common": "*"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --fix src"
+  }
 }

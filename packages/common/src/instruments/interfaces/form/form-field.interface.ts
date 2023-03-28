@@ -1,19 +1,19 @@
-import { FormFieldKind } from '../enums/form-field-kind.enum';
-import { NumberFieldVariant } from '../enums/number-field-variant.enum';
-import { StringFieldVariant } from '../enums/string-field-variant.enum';
+import { FormFieldKind } from '../../enums/form-field-kind.enum';
+import { NumberFieldVariant } from '../../enums/number-field-variant.enum';
+import { StringFieldVariant } from '../../enums/string-field-variant.enum';
 
 export interface BaseFormField {
   /** Discriminator key */
   kind: FormFieldKind;
-
-  /** The name of the key in the data object */
-  name: string;
 
   /** The label to be displayed to the user */
   label: string;
 
   /** An optional description of this field */
   description?: string;
+
+  /** Whether or not the field is required */
+  isRequired?: boolean;
 }
 
 export interface StringFormField extends BaseFormField {
@@ -32,3 +32,5 @@ export interface SelectField extends BaseFormField {
 }
 
 export type FormField = StringFormField | NumberFormField | SelectField;
+
+export type FormFieldType = string | number;
