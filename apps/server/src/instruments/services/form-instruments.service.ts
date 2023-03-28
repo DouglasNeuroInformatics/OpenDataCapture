@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { InstrumentKind } from '@ddcp/common';
+import { FormSummary, InstrumentKind } from '@ddcp/common';
 
 import { CreateFormDto } from '../dto/create-form.dto';
 import { InstrumentsRepository } from '../repositories/instruments.repository';
@@ -14,7 +14,11 @@ export class FormInstrumentsService {
   }
 
   findAll(): Promise<any[]> {
-    return this.instrumentsRepository.find();
+    return this.instrumentsRepository.find({ kind: InstrumentKind.Form });
+  }
+
+  async getAvailable(): Promise<FormSummary[]> {
+    return this.instrumentsRepository.find({ kind: InstrumentKind.Form }).select('name tags version details').lean();
   }
 
   async findById(id: string): Promise<any> {

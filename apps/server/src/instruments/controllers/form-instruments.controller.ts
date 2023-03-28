@@ -25,10 +25,11 @@ export class FormInstrumentsController {
     return this.formInstrumentsService.findAll();
   }
 
+  @ApiOperation({ description: 'Returns a summary of all available forms' })
   @Get('available')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   getAvailable(): Promise<any> {
-    return Promise.resolve('foo');
+    return this.formInstrumentsService.getAvailable();
   }
 
   @ApiOperation({ description: 'Returns the provided form' })
