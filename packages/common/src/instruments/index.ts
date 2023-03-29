@@ -1,7 +1,4 @@
-export * from './enums/form-field-kind.enum';
 export * from './enums/instrument-kind.enum';
-export * from './enums/number-field-variant.enum';
-export * from './enums/string-field-variant.enum';
 
 export * from './interfaces/base/base-instrument.interface';
 export * from './interfaces/form/form-details.interface';

@@ -1,4 +1,4 @@
-import { InstrumentKind } from '../../enums/instrument-kind.enum';
+export type InstrumentKind = 'form';
 
 export interface BaseInstrument<TContent = any> {
   kind: InstrumentKind;

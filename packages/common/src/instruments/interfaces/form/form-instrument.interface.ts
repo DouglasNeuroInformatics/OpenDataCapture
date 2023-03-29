@@ -3,16 +3,10 @@ import { JSONSchemaType } from 'ajv';
 import { BaseInstrument } from '../base/base-instrument.interface';
 
 import { FormDetails } from './form-details.interface';
-import { FormField, FormFieldType } from './form-field.interface';
+import { FormFields, FormInstrumentData } from './form-fields.interface';
 
-export interface FormInstrumentData {
-  [key: string]: FormFieldType;
-}
-
-export interface FormInstrument<TData extends FormInstrumentData = FormInstrumentData> extends BaseInstrument {
-  content: {
-    [FieldName in keyof TData]: FormField;
-  };
+export interface FormInstrument<T extends FormInstrumentData = FormInstrumentData> extends BaseInstrument {
+  content: FormFields<T>;
   details: FormDetails;
-  validationSchema: JSONSchemaType<TData>;
+  validationSchema: JSONSchemaType<T>;
 }

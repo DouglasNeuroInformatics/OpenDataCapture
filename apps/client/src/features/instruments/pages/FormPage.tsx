@@ -5,6 +5,7 @@ import { HiOutlineDocumentCheck, HiOutlinePrinter, HiOutlineQuestionMarkCircle }
 import { useParams } from 'react-router-dom';
 
 import { FormOverview } from '../components/FormOverview';
+import { FormQuestions } from '../components/FormQuestions';
 
 import { PageHeader, Spinner, Stepper } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
@@ -29,7 +30,7 @@ export const FormPage = () => {
             icon: <HiOutlineDocumentCheck />
           },
           {
-            element: <span>2</span>,
+            element: <FormQuestions />,
             label: 'Questions',
             icon: <HiOutlineQuestionMarkCircle />
           },
