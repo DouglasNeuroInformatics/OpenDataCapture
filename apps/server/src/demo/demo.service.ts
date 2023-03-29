@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { Sex } from '@ddcp/common';
-import { happinessQuestionnaire } from '@ddcp/instruments';
+import { briefPsychiatricRatingScale, happinessQuestionnaire } from '@ddcp/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 
@@ -51,6 +51,7 @@ export class DemoService {
         sex: faker.name.sexType() === 'female' ? Sex.Female : Sex.Male
       });
     }
+    await this.formInstrumentsService.create(briefPsychiatricRatingScale);
     await this.formInstrumentsService.create(happinessQuestionnaire);
   }
 

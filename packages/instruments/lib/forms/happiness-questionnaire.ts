@@ -31,6 +31,7 @@ export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> 
       kind: FormFieldKind.Number,
       label: 'Overall Happiness',
       description: "The subject's overall happiness from 1 through 10",
+      isRequired: true,
       variant: NumberFieldVariant.Slider
     }
   },
