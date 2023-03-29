@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { FormDetails, Language } from '@ddcp/common';
+import { FormDetails, type Language } from '@ddcp/common';
 
 @Schema({ strict: 'throw' })
 export class FormDetailsEntity implements FormDetails {
@@ -10,7 +10,7 @@ export class FormDetailsEntity implements FormDetails {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ enum: Language, required: true, type: String })
+  @Prop({ enum: ['en', 'fr'] satisfies Language[], required: true, type: String })
   language: Language;
 
   @Prop({ required: true })

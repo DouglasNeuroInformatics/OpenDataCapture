@@ -1,4 +1,4 @@
-import { FormFieldKind, FormInstrument, InstrumentKind, Language, NumberFieldVariant } from '@ddcp/common';
+import { FormFieldKind, FormInstrument, InstrumentKind, NumberFieldVariant } from '@ddcp/common';
 import { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
 const fields = [
@@ -33,7 +33,7 @@ export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingS
   version: 1,
   details: {
     title: 'Brief Psychiatric Rating Scale',
-    language: Language.English,
+    language: 'en',
     estimatedDuration: 30,
     description: `
       The Brief Psychiatric Rating Scale is a rating scale which a clinician or researcher may use to

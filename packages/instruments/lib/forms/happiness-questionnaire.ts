@@ -11,7 +11,7 @@ export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> 
   version: 1,
   details: {
     title: 'Happiness Questionnaire',
-    language: Language.English,
+    language: 'en',
     estimatedDuration: 5,
     description: `
       The Happiness Questionnaire is a survey that asks questions about an individual's

@@ -1,1 +1,1 @@
-export * from './enums/language.enum';
+export * from './types';

@@ -1,6 +1,5 @@
 import { JSONSchemaType } from 'ajv';
 
-import { Language } from '../../core';
 import { FormDetails } from '../interfaces/form/form-details.interface';
 
 export const formDetailsSchema: JSONSchemaType<FormDetails> = {
@@ -16,7 +15,7 @@ export const formDetailsSchema: JSONSchemaType<FormDetails> = {
     },
     language: {
       type: 'string',
-      enum: Object.values(Language)
+      enum: ['en', 'fr']
     },
     instructions: {
       type: 'string',

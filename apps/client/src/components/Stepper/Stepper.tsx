@@ -35,7 +35,7 @@ const Stepper = ({ steps }: StepperProps) => {
           </>
         ))}
       </div>
-      <h3 className="mb-4 font-sans">{steps[index].label}</h3>
+      <h3 className="mb-4 text-2xl font-semibold">{steps[index].label}</h3>
       <div>{steps[index].element}</div>
       <div className="mx-auto my-8 flex max-w-lg justify-between">
         <Button label="Previous" onClick={() => updateIndex('decrement')} />
