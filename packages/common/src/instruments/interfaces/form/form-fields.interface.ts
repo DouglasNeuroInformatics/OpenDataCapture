@@ -64,5 +64,12 @@ export type FormField<T> = [T] extends [FormFieldValue]
   : never;
 
 export type FormFields<T extends FormInstrumentData = FormInstrumentData> = {
-  [K in keyof T]?: FormField<T[K]>;
+  [K in keyof T]: FormField<T[K]>;
+};
+
+export type FormFieldsGroup<T extends FormInstrumentData = FormInstrumentData> = {
+  title?: string;
+  fields: {
+    [K in keyof T]?: FormField<T[K]>;
+  };
 };
