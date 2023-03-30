@@ -63,15 +63,6 @@ export type FormField<T> = [T] extends [FormFieldValue]
   ? ComplexFormField<T>
   : never;
 
-export type UngroupedFormFields<T extends FormInstrumentData> = {
-  [K in keyof T]: FormField<T[K]>;
+export type FormFields<T extends FormInstrumentData = FormInstrumentData> = {
+  [K in keyof T]?: FormField<T[K]>;
 };
-
-export type GroupedFormFields<T extends FormInstrumentData> = Array<{
-  title?: string;
-  fields: Partial<UngroupedFormFields<T>>;
-}>;
-
-export type FormFields<T extends FormInstrumentData = FormInstrumentData> =
-  | UngroupedFormFields<T>
-  | GroupedFormFields<T>;

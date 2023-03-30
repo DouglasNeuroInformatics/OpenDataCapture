@@ -1,17 +1,17 @@
 import { JSONSchemaType } from 'ajv';
-import { PropertiesSchema, SomeJSONSchema } from 'ajv/dist/types/json-schema';
+import { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
 import {
   BaseFormField,
   BinaryFormField,
-  ComplexFormField,
   DateFormField,
+  FormField,
   FormFieldValue,
+  FormFields,
   NumericFormField,
   OptionsFormField,
   PrimitiveFormField,
-  TextFormField,
-  UngroupedFormFields
+  TextFormField
 } from '../interfaces/form/form-fields.interface';
 
 const baseProperties: PropertiesSchema<Omit<BaseFormField, 'kind'>> = {
@@ -106,17 +106,11 @@ export const binaryFieldSchema: JSONSchemaType<BinaryFormField> = {
   required: ['kind', 'label']
 };
 
-export const primitiveFieldSchema: JSONSchemaType<
-  PrimitiveFormField<string> | PrimitiveFormField<number> | PrimitiveFormField<boolean>
-> = {
+export const primitiveFieldSchema: JSONSchemaType<PrimitiveFormField<FormFieldValue>> = {
   oneOf: [textFieldSchema, numericFieldSchema, optionsFieldSchema, dataFieldSchema, binaryFieldSchema]
 };
 
-export const complexFieldSchema: JSONSchemaType<
-  | ComplexFormField<Record<string, string>>
-  | ComplexFormField<Record<string, number>>
-  | ComplexFormField<Record<string, boolean>>
-> = {
+export const complexFieldSchema: JSONSchemaType<FormField<Record<string, FormFieldValue>>> = {
   type: 'object',
   properties: {
     kind: {
@@ -124,50 +118,25 @@ export const complexFieldSchema: JSONSchemaType<
       const: 'complex'
     },
     fieldset: {
-      additionalProperties: {
-        oneOf: [dataFieldSchema]
-      }
+      type: 'object',
+      patternProperties: {
+        '^.*$': primitiveFieldSchema
+      },
+      minProperties: 1,
+      required: []
     }
   },
   required: ['kind', 'fieldset']
 };
 
-export const formFieldSchema: JSONSchemaType<FormField<FormFieldValue | Record<string, FormFieldValue>>> = {
-  type: 'object',
-  oneOf: [primitiveFieldSchema, complexFieldSchema]
-};
-
-export const ungroupedFieldsSchema: JSONSchemaType<UngroupedFormFields<any>> = {
-  type: 'object',
-  additionalProperties: formFieldSchema
-};
-
-/*
 export const formFieldsSchema: JSONSchemaType<FormFields> = {
-  oneOf: [
-    {
+  type: 'object',
+  patternProperties: {
+    '^.*$': {
       type: 'object',
-      additionalProperties: formFieldSchema
-    },
-    {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          title: {
-            type: 'string',
-            minLength: 1,
-            nullable: true
-          },
-          fields: {
-            type: 'object',
-            patternProperties: {
-              '^S+$': formFieldSchema
-            }
-          }
-        }
-      }
+      oneOf: [primitiveFieldSchema, complexFieldSchema],
+      required: []
     }
-  ]
+  },
+  required: []
 };
-*/
