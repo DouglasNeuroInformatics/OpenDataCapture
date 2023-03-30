@@ -8,6 +8,7 @@ import {
   FormField,
   FormFieldValue,
   FormFields,
+  FormFieldsGroup,
   NumericFormField,
   OptionsFormField,
   PrimitiveFormField,
@@ -139,4 +140,27 @@ export const formFieldsSchema: JSONSchemaType<FormFields> = {
     }
   },
   required: []
+};
+
+export const formFieldsGroupSchema: JSONSchemaType<FormFieldsGroup> = {
+  type: 'object',
+  properties: {
+    title: {
+      type: 'string',
+      minLength: 1,
+      nullable: true
+    },
+    fields: {
+      type: 'object',
+      patternProperties: {
+        '^.*$': {
+          type: 'object',
+          oneOf: [primitiveFieldSchema, complexFieldSchema],
+          required: []
+        }
+      },
+      required: []
+    }
+  },
+  required: ['fields']
 };

@@ -3,7 +3,7 @@ import { JSONSchemaType } from 'ajv';
 import { FormInstrument } from '../interfaces/form/form-instrument.interface';
 
 import { formDetailsSchema } from './form-details.schema';
-import { formFieldsSchema } from './form-fields.schema';
+import { formFieldsGroupSchema, formFieldsSchema } from './form-fields.schema';
 
 export const formInstrumentSchema: JSONSchemaType<FormInstrument> = {
   type: 'object',
@@ -28,7 +28,15 @@ export const formInstrumentSchema: JSONSchemaType<FormInstrument> = {
       minimum: 1
     },
     details: formDetailsSchema,
-    content: formFieldsSchema,
+    content: {
+      oneOf: [
+        formFieldsSchema,
+        {
+          type: 'array',
+          items: formFieldsGroupSchema
+        }
+      ]
+    },
     validationSchema: {
       type: 'object'
     }
