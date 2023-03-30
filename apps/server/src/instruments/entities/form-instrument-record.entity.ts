@@ -1,9 +1,9 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 
-import { FormInstrument, FormInstrumentRecord, Group, InstrumentKind, Subject } from '@ddcp/common';
+import { FormInstrument, FormInstrumentRecord, Group, Subject } from '@ddcp/common';
 
 export class FormInstrumentRecordEntity implements FormInstrumentRecord {
-  kind: InstrumentKind.Form;
+  kind: 'form';
   dateCollected: Date;
   instrument: FormInstrument;
   group: Group;

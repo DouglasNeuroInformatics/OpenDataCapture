@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
-import { Sex } from '@ddcp/common';
+import { BasePermissionLevel, Sex } from '@ddcp/common';
 import { briefPsychiatricRatingScale, happinessQuestionnaire } from '@ddcp/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
@@ -21,6 +21,39 @@ export interface InitDemoOptions {
   nSubjects: number;
 }
 
+export const defaultDemoOptions = {
+  groups: [
+    {
+      name: 'Depression Clinic'
+    },
+    {
+      name: 'Psychosis Clinic'
+    }
+  ],
+  users: [
+    {
+      username: 'admin',
+      password: 'password',
+      basePermissionLevel: BasePermissionLevel.Admin,
+      isAdmin: true,
+      firstName: 'Admin'
+    },
+    {
+      username: 'JohnSmith',
+      password: 'password',
+      groupNames: ['Depression Clinic', 'Psychosis Clinic'],
+      basePermissionLevel: BasePermissionLevel.Standard
+    },
+    {
+      username: 'JaneDoe',
+      password: 'password',
+      groupNames: ['Depression Clinic'],
+      basePermissionLevel: BasePermissionLevel.GroupManager
+    }
+  ],
+  nSubjects: 100
+};
+
 @Injectable()
 export class DemoService {
   private readonly demoDbNames = ['development', 'test'];
@@ -34,7 +67,7 @@ export class DemoService {
     private readonly formInstrumentsService: FormInstrumentsService
   ) {}
 
-  async initDemo({ groups, users, nSubjects }: InitDemoOptions): Promise<void> {
+  async initDemo({ groups, users, nSubjects }: InitDemoOptions = defaultDemoOptions): Promise<void> {
     this.logger.verbose(`Initializing demo database: '${this.connection.name}'`);
     await this.dropDatabase();
     for (const group of groups) {

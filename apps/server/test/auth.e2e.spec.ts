@@ -51,7 +51,7 @@ describe('POST /auth/login', () => {
     expect(response.body.message).toBe('Invalid password');
   });
 
-  it('should return two JSON web tokens when provided the correct credentials', async () => {
+  it('should return a JSON web token when provided the correct credentials', async () => {
     const response = await request(server).post('/auth/login').send({
       username: admin.username,
       password: admin.password

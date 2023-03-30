@@ -1,6 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { type BaseInstrument, type Group, InstrumentKind, type InstrumentRecord, type Subject } from '@ddcp/common';
+import {
+  type BaseInstrument,
+  type Group,
+  type InstrumentKind,
+  type InstrumentRecord,
+  type Subject
+} from '@ddcp/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { InstrumentEntity } from './instrument.entity';
@@ -12,7 +18,7 @@ import { SubjectEntity } from '@/subjects/entities/subject.entity';
 export class InstrumentRecordEntity implements InstrumentRecord<BaseInstrument> {
   static readonly modelName = 'InstrumentRecord';
 
-  @Prop({ enum: InstrumentKind, required: true, type: String })
+  @Prop({ enum: ['form'] satisfies InstrumentKind[], required: true, type: String })
   kind: InstrumentKind;
 
   @Prop({ required: true, type: Date })

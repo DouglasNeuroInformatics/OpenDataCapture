@@ -21,7 +21,7 @@ const jwtService = new JwtService({
 
 const admin = Object.freeze({
   username: 'admin',
-  password: 'Password123',
+  password: 'password',
   get accessToken() {
     return jwtService.sign({ username: this.username });
   }
@@ -42,7 +42,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await demoService.initDemo({ defaultAdmin: admin });
+  await demoService.initDemo();
 });
 
 afterAll(async () => {

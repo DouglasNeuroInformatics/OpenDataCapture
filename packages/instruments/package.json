@@ -9,6 +9,6 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "check-types": "tsc --noEmit",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix lib"
   }
 }

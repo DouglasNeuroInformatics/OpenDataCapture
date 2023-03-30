@@ -28,7 +28,7 @@ interface InstrumentDiscriminator {
         schema: InstrumentSchema,
         discriminators: [
           {
-            name: InstrumentKind.Form,
+            name: 'form',
             schema: FormInstrumentSchema
           }
         ] satisfies InstrumentDiscriminator[]
@@ -38,7 +38,7 @@ interface InstrumentDiscriminator {
         schema: InstrumentRecordSchema,
         discriminators: [
           {
-            name: InstrumentKind.Form,
+            name: 'form',
             schema: FormInstrumentRecordSchema
           }
         ] satisfies InstrumentDiscriminator[]

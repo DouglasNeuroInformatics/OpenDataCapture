@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { BaseFormField, FormFieldKind, NumberFieldVariant, StringFieldVariant } from '@ddcp/common';
+import { BaseFormField, type FormFieldKind } from '@ddcp/common';
 
 @Schema({ strict: 'throw' })
 export class FormFieldEntity implements BaseFormField {
-  @Prop({ enum: FormFieldKind, required: true })
+  @Prop({ enum: ['binary', 'complex', 'date', 'numeric', 'options', 'text'] satisfies FormFieldKind[], required: true })
   kind: FormFieldKind;
-  
+
   @Prop({ required: true, unique: true })
   name: string;
 
@@ -17,7 +17,7 @@ export class FormFieldEntity implements BaseFormField {
   description?: string;
 
   @Prop({ required: true, type: String })
-  variant: StringFieldVariant | NumberFieldVariant;
+  variant: string;
 
   @Prop({ required: true })
   isRequired: boolean;

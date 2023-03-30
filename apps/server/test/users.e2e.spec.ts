@@ -1,6 +1,6 @@
-import { BasePermissionLevel } from '@ddcp/common';
 import { HttpStatus } from '@nestjs/common';
 
+import { BasePermissionLevel } from '@ddcp/common';
 import request from 'supertest';
 
 import { admin, server } from './config/jest-e2e.setup';
@@ -22,7 +22,7 @@ describe('POST /users', () => {
   it('should reject a request to create a user that already exists', async () => {
     const response = await request(server).post('/users').auth(admin.accessToken, { type: 'bearer' }).send({
       username: admin.username,
-      password: admin.password
+      password: "Password123"
     });
     expect(response.status).toBe(HttpStatus.CONFLICT);
   });

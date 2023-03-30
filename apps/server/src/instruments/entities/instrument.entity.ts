@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { BaseInstrument, InstrumentKind } from '@ddcp/common';
+import { BaseInstrument, type InstrumentKind } from '@ddcp/common';
 import { HydratedDocument } from 'mongoose';
 
 @Schema({ discriminatorKey: 'kind', strict: false, timestamps: true })
 export class InstrumentEntity implements BaseInstrument {
   static readonly modelName = 'Instrument';
 
-  @Prop({ enum: InstrumentKind, required: true, type: String })
+  @Prop({ enum: ['form'] satisfies InstrumentKind[], required: true, type: String })
   kind: InstrumentKind;
 
   @Prop({ required: true })

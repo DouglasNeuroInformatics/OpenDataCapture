@@ -1,4 +1,3 @@
-import { BasePermissionLevel } from '@ddcp/common';
 import { Command, CommandRunner } from 'nest-commander';
 
 import { DemoService } from '../demo.service';
@@ -13,37 +12,6 @@ export class InitDemoCommand extends CommandRunner {
   }
 
   run(): Promise<void> {
-    return this.demoService.initDemo({
-      groups: [
-        {
-          name: 'Depression Clinic'
-        },
-        {
-          name: 'Psychosis Clinic'
-        }
-      ],
-      users: [
-        {
-          username: 'admin',
-          password: 'password',
-          basePermissionLevel: BasePermissionLevel.Admin,
-          isAdmin: true,
-          firstName: 'Admin'
-        },
-        {
-          username: 'JohnSmith',
-          password: 'password',
-          groupNames: ['Depression Clinic', 'Psychosis Clinic'],
-          basePermissionLevel: BasePermissionLevel.Standard
-        },
-        {
-          username: 'JaneDoe',
-          password: 'password',
-          groupNames: ['Depression Clinic'],
-          basePermissionLevel: BasePermissionLevel.GroupManager
-        }
-      ],
-      nSubjects: 100
-    });
+    return this.demoService.initDemo();
   }
 }
