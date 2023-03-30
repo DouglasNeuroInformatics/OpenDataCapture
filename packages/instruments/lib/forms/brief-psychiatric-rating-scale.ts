@@ -1,4 +1,4 @@
-import { FormFieldKind, FormInstrument, InstrumentKind, NumberFieldVariant } from '@ddcp/common';
+import { FormInstrument } from '@ddcp/common';
 import { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
 const fields = [
@@ -27,7 +27,7 @@ export type BriefPsychiatricRatingScaleData = {
 };
 
 export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleData> = {
-  kind: InstrumentKind.Form,
+  kind: 'form',
   name: 'BriefPsychiatricRatingScale',
   tags: ['Schizophrenia', 'Psychosis'],
   version: 1,
@@ -46,145 +46,145 @@ export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingS
   },
   content: {
     somaticConcern: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Somatic Concern',
       description:
         'Degree of concern over present bodily health. Rate the degree to which physical health is perceived as a problem by the patient, whether complaints have a realistic basis or not.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     anxiety: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Anxiety',
       description:
         "Worry, fear, or over-concern for present or future. Rate solely on the basis of verbal report of patient's own subjective experiences. Do not infer anxiety from physical signs or from neurotic defense mechanisms.",
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     emotionalWithdrawal: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Emotional Withdrawal',
       description:
         'Deficiency in relating to the interviewer and to the interviewer situation. Rate only the degree to which the patient gives the impression of failing to be in emotional contact with other people in the interview situation.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     conceptualDisorganization: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Conceptual Disorganization',
       description:
         "Degree to which the thought processes are confused, disconnected, or disorganized. Rate on the basis of integration of the verbal products of the patient; do not rate on the basis of patient's subjective impression of his own level of functioning.",
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     guiltFeelings: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Guilt Feelings',
       description:
         "Over-concern or remorse for past behavior. Rate on the basis of the patient's subjective experiences of guilt as evidenced by verbal report with appropriate affect; do not infer guilt feelings from depression, anxiety or neurotic defenses.",
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     tension: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Tension',
       description:
         'Physical and motor manifestations of tension “nervousness”, and heightened activation level. Tension should be rated solely on the basis of physical signs and motor behavior and not on the basis of subjective experiences of tension reported by the patient.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     mannerismsAndPosturing: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Mannerisms And Posturing',
       description:
         'Unusual and unnatural motor behavior, the type of motor behavior which causes certain mental patients to stand out in a crowd of normal people. Rate only abnormality of movements; do not rate simple heightened motor activity here.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     grandiosity: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Grandiosity',
       description:
         'Exaggerated self-opinion, conviction of unusual ability or powers. Rate only on the basis of patient’s statements about himself or self-in-relation-to-others, not on the basis of his demeanour in the interview situation.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     depressiveMood: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Depressive Mood',
       description:
         'Despondency in mood, sadness. Rate only degree of despondency; do not rate on the basis of inferences concerning depression based upon general retardation and somatic complaints.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     hostility: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Hostility',
       description:
         'Animosity, contempt, belligerence, disdain for other people outside the interview situation. Rate solely on the basis of the verbal report of feelings and actions of the patient toward others; do not infer hostility from neurotic defenses, anxiety, nor somatic complaints. (Rate attitude toward interviewer under “uncooperativeness”).',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     suspiciousness: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Suspiciousness',
       description:
         'Brief (delusional or otherwise) that others have now, or have had in the past, malicious or discriminatory intent toward the patient. On the basis of verbal report, rate only those suspicions which are currently held whether they concern past or present circumstances.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     hallucinatoryBehavior: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Hallucinatory Behavior',
       description:
         'Perceptions without normal external stimulus correspondence. Rate only those experiences which are reported to have occurred within the last week and which are described as distinctly different from the thought and imagery processes of normal people.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     motorRetardation: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Motor Retardation',
       description:
         "Reduction in energy level evidenced in slowed movements. Rate on the basis of observed behavior of the patient only; do not rate on the basis of patient's subjective impression of own energy level.",
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     uncooperativeness: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Uncooperativeness',
       description:
         'Evidence of resistance, unfriendliness, resentment, and lack of readiness to cooperate with the interviewer. Rate only on the basis of the patient’s attitude and responses to the interviewer and the interview situation; do not rate on basis of reported resentment or uncooperativeness outside the interview situation.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     unusualThoughtContent: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Unusual Thought Content',
       description:
         'Unusual, odd, strange or bizarre thought content. Rate here the degree of unusualness, not the degree of disorganization of thought processes.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     bluntedAffect: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Blunted Affect',
       description: 'Reduced emotional tone, apparent lack of normal feeling or involvement.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     excitement: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Excitement',
       description: 'Heightened emotional tone, agitation, increased reactivity.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     },
     disorientation: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Disorientation',
       description: 'Confusion or lack of proper association for person, place or time.',
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     }
   },
   validationSchema: {

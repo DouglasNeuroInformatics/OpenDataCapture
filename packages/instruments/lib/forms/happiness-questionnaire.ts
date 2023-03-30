@@ -1,11 +1,11 @@
-import { FormFieldKind, FormInstrument, InstrumentKind, Language, NumberFieldVariant } from '@ddcp/common';
+import { FormInstrument } from '@ddcp/common';
 
 export type HappinessQuestionnaireData = {
   overallHappiness: number;
 };
 
 export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> = {
-  kind: InstrumentKind.Form,
+  kind: 'form',
   name: 'HappinessQuestionnaire',
   tags: ['Well-Being'],
   version: 1,
@@ -28,11 +28,11 @@ export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> 
   },
   content: {
     overallHappiness: {
-      kind: FormFieldKind.Number,
+      kind: 'numeric',
       label: 'Overall Happiness',
       description: "The subject's overall happiness from 1 through 10",
       isRequired: true,
-      variant: NumberFieldVariant.Slider
+      variant: 'slider'
     }
   },
   validationSchema: {
