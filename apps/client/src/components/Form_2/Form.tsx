@@ -8,19 +8,19 @@ import { FormContext } from '@/context/FormContext';
 import { ajv } from '@/services/ajv';
 
 export interface FormProps<T extends FormInstrumentData>
-  extends Pick<FormInstrument<T>, 'content' | 'details' | 'validationSchema'> {
+  extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
   className?: string;
   onSubmit: (data: T) => void;
 }
 
 export const Form = <T extends FormInstrumentData>({ content, details, validationSchema }: FormProps<T>) => {
   const [errors, setErrors] = useState<FormErrors<T>>({});
-  const [values, setValues] = useState<T>(() => {
+  const [values, setValues] = useState<FormValues<T>>(() => {
     let defaultValues: FormInstrumentData;
   });
 
   return (
-    <FormContext.Provider>
+    <FormContext.Provider value={{ errors, values }}>
       <form action="" autoComplete="off"></form>
     </FormContext.Provider>
   );

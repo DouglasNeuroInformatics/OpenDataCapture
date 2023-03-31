@@ -1,13 +1,11 @@
 import { createContext } from 'react';
 
-import { FormFieldType } from '@ddcp/common';
+import { FormFieldValue } from '@ddcp/common';
+
+import { FormErrors, FormValues } from '@/components/Form_2';
 
 export const FormContext = createContext<{
-  errors: {
-    [field: string]: string;
-  };
-  values: {
-    [field: string]: FormFieldType;
-  };
-  setValue: (key: string, value: FormFieldType) => void;
+  errors: FormErrors;
+  values: FormValues;
+  setValue: (key: string, value: FormFieldValue) => void;
 }>(null!);

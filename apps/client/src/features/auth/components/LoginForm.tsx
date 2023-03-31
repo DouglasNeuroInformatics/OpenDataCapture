@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 
-import { loginCredentialsSchema } from '@ddcp/common';
+import { FormInstrumentContent, loginCredentialsSchema } from '@ddcp/common';
+import { useTranslation } from 'react-i18next';
 
 import { AuthAPI } from '../api/auth-api';
 
-import { Form, FormStructure } from '@/components';
+import { Form } from '@/components/Form_2';
 import { useAuthStore } from '@/stores/auth-store';
 
 type LoginFormData = {
@@ -12,29 +13,26 @@ type LoginFormData = {
   password: string;
 };
 
-const structure: FormStructure<LoginFormData> = [
-  {
-    fields: {
-      username: {
-        kind: 'text',
-        label: 'Username',
-        variant: 'short'
-      },
-      password: {
-        kind: 'text',
-        label: 'Password',
-        variant: 'password'
-      }
-    }
-  }
-];
-
 export interface LoginFormProps {
   onSuccess: () => void;
 }
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const auth = useAuthStore();
+  const { t } = useTranslation('auth');
+
+  const content: FormInstrumentContent<LoginFormData> = {
+    username: {
+      kind: 'text',
+      label: t('login.form.username'),
+      variant: 'short'
+    },
+    password: {
+      kind: 'text',
+      label: t('login.form.password'),
+      variant: 'password'
+    }
+  };
 
   useEffect(() => {
     if (import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH) {
@@ -51,5 +49,5 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     onSuccess();
   };
 
-  return <Form<LoginFormData> structure={structure} validationSchema={loginCredentialsSchema} onSubmit={login} />;
+  return <Form<LoginFormData> content={content} validationSchema={loginCredentialsSchema} onSubmit={login} />;
 };
