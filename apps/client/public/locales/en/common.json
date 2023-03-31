@@ -8,5 +8,23 @@
   "languages": {
     "en": "English",
     "fr": "French"
+  },
+  "footer": {
+    "documentation": "Documentation",
+    "license": "License",
+    "sourceCode": "Source Code",
+    "contact": "Contact Us"
+  },
+  "navLinks": {
+    "overview": "Overview",
+    "addSubject": "Add Subject",
+    "lookupSubject": "Lookup Subject",
+    "viewSubjects": "View Subjects",
+    "createInstrument": "Add Instrument",
+    "availableInstruments": "View Instruments"
+  },
+  "userDropup": {
+    "logout": "Logout",
+    "preferences": "Preferences"
   }
 }

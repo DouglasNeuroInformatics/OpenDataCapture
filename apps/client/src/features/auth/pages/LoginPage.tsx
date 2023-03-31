@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForm';
 
 import logo from '@/assets/logo.png';
-import { Footer } from '@/components';
+import { Footer, LanguageToggle } from '@/components';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50 sm:bg-slate-100">
@@ -21,6 +21,7 @@ export const LoginPage = () => {
           <LoginForm onSuccess={() => navigate('/overview')} />
         </div>
         <br className="my-2" />
+        <LanguageToggle />
         <Footer showLinks={false} />
       </div>
     </div>

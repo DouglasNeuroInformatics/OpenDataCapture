@@ -8,5 +8,23 @@
   "languages": {
     "en": "Anglais",
     "fr": "Français"
+  },
+  "footer": {
+    "documentation": "Documentation",
+    "license": "Licence",
+    "sourceCode": "Code source",
+    "contact": "Contactez-nous"
+  },
+  "navLinks": {
+    "overview": "Vue d'ensemble",
+    "addSubject": "Ajouter un client",
+    "lookupSubject": "Trouver un client",
+    "viewSubjects": "Afficher tous les clients",
+    "createInstrument": "Ajouter un instrument",
+    "availableInstruments": "Afficher tous les instruments"
+  },
+  "userDropup": {
+    "logout": "Se déconnecter",
+    "preferences": "Préférences"
   }
 }

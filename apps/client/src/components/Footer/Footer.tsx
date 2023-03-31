@@ -22,26 +22,26 @@ export interface FooterProps {
 }
 
 export const Footer = ({ showDevInfo = DEV, showLinks = true }: FooterProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
   return (
     <footer className="py-4 text-slate-600">
       {showLinks && (
         <div className="mb-3 flex justify-center gap-8">
           <a href={DOCS_URL} rel="noreferrer" target="_blank">
-            Documentation
+            {t('footer.documentation')}
           </a>
           <a href={LICENSE_URL} rel="noreferrer" target="_blank">
-            License
+            {t('footer.license')}
           </a>
           <a href={SOURCE_URL} rel="noreferrer" target="_blank">
-            Source Code
+            {t('footer.sourceCode')}
           </a>
-          <Link to="/contact">Contact</Link>
+          <Link to="/contact">{t('footer.contact')}</Link>
         </div>
       )}
       <p className="text-center text-sm text-slate-500">
-        &copy; {CURRENT_YEAR} {t('organizationName')}
+        &copy; {CURRENT_YEAR} {t('organization.name')}
       </p>
       {showDevInfo && (
         <p className="text-center text-sm text-slate-500">{`Last Commit '${GIT_COMMIT!}' to Branch '${GIT_BRANCH!}' on ${GIT_COMMIT_DATE!}`}</p>

@@ -10,24 +10,20 @@ export interface NavigationProps {
 }
 
 export const Navigation = (props: NavigationProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
+
   return (
     <nav>
-      <NavigationLink href="/overview" icon={<HiChartBar />} label={t('sidebar.links.overview')} {...props} />
+      <NavigationLink href="/overview" icon={<HiChartBar />} label={t('navLinks.overview')} {...props} />
+      <NavigationLink href="/subjects/add-subject" icon={<HiUserPlus />} label={t('navLinks.addSubject')} {...props} />
+      <NavigationLink href="/subjects/view-subjects" icon={<HiEye />} label={t(`navLinks.viewSubjects`)} {...props} />
+      <NavigationLink href="/instruments/create" icon={<HiPlus />} label={t('navLinks.createInstrument')} {...props} />
       <NavigationLink
-        href="/subjects/add-subject"
-        icon={<HiUserPlus />}
-        label={t('sidebar.links.addSubject')}
-        {...props}
-      />
-      <NavigationLink
-        href="/subjects/view-subjects"
+        href="/instruments/available"
         icon={<HiEye />}
-        label={t(`sidebar.links.viewSubjects`)}
+        label={t('navLinks.availableInstruments')}
         {...props}
       />
-      <NavigationLink href="/instruments/create" icon={<HiPlus />} label={t('sidebar.links.create')} {...props} />
-      <NavigationLink href="/instruments/available" icon={<HiEye />} label={t('sidebar.links.available')} {...props} />
     </nav>
   );
 };

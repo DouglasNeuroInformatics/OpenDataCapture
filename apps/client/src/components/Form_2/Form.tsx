@@ -16,7 +16,7 @@ export interface FormProps<T extends FormInstrumentData>
 export const Form = <T extends FormInstrumentData>({ content, details, validationSchema }: FormProps<T>) => {
   const [errors, setErrors] = useState<FormErrors<T>>({});
   const [values, setValues] = useState<T>(() => {
-    let defaultValues: FormValues;
+    let defaultValues: FormInstrumentData;
   });
 
   return (
