@@ -1,8 +1,10 @@
-export type FormFieldKind = 'text' | 'numeric' | 'options' | 'date' | 'binary' | 'complex';
+export type FormFieldKind = 'text' | 'numeric' | 'options' | 'date' | 'binary' | 'array';
 
-export type FormFieldValue = string | number | boolean;
+export type PrimitiveFieldValue = string | number | boolean;
 
-export type FormInstrumentData = Record<string, FormFieldValue | Record<string, FormFieldValue>>;
+export type ArrayFieldValue = Record<string, PrimitiveFieldValue>[];
+
+export type FormInstrumentData = Record<string, PrimitiveFieldValue | ArrayFieldValue>;
 
 export interface BaseFormField {
   /** Discriminator key */
@@ -42,7 +44,7 @@ export interface BinaryFormField extends BaseFormField {
 }
 
 /** A field where the underlying value of the field data is of type FormFieldValue */
-export type PrimitiveFormField<T extends FormFieldValue> = T extends string
+export type PrimitiveFormField<T extends PrimitiveFieldValue> = T extends string
   ? TextFormField | OptionsFormField<T> | DateFormField
   : T extends number
   ? NumericFormField
@@ -50,17 +52,17 @@ export type PrimitiveFormField<T extends FormFieldValue> = T extends string
   ? BinaryFormField
   : never;
 
-export interface ComplexFormField<T extends Record<string, FormFieldValue>> {
-  kind: 'complex';
+export interface ArrayFormField<T extends ArrayFieldValue> {
+  kind: 'array';
   fieldset: {
-    [K in keyof T]: PrimitiveFormField<T[K]>;
+    [K in keyof T[number]]: PrimitiveFormField<T[number][K]>;
   };
 }
 
-export type FormField<T = any> = [T] extends [FormFieldValue]
+export type FormField<T = any> = [T] extends [PrimitiveFieldValue]
   ? PrimitiveFormField<T>
-  : T extends Record<string, FormFieldValue>
-  ? ComplexFormField<T>
+  : T extends ArrayFieldValue
+  ? ArrayFormField<T>
   : never;
 
 export type FormFields<T extends FormInstrumentData = FormInstrumentData> = {

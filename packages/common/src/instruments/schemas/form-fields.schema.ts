@@ -2,15 +2,16 @@ import { JSONSchemaType } from 'ajv';
 import { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
 import {
+  ArrayFieldValue,
+  ArrayFormField,
   BaseFormField,
   BinaryFormField,
   DateFormField,
-  FormField,
-  FormFieldValue,
   FormFields,
   FormFieldsGroup,
   NumericFormField,
   OptionsFormField,
+  PrimitiveFieldValue,
   PrimitiveFormField,
   TextFormField
 } from '../interfaces/form/form-fields.interface';
@@ -107,16 +108,16 @@ export const binaryFieldSchema: JSONSchemaType<BinaryFormField> = {
   required: ['kind', 'label']
 };
 
-export const primitiveFieldSchema: JSONSchemaType<PrimitiveFormField<FormFieldValue>> = {
+export const primitiveFieldSchema: JSONSchemaType<PrimitiveFormField<PrimitiveFieldValue>> = {
   oneOf: [textFieldSchema, numericFieldSchema, optionsFieldSchema, dataFieldSchema, binaryFieldSchema]
 };
 
-export const complexFieldSchema: JSONSchemaType<FormField<Record<string, FormFieldValue>>> = {
+export const arrayFieldSchema: JSONSchemaType<ArrayFormField<ArrayFieldValue>> = {
   type: 'object',
   properties: {
     kind: {
       type: 'string',
-      const: 'complex'
+      const: 'array'
     },
     fieldset: {
       type: 'object',
@@ -135,7 +136,7 @@ export const formFieldsSchema: JSONSchemaType<FormFields> = {
   patternProperties: {
     '^.*$': {
       type: 'object',
-      oneOf: [primitiveFieldSchema, complexFieldSchema],
+      oneOf: [primitiveFieldSchema, arrayFieldSchema],
       required: []
     }
   },
@@ -155,7 +156,7 @@ export const formFieldsGroupSchema: JSONSchemaType<FormFieldsGroup> = {
       patternProperties: {
         '^.*$': {
           type: 'object',
-          oneOf: [primitiveFieldSchema, complexFieldSchema],
+          oneOf: [primitiveFieldSchema, arrayFieldSchema],
           required: []
         }
       },
