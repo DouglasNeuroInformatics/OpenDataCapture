@@ -44,7 +44,7 @@ export interface BinaryFormField extends BaseFormField {
 }
 
 /** A field where the underlying value of the field data is of type FormFieldValue */
-export type PrimitiveFormField<T extends PrimitiveFieldValue> = T extends string
+export type PrimitiveFormField<T extends PrimitiveFieldValue = PrimitiveFieldValue> = T extends string
   ? TextFormField | OptionsFormField<T> | DateFormField
   : T extends number
   ? NumericFormField
@@ -52,14 +52,14 @@ export type PrimitiveFormField<T extends PrimitiveFieldValue> = T extends string
   ? BinaryFormField
   : never;
 
-export interface ArrayFormField<T extends ArrayFieldValue> {
+export interface ArrayFormField<T extends ArrayFieldValue = ArrayFieldValue> {
   kind: 'array';
   fieldset: {
     [K in keyof T[number]]: PrimitiveFormField<T[number][K]>;
   };
 }
 
-export type FormField<T = any> = [T] extends [PrimitiveFieldValue]
+export type FormField<T> = [T] extends [PrimitiveFieldValue]
   ? PrimitiveFormField<T>
   : T extends ArrayFieldValue
   ? ArrayFormField<T>
