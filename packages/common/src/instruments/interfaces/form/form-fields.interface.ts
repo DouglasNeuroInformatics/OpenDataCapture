@@ -57,7 +57,7 @@ export interface ComplexFormField<T extends Record<string, FormFieldValue>> {
   };
 }
 
-export type FormField<T> = [T] extends [FormFieldValue]
+export type FormField<T = any> = [T] extends [FormFieldValue]
   ? PrimitiveFormField<T>
   : T extends Record<string, FormFieldValue>
   ? ComplexFormField<T>
