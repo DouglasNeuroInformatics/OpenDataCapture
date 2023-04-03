@@ -1,22 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { FormInstrument, FormInstrumentData, FormSummary } from '@ddcp/common';
+import { FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@ddcp/common';
 
 import { InstrumentsRepository } from '../repositories/instruments.repository';
 
 @Injectable()
-export class FormInstrumentsService {
+export class FormsService {
   constructor(private readonly instrumentsRepository: InstrumentsRepository) {}
 
   create<T extends FormInstrumentData>(formInstrument: FormInstrument<T>): Promise<any> {
     return this.instrumentsRepository.create(formInstrument);
   }
-
+  
   findAll(): Promise<any[]> {
     return this.instrumentsRepository.find({ kind: 'form' });
   }
 
-  async getAvailable(): Promise<FormSummary[]> {
+  async getAvailable(): Promise<FormInstrumentSummary[]> {
     return this.instrumentsRepository.find({ kind: 'form' }).select('name tags version details').lean();
   }
 

@@ -13,8 +13,8 @@ import { Connection } from 'mongoose';
 
 import { CreateGroupDto } from '@/groups/dto/create-group.dto';
 import { GroupsService } from '@/groups/groups.service';
-import { FormInstrumentsService } from '@/instruments/services/form-instruments.service';
-import { InstrumentRecordsService } from '@/instruments/services/instrument-records.service';
+import { FormRecordsService } from '@/instruments/services/form-records.service';
+import { FormsService } from '@/instruments/services/forms.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UsersService } from '@/users/users.service';
@@ -70,8 +70,8 @@ export class DemoService {
     private readonly groupsService: GroupsService,
     private readonly usersService: UsersService,
     private readonly subjectsService: SubjectsService,
-    private readonly formInstrumentsService: FormInstrumentsService,
-    private readonly instrumentRecordsService: InstrumentRecordsService
+    private readonly formsService: FormsService,
+    private readonly formRecordsService: FormRecordsService
   ) {}
 
   async initDemo({ groups, users, nSubjects }: InitDemoOptions = defaultDemoOptions): Promise<void> {
@@ -84,12 +84,10 @@ export class DemoService {
     for (const user of users) {
       await this.usersService.create(user);
     }
-    const bprs = (await this.formInstrumentsService.create(
+    const bprs = (await this.formsService.create(
       briefPsychiatricRatingScale
     )) as FormInstrument<BriefPsychiatricRatingScaleData>;
-    const hq = (await this.formInstrumentsService.create(
-      happinessQuestionnaire
-    )) as FormInstrument<HappinessQuestionnaireData>;
+    const hq = (await this.formsService.create(happinessQuestionnaire)) as FormInstrument<HappinessQuestionnaireData>;
 
     for (let i = 0; i < nSubjects; i++) {
       const subject = await this.subjectsService.create({
@@ -102,7 +100,7 @@ export class DemoService {
       const group = await this.groupsService.findOne(Random.value(groups).name);
 
       for (let j = 0; j < 3; j++) {
-        await this.instrumentRecordsService.createFormRecord({
+        await this.formRecordsService.create({
           kind: 'form',
           dateCollected: faker.date.recent(365),
           instrument: hq,
@@ -118,7 +116,7 @@ export class DemoService {
 
       Object.fromEntries(Object.keys(fields).map((field) => [field, '']));
       for (let j = 0; j < 3; j++) {
-        await this.instrumentRecordsService.createFormRecord({
+        await this.formRecordsService.create({
           kind: 'form',
           dateCollected: faker.date.recent(365),
           instrument: bprs,

@@ -9,7 +9,7 @@ import { useFetch } from '@/hooks/useFetch';
 export const SubjectPage = () => {
   const params = useParams();
 
-  const { data } = useFetch<FormInstrumentRecord[]>(`/instruments/records?subject=${params.subjectId!}`);
+  const { data } = useFetch<FormInstrumentRecord[]>(`/instruments/records/forms?subject=${params.subjectId!}`);
 
   if (!data) {
     return <Spinner />;

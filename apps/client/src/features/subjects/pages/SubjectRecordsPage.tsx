@@ -17,7 +17,7 @@ export const SubjectRecordsPage = () => {
   const params = useParams();
 
   const subjectRecords = useFetch<FormInstrumentRecord[]>(
-    `/instruments/records?instrument=${params.instrumentName!}&subject=${params.subjectId!}`
+    `/instruments/records/forms?instrument=${params.instrumentName!}&subject=${params.subjectId!}`
   );
 
   const [selectedFields, setSelectedFields] = useState<string[]>([]);

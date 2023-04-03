@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FormSummary } from '@ddcp/common';
+import { FormInstrumentSummary } from '@ddcp/common';
 
 import { InstrumentCard } from '../components/InstrumentCard';
 
@@ -8,7 +8,7 @@ import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 export const AvailableInstrumentsPage = () => {
-  const { data } = useFetch<FormSummary[]>('/instruments/forms/available');
+  const { data } = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
 
   if (!data) {
     return <Spinner />;

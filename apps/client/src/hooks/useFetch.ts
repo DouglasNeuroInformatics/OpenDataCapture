@@ -19,7 +19,7 @@ type UseFetchOptions = GetRequestOptions | PostRequestOptions;
 /** Common hook used throughout the application to request data from our API. The
  * base URL used for requests is set in the Vite config.
  * @example
- * useFetch('/api/get-data')
+ * useFetch('/users')
  */
 export function useFetch<T = unknown>(
   resourceURL: string,

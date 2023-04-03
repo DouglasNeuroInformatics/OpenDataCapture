@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { FormSummary } from '@ddcp/common';
+import { FormInstrumentSummary } from '@ddcp/common';
 import { HiArrowRight, HiPencilSquare } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
 export interface InstrumentCardProps {
-  instrument: FormSummary;
+  instrument: FormInstrumentSummary;
 }
 
 export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
