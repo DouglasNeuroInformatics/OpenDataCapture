@@ -5,5 +5,5 @@ export interface FormFieldContainerProps {
 }
 
 export const FormFieldContainer = ({ children }: FormFieldContainerProps) => {
-  return <div className="relative my-5">{children}</div>;
+  return <div className="relative my-6 flex flex-col">{children}</div>;
 };

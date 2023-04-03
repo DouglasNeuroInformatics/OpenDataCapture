@@ -31,7 +31,7 @@
   }
 
   .field-label-floating {
-    @apply absolute left-0 transition-all;
+    @apply field-label absolute left-0 transition-all;
   }
 
   .field-label-floating--active {

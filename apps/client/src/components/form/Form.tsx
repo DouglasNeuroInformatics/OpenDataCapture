@@ -11,6 +11,7 @@ import { FormValues } from './types';
 
 import { FormProvider } from '@/context/FormContext';
 import { useForm } from '@/hooks/useForm';
+import { OptionsField } from './OptionsField';
 
 export interface FormProps<T extends FormInstrumentData>
   extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
@@ -48,6 +49,8 @@ export const Form = <T extends FormInstrumentData>({
               return <TextField {...props} />;
             case 'numeric':
               return <NumericField {...props} />;
+            case 'options':
+              return <OptionsField {...props} />;
             default:
               return null;
           }

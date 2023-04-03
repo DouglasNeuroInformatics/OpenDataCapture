@@ -33,7 +33,7 @@ export const NumericField = ({ name, label, min, max }: NumericFieldProps) => {
           value={displayValue}
           onChange={handleChange}
         />
-        <div className="ml-2 flex items-center justify-center">{displayValue}</div>
+        <div className="ml-2 flex items-center justify-center text-gray-600">{displayValue}</div>
       </div>
     </FormFieldContainer>
   );
