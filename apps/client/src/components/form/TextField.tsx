@@ -32,8 +32,8 @@ export const TextField = ({ name, label, variant }: TextFieldProps) => {
         <textarea autoComplete="off" className="field-input peer" rows={5} value={value} onChange={handleChange} />
       )}
       <label
-        className={clsx('field-label peer-focus:field-label-floating', {
-          'field-label-floating': value
+        className={clsx('field-label field-label-floating peer-focus:field-label-floating--active', {
+          'field-label-floating--active': value
         })}
         htmlFor={name}
       >

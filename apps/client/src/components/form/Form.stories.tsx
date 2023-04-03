@@ -5,36 +5,37 @@ import { Form } from './Form';
 export default { component: Form } as Meta<typeof Form>;
 
 type BasicFormValues = {
-  firstName: string;
-  lastName: string;
-  scores: Array<{
-    value: number;
-  }>;
+  textShort: string;
+  textLong: string;
+  textPassword: string;
+  numeric: number;
 };
 
 export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
   args: {
     content: {
-      firstName: {
+      textShort: {
         kind: 'text',
-        label: 'First Name',
+        label: 'Short Text',
         variant: 'short'
       },
-      lastName: {
+      textLong: {
         kind: 'text',
-        label: 'Last Name',
-        variant: 'short'
+        label: 'Long Text',
+        variant: 'long'
       },
-      scores: {
-        kind: 'array',
-        fieldset: {
-          value: {
-            kind: 'numeric',
-            label: 'Value',
-            variant: 'default'
-          }
-        }
+      textPassword: {
+        kind: 'text',
+        label: 'Password',
+        variant: 'password'
+      },
+      numeric: {
+        kind: 'numeric',
+        label: 'Numeric',
+        min: 0,
+        max: 10
       }
-    }
+    },
+    onSubmit: (data) => alert(JSON.stringify(data))
   }
 };

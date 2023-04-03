@@ -3,6 +3,9 @@ import React from 'react';
 import { FormInstrument, FormInstrumentData } from '@ddcp/common';
 import { clsx } from 'clsx';
 
+import { Button } from '../Button';
+
+import { NumericField } from './NumericField';
 import { TextField } from './TextField';
 import { FormValues } from './types';
 
@@ -12,6 +15,7 @@ import { useForm } from '@/hooks/useForm';
 export interface FormProps<T extends FormInstrumentData>
   extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
   className?: string;
+  submitBtnLabel?: string;
   onSubmit: (data: FormValues<T>) => void;
 }
 
@@ -19,6 +23,7 @@ export const Form = <T extends FormInstrumentData>({
   content,
   className,
   // validationSchema,
+  submitBtnLabel,
   onSubmit
 }: FormProps<T>) => {
   const form = useForm<T>(content);
@@ -40,10 +45,13 @@ export const Form = <T extends FormInstrumentData>({
           switch (props.kind) {
             case 'text':
               return <TextField {...props} />;
+            case 'numeric':
+              return <NumericField {...props} />;
             default:
               return null;
           }
         })}
+        <Button className="mt-5 w-full" label={submitBtnLabel ?? 'Submit'} type="submit" />
       </form>
     </FormProvider>
   );
