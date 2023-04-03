@@ -1,0 +1,19 @@
+{
+  "createInstrument": {
+    "pageTitle": "Ajouter un instrument",
+    "form": {
+      "name": {
+        "label": "Nom du champ"
+      },
+      "description": {
+        "label": "Description du champ"
+      },
+      "instructions": {
+        "label": "Instructions"
+      }
+    }
+  },
+  "availableInstruments": {
+    "pageTitle": "Afficher tous les instruments"
+  }
+}

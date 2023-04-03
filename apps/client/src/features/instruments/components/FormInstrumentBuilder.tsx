@@ -1,21 +1,25 @@
+/* eslint-disable no-alert */
 import React from 'react';
 
 import { JSONSchemaType } from 'ajv';
+import { useTranslation } from 'react-i18next';
 
-import { FieldKind, Form, type FormStructure } from '@/components';
+import { Form } from '@/components';
 
-type FormValues = {
+type CreateFormData = {
   name: string;
   description: string;
   instructions: string;
+  /*
   data: Array<{
     name: string;
     kind: FieldKind;
     label: string;
     variant: string;
-  }>;
+  }>; */
 };
 
+/*
 const structure: FormStructure<FormValues> = [
   {
     title: 'Instrument Details',
@@ -126,8 +130,47 @@ const validationSchema: JSONSchemaType<FormValues> = {
   required: ['name', 'description', 'instructions', 'data']
 };
 
+*/
 export const FormInstrumentBuilder = () => {
-  // eslint-disable-next-line no-alert
-  const handleSubmit = (data: FormValues) => alert(JSON.stringify(data));
-  return <Form structure={structure} validationSchema={validationSchema} onSubmit={handleSubmit} />;
+  const { t } = useTranslation('instruments');
+  return (
+    <Form<CreateFormData>
+      content={{
+        name: {
+          kind: 'text',
+          label: t('createInstrument.form.name.label'),
+          variant: 'short'
+        },
+        description: {
+          kind: 'text',
+          label: t('createInstrument.form.description.label'),
+          variant: 'long'
+        },
+        instructions: {
+          kind: 'text',
+          label: t('createInstrument.form.instructions.label'),
+          variant: 'long'
+        }
+      }}
+      validationSchema={{
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            minLength: 1
+          },
+          description: {
+            type: 'string',
+            minLength: 1
+          },
+          instructions: {
+            type: 'string',
+            minLength: 1
+          }
+        },
+        required: ['description', 'instructions', 'name']
+      }}
+      onSubmit={(data) => alert(JSON.stringify(data))}
+    />
+  );
 };
