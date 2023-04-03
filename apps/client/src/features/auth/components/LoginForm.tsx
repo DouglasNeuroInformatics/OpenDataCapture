@@ -21,7 +21,6 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const auth = useAuthStore();
   const { t } = useTranslation(['auth', 'form']);
 
-  t('auth:login.form.username');
   const content: FormInstrumentContent<LoginFormData> = {
     username: {
       kind: 'text',

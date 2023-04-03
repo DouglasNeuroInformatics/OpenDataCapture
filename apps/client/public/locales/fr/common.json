@@ -26,5 +26,16 @@
   "userDropup": {
     "logout": "Se déconnecter",
     "preferences": "Préférences"
+  },
+  "sex": {
+    "male": "Masculin",
+    "female": "Féminin"
+  },
+  "identificationForm": {
+    "firstName": "Prénom",
+    "lastName": "Nom de famille",
+    "sex": "Sexe",
+    "dateOfBirth": "Date de naissance",
+    "submit": "Soumettre"
   }
 }

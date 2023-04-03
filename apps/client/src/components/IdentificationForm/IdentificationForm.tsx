@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useTransition } from 'react';
 
 import { Sex } from '@ddcp/common';
-import { JSONSchemaType } from 'ajv';
+import { useTranslation } from 'react-i18next';
 
-import { Form, FormStructure } from '@/components';
+import { Form } from '@/components';
 
 type IdentificationFormData = {
   firstName: string;
@@ -12,6 +12,7 @@ type IdentificationFormData = {
   dateOfBirth: string;
 };
 
+/*
 const structure: FormStructure<IdentificationFormData> = [
   {
     fields: {
@@ -65,13 +66,68 @@ const validationSchema: JSONSchemaType<IdentificationFormData> = {
   additionalProperties: false,
   required: ['firstName', 'lastName', 'sex', 'dateOfBirth']
 };
+*/
 
 export interface IdentificationFormProps {
   onSubmit: (data: IdentificationFormData) => void;
 }
 
 export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
-  return <Form structure={structure} validationSchema={validationSchema} onSubmit={onSubmit} />;
+  const { t } = useTranslation('common');
+
+  return (
+    <Form<IdentificationFormData>
+      content={{
+        firstName: {
+          kind: 'text',
+          label: t('identificationForm.firstName'),
+          variant: 'short'
+        },
+        lastName: {
+          kind: 'text',
+          label: t('identificationForm.lastName'),
+          variant: 'short'
+        },
+        sex: {
+          kind: 'options',
+          label: t('identificationForm.sex'),
+          options: {
+            MALE: t('sex.male'),
+            FEMALE: t('sex.female')
+          }
+        },
+        dateOfBirth: {
+          kind: 'date',
+          label: t('identificationForm.dateOfBirth')
+        }
+      }}
+      submitBtnLabel={t('identificationForm.submit')}
+      validationSchema={{
+        type: 'object',
+        properties: {
+          firstName: {
+            type: 'string',
+            minLength: 1
+          },
+          lastName: {
+            type: 'string',
+            minLength: 1
+          },
+          sex: {
+            type: 'string',
+            enum: Object.values(Sex)
+          },
+          dateOfBirth: {
+            type: 'string',
+            format: 'date'
+          }
+        },
+        additionalProperties: false,
+        required: ['firstName', 'lastName', 'sex', 'dateOfBirth']
+      }}
+      onSubmit={onSubmit}
+    />
+  );
 };
 
 export type { IdentificationFormData };

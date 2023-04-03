@@ -26,5 +26,16 @@
   "userDropup": {
     "logout": "Logout",
     "preferences": "Preferences"
+  },
+  "sex": {
+    "male": "Male",
+    "female": "Female"
+  },
+  "identificationForm": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "sex": "Sex",
+    "dateOfBirth": "Date of Birth",
+    "submit": "Submit"
   }
 }
