@@ -16,5 +16,23 @@
         "sex": "Sexe"
       }
     }
+  },
+  "subjectPage": {
+    "pageTitle": "Dossiers d'instruments pour le client",
+    "table": {
+      "columns": {
+        "title": "Titre",
+        "version": "Version",
+        "nRecords": "Nombre d'enregistrements"
+      }
+    }
+  },
+  "subjectRecordsPage": {
+    "graph": {
+      "title": "Dossiers pour le client",
+      "fields": "Champs",
+      "xLabel": "Date d'enregistrement",
+      "yLabel": "Valeur"
+    }
   }
 }

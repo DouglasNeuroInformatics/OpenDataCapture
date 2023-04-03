@@ -16,5 +16,23 @@
         "sex": "Sex"
       }
     }
+  },
+  "subjectPage": {
+    "pageTitle": "Instrument Records for Subject",
+    "table": {
+      "columns": {
+        "title": "Title",
+        "version": "Version",
+        "nRecords": "Number of Records"
+      }
+    }
+  },
+  "subjectRecordsPage": {
+    "graph": {
+      "title": "Records for Subject",
+      "fields": "Fields",
+      "xLabel": "Date Collected",
+      "yLabel": "Score"
+    }
   }
 }

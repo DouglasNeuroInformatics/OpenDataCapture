@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { FormInstrumentRecord } from '@ddcp/common';
 import { Listbox, Transition } from '@headlessui/react';
+import { useTranslation } from 'react-i18next';
 import { HiCheck } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
@@ -15,6 +16,7 @@ function camelToTitleCase(s: string) {
 
 export const SubjectRecordsPage = () => {
   const params = useParams();
+  const { t } = useTranslation('subjects');
 
   const subjectRecords = useFetch<FormInstrumentRecord[]>(
     `/instruments/records/forms?instrument=${params.instrumentName!}&subject=${params.subjectId!}`
@@ -37,12 +39,18 @@ export const SubjectRecordsPage = () => {
     return { dateCollected: (dateCollected as any as string).split('T')[0], ...filteredData };
   });
 
+  const instrumentTitle = subjectRecords.data[0].instrument.details.title ?? params.instrumentName!;
+  const instrumentVersion = subjectRecords.data[0].instrument.version;
+
   return (
     <div>
-      <PageHeader title={`${params.instrumentName!}: Records for Subject ${params.subjectId!.slice(0, 6)}`} />
-      <div className="flex justify-end p-2">
+      <PageHeader title={`${instrumentTitle}: Version ${instrumentVersion.toPrecision(2)}`} />
+      <div className="flex items-center justify-between p-2">
+        <h3 className="text-xl font-medium text-slate-700">{`${t(
+          'subjectRecordsPage.graph.title'
+        )}: ${params.subjectId!.slice(0, 6)}`}</h3>
         <Listbox multiple as="div" className="relative" value={selectedFields} onChange={setSelectedFields}>
-          <Listbox.Button as={Button} label="Questions" />
+          <Listbox.Button as={Button} label={t('subjectRecordsPage.graph.fields')} />
           <Transition
             as={React.Fragment}
             leave="transition ease-in duration-100"
@@ -66,8 +74,8 @@ export const SubjectRecordsPage = () => {
       </div>
       <LineGraph
         data={graphData}
-        xAxis={{ key: 'dateCollected', label: 'Date Collected' }}
-        yAxis={{ label: 'Score' }}
+        xAxis={{ key: 'dateCollected', label: t('subjectRecordsPage.graph.xLabel') }}
+        yAxis={{ label: t('subjectRecordsPage.graph.yLabel') }}
       />
     </div>
   );
