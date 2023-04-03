@@ -3,13 +3,14 @@ import React from 'react';
 import { NumericFormField } from '@ddcp/common';
 
 import { FormFieldContainer } from './FormFieldContainer';
+import { FormFieldDescription } from './FormFieldDescription';
 import { BaseFieldProps } from './types';
 
 import { useFormField } from '@/hooks/useFormField';
 
 export type NumericFieldProps = BaseFieldProps<NumericFormField>;
 
-export const NumericField = ({ name, label, min, max }: NumericFieldProps) => {
+export const NumericField = ({ description, name, label, min, max }: NumericFieldProps) => {
   const { value, setValue } = useFormField<number>(name);
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -23,7 +24,7 @@ export const NumericField = ({ name, label, min, max }: NumericFieldProps) => {
       <label className="field-label" htmlFor={name}>
         {label}
       </label>
-      <div className="flex">
+      <div className="flex gap-3">
         <input
           className="field-input-base"
           max={max}
@@ -33,7 +34,8 @@ export const NumericField = ({ name, label, min, max }: NumericFieldProps) => {
           value={displayValue}
           onChange={handleChange}
         />
-        <div className="ml-2 flex items-center justify-center text-gray-600">{displayValue}</div>
+        <div className="flex items-center justify-center text-gray-600">{displayValue}</div>
+        <FormFieldDescription description={description} />
       </div>
     </FormFieldContainer>
   );

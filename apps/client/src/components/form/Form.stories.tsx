@@ -31,6 +31,7 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
         variant: 'password'
       },
       numeric: {
+        description: 'This is a numeric field',
         kind: 'numeric',
         label: 'Numeric',
         min: 0,
@@ -39,7 +40,11 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       options: {
         kind: 'options',
         label: 'Options',
-        options: ['a', 'b', 'c']
+        options: {
+          a: 'Option A',
+          b: 'Option B',
+          c: 'Option C'
+        }
       }
     },
     onSubmit: (data) => alert(JSON.stringify(data))

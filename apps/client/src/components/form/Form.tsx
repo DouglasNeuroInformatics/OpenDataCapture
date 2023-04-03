@@ -6,12 +6,12 @@ import { clsx } from 'clsx';
 import { Button } from '../Button';
 
 import { NumericField } from './NumericField';
+import { OptionsField } from './OptionsField';
 import { TextField } from './TextField';
 import { FormValues } from './types';
 
 import { FormProvider } from '@/context/FormContext';
 import { useForm } from '@/hooks/useForm';
-import { OptionsField } from './OptionsField';
 
 export interface FormProps<T extends FormInstrumentData>
   extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
