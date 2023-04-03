@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 
 import { Subject } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
+
+import { SubjectLookup } from './SubjectLookup';
 
 import { Dropdown, SearchBar, Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
@@ -13,8 +15,9 @@ export interface SubjectTableProps {
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const downloadJSON = useDownload('/api/v0/instruments/records/export-json', 'records.json');
   const downloadCSV = useDownload('/api/v0/instruments/records/export-csv', 'records.csv');
-
   const { t } = useTranslation(['common', 'subjects']);
+
+  const [showLookup, setShowLookup] = useState(false);
 
   const handleExportSelection = (option: string | ('JSON' | 'CSV')) => {
     switch (option) {
@@ -27,10 +30,16 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
     }
   };
 
+  /** Called when the user clicks outside the modal */
+  const handleLookupClose = () => {
+    setShowLookup(false);
+  };
+
   return (
-    <div>
+    <>
+      <SubjectLookup show={showLookup} onClose={handleLookupClose} />
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
-        <SearchBar />
+        <SearchBar onClick={() => setShowLookup(true)} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <Dropdown options={[]} title={t('subjects:viewSubjects.table.filters')} onSelection={() => null} />
           <Dropdown
@@ -58,6 +67,6 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         data={data}
         entryLinkFactory={(subject) => subject.identifier}
       />
-    </div>
+    </>
   );
 };

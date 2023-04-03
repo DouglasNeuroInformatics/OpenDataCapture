@@ -12,6 +12,9 @@
         "dateOfBirth": "Date de naissance",
         "sex": "Sexe"
       }
+    },
+    "lookup": {
+      "title": "Trouver un client"
     }
   },
   "subjectPage": {

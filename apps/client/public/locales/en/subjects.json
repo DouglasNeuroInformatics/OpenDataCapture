@@ -12,6 +12,9 @@
         "dateOfBirth": "Date of Birth",
         "sex": "Sex"
       }
+    },
+    "lookup": {
+      "title": "Subject Lookup"
     }
   },
   "subjectPage": {
