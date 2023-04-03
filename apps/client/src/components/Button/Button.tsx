@@ -16,12 +16,13 @@ export const Button = React.forwardRef(function Button(
 ) {
   return (
     <button
-      className={clsx(className, 'btn', {
+      className={clsx('btn', {
         'py-2 px-4 text-sm': size === 'sm',
         'text-md py-2 px-6': size === 'md',
         'py-3 px-8 text-lg': size === 'lg',
         'btn-dark': variant === 'dark',
-        'btn-light': variant === 'light'
+        'btn-light': variant === 'light',
+        className
       })}
       ref={ref}
       {...props}

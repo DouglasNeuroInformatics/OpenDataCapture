@@ -13,7 +13,7 @@ export interface DropdownProps {
 
 export const Dropdown = ({ title, options, onSelection }: DropdownProps) => {
   return (
-    <Menu as="div" className="relative inline-block h-full text-left">
+    <Menu as="div" className="relative flex w-full">
       <Menu.Button
         as={Button}
         className="h-full w-full"
@@ -21,9 +21,11 @@ export const Dropdown = ({ title, options, onSelection }: DropdownProps) => {
         icon={<HiChevronDown />}
         iconPosition="right"
         label={title}
+        style={{ width: '100%' }}
       />
       <Transition
-        as={React.Fragment}
+        as="div"
+        className="absolute bottom-0 z-10 w-full"
         enter="transition ease-out duration-100"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
@@ -31,7 +33,7 @@ export const Dropdown = ({ title, options, onSelection }: DropdownProps) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 z-10 mt-2 flex w-full flex-col border">
+        <Menu.Items className="absolute z-10 mt-2 flex w-full flex-col border">
           {options.map((option) => (
             <Menu.Item key={option}>
               <button

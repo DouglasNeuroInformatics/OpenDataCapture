@@ -29,9 +29,9 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
 
   return (
     <div>
-      <div className="my-2 flex justify-between gap-5">
+      <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
         <SearchBar />
-        <div className="flex gap-2">
+        <div className="flex flex-grow gap-2 lg:flex-shrink">
           <Dropdown options={[]} title={t('subjects:viewSubjects.table.filters')} onSelection={() => null} />
           <Dropdown
             options={['CSV', 'JSON']}
