@@ -35,7 +35,10 @@ export function useForm<T extends FormInstrumentData>(content: FormInstrumentCon
   const [errors, setErrors] = useState<FormErrors<T>>({});
   const [values, setValues] = useState<FormValues<T>>(() => getDefaultValues(content));
 
-  const reset = () => setValues(getDefaultValues(content));
+  const reset = () => {
+    setValues(getDefaultValues(content));
+    setErrors({});
+  };
 
   return { errors, setErrors, reset, values, setValues };
 }

@@ -4,6 +4,7 @@ import { Sex } from '@ddcp/common';
 import unidecode from 'unidecode';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
+import { LookupSubjectDto } from './dto/lookup-subject.dto';
 import { SubjectEntity } from './entities/subject.entity';
 import { SubjectsRepository } from './subjects.repository';
 
@@ -23,6 +24,11 @@ export class SubjectsService {
 
   async findAll(): Promise<SubjectEntity[]> {
     return this.subjectsRepository.find();
+  }
+
+  async lookup({ firstName, lastName, dateOfBirth, sex }: LookupSubjectDto): Promise<SubjectEntity> {
+    const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
+    return this.findByIdentifier(identifier);
   }
 
   async findByIdentifier(identifier: string): Promise<SubjectEntity> {

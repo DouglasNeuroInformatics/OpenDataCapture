@@ -17,7 +17,7 @@ export interface IdentificationFormProps {
 }
 
 export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['common', 'form']);
 
   return (
     <Form<IdentificationFormData>
@@ -70,7 +70,15 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
           }
         },
         additionalProperties: false,
-        required: ['firstName', 'lastName', 'sex', 'dateOfBirth']
+        required: ['firstName', 'lastName', 'sex', 'dateOfBirth'],
+        errorMessage: {
+          properties: {
+            firstName: t('form:errors.required'),
+            lastName: t('form:errors.required'),
+            sex: t('form:errors.required'),
+            dateOfBirth: t('form:errors.required')
+          }
+        }
       }}
       onSubmit={onSubmit}
     />

@@ -7,6 +7,7 @@ import { SubjectsService } from './subjects.service';
 
 import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { LookupSubjectDto } from './dto/lookup-subject.dto';
 
 @ApiTags('Subjects')
 @Controller('subjects')
@@ -25,5 +26,12 @@ export class SubjectsController implements EntityController<SubjectEntity> {
   @RouteAccess({ action: 'read', subject: 'Subject' })
   findAll(): Promise<SubjectEntity[]> {
     return this.subjectsService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Lookup Subject' })
+  @Post('lookup')
+  @RouteAccess({ action: 'read', subject: 'Subject' })
+  lookup(@Body() lookupSubjectDto: LookupSubjectDto): Promise<SubjectEntity> {
+    return this.subjectsService.lookup(lookupSubjectDto);
   }
 }
