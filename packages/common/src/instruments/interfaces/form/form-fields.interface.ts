@@ -27,6 +27,8 @@ export interface TextFormField extends BaseFormField {
 
 export interface NumericFormField extends BaseFormField {
   kind: 'numeric';
+  min: number;
+  max: number;
 }
 
 export interface OptionsFormField<T extends string = string> extends BaseFormField {
