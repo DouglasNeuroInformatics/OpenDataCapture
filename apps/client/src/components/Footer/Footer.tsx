@@ -50,11 +50,9 @@ export const Footer = ({ showDevInfo = DEV, showLinks = true }: FooterProps) => 
       <p className="text-center text-sm text-slate-500">
         &copy; {CURRENT_YEAR} {t('organization.name')}
       </p>
+      {showDevInfo && (
+        <p className="text-center text-sm text-slate-500">{`Last Commit '${GIT_COMMIT!}' to Branch '${GIT_BRANCH!}' on ${GIT_COMMIT_DATE!}`}</p>
+      )}
     </footer>
   );
 };
-
-/*
-      {showDevInfo && (
-        <p className="text-center text-sm text-slate-500">{`Last Commit '${GIT_COMMIT!}' to Branch '${GIT_BRANCH!}' on ${GIT_COMMIT_DATE!}`}</p>
-      )}*/

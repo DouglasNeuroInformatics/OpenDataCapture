@@ -6,6 +6,8 @@ import {
   BriefPsychiatricRatingScaleData,
   HappinessQuestionnaireData,
   briefPsychiatricRatingScale,
+  enhancedDemographicsQuestionnaireEn,
+  enhancedDemographicsQuestionnaireFr,
   happinessQuestionnaire
 } from '@ddcp/instruments';
 import { faker } from '@faker-js/faker';
@@ -88,6 +90,8 @@ export class DemoService {
       briefPsychiatricRatingScale
     )) as FormInstrument<BriefPsychiatricRatingScaleData>;
     const hq = (await this.formsService.create(happinessQuestionnaire)) as FormInstrument<HappinessQuestionnaireData>;
+    await this.formsService.create(enhancedDemographicsQuestionnaireEn);
+    await this.formsService.create(enhancedDemographicsQuestionnaireFr);
 
     for (let i = 0; i < nSubjects; i++) {
       const subject = await this.subjectsService.create({
