@@ -20,7 +20,7 @@ export const NumericField = ({ description, name, label, min, max }: NumericFiel
   const displayValue = value ?? min;
 
   return (
-    <FormFieldContainer description={description} error={error}>
+    <FormFieldContainer error={error}>
       <label className="field-label" htmlFor={name}>
         {label}
       </label>

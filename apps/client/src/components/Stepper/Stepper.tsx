@@ -4,6 +4,7 @@ import { Button } from '../Button';
 
 import { StepperDivider } from './StepperDivider';
 import { StepperIcon } from './StepperIcon';
+import { StepperContext } from '@/context/StepperContext';
 
 interface Step {
   label: string;
@@ -26,7 +27,7 @@ const Stepper = ({ steps }: StepperProps) => {
   }, 0);
 
   return (
-    <div>
+    <StepperContext.Provider value={{ index, updateIndex }}>
       <div className="mx-2 mb-16 flex items-center">
         {steps.map((step, i) => (
           <>
@@ -37,11 +38,7 @@ const Stepper = ({ steps }: StepperProps) => {
       </div>
       <h3 className="mb-4 text-2xl font-semibold">{steps[index].label}</h3>
       <div>{steps[index].element}</div>
-      <div className="mx-auto my-8 flex max-w-lg justify-between">
-        <Button label="Previous" onClick={() => updateIndex('decrement')} />
-        <Button label="Next" onClick={() => updateIndex('increment')} />
-      </div>
-    </div>
+    </StepperContext.Provider>
   );
 };
 

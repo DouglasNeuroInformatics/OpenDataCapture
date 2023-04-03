@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { FormDetails } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
+
+import { Button } from '@/components';
+import { StepperContext } from '@/context/StepperContext';
 
 interface FormOverviewItemProps {
   heading: string;
@@ -24,13 +27,18 @@ interface FormOverviewProps {
 export const FormOverview = ({
   details: { description, language, estimatedDuration, instructions }
 }: FormOverviewProps) => {
+  const { updateIndex } = useContext(StepperContext);
+
   const { t } = useTranslation('common');
   return (
-    <div>
-      <FormOverviewItem heading="Description" text={description} />
-      <FormOverviewItem heading="Language" text={t(`languages.${language}`)} />
-      <FormOverviewItem heading="Estimated Duration" text={`${estimatedDuration} Minutes`} />
-      <FormOverviewItem heading="Instructions" text={instructions} />
+    <div className="mb-2">
+      <div className="mb-5">
+        <FormOverviewItem heading="Description" text={description} />
+        <FormOverviewItem heading="Language" text={t(`languages.${language}`)} />
+        <FormOverviewItem heading="Estimated Duration" text={`${estimatedDuration} Minutes`} />
+        <FormOverviewItem heading="Instructions" text={instructions} />
+      </div>
+      <Button label="Begin" onClick={() => updateIndex('increment')} />
     </div>
   );
 };
