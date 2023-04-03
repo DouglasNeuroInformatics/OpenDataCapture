@@ -1,5 +1,20 @@
 {
   "addSubject": {
     "pageTitle": "Ajouter un client"
+  },
+  "viewSubjects": {
+    "pageTitle": "Afficher tous les clients",
+    "table": {
+      "search": {
+        "placeholder": "Rechercher..."
+      },
+      "filters": "Filtres",
+      "export": "Exporter",
+      "columns": {
+        "subject": "Client",
+        "dateOfBirth": "Date de naissance",
+        "sex": "Sexe"
+      }
+    }
   }
 }

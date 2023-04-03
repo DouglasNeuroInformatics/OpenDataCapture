@@ -1,5 +1,20 @@
 {
   "addSubject": {
     "pageTitle": "Add Subject"
+  },
+  "viewSubjects": {
+    "pageTitle": "View Subjects",
+    "table": {
+      "search": {
+        "placeholder": "Search..."
+      },
+      "filters": "Filters",
+      "export": "Export",
+      "columns": {
+        "subject": "Subject",
+        "dateOfBirth": "Date of Birth",
+        "sex": "Sex"
+      }
+    }
   }
 }
