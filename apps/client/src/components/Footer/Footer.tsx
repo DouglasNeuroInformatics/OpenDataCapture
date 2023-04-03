@@ -3,6 +3,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
+import { LanguageToggle } from '../LanguageToggle';
+
 const CURRENT_YEAR = new Date().getFullYear();
 
 const DEV = import.meta.env.DEV;
@@ -25,7 +27,7 @@ export const Footer = ({ showDevInfo = DEV, showLinks = true }: FooterProps) => 
   const { t } = useTranslation('common');
 
   return (
-    <footer className="py-4 text-slate-600">
+    <footer className="py-3 text-slate-600">
       {showLinks && (
         <div className="mb-3 flex justify-center gap-8">
           <a href={DOCS_URL} rel="noreferrer" target="_blank">
@@ -40,12 +42,19 @@ export const Footer = ({ showDevInfo = DEV, showLinks = true }: FooterProps) => 
           <Link to="/contact">{t('footer.contact')}</Link>
         </div>
       )}
+      <div className="@container">
+        <div className="@md:hidden mb-2 flex justify-center">
+          <LanguageToggle className="text-sm text-slate-500" />
+        </div>
+      </div>
       <p className="text-center text-sm text-slate-500">
         &copy; {CURRENT_YEAR} {t('organization.name')}
       </p>
-      {showDevInfo && (
-        <p className="text-center text-sm text-slate-500">{`Last Commit '${GIT_COMMIT!}' to Branch '${GIT_BRANCH!}' on ${GIT_COMMIT_DATE!}`}</p>
-      )}
     </footer>
   );
 };
+
+/*
+      {showDevInfo && (
+        <p className="text-center text-sm text-slate-500">{`Last Commit '${GIT_COMMIT!}' to Branch '${GIT_BRANCH!}' on ${GIT_COMMIT_DATE!}`}</p>
+      )}*/

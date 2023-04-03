@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { FormInstrumentSummary } from '@ddcp/common';
+import { useTranslation } from 'react-i18next';
 
 import { InstrumentCard } from '../components/InstrumentCard';
 
@@ -9,6 +10,7 @@ import { useFetch } from '@/hooks/useFetch';
 
 export const AvailableInstrumentsPage = () => {
   const { data } = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
+  const { t } = useTranslation('instruments');
 
   if (!data) {
     return <Spinner />;
@@ -16,9 +18,9 @@ export const AvailableInstrumentsPage = () => {
 
   return (
     <div>
-      <PageHeader title="Available Instruments" />
-      <div className="flex flex-wrap px-5 py-24">
-        <div className="-m-4 flex flex-wrap">
+      <PageHeader title={t('availableInstruments.pageTitle')} />
+      <div className="md:mx-6">
+        <div className="grid grid-cols-1 gap-5">
           {data.map((instrument, i) => (
             <InstrumentCard instrument={instrument} key={i} />
           ))}

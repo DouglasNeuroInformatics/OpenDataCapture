@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { FormInstrument } from '@ddcp/common';
+import { useTranslation } from 'react-i18next';
 import { HiOutlineDocumentCheck, HiOutlinePrinter, HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
@@ -15,6 +16,7 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 export const FormPage = () => {
   const params = useParams();
   const notifications = useNotificationsStore();
+  const { t } = useTranslation();
 
   const { data } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
   const [result, setResult] = useState<FormValues>();

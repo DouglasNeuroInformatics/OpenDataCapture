@@ -21,7 +21,6 @@ export const LoginPage = () => {
           <LoginForm onSuccess={() => navigate('/overview')} />
         </div>
         <br className="my-2" />
-        <LanguageToggle />
         <Footer showLinks={false} />
       </div>
     </div>
