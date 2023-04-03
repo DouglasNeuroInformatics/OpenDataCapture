@@ -33,7 +33,7 @@ export interface NumericFormField extends BaseFormField {
 
 export interface OptionsFormField<T extends string = string> extends BaseFormField {
   kind: 'options';
-  options: T[];
+  options: Record<T, string>;
 }
 
 export interface DateFormField extends BaseFormField {

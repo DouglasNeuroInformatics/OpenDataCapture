@@ -75,12 +75,13 @@ export const optionsFieldSchema: JSONSchemaType<OptionsFormField> = {
       const: 'options'
     },
     options: {
-      type: 'array',
-      items: {
-        type: 'string',
-        minLength: 1
+      type: 'object',
+      patternProperties: {
+        '^.*$': {
+          type: 'string'
+        }
       },
-      uniqueItems: true
+      required: []
     }
   },
   required: ['kind', 'label', 'options']
