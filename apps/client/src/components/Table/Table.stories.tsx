@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Random, Sex, Subject, range } from '@ddcp/common';
+import { Random, Subject, range } from '@ddcp/common';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -24,7 +24,7 @@ const columns: TableColumn<Subject>[] = [
 const data: Subject[] = range(25).map((i) => ({
   identifier: i.toString(),
   dateOfBirth: Random.birthday(),
-  sex: Random.int(0, 1) === 0 ? Sex.Male : Sex.Female
+  sex: Random.int(0, 1) === 0 ? 'male' : 'female'
 }));
 
 export default {

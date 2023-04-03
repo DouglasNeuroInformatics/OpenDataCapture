@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { useTranslation } from 'react-i18next';
 import { IoMdCloseCircle, IoMdRemoveCircle } from 'react-icons/io';
 
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
@@ -7,6 +8,7 @@ import { useActiveSubjectStore } from '@/stores/active-subject-store';
 export const ActiveSubject = () => {
   const { activeSubject, setActiveSubject } = useActiveSubjectStore();
   const [isHidden, setIsHidden] = useState(false);
+  const { t } = useTranslation('common');
 
   if (!activeSubject) {
     return null;
@@ -25,12 +27,20 @@ export const ActiveSubject = () => {
         </div>
         {isHidden && (
           <React.Fragment>
-            <h3 className="text-inherit">Active Subject</h3>
+            <h3 className="mb-2 text-xl font-medium text-inherit">{t('activeSubject.header')}</h3>
             <hr className="mb-2" />
-            <span>First Name: {activeSubject.firstName}</span>
-            <span>Last Name: {activeSubject.lastName}</span>
-            <span>Date of Birth: {activeSubject.dateOfBirth}</span>
-            <span>Sex: {activeSubject.sex}</span>
+            <span>
+              {t('identificationForm.firstName.label')}: {activeSubject.firstName}
+            </span>
+            <span>
+              {t('identificationForm.lastName.label')}: {activeSubject.lastName}
+            </span>
+            <span>
+              {t('identificationForm.dateOfBirth.label')}: {activeSubject.dateOfBirth}
+            </span>
+            <span>
+              {t('identificationForm.sex.label')}: {t(`sex.${activeSubject.sex}`)}
+            </span>
           </React.Fragment>
         )}
       </div>

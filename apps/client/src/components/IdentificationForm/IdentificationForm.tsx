@@ -1,4 +1,4 @@
-import React, { useTransition } from 'react';
+import React from 'react';
 
 import { Sex } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
@@ -12,62 +12,6 @@ type IdentificationFormData = {
   dateOfBirth: string;
 };
 
-/*
-const structure: FormStructure<IdentificationFormData> = [
-  {
-    fields: {
-      firstName: {
-        kind: 'text',
-        label: 'First Name',
-        variant: 'short',
-        description: "The subject's first name, as provided by their birth certificate"
-      },
-      lastName: {
-        kind: 'text',
-        label: 'Last Name',
-        variant: 'short',
-        description: "The subject's last name, as provided by their birth certificate"
-      },
-      sex: {
-        kind: 'select',
-        label: 'Sex',
-        options: Object.values(Sex),
-        description: "The subject's biological sex, as assigned at birth"
-      },
-      dateOfBirth: {
-        kind: 'date',
-        label: 'Date of Birth',
-        description: "The subject's date of birth"
-      }
-    }
-  }
-];
-
-const validationSchema: JSONSchemaType<IdentificationFormData> = {
-  type: 'object',
-  properties: {
-    firstName: {
-      type: 'string',
-      minLength: 1
-    },
-    lastName: {
-      type: 'string',
-      minLength: 1
-    },
-    sex: {
-      type: 'string',
-      enum: Object.values(Sex)
-    },
-    dateOfBirth: {
-      type: 'string',
-      format: 'date'
-    }
-  },
-  additionalProperties: false,
-  required: ['firstName', 'lastName', 'sex', 'dateOfBirth']
-};
-*/
-
 export interface IdentificationFormProps {
   onSubmit: (data: IdentificationFormData) => void;
 }
@@ -80,25 +24,28 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
       content={{
         firstName: {
           kind: 'text',
-          label: t('identificationForm.firstName'),
-          variant: 'short'
+          label: t('identificationForm.firstName.label'),
+          variant: 'short',
+          description: t('identificationForm.firstName.description')
         },
         lastName: {
           kind: 'text',
-          label: t('identificationForm.lastName'),
-          variant: 'short'
+          label: t('identificationForm.lastName.label'),
+          variant: 'short',
+          description: t('identificationForm.lastName.description')
         },
         sex: {
           kind: 'options',
-          label: t('identificationForm.sex'),
+          label: t('identificationForm.sex.label'),
           options: {
-            MALE: t('sex.male'),
-            FEMALE: t('sex.female')
-          }
+            male: t('sex.male'),
+            female: t('sex.female')
+          },
+          description: t('identificationForm.sex.description')
         },
         dateOfBirth: {
           kind: 'date',
-          label: t('identificationForm.dateOfBirth')
+          label: t('identificationForm.dateOfBirth.label')
         }
       }}
       submitBtnLabel={t('identificationForm.submit')}
@@ -115,7 +62,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
           },
           sex: {
             type: 'string',
-            enum: Object.values(Sex)
+            enum: ['male', 'female']
           },
           dateOfBirth: {
             type: 'string',

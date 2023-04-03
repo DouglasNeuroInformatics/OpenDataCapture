@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useTranslation } from 'react-i18next';
 import { HiUsers } from 'react-icons/hi2';
 
 import { StatisticCard } from '../components/StatisticCard';
@@ -9,8 +10,8 @@ import { useAuthStore } from '@/stores/auth-store';
 
 export const OverviewPage = () => {
   const { currentUser } = useAuthStore();
-
-  const pageTitle = currentUser?.firstName ? `Welcome Back, ${currentUser.firstName}` : 'Welcome Back';
+  const { t } = useTranslation('overview');
+  const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
   return (
     <div>

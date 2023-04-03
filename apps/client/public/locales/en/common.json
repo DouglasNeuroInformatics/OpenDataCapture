@@ -32,10 +32,24 @@
     "female": "Female"
   },
   "identificationForm": {
-    "firstName": "First Name",
-    "lastName": "Last Name",
-    "sex": "Sex",
-    "dateOfBirth": "Date of Birth",
+    "firstName": {
+      "description": "The subject's first name, as provided by their birth certificate",
+      "label": "First Name"
+    },
+    "lastName": {
+      "description": "The subject's last name, as provided by their birth certificate",
+      "label": "Last Name"
+    },
+    "sex": {
+      "description": "The subject's biological sex, as assigned at birth",
+      "label": "Sex"
+    },
+    "dateOfBirth": {
+      "label": "Date of Birth"
+    },
     "submit": "Submit"
+  },
+  "activeSubject": {
+    "header": "Active Subject"
   }
 }
