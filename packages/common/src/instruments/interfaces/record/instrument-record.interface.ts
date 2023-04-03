@@ -13,4 +13,7 @@ export interface InstrumentRecord<TInstrument extends BaseInstrument, TData = an
   data: TData;
 }
 
-export type FormInstrumentRecord = InstrumentRecord<FormInstrument, FormInstrumentData>;
+export type FormInstrumentRecord<T extends FormInstrumentData = FormInstrumentData> = InstrumentRecord<
+  FormInstrument<T>,
+  T
+>;

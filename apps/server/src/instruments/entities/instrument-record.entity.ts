@@ -14,7 +14,7 @@ import { InstrumentEntity } from './instrument.entity';
 import { GroupEntity } from '@/groups/entities/group.entity';
 import { SubjectEntity } from '@/subjects/entities/subject.entity';
 
-@Schema({ strict: 'throw' })
+@Schema({ strict: false })
 export class InstrumentRecordEntity implements InstrumentRecord<BaseInstrument> {
   static readonly modelName = 'InstrumentRecord';
 

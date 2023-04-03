@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { Sex } from '@ddcp/common';
 import unidecode from 'unidecode';
@@ -23,6 +23,14 @@ export class SubjectsService {
 
   async findAll(): Promise<SubjectEntity[]> {
     return this.subjectsRepository.find();
+  }
+
+  async findByIdentifier(identifier: string): Promise<SubjectEntity> {
+    const result = await this.subjectsRepository.findOne({ identifier });
+    if (!result) {
+      throw new NotFoundException(`Subject with identifier does not exist: ${identifier}`);
+    }
+    return result;
   }
 
   generateIdentifier(firstName: string, lastName: string, dateOfBirth: Date, sex: Sex): string {

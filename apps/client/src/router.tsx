@@ -27,7 +27,7 @@ export const Router = () => {
               <Route path="view-subjects">
                 <Route index element={<ViewSubjectsPage />} />
                 <Route element={<SubjectPage />} path=":subjectId" />
-                <Route element={<SubjectRecordsPage />} path=":subjectId/records/:instrumentTitle" />
+                <Route element={<SubjectRecordsPage />} path=":subjectId/records/:instrumentName" />
               </Route>
             </Route>
             <Route path="instruments">

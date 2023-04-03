@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { FormInstrumentRecord } from '@ddcp/common';
 import { Listbox, Transition } from '@headlessui/react';
 import { HiCheck } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
@@ -15,8 +16,8 @@ function camelToTitleCase(s: string) {
 export const SubjectRecordsPage = () => {
   const params = useParams();
 
-  const subjectRecords = useFetch<{ dateCollected: string; data: Record<string, number> }[]>(
-    `/api/v0/instruments/records?instrument=${params.instrumentTitle!}&subject=${params.subjectId!}`
+  const subjectRecords = useFetch<FormInstrumentRecord[]>(
+    `/instruments/records?instrument=${params.instrumentName!}&subject=${params.subjectId!}`
   );
 
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
@@ -33,14 +34,13 @@ export const SubjectRecordsPage = () => {
         return selectedFields.includes(entries[0]);
       })
     );
-    return { dateCollected: dateCollected.split('T')[0], ...filteredData };
+    return { dateCollected: (dateCollected as any as string).split('T')[0], ...filteredData };
   });
 
   return (
     <div>
-      <PageHeader title={`${params.instrumentTitle!}: Records for Subject ${params.subjectId!.slice(0, 6)}`} />
-      <div className="flex justify-between p-2">
-        <h3>Line Graph</h3>
+      <PageHeader title={`${params.instrumentName!}: Records for Subject ${params.subjectId!.slice(0, 6)}`} />
+      <div className="flex justify-end p-2">
         <Listbox multiple as="div" className="relative" value={selectedFields} onChange={setSelectedFields}>
           <Listbox.Button as={Button} label="Questions" />
           <Transition

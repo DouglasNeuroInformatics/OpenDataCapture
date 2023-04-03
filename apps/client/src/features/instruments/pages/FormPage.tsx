@@ -10,9 +10,11 @@ import { FormSummary } from '../components/FormSummary';
 
 import { FormValues, PageHeader, Spinner, Stepper } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
+import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const FormPage = () => {
   const params = useParams();
+  const notifications = useNotificationsStore();
 
   const { data } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
   const [result, setResult] = useState<FormValues>();
@@ -23,9 +25,8 @@ export const FormPage = () => {
 
   const handleSubmit = (data: FormValues) => {
     setResult(data);
+    setTimeout(() => notifications.add({ message: 'Upload Successful', type: 'success' }), 1000);
   };
-
-  console.log(data);
 
   return (
     <div>

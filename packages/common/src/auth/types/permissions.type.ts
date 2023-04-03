@@ -4,7 +4,7 @@ import { Group } from '../../groups';
 
 export type AppAction = 'create' | 'read' | 'update' | 'delete' | 'manage';
 
-export type AppSubject = 'Group' | Group | 'User' | 'Subject' | 'Instrument' | 'all';
+export type AppSubject = 'Group' | Group | 'User' | 'Subject' | 'Instrument' | 'InstrumentRecord' | 'all';
 
 export type AppAbility = MongoAbility<[AppAction, AppSubject]>;
 

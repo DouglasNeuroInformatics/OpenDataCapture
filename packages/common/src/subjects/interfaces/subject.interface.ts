@@ -1,6 +1,6 @@
 export type Sex = 'male' | 'female';
 
-export interface Subject {
+export type Subject = {
   identifier: string;
   firstName?: string;
   lastName?: string;

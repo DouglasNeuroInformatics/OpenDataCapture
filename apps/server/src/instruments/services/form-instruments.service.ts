@@ -28,6 +28,14 @@ export class FormInstrumentsService {
     return result;
   }
 
+  async findByName(name: string): Promise<any> {
+    const result = await this.instrumentsRepository.findOne({ name });
+    if (!result || result.kind !== 'form') {
+      throw new NotFoundException(`Failed to find form with name: ${name}`);
+    }
+    return result;
+  }
+
   remove(id: string): Promise<any> {
     return this.instrumentsRepository.findOneAndDelete({ id });
   }

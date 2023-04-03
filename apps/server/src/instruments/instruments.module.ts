@@ -5,6 +5,7 @@ import { InstrumentKind } from '@ddcp/common';
 import { Schema } from 'mongoose';
 
 import { FormInstrumentsController } from './controllers/form-instruments.controller';
+import { InstrumentRecordsController } from './controllers/instrument-records.controller';
 import { FormInstrumentRecordSchema } from './entities/form-instrument-record.entity';
 import { FormInstrumentSchema } from './entities/form-instrument.entity';
 import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity';
@@ -12,6 +13,7 @@ import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity
 import { InstrumentRecordsRepository } from './repositories/instrument-records.repository';
 import { InstrumentsRepository } from './repositories/instruments.repository';
 import { FormInstrumentsService } from './services/form-instruments.service';
+import { InstrumentRecordsService } from './services/instrument-records.service';
 
 import { SubjectsModule } from '@/subjects/subjects.module';
 
@@ -46,8 +48,8 @@ interface InstrumentDiscriminator {
     ]),
     SubjectsModule
   ],
-  controllers: [FormInstrumentsController],
-  providers: [InstrumentsRepository, InstrumentRecordsRepository, FormInstrumentsService],
-  exports: [FormInstrumentsService]
+  controllers: [FormInstrumentsController, InstrumentRecordsController],
+  providers: [InstrumentsRepository, InstrumentRecordsRepository, FormInstrumentsService, InstrumentRecordsService],
+  exports: [FormInstrumentsService, InstrumentRecordsService]
 })
 export class InstrumentsModule {}
