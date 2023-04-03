@@ -21,11 +21,11 @@ export const Form = <T extends FormInstrumentData>({
   // validationSchema,
   onSubmit
 }: FormProps<T>) => {
-  const props = useForm<T>(content);
+  const form = useForm<T>(content);
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    onSubmit(values);
+    onSubmit(form.values);
   };
 
   if (Array.isArray(content)) {
@@ -33,7 +33,7 @@ export const Form = <T extends FormInstrumentData>({
   }
 
   return (
-    <FormProvider {...props}>
+    <FormProvider {...form}>
       <form autoComplete="off" className={clsx('w-full', className)} onSubmit={handleSubmit}>
         {Object.keys(content).map((fieldName) => {
           const props = { name: fieldName, ...content[fieldName] };

@@ -7,10 +7,14 @@ export function useFormField<T extends NullablePrimitiveFieldValue>(
   name: string
 ): {
   value: T;
-  // setValues: any;
+  setValue: (value: T) => void;
 } {
-  const form = useContext(FormContext);
+  const { values, setValues } = useContext(FormContext);
+
   return {
-    value: form.values[name] as T
+    value: values[name] as T,
+    setValue: (value: T) => {
+      setValues((prevValues) => ({ ...prevValues, [name]: value }));
+    }
   };
 }
