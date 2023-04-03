@@ -47,9 +47,9 @@ export interface DatePickerProps {
 export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
   const [date, dispatch] = useReducer(reducer, new Date());
   const [showYearSelector, setShowYearSelector] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation('datetime');
 
-  const monthName = t('datetime.months')[date.getMonth()];
+  const monthName = t('months')[date.getMonth()];
 
   const handleYearSelection = (date: Date) => {
     dispatch({ type: 'set-year', value: date.getFullYear() });

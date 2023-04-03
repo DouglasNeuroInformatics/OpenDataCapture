@@ -5,6 +5,7 @@ import { clsx } from 'clsx';
 
 import { Button } from '../Button';
 
+import { DateField } from './DateField';
 import { NumericField } from './NumericField';
 import { OptionsField } from './OptionsField';
 import { TextField } from './TextField';
@@ -51,6 +52,8 @@ export const Form = <T extends FormInstrumentData>({
               return <NumericField {...props} />;
             case 'options':
               return <OptionsField {...props} />;
+            case 'date':
+              return <DateField {...props} />;
             default:
               return null;
           }

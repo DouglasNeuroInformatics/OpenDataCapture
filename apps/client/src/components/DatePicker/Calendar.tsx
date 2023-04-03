@@ -10,9 +10,9 @@ export interface CalendarProps {
 }
 
 export const Calendar = ({ year, month, onSelection }: CalendarProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('datetime');
 
-  const dayNames = t('datetime.days').map((day) => day.charAt(0).toUpperCase());
+  const dayNames = t('days').map((day) => day.charAt(0).toUpperCase());
   const firstDay = new Date(year, month).getDay();
   const lastDay = new Date(year, month + 1, 0).getDate();
   const days = range(1, lastDay + 1);
