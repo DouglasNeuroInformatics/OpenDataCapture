@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { Sex, Subject } from '@ddcp/common';
+import { type Sex, Subject } from '@ddcp/common';
 import { HydratedDocument } from 'mongoose';
 
 @Schema({ strict: 'throw', timestamps: true })
@@ -19,7 +19,7 @@ export class SubjectEntity implements Subject {
   @Prop({ required: true })
   dateOfBirth: Date;
 
-  @Prop({ enum: Sex, required: true, type: String })
+  @Prop({ enum: ['male', 'female'] satisfies Sex[], required: true, type: String })
   sex: Sex;
 }
 

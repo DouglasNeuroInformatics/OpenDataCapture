@@ -1,4 +1,4 @@
-import { Sex } from '../enums/sex.enum';
+export type Sex = 'male' | 'female';
 
 export interface Subject {
   identifier: string;

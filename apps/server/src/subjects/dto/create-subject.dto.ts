@@ -26,7 +26,7 @@ interface CreateSubjectData {
     },
     sex: {
       type: 'string',
-      enum: Object.values(Sex)
+      enum: ['male', 'female']
     }
   },
   required: ['firstName', 'lastName', 'dateOfBirth', 'sex']

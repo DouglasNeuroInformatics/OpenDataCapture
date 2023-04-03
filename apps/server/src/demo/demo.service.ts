@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
-import { BasePermissionLevel, Sex } from '@ddcp/common';
+import { BasePermissionLevel } from '@ddcp/common';
 import { briefPsychiatricRatingScale, happinessQuestionnaire } from '@ddcp/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
@@ -81,7 +81,7 @@ export class DemoService {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         dateOfBirth: faker.date.birthdate().toISOString(),
-        sex: faker.name.sexType() === 'female' ? Sex.Female : Sex.Male
+        sex: faker.name.sexType()
       });
     }
     await this.formInstrumentsService.create(briefPsychiatricRatingScale);
