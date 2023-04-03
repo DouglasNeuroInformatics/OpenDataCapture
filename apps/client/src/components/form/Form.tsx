@@ -41,7 +41,7 @@ export const Form = <T extends FormInstrumentData>({
     } else {
       validate.errors?.forEach((error) => {
         const path = error.instancePath.split('/').filter((e) => e);
-        const errorMessage = `${error.keyword}: ${error.message ?? 'Unknown'}`;
+        const errorMessage = `${error.message ?? 'Unknown Error'}`;
         form.setErrors((prevErrors) => {
           return { ...prevErrors, [path[0]]: errorMessage };
         });

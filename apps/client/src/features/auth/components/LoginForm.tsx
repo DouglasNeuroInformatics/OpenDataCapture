@@ -19,17 +19,18 @@ export interface LoginFormProps {
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const auth = useAuthStore();
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation(['auth', 'form']);
 
+  t('auth:login.form.username');
   const content: FormInstrumentContent<LoginFormData> = {
     username: {
       kind: 'text',
-      label: t('login.form.username'),
+      label: t('auth:login.form.username'),
       variant: 'short'
     },
     password: {
       kind: 'text',
-      label: t('login.form.password'),
+      label: t('auth:login.form.password'),
       variant: 'password'
     }
   };
@@ -52,8 +53,16 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   return (
     <Form<LoginFormData>
       content={content}
-      submitBtnLabel={t('login.form.submit')}
-      validationSchema={loginCredentialsSchema}
+      submitBtnLabel={t('auth:login.form.submit')}
+      validationSchema={{
+        ...loginCredentialsSchema,
+        errorMessage: {
+          properties: {
+            username: t('form:errors.required'),
+            password: t('form:errors.required')
+          }
+        }
+      }}
       onSubmit={login}
     />
   );

@@ -5,6 +5,7 @@ import 'i18next';
 import auth from './public/locales/en/auth.json';
 import common from './public/locales/en/common.json';
 import datetime from './public/locales/en/datetime.json';
+import form from './public/locales/en/form.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -13,6 +14,7 @@ declare module 'i18next' {
       auth: typeof auth;
       common: typeof common;
       datetime: typeof datetime;
+      form: typeof form;
     };
   }
 }
