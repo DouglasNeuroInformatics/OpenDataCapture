@@ -32,7 +32,8 @@ export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> 
       label: 'Overall Happiness',
       description: "The subject's overall happiness from 1 through 10",
       isRequired: true,
-      variant: 'slider'
+      min: 0,
+      max: 10
     }
   },
   validationSchema: {
