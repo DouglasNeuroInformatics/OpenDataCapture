@@ -30,6 +30,7 @@ export const Form = <T extends FormInstrumentData>({
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
+    form.reset();
     onSubmit(form.values);
   };
 
