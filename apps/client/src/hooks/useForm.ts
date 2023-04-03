@@ -3,7 +3,6 @@ import { useState } from 'react';
 import type { FormFields, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
 
 import type { FormErrors, FormValues, NullableArrayFieldValue } from '@/components';
-import { FormState } from '@/context/FormContext';
 
 const DEFAULT_PRIMITIVE_VALUES = {
   text: '',

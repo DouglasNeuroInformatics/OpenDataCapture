@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AuthAPI } from '../api/auth-api';
 
-import { Form } from '@/components/Form_2';
+import { Form } from '@/components/Form';
 import { useAuthStore } from '@/stores/auth-store';
 
 type LoginFormData = {
@@ -49,5 +49,12 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     onSuccess();
   };
 
-  return <Form<LoginFormData> content={content} validationSchema={loginCredentialsSchema} onSubmit={login} />;
+  return (
+    <Form<LoginFormData>
+      content={content}
+      submitBtnLabel={t('login.form.submit')}
+      validationSchema={loginCredentialsSchema}
+      onSubmit={login}
+    />
+  );
 };

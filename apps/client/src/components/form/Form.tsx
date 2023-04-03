@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { FormInstrument, FormInstrumentData } from '@ddcp/common';
 import { clsx } from 'clsx';
@@ -13,6 +13,7 @@ import { FormValues } from './types';
 
 import { FormProvider } from '@/context/FormContext';
 import { useForm } from '@/hooks/useForm';
+import { ajv } from '@/services/ajv';
 
 export interface FormProps<T extends FormInstrumentData>
   extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
@@ -24,16 +25,28 @@ export interface FormProps<T extends FormInstrumentData>
 export const Form = <T extends FormInstrumentData>({
   content,
   className,
-  // validationSchema,
   submitBtnLabel,
+  validationSchema,
   onSubmit
 }: FormProps<T>) => {
   const form = useForm<T>(content);
+  const validate = useMemo(() => ajv.compile(validationSchema), [validationSchema]);
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    form.reset();
-    onSubmit(form.values);
+    const valid = validate(form.values);
+    if (valid) {
+      form.reset();
+      onSubmit(form.values);
+    } else {
+      validate.errors?.forEach((error) => {
+        const path = error.instancePath.split('/').filter((e) => e);
+        const errorMessage = `${error.keyword}: ${error.message ?? 'Unknown'}`;
+        form.setErrors((prevErrors) => {
+          return { ...prevErrors, [path[0]]: errorMessage };
+        });
+      });
+    }
   };
 
   if (Array.isArray(content)) {
@@ -47,13 +60,13 @@ export const Form = <T extends FormInstrumentData>({
           const props = { name: fieldName, ...content[fieldName] };
           switch (props.kind) {
             case 'text':
-              return <TextField {...props} />;
+              return <TextField key={props.name} {...props} />;
             case 'numeric':
-              return <NumericField {...props} />;
+              return <NumericField key={props.name} {...props} />;
             case 'options':
-              return <OptionsField {...props} />;
+              return <OptionsField key={props.name} {...props} />;
             case 'date':
-              return <DateField {...props} />;
+              return <DateField key={props.name} {...props} />;
             default:
               return null;
           }

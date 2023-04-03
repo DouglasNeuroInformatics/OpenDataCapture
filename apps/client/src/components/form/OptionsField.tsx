@@ -11,11 +11,16 @@ import { useFormField } from '@/hooks/useFormField';
 
 export type OptionsFieldProps<T extends string> = BaseFieldProps<OptionsFormField<T>>;
 
-export const OptionsField = <T extends string = string>({ name, label, options }: OptionsFieldProps<T>) => {
-  const { value, setValue } = useFormField<T>(name);
+export const OptionsField = <T extends string = string>({
+  description,
+  name,
+  label,
+  options
+}: OptionsFieldProps<T>) => {
+  const { error, value, setValue } = useFormField<T>(name);
 
   return (
-    <FormFieldContainer>
+    <FormFieldContainer description={description} error={error}>
       <Listbox as={React.Fragment} name={name} value={value} onChange={setValue}>
         <Listbox.Button className="field-input capitalize">{options[value]}</Listbox.Button>
         <Listbox.Label

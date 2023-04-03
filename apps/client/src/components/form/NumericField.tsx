@@ -11,7 +11,7 @@ import { useFormField } from '@/hooks/useFormField';
 export type NumericFieldProps = BaseFieldProps<NumericFormField>;
 
 export const NumericField = ({ description, name, label, min, max }: NumericFieldProps) => {
-  const { value, setValue } = useFormField<number>(name);
+  const { error, value, setValue } = useFormField<number>(name);
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     setValue(Number(event.target.value));
@@ -20,7 +20,7 @@ export const NumericField = ({ description, name, label, min, max }: NumericFiel
   const displayValue = value ?? min;
 
   return (
-    <FormFieldContainer>
+    <FormFieldContainer description={description} error={error}>
       <label className="field-label" htmlFor={name}>
         {label}
       </label>

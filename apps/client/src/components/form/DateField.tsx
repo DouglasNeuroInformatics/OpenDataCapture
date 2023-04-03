@@ -14,7 +14,7 @@ import { useFormField } from '@/hooks/useFormField';
 export type DateFieldProps = BaseFieldProps<DateFormField>;
 
 export const DateField = ({ description, name, label }: DateFieldProps) => {
-  const { value, setValue } = useFormField<string>(name);
+  const { error, value, setValue } = useFormField<string>(name);
 
   const [inputFocused, setInputFocused] = useState(false);
   const [mouseInDatePicker, setMouseInDatePicker] = useState(false);
@@ -36,7 +36,7 @@ export const DateField = ({ description, name, label }: DateFieldProps) => {
   const isFloatingLabel = showDatePicker || value;
 
   return (
-    <FormFieldContainer description={description}>
+    <FormFieldContainer description={description} error={error}>
       <input
         autoComplete="off"
         className="field-input"

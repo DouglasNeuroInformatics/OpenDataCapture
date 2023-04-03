@@ -10,15 +10,15 @@ import { useFormField } from '@/hooks/useFormField';
 
 type TextFieldProps = BaseFieldProps<TextFormField>;
 
-export const TextField = ({ name, label, variant }: TextFieldProps) => {
-  const { value, setValue } = useFormField<string>(name);
+export const TextField = ({ description, name, label, variant }: TextFieldProps) => {
+  const { error, value, setValue } = useFormField<string>(name);
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
     setValue(event.target.value);
   };
 
   return (
-    <FormFieldContainer>
+    <FormFieldContainer description={description} error={error}>
       {variant === 'short' || variant === 'password' ? (
         <input
           autoComplete="off"
