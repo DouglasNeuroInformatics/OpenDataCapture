@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { FormInstrument } from '@ddcp/common';
 import { HiOutlineDocumentCheck, HiOutlinePrinter, HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 
 import { FormOverview } from '../components/FormOverview';
 import { FormQuestions } from '../components/FormQuestions';
+import { FormSummary } from '../components/FormSummary';
 
 import { FormValues, PageHeader, Spinner, Stepper } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
@@ -24,6 +25,8 @@ export const FormPage = () => {
     setResult(data);
   };
 
+  console.log(data);
+
   return (
     <div>
       <PageHeader title={data.details.title} />
@@ -40,7 +43,7 @@ export const FormPage = () => {
             icon: <HiOutlineQuestionMarkCircle />
           },
           {
-            element: <span>3</span>,
+            element: <FormSummary instrument={data} result={result!} />,
             label: 'Summary',
             icon: <HiOutlinePrinter />
           }
