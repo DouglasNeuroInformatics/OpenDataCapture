@@ -10,8 +10,8 @@ export interface FormFieldContainerProps {
 
 export const FormFieldContainer = ({ children, description, error }: FormFieldContainerProps) => {
   return (
-    <>
-      <div className="relative my-6 flex w-full">
+    <div className="my-8">
+      <div className="relative my-1 flex w-full">
         <div className="flex flex-grow flex-col">{children}</div>
         <FormFieldDescription description={description} />
       </div>
@@ -20,6 +20,6 @@ export const FormFieldContainer = ({ children, description, error }: FormFieldCo
           <span>{error}</span>
         </div>
       )}
-    </>
+    </div>
   );
 };

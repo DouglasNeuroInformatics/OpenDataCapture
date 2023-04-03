@@ -71,7 +71,9 @@ export const Form = <T extends FormInstrumentData>({
               return null;
           }
         })}
-        <Button className="mt-5 w-full" label={submitBtnLabel ?? 'Submit'} type="submit" />
+        <div className="w-full">
+          <Button className="w-full" label={submitBtnLabel ?? 'Submit'} type="submit" />
+        </div>
       </form>
     </FormProvider>
   );
