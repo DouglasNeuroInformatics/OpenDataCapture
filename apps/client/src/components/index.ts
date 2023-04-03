@@ -14,6 +14,7 @@ export * from './Link';
 export * from './Modal';
 export * from './Notifications';
 export * from './PageHeader';
+export * from './SearchBar';
 export * from './Spinner';
 export * from './Stepper';
 export * from './Table';

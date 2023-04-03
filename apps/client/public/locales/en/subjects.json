@@ -5,9 +5,6 @@
   "viewSubjects": {
     "pageTitle": "View Subjects",
     "table": {
-      "search": {
-        "placeholder": "Search..."
-      },
       "filters": "Filters",
       "export": "Export",
       "columns": {

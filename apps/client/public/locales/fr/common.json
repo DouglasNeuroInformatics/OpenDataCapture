@@ -51,5 +51,8 @@
   },
   "activeSubject": {
     "header": "Sujet actif"
+  },
+  "searchBar": {
+    "placeholder": "Rechercher..."
   }
 }

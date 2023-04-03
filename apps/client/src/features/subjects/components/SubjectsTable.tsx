@@ -3,7 +3,7 @@ import React from 'react';
 import { Subject } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
 
-import { Dropdown, Table } from '@/components';
+import { Dropdown, SearchBar, Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 
 export interface SubjectTableProps {
@@ -30,12 +30,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
   return (
     <div>
       <div className="my-2 flex justify-between gap-5">
-        <input
-          required
-          className="block w-full rounded-lg border border-gray-300 px-4 py-3 pl-2 text-sm"
-          placeholder={t('subjects:viewSubjects.table.search.placeholder')}
-          type="search"
-        />
+        <SearchBar />
         <div className="flex gap-2">
           <Dropdown options={[]} title={t('subjects:viewSubjects.table.filters')} onSelection={() => null} />
           <Dropdown
