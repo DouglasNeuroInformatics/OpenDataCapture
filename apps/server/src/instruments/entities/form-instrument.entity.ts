@@ -1,18 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import {
-  type FormDetails,
-  FormField,
-  FormInstrument,
-  type FormInstrumentContent,
-  FormInstrumentData
-} from '@ddcp/common';
+import { type FormDetails, FormInstrument, type FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
 import { type JSONSchemaType } from 'ajv';
 import { Schema as MongooseSchema } from 'mongoose';
 
 import { FormDetailsSchema } from './form-details-entity';
 
-@Schema()
+@Schema({ strict: false })
 export class FormInstrumentEntity implements FormInstrument {
   kind: 'form';
   name: string;
