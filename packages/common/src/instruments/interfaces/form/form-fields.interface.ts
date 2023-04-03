@@ -27,7 +27,6 @@ export interface TextFormField extends BaseFormField {
 
 export interface NumericFormField extends BaseFormField {
   kind: 'numeric';
-  variant: 'default' | 'slider';
 }
 
 export interface OptionsFormField<T extends string = string> extends BaseFormField {

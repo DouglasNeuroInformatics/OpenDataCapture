@@ -56,12 +56,8 @@ export const numericFieldSchema: JSONSchemaType<NumericFormField> = {
       type: 'string',
       const: 'numeric'
     },
-    variant: {
-      type: 'string',
-      enum: ['default', 'slider']
-    }
   },
-  required: ['kind', 'label', 'variant']
+  required: ['kind', 'label']
 };
 
 export const optionsFieldSchema: JSONSchemaType<OptionsFormField> = {
