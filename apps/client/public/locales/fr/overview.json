@@ -1,4 +1,11 @@
 {
   "pageTitle": "Vue d'ensemble",
-  "welcome": "Bienvenue"
+  "welcome": "Bienvenue",
+  "summary": "Résumé des données disponibles",
+  "stats": {
+    "totalUsers": "Nombre d'utilisateurs",
+    "totalSubjects": "Nombre de clients",
+    "totalInstruments": "Nombre d'instruments",
+    "totalRecords": "Nombre d'enregistrements"
+  }
 }

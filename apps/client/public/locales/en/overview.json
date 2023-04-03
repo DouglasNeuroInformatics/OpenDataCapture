@@ -1,4 +1,11 @@
 {
   "pageTitle": "Overview",
-  "welcome": "Welcome Back"
+  "welcome": "Welcome Back",
+  "summary": "Summary of Available Data",
+  "stats": {
+    "totalUsers": "Total Users",
+    "totalSubjects": "Total Subjects",
+    "totalInstruments": "Total Instruments",
+    "totalRecords": "Total Records"
+  }
 }
