@@ -1,48 +1,37 @@
 import { useState } from 'react';
 
-import {
-  FormField,
-  FormFieldKind,
-  FormFieldValue,
-  FormFields,
-  FormInstrumentContent,
-  FormInstrumentData
-} from '@ddcp/common';
+import type { FormFields, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
 
-import { FormErrors, FormValues } from '@/components/Form_2';
+import type { FormErrors, FormValues, NullableArrayFieldValue } from '@/components';
+import { FormState } from '@/context/FormContext';
 
-const defaultPrimitiveValues: Record<Exclude<FormFieldKind, 'complex'>, FormFieldValue | null> = {
+const DEFAULT_PRIMITIVE_VALUES = {
   text: '',
   options: '',
   date: '',
-  numeric: NaN,
+  numeric: null,
   binary: null
 };
 
-const getDefaultValuesFromFields = <T extends FormInstrumentData>(formFields: FormFields<T>): FormValues<T> => {
-  const values: Partial<FormValues> = {};
-  for (const fieldName in formFields) {
-    const field = formFields[fieldName];
-    if (field.kind === 'complex') {
-      throw new Error('Not Implemented!');
-    } else {
-      values[fieldName] = defaultPrimitiveValues[field.kind];
-    }
-  }
-  return values as FormValues<T>;
-};
-
-export interface FormState<T extends FormInstrumentData> {
-  errors: FormErrors<T>;
-  setErrors: React.Dispatch<React.SetStateAction<FormErrors<T>>>;
-  values: FormValues<T>;
-  setValues: React.Dispatch<React.SetStateAction<FormValues<T>>>;
-}
-
-export function useForm<T extends FormInstrumentData>(content: FormInstrumentContent<T>) {
+export function useForm<T extends FormInstrumentData>(content: FormInstrumentContent<T>): FormState<T> {
   const [errors, setErrors] = useState<FormErrors<T>>({});
   const [values, setValues] = useState<FormValues<T>>(() => {
-    return Array.isArray(content) ? {} : getDefaultValuesFromFields(content);
+    const defaultValues: Partial<FormValues<T>> = {};
+    const fields = (Array.isArray(content) ? content.map((group) => group.fields) : content) as FormFields<T>;
+    for (const fieldName in fields) {
+      const field = fields[fieldName];
+      if (field.kind === 'array') {
+        const defaultItemValues: NullableArrayFieldValue[number] = {};
+        for (const subfieldName in field.fieldset) {
+          const subfield = field.fieldset[subfieldName];
+          defaultItemValues[subfieldName] = DEFAULT_PRIMITIVE_VALUES[subfield.kind];
+        }
+        defaultValues[fieldName] = [defaultItemValues];
+      } else {
+        defaultValues[fieldName] = DEFAULT_PRIMITIVE_VALUES[field.kind];
+      }
+    }
+    return defaultValues as FormValues<T>;
   });
 
   return { errors, setErrors, values, setValues };
