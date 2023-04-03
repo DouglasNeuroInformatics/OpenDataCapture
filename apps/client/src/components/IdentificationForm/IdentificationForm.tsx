@@ -34,6 +34,10 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
           variant: 'short',
           description: t('identificationForm.lastName.description')
         },
+        dateOfBirth: {
+          kind: 'date',
+          label: t('identificationForm.dateOfBirth.label')
+        },
         sex: {
           kind: 'options',
           label: t('identificationForm.sex.label'),
@@ -42,10 +46,6 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
             female: t('sex.female')
           },
           description: t('identificationForm.sex.description')
-        },
-        dateOfBirth: {
-          kind: 'date',
-          label: t('identificationForm.dateOfBirth.label')
         }
       }}
       submitBtnLabel={t('identificationForm.submit')}
@@ -60,13 +60,13 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
             type: 'string',
             minLength: 1
           },
-          sex: {
-            type: 'string',
-            enum: ['male', 'female']
-          },
           dateOfBirth: {
             type: 'string',
             format: 'date'
+          },
+          sex: {
+            type: 'string',
+            enum: ['male', 'female']
           }
         },
         additionalProperties: false,

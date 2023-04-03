@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 import { Subject } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';

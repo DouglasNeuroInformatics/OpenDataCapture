@@ -39,7 +39,7 @@ export const Modal = ({ open, title, children, onClose }: ModalProps) => {
                 <Dialog.Title as="h3" className="text-xl font-bold leading-6 text-gray-900">
                   {title}
                 </Dialog.Title>
-                <div>{children}</div>
+                <div className="my-3">{children}</div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
