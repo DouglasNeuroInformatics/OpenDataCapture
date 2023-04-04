@@ -12,6 +12,10 @@ type BasicFormValues = {
   options: 'a' | 'b' | 'c';
   date: string;
   binary: boolean;
+  array: Array<{
+    f1: string;
+    f2: number;
+  }>;
 };
 
 export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
@@ -55,6 +59,22 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       binary: {
         kind: 'binary',
         label: 'Binary'
+      },
+      array: {
+        kind: 'array',
+        fieldset: {
+          f1: {
+            kind: 'text',
+            label: 'Field 1',
+            variant: 'short'
+          },
+          f2: {
+            kind: 'numeric',
+            label: 'Field 2',
+            min: 0,
+            max: 10
+          }
+        }
       }
     },
     validationSchema: {

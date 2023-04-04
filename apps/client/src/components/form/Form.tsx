@@ -5,11 +5,8 @@ import { clsx } from 'clsx';
 
 import { Button } from '../Button';
 
-import { BinaryField } from './BinaryField';
-import { DateField } from './DateField';
-import { NumericField } from './NumericField';
-import { OptionsField } from './OptionsField';
-import { TextField } from './TextField';
+import { ArrayField } from './ArrayField';
+import { PrimitiveFormField } from './PrimitiveFormField';
 import { FormValues } from './types';
 
 import { FormProvider } from '@/context/FormContext';
@@ -59,20 +56,10 @@ export const Form = <T extends FormInstrumentData>({
       <form autoComplete="off" className={clsx('w-full', className)} onSubmit={handleSubmit}>
         {Object.keys(content).map((fieldName) => {
           const props = { name: fieldName, ...content[fieldName] };
-          switch (props.kind) {
-            case 'text':
-              return <TextField key={props.name} {...props} />;
-            case 'numeric':
-              return <NumericField key={props.name} {...props} />;
-            case 'options':
-              return <OptionsField key={props.name} {...props} />;
-            case 'date':
-              return <DateField key={props.name} {...props} />;
-            case 'binary':
-              return <BinaryField key={props.name} {...props} />;
-            default:
-              return null;
+          if (props.kind === 'array') {
+            return <ArrayField key={props.name} {...props} />;
           }
+          return <PrimitiveFormField key={props.name} {...props} />;
         })}
         <div className="w-full">
           <Button className="w-full" label={submitBtnLabel ?? 'Submit'} type="submit" />
