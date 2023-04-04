@@ -49,8 +49,8 @@ export const defaultDemoOptions = {
     {
       username: 'JohnSmith',
       password: 'password',
-      groupNames: ['Depression Clinic', 'Psychosis Clinic'],
-      basePermissionLevel: BasePermissionLevel.Standard
+      groupNames: ['Psychosis Clinic'],
+      basePermissionLevel: BasePermissionLevel.GroupManager
     },
     {
       username: 'JaneDoe',

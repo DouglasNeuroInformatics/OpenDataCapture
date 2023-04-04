@@ -14,11 +14,30 @@ export const Navigation = (props: NavigationProps) => {
 
   return (
     <nav>
-      <NavigationLink href="/overview" icon={<HiChartBar />} label={t('navLinks.overview')} {...props} />
-      <NavigationLink href="/subjects/add-subject" icon={<HiUserPlus />} label={t('navLinks.addSubject')} {...props} />
-      <NavigationLink href="/subjects/view-subjects" icon={<HiEye />} label={t(`navLinks.viewSubjects`)} {...props} />
-      <NavigationLink href="/instruments/create" icon={<HiPlus />} label={t('navLinks.createInstrument')} {...props} />
+      <NavigationLink access={null} href="/overview" icon={<HiChartBar />} label={t('navLinks.overview')} {...props} />
       <NavigationLink
+        access={['create', 'Subject']}
+        href="/subjects/add-subject"
+        icon={<HiUserPlus />}
+        label={t('navLinks.addSubject')}
+        {...props}
+      />
+      <NavigationLink
+        access={['read', 'Subject']}
+        href="/subjects/view-subjects"
+        icon={<HiEye />}
+        label={t(`navLinks.viewSubjects`)}
+        {...props}
+      />
+      <NavigationLink
+        access={['create', 'Instrument']}
+        href="/instruments/create"
+        icon={<HiPlus />}
+        label={t('navLinks.createInstrument')}
+        {...props}
+      />
+      <NavigationLink
+        access={['create', 'InstrumentRecord']}
         href="/instruments/available"
         icon={<HiEye />}
         label={t('navLinks.availableInstruments')}
