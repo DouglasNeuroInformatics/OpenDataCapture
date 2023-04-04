@@ -5,6 +5,7 @@ import { clsx } from 'clsx';
 
 import { Button } from '../Button';
 
+import { BinaryField } from './BinaryField';
 import { DateField } from './DateField';
 import { NumericField } from './NumericField';
 import { OptionsField } from './OptionsField';
@@ -67,6 +68,8 @@ export const Form = <T extends FormInstrumentData>({
               return <OptionsField key={props.name} {...props} />;
             case 'date':
               return <DateField key={props.name} {...props} />;
+            case 'binary':
+              return <BinaryField key={props.name} {...props} />;
             default:
               return null;
           }

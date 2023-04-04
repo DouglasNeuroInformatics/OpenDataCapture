@@ -11,6 +11,7 @@ type BasicFormValues = {
   numeric: number;
   options: 'a' | 'b' | 'c';
   date: string;
+  binary: boolean;
 };
 
 export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
@@ -50,7 +51,15 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       date: {
         kind: 'date',
         label: 'Date'
+      },
+      binary: {
+        kind: 'binary',
+        label: 'Binary'
       }
+    },
+    validationSchema: {
+      type: 'object',
+      required: []
     },
     onSubmit: (data) => alert(JSON.stringify(data))
   }
