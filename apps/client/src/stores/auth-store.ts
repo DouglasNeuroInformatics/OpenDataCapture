@@ -1,19 +1,28 @@
-import { JwtPayload } from '@ddcp/common';
+import { createMongoAbility } from '@casl/ability';
+import { AppAbility, JwtPayload } from '@ddcp/common';
 import jwtDecode from 'jwt-decode';
 import { create } from 'zustand';
+
+export interface CurrentUser extends Omit<JwtPayload, 'permissions'> {
+  ability: AppAbility;
+}
 
 export interface AuthStore {
   accessToken: string | null;
   setAccessToken: (accessToken: string) => void;
-  currentUser: JwtPayload | null;
+  currentUser: CurrentUser | null;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
   accessToken: null,
   setAccessToken: (accessToken) => {
-    const currentUser = jwtDecode<JwtPayload>(accessToken);
-    set({ accessToken, currentUser });
+    const { permissions, ...rest } = jwtDecode<JwtPayload>(accessToken);
+    const ability = createMongoAbility<AppAbility>(permissions);
+    set({
+      accessToken,
+      currentUser: { ability, ...rest }
+    });
   },
   currentUser: null,
   logout: () => set({ accessToken: null, currentUser: null })
