@@ -1,9 +1,9 @@
-import React, { HTMLProps } from 'react';
+import React from 'react';
 
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
-export type SearchBarProps = Omit<HTMLProps<HTMLInputElement>, 'type'>;
+export type SearchBarProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'type'>;
 
 export const SearchBar = ({ className, required = true, placeholder, ...props }: SearchBarProps) => {
   const { t } = useTranslation('common');

@@ -4,6 +4,7 @@ import { Button } from '../Button';
 
 import { StepperDivider } from './StepperDivider';
 import { StepperIcon } from './StepperIcon';
+
 import { StepperContext } from '@/context/StepperContext';
 
 interface Step {

@@ -24,7 +24,7 @@ export const OptionsField = <T extends string = string>({
       <Listbox as={React.Fragment} name={name} value={value} onChange={setValue}>
         {({ open }) => (
           <>
-            <Listbox.Button className="field-input peer capitalize">{options[value]}</Listbox.Button>
+            <Listbox.Button className="field-input capitalize">{options[value]}</Listbox.Button>
             <Listbox.Label
               className={clsx('field-label-floating', {
                 'field-label-floating--active': value || open

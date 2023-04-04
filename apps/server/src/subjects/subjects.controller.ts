@@ -2,12 +2,12 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
+import { LookupSubjectDto } from './dto/lookup-subject.dto';
 import { SubjectEntity } from './entities/subject.entity';
 import { SubjectsService } from './subjects.service';
 
 import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import { LookupSubjectDto } from './dto/lookup-subject.dto';
 
 @ApiTags('Subjects')
 @Controller('subjects')
