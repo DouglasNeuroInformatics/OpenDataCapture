@@ -1,17 +1,44 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { FormInstrument, FormInstrumentData } from '@ddcp/common';
+import { FormFields, FormInstrument, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
 import { clsx } from 'clsx';
 
 import { Button } from '../Button';
 
 import { ArrayField } from './ArrayField';
 import { PrimitiveFormField } from './PrimitiveFormField';
-import { FormValues } from './types';
+import { FormErrors, FormValues, NullableArrayFieldValue } from './types';
 
 import { FormProvider } from '@/context/FormContext';
-import { useForm } from '@/hooks/useForm';
 import { ajv } from '@/services/ajv';
+
+const DEFAULT_PRIMITIVE_VALUES = {
+  text: '',
+  options: '',
+  date: '',
+  numeric: null,
+  binary: null
+};
+
+/** Returns the default values when initializing the state or resetting the form */
+const getDefaultValues = <T extends FormInstrumentData>(content: FormInstrumentContent<T>): FormValues<T> => {
+  const defaultValues: Partial<FormValues<T>> = {};
+  const fields = (Array.isArray(content) ? content.map((group) => group.fields) : content) as FormFields<T>;
+  for (const fieldName in fields) {
+    const field = fields[fieldName];
+    if (field.kind === 'array') {
+      const defaultItemValues: NullableArrayFieldValue[number] = {};
+      for (const subfieldName in field.fieldset) {
+        const subfield = field.fieldset[subfieldName];
+        defaultItemValues[subfieldName] = DEFAULT_PRIMITIVE_VALUES[subfield.kind];
+      }
+      defaultValues[fieldName] = [defaultItemValues];
+    } else {
+      defaultValues[fieldName] = DEFAULT_PRIMITIVE_VALUES[field.kind];
+    }
+  }
+  return defaultValues as FormValues<T>;
+};
 
 export interface FormProps<T extends FormInstrumentData>
   extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
@@ -27,20 +54,26 @@ export const Form = <T extends FormInstrumentData>({
   validationSchema,
   onSubmit
 }: FormProps<T>) => {
-  const form = useForm<T>(content);
+  const [errors, setErrors] = useState<FormErrors<T>>({});
+  const [values, setValues] = useState<FormValues<T>>(() => getDefaultValues(content));
+
+  const reset = () => {
+    setValues(getDefaultValues(content));
+    setErrors({});
+  };
   const validate = useMemo(() => ajv.compile(validationSchema), [validationSchema]);
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    const valid = validate(form.values);
+    const valid = validate(values);
     if (valid) {
-      form.reset();
-      onSubmit(form.values);
+      reset();
+      onSubmit(values);
     } else {
       validate.errors?.forEach((error) => {
         const path = error.instancePath.split('/').filter((e) => e);
         const errorMessage = `${error.message ?? 'Unknown Error'}`;
-        form.setErrors((prevErrors) => {
+        setErrors((prevErrors) => {
           return { ...prevErrors, [path[0]]: errorMessage };
         });
       });
@@ -52,7 +85,7 @@ export const Form = <T extends FormInstrumentData>({
   }
 
   return (
-    <FormProvider {...form}>
+    <FormProvider {...{ errors, setErrors, values, setValues }}>
       <form autoComplete="off" className={clsx('w-full', className)} onSubmit={handleSubmit}>
         {Object.keys(content).map((fieldName) => {
           const props = { name: fieldName, ...content[fieldName] };
