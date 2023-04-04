@@ -1,8 +1,19 @@
+import React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Form } from './Form';
 
-export default { component: Form } as Meta<typeof Form>;
+export default {
+  component: Form,
+  decorators: [
+    (Story) => (
+      <div className="container">
+        <Story />
+      </div>
+    )
+  ]
+} as Meta<typeof Form>;
 
 type BasicFormValues = {
   textShort: string;
@@ -62,6 +73,7 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       },
       array: {
         kind: 'array',
+        label: 'Array Field',
         fieldset: {
           f1: {
             kind: 'text',
@@ -81,6 +93,6 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       type: 'object',
       required: []
     },
-    onSubmit: (data) => alert(JSON.stringify(data))
+    onSubmit: (data) => alert(JSON.stringify(data, null, 2))
   }
 };

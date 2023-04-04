@@ -18,8 +18,12 @@
   }
 
   .field-input-base {
-    @apply w-full bg-transparent py-2 text-left text-gray-900 hover:border-gray-300 focus:border-indigo-800 focus:outline-none;
+    @apply w-full bg-transparent py-2 text-left text-slate-900 hover:border-slate-300 focus:border-indigo-800 focus:outline-none;
     min-height: 42px;
+  }
+
+  .field-header {
+    @apply font-medium text-slate-600;
   }
 
   .field-input {
@@ -27,7 +31,7 @@
   }
 
   .field-label {
-    @apply pointer-events-none text-gray-600;
+    @apply pointer-events-none text-slate-600;
   }
 
   .field-label-floating {

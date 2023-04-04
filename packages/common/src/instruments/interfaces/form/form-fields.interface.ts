@@ -53,7 +53,7 @@ export type PrimitiveFormField<T extends PrimitiveFieldValue = PrimitiveFieldVal
   ? BinaryFormField
   : never;
 
-export interface ArrayFormField<T extends ArrayFieldValue = ArrayFieldValue> {
+export interface ArrayFormField<T extends ArrayFieldValue = ArrayFieldValue> extends BaseFormField {
   kind: 'array';
   fieldset: {
     [K in keyof T[number]]: PrimitiveFormField<T[number][K]>;

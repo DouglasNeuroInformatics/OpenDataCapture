@@ -118,6 +118,7 @@ export const primitiveFieldSchema: JSONSchemaType<PrimitiveFormField<PrimitiveFi
 export const arrayFieldSchema: JSONSchemaType<ArrayFormField<ArrayFieldValue>> = {
   type: 'object',
   properties: {
+    ...baseProperties,
     kind: {
       type: 'string',
       const: 'array'
