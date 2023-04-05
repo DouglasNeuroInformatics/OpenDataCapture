@@ -23,8 +23,8 @@ export class UsersController {
 
   @Get()
   @RouteAccess({ action: 'read', subject: 'User' })
-  findAll(): Promise<UserEntity[]> {
-    return this.usersService.findAll();
+  findAll(@UserAbility() ability: AppAbility): Promise<UserEntity[]> {
+    return this.usersService.findAll(ability);
   }
 
   @Get(':username')

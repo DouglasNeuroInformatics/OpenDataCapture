@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { AppAbility } from '@ddcp/common';
 
@@ -47,8 +47,8 @@ export class UsersService {
   }
 
   /** Returns an array of all users */
-  async findAll(): Promise<UserEntity[]> {
-    return this.usersRepository.find().exec();
+  async findAll(ability: AppAbility): Promise<UserEntity[]> {
+    return this.usersRepository.find().accessibleBy(ability).lean();
   }
 
   /** Returns user with provided username if found, otherwise throws */
