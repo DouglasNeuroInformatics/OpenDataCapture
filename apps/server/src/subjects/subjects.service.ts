@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { AppAbility, Group, Sex } from '@ddcp/common';
 import unidecode from 'unidecode';
@@ -33,9 +33,14 @@ export class SubjectsService {
     return this.subjectsRepository.find().accessibleBy(ability).lean();
   }
 
-  async lookup({ firstName, lastName, dateOfBirth, sex }: LookupSubjectDto): Promise<SubjectEntity> {
+  async lookup(dto: LookupSubjectDto, ability: AppAbility): Promise<SubjectEntity> {
+    const { firstName, lastName, dateOfBirth, sex } = dto;
     const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
-    return this.findByIdentifier(identifier);
+    const subject = await this.findByIdentifier(identifier);
+    if (!ability.can('read', subject)) {
+      throw new ForbiddenException();
+    }
+    return subject;
   }
 
   /** Returns the subject with the provided identifier */
