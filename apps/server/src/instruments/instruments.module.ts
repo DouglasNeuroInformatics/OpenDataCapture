@@ -15,6 +15,8 @@ import { InstrumentsRepository } from './repositories/instruments.repository';
 import { FormRecordsService } from './services/form-records.service';
 import { FormsService } from './services/forms.service';
 
+import { AjvModule } from '@/ajv/ajv.module';
+import { GroupsModule } from '@/groups/groups.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
 interface InstrumentDiscriminator {
@@ -24,6 +26,8 @@ interface InstrumentDiscriminator {
 
 @Module({
   imports: [
+    AjvModule,
+    GroupsModule,
     MongooseModule.forFeature([
       {
         name: InstrumentEntity.modelName,

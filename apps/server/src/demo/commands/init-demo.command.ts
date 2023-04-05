@@ -2,17 +2,16 @@ import { Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, BasePermissionLevel, FormInstrument, Random } from '@ddcp/common';
+import { AppAbility, BasePermissionLevel, Random } from '@ddcp/common';
 import {
   BriefPsychiatricRatingScaleData,
-  HappinessQuestionnaireData,
   briefPsychiatricRatingScale,
   enhancedDemographicsQuestionnaireEn,
   enhancedDemographicsQuestionnaireFr,
   happinessQuestionnaire
 } from '@ddcp/instruments';
 import { faker } from '@faker-js/faker';
-import { Connection } from 'mongoose';
+import { Connection, Types } from 'mongoose';
 import { Command, CommandRunner } from 'nest-commander';
 
 import { CreateGroupDto } from '@/groups/dto/create-group.dto';
@@ -86,10 +85,8 @@ export class InitDemoCommand extends CommandRunner {
     for (const user of DEMO_USERS) {
       await this.usersService.create(user, this.ability);
     }
-    const bprs = (await this.formsService.create(
-      briefPsychiatricRatingScale
-    )) as FormInstrument<BriefPsychiatricRatingScaleData>;
-    const hq = (await this.formsService.create(happinessQuestionnaire)) as FormInstrument<HappinessQuestionnaireData>;
+    const bprs = await this.formsService.create(briefPsychiatricRatingScale);
+    const hq = await this.formsService.create(happinessQuestionnaire);
     await this.formsService.create(enhancedDemographicsQuestionnaireEn);
     await this.formsService.create(enhancedDemographicsQuestionnaireFr);
 
@@ -104,32 +101,38 @@ export class InitDemoCommand extends CommandRunner {
       const group = await this.groupsService.findByName(Random.value(DEMO_GROUPS).name, this.ability);
 
       for (let j = 0; j < 3; j++) {
-        await this.formRecordsService.create({
-          kind: 'form',
-          dateCollected: faker.date.recent(365),
-          instrument: hq,
-          group: group,
-          subject: subject,
-          data: {
-            overallHappiness: Random.int(0, 11)
-          }
-        });
+        await this.formRecordsService.create(
+          {
+            kind: 'form',
+            dateCollected: faker.date.recent(365).toISOString(),
+            instrumentId: (hq as typeof hq & { _id: Types.ObjectId })._id.toString(),
+            groupId: (group as typeof group & { _id: Types.ObjectId })._id.toString(),
+            subjectIdentifier: subject.identifier,
+            data: {
+              overallHappiness: Random.int(0, 11)
+            }
+          },
+          this.ability
+        );
       }
 
       const fields = Array.isArray(bprs.content) ? bprs.content.map((g) => g.fields).flat() : bprs.content;
 
       Object.fromEntries(Object.keys(fields).map((field) => [field, '']));
       for (let j = 0; j < 3; j++) {
-        await this.formRecordsService.create({
-          kind: 'form',
-          dateCollected: faker.date.recent(365),
-          instrument: bprs,
-          group: group,
-          subject: subject,
-          data: Object.fromEntries(
-            Object.keys(fields).map((field) => [field, Random.int(0, 7)])
-          ) as BriefPsychiatricRatingScaleData
-        });
+        await this.formRecordsService.create(
+          {
+            kind: 'form',
+            dateCollected: faker.date.recent(365).toISOString(),
+            instrumentId: (bprs as typeof bprs & { _id: Types.ObjectId })._id.toString(),
+            groupId: (group as typeof group & { _id: Types.ObjectId })._id.toString(),
+            subjectIdentifier: subject.identifier,
+            data: Object.fromEntries(
+              Object.keys(fields).map((field) => [field, Random.int(0, 7)])
+            ) as BriefPsychiatricRatingScaleData
+          },
+          this.ability
+        );
       }
     }
   }

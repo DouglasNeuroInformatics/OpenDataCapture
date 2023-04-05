@@ -3,6 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { type AppAbility, FormInstrumentRecord, FormInstrumentRecordsSummary } from '@ddcp/common';
 
+import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormRecordsService } from '../services/form-records.service';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -16,8 +17,8 @@ export class FormRecordsController {
   @ApiOperation({ description: 'Create a New Form Record' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
-  create(@Body() createRecordDto: any): Promise<any> {
-    return Promise.resolve(createRecordDto);
+  create(@Body() createFormRecordDto: CreateFormRecordDto, @UserAbility() ability: AppAbility): Promise<any> {
+    return this.formRecordsService.create(createFormRecordDto, ability);
   }
 
   @ApiOperation({ description: 'Get Specified Records' })
@@ -25,10 +26,10 @@ export class FormRecordsController {
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   find(
     @UserAbility() ability: AppAbility,
-    @Query('instrument') instrumentName?: string,
+    @Query('instrument') instrumentId?: string,
     @Query('subject') subjectIdentifier?: string
   ): Promise<FormInstrumentRecord[]> {
-    return this.formRecordsService.find(ability, instrumentName, subjectIdentifier);
+    return this.formRecordsService.find(ability, instrumentId, subjectIdentifier);
   }
 
   @ApiOperation({ description: 'Summarize Available Form Records' })

@@ -21,6 +21,17 @@ export class GroupsService {
     return this.groupsRepository.find().accessibleBy(ability);
   }
 
+  async findById(id: string, ability: AppAbility): Promise<Group> {
+    const group = await this.groupsRepository.findById(id);
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with id: ${id}`);
+    }
+    if (!ability.can('read', group)) {
+      throw new ForbiddenException();
+    }
+    return group;
+  }
+
   async findByName(name: string, ability: AppAbility): Promise<Group> {
     const group = await this.groupsRepository.findOne({ name }).exec();
     if (!group) {
