@@ -4,15 +4,15 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 
+import { AbilityFactory } from '@/ability/ability.factory';
 import { RouteAccessType } from '@/core/decorators/route-access.decorator';
-import { PermissionsFactory } from '@/permissions/permissions.factory';
 import { UserEntity } from '@/users/entities/user.entity';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
   private readonly logger = new Logger(AuthorizationGuard.name);
 
-  constructor(private readonly reflector: Reflector, private readonly permissionsFactory: PermissionsFactory) {}
+  constructor(private readonly reflector: Reflector, private readonly abilityFactory: AbilityFactory) {}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -29,7 +29,7 @@ export class AuthorizationGuard implements CanActivate {
       return false;
     }
 
-    const ability = this.permissionsFactory.createForUser(request.user as UserEntity);
+    const ability = this.abilityFactory.createForUser(request.user as UserEntity);
     return ability.can(routeAccess.action, routeAccess.subject);
   }
 }

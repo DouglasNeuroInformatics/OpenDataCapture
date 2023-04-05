@@ -7,10 +7,10 @@ import { createMock } from '@golevelup/ts-jest';
 
 import { AuthService } from '../auth.service';
 
+import { AbilityFactory } from '@/ability/ability.factory';
+import { MockAbilityFactory } from '@/ability/test/mocks/ability.factory.mock';
 import { CryptoService } from '@/crypto/crypto.service';
 import { MockCryptoService } from '@/crypto/test/mocks/crypto.service.mock';
-import { PermissionsFactory } from '@/permissions/permissions.factory';
-import { MockPermissionsFactory } from '@/permissions/test/mocks/permissions.factory.mock';
 import { UsersService } from '@/users/users.service';
 
 const MockConfigService = createMock<ConfigService>({
@@ -51,6 +51,10 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         {
+          provide: AbilityFactory,
+          useValue: MockAbilityFactory
+        },
+        {
           provide: ConfigService,
           useValue: MockConfigService
         },
@@ -61,10 +65,6 @@ describe('AuthService', () => {
         {
           provide: JwtService,
           useValue: MockJwtService
-        },
-        {
-          provide: PermissionsFactory,
-          useValue: MockPermissionsFactory
         },
         {
           provide: UsersService,

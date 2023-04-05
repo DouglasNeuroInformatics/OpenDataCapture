@@ -4,18 +4,18 @@ import { JwtService } from '@nestjs/jwt';
 
 import { AuthPayload, JwtPayload } from '@ddcp/common';
 
+import { AbilityFactory } from '@/ability/ability.factory';
 import { CryptoService } from '@/crypto/crypto.service';
-import { PermissionsFactory } from '@/permissions/permissions.factory';
 import { UserEntity } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly abilityFactory: AbilityFactory,
     private readonly configService: ConfigService,
     private readonly cryptoService: CryptoService,
     private readonly jwtService: JwtService,
-    private readonly permissionsFactory: PermissionsFactory,
     private readonly usersService: UsersService
   ) {}
 
@@ -31,7 +31,7 @@ export class AuthService {
     const payload: JwtPayload = {
       username: user.username,
       isAdmin: user.isAdmin,
-      permissions: this.permissionsFactory.createForUser(user).rules,
+      permissions: this.abilityFactory.createForUser(user).rules,
       firstName: user.firstName,
       lastName: user.lastName
     };

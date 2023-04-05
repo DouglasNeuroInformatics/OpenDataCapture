@@ -7,13 +7,13 @@ import { AppAbility } from '@ddcp/common/auth';
 import { UserEntity } from '@/users/entities/user.entity';
 
 @Injectable()
-export class PermissionsFactory {
-  private readonly logger = new Logger(PermissionsFactory.name);
+export class AbilityFactory {
+  private readonly logger = new Logger(AbilityFactory.name);
 
   createForUser(user: UserEntity): AppAbility {
     user.groups.map((group) => group.name);
 
-    this.logger.verbose('Creating permissions for user: ' + user.username);
+    this.logger.verbose('Creating ability for user: ' + user.username);
     const ability = new AbilityBuilder<AppAbility>(createMongoAbility);
     switch (user.basePermissionLevel) {
       case BasePermissionLevel.Admin:
@@ -25,7 +25,6 @@ export class PermissionsFactory {
         //  ability.can('manage', 'Group', { name: { $in: user.groups.map((group) => group.name) } });
         break;
       case BasePermissionLevel.Standard:
-        ability.can('read', 'all');
         break;
     }
     return ability.build();
