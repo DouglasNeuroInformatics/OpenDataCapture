@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import { AppAbility, FormInstrumentRecord, FormInstrumentRecordsSummary } from '@ddcp/common';
+import { AppAbility, FormInstrumentRecord, FormInstrumentRecordsSummary, Group } from '@ddcp/common';
 import { Model } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
@@ -14,7 +14,6 @@ import { FormsService } from './forms.service';
 import { AjvService } from '@/ajv/ajv.service';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
-import { identity } from 'rxjs';
 
 @Injectable()
 export class FormRecordsService {
@@ -32,11 +31,14 @@ export class FormRecordsService {
     ability: AppAbility
   ): Promise<FormInstrumentRecord> {
     const instrument = await this.formsService.findById(instrumentId);
-    const group = await this.groupsService.findById(groupId, ability);
     const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
 
-    if (!subject.groups.includes(group)) {
-      await this.subjectsService.appendGroup(subjectIdentifier, group);
+    let group: Group | undefined;
+    if (groupId) {
+      group = await this.groupsService.findById(groupId, ability);
+      if (!subject.groups.includes(group)) {
+        await this.subjectsService.appendGroup(subjectIdentifier, group);
+      }
     }
 
     return this.formRecordsModel.create({

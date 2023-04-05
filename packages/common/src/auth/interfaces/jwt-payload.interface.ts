@@ -1,3 +1,4 @@
+import { Group } from '../../groups';
 import { Permissions } from '../types/permissions.type';
 
 export interface JwtPayload {
@@ -6,4 +7,5 @@ export interface JwtPayload {
   isAdmin?: boolean;
   firstName?: string;
   lastName?: string;
+  groups: Group[];
 }

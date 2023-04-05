@@ -7,7 +7,7 @@ import { ValidationSchema } from '@/core/decorators/validation-schema.decorator'
 interface CreateFormRecordData
   extends Omit<FormInstrumentRecord, 'dateCollected' | 'group' | 'instrument' | 'subject'> {
   dateCollected: string;
-  groupId: string;
+  groupId?: string;
   instrumentId: string;
   subjectIdentifier: string;
 }
@@ -31,7 +31,8 @@ interface CreateFormRecordData
     groupId: {
       type: 'string',
       minLength: 24,
-      maxLength: 24
+      maxLength: 24,
+      nullable: true
     },
     subjectIdentifier: {
       type: 'string',
@@ -43,7 +44,7 @@ interface CreateFormRecordData
       required: []
     }
   },
-  required: ['kind', 'dateCollected', 'instrumentId', 'groupId', 'subjectIdentifier', 'data']
+  required: ['kind', 'dateCollected', 'instrumentId', 'subjectIdentifier', 'data']
 })
 export class CreateFormRecordDto implements CreateFormRecordData {
   @ApiProperty()
@@ -56,7 +57,7 @@ export class CreateFormRecordDto implements CreateFormRecordData {
   instrumentId: string;
 
   @ApiProperty()
-  groupId: string;
+  groupId?: string;
 
   @ApiProperty()
   subjectIdentifier: string;

@@ -35,7 +35,8 @@ export class AuthService {
       isAdmin: user.isAdmin,
       permissions: ability.rules,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      groups: user.groups
     };
 
     const accessToken = await this.signToken(payload);

@@ -1,5 +1,5 @@
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, JwtPayload } from '@ddcp/common';
+import { AppAbility, Group, JwtPayload } from '@ddcp/common';
 import jwtDecode from 'jwt-decode';
 import { create } from 'zustand';
 
@@ -11,6 +11,7 @@ export interface AuthStore {
   accessToken: string | null;
   setAccessToken: (accessToken: string) => void;
   currentUser: CurrentUser | null;
+  currentGroup: Group | null;
   logout: () => void;
 }
 
@@ -21,9 +22,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
     const ability = createMongoAbility<AppAbility>(permissions);
     set({
       accessToken,
-      currentUser: { ability, ...rest }
+      currentUser: { ability, ...rest },
     });
   },
   currentUser: null,
+  currentGroup: null,
   logout: () => set({ accessToken: null, currentUser: null })
 }));

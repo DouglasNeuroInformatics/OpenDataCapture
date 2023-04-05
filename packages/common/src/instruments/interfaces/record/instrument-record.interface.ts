@@ -8,7 +8,7 @@ export interface InstrumentRecord<TInstrument extends BaseInstrument, TData = an
   kind: InstrumentKind;
   dateCollected: Date;
   instrument: TInstrument;
-  group: Group;
+  group?: Group;
   subject: Subject;
   data: TData;
 }

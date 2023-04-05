@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { FormInstrument } from '@ddcp/common';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
   HiOutlineDocumentCheck,
@@ -15,16 +16,14 @@ import { FormOverview } from '../components/FormOverview';
 import { FormQuestions } from '../components/FormQuestions';
 import { FormSummary } from '../components/FormSummary';
 
-import { FormValues, IdentificationFormData, PageHeader, Spinner, Stepper } from '@/components';
+import { FormValues, PageHeader, Spinner, Stepper } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 import { useNotificationsStore } from '@/stores/notifications-store';
-import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
 export const FormPage = () => {
   const params = useParams();
   const notifications = useNotificationsStore();
   const { t } = useTranslation();
-  const { setActiveSubject } = useActiveSubjectStore();
 
   const { data } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
   const [result, setResult] = useState<FormValues>();
@@ -33,13 +32,14 @@ export const FormPage = () => {
     return <Spinner />;
   }
 
-  const handleSetSubject = (data: IdentificationFormData) => {
-    setActiveSubject(data);
-  };
-
-  const handleSubmit = (data: FormValues) => {
+  const handleSubmit = async (data: FormValues) => {
     setResult(data);
-    setTimeout(() => notifications.add({ message: 'Upload Successful', type: 'success' }), 1000);
+    await axios.post('/instruments/records/forms', {
+      kind: 'form',
+      dateCollected: new Date(),
+      instrumentId: params.id!,
+    });
+    notifications.add({ message: 'Upload Successful', type: 'success' });
   };
 
   return (
@@ -53,7 +53,7 @@ export const FormPage = () => {
             icon: <HiOutlineDocumentCheck />
           },
           {
-            element: <FormIdentification onSubmit={handleSetSubject} />,
+            element: <FormIdentification />,
             label: 'Identification',
             icon: <HiOutlineIdentification />
           },

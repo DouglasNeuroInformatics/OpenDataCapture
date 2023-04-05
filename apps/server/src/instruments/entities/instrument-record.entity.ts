@@ -27,8 +27,8 @@ export class InstrumentRecordEntity implements InstrumentRecord<BaseInstrument> 
   @Prop({ required: true, ref: InstrumentEntity.modelName, type: MongooseSchema.Types.ObjectId })
   instrument: BaseInstrument;
 
-  @Prop({ required: true, ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId })
-  group: Group;
+  @Prop({ required: false, ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId })
+  group?: Group;
 
   @Prop({ required: true, ref: SubjectEntity.modelName, type: MongooseSchema.Types.ObjectId })
   subject: Subject;
