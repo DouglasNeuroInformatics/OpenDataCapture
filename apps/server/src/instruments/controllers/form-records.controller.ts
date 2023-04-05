@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { type AppAbility, FormInstrumentRecord, FormInstrumentRecordsSummary } from '@ddcp/common';
+import { type AppAbility } from '@ddcp/common/auth';
+import { FormInstrumentRecord, FormInstrumentRecordsSummary, InstrumentRecordsExport } from '@ddcp/common/instruments';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormRecordsService } from '../services/form-records.service';
@@ -37,5 +38,12 @@ export class FormRecordsController {
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   summary(@UserAbility() ability: AppAbility): Promise<FormInstrumentRecordsSummary> {
     return this.formRecordsService.summary(ability);
+  }
+
+  @ApiOperation({ description: 'Export Records' })
+  @Get('export')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  export(@UserAbility() ability: AppAbility): Promise<InstrumentRecordsExport> {
+    return this.formRecordsService.export(ability);
   }
 }

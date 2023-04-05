@@ -19,7 +19,7 @@ export const UserPage = () => {
   return (
     <div className="flex flex-col items-center justify-center">
       <HiUserCircle className="h-20 w-20" />
-      <h1 className="mt-2 font-bold">{fullName}</h1>
+      <h1 className="mt-2 font-bold text-3xl">{fullName}</h1>
       <h3>{currentUser?.username}</h3>
     </div>
   );

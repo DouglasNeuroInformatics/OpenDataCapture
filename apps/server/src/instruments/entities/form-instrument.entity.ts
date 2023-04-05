@@ -4,7 +4,7 @@ import { type FormDetails, FormInstrument, type FormInstrumentContent, FormInstr
 import { type JSONSchemaType } from 'ajv';
 import { Schema as MongooseSchema } from 'mongoose';
 
-import { FormDetailsSchema } from './form-details-entity';
+import { FormDetailsSchema } from './form-details.entity';
 
 @Schema({ strict: false })
 export class FormInstrumentEntity implements FormInstrument {

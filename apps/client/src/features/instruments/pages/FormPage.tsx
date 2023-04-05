@@ -29,10 +29,10 @@ export const FormPage = () => {
   const { activeSubject } = useActiveSubjectStore();
   const { currentGroup } = useAuthStore();
 
-  const { data } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
+  const { data: instrument } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
   const [result, setResult] = useState<FormValues>();
 
-  if (!data) {
+  if (!instrument) {
     return <Spinner />;
   }
 
@@ -40,8 +40,9 @@ export const FormPage = () => {
     await axios.post('/instruments/records/forms', {
       kind: 'form',
       dateCollected: DateUtils.toBasicISOString(new Date()),
-      instrumentId: params.id!,
-      groupId: currentGroup,
+      instrumentName: instrument.name,
+      instrumentVersion: instrument.version,
+      groupName: currentGroup?.name,
       subjectInfo: activeSubject,
       data: data
     });
@@ -51,11 +52,11 @@ export const FormPage = () => {
 
   return (
     <div>
-      <PageHeader title={data.details.title} />
+      <PageHeader title={instrument.details.title} />
       <Stepper
         steps={[
           {
-            element: <FormOverview details={data.details} />,
+            element: <FormOverview details={instrument.details} />,
             label: 'Overview',
             icon: <HiOutlineDocumentCheck />
           },
@@ -65,12 +66,12 @@ export const FormPage = () => {
             icon: <HiOutlineIdentification />
           },
           {
-            element: <FormQuestions instrument={data} onSubmit={handleSubmit} />,
+            element: <FormQuestions instrument={instrument} onSubmit={handleSubmit} />,
             label: 'Questions',
             icon: <HiOutlineQuestionMarkCircle />
           },
           {
-            element: <FormSummary instrument={data} result={result} />,
+            element: <FormSummary instrument={instrument} result={result} />,
             label: 'Summary',
             icon: <HiOutlinePrinter />
           }

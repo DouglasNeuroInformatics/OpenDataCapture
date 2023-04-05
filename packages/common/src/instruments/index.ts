@@ -5,6 +5,7 @@ export * from './interfaces/form/form-instrument.interface';
 export * from './interfaces/form/form-instrument-summary.interface';
 
 export * from './interfaces/record/form-instrument-records-summary.interface';
+export * from './interfaces/record/instrument-record-export.interface';
 export * from './interfaces/record/instrument-record.interface';
 
 export * from './schemas/form-details.schema';

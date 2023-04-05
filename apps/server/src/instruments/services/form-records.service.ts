@@ -2,7 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import { AppAbility, FormInstrumentRecord, FormInstrumentRecordsSummary, Group } from '@ddcp/common';
+import { AppAbility } from '@ddcp/common/auth';
+import { Group } from '@ddcp/common/groups';
+import { FormInstrumentRecord, FormInstrumentRecordsSummary, InstrumentRecordsExport } from '@ddcp/common/instruments';
+import { DateUtils } from '@ddcp/common/utils';
 import { Model } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
@@ -26,16 +29,15 @@ export class FormRecordsService {
     private readonly subjectsService: SubjectsService
   ) {}
 
-  async create(
-    { kind, dateCollected, data, instrumentId, groupId, subjectInfo }: CreateFormRecordDto,
-    ability: AppAbility
-  ): Promise<FormInstrumentRecord> {
-    const instrument = await this.formsService.findById(instrumentId);
+  async create(dto: CreateFormRecordDto, ability: AppAbility): Promise<FormInstrumentRecord> {
+    const { kind, dateCollected, data, instrumentName, groupName, subjectInfo } = dto;
+
+    const instrument = await this.formsService.findByName(instrumentName);
     const subject = await this.subjectsService.lookup(subjectInfo);
 
     let group: Group | undefined;
-    if (groupId) {
-      group = await this.groupsService.findById(groupId, ability);
+    if (groupName) {
+      group = await this.groupsService.findByName(groupName, ability);
       if (!subject.groups.includes(group)) {
         await this.subjectsService.appendGroup(subject.identifier, group);
       }
@@ -72,5 +74,29 @@ export class FormRecordsService {
     return {
       count: await this.formRecordsModel.find().accessibleBy(ability).count()
     };
+  }
+
+  async export(ability: AppAbility): Promise<InstrumentRecordsExport> {
+    const subjects = await this.subjectsService.findAll(ability);
+    const data: InstrumentRecordsExport = [];
+    for (let i = 0; i < subjects.length; i++) {
+      const subject = subjects[i];
+      const records = await this.formRecordsModel.find({ kind: 'form', subject }, undefined, ['instrument']);
+      for (let j = 0; j < records.length; j++) {
+        const record = records[j];
+        for (const measure of Object.keys(record.data)) {
+          data.push({
+            subjectId: subject.identifier,
+            subjectAge: DateUtils.yearsPassed(subject.dateOfBirth),
+            subjectSex: subject.sex,
+            instrumentName: record.instrument.name,
+            instrumentVersion: record.instrument.version,
+            measure: measure,
+            value: record.data[measure] as unknown
+          });
+        }
+      }
+    }
+    return data;
   }
 }

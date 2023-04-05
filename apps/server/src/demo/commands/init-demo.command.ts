@@ -11,7 +11,7 @@ import {
   happinessQuestionnaire
 } from '@ddcp/instruments';
 import { faker } from '@faker-js/faker';
-import { Connection, Types } from 'mongoose';
+import { Connection } from 'mongoose';
 import { Command, CommandRunner } from 'nest-commander';
 
 import { CreateGroupDto } from '@/groups/dto/create-group.dto';
@@ -45,13 +45,17 @@ const DEMO_USERS: CreateUserDto[] = [
     username: 'JohnSmith',
     password: 'password',
     groupNames: ['Psychosis Clinic'],
-    basePermissionLevel: BasePermissionLevel.GroupManager
+    basePermissionLevel: BasePermissionLevel.GroupManager,
+    firstName: 'John',
+    lastName: 'Smith'
   },
   {
     username: 'JaneDoe',
     password: 'password',
     groupNames: ['Depression Clinic'],
-    basePermissionLevel: BasePermissionLevel.GroupManager
+    basePermissionLevel: BasePermissionLevel.GroupManager,
+    firstName: 'Jane',
+    lastName: 'Doe'
   }
 ];
 
@@ -98,7 +102,7 @@ export class InitDemoCommand extends CommandRunner {
         sex: faker.name.sexType()
       };
 
-      const subject = await this.subjectsService.create(createSubjectDto);
+      await this.subjectsService.create(createSubjectDto);
 
       const group = await this.groupsService.findByName(Random.value(DEMO_GROUPS).name, this.ability);
 
@@ -107,11 +111,12 @@ export class InitDemoCommand extends CommandRunner {
           {
             kind: 'form',
             dateCollected: faker.date.recent(365).toISOString(),
-            instrumentId: (hq as typeof hq & { _id: Types.ObjectId })._id.toString(),
-            groupId: (group as typeof group & { _id: Types.ObjectId })._id.toString(),
+            instrumentName: hq.name,
+            instrumentVersion: hq.version,
+            groupName: group.name,
             subjectInfo: createSubjectDto,
             data: {
-              overallHappiness: Random.int(0, 11)
+              overallHappiness: Random.int(1, 11)
             }
           },
           this.ability
@@ -126,8 +131,9 @@ export class InitDemoCommand extends CommandRunner {
           {
             kind: 'form',
             dateCollected: faker.date.recent(365).toISOString(),
-            instrumentId: (bprs as typeof bprs & { _id: Types.ObjectId })._id.toString(),
-            groupId: (group as typeof group & { _id: Types.ObjectId })._id.toString(),
+            instrumentName: bprs.name,
+            instrumentVersion: bprs.version,
+            groupName: group.name,
             subjectInfo: createSubjectDto,
             data: Object.fromEntries(
               Object.keys(fields).map((field) => [field, Random.int(0, 7)])
