@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { type AppAbility } from '@ddcp/common';
+
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupEntity } from './entities/group.entity';
@@ -8,10 +10,11 @@ import { GroupsService } from './groups.service';
 
 import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { UserAbility } from '@/core/decorators/user-ability.decorator';
 
 @ApiTags('Groups')
 @Controller('groups')
-export class GroupsController implements EntityController<GroupEntity> {
+export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
   @ApiOperation({ description: 'Adds a new group to the database' })
@@ -24,8 +27,8 @@ export class GroupsController implements EntityController<GroupEntity> {
   @ApiOperation({ description: 'Returns all groups in the database' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findAll(): Promise<GroupEntity[]> {
-    return this.groupsService.findAll();
+  findAll(@UserAbility() userAbility: AppAbility): Promise<GroupEntity[]> {
+    return this.groupsService.findAll(userAbility);
   }
 
   @ApiOperation({ description: 'Returns the group with the provided name' })

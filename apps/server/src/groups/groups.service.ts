@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { Group } from '@ddcp/common';
+import { AppAbility, Group } from '@ddcp/common';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -17,8 +17,9 @@ export class GroupsService {
     return this.groupsRepository.create(createGroupDto);
   }
 
-  async findAll(): Promise<Group[]> {
-    return this.groupsRepository.find().exec();
+  async findAll(userAbility: AppAbility): Promise<Group[]> {
+    console.log(JSON.stringify(userAbility.rules));
+    return this.groupsRepository.find().accessibleBy(userAbility);
   }
 
   async findOne(name: string): Promise<Group> {

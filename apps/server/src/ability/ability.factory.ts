@@ -11,8 +11,6 @@ export class AbilityFactory {
   private readonly logger = new Logger(AbilityFactory.name);
 
   createForUser(user: UserEntity): AppAbility {
-    user.groups.map((group) => group.name);
-
     this.logger.verbose('Creating ability for user: ' + user.username);
     const ability = new AbilityBuilder<AppAbility>(createMongoAbility);
     switch (user.basePermissionLevel) {
@@ -20,10 +18,7 @@ export class AbilityFactory {
         ability.can('manage', 'all');
         break;
       case BasePermissionLevel.GroupManager:
-        ability.can('manage', 'Group', { name: { $in: user.groups.map((group) => group.name) } });
-        // ability.can('manage', 'all');
-        // ability.cannot('create', 'Instrument');
-        //  ability.can('manage', 'Group', { name: { $in: user.groups.map((group) => group.name) } });
+        ability.can('read', 'Group', { _id: { $in: user.groups } });
         break;
       case BasePermissionLevel.Standard:
         break;
