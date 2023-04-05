@@ -20,8 +20,9 @@ export class AbilityFactory {
         ability.can('manage', 'all');
         break;
       case BasePermissionLevel.GroupManager:
-        ability.can('manage', 'all');
-        ability.cannot('create', 'Instrument');
+        ability.can('manage', 'Group', { name: { $in: user.groups.map((group) => group.name) } });
+        // ability.can('manage', 'all');
+        // ability.cannot('create', 'Instrument');
         //  ability.can('manage', 'Group', { name: { $in: user.groups.map((group) => group.name) } });
         break;
       case BasePermissionLevel.Standard:

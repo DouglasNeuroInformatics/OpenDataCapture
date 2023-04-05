@@ -28,10 +28,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
+    const ability = this.abilityFactory.createForUser(user);
+
     const payload: JwtPayload = {
       username: user.username,
       isAdmin: user.isAdmin,
-      permissions: this.abilityFactory.createForUser(user).rules,
+      permissions: ability.rules,
       firstName: user.firstName,
       lastName: user.lastName
     };

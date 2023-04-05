@@ -1,21 +1,19 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { Request } from 'express';
 import { Observable } from 'rxjs';
 
-import { AbilityFactory } from '@/ability/ability.factory';
 import { RouteAccessType } from '@/core/decorators/route-access.decorator';
-import { UserEntity } from '@/users/entities/user.entity';
+import { AuthenticatedRequest } from '@/core/interfaces/authenticated-request.interface';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
   private readonly logger = new Logger(AuthorizationGuard.name);
 
-  constructor(private readonly reflector: Reflector, private readonly abilityFactory: AbilityFactory) {}
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     this.logger.verbose(`Request URL: ${request.url}`);
 
     const routeAccess = this.reflector.getAllAndOverride<RouteAccessType | undefined>('RouteAccess', [
@@ -29,7 +27,6 @@ export class AuthorizationGuard implements CanActivate {
       return false;
     }
 
-    const ability = this.abilityFactory.createForUser(request.user as UserEntity);
-    return ability.can(routeAccess.action, routeAccess.subject);
+    return request.ability.can(routeAccess.action, routeAccess.subject);
   }
 }
