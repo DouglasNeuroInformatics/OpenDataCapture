@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { type Sex, Subject } from '@ddcp/common';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+
+import { GroupEntity } from '@/groups/entities/group.entity';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class SubjectEntity implements Subject {
@@ -21,6 +23,9 @@ export class SubjectEntity implements Subject {
 
   @Prop({ enum: ['male', 'female'] satisfies Sex[], required: true, type: String })
   sex: Sex;
+
+  @Prop({ required: false, default: [], type: [{ ref: GroupEntity.name, type: MongooseSchema.Types.ObjectId }] })
+  groups: GroupEntity[];
 }
 
 export type SubjectDocument = HydratedDocument<SubjectEntity>;
