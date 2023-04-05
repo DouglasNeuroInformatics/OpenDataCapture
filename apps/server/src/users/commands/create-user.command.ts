@@ -1,4 +1,5 @@
-import { BasePermissionLevel } from '@ddcp/common';
+import { createMongoAbility } from '@casl/ability';
+import { AppAbility, BasePermissionLevel } from '@ddcp/common';
 import { Command, CommandRunner, Option } from 'nest-commander';
 
 import { UsersService } from '../users.service';
@@ -14,17 +15,21 @@ interface CommandOptions {
 
 @Command({ arguments: '<username> <password>', name: 'create-user', description: 'add a new user to the database' })
 export class CreateUserCommand extends CommandRunner {
+  private readonly ability = createMongoAbility<AppAbility>([{ action: 'manage', subject: 'all' }]);
+
   constructor(private readonly usersService: UsersService) {
     super();
   }
 
   async run([username, password]: CommandArgs, options: CommandOptions): Promise<void> {
-    console.log(options);
-    const user = await this.usersService.create({
-      username,
-      password,
-      ...options
-    });
+    const user = await this.usersService.create(
+      {
+        username,
+        password,
+        ...options
+      },
+      this.ability
+    );
     console.log(`Successfully created user: ${user.username}`);
   }
 

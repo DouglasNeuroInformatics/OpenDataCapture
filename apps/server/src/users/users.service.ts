@@ -1,5 +1,7 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
+import { AppAbility } from '@ddcp/common';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
@@ -19,7 +21,8 @@ export class UsersService {
   ) {}
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
-  async create({ username, password, basePermissionLevel, groupNames, ...rest }: CreateUserDto): Promise<UserEntity> {
+  async create(createUserDto: CreateUserDto, ability: AppAbility): Promise<UserEntity> {
+    const { username, password, basePermissionLevel, groupNames, ...rest } = createUserDto;
     this.logger.verbose(`Attempting to create user: ${username}`);
 
     const userExists = await this.usersRepository.exists({ username: username });
@@ -29,7 +32,7 @@ export class UsersService {
 
     const groups: GroupEntity[] = [];
     for (let i = 0; i < (groupNames?.length ?? 0); i++) {
-      groups.push(await this.groupsService.findOne(groupNames![i]));
+      groups.push(await this.groupsService.findByName(groupNames![i], ability));
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(password);

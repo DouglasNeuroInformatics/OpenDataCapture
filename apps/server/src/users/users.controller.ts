@@ -1,22 +1,24 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
+import { type AppAbility } from '@ddcp/common';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
-import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { UserAbility } from '@/core/decorators/user-ability.decorator';
 
 @ApiTags('Users')
 @Controller({ path: 'users' })
-export class UsersController implements EntityController<UserEntity> {
+export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @RouteAccess({ action: 'create', subject: 'User' })
-  create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
-    return this.usersService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto, @UserAbility() ability: AppAbility): Promise<UserEntity> {
+    return this.usersService.create(createUserDto, ability);
   }
 
   @Get()

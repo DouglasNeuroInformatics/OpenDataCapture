@@ -1,14 +1,15 @@
+it('should do nothing', () => {
+  expect(true).toBeTruthy();
+});
+
+/*
+
 import request from 'supertest';
 
 import { HttpStatus } from '@nestjs/common';
 
 import { server } from './config/jest-e2e.setup';
 
-it('should do nothing', () => {
-  expect(true).toBeTruthy();
-});
-
-/*
 describe('POST /groups', () => {
   it('should reject a request with an empty body', async () => {
     const response = await request(server)

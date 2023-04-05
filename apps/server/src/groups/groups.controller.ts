@@ -8,7 +8,6 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupEntity } from './entities/group.entity';
 import { GroupsService } from './groups.service';
 
-import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import { UserAbility } from '@/core/decorators/user-ability.decorator';
 
@@ -27,15 +26,15 @@ export class GroupsController {
   @ApiOperation({ description: 'Returns all groups in the database' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findAll(@UserAbility() userAbility: AppAbility): Promise<GroupEntity[]> {
-    return this.groupsService.findAll(userAbility);
+  findAll(@UserAbility() ability: AppAbility): Promise<GroupEntity[]> {
+    return this.groupsService.findAll(ability);
   }
 
   @ApiOperation({ description: 'Returns the group with the provided name' })
   @Get(':name')
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findOne(@Param('name') name: string): Promise<GroupEntity> {
-    return this.groupsService.findOne(name);
+  findByName(@Param('name') name: string, @UserAbility() ability: AppAbility): Promise<GroupEntity> {
+    return this.groupsService.findByName(name, ability);
   }
 
   @ApiOperation({ description: 'Returns the updated group' })

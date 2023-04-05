@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { AppAbility, Group } from '@ddcp/common';
 
@@ -17,15 +17,17 @@ export class GroupsService {
     return this.groupsRepository.create(createGroupDto);
   }
 
-  async findAll(userAbility: AppAbility): Promise<Group[]> {
-    console.log(JSON.stringify(userAbility.rules));
-    return this.groupsRepository.find().accessibleBy(userAbility);
+  async findAll(ability: AppAbility): Promise<Group[]> {
+    return this.groupsRepository.find().accessibleBy(ability);
   }
 
-  async findOne(name: string): Promise<Group> {
+  async findByName(name: string, ability: AppAbility): Promise<Group> {
     const group = await this.groupsRepository.findOne({ name }).exec();
     if (!group) {
       throw new NotFoundException(`Failed to find group with name: ${name}`);
+    }
+    if (!ability.can('read', group)) {
+      throw new ForbiddenException();
     }
     return group;
   }
