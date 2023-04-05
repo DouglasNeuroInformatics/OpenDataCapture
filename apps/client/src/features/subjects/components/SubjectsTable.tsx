@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import { Subject } from '@ddcp/common';
+import { InstrumentRecordsExport, Subject } from '@ddcp/common';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { SubjectLookup } from './SubjectLookup';
@@ -13,19 +14,27 @@ export interface SubjectTableProps {
 }
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
-  const downloadJSON = useDownload('/api/v0/instruments/records/export-json', 'records.json');
-  const downloadCSV = useDownload('/api/v0/instruments/records/export-csv', 'records.csv');
+  const download = useDownload();
   const { t } = useTranslation(['common', 'subjects']);
 
   const [showLookup, setShowLookup] = useState(false);
 
+  const getExportRecords = async () => {
+    const response = await axios.get<InstrumentRecordsExport>('/instruments/records/forms/export');
+    return response.data;
+  };
+
   const handleExportSelection = (option: string | ('JSON' | 'CSV')) => {
     switch (option) {
       case 'JSON':
-        downloadJSON();
+        download('data.json', async () => {
+          const data = await getExportRecords();
+          return JSON.stringify(data, null, 2);
+        });
         break;
       case 'CSV':
-        downloadCSV();
+        download('foo', () => Promise.resolve('foo.txt'));
+        // downloadCSV();
         break;
     }
   };
