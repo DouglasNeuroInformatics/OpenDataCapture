@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { FormInstrumentData, FormInstrumentRecord, FormInstrumentRecordsSummary } from '@ddcp/common';
+import { AccessibleModel } from '@casl/mongoose';
+import { AppAbility, FormInstrumentData, FormInstrumentRecord, FormInstrumentRecordsSummary } from '@ddcp/common';
 import { Model } from 'mongoose';
 
 import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
@@ -14,7 +15,8 @@ import { SubjectsService } from '@/subjects/subjects.service';
 @Injectable()
 export class FormRecordsService {
   constructor(
-    @InjectModel(InstrumentRecordEntity.modelName) private formRecordsModel: Model<FormInstrumentRecordEntity>,
+    @InjectModel(InstrumentRecordEntity.modelName)
+    private readonly formRecordsModel: Model<FormInstrumentRecordEntity, AccessibleModel<FormInstrumentRecordEntity>>,
     private readonly formsService: FormsService,
     private readonly subjectsService: SubjectsService
   ) {}
@@ -25,7 +27,11 @@ export class FormRecordsService {
     return this.formRecordsModel.create(formInstrumentRecord);
   }
 
-  async find(instrumentName?: string, subjectIdentifier?: string): Promise<FormInstrumentRecord[]> {
+  async find(
+    ability: AppAbility,
+    instrumentName?: string,
+    subjectIdentifier?: string
+  ): Promise<FormInstrumentRecord[]> {
     const filter: Record<string, any> = {};
     if (instrumentName) {
       filter.instrument = (await this.formsService.findByName(instrumentName)) as unknown;
@@ -33,13 +39,12 @@ export class FormRecordsService {
     if (subjectIdentifier) {
       filter.subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
     }
-    const records = await this.formRecordsModel.find(filter).populate('group', 'name').populate('instrument');
-    return records;
+    return this.formRecordsModel.find(filter).accessibleBy(ability).populate('group');
   }
 
-  async summarize(): Promise<FormInstrumentRecordsSummary> {
+  async summary(ability: AppAbility): Promise<FormInstrumentRecordsSummary> {
     return {
-      count: await this.formRecordsModel.count()
+      count: await this.formRecordsModel.find().accessibleBy(ability).count()
     };
   }
 }

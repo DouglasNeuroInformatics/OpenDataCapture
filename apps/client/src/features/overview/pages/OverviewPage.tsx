@@ -16,7 +16,7 @@ export const OverviewPage = () => {
   const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
   const forms = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
-  const records = useFetch<FormInstrumentRecordsSummary>('/instruments/records/forms/summarize');
+  const records = useFetch<FormInstrumentRecordsSummary>('/instruments/records/forms/summary');
   const subjects = useFetch<Subject[]>('/subjects');
   const users = useFetch<User[]>('/users');
 
