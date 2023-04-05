@@ -1,17 +1,19 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { type AppAbility } from '@ddcp/common';
+
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { LookupSubjectDto } from './dto/lookup-subject.dto';
 import { SubjectEntity } from './entities/subject.entity';
 import { SubjectsService } from './subjects.service';
 
-import { EntityController } from '@/core/abstract/entity.controller';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { UserAbility } from '@/core/decorators/user-ability.decorator';
 
 @ApiTags('Subjects')
 @Controller('subjects')
-export class SubjectsController implements EntityController<SubjectEntity> {
+export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @ApiOperation({ summary: 'Create Subject' })
@@ -24,8 +26,8 @@ export class SubjectsController implements EntityController<SubjectEntity> {
   @ApiOperation({ summary: 'Get All Subjects' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  findAll(): Promise<SubjectEntity[]> {
-    return this.subjectsService.findAll();
+  findAll(@UserAbility() ability: AppAbility): Promise<SubjectEntity[]> {
+    return this.subjectsService.findAll(ability);
   }
 
   @ApiOperation({ summary: 'Lookup Subject' })

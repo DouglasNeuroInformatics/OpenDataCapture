@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { Group, Sex } from '@ddcp/common';
+import { AppAbility, Group, Sex } from '@ddcp/common';
 import unidecode from 'unidecode';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
@@ -29,8 +29,8 @@ export class SubjectsService {
     });
   }
 
-  async findAll(): Promise<SubjectEntity[]> {
-    return this.subjectsRepository.find();
+  async findAll(ability: AppAbility): Promise<SubjectEntity[]> {
+    return this.subjectsRepository.find().accessibleBy(ability).lean();
   }
 
   async lookup({ firstName, lastName, dateOfBirth, sex }: LookupSubjectDto): Promise<SubjectEntity> {
