@@ -4,6 +4,7 @@ import { Sex } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
 
 import { Form } from '@/components';
+import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
 type IdentificationFormData = {
   firstName: string;
@@ -13,10 +14,15 @@ type IdentificationFormData = {
 };
 
 export interface IdentificationFormProps {
+  /** Whether to prefill the form with the active subject, if one exists  */
+  fillActiveSubject?: boolean;
+
+  /** Callback function invoked when validation is successful */
   onSubmit: (data: IdentificationFormData) => void;
 }
 
-export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
+export const IdentificationForm = ({ fillActiveSubject, onSubmit }: IdentificationFormProps) => {
+  const { activeSubject } = useActiveSubjectStore();
   const { t } = useTranslation(['common', 'form']);
 
   return (
@@ -48,6 +54,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
           description: t('identificationForm.sex.description')
         }
       }}
+      initialValues={fillActiveSubject ? activeSubject : undefined}
       submitBtnLabel={t('identificationForm.submit')}
       validationSchema={{
         type: 'object',

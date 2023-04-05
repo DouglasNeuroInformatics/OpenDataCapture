@@ -43,6 +43,7 @@ const getDefaultValues = <T extends FormInstrumentData>(content: FormInstrumentC
 export interface FormProps<T extends FormInstrumentData>
   extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
   className?: string;
+  initialValues?: FormValues<T> | null;
   submitBtnLabel?: string;
   onSubmit: (data: FormValues<T>) => void;
 }
@@ -50,12 +51,13 @@ export interface FormProps<T extends FormInstrumentData>
 export const Form = <T extends FormInstrumentData>({
   content,
   className,
+  initialValues,
   submitBtnLabel,
   validationSchema,
   onSubmit
 }: FormProps<T>) => {
   const [errors, setErrors] = useState<FormErrors<T>>({});
-  const [values, setValues] = useState<FormValues<T>>(() => getDefaultValues(content));
+  const [values, setValues] = useState<FormValues<T>>(() => initialValues ?? getDefaultValues(content));
 
   const reset = () => {
     setValues(getDefaultValues(content));
