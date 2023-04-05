@@ -33,7 +33,7 @@ export class SubjectsController {
   @ApiOperation({ summary: 'Lookup Subject' })
   @Post('lookup')
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  lookup(@Body() lookupSubjectDto: LookupSubjectDto, @UserAbility() ability: AppAbility): Promise<SubjectEntity> {
-    return this.subjectsService.lookup(lookupSubjectDto, ability);
+  lookup(@Body() lookupSubjectDto: LookupSubjectDto): Promise<SubjectEntity> {
+    return this.subjectsService.lookup(lookupSubjectDto);
   }
 }

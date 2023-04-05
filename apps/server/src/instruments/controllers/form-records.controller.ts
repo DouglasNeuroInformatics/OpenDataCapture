@@ -26,10 +26,10 @@ export class FormRecordsController {
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   find(
     @UserAbility() ability: AppAbility,
-    @Query('instrument') instrumentId?: string,
+    @Query('instrument') instrumentName?: string,
     @Query('subject') subjectIdentifier?: string
   ): Promise<FormInstrumentRecord[]> {
-    return this.formRecordsService.find(ability, instrumentId, subjectIdentifier);
+    return this.formRecordsService.find(ability, instrumentName, subjectIdentifier);
   }
 
   @ApiOperation({ description: 'Summarize Available Form Records' })

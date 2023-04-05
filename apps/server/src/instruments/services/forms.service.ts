@@ -35,6 +35,14 @@ export class FormsService {
     return result;
   }
 
+  async findByName(name: string): Promise<FormInstrument> {
+    const result = await this.formModel.findOne({ name });
+    if (!result || result.kind !== 'form') {
+      throw new NotFoundException(`Failed to find form with name: ${name}`);
+    }
+    return result;
+  }
+
   async remove(id: string): Promise<FormInstrument> {
     const result = await this.formModel.findOneAndDelete({ id }, { new: true });
     if (!result) {

@@ -18,11 +18,12 @@ export interface AuthStore {
 export const useAuthStore = create<AuthStore>((set) => ({
   accessToken: null,
   setAccessToken: (accessToken) => {
-    const { permissions, ...rest } = jwtDecode<JwtPayload>(accessToken);
+    const { permissions, groups, ...rest } = jwtDecode<JwtPayload>(accessToken);
     const ability = createMongoAbility<AppAbility>(permissions);
     set({
       accessToken,
-      currentUser: { ability, ...rest },
+      currentUser: { ability, groups, ...rest },
+      currentGroup: groups[0]
     });
   },
   currentUser: null,

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { type FormInstrumentData, FormInstrumentRecord } from '@ddcp/common';
+import { type FormInstrumentData, FormInstrumentRecord } from '@ddcp/common/instruments';
+import { type SubjectIdentificationData, subjectIdentificationDataSchema } from '@ddcp/common/subjects';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
@@ -9,7 +10,7 @@ interface CreateFormRecordData
   dateCollected: string;
   groupId?: string;
   instrumentId: string;
-  subjectIdentifier: string;
+  subjectInfo: SubjectIdentificationData;
 }
 
 @ValidationSchema<CreateFormRecordData>({
@@ -34,17 +35,13 @@ interface CreateFormRecordData
       maxLength: 24,
       nullable: true
     },
-    subjectIdentifier: {
-      type: 'string',
-      minLength: 64,
-      maxLength: 64
-    },
+    subjectInfo: subjectIdentificationDataSchema,
     data: {
       type: 'object',
       required: []
     }
   },
-  required: ['kind', 'dateCollected', 'instrumentId', 'subjectIdentifier', 'data']
+  required: ['kind', 'dateCollected', 'instrumentId', 'subjectInfo', 'data']
 })
 export class CreateFormRecordDto implements CreateFormRecordData {
   @ApiProperty()
@@ -60,7 +57,7 @@ export class CreateFormRecordDto implements CreateFormRecordData {
   groupId?: string;
 
   @ApiProperty()
-  subjectIdentifier: string;
+  subjectInfo: SubjectIdentificationData;
 
   @ApiProperty()
   data: FormInstrumentData;

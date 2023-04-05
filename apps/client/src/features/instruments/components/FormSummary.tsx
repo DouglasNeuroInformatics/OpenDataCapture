@@ -2,14 +2,17 @@ import React from 'react';
 
 import { FormInstrument } from '@ddcp/common';
 
-import { Button, FormValues } from '@/components';
+import { Button, FormValues, Spinner } from '@/components';
 
 export interface FormSummaryProps {
   instrument: FormInstrument;
-  result: FormValues;
+  result?: FormValues;
 }
 
 export const FormSummary = ({ result }: FormSummaryProps) => {
+  if (!result) {
+    return <Spinner />;
+  }
   return (
     <div className="print:absolute print:h-screen print:w-screen">
       <div className="mb-3">

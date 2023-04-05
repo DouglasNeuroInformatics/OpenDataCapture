@@ -91,12 +91,14 @@ export class InitDemoCommand extends CommandRunner {
     await this.formsService.create(enhancedDemographicsQuestionnaireFr);
 
     for (let i = 0; i < 100; i++) {
-      const subject = await this.subjectsService.create({
+      const createSubjectDto = {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         dateOfBirth: faker.date.birthdate().toISOString(),
         sex: faker.name.sexType()
-      });
+      };
+
+      const subject = await this.subjectsService.create(createSubjectDto);
 
       const group = await this.groupsService.findByName(Random.value(DEMO_GROUPS).name, this.ability);
 
@@ -107,7 +109,7 @@ export class InitDemoCommand extends CommandRunner {
             dateCollected: faker.date.recent(365).toISOString(),
             instrumentId: (hq as typeof hq & { _id: Types.ObjectId })._id.toString(),
             groupId: (group as typeof group & { _id: Types.ObjectId })._id.toString(),
-            subjectIdentifier: subject.identifier,
+            subjectInfo: createSubjectDto,
             data: {
               overallHappiness: Random.int(0, 11)
             }
@@ -126,7 +128,7 @@ export class InitDemoCommand extends CommandRunner {
             dateCollected: faker.date.recent(365).toISOString(),
             instrumentId: (bprs as typeof bprs & { _id: Types.ObjectId })._id.toString(),
             groupId: (group as typeof group & { _id: Types.ObjectId })._id.toString(),
-            subjectIdentifier: subject.identifier,
+            subjectInfo: createSubjectDto,
             data: Object.fromEntries(
               Object.keys(fields).map((field) => [field, Random.int(0, 7)])
             ) as BriefPsychiatricRatingScaleData

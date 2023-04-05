@@ -27,17 +27,17 @@ export class FormRecordsService {
   ) {}
 
   async create(
-    { kind, dateCollected, data, instrumentId, groupId, subjectIdentifier }: CreateFormRecordDto,
+    { kind, dateCollected, data, instrumentId, groupId, subjectInfo }: CreateFormRecordDto,
     ability: AppAbility
   ): Promise<FormInstrumentRecord> {
     const instrument = await this.formsService.findById(instrumentId);
-    const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
+    const subject = await this.subjectsService.lookup(subjectInfo);
 
     let group: Group | undefined;
     if (groupId) {
       group = await this.groupsService.findById(groupId, ability);
       if (!subject.groups.includes(group)) {
-        await this.subjectsService.appendGroup(subjectIdentifier, group);
+        await this.subjectsService.appendGroup(subject.identifier, group);
       }
     }
 
@@ -53,15 +53,19 @@ export class FormRecordsService {
     });
   }
 
-  async find(ability: AppAbility, instrumentId?: string, subjectIdentifier?: string): Promise<FormInstrumentRecord[]> {
+  async find(
+    ability: AppAbility,
+    instrumentName?: string,
+    subjectIdentifier?: string
+  ): Promise<FormInstrumentRecord[]> {
     const filter: Record<string, any> = {};
-    if (instrumentId) {
-      filter.instrument = await this.formsService.findById(instrumentId);
+    if (instrumentName) {
+      filter.instrument = await this.formsService.findByName(instrumentName);
     }
     if (subjectIdentifier) {
       filter.subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
     }
-    return this.formRecordsModel.find(filter).accessibleBy(ability).populate('group');
+    return this.formRecordsModel.find(filter).accessibleBy(ability).populate('group instrument');
   }
 
   async summary(ability: AppAbility): Promise<FormInstrumentRecordsSummary> {

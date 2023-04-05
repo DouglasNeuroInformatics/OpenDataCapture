@@ -25,6 +25,10 @@
       "require": "./dist/cjs/instruments/index.js",
       "import": "./dist/mjs/instruments/index.js"
     },
+    "./subjects": {
+      "require": "./dist/cjs/subjects/index.js",
+      "import": "./dist/mjs/subjects/index.js"
+    },
     "./users": {
       "require": "./dist/cjs/users/index.js",
       "import": "./dist/mjs/users/index.js"

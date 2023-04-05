@@ -33,13 +33,10 @@ export class SubjectsService {
     return this.subjectsRepository.find().accessibleBy(ability).lean();
   }
 
-  async lookup(dto: LookupSubjectDto, ability: AppAbility): Promise<SubjectEntity> {
+  async lookup(dto: LookupSubjectDto): Promise<SubjectEntity> {
     const { firstName, lastName, dateOfBirth, sex } = dto;
     const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
     const subject = await this.findByIdentifier(identifier);
-    if (!ability.can('read', subject)) {
-      throw new ForbiddenException();
-    }
     return subject;
   }
 

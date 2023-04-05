@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { FormInstrument } from '@ddcp/common';
+import { DateUtils, FormInstrument } from '@ddcp/common';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,12 +18,16 @@ import { FormSummary } from '../components/FormSummary';
 
 import { FormValues, PageHeader, Spinner, Stepper } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
+import { useActiveSubjectStore } from '@/stores/active-subject-store';
+import { useAuthStore } from '@/stores/auth-store';
 import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const FormPage = () => {
   const params = useParams();
   const notifications = useNotificationsStore();
   const { t } = useTranslation();
+  const { activeSubject } = useActiveSubjectStore();
+  const { currentGroup } = useAuthStore();
 
   const { data } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
   const [result, setResult] = useState<FormValues>();
@@ -33,12 +37,15 @@ export const FormPage = () => {
   }
 
   const handleSubmit = async (data: FormValues) => {
-    setResult(data);
     await axios.post('/instruments/records/forms', {
       kind: 'form',
-      dateCollected: new Date(),
+      dateCollected: DateUtils.toBasicISOString(new Date()),
       instrumentId: params.id!,
+      groupId: currentGroup,
+      subjectInfo: activeSubject,
+      data: data
     });
+    setResult(data);
     notifications.add({ message: 'Upload Successful', type: 'success' });
   };
 
@@ -63,7 +70,7 @@ export const FormPage = () => {
             icon: <HiOutlineQuestionMarkCircle />
           },
           {
-            element: <FormSummary instrument={data} result={result!} />,
+            element: <FormSummary instrument={data} result={result} />,
             label: 'Summary',
             icon: <HiOutlinePrinter />
           }
