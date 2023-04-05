@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { Sex } from '@ddcp/common';
+import { Group, Sex } from '@ddcp/common';
 import unidecode from 'unidecode';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
@@ -38,12 +38,22 @@ export class SubjectsService {
     return this.findByIdentifier(identifier);
   }
 
+  /** Returns the subject with the provided identifier */
   async findByIdentifier(identifier: string): Promise<SubjectEntity> {
-    const result = await this.subjectsRepository.findOne({ identifier });
+    const result = await this.subjectsRepository.findOne({ identifier }).lean();
     if (!result) {
       throw new NotFoundException(`Subject with identifier does not exist: ${identifier}`);
     }
     return result;
+  }
+
+  /** Append a group to the subject with the provided identifier */
+  async appendGroup(identifier: string, group: Group): Promise<SubjectEntity> {
+    const subject = await this.subjectsRepository.findOne({ identifier });
+    if (!subject) {
+      throw new NotFoundException(`Subject with identifier does not exist: ${identifier}`);
+    }
+    return subject.updateOne({ groups: [group, ...subject.groups] });
   }
 
   generateIdentifier(firstName: string, lastName: string, dateOfBirth: Date, sex: Sex): string {

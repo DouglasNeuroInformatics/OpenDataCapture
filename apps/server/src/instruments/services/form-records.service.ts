@@ -14,6 +14,7 @@ import { FormsService } from './forms.service';
 import { AjvService } from '@/ajv/ajv.service';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
+import { identity } from 'rxjs';
 
 @Injectable()
 export class FormRecordsService {
@@ -33,6 +34,10 @@ export class FormRecordsService {
     const instrument = await this.formsService.findById(instrumentId);
     const group = await this.groupsService.findById(groupId, ability);
     const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
+
+    if (!subject.groups.includes(group)) {
+      await this.subjectsService.appendGroup(subjectIdentifier, group);
+    }
 
     return this.formRecordsModel.create({
       kind,
