@@ -46,7 +46,7 @@ export interface FormProps<T extends FormInstrumentData>
   className?: string;
   initialValues?: FormValues<T> | null;
   submitBtnLabel?: string;
-  onSubmit: (data: FormValues<T>) => void;
+  onSubmit: (data: T) => void;
 }
 
 export const Form = <T extends FormInstrumentData>({
@@ -73,7 +73,7 @@ export const Form = <T extends FormInstrumentData>({
     const valid = validate(values);
     if (valid) {
       reset();
-      onSubmit(values);
+      onSubmit(values as T);
     } else {
       validate.errors?.forEach((error) => {
         const path = error.instancePath.split('/').filter((e) => e);

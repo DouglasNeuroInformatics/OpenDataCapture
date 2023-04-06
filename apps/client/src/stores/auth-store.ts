@@ -2,6 +2,7 @@ import { createMongoAbility } from '@casl/ability';
 import { AppAbility, Group, JwtPayload } from '@ddcp/common';
 import jwtDecode from 'jwt-decode';
 import { create } from 'zustand';
+
 import { useActiveSubjectStore } from './active-subject-store';
 
 export interface CurrentUser extends Omit<JwtPayload, 'permissions'> {

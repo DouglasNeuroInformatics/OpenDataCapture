@@ -7,7 +7,7 @@ import addFormats from 'ajv-formats';
 @Injectable()
 export class AjvService {
   private readonly ajv: Ajv;
-  
+
   constructor() {
     this.ajv = new Ajv({ allErrors: true, coerceTypes: true, strict: true });
     addErrors(this.ajv);
