@@ -19,16 +19,24 @@ const GIT_COMMIT = import.meta.env.VITE_DEV_GIT_COMMIT?.slice(0, 7);
 const GIT_COMMIT_DATE = import.meta.env.VITE_DEV_GIT_COMMIT_DATE;
 
 export interface FooterProps {
+  isLogin?: boolean;
   showDevInfo?: boolean;
-  showLinks?: boolean;
 }
 
-export const Footer = ({ showDevInfo = DEV, showLinks = true }: FooterProps) => {
+export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
   const { t } = useTranslation('common');
 
   return (
     <footer className="py-3 text-slate-600">
-      {showLinks && (
+      {isLogin ? (
+        <div className="flex items-center justify-center text-slate-500">
+          <LanguageToggle className="text-sm" />
+          <span className="mx-1">|</span>
+          <a className="text-sm" href={DOCS_URL} rel="noreferrer" target="_blank">
+            {t('footer.documentation')}
+          </a>
+        </div>
+      ) : (
         <div className="mb-3 flex flex-col justify-center gap-4 lg:flex-row">
           <LanguageToggle className="lg:hidden" />
           <a className="text-center" href={DOCS_URL} rel="noreferrer" target="_blank">

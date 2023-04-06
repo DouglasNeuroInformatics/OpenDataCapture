@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForm';
 
 import logo from '@/assets/logo.png';
-import { Footer, LanguageToggle } from '@/components';
+import { Footer } from '@/components';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export const LoginPage = () => {
           <LoginForm onSuccess={() => navigate('/overview')} />
         </div>
         <br className="my-2" />
-        <Footer showLinks={false} />
+        <Footer isLogin />
       </div>
     </div>
   );

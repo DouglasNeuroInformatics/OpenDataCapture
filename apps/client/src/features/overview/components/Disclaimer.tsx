@@ -14,18 +14,18 @@ export interface DisclaimerProps {
 export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProps) => {
   const { currentUser, logout } = useAuthStore();
   const { isAccepted, username, setIsAccepted } = useDisclaimerStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation('overview');
 
   const handleClose = () => setIsAccepted(true, currentUser!.username);
 
   const show = (!isAccepted || currentUser?.username !== username) && isRequired;
 
   return (
-    <Modal open={show} title={t('home.disclaimer.title')} onClose={handleClose}>
-      <p>{t('home.disclaimer.message')}</p>
+    <Modal open={show} title={t('disclaimer.title')} onClose={handleClose}>
+      <p>{t('disclaimer.message')}</p>
       <div className="mt-3 flex">
-        <Button className="mr-2" label={t('home.disclaimer.accept')} size="sm" onClick={handleClose} />
-        <Button label={t('home.disclaimer.decline')} size="sm" variant="light" onClick={() => logout()} />
+        <Button className="mr-2" label={t('disclaimer.accept')} size="sm" onClick={handleClose} />
+        <Button label={t('disclaimer.decline')} size="sm" variant="light" onClick={() => logout()} />
       </div>
     </Modal>
   );

@@ -4,6 +4,7 @@ import { FormInstrumentRecordsSummary, FormInstrumentSummary, Subject, User } fr
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 
+import { Disclaimer } from '../components/Disclaimer';
 import { StatisticCard } from '../components/StatisticCard';
 
 import { PageHeader, Spinner } from '@/components';
@@ -26,6 +27,7 @@ export const OverviewPage = () => {
 
   return (
     <div>
+      <Disclaimer isRequired={true} />
       <PageHeader title={pageTitle} />
       <section>
         <h3 className="mb-5 text-center text-xl font-medium lg:text-left">{t('summary')}</h3>
