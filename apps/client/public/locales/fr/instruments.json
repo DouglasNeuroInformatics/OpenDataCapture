@@ -2,14 +2,20 @@
   "createInstrument": {
     "pageTitle": "Ajouter un instrument",
     "form": {
-      "name": {
+      "title": {
         "label": "Nom du champ"
       },
       "description": {
         "label": "Description du champ"
       },
+      "language": {
+        "label": "Langue"
+      },
       "instructions": {
         "label": "Instructions"
+      },
+      "estimatedDuration": {
+        "label": "Durée prévue"
       }
     }
   },

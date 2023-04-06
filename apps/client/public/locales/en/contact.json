@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Contact Us",
+  "reason": "Reason",
+  "reasons": {
+    "bug": "Bug Report",
+    "feedback": "Feedback",
+    "request": "Request",
+    "other": "Other"
+  },
+  "message": "Message"
+}

@@ -4,6 +4,7 @@ import 'i18next';
 // import all namespaces (for the default language, only)
 import auth from './public/locales/en/auth.json';
 import common from './public/locales/en/common.json';
+import contact from './public/locales/en/contact.json';
 import datetime from './public/locales/en/datetime.json';
 import form from './public/locales/en/form.json';
 import instruments from './public/locales/en/instruments.json';
@@ -16,6 +17,7 @@ declare module 'i18next' {
     resources: {
       auth: typeof auth;
       common: typeof common;
+      contact: typeof contact;
       datetime: typeof datetime;
       form: typeof form;
       instruments: typeof instruments;
