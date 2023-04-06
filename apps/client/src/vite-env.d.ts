@@ -14,6 +14,10 @@ interface ImportMetaDevEnv {
 
 interface ImportMetaEnv extends ImportMetaDevEnv {
   readonly VITE_API_HOST: string;
+  readonly VITE_DOCS_URL: string;
+  readonly VITE_LICENSE_URL: string;
+  readonly VITE_GITHUB_REPO_URL: string;
+  readonly VITE_CONTACT_EMAIL: string;
 }
 
 interface ImportMeta {

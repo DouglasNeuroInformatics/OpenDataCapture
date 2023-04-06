@@ -1,11 +1,13 @@
 {
-  "extends": "@douglas-data-capture-platform/tsconfig/base.json",
+  "extends": "@ddcp/tsconfig/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "incremental": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "dist",
     "paths": {
       "@/*": ["src/*"]

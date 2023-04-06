@@ -1,23 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { Model, UpdateQuery } from 'mongoose';
+import { AccessibleModel } from '@casl/mongoose';
+import { Model } from 'mongoose';
 
-import { User, UserDocument } from './schemas/user.schema';
+import { UserDocument, UserEntity } from './entities/user.entity';
 
-import { EntityRepository } from '@/abstract/entity.repository';
+import { EntityRepository } from '@/core/abstract/entity.repository';
 
 @Injectable()
-export class UsersRepository extends EntityRepository<User, UserDocument> {
-  constructor(@InjectModel(User.name) userModel: Model<UserDocument>) {
+export class UsersRepository extends EntityRepository<UserEntity> {
+  constructor(@InjectModel(UserEntity.modelName) userModel: Model<UserDocument, AccessibleModel<UserDocument>>) {
     super(userModel);
-  }
-
-  async updateUser(username: string, updateQuery: UpdateQuery<unknown>): Promise<UserDocument | null> {
-    return this.entityModel.findOneAndUpdate({ username }, updateQuery, { new: true });
-  }
-
-  async removeUser(username: string): Promise<UserDocument | null> {
-    return this.entityModel.findOneAndRemove({ username });
   }
 }

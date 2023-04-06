@@ -10,6 +10,7 @@
     "check-types": "tsc --noEmit",
     "cypress:open": "cypress open",
     "coverage": "vitest run --coverage",
+    "demo": "NODE_ENV=production vite build && yarn preview",
     "dev": "vite --host",
     "lint": "eslint --fix src",
     "preview": "vite preview --host --port 3000",
@@ -19,9 +20,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@ddcp/common": "*",
     "@headlessui/react": "^1.7.8",
     "@hookform/resolvers": "^2.9.10",
-    "ajv-formats": "^2.1.1",
     "axios": "^1.3.3",
     "clsx": "^1.2.1",
     "common": "*",

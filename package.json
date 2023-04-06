@@ -1,5 +1,5 @@
 {
-  "name": "douglas-data-capture-platform",
+  "name": "ddcp",
   "version": "0.0.1",
   "type": "module",
   "private": true,
@@ -9,7 +9,7 @@
   ],
   "license": "AGPL-3.0",
   "scripts": {
-    "build": "env-cmd NODE_ENV=production turbo run build",
+    "build": "env-cmd cross-env NODE_ENV=production turbo run build",
     "check-types": "turbo run check-types",
     "clean": "fd -H -I --prune \".turbo|dist|node_modules\" --exec rm -rf",
     "dev": "env-cmd cross-env NODE_ENV=development turbo run dev",
@@ -21,8 +21,8 @@
     "ws": "env-cmd yarn workspace"
   },
   "devDependencies": {
-    "@douglas-data-capture-platform/eslint-config": "*",
-    "@douglas-data-capture-platform/tsconfig": "*",
+    "@ddcp/eslint-config": "*",
+    "@ddcp/tsconfig": "*",
     "@types/node": "^18.11.18",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
@@ -35,7 +35,10 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
+    "@casl/ability": "^6.3.3",
     "ajv": "^8.12.0",
+    "ajv-errors": "^3.0.0",
+    "ajv-formats": "^2.1.1",
     "zod": "^3.20.2"
   },
   "engines": {

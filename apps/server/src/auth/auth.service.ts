@@ -1,77 +1,57 @@
-import {
-  ForbiddenException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import bcrypt from 'bcrypt';
-import { JwtPayload } from 'common';
+import { AuthPayload, JwtPayload } from '@ddcp/common';
 
-import { AuthTokensDto } from './dto/auth-tokens.dto';
-import { LoginCredentialsDto } from './dto/login-credentials.dto';
-
-import { User } from '@/users/schemas/user.schema';
+import { AbilityFactory } from '@/ability/ability.factory';
+import { CryptoService } from '@/crypto/crypto.service';
+import { UserEntity } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-
   constructor(
-    private readonly config: ConfigService,
+    private readonly abilityFactory: AbilityFactory,
+    private readonly configService: ConfigService,
+    private readonly cryptoService: CryptoService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService
   ) {}
 
-  async login({ username, password }: LoginCredentialsDto): Promise<AuthTokensDto> {
+  /** Validates the provided credentials and returns an access token */
+  async login(username: string, password: string): Promise<AuthPayload> {
     const user = await this.getUser(username);
 
-    const isAuth = await bcrypt.compare(password, user.password);
+    const isAuth = await this.cryptoService.comparePassword(password, user.password);
     if (!isAuth) {
-      throw new ForbiddenException('Invalid login credentials');
+      throw new UnauthorizedException('Invalid password');
     }
 
-    const tokens = await this.getTokens(user);
-    await this.updateUserRefreshToken(user.username, tokens.refreshToken);
-    return tokens;
+    const ability = this.abilityFactory.createForUser(user);
+
+    const payload: JwtPayload = {
+      username: user.username,
+      isAdmin: user.isAdmin,
+      permissions: ability.rules,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      groups: user.groups
+    };
+
+    const accessToken = await this.signToken(payload);
+
+    return { accessToken };
   }
 
-  async logout(username: string): Promise<void> {
-    const user = await this.getUser(username);
-    if (!user.refreshToken) {
-      throw new ForbiddenException('User is already logged out');
-    }
-    await this.usersService.updateUser(username, { refreshToken: undefined }); // change to null later
-  }
-
-  async refresh(username: string, refreshToken?: string): Promise<AuthTokensDto> {
-    if (!refreshToken) {
-      throw new ForbiddenException('Refresh token is undefined');
-    }
-    const user = await this.getUser(username);
-    if (!user.refreshToken) {
-      throw new ForbiddenException('User does not possess valid refresh token');
-    }
-    const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
-    if (!isValid) {
-      throw new ForbiddenException('Failed to validate provided refresh token');
-    }
-    const tokens = await this.getTokens(user);
-    await this.updateUserRefreshToken(user.username, tokens.refreshToken);
-    return tokens;
-  }
-
-  private async getUser(username: string): Promise<User> {
-    let user: User;
+  /** Wraps UserService.getByUsername with appropriate exception handling */
+  private async getUser(username: string): Promise<UserEntity> {
+    let user: UserEntity;
     try {
-      user = await this.usersService.findUser(username);
+      user = await this.usersService.findByUsername(username);
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw new ForbiddenException('Failed to find user');
+        throw new UnauthorizedException('Invalid username');
       }
       throw new InternalServerErrorException('Internal Server Error', {
         cause: error instanceof Error ? error : undefined
@@ -80,33 +60,10 @@ export class AuthService {
     return user;
   }
 
-  private async getTokens(user: User): Promise<AuthTokensDto> {
-    const payload: JwtPayload = {
-      username: user.username,
-      role: user.role
-    };
-
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        expiresIn: '7d',
-        secret: this.config.getOrThrow<string>('SECRET_KEY')
-      }),
-      this.jwtService.signAsync(payload, {
-        expiresIn: '7d',
-        secret: this.config.getOrThrow<string>('SECRET_KEY')
-      })
-    ]);
-    return { accessToken, refreshToken };
-  }
-
-  private async updateUserRefreshToken(username: string, refreshToken: string): Promise<void> {
-    const hashedRefreshToken = await this.hashRefreshToken(refreshToken);
-    await this.usersService.updateUser(username, {
-      refreshToken: hashedRefreshToken
+  private async signToken(payload: object): Promise<string> {
+    return this.jwtService.signAsync(payload, {
+      expiresIn: '7d',
+      secret: this.configService.getOrThrow<string>('SECRET_KEY')
     });
-  }
-
-  private async hashRefreshToken(refreshToken: string): Promise<string> {
-    return bcrypt.hash(refreshToken, await bcrypt.genSalt());
   }
 }

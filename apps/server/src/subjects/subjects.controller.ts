@@ -1,30 +1,39 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { RegisterSubjectDto } from './dto/register-subject.dto';
-import { Subject } from './schemas/subject.schema';
+import { type AppAbility } from '@ddcp/common';
+
+import { CreateSubjectDto } from './dto/create-subject.dto';
+import { LookupSubjectDto } from './dto/lookup-subject.dto';
+import { SubjectEntity } from './entities/subject.entity';
 import { SubjectsService } from './subjects.service';
+
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { UserAbility } from '@/core/decorators/user-ability.decorator';
 
 @ApiTags('Subjects')
 @Controller('subjects')
 export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
-  @ApiOperation({
-    description: 'Register a new subject in the database',
-    summary: 'Create'
-  })
+  @ApiOperation({ summary: 'Create Subject' })
   @Post()
-  register(@Body() dto: RegisterSubjectDto): Promise<Subject> {
-    return this.subjectsService.create(dto);
+  @RouteAccess({ action: 'create', subject: 'Subject' })
+  create(@Body() createSubjectDto: CreateSubjectDto): Promise<SubjectEntity> {
+    return this.subjectsService.create(createSubjectDto);
   }
 
-  @ApiOperation({
-    description: 'Get all subjects',
-    summary: 'Get All'
-  })
+  @ApiOperation({ summary: 'Get All Subjects' })
   @Get()
-  findAll(): Promise<Subject[]> {
-    return this.subjectsService.findAll();
+  @RouteAccess({ action: 'read', subject: 'Subject' })
+  findAll(@UserAbility() ability: AppAbility): Promise<SubjectEntity[]> {
+    return this.subjectsService.findAll(ability);
+  }
+
+  @ApiOperation({ summary: 'Lookup Subject' })
+  @Post('lookup')
+  @RouteAccess({ action: 'read', subject: 'Subject' })
+  lookup(@Body() lookupSubjectDto: LookupSubjectDto): Promise<SubjectEntity> {
+    return this.subjectsService.lookup(lookupSubjectDto);
   }
 }

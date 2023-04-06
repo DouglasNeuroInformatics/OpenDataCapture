@@ -1,7 +1,7 @@
 {
-  "extends": "@douglas-data-capture-platform/tsconfig/base.json",
+  "extends": "@ddcp/tsconfig/base.json",
   "include": ["src/**/*"],
   "compilerOptions": {
-    "outDir": "dist"
+    "declarationMap": true,
   }
 }

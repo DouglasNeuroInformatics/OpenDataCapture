@@ -1,5 +1,5 @@
 {
-  "name": "@douglas-data-capture-platform/tsconfig",
+  "name": "@ddcp/tsconfig",
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "files": [

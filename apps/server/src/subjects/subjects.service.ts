@@ -1,52 +1,70 @@
-import { createHash } from 'crypto';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { AppAbility, Group, Sex } from '@ddcp/common';
+import unidecode from 'unidecode';
 
-import { RegisterSubjectDto } from './dto/register-subject.dto';
-import { Subject } from './schemas/subject.schema';
+import { CreateSubjectDto } from './dto/create-subject.dto';
+import { LookupSubjectDto } from './dto/lookup-subject.dto';
+import { SubjectEntity } from './entities/subject.entity';
 import { SubjectsRepository } from './subjects.repository';
+
+import { CryptoService } from '@/crypto/crypto.service';
 
 @Injectable()
 export class SubjectsService {
-  constructor(private readonly subjectsRepository: SubjectsRepository) {}
+  constructor(private readonly cryptoService: CryptoService, private readonly subjectsRepository: SubjectsRepository) {}
 
-  async create(dto: RegisterSubjectDto): Promise<Subject> {
-    const identifier = this.generateIdentifier(dto.firstName, dto.lastName, dto.dateOfBirth);
+  async create({ firstName, lastName, dateOfBirth, sex }: CreateSubjectDto): Promise<SubjectEntity> {
+    const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
     if (await this.subjectsRepository.exists({ identifier })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
     }
-    return this.subjectsRepository.create({ identifier, demographics: dto });
+    return this.subjectsRepository.create({
+      identifier,
+      firstName,
+      lastName,
+      dateOfBirth: new Date(dateOfBirth),
+      sex,
+      groups: []
+    });
   }
 
-  async findAll(): Promise<Subject[]> {
-    return this.subjectsRepository.findAll();
+  async findAll(ability: AppAbility): Promise<SubjectEntity[]> {
+    return this.subjectsRepository.find().accessibleBy(ability).lean();
   }
 
-  async findByIdentifier(identifier: string): Promise<Subject> {
-    const subject = await this.subjectsRepository.findOne({ identifier });
-    if (!subject) {
-      throw new NotFoundException(`Subject with identifier ${identifier} not found`);
-    }
+  async lookup(dto: LookupSubjectDto): Promise<SubjectEntity> {
+    const { firstName, lastName, dateOfBirth, sex } = dto;
+    const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
+    const subject = await this.findByIdentifier(identifier);
     return subject;
   }
 
-  generateIdentifier(firstName: string, lastName: string, dateOfBirth: Date): string {
-    const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
-    const source = this.sanitizeStr(firstName + lastName) + this.sanitizeStr(shortDateOfBirth, true);
-    return createHash('sha256').update(source).digest('hex');
+  /** Returns the subject with the provided identifier */
+  async findByIdentifier(identifier: string): Promise<SubjectEntity> {
+    const result = await this.subjectsRepository.findOne({ identifier }).lean();
+    if (!result) {
+      throw new NotFoundException(`Subject with identifier does not exist: ${identifier}`);
+    }
+    return result;
   }
 
-  private sanitizeStr(s: string, allowNumericChars = false, validSpecialChars = /[-\s]/g): string {
-    s = s
-      .toUpperCase()
-      .replace(validSpecialChars, '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-    const invalidRegExp = allowNumericChars ? /[^A-Z0-9]/g : /[^A-Z]/g;
-    const invalidChars = s.toUpperCase().match(invalidRegExp);
-    if (invalidChars) {
-      throw new Error(`The following characters are invalid: ${invalidChars.join(', ')}`);
+  /** Append a group to the subject with the provided identifier */
+  async appendGroup(identifier: string, group: Group): Promise<SubjectEntity> {
+    const subject = await this.subjectsRepository.findOne({ identifier });
+    if (!subject) {
+      throw new NotFoundException(`Subject with identifier does not exist: ${identifier}`);
     }
-    return s;
+    return subject.updateOne({ groups: [group, ...subject.groups] });
+  }
+
+  generateIdentifier(firstName: string, lastName: string, dateOfBirth: Date, sex: Sex): string {
+    const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
+    const source = this.sanitizeStr(firstName + lastName + shortDateOfBirth + sex);
+    return this.cryptoService.hash(source);
+  }
+
+  private sanitizeStr(s: string): string {
+    return unidecode(s.toUpperCase().replaceAll('-', ''));
   }
 }

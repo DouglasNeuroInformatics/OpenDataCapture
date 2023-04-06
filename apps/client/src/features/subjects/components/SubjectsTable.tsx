@@ -1,85 +1,89 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { SubjectInterface } from 'common';
+import { DateUtils, InstrumentRecordsExport, Subject } from '@ddcp/common';
+import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
-import { Dropdown, Table } from '@/components/core';
+import { SubjectLookup } from './SubjectLookup';
+
+import { Dropdown, SearchBar, Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
+import { useAuthStore } from '@/stores/auth-store';
 
 export interface SubjectTableProps {
-  data: SubjectInterface[];
+  data: Subject[];
 }
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
-  const downloadJSON = useDownload('/api/v0/instruments/records/export-json', 'records.json');
-  const downloadCSV = useDownload('/api/v0/instruments/records/export-csv', 'records.csv');
+  const download = useDownload();
+  const { currentUser } = useAuthStore();
+  const { t } = useTranslation(['common', 'subjects']);
+
+  const [showLookup, setShowLookup] = useState(false);
+
+  const getExportRecords = async () => {
+    const response = await axios.get<InstrumentRecordsExport>('/instruments/records/forms/export');
+    return response.data;
+  };
 
   const handleExportSelection = (option: string | ('JSON' | 'CSV')) => {
+    const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'JSON':
-        downloadJSON();
+        download(`${baseFilename}.json`, async () => {
+          const data = await getExportRecords();
+          return JSON.stringify(data, null, 2);
+        });
         break;
       case 'CSV':
-        downloadCSV();
+        download('README.txt', () => Promise.resolve(t('subjects:viewSubjects.table.exportHelpText')));
+        download(`${baseFilename}.csv`, async () => {
+          const data = await getExportRecords();
+          const columnNames = Object.keys(data[0]);
+          const rows = data.map((record) => Object.values(record).join(',')).join('\n');
+          return columnNames + '\n' + rows;
+        });
         break;
     }
   };
 
+  /** Called when the user clicks outside the modal */
+  const handleLookupClose = () => {
+    setShowLookup(false);
+  };
+
   return (
-    <div>
-      <div className="my-2 flex justify-between gap-5">
-        <input
-          required
-          className="block w-full rounded-lg border border-gray-300 px-4 py-3 pl-2 text-sm"
-          placeholder="Search..."
-          type="search"
-        />
-        <div className="flex gap-2">
-          <Dropdown options={[]} title="Filters" onSelection={() => null} />
-          <Dropdown options={['CSV', 'JSON']} title="Export" onSelection={handleExportSelection} />
+    <>
+      <SubjectLookup show={showLookup} onClose={handleLookupClose} />
+      <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
+        <SearchBar onClick={() => setShowLookup(true)} />
+        <div className="flex flex-grow gap-2 lg:flex-shrink">
+          <Dropdown options={[]} title={t('subjects:viewSubjects.table.filters')} onSelection={() => null} />
+          <Dropdown
+            options={['CSV', 'JSON']}
+            title={t('subjects:viewSubjects.table.export')}
+            onSelection={handleExportSelection}
+          />
         </div>
       </div>
-      <Table
+      <Table<Subject>
         columns={[
           {
-            name: 'Subject',
+            name: t('subjects:viewSubjects.table.columns.subject'),
             field: (subject) => subject.identifier.slice(0, 6)
           },
           {
-            name: 'Date of Birth',
-            field: (subject) => subject.demographics.dateOfBirth
+            name: t('subjects:viewSubjects.table.columns.dateOfBirth'),
+            field: (subject) => DateUtils.toBasicISOString(new Date(subject.dateOfBirth))
           },
           {
-            name: 'Sex',
-            field: (subject) => subject.demographics.sex
-          },
-          {
-            name: 'Forward Sortation Area',
-            field: (subject) => subject.demographics.forwardSortationArea
-          },
-          {
-            name: 'Ethnicity',
-            field: (subject) => subject.demographics.ethnicity
-          },
-          {
-            name: 'Gender',
-            field: (subject) => subject.demographics.gender
-          },
-          {
-            name: 'Employment Status',
-            field: (subject) => subject.demographics.employmentStatus
-          },
-          {
-            name: 'Marital Status',
-            field: (subject) => subject.demographics.maritalStatus
-          },
-          {
-            name: 'First Language',
-            field: (subject) => subject.demographics.firstLanguage
+            name: t('subjects:viewSubjects.table.columns.sex'),
+            field: (subject) => (subject.sex === 'female' ? t('common:sex.female') : t('common:sex.male'))
           }
         ]}
         data={data}
         entryLinkFactory={(subject) => subject.identifier}
       />
-    </div>
+    </>
   );
 };

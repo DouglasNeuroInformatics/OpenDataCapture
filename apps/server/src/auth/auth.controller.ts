@@ -1,65 +1,22 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { Auth } from './decorators/auth.decorator';
-import { RequestUser } from './decorators/request-user.decorator';
-import { AuthTokensDto } from './dto/auth-tokens.dto';
+import { AccessTokenDto } from './dto/access-token.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
+
 @ApiTags('Authentication')
-@Controller('auth')
+@Controller({ path: 'auth' })
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({
-    description: 'Request a JSON Web Token from the server',
-    summary: 'Login'
-  })
-  @ApiOkResponse({
-    description: 'Successfully authenticated the user',
-    type: AuthTokensDto
-  })
-  @ApiForbiddenResponse({
-    description: 'Failed to authenticate the user'
-  })
-  @Auth({ isPublic: true })
+  @ApiOperation({ description: 'Request an access token using credentials' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(@Body() credentials: LoginCredentialsDto): Promise<AuthTokensDto> {
-    return this.authService.login(credentials);
-  }
-
-  @ApiOperation({
-    description: 'Invalidate refresh token for user. ',
-    summary: 'Logout'
-  })
-  @ApiOkResponse({
-    description: 'Successfully invalided refresh token'
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Failed to invalidate refresh token'
-  })
-  @Post('logout')
-  @HttpCode(HttpStatus.OK)
-  logout(@RequestUser('username') username: string): Promise<void> {
-    return this.authService.logout(username);
-  }
-
-  @ApiOperation({
-    description: 'Request a new access token from the server',
-    summary: 'Refresh'
-  })
-  @ApiOkResponse({
-    description: 'Success fully refreshed access token',
-    type: AuthTokensDto
-  })
-  @Post('refresh')
-  @HttpCode(HttpStatus.OK)
-  refresh(
-    @RequestUser('refreshToken') username: string,
-    @RequestUser('refreshToken') refreshToken: string
-  ): Promise<AuthTokensDto> {
-    return this.authService.refresh(username, refreshToken);
+  @RouteAccess('public')
+  login(@Body() { username, password }: LoginCredentialsDto): Promise<AccessTokenDto> {
+    return this.authService.login(username, password);
   }
 }

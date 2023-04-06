@@ -3,20 +3,16 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": [
+    "deleteOutDir": true,
+    "plugins": [
       {
-        "include": "resources/data/**/*",
-        "watchAssets": true
+        "name": "@nestjs/swagger",
+        "options": {
+          "dtoFileNameSuffix": [".dto.ts", ".entity.ts"],
+          "classValidatorShim": false,
+          "introspectComments": true
+        }
       }
-    ],
-    "deleteOutDir": true
-  },
-  "plugins": [
-    {
-      "name": "@nestjs/swagger",
-      "options": {
-        "classValidatorShim": true
-      }
-    }
-  ]
+    ]
+  }
 }

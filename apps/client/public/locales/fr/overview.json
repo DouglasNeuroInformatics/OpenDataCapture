@@ -1,0 +1,17 @@
+{
+  "pageTitle": "Vue d'ensemble",
+  "welcome": "Bienvenue",
+  "summary": "Résumé des données disponibles",
+  "stats": {
+    "totalUsers": "Nombre d'utilisateurs",
+    "totalSubjects": "Nombre de clients",
+    "totalInstruments": "Nombre d'instruments",
+    "totalRecords": "Nombre d'enregistrements"
+  },
+  "disclaimer": {
+    "title": "Avis",
+    "message": "Le Douglas Data Capture Platform n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques.",
+    "accept": "Accepter",
+    "decline": "Refuser"
+  }
+}

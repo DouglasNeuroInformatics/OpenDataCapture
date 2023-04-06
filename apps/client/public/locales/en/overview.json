@@ -1,0 +1,17 @@
+{
+  "pageTitle": "Overview",
+  "welcome": "Welcome Back",
+  "summary": "Summary of Available Data",
+  "stats": {
+    "totalUsers": "Total Users",
+    "totalSubjects": "Total Subjects",
+    "totalInstruments": "Total Instruments",
+    "totalRecords": "Total Records"
+  },
+  "disclaimer": {
+    "title": "Disclaimer",
+    "message": "The Douglas Data Capture Platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
+    "accept": "Accept",
+    "decline": "Decline"
+  }
+}

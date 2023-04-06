@@ -1,15 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
+import { AccessibleModel } from '@casl/mongoose';
 import { Model } from 'mongoose';
 
-import { InstrumentRecord, InstrumentRecordDocument } from '../schemas/instrument-record.schema';
+import { InstrumentRecordDocument, InstrumentRecordEntity } from '../entities/instrument-record.entity';
 
-import { EntityRepository } from '@/abstract/entity.repository';
+import { EntityRepository } from '@/core/abstract/entity.repository';
 
 @Injectable()
-export class InstrumentRecordsRepository extends EntityRepository<InstrumentRecord, InstrumentRecordDocument> {
-  constructor(@InjectModel(InstrumentRecord.name) instrumentRecordModel: Model<InstrumentRecordDocument>) {
+export class InstrumentRecordsRepository extends EntityRepository<InstrumentRecordEntity, InstrumentRecordDocument> {
+  constructor(
+    @InjectModel(InstrumentRecordEntity.modelName)
+    instrumentRecordModel: Model<InstrumentRecordDocument, AccessibleModel<InstrumentRecordDocument>>
+  ) {
     super(instrumentRecordModel);
   }
 }

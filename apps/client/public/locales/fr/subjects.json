@@ -1,0 +1,39 @@
+{
+  "addSubject": {
+    "pageTitle": "Ajouter un client"
+  },
+  "viewSubjects": {
+    "pageTitle": "Tous les clients",
+    "table": {
+      "filters": "Filtres",
+      "export": "Exporter",
+      "exportHelpText": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants.",
+      "columns": {
+        "subject": "Client",
+        "dateOfBirth": "Date de naissance",
+        "sex": "Sexe"
+      }
+    },
+    "lookup": {
+      "title": "Trouver un client"
+    }
+  },
+  "subjectPage": {
+    "pageTitle": "Dossiers d'instruments pour le client",
+    "table": {
+      "columns": {
+        "title": "Titre",
+        "version": "Version",
+        "nRecords": "Nombre d'enregistrements"
+      }
+    }
+  },
+  "subjectRecordsPage": {
+    "graph": {
+      "title": "Dossiers pour le client",
+      "fields": "Champs",
+      "xLabel": "Date d'enregistrement",
+      "yLabel": "Valeur"
+    }
+  }
+}

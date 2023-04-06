@@ -1,0 +1,39 @@
+{
+  "addSubject": {
+    "pageTitle": "Add Subject"
+  },
+  "viewSubjects": {
+    "pageTitle": "View Subjects",
+    "table": {
+      "filters": "Filters",
+      "export": "Export",
+      "exportHelpText": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
+      "columns": {
+        "subject": "Subject",
+        "dateOfBirth": "Date of Birth",
+        "sex": "Sex"
+      }
+    },
+    "lookup": {
+      "title": "Subject Lookup"
+    }
+  },
+  "subjectPage": {
+    "pageTitle": "Instrument Records for Subject",
+    "table": {
+      "columns": {
+        "title": "Title",
+        "version": "Version",
+        "nRecords": "Number of Records"
+      }
+    }
+  },
+  "subjectRecordsPage": {
+    "graph": {
+      "title": "Records for Subject",
+      "fields": "Fields",
+      "xLabel": "Date Collected",
+      "yLabel": "Score"
+    }
+  }
+}

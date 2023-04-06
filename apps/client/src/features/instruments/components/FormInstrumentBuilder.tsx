@@ -1,133 +1,82 @@
+/* eslint-disable no-alert */
 import React from 'react';
 
-import { JSONSchemaType } from 'ajv';
+import { Language } from '@ddcp/common';
+import { useTranslation } from 'react-i18next';
 
-import { FieldKind, Form, type FormStructure } from '@/components/form';
+import { Form } from '@/components';
 
-type FormValues = {
-  name: string;
+type CreateFormData = {
+  title: string;
   description: string;
+  language: Language;
   instructions: string;
-  data: Array<{
-    name: string;
-    kind: FieldKind;
-    label: string;
-    variant: string;
-  }>;
-};
-
-const structure: FormStructure<FormValues> = [
-  {
-    title: 'Instrument Details',
-    fields: {
-      name: {
-        kind: 'text',
-        label: 'Instrument Name',
-        variant: 'short'
-      },
-      description: {
-        kind: 'text',
-        label: 'Instrument Description',
-        variant: 'long'
-      },
-      instructions: {
-        kind: 'text',
-        label: 'Instrument Instructions',
-        variant: 'long'
-      }
-    }
-  },
-  {
-    title: 'Instrument Fields',
-    fields: {
-      data: {
-        kind: 'array',
-        fieldset: {
-          name: {
-            kind: 'text',
-            label: 'Field Name',
-            variant: 'short'
-          },
-          kind: {
-            kind: 'select',
-            label: 'Type of Field',
-            options: ['date', 'select', 'text']
-          },
-          label: {
-            kind: 'text',
-            label: 'Field Label',
-            variant: 'short'
-          },
-          variant: {
-            kind: 'text',
-            label: 'Field Variant',
-            variant: 'short'
-          }
-        }
-      }
-    }
-  }
-];
-
-const validationSchema: JSONSchemaType<FormValues> = {
-  type: 'object',
-  properties: {
-    name: {
-      type: 'string',
-      minLength: 1
-    },
-    description: {
-      type: 'string',
-      minLength: 1
-    },
-    instructions: {
-      type: 'string',
-      minLength: 1
-    },
-    data: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string',
-            minLength: 1
-          },
-          kind: {
-            type: 'string',
-            enum: ['date', 'select', 'text']
-          },
-          label: {
-            type: 'string',
-            minLength: 1
-          },
-          variant: {
-            type: 'string'
-          }
-        },
-        if: {
-          properties: {
-            kind: {
-              const: 'text'
-            }
-          }
-        },
-        then: {
-          properties: {
-            variant: {
-              enum: ['short', 'long', 'password']
-            }
-          }
-        },
-        required: ['name', 'kind', 'label', 'variant']
-      }
-    }
-  },
-  required: ['name', 'description', 'instructions', 'data']
+  estimatedDuration: number;
 };
 
 export const FormInstrumentBuilder = () => {
-  // eslint-disable-next-line no-alert
-  const handleSubmit = (data: FormValues) => alert(JSON.stringify(data));
-  return <Form structure={structure} validationSchema={validationSchema} onSubmit={handleSubmit} />;
+  const { t } = useTranslation(['common', 'instruments']);
+  return (
+    <Form<CreateFormData>
+      content={{
+        title: {
+          kind: 'text',
+          label: t('instruments:createInstrument.form.title.label'),
+          variant: 'short'
+        },
+        description: {
+          kind: 'text',
+          label: t('instruments:createInstrument.form.description.label'),
+          variant: 'long'
+        },
+        language: {
+          kind: 'options',
+          label: t('instruments:createInstrument.form.language.label'),
+          options: {
+            en: t('languages.en'),
+            fr: t('languages.fr')
+          }
+        },
+        instructions: {
+          kind: 'text',
+          label: t('instruments:createInstrument.form.instructions.label'),
+          variant: 'long'
+        },
+        estimatedDuration: {
+          kind: 'numeric',
+          label: t('instruments:createInstrument.form.estimatedDuration.label'),
+          min: 1,
+          max: 60
+        }
+      }}
+      validationSchema={{
+        type: 'object',
+        properties: {
+          title: {
+            type: 'string',
+            minLength: 1
+          },
+          description: {
+            type: 'string',
+            minLength: 1
+          },
+          language: {
+            type: 'string',
+            enum: ['en', 'fr']
+          },
+          instructions: {
+            type: 'string',
+            minLength: 1
+          },
+          estimatedDuration: {
+            type: 'integer',
+            minimum: 1,
+            maximum: 60
+          }
+        },
+        required: ['description', 'estimatedDuration', 'instructions', 'language', 'title']
+      }}
+      onSubmit={(data) => alert(JSON.stringify(data))}
+    />
+  );
 };

@@ -1,0 +1,8 @@
+{
+  "extends": "@ddcp/tsconfig/base.json",
+  "include": ["lib/**/*"],
+  "compilerOptions": {
+    "declarationMap": true,
+    "outDir": "dist"
+  }
+}

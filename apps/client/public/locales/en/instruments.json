@@ -1,0 +1,55 @@
+{
+  "createInstrument": {
+    "pageTitle": "Add Instrument",
+    "form": {
+      "title": {
+        "label": "Field Name"
+      },
+      "description": {
+        "label": "Description"
+      },
+      "language": {
+        "label": "Language"
+      },
+      "instructions": {
+        "label": "Instructions"
+      },
+      "estimatedDuration": {
+        "label": "Estimated Duration"
+      }
+    }
+  },
+  "availableInstruments": {
+    "pageTitle": "View Instruments",
+    "filters": {
+      "language": "Language",
+      "tags": "Tags"
+    }
+  },
+  "formPage": {
+    "overview": {
+      "label": "Overview",
+      "description": "Description",
+      "language": "Language",
+      "estimated Duration": "Estimated Duration",
+      "instructions": "Instructions",
+      "begin": "Begin"
+    },
+    "identification": {
+      "label": "Identification"
+    },
+    "questions": {
+      "label": "Questions"
+    },
+    "summary": {
+      "label": "Summary",
+      "instrumentTitle": "Instrument Title",
+      "instrumentVersion": "Instrument Version",
+      "dateCollected": "Date Collected",
+      "metadata": "Metadata",
+      "results": "Results",
+      "print": "Print",
+      "download": "Download"
+    }
+  }
+}

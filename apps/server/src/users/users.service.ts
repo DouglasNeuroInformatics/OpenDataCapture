@@ -1,50 +1,62 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
-import bcrypt from 'bcrypt';
+import { AppAbility } from '@ddcp/common';
 
-import { User } from './schemas/user.schema';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserEntity } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
+
+import { CryptoService } from '@/crypto/crypto.service';
+import { GroupEntity } from '@/groups/entities/group.entity';
+import { GroupsService } from '@/groups/groups.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  private readonly logger = new Logger(UsersService.name);
 
-  async create(user: User): Promise<User> {
-    if (await this.usersRepository.exists({ username: user.username })) {
-      throw new ConflictException(`User with username '${user.username}' already exists!`);
+  constructor(
+    private readonly cryptoService: CryptoService,
+    private readonly groupsService: GroupsService,
+    private readonly usersRepository: UsersRepository
+  ) {}
+
+  /** Adds a new user to the database with default permissions, verifying the provided groups exist */
+  async create(createUserDto: CreateUserDto, ability: AppAbility): Promise<UserEntity> {
+    const { username, password, basePermissionLevel, groupNames, ...rest } = createUserDto;
+    this.logger.verbose(`Attempting to create user: ${username}`);
+
+    const userExists = await this.usersRepository.exists({ username: username });
+    if (userExists) {
+      throw new ConflictException(`User with username '${username}' already exists!`);
     }
-    user.password = await this.hashPassword(user.password);
-    return this.usersRepository.create(user);
+
+    const groups: GroupEntity[] = [];
+    for (let i = 0; i < (groupNames?.length ?? 0); i++) {
+      groups.push(await this.groupsService.findByName(groupNames![i], ability));
+    }
+
+    const hashedPassword = await this.cryptoService.hashPassword(password);
+
+    return this.usersRepository.create({
+      username: username,
+      password: hashedPassword,
+      groups: groups,
+      basePermissionLevel: basePermissionLevel,
+      ...rest
+    });
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.findAll();
+  /** Returns an array of all users */
+  async findAll(ability: AppAbility): Promise<UserEntity[]> {
+    return this.usersRepository.find().accessibleBy(ability).lean();
   }
 
-  async findUser(username: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ username: username });
+  /** Returns user with provided username if found, otherwise throws */
+  async findByUsername(username: string): Promise<UserEntity> {
+    const user = await this.usersRepository.findOne({ username });
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
     return user;
-  }
-
-  async updateUser(username: string, dto: Partial<User>): Promise<User> {
-    const updatedUser = await this.usersRepository.updateUser(username, dto);
-    if (!updatedUser) {
-      throw new NotFoundException();
-    }
-    return updatedUser;
-  }
-
-  async removeUser(username: string): Promise<void> {
-    const deletedUser = await this.usersRepository.removeUser(username);
-    if (!deletedUser) {
-      throw new NotFoundException();
-    }
-  }
-
-  private async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, await bcrypt.genSalt());
   }
 }

@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForm';
 
 import logo from '@/assets/logo.png';
-import { Footer } from '@/components/layout';
+import { Footer } from '@/components';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50 sm:bg-slate-100">
@@ -18,9 +18,10 @@ export const LoginPage = () => {
         <img alt="logo" className="m-1 w-16" src={logo} />
         <h1 className="text-2xl font-bold">{t('login.pageTitle')}</h1>
         <div className="mt-3 w-full">
-          <LoginForm onSuccess={() => navigate('/home')} />
+          <LoginForm onSuccess={() => navigate('/overview')} />
         </div>
-        <Footer className="p-0" />
+        <br className="my-2" />
+        <Footer isLogin />
       </div>
     </div>
   );

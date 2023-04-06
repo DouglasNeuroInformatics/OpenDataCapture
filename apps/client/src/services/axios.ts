@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 import { useAuthStore } from '@/stores/auth-store';
 import { useNotificationsStore } from '@/stores/notifications-store';
@@ -28,7 +28,10 @@ axios.interceptors.response.use(
       message
     });
 
-    console.error(error);
+    if (error instanceof AxiosError) {
+      console.error(error.response)
+    }
+
     return Promise.reject(error);
   }
 );
