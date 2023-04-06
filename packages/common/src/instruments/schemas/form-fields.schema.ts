@@ -153,7 +153,6 @@ export const formFieldsGroupSchema: JSONSchemaType<FormFieldsGroup> = {
     title: {
       type: 'string',
       minLength: 1,
-      nullable: true
     },
     fields: {
       type: 'object',

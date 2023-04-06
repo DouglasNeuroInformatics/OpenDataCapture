@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 import { FormFields, FormInstrument, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '../Button';
 
@@ -11,7 +12,6 @@ import { FormErrors, FormValues, NullableArrayFieldValue } from './types';
 
 import { FormProvider } from '@/context/FormContext';
 import { ajv } from '@/services/ajv';
-import { useTranslation } from 'react-i18next';
 
 const DEFAULT_PRIMITIVE_VALUES = {
   text: '',
@@ -85,20 +85,29 @@ export const Form = <T extends FormInstrumentData>({
     }
   };
 
-  if (Array.isArray(content)) {
-    return <h1>Error</h1>;
-  }
+  const renderFormField = (fields: FormFields<T>) => {
+    return Object.keys(fields).map((fieldName) => {
+      const props = { name: fieldName, ...fields[fieldName] };
+      if (props.kind === 'array') {
+        return <ArrayField key={props.name} {...props} />;
+      }
+      return <PrimitiveFormField key={props.name} {...props} />;
+    });
+  };
 
   return (
     <FormProvider {...{ errors, setErrors, values, setValues }}>
       <form autoComplete="off" className={clsx('w-full', className)} onSubmit={handleSubmit}>
-        {Object.keys(content).map((fieldName) => {
-          const props = { name: fieldName, ...content[fieldName] };
-          if (props.kind === 'array') {
-            return <ArrayField key={props.name} {...props} />;
-          }
-          return <PrimitiveFormField key={props.name} {...props} />;
-        })}
+        {Array.isArray(content)
+          ? content.map((fieldGroup, i) => {
+              return (
+                <div className="font-semibold" key={i}>
+                  <h3>{fieldGroup.title}</h3>
+                  {renderFormField(fieldGroup.fields as FormFields<T>)}
+                </div>
+              );
+            })
+          : renderFormField(content)}
         <div className="w-full">
           <Button className="w-full" label={submitBtnLabel ?? t('submit')} type="submit" />
         </div>

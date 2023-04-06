@@ -96,3 +96,70 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
     onSubmit: (data) => alert(JSON.stringify(data, null, 2))
   }
 };
+
+type GroupedFormValues = {
+  f1: string;
+  f2: string;
+  f3: string;
+  f4: string;
+};
+
+export const GroupedForm: StoryObj<typeof Form<GroupedFormValues>> = {
+  args: {
+    content: [
+      {
+        title: 'Group 1',
+        fields: {
+          f1: {
+            kind: 'text',
+            label: 'Field 1',
+            variant: 'short'
+          },
+          f2: {
+            kind: 'text',
+            label: 'Field 2',
+            variant: 'short'
+          }
+        }
+      },
+      {
+        title: 'Group 2',
+        fields: {
+          f3: {
+            kind: 'text',
+            label: 'Field 3',
+            variant: 'short'
+          },
+          f4: {
+            kind: 'text',
+            label: 'Field 4',
+            variant: 'short'
+          }
+        }
+      }
+    ],
+    validationSchema: {
+      type: 'object',
+      properties: {
+        f1: {
+          type: 'string',
+          minLength: 1
+        },
+        f2: {
+          type: 'string',
+          minLength: 1
+        },
+        f3: {
+          type: 'string',
+          minLength: 1
+        },
+        f4: {
+          type: 'string',
+          minLength: 1
+        }
+      },
+      required: ['f1', 'f2', 'f3', 'f4']
+    },
+    onSubmit: (data) => alert(JSON.stringify(data, null, 2))
+  }
+};

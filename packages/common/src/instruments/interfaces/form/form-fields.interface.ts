@@ -71,7 +71,7 @@ export type FormFields<T extends FormInstrumentData = FormInstrumentData> = {
 };
 
 export type FormFieldsGroup<T extends FormInstrumentData = FormInstrumentData> = {
-  title?: string;
+  title: string;
   fields: {
     [K in keyof T]?: FormField<T[K]>;
   };
