@@ -32,7 +32,7 @@ export const FormSummary = <T extends FormInstrumentData>({
   }
 
   return (
-    <div className="print:hidden">
+    <div>
       <h3 className="my-3 text-xl font-semibold">Metadata</h3>
       <FormSummaryItem label={t('formPage.summary.instrumentTitle')} value={instrument.details.title} />
       <FormSummaryItem label={t('formPage.summary.instrumentVersion')} value={instrument.version} />
@@ -45,7 +45,9 @@ export const FormSummary = <T extends FormInstrumentData>({
           return <FormSummaryItem key={fieldName} label={field.label} value={result[fieldName] as string} />;
         })}
       </div>
-      <Button label={t('formPage.summary.print')} onClick={() => print()} />
+      <div className="print:hidden">
+        <Button label={t('formPage.summary.print')} onClick={() => print()} />
+      </div>
     </div>
   );
 };

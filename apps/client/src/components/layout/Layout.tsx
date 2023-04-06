@@ -12,17 +12,17 @@ export const Layout = () => {
 
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">
-      <div className="md:hidden">
+      <div className="print:hidden md:hidden">
         <Navbar containerRef={containerRef} />
       </div>
-      <div className="hidden md:flex md:flex-shrink-0">
+      <div className="hidden print:hidden md:flex md:flex-shrink-0">
         <Sidebar />
       </div>
       <div className="container flex flex-grow flex-col overflow-scroll" ref={containerRef}>
         <main className="flex-grow">
           <Outlet />
         </main>
-        <hr className="mb-2 mt-4" />
+        <hr className="mb-2 mt-4 print:hidden" />
         <Footer />
       </div>
     </div>

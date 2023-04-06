@@ -27,7 +27,7 @@ export const OverviewPage = () => {
 
   return (
     <div>
-      <Disclaimer isRequired={true} />
+      <Disclaimer isRequired={import.meta.env.PROD} />
       <PageHeader title={pageTitle} />
       <section>
         <h3 className="mb-5 text-center text-xl font-medium lg:text-left">{t('summary')}</h3>

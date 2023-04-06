@@ -27,7 +27,7 @@ export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
   const { t } = useTranslation('common');
 
   return (
-    <footer className="py-3 text-slate-600">
+    <footer className="py-3 text-slate-600 print:hidden">
       {isLogin ? (
         <div className="flex items-center justify-center text-slate-500">
           <LanguageToggle className="text-sm" />
