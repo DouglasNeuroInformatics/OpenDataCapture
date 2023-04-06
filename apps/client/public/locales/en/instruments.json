@@ -46,7 +46,10 @@
       "instrumentTitle": "Instrument Title",
       "instrumentVersion": "Instrument Version",
       "dateCollected": "Date Collected",
-      "print": "Print"
+      "metadata": "Metadata",
+      "results": "Results",
+      "print": "Print",
+      "download": "Download"
     }
   }
 }

@@ -46,7 +46,10 @@
       "instrumentTitle": "Titre de l'instrument",
       "instrumentVersion": "Version de l'instrument",
       "dateCollected": "Horodatage",
-      "print": "Imprimer"
+      "metadata": "Métadonnées",
+      "results": "Résultats",
+      "print": "Imprimer",
+      "download": "Télécharger"
     }
   }
 }
