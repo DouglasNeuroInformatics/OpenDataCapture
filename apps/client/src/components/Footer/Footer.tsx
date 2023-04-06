@@ -29,24 +29,22 @@ export const Footer = ({ showDevInfo = DEV, showLinks = true }: FooterProps) => 
   return (
     <footer className="py-3 text-slate-600">
       {showLinks && (
-        <div className="mb-3 flex justify-center gap-8">
-          <a href={DOCS_URL} rel="noreferrer" target="_blank">
+        <div className="mb-3 flex flex-col justify-center gap-4 lg:flex-row">
+          <LanguageToggle className="lg:hidden" />
+          <a className="text-center" href={DOCS_URL} rel="noreferrer" target="_blank">
             {t('footer.documentation')}
           </a>
-          <a href={LICENSE_URL} rel="noreferrer" target="_blank">
+          <a className="text-center" href={LICENSE_URL} rel="noreferrer" target="_blank">
             {t('footer.license')}
           </a>
-          <a href={SOURCE_URL} rel="noreferrer" target="_blank">
+          <a className="text-center" href={SOURCE_URL} rel="noreferrer" target="_blank">
             {t('footer.sourceCode')}
           </a>
-          <Link to="/contact">{t('footer.contact')}</Link>
+          <Link className="text-center" to="/contact">
+            {t('footer.contact')}
+          </Link>
         </div>
       )}
-      <div className="@container">
-        <div className="@md:hidden mb-2 flex justify-center">
-          <LanguageToggle className="text-sm text-slate-500" />
-        </div>
-      </div>
       <p className="text-center text-sm text-slate-500">
         &copy; {CURRENT_YEAR} {t('organization.name')}
       </p>

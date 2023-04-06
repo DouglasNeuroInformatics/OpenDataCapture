@@ -28,7 +28,7 @@ export const OverviewPage = () => {
     <div>
       <PageHeader title={pageTitle} />
       <section>
-        <h3 className="mb-5 text-xl font-medium">{t('summary')}</h3>
+        <h3 className="mb-5 text-center text-xl font-medium lg:text-left">{t('summary')}</h3>
         <div className="body-font text-slate-600">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
             <StatisticCard icon={<HiUsers />} label={t('stats.totalUsers')} value={users.data.length} />

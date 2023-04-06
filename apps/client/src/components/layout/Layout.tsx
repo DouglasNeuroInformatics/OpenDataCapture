@@ -19,10 +19,10 @@ export const Layout = () => {
         <Sidebar />
       </div>
       <div className="container flex flex-grow flex-col overflow-scroll" ref={containerRef}>
-        <main>
+        <main className="flex-grow">
           <Outlet />
         </main>
-        <hr className="mt-auto" />
+        <hr className="mb-2 mt-4" />
         <Footer />
       </div>
     </div>

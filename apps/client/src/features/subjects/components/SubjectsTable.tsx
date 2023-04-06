@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { InstrumentRecordsExport, Subject } from '@ddcp/common';
+import { DateUtils, InstrumentRecordsExport, Subject } from '@ddcp/common';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -73,7 +73,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
           },
           {
             name: t('subjects:viewSubjects.table.columns.dateOfBirth'),
-            field: (subject) => subject.dateOfBirth
+            field: (subject) => DateUtils.toBasicISOString(new Date(subject.dateOfBirth))
           },
           {
             name: t('subjects:viewSubjects.table.columns.sex'),
