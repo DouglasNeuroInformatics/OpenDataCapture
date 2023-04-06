@@ -42,20 +42,35 @@ const DEMO_USERS: CreateUserDto[] = [
     firstName: 'Admin'
   },
   {
-    username: 'JohnSmith',
+    username: 'PsychosisClinicPI',
     password: 'password',
     groupNames: ['Psychosis Clinic'],
     basePermissionLevel: BasePermissionLevel.GroupManager,
-    firstName: 'John',
-    lastName: 'Smith'
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName()
   },
   {
-    username: 'JaneDoe',
+    username: 'PsychosisClinicRA',
+    password: 'password',
+    groupNames: ['Psychosis Clinic'],
+    basePermissionLevel: BasePermissionLevel.Standard,
+    firstName: faker.name.firstName()
+  },
+  {
+    username: 'DepressionClinicPI',
     password: 'password',
     groupNames: ['Depression Clinic'],
     basePermissionLevel: BasePermissionLevel.GroupManager,
-    firstName: 'Jane',
-    lastName: 'Doe'
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName()
+  },
+  {
+    username: 'DepressionClinicRA',
+    password: 'password',
+    groupNames: ['Depression Clinic'],
+    basePermissionLevel: BasePermissionLevel.Standard,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName()
   }
 ];
 
