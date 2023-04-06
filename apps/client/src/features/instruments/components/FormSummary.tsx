@@ -3,6 +3,7 @@ import React from 'react';
 import { BaseFormField, FormInstrument, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
 
 import { Button, FormValues, Spinner } from '@/components';
+import { useTranslation } from 'react-i18next';
 
 const FormSummaryItem = ({ label, value }: { label: string; value: string | number }) => {
   return (
@@ -24,6 +25,8 @@ export const FormSummary = <T extends FormInstrumentData>({
   instrument,
   result
 }: FormSummaryProps<T>) => {
+  const { t } = useTranslation('instruments');
+
   if (!result) {
     return <Spinner />;
   }
@@ -31,9 +34,9 @@ export const FormSummary = <T extends FormInstrumentData>({
   return (
     <div className="print:hidden">
       <h3 className="my-3 text-xl font-semibold">Metadata</h3>
-      <FormSummaryItem label={'Instrument Title'} value={instrument.details.title} />
-      <FormSummaryItem label="Instrument Version" value={instrument.version} />
-      <FormSummaryItem label="Date Collected" value={dateCollected!.toLocaleString('en-CA')} />
+      <FormSummaryItem label={t('formPage.summary.instrumentTitle')} value={instrument.details.title} />
+      <FormSummaryItem label={t('formPage.summary.instrumentVersion')} value={instrument.version} />
+      <FormSummaryItem label={t('formPage.summary.dateCollected')} value={dateCollected!.toLocaleString('en-CA')} />
       <h3 className="my-3 text-xl font-semibold">Results</h3>
       <div className="mb-3">
         {Object.keys(result).map((fieldName) => {
@@ -42,7 +45,7 @@ export const FormSummary = <T extends FormInstrumentData>({
           return <FormSummaryItem key={fieldName} label={field.label} value={result[fieldName] as string} />;
         })}
       </div>
-      <Button label="Print" onClick={() => print()} />
+      <Button label={t('formPage.summary.print')} onClick={() => print()} />
     </div>
   );
 };

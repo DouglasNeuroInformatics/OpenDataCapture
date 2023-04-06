@@ -36,7 +36,11 @@
       "label": "Questions"
     },
     "summary": {
-      "label": "Summary"
+      "label": "Summary",
+      "instrumentTitle": "Instrument Title",
+      "instrumentVersion": "Instrument Version",
+      "dateCollected": "Date Collected",
+      "print": "Print"
     }
   }
 }
