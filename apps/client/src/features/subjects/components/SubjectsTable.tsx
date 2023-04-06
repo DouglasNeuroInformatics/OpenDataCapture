@@ -36,6 +36,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         });
         break;
       case 'CSV':
+        download('README.txt', () => Promise.resolve(t('subjects:viewSubjects.table.exportHelpText')));
         download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
           const columnNames = Object.keys(data[0]);
