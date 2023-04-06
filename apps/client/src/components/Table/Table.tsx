@@ -82,7 +82,7 @@ export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, e
           </tbody>
         </table>
       </div>
-      <div className="my-3 flex justify-center">
+      <div className="mb-2 mt-6 flex justify-center">
         <button className="flex h-8 w-8 items-center justify-center rounded-full border">
           <HiArrowLeft />
         </button>

@@ -35,7 +35,7 @@ const Stepper = ({ steps }: StepperProps) => {
           </>
         ))}
       </div>
-      <h3 className="mb-4 text-2xl font-semibold text-slate-900">{steps[index].label}</h3>
+      <h3 className="mb-5 text-2xl font-semibold text-slate-900">{steps[index].label}</h3>
       <div>{steps[index].element}</div>
     </StepperContext.Provider>
   );

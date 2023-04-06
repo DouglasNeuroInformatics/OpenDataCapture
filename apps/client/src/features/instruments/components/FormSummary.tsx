@@ -14,7 +14,7 @@ export const FormSummary = ({ result }: FormSummaryProps) => {
     return <Spinner />;
   }
   return (
-    <div className="print:absolute print:h-screen print:w-screen">
+    <div className="print:hidden">
       <div className="mb-3">
         {Object.keys(result).map((fieldName) => {
           return (

@@ -13,7 +13,7 @@ interface FormOverviewItemProps {
 
 const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
   return (
-    <div className="my-2">
+    <div className="my-5">
       <h5 className="text-xl mb-1 font-semibold text-slate-900">{heading}</h5>
       <p className="text-slate-700">{text}</p>
     </div>
