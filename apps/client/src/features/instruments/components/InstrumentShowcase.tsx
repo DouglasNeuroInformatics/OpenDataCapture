@@ -12,7 +12,7 @@ export interface InstrumentShowcaseProps {
 }
 
 export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => {
-  const { t } = useTranslation(['common', 'instruments']);
+  const { i18n, t } = useTranslation(['common', 'instruments']);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<Language[]>([]);
@@ -41,7 +41,7 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
         <SearchBar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <SelectDropdown
-            defaultSelections={['en']}
+            defaultSelections={[i18n.resolvedLanguage as Language]}
             options={languageOptions}
             title={t('instruments:availableInstruments.filters.language')}
             onChange={(selected) => setSelectedLanguages(selected.map((item) => item.key))}

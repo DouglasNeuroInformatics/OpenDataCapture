@@ -19,5 +19,24 @@
       "language": "Langue",
       "tags": "Tags"
     }
+  },
+  "formPage": {
+    "overview": {
+      "label": "Aperçu",
+      "description": "Description",
+      "language": "Langue",
+      "estimated Duration": "Durée estimée",
+      "instructions": "Instructions",
+      "begin": "Commencer"
+    },
+    "identification": {
+      "label": "Identification"
+    },
+    "questions": {
+      "label": "Questions"
+    },
+    "summary": {
+      "label": "Résumé"
+    }
   }
 }

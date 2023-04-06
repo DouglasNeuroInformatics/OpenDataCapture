@@ -14,7 +14,7 @@ interface FormOverviewItemProps {
 const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
   return (
     <div className="my-5">
-      <h5 className="text-xl mb-1 font-semibold text-slate-900">{heading}</h5>
+      <h5 className="mb-1 text-xl font-semibold text-slate-900">{heading}</h5>
       <p className="text-slate-700">{text}</p>
     </div>
   );
@@ -29,16 +29,19 @@ export const FormOverview = ({
 }: FormOverviewProps) => {
   const { updateIndex } = useContext(StepperContext);
 
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['common', 'instruments']);
   return (
     <div className="mb-2">
       <div className="mb-5">
-        <FormOverviewItem heading="Description" text={description} />
-        <FormOverviewItem heading="Language" text={t(`languages.${language}`)} />
-        <FormOverviewItem heading="Estimated Duration" text={`${estimatedDuration} Minutes`} />
-        <FormOverviewItem heading="Instructions" text={instructions} />
+        <FormOverviewItem heading={t('instruments:formPage.overview.description')} text={description} />
+        <FormOverviewItem heading={t('instruments:formPage.overview.language')} text={t(`languages.${language}`)} />
+        <FormOverviewItem
+          heading={t('instruments:formPage.overview.estimated Duration')}
+          text={`${estimatedDuration} Minutes`}
+        />
+        <FormOverviewItem heading={t('instruments:formPage.overview.instructions')} text={instructions} />
       </div>
-      <Button label="Begin" onClick={() => updateIndex('increment')} />
+      <Button label={t('instruments:formPage.overview.begin')} onClick={() => updateIndex('increment')} />
     </div>
   );
 };

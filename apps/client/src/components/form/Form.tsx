@@ -11,6 +11,7 @@ import { FormErrors, FormValues, NullableArrayFieldValue } from './types';
 
 import { FormProvider } from '@/context/FormContext';
 import { ajv } from '@/services/ajv';
+import { useTranslation } from 'react-i18next';
 
 const DEFAULT_PRIMITIVE_VALUES = {
   text: '',
@@ -59,6 +60,8 @@ export const Form = <T extends FormInstrumentData>({
   const [errors, setErrors] = useState<FormErrors<T>>({});
   const [values, setValues] = useState<FormValues<T>>(() => initialValues ?? getDefaultValues(content));
 
+  const { t } = useTranslation('form');
+
   const reset = () => {
     setValues(getDefaultValues(content));
     setErrors({});
@@ -97,7 +100,7 @@ export const Form = <T extends FormInstrumentData>({
           return <PrimitiveFormField key={props.name} {...props} />;
         })}
         <div className="w-full">
-          <Button className="w-full" label={submitBtnLabel ?? 'Submit'} type="submit" />
+          <Button className="w-full" label={submitBtnLabel ?? t('submit')} type="submit" />
         </div>
       </form>
     </FormProvider>

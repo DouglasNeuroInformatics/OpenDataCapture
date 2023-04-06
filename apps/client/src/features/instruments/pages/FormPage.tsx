@@ -25,27 +25,30 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 export const FormPage = () => {
   const params = useParams();
   const notifications = useNotificationsStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation('instruments');
   const { activeSubject } = useActiveSubjectStore();
   const { currentGroup } = useAuthStore();
 
   const { data: instrument } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
   const [result, setResult] = useState<FormValues>();
+  const [dateCollected, setDateCollected] = useState<Date>();
 
   if (!instrument) {
     return <Spinner />;
   }
 
   const handleSubmit = async (data: FormValues) => {
+    const now = new Date();
     await axios.post('/instruments/records/forms', {
       kind: 'form',
-      dateCollected: DateUtils.toBasicISOString(new Date()),
+      dateCollected: DateUtils.toBasicISOString(now),
       instrumentName: instrument.name,
       instrumentVersion: instrument.version,
       groupName: currentGroup?.name,
       subjectInfo: activeSubject,
       data: data
     });
+    setDateCollected(now);
     setResult(data);
     notifications.add({ message: 'Upload Successful', type: 'success' });
   };
@@ -57,22 +60,22 @@ export const FormPage = () => {
         steps={[
           {
             element: <FormOverview details={instrument.details} />,
-            label: 'Overview',
+            label: t('formPage.overview.label'),
             icon: <HiOutlineDocumentCheck />
           },
           {
             element: <FormIdentification />,
-            label: 'Identification',
+            label: t('formPage.identification.label'),
             icon: <HiOutlineIdentification />
           },
           {
             element: <FormQuestions instrument={instrument} onSubmit={handleSubmit} />,
-            label: 'Questions',
+            label: t('formPage.questions.label'),
             icon: <HiOutlineQuestionMarkCircle />
           },
           {
-            element: <FormSummary instrument={instrument} result={result} />,
-            label: 'Summary',
+            element: <FormSummary dateCollected={dateCollected} instrument={instrument} result={result} />,
+            label: t('formPage.summary.label'),
             icon: <HiOutlinePrinter />
           }
         ]}
