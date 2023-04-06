@@ -4,6 +4,7 @@ export type InstrumentRecordsExport = Array<{
   subjectSex: string;
   instrumentName: string;
   instrumentVersion: number;
+  timestamp: string;
   measure: string;
   value: any;
 }>;

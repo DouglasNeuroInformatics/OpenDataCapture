@@ -8,6 +8,7 @@ import { SubjectLookup } from './SubjectLookup';
 
 import { Dropdown, SearchBar, Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
+import { useAuthStore } from '@/stores/auth-store';
 
 export interface SubjectTableProps {
   data: Subject[];
@@ -15,6 +16,7 @@ export interface SubjectTableProps {
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
+  const { currentUser } = useAuthStore();
   const { t } = useTranslation(['common', 'subjects']);
 
   const [showLookup, setShowLookup] = useState(false);
@@ -25,16 +27,21 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
   };
 
   const handleExportSelection = (option: string | ('JSON' | 'CSV')) => {
+    const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'JSON':
-        download('data.json', async () => {
+        download(`${baseFilename}.json`, async () => {
           const data = await getExportRecords();
           return JSON.stringify(data, null, 2);
         });
         break;
       case 'CSV':
-        download('foo', () => Promise.resolve('foo.txt'));
-        // downloadCSV();
+        download(`${baseFilename}.csv`, async () => {
+          const data = await getExportRecords();
+          const columnNames = Object.keys(data[0]);
+          const rows = data.map((record) => Object.values(record).join(',')).join('\n');
+          return columnNames + '\n' + rows;
+        });
         break;
     }
   };

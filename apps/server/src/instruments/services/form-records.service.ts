@@ -91,6 +91,7 @@ export class FormRecordsService {
             subjectSex: subject.sex,
             instrumentName: record.instrument.name,
             instrumentVersion: record.instrument.version,
+            timestamp: record.dateCollected.toISOString(),
             measure: measure,
             value: record.data[measure] as unknown
           });
