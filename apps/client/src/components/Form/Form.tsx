@@ -7,39 +7,12 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '../Button';
 
-import { ArrayField } from './ArrayField';
+import { ArrayField, ArrayFieldProps } from './ArrayField';
 import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormField';
 import { FormErrors, FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
+import { getDefaultValues } from './utils';
 
 import { ajv } from '@/services/ajv';
-
-const DEFAULT_PRIMITIVE_VALUES = {
-  text: '',
-  options: '',
-  date: '',
-  numeric: null,
-  binary: null
-};
-
-/** Returns the default values when initializing the state or resetting the form */
-const getDefaultValues = <T extends FormInstrumentData>(content: FormInstrumentContent<T>): FormValues<T> => {
-  const defaultValues: Record<string, NullableArrayFieldValue | NullablePrimitiveFieldValue> = {};
-  const fields = (Array.isArray(content) ? content.map((group) => group.fields) : content) as FormFields<T>;
-  for (const fieldName in fields) {
-    const field = fields[fieldName];
-    if (field.kind === 'array') {
-      const defaultItemValues: NullableArrayFieldValue[number] = {};
-      for (const subfieldName in field.fieldset) {
-        const subfield = field.fieldset[subfieldName];
-        defaultItemValues[subfieldName] = DEFAULT_PRIMITIVE_VALUES[subfield.kind];
-      }
-      defaultValues[fieldName] = [defaultItemValues];
-    } else {
-      defaultValues[fieldName] = DEFAULT_PRIMITIVE_VALUES[field.kind];
-    }
-  }
-  return defaultValues as FormValues<T>;
-};
 
 export interface FormProps<T extends FormInstrumentData> {
   content: FormInstrumentContent<T>;
@@ -92,13 +65,13 @@ export const Form = <T extends FormInstrumentData>({
       const props = {
         name: fieldName,
         value: values[fieldName],
-        setValue: (value: NullablePrimitiveFieldValue) => {
+        setValue: (value: NullablePrimitiveFieldValue | NullableArrayFieldValue) => {
           setValues((prevValues) => ({ ...prevValues, [fieldName]: value }));
         },
         ...fields[fieldName]
       };
       if (props.kind === 'array') {
-        formFields.push(<span key={fieldName}>Array Here</span>);
+        formFields.push(<ArrayField key={fieldName} {...(props as ArrayFieldProps)} />);
       } else {
         formFields.push(<PrimitiveFormField key={fieldName} {...(props as PrimitiveFormFieldProps)} />);
       }

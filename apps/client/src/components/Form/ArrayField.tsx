@@ -1,41 +1,54 @@
-import React, { useReducer } from 'react';
+import React from 'react';
 
 import { ArrayFormField } from '@ddcp/common';
 
-import { BaseFieldProps, NullableArrayFieldValue } from './types';
+import { Button } from '../Button';
 
-type ArrayFieldProps = BaseFieldProps<NullableArrayFieldValue> & ArrayFormField;
+import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormField';
+import { BaseFieldProps, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
+import { DEFAULT_PRIMITIVE_VALUES } from './utils';
 
-export const ArrayField = ({ name, label, fieldset, value, setValue }: ArrayFieldProps) => {
-  return <span>Array Field</span>;
-  /*
+export type ArrayFieldProps = BaseFieldProps<NullableArrayFieldValue> & ArrayFormField;
 
-  const [state, dispatch] = useReducer(
-    (prevState: (typeof fieldset)[], action: 'append' | 'remove') => {
-      const newState = [...prevState];
-      if (action === 'append') {
-        newState.push({ ...fieldset });
-      } else if (action === 'remove' && prevState.length > 1) {
-        newState.pop();
-      }
-      return newState;
-    },
-    [fieldset]
-  );
+export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setArrayValue }: ArrayFieldProps) => {
+  const appendField = () => {
+    setArrayValue([
+      ...arrayValue,
+      Object.fromEntries(
+        Object.keys(fieldset).map((fieldName) => [fieldName, DEFAULT_PRIMITIVE_VALUES[fieldset[fieldName].kind]])
+      )
+    ]);
+  };
+
+  const removeField = () => {
+    if (arrayValue.length > 1) {
+      arrayValue.pop();
+      setArrayValue(arrayValue);
+    }
+  };
 
   return (
     <div>
       <span className="field-header">{label}</span>
-
-      {Object.keys(fieldset).map((fieldName) => {
-        const props = { name: fieldName + '_1', ...fieldset[fieldName] };
-        return <PrimitiveFormField key={fieldName} {...props} />;
-      })}
+      {arrayValue.map((fields, i) =>
+        Object.keys(fields).map((fieldName) => {
+          const props = {
+            name: fieldName + i,
+            value: fields[fieldName],
+            setValue: (value: NullablePrimitiveFieldValue) => {
+              const newArrayValue = [...arrayValue];
+              newArrayValue[i][fieldName] = value;
+              setArrayValue(newArrayValue);
+            },
+            ...fieldset[fieldName]
+          };
+          return <PrimitiveFormField key={fieldName} {...(props as PrimitiveFormFieldProps)} />;
+        })
+      )}
       <div className="mb-5 flex gap-5">
-        <Button label="Append" type="button" onClick={() => dispatch('append')} />
-        <Button label="Remove" type="button" onClick={() => dispatch('remove')} />
+        <Button label="Append" type="button" onClick={appendField} />
+        <Button label="Remove" type="button" onClick={removeField} />
       </div>
     </div>
   );
-  */
 };

@@ -23,10 +23,6 @@ type BasicFormValues = {
   options: 'a' | 'b' | 'c';
   date: string;
   binary: boolean;
-  array: Array<{
-    f1: string;
-    f2: number;
-  }>;
 };
 
 export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
@@ -70,7 +66,26 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       binary: {
         kind: 'binary',
         label: 'Binary'
-      },
+      }
+    },
+    validationSchema: {
+      type: 'object',
+      required: []
+    },
+    onSubmit: (data) => alert(JSON.stringify(data, null, 2))
+  }
+};
+
+type ArrayFormValues = {
+  array: Array<{
+    f1: string;
+    f2: number;
+  }>;
+};
+
+export const ArrayForm: StoryObj<typeof Form<ArrayFormValues>> = {
+  args: {
+    content: {
       array: {
         kind: 'array',
         label: 'Array Field',
