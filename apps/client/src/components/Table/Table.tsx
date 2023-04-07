@@ -46,7 +46,7 @@ export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, e
 
   return (
     <div>
-      <div className="overflow-x-scroll">
+      <div className="scrollbar-hidden overflow-x-scroll">
         <table className="relative w-full table-auto border">
           <thead>
             <tr>
