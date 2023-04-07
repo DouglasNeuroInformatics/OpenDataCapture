@@ -1,8 +1,5 @@
 import { ArrayFieldValue, FormInstrumentData, PrimitiveFieldValue } from '@ddcp/common';
 
-/** Omit property K across all objects in union T */
-export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
-
 /** Common props for all field components */
 export interface BaseFieldProps<T> {
   name: string;
@@ -11,19 +8,27 @@ export interface BaseFieldProps<T> {
   error?: string;
 }
 
-export type NullablePrimitiveFieldValue = PrimitiveFieldValue | null;
+export type NullablePrimitiveFieldValue<T extends PrimitiveFieldValue = PrimitiveFieldValue> = T | null;
 
-export type NullableArrayFieldValue = Record<string, NullablePrimitiveFieldValue>[];
+export type NullableArrayFieldValue<T extends ArrayFieldValue = ArrayFieldValue> = Array<{
+  [K in keyof T[number]]: NullablePrimitiveFieldValue<T[number][K]>;
+}>;
 
 /** An object mapping field names to error messages, if applicable */
 export type FormErrors<T extends FormInstrumentData = FormInstrumentData> = {
-  [K in keyof T]?: T[K] extends NullablePrimitiveFieldValue
+  [K in keyof T]?: T[K] extends PrimitiveFieldValue
     ? string
-    : {
-        [P in keyof T[K]]: string;
-      };
+    : T[K] extends ArrayFieldValue
+    ? Array<{
+        [P in keyof T[K][number]]: string;
+      }>
+    : never;
 };
 
 export type FormValues<T extends FormInstrumentData = FormInstrumentData> = {
-  [K in keyof T]: T[K] extends PrimitiveFieldValue ? NullablePrimitiveFieldValue : NullableArrayFieldValue;
+  [K in keyof T]: T[K] extends PrimitiveFieldValue
+    ? NullablePrimitiveFieldValue<T[K]>
+    : T[K] extends ArrayFieldValue
+    ? NullableArrayFieldValue<T[K]>
+    : never;
 };

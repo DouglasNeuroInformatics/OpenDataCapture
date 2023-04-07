@@ -106,7 +106,27 @@ export const ArrayForm: StoryObj<typeof Form<ArrayFormValues>> = {
     },
     validationSchema: {
       type: 'object',
-      required: []
+      properties: {
+        array: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              f1: {
+                type: 'string',
+                minLength: 1
+              },
+              f2: {
+                type: 'integer',
+                minimum: 0,
+                maximum: 10
+              }
+            },
+            required: ['f1', 'f2']
+          }
+        }
+      },
+      required: ['array']
     },
     onSubmit: (data) => alert(JSON.stringify(data, null, 2))
   }
