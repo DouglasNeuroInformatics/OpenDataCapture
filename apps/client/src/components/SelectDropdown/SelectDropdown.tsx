@@ -49,10 +49,10 @@ export const SelectDropdown = <T extends SelectOption>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Listbox.Options className="absolute z-10 mt-2 flex min-w-full flex-col border">
+        <Listbox.Options className="scrollbar-hidden absolute z-10 mt-2 flex max-h-80 min-w-full flex-col overflow-scroll border">
           {options.map((option) => (
             <Listbox.Option
-              className="flex w-full items-center bg-slate-50 p-2 hover:bg-slate-200"
+              className="flex w-full items-center whitespace-nowrap bg-slate-50 p-2 hover:bg-slate-200"
               key={option.key}
               value={option}
             >
@@ -65,14 +65,3 @@ export const SelectDropdown = <T extends SelectOption>({
     </Listbox>
   );
 };
-
-/*
-<Listbox.Option
-  className="flex w-full items-center bg-slate-50 p-2 hover:bg-slate-200"
-  key={option.key}
-  value={option}
->
-  <HiCheck className="ui-selected:visible invisible mr-2" />
-  <span className="ui-selected:font-medium">{option.label}</span>
-</Listbox.Option>
-*/

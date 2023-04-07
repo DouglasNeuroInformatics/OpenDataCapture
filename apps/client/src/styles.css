@@ -46,3 +46,14 @@
     @apply flex flex-col rounded-lg bg-white py-4 px-8 shadow-lg;
   }
 }
+
+@layer utilities {
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+}
