@@ -16,13 +16,7 @@ export type NullableArrayFieldValue<T extends ArrayFieldValue = ArrayFieldValue>
 
 /** An object mapping field names to error messages, if applicable */
 export type FormErrors<T extends FormInstrumentData = FormInstrumentData> = {
-  [K in keyof T]?: T[K] extends PrimitiveFieldValue
-    ? string
-    : T[K] extends ArrayFieldValue
-    ? Array<{
-        [P in keyof T[K][number]]: string;
-      }>
-    : never;
+  [K in keyof T]?: string | Record<string, string>[];
 };
 
 export type FormValues<T extends FormInstrumentData = FormInstrumentData> = {

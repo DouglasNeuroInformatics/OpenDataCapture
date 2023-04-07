@@ -1,6 +1,7 @@
 import { FormFields, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
+import { ErrorObject } from 'ajv';
 
-import { FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
+import { FormErrors, FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
 
 export const DEFAULT_PRIMITIVE_VALUES = {
   text: '',
@@ -43,3 +44,28 @@ export const getDefaultValues = <T extends FormInstrumentData>(content: FormInst
   }
   return defaultValues as FormValues<T>;
 };
+
+export function getFormErrors<T extends FormInstrumentData>(validationErrors?: ErrorObject[] | null): FormErrors<T> {
+  const formErrors: FormErrors<T> = {};
+  if (!validationErrors) {
+    return formErrors;
+  }
+  for (const error of validationErrors) {
+    const errorMessage = `${error.message ?? 'Unknown Error'}`;
+    const path = error.instancePath.split('/').filter((e) => e);
+    const baseField = path[0] as Extract<keyof T, string>;
+    if (path.length === 1) {
+      formErrors[baseField] = errorMessage;
+    } else if (path.length === 3) {
+      if (!Array.isArray(formErrors[baseField])) {
+        formErrors[baseField] = [];
+      }
+      const arrayErrors = formErrors[baseField] as Record<string, string>[];
+      if (!arrayErrors[parseInt(path[1])]) {
+        arrayErrors[parseInt(path[1])] = {};
+      }
+      arrayErrors[parseInt(path[1])][path[2]] = errorMessage;
+    }
+  }
+  return formErrors;
+}

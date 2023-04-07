@@ -10,7 +10,7 @@ import { Button } from '../Button';
 import { ArrayField, ArrayFieldProps } from './ArrayField';
 import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormField';
 import { FormErrors, FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
-import { getDefaultValues } from './utils';
+import { getDefaultValues, getFormErrors } from './utils';
 
 import { ajv } from '@/services/ajv';
 
@@ -49,13 +49,7 @@ export const Form = <T extends FormInstrumentData>({
       reset();
       onSubmit(values as T);
     } else {
-      validate.errors?.forEach((error) => {
-        const path = error.instancePath.split('/').filter((e) => e);
-        const errorMessage = `${error.message ?? 'Unknown Error'}`;
-        setErrors((prevErrors) => {
-          return { ...prevErrors, [path[0]]: errorMessage };
-        });
-      });
+      setErrors(getFormErrors(validate.errors));
     }
   };
 
@@ -64,6 +58,7 @@ export const Form = <T extends FormInstrumentData>({
     for (const fieldName in fields) {
       const props = {
         name: fieldName,
+        error: errors[fieldName],
         value: values[fieldName],
         setValue: (value: NullablePrimitiveFieldValue | NullableArrayFieldValue) => {
           setValues((prevValues) => ({ ...prevValues, [fieldName]: value }));
