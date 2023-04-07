@@ -6,13 +6,9 @@ import { clsx } from 'clsx';
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
+export type TextFieldProps = BaseFieldProps<string> & TextFormField;
 
-type TextFieldProps = BaseFieldProps<TextFormField>;
-
-export const TextField = ({ description, name, label, variant }: TextFieldProps) => {
-  const { error, value, setValue } = useFormField<string>(name);
-
+export const TextField = ({ description, name, label, variant, error, value, setValue }: TextFieldProps) => {
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
     setValue(event.target.value);
   };

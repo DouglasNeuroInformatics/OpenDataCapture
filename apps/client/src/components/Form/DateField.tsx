@@ -9,13 +9,9 @@ import { DatePicker } from '../DatePicker';
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
+export type DateFieldProps = BaseFieldProps<string> & DateFormField;
 
-export type DateFieldProps = BaseFieldProps<DateFormField>;
-
-export const DateField = ({ description, name, label }: DateFieldProps) => {
-  const { error, value, setValue } = useFormField<string>(name);
-
+export const DateField = ({ description, name, label, error, value, setValue }: DateFieldProps) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [mouseInDatePicker, setMouseInDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);

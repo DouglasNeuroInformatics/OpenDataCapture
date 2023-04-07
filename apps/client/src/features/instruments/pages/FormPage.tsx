@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DateUtils, FormInstrument } from '@ddcp/common';
+import { DateUtils, FormInstrument, FormInstrumentData } from '@ddcp/common';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
@@ -30,14 +30,14 @@ export const FormPage = () => {
   const { currentGroup } = useAuthStore();
 
   const { data: instrument } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
-  const [result, setResult] = useState<FormValues>();
+  const [result, setResult] = useState<FormInstrumentData>();
   const [dateCollected, setDateCollected] = useState<Date>();
 
   if (!instrument) {
     return <Spinner />;
   }
 
-  const handleSubmit = async (data: FormValues) => {
+  const handleSubmit = async (data: FormInstrumentData) => {
     const now = new Date();
     await axios.post('/instruments/records/forms', {
       kind: 'form',

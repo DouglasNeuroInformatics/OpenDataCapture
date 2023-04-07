@@ -7,20 +7,16 @@ import { HiCheck } from 'react-icons/hi2';
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
+export type BinaryFieldProps = BaseFieldProps<boolean | null> & BinaryFormField;
 
-type BinaryFieldProps = BaseFieldProps<BinaryFormField>;
-
-export const BinaryField = ({ description, name, label }: BinaryFieldProps) => {
-  const { error, value, setValue } = useFormField<boolean>(name);
-
+export const BinaryField = ({ description, name, label, error, value, setValue }: BinaryFieldProps) => {
   return (
     <FormFieldContainer description={description} error={error}>
       <label className="field-label" htmlFor={name}>
         {label}
       </label>
       <div className="field-input-base">
-        <Switch checked={value} className="w-fit border" onChange={setValue}>
+        <Switch checked={Boolean(value)} className="w-fit border" onChange={setValue}>
           <HiCheck className="ui-checked:visible invisible" />
         </Switch>
       </div>

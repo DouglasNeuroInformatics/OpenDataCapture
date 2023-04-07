@@ -7,18 +7,17 @@ import { clsx } from 'clsx';
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
-
-export type OptionsFieldProps<T extends string> = BaseFieldProps<OptionsFormField<T>>;
+export type OptionsFieldProps<T extends string = string> = BaseFieldProps<T> & OptionsFormField<T>;
 
 export const OptionsField = <T extends string = string>({
   description,
   name,
   label,
-  options
+  options,
+  error,
+  value,
+  setValue
 }: OptionsFieldProps<T>) => {
-  const { error, value, setValue } = useFormField<T>(name);
-
   return (
     <FormFieldContainer description={description} error={error}>
       <Listbox as={React.Fragment} name={name} value={value} onChange={setValue}>

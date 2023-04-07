@@ -3,7 +3,7 @@ import React from 'react';
 import { BaseFormField, FormInstrument, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
 
-import { Button, FormValues, Spinner } from '@/components';
+import { Button, Spinner } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 
 const FormSummaryItem = ({ label, value }: { label: string; value: string | number }) => {
@@ -17,7 +17,7 @@ const FormSummaryItem = ({ label, value }: { label: string; value: string | numb
 
 export interface FormSummaryProps<T extends FormInstrumentData> {
   instrument: FormInstrument<T>;
-  result?: FormValues<T>;
+  result?: T;
   dateCollected?: Date;
 }
 

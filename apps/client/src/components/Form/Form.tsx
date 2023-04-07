@@ -1,16 +1,16 @@
 import React, { useMemo, useState } from 'react';
 
-import { FormFields, FormInstrument, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
+import { FormFields, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
+import { JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '../Button';
 
 import { ArrayField } from './ArrayField';
-import { PrimitiveFormField } from './PrimitiveFormField';
-import { FormErrors, FormValues, NullableArrayFieldValue } from './types';
+import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormField';
+import { FormErrors, FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
 
-import { FormProvider } from '@/context/FormContext';
 import { ajv } from '@/services/ajv';
 
 const DEFAULT_PRIMITIVE_VALUES = {
@@ -23,7 +23,7 @@ const DEFAULT_PRIMITIVE_VALUES = {
 
 /** Returns the default values when initializing the state or resetting the form */
 const getDefaultValues = <T extends FormInstrumentData>(content: FormInstrumentContent<T>): FormValues<T> => {
-  const defaultValues: Partial<FormValues<T>> = {};
+  const defaultValues: Record<string, NullableArrayFieldValue | NullablePrimitiveFieldValue> = {};
   const fields = (Array.isArray(content) ? content.map((group) => group.fields) : content) as FormFields<T>;
   for (const fieldName in fields) {
     const field = fields[fieldName];
@@ -41,11 +41,12 @@ const getDefaultValues = <T extends FormInstrumentData>(content: FormInstrumentC
   return defaultValues as FormValues<T>;
 };
 
-export interface FormProps<T extends FormInstrumentData>
-  extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
+export interface FormProps<T extends FormInstrumentData> {
+  content: FormInstrumentContent<T>;
   className?: string;
   initialValues?: FormValues<T> | null;
   submitBtnLabel?: string;
+  validationSchema: JSONSchemaType<T>;
   onSubmit: (data: T) => void;
 }
 
@@ -85,33 +86,41 @@ export const Form = <T extends FormInstrumentData>({
     }
   };
 
-  const renderFormField = (fields: FormFields<T>) => {
-    return Object.keys(fields).map((fieldName) => {
-      const props = { name: fieldName, ...fields[fieldName] };
+  const renderFormFields = (fields: FormFields<T>): JSX.Element[] => {
+    const formFields: JSX.Element[] = [];
+    for (const fieldName in fields) {
+      const props = {
+        name: fieldName,
+        value: values[fieldName],
+        setValue: (value: NullablePrimitiveFieldValue) => {
+          setValues((prevValues) => ({ ...prevValues, [fieldName]: value }));
+        },
+        ...fields[fieldName]
+      };
       if (props.kind === 'array') {
-        return <ArrayField key={props.name} {...props} />;
+        formFields.push(<span key={fieldName}>Array Here</span>);
+      } else {
+        formFields.push(<PrimitiveFormField key={fieldName} {...(props as PrimitiveFormFieldProps)} />);
       }
-      return <PrimitiveFormField key={props.name} {...props} />;
-    });
+    }
+    return formFields;
   };
 
   return (
-    <FormProvider {...{ errors, setErrors, values, setValues }}>
-      <form autoComplete="off" className={clsx('w-full', className)} onSubmit={handleSubmit}>
-        {Array.isArray(content)
-          ? content.map((fieldGroup, i) => {
-              return (
-                <div className="font-semibold" key={i}>
-                  <h3>{fieldGroup.title}</h3>
-                  {renderFormField(fieldGroup.fields as FormFields<T>)}
-                </div>
-              );
-            })
-          : renderFormField(content)}
-        <div className="w-full">
-          <Button className="w-full" label={submitBtnLabel ?? t('submit')} type="submit" />
-        </div>
-      </form>
-    </FormProvider>
+    <form autoComplete="off" className={clsx('w-full', className)} onSubmit={handleSubmit}>
+      {Array.isArray(content)
+        ? content.map((fieldGroup, i) => {
+            return (
+              <div className="font-semibold" key={i}>
+                <h3>{fieldGroup.title}</h3>
+                {renderFormFields(fieldGroup.fields as FormFields<T>)}
+              </div>
+            );
+          })
+        : renderFormFields(content)}
+      <div className="w-full">
+        <Button className="w-full" label={submitBtnLabel ?? t('submit')} type="submit" />
+      </div>
+    </form>
   );
 };

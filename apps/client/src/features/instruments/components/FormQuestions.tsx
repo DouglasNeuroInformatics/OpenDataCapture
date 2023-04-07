@@ -1,18 +1,22 @@
 import React, { useContext } from 'react';
 
-import { FormInstrument } from '@ddcp/common';
+import { FormInstrument, FormInstrumentData } from '@ddcp/common';
 
-import { Form, FormValues } from '@/components';
+import { Form } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
 
-export interface FormQuestionsProps {
-  instrument: FormInstrument;
-  onSubmit: (data: FormValues) => void;
+export interface FormQuestionsProps<T extends FormInstrumentData> {
+  instrument: FormInstrument<T>;
+  onSubmit: (data: T) => void;
 }
 
-export const FormQuestions = ({ instrument: { content, validationSchema }, onSubmit }: FormQuestionsProps) => {
+export const FormQuestions = <T extends FormInstrumentData>({
+  instrument: { content, validationSchema },
+  onSubmit
+}: FormQuestionsProps<T>) => {
   const { updateIndex } = useContext(StepperContext);
-  const handleSubmit = (data: FormValues) => {
+
+  const handleSubmit = (data: T) => {
     onSubmit(data);
     updateIndex('increment');
   };

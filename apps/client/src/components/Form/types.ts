@@ -1,12 +1,15 @@
-import { BaseFormField, FormInstrumentData, PrimitiveFieldValue } from '@ddcp/common';
+import { ArrayFieldValue, FormInstrumentData, PrimitiveFieldValue } from '@ddcp/common';
 
 /** Omit property K across all objects in union T */
 export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
 
 /** Common props for all field components */
-export type BaseFieldProps<T extends BaseFormField> = T & {
+export interface BaseFieldProps<T> {
   name: string;
-};
+  value: T;
+  setValue: (value: T) => void;
+  error?: string;
+}
 
 export type NullablePrimitiveFieldValue = PrimitiveFieldValue | null;
 
@@ -22,5 +25,5 @@ export type FormErrors<T extends FormInstrumentData = FormInstrumentData> = {
 };
 
 export type FormValues<T extends FormInstrumentData = FormInstrumentData> = {
-  [K in keyof T]: NullablePrimitiveFieldValue | NullableArrayFieldValue;
+  [K in keyof T]: T[K] extends PrimitiveFieldValue ? NullablePrimitiveFieldValue : NullableArrayFieldValue;
 };

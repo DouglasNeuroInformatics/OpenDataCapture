@@ -2,17 +2,13 @@ import React, { useReducer } from 'react';
 
 import { ArrayFormField } from '@ddcp/common';
 
-import { Button } from '../Button';
+import { BaseFieldProps, NullableArrayFieldValue } from './types';
 
-import { PrimitiveFormField } from './PrimitiveFormField';
-import { BaseFieldProps } from './types';
+type ArrayFieldProps = BaseFieldProps<NullableArrayFieldValue> & ArrayFormField;
 
-import { useFormField } from '@/hooks/useFormField';
-
-type ArrayFieldProps = BaseFieldProps<ArrayFormField>;
-
-export const ArrayField = ({ name, label, fieldset }: ArrayFieldProps) => {
-  // const { error, value, setValue } = useFormField<boolean>(name);
+export const ArrayField = ({ name, label, fieldset, value, setValue }: ArrayFieldProps) => {
+  return <span>Array Field</span>;
+  /*
 
   const [state, dispatch] = useReducer(
     (prevState: (typeof fieldset)[], action: 'append' | 'remove') => {
@@ -41,4 +37,5 @@ export const ArrayField = ({ name, label, fieldset }: ArrayFieldProps) => {
       </div>
     </div>
   );
+  */
 };

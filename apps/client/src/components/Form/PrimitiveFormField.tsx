@@ -1,15 +1,19 @@
 import React from 'react';
 
-import { PrimitiveFormField as TPrimitiveFormField } from '@ddcp/common';
+import { BinaryField, BinaryFieldProps } from './BinaryField';
+import { DateField, DateFieldProps } from './DateField';
+import { NumericField, NumericFieldProps } from './NumericField';
+import { OptionsField, OptionsFieldProps } from './OptionsField';
+import { TextField, TextFieldProps } from './TextField';
 
-import { BinaryField } from './BinaryField';
-import { DateField } from './DateField';
-import { NumericField } from './NumericField';
-import { OptionsField } from './OptionsField';
-import { TextField } from './TextField';
-import { BaseFieldProps } from './types';
+export type PrimitiveFormFieldProps =
+  | TextFieldProps
+  | NumericFieldProps
+  | OptionsFieldProps
+  | DateFieldProps
+  | BinaryFieldProps;
 
-export const PrimitiveFormField = (props: BaseFieldProps<TPrimitiveFormField>) => {
+export const PrimitiveFormField = (props: PrimitiveFormFieldProps) => {
   switch (props.kind) {
     case 'text':
       return <TextField key={props.name} {...props} />;

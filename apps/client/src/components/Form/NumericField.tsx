@@ -6,13 +6,9 @@ import { FormFieldContainer } from './FormFieldContainer';
 import { FormFieldDescription } from './FormFieldDescription';
 import { BaseFieldProps } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
+export type NumericFieldProps = BaseFieldProps<number | null> & NumericFormField;
 
-export type NumericFieldProps = BaseFieldProps<NumericFormField>;
-
-export const NumericField = ({ description, name, label, min, max }: NumericFieldProps) => {
-  const { error, value, setValue } = useFormField<number>(name);
-
+export const NumericField = ({ description, name, label, min, max, error, value, setValue }: NumericFieldProps) => {
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     setValue(Number(event.target.value));
   };
