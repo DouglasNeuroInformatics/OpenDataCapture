@@ -1,7 +1,7 @@
 /* eslint-disable no-alert */
 import React from 'react';
 
-import { BaseFormField, FormFieldKind, Language } from '@ddcp/common';
+import { BaseFormField, FormFieldKind, Language, TextFormField } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
 
 import { Button, Form, TextField } from '@/components';
@@ -14,15 +14,9 @@ type CreateFormData = {
   estimatedDuration: number;
   fields: Array<{
     kind: FormFieldKind;
-
-    /** The label to be displayed to the user */
     label: string;
-
-    /** An optional description of this field */
     description?: string;
-
-    /** Whether or not the field is required */
-    isRequired?: boolean;
+    variant?: TextFormField['variant'];
   }>;
 };
 
@@ -94,6 +88,22 @@ export const FormInstrumentBuilder = () => {
                   kind: 'text',
                   label: 'Description',
                   variant: 'short'
+                },
+                variant: {
+                  kind: 'options',
+                  label: 'Variant',
+                  options: {
+                    short: 'Short',
+                    long: 'Long',
+                    password: 'Password'
+                  },
+                  dependsOn: {
+                    fields: {
+                      kind: {
+                        equals: 'text'
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -102,6 +112,7 @@ export const FormInstrumentBuilder = () => {
       ]}
       validationSchema={{
         type: 'object',
+        /*
         properties: {
           title: {
             type: 'string',
@@ -133,8 +144,10 @@ export const FormInstrumentBuilder = () => {
           }
         },
         required: ['description', 'estimatedDuration', 'instructions', 'language', 'title']
+        */
+        required: []
       }}
-      onSubmit={(data) => alert(JSON.stringify(data))}
+      onSubmit={(data) => alert(JSON.stringify(data, null, 2))}
     />
   );
 };

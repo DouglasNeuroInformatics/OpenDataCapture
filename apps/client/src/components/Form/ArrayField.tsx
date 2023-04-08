@@ -30,8 +30,8 @@ export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setAr
   return (
     <div>
       {arrayValue.map((fields, i) => (
-        <>
-          <span className="field-header">{label}</span>
+        <div key={i}>
+          <span className="field-header">{label + ' ' + (i + 1)}</span>
           {Object.keys(fields).map((fieldName) => {
             const props = {
               name: fieldName + i,
@@ -45,7 +45,7 @@ export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setAr
             };
             return <PrimitiveFormField key={fieldName} {...(props as PrimitiveFormFieldProps)} />;
           })}
-        </>
+        </div>
       ))}
       <div className="mb-5 flex gap-5">
         <Button label="Append" type="button" onClick={appendField} />
