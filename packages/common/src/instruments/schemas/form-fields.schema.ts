@@ -34,12 +34,7 @@ const baseProperties: PropertiesSchema<Omit<BaseFormField, 'kind'>> = {
     patternProperties: {
       '^.*$': {
         type: 'object',
-        properties: {
-          equals: {
-            type: ['boolean', 'number', 'string']
-          }
-        },
-        required: ['equals']
+        required: []
       }
     },
     required: []

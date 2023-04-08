@@ -6,6 +6,10 @@ export type ArrayFieldValue = Record<string, PrimitiveFieldValue>[];
 
 export type FormInstrumentData = Record<string, PrimitiveFieldValue | ArrayFieldValue>;
 
+export type DependentConditions<T extends PrimitiveFieldValue> = {
+  equals: T;
+};
+
 export interface BaseFormField<TData extends FormInstrumentData = FormInstrumentData> {
   /** Discriminator key */
   kind: FormFieldKind;
@@ -20,9 +24,13 @@ export interface BaseFormField<TData extends FormInstrumentData = FormInstrument
   isRequired?: boolean;
 
   dependsOn?: {
-    [K in keyof TData]: {
-      equals: TData[K];
-    };
+    [K in keyof TData]?: [TData[K]] extends [PrimitiveFieldValue]
+      ? DependentConditions<TData[K]>
+      : TData[K] extends ArrayFieldValue
+      ? {
+          [P in keyof TData[K][number]]?: DependentConditions<TData[K][number][P]>;
+        }
+      : any;
   };
 }
 
