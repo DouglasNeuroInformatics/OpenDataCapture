@@ -2,7 +2,6 @@ import { JSONSchemaType } from 'ajv';
 import { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
 import {
-  ArrayFieldValue,
   ArrayFormField,
   BaseFormField,
   BinaryFormField,
@@ -11,7 +10,6 @@ import {
   FormFieldsGroup,
   NumericFormField,
   OptionsFormField,
-  PrimitiveFieldValue,
   PrimitiveFormField,
   TextFormField
 } from '../interfaces/form/form-fields.interface';
@@ -29,6 +27,22 @@ const baseProperties: PropertiesSchema<Omit<BaseFormField, 'kind'>> = {
   isRequired: {
     type: 'boolean',
     nullable: true
+  },
+  dependsOn: {
+    type: 'object',
+    nullable: true,
+    patternProperties: {
+      '^.*$': {
+        type: 'object',
+        properties: {
+          equals: {
+            type: ['boolean', 'number', 'string']
+          }
+        },
+        required: ['equals']
+      }
+    },
+    required: []
   }
 };
 
@@ -111,11 +125,11 @@ export const binaryFieldSchema: JSONSchemaType<BinaryFormField> = {
   required: ['kind', 'label']
 };
 
-export const primitiveFieldSchema: JSONSchemaType<PrimitiveFormField<PrimitiveFieldValue>> = {
+export const primitiveFieldSchema: JSONSchemaType<PrimitiveFormField> = {
   oneOf: [textFieldSchema, numericFieldSchema, optionsFieldSchema, dataFieldSchema, binaryFieldSchema]
 };
 
-export const arrayFieldSchema: JSONSchemaType<ArrayFormField<ArrayFieldValue>> = {
+export const arrayFieldSchema: JSONSchemaType<ArrayFormField> = {
   type: 'object',
   properties: {
     ...baseProperties,
@@ -152,7 +166,7 @@ export const formFieldsGroupSchema: JSONSchemaType<FormFieldsGroup> = {
   properties: {
     title: {
       type: 'string',
-      minLength: 1,
+      minLength: 1
     },
     fields: {
       type: 'object',

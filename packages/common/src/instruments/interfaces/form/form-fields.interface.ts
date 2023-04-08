@@ -6,7 +6,7 @@ export type ArrayFieldValue = Record<string, PrimitiveFieldValue>[];
 
 export type FormInstrumentData = Record<string, PrimitiveFieldValue | ArrayFieldValue>;
 
-export interface BaseFormField {
+export interface BaseFormField<TData extends FormInstrumentData = FormInstrumentData> {
   /** Discriminator key */
   kind: FormFieldKind;
 
@@ -18,61 +18,74 @@ export interface BaseFormField {
 
   /** Whether or not the field is required */
   isRequired?: boolean;
+
+  dependsOn?: {
+    [K in keyof TData]: {
+      equals: TData[K];
+    };
+  };
 }
 
-export interface TextFormField extends BaseFormField {
+export interface TextFormField<TData extends FormInstrumentData = FormInstrumentData> extends BaseFormField<TData> {
   kind: 'text';
   variant: 'short' | 'long' | 'password';
 }
 
-export interface NumericFormField extends BaseFormField {
+export interface NumericFormField<TData extends FormInstrumentData = FormInstrumentData> extends BaseFormField<TData> {
   kind: 'numeric';
   min: number;
   max: number;
 }
 
-export interface OptionsFormField<T extends string = string> extends BaseFormField {
+export interface OptionsFormField<TValue extends string = string, TData extends FormInstrumentData = FormInstrumentData>
+  extends BaseFormField<TData> {
   kind: 'options';
-  options: Record<T, string>;
+  options: Record<TValue, string>;
 }
 
-export interface DateFormField extends BaseFormField {
+export interface DateFormField<TData extends FormInstrumentData = FormInstrumentData> extends BaseFormField<TData> {
   kind: 'date';
 }
 
-export interface BinaryFormField extends BaseFormField {
+export interface BinaryFormField<TData extends FormInstrumentData = FormInstrumentData> extends BaseFormField<TData> {
   kind: 'binary';
 }
 
 /** A field where the underlying value of the field data is of type FormFieldValue */
-export type PrimitiveFormField<T extends PrimitiveFieldValue = PrimitiveFieldValue> = T extends string
-  ? TextFormField | OptionsFormField<T> | DateFormField
-  : T extends number
-  ? NumericFormField
-  : T extends boolean
-  ? BinaryFormField
+export type PrimitiveFormField<
+  TValue extends PrimitiveFieldValue = PrimitiveFieldValue,
+  TData extends FormInstrumentData = FormInstrumentData
+> = TValue extends string
+  ? TextFormField<TData> | OptionsFormField<TValue, TData> | DateFormField<TData>
+  : TValue extends number
+  ? NumericFormField<TData>
+  : TValue extends boolean
+  ? BinaryFormField<TData>
   : never;
 
-export interface ArrayFormField<T extends ArrayFieldValue = ArrayFieldValue> extends BaseFormField {
+export interface ArrayFormField<
+  TValue extends ArrayFieldValue = ArrayFieldValue,
+  TData extends FormInstrumentData = FormInstrumentData
+> extends BaseFormField<TData> {
   kind: 'array';
   fieldset: {
-    [K in keyof T[number]]: PrimitiveFormField<T[number][K]>;
+    [K in keyof TValue[number]]: PrimitiveFormField<TValue[number][K], TData>;
   };
 }
 
-export type FormField<T> = [T] extends [PrimitiveFieldValue]
-  ? PrimitiveFormField<T>
-  : T extends ArrayFieldValue
-  ? ArrayFormField<T>
+export type FormField<TValue, TData extends FormInstrumentData> = [TValue] extends [PrimitiveFieldValue]
+  ? PrimitiveFormField<TValue, TData>
+  : TValue extends ArrayFieldValue
+  ? ArrayFormField<TValue, TData>
   : never;
 
-export type FormFields<T extends FormInstrumentData = FormInstrumentData> = {
-  [K in keyof T]: FormField<T[K]>;
+export type FormFields<TData extends FormInstrumentData = FormInstrumentData> = {
+  [K in keyof TData]: FormField<TData[K], TData>;
 };
 
-export type FormFieldsGroup<T extends FormInstrumentData = FormInstrumentData> = {
+export type FormFieldsGroup<TData extends FormInstrumentData = FormInstrumentData> = {
   title: string;
   fields: {
-    [K in keyof T]?: FormField<T[K]>;
+    [K in keyof TData]?: FormField<TData[K], TData>;
   };
 };
