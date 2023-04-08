@@ -12,6 +12,7 @@ import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormFiel
 import { FormErrors, FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
 import { getDefaultValues, getFormErrors } from './utils';
 
+import { FormProvider } from '@/context/FormContext';
 import { ajv } from '@/services/ajv';
 
 export interface FormProps<T extends FormInstrumentData> {
@@ -75,20 +76,22 @@ export const Form = <T extends FormInstrumentData>({
   };
 
   return (
-    <form autoComplete="off" className={clsx('w-full', className)} onSubmit={handleSubmit}>
-      {Array.isArray(content)
-        ? content.map((fieldGroup, i) => {
-            return (
-              <div key={i}>
-                <h3 className="my-5 font-semibold">{fieldGroup.title}</h3>
-                {renderFormFields(fieldGroup.fields as FormFields<T>)}
-              </div>
-            );
-          })
-        : renderFormFields(content)}
-      <div className="w-full">
-        <Button className="w-full" label={submitBtnLabel ?? t('submit')} type="submit" />
-      </div>
-    </form>
+    <FormProvider {...{ errors, setErrors, values, setValues }}>
+      <form autoComplete="off" className={clsx('w-full', className)} onSubmit={handleSubmit}>
+        {Array.isArray(content)
+          ? content.map((fieldGroup, i) => {
+              return (
+                <div key={i}>
+                  <h3 className="my-5 font-semibold">{fieldGroup.title}</h3>
+                  {renderFormFields(fieldGroup.fields as FormFields<T>)}
+                </div>
+              );
+            })
+          : renderFormFields(content)}
+        <div className="w-full">
+          <Button className="w-full" label={submitBtnLabel ?? t('submit')} type="submit" />
+        </div>
+      </form>
+    </FormProvider>
   );
 };
