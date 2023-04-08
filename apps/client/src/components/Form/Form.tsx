@@ -79,8 +79,8 @@ export const Form = <T extends FormInstrumentData>({
       {Array.isArray(content)
         ? content.map((fieldGroup, i) => {
             return (
-              <div className="font-semibold" key={i}>
-                <h3>{fieldGroup.title}</h3>
+              <div key={i}>
+                <h3 className="my-5 font-semibold">{fieldGroup.title}</h3>
                 {renderFormFields(fieldGroup.fields as FormFields<T>)}
               </div>
             );
