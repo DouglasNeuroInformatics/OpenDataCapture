@@ -29,10 +29,10 @@ const Stepper = ({ steps }: StepperProps) => {
     <StepperContext.Provider value={{ index, updateIndex }}>
       <div className="mx-2 mb-16 flex items-center print:hidden">
         {steps.map((step, i) => (
-          <>
+          <React.Fragment key={i}>
             <StepperIcon icon={step.icon} label={step.label} variant={i === index ? 'dark' : 'light'} />
             {i < steps.length - 1 && <StepperDivider variant={i < index ? 'dark' : 'light'} />}
-          </>
+          </React.Fragment>
         ))}
       </div>
       <h3 className="mb-5 text-2xl font-semibold text-slate-900">{steps[index].label}</h3>

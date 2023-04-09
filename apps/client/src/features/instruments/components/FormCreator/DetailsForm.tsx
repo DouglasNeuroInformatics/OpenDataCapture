@@ -1,17 +1,42 @@
 /* eslint-disable no-alert */
 import React from 'react';
 
-import { FormDetails } from '@ddcp/common';
+import { FormDetails, FormInstrument } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
 
 import { Form } from '@/components';
 
-export const DetailsForm = () => {
+export type DetailsFormData = FormDetails &
+  Pick<FormInstrument, 'name' | 'version'> & {
+    tags: string;
+  };
+
+export interface DetailsFormProps {
+  onSubmit: (data: DetailsFormData) => void;
+}
+
+export const DetailsForm = ({ onSubmit }: DetailsFormProps) => {
   const { t } = useTranslation(['common', 'instruments']);
 
   return (
-    <Form<FormDetails>
+    <Form<DetailsFormData>
       content={{
+        name: {
+          kind: 'text',
+          label: 'Name',
+          variant: 'short'
+        },
+        tags: {
+          kind: 'text',
+          label: 'Tags',
+          variant: 'short'
+        },
+        version: {
+          kind: 'numeric',
+          label: 'Version',
+          min: 0,
+          max: 10
+        },
         title: {
           kind: 'text',
           label: t('instruments:createInstrument.form.title.label'),
@@ -45,6 +70,17 @@ export const DetailsForm = () => {
       validationSchema={{
         type: 'object',
         properties: {
+          name: {
+            type: 'string',
+            minLength: 1
+          },
+          tags: {
+            type: 'string',
+            minLength: 1
+          },
+          version: {
+            type: 'number'
+          },
           title: {
             type: 'string',
             minLength: 1
@@ -69,7 +105,7 @@ export const DetailsForm = () => {
         },
         required: ['description', 'estimatedDuration', 'instructions', 'language', 'title']
       }}
-      onSubmit={(data) => alert(JSON.stringify(data, null, 2))}
+      onSubmit={onSubmit}
     />
   );
 };
