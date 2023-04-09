@@ -1,10 +1,11 @@
 /* eslint-disable no-alert */
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { FormDetails, FormInstrument } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
 
 import { Form } from '@/components';
+import { StepperContext } from '@/context/StepperContext';
 
 export type DetailsFormData = FormDetails &
   Pick<FormInstrument, 'name' | 'version'> & {
@@ -16,6 +17,7 @@ export interface DetailsFormProps {
 }
 
 export const DetailsForm = ({ onSubmit }: DetailsFormProps) => {
+  const { updateIndex } = useContext(StepperContext);
   const { t } = useTranslation(['common', 'instruments']);
 
   return (
@@ -105,7 +107,10 @@ export const DetailsForm = ({ onSubmit }: DetailsFormProps) => {
         },
         required: ['description', 'estimatedDuration', 'instructions', 'language', 'title']
       }}
-      onSubmit={onSubmit}
+      onSubmit={(data) => {
+        onSubmit(data);
+        updateIndex('increment');
+      }}
     />
   );
 };
