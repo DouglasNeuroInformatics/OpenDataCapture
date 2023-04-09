@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import React, { useContext } from 'react';
 
 import { FormDetails, FormInstrument } from '@ddcp/common';

@@ -79,7 +79,9 @@ export interface ArrayFormField<
 > extends BaseFormField<TData> {
   kind: 'array';
   fieldset: {
-    [K in keyof TValue[number]]: PrimitiveFormField<TValue[number][K], TData>;
+    [K in keyof TValue[number]]: PrimitiveFormField<TValue[number][K], TData> & {
+      shouldRender?: (fieldset: TValue[number]) => boolean;
+    };
   };
 }
 

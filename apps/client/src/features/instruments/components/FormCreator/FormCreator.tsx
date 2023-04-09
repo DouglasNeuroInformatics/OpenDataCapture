@@ -7,9 +7,9 @@ import { DetailsForm, DetailsFormData } from './DetailsForm';
 
 import { Stepper } from '@/components';
 
-type SimpleFormData = Record<string, PrimitiveFieldValue>;
+export type SimpleFormData = Record<string, PrimitiveFieldValue>;
 
-interface SimpleForm<T extends SimpleFormData = SimpleFormData> extends FormInstrument<T> {
+export interface SimpleForm<T extends SimpleFormData = SimpleFormData> extends FormInstrument<T> {
   content: FormFields<T>;
 }
 
