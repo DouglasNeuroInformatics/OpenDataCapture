@@ -6,6 +6,8 @@ export type ArrayFieldValue = Record<string, PrimitiveFieldValue>[];
 
 export type FormInstrumentData = Record<string, PrimitiveFieldValue | ArrayFieldValue>;
 
+export type Nullable<T extends object> = { [K in keyof T]: T[K] | null | undefined };
+
 export type DependentConditions<T extends PrimitiveFieldValue = PrimitiveFieldValue> = {
   equals: T;
 };
@@ -80,7 +82,7 @@ export interface ArrayFormField<
   kind: 'array';
   fieldset: {
     [K in keyof TValue[number]]: PrimitiveFormField<TValue[number][K], TData> & {
-      shouldRender?: (fieldset: TValue[number]) => boolean;
+      shouldRender?: (fieldset: Nullable<TValue[number]>) => boolean;
     };
   };
 }

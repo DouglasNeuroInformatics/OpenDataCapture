@@ -43,7 +43,8 @@ export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setAr
               },
               ...fieldset[fieldName]
             };
-            return <PrimitiveFormField key={fieldName} {...(props as PrimitiveFormFieldProps)} />;
+            const shouldRender = props.shouldRender === undefined || props.shouldRender(fields);
+            return shouldRender ? <PrimitiveFormField key={fieldName} {...(props as PrimitiveFormFieldProps)} /> : null;
           })}
         </div>
       ))}
