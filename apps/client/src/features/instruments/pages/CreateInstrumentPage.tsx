@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 
-import { FormInstrumentBuilder } from '../components/FormInstrumentBuilder';
+import { FormCreator } from '../components/FormCreator';
 
 import { PageHeader } from '@/components';
 
@@ -11,7 +11,7 @@ export const CreateInstrumentPage = () => {
   return (
     <div>
       <PageHeader title={t('createInstrument.pageTitle')} />
-      <FormInstrumentBuilder />
+      <FormCreator />
     </div>
   );
 };

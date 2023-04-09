@@ -3,7 +3,7 @@
     "pageTitle": "Add Instrument",
     "form": {
       "title": {
-        "label": "Field Name"
+        "label": "Title"
       },
       "description": {
         "label": "Description"

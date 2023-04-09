@@ -3,10 +3,10 @@
     "pageTitle": "Ajouter un instrument",
     "form": {
       "title": {
-        "label": "Nom du champ"
+        "label": "Titre"
       },
       "description": {
-        "label": "Description du champ"
+        "label": "Description"
       },
       "language": {
         "label": "Langue"

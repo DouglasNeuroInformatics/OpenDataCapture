@@ -1,6 +1,6 @@
 import { Language } from '../../../core';
 
-export interface FormDetails {
+export type FormDetails = {
   /** The title of the instrument in the language it is written, omitting the definite article */
   title: string;
 
@@ -15,4 +15,4 @@ export interface FormDetails {
 
   /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
   estimatedDuration: number;
-}
+};
