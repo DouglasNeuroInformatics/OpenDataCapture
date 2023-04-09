@@ -1,20 +1,29 @@
 /* eslint-disable no-alert */
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { FormFieldKind, TextFormField } from '@ddcp/common';
 
 import { Form } from '@/components';
+import { StepperContext } from '@/context/StepperContext';
 
-type FieldsFormData = {
+export type FieldsFormData = {
   fields: Array<{
+    name: string;
     kind: FormFieldKind;
     label: string;
     description: string;
     variant?: TextFormField['variant'];
+    options?: string;
   }>;
 };
 
-export const FieldsForm = () => {
+export interface FieldsFormProps {
+  onSubmit: (data: FieldsFormData) => void;
+}
+
+export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
+  const { updateIndex } = useContext(StepperContext);
+
   return (
     <Form<FieldsFormData>
       content={{
@@ -22,6 +31,11 @@ export const FieldsForm = () => {
           kind: 'array',
           label: 'Field',
           fieldset: {
+            name: {
+              kind: 'text',
+              label: 'Name',
+              variant: 'short'
+            },
             kind: {
               kind: 'options',
               label: 'Kind',
@@ -53,6 +67,13 @@ export const FieldsForm = () => {
                 password: 'Password'
               },
               shouldRender: ({ kind }) => kind === 'text'
+            },
+            options: {
+              description: 'Please enter all options',
+              kind: 'text',
+              label: 'Options',
+              variant: 'long',
+              shouldRender: ({ kind }) => kind === 'options'
             }
           }
         }
@@ -61,7 +82,10 @@ export const FieldsForm = () => {
         type: 'object',
         required: []
       }}
-      onSubmit={(data) => alert(JSON.stringify(data, null, 2))}
+      onSubmit={(data) => {
+        onSubmit(data);
+        updateIndex('increment');
+      }}
     />
   );
 };
