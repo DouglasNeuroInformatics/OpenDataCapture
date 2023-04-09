@@ -13,7 +13,9 @@ export type SimpleFormData = Record<string, PrimitiveFieldValue>;
 
 export type SimpleForm<T extends SimpleFormData = SimpleFormData> = Omit<FormInstrument<T>, 'content'> & {
   content: {
-    [key: string]: BaseFormField;
+    [key: string]: BaseFormField & {
+      variant?: string;
+    };
   };
 };
 

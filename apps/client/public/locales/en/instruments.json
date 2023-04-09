@@ -1,6 +1,6 @@
 {
   "createInstrument": {
-    "pageTitle": "Add Instrument",
+    "pageTitle": "Add Instrument (Experimental)",
     "form": {
       "title": {
         "label": "Title"
