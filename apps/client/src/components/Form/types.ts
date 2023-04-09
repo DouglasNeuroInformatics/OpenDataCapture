@@ -24,5 +24,7 @@ export type FormValues<T extends FormInstrumentData = FormInstrumentData> = {
     ? NullablePrimitiveFieldValue<T[K]>
     : T[K] extends ArrayFieldValue
     ? NullableArrayFieldValue<T[K]>
+    : T[K] extends PrimitiveFieldValue | ArrayFieldValue
+    ? NullablePrimitiveFieldValue | NullableArrayFieldValue
     : never;
 };

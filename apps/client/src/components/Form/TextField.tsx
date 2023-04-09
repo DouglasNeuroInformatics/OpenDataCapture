@@ -6,7 +6,7 @@ import { clsx } from 'clsx';
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-export type TextFieldProps = BaseFieldProps<string> & TextFormField;
+export type TextFieldProps = BaseFieldProps<string | null> & TextFormField;
 
 export const TextField = ({ description, name, label, variant, error, value, setValue }: TextFieldProps) => {
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
@@ -21,11 +21,17 @@ export const TextField = ({ description, name, label, variant, error, value, set
           className="field-input peer"
           name={name}
           type={variant === 'short' ? 'text' : 'password'}
-          value={value}
+          value={value ?? ''}
           onChange={handleChange}
         />
       ) : (
-        <textarea autoComplete="off" className="field-input peer" rows={5} value={value} onChange={handleChange} />
+        <textarea
+          autoComplete="off"
+          className="field-input peer"
+          rows={5}
+          value={value ?? ''}
+          onChange={handleChange}
+        />
       )}
       <label
         className={clsx('field-label field-label-floating peer-focus:field-label-floating--active', {

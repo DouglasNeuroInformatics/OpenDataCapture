@@ -6,8 +6,18 @@ export type ArrayFieldValue = Record<string, PrimitiveFieldValue>[];
 
 export type FormInstrumentData = Record<string, PrimitiveFieldValue | ArrayFieldValue>;
 
-export type DependentConditions<T extends PrimitiveFieldValue> = {
+export type DependentConditions<T extends PrimitiveFieldValue = PrimitiveFieldValue> = {
   equals: T;
+};
+
+export type DependsOn<TData extends FormInstrumentData = FormInstrumentData> = {
+  [K in keyof TData]?: [TData[K]] extends [PrimitiveFieldValue]
+    ? DependentConditions<TData[K]>
+    : TData[K] extends ArrayFieldValue
+    ? Array<{
+        [P in keyof TData[K][number]]?: DependentConditions<TData[K][number][P]>;
+      }>
+    : DependentConditions | Array<Record<string, DependentConditions>>;
 };
 
 export interface BaseFormField<TData extends FormInstrumentData = FormInstrumentData> {
@@ -23,15 +33,7 @@ export interface BaseFormField<TData extends FormInstrumentData = FormInstrument
   /** Whether or not the field is required */
   isRequired?: boolean;
 
-  dependsOn?: {
-    [K in keyof TData]?: [TData[K]] extends [PrimitiveFieldValue]
-      ? DependentConditions<TData[K]>
-      : TData[K] extends ArrayFieldValue
-      ? {
-          [P in keyof TData[K][number]]?: DependentConditions<TData[K][number][P]>;
-        }
-      : any;
-  };
+  dependsOn?: DependsOn<TData>;
 }
 
 export interface TextFormField<TData extends FormInstrumentData = FormInstrumentData> extends BaseFormField<TData> {
