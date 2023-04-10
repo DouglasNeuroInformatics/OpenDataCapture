@@ -22,7 +22,11 @@ export type SimpleForm<T extends SimpleFormData = SimpleFormData> = Omit<FormIns
 
 export const FormCreator = () => {
   const [state, setState] = useState<Partial<SimpleForm>>({
-    kind: 'form'
+    kind: 'form',
+    validationSchema: {
+      type: 'object',
+      required: []
+    }
   });
 
   const { t } = useTranslation('instruments');
