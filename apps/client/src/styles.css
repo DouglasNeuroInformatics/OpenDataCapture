@@ -13,11 +13,11 @@
   }
 
   input[type='range']::-moz-range-track {
-    @apply h-2 rounded-md bg-slate-600;
+    @apply h-2 rounded-md bg-slate-500;
   }
 
   input[type='range']::-webkit-slider-runnable-track {
-    @apply h-2 rounded-md bg-slate-600;
+    @apply h-2 rounded-md bg-slate-500;
   }
 
   input[type='range']::-moz-range-thumb {

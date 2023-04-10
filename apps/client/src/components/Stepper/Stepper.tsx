@@ -27,7 +27,7 @@ const Stepper = ({ steps }: StepperProps) => {
 
   return (
     <StepperContext.Provider value={{ index, updateIndex }}>
-      <div className="mx-2 mb-16 flex items-center print:hidden">
+      <div className="mb-16 flex items-center print:hidden">
         {steps.map((step, i) => (
           <React.Fragment key={i}>
             <StepperIcon icon={step.icon} label={step.label} variant={i === index ? 'dark' : 'light'} />
