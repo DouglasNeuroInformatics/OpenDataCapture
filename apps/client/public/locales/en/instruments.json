@@ -1,7 +1,23 @@
 {
   "createInstrument": {
     "pageTitle": "Add Instrument (Experimental)",
+    "steps": {
+      "info": "Info",
+      "fields": "Fields",
+      "review": "Review"
+    },
     "form": {
+      "basics": "Basics",
+      "name": {
+        "label": "Name"
+      },
+      "tags": {
+        "label": "Tags"
+      },
+      "version": {
+        "label": "Version"
+      },
+      "details": "Details",
       "title": {
         "label": "Title"
       },

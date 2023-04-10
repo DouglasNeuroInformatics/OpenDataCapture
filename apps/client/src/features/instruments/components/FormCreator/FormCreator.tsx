@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { BaseFormField, FormInstrument, PrimitiveFieldValue } from '@ddcp/common';
+import { useTranslation } from 'react-i18next';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 
 import { FieldsForm, FieldsFormData } from './FieldsForm';
@@ -24,6 +25,8 @@ export const FormCreator = () => {
     kind: 'form'
   });
 
+  const { t } = useTranslation('instruments');
+
   const handleSubmitDetails = ({ name, tags, version, ...details }: InfoFormData) => {
     setState((prevState) => ({
       ...prevState,
@@ -46,17 +49,17 @@ export const FormCreator = () => {
     <Stepper
       steps={[
         {
-          label: 'Info',
+          label: t('createInstrument.steps.info'),
           icon: <HiOutlineQuestionMarkCircle />,
           element: <InfoForm onSubmit={handleSubmitDetails} />
         },
         {
-          label: 'Fields',
+          label: t('createInstrument.steps.fields'),
           icon: <HiOutlineQuestionMarkCircle />,
           element: <FieldsForm onSubmit={handleSubmitFields} />
         },
         {
-          label: 'Review',
+          label: t('createInstrument.steps.review'),
           icon: <HiOutlineQuestionMarkCircle />,
           element: <Review form={state} />
         }

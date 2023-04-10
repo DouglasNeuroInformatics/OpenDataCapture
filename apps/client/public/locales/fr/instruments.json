@@ -1,7 +1,23 @@
 {
   "createInstrument": {
     "pageTitle": "Ajouter un instrument (Expérimental)",
+    "steps": {
+      "info": "Info",
+      "fields": "Champs",
+      "review": "Révision"
+    },
     "form": {
+      "basics": "De base",
+      "name": {
+        "label": "Nom"
+      },
+      "tags": {
+        "label": "Tags"
+      },
+      "version": {
+        "label": "Version"
+      },
+      "details": "Détails",
       "title": {
         "label": "Titre"
       },

@@ -23,28 +23,28 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
     <Form<InfoFormData>
       content={[
         {
-          title: 'Basics',
+          title: t('instruments:createInstrument.form.basics'),
           fields: {
             name: {
               kind: 'text',
-              label: 'Name',
+              label: t('instruments:createInstrument.form.name.label'),
               variant: 'short'
             },
             tags: {
               kind: 'text',
-              label: 'Tags',
+              label: t('instruments:createInstrument.form.tags.label'),
               variant: 'short'
             },
             version: {
               kind: 'numeric',
-              label: 'Version',
+              label: t('instruments:createInstrument.form.version.label'),
               min: 0,
               max: 10
             }
           }
         },
         {
-          title: 'Details',
+          title: t('instruments:createInstrument.form.details'),
           fields: {
             title: {
               kind: 'text',
