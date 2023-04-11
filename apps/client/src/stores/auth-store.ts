@@ -14,6 +14,7 @@ export interface AuthStore {
   setAccessToken: (accessToken: string) => void;
   currentUser: CurrentUser | null;
   currentGroup: Group | null;
+  setCurrentGroup: (group: Group) => void;
   logout: () => void;
 }
 
@@ -30,6 +31,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
   currentUser: null,
   currentGroup: null,
+  setCurrentGroup: (group) => {
+    set({ currentGroup: group });
+  },
   logout: () => {
     useActiveSubjectStore.setState({ activeSubject: null });
     set({ accessToken: null, currentUser: null });
