@@ -70,18 +70,20 @@ export class FormRecordsService {
     return this.formRecordsModel.find(filter).accessibleBy(ability).populate('group instrument');
   }
 
-  async summary(ability: AppAbility): Promise<FormInstrumentRecordsSummary> {
+  async summary(ability: AppAbility, groupName?: string): Promise<FormInstrumentRecordsSummary> {
+    const group = groupName ? await this.groupsService.findByName(groupName, ability) : undefined;
     return {
-      count: await this.formRecordsModel.find().accessibleBy(ability).count()
+      count: await this.formRecordsModel.find({ group }).accessibleBy(ability).count()
     };
   }
 
-  async export(ability: AppAbility): Promise<InstrumentRecordsExport> {
-    const subjects = await this.subjectsService.findAll(ability);
+  async export(ability: AppAbility, groupName?: string): Promise<InstrumentRecordsExport> {
+    const group = groupName ? await this.groupsService.findByName(groupName, ability) : undefined;
+    const subjects = await this.subjectsService.findAll(ability, groupName);
     const data: InstrumentRecordsExport = [];
     for (let i = 0; i < subjects.length; i++) {
       const subject = subjects[i];
-      const records = await this.formRecordsModel.find({ kind: 'form', subject }, undefined, ['instrument']);
+      const records = await this.formRecordsModel.find({ kind: 'form', group, subject }, undefined, ['instrument']);
       for (let j = 0; j < records.length; j++) {
         const record = records[j];
         for (const measure of Object.keys(record.data)) {

@@ -36,14 +36,17 @@ export class FormRecordsController {
   @ApiOperation({ description: 'Summarize Available Form Records' })
   @Get('summary')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  summary(@UserAbility() ability: AppAbility): Promise<FormInstrumentRecordsSummary> {
-    return this.formRecordsService.summary(ability);
+  summary(
+    @UserAbility() ability: AppAbility,
+    @Query('group') groupName?: string
+  ): Promise<FormInstrumentRecordsSummary> {
+    return this.formRecordsService.summary(ability, groupName);
   }
 
   @ApiOperation({ description: 'Export Records' })
   @Get('export')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  export(@UserAbility() ability: AppAbility): Promise<InstrumentRecordsExport> {
-    return this.formRecordsService.export(ability);
+  export(@UserAbility() ability: AppAbility, @Query('group') groupName?: string): Promise<InstrumentRecordsExport> {
+    return this.formRecordsService.export(ability, groupName);
   }
 }
