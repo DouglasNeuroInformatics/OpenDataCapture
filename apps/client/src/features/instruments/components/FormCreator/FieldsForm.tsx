@@ -58,22 +58,28 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
               label: 'Description',
               variant: 'short'
             },
-            variant: {
-              kind: 'options',
-              label: 'Variant',
-              options: {
-                short: 'Short',
-                long: 'Long',
-                password: 'Password'
-              },
-              shouldRender: ({ kind }) => kind === 'text'
+            variant: ({ kind }) => {
+              return kind === 'text'
+                ? {
+                    kind: 'options',
+                    label: 'Variant',
+                    options: {
+                      short: 'Short',
+                      long: 'Long',
+                      password: 'Password'
+                    }
+                  }
+                : null;
             },
-            options: {
-              description: 'Please enter all options',
-              kind: 'text',
-              label: 'Options',
-              variant: 'long',
-              shouldRender: ({ kind }) => kind === 'options'
+            options: ({ kind }) => {
+              return kind === 'options'
+                ? {
+                    description: 'Please enter all options',
+                    kind: 'text',
+                    label: 'Options',
+                    variant: 'long'
+                  }
+                : null;
             }
           }
         }

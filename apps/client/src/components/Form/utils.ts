@@ -3,14 +3,6 @@ import { ErrorObject } from 'ajv';
 
 import { FormErrors, FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
 
-export const DEFAULT_PRIMITIVE_VALUES = {
-  text: '',
-  options: '',
-  date: '',
-  numeric: null,
-  binary: null
-};
-
 /** Extract a flat array of form fields from the content. This function assumes there are no duplicate keys in groups  */
 export function getFormFields<T extends FormInstrumentData>(content: FormInstrumentContent<T>): FormFields<T> {
   let fields: FormFields<T>;
@@ -34,12 +26,11 @@ export const getDefaultValues = <T extends FormInstrumentData>(content: FormInst
     if (field.kind === 'array') {
       const defaultItemValues: NullableArrayFieldValue[number] = {};
       for (const subfieldName in field.fieldset) {
-        const subfield = field.fieldset[subfieldName];
-        defaultItemValues[subfieldName] = DEFAULT_PRIMITIVE_VALUES[subfield.kind];
+        defaultItemValues[subfieldName] = null;
       }
       defaultValues[fieldName] = [defaultItemValues];
     } else {
-      defaultValues[fieldName] = DEFAULT_PRIMITIVE_VALUES[field.kind];
+      defaultValues[fieldName] = null;
     }
   }
   return defaultValues as FormValues<T>;

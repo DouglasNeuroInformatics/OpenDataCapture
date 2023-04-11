@@ -6,18 +6,12 @@ import { Button } from '../Button';
 
 import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormField';
 import { BaseFieldProps, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
-import { DEFAULT_PRIMITIVE_VALUES } from './utils';
 
 export type ArrayFieldProps = BaseFieldProps<NullableArrayFieldValue> & ArrayFormField;
 
 export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setArrayValue }: ArrayFieldProps) => {
   const appendField = () => {
-    setArrayValue([
-      ...arrayValue,
-      Object.fromEntries(
-        Object.keys(fieldset).map((fieldName) => [fieldName, DEFAULT_PRIMITIVE_VALUES[fieldset[fieldName].kind]])
-      )
-    ]);
+    setArrayValue([...arrayValue, Object.fromEntries(Object.keys(fieldset).map((fieldName) => [fieldName, null]))]);
   };
 
   const removeField = () => {
@@ -33,6 +27,11 @@ export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setAr
         <div key={i}>
           <span className="field-header">{label + ' ' + (i + 1)}</span>
           {Object.keys(fields).map((fieldName) => {
+            const field = fieldset[fieldName];
+            const fieldProps = field instanceof Function ? field(fields) : field;
+            if (!fieldProps) {
+              return null;
+            }
             const props = {
               name: fieldName + i,
               value: fields[fieldName],
@@ -41,10 +40,9 @@ export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setAr
                 newArrayValue[i][fieldName] = value;
                 setArrayValue(newArrayValue);
               },
-              ...fieldset[fieldName]
-            };
-            const shouldRender = props.shouldRender === undefined || props.shouldRender(fields);
-            return shouldRender ? <PrimitiveFormField key={fieldName} {...(props as PrimitiveFormFieldProps)} /> : null;
+              ...fieldProps
+            } as PrimitiveFormFieldProps;
+            return <PrimitiveFormField key={fieldName} {...props} />;
           })}
         </div>
       ))}

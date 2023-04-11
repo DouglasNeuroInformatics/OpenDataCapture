@@ -134,10 +134,9 @@ export const arrayFieldSchema: JSONSchemaType<ArrayFormField> = {
     },
     fieldset: {
       type: 'object',
-      /*
       patternProperties: {
         '^.*$': primitiveFieldSchema
-      },*/
+      },
       minProperties: 1,
       required: []
     }
