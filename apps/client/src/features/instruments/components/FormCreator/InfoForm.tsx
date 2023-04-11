@@ -39,7 +39,8 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
               kind: 'numeric',
               label: t('instruments:createInstrument.form.version.label'),
               min: 0,
-              max: 10
+              max: 10,
+              variant: 'default'
             }
           }
         },
@@ -73,7 +74,8 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
               kind: 'numeric',
               label: t('instruments:createInstrument.form.estimatedDuration.label'),
               min: 1,
-              max: 60
+              max: 60,
+              variant: 'slider'
             }
           }
         }

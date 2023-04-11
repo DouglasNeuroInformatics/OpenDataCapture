@@ -47,6 +47,7 @@ export interface NumericFormField<TData extends FormInstrumentData = FormInstrum
   kind: 'numeric';
   min: number;
   max: number;
+  variant: 'default' | 'slider';
 }
 
 export interface OptionsFormField<TValue extends string = string, TData extends FormInstrumentData = FormInstrumentData>

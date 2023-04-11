@@ -19,7 +19,8 @@ type BasicFormValues = {
   textShort: string;
   textLong: string;
   textPassword: string;
-  numeric: number;
+  numericDefault: number;
+  numericSlider: number;
   options: 'a' | 'b' | 'c';
   date: string;
   binary: boolean;
@@ -43,12 +44,21 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
         label: 'Password',
         variant: 'password'
       },
-      numeric: {
+      numericDefault: {
         description: 'This is a numeric field',
         kind: 'numeric',
         label: 'Numeric',
         min: 0,
-        max: 10
+        max: 10,
+        variant: 'default'
+      },
+      numericSlider: {
+        description: 'This is a numeric field',
+        kind: 'numeric',
+        label: 'Numeric',
+        min: 0,
+        max: 10,
+        variant: 'slider'
       },
       options: {
         kind: 'options',
@@ -99,7 +109,8 @@ export const ArrayForm: StoryObj<typeof Form<ArrayFormValues>> = {
             kind: 'numeric',
             label: 'Field 2',
             min: 0,
-            max: 10
+            max: 10,
+            variant: 'slider'
           }
         }
       }

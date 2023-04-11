@@ -33,7 +33,8 @@ export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> 
       description: "The subject's overall happiness from 1 through 10",
       isRequired: true,
       min: 0,
-      max: 10
+      max: 10,
+      variant: 'slider'
     }
   },
   validationSchema: {

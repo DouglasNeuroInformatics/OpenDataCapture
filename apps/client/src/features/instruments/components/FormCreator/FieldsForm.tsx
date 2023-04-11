@@ -1,7 +1,7 @@
 /* eslint-disable no-alert */
 import React, { useContext } from 'react';
 
-import { FormFieldKind, TextFormField } from '@ddcp/common';
+import { FormFieldKind, NumericFormField, TextFormField } from '@ddcp/common';
 
 import { Form } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
@@ -12,7 +12,7 @@ export type FieldsFormData = {
     kind: FormFieldKind;
     label: string;
     description: string;
-    variant?: TextFormField['variant'];
+    variant?: TextFormField['variant'] | NumericFormField['variant'];
     options?: string;
   }>;
 };
@@ -59,17 +59,28 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
               variant: 'short'
             },
             variant: ({ kind }) => {
-              return kind === 'text'
-                ? {
-                    kind: 'options',
-                    label: 'Variant',
+              const base = { kind: 'options', label: 'Variant' } as const;
+              switch (kind) {
+                case 'numeric':
+                  return {
+                    ...base,
+                    options: {
+                      default: 'Default',
+                      slider: 'Slider'
+                    }
+                  };
+                case 'text':
+                  return {
+                    ...base,
                     options: {
                       short: 'Short',
                       long: 'Long',
                       password: 'Password'
                     }
-                  }
-                : null;
+                  };
+                default:
+                  return null;
+              }
             },
             options: ({ kind }) => {
               return kind === 'options'
