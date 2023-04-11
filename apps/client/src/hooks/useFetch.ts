@@ -23,6 +23,7 @@ type UseFetchOptions = GetRequestOptions | PostRequestOptions;
  */
 export function useFetch<T = unknown>(
   resourceURL: string,
+  deps: readonly unknown[] = [],
   options: UseFetchOptions = {
     method: 'GET'
   }
@@ -59,7 +60,7 @@ export function useFetch<T = unknown>(
           message
         });
       });
-  }, []);
+  }, deps);
 
   return { data };
 }

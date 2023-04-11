@@ -20,9 +20,11 @@ export const OverviewPage = () => {
   const groupQuery = currentGroup ? `?group=${currentGroup.name}` : '';
 
   const forms = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
-  const records = useFetch<FormInstrumentRecordsSummary>('/instruments/records/forms/summary' + groupQuery);
-  const subjects = useFetch<Subject[]>('/subjects' + groupQuery);
-  const users = useFetch<User[]>('/users' + groupQuery);
+  const records = useFetch<FormInstrumentRecordsSummary>('/instruments/records/forms/summary' + groupQuery, [
+    currentGroup
+  ]);
+  const subjects = useFetch<Subject[]>('/subjects' + groupQuery, [currentGroup]);
+  const users = useFetch<User[]>('/users' + groupQuery, [currentGroup]);
 
   if (!(forms.data && records.data && subjects.data && users.data)) {
     return <Spinner />;
