@@ -47,7 +47,7 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       numericDefault: {
         description: 'This is a numeric field',
         kind: 'numeric',
-        label: 'Numeric',
+        label: 'Numeric (Default)',
         min: 0,
         max: 10,
         variant: 'default'
@@ -55,7 +55,7 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       numericSlider: {
         description: 'This is a numeric field',
         kind: 'numeric',
-        label: 'Numeric',
+        label: 'Numeric (Slider)',
         min: 0,
         max: 10,
         variant: 'slider'
