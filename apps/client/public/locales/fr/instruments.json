@@ -40,6 +40,14 @@
     "filters": {
       "language": "Langue",
       "tags": "Tags"
+    },
+    "deleteModal": {
+      "title": "Confirmation de l'effacement",
+      "name": "Nom",
+      "language": "Langue",
+      "version": "Version",
+      "delete": "Effacer",
+      "cancel": "Annuler"
     }
   },
   "formPage": {

@@ -7,7 +7,7 @@ export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button
   iconPosition?: 'left' | 'right';
   label: string;
   size?: 'sm' | 'md' | 'lg';
-  variant?: 'dark' | 'light';
+  variant?: 'dark' | 'light' | 'red';
 }
 
 export const Button = React.forwardRef(function Button(
@@ -21,7 +21,8 @@ export const Button = React.forwardRef(function Button(
         'text-md py-2 px-6': size === 'md',
         'py-3 px-8 text-lg': size === 'lg',
         'btn-dark': variant === 'dark',
-        'btn-light': variant === 'light'
+        'btn-light': variant === 'light',
+        'btn-red': variant === 'red'
       })}
       ref={ref}
       {...props}

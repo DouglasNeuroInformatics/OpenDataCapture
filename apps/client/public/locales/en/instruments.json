@@ -40,6 +40,14 @@
     "filters": {
       "language": "Language",
       "tags": "Tags"
+    },
+    "deleteModal": {
+      "title": "Confirmation",
+      "name": "Name",
+      "language": "Language",
+      "version": "Version",
+      "delete": "Delete",
+      "cancel": "Cancel"
     }
   },
   "formPage": {

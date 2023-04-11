@@ -44,6 +44,10 @@
     @apply text-cello-900 bg-peppermint-50 border-2;
   }
 
+  .btn-red {
+    @apply bg-red-600 text-white;
+  }
+
   .field-input-base {
     @apply w-full bg-transparent py-2 text-left text-slate-900 hover:border-slate-300 focus:border-indigo-800 focus:outline-none;
     min-height: 42px;
