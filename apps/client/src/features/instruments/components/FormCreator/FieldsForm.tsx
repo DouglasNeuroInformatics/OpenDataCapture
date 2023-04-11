@@ -14,6 +14,8 @@ export type FieldsFormData = {
     description?: string;
     variant?: TextFormField['variant'] | NumericFormField['variant'];
     options?: string;
+    min?: number;
+    max?: number;
   }>;
 };
 
@@ -91,6 +93,28 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                     variant: 'long'
                   }
                 : null;
+            },
+            min: ({ kind }) => {
+              return kind === 'numeric'
+                ? {
+                    kind: 'numeric',
+                    label: 'Minimum Value',
+                    variant: 'default',
+                    min: 0,
+                    max: Number.MAX_SAFE_INTEGER
+                  }
+                : null;
+            },
+            max: ({ kind }) => {
+              return kind === 'numeric'
+                ? {
+                    kind: 'numeric',
+                    label: 'Maximum Value',
+                    variant: 'default',
+                    min: 0,
+                    max: Number.MAX_SAFE_INTEGER
+                  }
+                : null;
             }
           }
         }
@@ -109,7 +133,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                 },
                 name: {
                   type: 'string',
-                  pattern: '/^S+$/',
+                  pattern: /^\S+$/.source,
                   minLength: 1
                 },
                 label: {
@@ -123,16 +147,71 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                 },
                 variant: {
                   type: 'string',
-                  enum: ['default', 'long', 'password', 'short', 'slider'],
                   nullable: true
                 },
                 options: {
                   type: 'string',
                   minLength: 1,
                   nullable: true
+                },
+                min: {
+                  type: 'number',
+                  nullable: true
+                },
+                max: {
+                  type: 'number',
+                  nullable: true
                 }
               },
-              required: ['kind', 'name', 'label']
+              required: ['kind', 'name', 'label'],
+              allOf: [
+                {
+                  if: {
+                    properties: {
+                      kind: {
+                        const: 'text'
+                      }
+                    }
+                  },
+                  then: {
+                    properties: {
+                      variant: {
+                        type: 'string',
+                        enum: ['short', 'long', 'password']
+                      }
+                    }
+                  }
+                },
+                {
+                  if: {
+                    properties: {
+                      kind: {
+                        const: 'numeric'
+                      }
+                    }
+                  },
+                  then: {
+                    properties: {
+                      variant: {
+                        type: 'string',
+                        enum: ['default', 'slider']
+                      },
+                      min: {
+                        type: 'number',
+                        minimum: 0,
+                        maximum: Number.MAX_SAFE_INTEGER,
+                        nullable: false
+                      },
+                      max: {
+                        type: 'number',
+                        minimum: 0,
+                        maximum: Number.MAX_SAFE_INTEGER,
+                        nullable: false
+                      }
+                    }
+                  }
+                }
+              ]
             }
           }
         },

@@ -90,9 +90,9 @@ export interface ArrayFormField<
 
 export type FormField<TValue, TData extends FormInstrumentData> = [TValue] extends [PrimitiveFieldValue]
   ? PrimitiveFormField<TValue, TData>
-  : TValue extends ArrayFieldValue
+  : [TValue] extends [ArrayFieldValue]
   ? ArrayFormField<TValue, TData>
-  : never;
+  : PrimitiveFormField | ArrayFormField;
 
 export type FormFields<TData extends FormInstrumentData = FormInstrumentData> = {
   [K in keyof TData]: FormField<TData[K], TData>;
