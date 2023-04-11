@@ -1,9 +1,9 @@
-import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { AppAbility } from '@ddcp/common';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserEntity } from './entities/user.entity';
+import { UserDocument } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';
@@ -21,7 +21,7 @@ export class UsersService {
   ) {}
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
-  async create(createUserDto: CreateUserDto, ability: AppAbility): Promise<UserEntity> {
+  async create(createUserDto: CreateUserDto, ability: AppAbility): Promise<UserDocument> {
     const { username, password, basePermissionLevel, groupNames, ...rest } = createUserDto;
     this.logger.verbose(`Attempting to create user: ${username}`);
 
@@ -47,12 +47,12 @@ export class UsersService {
   }
 
   /** Returns an array of all users */
-  async findAll(ability: AppAbility): Promise<UserEntity[]> {
+  async findAll(ability: AppAbility): Promise<UserDocument[]> {
     return this.usersRepository.find().accessibleBy(ability).lean();
   }
 
   /** Returns user with provided username if found, otherwise throws */
-  async findByUsername(username: string): Promise<UserEntity> {
+  async findByUsername(username: string): Promise<UserDocument> {
     const user = await this.usersRepository.findOne({ username });
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);

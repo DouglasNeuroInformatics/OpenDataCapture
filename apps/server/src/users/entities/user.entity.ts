@@ -17,7 +17,7 @@ export class UserEntity implements User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true, type: [{ ref: GroupEntity.name, type: MongooseSchema.Types.ObjectId }] })
+  @Prop({ required: true, type: [{ ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId }] })
   groups: GroupEntity[];
 
   @Prop({ required: false })

@@ -42,6 +42,14 @@ const DEMO_USERS: CreateUserDto[] = [
     firstName: 'Admin'
   },
   {
+    username: 'MultiGroupPI',
+    password: 'password',
+    groupNames: ['Psychosis Clinic', 'Depression Clinic'],
+    basePermissionLevel: BasePermissionLevel.GroupManager,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName()
+  },
+  {
     username: 'PsychosisClinicPI',
     password: 'password',
     groupNames: ['Psychosis Clinic'],

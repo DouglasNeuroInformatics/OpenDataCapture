@@ -12,7 +12,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 
 export const OverviewPage = () => {
-  const { currentUser } = useAuthStore();
+  const { currentUser, currentGroup } = useAuthStore();
   const { t } = useTranslation('overview');
   const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
