@@ -9,10 +9,12 @@ import { BaseFieldProps, NullableArrayFieldValue, NullablePrimitiveFieldValue } 
 
 export type ArrayFieldProps = BaseFieldProps<NullableArrayFieldValue> & ArrayFormField;
 
-export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setArrayValue }: ArrayFieldProps) => {
+export const ArrayField = ({ label, fieldset, error, value: arrayValue, setValue: setArrayValue }: ArrayFieldProps) => {
   const appendField = () => {
     setArrayValue([...arrayValue, Object.fromEntries(Object.keys(fieldset).map((fieldName) => [fieldName, null]))]);
   };
+
+  console.error(error);
 
   const removeField = () => {
     if (arrayValue.length > 1) {
@@ -34,6 +36,7 @@ export const ArrayField = ({ label, fieldset, value: arrayValue, setValue: setAr
             }
             const props = {
               name: fieldName + i,
+              error: error?.[i]?.[fieldName],
               value: fields[fieldName],
               setValue: (value: NullablePrimitiveFieldValue) => {
                 const newArrayValue = [...arrayValue];

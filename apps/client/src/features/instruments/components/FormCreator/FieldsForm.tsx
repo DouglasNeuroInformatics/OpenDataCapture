@@ -11,7 +11,7 @@ export type FieldsFormData = {
     name: string;
     kind: FormFieldKind;
     label: string;
-    description: string;
+    description?: string;
     variant?: TextFormField['variant'] | NumericFormField['variant'];
     options?: string;
   }>;
@@ -97,7 +97,46 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
       }}
       validationSchema={{
         type: 'object',
-        required: []
+        properties: {
+          fields: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                kind: {
+                  type: 'string',
+                  enum: ['array', 'binary', 'date', 'numeric', 'options', 'text']
+                },
+                name: {
+                  type: 'string',
+                  pattern: '/^S+$/',
+                  minLength: 1
+                },
+                label: {
+                  type: 'string',
+                  minLength: 1
+                },
+                description: {
+                  type: 'string',
+                  minLength: 1,
+                  nullable: true
+                },
+                variant: {
+                  type: 'string',
+                  enum: ['default', 'long', 'password', 'short', 'slider'],
+                  nullable: true
+                },
+                options: {
+                  type: 'string',
+                  minLength: 1,
+                  nullable: true
+                }
+              },
+              required: ['kind', 'name', 'label']
+            }
+          }
+        },
+        required: ['fields']
       }}
       onSubmit={(data) => {
         onSubmit(data);

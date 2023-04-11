@@ -9,7 +9,7 @@ import { DatePicker } from '../DatePicker';
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-export type DateFieldProps = BaseFieldProps<string> & DateFormField;
+export type DateFieldProps = BaseFieldProps<string | null> & DateFormField;
 
 export const DateField = ({ description, name, label, error, value, setValue }: DateFieldProps) => {
   const [inputFocused, setInputFocused] = useState(false);
@@ -36,7 +36,7 @@ export const DateField = ({ description, name, label, error, value, setValue }: 
       <input
         autoComplete="off"
         className="field-input"
-        value={value}
+        value={value ?? ''}
         onBlur={() => setInputFocused(false)}
         onChange={(event) => handleChange(event.target.value)}
         onFocus={() => setInputFocused(true)}

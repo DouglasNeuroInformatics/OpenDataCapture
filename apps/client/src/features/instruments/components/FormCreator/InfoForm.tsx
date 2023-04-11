@@ -75,7 +75,7 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
               label: t('instruments:createInstrument.form.estimatedDuration.label'),
               min: 1,
               max: 60,
-              variant: 'slider'
+              variant: 'default'
             }
           }
         }
@@ -85,7 +85,8 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
         properties: {
           name: {
             type: 'string',
-            minLength: 1
+            minLength: 1,
+            pattern: /^\S+$/.source
           },
           tags: {
             type: 'string',
