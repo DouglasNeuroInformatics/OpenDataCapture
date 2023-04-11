@@ -43,6 +43,6 @@ export class FormsController {
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Instrument' })
   remove(@Param('id') id: string): Promise<any> {
-    return Promise.resolve(id);
+    return this.formsService.remove(id);
   }
 }

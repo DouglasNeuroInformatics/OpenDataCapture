@@ -44,7 +44,7 @@ export class FormsService {
   }
 
   async remove(id: string): Promise<FormInstrument> {
-    const result = await this.formModel.findOneAndDelete({ id }, { new: true });
+    const result = await this.formModel.findByIdAndDelete(id, { new: true });
     if (!result) {
       throw new NotFoundException(`Failed to find form with id: ${id}`);
     }
