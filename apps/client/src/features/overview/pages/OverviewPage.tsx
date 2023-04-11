@@ -13,14 +13,14 @@ import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 
 export const OverviewPage = () => {
-  const { currentUser } = useAuthStore();
+  const { currentUser, currentGroup } = useAuthStore();
   const { t } = useTranslation('overview');
   const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
   const forms = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
   const records = useFetch<FormInstrumentRecordsSummary>('/instruments/records/forms/summary');
   const subjects = useFetch<Subject[]>('/subjects');
-  const users = useFetch<User[]>('/users');
+  const users = useFetch<User[]>('/users' + (currentGroup ? `?group=${currentGroup.name}` : ''));
 
   if (!(forms.data && records.data && subjects.data && users.data)) {
     return <Spinner />;
