@@ -5,18 +5,29 @@ import { FormFieldKind, NumericFormField, TextFormField } from '@ddcp/common';
 
 import { Form } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
+import { useNotificationsStore } from '@/stores/notifications-store';
+
+type RawFieldData = {
+  name: string;
+  kind: FormFieldKind;
+  label: string;
+  description?: string;
+  variant?: TextFormField['variant'] | NumericFormField['variant'];
+  options?: string;
+  min?: number;
+  max?: number;
+};
+
+type FieldData = Omit<RawFieldData, 'options'> & {
+  options?: Record<string, string>;
+};
+
+type RawFieldsFormData = {
+  fields: RawFieldData[];
+};
 
 export type FieldsFormData = {
-  fields: Array<{
-    name: string;
-    kind: FormFieldKind;
-    label: string;
-    description?: string;
-    variant?: TextFormField['variant'] | NumericFormField['variant'];
-    options?: string;
-    min?: number;
-    max?: number;
-  }>;
+  fields: FieldData[];
 };
 
 export interface FieldsFormProps {
@@ -25,9 +36,45 @@ export interface FieldsFormProps {
 
 export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
   const { updateIndex } = useContext(StepperContext);
+  const notifications = useNotificationsStore();
+
+  const handleSubmit = (data: RawFieldsFormData) => {
+    let formattedFields: FieldData[];
+    try {
+      formattedFields = data.fields.map(({ options, ...rest }) => {
+        if (options === undefined || options === null) {
+          return { ...rest, options };
+        }
+
+        const formattedOptions: Record<string, string> = Object.fromEntries(
+          options
+            .split('\n')
+            .filter((s) => s)
+            .map((option) => {
+              const items = option.split(':').map((item) => item.trim());
+              if (items.length !== 2) {
+                throw new Error(`Invalid value for option: ${option}`);
+              }
+              return [items[0], items[1]];
+            })
+        );
+
+        return { ...rest, options: formattedOptions };
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        notifications.add({ type: 'error', message: error.message });
+      }
+      console.error(error);
+      return;
+    }
+
+    onSubmit({ ...data, fields: formattedFields });
+    updateIndex('increment');
+  };
 
   return (
-    <Form<FieldsFormData>
+    <Form<RawFieldsFormData>
       content={{
         fields: {
           kind: 'array',
@@ -46,8 +93,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                 numeric: 'Numeric',
                 options: 'Options',
                 date: 'Date',
-                binary: 'Binary',
-                array: 'Array'
+                binary: 'Binary'
               }
             },
             label: {
@@ -87,7 +133,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
             options: ({ kind }) => {
               return kind === 'options'
                 ? {
-                    description: 'Please enter all options',
+                    description: 'Please enter options in the format {KEY}:{LABEL}, separated by newlines',
                     kind: 'text',
                     label: 'Options',
                     variant: 'long'
@@ -129,7 +175,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
               properties: {
                 kind: {
                   type: 'string',
-                  enum: ['array', 'binary', 'date', 'numeric', 'options', 'text']
+                  enum: ['binary', 'date', 'numeric', 'options', 'text']
                 },
                 name: {
                   type: 'string',
@@ -151,7 +197,6 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                 },
                 options: {
                   type: 'string',
-                  minLength: 1,
                   nullable: true
                 },
                 min: {
@@ -178,6 +223,24 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                       variant: {
                         type: 'string',
                         enum: ['short', 'long', 'password']
+                      }
+                    }
+                  }
+                },
+                {
+                  if: {
+                    properties: {
+                      kind: {
+                        const: 'options'
+                      }
+                    }
+                  },
+                  then: {
+                    properties: {
+                      options: {
+                        type: 'string',
+                        minLength: 1,
+                        nullable: false
                       }
                     }
                   }
@@ -217,10 +280,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
         },
         required: ['fields']
       }}
-      onSubmit={(data) => {
-        onSubmit(data);
-        updateIndex('increment');
-      }}
+      onSubmit={handleSubmit}
     />
   );
 };
