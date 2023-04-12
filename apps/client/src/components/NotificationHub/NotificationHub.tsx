@@ -44,10 +44,10 @@ export const NotificationHub = ({
   });
 
   return (
-    <div className="fixed bottom-0 z-50 m-3 w-full">
+    <div className="fixed bottom-0 z-50 w-full">
       {transitions(({ progress, ...style }, item) => (
         <animated.div
-          className="relative w-full max-w-sm rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+          className="relative m-2 max-w-sm rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5"
           style={style}
         >
           <div ref={(ref: HTMLDivElement) => ref && refMap.set(item, ref)}>

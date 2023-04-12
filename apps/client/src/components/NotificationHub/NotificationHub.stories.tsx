@@ -16,7 +16,7 @@ export default {
     (Story) => {
       const notifications = useNotificationsStore();
       return (
-        <div>
+        <div className="border">
           <Story />
           <Button
             label="Add Notification"
@@ -31,4 +31,8 @@ export default {
   ]
 } as Meta<typeof NotificationHub>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: {
+    timeout: 100000
+  }
+};
