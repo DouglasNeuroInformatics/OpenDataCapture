@@ -12,7 +12,7 @@ export * from './Layout';
 export * from './LineGraph';
 export * from './Link';
 export * from './Modal';
-export * from './Notifications';
+export * from './NotificationHub';
 export * from './PageHeader';
 export * from './SearchBar';
 export * from './SelectDropdown';
