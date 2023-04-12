@@ -1,30 +1,22 @@
 import React, { useState } from 'react';
 
 import { FormInstrumentSummary } from '@ddcp/common';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { HiArrowRight, HiPencilSquare, HiXCircle } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
 import { Button, Modal } from '@/components';
 import { useAuthStore } from '@/stores/auth-store';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 export interface InstrumentCardProps {
+  deleteInstrument: (instrument: FormInstrumentSummary) => Promise<void>;
   instrument: FormInstrumentSummary;
 }
 
-export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
+export const InstrumentCard = ({ deleteInstrument, instrument }: InstrumentCardProps) => {
   const { currentUser } = useAuthStore();
-  const notifications = useNotificationsStore();
   const { t } = useTranslation('instruments');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-
-  const deleteInstrument = async () => {
-    await axios.delete(`instruments/forms/${instrument._id}`);
-    notifications.add({ type: 'success' });
-    setIsDeleteConfirmOpen(false);
-  };
 
   return (
     <div className="relative">
@@ -49,7 +41,10 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
             label={t('availableInstruments.deleteModal.delete')}
             type="button"
             variant="red"
-            onClick={deleteInstrument}
+            onClick={() => {
+              setIsDeleteConfirmOpen(false);
+              void deleteInstrument(instrument);
+            }}
           />
           <Button
             label={t('availableInstruments.deleteModal.cancel')}

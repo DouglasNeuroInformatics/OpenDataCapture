@@ -29,6 +29,7 @@ export function useFetch<T = unknown>(
   }
 ): {
   data: T | null;
+  setData: React.Dispatch<React.SetStateAction<T | null>>;
 } {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
@@ -62,5 +63,5 @@ export function useFetch<T = unknown>(
       });
   }, deps);
 
-  return { data };
+  return { data, setData };
 }

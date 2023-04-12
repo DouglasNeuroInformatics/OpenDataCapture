@@ -9,9 +9,10 @@ import { SearchBar, SelectDropdown } from '@/components';
 
 export interface InstrumentShowcaseProps {
   instruments: FormInstrumentSummary[];
+  deleteInstrument: (instrument: FormInstrumentSummary) => Promise<void>;
 }
 
-export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => {
+export const InstrumentShowcase = ({ deleteInstrument, instruments }: InstrumentShowcaseProps) => {
   const { i18n, t } = useTranslation(['common', 'instruments']);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,7 +56,7 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
       </div>
       <div className="grid grid-cols-1 gap-5">
         {filteredInstruments.map((instrument, i) => (
-          <InstrumentCard instrument={instrument} key={i} />
+          <InstrumentCard deleteInstrument={deleteInstrument} instrument={instrument} key={i} />
         ))}
       </div>
     </div>
