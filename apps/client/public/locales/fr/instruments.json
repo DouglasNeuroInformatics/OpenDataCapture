@@ -33,6 +33,10 @@
       "estimatedDuration": {
         "label": "Durée prévue"
       }
+    },
+    "errors": {
+      "duplicateField": "Nom de champ en double invalide",
+      "invalidOptionFormat": "Format non valide pour l'option"
     }
   },
   "availableInstruments": {

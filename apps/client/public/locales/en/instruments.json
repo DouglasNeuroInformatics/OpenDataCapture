@@ -33,6 +33,10 @@
       "estimatedDuration": {
         "label": "Estimated Duration"
       }
+    },
+    "errors": {
+      "duplicateField": "Invalid duplicate field name",
+      "invalidOptionFormat": "Invalid format for option"
     }
   },
   "availableInstruments": {

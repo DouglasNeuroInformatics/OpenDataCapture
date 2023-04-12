@@ -2,6 +2,7 @@
 import React, { useContext } from 'react';
 
 import { FormFieldKind, NumericFormField, TextFormField } from '@ddcp/common';
+import { useTranslation } from 'react-i18next';
 
 import { Form } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
@@ -37,13 +38,20 @@ export interface FieldsFormProps {
 export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
   const { updateIndex } = useContext(StepperContext);
   const notifications = useNotificationsStore();
+  const { t } = useTranslation('instruments');
 
   const handleSubmit = (data: RawFieldsFormData) => {
+    const fieldNames: string[] = [];
     let formattedFields: FieldData[];
     try {
-      formattedFields = data.fields.map(({ options, ...rest }) => {
+      formattedFields = data.fields.map(({ options, name, ...rest }) => {
+        if (fieldNames.includes(name)) {
+          throw new Error(`${t('createInstrument.errors.duplicateField')}: '${name}'`);
+        }
+        fieldNames.push(name);
+
         if (options === undefined || options === null) {
-          return { ...rest, options };
+          return { ...rest, name, options };
         }
 
         const formattedOptions: Record<string, string> = Object.fromEntries(
@@ -53,13 +61,13 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
             .map((option) => {
               const items = option.split(':').map((item) => item.trim());
               if (items.length !== 2) {
-                throw new Error(`Invalid value for option: ${option}`);
+                throw new Error(`${t('createInstrument.errors.invalidOptionFormat')}: '${option}'`);
               }
               return [items[0], items[1]];
             })
         );
 
-        return { ...rest, options: formattedOptions };
+        return { ...rest, name, options: formattedOptions };
       });
     } catch (error) {
       if (error instanceof Error) {
