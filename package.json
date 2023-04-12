@@ -12,6 +12,7 @@
     "build": "env-cmd cross-env NODE_ENV=production turbo run build",
     "check-types": "turbo run check-types",
     "clean": "fd -H -I --prune \".turbo|dist|node_modules\" --exec rm -rf",
+    "demo": "env-cmd turbo run demo",
     "dev": "env-cmd cross-env NODE_ENV=development turbo run dev",
     "format": "turbo run format",
     "lint": "turbo run lint",
