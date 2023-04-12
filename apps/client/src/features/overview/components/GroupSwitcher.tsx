@@ -1,12 +1,14 @@
 import React from 'react';
 
 import { Menu, Transition } from '@headlessui/react';
+import { useTranslation } from 'react-i18next';
 import { HiChevronDown } from 'react-icons/hi';
 
 import { useAuthStore } from '@/stores/auth-store';
 
 export const GroupSwitcher = () => {
   const { currentUser, currentGroup, setCurrentGroup } = useAuthStore();
+  const { t } = useTranslation('overview');
 
   // unless the user is an admin, this is set at login
   if (!currentGroup) {
@@ -16,7 +18,7 @@ export const GroupSwitcher = () => {
   return (
     <Menu as="div" className="relative my-2 w-fit">
       <Menu.Button className="flex items-center justify-center">
-        Current Group:&nbsp;{currentGroup?.name}
+        {t('currentGroup')}:&nbsp;{currentGroup?.name}
         <HiChevronDown className="mx-1" />
       </Menu.Button>
       <Transition
