@@ -21,13 +21,17 @@ export const SelectDropdown = <T extends SelectOption>({
   options,
   title,
   onChange,
-  defaultSelections
+  defaultSelections // be careful with object equality here
 }: SelectDropdownProps<T>) => {
-  const [selected, setSelected] = useState<T[]>(options.filter((item) => defaultSelections?.includes(item.key)));
+  const [selected, setSelected] = useState<T[]>([]);
 
   useEffect(() => {
     onChange(selected);
   }, [selected]);
+
+  useEffect(() => {
+    setSelected(options.filter((item) => defaultSelections?.includes(item.key)));
+  }, [defaultSelections]);
 
   // Here we specify the key prop of objects for comparison
   return (

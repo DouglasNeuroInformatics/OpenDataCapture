@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { FormInstrumentSummary, Language } from '@ddcp/common';
 import { useTranslation } from 'react-i18next';
@@ -14,10 +14,13 @@ export interface InstrumentShowcaseProps {
 
 export const InstrumentShowcase = ({ deleteInstrument, instruments }: InstrumentShowcaseProps) => {
   const { i18n, t } = useTranslation(['common', 'instruments']);
-
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<Language[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const defaultLanguageOptions = useMemo<Language[]>(() => {
+    return [i18n.resolvedLanguage as Language];
+  }, [i18n.resolvedLanguage]);
 
   const languageOptions = Array.from(new Set(instruments.map((item) => item.details.language))).map((item) => ({
     key: item,
@@ -42,7 +45,7 @@ export const InstrumentShowcase = ({ deleteInstrument, instruments }: Instrument
         <SearchBar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <SelectDropdown
-            defaultSelections={[i18n.resolvedLanguage as Language]}
+            defaultSelections={defaultLanguageOptions}
             options={languageOptions}
             title={t('instruments:availableInstruments.filters.language')}
             onChange={(selected) => setSelectedLanguages(selected.map((item) => item.key))}
