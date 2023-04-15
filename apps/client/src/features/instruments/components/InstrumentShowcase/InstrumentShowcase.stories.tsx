@@ -18,7 +18,7 @@ function createDummyInstrument(n: number): FormInstrumentSummary {
     details: {
       title: 'My Instrument ' + n,
       description: 'This is my instrument',
-      language: Random.value(['en', 'fr']),
+      language: n % 2 ? 'en' : 'fr',
       instructions: 'Please complete all questions',
       estimatedDuration: 15
     }

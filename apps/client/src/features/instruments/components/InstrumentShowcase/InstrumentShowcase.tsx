@@ -35,16 +35,20 @@ export const InstrumentShowcase = ({ deleteInstrument, instruments }: Instrument
 
   const [trails, api] = useTrail(
     filteredInstruments.length,
-    () => ({
-      from: { opacity: 0 },
-      to: { opacity: 1 }
+    (index) => ({
+      config: { tension: 280, friction: 60 },
+      from: {
+        opacity: 0,
+        y: 80
+      },
+      to: {
+        opacity: 1,
+        y: 0
+      },
+      reset: true
     }),
     [filteredInstruments]
   );
-
-  useEffect(() => {
-    api.start();
-  }, [filteredInstruments]);
 
   const languageOptions = Array.from(new Set(instruments.map((item) => item.details.language))).map((item) => ({
     key: item,
