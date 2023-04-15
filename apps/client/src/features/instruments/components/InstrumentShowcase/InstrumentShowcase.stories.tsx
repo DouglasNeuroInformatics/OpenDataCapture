@@ -37,7 +37,9 @@ export default {
   decorators: [
     (Story) => (
       <MemoryRouter>
-        <Story />
+        <div className="container">
+          <Story />
+        </div>
       </MemoryRouter>
     )
   ],

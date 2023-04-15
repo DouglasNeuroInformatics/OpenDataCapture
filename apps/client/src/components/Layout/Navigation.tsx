@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { HiChartBar, HiEye, HiPlus, HiUserPlus } from 'react-icons/hi2';
+import { HiAdjustmentsHorizontal, HiChartBar, HiEye, HiPlus, HiUserPlus } from 'react-icons/hi2';
 
 import { NavigationLink } from './NavigationLink';
 
@@ -34,6 +34,13 @@ export const Navigation = (props: NavigationProps) => {
         href="/instruments/create"
         icon={<HiPlus />}
         label={t('navLinks.createInstrument')}
+        {...props}
+      />
+      <NavigationLink
+        access={['delete', 'Instrument']}
+        href="instruments/manage"
+        icon={<HiAdjustmentsHorizontal />}
+        label={t('navLinks.manageInstruments')}
         {...props}
       />
       <NavigationLink

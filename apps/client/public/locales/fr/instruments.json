@@ -44,7 +44,10 @@
     "filters": {
       "language": "Langue",
       "tags": "Tags"
-    },
+    }
+  },
+  "manageInstruments": {
+    "pageTitle": "Gérer les instruments",
     "deleteModal": {
       "title": "Confirmation de l'effacement",
       "name": "Nom",

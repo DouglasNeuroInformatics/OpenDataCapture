@@ -44,7 +44,10 @@
     "filters": {
       "language": "Language",
       "tags": "Tags"
-    },
+    }
+  },
+  "manageInstruments": {
+    "pageTitle": "Manage Instruments",
     "deleteModal": {
       "title": "Confirmation",
       "name": "Name",

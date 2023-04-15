@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { FormInstrumentSummary, Language } from '@ddcp/common';
 import { animated, useTrail } from '@react-spring/web';
@@ -10,10 +10,9 @@ import { SearchBar, SelectDropdown } from '@/components';
 
 export interface InstrumentShowcaseProps {
   instruments: FormInstrumentSummary[];
-  deleteInstrument: (instrument: FormInstrumentSummary) => Promise<void>;
 }
 
-export const InstrumentShowcase = ({ deleteInstrument, instruments }: InstrumentShowcaseProps) => {
+export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => {
   const { i18n, t } = useTranslation(['common', 'instruments']);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<Language[]>([]);
@@ -81,7 +80,7 @@ export const InstrumentShowcase = ({ deleteInstrument, instruments }: Instrument
       <div className="relative grid grid-cols-1 gap-5">
         {trails.map((style, i) => (
           <animated.div key={i} style={style}>
-            <InstrumentCard deleteInstrument={deleteInstrument} instrument={filteredInstruments[i]} />
+            <InstrumentCard instrument={filteredInstruments[i]} />
           </animated.div>
         ))}
       </div>
