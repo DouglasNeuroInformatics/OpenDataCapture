@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { FormInstrumentSummary, Language } from '@ddcp/common';
+import { animated, useTrail } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentCard } from './InstrumentCard';
@@ -22,6 +23,29 @@ export const InstrumentShowcase = ({ deleteInstrument, instruments }: Instrument
     return [i18n.resolvedLanguage as Language];
   }, [i18n.resolvedLanguage]);
 
+  const filteredInstruments = useMemo(() => {
+    return instruments.filter((instrument) => {
+      const matchesSearch = instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
+      const matchesLanguages =
+        selectedLanguages.length === 0 || selectedLanguages.includes(instrument.details.language);
+      const matchesTags = selectedTags.length === 0 || instrument.tags.some((tag) => selectedTags.includes(tag));
+      return matchesSearch && matchesLanguages && matchesTags;
+    });
+  }, [instruments, searchTerm, selectedLanguages, selectedTags]);
+
+  const [trails, api] = useTrail(
+    filteredInstruments.length,
+    () => ({
+      from: { opacity: 0 },
+      to: { opacity: 1 }
+    }),
+    [filteredInstruments]
+  );
+
+  useEffect(() => {
+    api.start();
+  }, [filteredInstruments]);
+
   const languageOptions = Array.from(new Set(instruments.map((item) => item.details.language))).map((item) => ({
     key: item,
     label: t(`common:languages.${item}`)
@@ -31,13 +55,6 @@ export const InstrumentShowcase = ({ deleteInstrument, instruments }: Instrument
     key: item,
     label: item
   }));
-
-  const filteredInstruments = instruments.filter((instrument) => {
-    const matchesSearch = instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
-    const matchesLanguages = selectedLanguages.length === 0 || selectedLanguages.includes(instrument.details.language);
-    const matchesTags = selectedTags.length === 0 || instrument.tags.some((tag) => selectedTags.includes(tag));
-    return matchesSearch && matchesLanguages && matchesTags;
-  });
 
   return (
     <div>
@@ -57,9 +74,11 @@ export const InstrumentShowcase = ({ deleteInstrument, instruments }: Instrument
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-5">
-        {filteredInstruments.map((instrument, i) => (
-          <InstrumentCard deleteInstrument={deleteInstrument} instrument={instrument} key={i} />
+      <div className="relative grid grid-cols-1 gap-5">
+        {trails.map((style, i) => (
+          <animated.div key={i} style={style}>
+            <InstrumentCard deleteInstrument={deleteInstrument} instrument={filteredInstruments[i]} />
+          </animated.div>
         ))}
       </div>
     </div>
