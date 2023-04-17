@@ -9,8 +9,9 @@ export type FormInstrumentContent<T extends FormInstrumentData = FormInstrumentD
   | FormFields<T>
   | FormFieldsGroup<T>[];
 
-export interface FormInstrument<T extends FormInstrumentData = FormInstrumentData> extends BaseInstrument {
-  content: FormInstrumentContent<T>;
+export type FormInstrument<T extends FormInstrumentData = FormInstrumentData> = BaseInstrument<
+  FormInstrumentContent<T>
+> & {
   details: FormDetails;
   validationSchema: JSONSchemaType<T>;
-}
+};
