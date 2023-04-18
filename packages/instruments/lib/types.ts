@@ -1,3 +1,4 @@
+import { DistributiveOmit } from '@ddcp/common';
 import { Language } from '@ddcp/common/core';
 import {
   ArrayFieldValue,
@@ -17,12 +18,13 @@ export type MultilingualFormDetails = Simplify<
   }
 >;
 
-export type MultilingualFormField<TValue extends PrimitiveFieldValue | ArrayFieldValue> = Simplify<
-  Omit<FormField<TValue>, 'label' | 'description'> & {
-    label: { [L in Language]: string };
-    description?: { [L in Language]: string };
-  }
->;
+export type MultilingualFormField<TValue extends ArrayFieldValue | PrimitiveFieldValue> = DistributiveOmit<
+  FormField<TValue>,
+  'label' | 'description'
+> & {
+  label: { [L in Language]: string };
+  description?: { [L in Language]: string };
+};
 
 export type MultilingualFormFields<TData extends FormInstrumentData> = {
   [K in keyof TData]: MultilingualFormField<TData[K]>;
