@@ -7,3 +7,5 @@ export type DeepPartial<T> = T extends object
       [P in keyof T]?: DeepPartial<T[P]>;
     }
   : T;
+
+export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
