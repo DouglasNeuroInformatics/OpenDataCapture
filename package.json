@@ -41,6 +41,7 @@
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^2.1.1",
     "ts-toolbelt": "^9.6.0",
+    "type-fest": "^3.8.0",
     "zod": "^3.20.2"
   },
   "engines": {
