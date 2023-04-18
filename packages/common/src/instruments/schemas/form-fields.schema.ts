@@ -27,17 +27,6 @@ const baseProperties: PropertiesSchema<Omit<BaseFormField, 'kind'>> = {
   isRequired: {
     type: 'boolean',
     nullable: true
-  },
-  dependsOn: {
-    type: 'object',
-    nullable: true,
-    patternProperties: {
-      '^.*$': {
-        type: 'object',
-        required: []
-      }
-    },
-    required: []
   }
 };
 

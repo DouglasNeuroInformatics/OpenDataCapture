@@ -1,4 +1,5 @@
 import { JSONSchemaType } from 'ajv';
+import { Simplify } from 'type-fest';
 
 import { BaseInstrument } from '../base/base-instrument.interface';
 
@@ -9,9 +10,9 @@ export type FormInstrumentContent<T extends FormInstrumentData = FormInstrumentD
   | FormFields<T>
   | FormFieldsGroup<T>[];
 
-export type FormInstrument<T extends FormInstrumentData = FormInstrumentData> = BaseInstrument<
-  FormInstrumentContent<T>
-> & {
-  details: FormDetails;
-  validationSchema: JSONSchemaType<T>;
-};
+export type FormInstrument<T extends FormInstrumentData = FormInstrumentData> = Simplify<
+  BaseInstrument<FormInstrumentContent<T>> & {
+    details: FormDetails;
+    validationSchema: JSONSchemaType<T>;
+  }
+>;
