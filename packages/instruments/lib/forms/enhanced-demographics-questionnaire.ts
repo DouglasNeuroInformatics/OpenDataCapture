@@ -1,3 +1,82 @@
+import { createMultilingualForms } from '../utils/create-multilingual-forms';
+
+type EnhancedDemographicsQuestionnaireData = {
+  /** Personal Characteristics */
+
+  annualIncome: number;
+
+  /** Education */
+
+  /** Families, Households and Marital Status */
+  // numberChildren: number;
+
+  /** Housing */
+
+  /** Immigration and Ethnocultural Diversity */
+  // ageAtImmigration: number;
+  // citizenship: string;
+  // immigrationStatus: string;
+
+  /** Income */
+
+  /** Labour */
+
+  /** Language */
+};
+
+export const enhancedDemographicsQuestionnaires = createMultilingualForms<EnhancedDemographicsQuestionnaireData>({
+  name: 'EnhancedDemographicsQuestionnaire',
+  tags: ['Demographics'],
+  version: 1,
+  details: {
+    title: {
+      en: 'Enhanced Demographics Questionnaire',
+      fr: 'Questionnaire démographique détaillé'
+    },
+    description: {
+      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration',
+      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets"
+    },
+    instructions: {
+      en: 'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.',
+      fr: "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
+    },
+    estimatedDuration: 5
+  },
+  content: {
+    annualIncome: {
+      kind: 'numeric',
+      variant: 'default',
+      min: 0,
+      max: 1000000,
+      label: {
+        en: 'Foo',
+        fr: 'Foo'
+      }
+    }
+  },
+  validationSchema: {
+    type: 'object',
+    properties: {
+      annualIncome: {
+        type: 'integer'
+      }
+    },
+    required: ['annualIncome']
+  }
+});
+
+/*
+
+export type EnhancedDemographicsQuestionnaireData = {
+  forwardSortationArea: string;
+  ethnicity: keyof typeof ethnicityOptionsEn;
+  gender: keyof typeof genderOptionsEn;
+  employmentStatus: keyof typeof employmentStatusOptionsEn;
+  maritalStatus: keyof typeof maritalStatusOptionsEn;
+  firstLanguage: keyof typeof firstLanguageOptionsEn;
+};
+
 import { FormInstrument } from '@ddcp/common';
 
 type TranslatedOptions<T> = {
@@ -72,15 +151,6 @@ export const firstLanguageOptionsFr: TranslatedOptions<typeof firstLanguageOptio
   english: 'Anglais',
   french: 'Français',
   other: 'Autre'
-};
-
-export type EnhancedDemographicsQuestionnaireData = {
-  forwardSortationArea: string;
-  ethnicity: keyof typeof ethnicityOptionsEn;
-  gender: keyof typeof genderOptionsEn;
-  employmentStatus: keyof typeof employmentStatusOptionsEn;
-  maritalStatus: keyof typeof maritalStatusOptionsEn;
-  firstLanguage: keyof typeof firstLanguageOptionsEn;
 };
 
 export const enhancedDemographicsQuestionnaireEn: FormInstrument<EnhancedDemographicsQuestionnaireData> = {
@@ -244,3 +314,4 @@ export const enhancedDemographicsQuestionnaireFr: FormInstrument<EnhancedDemogra
     required: ['employmentStatus', 'ethnicity', 'firstLanguage', 'forwardSortationArea', 'gender', 'maritalStatus']
   }
 };
+*/

@@ -3,6 +3,8 @@
   "include": ["lib/**/*"],
   "compilerOptions": {
     "declarationMap": true,
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "outDir": "dist"
   }
 }
