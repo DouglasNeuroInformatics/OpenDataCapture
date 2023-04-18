@@ -1,3 +1,5 @@
+import { Nullable } from '../../../utils';
+
 export type FormFieldKind = 'text' | 'numeric' | 'options' | 'date' | 'binary' | 'array';
 
 export type PrimitiveFieldValue = string | number | boolean;
@@ -5,8 +7,6 @@ export type PrimitiveFieldValue = string | number | boolean;
 export type ArrayFieldValue = Record<string, PrimitiveFieldValue>[];
 
 export type FormInstrumentData = Record<string, PrimitiveFieldValue | ArrayFieldValue>;
-
-export type Nullable<T extends object> = { [K in keyof T]: T[K] | null | undefined };
 
 export type DependentConditions<T extends PrimitiveFieldValue = PrimitiveFieldValue> = {
   equals: T;
