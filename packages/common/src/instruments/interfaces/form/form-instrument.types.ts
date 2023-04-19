@@ -3,8 +3,8 @@ import { Simplify } from 'type-fest';
 
 import { BaseInstrument } from '../base/base-instrument.interface';
 
-import { FormDetails } from './form-details.interface';
-import { FormFields, FormFieldsGroup, FormInstrumentData } from './form-fields.interface';
+import { FormDetails } from './form-details.types';
+import { FormFields, FormFieldsGroup, FormInstrumentData } from './form-fields.types';
 
 export type FormInstrumentContent<T extends FormInstrumentData = FormInstrumentData> =
   | FormFields<T>

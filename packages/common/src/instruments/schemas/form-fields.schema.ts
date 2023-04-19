@@ -12,7 +12,7 @@ import {
   OptionsFormField,
   PrimitiveFormField,
   TextFormField
-} from '../interfaces/form/form-fields.interface';
+} from '../interfaces/form/form-fields.types';
 
 const baseProperties = {
   label: {

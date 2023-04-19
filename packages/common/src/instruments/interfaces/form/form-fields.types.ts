@@ -60,13 +60,12 @@ export type PrimitiveFormField<TValue extends PrimitiveFieldValue = PrimitiveFie
   ? BinaryFormField
   : never;
 
+export type ArrayFieldset<T extends ArrayFieldValue[number]> = {
+  [K in keyof T]: PrimitiveFormField<T[K]> | ((fieldset: Nullable<T>) => PrimitiveFormField<T[K]> | null);
+};
 export type ArrayFormField<TValue extends ArrayFieldValue = ArrayFieldValue> = FormFieldMixin<{
   kind: 'array';
-  fieldset: {
-    [K in keyof TValue[number]]:
-      | PrimitiveFormField<TValue[number][K]>
-      | ((fieldset: Nullable<TValue[number]>) => PrimitiveFormField<TValue[number][K]> | null);
-  };
+  fieldset: ArrayFieldset<TValue[number]>;
 }>;
 
 export type FormField<TValue extends ArrayFieldValue | PrimitiveFieldValue> = [TValue] extends [PrimitiveFieldValue]
