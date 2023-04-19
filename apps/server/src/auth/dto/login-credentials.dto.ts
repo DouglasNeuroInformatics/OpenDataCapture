@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { LoginCredentials, loginCredentialsSchema } from '@ddcp/common/auth';
+import { LoginCredentials, loginCredentialsSchema } from '@douglasneuroinformatics/common/auth';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 

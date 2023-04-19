@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { FormInstrument, FormInstrumentData } from '@ddcp/common';
+import { FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
 
 import { Form } from '@/components';
 import { StepperContext } from '@/context/StepperContext';

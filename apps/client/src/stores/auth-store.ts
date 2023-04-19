@@ -1,5 +1,5 @@
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, Group, JwtPayload } from '@ddcp/common';
+import { AppAbility, Group, JwtPayload } from '@douglasneuroinformatics/common';
 import jwtDecode from 'jwt-decode';
 import { create } from 'zustand';
 

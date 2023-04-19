@@ -2,10 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import { AppAbility } from '@ddcp/common/auth';
-import { Group } from '@ddcp/common/groups';
-import { FormInstrumentRecord, FormInstrumentRecordsSummary, InstrumentRecordsExport } from '@ddcp/common/instruments';
-import { DateUtils } from '@ddcp/common/utils';
+import { AppAbility } from '@douglasneuroinformatics/common/auth';
+import { Group } from '@douglasneuroinformatics/common/groups';
+import {
+  FormInstrumentRecord,
+  FormInstrumentRecordsSummary,
+  InstrumentRecordsExport
+} from '@douglasneuroinformatics/common/instruments';
+import { DateUtils } from '@douglasneuroinformatics/common/utils';
 import { Model } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';

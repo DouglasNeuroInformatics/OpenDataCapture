@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { FormInstrumentSummary } from '@ddcp/common';
+import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 

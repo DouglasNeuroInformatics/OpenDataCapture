@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { DateFormField, DateUtils } from '@ddcp/common';
+import { DateFormField, DateUtils } from '@douglasneuroinformatics/common';
 import { Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 

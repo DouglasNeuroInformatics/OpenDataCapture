@@ -1,6 +1,6 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { AppAbility, Group, Sex } from '@ddcp/common';
+import { AppAbility, Group, Sex } from '@douglasneuroinformatics/common';
 import unidecode from 'unidecode';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';

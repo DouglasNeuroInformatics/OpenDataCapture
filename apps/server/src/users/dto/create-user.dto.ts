@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { BasePermissionLevel, type User } from '@ddcp/common/users';
+import { BasePermissionLevel, type User } from '@douglasneuroinformatics/common/users';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 

@@ -1,5 +1,5 @@
 {
-  "name": "ddcp",
+  "name": "@douglasneuroinformatics/ddcp",
   "version": "0.0.1",
   "type": "module",
   "private": true,
@@ -22,8 +22,8 @@
     "ws": "env-cmd yarn workspace"
   },
   "devDependencies": {
-    "@ddcp/eslint-config": "*",
-    "@ddcp/tsconfig": "*",
+    "@douglasneuroinformatics/eslint-config": "*",
+    "@douglasneuroinformatics/tsconfig": "*",
     "@types/node": "^18.11.18",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",

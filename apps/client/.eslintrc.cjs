@@ -2,7 +2,12 @@ const path = require('path');
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: ['@ddcp', 'plugin:cypress/recommended', 'plugin:react/recommended', 'plugin:jsx-a11y/recommended'],
+  extends: [
+    '@douglasneuroinformatics',
+    'plugin:cypress/recommended',
+    'plugin:react/recommended',
+    'plugin:jsx-a11y/recommended'
+  ],
   env: {
     browser: true
   },

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TextFormField } from '@ddcp/common';
+import { TextFormField } from '@douglasneuroinformatics/common';
 import { clsx } from 'clsx';
 
 import { FormFieldContainer } from './FormFieldContainer';

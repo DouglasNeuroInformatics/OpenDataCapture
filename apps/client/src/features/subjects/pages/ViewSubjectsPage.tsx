@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Subject } from '@ddcp/common';
+import { Subject } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { SubjectsTable } from '../components/SubjectsTable';
@@ -11,7 +11,7 @@ import { useFetch } from '@/hooks/useFetch';
 export const ViewSubjectsPage = () => {
   const { data } = useFetch<Subject[]>('/subjects');
   const { t } = useTranslation('subjects');
-  
+
   if (!data) {
     return <Spinner />;
   }

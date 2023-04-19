@@ -1,4 +1,4 @@
-import { AuthPayload, LoginCredentials } from '@ddcp/common';
+import { AuthPayload, LoginCredentials } from '@douglasneuroinformatics/common';
 import { rest } from 'msw';
 
 export const handlers = [

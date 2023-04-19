@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import { FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@ddcp/common';
+import { FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@douglasneuroinformatics/common';
 import { Model } from 'mongoose';
 
 import { FormInstrumentEntity } from '../entities/form-instrument.entity';

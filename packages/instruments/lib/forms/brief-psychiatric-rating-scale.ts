@@ -1,4 +1,4 @@
-import { FormInstrument } from '@ddcp/common';
+import { FormInstrument } from '@douglasneuroinformatics/common';
 import { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
 const fields = [

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DateUtils } from '@ddcp/common';
+import { DateUtils } from '@douglasneuroinformatics/common';
 import { clsx } from 'clsx';
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';

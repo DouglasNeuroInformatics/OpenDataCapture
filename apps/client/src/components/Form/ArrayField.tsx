@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ArrayFormField } from '@ddcp/common';
+import { ArrayFormField } from '@douglasneuroinformatics/common';
 
 import { Button } from '../Button';
 

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Group, groupSchema } from '@ddcp/common';
+import { Group, groupSchema } from '@douglasneuroinformatics/common';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 

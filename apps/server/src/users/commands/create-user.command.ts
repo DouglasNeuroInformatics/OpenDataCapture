@@ -1,5 +1,5 @@
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, BasePermissionLevel } from '@ddcp/common';
+import { AppAbility, BasePermissionLevel } from '@douglasneuroinformatics/common';
 import { Command, CommandRunner, Option } from 'nest-commander';
 
 import { UsersService } from '../users.service';

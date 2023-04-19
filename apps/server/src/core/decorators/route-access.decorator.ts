@@ -1,6 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
 
-import { AppAction, AppSubject } from '@ddcp/common/auth';
+import { AppAction, AppSubject } from '@douglasneuroinformatics/common/auth';
 
 type PublicRouteAccess = 'public';
 

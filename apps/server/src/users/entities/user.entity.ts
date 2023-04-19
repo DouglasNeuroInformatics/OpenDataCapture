@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { BasePermissionLevel, type User, type UserPreferences } from '@ddcp/common';
+import { BasePermissionLevel, type User, type UserPreferences } from '@douglasneuroinformatics/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { UserPreferencesSchema } from './user-preferences.entity';

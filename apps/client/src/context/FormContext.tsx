@@ -1,6 +1,6 @@
 import React, { createContext } from 'react';
 
-import { FormInstrumentData } from '@ddcp/common';
+import { FormInstrumentData } from '@douglasneuroinformatics/common';
 
 import type { FormErrors, FormValues } from '@/components';
 

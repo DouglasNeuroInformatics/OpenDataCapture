@@ -1,7 +1,7 @@
 /* eslint-disable no-alert */
 import React, { useContext } from 'react';
 
-import { FormFieldKind, NumericFormField, TextFormField } from '@ddcp/common';
+import { FormFieldKind, NumericFormField, TextFormField } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { Form } from '@/components';

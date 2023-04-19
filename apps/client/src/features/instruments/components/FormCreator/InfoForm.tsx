@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { FormDetails, FormInstrument } from '@ddcp/common';
+import { FormDetails, FormInstrument } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { Form } from '@/components';

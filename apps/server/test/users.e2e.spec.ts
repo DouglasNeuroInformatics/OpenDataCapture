@@ -7,7 +7,7 @@ export {};
 /**
 import { HttpStatus } from '@nestjs/common';
 
-import { BasePermissionLevel } from '@ddcp/common';
+import { BasePermissionLevel } from '@douglasneuroinformatics/common';
 import request from 'supertest';
 
 import { admin, server } from './config/jest-e2e.setup';

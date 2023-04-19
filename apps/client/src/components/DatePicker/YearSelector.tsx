@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { range } from '@ddcp/common';
+import { range } from '@douglasneuroinformatics/common';
 import { clsx } from 'clsx';
 
 export interface YearSelectorProps {

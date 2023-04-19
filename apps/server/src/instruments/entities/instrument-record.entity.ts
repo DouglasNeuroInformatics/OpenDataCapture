@@ -6,7 +6,7 @@ import {
   type InstrumentKind,
   type InstrumentRecord,
   type Subject
-} from '@ddcp/common';
+} from '@douglasneuroinformatics/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { InstrumentEntity } from './instrument.entity';

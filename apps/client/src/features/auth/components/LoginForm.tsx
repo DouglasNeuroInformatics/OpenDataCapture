@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { FormInstrumentContent, loginCredentialsSchema } from '@ddcp/common';
+import { FormInstrumentContent, loginCredentialsSchema } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { AuthAPI } from '../api/auth-api';

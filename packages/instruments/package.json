@@ -1,10 +1,10 @@
 {
-  "name": "@ddcp/instruments",
+  "name": "@douglasneuroinformatics/instruments",
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
   "dependencies": {
-    "@ddcp/common": "*"
+    "@douglasneuroinformatics/common": "*"
   },
   "scripts": {
     "build": "rm -rf dist && tsc",

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { OptionsFormField } from '@ddcp/common';
+import { OptionsFormField } from '@douglasneuroinformatics/common';
 import { Listbox, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 

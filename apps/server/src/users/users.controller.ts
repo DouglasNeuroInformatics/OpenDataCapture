@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { type AppAbility } from '@ddcp/common';
+import { type AppAbility } from '@douglasneuroinformatics/common';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';

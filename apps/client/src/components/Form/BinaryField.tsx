@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BinaryFormField } from '@ddcp/common';
+import { BinaryFormField } from '@douglasneuroinformatics/common';
 import { Switch } from '@headlessui/react';
 import { HiCheck } from 'react-icons/hi2';
 

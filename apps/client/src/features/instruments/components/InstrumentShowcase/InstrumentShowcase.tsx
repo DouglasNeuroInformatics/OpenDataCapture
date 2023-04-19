@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import { FormInstrumentSummary, Language } from '@ddcp/common';
+import { FormInstrumentSummary, Language } from '@douglasneuroinformatics/common';
 import { animated, useTrail } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 

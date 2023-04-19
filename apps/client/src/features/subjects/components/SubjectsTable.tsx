@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DateUtils, InstrumentRecordsExport, Subject } from '@ddcp/common';
+import { DateUtils, InstrumentRecordsExport, Subject } from '@douglasneuroinformatics/common';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 

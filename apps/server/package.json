@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@casl/mongoose": "^7.1.2",
-    "@ddcp/common": "*",
-    "@ddcp/instruments": "*",
+    "@douglasneuroinformatics/common": "*",
+    "@douglasneuroinformatics/instruments": "*",
     "@faker-js/faker": "^7.6.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",

@@ -2,13 +2,13 @@ import { Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, BasePermissionLevel, Random } from '@ddcp/common';
+import { AppAbility, BasePermissionLevel, Random } from '@douglasneuroinformatics/common';
 import {
   BriefPsychiatricRatingScaleData,
   briefPsychiatricRatingScale,
   enhancedDemographicsQuestionnaire,
   happinessQuestionnaire
-} from '@ddcp/instruments';
+} from '@douglasneuroinformatics/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 import { Command, CommandRunner } from 'nest-commander';

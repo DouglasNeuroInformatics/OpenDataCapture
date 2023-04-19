@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { type Sex, Subject } from '@ddcp/common';
+import { type Sex, Subject } from '@douglasneuroinformatics/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';

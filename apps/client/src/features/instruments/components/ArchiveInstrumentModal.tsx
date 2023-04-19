@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FormInstrumentSummary } from '@ddcp/common';
+import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { Button, Modal } from '@/components';

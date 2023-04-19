@@ -1,4 +1,4 @@
-import { FormFields, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
+import { FormFields, FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/common';
 import { ErrorObject } from 'ajv';
 
 import { FormErrors, FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';

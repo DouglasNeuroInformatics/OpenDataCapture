@@ -4,7 +4,7 @@ import {
   FormInstrumentContent,
   FormInstrumentData,
   formInstrumentSchema
-} from '@ddcp/common';
+} from '@douglasneuroinformatics/common';
 import { JSONSchemaType } from 'ajv';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';

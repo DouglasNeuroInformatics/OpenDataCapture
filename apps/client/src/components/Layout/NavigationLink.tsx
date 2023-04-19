@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AppAction, AppSubject } from '@ddcp/common';
+import { AppAction, AppSubject } from '@douglasneuroinformatics/common';
 import { NavLink } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';

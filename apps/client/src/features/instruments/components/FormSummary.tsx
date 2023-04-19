@@ -1,6 +1,11 @@
 import React from 'react';
 
-import { BaseFormField, FormInstrument, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
+import {
+  BaseFormField,
+  FormInstrument,
+  FormInstrumentContent,
+  FormInstrumentData
+} from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { Button, Spinner } from '@/components';

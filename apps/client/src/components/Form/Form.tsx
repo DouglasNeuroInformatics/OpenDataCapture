@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import { FormFields, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
+import { FormFields, FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/common';
 import { JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';

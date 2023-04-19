@@ -1,5 +1,5 @@
 {
-  "extends": "@ddcp/tsconfig/base.json",
+  "extends": "@douglasneuroinformatics/tsconfig/base.json",
   "include": ["lib/**/*"],
   "compilerOptions": {
     "declarationMap": true,

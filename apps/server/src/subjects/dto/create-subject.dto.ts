@@ -1,4 +1,4 @@
-import { Sex, SubjectIdentificationData, subjectIdentificationDataSchema } from '@ddcp/common';
+import { Sex, SubjectIdentificationData, subjectIdentificationDataSchema } from '@douglasneuroinformatics/common';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
