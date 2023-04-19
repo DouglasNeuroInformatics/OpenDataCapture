@@ -1,6 +1,6 @@
 {
   "name": "@douglasneuroinformatics/instruments",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "AGPL-3.0",
   "main": "./dist/cjs/index.js",
   "module": "./dist/mjs/index.js",
