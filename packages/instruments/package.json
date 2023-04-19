@@ -2,22 +2,21 @@
   "name": "@douglasneuroinformatics/instruments",
   "version": "0.0.1",
   "license": "AGPL-3.0",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/mjs/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/cjs/index.js",
-      "import": "./dist/mjs/index.js"
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "dependencies": {
     "@douglasneuroinformatics/common": "*"
   },
   "scripts": {
-    "build": "rm -rf dist && yarn build:cjs && yarn build:mjs",
-    "build:cjs": "tsc --outDir dist/cjs -m nodenext",
-    "build:mjs": "tsc --outDir dist/mjs --m esnext",
-    "build:types": "tsc --outDir dist/types --declaration --emitDeclarationOnly --declarationMap",
+    "build": "tsup",
     "check-types": "tsc --noEmit",
     "lint": "eslint --fix lib"
   }

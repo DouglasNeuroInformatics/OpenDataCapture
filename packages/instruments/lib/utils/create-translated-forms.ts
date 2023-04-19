@@ -1,12 +1,12 @@
-import { Language } from '@douglasneuroinformatics/common/core';
 import {
   FormFields,
   FormInstrument,
   FormInstrumentContent,
   FormInstrumentData,
+  Language,
   MultilingualForm,
   MultilingualFormFields
-} from '@douglasneuroinformatics/common/instruments';
+} from '@douglasneuroinformatics/common';
 
 type TranslatedForms<T extends FormInstrumentData> = {
   [L in Language]: FormInstrument<T>;
