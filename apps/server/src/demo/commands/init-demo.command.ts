@@ -6,8 +6,7 @@ import { AppAbility, BasePermissionLevel, Random } from '@ddcp/common';
 import {
   BriefPsychiatricRatingScaleData,
   briefPsychiatricRatingScale,
-  enhancedDemographicsQuestionnaireEn,
-  enhancedDemographicsQuestionnaireFr,
+  enhancedDemographicsQuestionnaire,
   happinessQuestionnaire
 } from '@ddcp/instruments';
 import { faker } from '@faker-js/faker';
@@ -112,10 +111,12 @@ export class InitDemoCommand extends CommandRunner {
     for (const user of DEMO_USERS) {
       await this.usersService.create(user, this.ability);
     }
+
     const bprs = await this.formsService.create(briefPsychiatricRatingScale);
-    const hq = await this.formsService.create(happinessQuestionnaire);
-    await this.formsService.create(enhancedDemographicsQuestionnaireEn);
-    await this.formsService.create(enhancedDemographicsQuestionnaireFr);
+    const hq = await this.formsService.create(happinessQuestionnaire.en);
+    await this.formsService.create(happinessQuestionnaire.fr);
+    await this.formsService.create(enhancedDemographicsQuestionnaire.en);
+    await this.formsService.create(enhancedDemographicsQuestionnaire.fr);
 
     for (let i = 0; i < 100; i++) {
       const createSubjectDto = {

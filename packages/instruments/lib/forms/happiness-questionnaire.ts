@@ -1,36 +1,39 @@
-import { FormInstrument } from '@ddcp/common';
+import { createTranslatedForms } from '../utils/create-translated-forms';
 
 export type HappinessQuestionnaireData = {
   overallHappiness: number;
 };
 
-export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> = {
-  kind: 'form',
+export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnaireData>({
   name: 'HappinessQuestionnaire',
   tags: ['Well-Being'],
   version: 1,
   details: {
-    title: 'Happiness Questionnaire',
-    language: 'en',
-    estimatedDuration: 5,
-    description: `
-      The Happiness Questionnaire is a survey that asks questions about an individual's
-      feelings of contentment, satisfaction, and well-being. It includes questions about 
-      daily activities, social connections, and overall life satisfaction.`,
-    instructions: `
-      To complete the questionnaire, you should read each question carefully and consider your 
-      personal experiences and feelings before choosing the response that best reflects your 
-      thoughts and feelings. It is important to answer all questions honestly and to the best of 
-      your ability. Once you have finished answering all of the questions, you should submit the
-       questionnaire. It is important to be as honest and accurate as possible when completing a 
-       happiness questionnaire, as the results can be used to identify areas of your life that 
-       may be contributing to your overall sense of well-being.`
+    title: {
+      en: 'Happiness Questionnaire',
+      fr: 'Questionnaire sur le bonheur'
+    },
+    description: {
+      en: 'The Happiness Questionnaire is a questionnaire about happiness.',
+      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
+    },
+    instructions: {
+      en: 'Please answer the question based on your current feelings.',
+      fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'
+    },
+    estimatedDuration: 1
   },
   content: {
     overallHappiness: {
       kind: 'numeric',
-      label: 'Overall Happiness',
-      description: "The subject's overall happiness from 1 through 10",
+      label: {
+        en: 'Overall Happiness',
+        fr: 'Bonheur général'
+      },
+      description: {
+        en: 'Overall happiness from 1 through 10 (inclusive)',
+        fr: 'Bonheur général de 1 à 10 (inclus)'
+      },
       isRequired: true,
       min: 0,
       max: 10,
@@ -48,4 +51,4 @@ export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> 
     },
     required: ['overallHappiness']
   }
-};
+});

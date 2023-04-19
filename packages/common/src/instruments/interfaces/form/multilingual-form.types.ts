@@ -15,17 +15,38 @@ type MultilingualFormDetails = Simplify<
   }
 >;
 
-type MultilingualOptionsFormField<TValue extends string = string> = Simplify<
-  Omit<BaseTypes.OptionsFormField<TValue>, 'options'> & {
-    options: { [L in Language]: Record<TValue, string> };
+type MultilingualFormFieldMixin<T extends BaseTypes.BaseFormField, U extends object = object> = Simplify<
+  Omit<T, keyof U | 'description' | 'label'> & {
+    description?: { [L in Language]: string };
+    label: { [L in Language]: string };
+  } & U
+>;
+
+type MultilingualTextFormField = MultilingualFormFieldMixin<BaseTypes.TextFormField>;
+
+type MultilingualOptionsFormField<TValue extends string = string> = MultilingualFormFieldMixin<
+  BaseTypes.OptionsFormField<TValue>,
+  {
+    options: {
+      [L in Language]: {
+        [K in TValue]: string;
+      };
+    };
   }
 >;
-type MultilingualPrimitiveFormField<TValue extends BaseTypes.PrimitiveFieldValue> = TValue extends string
-  ? BaseTypes.TextFormField | MultilingualOptionsFormField<TValue> | BaseTypes.DateFormField
+
+type MultilingualDateFormField = MultilingualFormFieldMixin<BaseTypes.DateFormField>;
+
+type MultilingualNumericFormField = MultilingualFormFieldMixin<BaseTypes.NumericFormField>;
+
+type MultilingualBinaryFormField = MultilingualFormFieldMixin<BaseTypes.BinaryFormField>;
+
+type MultilingualPrimitiveFormField<TValue extends BaseTypes.PrimitiveFieldValue> = [TValue] extends [string]
+  ? MultilingualTextFormField | MultilingualOptionsFormField<TValue> | MultilingualDateFormField
   : TValue extends number
-  ? BaseTypes.NumericFormField
+  ? MultilingualNumericFormField
   : TValue extends boolean
-  ? BaseTypes.BinaryFormField
+  ? MultilingualBinaryFormField
   : never;
 
 type MultilingualArrayFieldset<T extends BaseTypes.ArrayFieldValue[number]> = {
@@ -34,29 +55,31 @@ type MultilingualArrayFieldset<T extends BaseTypes.ArrayFieldValue[number]> = {
     | ((fieldset: Nullable<T>) => MultilingualPrimitiveFormField<T[K]> | null);
 };
 
-type MultilingualArrayFormField<TValue extends BaseTypes.ArrayFieldValue> = BaseTypes.FormFieldMixin<{
-  kind: 'array';
-  fieldset: MultilingualArrayFieldset<TValue[number]>;
-}>;
+type MultilingualArrayFormField<TValue extends BaseTypes.ArrayFieldValue> = MultilingualFormFieldMixin<
+  BaseTypes.ArrayFormField,
+  {
+    fieldset: MultilingualArrayFieldset<TValue[number]>;
+  }
+>;
 
-type MultilingualFormField<TValue> = [TValue] extends [BaseTypes.PrimitiveFieldValue]
+export type MultilingualFormField<TValue> = [TValue] extends [BaseTypes.PrimitiveFieldValue]
   ? MultilingualPrimitiveFormField<TValue>
   : [TValue] extends [BaseTypes.ArrayFieldValue]
   ? MultilingualArrayFormField<TValue>
   : never;
 
-type MultilingualFormFields<TData extends BaseTypes.FormInstrumentData> = {
+export type MultilingualFormFields<TData extends BaseTypes.FormInstrumentData> = {
   [K in keyof TData]: MultilingualFormField<TData[K]>;
 };
 
-type MultilingualFormFieldsGroup<TData extends BaseTypes.FormInstrumentData> = {
+export type MultilingualFormFieldsGroup<TData extends BaseTypes.FormInstrumentData> = {
   title: { [L in Language]: string };
   fields: {
     [K in keyof TData]?: MultilingualFormField<TData[K]>;
   };
 };
 
-type MultilingualFormContent<TData extends BaseTypes.FormInstrumentData> =
+export type MultilingualFormContent<TData extends BaseTypes.FormInstrumentData> =
   | MultilingualFormFields<TData>
   | MultilingualFormFieldsGroup<TData>[];
 
