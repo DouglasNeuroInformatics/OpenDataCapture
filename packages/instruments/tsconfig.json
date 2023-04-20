@@ -5,6 +5,7 @@
     "declarationMap": true,
     "module": "Node16",
     "moduleResolution": "Node16",
-    "outDir": "dist"
+    "outDir": "dist",
+    "resolveJsonModule": true
   }
 }

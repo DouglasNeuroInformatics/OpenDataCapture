@@ -1,15 +1,24 @@
+import ethnicOrigin from '../data/ethnic-origin.json';
+import gender from '../data/gender.json';
 import { createTranslatedForms } from '../utils/create-translated-forms';
+import { extractKeys, formatOptions } from '../utils/format-options';
+
+type EthnicOrigin = keyof typeof ethnicOrigin;
+
+type Gender = keyof typeof gender;
 
 type EnhancedDemographicsQuestionnaireData = {
   /** Personal Characteristics */
+  gender: Gender;
+  ethnicOrigin: EthnicOrigin;
 
-  annualIncome: number;
-  forwardSortationArea: string;
-  ethnicity: 'white' | 'black' | 'asian' | 'indigenous' | 'other';
-  gender: 'male' | 'female' | 'nonBinary';
-  employmentStatus: 'fullTime' | 'partTime' | 'student' | 'unemployed';
-  maritalStatus: 'married' | 'widowed' | 'separated' | 'divorced' | 'single';
-  firstLanguage: 'english' | 'french' | 'other';
+  /** Living Situation */
+  postalCode: string;
+
+  //annualIncome: number;
+  //employmentStatus: 'fullTime' | 'partTime' | 'student' | 'unemployed';
+  //maritalStatus: 'married' | 'widowed' | 'separated' | 'divorced' | 'single';
+  //firstLanguage: 'english' | 'french' | 'other';
 
   /** Education */
 
@@ -51,15 +60,87 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     estimatedDuration: 5
   },
   content: {
-    annualIncome: {
-      kind: 'numeric',
-      variant: 'default',
-      min: 0,
-      max: 1000000,
+    gender: {
+      kind: 'options',
       label: {
-        en: 'Foo',
-        fr: 'Foo'
+        en: 'Gender Identity',
+        fr: 'Identité de genre'
+      },
+      options: formatOptions(gender)
+    },
+    ethnicOrigin: {
+      kind: 'options',
+      label: {
+        en: 'Ethnic Origin',
+        fr: 'Origine ethnique'
+      },
+      options: formatOptions(ethnicOrigin)
+    },
+    postalCode: {
+      kind: 'text',
+      label: {
+        en: 'Postal Code',
+        fr: 'Code postal'
+      },
+      variant: 'short'
+    }
+  },
+  validationSchema: {
+    type: 'object',
+    properties: {
+      ethnicOrigin: {
+        type: 'string',
+        enum: extractKeys(ethnicOrigin)
+      },
+      gender: {
+        type: 'string',
+        enum: extractKeys(gender)
+      },
+      postalCode: {
+        type: 'string',
+        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source
       }
+    },
+    required: ['ethnicOrigin', 'gender', 'postalCode']
+  }
+});
+/*
+
+export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
+  name: 'EnhancedDemographicsQuestionnaire',
+  tags: ['Demographics'],
+  version: 1,
+  details: {
+    title: {
+      en: 'Enhanced Demographics Questionnaire',
+      fr: 'Questionnaire démographique détaillé'
+    },
+    description: {
+      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration',
+      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets"
+    },
+    instructions: {
+      en: 'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.',
+      fr: "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
+    },
+    estimatedDuration: 5
+  },
+  content: {
+    genderIdentity: {
+      kind: 'options',
+      label: {
+        en: 'Gender Identity',
+        fr: 'Identité de genre'
+      },
+      options: formatOptions(genderIdentity)
+    },
+    ethnicOrigin: {
+      kind: 'options',
+      label: {
+        en: 'Ethnic Origin',
+        fr: 'Origine ethnique'
+      },
+      options: formatOptions(ethnicOrigin)
     },
     forwardSortationArea: {
       kind: 'text',
@@ -72,48 +153,6 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
         fr: "Une région de tri d'acheminement (RTA) est une unité géographique désignée par les trois premiers caractères d'un code postal canadien. Tous les codes postaux commençant par les trois mêmes caractères — par exemple, K1A — forment une même RTA."
       },
       variant: 'short'
-    },
-    ethnicity: {
-      kind: 'options',
-      label: {
-        en: 'Ethnicity',
-        fr: 'Ethnicité'
-      },
-      options: {
-        en: {
-          white: 'White',
-          black: 'Black',
-          asian: 'Asian',
-          indigenous: 'Indigenous',
-          other: 'Other'
-        },
-        fr: {
-          white: 'Blanc',
-          black: 'Noir',
-          asian: 'Asiatique',
-          indigenous: 'Autochtone',
-          other: 'Autre'
-        }
-      }
-    },
-    gender: {
-      kind: 'options',
-      label: {
-        en: 'Gender Identity',
-        fr: 'Identité de genre'
-      },
-      options: {
-        en: {
-          male: 'Male',
-          female: 'Female',
-          nonBinary: 'Non-Binary'
-        },
-        fr: {
-          male: 'Masculin',
-          female: 'Féminin',
-          nonBinary: 'Non-binaire'
-        }
-      }
     },
     employmentStatus: {
       kind: 'options',
@@ -214,3 +253,4 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     required: ['annualIncome']
   }
 });
+*/
