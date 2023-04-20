@@ -1,5 +1,11 @@
 # @douglasneuroinformatics/common
 
+## 0.0.3
+
+### Patch Changes
+
+- Add some intellisense support when creating multilingual forms with vanilla js, use tsup to transpire to esm, and minor build changes
+
 ## 0.0.2
 
 ### Patch Changes
