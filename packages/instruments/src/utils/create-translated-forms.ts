@@ -25,7 +25,10 @@ function getTranslatedFields<T extends FormInstrumentData>(
   return fields as FormFields<T>;
 }
 
-/** Create translated forms from a multilingual form -- foo */
+/**
+ * Given a multilingual form, returns an object with the keys `en` and `fr`
+ * mapped to the English and French versions of the form instrument respectively.
+ */
 function createTranslatedForms<T extends FormInstrumentData>(
   multilingualForm: MultilingualForm<T>
 ): TranslatedForms<T> {

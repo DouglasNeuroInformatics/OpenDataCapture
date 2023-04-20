@@ -41,13 +41,14 @@ type MultilingualNumericFormField = MultilingualFormFieldMixin<BaseTypes.Numeric
 
 type MultilingualBinaryFormField = MultilingualFormFieldMixin<BaseTypes.BinaryFormField>;
 
-type MultilingualPrimitiveFormField<TValue extends BaseTypes.PrimitiveFieldValue> = [TValue] extends [string]
-  ? MultilingualTextFormField | MultilingualOptionsFormField<TValue> | MultilingualDateFormField
-  : TValue extends number
-  ? MultilingualNumericFormField
-  : TValue extends boolean
-  ? MultilingualBinaryFormField
-  : never;
+type MultilingualPrimitiveFormField<TValue extends BaseTypes.PrimitiveFieldValue = BaseTypes.PrimitiveFieldValue> =
+  TValue extends string
+    ? MultilingualTextFormField | MultilingualOptionsFormField<TValue> | MultilingualDateFormField
+    : TValue extends number
+    ? MultilingualNumericFormField
+    : TValue extends boolean
+    ? MultilingualBinaryFormField
+    : never;
 
 type MultilingualArrayFieldset<T extends BaseTypes.ArrayFieldValue[number]> = {
   [K in keyof T]:
@@ -55,18 +56,19 @@ type MultilingualArrayFieldset<T extends BaseTypes.ArrayFieldValue[number]> = {
     | ((fieldset: Nullable<T>) => MultilingualPrimitiveFormField<T[K]> | null);
 };
 
-type MultilingualArrayFormField<TValue extends BaseTypes.ArrayFieldValue> = MultilingualFormFieldMixin<
-  BaseTypes.ArrayFormField,
-  {
-    fieldset: MultilingualArrayFieldset<TValue[number]>;
-  }
->;
+type MultilingualArrayFormField<TValue extends BaseTypes.ArrayFieldValue = BaseTypes.ArrayFieldValue> =
+  MultilingualFormFieldMixin<
+    BaseTypes.ArrayFormField,
+    {
+      fieldset: MultilingualArrayFieldset<TValue[number]>;
+    }
+  >;
 
 export type MultilingualFormField<TValue> = [TValue] extends [BaseTypes.PrimitiveFieldValue]
   ? MultilingualPrimitiveFormField<TValue>
   : [TValue] extends [BaseTypes.ArrayFieldValue]
   ? MultilingualArrayFormField<TValue>
-  : never;
+  : MultilingualPrimitiveFormField | MultilingualArrayFormField;
 
 export type MultilingualFormFields<TData extends BaseTypes.FormInstrumentData> = {
   [K in keyof TData]: MultilingualFormField<TData[K]>;
