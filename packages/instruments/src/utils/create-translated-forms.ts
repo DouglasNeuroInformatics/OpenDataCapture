@@ -25,9 +25,9 @@ function getTranslatedFields<T extends FormInstrumentData>(
   return fields as FormFields<T>;
 }
 
-/** Create translated forms from a multilingual form */
-function createTranslatedForms<T extends FormInstrumentData = FormInstrumentData>(
-  multilingualForm: Omit<MultilingualForm<T>, 'kind'>
+/** Create translated forms from a multilingual form -- foo */
+function createTranslatedForms<T extends FormInstrumentData>(
+  multilingualForm: MultilingualForm<T>
 ): TranslatedForms<T> {
   const forms: Partial<TranslatedForms<T>> = {};
   for (const language of ['en', 'fr'] satisfies Language[]) {

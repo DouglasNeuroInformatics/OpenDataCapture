@@ -18,6 +18,10 @@
   "scripts": {
     "build": "tsup",
     "check-types": "tsc --noEmit",
-    "lint": "eslint --fix lib"
-  }
+    "lint": "eslint --fix src"
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ]
 }

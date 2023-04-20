@@ -84,7 +84,7 @@ export type MultilingualFormContent<TData extends BaseTypes.FormInstrumentData> 
   | MultilingualFormFieldsGroup<TData>[];
 
 export type MultilingualForm<TData extends BaseTypes.FormInstrumentData> = Simplify<
-  Omit<FormInstrument<TData>, 'details' | 'content'> & {
+  Omit<FormInstrument<TData>, 'details' | 'content' | 'kind'> & {
     details: MultilingualFormDetails;
     content: MultilingualFormContent<TData>;
   }

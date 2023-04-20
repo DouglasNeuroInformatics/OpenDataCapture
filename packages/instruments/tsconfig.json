@@ -1,6 +1,6 @@
 {
   "extends": "@douglasneuroinformatics/tsconfig/base.json",
-  "include": ["lib/**/*"],
+  "include": ["src/**/*"],
   "compilerOptions": {
     "declarationMap": true,
     "module": "Node16",
