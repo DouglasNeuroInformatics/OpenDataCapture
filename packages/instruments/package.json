@@ -5,6 +5,10 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "package.json"
+  ],
   "exports": {
     ".": {
       "require": "./dist/index.js",
@@ -12,16 +16,13 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "dependencies": {
-    "@douglasneuroinformatics/common": "*"
-  },
   "scripts": {
     "build": "tsup",
     "check-types": "tsc --noEmit",
     "lint": "eslint --fix src"
   },
-  "files": [
-    "dist",
-    "package.json"
-  ]
+  "dependencies": {
+    "@douglasneuroinformatics/common": "*",
+    "ajv": "^8.12.0"
+  }
 }

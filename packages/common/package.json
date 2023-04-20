@@ -5,6 +5,10 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "package.json"
+  ],
   "exports": {
     ".": {
       "require": "./dist/index.js",
@@ -45,8 +49,11 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint --fix src"
   },
-  "files": [
-    "dist",
-    "package.json"
-  ]
+  "dependencies": {
+    "@casl/ability": "^6.3.3",
+    "ajv": "^8.12.0",
+    "ajv-errors": "^3.0.0",
+    "ajv-formats": "^2.1.1",
+    "type-fest": "^3.8.0"
+  }
 }
