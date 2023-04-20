@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 import { HiChevronUp } from 'react-icons/hi2';
 
-export interface ArrowToggleProps extends React.ComponentPropsWithoutRef<'button'> {
+export interface ArrowToggleProps extends Omit<React.ComponentPropsWithoutRef<'button'>, 'content'> {
   position: 'up' | 'right' | 'down' | 'left';
   rotation: number;
   content?: React.ReactNode;
@@ -11,7 +11,6 @@ export interface ArrowToggleProps extends React.ComponentPropsWithoutRef<'button
 
 export const ArrowToggle = ({ position, rotation, onClick, content, contentPosition, ...props }: ArrowToggleProps) => {
   const [isToggled, setIsToggled] = useState(false);
-
   const computedRotation = useMemo(() => {
     const toggleRotation = isToggled ? rotation : 0;
     switch (position) {
