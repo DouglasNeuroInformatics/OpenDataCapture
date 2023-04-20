@@ -1,5 +1,13 @@
 # @douglasneuroinformatics/instruments
 
+## 0.0.3
+
+### Patch Changes
+
+- Fix some dependency issues
+- Updated dependencies
+  - @douglasneuroinformatics/common@0.0.4
+
 ## 0.0.2
 
 ### Patch Changes

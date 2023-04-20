@@ -1,5 +1,11 @@
 # @douglasneuroinformatics/common
 
+## 0.0.4
+
+### Patch Changes
+
+- Fix some dependency issues
+
 ## 0.0.3
 
 ### Patch Changes
