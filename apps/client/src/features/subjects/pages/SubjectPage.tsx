@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FormInstrumentRecord } from '@ddcp/common';
+import { FormInstrumentRecord } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 

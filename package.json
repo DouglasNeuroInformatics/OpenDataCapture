@@ -1,5 +1,5 @@
 {
-  "name": "ddcp",
+  "name": "@douglasneuroinformatics/ddcp",
   "version": "0.0.1",
   "type": "module",
   "private": true,
@@ -12,17 +12,20 @@
     "build": "env-cmd cross-env NODE_ENV=production turbo run build",
     "check-types": "turbo run check-types",
     "clean": "fd -H -I --prune \".turbo|dist|node_modules\" --exec rm -rf",
+    "demo": "env-cmd turbo run demo",
     "dev": "env-cmd cross-env NODE_ENV=development turbo run dev",
     "format": "turbo run format",
     "lint": "turbo run lint",
     "prepare": "husky install",
+    "publish-packages": "turbo run build lint test && changeset version && changeset publish",
     "storybook": "yarn ws client storybook",
     "test": "env-cmd turbo run test",
     "ws": "env-cmd yarn workspace"
   },
   "devDependencies": {
-    "@ddcp/eslint-config": "*",
-    "@ddcp/tsconfig": "*",
+    "@changesets/cli": "^2.26.1",
+    "@douglasneuroinformatics/eslint-config": "*",
+    "@douglasneuroinformatics/tsconfig": "*",
     "@types/node": "^18.11.18",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
@@ -31,15 +34,9 @@
     "lint-staged": "^13.1.0",
     "prettier": "^2.8.4",
     "ts-node": "^10.9.1",
+    "tsup": "^6.7.0",
     "turbo": "^1.7.2",
     "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "@casl/ability": "^6.3.3",
-    "ajv": "^8.12.0",
-    "ajv-errors": "^3.0.0",
-    "ajv-formats": "^2.1.1",
-    "zod": "^3.20.2"
   },
   "engines": {
     "node": ">=18.0.0 <19.0.0",

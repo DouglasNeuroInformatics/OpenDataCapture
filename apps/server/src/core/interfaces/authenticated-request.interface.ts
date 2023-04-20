@@ -1,4 +1,4 @@
-import { AppAbility } from '@ddcp/common';
+import { AppAbility } from '@douglasneuroinformatics/common';
 import { Request } from 'express';
 
 import { UserEntity } from '@/users/entities/user.entity';

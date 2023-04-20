@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { FormInstrumentSummary, Language } from '@ddcp/common';
+import { FormInstrumentSummary, Language } from '@douglasneuroinformatics/common';
+import { animated, useTrail } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentCard } from './InstrumentCard';
@@ -13,10 +14,40 @@ export interface InstrumentShowcaseProps {
 
 export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => {
   const { i18n, t } = useTranslation(['common', 'instruments']);
-
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<Language[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const defaultLanguageOptions = useMemo<Language[]>(() => {
+    return [i18n.resolvedLanguage as Language];
+  }, [i18n.resolvedLanguage]);
+
+  const filteredInstruments = useMemo(() => {
+    return instruments.filter((instrument) => {
+      const matchesSearch = instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
+      const matchesLanguages =
+        selectedLanguages.length === 0 || selectedLanguages.includes(instrument.details.language);
+      const matchesTags = selectedTags.length === 0 || instrument.tags.some((tag) => selectedTags.includes(tag));
+      return matchesSearch && matchesLanguages && matchesTags;
+    });
+  }, [instruments, searchTerm, selectedLanguages, selectedTags]);
+
+  const [trails, api] = useTrail(
+    filteredInstruments.length,
+    (index) => ({
+      config: { tension: 280, friction: 60 },
+      from: {
+        opacity: 0,
+        y: 80
+      },
+      to: {
+        opacity: 1,
+        y: 0
+      },
+      reset: true
+    }),
+    [filteredInstruments]
+  );
 
   const languageOptions = Array.from(new Set(instruments.map((item) => item.details.language))).map((item) => ({
     key: item,
@@ -28,20 +59,13 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
     label: item
   }));
 
-  const filteredInstruments = instruments.filter((instrument) => {
-    const matchesSearch = instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
-    const matchesLanguages = selectedLanguages.length === 0 || selectedLanguages.includes(instrument.details.language);
-    const matchesTags = selectedTags.length === 0 || instrument.tags.some((tag) => selectedTags.includes(tag));
-    return matchesSearch && matchesLanguages && matchesTags;
-  });
-
   return (
     <div>
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
         <SearchBar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <SelectDropdown
-            defaultSelections={[i18n.resolvedLanguage as Language]}
+            defaultSelections={defaultLanguageOptions}
             options={languageOptions}
             title={t('instruments:availableInstruments.filters.language')}
             onChange={(selected) => setSelectedLanguages(selected.map((item) => item.key))}
@@ -53,9 +77,11 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-5">
-        {filteredInstruments.map((instrument, i) => (
-          <InstrumentCard instrument={instrument} key={i} />
+      <div className="relative grid grid-cols-1 gap-5">
+        {trails.map((style, i) => (
+          <animated.div key={i} style={style}>
+            <InstrumentCard instrument={filteredInstruments[i]} />
+          </animated.div>
         ))}
       </div>
     </div>

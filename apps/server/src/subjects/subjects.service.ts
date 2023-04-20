@@ -1,6 +1,6 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { AppAbility, Group, Sex } from '@ddcp/common';
+import { AppAbility, Group, Sex } from '@douglasneuroinformatics/common';
 import unidecode from 'unidecode';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
@@ -9,10 +9,15 @@ import { SubjectEntity } from './entities/subject.entity';
 import { SubjectsRepository } from './subjects.repository';
 
 import { CryptoService } from '@/crypto/crypto.service';
+import { GroupsService } from '@/groups/groups.service';
 
 @Injectable()
 export class SubjectsService {
-  constructor(private readonly cryptoService: CryptoService, private readonly subjectsRepository: SubjectsRepository) {}
+  constructor(
+    private readonly cryptoService: CryptoService,
+    private readonly groupsService: GroupsService,
+    private readonly subjectsRepository: SubjectsRepository
+  ) {}
 
   async create({ firstName, lastName, dateOfBirth, sex }: CreateSubjectDto): Promise<SubjectEntity> {
     const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
@@ -29,8 +34,9 @@ export class SubjectsService {
     });
   }
 
-  async findAll(ability: AppAbility): Promise<SubjectEntity[]> {
-    return this.subjectsRepository.find().accessibleBy(ability).lean();
+  async findAll(ability: AppAbility, groupName?: string): Promise<SubjectEntity[]> {
+    const filter = groupName ? { groups: await this.groupsService.findByName(groupName, ability) } : {};
+    return this.subjectsRepository.find(filter).accessibleBy(ability).lean();
   }
 
   async lookup(dto: LookupSubjectDto): Promise<SubjectEntity> {

@@ -1,10 +1,24 @@
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { CryptoService } from '../crypto.service';
+
+import { MockConfigService } from '@/core/test/mocks/config.service.mock';
 
 describe('CryptoService', () => {
   let cryptoService: CryptoService;
 
-  beforeEach(() => {
-    cryptoService = new CryptoService();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        CryptoService,
+        {
+          provide: ConfigService,
+          useValue: MockConfigService
+        }
+      ]
+    }).compile();
+    cryptoService = module.get(CryptoService);
   });
 
   describe('hash', () => {

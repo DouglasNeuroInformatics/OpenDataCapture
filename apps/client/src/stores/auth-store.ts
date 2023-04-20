@@ -1,7 +1,8 @@
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, Group, JwtPayload } from '@ddcp/common';
+import { AppAbility, Group, JwtPayload } from '@douglasneuroinformatics/common';
 import jwtDecode from 'jwt-decode';
 import { create } from 'zustand';
+
 import { useActiveSubjectStore } from './active-subject-store';
 
 export interface CurrentUser extends Omit<JwtPayload, 'permissions'> {
@@ -13,6 +14,7 @@ export interface AuthStore {
   setAccessToken: (accessToken: string) => void;
   currentUser: CurrentUser | null;
   currentGroup: Group | null;
+  setCurrentGroup: (group: Group) => void;
   logout: () => void;
 }
 
@@ -29,6 +31,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
   currentUser: null,
   currentGroup: null,
+  setCurrentGroup: (group) => {
+    set({ currentGroup: group });
+  },
   logout: () => {
     useActiveSubjectStore.setState({ activeSubject: null });
     set({ accessToken: null, currentUser: null });

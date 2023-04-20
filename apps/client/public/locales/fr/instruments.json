@@ -1,12 +1,28 @@
 {
   "createInstrument": {
-    "pageTitle": "Ajouter un instrument",
+    "pageTitle": "Ajouter un instrument (Expérimental)",
+    "steps": {
+      "info": "Info",
+      "fields": "Champs",
+      "review": "Révision"
+    },
     "form": {
+      "basics": "De base",
+      "name": {
+        "label": "Nom"
+      },
+      "tags": {
+        "label": "Tags"
+      },
+      "version": {
+        "label": "Version"
+      },
+      "details": "Détails",
       "title": {
-        "label": "Nom du champ"
+        "label": "Titre"
       },
       "description": {
-        "label": "Description du champ"
+        "label": "Description"
       },
       "language": {
         "label": "Langue"
@@ -17,6 +33,10 @@
       "estimatedDuration": {
         "label": "Durée prévue"
       }
+    },
+    "errors": {
+      "duplicateField": "Nom de champ en double invalide",
+      "invalidOptionFormat": "Format non valide pour l'option"
     }
   },
   "availableInstruments": {
@@ -24,6 +44,17 @@
     "filters": {
       "language": "Langue",
       "tags": "Tags"
+    }
+  },
+  "manageInstruments": {
+    "pageTitle": "Gérer les instruments",
+    "deleteModal": {
+      "title": "Confirmation de l'effacement",
+      "name": "Nom",
+      "language": "Langue",
+      "version": "Version",
+      "delete": "Effacer",
+      "cancel": "Annuler"
     }
   },
   "formPage": {

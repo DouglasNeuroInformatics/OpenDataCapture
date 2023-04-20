@@ -2,7 +2,7 @@ const path = require('path');
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: ['@ddcp'],
+  extends: ['@douglasneuroinformatics'],
   ignorePatterns: ['dist/**/*'],
   env: {
     node: true

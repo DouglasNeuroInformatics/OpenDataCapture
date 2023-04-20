@@ -1,43 +1,57 @@
-import React, { useReducer } from 'react';
+import React from 'react';
 
-import { ArrayFormField } from '@ddcp/common';
+import { ArrayFormField } from '@douglasneuroinformatics/common';
 
 import { Button } from '../Button';
 
-import { PrimitiveFormField } from './PrimitiveFormField';
-import { BaseFieldProps } from './types';
+import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormField';
+import { BaseFieldProps, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
+export type ArrayFieldProps = BaseFieldProps<NullableArrayFieldValue> & ArrayFormField;
 
-type ArrayFieldProps = BaseFieldProps<ArrayFormField>;
+export const ArrayField = ({ label, fieldset, error, value: arrayValue, setValue: setArrayValue }: ArrayFieldProps) => {
+  const appendField = () => {
+    setArrayValue([...arrayValue, Object.fromEntries(Object.keys(fieldset).map((fieldName) => [fieldName, null]))]);
+  };
 
-export const ArrayField = ({ name, label, fieldset }: ArrayFieldProps) => {
-  // const { error, value, setValue } = useFormField<boolean>(name);
+  console.error(error);
 
-  const [state, dispatch] = useReducer(
-    (prevState: (typeof fieldset)[], action: 'append' | 'remove') => {
-      const newState = [...prevState];
-      if (action === 'append') {
-        newState.push({ ...fieldset });
-      } else if (action === 'remove' && prevState.length > 1) {
-        newState.pop();
-      }
-      return newState;
-    },
-    [fieldset]
-  );
+  const removeField = () => {
+    if (arrayValue.length > 1) {
+      arrayValue.pop();
+      setArrayValue(arrayValue);
+    }
+  };
 
   return (
     <div>
-      <span className="field-header">{label}</span>
-
-      {Object.keys(fieldset).map((fieldName) => {
-        const props = { name: fieldName + '_1', ...fieldset[fieldName] };
-        return <PrimitiveFormField key={fieldName} {...props} />;
-      })}
+      {arrayValue.map((fields, i) => (
+        <div key={i}>
+          <span className="field-header">{label + ' ' + (i + 1)}</span>
+          {Object.keys(fields).map((fieldName) => {
+            const field = fieldset[fieldName];
+            const fieldProps = field instanceof Function ? field(fields) : field;
+            if (!fieldProps) {
+              return null;
+            }
+            const props = {
+              name: fieldName + i,
+              error: error?.[i]?.[fieldName],
+              value: fields[fieldName],
+              setValue: (value: NullablePrimitiveFieldValue) => {
+                const newArrayValue = [...arrayValue];
+                newArrayValue[i][fieldName] = value;
+                setArrayValue(newArrayValue);
+              },
+              ...fieldProps
+            } as PrimitiveFormFieldProps;
+            return <PrimitiveFormField key={fieldName} {...props} />;
+          })}
+        </div>
+      ))}
       <div className="mb-5 flex gap-5">
-        <Button label="Append" type="button" onClick={() => dispatch('append')} />
-        <Button label="Remove" type="button" onClick={() => dispatch('remove')} />
+        <Button label="Append" type="button" onClick={appendField} />
+        <Button label="Remove" type="button" onClick={removeField} />
       </div>
     </div>
   );

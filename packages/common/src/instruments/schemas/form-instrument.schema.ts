@@ -1,6 +1,6 @@
 import { JSONSchemaType } from 'ajv';
 
-import { FormInstrument } from '../interfaces/form/form-instrument.interface';
+import { FormInstrument } from '../interfaces/form/form-instrument.types';
 
 import { formDetailsSchema } from './form-details.schema';
 import { formFieldsGroupSchema, formFieldsSchema } from './form-fields.schema';

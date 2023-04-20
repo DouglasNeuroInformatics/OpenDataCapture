@@ -9,15 +9,10 @@ import { AuthService } from '../auth.service';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { MockAbilityFactory } from '@/ability/test/mocks/ability.factory.mock';
+import { MockConfigService } from '@/core/test/mocks/config.service.mock';
 import { CryptoService } from '@/crypto/crypto.service';
 import { MockCryptoService } from '@/crypto/test/mocks/crypto.service.mock';
 import { UsersService } from '@/users/users.service';
-
-const MockConfigService = createMock<ConfigService>({
-  getOrThrow(property: string) {
-    return property;
-  }
-});
 
 const MockJwtService = createMock<JwtService>({
   signAsync: () => {

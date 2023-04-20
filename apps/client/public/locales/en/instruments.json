@@ -1,9 +1,25 @@
 {
   "createInstrument": {
-    "pageTitle": "Add Instrument",
+    "pageTitle": "Add Instrument (Experimental)",
+    "steps": {
+      "info": "Info",
+      "fields": "Fields",
+      "review": "Review"
+    },
     "form": {
+      "basics": "Basics",
+      "name": {
+        "label": "Name"
+      },
+      "tags": {
+        "label": "Tags"
+      },
+      "version": {
+        "label": "Version"
+      },
+      "details": "Details",
       "title": {
-        "label": "Field Name"
+        "label": "Title"
       },
       "description": {
         "label": "Description"
@@ -17,6 +33,10 @@
       "estimatedDuration": {
         "label": "Estimated Duration"
       }
+    },
+    "errors": {
+      "duplicateField": "Invalid duplicate field name",
+      "invalidOptionFormat": "Invalid format for option"
     }
   },
   "availableInstruments": {
@@ -24,6 +44,17 @@
     "filters": {
       "language": "Language",
       "tags": "Tags"
+    }
+  },
+  "manageInstruments": {
+    "pageTitle": "Manage Instruments",
+    "deleteModal": {
+      "title": "Confirmation",
+      "name": "Name",
+      "language": "Language",
+      "version": "Version",
+      "delete": "Delete",
+      "cancel": "Cancel"
     }
   },
   "formPage": {

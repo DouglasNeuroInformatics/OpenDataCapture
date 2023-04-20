@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { type AppAbility } from '@ddcp/common';
+import { type AppAbility } from '@douglasneuroinformatics/common';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { LookupSubjectDto } from './dto/lookup-subject.dto';
@@ -26,8 +26,8 @@ export class SubjectsController {
   @ApiOperation({ summary: 'Get All Subjects' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  findAll(@UserAbility() ability: AppAbility): Promise<SubjectEntity[]> {
-    return this.subjectsService.findAll(ability);
+  findAll(@UserAbility() ability: AppAbility, @Query('group') groupName?: string): Promise<SubjectEntity[]> {
+    return this.subjectsService.findAll(ability, groupName);
   }
 
   @ApiOperation({ summary: 'Lookup Subject' })

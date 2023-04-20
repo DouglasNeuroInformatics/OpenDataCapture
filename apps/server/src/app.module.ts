@@ -41,6 +41,7 @@ import { UsersModule } from './users/users.module';
             connection.plugin(accessibleRecordsPlugin);
             return connection;
           },
+          ignoreUndefined: true,
           uri: `${mongoUri}/${env}`
         };
       }

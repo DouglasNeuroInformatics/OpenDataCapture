@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import { FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@ddcp/common';
+import { FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@douglasneuroinformatics/common';
 import { Model } from 'mongoose';
 
 import { FormInstrumentEntity } from '../entities/form-instrument.entity';
@@ -44,7 +44,7 @@ export class FormsService {
   }
 
   async remove(id: string): Promise<FormInstrument> {
-    const result = await this.formModel.findOneAndDelete({ id }, { new: true });
+    const result = await this.formModel.findByIdAndDelete(id, { new: true });
     if (!result) {
       throw new NotFoundException(`Failed to find form with id: ${id}`);
     }

@@ -2,6 +2,7 @@
   "pageTitle": "Overview",
   "welcome": "Welcome Back",
   "summary": "Summary of Available Data",
+  "currentGroup": "Current Group",
   "stats": {
     "totalUsers": "Total Users",
     "totalSubjects": "Total Subjects",

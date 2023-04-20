@@ -17,6 +17,7 @@ const SOURCE_URL = import.meta.env.DEV
 const GIT_BRANCH = import.meta.env.VITE_DEV_GIT_BRANCH;
 const GIT_COMMIT = import.meta.env.VITE_DEV_GIT_COMMIT?.slice(0, 7);
 const GIT_COMMIT_DATE = import.meta.env.VITE_DEV_GIT_COMMIT_DATE;
+const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL;
 
 export interface FooterProps {
   isLogin?: boolean;
@@ -30,6 +31,10 @@ export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
     <footer className="py-3 text-slate-600 print:hidden">
       {isLogin ? (
         <div className="flex items-center justify-center text-slate-500">
+          <a className="text-sm" href={`mailto:${CONTACT_EMAIL}`}>
+            {t('footer.contact')}
+          </a>
+          <span className="mx-1">|</span>
           <LanguageToggle className="text-sm" />
           <span className="mx-1">|</span>
           <a className="text-sm" href={DOCS_URL} rel="noreferrer" target="_blank">

@@ -1,52 +1,27 @@
 import React, { useMemo, useState } from 'react';
 
-import { FormFields, FormInstrument, FormInstrumentContent, FormInstrumentData } from '@ddcp/common';
+import { FormFields, FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/common';
+import { JSONSchemaType } from 'ajv';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '../Button';
 
-import { ArrayField } from './ArrayField';
-import { PrimitiveFormField } from './PrimitiveFormField';
-import { FormErrors, FormValues, NullableArrayFieldValue } from './types';
+import { ArrayField, ArrayFieldProps } from './ArrayField';
+import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormField';
+import { FormErrors, FormValues, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';
+import { getDefaultValues, getFormErrors } from './utils';
 
 import { FormProvider } from '@/context/FormContext';
 import { ajv } from '@/services/ajv';
 
-const DEFAULT_PRIMITIVE_VALUES = {
-  text: '',
-  options: '',
-  date: '',
-  numeric: null,
-  binary: null
-};
-
-/** Returns the default values when initializing the state or resetting the form */
-const getDefaultValues = <T extends FormInstrumentData>(content: FormInstrumentContent<T>): FormValues<T> => {
-  const defaultValues: Partial<FormValues<T>> = {};
-  const fields = (Array.isArray(content) ? content.map((group) => group.fields) : content) as FormFields<T>;
-  for (const fieldName in fields) {
-    const field = fields[fieldName];
-    if (field.kind === 'array') {
-      const defaultItemValues: NullableArrayFieldValue[number] = {};
-      for (const subfieldName in field.fieldset) {
-        const subfield = field.fieldset[subfieldName];
-        defaultItemValues[subfieldName] = DEFAULT_PRIMITIVE_VALUES[subfield.kind];
-      }
-      defaultValues[fieldName] = [defaultItemValues];
-    } else {
-      defaultValues[fieldName] = DEFAULT_PRIMITIVE_VALUES[field.kind];
-    }
-  }
-  return defaultValues as FormValues<T>;
-};
-
-export interface FormProps<T extends FormInstrumentData>
-  extends Pick<FormInstrument<T>, 'content' | 'validationSchema'> {
+export interface FormProps<T extends FormInstrumentData> {
+  content: FormInstrumentContent<T>;
   className?: string;
   initialValues?: FormValues<T> | null;
   submitBtnLabel?: string;
-  onSubmit: (data: FormValues<T>) => void;
+  validationSchema: JSONSchemaType<T>;
+  onSubmit: (data: T) => void;
 }
 
 export const Form = <T extends FormInstrumentData>({
@@ -73,26 +48,31 @@ export const Form = <T extends FormInstrumentData>({
     const valid = validate(values);
     if (valid) {
       reset();
-      onSubmit(values);
+      onSubmit(values as T);
     } else {
-      validate.errors?.forEach((error) => {
-        const path = error.instancePath.split('/').filter((e) => e);
-        const errorMessage = `${error.message ?? 'Unknown Error'}`;
-        setErrors((prevErrors) => {
-          return { ...prevErrors, [path[0]]: errorMessage };
-        });
-      });
+      setErrors(getFormErrors(validate.errors));
     }
   };
 
-  const renderFormField = (fields: FormFields<T>) => {
-    return Object.keys(fields).map((fieldName) => {
-      const props = { name: fieldName, ...fields[fieldName] };
+  const renderFormFields = (fields: FormFields<T>): JSX.Element[] => {
+    const formFields: JSX.Element[] = [];
+    for (const fieldName in fields) {
+      const props = {
+        name: fieldName,
+        error: errors[fieldName],
+        value: values[fieldName],
+        setValue: (value: NullablePrimitiveFieldValue | NullableArrayFieldValue) => {
+          setValues((prevValues) => ({ ...prevValues, [fieldName]: value }));
+        },
+        ...fields[fieldName]
+      };
       if (props.kind === 'array') {
-        return <ArrayField key={props.name} {...props} />;
+        formFields.push(<ArrayField key={fieldName} {...(props as ArrayFieldProps)} />);
+      } else {
+        formFields.push(<PrimitiveFormField key={fieldName} {...(props as PrimitiveFormFieldProps)} />);
       }
-      return <PrimitiveFormField key={props.name} {...props} />;
-    });
+    }
+    return formFields;
   };
 
   return (
@@ -101,13 +81,13 @@ export const Form = <T extends FormInstrumentData>({
         {Array.isArray(content)
           ? content.map((fieldGroup, i) => {
               return (
-                <div className="font-semibold" key={i}>
-                  <h3>{fieldGroup.title}</h3>
-                  {renderFormField(fieldGroup.fields as FormFields<T>)}
+                <div key={i}>
+                  <h3 className="my-5 font-semibold">{fieldGroup.title}</h3>
+                  {renderFormFields(fieldGroup.fields as FormFields<T>)}
                 </div>
               );
             })
-          : renderFormField(content)}
+          : renderFormFields(content)}
         <div className="w-full">
           <Button className="w-full" label={submitBtnLabel ?? t('submit')} type="submit" />
         </div>

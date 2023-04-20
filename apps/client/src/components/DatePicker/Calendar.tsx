@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { range } from '@ddcp/common';
+import { range } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 export interface CalendarProps {

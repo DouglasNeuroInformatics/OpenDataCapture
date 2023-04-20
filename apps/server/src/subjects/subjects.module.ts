@@ -7,10 +7,12 @@ import { SubjectsRepository } from './subjects.repository';
 import { SubjectsService } from './subjects.service';
 
 import { CryptoModule } from '@/crypto/crypto.module';
+import { GroupsModule } from '@/groups/groups.module';
 
 @Module({
   imports: [
     CryptoModule,
+    GroupsModule,
     MongooseModule.forFeature([
       {
         name: SubjectEntity.modelName,

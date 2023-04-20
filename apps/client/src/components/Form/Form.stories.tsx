@@ -19,14 +19,11 @@ type BasicFormValues = {
   textShort: string;
   textLong: string;
   textPassword: string;
-  numeric: number;
+  numericDefault: number;
+  numericSlider: number;
   options: 'a' | 'b' | 'c';
   date: string;
   binary: boolean;
-  array: Array<{
-    f1: string;
-    f2: number;
-  }>;
 };
 
 export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
@@ -47,12 +44,21 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
         label: 'Password',
         variant: 'password'
       },
-      numeric: {
+      numericDefault: {
         description: 'This is a numeric field',
         kind: 'numeric',
-        label: 'Numeric',
+        label: 'Numeric (Default)',
         min: 0,
-        max: 10
+        max: 10,
+        variant: 'default'
+      },
+      numericSlider: {
+        description: 'This is a numeric field',
+        kind: 'numeric',
+        label: 'Numeric (Slider)',
+        min: 0,
+        max: 10,
+        variant: 'slider'
       },
       options: {
         kind: 'options',
@@ -70,7 +76,26 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
       binary: {
         kind: 'binary',
         label: 'Binary'
-      },
+      }
+    },
+    validationSchema: {
+      type: 'object',
+      required: []
+    },
+    onSubmit: (data) => alert(JSON.stringify(data, null, 2))
+  }
+};
+
+type ArrayFormValues = {
+  array: Array<{
+    f1: string;
+    f2: number;
+  }>;
+};
+
+export const ArrayForm: StoryObj<typeof Form<ArrayFormValues>> = {
+  args: {
+    content: {
       array: {
         kind: 'array',
         label: 'Array Field',
@@ -84,14 +109,35 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
             kind: 'numeric',
             label: 'Field 2',
             min: 0,
-            max: 10
+            max: 10,
+            variant: 'slider'
           }
         }
       }
     },
     validationSchema: {
       type: 'object',
-      required: []
+      properties: {
+        array: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              f1: {
+                type: 'string',
+                minLength: 1
+              },
+              f2: {
+                type: 'integer',
+                minimum: 0,
+                maximum: 10
+              }
+            },
+            required: ['f1', 'f2']
+          }
+        }
+      },
+      required: ['array']
     },
     onSubmit: (data) => alert(JSON.stringify(data, null, 2))
   }

@@ -1,26 +1,34 @@
-import { BaseFormField, FormInstrumentData, PrimitiveFieldValue } from '@ddcp/common';
+import { ArrayFieldValue, FormInstrumentData, PrimitiveFieldValue } from '@douglasneuroinformatics/common';
 
-/** Omit property K across all objects in union T */
-export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
+export type NullablePrimitiveFieldValue<T extends PrimitiveFieldValue = PrimitiveFieldValue> = T | null;
+
+export type NullableArrayFieldValue<T extends ArrayFieldValue = ArrayFieldValue> = Array<{
+  [K in keyof T[number]]: NullablePrimitiveFieldValue<T[number][K]>;
+}>;
 
 /** Common props for all field components */
-export type BaseFieldProps<T extends BaseFormField> = T & {
+export interface BaseFieldProps<T> {
   name: string;
-};
-
-export type NullablePrimitiveFieldValue = PrimitiveFieldValue | null;
-
-export type NullableArrayFieldValue = Record<string, NullablePrimitiveFieldValue>[];
+  value: T;
+  setValue: (value: T) => void;
+  error?: T extends NullableArrayFieldValue
+    ? Record<string, string>[]
+    : T extends NullablePrimitiveFieldValue
+    ? string
+    : never;
+}
 
 /** An object mapping field names to error messages, if applicable */
 export type FormErrors<T extends FormInstrumentData = FormInstrumentData> = {
-  [K in keyof T]?: T[K] extends NullablePrimitiveFieldValue
-    ? string
-    : {
-        [P in keyof T[K]]: string;
-      };
+  [K in keyof T]?: string | Record<string, string>[];
 };
 
 export type FormValues<T extends FormInstrumentData = FormInstrumentData> = {
-  [K in keyof T]: NullablePrimitiveFieldValue | NullableArrayFieldValue;
+  [K in keyof T]: T[K] extends PrimitiveFieldValue
+    ? NullablePrimitiveFieldValue<T[K]>
+    : T[K] extends ArrayFieldValue
+    ? NullableArrayFieldValue<T[K]>
+    : T[K] extends PrimitiveFieldValue | ArrayFieldValue
+    ? NullablePrimitiveFieldValue | NullableArrayFieldValue
+    : never;
 };

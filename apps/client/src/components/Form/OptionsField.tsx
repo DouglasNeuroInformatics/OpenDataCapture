@@ -1,30 +1,29 @@
 import React from 'react';
 
-import { OptionsFormField } from '@ddcp/common';
+import { OptionsFormField } from '@douglasneuroinformatics/common';
 import { Listbox, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
-
-export type OptionsFieldProps<T extends string> = BaseFieldProps<OptionsFormField<T>>;
+export type OptionsFieldProps<T extends string = string> = BaseFieldProps<T | null> & OptionsFormField<T>;
 
 export const OptionsField = <T extends string = string>({
   description,
   name,
   label,
-  options
+  options,
+  error,
+  value,
+  setValue
 }: OptionsFieldProps<T>) => {
-  const { error, value, setValue } = useFormField<T>(name);
-
   return (
     <FormFieldContainer description={description} error={error}>
       <Listbox as={React.Fragment} name={name} value={value} onChange={setValue}>
         {({ open }) => (
           <>
-            <Listbox.Button className="field-input capitalize">{options[value]}</Listbox.Button>
+            <Listbox.Button className="field-input capitalize">{value ? options[value] : ''}</Listbox.Button>
             <Listbox.Label
               className={clsx('field-label-floating', {
                 'field-label-floating--active': value || open

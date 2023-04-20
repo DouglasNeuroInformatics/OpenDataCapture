@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { BasePermissionLevel } from '@ddcp/common';
+import { BasePermissionLevel } from '@douglasneuroinformatics/common';
 
 import { AbilityFactory } from '../ability.factory';
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DateUtils } from '@ddcp/common';
+import { DateUtils } from '@douglasneuroinformatics/common';
 import { clsx } from 'clsx';
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
@@ -46,7 +46,7 @@ export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, e
 
   return (
     <div>
-      <div className="overflow-x-scroll">
+      <div className="scrollbar-hidden overflow-x-scroll">
         <table className="relative w-full table-auto border">
           <thead>
             <tr>

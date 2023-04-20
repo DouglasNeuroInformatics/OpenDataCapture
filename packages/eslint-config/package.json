@@ -1,6 +1,6 @@
 {
-  "name": "@ddcp/eslint-config",
-  "version": "0.0.0",
+  "name": "@douglasneuroinformatics/eslint-config",
+  "version": "0.0.1",
   "license": "AGPL-3.0",
   "main": "index.cjs",
   "dependencies": {

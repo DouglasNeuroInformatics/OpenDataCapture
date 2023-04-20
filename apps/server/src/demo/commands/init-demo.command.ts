@@ -2,14 +2,13 @@ import { Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, BasePermissionLevel, Random } from '@ddcp/common';
+import { AppAbility, BasePermissionLevel, Random } from '@douglasneuroinformatics/common';
 import {
   BriefPsychiatricRatingScaleData,
   briefPsychiatricRatingScale,
-  enhancedDemographicsQuestionnaireEn,
-  enhancedDemographicsQuestionnaireFr,
+  enhancedDemographicsQuestionnaire,
   happinessQuestionnaire
-} from '@ddcp/instruments';
+} from '@douglasneuroinformatics/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 import { Command, CommandRunner } from 'nest-commander';
@@ -40,6 +39,14 @@ const DEMO_USERS: CreateUserDto[] = [
     basePermissionLevel: BasePermissionLevel.Admin,
     isAdmin: true,
     firstName: 'Admin'
+  },
+  {
+    username: 'MultiGroupPI',
+    password: 'password',
+    groupNames: ['Psychosis Clinic', 'Depression Clinic'],
+    basePermissionLevel: BasePermissionLevel.GroupManager,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName()
   },
   {
     username: 'PsychosisClinicPI',
@@ -80,7 +87,7 @@ const DEMO_USERS: CreateUserDto[] = [
 })
 export class InitDemoCommand extends CommandRunner {
   private readonly ability = createMongoAbility<AppAbility>([{ action: 'manage', subject: 'all' }]);
-  private readonly demoDbNames = ['development', 'test'];
+  private readonly demoDbNames = ['development', 'demo', 'test'];
   private readonly logger = new Logger(InitDemoCommand.name);
 
   constructor(
@@ -104,10 +111,12 @@ export class InitDemoCommand extends CommandRunner {
     for (const user of DEMO_USERS) {
       await this.usersService.create(user, this.ability);
     }
+
     const bprs = await this.formsService.create(briefPsychiatricRatingScale);
-    const hq = await this.formsService.create(happinessQuestionnaire);
-    await this.formsService.create(enhancedDemographicsQuestionnaireEn);
-    await this.formsService.create(enhancedDemographicsQuestionnaireFr);
+    const hq = await this.formsService.create(happinessQuestionnaire.en);
+    await this.formsService.create(happinessQuestionnaire.fr);
+    await this.formsService.create(enhancedDemographicsQuestionnaire.en);
+    await this.formsService.create(enhancedDemographicsQuestionnaire.fr);
 
     for (let i = 0; i < 100; i++) {
       const createSubjectDto = {

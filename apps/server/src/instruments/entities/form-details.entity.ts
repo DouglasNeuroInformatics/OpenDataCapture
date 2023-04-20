@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { FormDetails, type Language } from '@ddcp/common';
+import { FormDetails, type Language } from '@douglasneuroinformatics/common';
 
 @Schema({ strict: 'throw' })
 export class FormDetailsEntity implements FormDetails {

@@ -23,11 +23,13 @@ type UseFetchOptions = GetRequestOptions | PostRequestOptions;
  */
 export function useFetch<T = unknown>(
   resourceURL: string,
+  deps: readonly unknown[] = [],
   options: UseFetchOptions = {
     method: 'GET'
   }
 ): {
   data: T | null;
+  setData: React.Dispatch<React.SetStateAction<T | null>>;
 } {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
@@ -59,7 +61,7 @@ export function useFetch<T = unknown>(
           message
         });
       });
-  }, []);
+  }, deps);
 
-  return { data };
+  return { data, setData };
 }

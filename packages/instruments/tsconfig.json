@@ -1,8 +1,10 @@
 {
-  "extends": "@ddcp/tsconfig/base.json",
-  "include": ["lib/**/*"],
+  "extends": "@douglasneuroinformatics/tsconfig/base.json",
+  "include": ["src/**/*"],
   "compilerOptions": {
     "declarationMap": true,
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "outDir": "dist"
   }
 }

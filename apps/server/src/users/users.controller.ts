@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { type AppAbility } from '@ddcp/common';
+import { type AppAbility } from '@douglasneuroinformatics/common';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
@@ -23,8 +23,8 @@ export class UsersController {
 
   @Get()
   @RouteAccess({ action: 'read', subject: 'User' })
-  findAll(@UserAbility() ability: AppAbility): Promise<UserEntity[]> {
-    return this.usersService.findAll(ability);
+  findAll(@UserAbility() ability: AppAbility, @Query('group') groupName?: string): Promise<UserEntity[]> {
+    return this.usersService.findAll(ability, groupName);
   }
 
   @Get(':username')

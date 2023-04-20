@@ -1,18 +1,14 @@
 import React from 'react';
 
-import { TextFormField } from '@ddcp/common';
+import { TextFormField } from '@douglasneuroinformatics/common';
 import { clsx } from 'clsx';
 
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
+export type TextFieldProps = BaseFieldProps<string | null> & TextFormField;
 
-type TextFieldProps = BaseFieldProps<TextFormField>;
-
-export const TextField = ({ description, name, label, variant }: TextFieldProps) => {
-  const { error, value, setValue } = useFormField<string>(name);
-
+export const TextField = ({ description, name, label, variant, error, value, setValue }: TextFieldProps) => {
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
     setValue(event.target.value);
   };
@@ -25,11 +21,17 @@ export const TextField = ({ description, name, label, variant }: TextFieldProps)
           className="field-input peer"
           name={name}
           type={variant === 'short' ? 'text' : 'password'}
-          value={value}
+          value={value ?? ''}
           onChange={handleChange}
         />
       ) : (
-        <textarea autoComplete="off" className="field-input peer" rows={5} value={value} onChange={handleChange} />
+        <textarea
+          autoComplete="off"
+          className="field-input peer"
+          rows={5}
+          value={value ?? ''}
+          onChange={handleChange}
+        />
       )}
       <label
         className={clsx('field-label field-label-floating peer-focus:field-label-floating--active', {

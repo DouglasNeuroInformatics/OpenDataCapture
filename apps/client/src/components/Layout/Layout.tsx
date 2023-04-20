@@ -18,7 +18,7 @@ export const Layout = () => {
       <div className="hidden print:hidden md:flex md:flex-shrink-0">
         <Sidebar />
       </div>
-      <div className="container flex flex-grow flex-col overflow-scroll" ref={containerRef}>
+      <div className="scrollbar-hidden container flex flex-grow flex-col overflow-y-scroll" ref={containerRef}>
         <main className="flex-grow">
           <Outlet />
         </main>

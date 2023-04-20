@@ -5,7 +5,12 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components';
 import { LoginPage } from './features/auth';
 import { ContactPage } from './features/contact';
-import { AvailableInstrumentsPage, CreateInstrumentPage, FormPage } from './features/instruments';
+import {
+  AvailableInstrumentsPage,
+  CreateInstrumentPage,
+  FormPage,
+  ManageInstrumentsPage
+} from './features/instruments';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
 import { AddSubjectPage, SubjectPage, SubjectRecordsPage, ViewSubjectsPage } from './features/subjects';
 import { UserPage } from './features/user';
@@ -32,6 +37,7 @@ export const Router = () => {
             </Route>
             <Route path="instruments">
               <Route element={<AvailableInstrumentsPage />} path="available" />
+              <Route element={<ManageInstrumentsPage />} path="manage" />
               <Route element={<CreateInstrumentPage />} path="create" />
               <Route path="forms">
                 <Route element={<FormPage />} path=":id" />

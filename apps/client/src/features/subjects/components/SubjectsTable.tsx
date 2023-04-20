@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DateUtils, InstrumentRecordsExport, Subject } from '@ddcp/common';
+import { DateUtils, InstrumentRecordsExport, Subject } from '@douglasneuroinformatics/common';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -16,13 +16,14 @@ export interface SubjectTableProps {
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
-  const { currentUser } = useAuthStore();
+  const { currentUser, currentGroup } = useAuthStore();
   const { t } = useTranslation(['common', 'subjects']);
 
   const [showLookup, setShowLookup] = useState(false);
 
   const getExportRecords = async () => {
-    const response = await axios.get<InstrumentRecordsExport>('/instruments/records/forms/export');
+    const url = '/instruments/records/forms/export' + (currentGroup ? `?group=${currentGroup.name}` : '');
+    const response = await axios.get<InstrumentRecordsExport>(url);
     return response.data;
   };
 

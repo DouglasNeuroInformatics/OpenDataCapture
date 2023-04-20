@@ -1,0 +1,50 @@
+import React from 'react';
+
+import { Menu, Transition } from '@headlessui/react';
+import { useTranslation } from 'react-i18next';
+import { HiChevronDown } from 'react-icons/hi';
+
+import { useAuthStore } from '@/stores/auth-store';
+
+export const GroupSwitcher = () => {
+  const { currentUser, currentGroup, setCurrentGroup } = useAuthStore();
+  const { t } = useTranslation('overview');
+
+  // unless the user is an admin, this is set at login
+  if (!currentGroup) {
+    return null;
+  }
+
+  return (
+    <Menu as="div" className="relative my-2 w-fit">
+      <Menu.Button className="flex items-center justify-center">
+        {t('currentGroup')}:&nbsp;{currentGroup?.name}
+        <HiChevronDown className="mx-1" />
+      </Menu.Button>
+      <Transition
+        as="div"
+        className="absolute bottom-0 z-10 w-full"
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <Menu.Items className="absolute z-10 mt-2 flex w-full flex-col border">
+          {currentUser?.groups.map((group) => (
+            <Menu.Item key={group.name}>
+              <button
+                className="w-full bg-slate-50 p-2 text-left hover:bg-slate-200"
+                style={{ minWidth: 100 }}
+                onClick={() => setCurrentGroup(group)}
+              >
+                {group.name}
+              </button>
+            </Menu.Item>
+          ))}
+        </Menu.Items>
+      </Transition>
+    </Menu>
+  );
+};

@@ -2,7 +2,6 @@ import { JSONSchemaType } from 'ajv';
 import { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
 import {
-  ArrayFieldValue,
   ArrayFormField,
   BaseFormField,
   BinaryFormField,
@@ -11,12 +10,11 @@ import {
   FormFieldsGroup,
   NumericFormField,
   OptionsFormField,
-  PrimitiveFieldValue,
   PrimitiveFormField,
   TextFormField
-} from '../interfaces/form/form-fields.interface';
+} from '../interfaces/form/form-fields.types';
 
-const baseProperties: PropertiesSchema<Omit<BaseFormField, 'kind'>> = {
+const baseProperties = {
   label: {
     type: 'string',
     minLength: 1
@@ -30,9 +28,9 @@ const baseProperties: PropertiesSchema<Omit<BaseFormField, 'kind'>> = {
     type: 'boolean',
     nullable: true
   }
-};
+} satisfies PropertiesSchema<Omit<BaseFormField, 'kind'>>;
 
-export const textFieldSchema: JSONSchemaType<TextFormField> = {
+export const textFieldSchema = {
   type: 'object',
   properties: {
     ...baseProperties,
@@ -46,9 +44,9 @@ export const textFieldSchema: JSONSchemaType<TextFormField> = {
     }
   },
   required: ['kind', 'label', 'variant']
-};
+} satisfies JSONSchemaType<TextFormField>;
 
-export const numericFieldSchema: JSONSchemaType<NumericFormField> = {
+export const numericFieldSchema = {
   type: 'object',
   properties: {
     ...baseProperties,
@@ -61,12 +59,16 @@ export const numericFieldSchema: JSONSchemaType<NumericFormField> = {
     },
     max: {
       type: 'integer'
+    },
+    variant: {
+      type: 'string',
+      enum: ['default', 'slider']
     }
   },
-  required: ['kind', 'label', 'min', 'max']
-};
+  required: ['kind', 'label', 'min', 'max', 'variant']
+} satisfies JSONSchemaType<NumericFormField>;
 
-export const optionsFieldSchema: JSONSchemaType<OptionsFormField> = {
+export const optionsFieldSchema = {
   type: 'object',
   properties: {
     ...baseProperties,
@@ -85,9 +87,9 @@ export const optionsFieldSchema: JSONSchemaType<OptionsFormField> = {
     }
   },
   required: ['kind', 'label', 'options']
-};
+} satisfies JSONSchemaType<OptionsFormField>;
 
-export const dataFieldSchema: JSONSchemaType<DateFormField> = {
+export const dataFieldSchema = {
   type: 'object',
   properties: {
     ...baseProperties,
@@ -97,9 +99,9 @@ export const dataFieldSchema: JSONSchemaType<DateFormField> = {
     }
   },
   required: ['kind', 'label']
-};
+} satisfies JSONSchemaType<DateFormField>;
 
-export const binaryFieldSchema: JSONSchemaType<BinaryFormField> = {
+export const binaryFieldSchema = {
   type: 'object',
   properties: {
     ...baseProperties,
@@ -109,13 +111,13 @@ export const binaryFieldSchema: JSONSchemaType<BinaryFormField> = {
     }
   },
   required: ['kind', 'label']
-};
+} satisfies JSONSchemaType<BinaryFormField>;
 
-export const primitiveFieldSchema: JSONSchemaType<PrimitiveFormField<PrimitiveFieldValue>> = {
+export const primitiveFieldSchema = {
   oneOf: [textFieldSchema, numericFieldSchema, optionsFieldSchema, dataFieldSchema, binaryFieldSchema]
-};
+} satisfies JSONSchemaType<PrimitiveFormField>;
 
-export const arrayFieldSchema: JSONSchemaType<ArrayFormField<ArrayFieldValue>> = {
+export const arrayFieldSchema = {
   type: 'object',
   properties: {
     ...baseProperties,
@@ -133,9 +135,9 @@ export const arrayFieldSchema: JSONSchemaType<ArrayFormField<ArrayFieldValue>> =
     }
   },
   required: ['kind', 'fieldset']
-};
+} satisfies JSONSchemaType<ArrayFormField>;
 
-export const formFieldsSchema: JSONSchemaType<FormFields> = {
+export const formFieldsSchema = {
   type: 'object',
   patternProperties: {
     '^.*$': {
@@ -145,14 +147,14 @@ export const formFieldsSchema: JSONSchemaType<FormFields> = {
     }
   },
   required: []
-};
+} satisfies JSONSchemaType<FormFields>;
 
-export const formFieldsGroupSchema: JSONSchemaType<FormFieldsGroup> = {
+export const formFieldsGroupSchema = {
   type: 'object',
   properties: {
     title: {
       type: 'string',
-      minLength: 1,
+      minLength: 1
     },
     fields: {
       type: 'object',
@@ -167,4 +169,4 @@ export const formFieldsGroupSchema: JSONSchemaType<FormFieldsGroup> = {
     }
   },
   required: ['fields']
-};
+} satisfies JSONSchemaType<FormFieldsGroup>;

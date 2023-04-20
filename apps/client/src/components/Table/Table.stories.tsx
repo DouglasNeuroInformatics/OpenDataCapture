@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Random, Subject, range } from '@ddcp/common';
+import { Random, Subject, range } from '@douglasneuroinformatics/common';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 

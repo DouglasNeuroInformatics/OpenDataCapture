@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { BaseFormField, type FormFieldKind } from '@ddcp/common';
+import { BaseFormField, type FormFieldKind } from '@douglasneuroinformatics/common';
 
 @Schema({ strict: false })
 export class FormFieldEntity implements BaseFormField {

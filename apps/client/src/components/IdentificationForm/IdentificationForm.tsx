@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Sex } from '@ddcp/common';
+import { Sex } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { Form } from '@/components';

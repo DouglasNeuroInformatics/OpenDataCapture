@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { BasePermissionLevel, type User } from '@ddcp/common/users';
+import { BasePermissionLevel, type User } from '@douglasneuroinformatics/common/users';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
@@ -67,7 +67,7 @@ export class CreateUserDto {
       'Whether the user is an admin, in which case the frontend will render content for all groups the user has permission to access'
   })
   isAdmin?: boolean;
-  
+
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
     enum: BasePermissionLevel,

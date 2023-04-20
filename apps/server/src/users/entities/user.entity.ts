@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { BasePermissionLevel, type User, type UserPreferences } from '@ddcp/common';
+import { BasePermissionLevel, type User, type UserPreferences } from '@douglasneuroinformatics/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { UserPreferencesSchema } from './user-preferences.entity';
@@ -17,7 +17,7 @@ export class UserEntity implements User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true, type: [{ ref: GroupEntity.name, type: MongooseSchema.Types.ObjectId }] })
+  @Prop({ required: true, type: [{ ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId }] })
   groups: GroupEntity[];
 
   @Prop({ required: false })

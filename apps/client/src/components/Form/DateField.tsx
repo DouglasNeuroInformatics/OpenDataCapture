@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { DateFormField, DateUtils } from '@ddcp/common';
+import { DateFormField, DateUtils } from '@douglasneuroinformatics/common';
 import { Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 
@@ -9,13 +9,9 @@ import { DatePicker } from '../DatePicker';
 import { FormFieldContainer } from './FormFieldContainer';
 import { BaseFieldProps } from './types';
 
-import { useFormField } from '@/hooks/useFormField';
+export type DateFieldProps = BaseFieldProps<string | null> & DateFormField;
 
-export type DateFieldProps = BaseFieldProps<DateFormField>;
-
-export const DateField = ({ description, name, label }: DateFieldProps) => {
-  const { error, value, setValue } = useFormField<string>(name);
-
+export const DateField = ({ description, name, label, error, value, setValue }: DateFieldProps) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [mouseInDatePicker, setMouseInDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -40,7 +36,7 @@ export const DateField = ({ description, name, label }: DateFieldProps) => {
       <input
         autoComplete="off"
         className="field-input"
-        value={value}
+        value={value ?? ''}
         onBlur={() => setInputFocused(false)}
         onChange={(event) => handleChange(event.target.value)}
         onFocus={() => setInputFocused(true)}

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { BaseInstrument, type InstrumentKind } from '@ddcp/common';
+import { BaseInstrument, type InstrumentKind } from '@douglasneuroinformatics/common';
 import { HydratedDocument } from 'mongoose';
 
 @Schema({ discriminatorKey: 'kind', strict: false, timestamps: true })

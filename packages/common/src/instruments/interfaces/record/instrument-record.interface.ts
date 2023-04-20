@@ -1,8 +1,8 @@
 import { Group } from '../../../groups';
 import { Subject } from '../../../subjects';
 import { BaseInstrument, InstrumentKind } from '../base/base-instrument.interface';
-import { FormInstrumentData } from '../form/form-fields.interface';
-import { FormInstrument } from '../form/form-instrument.interface';
+import { FormInstrumentData } from '../form/form-fields.types';
+import { FormInstrument } from '../form/form-instrument.types';
 
 export interface InstrumentRecord<TInstrument extends BaseInstrument, TData = any> {
   kind: InstrumentKind;

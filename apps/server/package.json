@@ -1,6 +1,6 @@
 {
-  "name": "server",
-  "version": "0.0.0",
+  "name": "@douglasneuroinformatics/server",
+  "version": "0.0.1",
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
@@ -8,6 +8,7 @@
     "check-types": "tsc --noEmit",
     "cli": "NODE_ENV=development nest start --entryFile cli -- $@",
     "debug": "nest start --debug --watch",
+    "demo": "NODE_ENV=demo node ./dist/cli.js init-demo && NODE_ENV=demo yarn start",
     "dev": "NODE_ENV=development nest start --watch",
     "format": "prettier --write .",
     "lint": "eslint --fix src",
@@ -19,9 +20,10 @@
     "test:unit": "jest"
   },
   "dependencies": {
+    "@casl/ability": "^6.3.3",
     "@casl/mongoose": "^7.1.2",
-    "@ddcp/common": "*",
-    "@ddcp/instruments": "*",
+    "@douglasneuroinformatics/common": "*",
+    "@douglasneuroinformatics/instruments": "*",
     "@faker-js/faker": "^7.6.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
@@ -32,6 +34,7 @@
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.2.1",
+    "ajv": "^8.12.0",
     "bcrypt": "^5.1.0",
     "mongoose": "^7.0.3",
     "nest-commander": "^3.6.1",
