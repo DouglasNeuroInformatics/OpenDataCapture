@@ -11569,6 +11569,11 @@ trim-newlines@^3.0.0:
   resolved "https://registry.yarnpkg.com/trim-newlines/-/trim-newlines-3.0.1.tgz#260a5d962d8b752425b32f3a7db0dcacd176c144"
   integrity sha512-c1PTsA3tYrIsLGkJkzHF+w9F2EyxfXGo4UyJc4pFL++FMjnq0HJS69T3M7d//gKrFKwy429bouPescbjecU+Zw==
 
+ts-arithmetic@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/ts-arithmetic/-/ts-arithmetic-0.1.1.tgz#d99bc2b5c68ec00f5226ec93ff679af644cf78e0"
+  integrity sha512-3VqgsRgzaYfj+zKWn+7O66ifHwbOOnT2BoOrHwdEUBz7az0DetoZOS20+juNJh1klgzvWEi2Qxden41pomOUAQ==
+
 ts-dedent@^2.0.0, ts-dedent@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/ts-dedent/-/ts-dedent-2.2.0.tgz#39e4bd297cd036292ae2394eb3412be63f563bb5"

@@ -14,6 +14,7 @@ type EnhancedDemographicsQuestionnaireData = {
 
   /** Living Situation */
   postalCode: string;
+  // householdSize: number;
 
   //annualIncome: number;
   //employmentStatus: 'fullTime' | 'partTime' | 'student' | 'unemployed';
@@ -59,32 +60,40 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     },
     estimatedDuration: 5
   },
-  content: {
-    gender: {
-      kind: 'options',
-      label: {
-        en: 'Gender Identity',
-        fr: 'Identité de genre'
+  content: [
+    {
+      title: {
+        en: 'Personal Characteristics',
+        fr: 'Foo'
       },
-      options: formatOptions(gender)
-    },
-    ethnicOrigin: {
-      kind: 'options',
-      label: {
-        en: 'Ethnic Origin',
-        fr: 'Origine ethnique'
-      },
-      options: formatOptions(ethnicOrigin)
-    },
-    postalCode: {
-      kind: 'text',
-      label: {
-        en: 'Postal Code',
-        fr: 'Code postal'
-      },
-      variant: 'short'
+      fields: {
+        gender: {
+          kind: 'options',
+          label: {
+            en: 'Gender Identity',
+            fr: 'Identité de genre'
+          },
+          options: formatOptions(gender)
+        },
+        ethnicOrigin: {
+          kind: 'options',
+          label: {
+            en: 'Ethnic Origin',
+            fr: 'Origine ethnique'
+          },
+          options: formatOptions(ethnicOrigin)
+        },
+        postalCode: {
+          kind: 'text',
+          label: {
+            en: 'Postal Code',
+            fr: 'Code postal'
+          },
+          variant: 'short'
+        },
+      }
     }
-  },
+  ],
   validationSchema: {
     type: 'object',
     properties: {
@@ -104,6 +113,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     required: ['ethnicOrigin', 'gender', 'postalCode']
   }
 });
+
 /*
 
 export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
