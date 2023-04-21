@@ -39,6 +39,11 @@ export const formInstrumentSchema: JSONSchemaType<FormInstrument> = {
     },
     validationSchema: {
       type: 'object'
+    },
+    computedMeasures: {
+      type: 'object',
+      nullable: true,
+      required: []
     }
   },
   required: ['content', 'details', 'kind', 'name', 'tags', 'version']
