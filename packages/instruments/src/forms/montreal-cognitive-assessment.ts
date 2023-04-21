@@ -1,6 +1,13 @@
 import { createTranslatedForms } from '..';
 
-export type MontrealCognitiveAssessmentData = {};
+export type MontrealCognitiveAssessmentData = {
+  trailMaking: boolean;
+  copyCube: boolean;
+  drawClock: number;
+  canNameLion: boolean;
+  canNameRhino: boolean;
+  canNameCamel: boolean;
+};
 
 export const montrealCognitiveAssessment = createTranslatedForms<MontrealCognitiveAssessmentData>({
   name: 'MontrealCognitiveAssessment',
@@ -21,7 +28,69 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
       fr: 'Toutes les instructions peuvent être répétées une fois.'
     }
   },
-  content: {},
+  content: [
+    {
+      title: {
+        en: 'Visuospatial/Executive',
+        fr: 'Visuospatial/Executive'
+      },
+      fields: {
+        trailMaking: {
+          kind: 'binary',
+          label: {
+            en: 'Alternating Trail Making',
+            fr: 'Alternating Trail Making'
+          }
+        },
+        copyCube: {
+          kind: 'binary',
+          label: {
+            en: 'Visuoconstructional Skills (Cube)',
+            fr: 'Visuoconstructional Skills (Cube)'
+          }
+        },
+        drawClock: {
+          kind: 'numeric',
+          label: {
+            en: 'Visuoconstructional Skills (Clock)',
+            fr: 'Visuoconstructional Skills (Clock)'
+          },
+          variant: 'slider',
+          min: 0,
+          max: 3
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Naming',
+        fr: 'Naming'
+      },
+      fields: {
+        canNameLion: {
+          kind: 'binary',
+          label: {
+            en: 'Lion',
+            fr: 'Lion'
+          }
+        },
+        canNameRhino: {
+          kind: 'binary',
+          label: {
+            en: 'Rhinoceros',
+            fr: 'Rhinocéros'
+          }
+        },
+        canNameCamel: {
+          kind: 'binary',
+          label: {
+            en: 'Camel',
+            fr: 'Chameau'
+          }
+        }
+      }
+    }
+  ],
   validationSchema: {
     type: 'object',
     required: []
