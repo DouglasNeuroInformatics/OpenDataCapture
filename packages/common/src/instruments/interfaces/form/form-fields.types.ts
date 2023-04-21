@@ -2,16 +2,20 @@ import { Simplify } from 'type-fest';
 
 import { Nullable } from '../../../utils';
 
+/** Discriminator key to determine the structure of a specific form field */
 export type FormFieldKind = 'text' | 'numeric' | 'options' | 'date' | 'binary' | 'array';
 
+/** The type of the data associated with a primitive field */
 export type PrimitiveFieldValue = string | number | boolean;
 
+/** The type of the data associated with an array field */
 export type ArrayFieldValue = Record<string, PrimitiveFieldValue>[];
 
+/** The type of the data associated with the entire instrument (i.e., the values for all fields) */
 export type FormInstrumentData = Record<string, PrimitiveFieldValue | ArrayFieldValue>;
 
+/** The basic properties common to all field kinds */
 export type BaseFormField = {
-  /** Discriminator key */
   kind: FormFieldKind;
 
   /** The label to be displayed to the user */
@@ -24,6 +28,7 @@ export type BaseFormField = {
   isRequired?: boolean;
 };
 
+/** A helper type used to merge `BaseFormField` with `T` */
 export type FormFieldMixin<T extends { kind: FormFieldKind }> = Simplify<BaseFormField & T>;
 
 export type TextFormField = FormFieldMixin<{

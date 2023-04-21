@@ -7,6 +7,10 @@ import { FormDetails } from './form-details.types';
 import * as BaseTypes from './form-fields.types';
 import { FormInstrument } from './form-instrument.types';
 
+/**
+ * The details of the form to be displayed to the user. This corresponds to the same
+ * properties as `FormDetails`, excluding language, but with multilingual options
+ */
 type MultilingualFormDetails = Simplify<
   Pick<FormDetails, 'estimatedDuration'> & {
     [K in keyof Pick<FormDetails, 'description' | 'instructions' | 'title'>]: {
@@ -85,6 +89,7 @@ export type MultilingualFormContent<TData extends BaseTypes.FormInstrumentData> 
   | MultilingualFormFields<TData>
   | MultilingualFormFieldsGroup<TData>[];
 
+/** The definition of a multilingual form, which can be used to derive actual forms */
 export type MultilingualForm<TData extends BaseTypes.FormInstrumentData> = Simplify<
   Omit<FormInstrument<TData>, 'details' | 'content' | 'kind'> & {
     details: MultilingualFormDetails;

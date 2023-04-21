@@ -1,5 +1,6 @@
 import { Language } from '../../../core';
 
+/** The details of the form to be displayed to the user */
 export type FormDetails = {
   /** The title of the instrument in the language it is written, omitting the definite article */
   title: string;
