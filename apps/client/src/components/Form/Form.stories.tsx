@@ -24,7 +24,8 @@ type BasicFormValues = {
   numericSlider: number;
   options: 'a' | 'b' | 'c';
   date: string;
-  binary: boolean;
+  binaryCheck: boolean;
+  binaryRadio: boolean;
 };
 
 export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
@@ -74,9 +75,15 @@ export const BasicForm: StoryObj<typeof Form<BasicFormValues>> = {
         kind: 'date',
         label: 'Date'
       },
-      binary: {
+      binaryCheck: {
         kind: 'binary',
-        label: 'Binary'
+        label: 'Binary',
+        variant: 'checkbox'
+      },
+      binaryRadio: {
+        kind: 'binary',
+        label: 'Binary',
+        variant: 'radio'
       }
     },
     validationSchema: {

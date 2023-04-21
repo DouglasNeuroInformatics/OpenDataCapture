@@ -19,12 +19,14 @@ type MultilingualFormDetails = Simplify<
   }
 >;
 
-type MultilingualFormFieldMixin<T extends BaseTypes.BaseFormField, U extends object = object> = Simplify<
-  Omit<T, keyof U | 'description' | 'label'> & {
-    description?: { [L in Language]: string };
-    label: { [L in Language]: string };
-  } & U
->;
+type MultilingualFormFieldMixin<T, U extends object = object> = T extends BaseTypes.BaseFormField
+  ? Simplify<
+      Omit<T, keyof U | 'description' | 'label'> & {
+        description?: { [L in Language]: string };
+        label: { [L in Language]: string };
+      } & U
+    >
+  : never;
 
 type MultilingualTextFormField = MultilingualFormFieldMixin<BaseTypes.TextFormField>;
 
@@ -43,7 +45,21 @@ type MultilingualDateFormField = MultilingualFormFieldMixin<BaseTypes.DateFormFi
 
 type MultilingualNumericFormField = MultilingualFormFieldMixin<BaseTypes.NumericFormField>;
 
-type MultilingualBinaryFormField = MultilingualFormFieldMixin<BaseTypes.BinaryFormField>;
+type MultilingualBinaryFormField<T extends BaseTypes.BinaryFormField = BaseTypes.BinaryFormField> = T extends {
+  variant: 'radio';
+}
+  ? MultilingualFormFieldMixin<
+      T,
+      {
+        options?: {
+          [L in Language]: {
+            t: string;
+            f: string;
+          };
+        };
+      }
+    >
+  : MultilingualFormFieldMixin<T>;
 
 type MultilingualPrimitiveFormField<TValue extends BaseTypes.PrimitiveFieldValue = BaseTypes.PrimitiveFieldValue> =
   TValue extends string

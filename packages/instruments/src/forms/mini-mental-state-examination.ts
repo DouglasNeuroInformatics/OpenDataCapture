@@ -70,70 +70,80 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           label: {
             en: 'What year is this?',
             fr: 'En quelle année sommes-nous?'
-          }
+          },
+          variant: 'radio'
         },
         season: {
           kind: 'binary',
           label: {
             en: 'What season is this?',
             fr: 'Quelle est la saison?'
-          }
+          },
+          variant: 'radio'
         },
         month: {
           kind: 'binary',
           label: {
             en: 'What month is this?',
             fr: 'Quel est le mois?'
-          }
+          },
+          variant: 'radio'
         },
         date: {
           kind: 'binary',
           label: {
             en: "What is today's date?",
             fr: "Quelle est la date d'aujourd'hui?"
-          }
+          },
+          variant: 'radio'
         },
         day: {
           kind: 'binary',
           label: {
             en: 'What day of the week is this?',
             fr: 'Quel est le jour de la semaine ?'
-          }
+          },
+          variant: 'radio'
         },
         country: {
           kind: 'binary',
           label: {
             en: 'What country are we in?',
             fr: 'Dans quel pays sommes-nous?'
-          }
+          },
+          variant: 'radio'
         },
         province: {
           kind: 'binary',
           label: {
             en: 'What province are we in?',
             fr: 'Dans quelle province sommes-nous?'
-          }
+          },
+          variant: 'radio'
         },
         city: {
           kind: 'binary',
           label: {
             en: 'What city/town are we in?',
             fr: 'Dans quelle ville sommes-nous?'
-          }
+          },
+          variant: 'radio'
         },
         institution: {
           kind: 'binary',
           label: {
             en: 'What is the name of this building?',
             fr: 'Quel est le nom de cet édifice?'
-          }
+          },
+          variant: 'radio'
         },
         floor: {
           kind: 'binary',
           label: {
             en: 'What floor of the building are we on?',
             fr: 'À quel étage sommes-nous?'
-          }
+          },
+          variant: 'radio'
         }
       }
     },
@@ -202,35 +212,40 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           label: {
             en: 'Show wristwatch. Ask: What is this called?',
             fr: 'Montrer une montre. Quel est le nom de cet objet ?'
-          }
+          },
+          variant: 'radio'
         },
         canNamePencil: {
           kind: 'binary',
           label: {
             en: 'Show pencil. Ask: What is this called?',
             fr: 'Montrer un crayon. Quel est le nom de cet objet ?'
-          }
+          },
+          variant: 'radio'
         },
         canRepeatPhrase: {
           kind: 'binary',
           label: {
             en: 'Say: I would like you to repeat a phrase after me: No ifs, ands or buts',
             fr: 'Répétez cette phrase après moi : Pas de mais, de si, ni de et'
-          }
+          },
+          variant: 'radio'
         },
         canFollowWrittenInstructions: {
           kind: 'binary',
           label: {
             en: 'Say: Read the words on this page and then do what it says. Then, hand the person the sheet with "CLOSE YOUR EYES on it. If the subject just reads and does not close eyes, you may repeat: Read the words on this page and then do what it says, (a maximum of three times. Score one point only if the subject closes eyes. The subject does not have to read aloud.',
             fr: "S'il-vous-plait, faites ceci."
-          }
+          },
+          variant: 'radio'
         },
         canWriteSentence: {
           kind: 'binary',
           label: {
             en: 'Hand the person a pencil and paper (Page 3). Say: Write any complete sentence on that piece of paper. Score one point. The sentence must make sense. Ignore spelling errors.',
             fr: "J'aimerais que vous écriviez une phrase complète sur cette feuille de papier."
-          }
+          },
+          variant: 'radio'
         }
       }
     },
@@ -245,7 +260,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           label: {
             en: 'Place design, eraser and pencil in front of the person. Say: Copy this design please. Allow multiple tries. Wait until the person is finished and hands it back. Score one point for a correctly copied diagram. The person must have drawn a four-sided figure between two five-sided figures',
             fr: 'Pourriez-vous copier ce dessin?'
-          }
+          },
+          variant: 'radio'
         }
       }
     }

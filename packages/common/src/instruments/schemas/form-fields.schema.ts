@@ -108,9 +108,13 @@ export const binaryFieldSchema = {
     kind: {
       type: 'string',
       const: 'binary'
+    },
+    variant: {
+      type: 'string',
+      const: 'checkbox'
     }
   },
-  required: ['kind', 'label']
+  required: ['kind', 'label', 'variant']
 } satisfies JSONSchemaType<BinaryFormField>;
 
 export const primitiveFieldSchema = {

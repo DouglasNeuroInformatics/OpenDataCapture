@@ -40,14 +40,16 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
           label: {
             en: 'Alternating Trail Making',
             fr: 'Alternating Trail Making'
-          }
+          },
+          variant: 'radio'
         },
         copyCube: {
           kind: 'binary',
           label: {
             en: 'Visuoconstructional Skills (Cube)',
             fr: 'Visuoconstructional Skills (Cube)'
-          }
+          },
+          variant: 'radio'
         },
         drawClock: {
           kind: 'numeric',
@@ -59,7 +61,7 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
           min: 0,
           max: 3
         }
-      }
+      },
     },
     {
       title: {
@@ -72,21 +74,24 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
           label: {
             en: 'Lion',
             fr: 'Lion'
-          }
+          },
+          variant: 'radio'
         },
         canNameRhino: {
           kind: 'binary',
           label: {
             en: 'Rhinoceros',
             fr: 'Rhinocéros'
-          }
+          },
+          variant: 'radio'
         },
         canNameCamel: {
           kind: 'binary',
           label: {
             en: 'Camel',
             fr: 'Chameau'
-          }
+          },
+          variant: 'radio'
         }
       }
     }

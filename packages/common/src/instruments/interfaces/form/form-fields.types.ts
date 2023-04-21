@@ -52,9 +52,20 @@ export type DateFormField = FormFieldMixin<{
   kind: 'date';
 }>;
 
-export type BinaryFormField = FormFieldMixin<{
-  kind: 'binary';
-}>;
+export type BinaryFormField = FormFieldMixin<
+  | {
+      kind: 'binary';
+      variant: 'checkbox';
+    }
+  | {
+      kind: 'binary';
+      variant: 'radio';
+      options?: {
+        t: string;
+        f: string;
+      };
+    }
+>;
 
 /** A field where the underlying value of the field data is of type FormFieldValue */
 export type PrimitiveFormField<TValue extends PrimitiveFieldValue = PrimitiveFieldValue> = TValue extends string
