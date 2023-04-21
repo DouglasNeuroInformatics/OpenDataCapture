@@ -8,14 +8,14 @@ import { StepperContext } from '@/context/StepperContext';
 
 interface FormOverviewItemProps {
   heading: string;
-  text: string;
+  text: string | string[];
 }
 
 const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
   return (
     <div className="my-5">
       <h5 className="mb-1 text-xl font-semibold text-slate-900">{heading}</h5>
-      <p className="text-slate-700">{text}</p>
+      <p className="text-slate-700">{Array.isArray(text) ? text.join('\n') : text}</p>
     </div>
   );
 };

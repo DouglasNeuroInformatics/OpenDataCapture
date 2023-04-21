@@ -8,6 +8,7 @@ import { StepperContext } from '@/context/StepperContext';
 
 export type InfoFormData = FormDetails &
   Pick<FormInstrument, 'name' | 'version'> & {
+    instructions: string;
     tags: string;
   };
 

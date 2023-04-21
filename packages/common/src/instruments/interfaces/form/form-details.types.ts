@@ -11,8 +11,8 @@ export type FormDetails = {
   /** The language in which the fields of the instrument are written */
   language: Language;
 
-  /** Brief instructions for how the subject should complete the instrument */
-  instructions: string;
+  /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
+  instructions: string | string[];
 
   /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
   estimatedDuration: number;
