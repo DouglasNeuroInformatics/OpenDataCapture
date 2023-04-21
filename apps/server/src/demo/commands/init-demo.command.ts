@@ -117,7 +117,6 @@ export class InitDemoCommand extends CommandRunner {
     const bprs = await this.formsService.create(briefPsychiatricRatingScale);
     const hq = await this.formsService.create(happinessQuestionnaire.en);
     await this.formsService.create(happinessQuestionnaire.fr);
-    await this.formsService.createTranslatedForms(happinessQuestionnaire);
     await this.formsService.createTranslatedForms(miniMentalStateExamination);
     await this.formsService.createTranslatedForms(montrealCognitiveAssessment);
 
