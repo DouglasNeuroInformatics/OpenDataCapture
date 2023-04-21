@@ -80,6 +80,7 @@ export type MultilingualFormFields<TData extends BaseTypes.FormInstrumentData> =
 
 export type MultilingualFormFieldsGroup<TData extends BaseTypes.FormInstrumentData> = {
   title: { [L in Language]: string };
+  description?: { [L in Language]: string };
   fields: {
     [K in keyof TData]?: MultilingualFormField<TData[K]>;
   };

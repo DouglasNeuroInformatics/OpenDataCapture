@@ -9,6 +9,7 @@ export default {
   decorators: [
     (Story) => (
       <div className="container">
+        <h1 className="mb-3 text-center text-3xl">Example Form</h1>
         <Story />
       </div>
     )
@@ -155,6 +156,8 @@ export const GroupedForm: StoryObj<typeof Form<GroupedFormValues>> = {
     content: [
       {
         title: 'Group 1',
+        description:
+          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam et ut aut. Assumenda facilis numquam cupiditate aut in magni quisquam et natus obcaecati dicta eum nulla ducimus, earum alias rerum.',
         fields: {
           f1: {
             kind: 'text',
@@ -170,6 +173,8 @@ export const GroupedForm: StoryObj<typeof Form<GroupedFormValues>> = {
       },
       {
         title: 'Group 2',
+        description:
+          'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Recusandae natus eaque dolor sequi qui dolore aut at amet fugit, porro, est et maiores, id esse! Esse doloribus laudantium laborum aperiam.',
         fields: {
           f3: {
             kind: 'text',

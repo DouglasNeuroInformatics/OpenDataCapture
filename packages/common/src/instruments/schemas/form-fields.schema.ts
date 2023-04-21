@@ -156,6 +156,11 @@ export const formFieldsGroupSchema = {
       type: 'string',
       minLength: 1
     },
+    description: {
+      type: 'string',
+      maxLength: 1,
+      nullable: true
+    },
     fields: {
       type: 'object',
       patternProperties: {
