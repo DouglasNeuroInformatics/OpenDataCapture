@@ -86,5 +86,8 @@
       "print": "Print",
       "download": "Download"
     }
+  },
+  "fetchInstrument": {
+    "notFound": "This instrument does not exist in English"
   }
 }

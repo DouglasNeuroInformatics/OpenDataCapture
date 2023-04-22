@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
 import { FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { type Language } from '@douglasneuroinformatics/common';
 import { TranslatedForms } from '@douglasneuroinformatics/instruments';
 import { Model, ObjectId } from 'mongoose';
 
@@ -45,9 +46,18 @@ export class FormsService {
   }
 
   async getAvailable(): Promise<FormInstrumentSummary[]> {
-    return this.formModel.find({ kind: 'form' }).select('name tags version details').lean();
+    return this.formModel.find({ kind: 'form' }).select('identifier name tags version details').lean();
   }
 
+  async findOne(identifier: string, language?: Language): Promise<FormInstrument> {
+    const result = await this.formModel.findOne({ identifier, 'details.language': language });
+    if (!result || result.kind !== 'form') {
+      throw new NotFoundException(`Failed to find form with identifier: ${identifier}`);
+    }
+    return result;
+  }
+
+  /** @deprecated */
   async findById(id: string | ObjectId): Promise<FormInstrument> {
     const result = await this.formModel.findById(id);
     if (!result || result.kind !== 'form') {

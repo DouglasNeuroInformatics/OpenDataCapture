@@ -1,6 +1,7 @@
 import React, { MouseEvent, useMemo } from 'react';
 
 import { animated, useTransition } from '@react-spring/web';
+import { useTranslation } from 'react-i18next';
 import { HiX } from 'react-icons/hi';
 
 import { NotificationIcon } from './NotificationIcon';
@@ -23,6 +24,7 @@ export const NotificationHub = ({
   config = { tension: 125, friction: 20, precision: 0.1 },
   timeout = 5000
 }: NotificationHubProps) => {
+  const { t } = useTranslation('common');
   const { notifications, dismiss } = useNotificationsStore();
 
   const refMap = useMemo<RefMap>(() => new WeakMap(), []);
@@ -55,7 +57,7 @@ export const NotificationHub = ({
               <div className="mb-2 flex items-center">
                 <NotificationIcon type={item.type} />
                 <h5 className="ml-3 flex-grow font-medium text-slate-900">
-                  {item.title ?? item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                  {item.title ?? t(`notifications.types.${item.type}`)}
                 </h5>
                 <button
                   className="inline-flex rounded-md bg-white text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"

@@ -14,7 +14,7 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
   const { t } = useTranslation('instruments');
 
   const handleClick = () => {
-    navigate(`../forms/${instrument._id}`);
+    navigate(`../forms/${instrument.identifier}`);
   };
 
   return (
@@ -26,7 +26,7 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
       onKeyDown={handleClick}
     >
       <div className="flex flex-col rounded-lg border-2 border-slate-200 border-opacity-50 p-8 sm:flex-row">
-        <div className="mb-4 inline-flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-500 sm:mr-8 sm:mb-0">
+        <div className="mb-4 inline-flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-500 sm:mb-0 sm:mr-8">
           <HiPencilSquare className="h-8 w-8" />
         </div>
         <div className="flex-grow">

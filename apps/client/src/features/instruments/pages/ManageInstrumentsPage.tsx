@@ -14,11 +14,13 @@ export const ManageInstrumentsPage = () => {
   const { data, setData } = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
   const notifications = useNotificationsStore();
 
+  /*
   const deleteInstrument = async (instrument: { _id: string }) => {
     await axios.delete(`instruments/forms/${instrument._id}`);
     setData((prevData) => prevData?.filter((item) => item._id !== instrument._id) ?? null);
     notifications.add({ type: 'success' });
   };
+  */
 
   return (
     <div>
