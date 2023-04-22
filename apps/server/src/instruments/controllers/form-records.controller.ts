@@ -3,9 +3,9 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { type AppAbility } from '@douglasneuroinformatics/common/auth';
 import {
-  FormInstrumentRecord,
   FormInstrumentRecordsSummary,
-  InstrumentRecordsExport
+  InstrumentRecordsExport,
+  SubjectFormRecords
 } from '@douglasneuroinformatics/common/instruments';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
@@ -29,12 +29,8 @@ export class FormRecordsController {
   @ApiOperation({ description: 'Get Specified Records' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  find(
-    @UserAbility() ability: AppAbility,
-    @Query('instrument') instrumentName?: string,
-    @Query('subject') subjectIdentifier?: string
-  ): Promise<FormInstrumentRecord[]> {
-    return this.formRecordsService.find(ability, instrumentName, subjectIdentifier);
+  find(@UserAbility() ability: AppAbility, @Query('subject') subjectIdentifier: string): Promise<SubjectFormRecords[]> {
+    return this.formRecordsService.find(ability, subjectIdentifier);
   }
 
   @ApiOperation({ description: 'Summarize Available Form Records' })

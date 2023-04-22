@@ -7,10 +7,11 @@ import { Group } from '@douglasneuroinformatics/common/groups';
 import {
   FormInstrumentRecord,
   FormInstrumentRecordsSummary,
-  InstrumentRecordsExport
+  InstrumentRecordsExport,
+  SubjectFormRecords
 } from '@douglasneuroinformatics/common/instruments';
 import { DateUtils } from '@douglasneuroinformatics/common/utils';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
@@ -59,19 +60,25 @@ export class FormRecordsService {
     });
   }
 
-  async find(
-    ability: AppAbility,
-    instrumentName?: string,
-    subjectIdentifier?: string
-  ): Promise<FormInstrumentRecord[]> {
-    const filter: Record<string, any> = {};
-    if (instrumentName) {
-      filter.instrument = await this.formsService.findByName(instrumentName);
+  async find(ability: AppAbility, subjectIdentifier: string): Promise<SubjectFormRecords[]> {
+    const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
+
+    const uniqueInstruments: ObjectId[] = await this.formRecordsModel
+      .find({ subject }, 'instrument')
+      .accessibleBy(ability)
+      .distinct('instrument');
+
+    const records: SubjectFormRecords[] = [];
+    for (const instrument of uniqueInstruments) {
+      records.push({
+        instrument: await this.formsService.findById(instrument),
+        records: await this.formRecordsModel
+          .find({ instrument, subject })
+          .accessibleBy(ability)
+          .select(['data', 'dateCollected'])
+      });
     }
-    if (subjectIdentifier) {
-      filter.subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
-    }
-    return this.formRecordsModel.find(filter).accessibleBy(ability).populate('group instrument');
+    return records;
   }
 
   async summary(ability: AppAbility, groupName?: string): Promise<FormInstrumentRecordsSummary> {

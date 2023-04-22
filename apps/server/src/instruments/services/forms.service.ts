@@ -2,14 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import {
-  FormInstrument,
-  FormInstrumentData,
-  FormInstrumentSummary,
-  MultilingualForm
-} from '@douglasneuroinformatics/common';
-import { TranslatedForms, createTranslatedForms } from '@douglasneuroinformatics/instruments';
-import { Model } from 'mongoose';
+import { FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { TranslatedForms } from '@douglasneuroinformatics/instruments';
+import { Model, ObjectId } from 'mongoose';
 
 import { FormInstrumentEntity } from '../entities/form-instrument.entity';
 import { InstrumentEntity } from '../entities/instrument.entity';
@@ -40,10 +35,10 @@ export class FormsService {
     return this.formModel.find({ kind: 'form' }).select('name tags version details').lean();
   }
 
-  async findById(id: string): Promise<FormInstrument> {
+  async findById(id: string | ObjectId): Promise<FormInstrument> {
     const result = await this.formModel.findById(id);
     if (!result || result.kind !== 'form') {
-      throw new NotFoundException(`Failed to find form with id: ${id}`);
+      throw new NotFoundException(`Failed to find form with id: ${id.toString()}`);
     }
     return result;
   }
