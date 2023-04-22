@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
@@ -19,7 +19,15 @@ export class FormsService {
     private readonly cryptoService: CryptoService
   ) {}
 
-  create<T extends FormInstrumentData>(formInstrument: FormInstrument<T>): Promise<FormInstrument> {
+  async create<T extends FormInstrumentData>(formInstrument: FormInstrument<T>): Promise<FormInstrument> {
+    const identifier = this.createIdentifier(formInstrument.name, formInstrument.version);
+    const conflict = await this.formModel.exists({
+      identifier,
+      'details.language': formInstrument.details.language
+    });
+    if (conflict) {
+      throw new ConflictException('Instrument already exists');
+    }
     return this.formModel.create({
       identifier: this.createIdentifier(formInstrument.name, formInstrument.version),
       ...formInstrument
@@ -29,7 +37,6 @@ export class FormsService {
   async createTranslatedForms<T extends FormInstrumentData>(
     translatedForms: TranslatedForms<T>
   ): Promise<FormInstrument[]> {
-    translatedForms;
     return Promise.all(Object.values(translatedForms).map(async (form) => await this.create(form)));
   }
 
