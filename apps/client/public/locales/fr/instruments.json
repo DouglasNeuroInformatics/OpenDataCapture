@@ -78,6 +78,10 @@
       "instrumentVersion": "Version de l'instrument",
       "dateCollected": "Horodatage",
       "metadata": "Métadonnées",
+      "subject": "Client",
+      "name": "Nom",
+      "dateOfBirth": "Date de naissance",
+      "sex": "Sexe",
       "results": "Résultats",
       "print": "Imprimer",
       "download": "Télécharger"
