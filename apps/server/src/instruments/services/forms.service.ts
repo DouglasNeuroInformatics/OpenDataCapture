@@ -9,15 +9,21 @@ import { Model, ObjectId } from 'mongoose';
 import { FormInstrumentEntity } from '../entities/form-instrument.entity';
 import { InstrumentEntity } from '../entities/instrument.entity';
 
+import { CryptoService } from '@/crypto/crypto.service';
+
 @Injectable()
 export class FormsService {
   constructor(
     @InjectModel(InstrumentEntity.modelName)
-    private readonly formModel: Model<FormInstrumentEntity, AccessibleModel<FormInstrumentEntity>>
+    private readonly formModel: Model<FormInstrumentEntity, AccessibleModel<FormInstrumentEntity>>,
+    private readonly cryptoService: CryptoService
   ) {}
 
   create<T extends FormInstrumentData>(formInstrument: FormInstrument<T>): Promise<FormInstrument> {
-    return this.formModel.create(formInstrument);
+    return this.formModel.create({
+      identifier: this.createIdentifier(formInstrument.name, formInstrument.version),
+      ...formInstrument
+    });
   }
 
   async createTranslatedForms<T extends FormInstrumentData>(
@@ -57,5 +63,9 @@ export class FormsService {
       throw new NotFoundException(`Failed to find form with id: ${id}`);
     }
     return result;
+  }
+
+  private createIdentifier(name: string, version: number): string {
+    return this.cryptoService.hash(name + version);
   }
 }
