@@ -2,7 +2,7 @@ import { Language } from '../../../core';
 
 import { FormInstrumentData } from './form-fields.types';
 
-type ComputedMeasure<TData extends FormInstrumentData> = {
+type Measure<TData extends FormInstrumentData> = {
   label: {
     [L in Language]: string;
   };
@@ -15,6 +15,6 @@ type ComputedMeasure<TData extends FormInstrumentData> = {
       };
 };
 
-export type ComputedMeasures<TData extends FormInstrumentData> = {
-  [key: string]: ComputedMeasure<TData>;
+export type Measures<TData extends FormInstrumentData> = {
+  [key: string]: Measure<TData>;
 };

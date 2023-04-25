@@ -40,7 +40,7 @@ export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnai
       variant: 'slider'
     }
   },
-  computedMeasures: {
+  measures: {
     overallHappiness: {
       label: {
         en: 'Overall Happiness',

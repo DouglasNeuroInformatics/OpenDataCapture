@@ -58,7 +58,7 @@ function createTranslatedForms<T extends FormInstrumentData>(
         title: multilingualForm.details.title[language]
       },
       content,
-      computedMeasures: multilingualForm.computedMeasures,
+      measures: multilingualForm.measures,
       validationSchema: multilingualForm.validationSchema
     };
   }

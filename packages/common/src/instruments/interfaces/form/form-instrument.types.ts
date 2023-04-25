@@ -3,9 +3,9 @@ import { Simplify } from 'type-fest';
 
 import { BaseInstrument } from '../base/base-instrument.interface';
 
-import { ComputedMeasures } from './computed-measures.types';
 import { FormDetails } from './form-details.types';
 import { FormFields, FormFieldsGroup, FormInstrumentData } from './form-fields.types';
+import { Measures } from './measures.types';
 
 export type FormInstrumentContent<TData extends FormInstrumentData = FormInstrumentData> =
   | FormFields<TData>
@@ -16,6 +16,6 @@ export type FormInstrument<TData extends FormInstrumentData = FormInstrumentData
     content: FormInstrumentContent<TData>;
     details: FormDetails;
     validationSchema: JSONSchemaType<TData>;
-    computedMeasures?: ComputedMeasures<TData>;
+    measures?: Measures<TData>;
   }
 >;
