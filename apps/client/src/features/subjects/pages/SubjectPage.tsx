@@ -62,26 +62,6 @@ export const SubjectPage = () => {
           />
           <SelectDropdown options={[]} title="Dropdown" onChange={(selection) => undefined} />
         </div>
-        <LineGraph
-          data={[
-            {
-              a: 1
-            },
-            {
-              a: 2
-            },
-            {
-              a: 3
-            }
-          ]}
-          xAxis={{
-            key: 'a',
-            label: 'X'
-          }}
-          yAxis={{
-            label: 'Y'
-          }}
-        />
       </div>
     </div>
   );
