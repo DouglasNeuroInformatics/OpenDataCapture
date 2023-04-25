@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { LineGraph } from './LineGraph';
@@ -12,7 +14,18 @@ type GraphData = ReadonlyArray<{
 
 type Story = StoryObj<typeof LineGraph<GraphData>>;
 
-export default { component: LineGraph } as Meta<typeof LineGraph>;
+export default {
+  component: LineGraph,
+  decorators: [
+    (Story) => (
+      <div className="container flex justify-center">
+        <div style={{ width: 600 }}>
+          <Story />
+        </div>
+      </div>
+    )
+  ]
+} as Meta<typeof LineGraph>;
 
 export const Default: Story = {
   args: {
