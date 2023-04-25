@@ -1,6 +1,6 @@
-import { Language } from '../../../core';
-
 import { FormInstrumentData } from './form-fields.types';
+
+import { Language } from '@/core';
 
 type Measure<TData extends FormInstrumentData> = {
   label: {

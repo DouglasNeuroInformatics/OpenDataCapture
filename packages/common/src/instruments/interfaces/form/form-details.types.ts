@@ -1,4 +1,4 @@
-import { Language } from '../../../core';
+import { Language } from '@/core';
 
 /** The details of the form to be displayed to the user */
 export type FormDetails = {

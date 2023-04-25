@@ -1,11 +1,11 @@
 import { Simplify } from 'type-fest';
 
-import { Language } from '../../../core';
-import { Nullable } from '../../../utils';
-
 import { FormDetails } from './form-details.types';
 import * as BaseTypes from './form-fields.types';
 import { FormInstrument } from './form-instrument.types';
+
+import { Language } from '@/core';
+import { Nullable } from '@/utils';
 
 /**
  * The details of the form to be displayed to the user. This corresponds to the same
