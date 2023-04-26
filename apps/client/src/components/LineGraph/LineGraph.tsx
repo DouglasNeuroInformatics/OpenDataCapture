@@ -5,6 +5,7 @@ import {
   ErrorBar,
   Label,
   Legend,
+  LegendProps,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -42,13 +43,19 @@ export function LineGraph<const T extends LineGraphData>({
   yAxis: {
     label?: string;
   };
-  legend?: {
-    position: 'top' | 'right';
-  };
+  legend?:
+    | {
+        kind?: 'default';
+        position: 'top' | 'right';
+      }
+    | {
+        kind: 'custom';
+        content: React.ReactElement<LegendProps>;
+      };
 }) {
   return (
     <ResponsiveContainer height={400} width="100%">
-      <LineChart className="border" data={[...data]} margin={{ left: 10, right: 10, bottom: 5, top: 5 }}>
+      <LineChart data={[...data]} margin={{ left: 10, right: 10, bottom: 5, top: 5 }}>
         <CartesianGrid stroke={'#ccc'} strokeDasharray="5 5" />
         <XAxis dataKey={xAxis?.key} height={50} padding={{ left: 20, right: 20 }} tickMargin={5} tickSize={8}>
           <Label offset={5} position="insideBottom" value={xAxis?.label} />
@@ -57,19 +64,23 @@ export function LineGraph<const T extends LineGraphData>({
           <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} value={yAxis.label} />
         </YAxis>
         <Tooltip />
-        <Legend
-          align={legend?.position === 'right' ? 'right' : 'center'}
-          height={36}
-          layout={legend?.position === 'right' ? 'vertical' : 'horizontal'}
-          verticalAlign={legend?.position === 'right' ? 'middle' : 'top'}
-          wrapperStyle={
-            legend?.position === 'right'
-              ? {
-                  paddingLeft: '1rem'
-                }
-              : undefined
-          }
-        />
+        {legend?.kind === 'custom' ? (
+          <Legend content={legend.content} />
+        ) : (
+          <Legend
+            align={legend?.position === 'right' ? 'right' : 'center'}
+            height={36}
+            layout={legend?.position === 'right' ? 'vertical' : 'horizontal'}
+            verticalAlign={legend?.position === 'right' ? 'middle' : 'top'}
+            wrapperStyle={
+              legend?.position === 'right'
+                ? {
+                    paddingLeft: '1rem'
+                  }
+                : undefined
+            }
+          />
+        )}
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="monotone">
             <ErrorBar dataKey={err} />
