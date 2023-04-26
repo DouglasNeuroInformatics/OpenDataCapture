@@ -43,15 +43,9 @@ export function LineGraph<const T extends LineGraphData>({
   yAxis: {
     label?: string;
   };
-  legend?:
-    | {
-        kind?: 'default';
-        position: 'top' | 'right';
-      }
-    | {
-        kind: 'custom';
-        content: React.ReactElement<LegendProps>;
-      };
+  legend?: {
+    position: 'top' | 'right';
+  };
 }) {
   return (
     <ResponsiveContainer height={400} width="100%">
@@ -64,23 +58,19 @@ export function LineGraph<const T extends LineGraphData>({
           <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} value={yAxis.label} />
         </YAxis>
         <Tooltip />
-        {legend?.kind === 'custom' ? (
-          <Legend content={legend.content} />
-        ) : (
-          <Legend
-            align={legend?.position === 'right' ? 'right' : 'center'}
-            height={36}
-            layout={legend?.position === 'right' ? 'vertical' : 'horizontal'}
-            verticalAlign={legend?.position === 'right' ? 'middle' : 'top'}
-            wrapperStyle={
-              legend?.position === 'right'
-                ? {
-                    paddingLeft: '1rem'
-                  }
-                : undefined
-            }
-          />
-        )}
+        <Legend
+          align={legend?.position === 'right' ? 'right' : 'center'}
+          height={36}
+          layout={legend?.position === 'right' ? 'vertical' : 'horizontal'}
+          verticalAlign={legend?.position === 'right' ? 'middle' : 'top'}
+          wrapperStyle={
+            legend?.position === 'right'
+              ? {
+                  paddingLeft: '1rem'
+                }
+              : undefined
+          }
+        />
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="monotone">
             <ErrorBar dataKey={err} />
