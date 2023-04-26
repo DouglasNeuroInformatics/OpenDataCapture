@@ -1,18 +1,33 @@
 import React from 'react';
 
-import { LineGraph } from './LineGraph';
+import { LegendProps } from 'recharts';
 
-export interface DynamicLineGraphProps {
+import { LineGraph } from '@/components';
+
+const CustomLegend = (props: LegendProps) => {
+  const { payload } = props;
+
+  return (
+    <div className="h-full">
+      <ul>
+        {payload?.map((entry, index) => (
+          <li key={`item-${index}`}>{entry.value}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export interface SubjectRecordsGraphProps {
   title: string;
 }
 
-export const DynamicLineGraph = ({ title }: DynamicLineGraphProps) => {
+export const SubjectRecordsGraph = ({ title }: SubjectRecordsGraphProps) => {
   return (
-    <div className="grid max-w-3xl grid-cols-3 gap-5 border p-2">
-      <div className="col-span-full">
-        <h3 className="text-center text-2xl font-semibold">{title}</h3>
-      </div>
-      <div className="col-span-2">
+    <div className="max-w-3xl">
+      <h3 className="text-center text-2xl font-semibold">Subject Records Graph</h3>
+      <hr />
+      <div>
         <LineGraph
           data={[
             {
@@ -44,6 +59,9 @@ export const DynamicLineGraph = ({ title }: DynamicLineGraphProps) => {
               sd2: 100
             }
           ]}
+          legend={{
+            customElement: <CustomLegend />
+          }}
           lines={[
             {
               name: 'Mean 1',
@@ -64,12 +82,6 @@ export const DynamicLineGraph = ({ title }: DynamicLineGraphProps) => {
             label: 'Average Daily Sales'
           }}
         />
-      </div>
-      <div className="col-span-1">
-        <h3 className="whitespace-nowrap text-center font-semibold">Data Selector</h3>
-        <div>
-          <h5>Instruments</h5>
-        </div>
       </div>
     </div>
   );
