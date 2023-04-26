@@ -2,6 +2,10 @@
   "extends": "@douglasneuroinformatics/tsconfig/base.json",
   "include": ["src/**/*"],
   "compilerOptions": {
-    "declarationMap": true
+    "baseUrl": "src",
+    "declarationMap": true,
+    "paths": {
+      "@/*": ["*"]
+    }
   }
 }

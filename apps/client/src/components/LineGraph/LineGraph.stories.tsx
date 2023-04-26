@@ -1,34 +1,82 @@
+import React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { LineGraph } from './LineGraph';
 
-type Story = StoryObj<typeof LineGraph>;
+type GraphData = ReadonlyArray<{
+  month: string;
+  m1: number;
+  sd1: number;
+  m2: number;
+  sd2: number;
+}>;
 
-export default { component: LineGraph } as Meta<typeof LineGraph>;
+type Story = StoryObj<typeof LineGraph<GraphData>>;
+
+export default {
+  component: LineGraph,
+  decorators: [
+    (Story) => (
+      <div className="container flex justify-center">
+        <div style={{ width: 600 }}>
+          <Story />
+        </div>
+      </div>
+    )
+  ]
+} as Meta<typeof LineGraph>;
 
 export const Default: Story = {
   args: {
     data: [
       {
-        label: 'January',
-        mean: 5,
-        std: 1
+        month: 'January',
+        m1: 1000,
+        sd1: 100,
+        m2: 550,
+        sd2: 100
       },
       {
-        label: 'February',
-        mean: 6,
-        std: 1
+        month: 'February',
+        m1: 1500,
+        sd1: 100,
+        m2: 600,
+        sd2: 100
       },
       {
-        label: 'March',
-        mean: 7,
-        std: 1
+        month: 'March',
+        m1: 1200,
+        sd1: 100,
+        m2: 500,
+        sd2: 100
       },
       {
-        label: 'April',
-        mean: 8,
-        std: 1
+        month: 'April',
+        m1: 1800,
+        sd1: 100,
+        m2: 450,
+        sd2: 100
       }
-    ]
+    ],
+    lines: [
+      {
+        name: 'Mean 1',
+        val: 'm1',
+        err: 'sd1'
+      },
+      {
+        name: 'Mean 2',
+        val: 'm2',
+        err: 'sd2'
+      }
+    ],
+    xAxis: {
+      key: 'month',
+      label: 'Month'
+    },
+    yAxis: {
+      label: 'Average Daily Sales'
+    }
   }
 };

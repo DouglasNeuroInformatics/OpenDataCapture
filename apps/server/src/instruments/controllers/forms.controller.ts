@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { FormInstrument, FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { FormInstrument, FormInstrumentSummary, type Language } from '@douglasneuroinformatics/common';
 
 import { CreateFormDto } from '../dto/create-form.dto';
 import { FormsService } from '../services/forms.service';
@@ -37,8 +37,8 @@ export class FormsController {
   @ApiOperation({ description: 'Returns the provided form' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  findOne(@Param('id') id: string): Promise<FormInstrument> {
-    return this.formsService.findById(id);
+  findOne(@Param('id') identifier: string, @Query('lang') language?: Language): Promise<FormInstrument> {
+    return this.formsService.findOne(identifier, language);
   }
 
   @ApiOperation({ description: 'Returns the deleted instrument ' })

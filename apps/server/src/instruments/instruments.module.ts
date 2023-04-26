@@ -16,6 +16,7 @@ import { FormRecordsService } from './services/form-records.service';
 import { FormsService } from './services/forms.service';
 
 import { AjvModule } from '@/ajv/ajv.module';
+import { CryptoModule } from '@/crypto/crypto.module';
 import { GroupsModule } from '@/groups/groups.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
@@ -27,6 +28,7 @@ interface InstrumentDiscriminator {
 @Module({
   imports: [
     AjvModule,
+    CryptoModule,
     GroupsModule,
     MongooseModule.forFeature([
       {

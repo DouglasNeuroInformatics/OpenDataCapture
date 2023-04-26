@@ -1,21 +1,17 @@
 import React from 'react';
 
-import {
-  BaseFormField,
-  FormInstrument,
-  FormInstrumentContent,
-  FormInstrumentData
-} from '@douglasneuroinformatics/common';
+import { BaseFormField, FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { Button, Spinner } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
+import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
-const FormSummaryItem = ({ label, value }: { label: string; value: string | number }) => {
+const FormSummaryItem = ({ label, value }: { label: string; value: any }) => {
   return (
     <div className="my-1">
       <span className="font-semibold">{label}: </span>
-      <span>{value}</span>
+      <span>{String(value)}</span>
     </div>
   );
 };
@@ -31,6 +27,7 @@ export const FormSummary = <T extends FormInstrumentData>({
   instrument,
   result
 }: FormSummaryProps<T>) => {
+  const { activeSubject } = useActiveSubjectStore();
   const download = useDownload();
   const { t } = useTranslation('instruments');
 
@@ -45,6 +42,13 @@ export const FormSummary = <T extends FormInstrumentData>({
 
   return (
     <div>
+      <h3 className="my-3 text-xl font-semibold">{t('formPage.summary.subject')}</h3>
+      <FormSummaryItem
+        label={t('formPage.summary.name')}
+        value={`${activeSubject!.firstName} ${activeSubject!.lastName}`}
+      />
+      <FormSummaryItem label={t('formPage.summary.dateOfBirth')} value={activeSubject?.dateOfBirth} />
+      <FormSummaryItem label={t('formPage.summary.sex')} value={activeSubject?.sex} />
       <h3 className="my-3 text-xl font-semibold">{t('formPage.summary.metadata')}</h3>
       <FormSummaryItem label={t('formPage.summary.instrumentTitle')} value={instrument.details.title} />
       <FormSummaryItem label={t('formPage.summary.instrumentVersion')} value={instrument.version} />
@@ -52,9 +56,15 @@ export const FormSummary = <T extends FormInstrumentData>({
       <h3 className="my-3 text-xl font-semibold">{t('formPage.summary.results')}</h3>
       <div className="mb-3">
         {Object.keys(result).map((fieldName) => {
-          // Fix before finalizing
-          const field = instrument.content[fieldName as keyof FormInstrumentContent<T>] as BaseFormField;
-          return <FormSummaryItem key={fieldName} label={field.label} value={result[fieldName] as string} />;
+          let field: BaseFormField;
+          if (instrument.content instanceof Array) {
+            field = instrument.content
+              .map((group) => group.fields)
+              .reduce((prev, current) => ({ ...prev, ...current }))[fieldName]!;
+          } else {
+            field = instrument.content[fieldName];
+          }
+          return <FormSummaryItem key={fieldName} label={field.label} value={result[fieldName]} />;
         })}
       </div>
       <div className="flex gap-3 print:hidden">

@@ -5,28 +5,18 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 
 const baseURL = import.meta.env.VITE_API_HOST;
 
-interface GetRequestOptions {
-  method: 'GET';
-}
-
-interface PostRequestOptions {
-  body: unknown;
-  method: 'POST';
-}
-
-type UseFetchOptions = GetRequestOptions | PostRequestOptions;
-
-/** Common hook used throughout the application to request data from our API. The
+/**
+ * Common hook used throughout the application to request data from our API. The
  * base URL used for requests is set in the Vite config.
- * @example
- * useFetch('/users')
+ * @param resourceURL - the url of the resource to require (e.g., /users)
+ * @param deps - an optional list of dependencies to trigger a refetch
+ * @param onError - a callback to override the default error handler which is to add a notification
+ * @returns
  */
 export function useFetch<T = unknown>(
   resourceURL: string,
   deps: readonly unknown[] = [],
-  options: UseFetchOptions = {
-    method: 'GET'
-  }
+  onError?: (error: unknown) => void
 ): {
   data: T | null;
   setData: React.Dispatch<React.SetStateAction<T | null>>;
@@ -36,10 +26,17 @@ export function useFetch<T = unknown>(
 
   const [data, setData] = useState<T | null>(null);
 
+  const setError = (error: unknown) => {
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    notifications.add({
+      type: 'error',
+      message
+    });
+  };
+
   useEffect(() => {
     fetch(baseURL + resourceURL, {
-      body: options.method === 'POST' ? JSON.stringify(options.body) : null,
-      method: options.method,
+      method: 'GET',
       headers: {
         Accept: 'application/json',
         Authorization: `Bearer ${auth.accessToken!}`
@@ -53,14 +50,7 @@ export function useFetch<T = unknown>(
         return response.json();
       })
       .then((data: T) => setData(data))
-      .catch((error) => {
-        const message = error instanceof Error ? error.message : 'An unknown error occurred';
-        notifications.add({
-          type: 'error',
-          title: 'Error',
-          message
-        });
-      });
+      .catch(onError ?? setError);
   }, deps);
 
   return { data, setData };

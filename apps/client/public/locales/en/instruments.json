@@ -78,9 +78,16 @@
       "instrumentVersion": "Instrument Version",
       "dateCollected": "Date Collected",
       "metadata": "Metadata",
+      "subject": "Subject",
+      "name": "Name",
+      "dateOfBirth": "Date of Birth",
+      "sex": "Sex",
       "results": "Results",
       "print": "Print",
       "download": "Download"
     }
+  },
+  "fetchInstrument": {
+    "notFound": "This instrument does not exist in English"
   }
 }

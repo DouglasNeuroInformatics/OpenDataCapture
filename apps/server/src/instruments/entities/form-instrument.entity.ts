@@ -1,18 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import {
-  type FormDetails,
-  FormInstrument,
-  type FormInstrumentContent,
-  FormInstrumentData
-} from '@douglasneuroinformatics/common';
+import { type FormDetails, type FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/common';
 import { type JSONSchemaType } from 'ajv';
 import { Schema as MongooseSchema } from 'mongoose';
 
+import { BaseInstrumentEntity } from './base-instrument.entity';
 import { FormDetailsSchema } from './form-details.entity';
 
-@Schema({ strict: false })
-export class FormInstrumentEntity implements FormInstrument {
+@Schema()
+export class FormInstrumentEntity extends BaseInstrumentEntity {
   kind: 'form';
   name: string;
   tags: string[];

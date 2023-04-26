@@ -40,6 +40,17 @@ export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnai
       variant: 'slider'
     }
   },
+  measures: {
+    overallHappiness: {
+      label: {
+        en: 'Overall Happiness',
+        fr: 'Bonheur général'
+      },
+      formula: {
+        $const: 'overallHappiness'
+      }
+    }
+  },
   validationSchema: {
     type: 'object',
     properties: {

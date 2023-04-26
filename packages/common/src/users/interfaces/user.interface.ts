@@ -1,7 +1,8 @@
-import { Group } from '../../groups';
 import { BasePermissionLevel } from '../enums/base-permission-level.enum';
 
 import { UserPreferences } from './user-preferences.interface';
+
+import { Group } from '@/groups';
 
 export interface User {
   username: string;

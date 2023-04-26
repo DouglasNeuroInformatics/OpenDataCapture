@@ -38,6 +38,7 @@ function createTranslatedForms<T extends FormInstrumentData>(
     if (multilingualForm.content instanceof Array) {
       content = multilingualForm.content.map((group) => ({
         title: group.title[language],
+        description: group.description?.[language],
         fields: getTranslatedFields(group.fields as MultilingualFormFields<T>, language)
       }));
     } else {
@@ -57,6 +58,7 @@ function createTranslatedForms<T extends FormInstrumentData>(
         title: multilingualForm.details.title[language]
       },
       content,
+      measures: multilingualForm.measures,
       validationSchema: multilingualForm.validationSchema
     };
   }

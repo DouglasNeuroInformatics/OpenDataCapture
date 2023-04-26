@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DateUtils, FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
+import { DateUtils, FormInstrumentData } from '@douglasneuroinformatics/common';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,9 +15,9 @@ import { FormIdentification } from '../components/FormIdentification';
 import { FormOverview } from '../components/FormOverview';
 import { FormQuestions } from '../components/FormQuestions';
 import { FormSummary } from '../components/FormSummary';
+import { useFetchInstrument } from '../hooks/useFetchInstrument';
 
 import { PageHeader, Spinner, Stepper } from '@/components';
-import { useFetch } from '@/hooks/useFetch';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useNotificationsStore } from '@/stores/notifications-store';
@@ -29,7 +29,8 @@ export const FormPage = () => {
   const { activeSubject } = useActiveSubjectStore();
   const { currentGroup } = useAuthStore();
 
-  const { data: instrument } = useFetch<FormInstrument>(`/instruments/forms/${params.id!}`);
+  const instrument = useFetchInstrument(params.id!);
+
   const [result, setResult] = useState<FormInstrumentData>();
   const [dateCollected, setDateCollected] = useState<Date>();
 

@@ -1,5 +1,6 @@
-import { Group } from '../../groups';
 import { Permissions } from '../types/permissions.type';
+
+import { Group } from '@/groups';
 
 export interface JwtPayload {
   username: string;

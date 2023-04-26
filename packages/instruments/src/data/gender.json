@@ -1,0 +1,14 @@
+{
+  "male": {
+    "en": "Male",
+    "fr": "Masculin"
+  },
+  "female": {
+    "en": "Female",
+    "fr": "Féminin"
+  },
+  "nonBinary": {
+    "en": "Non-Binary",
+    "fr": "Non-binaire"
+  }
+}

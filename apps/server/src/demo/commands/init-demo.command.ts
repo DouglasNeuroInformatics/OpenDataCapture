@@ -7,7 +7,9 @@ import {
   BriefPsychiatricRatingScaleData,
   briefPsychiatricRatingScale,
   enhancedDemographicsQuestionnaire,
-  happinessQuestionnaire
+  happinessQuestionnaire,
+  miniMentalStateExamination,
+  montrealCognitiveAssessment
 } from '@douglasneuroinformatics/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
@@ -115,8 +117,8 @@ export class InitDemoCommand extends CommandRunner {
     const bprs = await this.formsService.create(briefPsychiatricRatingScale);
     const hq = await this.formsService.create(happinessQuestionnaire.en);
     await this.formsService.create(happinessQuestionnaire.fr);
-    await this.formsService.create(enhancedDemographicsQuestionnaire.en);
-    await this.formsService.create(enhancedDemographicsQuestionnaire.fr);
+    await this.formsService.createTranslatedForms(miniMentalStateExamination);
+    await this.formsService.createTranslatedForms(montrealCognitiveAssessment);
 
     for (let i = 0; i < 100; i++) {
       const createSubjectDto = {

@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 
-import { FormInstrumentContent, loginCredentialsSchema } from '@douglasneuroinformatics/common';
+import { AuthPayload, FormInstrumentContent, loginCredentialsSchema } from '@douglasneuroinformatics/common';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-
-import { AuthAPI } from '../api/auth-api';
 
 import { Form } from '@/components/Form';
 import { useAuthStore } from '@/stores/auth-store';
+import { useNotificationsStore } from '@/stores/notifications-store';
 
 type LoginFormData = {
   username: string;
@@ -19,6 +19,7 @@ export interface LoginFormProps {
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const auth = useAuthStore();
+  const notifications = useNotificationsStore();
   const { t } = useTranslation(['auth', 'form']);
 
   const content: FormInstrumentContent<LoginFormData> = {
@@ -44,8 +45,19 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   }, []);
 
   const login = async (credentials: LoginFormData) => {
-    const { accessToken } = await AuthAPI.login(credentials);
-    auth.setAccessToken(accessToken);
+    const response = await axios.post<AuthPayload>('/auth/login', credentials, {
+      // Do not throw if unauthorized
+      validateStatus: (status) => status === 200 || status === 401
+    });
+    if (response.status === 401) {
+      notifications.add({
+        type: 'error',
+        title: t('auth:login.form.unauthorizedError.title'),
+        message: t('auth:login.form.unauthorizedError.message')
+      });
+      return;
+    }
+    auth.setAccessToken(response.data.accessToken);
     onSuccess();
   };
 

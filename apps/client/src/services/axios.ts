@@ -24,12 +24,11 @@ axios.interceptors.response.use(
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
     notifications.add({
       type: 'error',
-      title: 'Error',
       message
     });
 
     if (error instanceof AxiosError) {
-      console.error(error.response)
+      console.error(error.response);
     }
 
     return Promise.reject(error);

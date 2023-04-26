@@ -10,7 +10,7 @@ type Story = StoryObj<typeof InstrumentShowcase>;
 
 function createDummyInstrument(n: number): FormInstrumentSummary {
   return {
-    _id: n.toString(),
+    identifier: n.toString(),
     kind: 'form',
     name: 'MyInstrument' + n,
     tags: ['foo'],

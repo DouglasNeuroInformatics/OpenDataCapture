@@ -55,5 +55,13 @@
   },
   "searchBar": {
     "placeholder": "Search..."
+  },
+  "notifications": {
+    "types": {
+      "info": "Info",
+      "warning": "Warning",
+      "success": "Success",
+      "error": "Error"
+    }
   }
 }

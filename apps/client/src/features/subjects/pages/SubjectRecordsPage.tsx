@@ -52,11 +52,6 @@ export const SubjectRecordsPage = () => {
           />
         </div>
       </div>
-      <LineGraph
-        data={graphData}
-        xAxis={{ key: 'dateCollected', label: t('subjectRecordsPage.graph.xLabel') }}
-        yAxis={{ label: t('subjectRecordsPage.graph.yLabel') }}
-      />
     </div>
   );
 };

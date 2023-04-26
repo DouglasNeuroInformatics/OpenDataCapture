@@ -1,8 +1,8 @@
 import { MongoAbility, RawRuleOf } from '@casl/ability';
 
-import { Group } from '../../groups';
-import { Subject } from '../../subjects';
-import { User } from '../../users';
+import { Group } from '@/groups';
+import { Subject } from '@/subjects';
+import { User } from '@/users';
 
 export type AppAction = 'create' | 'read' | 'update' | 'delete' | 'manage';
 

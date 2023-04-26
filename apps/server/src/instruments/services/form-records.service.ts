@@ -5,12 +5,15 @@ import { AccessibleModel } from '@casl/mongoose';
 import { AppAbility } from '@douglasneuroinformatics/common/auth';
 import { Group } from '@douglasneuroinformatics/common/groups';
 import {
+  FormInstrument,
+  FormInstrumentData,
   FormInstrumentRecord,
   FormInstrumentRecordsSummary,
-  InstrumentRecordsExport
+  InstrumentRecordsExport,
+  SubjectFormRecords
 } from '@douglasneuroinformatics/common/instruments';
 import { DateUtils } from '@douglasneuroinformatics/common/utils';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
@@ -59,19 +62,26 @@ export class FormRecordsService {
     });
   }
 
-  async find(
-    ability: AppAbility,
-    instrumentName?: string,
-    subjectIdentifier?: string
-  ): Promise<FormInstrumentRecord[]> {
-    const filter: Record<string, any> = {};
-    if (instrumentName) {
-      filter.instrument = await this.formsService.findByName(instrumentName);
+  async find(ability: AppAbility, subjectIdentifier: string): Promise<SubjectFormRecords[]> {
+    const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
+
+    const uniqueInstruments: ObjectId[] = await this.formRecordsModel
+      .find({ subject }, 'instrument')
+      .accessibleBy(ability)
+      .distinct('instrument');
+
+    const arr: SubjectFormRecords[] = [];
+    for (const instrumentId of uniqueInstruments) {
+      const instrument = await this.formsService.findById(instrumentId);
+      const records = await this.formRecordsModel
+        .find({ instrument, subject })
+        .accessibleBy(ability)
+        .select(['data', 'dateCollected'])
+        .lean();
+      const computedRecords = this.computeMeasures(instrument, records);
+      arr.push({ instrument, records: computedRecords });
     }
-    if (subjectIdentifier) {
-      filter.subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
-    }
-    return this.formRecordsModel.find(filter).accessibleBy(ability).populate('group instrument');
+    return arr;
   }
 
   async summary(ability: AppAbility, groupName?: string): Promise<FormInstrumentRecordsSummary> {
@@ -105,5 +115,16 @@ export class FormRecordsService {
       }
     }
     return data;
+  }
+
+  /** Calculate the value for measures */
+  private computeMeasures<
+    T extends FormInstrumentData,
+    TRecord = Pick<FormInstrumentRecord<T>, 'data' | 'dateCollected'>
+  >(instrument: FormInstrument<T>, records: TRecord[]): Array<TRecord & { computedMeasures: any }> {
+    return records.map((record) => {
+      console.log(record);
+      return { ...record, computedMeasures: 'foo' };
+    });
   }
 }
