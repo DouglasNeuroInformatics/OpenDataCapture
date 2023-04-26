@@ -50,10 +50,10 @@ export function LineGraph<const T extends LineGraphData>({
     <ResponsiveContainer height={400} width="100%">
       <LineChart className="border" data={[...data]} margin={{ left: 10, right: 10, bottom: 5, top: 5 }}>
         <CartesianGrid stroke={'#ccc'} strokeDasharray="5 5" />
-        <XAxis dataKey={xAxis?.key} height={50} padding={{ left: 20, right: 20 }}>
+        <XAxis dataKey={xAxis?.key} height={50} padding={{ left: 20, right: 20 }} tickMargin={5} tickSize={8}>
           <Label offset={5} position="insideBottom" value={xAxis?.label} />
         </XAxis>
-        <YAxis width={70}>
+        <YAxis tickMargin={5} tickSize={8} width={70}>
           <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} value={yAxis.label} />
         </YAxis>
         <Tooltip />
