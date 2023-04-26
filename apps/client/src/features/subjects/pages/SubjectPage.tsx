@@ -4,8 +4,6 @@ import { FormInstrument, FormInstrumentData, SubjectFormRecords } from '@douglas
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { SubjectRecordsGraph } from '../components/SubjectRecordsGraph';
-
 import { Dropdown, LineGraph, PageHeader, SelectDropdown, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
@@ -26,18 +24,6 @@ export const SubjectPage = () => {
   const { data } = useFetch<SubjectFormRecords[]>(`/instruments/records/forms?subject=${params.subjectId!}`);
   const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument>();
 
-  const fields = useMemo(() => {
-    if (!selectedInstrument) {
-      return null;
-    } else if (selectedInstrument.content instanceof Array) {
-      return selectedInstrument.content
-        .map((group) => group.fields)
-        .reduce((prev, current) => ({ ...prev, ...current }));
-    } else {
-      return selectedInstrument.content;
-    }
-  }, [selectedInstrument]);
-
   if (!data) {
     return <Spinner />;
   }
@@ -45,7 +31,36 @@ export const SubjectPage = () => {
   return (
     <div>
       <PageHeader title={`${t('subjectPage.pageTitle')}: ${params.subjectId!.slice(0, 6)}`} />
-      <SubjectRecordsGraph data={data} />
+      <LineGraph
+        data={[
+          {
+            x: '1',
+            y: 1
+          },
+          {
+            x: '2',
+            y: 2
+          },
+          {
+            x: ' 3',
+            y: 3
+          }
+        ]}
+        legend={null}
+        lines={[
+          {
+            name: 'Value',
+            val: 'y'
+          }
+        ]}
+        xAxis={{
+          key: 'x',
+          label: 'X'
+        }}
+        yAxis={{
+          label: 'Y'
+        }}
+      />
     </div>
   );
 };

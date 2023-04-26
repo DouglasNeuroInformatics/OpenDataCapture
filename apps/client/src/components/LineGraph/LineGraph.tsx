@@ -5,7 +5,6 @@ import {
   ErrorBar,
   Label,
   Legend,
-  LegendProps,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -27,14 +26,14 @@ export function LineGraph<const T extends LineGraphData>({
   lines,
   xAxis,
   yAxis,
-  legend
+  legend = null
 }: {
   /** An array of objects, where each object represents one point on the x-axis */
   data: T;
   lines: Array<{
     name: string;
     val: ExtractValidKeys<T, number>;
-    err: ExtractValidKeys<T, number>;
+    err?: ExtractValidKeys<T, number>;
   }>;
   xAxis?: {
     key?: ExtractValidKeys<T, string>;
@@ -43,10 +42,29 @@ export function LineGraph<const T extends LineGraphData>({
   yAxis: {
     label?: string;
   };
-  legend?: {
-    position: 'top' | 'right';
-  };
+  legend: 'top' | 'right' | null;
 }) {
+  let legendComponent: JSX.Element | null;
+  switch (legend) {
+    case 'top':
+      legendComponent = <Legend height={36} verticalAlign="top" />;
+      break;
+    case 'right':
+      legendComponent = (
+        <Legend
+          align="right"
+          height={36}
+          layout="vertical"
+          verticalAlign="middle"
+          wrapperStyle={{ paddingLeft: '1rem' }}
+        />
+      );
+      break;
+    default:
+      legendComponent = null;
+      break;
+  }
+
   return (
     <ResponsiveContainer height={400} width="100%">
       <LineChart data={[...data]} margin={{ left: 10, right: 10, bottom: 5, top: 5 }}>
@@ -58,24 +76,12 @@ export function LineGraph<const T extends LineGraphData>({
           <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} value={yAxis.label} />
         </YAxis>
         <Tooltip />
-        <Legend
-          align={legend?.position === 'right' ? 'right' : 'center'}
-          height={36}
-          layout={legend?.position === 'right' ? 'vertical' : 'horizontal'}
-          verticalAlign={legend?.position === 'right' ? 'middle' : 'top'}
-          wrapperStyle={
-            legend?.position === 'right'
-              ? {
-                  paddingLeft: '1rem'
-                }
-              : undefined
-          }
-        />
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="monotone">
-            <ErrorBar dataKey={err} />
+            {err && <ErrorBar dataKey={err} />}
           </Line>
         ))}
+        {legendComponent}
       </LineChart>
     </ResponsiveContainer>
   );
