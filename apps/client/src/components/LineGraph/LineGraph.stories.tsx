@@ -77,6 +77,9 @@ export const Default: Story = {
     },
     yAxis: {
       label: 'Average Daily Sales'
+    },
+    legend: {
+      position: 'right'
     }
   }
 };

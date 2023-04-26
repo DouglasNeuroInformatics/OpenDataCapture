@@ -51,13 +51,7 @@ export const SubjectRecordsGraph = ({ data }: SubjectRecordsGraphProps) => {
             }
           ]}
           legend={{
-            customElement: (
-              <QuerySelector
-                instruments={instruments}
-                selectedInstrument={selectedInstrument}
-                setSelectedInstrument={setSelectedInstrument}
-              />
-            )
+            position: 'right'
           }}
           lines={[
             {

@@ -15,7 +15,6 @@ import {
 } from 'recharts';
 import { ConditionalKeys } from 'type-fest';
 
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 /** An array of arbitrary objects with data to graph  */
 type LineGraphData = readonly object[];
 
@@ -44,12 +43,16 @@ export function LineGraph<const T extends LineGraphData>({
   yAxis: {
     label?: string;
   };
-  legend?: {
-    customElement: React.ReactElement<LegendProps>;
-  };
+  legend?:
+    | {
+        kind?: 'default';
+        position: 'top' | 'right';
+      }
+    | {
+        kind: 'custom';
+        content: React.ReactElement<LegendProps>;
+      };
 }) {
-  const isMobile = useMediaQuery('(max-width: 640px)');
-
   return (
     <ResponsiveContainer height={400} width="100%">
       <LineChart data={[...data]} margin={{ left: 10, right: 10, bottom: 5, top: 5 }}>
@@ -61,14 +64,23 @@ export function LineGraph<const T extends LineGraphData>({
           <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} value={yAxis.label} />
         </YAxis>
         <Tooltip />
-        <Legend
-          align={isMobile ? 'center' : 'right'}
-          content={legend?.customElement}
-          height={isMobile ? undefined : 400}
-          layout={isMobile ? undefined : 'vertical'}
-          verticalAlign={isMobile ? 'top' : 'middle'}
-          wrapperStyle={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0.5rem' }}
-        />
+        {legend?.kind === 'custom' ? (
+          <Legend content={legend.content} />
+        ) : (
+          <Legend
+            align={legend?.position === 'right' ? 'right' : 'center'}
+            height={36}
+            layout={legend?.position === 'right' ? 'vertical' : 'horizontal'}
+            verticalAlign={legend?.position === 'right' ? 'middle' : 'top'}
+            wrapperStyle={
+              legend?.position === 'right'
+                ? {
+                    paddingLeft: '1rem'
+                  }
+                : undefined
+            }
+          />
+        )}
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="monotone">
             <ErrorBar dataKey={err} />
