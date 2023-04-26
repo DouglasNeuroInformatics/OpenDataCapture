@@ -18,3 +18,9 @@ type Measure<TData extends FormInstrumentData> = {
 export type Measures<TData extends FormInstrumentData> = {
   [key: string]: Measure<TData>;
 };
+
+export type ComputedMeasures<TData extends FormInstrumentData> = {
+  [key: string]: Measure<TData> & {
+    value: number;
+  };
+};
