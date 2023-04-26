@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { ConditionalKeys } from 'type-fest';
 
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 /** An array of arbitrary objects with data to graph  */
 type LineGraphData = readonly object[];
 
@@ -47,6 +48,8 @@ export function LineGraph<const T extends LineGraphData>({
     customElement: React.ReactElement<LegendProps>;
   };
 }) {
+  const isMobile = useMediaQuery('(max-width: 640px)');
+
   return (
     <ResponsiveContainer height={400} width="100%">
       <LineChart data={[...data]} margin={{ left: 10, right: 10, bottom: 5, top: 5 }}>
