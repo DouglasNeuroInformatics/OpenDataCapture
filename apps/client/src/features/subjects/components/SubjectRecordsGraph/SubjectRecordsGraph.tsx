@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { SubjectFormRecords } from '@douglasneuroinformatics/common';
 
 import { QuerySelector } from './QuerySelector';
 
-import { LineGraph } from '@/components';
+import { Button, LineGraph } from '@/components';
 
 export interface SubjectRecordsGraphProps {
   data: SubjectFormRecords[];
@@ -12,6 +12,7 @@ export interface SubjectRecordsGraphProps {
 
 export const SubjectRecordsGraph = ({ data }: SubjectRecordsGraphProps) => {
   const instruments = data.map(({ instrument }) => instrument);
+  const [selectedInstrument, setSelectedInstrument] = useState<(typeof instruments)[number]>();
 
   return (
     <div className="max-w-3xl">
@@ -50,7 +51,13 @@ export const SubjectRecordsGraph = ({ data }: SubjectRecordsGraphProps) => {
             }
           ]}
           legend={{
-            customElement: <QuerySelector instruments={instruments} />
+            customElement: (
+              <QuerySelector
+                instruments={instruments}
+                selectedInstrument={selectedInstrument}
+                setSelectedInstrument={setSelectedInstrument}
+              />
+            )
           }}
           lines={[
             {
