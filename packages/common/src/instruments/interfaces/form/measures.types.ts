@@ -1,3 +1,5 @@
+import { Simplify } from 'type-fest';
+
 import { FormInstrumentData } from './form-fields.types';
 
 import { Language } from '@/core';
@@ -15,12 +17,16 @@ type Measure<TData extends FormInstrumentData> = {
       };
 };
 
+type ComputedMeasure<TData extends FormInstrumentData> = Simplify<
+  Measure<TData> & {
+    value: number;
+  }
+>;
+
 export type Measures<TData extends FormInstrumentData> = {
   [key: string]: Measure<TData>;
 };
 
 export type ComputedMeasures<TData extends FormInstrumentData> = {
-  [key: string]: Measure<TData> & {
-    value: number;
-  };
+  [key: string]: ComputedMeasure<TData>;
 };

@@ -5,6 +5,8 @@ import { AccessibleModel } from '@casl/mongoose';
 import { AppAbility } from '@douglasneuroinformatics/common/auth';
 import { Group } from '@douglasneuroinformatics/common/groups';
 import {
+  FormInstrument,
+  FormInstrumentData,
   FormInstrumentRecord,
   FormInstrumentRecordsSummary,
   InstrumentRecordsExport,
@@ -68,17 +70,18 @@ export class FormRecordsService {
       .accessibleBy(ability)
       .distinct('instrument');
 
-    const records: SubjectFormRecords[] = [];
-    for (const instrument of uniqueInstruments) {
-      records.push({
-        instrument: await this.formsService.findById(instrument),
-        records: await this.formRecordsModel
-          .find({ instrument, subject })
-          .accessibleBy(ability)
-          .select(['data', 'dateCollected'])
-      });
+    const arr: SubjectFormRecords[] = [];
+    for (const instrumentId of uniqueInstruments) {
+      const instrument = await this.formsService.findById(instrumentId);
+      const records = await this.formRecordsModel
+        .find({ instrument, subject })
+        .accessibleBy(ability)
+        .select(['data', 'dateCollected'])
+        .lean();
+      const computedRecords = this.computeMeasures(instrument, records);
+      arr.push({ instrument, records: computedRecords });
     }
-    return records;
+    return arr;
   }
 
   async summary(ability: AppAbility, groupName?: string): Promise<FormInstrumentRecordsSummary> {
@@ -112,5 +115,16 @@ export class FormRecordsService {
       }
     }
     return data;
+  }
+
+  /** Calculate the value for measures */
+  private computeMeasures<
+    T extends FormInstrumentData,
+    TRecord = Pick<FormInstrumentRecord<T>, 'data' | 'dateCollected'>
+  >(instrument: FormInstrument<T>, records: TRecord[]): Array<TRecord & { computedMeasures: any }> {
+    return records.map((record) => {
+      console.log(record);
+      return { ...record, computedMeasures: 'foo' };
+    });
   }
 }

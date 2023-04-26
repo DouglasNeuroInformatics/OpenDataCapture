@@ -3,6 +3,7 @@ export * from './interfaces/form/form-details.types';
 export * from './interfaces/form/form-fields.types';
 export * from './interfaces/form/form-instrument.types';
 export * from './interfaces/form/form-instrument-summary.types';
+export * from './interfaces/form/measures.types';
 export * from './interfaces/form/multilingual-form.types';
 
 export * from './interfaces/record/form-instrument-records-summary.interface';
