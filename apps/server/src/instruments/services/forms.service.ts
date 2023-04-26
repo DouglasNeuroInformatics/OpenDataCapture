@@ -58,7 +58,7 @@ export class FormsService {
   }
 
   /** @deprecated */
-  async findById(id: string | ObjectId): Promise<FormInstrument> {
+  async findById(id: string | ObjectId): Promise<FormInstrumentEntity> {
     const result = await this.formModel.findById(id);
     if (!result || result.kind !== 'form') {
       throw new NotFoundException(`Failed to find form with id: ${id.toString()}`);

@@ -1,28 +1,18 @@
 import React from 'react';
 
-import { LegendProps } from 'recharts';
+import { SubjectFormRecords } from '@douglasneuroinformatics/common';
+
+import { QuerySelector } from './QuerySelector';
 
 import { LineGraph } from '@/components';
 
-const CustomLegend = (props: LegendProps) => {
-  const { payload } = props;
-
-  return (
-    <div className="h-full">
-      <ul>
-        {payload?.map((entry, index) => (
-          <li key={`item-${index}`}>{entry.value}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
 export interface SubjectRecordsGraphProps {
-  title: string;
+  data: SubjectFormRecords[];
 }
 
-export const SubjectRecordsGraph = ({ title }: SubjectRecordsGraphProps) => {
+export const SubjectRecordsGraph = ({ data }: SubjectRecordsGraphProps) => {
+  const instruments = data.map(({ instrument }) => instrument);
+
   return (
     <div className="max-w-3xl">
       <h3 className="text-center text-2xl font-semibold">Subject Records Graph</h3>
@@ -60,7 +50,7 @@ export const SubjectRecordsGraph = ({ title }: SubjectRecordsGraphProps) => {
             }
           ]}
           legend={{
-            customElement: <CustomLegend />
+            customElement: <QuerySelector instruments={instruments} />
           }}
           lines={[
             {

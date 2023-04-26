@@ -17,6 +17,7 @@ import { Model, ObjectId } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
+import { FormInstrumentEntity } from '../entities/form-instrument.entity';
 import { InstrumentRecordEntity } from '../entities/instrument-record.entity';
 
 import { FormsService } from './forms.service';
@@ -121,7 +122,7 @@ export class FormRecordsService {
   private computeMeasures<
     T extends FormInstrumentData,
     TRecord = Pick<FormInstrumentRecord<T>, 'data' | 'dateCollected'>
-  >(instrument: FormInstrument<T>, records: TRecord[]): Array<TRecord & { computedMeasures: any }> {
+  >(instrument: FormInstrumentEntity, records: TRecord[]): Array<TRecord & { computedMeasures: any }> {
     return records.map((record) => {
       console.log(record);
       return { ...record, computedMeasures: 'foo' };

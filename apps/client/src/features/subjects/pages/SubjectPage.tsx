@@ -4,6 +4,8 @@ import { FormInstrument, FormInstrumentData, SubjectFormRecords } from '@douglas
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
+import { SubjectRecordsGraph } from '../components/SubjectRecordsGraph';
+
 import { Dropdown, LineGraph, PageHeader, SelectDropdown, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
@@ -36,35 +38,14 @@ export const SubjectPage = () => {
     }
   }, [selectedInstrument]);
 
-  //const m = computeMeasures(selectedInstrument);
-  //console.log(m);
-
   if (!data) {
     return <Spinner />;
   }
 
-  const instruments = data.map((item) => item.instrument);
-  const instrumentTitles = instruments.map((instrument) => instrument.details.title);
-
   return (
     <div>
       <PageHeader title={`${t('subjectPage.pageTitle')}: ${params.subjectId!.slice(0, 6)}`} />
-      <h3>Selected Instrument: {selectedInstrument?.details.title ?? 'None'}</h3>
-      <div>
-        <div className="flex gap-3">
-          <Dropdown
-            options={instrumentTitles}
-            title="Instrument"
-            onSelection={(title) => {
-              const instrument = instruments.find((instrument) => instrument.details.title === title);
-              setSelectedInstrument(instrument);
-            }}
-          />
-          <SelectDropdown options={[]} title="Dropdown" onChange={(selection) => undefined} />
-        </div>
-      </div>
+      <SubjectRecordsGraph data={data} />
     </div>
   );
 };
-
-export default SubjectPage;
