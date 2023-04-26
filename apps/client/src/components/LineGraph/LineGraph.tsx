@@ -62,12 +62,12 @@ export function LineGraph<const T extends LineGraphData>({
         </YAxis>
         <Tooltip />
         <Legend
-          align="right"
+          align={isMobile ? 'center' : 'right'}
           content={legend?.customElement}
-          height={400}
-          layout="vertical"
-          verticalAlign="middle"
-          wrapperStyle={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: '1rem' }}
+          height={isMobile ? undefined : 400}
+          layout={isMobile ? undefined : 'vertical'}
+          verticalAlign={isMobile ? 'top' : 'middle'}
+          wrapperStyle={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0.5rem' }}
         />
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="monotone">
