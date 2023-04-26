@@ -20,17 +20,13 @@ type LineGraphData = readonly object[];
 /** Extract string keys from items in `T` where the value of `T[K]` extends `K` */
 type ExtractValidKeys<T extends LineGraphData, K> = Extract<ConditionalKeys<T[number], K>, string>;
 
-const DEFAULT_STYLES = {
-  /** The offset for the labels on the x and y axis, which also defines bottom and left margins respectively */
-  labelOffset: 10
-};
-
 // eslint-disable-next-line react/function-component-definition
 export function LineGraph<const T extends LineGraphData>({
   data,
   lines,
   xAxis,
-  yAxis
+  yAxis,
+  legend
 }: {
   /** An array of objects, where each object represents one point on the x-axis */
   data: T;
@@ -46,6 +42,9 @@ export function LineGraph<const T extends LineGraphData>({
   yAxis: {
     label?: string;
   };
+  legend?: {
+    position: 'top' | 'right';
+  };
 }) {
   return (
     <ResponsiveContainer height={400} width="100%">
@@ -58,7 +57,19 @@ export function LineGraph<const T extends LineGraphData>({
           <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} value={yAxis.label} />
         </YAxis>
         <Tooltip />
-        <Legend height={36} verticalAlign="top" />
+        <Legend
+          align={legend?.position === 'right' ? 'right' : 'center'}
+          height={36}
+          layout={legend?.position === 'right' ? 'vertical' : 'horizontal'}
+          verticalAlign={legend?.position === 'right' ? 'middle' : 'top'}
+          wrapperStyle={
+            legend?.position === 'right'
+              ? {
+                  paddingLeft: '1rem'
+                }
+              : undefined
+          }
+        />
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="monotone">
             <ErrorBar dataKey={err} />

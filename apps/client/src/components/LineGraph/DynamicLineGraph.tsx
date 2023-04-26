@@ -8,7 +8,10 @@ export interface DynamicLineGraphProps {
 
 export const DynamicLineGraph = ({ title }: DynamicLineGraphProps) => {
   return (
-    <div className="grid grid-cols-3 border p-2">
+    <div className="grid max-w-3xl grid-cols-3 gap-5 border p-2">
+      <div className="col-span-full">
+        <h3 className="text-center text-2xl font-semibold">{title}</h3>
+      </div>
       <div className="col-span-2">
         <LineGraph
           data={[
@@ -64,7 +67,9 @@ export const DynamicLineGraph = ({ title }: DynamicLineGraphProps) => {
       </div>
       <div className="col-span-1">
         <h3 className="whitespace-nowrap text-center font-semibold">Data Selector</h3>
-        <div></div>
+        <div>
+          <h5>Instruments</h5>
+        </div>
       </div>
     </div>
   );
