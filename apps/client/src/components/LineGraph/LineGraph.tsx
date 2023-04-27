@@ -5,7 +5,6 @@ import {
   ErrorBar,
   Label,
   Legend,
-  LegendProps,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -15,7 +14,6 @@ import {
 } from 'recharts';
 import { ConditionalKeys } from 'type-fest';
 
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 /** An array of arbitrary objects with data to graph  */
 type LineGraphData = readonly object[];
 
@@ -28,14 +26,14 @@ export function LineGraph<const T extends LineGraphData>({
   lines,
   xAxis,
   yAxis,
-  legend
+  legend = null
 }: {
   /** An array of objects, where each object represents one point on the x-axis */
   data: T;
   lines: Array<{
     name: string;
     val: ExtractValidKeys<T, number>;
-    err: ExtractValidKeys<T, number>;
+    err?: ExtractValidKeys<T, number>;
   }>;
   xAxis?: {
     key?: ExtractValidKeys<T, string>;
@@ -44,11 +42,31 @@ export function LineGraph<const T extends LineGraphData>({
   yAxis: {
     label?: string;
   };
-  legend?: {
-    customElement: React.ReactElement<LegendProps>;
-  };
+  legend: 'top' | 'right' | 'bottom' | null;
 }) {
-  const isMobile = useMediaQuery('(max-width: 640px)');
+  let legendComponent: JSX.Element | null;
+  switch (legend) {
+    case 'bottom':
+      legendComponent = <Legend wrapperStyle={{ paddingLeft: 70, paddingTop: 10 }} />;
+      break;
+    case 'top':
+      legendComponent = <Legend height={36} verticalAlign="top" />;
+      break;
+    case 'right':
+      legendComponent = (
+        <Legend
+          align="right"
+          height={36}
+          layout="vertical"
+          verticalAlign="middle"
+          wrapperStyle={{ paddingLeft: '1rem' }}
+        />
+      );
+      break;
+    default:
+      legendComponent = null;
+      break;
+  }
 
   return (
     <ResponsiveContainer height={400} width="100%">
@@ -61,19 +79,12 @@ export function LineGraph<const T extends LineGraphData>({
           <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} value={yAxis.label} />
         </YAxis>
         <Tooltip />
-        <Legend
-          align={isMobile ? 'center' : 'right'}
-          content={legend?.customElement}
-          height={isMobile ? undefined : 400}
-          layout={isMobile ? undefined : 'vertical'}
-          verticalAlign={isMobile ? 'top' : 'middle'}
-          wrapperStyle={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0.5rem' }}
-        />
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="monotone">
-            <ErrorBar dataKey={err} />
+            {err && <ErrorBar dataKey={err} />}
           </Line>
         ))}
+        {legendComponent}
       </LineChart>
     </ResponsiveContainer>
   );

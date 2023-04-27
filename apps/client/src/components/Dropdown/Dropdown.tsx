@@ -1,19 +1,45 @@
 import React from 'react';
 
 import { Menu, Transition } from '@headlessui/react';
+import { clsx } from 'clsx';
 import { HiChevronDown } from 'react-icons/hi2';
 
-import { Button } from '@/components';
+import { Button, type ButtonProps } from '@/components';
 
-export interface DropdownProps {
+type DropdownOptions = string[] | Record<string, string>;
+
+type DropdownOptionKey<T> = T extends string[]
+  ? T[number]
+  : T extends Record<string, string>
+  ? Extract<keyof T, string>
+  : never;
+
+export interface DropdownProps<T extends DropdownOptions> {
+  /** The text content for the dropdown toggle */
   title: string;
-  options: string[];
-  onSelection: (option: string) => void;
+
+  /** Either a list of options for the dropdown, or an object with options mapped to custom labels  */
+  options: T;
+
+  /** Callback function invoked when user clicks an option */
+  onSelection: (option: DropdownOptionKey<T>) => void;
+
+  /** The button variant to use for the dropdown toggle */
+  variant?: ButtonProps['variant'];
+
+  className?: string;
 }
 
-export const Dropdown = ({ title, options, onSelection }: DropdownProps) => {
+export const Dropdown = <T extends DropdownOptions>({
+  title,
+  options,
+  onSelection,
+  variant,
+  className
+}: DropdownProps<T>) => {
+  const optionKeys: string[] = Array.isArray(options) ? options : Object.keys(options);
   return (
-    <Menu as="div" className="relative flex w-full">
+    <Menu as="div" className={clsx('relative w-full whitespace-nowrap', className)}>
       <Menu.Button
         as={Button}
         className="h-full w-full"
@@ -22,6 +48,7 @@ export const Dropdown = ({ title, options, onSelection }: DropdownProps) => {
         iconPosition="right"
         label={title}
         style={{ width: '100%' }}
+        variant={variant}
       />
       <Transition
         as="div"
@@ -33,15 +60,15 @@ export const Dropdown = ({ title, options, onSelection }: DropdownProps) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute z-10 mt-2 flex w-full flex-col border">
-          {options.map((option) => (
+        <Menu.Items className="absolute z-10 mt-2 flex w-fit min-w-full flex-col border">
+          {optionKeys.map((option) => (
             <Menu.Item key={option}>
               <button
-                className="w-full bg-slate-50 p-2 text-left hover:bg-slate-200"
+                className="bg-slate-50 p-2 text-left hover:bg-slate-200"
                 style={{ minWidth: 100 }}
-                onClick={() => onSelection(option)}
+                onClick={() => onSelection(option as DropdownOptionKey<T>)}
               >
-                {option}
+                {Array.isArray(options) ? option : options[option]}
               </button>
             </Menu.Item>
           ))}

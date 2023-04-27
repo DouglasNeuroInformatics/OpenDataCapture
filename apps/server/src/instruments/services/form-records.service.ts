@@ -5,11 +5,11 @@ import { AccessibleModel } from '@casl/mongoose';
 import { AppAbility } from '@douglasneuroinformatics/common/auth';
 import { Group } from '@douglasneuroinformatics/common/groups';
 import {
-  FormInstrument,
   FormInstrumentData,
   FormInstrumentRecord,
   FormInstrumentRecordsSummary,
   InstrumentRecordsExport,
+  Measure,
   SubjectFormRecords
 } from '@douglasneuroinformatics/common/instruments';
 import { DateUtils } from '@douglasneuroinformatics/common/utils';
@@ -73,13 +73,23 @@ export class FormRecordsService {
     const arr: SubjectFormRecords[] = [];
     for (const instrumentId of uniqueInstruments) {
       const instrument = await this.formsService.findById(instrumentId);
-      const records = await this.formRecordsModel
+      const records: SubjectFormRecords['records'] = await this.formRecordsModel
         .find({ instrument, subject })
         .accessibleBy(ability)
         .select(['data', 'dateCollected'])
         .lean();
-      const computedRecords = this.computeMeasures(instrument, records);
-      arr.push({ instrument, records: computedRecords });
+
+      if (instrument.measures) {
+        for (let i = 0; i < records.length; i++) {
+          const computedMeasures: Record<string, number> = {};
+          for (const key in instrument.measures) {
+            const measure = instrument.measures[key];
+            computedMeasures[key] = this.computeMeasure(measure, records[i].data);
+          }
+          records[i].computedMeasures = computedMeasures;
+        }
+      }
+      arr.push({ instrument, records: records });
     }
     return arr;
   }
@@ -117,14 +127,13 @@ export class FormRecordsService {
     return data;
   }
 
-  /** Calculate the value for measures */
-  private computeMeasures<
-    T extends FormInstrumentData,
-    TRecord = Pick<FormInstrumentRecord<T>, 'data' | 'dateCollected'>
-  >(instrument: FormInstrument<T>, records: TRecord[]): Array<TRecord & { computedMeasures: any }> {
-    return records.map((record) => {
-      console.log(record);
-      return { ...record, computedMeasures: 'foo' };
-    });
+  private computeMeasure<T extends FormInstrumentData>(measure: Measure<T>, data: T): number {
+    // data[measure.formula.field] should always be a number because only numeric fields may be used for fields in measure
+    switch (measure.formula.kind) {
+      case 'const':
+        return data[measure.formula.field] as number;
+      case 'sum':
+        return measure.formula.fields.map((field) => data[field] as number).reduce((a, b) => a + b, 0);
+    }
   }
 }

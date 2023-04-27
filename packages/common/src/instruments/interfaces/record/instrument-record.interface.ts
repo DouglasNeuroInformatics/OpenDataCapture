@@ -1,7 +1,6 @@
 import { BaseInstrument, InstrumentKind } from '../base/base-instrument.interface';
 import { FormInstrumentData } from '../form/form-fields.types';
 import { FormInstrument } from '../form/form-instrument.types';
-import { ComputedMeasures } from '../form/measures.types';
 
 import { Group } from '@/groups';
 import { Subject } from '@/subjects';
@@ -22,10 +21,12 @@ export type FormInstrumentRecord<T extends FormInstrumentData = FormInstrumentDa
 
 /** An object containing all of the records for a given form and subject */
 export type SubjectFormRecords<TData extends FormInstrumentData = FormInstrumentData> = {
-  instrument: FormInstrument<TData>;
+  instrument: FormInstrument<TData> & {
+    identifier: string;
+  };
   records: Array<
     Pick<FormInstrumentRecord<TData>, 'data' | 'dateCollected'> & {
-      computedMeasures?: ComputedMeasures<TData>;
+      computedMeasures?: Record<string, number>;
     }
   >;
 };

@@ -47,7 +47,8 @@ export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnai
         fr: 'Bonheur général'
       },
       formula: {
-        $const: 'overallHappiness'
+        kind: 'const',
+        field: 'overallHappiness'
       }
     }
   },

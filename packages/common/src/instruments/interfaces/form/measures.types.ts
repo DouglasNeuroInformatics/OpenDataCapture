@@ -1,32 +1,20 @@
-import { Simplify } from 'type-fest';
+import { ConditionalKeys } from 'type-fest';
 
 import { FormInstrumentData } from './form-fields.types';
 
-import { Language } from '@/core';
-
-type Measure<TData extends FormInstrumentData> = {
-  label: {
-    [L in Language]: string;
-  };
+export type Measure<TData extends FormInstrumentData = FormInstrumentData> = {
+  label: string;
   formula:
     | {
-        $sum: Array<keyof TData>;
+        kind: 'sum';
+        fields: Array<ConditionalKeys<TData, number>>;
       }
     | {
-        $const: keyof TData;
+        kind: 'const';
+        field: ConditionalKeys<TData, number>;
       };
 };
 
-type ComputedMeasure<TData extends FormInstrumentData> = Simplify<
-  Measure<TData> & {
-    value: number;
-  }
->;
-
-export type Measures<TData extends FormInstrumentData> = {
+export type Measures<TData extends FormInstrumentData = FormInstrumentData> = {
   [key: string]: Measure<TData>;
-};
-
-export type ComputedMeasures<TData extends FormInstrumentData> = {
-  [key: string]: ComputedMeasure<TData>;
 };

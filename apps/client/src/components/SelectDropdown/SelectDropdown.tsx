@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import { Listbox, Transition } from '@headlessui/react';
+import { clsx } from 'clsx';
 import { HiCheck, HiChevronDown } from 'react-icons/hi2';
 
-import { Button } from '../Button';
+import { Button, type ButtonProps } from '../Button';
 
 export interface SelectOption {
   key: string;
@@ -13,35 +14,40 @@ export interface SelectOption {
 export interface SelectDropdownProps<T extends SelectOption> {
   title: string;
   options: T[];
-  onChange: (selected: T[]) => void;
-  defaultSelections?: Array<T[][number]['key']>;
+  selected: T[];
+  setSelected: (selected: T[]) => void;
+  /** The button variant to use for the dropdown toggle */
+  variant?: ButtonProps['variant'];
+  className?: string;
+  checkPosition?: 'left' | 'right';
 }
 
 export const SelectDropdown = <T extends SelectOption>({
   options,
   title,
-  onChange,
-  defaultSelections // be careful with object equality here
+  variant,
+  className,
+  checkPosition = 'left',
+  selected,
+  setSelected
 }: SelectDropdownProps<T>) => {
-  const [selected, setSelected] = useState<T[]>([]);
-
-  useEffect(() => {
-    onChange(selected);
-  }, [selected]);
-
-  useEffect(() => {
-    setSelected(options.filter((item) => defaultSelections?.includes(item.key)));
-  }, [defaultSelections]);
-
   // Here we specify the key prop of objects for comparison
   return (
-    <Listbox multiple as="div" by="key" className="relative flex w-full" value={selected} onChange={setSelected}>
+    <Listbox
+      multiple
+      as="div"
+      by="key"
+      className={clsx('relative flex w-full', className)}
+      value={selected}
+      onChange={setSelected}
+    >
       <Listbox.Button
         as={Button}
         className="h-full w-full"
         icon={<HiChevronDown />}
         iconPosition="right"
         label={title}
+        variant={variant}
       />
       <Transition
         as="div"
@@ -60,8 +66,9 @@ export const SelectDropdown = <T extends SelectOption>({
               key={option.key}
               value={option}
             >
-              <HiCheck className="ui-selected:visible invisible mr-2" />
+              {checkPosition === 'left' && <HiCheck className="ui-selected:visible invisible mr-2" />}
               <span className="ui-selected:font-medium">{option.label}</span>
+              {checkPosition === 'right' && <HiCheck className="ui-selected:visible invisible ml-2" />}
             </Listbox.Option>
           ))}
         </Listbox.Options>

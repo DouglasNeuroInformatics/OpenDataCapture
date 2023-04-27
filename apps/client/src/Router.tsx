@@ -12,7 +12,7 @@ import {
   ManageInstrumentsPage
 } from './features/instruments';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
-import { AddSubjectPage, SubjectPage, SubjectRecordsPage, ViewSubjectsPage } from './features/subjects';
+import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
 
@@ -31,8 +31,7 @@ export const Router = () => {
               <Route element={<AddSubjectPage />} path="add-subject" />
               <Route path="view-subjects">
                 <Route index element={<ViewSubjectsPage />} />
-                <Route element={<SubjectPage />} path=":subjectId" />
-                <Route element={<SubjectRecordsPage />} path=":subjectId/records/:instrumentName" />
+                <Route element={<SubjectPage />} path=":subjectIdentifier" />
               </Route>
             </Route>
             <Route path="instruments">

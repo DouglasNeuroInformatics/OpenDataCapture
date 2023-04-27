@@ -6,6 +6,7 @@ import { FormInstrument } from './form-instrument.types';
 
 import { Language } from '@/core';
 import { Nullable } from '@/utils';
+import { Measure } from './measures.types';
 
 /**
  * The details of the form to be displayed to the user. This corresponds to the same
@@ -106,10 +107,19 @@ export type MultilingualFormContent<TData extends BaseTypes.FormInstrumentData> 
   | MultilingualFormFields<TData>
   | MultilingualFormFieldsGroup<TData>[];
 
+export type MultilingualFormMeasures<TData extends BaseTypes.FormInstrumentData> = {
+  [key: string]: Omit<Measure<TData>, 'label'> & {
+    label: {
+      [L in Language]: string;
+    };
+  };
+};
+
 /** The definition of a multilingual form, which can be used to derive actual forms */
 export type MultilingualForm<TData extends BaseTypes.FormInstrumentData> = Simplify<
-  Omit<FormInstrument<TData>, 'details' | 'content' | 'kind'> & {
+  Omit<FormInstrument<TData>, 'details' | 'content' | 'kind' | 'measures'> & {
     details: MultilingualFormDetails;
     content: MultilingualFormContent<TData>;
+    measures?: MultilingualFormMeasures<TData>;
   }
 >;
