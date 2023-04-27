@@ -223,6 +223,34 @@ export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingS
       variant: 'slider'
     }
   },
+  measures: {
+    totalScore: {
+      label: 'Total Score',
+      formula: {
+        kind: 'sum',
+        fields: [
+          'anxiety',
+          'bluntedAffect',
+          'conceptualDisorganization',
+          'depressiveMood',
+          'disorientation',
+          'emotionalWithdrawal',
+          'excitement',
+          'grandiosity',
+          'guiltFeelings',
+          'hallucinatoryBehavior',
+          'hostility',
+          'mannerismsAndPosturing',
+          'motorRetardation',
+          'somaticConcern',
+          'suspiciousness',
+          'tension',
+          'uncooperativeness',
+          'unusualThoughtContent'
+        ]
+      }
+    }
+  },
   validationSchema: {
     type: 'object',
     properties: Object.fromEntries(

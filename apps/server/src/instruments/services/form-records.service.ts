@@ -5,11 +5,10 @@ import { AccessibleModel } from '@casl/mongoose';
 import { AppAbility } from '@douglasneuroinformatics/common/auth';
 import { Group } from '@douglasneuroinformatics/common/groups';
 import {
-  FormInstrument,
-  FormInstrumentData,
   FormInstrumentRecord,
   FormInstrumentRecordsSummary,
   InstrumentRecordsExport,
+  Measure,
   SubjectFormRecords
 } from '@douglasneuroinformatics/common/instruments';
 import { DateUtils } from '@douglasneuroinformatics/common/utils';
@@ -17,7 +16,6 @@ import { Model, ObjectId } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
-import { FormInstrumentEntity } from '../entities/form-instrument.entity';
 import { InstrumentRecordEntity } from '../entities/instrument-record.entity';
 
 import { FormsService } from './forms.service';
@@ -74,13 +72,25 @@ export class FormRecordsService {
     const arr: SubjectFormRecords[] = [];
     for (const instrumentId of uniqueInstruments) {
       const instrument = await this.formsService.findById(instrumentId);
-      const records = await this.formRecordsModel
+      const records: SubjectFormRecords['records'] = await this.formRecordsModel
         .find({ instrument, subject })
         .accessibleBy(ability)
         .select(['data', 'dateCollected'])
         .lean();
-      const computedRecords = this.computeMeasures(instrument, records);
-      arr.push({ instrument, records: computedRecords });
+
+      if (instrument.measures) {
+        for (let i = 0; i < records.length; i++) {
+          const computedMeasures: Record<string, number> = {};
+          for (const key in instrument.measures) {
+            const measure = instrument.measures[key];
+            computedMeasures[key] = this.computeMeasure(measure);
+          }
+          records[i].computedMeasures = computedMeasures;
+        }
+      }
+
+      //const computedRecords = instrument.measures ? this.computeMeasures(instrument, records) : records;
+      arr.push({ instrument, records: records });
     }
     return arr;
   }
@@ -118,14 +128,7 @@ export class FormRecordsService {
     return data;
   }
 
-  /** Calculate the value for measures */
-  private computeMeasures<
-    T extends FormInstrumentData,
-    TRecord = Pick<FormInstrumentRecord<T>, 'data' | 'dateCollected'>
-  >(instrument: FormInstrumentEntity, records: TRecord[]): Array<TRecord & { computedMeasures: any }> {
-    return records.map((record) => {
-      console.log(record);
-      return { ...record, computedMeasures: 'foo' };
-    });
+  private computeMeasure(measure: Measure): number {
+    return 0;
   }
 }

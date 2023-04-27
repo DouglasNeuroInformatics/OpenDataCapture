@@ -4,6 +4,7 @@ import {
   FormInstrumentContent,
   FormInstrumentData,
   Language,
+  Measures,
   MultilingualForm,
   MultilingualFormFields
 } from '@douglasneuroinformatics/common';
@@ -45,6 +46,18 @@ function createTranslatedForms<T extends FormInstrumentData>(
       content = getTranslatedFields(multilingualForm.content, language);
     }
 
+    let measures: Measures<T> | undefined;
+    if (multilingualForm.measures) {
+      measures = {};
+      for (const key in multilingualForm.measures) {
+        const measure = multilingualForm.measures[key];
+        measures[key] = {
+          formula: measure.formula,
+          label: measure.label[language]
+        };
+      }
+    }
+
     forms[language] = {
       kind: 'form',
       name: multilingualForm.name,
@@ -58,7 +71,7 @@ function createTranslatedForms<T extends FormInstrumentData>(
         title: multilingualForm.details.title[language]
       },
       content,
-      measures: multilingualForm.measures,
+      measures,
       validationSchema: multilingualForm.validationSchema
     };
   }

@@ -28,21 +28,26 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
       for (const measure in selectedInstrument.measures) {
         arr.push({
           key: measure,
-          label: selectedInstrument.measures[measure].label.en
+          label: selectedInstrument.measures[measure].label
         });
       }
     }
     return arr;
   }, [selectedInstrument]);
 
-  console.log(measureOptions);
+  if (records) {
+    console.log(records[0].computedMeasures);
+  }
 
   // console.log(selectedInstrument, records);
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div>
-        <div className="ml-[70px] flex justify-between p-2">
+      <div className="ml-[70px] p-2">
+        <h3 className="mb-5 text-center text-xl font-medium">
+          {selectedInstrument?.details.title ?? 'Please Select an Instrument'}
+        </h3>
+        <div className="flex justify-between">
           <div className="flex gap-2">
             <Dropdown
               options={instrumentOptions}
@@ -61,6 +66,8 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
           </div>
           <DropdownToggle text="Timeframe" />
         </div>
+      </div>
+      <div>
         <LineGraph
           data={[
             {

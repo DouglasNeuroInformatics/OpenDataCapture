@@ -1,7 +1,6 @@
 import { BaseInstrument, InstrumentKind } from '../base/base-instrument.interface';
 import { FormInstrumentData } from '../form/form-fields.types';
 import { FormInstrument } from '../form/form-instrument.types';
-import { ComputedMeasures } from '../form/measures.types';
 
 import { Group } from '@/groups';
 import { Subject } from '@/subjects';
@@ -27,7 +26,7 @@ export type SubjectFormRecords<TData extends FormInstrumentData = FormInstrument
   };
   records: Array<
     Pick<FormInstrumentRecord<TData>, 'data' | 'dateCollected'> & {
-      computedMeasures?: ComputedMeasures<TData>;
+      computedMeasures?: Record<string, number>;
     }
   >;
 };
