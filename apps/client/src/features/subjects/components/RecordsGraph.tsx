@@ -107,9 +107,10 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
               checkPosition="right"
               className="text-sm"
               options={measureOptions}
+              selected={selectedMeasures}
+              setSelected={setSelectedMeasures}
               title={t('subjectPage.graph.measures')}
               variant="light"
-              onChange={setSelectedMeasures}
             />
           </div>
           <div>

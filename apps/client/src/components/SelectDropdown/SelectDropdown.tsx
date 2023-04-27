@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import { Listbox, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
@@ -14,8 +14,8 @@ export interface SelectOption {
 export interface SelectDropdownProps<T extends SelectOption> {
   title: string;
   options: T[];
-  onChange: (selected: T[]) => void;
-  defaultSelections?: Array<T[][number]['key']>;
+  selected: T[];
+  setSelected: (selected: T[]) => void;
   /** The button variant to use for the dropdown toggle */
   variant?: ButtonProps['variant'];
   className?: string;
@@ -25,22 +25,12 @@ export interface SelectDropdownProps<T extends SelectOption> {
 export const SelectDropdown = <T extends SelectOption>({
   options,
   title,
-  onChange,
-  defaultSelections, // be careful with object equality here
   variant,
   className,
-  checkPosition = 'left'
+  checkPosition = 'left',
+  selected,
+  setSelected
 }: SelectDropdownProps<T>) => {
-  const [selected, setSelected] = useState<T[]>([]);
-
-  useEffect(() => {
-    onChange(selected);
-  }, [selected]);
-
-  useEffect(() => {
-    setSelected(options.filter((item) => defaultSelections?.includes(item.key)));
-  }, [defaultSelections]);
-
   // Here we specify the key prop of objects for comparison
   return (
     <Listbox

@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { FormInstrumentSummary, Language } from '@douglasneuroinformatics/common';
+import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
 import { animated, useTrail } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 
@@ -15,19 +15,34 @@ export interface InstrumentShowcaseProps {
 export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => {
   const { i18n, t } = useTranslation(['common', 'instruments']);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLanguages, setSelectedLanguages] = useState<Language[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const defaultLanguageOptions = useMemo<Language[]>(() => {
-    return [i18n.resolvedLanguage as Language];
+  const languageOptions = Array.from(new Set(instruments.map((item) => item.details.language))).map((item) => ({
+    key: item,
+    label: t(`common:languages.${item}`)
+  }));
+
+  const tagOptions = Array.from(new Set(instruments.flatMap((item) => item.tags))).map((item) => ({
+    key: item,
+    label: item
+  }));
+
+  const [selectedLanguages, setSelectedLanguages] = useState<typeof languageOptions>([]);
+  const [selectedTags, setSelectedTags] = useState<typeof tagOptions>([]);
+
+  useEffect(() => {
+    const nativeLanguage = languageOptions.find((lang) => lang.key === i18n.resolvedLanguage);
+    if (nativeLanguage) {
+      setSelectedLanguages([nativeLanguage]);
+    }
   }, [i18n.resolvedLanguage]);
 
   const filteredInstruments = useMemo(() => {
     return instruments.filter((instrument) => {
       const matchesSearch = instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
       const matchesLanguages =
-        selectedLanguages.length === 0 || selectedLanguages.includes(instrument.details.language);
-      const matchesTags = selectedTags.length === 0 || instrument.tags.some((tag) => selectedTags.includes(tag));
+        selectedLanguages.length === 0 || selectedLanguages.find(({ key }) => key === instrument.details.language);
+      const matchesTags =
+        selectedTags.length === 0 || instrument.tags.some((tag) => selectedTags.find(({ key }) => key === tag));
       return matchesSearch && matchesLanguages && matchesTags;
     });
   }, [instruments, searchTerm, selectedLanguages, selectedTags]);
@@ -49,31 +64,22 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
     [filteredInstruments]
   );
 
-  const languageOptions = Array.from(new Set(instruments.map((item) => item.details.language))).map((item) => ({
-    key: item,
-    label: t(`common:languages.${item}`)
-  }));
-
-  const tagOptions = Array.from(new Set(instruments.flatMap((item) => item.tags))).map((item) => ({
-    key: item,
-    label: item
-  }));
-
   return (
     <div>
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
         <SearchBar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <SelectDropdown
-            defaultSelections={defaultLanguageOptions}
             options={languageOptions}
+            selected={selectedLanguages}
+            setSelected={setSelectedLanguages}
             title={t('instruments:availableInstruments.filters.language')}
-            onChange={(selected) => setSelectedLanguages(selected.map((item) => item.key))}
           />
           <SelectDropdown
             options={tagOptions}
+            selected={selectedTags}
+            setSelected={setSelectedTags}
             title={t('instruments:availableInstruments.filters.tags')}
-            onChange={(selected) => setSelectedTags(selected.map((item) => item.key))}
           />
         </div>
       </div>
