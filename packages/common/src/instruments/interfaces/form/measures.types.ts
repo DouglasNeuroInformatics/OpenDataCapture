@@ -1,3 +1,5 @@
+import { ConditionalKeys } from 'type-fest';
+
 import { FormInstrumentData } from './form-fields.types';
 
 export type Measure<TData extends FormInstrumentData = FormInstrumentData> = {
@@ -5,11 +7,11 @@ export type Measure<TData extends FormInstrumentData = FormInstrumentData> = {
   formula:
     | {
         kind: 'sum';
-        fields: Array<keyof TData>;
+        fields: Array<ConditionalKeys<TData, number>>;
       }
     | {
         kind: 'const';
-        field: keyof TData;
+        field: ConditionalKeys<TData, number>;
       };
 };
 

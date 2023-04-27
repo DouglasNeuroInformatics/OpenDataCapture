@@ -30,10 +30,10 @@ export class FormInstrumentEntity<TData extends FormInstrumentData = FormInstrum
   content: FormInstrumentContent<TData>;
 
   @Prop({ required: true, type: Object })
-  validationSchema: JSONSchemaType<FormInstrumentData>;
+  validationSchema: JSONSchemaType<TData>;
 
   @Prop({ required: false, type: Object })
-  measures?: Measures<FormInstrumentData>;
+  measures?: Measures<TData>;
 }
 
 export const FormInstrumentSchema = SchemaFactory.createForClass(FormInstrumentEntity);

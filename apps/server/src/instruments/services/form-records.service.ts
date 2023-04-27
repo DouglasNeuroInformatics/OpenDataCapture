@@ -5,6 +5,7 @@ import { AccessibleModel } from '@casl/mongoose';
 import { AppAbility } from '@douglasneuroinformatics/common/auth';
 import { Group } from '@douglasneuroinformatics/common/groups';
 import {
+  FormInstrumentData,
   FormInstrumentRecord,
   FormInstrumentRecordsSummary,
   InstrumentRecordsExport,
@@ -83,13 +84,11 @@ export class FormRecordsService {
           const computedMeasures: Record<string, number> = {};
           for (const key in instrument.measures) {
             const measure = instrument.measures[key];
-            computedMeasures[key] = this.computeMeasure(measure);
+            computedMeasures[key] = this.computeMeasure(measure, records[i].data);
           }
           records[i].computedMeasures = computedMeasures;
         }
       }
-
-      //const computedRecords = instrument.measures ? this.computeMeasures(instrument, records) : records;
       arr.push({ instrument, records: records });
     }
     return arr;
@@ -128,7 +127,13 @@ export class FormRecordsService {
     return data;
   }
 
-  private computeMeasure(measure: Measure): number {
-    return 0;
+  private computeMeasure<T extends FormInstrumentData>(measure: Measure<T>, data: T): number {
+    // data[measure.formula.field] should always be a number because only numeric fields may be used for fields in measure
+    switch (measure.formula.kind) {
+      case 'const':
+        return data[measure.formula.field] as number;
+      case 'sum':
+        return measure.formula.fields.map((field) => data[field] as number).reduce((a, b) => a + b, 0);
+    }
   }
 }
