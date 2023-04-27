@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Menu, Transition } from '@headlessui/react';
+import { clsx } from 'clsx';
 import { HiChevronDown } from 'react-icons/hi2';
 
 import { Button, type ButtonProps } from '@/components';
@@ -25,12 +26,20 @@ export interface DropdownProps<T extends DropdownOptions> {
 
   /** The button variant to use for the dropdown toggle */
   variant?: ButtonProps['variant'];
+
+  className?: string;
 }
 
-export const Dropdown = <T extends DropdownOptions>({ title, options, onSelection, variant }: DropdownProps<T>) => {
+export const Dropdown = <T extends DropdownOptions>({
+  title,
+  options,
+  onSelection,
+  variant,
+  className
+}: DropdownProps<T>) => {
   const optionKeys: string[] = Array.isArray(options) ? options : Object.keys(options);
   return (
-    <Menu as="div" className="relative flex w-full">
+    <Menu as="div" className={clsx('relative flex w-full', className)}>
       <Menu.Button
         as={Button}
         className="h-full w-full"
@@ -51,11 +60,11 @@ export const Dropdown = <T extends DropdownOptions>({ title, options, onSelectio
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute z-10 mt-2 flex w-full flex-col border">
+        <Menu.Items className="absolute z-10 mt-2 flex w-fit flex-col border">
           {optionKeys.map((option) => (
             <Menu.Item key={option}>
               <button
-                className="w-full bg-slate-50 p-2 text-left hover:bg-slate-200"
+                className="bg-slate-50 p-2 text-left hover:bg-slate-200"
                 style={{ minWidth: 100 }}
                 onClick={() => onSelection(option as DropdownOptionKey<T>)}
               >

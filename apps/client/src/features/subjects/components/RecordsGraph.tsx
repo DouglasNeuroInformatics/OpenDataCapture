@@ -35,10 +35,6 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
     return arr;
   }, [selectedInstrument]);
 
-  if (records) {
-    console.log(records[0].computedMeasures);
-  }
-
   // console.log(selectedInstrument, records);
 
   return (
@@ -50,6 +46,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
         <div className="flex justify-between">
           <div className="flex gap-2">
             <Dropdown
+              className="whitespace-nowrap text-sm"
               options={instrumentOptions}
               title="Instrument"
               variant="light"
@@ -58,10 +55,11 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
               }}
             />
             <SelectDropdown
+              className="text-sm"
               options={measureOptions}
               title="Measures"
               variant="light"
-              onChange={(selected) => console.log(selected)}
+              onChange={(selected) => null}
             />
           </div>
           <DropdownToggle text="Timeframe" />

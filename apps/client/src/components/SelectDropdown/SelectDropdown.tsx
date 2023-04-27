@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { Listbox, Transition } from '@headlessui/react';
+import { clsx } from 'clsx';
 import { HiCheck, HiChevronDown } from 'react-icons/hi2';
 
 import { Button, type ButtonProps } from '../Button';
@@ -17,6 +18,7 @@ export interface SelectDropdownProps<T extends SelectOption> {
   defaultSelections?: Array<T[][number]['key']>;
   /** The button variant to use for the dropdown toggle */
   variant?: ButtonProps['variant'];
+  className?: string;
 }
 
 export const SelectDropdown = <T extends SelectOption>({
@@ -24,7 +26,8 @@ export const SelectDropdown = <T extends SelectOption>({
   title,
   onChange,
   defaultSelections, // be careful with object equality here
-  variant
+  variant,
+  className
 }: SelectDropdownProps<T>) => {
   const [selected, setSelected] = useState<T[]>([]);
 
@@ -38,7 +41,14 @@ export const SelectDropdown = <T extends SelectOption>({
 
   // Here we specify the key prop of objects for comparison
   return (
-    <Listbox multiple as="div" by="key" className="relative flex w-full" value={selected} onChange={setSelected}>
+    <Listbox
+      multiple
+      as="div"
+      by="key"
+      className={clsx('relative flex w-full', className)}
+      value={selected}
+      onChange={setSelected}
+    >
       <Listbox.Button
         as={Button}
         className="h-full w-full"
