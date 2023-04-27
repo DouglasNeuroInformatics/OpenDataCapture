@@ -31,7 +31,7 @@ export interface RecordsGraphProps {
 }
 
 export const RecordsGraph = ({ data }: RecordsGraphProps) => {
-  const [timeframe, setTimeframe] = useState<'all' | 'pastYear' | 'pastMonth'>('all');
+  const [oldestDate, setOldestDate] = useState<Date | null>(null);
   const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument>();
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
   const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
@@ -57,17 +57,15 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   }, [selectedInstrument]);
 
   const graphData = useMemo(() => {
-    // const minDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
-    const minDate = new Date(new Date().setMonth(new Date().getMonth() - 1));
-
     const arr: RecordsGraphData = [];
     for (const record of records) {
       const dateCollected = new Date(record.dateCollected);
-      arr.push({
-        dateObj: dateCollected,
-        dateString: DateUtils.toBasicISOString(dateCollected),
-        ...filterObj(record.computedMeasures!, ({ key }) => selectedMeasures.find((item) => item.key === key))
-      });
+      if (oldestDate === null || dateCollected > oldestDate)
+        arr.push({
+          dateObj: dateCollected,
+          dateString: DateUtils.toBasicISOString(dateCollected),
+          ...filterObj(record.computedMeasures!, ({ key }) => selectedMeasures.find((item) => item.key === key))
+        });
     }
     return arr.sort((a, b) => {
       if (a.dateObj > b.dateObj) {
@@ -77,7 +75,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
       }
       return 0;
     });
-  }, [records, selectedMeasures]);
+  }, [records, selectedMeasures, oldestDate]);
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -115,7 +113,15 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
               }}
               title="Timeframe"
               variant="light"
-              onSelection={setTimeframe}
+              onSelection={(selection) => {
+                if (selection === 'pastYear') {
+                  setOldestDate(new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+                } else if (selection === 'pastMonth') {
+                  setOldestDate(new Date(new Date().setMonth(new Date().getMonth() - 1)));
+                } else {
+                  setOldestDate(null);
+                }
+              }}
             />
           </div>
         </div>
