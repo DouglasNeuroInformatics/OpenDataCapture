@@ -4,6 +4,12 @@ import { DateUtils, FormInstrument, SubjectFormRecords } from '@douglasneuroinfo
 
 import { Dropdown, LineGraph, SelectDropdown } from '@/components';
 
+type RecordsGraphData = Array<{
+  [key: string]: any;
+  dateObj: Date;
+  dateString: string;
+}>;
+
 type SelectedMeasure = {
   key: string;
   label: string;
@@ -51,14 +57,26 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   }, [selectedInstrument]);
 
   const graphData = useMemo(() => {
-    const arr: Record<string, any>[] = [];
+    // const minDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+    const minDate = new Date(new Date().setMonth(new Date().getMonth() - 1));
+
+    const arr: RecordsGraphData = [];
     for (const record of records) {
+      const dateCollected = new Date(record.dateCollected);
       arr.push({
-        dateCollected: DateUtils.toBasicISOString(new Date(record.dateCollected)),
+        dateObj: dateCollected,
+        dateString: DateUtils.toBasicISOString(dateCollected),
         ...filterObj(record.computedMeasures!, ({ key }) => selectedMeasures.find((item) => item.key === key))
       });
     }
-    return arr;
+    return arr.sort((a, b) => {
+      if (a.dateObj > b.dateObj) {
+        return 1;
+      } else if (b.dateObj > a.dateObj) {
+        return -1;
+      }
+      return 0;
+    });
   }, [records, selectedMeasures]);
 
   return (
@@ -111,7 +129,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
             val: measure.key
           }))}
           xAxis={{
-            key: 'dateCollected',
+            key: 'dateString',
             label: 'Date Collected'
           }}
           yAxis={{
