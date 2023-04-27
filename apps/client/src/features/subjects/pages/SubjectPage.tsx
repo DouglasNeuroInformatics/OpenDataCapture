@@ -22,19 +22,16 @@ function computeMeasures<T extends FormInstrumentData>(instrument?: FormInstrume
 export const SubjectPage = () => {
   const params = useParams();
   const { t } = useTranslation('subjects');
-  const { data } = useFetch<SubjectFormRecords[]>(`/instruments/records/forms?subject=${params.subjectId!}`);
-  const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument>();
+  const { data } = useFetch<SubjectFormRecords[]>(`/instruments/records/forms?subject=${params.subjectIdentifier!}`);
 
   if (!data) {
     return <Spinner />;
   }
 
-  const instruments = data.map(({ instrument }) => instrument);
-
   return (
     <div>
-      <PageHeader title={`${t('subjectPage.pageTitle')}: ${params.subjectId!.slice(0, 6)}`} />
-      <RecordsGraph />
+      <PageHeader title={`${t('subjectPage.pageTitle')}: ${params.subjectIdentifier!.slice(0, 6)}`} />
+      <RecordsGraph data={data} />
     </div>
   );
 };

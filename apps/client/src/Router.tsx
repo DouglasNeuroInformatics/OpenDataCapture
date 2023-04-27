@@ -31,8 +31,7 @@ export const Router = () => {
               <Route element={<AddSubjectPage />} path="add-subject" />
               <Route path="view-subjects">
                 <Route index element={<ViewSubjectsPage />} />
-                <Route element={<SubjectPage />} path=":subjectId" />
-                <Route element={<SubjectRecordsPage />} path=":subjectId/records/:instrumentName" />
+                <Route element={<SubjectPage />} path=":subjectIdentifier" />
               </Route>
             </Route>
             <Route path="instruments">

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { HiCheck, HiChevronDown } from 'react-icons/hi2';
 
-import { Button } from '../Button';
+import { Button, type ButtonProps } from '../Button';
 
 export interface SelectOption {
   key: string;
@@ -15,13 +15,16 @@ export interface SelectDropdownProps<T extends SelectOption> {
   options: T[];
   onChange: (selected: T[]) => void;
   defaultSelections?: Array<T[][number]['key']>;
+  /** The button variant to use for the dropdown toggle */
+  variant?: ButtonProps['variant'];
 }
 
 export const SelectDropdown = <T extends SelectOption>({
   options,
   title,
   onChange,
-  defaultSelections // be careful with object equality here
+  defaultSelections, // be careful with object equality here
+  variant
 }: SelectDropdownProps<T>) => {
   const [selected, setSelected] = useState<T[]>([]);
 
@@ -42,6 +45,7 @@ export const SelectDropdown = <T extends SelectOption>({
         icon={<HiChevronDown />}
         iconPosition="right"
         label={title}
+        variant={variant}
       />
       <Transition
         as="div"
