@@ -20,20 +20,18 @@
   },
   "subjectPage": {
     "pageTitle": "Instrument Records for Subject",
-    "table": {
-      "columns": {
-        "title": "Title",
-        "version": "Version",
-        "nRecords": "Number of Records"
-      }
-    }
-  },
-  "subjectRecordsPage": {
     "graph": {
-      "title": "Records for Subject",
-      "fields": "Fields",
+      "defaultTitle": "Please Select an Instrument",
+      "instrument": "Instrument",
+      "measures": "Measures",
+      "timeframe": "Timeframe",
+      "timeframeOptions": {
+        "all": "All-Time",
+        "month": "Past Month",
+        "year": "Past Year"
+      },
       "xLabel": "Date Collected",
-      "yLabel": "Score"
+      "yLabel": "Value"
     }
   }
 }

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
 import { DateUtils, FormInstrument, SubjectFormRecords } from '@douglasneuroinformatics/common';
+import { useTranslation } from 'react-i18next';
 
 import { Dropdown, LineGraph, SelectDropdown } from '@/components';
 
@@ -31,6 +32,7 @@ export interface RecordsGraphProps {
 }
 
 export const RecordsGraph = ({ data }: RecordsGraphProps) => {
+  const { t } = useTranslation('subjects');
   const [oldestDate, setOldestDate] = useState<Date | null>(null);
   const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument>();
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
@@ -81,14 +83,14 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
     <div className="mx-auto max-w-3xl">
       <div className="ml-[70px] p-2">
         <h3 className="mb-5 text-center text-xl font-medium">
-          {selectedInstrument?.details.title ?? 'Please Select an Instrument'}
+          {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
         </h3>
         <div className="flex justify-between">
           <div className="flex gap-2">
             <Dropdown
               className="text-sm"
               options={instrumentOptions}
-              title="Instrument"
+              title={t('subjectPage.graph.instrument')}
               variant="light"
               onSelection={(selection) => {
                 setSelectedMeasures([]);
@@ -98,7 +100,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
             <SelectDropdown
               className="text-sm"
               options={measureOptions}
-              title="Measures"
+              title={t('subjectPage.graph.measures')}
               variant="light"
               onChange={setSelectedMeasures}
             />
@@ -107,11 +109,11 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
             <Dropdown
               className="text-sm"
               options={{
-                all: 'All',
-                pastYear: 'Past Year',
-                pastMonth: 'Past Month'
+                all: t('subjectPage.graph.timeframeOptions.all'),
+                pastYear: t('subjectPage.graph.timeframeOptions.year'),
+                pastMonth: t('subjectPage.graph.timeframeOptions.month')
               }}
-              title="Timeframe"
+              title={t('subjectPage.graph.measures')}
               variant="light"
               onSelection={(selection) => {
                 if (selection === 'pastYear') {
@@ -136,10 +138,10 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
           }))}
           xAxis={{
             key: 'dateString',
-            label: 'Date Collected'
+            label: t('subjectPage.graph.xLabel')
           }}
           yAxis={{
-            label: 'Y'
+            label: t('subjectPage.graph.yLabel')
           }}
         />
       </div>

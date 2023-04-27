@@ -20,18 +20,16 @@
   },
   "subjectPage": {
     "pageTitle": "Dossiers d'instruments pour le client",
-    "table": {
-      "columns": {
-        "title": "Titre",
-        "version": "Version",
-        "nRecords": "Nombre d'enregistrements"
-      }
-    }
-  },
-  "subjectRecordsPage": {
     "graph": {
-      "title": "Dossiers pour le client",
-      "fields": "Champs",
+      "defaultTitle": "Veuillez sélectionner un instrument",
+      "instrument": "Instrument",
+      "measures": "Mesures",
+      "timeframe": "Période",
+      "timeframeOptions": {
+        "all": "Toujours",
+        "month": "Mois écoulé",
+        "year": "Année écoulée"
+      },
       "xLabel": "Date d'enregistrement",
       "yLabel": "Valeur"
     }
