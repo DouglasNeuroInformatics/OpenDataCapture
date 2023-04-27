@@ -19,6 +19,7 @@ export interface SelectDropdownProps<T extends SelectOption> {
   /** The button variant to use for the dropdown toggle */
   variant?: ButtonProps['variant'];
   className?: string;
+  checkPosition?: 'left' | 'right';
 }
 
 export const SelectDropdown = <T extends SelectOption>({
@@ -27,7 +28,8 @@ export const SelectDropdown = <T extends SelectOption>({
   onChange,
   defaultSelections, // be careful with object equality here
   variant,
-  className
+  className,
+  checkPosition = 'left'
 }: SelectDropdownProps<T>) => {
   const [selected, setSelected] = useState<T[]>([]);
 
@@ -74,8 +76,9 @@ export const SelectDropdown = <T extends SelectOption>({
               key={option.key}
               value={option}
             >
-              <HiCheck className="ui-selected:visible invisible mr-2" />
+              {checkPosition === 'left' && <HiCheck className="ui-selected:visible invisible mr-2" />}
               <span className="ui-selected:font-medium">{option.label}</span>
+              {checkPosition === 'right' && <HiCheck className="ui-selected:visible invisible ml-2" />}
             </Listbox.Option>
           ))}
         </Listbox.Options>

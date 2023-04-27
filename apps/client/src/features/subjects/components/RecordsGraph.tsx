@@ -98,6 +98,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
               }}
             />
             <SelectDropdown
+              checkPosition="right"
               className="text-sm"
               options={measureOptions}
               title={t('subjectPage.graph.measures')}
