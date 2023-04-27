@@ -39,7 +39,7 @@ export const Dropdown = <T extends DropdownOptions>({
 }: DropdownProps<T>) => {
   const optionKeys: string[] = Array.isArray(options) ? options : Object.keys(options);
   return (
-    <Menu as="div" className={clsx('relative flex w-full', className)}>
+    <Menu as="div" className={clsx('relative w-full whitespace-nowrap', className)}>
       <Menu.Button
         as={Button}
         className="h-full w-full"
@@ -60,7 +60,7 @@ export const Dropdown = <T extends DropdownOptions>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute z-10 mt-2 flex w-fit flex-col border">
+        <Menu.Items className="absolute z-10 mt-2 flex w-fit min-w-full flex-col border">
           {optionKeys.map((option) => (
             <Menu.Item key={option}>
               <button

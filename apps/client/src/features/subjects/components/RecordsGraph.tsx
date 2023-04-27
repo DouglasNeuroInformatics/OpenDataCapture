@@ -2,18 +2,12 @@ import React, { useMemo, useState } from 'react';
 
 import { DateUtils, FormInstrument, SubjectFormRecords } from '@douglasneuroinformatics/common';
 
-import { ArrowToggle, Dropdown, LineGraph, SelectDropdown } from '@/components';
-
-type RecordsGraphData = Record<string, any>[];
+import { Dropdown, LineGraph, SelectDropdown } from '@/components';
 
 type SelectedMeasure = {
   key: string;
   label: string;
 };
-
-const DropdownToggle = ({ text }: { text: string }) => (
-  <ArrowToggle className="border px-3 py-1" content={text} contentPosition="left" position="up" rotation={180} />
-);
 
 /** Apply a callback function to filter items from object */
 function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
@@ -31,9 +25,9 @@ export interface RecordsGraphProps {
 }
 
 export const RecordsGraph = ({ data }: RecordsGraphProps) => {
+  const [timeframe, setTimeframe] = useState<'all' | 'pastYear' | 'pastMonth'>('all');
   const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument>();
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
-
   const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
 
   /** Instrument identifiers mapped to titles */
@@ -76,11 +70,12 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
         <div className="flex justify-between">
           <div className="flex gap-2">
             <Dropdown
-              className="whitespace-nowrap text-sm"
+              className="text-sm"
               options={instrumentOptions}
               title="Instrument"
               variant="light"
               onSelection={(selection) => {
+                setSelectedMeasures([]);
                 setSelectedInstrument(data.find(({ instrument }) => instrument.identifier === selection)?.instrument);
               }}
             />
@@ -92,13 +87,25 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
               onChange={setSelectedMeasures}
             />
           </div>
-          <DropdownToggle text="Timeframe" />
+          <div>
+            <Dropdown
+              className="text-sm"
+              options={{
+                all: 'All',
+                pastYear: 'Past Year',
+                pastMonth: 'Past Month'
+              }}
+              title="Timeframe"
+              variant="light"
+              onSelection={setTimeframe}
+            />
+          </div>
         </div>
       </div>
       <div>
         <LineGraph
           data={graphData}
-          legend={null}
+          legend="bottom"
           lines={selectedMeasures.map((measure) => ({
             name: measure.label,
             val: measure.key

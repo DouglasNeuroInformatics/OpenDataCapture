@@ -42,10 +42,13 @@ export function LineGraph<const T extends LineGraphData>({
   yAxis: {
     label?: string;
   };
-  legend: 'top' | 'right' | null;
+  legend: 'top' | 'right' | 'bottom' | null;
 }) {
   let legendComponent: JSX.Element | null;
   switch (legend) {
+    case 'bottom':
+      legendComponent = <Legend wrapperStyle={{ paddingLeft: 70, paddingTop: 10 }} />;
+      break;
     case 'top':
       legendComponent = <Legend height={36} verticalAlign="top" />;
       break;
