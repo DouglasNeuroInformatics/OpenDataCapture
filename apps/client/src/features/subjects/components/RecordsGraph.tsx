@@ -62,12 +62,18 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
     const arr: RecordsGraphData = [];
     for (const record of records) {
       const dateCollected = new Date(record.dateCollected);
-      if (oldestDate === null || dateCollected > oldestDate)
+      const measures = filterObj(record.computedMeasures!, ({ key }) => {
+        return selectedMeasures.find((item) => item.key === key);
+      });
+      // Whether this date contains a point that should be on the x axis
+      const isPoint = (oldestDate === null || dateCollected > oldestDate) && Object.keys(measures).length > 0;
+      if (isPoint) {
         arr.push({
           dateObj: dateCollected,
           dateString: DateUtils.toBasicISOString(dateCollected),
-          ...filterObj(record.computedMeasures!, ({ key }) => selectedMeasures.find((item) => item.key === key))
+          ...measures
         });
+      }
     }
     return arr.sort((a, b) => {
       if (a.dateObj > b.dateObj) {
@@ -114,7 +120,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
                 pastYear: t('subjectPage.graph.timeframeOptions.year'),
                 pastMonth: t('subjectPage.graph.timeframeOptions.month')
               }}
-              title={t('subjectPage.graph.measures')}
+              title={t('subjectPage.graph.timeframe')}
               variant="light"
               onSelection={(selection) => {
                 if (selection === 'pastYear') {
