@@ -41,7 +41,7 @@
   }
 
   .btn-light {
-    @apply text-cello-900 bg-peppermint-50 border-2;
+    @apply border;
   }
 
   .btn-red {

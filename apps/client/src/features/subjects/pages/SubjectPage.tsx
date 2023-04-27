@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { HTMLProps, useMemo, useState } from 'react';
 
 import { FormInstrument, FormInstrumentData, SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 
 import { Dropdown, LineGraph, PageHeader, SelectDropdown, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
+import { RecordsGraph } from '../components/RecordsGraph';
 
 function computeMeasures<T extends FormInstrumentData>(instrument?: FormInstrument<T>) {
   if (!instrument?.measures) {
@@ -28,39 +29,12 @@ export const SubjectPage = () => {
     return <Spinner />;
   }
 
+  const instruments = data.map(({ instrument }) => instrument);
+
   return (
     <div>
       <PageHeader title={`${t('subjectPage.pageTitle')}: ${params.subjectId!.slice(0, 6)}`} />
-      <LineGraph
-        data={[
-          {
-            x: '1',
-            y: 1
-          },
-          {
-            x: '2',
-            y: 2
-          },
-          {
-            x: ' 3',
-            y: 3
-          }
-        ]}
-        legend={null}
-        lines={[
-          {
-            name: 'Value',
-            val: 'y'
-          }
-        ]}
-        xAxis={{
-          key: 'x',
-          label: 'X'
-        }}
-        yAxis={{
-          label: 'Y'
-        }}
-      />
+      <RecordsGraph />
     </div>
   );
 };

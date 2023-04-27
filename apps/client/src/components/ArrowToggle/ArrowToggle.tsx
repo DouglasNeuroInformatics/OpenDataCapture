@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
+import { clsx } from 'clsx';
 import { HiChevronUp } from 'react-icons/hi2';
 
 export interface ArrowToggleProps extends Omit<React.ComponentPropsWithoutRef<'button'>, 'content'> {
@@ -9,7 +10,15 @@ export interface ArrowToggleProps extends Omit<React.ComponentPropsWithoutRef<'b
   contentPosition?: 'left' | 'right';
 }
 
-export const ArrowToggle = ({ position, rotation, onClick, content, contentPosition, ...props }: ArrowToggleProps) => {
+export const ArrowToggle = ({
+  className,
+  position,
+  rotation,
+  onClick,
+  content,
+  contentPosition,
+  ...props
+}: ArrowToggleProps) => {
   const [isToggled, setIsToggled] = useState(false);
   const computedRotation = useMemo(() => {
     const toggleRotation = isToggled ? rotation : 0;
@@ -33,7 +42,12 @@ export const ArrowToggle = ({ position, rotation, onClick, content, contentPosit
   };
 
   return (
-    <button className="flex items-center justify-center" type="button" onClick={handleClick} {...props}>
+    <button
+      className={clsx('flex items-center justify-center', className)}
+      type="button"
+      onClick={handleClick}
+      {...props}
+    >
       {content && contentPosition === 'left' && <span className="mr-1">{content}</span>}
       <HiChevronUp
         className="transform-gpu transition-transform"

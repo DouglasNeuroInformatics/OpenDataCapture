@@ -3,15 +3,16 @@ import React from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { HiChevronDown } from 'react-icons/hi2';
 
-import { Button } from '@/components';
+import { Button, type ButtonProps } from '@/components';
 
 export interface DropdownProps {
   title: string;
   options: string[];
   onSelection: (option: string) => void;
+  variant?: ButtonProps['variant'];
 }
 
-export const Dropdown = ({ title, options, onSelection }: DropdownProps) => {
+export const Dropdown = ({ title, options, onSelection, variant }: DropdownProps) => {
   return (
     <Menu as="div" className="relative flex w-full">
       <Menu.Button
@@ -22,6 +23,7 @@ export const Dropdown = ({ title, options, onSelection }: DropdownProps) => {
         iconPosition="right"
         label={title}
         style={{ width: '100%' }}
+        variant={variant}
       />
       <Transition
         as="div"
