@@ -48,7 +48,7 @@ export const UserDropup = () => {
         </Transition>
       </div>
       <ArrowToggle
-        className="flex w-full items-center p-2"
+        className="p-2"
         content={
           <div className="flex items-center">
             <HiUserCircle className="mr-2 h-8 w-8" />

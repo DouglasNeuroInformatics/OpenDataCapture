@@ -12,7 +12,15 @@ export const RecordsGraph = () => {
       <div>
         <div className="ml-[70px] flex justify-between p-2">
           <div className="flex gap-2">
-            <Dropdown options={['A', 'B']} title="Instrument" onSelection={(option) => console.log(option)} variant="light" />
+            <Dropdown
+              options={{
+                a: 'A',
+                b: 'B'
+              }}
+              title="Instrument"
+              variant="light"
+              onSelection={(option) => alert(option)}
+            />
             <DropdownToggle text="Instrument" />
             <DropdownToggle text="Measures" />
           </div>
