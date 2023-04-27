@@ -88,9 +88,16 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="ml-[70px] p-2">
-        <h3 className="mb-5 text-center text-xl font-medium">
-          {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
-        </h3>
+        <div className="mb-5">
+          <h3 className="text-center text-xl font-medium">
+            {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
+          </h3>
+          {oldestDate && (
+            <p className="text-center">
+              {DateUtils.toBasicISOString(oldestDate)} - {DateUtils.toBasicISOString(new Date())}
+            </p>
+          )}
+        </div>
         <div className="flex justify-between">
           <div className="flex gap-2">
             <Dropdown

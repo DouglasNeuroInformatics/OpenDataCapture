@@ -1,28 +1,21 @@
-import React, { HTMLProps, useMemo, useState } from 'react';
+import React from 'react';
 
-import { FormInstrument, FormInstrumentData, SubjectFormRecords } from '@douglasneuroinformatics/common';
+import { SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { Dropdown, LineGraph, PageHeader, SelectDropdown, Spinner } from '@/components';
-import { useFetch } from '@/hooks/useFetch';
 import { RecordsGraph } from '../components/RecordsGraph';
 
-function computeMeasures<T extends FormInstrumentData>(instrument?: FormInstrument<T>) {
-  if (!instrument?.measures) {
-    return null;
-  }
-  return Object.fromEntries(
-    Object.entries(instrument.measures).map(([key, { label, formula }]) => {
-      return [key, { label, formula }];
-    })
-  );
-}
+import { PageHeader, Spinner } from '@/components';
+import { useFetch } from '@/hooks/useFetch';
 
 export const SubjectPage = () => {
   const params = useParams();
-  const { t } = useTranslation('subjects');
-  const { data } = useFetch<SubjectFormRecords[]>(`/instruments/records/forms?subject=${params.subjectIdentifier!}`);
+  const { i18n, t } = useTranslation('subjects');
+  const { data } = useFetch<SubjectFormRecords[]>(
+    `/instruments/records/forms?subject=${params.subjectIdentifier!}&lang=${i18n.resolvedLanguage}`,
+    [i18n.resolvedLanguage]
+  );
 
   if (!data) {
     return <Spinner />;
