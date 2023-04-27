@@ -12,7 +12,7 @@ import {
   ManageInstrumentsPage
 } from './features/instruments';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
-import { AddSubjectPage, SubjectPage, SubjectRecordsPage, ViewSubjectsPage } from './features/subjects';
+import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
 
