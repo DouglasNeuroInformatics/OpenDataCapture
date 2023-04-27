@@ -1,19 +1,40 @@
 import React, { useMemo, useState } from 'react';
 
-import { FormInstrument, SubjectFormRecords } from '@douglasneuroinformatics/common';
+import { DateUtils, FormInstrument, SubjectFormRecords } from '@douglasneuroinformatics/common';
 
 import { ArrowToggle, Dropdown, LineGraph, SelectDropdown } from '@/components';
+
+type RecordsGraphData = Record<string, any>[];
+
+type SelectedMeasure = {
+  key: string;
+  label: string;
+};
 
 const DropdownToggle = ({ text }: { text: string }) => (
   <ArrowToggle className="border px-3 py-1" content={text} contentPosition="left" position="up" rotation={180} />
 );
 
+/** Apply a callback function to filter items from object */
+function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
+  const result: Partial<T> = {};
+  for (const key in obj) {
+    if (fn({ key, value: obj[key] })) {
+      result[key] = obj[key];
+    }
+  }
+  return result;
+}
+
 export interface RecordsGraphProps {
   data: SubjectFormRecords[];
 }
+
 export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument>();
-  const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records;
+  const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
+
+  const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
 
   /** Instrument identifiers mapped to titles */
   const instrumentOptions = Object.fromEntries(
@@ -23,7 +44,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   );
 
   const measureOptions = useMemo(() => {
-    const arr: Array<{ key: string; label: string }> = [];
+    const arr: SelectedMeasure[] = [];
     if (selectedInstrument) {
       for (const measure in selectedInstrument.measures) {
         arr.push({
@@ -35,7 +56,16 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
     return arr;
   }, [selectedInstrument]);
 
-  // console.log(selectedInstrument, records);
+  const graphData = useMemo(() => {
+    const arr: Record<string, any>[] = [];
+    for (const record of records) {
+      arr.push({
+        dateCollected: DateUtils.toBasicISOString(new Date(record.dateCollected)),
+        ...filterObj(record.computedMeasures!, ({ key }) => selectedMeasures.find((item) => item.key === key))
+      });
+    }
+    return arr;
+  }, [records, selectedMeasures]);
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -59,7 +89,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
               options={measureOptions}
               title="Measures"
               variant="light"
-              onChange={(selected) => null}
+              onChange={setSelectedMeasures}
             />
           </div>
           <DropdownToggle text="Timeframe" />
@@ -67,30 +97,15 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
       </div>
       <div>
         <LineGraph
-          data={[
-            {
-              x: '1',
-              y: 1
-            },
-            {
-              x: '2',
-              y: 2
-            },
-            {
-              x: ' 3',
-              y: 3
-            }
-          ]}
+          data={graphData}
           legend={null}
-          lines={[
-            {
-              name: 'Value',
-              val: 'y'
-            }
-          ]}
+          lines={selectedMeasures.map((measure) => ({
+            name: measure.label,
+            val: measure.key
+          }))}
           xAxis={{
-            key: 'x',
-            label: 'X'
+            key: 'dateCollected',
+            label: 'Date Collected'
           }}
           yAxis={{
             label: 'Y'
