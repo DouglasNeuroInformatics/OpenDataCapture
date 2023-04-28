@@ -1,0 +1,14 @@
+{
+  "english": {
+    "en": "English", 
+    "fr": "Anglais"
+  },
+  "french": {
+    "en": "French",
+    "fr": "Français"
+  },
+  "other": {
+    "en": "Other",
+    "fr": "Autre"
+  }
+}
