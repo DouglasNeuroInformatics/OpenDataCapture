@@ -33,6 +33,7 @@ export function formatOptions<T extends MultilingualOptions>(options: T): Format
   };
 }
 
-export function extractKeys<T extends MultilingualOptions>(options: T) {
-  return Object.keys(options) as Array<keyof T>;
+export function extractKeys<T extends MultilingualOptions>(options: T, nullable = false) {
+  const keys = Object.keys(options) as Array<keyof T>;
+  return nullable ? [...keys, null] : keys;
 }

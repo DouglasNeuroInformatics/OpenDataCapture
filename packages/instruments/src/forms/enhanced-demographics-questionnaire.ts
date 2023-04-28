@@ -261,22 +261,22 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     properties: {
       ethnicOrigin: {
         type: 'string',
-        enum: extractKeys(ethnicOrigin),
+        enum: extractKeys(ethnicOrigin, true),
         nullable: true
       },
       gender: {
         type: 'string',
-        enum: extractKeys(gender),
+        enum: extractKeys(gender, true),
         nullable: true
       },
       religion: {
         type: 'string',
-        enum: extractKeys(religion),
+        enum: extractKeys(religion, true),
         nullable: true
       },
       firstLanguage: {
         type: 'string',
-        enum: extractKeys(firstLanguage),
+        enum: extractKeys(firstLanguage, true),
         nullable: true
       },
       speaksEnglish: {
@@ -306,7 +306,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
       },
       maritalStatus: {
         type: 'string',
-        enum: extractKeys(maritalStatus),
+        enum: extractKeys(maritalStatus, true),
         nullable: true
       },
       annualIncome: {
@@ -317,7 +317,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
       },
       employmentStatus: {
         type: 'string',
-        enum: extractKeys(employmentStatus),
+        enum: extractKeys(employmentStatus, true),
         nullable: true
       },
       yearsOfEducation: {
