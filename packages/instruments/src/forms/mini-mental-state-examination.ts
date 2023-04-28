@@ -1,5 +1,16 @@
 import { createTranslatedForms } from '..';
 
+const binaryOptions = {
+  en: {
+    t: 'Correct',
+    f: 'Incorrect'
+  },
+  fr: {
+    t: 'Correct',
+    f: 'Incorrect'
+  }
+} as const;
+
 export type MiniMentalStateExaminationData = {
   year: boolean;
   season: boolean;
@@ -71,7 +82,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What year is this?',
             fr: 'En quelle année sommes-nous?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         season: {
           kind: 'binary',
@@ -79,7 +91,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What season is this?',
             fr: 'Quelle est la saison?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         month: {
           kind: 'binary',
@@ -87,7 +100,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What month is this?',
             fr: 'Quel est le mois?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         date: {
           kind: 'binary',
@@ -95,7 +109,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: "What is today's date?",
             fr: "Quelle est la date d'aujourd'hui?"
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         day: {
           kind: 'binary',
@@ -103,7 +118,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What day of the week is this?',
             fr: 'Quel est le jour de la semaine ?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         country: {
           kind: 'binary',
@@ -111,7 +127,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What country are we in?',
             fr: 'Dans quel pays sommes-nous?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         province: {
           kind: 'binary',
@@ -119,7 +136,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What province are we in?',
             fr: 'Dans quelle province sommes-nous?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         city: {
           kind: 'binary',
@@ -127,7 +145,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What city/town are we in?',
             fr: 'Dans quelle ville sommes-nous?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         institution: {
           kind: 'binary',
@@ -135,7 +154,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What is the name of this building?',
             fr: 'Quel est le nom de cet édifice?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         floor: {
           kind: 'binary',
@@ -143,7 +163,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'What floor of the building are we on?',
             fr: 'À quel étage sommes-nous?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         }
       }
     },
@@ -213,7 +234,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'Show wristwatch. Ask: What is this called?',
             fr: 'Montrer une montre. Quel est le nom de cet objet ?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         canNamePencil: {
           kind: 'binary',
@@ -221,7 +243,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'Show pencil. Ask: What is this called?',
             fr: 'Montrer un crayon. Quel est le nom de cet objet ?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         canRepeatPhrase: {
           kind: 'binary',
@@ -229,7 +252,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'Say: I would like you to repeat a phrase after me: No ifs, ands or buts',
             fr: 'Répétez cette phrase après moi : Pas de mais, de si, ni de et'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         canFollowWrittenInstructions: {
           kind: 'binary',
@@ -237,7 +261,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'Say: Read the words on this page and then do what it says. Then, hand the person the sheet with "CLOSE YOUR EYES" on it.',
             fr: 'Lisez les mots de cette page et faites ce qui est dit. Ensuite, remettez à la personne la feuille sur laquelle est écrit "FERMEZ LES YEUX".'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         canWriteSentence: {
           kind: 'binary',
@@ -245,7 +270,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'Hand the person a pencil and paper. Say: Write any complete sentence on that piece of paper.',
             fr: "Donnez à la personne un crayon et une feuille de papier. Dites : Écrivez n'importe quelle phrase complète sur ce morceau de papier."
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         },
         canFollowOralInstructions: {
           kind: 'numeric',
@@ -275,7 +301,8 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
             en: 'Place design, eraser and pencil in front of the person. Say: Copy this design please. Allow multiple tries. Wait until the person is finished and hands it back. Score one point for a correctly copied diagram. The person must have drawn a four-sided figure between two five-sided figures',
             fr: 'Pourriez-vous copier ce dessin?'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: binaryOptions
         }
       }
     }

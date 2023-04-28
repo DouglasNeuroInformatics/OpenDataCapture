@@ -1,5 +1,16 @@
 import { createTranslatedForms } from '..';
 
+const correctIncorrectOptions = {
+  en: {
+    t: 'Correct',
+    f: 'Incorrect'
+  },
+  fr: {
+    t: 'Correct',
+    f: 'Incorrect'
+  }
+} as const;
+
 export type MontrealCognitiveAssessmentData = {
   // Visuospatial/Executive
   trailMaking: boolean;
@@ -67,7 +78,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Alternating Trail Making',
             fr: 'Alternating Trail Making'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         copyCube: {
           kind: 'binary',
@@ -75,7 +87,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Visuoconstructional Skills (Cube)',
             fr: 'Compétences visuoconstructives (Cube)'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         drawClock: {
           kind: 'numeric',
@@ -101,7 +114,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Lion',
             fr: 'Lion'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         canNameRhino: {
           kind: 'binary',
@@ -109,7 +123,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Rhinoceros',
             fr: 'Rhinocéros'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         canNameCamel: {
           kind: 'binary',
@@ -117,7 +132,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Camel',
             fr: 'Chameau'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         }
       }
     },
@@ -143,7 +159,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Read list of letters. The subject must tap with his hand at each letter A.',
             fr: 'Lisez la liste des lettres. Le sujet doit taper avec sa main sur chaque lettre A.'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         serialSeven: {
           kind: 'numeric',
@@ -179,7 +196,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Fluency / Name maximum number of words in one minute that begin with the letter F ',
             fr: 'Fluidité du langage. Nommer un maximum de mots commençant par la lettre « T » en 1 min.'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         }
       }
     },
@@ -231,7 +249,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Date',
             fr: 'Date'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         orientationMonth: {
           kind: 'binary',
@@ -239,7 +258,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Month',
             fr: 'Moi'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         orientationYear: {
           kind: 'binary',
@@ -247,7 +267,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Année',
             fr: 'Year'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         orientationDay: {
           kind: 'binary',
@@ -255,7 +276,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Day',
             fr: 'Jour'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         orientationPlace: {
           kind: 'binary',
@@ -263,7 +285,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'Place',
             fr: 'Endroit'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         },
         orientationCity: {
           kind: 'binary',
@@ -271,7 +294,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
             en: 'City',
             fr: 'Ville'
           },
-          variant: 'radio'
+          variant: 'radio',
+          options: correctIncorrectOptions
         }
       }
     }

@@ -27,31 +27,31 @@ const yesNoOptions = {
 
 type EnhancedDemographicsQuestionnaireData = {
   // Personal Characteristics
-  gender: Gender;
-  ethnicOrigin: EthnicOrigin;
-  religion: Religion;
+  gender?: Gender;
+  ethnicOrigin?: EthnicOrigin;
+  religion?: Religion;
 
   // Language
-  firstLanguage: FirstLanguage;
-  speaksEnglish: boolean;
-  speaksFrench: boolean;
+  firstLanguage?: FirstLanguage;
+  speaksEnglish?: boolean;
+  speaksFrench?: boolean;
 
   // Living Situation
-  postalCode: string;
-  householdSize: number;
-  numberChildren: number;
-  maritalStatus: MartialStatus;
+  postalCode?: string;
+  householdSize?: number;
+  numberChildren?: number;
+  maritalStatus?: MartialStatus;
 
   // Economic
-  annualIncome: number;
-  employmentStatus: EmploymentStatus;
+  annualIncome?: number;
+  employmentStatus?: EmploymentStatus;
 
   // Education
-  yearsOfEducation: number;
+  yearsOfEducation?: number;
 
   // Immigration
-  isCanadianCitizen: boolean;
-  ageAtImmigration: number;
+  isCanadianCitizen?: boolean;
+  ageAtImmigration?: number;
 };
 
 export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
@@ -261,65 +261,80 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     properties: {
       ethnicOrigin: {
         type: 'string',
-        enum: extractKeys(ethnicOrigin)
+        enum: extractKeys(ethnicOrigin),
+        nullable: true
       },
       gender: {
         type: 'string',
-        enum: extractKeys(gender)
+        enum: extractKeys(gender),
+        nullable: true
       },
       religion: {
         type: 'string',
-        enum: extractKeys(religion)
+        enum: extractKeys(religion),
+        nullable: true
       },
       firstLanguage: {
         type: 'string',
-        enum: extractKeys(firstLanguage)
+        enum: extractKeys(firstLanguage),
+        nullable: true
       },
       speaksEnglish: {
-        type: 'boolean'
+        type: 'boolean',
+        nullable: true
       },
       speaksFrench: {
-        type: 'boolean'
+        type: 'boolean',
+        nullable: true
       },
       postalCode: {
         type: 'string',
-        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source
+        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source,
+        nullable: true
       },
       householdSize: {
         type: 'integer',
         minimum: 0,
-        maximum: 20
+        maximum: 20,
+        nullable: true
       },
       numberChildren: {
         type: 'integer',
         minimum: 0,
-        maximum: 20
+        maximum: 20,
+        nullable: true
       },
       maritalStatus: {
         type: 'string',
-        enum: extractKeys(maritalStatus)
+        enum: extractKeys(maritalStatus),
+        nullable: true
       },
       annualIncome: {
         type: 'integer',
         minimum: 0,
-        maximum: 1000000
+        maximum: 1000000,
+        nullable: true
       },
       employmentStatus: {
         type: 'string',
-        enum: extractKeys(employmentStatus)
+        enum: extractKeys(employmentStatus),
+        nullable: true
       },
       yearsOfEducation: {
         type: 'integer',
         minimum: 0,
-        maximum: 30
+        maximum: 30,
+        nullable: true
       },
       isCanadianCitizen: {
-        type: 'boolean'
+        type: 'boolean',
+        nullable: true
       },
       ageAtImmigration: {
         type: 'integer',
         minimum: 1,
-        maximum: 100
+        maximum: 100,
+        nullable: true
       }
     },
     required: []
