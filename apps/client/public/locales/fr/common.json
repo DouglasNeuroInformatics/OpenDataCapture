@@ -48,7 +48,8 @@
     "dateOfBirth": {
       "label": "Date de naissance"
     },
-    "submit": "Soumettre"
+    "submit": "Soumettre",
+    "notFound": "Pas trouvé"
   },
   "activeSubject": {
     "header": "Sujet actif"
