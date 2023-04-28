@@ -3,6 +3,7 @@ import ethnicOrigin from '../data/ethnic-origin.json';
 import firstLanguage from '../data/first-language.json';
 import gender from '../data/gender.json';
 import maritalStatus from '../data/marital-status.json';
+import religion from '../data/religion.json';
 import { createTranslatedForms } from '../utils/create-translated-forms';
 import { extractKeys, formatOptions } from '../utils/format-options';
 
@@ -11,40 +12,46 @@ type EthnicOrigin = keyof typeof ethnicOrigin;
 type FirstLanguage = keyof typeof firstLanguage;
 type Gender = keyof typeof gender;
 type MartialStatus = keyof typeof maritalStatus;
+type Religion = keyof typeof religion;
+
+const yesNoOptions = {
+  en: {
+    t: 'Yes',
+    f: 'No'
+  },
+  fr: {
+    t: 'Oui',
+    f: 'Non'
+  }
+} as const;
 
 type EnhancedDemographicsQuestionnaireData = {
   // Personal Characteristics
   gender: Gender;
   ethnicOrigin: EthnicOrigin;
-  firstLanguage: FirstLanguage;
+  religion: Religion;
 
-  /** Living Situation */
+  // Language
+  firstLanguage: FirstLanguage;
+  speaksEnglish: boolean;
+  speaksFrench: boolean;
+
+  // Living Situation
   postalCode: string;
   householdSize: number;
+  numberChildren: number;
   maritalStatus: MartialStatus;
 
-  /** Economic */
+  // Economic
   annualIncome: number;
   employmentStatus: EmploymentStatus;
 
-  /** Education */
+  // Education
+  yearsOfEducation: number;
 
-  /** Families, Households and Marital Status */
-
-  // numberChildren: number;
-
-  /** Housing */
-
-  /** Immigration and Ethnocultural Diversity */
-  // ageAtImmigration: number;
-  // citizenship: string;
-  // immigrationStatus: string;
-
-  /** Income */
-
-  /** Labour */
-
-  /** Language */
+  // Immigration
+  isCanadianCitizen: boolean;
+  ageAtImmigration: number;
 };
 
 export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
@@ -89,6 +96,22 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
           },
           options: formatOptions(ethnicOrigin)
         },
+        religion: {
+          kind: 'options',
+          label: {
+            en: 'Religion',
+            fr: 'Religion'
+          },
+          options: formatOptions(religion)
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Language',
+        fr: 'Langue'
+      },
+      fields: {
         firstLanguage: {
           kind: 'options',
           label: {
@@ -96,6 +119,24 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             fr: 'Langue maternelle'
           },
           options: formatOptions(firstLanguage)
+        },
+        speaksEnglish: {
+          kind: 'binary',
+          label: {
+            en: 'Speak and Understand English',
+            fr: "Parler et comprendre l'anglais"
+          },
+          variant: 'radio',
+          options: yesNoOptions
+        },
+        speaksFrench: {
+          kind: 'binary',
+          label: {
+            en: 'Speak and Understand French',
+            fr: 'Parler et comprendre le français'
+          },
+          variant: 'radio',
+          options: yesNoOptions
         }
       }
     },
@@ -118,6 +159,16 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
           label: {
             en: 'Household Size',
             fr: 'Taille du ménage'
+          },
+          variant: 'default',
+          min: 0,
+          max: 20
+        },
+        numberChildren: {
+          kind: 'numeric',
+          label: {
+            en: 'Number of Children',
+            fr: "Nombre d'enfants"
           },
           variant: 'default',
           min: 0,
@@ -158,6 +209,51 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
           options: formatOptions(employmentStatus)
         }
       }
+    },
+    {
+      title: {
+        en: 'Education',
+        fr: 'Éducation'
+      },
+      fields: {
+        yearsOfEducation: {
+          kind: 'numeric',
+          label: {
+            en: 'Years of Education',
+            fr: "Années d'études"
+          },
+          variant: 'default',
+          min: 0,
+          max: 30
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Immigration',
+        fr: 'Immigration'
+      },
+      fields: {
+        isCanadianCitizen: {
+          kind: 'binary',
+          label: {
+            en: 'Canadian Citizen',
+            fr: 'Citoyen canadien'
+          },
+          variant: 'radio',
+          options: yesNoOptions
+        },
+        ageAtImmigration: {
+          kind: 'numeric',
+          label: {
+            en: 'Age at Immigration',
+            fr: "Âge à l'immigration (le cas échéant)"
+          },
+          variant: 'default',
+          min: 1,
+          max: 100
+        }
+      }
     }
   ],
   validationSchema: {
@@ -171,15 +267,30 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
         type: 'string',
         enum: extractKeys(gender)
       },
+      religion: {
+        type: 'string',
+        enum: extractKeys(religion)
+      },
       firstLanguage: {
         type: 'string',
         enum: extractKeys(firstLanguage)
+      },
+      speaksEnglish: {
+        type: 'boolean'
+      },
+      speaksFrench: {
+        type: 'boolean'
       },
       postalCode: {
         type: 'string',
         pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source
       },
       householdSize: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 20
+      },
+      numberChildren: {
         type: 'integer',
         minimum: 0,
         maximum: 20
@@ -196,17 +307,21 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
       employmentStatus: {
         type: 'string',
         enum: extractKeys(employmentStatus)
+      },
+      yearsOfEducation: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 30
+      },
+      isCanadianCitizen: {
+        type: 'boolean'
+      },
+      ageAtImmigration: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 100
       }
     },
-    required: [
-      'annualIncome',
-      'employmentStatus',
-      'ethnicOrigin',
-      'firstLanguage',
-      'gender',
-      'householdSize',
-      'maritalStatus',
-      'postalCode'
-    ]
+    required: []
   }
 });
