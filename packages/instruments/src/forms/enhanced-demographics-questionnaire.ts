@@ -8,7 +8,7 @@ type EthnicOrigin = keyof typeof ethnicOrigin;
 type Gender = keyof typeof gender;
 
 type EnhancedDemographicsQuestionnaireData = {
-  /** Personal Characteristics */
+  // Personal Characteristics
   gender: Gender;
   ethnicOrigin: EthnicOrigin;
 
@@ -64,7 +64,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     {
       title: {
         en: 'Personal Characteristics',
-        fr: 'Foo'
+        fr: 'Caractéristiques individuelles'
       },
       fields: {
         gender: {
@@ -90,7 +90,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             fr: 'Code postal'
           },
           variant: 'short'
-        },
+        }
       }
     }
   ],

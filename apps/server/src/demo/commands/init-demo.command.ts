@@ -5,7 +5,6 @@ import { createMongoAbility } from '@casl/ability';
 import {
   AppAbility,
   BasePermissionLevel,
-  FormFields,
   FormInstrument,
   FormInstrumentData,
   Random
@@ -99,6 +98,9 @@ export class InitDemoCommand extends CommandRunner {
     const montrealCognitiveAssessments = await this.formsService.createTranslatedForms(
       instruments.montrealCognitiveAssessment
     );
+    const enhancedDemographicsQuestionnaires = await this.formsService.createTranslatedForms(
+      instruments.enhancedDemographicsQuestionnaire
+    );
 
     for (let i = 0; i < 100; i++) {
       const createSubjectDto = this.getCreateSubjectDto();
@@ -107,6 +109,11 @@ export class InitDemoCommand extends CommandRunner {
       await this.createFormRecords(happinessQuestionnaires[0], group.name, createSubjectDto);
       await this.createFormRecords(miniMentalStateExaminations[0], group.name, createSubjectDto);
       await this.createFormRecords(montrealCognitiveAssessments[0], group.name, createSubjectDto);
+      await this.createFormRecords(enhancedDemographicsQuestionnaires[0], group.name, createSubjectDto, {
+        customValues: {
+          postalCode: 'A1A-1A1'
+        }
+      });
     }
   }
 
@@ -131,13 +138,23 @@ export class InitDemoCommand extends CommandRunner {
   private async createFormRecords<T extends FormInstrumentData = FormInstrumentData>(
     instrument: FormInstrument<T>,
     groupName: string,
-    subjectInfo: CreateSubjectDto
+    subjectInfo: CreateSubjectDto,
+    options?: {
+      customValues?: {
+        [K in keyof T]?: T[K];
+      };
+    }
   ): Promise<any> {
     for (let i = 0; i < 5; i++) {
       const fields = this.formsService.getFields(instrument);
       const data: FormInstrumentData = {};
       for (const fieldName in fields) {
         const field = fields[fieldName];
+        const customValue = options?.customValues?.[fieldName];
+        if (customValue) {
+          data[fieldName] = customValue;
+          continue;
+        }
         switch (field.kind) {
           case 'array':
             throw new Error('Not supported');

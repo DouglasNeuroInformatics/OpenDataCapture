@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   FormFields,
   FormInstrument,
@@ -20,8 +22,13 @@ function getTranslatedFields<T extends FormInstrumentData>(
 ) {
   const fields: { [K in keyof T]?: any } = {};
   for (const fieldName in multilingualFields) {
-    const { label, description, ...rest } = multilingualFields[fieldName];
-    fields[fieldName] = { label: label[language], description: description?.[language], ...rest };
+    const { label, description, options, ...rest } = multilingualFields[fieldName] as any;
+    fields[fieldName] = {
+      label: label[language],
+      description: description?.[language],
+      options: options?.[language],
+      ...rest
+    };
   }
   return fields as FormFields<T>;
 }

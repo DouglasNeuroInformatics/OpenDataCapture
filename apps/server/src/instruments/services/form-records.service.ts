@@ -56,7 +56,8 @@ export class FormRecordsService {
       kind,
       dateCollected,
       data: this.ajvService.validate(data, instrument.validationSchema, (error) => {
-        throw new BadRequestException(error);
+        console.error(error);
+        throw new BadRequestException();
       }),
       instrument,
       group,
