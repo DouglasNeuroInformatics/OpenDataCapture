@@ -29,7 +29,7 @@ export const ActiveSubject = () => {
 
   return (
     <animated.div
-      className="absolute z-50 flex cursor-pointer touch-none flex-col rounded-lg bg-slate-900/75 p-3 text-slate-300 backdrop-blur-sm"
+      className="absolute z-50 flex cursor-pointer touch-none flex-col rounded-lg bg-slate-900/75 p-3 text-slate-300 backdrop-blur-sm print:hidden"
       {...bind()}
       style={{ x, y }}
     >
