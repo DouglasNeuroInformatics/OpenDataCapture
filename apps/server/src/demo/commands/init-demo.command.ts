@@ -2,15 +2,14 @@ import { Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, BasePermissionLevel, Random } from '@douglasneuroinformatics/common';
 import {
-  BriefPsychiatricRatingScaleData,
-  briefPsychiatricRatingScale,
-  enhancedDemographicsQuestionnaire,
-  happinessQuestionnaire,
-  miniMentalStateExamination,
-  montrealCognitiveAssessment
-} from '@douglasneuroinformatics/instruments';
+  AppAbility,
+  BasePermissionLevel,
+  FormInstrument,
+  FormInstrumentData,
+  Random
+} from '@douglasneuroinformatics/common';
+import * as instruments from '@douglasneuroinformatics/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 import { Command, CommandRunner } from 'nest-commander';
@@ -19,6 +18,7 @@ import { CreateGroupDto } from '@/groups/dto/create-group.dto';
 import { GroupsService } from '@/groups/groups.service';
 import { FormRecordsService } from '@/instruments/services/form-records.service';
 import { FormsService } from '@/instruments/services/forms.service';
+import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UsersService } from '@/users/users.service';
@@ -43,43 +43,20 @@ const DEMO_USERS: CreateUserDto[] = [
     firstName: 'Admin'
   },
   {
-    username: 'MultiGroupPI',
-    password: 'password',
+    username: 'JohnSmith',
+    password: 'Douglas123',
+    groupNames: ['Depression Clinic'],
+    basePermissionLevel: BasePermissionLevel.GroupManager,
+    firstName: 'John',
+    lastName: 'Smith'
+  },
+  {
+    username: 'JaneDoe',
+    password: 'Douglas123',
     groupNames: ['Psychosis Clinic', 'Depression Clinic'],
     basePermissionLevel: BasePermissionLevel.GroupManager,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName()
-  },
-  {
-    username: 'PsychosisClinicPI',
-    password: 'password',
-    groupNames: ['Psychosis Clinic'],
-    basePermissionLevel: BasePermissionLevel.GroupManager,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName()
-  },
-  {
-    username: 'PsychosisClinicRA',
-    password: 'password',
-    groupNames: ['Psychosis Clinic'],
-    basePermissionLevel: BasePermissionLevel.Standard,
-    firstName: faker.name.firstName()
-  },
-  {
-    username: 'DepressionClinicPI',
-    password: 'password',
-    groupNames: ['Depression Clinic'],
-    basePermissionLevel: BasePermissionLevel.GroupManager,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName()
-  },
-  {
-    username: 'DepressionClinicRA',
-    password: 'password',
-    groupNames: ['Depression Clinic'],
-    basePermissionLevel: BasePermissionLevel.Standard,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName()
+    firstName: 'Jane',
+    lastName: 'Doe'
   }
 ];
 
@@ -114,60 +91,29 @@ export class InitDemoCommand extends CommandRunner {
       await this.usersService.create(user, this.ability);
     }
 
-    const bprs = await this.formsService.create(briefPsychiatricRatingScale);
-    const hq = await this.formsService.create(happinessQuestionnaire.en);
-    await this.formsService.create(happinessQuestionnaire.fr);
-    await this.formsService.createTranslatedForms(miniMentalStateExamination);
-    await this.formsService.createTranslatedForms(montrealCognitiveAssessment);
+    const happinessQuestionnaires = await this.formsService.createTranslatedForms(instruments.happinessQuestionnaire);
+    const miniMentalStateExaminations = await this.formsService.createTranslatedForms(
+      instruments.miniMentalStateExamination
+    );
+    const montrealCognitiveAssessments = await this.formsService.createTranslatedForms(
+      instruments.montrealCognitiveAssessment
+    );
+    const enhancedDemographicsQuestionnaires = await this.formsService.createTranslatedForms(
+      instruments.enhancedDemographicsQuestionnaire
+    );
 
     for (let i = 0; i < 100; i++) {
-      const createSubjectDto = {
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-        dateOfBirth: faker.date.birthdate().toISOString(),
-        sex: faker.name.sexType()
-      };
-
+      const createSubjectDto = this.getCreateSubjectDto();
       await this.subjectsService.create(createSubjectDto);
-
       const group = await this.groupsService.findByName(Random.value(DEMO_GROUPS).name, this.ability);
-
-      for (let j = 0; j < 3; j++) {
-        await this.formRecordsService.create(
-          {
-            kind: 'form',
-            dateCollected: faker.date.recent(365).toISOString(),
-            instrumentName: hq.name,
-            instrumentVersion: hq.version,
-            groupName: group.name,
-            subjectInfo: createSubjectDto,
-            data: {
-              overallHappiness: Random.int(1, 11)
-            }
-          },
-          this.ability
-        );
-      }
-
-      const fields = Array.isArray(bprs.content) ? bprs.content.map((g) => g.fields).flat() : bprs.content;
-
-      Object.fromEntries(Object.keys(fields).map((field) => [field, '']));
-      for (let j = 0; j < 3; j++) {
-        await this.formRecordsService.create(
-          {
-            kind: 'form',
-            dateCollected: faker.date.recent(365).toISOString(),
-            instrumentName: bprs.name,
-            instrumentVersion: bprs.version,
-            groupName: group.name,
-            subjectInfo: createSubjectDto,
-            data: Object.fromEntries(
-              Object.keys(fields).map((field) => [field, Random.int(0, 7)])
-            ) as BriefPsychiatricRatingScaleData
-          },
-          this.ability
-        );
-      }
+      await this.createFormRecords(happinessQuestionnaires[0], group.name, createSubjectDto);
+      await this.createFormRecords(miniMentalStateExaminations[0], group.name, createSubjectDto);
+      await this.createFormRecords(montrealCognitiveAssessments[0], group.name, createSubjectDto);
+      await this.createFormRecords(enhancedDemographicsQuestionnaires[0], group.name, createSubjectDto, {
+        customValues: {
+          postalCode: 'A1A-1A1'
+        }
+      });
     }
   }
 
@@ -177,5 +123,69 @@ export class InitDemoCommand extends CommandRunner {
       throw new Error(`Unexpected database name: ${this.connection.name}`);
     }
     return this.connection.dropDatabase();
+  }
+
+  private getCreateSubjectDto(): CreateSubjectDto {
+    return {
+      firstName: faker.name.firstName(),
+      lastName: faker.name.lastName(),
+      dateOfBirth: faker.date.birthdate().toISOString(),
+      sex: faker.name.sexType()
+    };
+  }
+
+  /** Create form records for translated instruments */
+  private async createFormRecords<T extends FormInstrumentData = FormInstrumentData>(
+    instrument: FormInstrument<T>,
+    groupName: string,
+    subjectInfo: CreateSubjectDto,
+    options?: {
+      customValues?: {
+        [K in keyof T]?: T[K];
+      };
+    }
+  ): Promise<any> {
+    for (let i = 0; i < 5; i++) {
+      const fields = this.formsService.getFields(instrument);
+      const data: FormInstrumentData = {};
+      for (const fieldName in fields) {
+        const field = fields[fieldName];
+        const customValue = options?.customValues?.[fieldName];
+        if (customValue) {
+          data[fieldName] = customValue;
+          continue;
+        }
+        switch (field.kind) {
+          case 'array':
+            throw new Error('Not supported');
+          case 'binary':
+            data[fieldName] = faker.datatype.boolean();
+            break;
+          case 'date':
+            data[fieldName] = faker.datatype.datetime().toISOString();
+            break;
+          case 'numeric':
+            data[fieldName] = faker.datatype.number({ min: field.min, max: field.max, precision: 1 });
+            break;
+          case 'options':
+            data[fieldName] = Random.value(Object.keys(field.options));
+            break;
+          case 'text':
+            data[fieldName] = faker.lorem.sentence();
+            break;
+        }
+      }
+
+      const record = {
+        kind: 'form',
+        dateCollected: faker.date.recent(i * 30 + 5).toISOString(),
+        instrumentName: instrument.name,
+        instrumentVersion: instrument.version,
+        groupName: groupName,
+        subjectInfo: subjectInfo,
+        data: data
+      } as const;
+      await this.formRecordsService.create(record, this.ability);
+    }
   }
 }

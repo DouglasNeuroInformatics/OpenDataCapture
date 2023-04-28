@@ -35,7 +35,7 @@ export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnai
         fr: 'Bonheur général de 1 à 10 (inclus)'
       },
       isRequired: true,
-      min: 0,
+      min: 1,
       max: 10,
       variant: 'slider'
     }

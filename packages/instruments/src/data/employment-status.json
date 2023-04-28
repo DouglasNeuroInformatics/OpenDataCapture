@@ -1,0 +1,18 @@
+{
+   "fullTime": {
+    "en": "Full-Time",
+    "fr": "Temps plein"
+   },
+   "partTime": {
+    "en": "Part-Time",
+    "fr": "Temps partiel"
+   },
+   "student": {
+    "en": "Student",
+    "fr": "Étudiant"
+   },
+   "unemployed": {
+    "en": "Unemployed",
+    "fr": "Au chômage "
+   }
+}

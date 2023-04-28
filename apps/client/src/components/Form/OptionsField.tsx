@@ -38,7 +38,7 @@ export const OptionsField = <T extends string = string>({
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="absolute z-10 mt-1 w-full rounded-lg bg-slate-50 shadow-md">
+              <Listbox.Options className="absolute z-10 mt-1 max-h-80 w-full overflow-scroll rounded-lg bg-slate-50 shadow-md">
                 {Object.keys(options).map((option) => (
                   <Listbox.Option className="p-2 capitalize hover:bg-slate-200" key={option} value={option}>
                     {options[option as T]}

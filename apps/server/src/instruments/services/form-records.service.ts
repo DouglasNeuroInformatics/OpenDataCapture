@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
+import { Language } from '@douglasneuroinformatics/common';
 import { AppAbility } from '@douglasneuroinformatics/common/auth';
 import { Group } from '@douglasneuroinformatics/common/groups';
 import {
@@ -13,10 +14,11 @@ import {
   SubjectFormRecords
 } from '@douglasneuroinformatics/common/instruments';
 import { DateUtils } from '@douglasneuroinformatics/common/utils';
-import { Model, ObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
+import { FormInstrumentEntity } from '../entities/form-instrument.entity';
 import { InstrumentRecordEntity } from '../entities/instrument-record.entity';
 
 import { FormsService } from './forms.service';
@@ -54,7 +56,8 @@ export class FormRecordsService {
       kind,
       dateCollected,
       data: this.ajvService.validate(data, instrument.validationSchema, (error) => {
-        throw new BadRequestException(error);
+        console.error(error);
+        throw new BadRequestException();
       }),
       instrument,
       group,
@@ -62,19 +65,33 @@ export class FormRecordsService {
     });
   }
 
-  async find(ability: AppAbility, subjectIdentifier: string): Promise<SubjectFormRecords[]> {
+  async find(ability: AppAbility, subjectIdentifier: string, language?: Language): Promise<SubjectFormRecords[]> {
     const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
 
-    const uniqueInstruments: ObjectId[] = await this.formRecordsModel
+    const instrumentDocs = await this.formRecordsModel
       .find({ subject }, 'instrument')
       .accessibleBy(ability)
-      .distinct('instrument');
+      .populate({ path: 'instrument', select: 'identifier details.language' })
+      .lean();
+
+    const uniqueIdentifiers = Array.from(new Set(instrumentDocs.map((item) => item.instrument.identifier)));
 
     const arr: SubjectFormRecords[] = [];
-    for (const instrumentId of uniqueInstruments) {
-      const instrument = await this.formsService.findById(instrumentId);
+    for (const identifier of uniqueIdentifiers) {
+      let instrument: FormInstrumentEntity;
+      let instruments: FormInstrumentEntity[];
+      try {
+        instrument = await this.formsService.findOne(identifier, language);
+        instruments = await this.formsService.findByIdentifier(identifier);
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          continue;
+        }
+        throw error;
+      }
       const records: SubjectFormRecords['records'] = await this.formRecordsModel
-        .find({ instrument, subject })
+        .find({ subject, instrument: { $in: instruments } })
+        .populate({ path: 'instrument', select: 'identifier details.language' })
         .accessibleBy(ability)
         .select(['data', 'dateCollected'])
         .lean();
@@ -133,7 +150,18 @@ export class FormRecordsService {
       case 'const':
         return data[measure.formula.field] as number;
       case 'sum':
-        return measure.formula.fields.map((field) => data[field] as number).reduce((a, b) => a + b, 0);
+        // eslint-disable-next-line no-case-declarations
+        const coerceBool = measure.formula.options?.coerceBool;
+        return measure.formula.fields
+          .map((field) => {
+            if (typeof data[field] === 'number') {
+              return data[field] as number;
+            } else if (typeof data[field] === 'boolean' && coerceBool) {
+              return Number(data[field]);
+            }
+            throw new Error(`Unexpected type of field '${field.toString()}': ${typeof data[field]}`);
+          })
+          .reduce((a, b) => a + b, 0);
     }
   }
 }

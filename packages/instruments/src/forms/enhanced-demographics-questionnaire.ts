@@ -1,44 +1,57 @@
+import employmentStatus from '../data/employment-status.json';
 import ethnicOrigin from '../data/ethnic-origin.json';
+import firstLanguage from '../data/first-language.json';
 import gender from '../data/gender.json';
+import maritalStatus from '../data/marital-status.json';
+import religion from '../data/religion.json';
 import { createTranslatedForms } from '../utils/create-translated-forms';
 import { extractKeys, formatOptions } from '../utils/format-options';
 
+type EmploymentStatus = keyof typeof employmentStatus;
 type EthnicOrigin = keyof typeof ethnicOrigin;
-
+type FirstLanguage = keyof typeof firstLanguage;
 type Gender = keyof typeof gender;
+type MartialStatus = keyof typeof maritalStatus;
+type Religion = keyof typeof religion;
+
+const yesNoOptions = {
+  en: {
+    t: 'Yes',
+    f: 'No'
+  },
+  fr: {
+    t: 'Oui',
+    f: 'Non'
+  }
+} as const;
 
 type EnhancedDemographicsQuestionnaireData = {
-  /** Personal Characteristics */
-  gender: Gender;
-  ethnicOrigin: EthnicOrigin;
+  // Personal Characteristics
+  gender?: Gender;
+  ethnicOrigin?: EthnicOrigin;
+  religion?: Religion;
 
-  /** Living Situation */
-  postalCode: string;
-  // householdSize: number;
+  // Language
+  firstLanguage?: FirstLanguage;
+  speaksEnglish?: boolean;
+  speaksFrench?: boolean;
 
-  //annualIncome: number;
-  //employmentStatus: 'fullTime' | 'partTime' | 'student' | 'unemployed';
-  //maritalStatus: 'married' | 'widowed' | 'separated' | 'divorced' | 'single';
-  //firstLanguage: 'english' | 'french' | 'other';
+  // Living Situation
+  postalCode?: string;
+  householdSize?: number;
+  numberChildren?: number;
+  maritalStatus?: MartialStatus;
 
-  /** Education */
+  // Economic
+  annualIncome?: number;
+  employmentStatus?: EmploymentStatus;
 
-  /** Families, Households and Marital Status */
+  // Education
+  yearsOfEducation?: number;
 
-  // numberChildren: number;
-
-  /** Housing */
-
-  /** Immigration and Ethnocultural Diversity */
-  // ageAtImmigration: number;
-  // citizenship: string;
-  // immigrationStatus: string;
-
-  /** Income */
-
-  /** Labour */
-
-  /** Language */
+  // Immigration
+  isCanadianCitizen?: boolean;
+  ageAtImmigration?: number;
 };
 
 export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
@@ -64,7 +77,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     {
       title: {
         en: 'Personal Characteristics',
-        fr: 'Foo'
+        fr: 'Caractéristiques individuelles'
       },
       fields: {
         gender: {
@@ -83,6 +96,56 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
           },
           options: formatOptions(ethnicOrigin)
         },
+        religion: {
+          kind: 'options',
+          label: {
+            en: 'Religion',
+            fr: 'Religion'
+          },
+          options: formatOptions(religion)
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Language',
+        fr: 'Langue'
+      },
+      fields: {
+        firstLanguage: {
+          kind: 'options',
+          label: {
+            en: 'First Language',
+            fr: 'Langue maternelle'
+          },
+          options: formatOptions(firstLanguage)
+        },
+        speaksEnglish: {
+          kind: 'binary',
+          label: {
+            en: 'Speak and Understand English',
+            fr: "Parler et comprendre l'anglais"
+          },
+          variant: 'radio',
+          options: yesNoOptions
+        },
+        speaksFrench: {
+          kind: 'binary',
+          label: {
+            en: 'Speak and Understand French',
+            fr: 'Parler et comprendre le français'
+          },
+          variant: 'radio',
+          options: yesNoOptions
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Living Situation',
+        fr: 'Situation de vie'
+      },
+      fields: {
         postalCode: {
           kind: 'text',
           label: {
@@ -91,6 +154,105 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
           },
           variant: 'short'
         },
+        householdSize: {
+          kind: 'numeric',
+          label: {
+            en: 'Household Size',
+            fr: 'Taille du ménage'
+          },
+          variant: 'default',
+          min: 0,
+          max: 20
+        },
+        numberChildren: {
+          kind: 'numeric',
+          label: {
+            en: 'Number of Children',
+            fr: "Nombre d'enfants"
+          },
+          variant: 'default',
+          min: 0,
+          max: 20
+        },
+        maritalStatus: {
+          kind: 'options',
+          label: {
+            en: 'Martial Status',
+            fr: 'État matrimonial'
+          },
+          options: formatOptions(maritalStatus)
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Economic Situation',
+        fr: 'Situation économique'
+      },
+      fields: {
+        annualIncome: {
+          kind: 'numeric',
+          label: {
+            en: 'Annual Income',
+            fr: 'Revenu annuel'
+          },
+          variant: 'default',
+          min: 0,
+          max: 1000000
+        },
+        employmentStatus: {
+          kind: 'options',
+          label: {
+            en: 'Employment Status',
+            fr: "Statut de l'emploi"
+          },
+          options: formatOptions(employmentStatus)
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Education',
+        fr: 'Éducation'
+      },
+      fields: {
+        yearsOfEducation: {
+          kind: 'numeric',
+          label: {
+            en: 'Years of Education',
+            fr: "Années d'études"
+          },
+          variant: 'default',
+          min: 0,
+          max: 30
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Immigration',
+        fr: 'Immigration'
+      },
+      fields: {
+        isCanadianCitizen: {
+          kind: 'binary',
+          label: {
+            en: 'Canadian Citizen',
+            fr: 'Citoyen canadien'
+          },
+          variant: 'radio',
+          options: yesNoOptions
+        },
+        ageAtImmigration: {
+          kind: 'numeric',
+          label: {
+            en: 'Age at Immigration',
+            fr: "Âge à l'immigration (le cas échéant)"
+          },
+          variant: 'default',
+          min: 1,
+          max: 100
+        }
       }
     }
   ],
@@ -99,168 +261,82 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     properties: {
       ethnicOrigin: {
         type: 'string',
-        enum: extractKeys(ethnicOrigin)
+        enum: extractKeys(ethnicOrigin),
+        nullable: true
       },
       gender: {
         type: 'string',
-        enum: extractKeys(gender)
+        enum: extractKeys(gender),
+        nullable: true
       },
-      postalCode: {
+      religion: {
         type: 'string',
-        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source
-      }
-    },
-    required: ['ethnicOrigin', 'gender', 'postalCode']
-  }
-});
-
-/*
-
-export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
-  name: 'EnhancedDemographicsQuestionnaire',
-  tags: ['Demographics'],
-  version: 1,
-  details: {
-    title: {
-      en: 'Enhanced Demographics Questionnaire',
-      fr: 'Questionnaire démographique détaillé'
-    },
-    description: {
-      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration',
-      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets"
-    },
-    instructions: {
-      en: 'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.',
-      fr: "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
-    },
-    estimatedDuration: 5
-  },
-  content: {
-    genderIdentity: {
-      kind: 'options',
-      label: {
-        en: 'Gender Identity',
-        fr: 'Identité de genre'
-      },
-      options: formatOptions(genderIdentity)
-    },
-    ethnicOrigin: {
-      kind: 'options',
-      label: {
-        en: 'Ethnic Origin',
-        fr: 'Origine ethnique'
-      },
-      options: formatOptions(ethnicOrigin)
-    },
-    forwardSortationArea: {
-      kind: 'text',
-      label: {
-        en: 'Forward Sortation Area',
-        fr: "Région de tri d'acheminement"
-      },
-      description: {
-        en: 'A forward sortation area (FSA) is a way to designate a geographical unit based on the first three characters in a Canadian postal code. All postal codes that start with the same three characters—for example, K1A—are together considered an FSA.',
-        fr: "Une région de tri d'acheminement (RTA) est une unité géographique désignée par les trois premiers caractères d'un code postal canadien. Tous les codes postaux commençant par les trois mêmes caractères — par exemple, K1A — forment une même RTA."
-      },
-      variant: 'short'
-    },
-    employmentStatus: {
-      kind: 'options',
-      label: {
-        en: 'Employment Status',
-        fr: "Statut de l'emploi"
-      },
-      options: {
-        en: {
-          fullTime: 'Full-Time',
-          partTime: 'Part-Time',
-          student: 'Student',
-          unemployed: 'Unemployed'
-        },
-        fr: {
-          fullTime: 'Emploi à temps plein',
-          partTime: 'Emploi à temps partiel',
-          student: 'Étudiant',
-          unemployed: 'Chômage'
-        }
-      }
-    },
-    maritalStatus: {
-      kind: 'options',
-      label: {
-        en: 'Marital Status',
-        fr: 'État civil'
-      },
-      options: {
-        en: {
-          married: 'Married (and not separated)',
-          widowed: 'Widowed (including living common law)',
-          separated: 'Separated (including living common law)',
-          divorced: 'Divorced (including living common law)',
-          single: 'Single (including living common law)'
-        },
-        fr: {
-          married: 'Marié',
-          widowed: 'Widowed (including living common law)',
-          separated: 'Séparé (y compris vivant en union libre)',
-          divorced: 'Divorcé (y compris vivant en union libre))',
-          single: 'Jamais marié (y compris vivant en union libre)'
-        }
-      }
-    },
-    firstLanguage: {
-      kind: 'options',
-      label: {
-        en: 'First Language',
-        fr: 'Langue maternelle'
-      },
-      options: {
-        en: {
-          english: 'English',
-          french: 'French',
-          other: 'Other'
-        },
-        fr: {
-          english: 'Anglais',
-          french: 'Français',
-          other: 'Autre'
-        }
-      }
-    }
-  },
-  validationSchema: {
-    type: 'object',
-    properties: {
-      annualIncome: {
-        type: 'integer'
-      },
-      forwardSortationArea: {
-        type: 'string',
-        minLength: 3,
-        maxLength: 3
-      },
-      ethnicity: {
-        type: 'string',
-        enum: ['asian', 'black', 'indigenous', 'other', 'white']
-      },
-      gender: {
-        type: 'string',
-        enum: ['female', 'male', 'nonBinary']
-      },
-      employmentStatus: {
-        type: 'string',
-        enum: ['fullTime', 'partTime', 'student', 'unemployed']
-      },
-      maritalStatus: {
-        type: 'string',
-        enum: ['divorced', 'married', 'separated', 'single', 'widowed']
+        enum: extractKeys(religion),
+        nullable: true
       },
       firstLanguage: {
         type: 'string',
-        enum: ['english', 'french', 'other']
+        enum: extractKeys(firstLanguage),
+        nullable: true
+      },
+      speaksEnglish: {
+        type: 'boolean',
+        nullable: true
+      },
+      speaksFrench: {
+        type: 'boolean',
+        nullable: true
+      },
+      postalCode: {
+        type: 'string',
+        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source,
+        nullable: true
+      },
+      householdSize: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 20,
+        nullable: true
+      },
+      numberChildren: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 20,
+        nullable: true
+      },
+      maritalStatus: {
+        type: 'string',
+        enum: extractKeys(maritalStatus),
+        nullable: true
+      },
+      annualIncome: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 1000000,
+        nullable: true
+      },
+      employmentStatus: {
+        type: 'string',
+        enum: extractKeys(employmentStatus),
+        nullable: true
+      },
+      yearsOfEducation: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 30,
+        nullable: true
+      },
+      isCanadianCitizen: {
+        type: 'boolean',
+        nullable: true
+      },
+      ageAtImmigration: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 100,
+        nullable: true
       }
     },
-    required: ['annualIncome']
+    required: []
   }
 });
-*/

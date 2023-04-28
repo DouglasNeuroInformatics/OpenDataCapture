@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { DateUtils, FormInstrument, SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +34,7 @@ export interface RecordsGraphProps {
 export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   const { t } = useTranslation('subjects');
   const [oldestDate, setOldestDate] = useState<Date | null>(null);
-  const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument>();
+  const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument | null>();
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
   const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
 
@@ -44,6 +44,12 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
       .filter(({ instrument }) => instrument.measures)
       .map(({ instrument }) => [instrument.identifier, instrument.details.title])
   );
+
+  // If language changes
+  useEffect(() => {
+    setSelectedInstrument(null);
+    setSelectedMeasures([]);
+  }, [data]);
 
   const measureOptions = useMemo(() => {
     const arr: SelectedMeasure[] = [];
@@ -88,9 +94,16 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="ml-[70px] p-2">
-        <h3 className="mb-5 text-center text-xl font-medium">
-          {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
-        </h3>
+        <div className="mb-5">
+          <h3 className="text-center text-xl font-medium">
+            {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
+          </h3>
+          {oldestDate && (
+            <p className="text-center">
+              {DateUtils.toBasicISOString(oldestDate)} - {DateUtils.toBasicISOString(new Date())}
+            </p>
+          )}
+        </div>
         <div className="flex justify-between">
           <div className="flex gap-2">
             <Dropdown

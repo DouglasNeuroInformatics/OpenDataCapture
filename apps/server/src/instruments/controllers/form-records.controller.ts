@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { type AppAbility } from '@douglasneuroinformatics/common/auth';
+import { type Language } from '@douglasneuroinformatics/common/core';
 import {
   FormInstrumentRecordsSummary,
   InstrumentRecordsExport,
@@ -29,8 +30,12 @@ export class FormRecordsController {
   @ApiOperation({ description: 'Get Specified Records' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  find(@UserAbility() ability: AppAbility, @Query('subject') subjectIdentifier: string): Promise<SubjectFormRecords[]> {
-    return this.formRecordsService.find(ability, subjectIdentifier);
+  find(
+    @UserAbility() ability: AppAbility,
+    @Query('subject') subjectIdentifier: string,
+    @Query('lang') language?: Language
+  ): Promise<SubjectFormRecords[]> {
+    return this.formRecordsService.find(ability, subjectIdentifier, language);
   }
 
   @ApiOperation({ description: 'Summarize Available Form Records' })
