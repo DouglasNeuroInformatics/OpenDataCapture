@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import { FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { FormFields, FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@douglasneuroinformatics/common';
 import { type Language } from '@douglasneuroinformatics/common';
 import { TranslatedForms } from '@douglasneuroinformatics/instruments';
 import { Model, ObjectId } from 'mongoose';
@@ -84,6 +84,19 @@ export class FormsService {
       throw new NotFoundException(`Failed to find form with id: ${id}`);
     }
     return result;
+  }
+
+  getFields<T extends FormInstrumentData>(instrument: FormInstrument<T>): FormFields<T> {
+    let fields: FormFields<T>;
+    if (Array.isArray(instrument.content)) {
+      fields = instrument.content.reduce(
+        (prev, current) => ({ ...prev, ...current.fields }),
+        instrument.content[0].fields
+      ) as FormFields<T>;
+    } else {
+      fields = instrument.content;
+    }
+    return fields;
   }
 
   private createIdentifier(name: string, version: number): string {

@@ -16,8 +16,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
   details: {
     estimatedDuration: 10,
     title: {
-      en: 'Montreal Cognitive Assessment (English)',
-      fr: 'Montreal Cognitive Assessment (Français)'
+      en: 'Montreal Cognitive Assessment',
+      fr: 'Montreal Cognitive Assessment'
     },
     description: {
       en: 'The Montreal Cognitive Assessment (MoCA) was designed as a rapid screening instrument for mild cognitive dysfunction. It assesses different cognitive domains: attention and concentration, executive functions, memory, language, visuoconstructional skills, conceptual thinking, calculations, and orientation. The MoCA may be administered by anyone who understands and follows the instructions, however, only a health professional with expertise in the cognitive field may interpret the results. Time to administer the MoCA is approximately 10 minutes. The total possible score is 30 points; a score of 26 or above is considered normal.',

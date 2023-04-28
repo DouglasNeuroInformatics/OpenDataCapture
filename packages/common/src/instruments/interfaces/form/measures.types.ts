@@ -7,7 +7,10 @@ export type Measure<TData extends FormInstrumentData = FormInstrumentData> = {
   formula:
     | {
         kind: 'sum';
-        fields: Array<ConditionalKeys<TData, number>>;
+        fields: Array<ConditionalKeys<TData, number | boolean>>;
+        options?: {
+          coerceBool?: boolean;
+        };
       }
     | {
         kind: 'const';

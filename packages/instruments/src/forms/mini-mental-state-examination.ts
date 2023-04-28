@@ -266,6 +266,42 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       }
     }
   ],
+  measures: {
+    totalScore: {
+      label: {
+        en: 'Total Score',
+        fr: 'Score total'
+      },
+      formula: {
+        kind: 'sum',
+        fields: [
+          'canCopyDesign',
+          'canFollowOralInstructions',
+          'canFollowWrittenInstructions',
+          'canNamePencil',
+          'canNameWatch',
+          'canRepeatPhrase',
+          'canWriteSentence',
+          'city',
+          'country',
+          'date',
+          'day',
+          'floor',
+          'institution',
+          'learningScore',
+          'month',
+          'province',
+          'recallScore',
+          'season',
+          'spellWorldScore',
+          'year'
+        ],
+        options: {
+          coerceBool: true
+        }
+      }
+    }
+  },
   validationSchema: {
     type: 'object',
     required: []
