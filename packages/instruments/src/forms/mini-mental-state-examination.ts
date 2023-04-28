@@ -318,6 +318,89 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
   },
   validationSchema: {
     type: 'object',
-    required: []
+    properties: {
+      canCopyDesign: {
+        type: 'boolean'
+      },
+      canFollowOralInstructions: {
+        type: 'integer'
+      },
+      canFollowWrittenInstructions: {
+        type: 'boolean'
+      },
+      canNamePencil: {
+        type: 'boolean'
+      },
+      canNameWatch: {
+        type: 'boolean'
+      },
+      canRepeatPhrase: {
+        type: 'boolean'
+      },
+      canWriteSentence: {
+        type: 'boolean'
+      },
+      city: {
+        type: 'boolean'
+      },
+      country: {
+        type: 'boolean'
+      },
+      date: {
+        type: 'boolean'
+      },
+      day: {
+        type: 'boolean'
+      },
+      floor: {
+        type: 'boolean'
+      },
+      institution: {
+        type: 'boolean'
+      },
+      learningScore: {
+        type: 'integer'
+      },
+      month: {
+        type: 'boolean'
+      },
+      province: {
+        type: 'boolean'
+      },
+      recallScore: {
+        type: 'integer'
+      },
+      season: {
+        type: 'boolean'
+      },
+      spellWorldScore: {
+        type: 'integer'
+      },
+      year: {
+        type: 'boolean'
+      }
+    },
+    required: [
+      'canCopyDesign',
+      'canFollowOralInstructions',
+      'canFollowWrittenInstructions',
+      'canNamePencil',
+      'canNameWatch',
+      'canRepeatPhrase',
+      'canWriteSentence',
+      'city',
+      'country',
+      'date',
+      'day',
+      'floor',
+      'institution',
+      'learningScore',
+      'month',
+      'province',
+      'recallScore',
+      'season',
+      'spellWorldScore',
+      'year'
+    ]
   }
 });
