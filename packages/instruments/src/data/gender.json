@@ -1,11 +1,11 @@
 {
   "male": {
-    "en": "Male",
-    "fr": "Masculin"
+    "en": "Man",
+    "fr": "Homme"
   },
   "female": {
-    "en": "Female",
-    "fr": "Féminin"
+    "en": "Woman",
+    "fr": "Femme"
   },
   "nonBinary": {
     "en": "Non-Binary",
