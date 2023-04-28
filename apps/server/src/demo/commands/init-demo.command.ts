@@ -105,6 +105,8 @@ export class InitDemoCommand extends CommandRunner {
       await this.subjectsService.create(createSubjectDto);
       const group = await this.groupsService.findByName(Random.value(DEMO_GROUPS).name, this.ability);
       await this.createFormRecords(happinessQuestionnaires[0], group.name, createSubjectDto);
+      await this.createFormRecords(miniMentalStateExaminations[0], group.name, createSubjectDto);
+      await this.createFormRecords(montrealCognitiveAssessments[0], group.name, createSubjectDto);
     }
   }
 

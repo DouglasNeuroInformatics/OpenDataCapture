@@ -17,7 +17,7 @@ export type MiniMentalStateExaminationData = {
   canNameWatch: boolean;
   canNamePencil: boolean;
   canRepeatPhrase: boolean;
-  canFollowOralInstructions: boolean;
+  canFollowOralInstructions: number;
   canFollowWrittenInstructions: boolean;
   canWriteSentence: boolean;
   canCopyDesign: boolean;
@@ -179,7 +179,7 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           },
           variant: 'slider',
           min: 0,
-          max: 3
+          max: 5
         }
       }
     },
@@ -234,18 +234,32 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         canFollowWrittenInstructions: {
           kind: 'binary',
           label: {
-            en: 'Say: Read the words on this page and then do what it says. Then, hand the person the sheet with "CLOSE YOUR EYES on it. If the subject just reads and does not close eyes, you may repeat: Read the words on this page and then do what it says, (a maximum of three times. Score one point only if the subject closes eyes. The subject does not have to read aloud.',
-            fr: "S'il-vous-plait, faites ceci."
+            en: 'Say: Read the words on this page and then do what it says. Then, hand the person the sheet with "CLOSE YOUR EYES" on it.',
+            fr: 'Lisez les mots de cette page et faites ce qui est dit. Ensuite, remettez à la personne la feuille sur laquelle est écrit "FERMEZ LES YEUX".'
           },
           variant: 'radio'
         },
         canWriteSentence: {
           kind: 'binary',
           label: {
-            en: 'Hand the person a pencil and paper (Page 3). Say: Write any complete sentence on that piece of paper. Score one point. The sentence must make sense. Ignore spelling errors.',
-            fr: "J'aimerais que vous écriviez une phrase complète sur cette feuille de papier."
+            en: 'Hand the person a pencil and paper. Say: Write any complete sentence on that piece of paper.',
+            fr: "Donnez à la personne un crayon et une feuille de papier. Dites : Écrivez n'importe quelle phrase complète sur ce morceau de papier."
           },
           variant: 'radio'
+        },
+        canFollowOralInstructions: {
+          kind: 'numeric',
+          label: {
+            en: 'Ask the person if he is right or left handed. Take a piece of paper, hold it up in front of the person and say: Take this paper in your right/left hand (whichever is non-dominant), fold the paper in half once with both hands and put the paper down on the floor.',
+            fr: "Demandez à la personne si elle est droitière ou gauchère. Prenez une feuille de papier, tenez-la devant la personne et dites : Prenez cette feuille dans votre main droite/gauche (celle qui n'est pas dominante), pliez-la en deux avec vos deux mains : Prenez cette feuille dans votre main droite/gauche (celle qui n'est pas dominante), pliez-la en deux avec vos deux mains et posez-la sur le sol. une fois avec les deux mains et posez le papier sur le sol."
+          },
+          variant: 'slider',
+          min: 0,
+          max: 3,
+          description: {
+            en: 'Score one point for each instruction executed correctly.',
+            fr: 'Donnez un point pour chaque instruction exécutée correctement.'
+          }
         }
       }
     },

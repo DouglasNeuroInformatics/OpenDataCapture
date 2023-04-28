@@ -149,7 +149,18 @@ export class FormRecordsService {
       case 'const':
         return data[measure.formula.field] as number;
       case 'sum':
-        return measure.formula.fields.map((field) => data[field] as number).reduce((a, b) => a + b, 0);
+        // eslint-disable-next-line no-case-declarations
+        const coerceBool = measure.formula.options?.coerceBool;
+        return measure.formula.fields
+          .map((field) => {
+            if (typeof data[field] === 'number') {
+              return data[field] as number;
+            } else if (typeof data[field] === 'boolean' && coerceBool) {
+              return Number(data[field]);
+            }
+            throw new Error(`Unexpected type of field '${field.toString()}': ${typeof data[field]}`);
+          })
+          .reduce((a, b) => a + b, 0);
     }
   }
 }
