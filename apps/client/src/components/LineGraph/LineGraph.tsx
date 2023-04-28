@@ -80,7 +80,7 @@ export function LineGraph<const T extends LineGraphData>({
         </YAxis>
         <Tooltip />
         {lines.map(({ name, val, err }) => (
-          <Line dataKey={val} key={val} name={name} stroke={'black'} type="monotone">
+          <Line dataKey={val} key={val} name={name} stroke={'black'} type="linear">
             {err && <ErrorBar dataKey={err} />}
           </Line>
         ))}
