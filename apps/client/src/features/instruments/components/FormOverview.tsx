@@ -15,7 +15,17 @@ const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
   return (
     <div className="my-5">
       <h5 className="mb-1 text-xl font-semibold text-slate-900">{heading}</h5>
-      <p className="text-slate-700">{Array.isArray(text) ? text.join('\n') : text}</p>
+      {Array.isArray(text) ? (
+        <ul>
+          {text.map((s, i) => (
+            <li className="my-3" key={i}>
+              {s}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-slate-700">{text}</p>
+      )}
     </div>
   );
 };
