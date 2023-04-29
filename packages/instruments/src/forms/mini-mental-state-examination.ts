@@ -1,37 +1,26 @@
 import { createTranslatedForms } from '..';
 
-const binaryOptions = {
-  en: {
-    t: 'Correct',
-    f: 'Incorrect'
-  },
-  fr: {
-    t: 'Correct',
-    f: 'Incorrect'
-  }
-} as const;
-
 export type MiniMentalStateExaminationData = {
-  year: boolean;
-  season: boolean;
-  month: boolean;
-  date: boolean;
-  day: boolean;
-  country: boolean;
-  province: boolean;
-  city: boolean;
-  institution: boolean;
-  floor: boolean;
+  year: number;
+  season: number;
+  month: number;
+  date: number;
+  day: number;
+  country: number;
+  province: number;
+  city: number;
+  institution: number;
+  floor: number;
   learningScore: number;
   spellWorldScore: number;
   recallScore: number;
-  canNameWatch: boolean;
-  canNamePencil: boolean;
-  canRepeatPhrase: boolean;
+  canNameWatch: number;
+  canNamePencil: number;
+  canRepeatPhrase: number;
   canFollowOralInstructions: number;
-  canFollowWrittenInstructions: boolean;
-  canWriteSentence: boolean;
-  canCopyDesign: boolean;
+  canFollowWrittenInstructions: number;
+  canWriteSentence: number;
+  canCopyDesign: number;
 };
 
 export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateExaminationData>({
@@ -72,115 +61,173 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
   content: [
     {
       title: {
-        en: 'Orientation',
-        fr: 'Orientation'
+        en: 'Time: 10 seconds for each reply',
+        fr: 'Durée : 10 secondes pour chaque réponse'
       },
       fields: {
         year: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
             en: 'What year is this?',
-            fr: 'En quelle année sommes-nous?'
+            fr: "De quelle année s'agit-il ?"
           },
-          variant: 'radio',
-          options: binaryOptions
+          description: {
+            en: 'Accept exact answer only',
+            fr: "N'accepter que les réponses exactes"
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
         },
         season: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
             en: 'What season is this?',
-            fr: 'Quelle est la saison?'
+            fr: "De quelle saison s'agit-il ?"
           },
-          variant: 'radio',
-          options: binaryOptions
+          description: {
+            en: 'Accept either the last week of the old season or the first week of a new season',
+            fr: "accepter soit : la dernière semaine de l'ancienne saison, soit la première semaine d'une nouvelle saison"
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
         },
         month: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
             en: 'What month is this?',
-            fr: 'Quel est le mois?'
+            fr: 'Quel mois sommes-nous ?'
           },
-          variant: 'radio',
-          options: binaryOptions
+          description: {
+            en: 'Accept either: the first day of a new month or the last day of the previous month',
+            fr: "Accepter soit : le premier jour d'un nouveau mois, soit le dernier jour du mois précédent"
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
         },
         date: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
             en: "What is today's date?",
-            fr: "Quelle est la date d'aujourd'hui?"
+            fr: "Quelle est la date d'aujourd'hui ?"
           },
-          variant: 'radio',
-          options: binaryOptions
+          description: {
+            en: 'Accept previous or next date',
+            fr: 'Accepter la date précédente ou suivante'
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
         },
         day: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
             en: 'What day of the week is this?',
-            fr: 'Quel est le jour de la semaine ?'
+            fr: "Quel jour de la semaine sommes-nous ?"
           },
-          variant: 'radio',
-          options: binaryOptions
-        },
-        country: {
-          kind: 'binary',
-          label: {
-            en: 'What country are we in?',
-            fr: 'Dans quel pays sommes-nous?'
+          description: {
+            en: 'Accept exact answer only',
+            fr: "N'accepter que les réponses exactes"
           },
-          variant: 'radio',
-          options: binaryOptions
-        },
-        province: {
-          kind: 'binary',
-          label: {
-            en: 'What province are we in?',
-            fr: 'Dans quelle province sommes-nous?'
-          },
-          variant: 'radio',
-          options: binaryOptions
-        },
-        city: {
-          kind: 'binary',
-          label: {
-            en: 'What city/town are we in?',
-            fr: 'Dans quelle ville sommes-nous?'
-          },
-          variant: 'radio',
-          options: binaryOptions
-        },
-        institution: {
-          kind: 'binary',
-          label: {
-            en: 'What is the name of this building?',
-            fr: 'Quel est le nom de cet édifice?'
-          },
-          variant: 'radio',
-          options: binaryOptions
-        },
-        floor: {
-          kind: 'binary',
-          label: {
-            en: 'What floor of the building are we on?',
-            fr: 'À quel étage sommes-nous?'
-          },
-          variant: 'radio',
-          options: binaryOptions
+          variant: 'default',
+          min: 0,
+          max: 1
         }
       }
     },
     {
       title: {
-        en: 'Registration',
-        fr: 'Apprentissage'
+        en: 'Time: 10 seconds for each reply',
+        fr: 'Durée : 10 secondes pour chaque réponse'
+      },
+      fields: {
+        country: {
+          kind: 'numeric',
+          label: {
+            en: 'What country are we in?',
+            fr: "Dans quel pays nous trouvons-nous ?"
+          },
+          description: {
+            en: "Accept exact answer only",
+            fr: "N'accepter que les réponses exactes"
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
+        },
+        province: {
+          kind: 'numeric',
+          label: {
+            en: 'What province are we in?',
+            fr: "Dans quelle province nous trouvons-nous ?"
+          },
+          description: {
+            en: "Accept exact answer only",
+            fr: "N'accepter que les réponses exactes"
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
+        },
+        city: {
+          kind: 'numeric',
+          label: {
+            en: 'What city/town are we in?',
+            fr: "Dans quelle ville nous trouvons-nous ?"
+          },
+          description: {
+            en: "Accept exact answer only",
+            fr: "N'accepter que la réponse exacte"
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
+        },
+        institution: {
+          kind: 'numeric',
+          label: {
+            en: 'What is the name of this building?',
+            fr: "Quel est le nom de ce bâtiment ?"
+          },
+          description: {
+            en: "Accept exact name of institution only",
+            fr: "N'accepter que le nom exact de l'institution"
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
+        },
+        floor: {
+          kind: 'numeric',
+          label: {
+            en: 'What floor of the building are we on?',
+            fr: "A quel étage du bâtiment nous trouvons-nous ?"
+          },
+          description: {
+            en: "Accept exact answer only",
+            fr: "N'accepter que la réponse exacte"
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Time: 20 seconds',
+        fr: 'Durée : 20 secondes'
       },
       fields: {
         learningScore: {
           kind: 'numeric',
           label: {
-            en: 'Number of words remembered',
-            fr: 'Nombre de mots mémorisés'
+            en: 'Say: I am going to name three objects. When I am finished, I want you to repeat them. Remember what they are because I am going to ask you to name them again in a few minutes. Say the following words slowly at approximately one-second intervals: Ball / Car / Man.',
+            fr: "Dites : Je vais nommer trois objets. Quand j'aurai fini, je veux que vous les répétiez. Souvenez-vous de ce que c'est parce que je vais vous demander de les nommer à nouveau dans quelques minutes. Dites les mots suivants lentement à environ une seconde d'intervalle : Balle / Voiture / Homme."
           },
-          variant: 'slider',
+          variant: 'default',
           min: 0,
           max: 3
         }
@@ -188,17 +235,17 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
     },
     {
       title: {
-        en: 'Attention',
-        fr: 'Attention'
+        en: 'Time: 30 seconds',
+        fr: 'Durée : 30 secondes'
       },
       fields: {
         spellWorldScore: {
           kind: 'numeric',
           label: {
-            en: 'Spell the word "world" in reverse',
-            fr: 'Épelez le mot "monde" à l\'envers'
+            en: 'Spell the word WORLD (you may help the person to spell the word correctly). Say: Now spell it backwards please. If the subject cannot spell world even with assistance, score 0.',
+            fr: "Épellez le mot MONDE (vous pouvez aider la personne à épeler le mot correctement). Dites : Maintenant, épellez-le à l'envers, s'il vous plaît. Si le sujet ne peut pas épeler monde même avec de l'aide, marquez 0."
           },
-          variant: 'slider',
+          variant: 'default',
           min: 0,
           max: 5
         }
@@ -206,17 +253,17 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
     },
     {
       title: {
-        en: 'Recall',
-        fr: 'Rappel'
+        en: 'Time: 10 seconds',
+        fr: 'Time: 10 seconds'
       },
       fields: {
         recallScore: {
           kind: 'numeric',
           label: {
-            en: 'Now what were the three objects I asked you to remember?',
-            fr: 'Pourriez-vous me dire quels étaient les trois mots que je vous avais demandé de retenir?'
+            en: 'Say: Now what were the three objects I asked you to remember? (score one point for each correct answer regardless of order).',
+            fr: "Dites : Maintenant, quels sont les trois objets dont je vous ai demandé de vous souvenir ? (marquez un point pour chaque réponse correcte, quel que soit l'ordre)."
           },
-          variant: 'slider',
+          variant: 'default',
           min: 0,
           max: 3
         }
@@ -224,85 +271,131 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
     },
     {
       title: {
-        en: 'Language',
-        fr: 'Langue'
+        en: 'Time: 10 seconds',
+        fr: 'Durée : 10 secondes'
       },
       fields: {
         canNameWatch: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
-            en: 'Show wristwatch. Ask: What is this called?',
-            fr: 'Montrer une montre. Quel est le nom de cet objet ?'
+            en: 'Show wristwatch. Ask: What is this called? (score one point for correct response, e.g., accept “wristwatch” or “watch”, but do not accept “clock” or “time”).',
+            fr: 'Montrer la montre-bracelet. Demandez : Quel est le nom de cet objet ? (marquez un point pour une réponse correcte, par exemple, acceptez "montre-bracelet" ou "montre", mais n\'acceptez pas "horloge" ou "heure").'
           },
-          variant: 'radio',
-          options: binaryOptions
-        },
+          variant: 'default',
+          min: 0,
+          max: 1
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Time: 10 seconds',
+        fr: 'Durée : 10 secondes'
+      },
+      fields: {
         canNamePencil: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
             en: 'Show pencil. Ask: What is this called?',
             fr: 'Montrer un crayon. Quel est le nom de cet objet ?'
           },
-          variant: 'radio',
-          options: binaryOptions
-        },
+          variant: 'default',
+          min: 0,
+          max: 1
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Time: 10 seconds',
+        fr: 'Durée : 10 secondes'
+      },
+      fields: {
         canRepeatPhrase: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
             en: 'Say: I would like you to repeat a phrase after me: No ifs, ands or buts',
-            fr: 'Répétez cette phrase après moi : Pas de mais, de si, ni de et'
+            fr: 'Dites : Je voudrais que vous répétiez une phrase après moi : Pas de si, ni de et, ni de mais'
           },
-          variant: 'radio',
-          options: binaryOptions
-        },
+          variant: 'default',
+          min: 0,
+          max: 1
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Time: 10 seconds',
+        fr: 'Durée : 10 secondes'
+      },
+      fields: {
         canFollowWrittenInstructions: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
-            en: 'Say: Read the words on this page and then do what it says. Then, hand the person the sheet with "CLOSE YOUR EYES" on it.',
-            fr: 'Lisez les mots de cette page et faites ce qui est dit. Ensuite, remettez à la personne la feuille sur laquelle est écrit "FERMEZ LES YEUX".'
+            en: 'Say: Read the words on this page and then do what it says. Then, hand the person the sheet with CLOSE YOUR EYES on it. If the subject just reads and does not close eyes, you may repeat: read the words on this page and then do what it says, (a maximum of three times). Score one point only if the subject closes eyes. The subject does not have to read aloud.',
+            fr: "Dites : Lisez les mots de cette page et faites ce qui est écrit. Ensuite, remettez à la personne la feuille sur laquelle est écrit FERMEZ LES YEUX. Si le sujet se contente de lire et ne ferme pas les yeux, vous pouvez répéter : lisez les mots de cette page et faites ce qui est écrit (trois fois au maximum). Ne marquez qu'un point si le sujet ferme les yeux. Le sujet n'est pas obligé de lire à haute voix."
           },
-          variant: 'radio',
-          options: binaryOptions
-        },
+          variant: 'default',
+          min: 0,
+          max: 1
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Time: 30 seconds',
+        fr: 'Durée : 30 secondes'
+      },
+      fields: {
         canWriteSentence: {
-          kind: 'binary',
+          kind: 'numeric',
           label: {
-            en: 'Hand the person a pencil and paper. Say: Write any complete sentence on that piece of paper.',
-            fr: "Donnez à la personne un crayon et une feuille de papier. Dites : Écrivez n'importe quelle phrase complète sur ce morceau de papier."
+            en: 'Hand the person a pencil and paper. Say: Write any complete sentence on that piece of paper. Score one point. The sentence must make sense. Ignore spelling errors.',
+            fr: "Donnez à la personne un crayon et du papier. Dites : Écrivez une phrase complète sur ce morceau de papier. Marquez un point. La phrase doit avoir un sens. Ne tenez pas compte des fautes d'orthographe."
           },
-          variant: 'radio',
-          options: binaryOptions
-        },
+          variant: 'default',
+          min: 0,
+          max: 1
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Time: 1 minute maximum',
+        fr: 'Durée : 1 minute maximum'
+      },
+      fields: {
+        canCopyDesign: {
+          kind: 'numeric',
+          label: {
+            en: 'Place design, eraser and pencil in front of the person. Say: Copy this design please. Allow multiple tries. Wait until the person is finished and hands it back. Score one point for a correctly copied diagram. The person must have drawn a four-sided figure between two five-sided figures.',
+            fr: "Placez le dessin, la gomme et le crayon devant la personne. Dites : Copiez ce dessin, s'il vous plaît. Permettez plusieurs essais. Attendez que la personne ait terminé et rende le dessin. Marquez un point pour un diagramme correctement copié. La personne doit avoir dessiné une figure à quatre côtés entre deux figures à cinq côtés."
+          },
+          variant: 'default',
+          min: 0,
+          max: 1
+        }
+      }
+    },
+    {
+      title: {
+        en: 'Time: 30 seconds',
+        fr: 'Durée : 30 secondes'
+      },
+      fields: {
         canFollowOralInstructions: {
           kind: 'numeric',
           label: {
             en: 'Ask the person if he is right or left handed. Take a piece of paper, hold it up in front of the person and say: Take this paper in your right/left hand (whichever is non-dominant), fold the paper in half once with both hands and put the paper down on the floor.',
             fr: "Demandez à la personne si elle est droitière ou gauchère. Prenez une feuille de papier, tenez-la devant la personne et dites : Prenez cette feuille dans votre main droite/gauche (celle qui n'est pas dominante), pliez-la en deux avec vos deux mains : Prenez cette feuille dans votre main droite/gauche (celle qui n'est pas dominante), pliez-la en deux avec vos deux mains et posez-la sur le sol. une fois avec les deux mains et posez le papier sur le sol."
           },
-          variant: 'slider',
+          variant: 'default',
           min: 0,
           max: 3,
           description: {
             en: 'Score one point for each instruction executed correctly.',
             fr: 'Donnez un point pour chaque instruction exécutée correctement.'
           }
-        }
-      }
-    },
-    {
-      title: {
-        en: 'Visuoconstruction',
-        fr: 'Visuoconstruction'
-      },
-      fields: {
-        canCopyDesign: {
-          kind: 'binary',
-          label: {
-            en: 'Place design, eraser and pencil in front of the person. Say: Copy this design please. Allow multiple tries. Wait until the person is finished and hands it back. Score one point for a correctly copied diagram. The person must have drawn a four-sided figure between two five-sided figures',
-            fr: 'Pourriez-vous copier ce dessin?'
-          },
-          variant: 'radio',
-          options: binaryOptions
         }
       }
     }
@@ -336,10 +429,7 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           'season',
           'spellWorldScore',
           'year'
-        ],
-        options: {
-          coerceBool: true
-        }
+        ]
       }
     }
   },
@@ -347,64 +437,104 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
     type: 'object',
     properties: {
       canCopyDesign: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       canFollowOralInstructions: {
-        type: 'integer'
+        type: 'integer',
+        minimum: 0,
+        maximum: 3
       },
       canFollowWrittenInstructions: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       canNamePencil: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       canNameWatch: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       canRepeatPhrase: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       canWriteSentence: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       city: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       country: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       date: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       day: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       floor: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       institution: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       learningScore: {
-        type: 'integer'
+        type: 'integer',
+        minimum: 0,
+        maximum: 3
       },
       month: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       province: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       recallScore: {
-        type: 'integer'
+        type: 'integer',
+        minimum: 0,
+        maximum: 3
       },
       season: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       },
       spellWorldScore: {
-        type: 'integer'
+        type: 'integer',
+        minimum: 0,
+        maximum: 5
       },
       year: {
-        type: 'boolean'
+        type: 'integer',
+        minimum: 0,
+        maximum: 1
       }
     },
     required: [
