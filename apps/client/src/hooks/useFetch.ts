@@ -8,13 +8,13 @@ const baseURL = import.meta.env.VITE_API_HOST;
 /**
  * Common hook used throughout the application to request data from our API. The
  * base URL used for requests is set in the Vite config.
- * @param resourceURL - the url of the resource to require (e.g., /users)
+ * @param resourceURL - the url of the resource to require (e.g., /users), or null to skip fetching
  * @param deps - an optional list of dependencies to trigger a refetch
  * @param onError - a callback to override the default error handler which is to add a notification
  * @returns
  */
 export function useFetch<T = unknown>(
-  resourceURL: string,
+  resourceURL: string | null,
   deps: readonly unknown[] = [],
   onError?: (error: unknown) => void
 ): {
@@ -35,22 +35,26 @@ export function useFetch<T = unknown>(
   };
 
   useEffect(() => {
-    fetch(baseURL + resourceURL, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${auth.accessToken!}`
-      }
-    })
-      .then((response) => {
-        if (!response.ok) {
-          console.error(response);
-          throw new Error(`${response.status}: ${response.statusText}`);
+    if (resourceURL !== null) {
+      fetch(baseURL + resourceURL, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${auth.accessToken!}`
         }
-        return response.json();
       })
-      .then((data: T) => setData(data))
-      .catch(onError ?? setError);
+        .then((response) => {
+          if (!response.ok) {
+            console.error(response);
+            throw new Error(`${response.status}: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data: T) => setData(data))
+        .catch(onError ?? setError);
+    } else {
+      setData(null);
+    }
   }, deps);
 
   return { data, setData };
