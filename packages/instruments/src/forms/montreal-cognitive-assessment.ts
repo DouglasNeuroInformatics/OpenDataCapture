@@ -1,49 +1,14 @@
 import { createTranslatedForms } from '..';
 
-const correctIncorrectOptions = {
-  en: {
-    t: 'Correct',
-    f: 'Incorrect'
-  },
-  fr: {
-    t: 'Correct',
-    f: 'Incorrect'
-  }
-} as const;
-
 export type MontrealCognitiveAssessmentData = {
-  // Visuospatial/Executive
-  trailMaking: boolean;
-  copyCube: boolean;
-  drawClock: number;
-
-  // Naming
-  canNameLion: boolean;
-  canNameRhino: boolean;
-  canNameCamel: boolean;
-
-  // Attention
-  readListDigits: number;
-  readListLetters: boolean;
-  serialSeven: number;
-
-  // Language
-  langRepeat: number;
-  langFluency: boolean;
-
-  // Abstraction
-  abstractionSimilarity: number;
-
-  // Delayed Recall
-  uncuedRecall: number;
-
-  // Orientation
-  orientationDate: boolean;
-  orientationMonth: boolean;
-  orientationYear: boolean;
-  orientationDay: boolean;
-  orientationPlace: boolean;
-  orientationCity: boolean;
+  visuospatialExecutive: number;
+  naming: number;
+  attention: number;
+  language: number;
+  abstraction: number;
+  delayedRecall: number;
+  orientation: number;
+  lowEdu: boolean;
 };
 
 export const montrealCognitiveAssessment = createTranslatedForms<MontrealCognitiveAssessmentData>({
@@ -65,241 +30,96 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
       fr: 'Toutes les instructions peuvent être répétées une fois.'
     }
   },
-  content: [
-    {
-      title: {
+  content: {
+    visuospatialExecutive: {
+      kind: 'numeric',
+      label: {
         en: 'Visuospatial/Executive',
         fr: 'Visuospatial/Exécutif'
       },
-      fields: {
-        trailMaking: {
-          kind: 'binary',
-          label: {
-            en: 'Alternating Trail Making',
-            fr: 'Alternating Trail Making'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        copyCube: {
-          kind: 'binary',
-          label: {
-            en: 'Visuoconstructional Skills (Cube)',
-            fr: 'Compétences visuoconstructives (Cube)'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        drawClock: {
-          kind: 'numeric',
-          label: {
-            en: 'Visuoconstructional Skills (Clock)',
-            fr: 'Compétences visuoconstructives (Horloge)'
-          },
-          variant: 'slider',
-          min: 0,
-          max: 3
-        }
-      }
+      variant: 'default',
+      min: 0,
+      max: 5
     },
-    {
-      title: {
+    naming: {
+      kind: 'numeric',
+      label: {
         en: 'Naming',
         fr: 'Dénomination'
       },
-      fields: {
-        canNameLion: {
-          kind: 'binary',
-          label: {
-            en: 'Lion',
-            fr: 'Lion'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        canNameRhino: {
-          kind: 'binary',
-          label: {
-            en: 'Rhinoceros',
-            fr: 'Rhinocéros'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        canNameCamel: {
-          kind: 'binary',
-          label: {
-            en: 'Camel',
-            fr: 'Chameau'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        }
-      }
+      variant: 'default',
+      min: 0,
+      max: 3
     },
-    {
-      title: {
+    attention: {
+      kind: 'numeric',
+      label: {
         en: 'Attention',
         fr: 'Attention'
       },
-      fields: {
-        readListDigits: {
-          kind: 'numeric',
-          label: {
-            en: 'Read list of digits (1 digit/ sec.)',
-            fr: "Lecture d'une liste de chiffres (1 chiffre/sec.)"
-          },
-          variant: 'slider',
-          min: 0,
-          max: 2
-        },
-        readListLetters: {
-          kind: 'binary',
-          label: {
-            en: 'Read list of letters. The subject must tap with his hand at each letter A.',
-            fr: 'Lisez la liste des lettres. Le sujet doit taper avec sa main sur chaque lettre A.'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        serialSeven: {
-          kind: 'numeric',
-          label: {
-            en: 'Serial 7 subtraction starting at 100',
-            fr: 'Soustraction en série 7 à partir de 100'
-          },
-          variant: 'slider',
-          min: 0,
-          max: 3
-        }
-      }
+      variant: 'default',
+      min: 0,
+      max: 6
     },
-    {
-      title: {
+    language: {
+      kind: 'numeric',
+      label: {
         en: 'Language',
         fr: 'Langue'
       },
-      fields: {
-        langRepeat: {
-          kind: 'numeric',
-          label: {
-            en: 'Repeat : (1) I only know that John is the one to help today, (2) The cat always hid under the couch when dogs were in the room.',
-            fr: "Répéter : (1) L'enfant a promené son chien dans le parc après minuit, (2) L'artiste a terminé sa toile au bon moment pour l'exposition."
-          },
-          variant: 'slider',
-          min: 0,
-          max: 2
-        },
-        langFluency: {
-          kind: 'binary',
-          label: {
-            en: 'Fluency / Name maximum number of words in one minute that begin with the letter F ',
-            fr: 'Fluidité du langage. Nommer un maximum de mots commençant par la lettre « T » en 1 min.'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        }
-      }
+      variant: 'default',
+      min: 0,
+      max: 3
     },
-    {
-      title: {
+    abstraction: {
+      kind: 'numeric',
+      label: {
         en: 'Abstraction',
         fr: 'Abstraction'
       },
-      fields: {
-        abstractionSimilarity: {
-          kind: 'numeric',
-          label: {
-            en: 'Similarity between (e.g., banana - orange = fruit): (1) train - bicycle, (2) watch - ruler',
-            fr: 'Similitude entre (ex : banane - orange = fruit): (1) marteau - tournevis, (2) allumette - lampe'
-          },
-          variant: 'slider',
-          min: 0,
-          max: 2
-        }
-      }
+      variant: 'default',
+      min: 0,
+      max: 2
     },
-    {
-      title: {
+    delayedRecall: {
+      kind: 'numeric',
+      label: {
         en: 'Delayed Recall',
         fr: 'Rappel'
       },
-      fields: {
-        uncuedRecall: {
-          kind: 'numeric',
-          label: {
-            en: 'Points for UNCUED recall only',
-            fr: 'Points pour rappel SANS INDICE seulement'
-          },
-          variant: 'slider',
-          min: 0,
-          max: 5
-        }
-      }
+      variant: 'default',
+      min: 0,
+      max: 5
     },
-    {
-      title: {
+    orientation: {
+      kind: 'numeric',
+      label: {
         en: 'Orientation',
         fr: 'Orientation'
       },
-      fields: {
-        orientationDate: {
-          kind: 'binary',
-          label: {
-            en: 'Date',
-            fr: 'Date'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
+      variant: 'default',
+      min: 0,
+      max: 6
+    },
+    lowEdu: {
+      kind: 'binary',
+      label: {
+        en: 'Less Than 12 Years of Education',
+        fr: "Moins de 12 ans d'études"
+      },
+      variant: 'radio',
+      options: {
+        en: {
+          t: 'Yes',
+          f: 'No'
         },
-        orientationMonth: {
-          kind: 'binary',
-          label: {
-            en: 'Month',
-            fr: 'Moi'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        orientationYear: {
-          kind: 'binary',
-          label: {
-            en: 'Année',
-            fr: 'Year'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        orientationDay: {
-          kind: 'binary',
-          label: {
-            en: 'Day',
-            fr: 'Jour'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        orientationPlace: {
-          kind: 'binary',
-          label: {
-            en: 'Place',
-            fr: 'Endroit'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
-        },
-        orientationCity: {
-          kind: 'binary',
-          label: {
-            en: 'City',
-            fr: 'Ville'
-          },
-          variant: 'radio',
-          options: correctIncorrectOptions
+        fr: {
+          t: 'Oui',
+          f: 'No'
         }
       }
     }
-  ],
+  },
   measures: {
     totalScore: {
       label: {
@@ -312,25 +132,14 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
           coerceBool: true
         },
         fields: [
-          'abstractionSimilarity',
-          'canNameCamel',
-          'canNameLion',
-          'canNameRhino',
-          'copyCube',
-          'drawClock',
-          'langFluency',
-          'langRepeat',
-          'orientationCity',
-          'orientationDate',
-          'orientationDay',
-          'orientationMonth',
-          'orientationPlace',
-          'orientationYear',
-          'readListDigits',
-          'readListLetters',
-          'serialSeven',
-          'trailMaking',
-          'uncuedRecall'
+          'abstraction',
+          'attention',
+          'delayedRecall',
+          'language',
+          'lowEdu',
+          'naming',
+          'orientation',
+          'visuospatialExecutive'
         ]
       }
     },
@@ -340,11 +149,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
         fr: 'Visuospatial/Exécutif'
       },
       formula: {
-        kind: 'sum',
-        options: {
-          coerceBool: true
-        },
-        fields: ['trailMaking', 'copyCube', 'drawClock']
+        kind: 'const',
+        field: 'visuospatialExecutive'
       }
     },
     naming: {
@@ -353,11 +159,8 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
         fr: 'Dénomination'
       },
       formula: {
-        kind: 'sum',
-        options: {
-          coerceBool: true
-        },
-        fields: ['canNameLion', 'canNameRhino', 'canNameCamel']
+        kind: 'const',
+        field: 'naming'
       }
     },
     attention: {
@@ -366,24 +169,18 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
         fr: 'Attention'
       },
       formula: {
-        kind: 'sum',
-        options: {
-          coerceBool: true
-        },
-        fields: ['readListDigits', 'readListLetters', 'serialSeven']
+        kind: 'const',
+        field: 'attention'
       }
     },
     language: {
       label: {
         en: 'Language',
-        fr: 'Langage'
+        fr: 'Langue'
       },
       formula: {
-        kind: 'sum',
-        options: {
-          coerceBool: true
-        },
-        fields: ['langRepeat', 'langFluency']
+        kind: 'const',
+        field: 'language'
       }
     },
     abstraction: {
@@ -393,7 +190,7 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
       },
       formula: {
         kind: 'const',
-        field: 'abstractionSimilarity'
+        field: 'abstraction'
       }
     },
     delayedRecall: {
@@ -403,7 +200,7 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
       },
       formula: {
         kind: 'const',
-        field: 'uncuedRecall'
+        field: 'delayedRecall'
       }
     },
     orientation: {
@@ -412,102 +209,61 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
         fr: 'Orientation'
       },
       formula: {
-        kind: 'sum',
-        options: {
-          coerceBool: true
-        },
-        fields: [
-          'orientationDate',
-          'orientationMonth',
-          'orientationYear',
-          'orientationDay',
-          'orientationPlace',
-          'orientationCity'
-        ]
+        kind: 'const',
+        field: 'orientation'
       }
     }
   },
   validationSchema: {
     type: 'object',
     properties: {
-      abstractionSimilarity: {
-        type: 'integer'
+      visuospatialExecutive: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 5
       },
-      canNameCamel: {
+      naming: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 3
+      },
+      attention: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 6
+      },
+      language: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 3
+      },
+      abstraction: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 2
+      },
+      delayedRecall: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 5
+      },
+      orientation: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 6
+      },
+      lowEdu: {
         type: 'boolean'
-      },
-      canNameLion: {
-        type: 'boolean'
-      },
-      canNameRhino: {
-        type: 'boolean'
-      },
-      copyCube: {
-        type: 'boolean'
-      },
-      drawClock: {
-        type: 'integer'
-      },
-      langFluency: {
-        type: 'boolean'
-      },
-      langRepeat: {
-        type: 'integer'
-      },
-      orientationCity: {
-        type: 'boolean'
-      },
-      orientationDate: {
-        type: 'boolean'
-      },
-      orientationDay: {
-        type: 'boolean'
-      },
-      orientationMonth: {
-        type: 'boolean'
-      },
-      orientationPlace: {
-        type: 'boolean'
-      },
-      orientationYear: {
-        type: 'boolean'
-      },
-      readListDigits: {
-        type: 'integer'
-      },
-      readListLetters: {
-        type: 'boolean'
-      },
-      serialSeven: {
-        type: 'integer'
-      },
-      trailMaking: {
-        type: 'boolean'
-      },
-      uncuedRecall: {
-        type: 'integer'
       }
     },
     required: [
-      'abstractionSimilarity',
-      'canNameCamel',
-      'canNameLion',
-      'canNameRhino',
-      'copyCube',
-      'drawClock',
-      'langFluency',
-      'langRepeat',
-      'orientationCity',
-      'orientationDate',
-      'orientationDay',
-      'orientationMonth',
-      'orientationPlace',
-      'orientationYear',
-      'readListDigits',
-      'readListLetters',
-      'serialSeven',
-      'trailMaking',
-      'uncuedRecall'
+      'abstraction',
+      'attention',
+      'delayedRecall',
+      'language',
+      'naming',
+      'orientation',
+      'visuospatialExecutive'
     ]
   }
 });
