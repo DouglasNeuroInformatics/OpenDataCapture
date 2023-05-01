@@ -48,7 +48,7 @@ export const NumericField = ({
             })}
             htmlFor={name}
           >
-            {label}
+            {`${label} (${min}-${max})`}
           </label>
         </>
       )}
