@@ -1,5 +1,10 @@
 import { createTranslatedForms } from '..';
 
+const genericLabels = {
+  en: 'Value',
+  fr: 'Valeur'
+} as const;
+
 export type MiniMentalStateExaminationData = {
   year: number;
   season: number;
@@ -125,7 +130,7 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           kind: 'numeric',
           label: {
             en: 'What day of the week is this?',
-            fr: "Quel jour de la semaine sommes-nous ?"
+            fr: 'Quel jour de la semaine sommes-nous ?'
           },
           description: {
             en: 'Accept exact answer only',
@@ -147,10 +152,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           kind: 'numeric',
           label: {
             en: 'What country are we in?',
-            fr: "Dans quel pays nous trouvons-nous ?"
+            fr: 'Dans quel pays nous trouvons-nous ?'
           },
           description: {
-            en: "Accept exact answer only",
+            en: 'Accept exact answer only',
             fr: "N'accepter que les réponses exactes"
           },
           variant: 'default',
@@ -161,10 +166,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           kind: 'numeric',
           label: {
             en: 'What province are we in?',
-            fr: "Dans quelle province nous trouvons-nous ?"
+            fr: 'Dans quelle province nous trouvons-nous ?'
           },
           description: {
-            en: "Accept exact answer only",
+            en: 'Accept exact answer only',
             fr: "N'accepter que les réponses exactes"
           },
           variant: 'default',
@@ -175,10 +180,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           kind: 'numeric',
           label: {
             en: 'What city/town are we in?',
-            fr: "Dans quelle ville nous trouvons-nous ?"
+            fr: 'Dans quelle ville nous trouvons-nous ?'
           },
           description: {
-            en: "Accept exact answer only",
+            en: 'Accept exact answer only',
             fr: "N'accepter que la réponse exacte"
           },
           variant: 'default',
@@ -189,10 +194,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           kind: 'numeric',
           label: {
             en: 'What is the name of this building?',
-            fr: "Quel est le nom de ce bâtiment ?"
+            fr: 'Quel est le nom de ce bâtiment ?'
           },
           description: {
-            en: "Accept exact name of institution only",
+            en: 'Accept exact name of institution only',
             fr: "N'accepter que le nom exact de l'institution"
           },
           variant: 'default',
@@ -203,10 +208,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
           kind: 'numeric',
           label: {
             en: 'What floor of the building are we on?',
-            fr: "A quel étage du bâtiment nous trouvons-nous ?"
+            fr: 'A quel étage du bâtiment nous trouvons-nous ?'
           },
           description: {
-            en: "Accept exact answer only",
+            en: 'Accept exact answer only',
             fr: "N'accepter que la réponse exacte"
           },
           variant: 'default',
@@ -220,13 +225,14 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         en: 'Time: 20 seconds',
         fr: 'Durée : 20 secondes'
       },
+      description: {
+        en: 'Say: I am going to name three objects. When I am finished, I want you to repeat them. Remember what they are because I am going to ask you to name them again in a few minutes. Say the following words slowly at approximately one-second intervals: Ball / Car / Man.',
+        fr: "Dites : Je vais nommer trois objets. Quand j'aurai fini, je veux que vous les répétiez. Souvenez-vous de ce que c'est parce que je vais vous demander de les nommer à nouveau dans quelques minutes. Dites les mots suivants lentement à environ une seconde d'intervalle : Balle / Voiture / Homme."
+      },
       fields: {
         learningScore: {
           kind: 'numeric',
-          label: {
-            en: 'Say: I am going to name three objects. When I am finished, I want you to repeat them. Remember what they are because I am going to ask you to name them again in a few minutes. Say the following words slowly at approximately one-second intervals: Ball / Car / Man.',
-            fr: "Dites : Je vais nommer trois objets. Quand j'aurai fini, je veux que vous les répétiez. Souvenez-vous de ce que c'est parce que je vais vous demander de les nommer à nouveau dans quelques minutes. Dites les mots suivants lentement à environ une seconde d'intervalle : Balle / Voiture / Homme."
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 3
@@ -238,13 +244,14 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         en: 'Time: 30 seconds',
         fr: 'Durée : 30 secondes'
       },
+      description: {
+        en: 'Spell the word WORLD (you may help the person to spell the word correctly). Say: Now spell it backwards please. If the subject cannot spell world even with assistance, score 0.',
+        fr: "Épellez le mot MONDE (vous pouvez aider la personne à épeler le mot correctement). Dites : Maintenant, épellez-le à l'envers, s'il vous plaît. Si le sujet ne peut pas épeler monde même avec de l'aide, marquez 0."
+      },
       fields: {
         spellWorldScore: {
           kind: 'numeric',
-          label: {
-            en: 'Spell the word WORLD (you may help the person to spell the word correctly). Say: Now spell it backwards please. If the subject cannot spell world even with assistance, score 0.',
-            fr: "Épellez le mot MONDE (vous pouvez aider la personne à épeler le mot correctement). Dites : Maintenant, épellez-le à l'envers, s'il vous plaît. Si le sujet ne peut pas épeler monde même avec de l'aide, marquez 0."
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 5
@@ -256,13 +263,14 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         en: 'Time: 10 seconds',
         fr: 'Time: 10 seconds'
       },
+      description: {
+        en: 'Say: Now what were the three objects I asked you to remember? (score one point for each correct answer regardless of order).',
+        fr: "Dites : Maintenant, quels sont les trois objets dont je vous ai demandé de vous souvenir ? (marquez un point pour chaque réponse correcte, quel que soit l'ordre)."
+      },
       fields: {
         recallScore: {
           kind: 'numeric',
-          label: {
-            en: 'Say: Now what were the three objects I asked you to remember? (score one point for each correct answer regardless of order).',
-            fr: "Dites : Maintenant, quels sont les trois objets dont je vous ai demandé de vous souvenir ? (marquez un point pour chaque réponse correcte, quel que soit l'ordre)."
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 3
@@ -274,13 +282,14 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         en: 'Time: 10 seconds',
         fr: 'Durée : 10 secondes'
       },
+      description: {
+        en: 'Show wristwatch. Ask: What is this called? (score one point for correct response, e.g., accept “wristwatch” or “watch”, but do not accept “clock” or “time”).',
+        fr: 'Montrer la montre-bracelet. Demandez : Quel est le nom de cet objet ? (marquez un point pour une réponse correcte, par exemple, acceptez "montre-bracelet" ou "montre", mais n\'acceptez pas "horloge" ou "heure").'
+      },
       fields: {
         canNameWatch: {
           kind: 'numeric',
-          label: {
-            en: 'Show wristwatch. Ask: What is this called? (score one point for correct response, e.g., accept “wristwatch” or “watch”, but do not accept “clock” or “time”).',
-            fr: 'Montrer la montre-bracelet. Demandez : Quel est le nom de cet objet ? (marquez un point pour une réponse correcte, par exemple, acceptez "montre-bracelet" ou "montre", mais n\'acceptez pas "horloge" ou "heure").'
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 1
@@ -291,14 +300,15 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       title: {
         en: 'Time: 10 seconds',
         fr: 'Durée : 10 secondes'
+      },
+      description: {
+        en: 'Show pencil. Ask: What is this called?',
+        fr: 'Montrer un crayon. Quel est le nom de cet objet ?'
       },
       fields: {
         canNamePencil: {
           kind: 'numeric',
-          label: {
-            en: 'Show pencil. Ask: What is this called?',
-            fr: 'Montrer un crayon. Quel est le nom de cet objet ?'
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 1
@@ -309,14 +319,15 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       title: {
         en: 'Time: 10 seconds',
         fr: 'Durée : 10 secondes'
+      },
+      description: {
+        en: 'Say: I would like you to repeat a phrase after me: No ifs, ands or buts',
+        fr: 'Dites : Je voudrais que vous répétiez une phrase après moi : Pas de si, ni de et, ni de mais'
       },
       fields: {
         canRepeatPhrase: {
           kind: 'numeric',
-          label: {
-            en: 'Say: I would like you to repeat a phrase after me: No ifs, ands or buts',
-            fr: 'Dites : Je voudrais que vous répétiez une phrase après moi : Pas de si, ni de et, ni de mais'
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 1
@@ -328,13 +339,14 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         en: 'Time: 10 seconds',
         fr: 'Durée : 10 secondes'
       },
+      description: {
+        en: 'Say: Read the words on this page and then do what it says. Then, hand the person the sheet with CLOSE YOUR EYES on it. If the subject just reads and does not close eyes, you may repeat: read the words on this page and then do what it says, (a maximum of three times). Score one point only if the subject closes eyes. The subject does not have to read aloud.',
+        fr: "Dites : Lisez les mots de cette page et faites ce qui est écrit. Ensuite, remettez à la personne la feuille sur laquelle est écrit FERMEZ LES YEUX. Si le sujet se contente de lire et ne ferme pas les yeux, vous pouvez répéter : lisez les mots de cette page et faites ce qui est écrit (trois fois au maximum). Ne marquez qu'un point si le sujet ferme les yeux. Le sujet n'est pas obligé de lire à haute voix."
+      },
       fields: {
         canFollowWrittenInstructions: {
           kind: 'numeric',
-          label: {
-            en: 'Say: Read the words on this page and then do what it says. Then, hand the person the sheet with CLOSE YOUR EYES on it. If the subject just reads and does not close eyes, you may repeat: read the words on this page and then do what it says, (a maximum of three times). Score one point only if the subject closes eyes. The subject does not have to read aloud.',
-            fr: "Dites : Lisez les mots de cette page et faites ce qui est écrit. Ensuite, remettez à la personne la feuille sur laquelle est écrit FERMEZ LES YEUX. Si le sujet se contente de lire et ne ferme pas les yeux, vous pouvez répéter : lisez les mots de cette page et faites ce qui est écrit (trois fois au maximum). Ne marquez qu'un point si le sujet ferme les yeux. Le sujet n'est pas obligé de lire à haute voix."
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 1
@@ -346,13 +358,14 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         en: 'Time: 30 seconds',
         fr: 'Durée : 30 secondes'
       },
+      description: {
+        en: 'Hand the person a pencil and paper. Say: Write any complete sentence on that piece of paper. Score one point. The sentence must make sense. Ignore spelling errors.',
+        fr: "Donnez à la personne un crayon et du papier. Dites : Écrivez une phrase complète sur ce morceau de papier. Marquez un point. La phrase doit avoir un sens. Ne tenez pas compte des fautes d'orthographe."
+      },
       fields: {
         canWriteSentence: {
           kind: 'numeric',
-          label: {
-            en: 'Hand the person a pencil and paper. Say: Write any complete sentence on that piece of paper. Score one point. The sentence must make sense. Ignore spelling errors.',
-            fr: "Donnez à la personne un crayon et du papier. Dites : Écrivez une phrase complète sur ce morceau de papier. Marquez un point. La phrase doit avoir un sens. Ne tenez pas compte des fautes d'orthographe."
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 1
@@ -364,13 +377,14 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         en: 'Time: 1 minute maximum',
         fr: 'Durée : 1 minute maximum'
       },
+      description: {
+        en: 'Place design, eraser and pencil in front of the person. Say: Copy this design please. Allow multiple tries. Wait until the person is finished and hands it back. Score one point for a correctly copied diagram. The person must have drawn a four-sided figure between two five-sided figures.',
+        fr: "Placez le dessin, la gomme et le crayon devant la personne. Dites : Copiez ce dessin, s'il vous plaît. Permettez plusieurs essais. Attendez que la personne ait terminé et rende le dessin. Marquez un point pour un diagramme correctement copié. La personne doit avoir dessiné une figure à quatre côtés entre deux figures à cinq côtés."
+      },
       fields: {
         canCopyDesign: {
           kind: 'numeric',
-          label: {
-            en: 'Place design, eraser and pencil in front of the person. Say: Copy this design please. Allow multiple tries. Wait until the person is finished and hands it back. Score one point for a correctly copied diagram. The person must have drawn a four-sided figure between two five-sided figures.',
-            fr: "Placez le dessin, la gomme et le crayon devant la personne. Dites : Copiez ce dessin, s'il vous plaît. Permettez plusieurs essais. Attendez que la personne ait terminé et rende le dessin. Marquez un point pour un diagramme correctement copié. La personne doit avoir dessiné une figure à quatre côtés entre deux figures à cinq côtés."
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 1
@@ -382,13 +396,14 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
         en: 'Time: 30 seconds',
         fr: 'Durée : 30 secondes'
       },
+      description: {
+        en: 'Ask the person if he is right or left handed. Take a piece of paper, hold it up in front of the person and say: Take this paper in your right/left hand (whichever is non-dominant), fold the paper in half once with both hands and put the paper down on the floor.',
+        fr: "Demandez à la personne si elle est droitière ou gauchère. Prenez une feuille de papier, tenez-la devant la personne et dites : Prenez cette feuille dans votre main droite/gauche (celle qui n'est pas dominante), pliez-la en deux avec vos deux mains : Prenez cette feuille dans votre main droite/gauche (celle qui n'est pas dominante), pliez-la en deux avec vos deux mains et posez-la sur le sol. une fois avec les deux mains et posez le papier sur le sol."
+      },
       fields: {
         canFollowOralInstructions: {
           kind: 'numeric',
-          label: {
-            en: 'Ask the person if he is right or left handed. Take a piece of paper, hold it up in front of the person and say: Take this paper in your right/left hand (whichever is non-dominant), fold the paper in half once with both hands and put the paper down on the floor.',
-            fr: "Demandez à la personne si elle est droitière ou gauchère. Prenez une feuille de papier, tenez-la devant la personne et dites : Prenez cette feuille dans votre main droite/gauche (celle qui n'est pas dominante), pliez-la en deux avec vos deux mains : Prenez cette feuille dans votre main droite/gauche (celle qui n'est pas dominante), pliez-la en deux avec vos deux mains et posez-la sur le sol. une fois avec les deux mains et posez le papier sur le sol."
-          },
+          label: genericLabels,
           variant: 'default',
           min: 0,
           max: 3,
