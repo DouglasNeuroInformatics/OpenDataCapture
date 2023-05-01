@@ -20,7 +20,7 @@
     "publish-packages": "turbo run build lint test && changeset version && changeset publish",
     "storybook": "yarn ws @douglasneuroinformatics/client storybook",
     "test": "env-cmd turbo run test",
-    "ws": "./scripts/workspace.sh"
+    "ws": "sh -c 'yarn workspace \"@douglasneuroinformatics/$0\" \"${@:1}\"'"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
