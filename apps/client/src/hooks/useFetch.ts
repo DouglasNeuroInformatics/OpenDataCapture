@@ -16,7 +16,9 @@ const baseURL = import.meta.env.VITE_API_HOST;
 export function useFetch<T = unknown>(
   resourceURL: string | null,
   deps: readonly unknown[] = [],
-  onError?: (error: unknown) => void
+  options: {
+    onError?: (error: unknown) => void;
+  } = {}
 ): {
   data: T | null;
   setData: React.Dispatch<React.SetStateAction<T | null>>;
@@ -51,7 +53,7 @@ export function useFetch<T = unknown>(
           return response.json();
         })
         .then((data: T) => setData(data))
-        .catch(onError ?? setError);
+        .catch(options?.onError ?? setError);
     } else {
       setData(null);
     }
