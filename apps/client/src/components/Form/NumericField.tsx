@@ -30,7 +30,7 @@ export const NumericField = ({
   };
 
   return (
-    <FormFieldContainer error={error}>
+    <FormFieldContainer description={variant === 'default' ? description : undefined} error={error}>
       {variant === 'default' && (
         <>
           <input
