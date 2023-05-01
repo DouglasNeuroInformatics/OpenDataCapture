@@ -19,7 +19,6 @@
   "scripts": {
     "build": "tsup",
     "check-types": "tsc --noEmit",
-    "dev": "tsup --watch",
     "lint": "eslint --fix src"
   },
   "dependencies": {
