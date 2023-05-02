@@ -1,14 +1,6 @@
 version: '3'
 services:
-  # reverse-proxy:
-  #   build:
-  #     context: ./apps/reverse-proxy
-  #     dockerfile: ./apps/reverse-proxy/Dockerfile
-  # volumes:
-  # depends_on:
-  #   - server
-
-  frontend-server:
+  client:
     build:
       context: .
       dockerfile: ./apps/client/Dockerfile
@@ -21,8 +13,7 @@ services:
     ports:
       - '3000:3000'
     restart: always
-
-  api-server:
+  server:
     build:
       context: .
       dockerfile: ./apps/server/Dockerfile
@@ -38,7 +29,6 @@ services:
     ports:
       - '5500:5500'
     restart: always
-
   mongo:
     container_name: mongo
     image: mongo:6.0.2
