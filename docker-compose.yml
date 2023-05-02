@@ -6,7 +6,7 @@ services:
       dockerfile: ./apps/client/Dockerfile
       args:
         - NODE_ENV=production
-        - VITE_API_HOST=http://server:5500
+        - VITE_API_HOST=https://datacapture.douglasneuroinformatics.ca:5500/api/v1
         - VITE_DEV_SERVER_PORT=3000
     expose:
       - 3000
@@ -17,6 +17,11 @@ services:
     build:
       context: .
       dockerfile: ./apps/server/Dockerfile
+      args:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017
+      - SERVER_PORT=5500
+      - SECRET_KEY
     depends_on:
       - mongo
     environment:

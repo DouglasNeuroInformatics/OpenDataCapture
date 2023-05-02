@@ -74,7 +74,7 @@ const DEMO_USERS: CreateUserDto[] = [
 })
 export class InitDemoCommand extends CommandRunner {
   private readonly ability = createMongoAbility<AppAbility>([{ action: 'manage', subject: 'all' }]);
-  private readonly demoDbNames = ['development', 'demo', 'test'];
+  private readonly demoDbNames = ['development', 'demo', 'test', 'production'];
   private readonly logger = new Logger(InitDemoCommand.name);
 
   constructor(
