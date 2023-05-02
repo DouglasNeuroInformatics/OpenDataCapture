@@ -64,8 +64,8 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
       fr: 'Questionnaire démographique détaillé'
     },
     description: {
-      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration',
-      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets"
+      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
+      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
     },
     instructions: {
       en: 'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.',
