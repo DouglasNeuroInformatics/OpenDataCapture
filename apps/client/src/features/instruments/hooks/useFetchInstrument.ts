@@ -22,15 +22,17 @@ export function useFetchInstrument(identifier: string) {
   const { data: instrument } = useFetch<FormInstrument>(
     `/instruments/forms/${identifier}?lang=${preferredLanguage}`,
     [preferredLanguage],
-    (error) => {
-      setPreferredLanguage((prevLanguage) => {
-        if (prevLanguage === 'en') {
-          return 'fr';
-        }
-        return 'en';
-      });
-      notifications.add({ type: 'warning', message: t('fetchInstrument.notFound') });
-      console.error(error);
+    {
+      onError: (error) => {
+        setPreferredLanguage((prevLanguage) => {
+          if (prevLanguage === 'en') {
+            return 'fr';
+          }
+          return 'en';
+        });
+        notifications.add({ type: 'warning', message: t('fetchInstrument.notFound') });
+        console.error(error);
+      }
     }
   );
 

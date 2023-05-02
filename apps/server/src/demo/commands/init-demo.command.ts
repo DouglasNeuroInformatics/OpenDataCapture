@@ -57,6 +57,14 @@ const DEMO_USERS: CreateUserDto[] = [
     basePermissionLevel: BasePermissionLevel.GroupManager,
     firstName: 'Jane',
     lastName: 'Doe'
+  },
+  {
+    username: 'FrançoisBouchard',
+    password: 'Douglas123',
+    groupNames: ['Psychosis Clinic'],
+    basePermissionLevel: BasePermissionLevel.Standard,
+    firstName: 'François',
+    lastName: 'Bouchard'
   }
 ];
 

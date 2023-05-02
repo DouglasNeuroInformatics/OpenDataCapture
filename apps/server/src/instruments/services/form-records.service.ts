@@ -124,7 +124,7 @@ export class FormRecordsService {
     const data: InstrumentRecordsExport = [];
     for (let i = 0; i < subjects.length; i++) {
       const subject = subjects[i];
-      const records = await this.formRecordsModel.find({ kind: 'form', group, subject }, undefined, ['instrument']);
+      const records = await this.formRecordsModel.find({ kind: 'form', group, subject }).populate('instrument');
       for (let j = 0; j < records.length; j++) {
         const record = records[j];
         for (const measure of Object.keys(record.data)) {

@@ -1,10 +1,5 @@
 import { createTranslatedForms } from '..';
 
-const genericLabels = {
-  en: 'Value',
-  fr: 'Valeur'
-} as const;
-
 export type MiniMentalStateExaminationData = {
   year: number;
   season: number;
@@ -232,7 +227,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         learningScore: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Learning Score',
+            fr: "Score d'apprentissage"
+          },
           variant: 'default',
           min: 0,
           max: 3
@@ -251,7 +249,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         spellWorldScore: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Spelling Score',
+            fr: "Score d'orthographe"
+          },
           variant: 'default',
           min: 0,
           max: 5
@@ -270,7 +271,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         recallScore: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Recall Score',
+            fr: 'Score de rappel'
+          },
           variant: 'default',
           min: 0,
           max: 3
@@ -289,7 +293,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         canNameWatch: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Name Watch Score',
+            fr: 'Peut nommer une montre'
+          },
           variant: 'default',
           min: 0,
           max: 1
@@ -308,7 +315,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         canNamePencil: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Name Pencil Score',
+            fr: 'Peut nommer un crayon'
+          },
           variant: 'default',
           min: 0,
           max: 1
@@ -327,7 +337,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         canRepeatPhrase: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Repeat Phrase Score',
+            fr: 'Peut répéter une phrase'
+          },
           variant: 'default',
           min: 0,
           max: 1
@@ -346,7 +359,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         canFollowWrittenInstructions: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Follow Written Instructions Score',
+            fr: 'Peut suivre des instructions écrites'
+          },
           variant: 'default',
           min: 0,
           max: 1
@@ -365,7 +381,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         canWriteSentence: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Write Sentence Score',
+            fr: 'Peut écrire une phrase'
+          },
           variant: 'default',
           min: 0,
           max: 1
@@ -384,7 +403,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         canCopyDesign: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Copy Design Score',
+            fr: 'Peut copier le dessin'
+          },
           variant: 'default',
           min: 0,
           max: 1
@@ -403,7 +425,10 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       fields: {
         canFollowOralInstructions: {
           kind: 'numeric',
-          label: genericLabels,
+          label: {
+            en: 'Follow Oral Instructions Score',
+            fr: 'Peut suivre des instructions orales'
+          },
           variant: 'default',
           min: 0,
           max: 3,
