@@ -13,7 +13,6 @@ async function bootstrap(): Promise<void> {
     defaultVersion: '1',
     type: VersioningType.URI
   });
-  app.setGlobalPrefix('/api');
 
   const documentBuilder = new DocumentBuilder()
     .setTitle('The Douglas Data Capture Platform')
@@ -34,7 +33,7 @@ async function bootstrap(): Promise<void> {
     .build();
 
   const document = SwaggerModule.createDocument(app, documentBuilder);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('/', app, document);
 
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('SERVER_PORT');
