@@ -2,7 +2,8 @@
 FROM node:18 AS builder
 WORKDIR /app
 COPY . .
-RUN npx turbo prune --scope=client --docker
+# @douglasneuroinformatics
+RUN npx turbo prune --scope=@douglasneuroinformatics/client --docker 
 
 # Install dependencies
 FROM node:18 AS installer
@@ -20,7 +21,7 @@ ENV VITE_API_HOST=${VITE_API_HOST}
 
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
-RUN yarn turbo run build --filter=client
+RUN yarn turbo run build --filter=@douglasneuroinformatics/client
 
 # Run as non-root user when finalized
 FROM node:18 AS runner
