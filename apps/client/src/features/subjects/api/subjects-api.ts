@@ -5,10 +5,10 @@ import { IdentificationFormData } from '@/components';
 
 export class SubjectsAPI {
   static async addSubject(data: IdentificationFormData) {
-    await axios.post('/subjects', data);
+    await axios.post('/v1/subjects', data);
   }
 
   static async lookupSubject(data: IdentificationFormData) {
-    return axios.post<Subject>('/subjects/lookup', data);
+    return axios.post<Subject>('/v1/subjects/lookup', data);
   }
 }

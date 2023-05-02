@@ -20,6 +20,16 @@ RUN yarn turbo run build --filter=@douglasneuroinformatics/server
 # Run as non-root user
 FROM node:18 AS runner
 WORKDIR /app
+
+ARG SECRET_KEY
+ENV SECRET_KEY=${SECRET_KEY}
+ARG NODE_ENV
+ENV NODE_ENV=${NODE_ENV}
+ARG MONGO_URI
+ENV MONGO_URI=${MONGO_URI}
+ARG SERVER_PORT
+ENV SERVER_PORT=${SERVER_PORT}
+
 RUN addgroup --system --gid 1001 server
 RUN adduser --system --uid 1001 server
 USER server

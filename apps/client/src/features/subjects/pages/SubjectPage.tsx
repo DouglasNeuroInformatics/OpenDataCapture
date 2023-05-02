@@ -13,7 +13,7 @@ export const SubjectPage = () => {
   const params = useParams();
   const { i18n, t } = useTranslation('subjects');
   const { data } = useFetch<SubjectFormRecords[]>(
-    `/instruments/records/forms?subject=${params.subjectIdentifier!}&lang=${i18n.resolvedLanguage}`,
+    `/v1/instruments/records/forms?subject=${params.subjectIdentifier!}&lang=${i18n.resolvedLanguage}`,
     [i18n.resolvedLanguage]
   );
 

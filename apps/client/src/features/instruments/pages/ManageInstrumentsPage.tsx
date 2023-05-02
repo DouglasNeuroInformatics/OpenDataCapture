@@ -11,7 +11,7 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 export const ManageInstrumentsPage = () => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const { t } = useTranslation('instruments');
-  const { data, setData } = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
+  const { data, setData } = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available');
   const notifications = useNotificationsStore();
 
   /*

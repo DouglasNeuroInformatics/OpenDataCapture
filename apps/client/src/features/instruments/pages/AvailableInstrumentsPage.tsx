@@ -9,7 +9,7 @@ import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 export const AvailableInstrumentsPage = () => {
-  const { data } = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
+  const { data } = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available');
   const { t } = useTranslation('instruments');
 
   if (!data) {

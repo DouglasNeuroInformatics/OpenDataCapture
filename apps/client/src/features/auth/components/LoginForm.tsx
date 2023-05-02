@@ -45,7 +45,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   }, []);
 
   const login = async (credentials: LoginFormData) => {
-    const response = await axios.post<AuthPayload>('/auth/login', credentials, {
+    const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
       // Do not throw if unauthorized
       validateStatus: (status) => status === 200 || status === 401
     });

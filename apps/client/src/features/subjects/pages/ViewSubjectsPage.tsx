@@ -9,7 +9,7 @@ import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 export const ViewSubjectsPage = () => {
-  const { data } = useFetch<Subject[]>('/subjects');
+  const { data } = useFetch<Subject[]>('/v1/subjects');
   const { t } = useTranslation('subjects');
 
   if (!data) {

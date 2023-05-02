@@ -40,7 +40,7 @@ export const FormPage = () => {
 
   const handleSubmit = async (data: FormInstrumentData) => {
     const now = new Date();
-    await axios.post('/instruments/records/forms', {
+    await axios.post('/v1/instruments/records/forms', {
       kind: 'form',
       dateCollected: DateUtils.toBasicISOString(now),
       instrumentName: instrument.name,

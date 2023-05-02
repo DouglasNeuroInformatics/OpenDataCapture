@@ -1,0 +1,31 @@
+version: '3'
+services:
+  # 1. Login to github repository using `docker login` cf. https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
+  # ie. echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
+  client:
+    image: ghcr.io/douglasneuroinformatics/douglasdatacaptureplatform-client:latest
+    expose:
+      - 3000
+    ports:
+      - '3000:3000'
+    restart: always
+  server:
+    image: ghcr.io/douglasneuroinformatics/douglasdatacaptureplatform-server:latest
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017
+      - SERVER_PORT=5500
+      - SECRET_KEY
+    expose:
+      - 5500
+    ports:
+      - '5500:5500'
+    restart: always
+
+  mongo:
+    image: ghcr.io/douglasneuroinformatics/douglasdatacaptureplatform-mongo:latest
+    container_name: mongo
+    ports:
+      - '27017:27017'

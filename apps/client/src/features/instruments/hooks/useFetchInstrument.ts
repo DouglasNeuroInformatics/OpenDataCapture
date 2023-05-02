@@ -20,7 +20,7 @@ export function useFetchInstrument(identifier: string) {
   }, [i18n.resolvedLanguage]);
 
   const { data: instrument } = useFetch<FormInstrument>(
-    `/instruments/forms/${identifier}?lang=${preferredLanguage}`,
+    `/v1/instruments/forms/${identifier}?lang=${preferredLanguage}`,
     [preferredLanguage],
     {
       onError: (error) => {
