@@ -27,6 +27,7 @@ export class AbilityFactory {
         ability.can('read', 'User', { groups: { $in: user.groups } });
         break;
       case BasePermissionLevel.Standard:
+        ability.can('read', 'Group', { _id: { $in: user.groups } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
         ability.can('create', 'Subject');
