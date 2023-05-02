@@ -24,7 +24,7 @@ export const Review = ({ form }: ReviewProps) => {
   const notifications = useNotificationsStore();
 
   const submitForm = async () => {
-    await axios.post('/instruments/forms', form);
+    await axios.post('/v1/instruments/forms', form);
     setIsSubmitted(true);
     notifications.add({ type: 'success' });
   };

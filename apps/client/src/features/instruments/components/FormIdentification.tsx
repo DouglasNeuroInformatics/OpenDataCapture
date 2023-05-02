@@ -15,7 +15,7 @@ export const FormIdentification = () => {
   const { t } = useTranslation('common');
 
   const handleSubmit = async (data: IdentificationFormData) => {
-    const response = await axios.post('/subjects/lookup', data, {
+    const response = await axios.post('/v1/subjects/lookup', data, {
       validateStatus: (status) => status === 201 || status === 404
     });
     if (response.status === 404) {

@@ -22,7 +22,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const [showLookup, setShowLookup] = useState(false);
 
   const getExportRecords = async () => {
-    const url = '/instruments/records/forms/export' + (currentGroup ? `?group=${currentGroup.name}` : '');
+    const url = '/v1/instruments/records/forms/export' + (currentGroup ? `?group=${currentGroup.name}` : '');
     const response = await axios.get<InstrumentRecordsExport>(url);
     return response.data;
   };

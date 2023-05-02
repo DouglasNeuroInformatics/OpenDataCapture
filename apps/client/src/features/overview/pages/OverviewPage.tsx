@@ -19,22 +19,22 @@ export const OverviewPage = () => {
 
   const groupQuery = currentGroup ? `?group=${currentGroup.name}` : '';
 
-  const forms = useFetch<FormInstrumentSummary[]>('/instruments/forms/available', [], {
+  const forms = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available', [], {
     access: { action: 'read', subject: 'User' }
   });
 
   const records = useFetch<FormInstrumentRecordsSummary>(
-    '/instruments/records/forms/summary' + groupQuery,
+    '/v1/instruments/records/forms/summary' + groupQuery,
     [currentGroup],
     {
       access: { action: 'read', subject: 'User' }
     }
   );
 
-  const subjects = useFetch<Subject[]>('/subjects' + groupQuery, [currentGroup], {
+  const subjects = useFetch<Subject[]>('/v1/subjects' + groupQuery, [currentGroup], {
     access: { action: 'read', subject: 'User' }
   });
-  const users = useFetch<User[]>('/users' + groupQuery, [currentGroup], {
+  const users = useFetch<User[]>('/v1/users' + groupQuery, [currentGroup], {
     access: { action: 'read', subject: 'User' }
   });
 
