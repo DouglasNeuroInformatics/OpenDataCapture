@@ -19,14 +19,26 @@ export const OverviewPage = () => {
 
   const groupQuery = currentGroup ? `?group=${currentGroup.name}` : '';
 
-  const forms = useFetch<FormInstrumentSummary[]>('/instruments/forms/available');
-  const records = useFetch<FormInstrumentRecordsSummary>('/instruments/records/forms/summary' + groupQuery, [
-    currentGroup
-  ]);
-  const subjects = useFetch<Subject[]>('/subjects' + groupQuery, [currentGroup]);
-  const users = useFetch<User[]>('/users' + groupQuery, [currentGroup]);
+  const forms = useFetch<FormInstrumentSummary[]>('/instruments/forms/available', [], {
+    access: { action: 'read', subject: 'Instrument' }
+  });
 
-  if (!(forms.data && records.data && subjects.data && users.data)) {
+  const records = useFetch<FormInstrumentRecordsSummary>(
+    '/instruments/records/forms/summary' + groupQuery,
+    [currentGroup],
+    {
+      access: { action: 'read', subject: 'User' }
+    }
+  );
+
+  const subjects = useFetch<Subject[]>('/subjects' + groupQuery, [currentGroup], {
+    access: { action: 'read', subject: 'User' }
+  });
+  const users = useFetch<User[]>('/users' + groupQuery, [currentGroup], {
+    access: { action: 'read', subject: 'User' }
+  });
+
+  if (forms.isLoading || records.isLoading || subjects.isLoading || users.isLoading) {
     return <Spinner />;
   }
 
@@ -41,14 +53,20 @@ export const OverviewPage = () => {
         </div>
         <div className="body-font text-slate-600">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            <StatisticCard icon={<HiUsers />} label={t('stats.totalUsers')} value={users.data.length} />
-            <StatisticCard icon={<HiUser />} label={t('stats.totalSubjects')} value={subjects.data.length} />
-            <StatisticCard
-              icon={<HiClipboardDocument />}
-              label={t('stats.totalInstruments')}
-              value={forms.data.length}
-            />
-            <StatisticCard icon={<HiDocumentText />} label={t('stats.totalRecords')} value={records.data.count} />
+            {users.data && <StatisticCard icon={<HiUsers />} label={t('stats.totalUsers')} value={users.data.length} />}
+            {subjects.data && (
+              <StatisticCard icon={<HiUser />} label={t('stats.totalSubjects')} value={subjects.data.length} />
+            )}
+            {forms.data && (
+              <StatisticCard
+                icon={<HiClipboardDocument />}
+                label={t('stats.totalInstruments')}
+                value={forms.data.length}
+              />
+            )}
+            {records.data && (
+              <StatisticCard icon={<HiDocumentText />} label={t('stats.totalRecords')} value={records.data.count} />
+            )}
           </div>
         </div>
       </section>
