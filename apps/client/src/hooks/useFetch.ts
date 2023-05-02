@@ -20,6 +20,7 @@ export type UseFetchOptions = {
 export type UseFetchReturn<T> = {
   data: T | null;
   setData: React.Dispatch<React.SetStateAction<T | null>>;
+  isLoading: boolean;
 };
 
 /**
@@ -39,6 +40,7 @@ export function useFetch<T = unknown>(
   const notifications = useNotificationsStore();
 
   const [data, setData] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const url = new URL(baseURL + resourceURL);
 
@@ -59,6 +61,7 @@ export function useFetch<T = unknown>(
 
   useEffect(() => {
     if (isAuthorized) {
+      setIsLoading(true);
       fetch(url, {
         method: 'GET',
         headers: {
@@ -74,11 +77,12 @@ export function useFetch<T = unknown>(
           return response.json();
         })
         .then((data: T) => setData(data))
-        .catch(options?.onError ?? setError);
+        .catch(options?.onError ?? setError)
+        .finally(() => setIsLoading(false));
     } else {
       setData(null);
     }
   }, deps);
 
-  return { data, setData };
+  return { data, setData, isLoading };
 }
