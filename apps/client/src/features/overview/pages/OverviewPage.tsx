@@ -20,7 +20,7 @@ export const OverviewPage = () => {
   const groupQuery = currentGroup ? `?group=${currentGroup.name}` : '';
 
   const forms = useFetch<FormInstrumentSummary[]>('/instruments/forms/available', [], {
-    access: { action: 'read', subject: 'Instrument' }
+    access: { action: 'read', subject: 'User' }
   });
 
   const records = useFetch<FormInstrumentRecordsSummary>(
@@ -38,7 +38,11 @@ export const OverviewPage = () => {
     access: { action: 'read', subject: 'User' }
   });
 
-  if (forms.isLoading || records.isLoading || subjects.isLoading || users.isLoading) {
+  const isAllDataDefined = forms.data && records.data && subjects.data && users.data;
+  const isAnyLoading = forms.isLoading || records.isLoading || subjects.isLoading || users.isLoading;
+
+  // If it is the first time loading data
+  if (!isAllDataDefined && isAnyLoading) {
     return <Spinner />;
   }
 
@@ -53,19 +57,17 @@ export const OverviewPage = () => {
         </div>
         <div className="body-font text-slate-600">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            {users.data && <StatisticCard icon={<HiUsers />} label={t('stats.totalUsers')} value={users.data.length} />}
-            {subjects.data && (
-              <StatisticCard icon={<HiUser />} label={t('stats.totalSubjects')} value={subjects.data.length} />
-            )}
-            {forms.data && (
-              <StatisticCard
-                icon={<HiClipboardDocument />}
-                label={t('stats.totalInstruments')}
-                value={forms.data.length}
-              />
-            )}
-            {records.data && (
-              <StatisticCard icon={<HiDocumentText />} label={t('stats.totalRecords')} value={records.data.count} />
+            {forms.data && records.data && subjects.data && users.data && (
+              <>
+                <StatisticCard icon={<HiUsers />} label={t('stats.totalUsers')} value={users.data.length} />
+                <StatisticCard icon={<HiUser />} label={t('stats.totalSubjects')} value={subjects.data.length} />
+                <StatisticCard
+                  icon={<HiClipboardDocument />}
+                  label={t('stats.totalInstruments')}
+                  value={forms.data.length}
+                />
+                <StatisticCard icon={<HiDocumentText />} label={t('stats.totalRecords')} value={records.data.count} />
+              </>
             )}
           </div>
         </div>
