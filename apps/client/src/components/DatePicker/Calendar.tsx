@@ -9,16 +9,16 @@ export interface CalendarProps {
   onSelection: (date: Date) => void;
 }
 
-export const Calendar = ({ year, month, onSelection }: CalendarProps) => {
+export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calendar(props, ref) {
   const { t } = useTranslation('datetime');
 
   const dayNames = t('days').map((day) => day.charAt(0).toUpperCase());
-  const firstDay = new Date(year, month).getDay();
-  const lastDay = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(props.year, props.month).getDay();
+  const lastDay = new Date(props.year, props.month + 1, 0).getDate();
   const days = range(1, lastDay + 1);
 
   return (
-    <div className="grid w-72 grid-cols-7 gap-4">
+    <div className="grid w-72 grid-cols-7 gap-4" ref={ref}>
       {dayNames.map((name, i) => (
         <div className="flex items-center justify-center" key={i}>
           {name}
@@ -30,11 +30,11 @@ export const Calendar = ({ year, month, onSelection }: CalendarProps) => {
           className="flex h-8 w-8 items-center justify-center rounded-full text-sm hover:bg-slate-200"
           key={day}
           type="button"
-          onClick={() => onSelection(new Date(year, month, day))}
+          onClick={() => props.onSelection(new Date(props.year, props.month, day))}
         >
           {day}
         </button>
       ))}
     </div>
   );
-};
+});

@@ -18,7 +18,7 @@
     "lint": "turbo run lint",
     "prepare": "husky install",
     "publish-packages": "turbo run build lint test && changeset version && changeset publish",
-    "storybook": "yarn ws @douglasneuroinformatics/client storybook",
+    "storybook": "yarn ws client storybook",
     "test": "env-cmd turbo run test",
     "ws": "sh -c 'yarn workspace \"@douglasneuroinformatics/$0\" \"${@:1}\"'"
   },

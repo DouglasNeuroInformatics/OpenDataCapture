@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Calendar } from './Calendar';
 import { YearSelector } from './YearSelector';
 
-import { ArrowToggle, TransitionOpacity } from '@/components';
+import { ArrowToggle } from '@/components';
 
 interface IncrementAction {
   type: 'increment';
@@ -83,12 +83,13 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
           />
         </div>
       </div>
-      <TransitionOpacity show={!showYearSelector}>
-        <Calendar month={date.getMonth()} year={date.getFullYear()} onSelection={onSelection} />
-      </TransitionOpacity>
-      <TransitionOpacity show={showYearSelector}>
-        <YearSelector currentDate={date} onSelection={handleYearSelection} />
-      </TransitionOpacity>
+      <div>
+        {showYearSelector ? (
+          <YearSelector selected={date} onSelection={handleYearSelection} />
+        ) : (
+          <Calendar month={date.getMonth()} year={date.getFullYear()} onSelection={onSelection} />
+        )}
+      </div>
     </div>
   );
 };
