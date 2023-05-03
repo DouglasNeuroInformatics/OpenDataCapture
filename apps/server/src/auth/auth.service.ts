@@ -33,14 +33,16 @@ export class AuthService {
     if (!isAuth) {
       throw new UnauthorizedException('Invalid password');
     }
-    user.sessions.push({
-      fingerprint,
-      ipAddress
-    });
-    console.log(user.sessions);
-    await user.save();
 
-    console.log(user.sessions);
+    await user.updateOne({
+      sessions: [
+        ...user.sessions,
+        {
+          fingerprint,
+          ipAddress
+        }
+      ]
+    });
 
     const ability = this.abilityFactory.createForUser(user);
 
