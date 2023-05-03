@@ -7,11 +7,9 @@ import { LoginForm } from '../components/LoginForm';
 
 import logo from '@/assets/logo.png';
 import { Footer } from '@/components';
-import { useFingerprint } from '@/hooks/useFingerprint';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const fingerprint = useFingerprint();
   const { t } = useTranslation('auth');
 
   return (

@@ -3,7 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { AccessTokenDto } from './dto/access-token.dto';
-import { LoginCredentialsDto } from './dto/login-credentials.dto';
+import { LoginRequestDto } from './dto/login-request.dto';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -16,7 +16,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @RouteAccess('public')
-  login(@Body() { username, password }: LoginCredentialsDto): Promise<AccessTokenDto> {
+  login(@Body() { username, password }: LoginRequestDto): Promise<AccessTokenDto> {
     return this.authService.login(username, password);
   }
 }
