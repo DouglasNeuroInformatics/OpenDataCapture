@@ -12,7 +12,7 @@ export const useFingerprint = () => {
       .then(({ visitorId, components }) => {
         setFingerprint({
           visitorId,
-          languages: components.languages.value,
+          language: navigator.language,
           screenResolution: components.screenResolution.value
         });
       })
