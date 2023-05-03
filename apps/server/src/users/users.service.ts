@@ -42,6 +42,7 @@ export class UsersService {
       password: hashedPassword,
       groups: groups,
       basePermissionLevel: basePermissionLevel,
+      sessions: [],
       ...rest
     });
   }

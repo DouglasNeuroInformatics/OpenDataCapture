@@ -2,11 +2,11 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unauthoriz
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { AuthPayload, JwtPayload } from '@douglasneuroinformatics/common';
+import { AuthPayload, Fingerprint, JwtPayload } from '@douglasneuroinformatics/common';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { CryptoService } from '@/crypto/crypto.service';
-import { UserDocument, UserEntity } from '@/users/entities/user.entity';
+import { UserDocument } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
@@ -20,7 +20,12 @@ export class AuthService {
   ) {}
 
   /** Validates the provided credentials and returns an access token */
-  async login(username: string, password: string): Promise<AuthPayload> {
+  async login(
+    username: string,
+    password: string,
+    fingerprint?: Fingerprint | null,
+    ipAddress?: string
+  ): Promise<AuthPayload> {
     const user = await this.getUser(username);
     await user.populate('groups', 'name');
 
@@ -28,6 +33,14 @@ export class AuthService {
     if (!isAuth) {
       throw new UnauthorizedException('Invalid password');
     }
+    user.sessions.push({
+      fingerprint,
+      ipAddress
+    });
+    console.log(user.sessions);
+    await user.save();
+
+    console.log(user.sessions);
 
     const ability = this.abilityFactory.createForUser(user);
 
