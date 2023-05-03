@@ -13,7 +13,7 @@
     </a>
     <br />
     <br />
-    <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform">View Demo</a>
+    <a href="https://datacapture.douglasneuroinformatics.ca">View Demo</a>
     ·
     <a href="https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/issues">Report Bug</a>
     ·
@@ -41,7 +41,7 @@ The Douglas Data Capture Platform is a modern, easy-to-use web application desig
 - Interactive form creation tool with seamless registration and database retrieval
 - Overview page to summarize available data
 - Active subject concept for easy input of multiple instruments for a single client during a session
-- Fully bilingual with support for additional languages, including arbitrary ones 🇬🇧🇫🇷
+- Fully bilingual with support for additional languages 🇬🇧🇫🇷
 - Interface for easy graphing of measures from multiple instruments for a subject
 - Data export capability
 - Subject search in the database based on identifying information (e.g., full name, age, sex)
@@ -61,11 +61,12 @@ yarn demo
 
 ### Demo Login Credentials
 
-| Username         | admin    | JohnSmith         | JaneDoe                             | FrançoisBouchard   |
-|------------------|----------|-------------------|-------------------------------------|--------------------|
-| Password         | password | Douglas123        | Douglas123                          | Douglas123         |
-| Base Permissions | Admin    | Group Manager     | Group Manager                       | Research Assistant |
-| Group(s)         | null     | Depression Clinic | Depression Clinic, Psychosis Clinic | Psychosis Clinic   |
+| Username         | Password   | Base Permissions   | Group(s)                            |
+|------------------|------------|--------------------|-------------------------------------|
+| admin            | password   | Admin              | null                                |
+| JohnSmith        | Douglas123 | Group Manager      | Depression Clinic                   |
+| JaneDoe          | Douglas123 | Group Manager      | Depression Clinic, Psychosis Clinic |
+| FrançoisBouchard | Douglas123 | Research Assistant | Psychosis Clinic                    |
 
 ## License
 
