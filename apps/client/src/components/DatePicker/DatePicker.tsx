@@ -1,6 +1,7 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 
 import { clsx } from 'clsx';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
 import { Calendar } from './Calendar';
@@ -84,11 +85,29 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
         </div>
       </div>
       <div>
-        {showYearSelector ? (
-          <YearSelector selected={date} onSelection={handleYearSelection} />
-        ) : (
-          <Calendar month={date.getMonth()} year={date.getFullYear()} onSelection={onSelection} />
-        )}
+        <AnimatePresence initial={false} mode="wait">
+          {showYearSelector ? (
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 10 }}
+              key={0}
+              transition={{ duration: 0.2 }}
+            >
+              <YearSelector selected={date} onSelection={handleYearSelection} />
+            </motion.div>
+          ) : (
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -10 }}
+              key={1}
+              transition={{ duration: 0.2 }}
+            >
+              <Calendar month={date.getMonth()} year={date.getFullYear()} onSelection={onSelection} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

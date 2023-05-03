@@ -21,12 +21,12 @@ export const YearSelector = (props: YearSelectorProps) => {
 
   return (
     <div className="h-96 w-72 overflow-y-scroll">
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-3 gap-4">
         {years.map((year) => (
-          <div className="flex h-12 items-center justify-center border" key={year}>
+          <div className="flex h-12 items-center justify-center" key={year}>
             <button
-              className={clsx('rounded-full p-2 hover:bg-indigo-200', {
-                'bg-indigo-800 text-white': year === props.selected.getFullYear()
+              className={clsx(' h-full w-full rounded-lg border shadow-sm hover:bg-slate-200', {
+                'bg-slate-700 text-white hover:bg-slate-600': year === props.selected.getFullYear()
               })}
               ref={year === props.selected.getFullYear() ? selectedRef : null}
               type="button"
