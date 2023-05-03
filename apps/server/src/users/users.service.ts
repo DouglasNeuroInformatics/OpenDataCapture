@@ -50,7 +50,7 @@ export class UsersService {
   /** Returns an array of all users */
   async findAll(ability: AppAbility, groupName?: string): Promise<UserDocument[]> {
     const filter = groupName ? { groups: await this.groupsService.findByName(groupName, ability) } : {};
-    return this.usersRepository.find(filter).accessibleBy(ability).lean();
+    return this.usersRepository.find(filter).accessibleBy(ability);
   }
 
   /** Returns user with provided username if found, otherwise throws */
