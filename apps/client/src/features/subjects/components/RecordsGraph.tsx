@@ -104,8 +104,8 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
             </p>
           )}
         </div>
-        <div className="flex justify-between">
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
+          <div className="flex flex-col gap-2 lg:flex-row">
             <Dropdown
               className="text-sm"
               options={instrumentOptions}
