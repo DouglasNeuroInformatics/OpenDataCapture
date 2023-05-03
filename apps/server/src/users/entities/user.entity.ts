@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { BasePermissionLevel, type User, type UserPreferences } from '@douglasneuroinformatics/common';
+import { BasePermissionLevel, Fingerprint, type User, type UserPreferences } from '@douglasneuroinformatics/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { UserPreferencesSchema } from './user-preferences.entity';
@@ -34,6 +34,12 @@ export class UserEntity implements User {
 
   @Prop({ required: false, type: UserPreferencesSchema })
   preferences?: UserPreferences;
+
+  @Prop({ required: true, type: Array })
+  sessions: Array<{
+    fingerprint?: Fingerprint | null;
+    ipAddress?: string | null;
+  }>;
 }
 
 export type UserDocument = HydratedDocument<UserEntity>;

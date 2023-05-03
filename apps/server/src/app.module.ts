@@ -8,6 +8,7 @@ import { Connection } from 'mongoose';
 
 import { AbilityModule } from './ability/ability.module';
 import { AjvModule } from './ajv/ajv.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     AjvModule,
+    AnalyticsModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true
