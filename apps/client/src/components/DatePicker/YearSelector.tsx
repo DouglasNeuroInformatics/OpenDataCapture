@@ -19,24 +19,23 @@ export const YearSelector = (props: YearSelectorProps) => {
     }
   }, []);
 
+  // height is to h-8 + gap-3 = 3rem -> 3rem x 7 = 21rem
   return (
-    <div className="h-96 w-72 overflow-y-scroll">
-      <div className="grid grid-cols-3 gap-4">
-        {years.map((year) => (
-          <div className="flex h-12 items-center justify-center" key={year}>
-            <button
-              className={clsx(' h-full w-full rounded-lg border shadow-sm hover:bg-slate-200', {
-                'bg-slate-700 text-white hover:bg-slate-600': year === props.selected.getFullYear()
-              })}
-              ref={year === props.selected.getFullYear() ? selectedRef : null}
-              type="button"
-              onClick={() => props.onSelection(new Date(year, 0))}
-            >
-              {year}
-            </button>
-          </div>
-        ))}
-      </div>
+    <div className="h grid w-72 grid-cols-3 gap-3 overflow-y-scroll text-sm" style={{ height: '21rem' }}>
+      {years.map((year) => (
+        <div className="flex h-9 items-center justify-center" key={year}>
+          <button
+            className={clsx(' h-full w-full rounded-lg border shadow-sm hover:bg-slate-200', {
+              'bg-slate-700 text-white hover:bg-slate-600': year === props.selected.getFullYear()
+            })}
+            ref={year === props.selected.getFullYear() ? selectedRef : null}
+            type="button"
+            onClick={() => props.onSelection(new Date(year, 0))}
+          >
+            {year}
+          </button>
+        </div>
+      ))}
     </div>
   );
 };

@@ -18,7 +18,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   const days = range(1, lastDay + 1);
 
   return (
-    <div className="grid w-72 grid-cols-7 gap-4" ref={ref}>
+    <div className="grid w-72 grid-cols-7 gap-3" ref={ref}>
       {dayNames.map((name, i) => (
         <div className="flex items-center justify-center" key={i}>
           {name}
@@ -27,7 +27,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
       <div style={{ gridColumn: `span ${firstDay} / span ${firstDay}` }} />
       {days.map((day) => (
         <button
-          className="flex h-8 w-8 items-center justify-center rounded-full text-sm hover:bg-slate-200"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-sm hover:bg-slate-200"
           key={day}
           type="button"
           onClick={() => props.onSelection(new Date(props.year, props.month, day))}
