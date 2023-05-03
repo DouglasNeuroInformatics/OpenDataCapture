@@ -9,7 +9,8 @@ export interface YearSelectorProps {
 }
 
 export const YearSelector = ({ currentDate, onSelection }: YearSelectorProps) => {
-  const years = range(1900, 2101);
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(range(currentYear - 100, currentYear + 8)).reverse();
   return (
     <div className="h mt-4 grid h-96 w-72 grid-cols-3 gap-4 overflow-y-scroll">
       {years.map((year) => (
