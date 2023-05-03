@@ -2,13 +2,7 @@ import { Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import {
-  AppAbility,
-  BasePermissionLevel,
-  FormInstrument,
-  FormInstrumentData,
-  Random
-} from '@douglasneuroinformatics/common';
+import { AppAbility, FormInstrument, FormInstrumentData, Random } from '@douglasneuroinformatics/common';
 import * as instruments from '@douglasneuroinformatics/instruments';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
@@ -20,7 +14,6 @@ import { FormRecordsService } from '@/instruments/services/form-records.service'
 import { FormsService } from '@/instruments/services/forms.service';
 import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
-import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UsersService } from '@/users/users.service';
 
 faker.seed(123);
@@ -31,40 +24,6 @@ const DEMO_GROUPS: CreateGroupDto[] = [
   },
   {
     name: 'Psychosis Clinic'
-  }
-];
-
-const DEMO_USERS: CreateUserDto[] = [
-  {
-    username: 'admin',
-    password: 'password',
-    basePermissionLevel: BasePermissionLevel.Admin,
-    isAdmin: true,
-    firstName: 'Admin'
-  },
-  {
-    username: 'JohnSmith',
-    password: 'Douglas123',
-    groupNames: ['Depression Clinic'],
-    basePermissionLevel: BasePermissionLevel.GroupManager,
-    firstName: 'John',
-    lastName: 'Smith'
-  },
-  {
-    username: 'JaneDoe',
-    password: 'Douglas123',
-    groupNames: ['Psychosis Clinic', 'Depression Clinic'],
-    basePermissionLevel: BasePermissionLevel.GroupManager,
-    firstName: 'Jane',
-    lastName: 'Doe'
-  },
-  {
-    username: 'FrançoisBouchard',
-    password: 'Douglas123',
-    groupNames: ['Psychosis Clinic'],
-    basePermissionLevel: BasePermissionLevel.Standard,
-    firstName: 'François',
-    lastName: 'Bouchard'
   }
 ];
 
@@ -94,9 +53,6 @@ export class InitDemoCommand extends CommandRunner {
 
     for (const group of DEMO_GROUPS) {
       await this.groupsService.create(group);
-    }
-    for (const user of DEMO_USERS) {
-      await this.usersService.create(user, this.ability);
     }
 
     const happinessQuestionnaires = await this.formsService.createTranslatedForms(instruments.happinessQuestionnaire);
