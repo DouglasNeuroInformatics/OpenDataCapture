@@ -60,7 +60,7 @@ export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, e
           <tbody>
             {currentEntries.map((entry, i) => (
               <tr
-                className="odd:bg-slate-100 hover:bg-zinc-200"
+                className="cursor-pointer odd:bg-slate-100 hover:bg-zinc-200"
                 key={i}
                 onClick={() => {
                   if (!entryLinkFactory) {
