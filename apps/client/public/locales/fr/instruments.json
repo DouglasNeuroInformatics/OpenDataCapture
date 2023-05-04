@@ -85,7 +85,8 @@
       "results": "Résultats",
       "print": "Imprimer",
       "download": "Télécharger"
-    }
+    },
+    "uploadSuccessful": "Téléchargement réussi"
   },
   "fetchInstrument": {
     "notFound": "Cet instrument n'existe pas en français"

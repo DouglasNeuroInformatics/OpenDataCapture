@@ -1,6 +1,7 @@
 {
   "addSubject": {
-    "pageTitle": "Ajouter un client"
+    "pageTitle": "Ajouter un client",
+    "exists": "Ce client a déjà été enregistré"
   },
   "viewSubjects": {
     "pageTitle": "Tous les clients",

@@ -85,7 +85,8 @@
       "results": "Results",
       "print": "Print",
       "download": "Download"
-    }
+    },
+    "uploadSuccessful": "Upload Successful"
   },
   "fetchInstrument": {
     "notFound": "This instrument does not exist in English"
