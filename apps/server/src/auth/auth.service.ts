@@ -38,6 +38,7 @@ export class AuthService {
       sessions: [
         ...user.sessions,
         {
+          time: Date.now(),
           fingerprint,
           ipAddress
         }
