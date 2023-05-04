@@ -1,26 +1,15 @@
 # Subject Registration
 
-Before administering any instruments, subjects must be registered in our database. This entails completing a form with a number of required and optional fields.
-
-## Required Data
+Before administering any instruments, subjects must be registered in our database. This entails completing a form with the following fields:
 
 - First Name
 - Last Name
 - Sex
 - Date of Birth
 
-> **Important Note:** Although first and last name are required to be transmitted to our server in order to compute a unique ID, these data are never stored in our database without the subject's explicit consent. Instead, we use a one-way hashing function to compute this ID, a method that is currently employed by the NIH for a [similar purpose](https://nda.nih.gov/nda/using-the-nda-guid.html). This process is described in detail below.
+> **Important Note:** Although first and last name are required to be transmitted to our server in order to compute a unique ID, these data are never stored in our database. Instead, we use a one-way hashing function to compute this ID, a method that is currently employed by the NIH for a [similar purpose](https://nda.nih.gov/nda/using-the-nda-guid.html). This process is described in detail below.
 
-> **Potential Change:** We recently learned that all patients at the Douglas have a hospital ID. This may be used and hashed in the future, rather than the above data.
-
-## Optional Data
-
-- Forward Sortation Area
-- Ethnicity
-- Gender
-- Employment Status
-- Marital Status
-- First Language
+> **Potential Change:** We recently learned that all patients at the Douglas have a hospital ID. This may be used and hashed in the future, rather than the above data. In addition, we are considering optionally storing patient first and last name, for the purposes of recontacting.
 
 ## Unique Identifier
 
@@ -41,7 +30,7 @@ To illustrate how this process works, suppose we have the following information:
 | Date of Birth | 1980-01-01 |
 | Sex           | female     |
 
-Before adding this information to our database, we thoroughly validate and process the provided inputs. Specifically, we standardize the format of first and last names by converting any accented Latin characters to their non-accented ASCII equivalent and capitalizing all characters. Non-Latin characters are not accepted and the user must provide a Latin representation of the name. Additionally, we verify that the date of birth adheres to the ISO 8601 standard and that the sex field is accurately filled with "male" or "female".
+Before adding this information to our database, we thoroughly validate and process the provided inputs. Specifically, we standardize the format of first and last names by converting any accented Latin characters to their non-accented [ASCII](https://en.wikipedia.org/wiki/ASCII) equivalent and capitalizing all characters. Non-Latin characters are not accepted and the user must provide a Latin representation of the name. Additionally, we verify that the date of birth adheres to the ISO 8601 standard and that the sex field is accurately filled with "male" or "female".
 
 If the inputs appear to be valid, the inputs are concatenated together alongside a private key, which is an additional string of characters that is stored in the memory of our server. This is done to prevent an adversary from determining if an individual is in the database, in the unlikely event of a data breach.
 
@@ -56,4 +45,4 @@ If the inputs appear to be valid, the inputs are concatenated together alongside
 </tr>
 </table>
 
-This output is used as the identifier for René Tremblay. If René consents for her identity to be stored in our database, then all of the information provided is stored in the database, in addition to this hash. Otherwise, her first and last name are not entered into the database, and we store her date of birth and sex, alongside her identifier.
+This output is used as the identifier for René Tremblay. Her first and last name are not entered into the database, and we store her date of birth and sex, alongside her identifier.

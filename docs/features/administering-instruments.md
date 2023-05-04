@@ -4,7 +4,7 @@ Instruments may be completed by users themselves. *Users may also delegate an in
 
 ## Selecting an Instrument
 
-When a user accesses the platform through the web client, they are presented with a list of instruments, with a brief description of each. The exact instruments presented to the user depends on the clinic the user is associated with, as described in the authentication section.
+When a user accesses the platform through the web client, they are presented with a list of instruments, with a brief description of each. *The exact instruments presented to the user depends on the clinic the user is associated with, as described in the authentication section.*
 
 ## Completing an Instrument
 
@@ -14,9 +14,7 @@ First, the user is asked to review the details of the instrument. *This may also
 
 ### Step 2: Enter Demographic Information
 
-Next, the user is required to enter the demographics information for the subject in question. This data is used to compute the subject's unique ID, and link the record to this individual in the database.
-
-> **Important Note:** This will be replaced in the future as it is cumbersome for users. Potential options include autofill or the subject's hospital ID.
+Next, the user is required to enter the demographics information for the subject in question. This data is used to compute the subject's unique ID, and link the record to this individual in the database. If there is an active subject, this is filled in automatically.
 
 ### Step 3: Complete the Instrument
 
