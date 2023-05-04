@@ -51,7 +51,7 @@ export const FormPage = () => {
     });
     setDateCollected(now);
     setResult(data);
-    notifications.add({ message: 'Upload Successful', type: 'success' });
+    notifications.add({ message: t('formPage.uploadSuccessful'), type: 'success' });
   };
 
   return (

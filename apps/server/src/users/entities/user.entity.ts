@@ -39,6 +39,7 @@ export class UserEntity implements User {
   sessions: Array<{
     fingerprint?: Fingerprint | null;
     ipAddress?: string | null;
+    time: number;
   }>;
 }
 

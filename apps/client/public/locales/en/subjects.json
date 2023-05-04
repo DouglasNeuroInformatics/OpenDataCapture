@@ -1,6 +1,7 @@
 {
   "addSubject": {
-    "pageTitle": "Add Subject"
+    "pageTitle": "Add Subject",
+    "exists": "This subject has already been registered"
   },
   "viewSubjects": {
     "pageTitle": "View Subjects",
