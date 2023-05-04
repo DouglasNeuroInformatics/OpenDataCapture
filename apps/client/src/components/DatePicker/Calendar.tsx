@@ -4,6 +4,8 @@ import { range } from '@douglasneuroinformatics/common';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
+export const CALENDAR_ANIMATION_DURATION = 0.2; // seconds
+
 export type CalendarProps = {
   year: number;
   month: number;
@@ -25,7 +27,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
         exit={{ opacity: 0, x: -20 }}
         initial={{ opacity: 0, x: 20 }}
         key={`${props.year}-${props.month}`}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: CALENDAR_ANIMATION_DURATION }}
       >
         <div className="grid w-72 grid-cols-7 gap-3" ref={ref}>
           {dayNames.map((name, i) => (
