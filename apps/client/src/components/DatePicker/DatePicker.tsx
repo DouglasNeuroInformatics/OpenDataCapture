@@ -51,6 +51,7 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
   const { t } = useTranslation('datetime');
 
   // this is to prevent changing month before prev calendar is unmounted
+  // the duration is doubled because presumably it is to mount old and mount new
   const [canSetMonth, setCanSetMonth] = useState(true);
 
   const monthName = t('months')[date.getMonth()];
@@ -81,7 +82,7 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
               if (canSetMonth) {
                 setCanSetMonth(false);
                 dispatch({ type: 'decrement' });
-                setTimeout(() => setCanSetMonth(true), CALENDAR_ANIMATION_DURATION * 1000);
+                setTimeout(() => setCanSetMonth(true), CALENDAR_ANIMATION_DURATION * 2000);
               }
             }}
           />
@@ -93,7 +94,7 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
               if (canSetMonth) {
                 setCanSetMonth(false);
                 dispatch({ type: 'increment' });
-                setTimeout(() => setCanSetMonth(true), CALENDAR_ANIMATION_DURATION * 1000);
+                setTimeout(() => setCanSetMonth(true), CALENDAR_ANIMATION_DURATION * 2000);
               }
             }}
           />
