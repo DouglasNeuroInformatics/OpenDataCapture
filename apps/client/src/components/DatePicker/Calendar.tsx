@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { range } from '@douglasneuroinformatics/common';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
-export interface CalendarProps {
+export type CalendarProps = {
   year: number;
   month: number;
   onSelection: (date: Date) => void;
-}
+};
 
 export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calendar(props, ref) {
   const { t } = useTranslation('datetime');
@@ -18,23 +19,33 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   const days = range(1, lastDay + 1);
 
   return (
-    <div className="grid w-72 grid-cols-7 gap-3" ref={ref}>
-      {dayNames.map((name, i) => (
-        <div className="flex items-center justify-center" key={i}>
-          {name}
+    <AnimatePresence initial={false} mode="wait">
+      <motion.div
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: 20 }}
+        key={`${props.year}-${props.month}`}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="grid w-72 grid-cols-7 gap-3" ref={ref}>
+          {dayNames.map((name, i) => (
+            <div className="flex items-center justify-center" key={i}>
+              {name}
+            </div>
+          ))}
+          <div style={{ gridColumn: `span ${firstDay} / span ${firstDay}` }} />
+          {days.map((day) => (
+            <button
+              className="flex h-9 w-9 items-center justify-center rounded-full text-sm hover:bg-slate-200"
+              key={day}
+              type="button"
+              onClick={() => props.onSelection(new Date(props.year, props.month, day))}
+            >
+              {day}
+            </button>
+          ))}
         </div>
-      ))}
-      <div style={{ gridColumn: `span ${firstDay} / span ${firstDay}` }} />
-      {days.map((day) => (
-        <button
-          className="flex h-9 w-9 items-center justify-center rounded-full text-sm hover:bg-slate-200"
-          key={day}
-          type="button"
-          onClick={() => props.onSelection(new Date(props.year, props.month, day))}
-        >
-          {day}
-        </button>
-      ))}
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
 });
