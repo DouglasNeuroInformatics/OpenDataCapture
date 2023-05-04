@@ -23,7 +23,7 @@ All environment variables are are set in a `.env` file, located in the root dire
 ### Quick Start
 
 ```shell
-cat .env.template <(python -c "import secrets; print(secrets.token_hex(32))") > .env
+cat .env.template <(openssl rand -hex 16) > .env
 ```
 
 ### Legend
@@ -35,21 +35,18 @@ cat .env.template <(python -c "import secrets; print(secrets.token_hex(32))") > 
 | VITE_DEV_USERNAME         | The username to use if VITE_DEV_BYPASS_AUTH is set to true |
 | VITE_DEV_PASSWORD         | The password to use if VITE_DEV_BYPASS_AUTH is set to true |
 | VITE_DEV_BYPASS_AUTH      | If true and NODE_ENV is development, then login is automated |
-| MONGO_DEV_CONNECTION_URI  | MongoDB URI for the development database |
-| MONGO_PROD_CONNECTION_URI  | MongoDB URI for the production database |
-| MONGO_TEST_CONNECTION_URI | MongoDB URI for the testing database |
+| MONGO_URI                 | MongoDB URI not including database name |
 | SERVER_PORT               | The port to use for the Nest development server |
 | SECRET_KEY                | The value to use for various security purposes. |
-| INIT_DEMO_DB              | If true and NODE_ENV is development, then drop the database and setup dummy data |
+
 ## Run Dev Server
 
-### Initial Run
 ```shell
-yarn ws common build && INIT_DEMO_DB=true yarn dev
-```
-
-### Subsequent Runs
-
-```
 yarn dev
+```
+
+## Create First User
+
+```shell
+yarn ws server cli create-user admin password --basePermissionLevel ADMIN --firstName John --lastName Smith --isAdmin
 ```
