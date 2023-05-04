@@ -40,6 +40,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
             <button
               className="flex h-9 w-9 items-center justify-center rounded-full text-sm hover:bg-slate-200"
               key={day}
+              tabIndex={-1}
               type="button"
               onClick={() => props.onSelection(new Date(props.year, props.month, day))}
             >

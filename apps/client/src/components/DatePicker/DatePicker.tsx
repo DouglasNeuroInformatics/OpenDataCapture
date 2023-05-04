@@ -70,6 +70,7 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
             className="mx-1 flex items-center justify-center rounded-full p-1 hover:bg-slate-200"
             position="up"
             rotation={180}
+            tabIndex={-1}
             onClick={() => setShowYearSelector(!showYearSelector)}
           />
         </div>
@@ -78,6 +79,7 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
             className="mx-1 flex items-center justify-center rounded-full p-1 hover:bg-slate-200"
             position="left"
             rotation={0}
+            tabIndex={-1}
             onClick={() => {
               if (canSetMonth) {
                 setCanSetMonth(false);
@@ -90,6 +92,7 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
             className="ml-1 flex  items-center justify-center rounded-full p-1 hover:bg-slate-200"
             position="right"
             rotation={0}
+            tabIndex={-1}
             onClick={() => {
               if (canSetMonth) {
                 setCanSetMonth(false);

@@ -11,7 +11,7 @@ export const FormFieldDescription = ({ description }: FormFieldDescriptionProps)
   return description ? (
     <div className="flex items-center justify-center">
       <Popover>
-        <Popover.Button>
+        <Popover.Button tabIndex={-1}>
           <HiOutlineQuestionMarkCircle />
         </Popover.Button>
         <Transition
