@@ -6,4 +6,4 @@ The Douglas Data Capture Platform is a comprehensive solution for safe and effic
 
 As a consequence of the collection of this structured data, the platform also aims to:
 1. Provide authorized users with real-time access to a dashboard that displays summary information about clients
-2. Provide authorized users with an easy way to extract collected data, including filtering by date collected, age, and sex
+2. Provide authorized users with an easy way to extract collected data
