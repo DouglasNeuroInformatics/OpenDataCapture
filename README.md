@@ -49,24 +49,15 @@ The Douglas Data Capture Platform is a modern, easy-to-use web application desig
 - Fine-grained user permissions for enhanced security
 - Well-documented REST API
 
-## Quick Start
-
-### Launch Demo
+## Quick Start (Development)
 
 ```shell
 cat .env.template <(openssl rand -hex 16) > .env
 yarn install
-yarn demo
+yarn ws server cli init-demo
+yarn ws server cli create-user admin password --basePermissionLevel ADMIN --isAdmin
+yarn dev
 ```
-
-### Demo Login Credentials
-
-| Username         | Password   | Base Permissions   | Group(s)                            |
-|------------------|------------|--------------------|-------------------------------------|
-| admin            | password   | Admin              | null                                |
-| JohnSmith        | Douglas123 | Group Manager      | Depression Clinic                   |
-| JaneDoe          | Douglas123 | Group Manager      | Depression Clinic, Psychosis Clinic |
-| FrançoisBouchard | Douglas123 | Research Assistant | Psychosis Clinic                    |
 
 ## License
 
