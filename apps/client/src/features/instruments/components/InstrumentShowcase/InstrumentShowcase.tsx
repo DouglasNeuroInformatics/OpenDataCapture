@@ -70,16 +70,16 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
         <SearchBar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <SelectDropdown
-            options={languageOptions}
-            selected={selectedLanguages}
-            setSelected={setSelectedLanguages}
-            title={t('instruments:availableInstruments.filters.language')}
-          />
-          <SelectDropdown
             options={tagOptions}
             selected={selectedTags}
             setSelected={setSelectedTags}
             title={t('instruments:availableInstruments.filters.tags')}
+          />
+          <SelectDropdown
+            options={languageOptions}
+            selected={selectedLanguages}
+            setSelected={setSelectedLanguages}
+            title={t('instruments:availableInstruments.filters.language')}
           />
         </div>
       </div>

@@ -1,12 +1,13 @@
 import React, { useReducer, useState } from 'react';
 
 import { clsx } from 'clsx';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
-import { Calendar } from './Calendar';
+import { CALENDAR_ANIMATION_DURATION, Calendar } from './Calendar';
 import { YearSelector } from './YearSelector';
 
-import { ArrowToggle, TransitionOpacity } from '@/components';
+import { ArrowToggle } from '@/components';
 
 interface IncrementAction {
   type: 'increment';
@@ -49,6 +50,10 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
   const [showYearSelector, setShowYearSelector] = useState(false);
   const { t } = useTranslation('datetime');
 
+  // this is to prevent changing month before prev calendar is unmounted
+  // the duration is doubled because presumably it is to mount old and mount new
+  const [canSetMonth, setCanSetMonth] = useState(true);
+
   const monthName = t('months')[date.getMonth()];
 
   const handleYearSelection = (date: Date) => {
@@ -65,6 +70,7 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
             className="mx-1 flex items-center justify-center rounded-full p-1 hover:bg-slate-200"
             position="up"
             rotation={180}
+            tabIndex={-1}
             onClick={() => setShowYearSelector(!showYearSelector)}
           />
         </div>
@@ -73,22 +79,55 @@ export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
             className="mx-1 flex items-center justify-center rounded-full p-1 hover:bg-slate-200"
             position="left"
             rotation={0}
-            onClick={() => dispatch({ type: 'decrement' })}
+            tabIndex={-1}
+            onClick={() => {
+              if (canSetMonth) {
+                setCanSetMonth(false);
+                dispatch({ type: 'decrement' });
+                setTimeout(() => setCanSetMonth(true), CALENDAR_ANIMATION_DURATION * 2000);
+              }
+            }}
           />
           <ArrowToggle
             className="ml-1 flex  items-center justify-center rounded-full p-1 hover:bg-slate-200"
             position="right"
             rotation={0}
-            onClick={() => dispatch({ type: 'increment' })}
+            tabIndex={-1}
+            onClick={() => {
+              if (canSetMonth) {
+                setCanSetMonth(false);
+                dispatch({ type: 'increment' });
+                setTimeout(() => setCanSetMonth(true), CALENDAR_ANIMATION_DURATION * 2000);
+              }
+            }}
           />
         </div>
       </div>
-      <TransitionOpacity show={!showYearSelector}>
-        <Calendar month={date.getMonth()} year={date.getFullYear()} onSelection={onSelection} />
-      </TransitionOpacity>
-      <TransitionOpacity show={showYearSelector}>
-        <YearSelector currentDate={date} onSelection={handleYearSelection} />
-      </TransitionOpacity>
+      <div>
+        <AnimatePresence initial={false} mode="wait">
+          {showYearSelector ? (
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 10 }}
+              key={0}
+              transition={{ duration: 0.2 }}
+            >
+              <YearSelector selected={date} onSelection={handleYearSelection} />
+            </motion.div>
+          ) : (
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -10 }}
+              key={1}
+              transition={{ duration: 0.2 }}
+            >
+              <Calendar month={date.getMonth()} year={date.getFullYear()} onSelection={onSelection} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

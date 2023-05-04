@@ -26,3 +26,5 @@ export const AddSubjectPage = () => {
     </div>
   );
 };
+
+export default AddSubjectPage;

@@ -75,3 +75,5 @@ export const OverviewPage = () => {
     </div>
   );
 };
+
+export default OverviewPage;

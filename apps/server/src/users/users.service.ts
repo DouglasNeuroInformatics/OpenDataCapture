@@ -61,4 +61,13 @@ export class UsersService {
     }
     return user;
   }
+
+  /** Delete the user with the provided username, otherwise throws */
+  async deleteByUsername(username: string): Promise<UserDocument> {
+    const deletedUser = await this.usersRepository.findOneAndDelete({ username });
+    if (!deletedUser) {
+      throw new NotFoundException(`Failed to find user with username: ${username}`);
+    }
+    return deletedUser;
+  }
 }

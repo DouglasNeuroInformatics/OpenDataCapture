@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { type AppAbility } from '@douglasneuroinformatics/common';
@@ -31,5 +31,11 @@ export class UsersController {
   @RouteAccess({ action: 'read', subject: 'User' })
   findByUsername(@Param('username') username: string): Promise<UserEntity> {
     return this.usersService.findByUsername(username);
+  }
+
+  @Delete(':username')
+  @RouteAccess({ action: 'delete', subject: 'User' })
+  deleteByUsername(@Param('username') username: string): Promise<UserEntity> {
+    return this.usersService.deleteByUsername(username);
   }
 }

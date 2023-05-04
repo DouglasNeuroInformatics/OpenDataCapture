@@ -28,3 +28,5 @@ export const SubjectPage = () => {
     </div>
   );
 };
+
+export default SubjectPage;

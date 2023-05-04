@@ -23,3 +23,5 @@ export const AvailableInstrumentsPage = () => {
     </div>
   );
 };
+
+export default AvailableInstrumentsPage;

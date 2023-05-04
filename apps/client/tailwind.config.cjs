@@ -80,6 +80,10 @@ module.exports = {
           800: '#314559',
           900: '#2d3d4c'
         }
+      },
+      transitionProperty: {
+        height: 'height',
+        'max-h': 'max-height'
       }
     },
     fontFamily: {

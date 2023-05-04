@@ -23,3 +23,5 @@ export const ViewSubjectsPage = () => {
     </div>
   ) : null;
 };
+
+export default ViewSubjectsPage;

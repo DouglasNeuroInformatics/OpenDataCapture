@@ -30,7 +30,7 @@ export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
   return (
     <footer className="py-3 text-slate-600 print:hidden">
       {isLogin ? (
-        <div className="flex items-center justify-center text-slate-500">
+        <div className="flex items-center justify-center">
           <a className="text-sm" href={`mailto:${CONTACT_EMAIL}`}>
             {t('footer.contact')}
           </a>
@@ -58,11 +58,11 @@ export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
           </Link>
         </div>
       )}
-      <p className="text-center text-sm text-slate-500">
+      <p className="text-center text-sm">
         &copy; {CURRENT_YEAR} {t('organization.name')}
       </p>
       {showDevInfo && (
-        <p className="text-center text-sm text-slate-500">{`Last Commit '${GIT_COMMIT!}' to Branch '${GIT_BRANCH!}' on ${GIT_COMMIT_DATE!}`}</p>
+        <p className="text-center text-sm">{`Last Commit '${GIT_COMMIT!}' to Branch '${GIT_BRANCH!}' on ${GIT_COMMIT_DATE!}`}</p>
       )}
     </footer>
   );
