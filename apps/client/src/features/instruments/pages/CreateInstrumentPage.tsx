@@ -15,3 +15,5 @@ export const CreateInstrumentPage = () => {
     </div>
   );
 };
+
+export default CreateInstrumentPage;

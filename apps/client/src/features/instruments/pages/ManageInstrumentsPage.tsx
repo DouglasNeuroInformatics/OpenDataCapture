@@ -28,3 +28,5 @@ export const ManageInstrumentsPage = () => {
     </div>
   );
 };
+
+export default ManageInstrumentsPage;
