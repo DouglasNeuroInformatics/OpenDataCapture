@@ -1,6 +1,5 @@
 name: Feature
 description: Request a new feature be implemented in the codebase
-title: "[Feature]: "
 labels: ["Feature"]
 body:
 - type: textarea

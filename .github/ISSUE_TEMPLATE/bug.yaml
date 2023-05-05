@@ -1,6 +1,5 @@
 name: Bug
 description: Report a bug
-title: "[Bug]: "
 labels: ["Bug"]
 body:
 - type: textarea
@@ -46,3 +45,13 @@ body:
     label: Additional Details
   validations:
     required: false
+- type: dropdown
+  id: priority
+  attributes:
+    label: Priority
+    options:
+      - High
+      - Medium
+      - Low
+  validations:
+    required: true
