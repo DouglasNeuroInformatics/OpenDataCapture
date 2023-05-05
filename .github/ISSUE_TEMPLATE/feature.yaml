@@ -1,7 +1,7 @@
 name: Feature
 description: Request a new feature be implemented in the codebase
-title: "[FEATURE]: <title>"
-labels: [Feature]
+title: "[Feature]: "
+labels: ["Feature"]
 body:
 - type: textarea
   attributes:
@@ -17,3 +17,5 @@ body:
       - High
       - Medium
       - Low
+    validations:
+      required: true
