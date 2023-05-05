@@ -1,0 +1,19 @@
+name: Feature
+description: Request a new feature be implemented in the codebase
+title: "[FEATURE]: <title>"
+labels: [Feature]
+body:
+- type: textarea
+  attributes:
+    label: Description
+    description: Please describe the feature in detail
+  validations:
+    required: true
+- type: dropdown
+  id: priority
+  attributes:
+    label: Priority
+    options:
+      - High
+      - Medium
+      - Low
