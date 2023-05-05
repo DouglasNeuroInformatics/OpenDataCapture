@@ -19,6 +19,17 @@ body:
       Example: If a user changes languages, any error messages in the form should be translated into the new language.
   validations:
     required: true
+- type: dropdown
+  id: browsers
+  attributes:
+    label: Browser
+    description: What browsers are you seeing the problem on?
+    multiple: true
+    options:
+      - Firefox
+      - Chrome
+      - Safari
+      - Edge
 - type: textarea
   attributes:
     label: Steps To Reproduce
