@@ -1,0 +1,14 @@
+name: Issues
+on:
+  issues:
+    types:
+      - reopened
+      - opened
+jobs:
+  prioritize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: View context attributes
+        uses: actions/github-script@v6
+        with:
+          script: console.log(context)
