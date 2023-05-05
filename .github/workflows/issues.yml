@@ -23,7 +23,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: [`Priority: ${priority}`]
+              labels: [`${priority} Priority`]
             })
       - name: Add label to title
         uses: actions/github-script@v6
