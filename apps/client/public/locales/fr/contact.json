@@ -1,11 +1,9 @@
 {
+  "message": "Message",
   "pageTitle": "Nous contacter",
   "reason": "Raison",
-  "reasons": {
-    "bug": "Rapport de bug",
-    "feedback": "Retour d'information",
-    "request": "Demande",
-    "other": "Autre"
-  },
-  "message": "Message"
+  "reasons.bug": "Rapport de bug",
+  "reasons.feedback": "Retour d'information",
+  "reasons.other": "Autre",
+  "reasons.request": "Demande"
 }

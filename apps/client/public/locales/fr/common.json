@@ -1,68 +1,36 @@
 {
-  "platform": {
-    "title": "Douglas Data Capture Platform"
-  },
-  "organization": {
-    "name": "Douglas Neuroinformatics Platform"
-  },
-  "languages": {
-    "en": "Anglais",
-    "fr": "Français"
-  },
-  "footer": {
-    "documentation": "Documentation",
-    "license": "Licence",
-    "sourceCode": "Code source",
-    "contact": "Contactez-nous"
-  },
-  "navLinks": {
-    "overview": "Vue d'ensemble",
-    "addSubject": "Ajouter un client",
-    "lookupSubject": "Trouver un client",
-    "viewSubjects": "Afficher tous les clients",
-    "createInstrument": "Ajouter un instrument",
-    "manageInstruments": "Gérer les instruments",
-    "availableInstruments": "Afficher tous les instruments"
-  },
-  "userDropup": {
-    "logout": "Se déconnecter",
-    "preferences": "Préférences"
-  },
-  "sex": {
-    "male": "Masculin",
-    "female": "Féminin"
-  },
-  "identificationForm": {
-    "firstName": {
-      "description": "Le prénom du sujet, tel qu'il figure dans son acte de naissance",
-      "label": "Prénom"
-    },
-    "lastName": {
-      "description": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance",
-      "label": "Nom de famille"
-    },
-    "sex": {
-      "description": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance",
-      "label": "Sexe"
-    },
-    "dateOfBirth": {
-      "label": "Date de naissance"
-    },
-    "submit": "Soumettre",
-    "notFound": "Pas trouvé"
-  },
-  "activeSubject": {
-    "header": "Sujet actif"
-  },
-  "searchBar": {
-    "placeholder": "Rechercher..."
-  },
-  "notifications": {
-    "types": {
-      "info": "Attention",
-      "warning": "Avertissement",
-      "success": "Succès",
-      "error": "Erreur"
-    }
-  }
+  "activeSubject.header": "Sujet actif",
+  "footer.contact": "Contactez-nous",
+  "footer.documentation": "Documentation",
+  "footer.license": "Licence",
+  "footer.sourceCode": "Code source",
+  "identificationForm.dateOfBirth.label": "Date de naissance",
+  "identificationForm.firstName.description": "Le prénom du sujet, tel qu'il figure dans son acte de naissance",
+  "identificationForm.firstName.label": "Prénom",
+  "identificationForm.lastName.description": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance",
+  "identificationForm.lastName.label": "Nom de famille",
+  "identificationForm.notFound": "Pas trouvé",
+  "identificationForm.sex.description": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance",
+  "identificationForm.sex.label": "Sexe",
+  "identificationForm.submit": "Soumettre",
+  "languages.en": "Anglais",
+  "languages.fr": "Français",
+  "navLinks.addSubject": "Ajouter un client",
+  "navLinks.availableInstruments": "Afficher tous les instruments",
+  "navLinks.createInstrument": "Ajouter un instrument",
+  "navLinks.lookupSubject": "Trouver un client",
+  "navLinks.manageInstruments": "Gérer les instruments",
+  "navLinks.overview": "Vue d'ensemble",
+  "navLinks.viewSubjects": "Afficher tous les clients",
+  "notifications.types.error": "Erreur",
+  "notifications.types.info": "Attention",
+  "notifications.types.success": "Succès",
+  "notifications.types.warning": "Avertissement",
+  "organization.name": "Douglas Neuroinformatics Platform",
+  "platform.title": "Douglas Data Capture Platform",
+  "searchBar.placeholder": "Rechercher...",
+  "sex.female": "Féminin",
+  "sex.male": "Masculin",
+  "userDropup.logout": "Se déconnecter",
+  "userDropup.preferences": "Préférences"
 }

@@ -1,38 +1,22 @@
 {
-  "addSubject": {
-    "pageTitle": "Add Subject",
-    "exists": "This subject has already been registered"
-  },
-  "viewSubjects": {
-    "pageTitle": "View Subjects",
-    "table": {
-      "filters": "Filters",
-      "export": "Export",
-      "exportHelpText": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
-      "columns": {
-        "subject": "Subject",
-        "dateOfBirth": "Date of Birth",
-        "sex": "Sex"
-      }
-    },
-    "lookup": {
-      "title": "Subject Lookup"
-    }
-  },
-  "subjectPage": {
-    "pageTitle": "Instrument Records for Subject",
-    "graph": {
-      "defaultTitle": "Please Select an Instrument",
-      "instrument": "Instrument",
-      "measures": "Measures",
-      "timeframe": "Timeframe",
-      "timeframeOptions": {
-        "all": "All-Time",
-        "month": "Past Month",
-        "year": "Past Year"
-      },
-      "xLabel": "Date Collected",
-      "yLabel": "Value"
-    }
-  }
+  "addSubject.exists": "This subject has already been registered",
+  "addSubject.pageTitle": "Add Subject",
+  "subjectPage.graph.defaultTitle": "Please Select an Instrument",
+  "subjectPage.graph.instrument": "Instrument",
+  "subjectPage.graph.measures": "Measures",
+  "subjectPage.graph.timeframe": "Timeframe",
+  "subjectPage.graph.timeframeOptions.all": "All-Time",
+  "subjectPage.graph.timeframeOptions.month": "Past Month",
+  "subjectPage.graph.timeframeOptions.year": "Past Year",
+  "subjectPage.graph.xLabel": "Date Collected",
+  "subjectPage.graph.yLabel": "Value",
+  "subjectPage.pageTitle": "Instrument Records for Subject",
+  "viewSubjects.lookup.title": "Subject Lookup",
+  "viewSubjects.pageTitle": "View Subjects",
+  "viewSubjects.table.columns.dateOfBirth": "Date of Birth",
+  "viewSubjects.table.columns.sex": "Sex",
+  "viewSubjects.table.columns.subject": "Subject",
+  "viewSubjects.table.export": "Export",
+  "viewSubjects.table.exportHelpText": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
+  "viewSubjects.table.filters": "Filters"
 }

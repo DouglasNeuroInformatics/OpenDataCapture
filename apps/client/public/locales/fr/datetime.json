@@ -1,4 +1,5 @@
 {
+  "days": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
   "months": [
     "Janvier",
     "Février",
@@ -12,6 +13,5 @@
     "Octobre",
     "Novembre",
     "Décembre"
-  ],
-  "days": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+  ]
 }

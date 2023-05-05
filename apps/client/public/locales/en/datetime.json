@@ -1,4 +1,5 @@
 {
+  "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
   "months": [
     "January",
     "February",
@@ -12,6 +13,5 @@
     "October",
     "November",
     "December"
-  ],
-  "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+  ]
 }

@@ -1,12 +1,6 @@
 {
-  "errors": {
-    "required": "Ce champ est obligatoire"
-  },
-  "radio": {
-    "labels": {
-      "true": "Vrai",
-      "false": "Faux"
-    }
-  },
+  "errors.required": "Ce champ est obligatoire",
+  "radio.labels.false": "Faux",
+  "radio.labels.true": "Vrai",
   "submit": "Soumettre"
 }

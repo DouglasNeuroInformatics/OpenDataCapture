@@ -1,11 +1,9 @@
 {
+  "message": "Message",
   "pageTitle": "Contact Us",
   "reason": "Reason",
-  "reasons": {
-    "bug": "Bug Report",
-    "feedback": "Feedback",
-    "request": "Request",
-    "other": "Other"
-  },
-  "message": "Message"
+  "reasons.bug": "Bug Report",
+  "reasons.feedback": "Feedback",
+  "reasons.other": "Other",
+  "reasons.request": "Request"
 }

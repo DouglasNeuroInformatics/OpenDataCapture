@@ -1,18 +1,14 @@
 {
-  "pageTitle": "Overview",
-  "welcome": "Welcome Back",
-  "summary": "Summary of Available Data",
   "currentGroup": "Current Group",
-  "stats": {
-    "totalUsers": "Total Users",
-    "totalSubjects": "Total Subjects",
-    "totalInstruments": "Total Instruments",
-    "totalRecords": "Total Records"
-  },
-  "disclaimer": {
-    "title": "Disclaimer",
-    "message": "The Douglas Data Capture Platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
-    "accept": "Accept",
-    "decline": "Decline"
-  }
+  "disclaimer.accept": "Accept",
+  "disclaimer.decline": "Decline",
+  "disclaimer.message": "The Douglas Data Capture Platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
+  "disclaimer.title": "Disclaimer",
+  "pageTitle": "Overview",
+  "stats.totalInstruments": "Total Instruments",
+  "stats.totalRecords": "Total Records",
+  "stats.totalSubjects": "Total Subjects",
+  "stats.totalUsers": "Total Users",
+  "summary": "Summary of Available Data",
+  "welcome": "Welcome Back"
 }
