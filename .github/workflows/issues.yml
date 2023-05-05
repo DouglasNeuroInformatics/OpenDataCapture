@@ -8,14 +8,20 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - name: View context attributes
-        uses: actions/github-script@v6
-        with:
-          script: console.log(context)
       - name: Add priority
         uses: actions/github-script@v6
         with:
           script: |
             const body = context.payload.issue.body
-            console.log(body)
-            
+            const items = body.split('\n\n')
+            const priorityLabelIndex = items.findIndex((s) => s.includes('Priority'))
+            if (priorityLabelIndex === -1) {
+              return;
+            }
+            const priority = items[priorityLabelIndex + 1]
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [`Priority: ${priority}`]
+            })
