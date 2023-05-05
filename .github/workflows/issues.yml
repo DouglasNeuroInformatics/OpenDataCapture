@@ -35,7 +35,7 @@ jobs:
               console.log('Does not match kind');
               return;
             }
-            octokit.rest.issues.update({
+            github.rest.issues.update({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
