@@ -1,7 +1,7 @@
-name: Bug Report
+name: Bug
 description: Report a bug
-title: "[BUG]: <title>"
-labels: [Bug, Needs Triage]
+title: "[Bug]: "
+labels: ["Bug"]
 body:
 - type: textarea
   attributes:

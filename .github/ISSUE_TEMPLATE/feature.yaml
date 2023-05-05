@@ -17,5 +17,5 @@ body:
       - High
       - Medium
       - Low
-    validations:
-      required: true
+  validations:
+    required: true
