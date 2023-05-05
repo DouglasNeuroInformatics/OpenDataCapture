@@ -48,13 +48,13 @@ export interface DatePickerProps {
 export const DatePicker = ({ onSelection, ...props }: DatePickerProps) => {
   const [date, dispatch] = useReducer(reducer, new Date());
   const [showYearSelector, setShowYearSelector] = useState(false);
-  const { t } = useTranslation('datetime');
+  const { t } = useTranslation();
 
   // this is to prevent changing month before prev calendar is unmounted
   // the duration is doubled because presumably it is to mount old and mount new
   const [canSetMonth, setCanSetMonth] = useState(true);
 
-  const monthName = t('months')[date.getMonth()];
+  const monthName = t('datetime.months')[date.getMonth()];
 
   const handleYearSelection = (date: Date) => {
     dispatch({ type: 'set-year', value: date.getFullYear() });

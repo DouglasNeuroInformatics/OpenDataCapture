@@ -13,9 +13,9 @@ export type CalendarProps = {
 };
 
 export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calendar(props, ref) {
-  const { t } = useTranslation('datetime');
+  const { t } = useTranslation();
 
-  const dayNames = t('days').map((day) => day.charAt(0).toUpperCase());
+  const dayNames = t('datetime.days').map((day) => day.charAt(0).toUpperCase());
   const firstDay = new Date(props.year, props.month).getDay();
   const lastDay = new Date(props.year, props.month + 1, 0).getDate();
   const days = range(1, lastDay + 1);

@@ -32,5 +32,20 @@
   "sex.female": "Female",
   "sex.male": "Male",
   "userDropup.logout": "Logout",
-  "userDropup.preferences": "Preferences"
+  "userDropup.preferences": "Preferences",
+  "datetime.days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  "datetime.months": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ]
 }
