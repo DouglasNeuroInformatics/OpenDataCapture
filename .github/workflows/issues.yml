@@ -33,6 +33,7 @@ jobs:
             const kind = context.payload.issue.labels.find((s) => s === 'Bug' || s === 'Feature')
             if (!kind) {
               console.log('Does not match kind');
+              console.log(context.payload.issue)
               return;
             }
             octokit.rest.issues.update({
