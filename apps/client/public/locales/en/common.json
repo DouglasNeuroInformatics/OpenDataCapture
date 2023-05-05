@@ -47,5 +47,9 @@
     "October",
     "November",
     "December"
-  ]
+  ],
+  "form.errors.required": "This field is required",
+  "form.radio.labels.false": "False",
+  "form.radio.labels.true": "True",
+  "form.submit": "Submit"
 }

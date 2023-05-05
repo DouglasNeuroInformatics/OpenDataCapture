@@ -22,7 +22,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
   const fingerprint = useFingerprint();
-  const { t } = useTranslation(['auth', 'form']);
+  const { t } = useTranslation(['auth']);
 
   const content: FormInstrumentContent<LoginFormData> = {
     username: {
@@ -75,8 +75,8 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         ...loginCredentialsSchema,
         errorMessage: {
           properties: {
-            username: t('form:errors.required'),
-            password: t('form:errors.required')
+            username: t('form.errors.required'),
+            password: t('form.errors.required')
           }
         }
       }}

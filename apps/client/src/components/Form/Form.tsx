@@ -35,7 +35,7 @@ export const Form = <T extends FormInstrumentData>({
   const [errors, setErrors] = useState<FormErrors<T>>({});
   const [values, setValues] = useState<FormValues<T>>(() => initialValues ?? getDefaultValues(content));
 
-  const { t } = useTranslation('form');
+  const { t } = useTranslation();
 
   const reset = () => {
     setValues(getDefaultValues(content));
@@ -94,7 +94,7 @@ export const Form = <T extends FormInstrumentData>({
             })
           : renderFormFields(content)}
         <div className="w-full">
-          <Button className="w-full" label={submitBtnLabel ?? t('submit')} type="submit" />
+          <Button className="w-full" label={submitBtnLabel ?? t('form.submit')} type="submit" />
         </div>
       </form>
     </FormProvider>
