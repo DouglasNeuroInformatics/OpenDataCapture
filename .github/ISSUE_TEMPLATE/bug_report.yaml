@@ -1,20 +1,22 @@
 name: Bug Report
 description: Report a bug
-title: "[BUG] <title>"
+title: "[BUG]: <title>"
 labels: [Bug, Needs Triage]
 body:
 - type: textarea
   attributes:
     label: Current Behavior
     description: A concise description of what you're experiencing.
-    placeholder: e.g., Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tenetur similique, fuga dolores libero ipsa assumenda quo reprehenderit temporibus qui fugit repellendus sequi corrupti officiis dolore ut quod pariatur architecto praesentium.
+    placeholder: |
+      Example: If there are errors in a form and the user changes the language, the error messages are not translated into the new language.
   validations:
     required: true
 - type: textarea
   attributes:
     label: Expected Behavior
     description: A concise description of what you expected to happen.
-    placeholder: e.g., Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tenetur similique, fuga dolores libero ipsa assumenda quo reprehenderit temporibus qui fugit repellendus sequi corrupti officiis dolore ut quod pariatur architecto praesentium.
+    placeholder: |
+      Example: If a user changes languages, any error messages in the form should be translated into the new language.
   validations:
     required: true
 - type: textarea
@@ -22,18 +24,14 @@ body:
     label: Steps To Reproduce
     description: Steps to reproduce the behavior.
     placeholder: |
-      1. In this environment...
-      2. With this config...
-      3. Run '...'
-      4. See error...
+      Example:
+      1. Open a form with required fields
+      2. Attempt to submit the empty form
+      3. Change the language
   validations:
     required: false
 - type: textarea
   attributes:
-    label: Anything else?
-    description: |
-      Links? References? Anything that will give us more context about the issue you are encountering!
-
-      Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    label: Additional Details
   validations:
     required: false
