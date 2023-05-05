@@ -1,0 +1,9 @@
+name: Discussion
+description: Discuss a potential feature or enhancement
+labels: ["Discussion"]
+body:
+- type: textarea
+  attributes:
+    label: Content
+  validations:
+    required: true

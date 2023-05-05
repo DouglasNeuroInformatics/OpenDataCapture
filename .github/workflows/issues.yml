@@ -30,7 +30,7 @@ jobs:
         with:
           script: |
             const title = context.payload.issue.title
-            const names = ['Bug', 'Feature', 'Enhancement']
+            const names = ['Bug', 'Feature', 'Enhancement', 'Discussion']
             const kind = context.payload.issue.labels.find((item) => names.includes(item.name))?.name
             if (!kind) {
               console.log('Does not match kind');
