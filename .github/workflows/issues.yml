@@ -25,3 +25,19 @@ jobs:
               repo: context.repo.repo,
               labels: [`Priority: ${priority}`]
             })
+      - name: Add label to title
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const title = context.payload.issue.title
+            const kind = context.payload.issue.labels.find((s) => s === 'Bug' || s === 'Feature')
+            if (!kind) {
+              console.log('Does not match kind');
+              return;
+            }
+            octokit.rest.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[${kind}]: ${context.payload.issue.title}`
+            });
