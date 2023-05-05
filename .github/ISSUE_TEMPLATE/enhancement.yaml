@@ -1,0 +1,20 @@
+name: Enhancement
+description: Request a change to an existing feature in the codebase
+labels: ["Enhancement"]
+body:
+- type: textarea
+  attributes:
+    label: Description
+    description: Please describe the enhancement in detail
+  validations:
+    required: true
+- type: dropdown
+  id: priority
+  attributes:
+    label: Priority
+    options:
+      - High
+      - Medium
+      - Low
+  validations:
+    required: true
