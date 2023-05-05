@@ -12,7 +12,7 @@ type ContactFormData = {
 };
 
 export const ContactPage = () => {
-  const { t } = useTranslation(['contact', 'form']);
+  const { t } = useTranslation(['contact']);
 
   const handleSubmit = ({ contactReason, message }: ContactFormData) => {
     const subject = encodeURIComponent(t(`contact:reasons.${contactReason}`).toUpperCase());
@@ -57,7 +57,7 @@ export const ContactPage = () => {
           required: ['contactReason'],
           errorMessage: {
             properties: {
-              reason: t('form:errors.required')
+              reason: t('form.errors.required')
             }
           }
         }}

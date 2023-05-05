@@ -23,7 +23,7 @@ export interface IdentificationFormProps {
 
 export const IdentificationForm = ({ fillActiveSubject, onSubmit }: IdentificationFormProps) => {
   const { activeSubject } = useActiveSubjectStore();
-  const { t } = useTranslation(['common', 'form']);
+  const { t } = useTranslation(['common']);
 
   return (
     <Form<IdentificationFormData>
@@ -80,10 +80,10 @@ export const IdentificationForm = ({ fillActiveSubject, onSubmit }: Identificati
         required: ['firstName', 'lastName', 'sex', 'dateOfBirth'],
         errorMessage: {
           properties: {
-            firstName: t('form:errors.required'),
-            lastName: t('form:errors.required'),
-            sex: t('form:errors.required'),
-            dateOfBirth: t('form:errors.required')
+            firstName: t('form.errors.required'),
+            lastName: t('form.errors.required'),
+            sex: t('form.errors.required'),
+            dateOfBirth: t('form.errors.required')
           }
         }
       }}

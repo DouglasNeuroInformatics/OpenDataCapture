@@ -1,94 +1,50 @@
 {
-  "createInstrument": {
-    "pageTitle": "Ajouter un instrument",
-    "steps": {
-      "info": "Info",
-      "fields": "Champs",
-      "review": "Révision"
-    },
-    "form": {
-      "basics": "De base",
-      "name": {
-        "label": "Nom"
-      },
-      "tags": {
-        "label": "Tags"
-      },
-      "version": {
-        "label": "Version"
-      },
-      "details": "Détails",
-      "title": {
-        "label": "Titre"
-      },
-      "description": {
-        "label": "Description"
-      },
-      "language": {
-        "label": "Langue"
-      },
-      "instructions": {
-        "label": "Instructions"
-      },
-      "estimatedDuration": {
-        "label": "Durée prévue"
-      }
-    },
-    "errors": {
-      "duplicateField": "Nom de champ en double invalide",
-      "invalidOptionFormat": "Format non valide pour l'option"
-    }
-  },
-  "availableInstruments": {
-    "pageTitle": "Tous les instruments",
-    "filters": {
-      "language": "Langue",
-      "tags": "Tags"
-    }
-  },
-  "manageInstruments": {
-    "pageTitle": "Gérer les instruments",
-    "deleteModal": {
-      "title": "Confirmation de l'effacement",
-      "name": "Nom",
-      "language": "Langue",
-      "version": "Version",
-      "delete": "Effacer",
-      "cancel": "Annuler"
-    }
-  },
-  "formPage": {
-    "overview": {
-      "label": "Aperçu",
-      "description": "Description",
-      "language": "Langue",
-      "estimated Duration": "Durée estimée",
-      "instructions": "Instructions",
-      "begin": "Commencer"
-    },
-    "identification": {
-      "label": "Identification"
-    },
-    "questions": {
-      "label": "Questions"
-    },
-    "summary": {
-      "label": "Résumé",
-      "instrumentTitle": "Titre de l'instrument",
-      "instrumentVersion": "Version de l'instrument",
-      "dateCollected": "Horodatage",
-      "metadata": "Métadonnées",
-      "subject": "Client",
-      "name": "Nom",
-      "dateOfBirth": "Date de naissance",
-      "sex": "Sexe",
-      "results": "Résultats",
-      "print": "Imprimer",
-      "download": "Télécharger"
-    },
-    "uploadSuccessful": "Téléchargement réussi"
-  },
-  "fetchInstrument": {
-    "notFound": "Cet instrument n'existe pas en français"
-  }
+  "availableInstruments.filters.language": "Langue",
+  "availableInstruments.filters.tags": "Tags",
+  "availableInstruments.pageTitle": "Tous les instruments",
+  "createInstrument.errors.duplicateField": "Nom de champ en double invalide",
+  "createInstrument.errors.invalidOptionFormat": "Format non valide pour l'option",
+  "createInstrument.form.basics": "De base",
+  "createInstrument.form.description.label": "Description",
+  "createInstrument.form.details": "Détails",
+  "createInstrument.form.estimatedDuration.label": "Durée prévue",
+  "createInstrument.form.instructions.label": "Instructions",
+  "createInstrument.form.language.label": "Langue",
+  "createInstrument.form.name.label": "Nom",
+  "createInstrument.form.tags.label": "Tags",
+  "createInstrument.form.title.label": "Titre",
+  "createInstrument.form.version.label": "Version",
+  "createInstrument.pageTitle": "Ajouter un instrument",
+  "createInstrument.steps.fields": "Champs",
+  "createInstrument.steps.info": "Info",
+  "createInstrument.steps.review": "Révision",
+  "fetchInstrument.notFound": "Cet instrument n'existe pas en français",
+  "formPage.identification.label": "Identification",
+  "formPage.overview.begin": "Commencer",
+  "formPage.overview.description": "Description",
+  "formPage.overview.estimated Duration": "Durée estimée",
+  "formPage.overview.instructions": "Instructions",
+  "formPage.overview.label": "Aperçu",
+  "formPage.overview.language": "Langue",
+  "formPage.questions.label": "Questions",
+  "formPage.summary.dateCollected": "Horodatage",
+  "formPage.summary.dateOfBirth": "Date de naissance",
+  "formPage.summary.download": "Télécharger",
+  "formPage.summary.instrumentTitle": "Titre de l'instrument",
+  "formPage.summary.instrumentVersion": "Version de l'instrument",
+  "formPage.summary.label": "Résumé",
+  "formPage.summary.metadata": "Métadonnées",
+  "formPage.summary.name": "Nom",
+  "formPage.summary.print": "Imprimer",
+  "formPage.summary.results": "Résultats",
+  "formPage.summary.sex": "Sexe",
+  "formPage.summary.subject": "Client",
+  "formPage.uploadSuccessful": "Téléchargement réussi",
+  "manageInstruments.deleteModal.cancel": "Annuler",
+  "manageInstruments.deleteModal.delete": "Effacer",
+  "manageInstruments.deleteModal.language": "Langue",
+  "manageInstruments.deleteModal.name": "Nom",
+  "manageInstruments.deleteModal.title": "Confirmation de l'effacement",
+  "manageInstruments.deleteModal.version": "Version",
+  "manageInstruments.pageTitle": "Gérer les instruments"
 }

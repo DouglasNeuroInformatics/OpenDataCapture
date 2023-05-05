@@ -1,38 +1,22 @@
 {
-  "addSubject": {
-    "pageTitle": "Ajouter un client",
-    "exists": "Ce client a déjà été enregistré"
-  },
-  "viewSubjects": {
-    "pageTitle": "Tous les clients",
-    "table": {
-      "filters": "Filtres",
-      "export": "Exporter",
-      "exportHelpText": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants.",
-      "columns": {
-        "subject": "Client",
-        "dateOfBirth": "Date de naissance",
-        "sex": "Sexe"
-      }
-    },
-    "lookup": {
-      "title": "Trouver un client"
-    }
-  },
-  "subjectPage": {
-    "pageTitle": "Dossiers d'instruments pour le client",
-    "graph": {
-      "defaultTitle": "Veuillez sélectionner un instrument",
-      "instrument": "Instrument",
-      "measures": "Mesures",
-      "timeframe": "Période",
-      "timeframeOptions": {
-        "all": "Toujours",
-        "month": "Mois écoulé",
-        "year": "Année écoulée"
-      },
-      "xLabel": "Date d'enregistrement",
-      "yLabel": "Valeur"
-    }
-  }
+  "addSubject.exists": "Ce client a déjà été enregistré",
+  "addSubject.pageTitle": "Ajouter un client",
+  "subjectPage.graph.defaultTitle": "Veuillez sélectionner un instrument",
+  "subjectPage.graph.instrument": "Instrument",
+  "subjectPage.graph.measures": "Mesures",
+  "subjectPage.graph.timeframe": "Période",
+  "subjectPage.graph.timeframeOptions.all": "Toujours",
+  "subjectPage.graph.timeframeOptions.month": "Mois écoulé",
+  "subjectPage.graph.timeframeOptions.year": "Année écoulée",
+  "subjectPage.graph.xLabel": "Date d'enregistrement",
+  "subjectPage.graph.yLabel": "Valeur",
+  "subjectPage.pageTitle": "Dossiers d'instruments pour le client",
+  "viewSubjects.lookup.title": "Trouver un client",
+  "viewSubjects.pageTitle": "Tous les clients",
+  "viewSubjects.table.columns.dateOfBirth": "Date de naissance",
+  "viewSubjects.table.columns.sex": "Sexe",
+  "viewSubjects.table.columns.subject": "Client",
+  "viewSubjects.table.export": "Exporter",
+  "viewSubjects.table.exportHelpText": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants.",
+  "viewSubjects.table.filters": "Filtres"
 }

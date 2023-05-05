@@ -1,94 +1,50 @@
 {
-  "createInstrument": {
-    "pageTitle": "Add Instrument",
-    "steps": {
-      "info": "Info",
-      "fields": "Fields",
-      "review": "Review"
-    },
-    "form": {
-      "basics": "Basics",
-      "name": {
-        "label": "Name"
-      },
-      "tags": {
-        "label": "Tags"
-      },
-      "version": {
-        "label": "Version"
-      },
-      "details": "Details",
-      "title": {
-        "label": "Title"
-      },
-      "description": {
-        "label": "Description"
-      },
-      "language": {
-        "label": "Language"
-      },
-      "instructions": {
-        "label": "Instructions"
-      },
-      "estimatedDuration": {
-        "label": "Estimated Duration"
-      }
-    },
-    "errors": {
-      "duplicateField": "Invalid duplicate field name",
-      "invalidOptionFormat": "Invalid format for option"
-    }
-  },
-  "availableInstruments": {
-    "pageTitle": "View Instruments",
-    "filters": {
-      "language": "Language",
-      "tags": "Tags"
-    }
-  },
-  "manageInstruments": {
-    "pageTitle": "Manage Instruments",
-    "deleteModal": {
-      "title": "Confirmation",
-      "name": "Name",
-      "language": "Language",
-      "version": "Version",
-      "delete": "Delete",
-      "cancel": "Cancel"
-    }
-  },
-  "formPage": {
-    "overview": {
-      "label": "Overview",
-      "description": "Description",
-      "language": "Language",
-      "estimated Duration": "Estimated Duration",
-      "instructions": "Instructions",
-      "begin": "Begin"
-    },
-    "identification": {
-      "label": "Identification"
-    },
-    "questions": {
-      "label": "Questions"
-    },
-    "summary": {
-      "label": "Summary",
-      "instrumentTitle": "Instrument Title",
-      "instrumentVersion": "Instrument Version",
-      "dateCollected": "Date Collected",
-      "metadata": "Metadata",
-      "subject": "Subject",
-      "name": "Name",
-      "dateOfBirth": "Date of Birth",
-      "sex": "Sex",
-      "results": "Results",
-      "print": "Print",
-      "download": "Download"
-    },
-    "uploadSuccessful": "Upload Successful"
-  },
-  "fetchInstrument": {
-    "notFound": "This instrument does not exist in English"
-  }
+  "availableInstruments.filters.language": "Language",
+  "availableInstruments.filters.tags": "Tags",
+  "availableInstruments.pageTitle": "View Instruments",
+  "createInstrument.errors.duplicateField": "Invalid duplicate field name",
+  "createInstrument.errors.invalidOptionFormat": "Invalid format for option",
+  "createInstrument.form.basics": "Basics",
+  "createInstrument.form.description.label": "Description",
+  "createInstrument.form.details": "Details",
+  "createInstrument.form.estimatedDuration.label": "Estimated Duration",
+  "createInstrument.form.instructions.label": "Instructions",
+  "createInstrument.form.language.label": "Language",
+  "createInstrument.form.name.label": "Name",
+  "createInstrument.form.tags.label": "Tags",
+  "createInstrument.form.title.label": "Title",
+  "createInstrument.form.version.label": "Version",
+  "createInstrument.pageTitle": "Add Instrument",
+  "createInstrument.steps.fields": "Fields",
+  "createInstrument.steps.info": "Info",
+  "createInstrument.steps.review": "Review",
+  "fetchInstrument.notFound": "This instrument does not exist in English",
+  "formPage.identification.label": "Identification",
+  "formPage.overview.begin": "Begin",
+  "formPage.overview.description": "Description",
+  "formPage.overview.estimated Duration": "Estimated Duration",
+  "formPage.overview.instructions": "Instructions",
+  "formPage.overview.label": "Overview",
+  "formPage.overview.language": "Language",
+  "formPage.questions.label": "Questions",
+  "formPage.summary.dateCollected": "Date Collected",
+  "formPage.summary.dateOfBirth": "Date of Birth",
+  "formPage.summary.download": "Download",
+  "formPage.summary.instrumentTitle": "Instrument Title",
+  "formPage.summary.instrumentVersion": "Instrument Version",
+  "formPage.summary.label": "Summary",
+  "formPage.summary.metadata": "Metadata",
+  "formPage.summary.name": "Name",
+  "formPage.summary.print": "Print",
+  "formPage.summary.results": "Results",
+  "formPage.summary.sex": "Sex",
+  "formPage.summary.subject": "Subject",
+  "formPage.uploadSuccessful": "Upload Successful",
+  "manageInstruments.deleteModal.cancel": "Cancel",
+  "manageInstruments.deleteModal.delete": "Delete",
+  "manageInstruments.deleteModal.language": "Language",
+  "manageInstruments.deleteModal.name": "Name",
+  "manageInstruments.deleteModal.title": "Confirmation",
+  "manageInstruments.deleteModal.version": "Version",
+  "manageInstruments.pageTitle": "Manage Instruments"
 }

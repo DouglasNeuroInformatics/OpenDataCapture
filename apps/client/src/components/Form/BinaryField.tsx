@@ -26,13 +26,13 @@ const Checkbox = (props: InnerProps) => (
 );
 
 const RadioOption = ({ value, label }: { value: true | false; label?: string }) => {
-  const { t } = useTranslation('form');
+  const { t } = useTranslation();
   return (
     <RadioGroup.Option className="flex items-center" value={value}>
       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white ring-1 ring-slate-200 hover:bg-slate-50 hover:shadow-xl">
         <HiCheck className="ui-checked:opacity-100 duration-400 text-slate-600 opacity-0 transition-opacity ease-in-out" />
       </div>
-      <span className="ms-2">{label ?? t(`radio.labels.${value}`)}</span>
+      <span className="ms-2">{label ?? t(`form.radio.labels.${value}`)}</span>
     </RadioGroup.Option>
   );
 };
