@@ -4,8 +4,14 @@ labels: ["Enhancement"]
 body:
 - type: textarea
   attributes:
+    label: Current Situation
+    description: Please briefly describe current state of the feature in question, in particular the limitations/problems of the current solution
+  validations:
+    required: true
+- type: textarea
+  attributes:
     label: Description
-    description: Please describe the enhancement in detail
+    description: Please describe the enhancement in detail, explaining how this change will solve the above limitations
   validations:
     required: true
 - type: dropdown
