@@ -8,6 +8,16 @@ body:
     description: Please briefly describe current state of the feature in question, in particular the limitations/problems of the current solution
   validations:
     required: true
+- type: dropdown
+  attributes:
+    label: Associated Application Components
+    description: Please select all application components that this enhancement concerns
+    multiple: true
+    options:
+      - Client
+      - Server
+  validations:
+    required: true
 - type: textarea
   attributes:
     label: Proposed Changes
