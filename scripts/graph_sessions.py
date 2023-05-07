@@ -2,6 +2,7 @@ import os
 
 from datetime import datetime
 
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import requests
 
@@ -23,6 +24,17 @@ response = requests.get(f"{API_URL}/v1/users", headers={
 # admin is running this so should not be included
 users: list[dict] = [user for user in response.json() if user['username'] != 'admin']
 
+sessions: list[datetime] = []
+for user in users:
+    for session in user['sessions']:
+        # Some sessions were recorded before time was added
+        try:
+            time = session['time']
+        except KeyError:
+            continue
+        # Date.now() creates in ms while Python expects seconds
+        sessions.append(datetime.fromtimestamp(time / 1000))
+
 # a record of the number of logins at each timestamp
 data: dict[datetime, int] = {}
 for user in users:
@@ -40,10 +52,23 @@ for user in users:
         else:
             data[session_date] += 1
 
+data = dict(sorted(data.items()))
+
+print(min(data.values()))
 
 fig, ax = plt.subplots()
 ax.plot(data.keys(), data.values())
 ax.scatter(data.keys(), data.values())
 ax.set_ylabel('Number of Logins')
 ax.set_title('Summary of Demo Activity')
+
+locator = mdates.AutoDateLocator(minticks=3, maxticks=7)
+formatter = mdates.ConciseDateFormatter(locator)
+ax.xaxis.set_major_locator(locator)
+ax.xaxis.set_major_formatter(formatter)
+
+for label in ax.get_xticklabels():
+    label.set_rotation(40)
+    label.set_horizontalalignment('right')
+
 plt.show()
