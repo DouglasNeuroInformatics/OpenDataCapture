@@ -4,8 +4,30 @@ labels: ["Enhancement"]
 body:
 - type: textarea
   attributes:
-    label: Description
-    description: Please describe the enhancement in detail
+    label: Current Implementation
+    description: Describe current state of the feature in question
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Limitations of Current Implementation
+    description: Describe the limitations of the current solution
+  validations:
+    required: true
+- type: dropdown
+  attributes:
+    label: Associated Application Components
+    description: Select the application components related to this feature
+    multiple: true
+    options:
+      - Client
+      - Server
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Proposed Solution
+    description: Describe the enhancement in detail and explain how it will address the limitations/problems described above
   validations:
     required: true
 - type: dropdown
