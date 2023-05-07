@@ -5,13 +5,19 @@ body:
 - type: textarea
   attributes:
     label: Current Implementation
-    description: Please briefly describe current state of the feature in question, in particular the limitations/problems of the current solution
+    description: Describe current state of the feature in question
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Limitations of Current Implementation
+    description: Describe the limitations of the current solution
   validations:
     required: true
 - type: dropdown
   attributes:
     label: Associated Application Components
-    description: Please select all application components that this enhancement concerns
+    description: Select the application components related to this feature
     multiple: true
     options:
       - Client
@@ -20,8 +26,8 @@ body:
     required: true
 - type: textarea
   attributes:
-    label: Proposed Changes
-    description: Please describe the enhancement in detail, explaining how this change will solve the above limitations
+    label: Proposed Solution
+    description: Describe the enhancement in detail and explain how it will address the limitations/problems described above
   validations:
     required: true
 - type: dropdown
