@@ -27,10 +27,10 @@ jobs:
 
             const labels = []
             if (priority) {
-              labels.push(`${priority} Priority`)
+              labels.push(`Priority: ${priority} `)
             }
             if (difficulty) {
-              labels.push(`${difficulty} Difficulty)`)
+              labels.push(`Difficulty: ${difficulty}`)
             }
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
