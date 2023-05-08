@@ -27,7 +27,7 @@ export const SubjectLookup = ({ show, onClose }: SubjectLookupProps) => {
   return (
     <Modal open={show} title={t('viewSubjects.lookup.title')} onClose={onClose}>
       <div>
-        <IdentificationForm onSubmit={lookupSubject} />
+        <IdentificationForm fillActiveSubject onSubmit={lookupSubject} />
       </div>
     </Modal>
   );
