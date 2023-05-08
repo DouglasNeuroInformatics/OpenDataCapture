@@ -4,6 +4,7 @@ import url from 'url';
 
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import viteCompression from 'vite-plugin-compression';
 
 const clientDir = path.dirname(url.fileURLToPath(import.meta.url));
 
@@ -20,7 +21,7 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [react()],
+    plugins: [react(), viteCompression()],
     server: {
       port: process.env.VITE_DEV_SERVER_PORT
     },
