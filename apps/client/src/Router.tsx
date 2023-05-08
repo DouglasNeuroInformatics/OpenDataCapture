@@ -12,12 +12,12 @@ import {
   ManageInstrumentsPage
 } from './features/instruments';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
-import { AddSubjectPage, SubjectPage, ViewSubjectsPage } from './features/subjects';
+import { AddSubjectPage, ViewSubjectsPage } from './features/subjects';
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
 
 /** Recharts library is huge! */
-// const SubjectPage = React.lazy(() => import('@/features/subjects/pages/SubjectPage'));
+const SubjectPage = React.lazy(() => import('@/features/subjects/pages/SubjectPage'));
 
 export const Router = () => {
   const { accessToken } = useAuthStore();
