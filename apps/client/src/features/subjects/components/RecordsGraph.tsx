@@ -93,7 +93,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="ml-[70px] p-2">
+      <div className="ml-[40px] p-2">
         <div className="mb-5">
           <h3 className="text-center text-xl font-medium">
             {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
@@ -160,9 +160,6 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
           xAxis={{
             key: 'dateString',
             label: t('subjectPage.graph.xLabel')
-          }}
-          yAxis={{
-            label: t('subjectPage.graph.yLabel')
           }}
         />
       </div>

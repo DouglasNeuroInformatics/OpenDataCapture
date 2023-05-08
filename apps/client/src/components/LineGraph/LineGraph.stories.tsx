@@ -75,9 +75,6 @@ export const Default: Story = {
       key: 'month',
       label: 'Month'
     },
-    yAxis: {
-      label: 'Average Daily Sales'
-    },
     legend: 'top'
   }
 };
