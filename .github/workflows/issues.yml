@@ -27,7 +27,7 @@ jobs:
 
             const labels = []
             if (priority) {
-              labels.push(`Priority: ${priority} `)
+              labels.push(`Priority: ${priority}`)
             }
             if (difficulty) {
               labels.push(`Difficulty: ${difficulty}`)
