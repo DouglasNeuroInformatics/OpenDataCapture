@@ -25,7 +25,6 @@ export function LineGraph<const T extends LineGraphData>({
   data,
   lines,
   xAxis,
-  yAxis,
   legend = null
 }: {
   /** An array of objects, where each object represents one point on the x-axis */
@@ -39,15 +38,12 @@ export function LineGraph<const T extends LineGraphData>({
     key?: ExtractValidKeys<T, string>;
     label?: string;
   };
-  yAxis: {
-    label?: string;
-  };
   legend: 'top' | 'right' | 'bottom' | null;
 }) {
   let legendComponent: JSX.Element | null;
   switch (legend) {
     case 'bottom':
-      legendComponent = <Legend wrapperStyle={{ paddingLeft: 70, paddingTop: 10 }} />;
+      legendComponent = <Legend wrapperStyle={{ paddingLeft: 40, paddingTop: 10 }} />;
       break;
     case 'top':
       legendComponent = <Legend height={36} verticalAlign="top" />;
@@ -75,9 +71,7 @@ export function LineGraph<const T extends LineGraphData>({
         <XAxis dataKey={xAxis?.key} height={50} padding={{ left: 20, right: 20 }} tickMargin={5} tickSize={8}>
           <Label offset={5} position="insideBottom" value={xAxis?.label} />
         </XAxis>
-        <YAxis tickMargin={5} tickSize={8} width={70}>
-          <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} value={yAxis.label} />
-        </YAxis>
+        <YAxis tickMargin={5} tickSize={8} width={40} />
         <Tooltip />
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="linear">
