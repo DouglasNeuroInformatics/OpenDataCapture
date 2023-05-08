@@ -8,7 +8,7 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - name: Add priority
+      - name: Add priority and difficulty
         uses: actions/github-script@v6
         with:
           script: |
@@ -29,22 +29,16 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            function titleCase(str) {
-              return str.toLowerCase().split(' ').map(function(word) {
-                return word.replace(word[0], word[0].toUpperCase());
-              }).join(' ');
-            }
-            let title = titleCase(context.payload.issue.title)
+            const title = context.payload.issue.title
             const names = ['Bug', 'Feature', 'Enhancement', 'Discussion']
             const kind = context.payload.issue.labels.find((item) => names.includes(item.name))?.name
-            if (kind) {
-              title = `[${kind}]: ${title}`
-            } else if (title === context.payload.issue.title) {
+            if (!kind) {
+              console.log('Does not match kind');
               return;
             }
             github.rest.issues.update({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: title
+              title: `[${kind}]: ${context.payload.issue.title}`
             });
