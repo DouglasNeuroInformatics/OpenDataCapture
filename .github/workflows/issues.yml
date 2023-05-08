@@ -12,18 +12,31 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const body = context.payload.issue.body
-            const items = body.split('\n\n')
-            const priorityLabelIndex = items.findIndex((s) => s.includes('Priority'))
-            if (priorityLabelIndex === -1) {
-              return;
+            // Extract item from context.payload.issue.body
+            function extractItem(item) {
+              const items = context.payload.issue.body.split('\n\n')
+              const labelIndex = items.findIndex((s) => s.includes(item))
+              if (labelIndex === -1) {
+                return null
+              }
+              return items[labelIndex + 1]
             }
-            const priority = items[priorityLabelIndex + 1]
+
+            const priority = extractItem('Priority')
+            const difficulty = extractItem('Estimated Difficulty')
+
+            const labels = []
+            if (priority) {
+              labels.push(`${priority} Priority`)
+            }
+            if (difficulty) {
+              labels.push(`${difficulty} Difficulty)`)
+            }
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: [`${priority} Priority`]
+              labels: labels
             })
       - name: Add label to title
         uses: actions/github-script@v6
