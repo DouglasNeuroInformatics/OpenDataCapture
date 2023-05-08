@@ -19,6 +19,7 @@ export interface FormProps<T extends FormInstrumentData> {
   content: FormInstrumentContent<T>;
   className?: string;
   initialValues?: FormValues<T> | null;
+  resetBtn?: boolean;
   submitBtnLabel?: string;
   validationSchema: JSONSchemaType<T>;
   onSubmit: (data: T) => void;
@@ -30,7 +31,8 @@ export const Form = <T extends FormInstrumentData>({
   initialValues,
   submitBtnLabel,
   validationSchema,
-  onSubmit
+  onSubmit,
+  resetBtn
 }: FormProps<T>) => {
   const [errors, setErrors] = useState<FormErrors<T>>({});
   const [values, setValues] = useState<FormValues<T>>(() => initialValues ?? getDefaultValues(content));
@@ -93,8 +95,11 @@ export const Form = <T extends FormInstrumentData>({
               );
             })
           : renderFormFields(content)}
-        <div className="w-full">
+        <div className="flex w-full gap-3">
           <Button className="w-full" label={submitBtnLabel ?? t('form.submit')} type="submit" />
+          {resetBtn && (
+            <Button className="w-full" label={t('form.reset')} type="button" variant="light" onClick={reset} />
+          )}
         </div>
       </form>
     </FormProvider>

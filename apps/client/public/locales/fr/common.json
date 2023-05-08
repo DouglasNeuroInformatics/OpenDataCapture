@@ -51,5 +51,6 @@
   "form.errors.required": "Ce champ est obligatoire",
   "form.radio.labels.false": "Faux",
   "form.radio.labels.true": "Vrai",
-  "form.submit": "Soumettre"
+  "form.submit": "Soumettre",
+  "form.reset": "Réinitialiser"
 }

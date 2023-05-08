@@ -58,6 +58,7 @@ export const IdentificationForm = ({ fillActiveSubject, submitBtnLabel, onSubmit
         }
       }}
       initialValues={fillActiveSubject ? activeSubject : undefined}
+      resetBtn={fillActiveSubject}
       submitBtnLabel={submitBtnLabel ?? t('identificationForm.submit')}
       validationSchema={{
         type: 'object',
