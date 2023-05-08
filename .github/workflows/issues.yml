@@ -29,16 +29,22 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const title = context.payload.issue.title
+            function titleCase(str) {
+              return str.toLowerCase().split(' ').map(function(word) {
+                return word.replace(word[0], word[0].toUpperCase());
+              }).join(' ');
+            }
+            let title = titleCase(context.payload.issue.title)
             const names = ['Bug', 'Feature', 'Enhancement', 'Discussion']
             const kind = context.payload.issue.labels.find((item) => names.includes(item.name))?.name
-            if (!kind) {
-              console.log('Does not match kind');
+            if (kind) {
+              title = `[${kind}]: ${title}`
+            } else if (title === context.payload.issue.title) {
               return;
             }
             github.rest.issues.update({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `[${kind}]: ${context.payload.issue.title}`
+              title: title
             });
