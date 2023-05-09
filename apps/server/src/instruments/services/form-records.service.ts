@@ -111,10 +111,17 @@ export class FormRecordsService {
     return arr;
   }
 
-  async summary(ability: AppAbility, groupName?: string): Promise<FormInstrumentRecordsSummary> {
+  async summary(
+    ability: AppAbility,
+    groupName?: string,
+    instrumentIdentifier?: string
+  ): Promise<FormInstrumentRecordsSummary> {
     const group = groupName ? await this.groupsService.findByName(groupName, ability) : undefined;
+    const instrument = instrumentIdentifier
+      ? await this.formsService.findByIdentifier(instrumentIdentifier)
+      : undefined;
     return {
-      count: await this.formRecordsModel.find({ group }).accessibleBy(ability).count()
+      count: await this.formRecordsModel.find({ group, instrument }).accessibleBy(ability).count()
     };
   }
 

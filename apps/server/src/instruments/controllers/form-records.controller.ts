@@ -43,9 +43,10 @@ export class FormRecordsController {
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   summary(
     @UserAbility() ability: AppAbility,
-    @Query('group') groupName?: string
+    @Query('group') groupName?: string,
+    @Query('instrument') instrumentIdentifier?: string
   ): Promise<FormInstrumentRecordsSummary> {
-    return this.formRecordsService.summary(ability, groupName);
+    return this.formRecordsService.summary(ability, groupName, instrumentIdentifier);
   }
 
   @ApiOperation({ description: 'Export Records' })
