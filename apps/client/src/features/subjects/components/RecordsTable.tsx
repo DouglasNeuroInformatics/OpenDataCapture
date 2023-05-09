@@ -31,7 +31,8 @@ export const RecordsTable = () => {
         columns={[
           {
             name: t('subjectPage.graph.xLabel'),
-            field: 'time'
+            field: 'time',
+            format: (value: number) => new Date(value).toISOString()
           },
           ...selectedMeasures.map((measure) => ({
             name: measure.label,

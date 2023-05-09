@@ -24,6 +24,8 @@ function formatValue(value: unknown): string {
 export interface TableColumn<T> {
   name: string;
   field: keyof T | ((entry: T) => unknown);
+  /** Override the default formatter for this field */
+  format?: (value: any) => string;
 }
 
 export interface TableProps<T> {
@@ -60,7 +62,9 @@ export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, e
           <tbody>
             {currentEntries.map((entry, i) => (
               <tr
-                className="cursor-pointer odd:bg-slate-100 hover:bg-zinc-200"
+                className={clsx('odd:bg-slate-100 hover:bg-zinc-200', {
+                  'cursor-pointer': typeof entryLinkFactory === 'function'
+                })}
                 key={i}
                 onClick={() => {
                   if (!entryLinkFactory) {
@@ -69,11 +73,11 @@ export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, e
                   navigate(entryLinkFactory(entry));
                 }}
               >
-                {columns.map(({ field }, j) => {
+                {columns.map(({ field, format }, j) => {
                   const value = typeof field === 'function' ? field(entry) : entry[field];
                   return (
                     <td className="whitespace-nowrap px-6 py-3" key={j}>
-                      <span>{formatValue(value)}</span>
+                      <span>{format ? format(value) : formatValue(value)}</span>
                     </td>
                   );
                 })}
