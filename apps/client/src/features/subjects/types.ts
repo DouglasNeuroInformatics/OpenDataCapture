@@ -1,6 +1,6 @@
 import { FormInstrument } from '@douglasneuroinformatics/common';
 
-export type RecordsGraphData = Array<{
+export type Measurements = Array<{
   [key: string]: any;
   time: number;
 }>;

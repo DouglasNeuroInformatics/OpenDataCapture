@@ -3,22 +3,36 @@ import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { FormInstrumentRecord, SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useParams } from 'react-router-dom';
 
-import { SelectedInstrument, SelectedMeasure } from '../types';
+import { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
 
 import { Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 import i18n from '@/services/18n';
 
+/** Apply a callback function to filter items from object */
+function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
+  const result: Partial<T> = {};
+  for (const key in obj) {
+    if (fn({ key, value: obj[key] })) {
+      result[key] = obj[key];
+    }
+  }
+  return result;
+}
+
 export type VisualizationContextData = {
   /** Data in the format returned from the API */
   data: SubjectFormRecords[];
 
-  /** An array of all records in the data returned by the API */
+  /** An array of records in the data returned by the API, after applying filters */
   records: Array<
     Pick<FormInstrumentRecord, 'data' | 'time'> & {
       computedMeasures?: Record<string, number> | undefined;
     }
   >;
+
+  /** Merger of `computedMeasures` and `time` for all records  */
+  measurements: Measurements;
 
   /** Minimum unix timestamp for a record */
   minTime: number | null;
@@ -71,11 +85,30 @@ export const VisualizationContextProvider = ({ children }: { children: React.Rea
   }, [selectedInstrument]);
 
   const records = useMemo(() => {
-    if (data) {
-      return data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
+    const instrument = data?.find(({ instrument }) => instrument === selectedInstrument);
+    if (!instrument) {
+      return [];
     }
-    return [];
-  }, [data, selectedInstrument]);
+    return instrument.records.map((record) => record).filter((record) => minTime === null || record.time > minTime);
+  }, [data, selectedMeasures, selectedInstrument, minTime]);
+
+  const measurements = useMemo<Measurements>(() => {
+    return records
+      .map((record) => ({
+        time: record.time,
+        ...filterObj(record.computedMeasures!, ({ key }) => {
+          return selectedMeasures.find((item) => item.key === key);
+        })
+      }))
+      .sort((a, b) => {
+        if (a.time > b.time) {
+          return 1;
+        } else if (b.time > a.time) {
+          return -1;
+        }
+        return 0;
+      });
+  }, [records]);
 
   const instrumentOptions = useMemo(() => {
     return data
@@ -109,6 +142,7 @@ export const VisualizationContextProvider = ({ children }: { children: React.Rea
       value={{
         data,
         records,
+        measurements,
         measureOptions,
         instrumentOptions,
         minTime,
