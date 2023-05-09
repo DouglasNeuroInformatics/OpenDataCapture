@@ -1,28 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import {
-  DateUtils,
-  FormInstrument,
-  FormInstrumentRecordsSummary,
-  SubjectFormRecords
-} from '@douglasneuroinformatics/common';
+import { DateUtils, FormInstrumentRecordsSummary, SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrumentOptions } from '../hooks/useInstrumentOptions';
+import { RecordsGraphData, SelectedInstrument, SelectedMeasure } from '../types';
 
 import { Dropdown, LineGraph, SelectDropdown } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
-
-type RecordsGraphData = Array<{
-  [key: string]: any;
-  time: number;
-}>;
-
-type SelectedMeasure = {
-  key: string;
-  label: string;
-};
 
 /** Apply a callback function to filter items from object */
 function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
@@ -42,7 +28,7 @@ export interface RecordsGraphProps {
 export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   const { t } = useTranslation('subjects');
   const [oldestTime, setOldestTime] = useState<number | null>(null);
-  const [selectedInstrument, setSelectedInstrument] = useState<(FormInstrument & { identifier: string }) | null>();
+  const [selectedInstrument, setSelectedInstrument] = useState<SelectedInstrument | null>();
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
   const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
 
