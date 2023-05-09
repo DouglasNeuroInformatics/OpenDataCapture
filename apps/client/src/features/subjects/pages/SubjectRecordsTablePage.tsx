@@ -1,10 +1,18 @@
 import React from 'react';
 
+import { RecordsTable } from '../components/RecordsTable';
+import { VisualizationContextProvider } from '../context/VisualizationContext';
+import { useSubjectPageTitle } from '../hooks/useSubjectPageTitle';
+
+import { PageHeader } from '@/components';
+
 export const SubjectRecordsTablePage = () => {
+  const title = useSubjectPageTitle();
   return (
-    <div>
-      <h1>Foo</h1>
-    </div>
+    <VisualizationContextProvider>
+      <PageHeader title={title} />
+      <RecordsTable />
+    </VisualizationContextProvider>
   );
 };
 
