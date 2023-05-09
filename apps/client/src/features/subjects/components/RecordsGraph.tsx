@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { DateUtils, FormInstrumentRecordsSummary, SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
+import { VisualizationContext } from '../context/VisualizationContext';
 import { useInstrumentOptions } from '../hooks/useInstrumentOptions';
 import { RecordsGraphData, SelectedInstrument, SelectedMeasure } from '../types';
 
@@ -27,7 +28,8 @@ export interface RecordsGraphProps {
   data: SubjectFormRecords[];
 }
 
-export const RecordsGraph = ({ data }: RecordsGraphProps) => {
+export const RecordsGraph = () => {
+  const { data } = useContext(VisualizationContext);
   const { t } = useTranslation('subjects');
   const [oldestTime, setOldestTime] = useState<number | null>(null);
   const [selectedInstrument, setSelectedInstrument] = useState<SelectedInstrument | null>();
