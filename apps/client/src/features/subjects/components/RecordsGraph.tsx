@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 
 import { DateUtils, SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
@@ -8,8 +8,9 @@ import { RecordsGraphData } from '../types';
 
 import { InstrumentDropdown } from './InstrumentDropdown';
 import { MeasuresDropdown } from './MeasuresDropdown';
+import { TimeDropdown } from './TimeDropdown';
 
-import { Dropdown, LineGraph } from '@/components';
+import { LineGraph } from '@/components';
 
 /** Apply a callback function to filter items from object */
 function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
@@ -29,7 +30,6 @@ export interface RecordsGraphProps {
 export const RecordsGraph = () => {
   const ctx = useContext(VisualizationContext);
   const { t } = useTranslation('subjects');
-  const [oldestTime, setOldestTime] = useState<number | null>(null);
 
   const graphData = useMemo(() => {
     const arr: RecordsGraphData = [];
@@ -38,7 +38,7 @@ export const RecordsGraph = () => {
         return ctx.selectedMeasures.find((item) => item.key === key);
       });
       // Whether this date contains a point that should be on the x axis
-      const isPoint = (oldestTime === null || record.time > oldestTime) && Object.keys(measures).length > 0;
+      const isPoint = (ctx.minTime === null || record.time > ctx.minTime) && Object.keys(measures).length > 0;
       if (isPoint) {
         arr.push({
           time: record.time,
@@ -54,7 +54,7 @@ export const RecordsGraph = () => {
       }
       return 0;
     });
-  }, [ctx.records, ctx.selectedMeasures, oldestTime]);
+  }, [ctx.records, ctx.selectedMeasures, ctx.minTime]);
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -63,9 +63,9 @@ export const RecordsGraph = () => {
           <h3 className="text-center text-xl font-medium">
             {ctx.selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
           </h3>
-          {oldestTime && (
+          {ctx.minTime && (
             <p className="text-center">
-              {DateUtils.toBasicISOString(new Date(oldestTime))} - {DateUtils.toBasicISOString(new Date())}
+              {DateUtils.toBasicISOString(new Date(ctx.minTime))} - {DateUtils.toBasicISOString(new Date())}
             </p>
           )}
         </div>
@@ -75,25 +75,7 @@ export const RecordsGraph = () => {
             <MeasuresDropdown />
           </div>
           <div>
-            <Dropdown
-              className="text-sm"
-              options={{
-                all: t('subjectPage.graph.timeframeOptions.all'),
-                pastYear: t('subjectPage.graph.timeframeOptions.year'),
-                pastMonth: t('subjectPage.graph.timeframeOptions.month')
-              }}
-              title={t('subjectPage.graph.timeframe')}
-              variant="light"
-              onSelection={(selection) => {
-                if (selection === 'pastYear') {
-                  setOldestTime(new Date(new Date().setFullYear(new Date().getFullYear() - 1)).getTime());
-                } else if (selection === 'pastMonth') {
-                  setOldestTime(new Date(new Date().setMonth(new Date().getMonth() - 1)).getTime());
-                } else {
-                  setOldestTime(null);
-                }
-              }}
-            />
+            <TimeDropdown />
           </div>
         </div>
       </div>

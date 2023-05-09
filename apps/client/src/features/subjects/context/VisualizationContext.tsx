@@ -20,6 +20,12 @@ export type VisualizationContextData = {
     }
   >;
 
+  /** Minimum unix timestamp for a record */
+  minTime: number | null;
+
+  /** A function to set the minimum time */
+  setMinTime: React.Dispatch<React.SetStateAction<number | null>>;
+
   /** The selected instrument from among those in the data */
   selectedInstrument: SelectedInstrument | null;
 
@@ -50,8 +56,19 @@ export const VisualizationContextProvider = ({ children }: { children: React.Rea
     }
   });
 
+  const [minTime, setMinTime] = useState<number | null>(null);
   const [selectedInstrument, setSelectedInstrument] = useState<SelectedInstrument | null>(null);
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
+
+  // This is to reset all data when language changes
+  useEffect(() => {
+    setSelectedInstrument(null);
+    setSelectedMeasures([]);
+  }, [i18n.resolvedLanguage]);
+
+  useEffect(() => {
+    setMinTime(null);
+  }, [selectedInstrument]);
 
   const records = useMemo(() => {
     if (data) {
@@ -83,12 +100,6 @@ export const VisualizationContextProvider = ({ children }: { children: React.Rea
     return arr;
   }, [selectedInstrument]);
 
-  // This is to reset all data when language changes
-  useEffect(() => {
-    setSelectedInstrument(null);
-    setSelectedMeasures([]);
-  }, [i18n.resolvedLanguage]);
-
   if (!data) {
     return <Spinner />;
   }
@@ -100,6 +111,8 @@ export const VisualizationContextProvider = ({ children }: { children: React.Rea
         records,
         measureOptions,
         instrumentOptions,
+        minTime,
+        setMinTime,
         selectedInstrument,
         setSelectedInstrument,
         selectedMeasures,
