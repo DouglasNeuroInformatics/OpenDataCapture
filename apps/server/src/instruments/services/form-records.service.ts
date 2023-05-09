@@ -15,7 +15,6 @@ import {
 } from '@douglasneuroinformatics/common/instruments';
 import { DateUtils } from '@douglasneuroinformatics/common/utils';
 import { Model } from 'mongoose';
-import { mean, standardDeviation } from 'simple-statistics';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
@@ -26,6 +25,7 @@ import { FormsService } from './forms.service';
 
 import { AjvService } from '@/ajv/ajv.service';
 import { GroupsService } from '@/groups/groups.service';
+import { StatsService } from '@/stats/stats.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
@@ -36,6 +36,7 @@ export class FormRecordsService {
     private readonly ajvService: AjvService,
     private readonly formsService: FormsService,
     private readonly groupsService: GroupsService,
+    private readonly statsService: StatsService,
     private readonly subjectsService: SubjectsService
   ) {}
 
@@ -135,8 +136,8 @@ export class FormRecordsService {
           return [
             key,
             {
-              mean: mean(arr),
-              std: standardDeviation(arr)
+              mean: this.statsService.mean(arr),
+              std: this.statsService.std(arr)
             }
           ];
         })
