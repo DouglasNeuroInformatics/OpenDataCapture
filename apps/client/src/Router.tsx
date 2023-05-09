@@ -18,6 +18,7 @@ import { useAuthStore } from './stores/auth-store';
 
 /** Recharts library is huge! */
 const SubjectRecordsGraphPage = React.lazy(() => import('@/features/subjects/pages/SubjectRecordsGraphPage'));
+const SubjectRecordsTablePage = React.lazy(() => import('@/features/subjects/pages/SubjectRecordsTablePage'));
 
 export const Router = () => {
   const { accessToken } = useAuthStore();
@@ -37,6 +38,7 @@ export const Router = () => {
                 <Route path=":subjectIdentifier">
                   <Route index element={<SelectVisualizationPage />} />
                   <Route element={<SubjectRecordsGraphPage />} path="graph" />
+                  <Route element={<SubjectRecordsTablePage />} path="table" />
                 </Route>
               </Route>
             </Route>
