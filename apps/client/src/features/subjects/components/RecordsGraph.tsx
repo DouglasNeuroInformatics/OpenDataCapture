@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { VisualizationContext } from '../context/VisualizationContext';
 import { RecordsGraphData } from '../types';
 
+import { InstrumentDropdown } from './InstrumentDropdown';
 import { MeasuresDropdown } from './MeasuresDropdown';
 
 import { Dropdown, LineGraph } from '@/components';
@@ -70,18 +71,7 @@ export const RecordsGraph = () => {
         </div>
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
-            <Dropdown
-              className="text-sm"
-              options={ctx.instrumentOptions}
-              title={t('subjectPage.graph.instrument')}
-              variant="light"
-              onSelection={(selection) => {
-                ctx.setSelectedMeasures([]);
-                ctx.setSelectedInstrument(
-                  ctx.data.find(({ instrument }) => instrument.identifier === selection)?.instrument ?? null
-                );
-              }}
-            />
+            <InstrumentDropdown />
             <MeasuresDropdown />
           </div>
           <div>
