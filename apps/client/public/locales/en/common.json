@@ -52,5 +52,6 @@
   "form.radio.labels.false": "False",
   "form.radio.labels.true": "True",
   "form.submit": "Submit",
-  "form.reset": "Clear"
+  "form.reset": "Clear",
+  "visualization.selectMode": "Please select a visualization mode"
 }

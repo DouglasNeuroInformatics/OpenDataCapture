@@ -12,12 +12,12 @@ import {
   ManageInstrumentsPage
 } from './features/instruments';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
-import { AddSubjectPage, ViewSubjectsPage } from './features/subjects';
+import { AddSubjectPage, SelectVisualizationPage, ViewSubjectsPage } from './features/subjects';
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
 
 /** Recharts library is huge! */
-const SubjectPage = React.lazy(() => import('@/features/subjects/pages/SubjectPage'));
+const SubjectRecordsGraphPage = React.lazy(() => import('@/features/subjects/pages/SubjectRecordsGraphPage'));
 
 export const Router = () => {
   const { accessToken } = useAuthStore();
@@ -34,7 +34,10 @@ export const Router = () => {
               <Route element={<AddSubjectPage />} path="add-subject" />
               <Route path="view-subjects">
                 <Route index element={<ViewSubjectsPage />} />
-                <Route element={<SubjectPage />} path=":subjectIdentifier" />
+                <Route path=":subjectIdentifier">
+                  <Route index element={<SelectVisualizationPage />} />
+                  <Route element={<SubjectRecordsGraphPage />} path="graph" />
+                </Route>
               </Route>
             </Route>
             <Route path="instruments">

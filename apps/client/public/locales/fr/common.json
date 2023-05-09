@@ -52,5 +52,6 @@
   "form.radio.labels.false": "Faux",
   "form.radio.labels.true": "Vrai",
   "form.submit": "Soumettre",
-  "form.reset": "Réinitialiser"
+  "form.reset": "Réinitialiser",
+  "visualization.selectMode": "Veuillez sélectionner un mode de visualisation"
 }

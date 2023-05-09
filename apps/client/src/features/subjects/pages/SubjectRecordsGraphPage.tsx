@@ -9,7 +9,7 @@ import { RecordsGraph } from '../components/RecordsGraph';
 import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
-export const SubjectPage = () => {
+export const SubjectRecordsGraphPage = () => {
   const params = useParams();
   const { i18n, t } = useTranslation('subjects');
   const { data } = useFetch<SubjectFormRecords[]>(
@@ -29,4 +29,4 @@ export const SubjectPage = () => {
   );
 };
 
-export default SubjectPage;
+export default SubjectRecordsGraphPage;
