@@ -6,7 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { useInstrumentOptions } from '../hooks/useInstrumentOptions';
 import { RecordsGraphData, SelectedInstrument, SelectedMeasure } from '../types';
 
-import { Dropdown, LineGraph, SelectDropdown } from '@/components';
+import { MeasuresDropdown } from './MeasuresDropdown';
+
+import { Dropdown, LineGraph } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -112,15 +114,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
                 setSelectedInstrument(data.find(({ instrument }) => instrument.identifier === selection)?.instrument);
               }}
             />
-            <SelectDropdown
-              checkPosition="right"
-              className="text-sm"
-              options={measureOptions}
-              selected={selectedMeasures}
-              setSelected={setSelectedMeasures}
-              title={t('subjectPage.graph.measures')}
-              variant="light"
-            />
+            <MeasuresDropdown options={measureOptions} selected={selectedMeasures} setSelected={setSelectedMeasures} />
           </div>
           <div>
             <Dropdown
