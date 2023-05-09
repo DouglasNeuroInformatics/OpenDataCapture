@@ -9,6 +9,7 @@ type RecordsGraphData = Array<{
   [key: string]: any;
   dateObj: Date;
   dateString: string;
+  time: number;
 }>;
 
 type SelectedMeasure = {
@@ -77,6 +78,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
         arr.push({
           dateObj: dateCollected,
           dateString: DateUtils.toBasicISOString(dateCollected),
+          time: dateCollected.getTime(),
           ...measures
         });
       }
@@ -152,13 +154,12 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
       <div>
         <LineGraph
           data={graphData}
-          legend="bottom"
           lines={selectedMeasures.map((measure) => ({
             name: measure.label,
             val: measure.key
           }))}
           xAxis={{
-            key: 'dateString',
+            key: 'time',
             label: t('subjectPage.graph.xLabel')
           }}
         />

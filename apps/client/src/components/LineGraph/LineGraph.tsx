@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { DateUtils } from '@douglasneuroinformatics/common';
 import {
   CartesianGrid,
   ErrorBar,
@@ -14,6 +15,8 @@ import {
 } from 'recharts';
 import { ConditionalKeys } from 'type-fest';
 
+import i18n from '@/services/18n';
+
 /** An array of arbitrary objects with data to graph  */
 type LineGraphData = readonly object[];
 
@@ -24,8 +27,7 @@ type ExtractValidKeys<T extends LineGraphData, K> = Extract<ConditionalKeys<T[nu
 export function LineGraph<const T extends LineGraphData>({
   data,
   lines,
-  xAxis,
-  legend = null
+  xAxis
 }: {
   /** An array of objects, where each object represents one point on the x-axis */
   data: T;
@@ -35,50 +37,44 @@ export function LineGraph<const T extends LineGraphData>({
     err?: ExtractValidKeys<T, number>;
   }>;
   xAxis?: {
-    key?: ExtractValidKeys<T, string>;
+    key?: ExtractValidKeys<T, number>; // unix time
     label?: string;
   };
-  legend: 'top' | 'right' | 'bottom' | null;
 }) {
-  let legendComponent: JSX.Element | null;
-  switch (legend) {
-    case 'bottom':
-      legendComponent = <Legend wrapperStyle={{ paddingLeft: 40, paddingTop: 10 }} />;
-      break;
-    case 'top':
-      legendComponent = <Legend height={36} verticalAlign="top" />;
-      break;
-    case 'right':
-      legendComponent = (
-        <Legend
-          align="right"
-          height={36}
-          layout="vertical"
-          verticalAlign="middle"
-          wrapperStyle={{ paddingLeft: '1rem' }}
-        />
-      );
-      break;
-    default:
-      legendComponent = null;
-      break;
-  }
-
   return (
     <ResponsiveContainer height={400} width="100%">
       <LineChart data={[...data]} margin={{ left: 10, right: 10, bottom: 5, top: 5 }}>
         <CartesianGrid stroke={'#ccc'} strokeDasharray="5 5" />
-        <XAxis dataKey={xAxis?.key} height={50} padding={{ left: 20, right: 20 }} tickMargin={5} tickSize={8}>
+        <XAxis
+          dataKey={xAxis?.key}
+          domain={['auto', 'auto']}
+          height={50}
+          interval="preserveStartEnd"
+          padding={{ left: 20, right: 20 }}
+          tickFormatter={(time: number) => DateUtils.toBasicISOString(new Date(time))}
+          tickMargin={5}
+          tickSize={8}
+          type={'number'}
+        >
           <Label offset={5} position="insideBottom" value={xAxis?.label} />
         </XAxis>
         <YAxis tickMargin={5} tickSize={8} width={40} />
-        <Tooltip />
+        <Tooltip
+          labelFormatter={(time: number) => {
+            const date = new Date(time);
+            return new Intl.DateTimeFormat(i18n.resolvedLanguage, {
+              dateStyle: 'full',
+              timeStyle: 'medium'
+            }).format(date);
+          }}
+          labelStyle={{ whiteSpace: 'pre-wrap' }}
+        />
         {lines.map(({ name, val, err }) => (
           <Line dataKey={val} key={val} name={name} stroke={'black'} type="linear">
             {err && <ErrorBar dataKey={err} />}
           </Line>
         ))}
-        {legendComponent}
+        <Legend wrapperStyle={{ paddingLeft: 40, paddingTop: 10 }} />
       </LineChart>
     </ResponsiveContainer>
   );

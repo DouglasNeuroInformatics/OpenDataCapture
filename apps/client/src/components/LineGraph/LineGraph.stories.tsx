@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { LineGraph } from './LineGraph';
 
 type GraphData = ReadonlyArray<{
-  month: string;
+  month: number;
   m1: number;
   sd1: number;
   m2: number;
@@ -31,28 +31,28 @@ export const Default: Story = {
   args: {
     data: [
       {
-        month: 'January',
+        month: 1,
         m1: 1000,
         sd1: 100,
         m2: 550,
         sd2: 100
       },
       {
-        month: 'February',
+        month: 2,
         m1: 1500,
         sd1: 100,
         m2: 600,
         sd2: 100
       },
       {
-        month: 'March',
+        month: 3,
         m1: 1200,
         sd1: 100,
         m2: 500,
         sd2: 100
       },
       {
-        month: 'April',
+        month: 4,
         m1: 1800,
         sd1: 100,
         m2: 450,
@@ -74,7 +74,6 @@ export const Default: Story = {
     xAxis: {
       key: 'month',
       label: 'Month'
-    },
-    legend: 'top'
+    }
   }
 };
