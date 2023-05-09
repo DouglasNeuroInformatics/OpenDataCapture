@@ -15,6 +15,9 @@ export type UseFetchOptions = {
   };
   /** a callback to override the default error handler which is to add a notification */
   onError?: (error: unknown) => void;
+
+  /** Query params to add to the URL */
+  queryParams?: Record<string, string | null | undefined>;
 };
 
 export type UseFetchReturn<T> = {
@@ -42,7 +45,15 @@ export function useFetch<T = unknown>(
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const url = new URL(baseURL + resourceURL);
+  const url = useMemo(() => {
+    const url = new URL(baseURL + resourceURL);
+    for (const key in options.queryParams) {
+      if (options.queryParams[key]) {
+        url.searchParams.append(key, options.queryParams[key] as string);
+      }
+    }
+    return url;
+  }, [baseURL, resourceURL, options.queryParams]);
 
   const isAuthorized = useMemo(() => {
     if (!options.access) {
@@ -82,7 +93,7 @@ export function useFetch<T = unknown>(
     } else {
       setData(null);
     }
-  }, deps);
+  }, [...deps, url.href]);
 
   return { data, setData, isLoading };
 }

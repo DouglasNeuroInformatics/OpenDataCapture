@@ -1,9 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { DateUtils, FormInstrument, SubjectFormRecords } from '@douglasneuroinformatics/common';
+import {
+  DateUtils,
+  FormInstrument,
+  FormInstrumentRecordsSummary,
+  SubjectFormRecords
+} from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { Dropdown, LineGraph, SelectDropdown } from '@/components';
+import { useFetch } from '@/hooks/useFetch';
+import { useAuthStore } from '@/stores/auth-store';
 
 type RecordsGraphData = Array<{
   [key: string]: any;
@@ -33,9 +40,17 @@ export interface RecordsGraphProps {
 export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   const { t } = useTranslation('subjects');
   const [oldestTime, setOldestTime] = useState<number | null>(null);
-  const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument | null>();
+  const [selectedInstrument, setSelectedInstrument] = useState<(FormInstrument & { identifier: string }) | null>();
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
   const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
+
+  const { currentGroup } = useAuthStore();
+  const summary = useFetch<FormInstrumentRecordsSummary>('/v1/instruments/records/forms/summary', [], {
+    queryParams: {
+      group: currentGroup?.name,
+      instrument: selectedInstrument?.identifier
+    }
+  });
 
   /** Instrument identifiers mapped to titles */
   const instrumentOptions = Object.fromEntries(

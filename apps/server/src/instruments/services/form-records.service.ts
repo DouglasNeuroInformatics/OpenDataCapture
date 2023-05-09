@@ -15,6 +15,7 @@ import {
 } from '@douglasneuroinformatics/common/instruments';
 import { DateUtils } from '@douglasneuroinformatics/common/utils';
 import { Model } from 'mongoose';
+import { mean, standardDeviation } from 'simple-statistics';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
@@ -117,11 +118,34 @@ export class FormRecordsService {
     instrumentIdentifier?: string
   ): Promise<FormInstrumentRecordsSummary> {
     const group = groupName ? await this.groupsService.findByName(groupName, ability) : undefined;
-    const instrument = instrumentIdentifier
+    const instruments = instrumentIdentifier
       ? await this.formsService.findByIdentifier(instrumentIdentifier)
       : undefined;
+    const records = await this.formRecordsModel
+      .find({ group, instrument: instrumentIdentifier ? { $in: instruments } : undefined })
+      .populate('instrument')
+      .accessibleBy(ability);
+
+    console.log(groupName, instrumentIdentifier);
+
+    let centralTendency: Record<string, { mean: number; std: number }> | undefined;
+    if (instrumentIdentifier) {
+      centralTendency = Object.fromEntries(
+        Object.entries(this.getMeasuresFromRecords(records)).map(([key, arr]) => {
+          return [
+            key,
+            {
+              mean: mean(arr),
+              std: standardDeviation(arr)
+            }
+          ];
+        })
+      );
+    }
+
     return {
-      count: await this.formRecordsModel.find({ group, instrument }).accessibleBy(ability).count()
+      count: records.length,
+      centralTendency: centralTendency
     };
   }
 
@@ -170,5 +194,25 @@ export class FormRecordsService {
           })
           .reduce((a, b) => a + b, 0);
     }
+  }
+
+  /** Return an object with measures corresponding to all outcomes  */
+  private getMeasuresFromRecords<T extends FormInstrumentData>(
+    records: FormInstrumentRecord<T>[]
+  ): Record<string, number[]> {
+    const data: Record<string, number[]> = {};
+    for (const record of records) {
+      console.log(record);
+      for (const measure in record.instrument.measures) {
+        console.log(measure);
+        const value = this.computeMeasure(record.instrument.measures[measure], record.data);
+        if (!data[measure]) {
+          data[measure] = [value];
+        } else {
+          data[measure].push(value);
+        }
+      }
+    }
+    return data;
   }
 }
