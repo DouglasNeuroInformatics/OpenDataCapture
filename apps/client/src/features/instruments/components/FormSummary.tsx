@@ -19,11 +19,11 @@ const FormSummaryItem = ({ label, value }: { label: string; value: any }) => {
 export interface FormSummaryProps<T extends FormInstrumentData> {
   instrument: FormInstrument<T>;
   result?: T;
-  dateCollected?: Date;
+  timeCollected: number;
 }
 
 export const FormSummary = <T extends FormInstrumentData>({
-  dateCollected,
+  timeCollected,
   instrument,
   result
 }: FormSummaryProps<T>) => {
@@ -36,7 +36,7 @@ export const FormSummary = <T extends FormInstrumentData>({
   }
 
   const downloadResult = () => {
-    const filename = `${instrument.name}_v${instrument.version}_${dateCollected!.toISOString()}.json`;
+    const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.json`;
     download(filename, () => Promise.resolve(JSON.stringify(result, null, 2)));
   };
 
@@ -52,7 +52,10 @@ export const FormSummary = <T extends FormInstrumentData>({
       <h3 className="my-3 text-xl font-semibold">{t('formPage.summary.metadata')}</h3>
       <FormSummaryItem label={t('formPage.summary.instrumentTitle')} value={instrument.details.title} />
       <FormSummaryItem label={t('formPage.summary.instrumentVersion')} value={instrument.version} />
-      <FormSummaryItem label={t('formPage.summary.dateCollected')} value={dateCollected!.toLocaleString('en-CA')} />
+      <FormSummaryItem
+        label={t('formPage.summary.timeCollected')}
+        value={new Date(timeCollected).toLocaleString('en-CA')}
+      />
       <h3 className="my-3 text-xl font-semibold">{t('formPage.summary.results')}</h3>
       <div className="mb-3">
         {Object.keys(result).map((fieldName) => {

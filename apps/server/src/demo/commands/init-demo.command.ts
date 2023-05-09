@@ -142,7 +142,7 @@ export class InitDemoCommand extends CommandRunner {
 
       const record = {
         kind: 'form',
-        dateCollected: faker.date.recent(i * 30 + 5).toISOString(),
+        time: faker.date.recent(i * 30 + 5).getTime(),
         instrumentName: instrument.name,
         instrumentVersion: instrument.version,
         groupName: groupName,

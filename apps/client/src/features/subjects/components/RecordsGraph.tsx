@@ -7,8 +7,6 @@ import { Dropdown, LineGraph, SelectDropdown } from '@/components';
 
 type RecordsGraphData = Array<{
   [key: string]: any;
-  dateObj: Date;
-  dateString: string;
   time: number;
 }>;
 
@@ -34,7 +32,7 @@ export interface RecordsGraphProps {
 
 export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   const { t } = useTranslation('subjects');
-  const [oldestDate, setOldestDate] = useState<Date | null>(null);
+  const [oldestTime, setOldestTime] = useState<number | null>(null);
   const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument | null>();
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
   const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
@@ -68,30 +66,27 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   const graphData = useMemo(() => {
     const arr: RecordsGraphData = [];
     for (const record of records) {
-      const dateCollected = new Date(record.dateCollected);
       const measures = filterObj(record.computedMeasures!, ({ key }) => {
         return selectedMeasures.find((item) => item.key === key);
       });
       // Whether this date contains a point that should be on the x axis
-      const isPoint = (oldestDate === null || dateCollected > oldestDate) && Object.keys(measures).length > 0;
+      const isPoint = (oldestTime === null || record.time > oldestTime) && Object.keys(measures).length > 0;
       if (isPoint) {
         arr.push({
-          dateObj: dateCollected,
-          dateString: DateUtils.toBasicISOString(dateCollected),
-          time: dateCollected.getTime(),
+          time: record.time,
           ...measures
         });
       }
     }
     return arr.sort((a, b) => {
-      if (a.dateObj > b.dateObj) {
+      if (a.time > b.time) {
         return 1;
-      } else if (b.dateObj > a.dateObj) {
+      } else if (b.time > a.time) {
         return -1;
       }
       return 0;
     });
-  }, [records, selectedMeasures, oldestDate]);
+  }, [records, selectedMeasures, oldestTime]);
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -100,9 +95,9 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
           <h3 className="text-center text-xl font-medium">
             {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
           </h3>
-          {oldestDate && (
+          {oldestTime && (
             <p className="text-center">
-              {DateUtils.toBasicISOString(oldestDate)} - {DateUtils.toBasicISOString(new Date())}
+              {DateUtils.toBasicISOString(new Date(oldestTime))} - {DateUtils.toBasicISOString(new Date())}
             </p>
           )}
         </div>
@@ -140,11 +135,11 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
               variant="light"
               onSelection={(selection) => {
                 if (selection === 'pastYear') {
-                  setOldestDate(new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+                  setOldestTime(new Date(new Date().setFullYear(new Date().getFullYear() - 1)).getTime());
                 } else if (selection === 'pastMonth') {
-                  setOldestDate(new Date(new Date().setMonth(new Date().getMonth() - 1)));
+                  setOldestTime(new Date(new Date().setMonth(new Date().getMonth() - 1)).getTime());
                 } else {
-                  setOldestDate(null);
+                  setOldestTime(null);
                 }
               }}
             />

@@ -39,7 +39,7 @@ export class FormRecordsService {
   ) {}
 
   async create(dto: CreateFormRecordDto, ability: AppAbility): Promise<FormInstrumentRecord> {
-    const { kind, dateCollected, data, instrumentName, groupName, subjectInfo } = dto;
+    const { kind, time, data, instrumentName, groupName, subjectInfo } = dto;
 
     const instrument = await this.formsService.findByName(instrumentName);
     const subject = await this.subjectsService.lookup(subjectInfo);
@@ -54,7 +54,7 @@ export class FormRecordsService {
 
     return this.formRecordsModel.create({
       kind,
-      dateCollected,
+      time,
       data: this.ajvService.validate(data, instrument.validationSchema, (error) => {
         console.error(error);
         throw new BadRequestException();
@@ -93,7 +93,7 @@ export class FormRecordsService {
         .find({ subject, instrument: { $in: instruments } })
         .populate({ path: 'instrument', select: 'identifier details.language' })
         .accessibleBy(ability)
-        .select(['data', 'dateCollected'])
+        .select(['data', 'time'])
         .lean();
 
       if (instrument.measures) {
@@ -134,7 +134,7 @@ export class FormRecordsService {
             subjectSex: subject.sex,
             instrumentName: record.instrument.name,
             instrumentVersion: record.instrument.version,
-            timestamp: record.dateCollected.toISOString(),
+            timestamp: new Date(record.time).toISOString(),
             measure: measure,
             value: record.data[measure] as unknown
           });

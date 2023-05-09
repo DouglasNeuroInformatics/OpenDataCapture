@@ -27,7 +27,7 @@
   "formPage.overview.label": "Aperçu",
   "formPage.overview.language": "Langue",
   "formPage.questions.label": "Questions",
-  "formPage.summary.dateCollected": "Horodatage",
+  "formPage.summary.timeCollected": "Horodatage",
   "formPage.summary.dateOfBirth": "Date de naissance",
   "formPage.summary.download": "Télécharger",
   "formPage.summary.instrumentTitle": "Titre de l'instrument",

@@ -21,8 +21,8 @@ export class InstrumentRecordEntity implements InstrumentRecord<BaseInstrument> 
   @Prop({ enum: ['form'] satisfies InstrumentKind[], required: true, type: String })
   kind: InstrumentKind;
 
-  @Prop({ required: true, type: Date })
-  dateCollected: Date;
+  @Prop({ required: true })
+  time: number;
 
   @Prop({ required: true, ref: InstrumentEntity.modelName, type: MongooseSchema.Types.ObjectId })
   instrument: BaseInstrument;

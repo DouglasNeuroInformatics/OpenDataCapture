@@ -8,9 +8,7 @@ import {
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
-interface CreateFormRecordData
-  extends Omit<FormInstrumentRecord, 'dateCollected' | 'group' | 'instrument' | 'subject'> {
-  dateCollected: string;
+interface CreateFormRecordData extends Omit<FormInstrumentRecord, 'group' | 'instrument' | 'subject'> {
   groupName?: string;
   instrumentName: string;
   instrumentVersion: number;
@@ -24,9 +22,9 @@ interface CreateFormRecordData
       type: 'string',
       const: 'form'
     },
-    dateCollected: {
-      type: 'string',
-      format: 'date'
+    time: {
+      type: 'number',
+      minimum: 0
     },
     instrumentName: {
       type: 'string',
@@ -46,14 +44,14 @@ interface CreateFormRecordData
       required: []
     }
   },
-  required: ['kind', 'dateCollected', 'instrumentName', 'instrumentVersion', 'subjectInfo', 'data']
+  required: ['kind', 'time', 'instrumentName', 'instrumentVersion', 'subjectInfo', 'data']
 })
 export class CreateFormRecordDto implements CreateFormRecordData {
   @ApiProperty()
   kind: 'form';
 
   @ApiProperty()
-  dateCollected: string;
+  time: number;
 
   @ApiProperty()
   instrumentName: string;

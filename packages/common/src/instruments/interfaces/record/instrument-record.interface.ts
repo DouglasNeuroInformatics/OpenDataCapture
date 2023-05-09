@@ -7,7 +7,7 @@ import { Subject } from '@/subjects';
 
 export type InstrumentRecord<TInstrument extends BaseInstrument, TData = unknown> = {
   kind: InstrumentKind;
-  dateCollected: Date;
+  time: number;
   instrument: TInstrument;
   group?: Group;
   subject: Subject;
@@ -25,7 +25,7 @@ export type SubjectFormRecords<TData extends FormInstrumentData = FormInstrument
     identifier: string;
   };
   records: Array<
-    Pick<FormInstrumentRecord<TData>, 'data' | 'dateCollected'> & {
+    Pick<FormInstrumentRecord<TData>, 'data' | 'time'> & {
       computedMeasures?: Record<string, number>;
     }
   >;

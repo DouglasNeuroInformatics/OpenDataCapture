@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DateUtils, FormInstrumentData } from '@douglasneuroinformatics/common';
+import { FormInstrumentData } from '@douglasneuroinformatics/common';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
@@ -32,24 +32,24 @@ export const FormPage = () => {
   const instrument = useFetchInstrument(params.id!);
 
   const [result, setResult] = useState<FormInstrumentData>();
-  const [dateCollected, setDateCollected] = useState<Date>();
+  const [timeCollected, setTimeCollected] = useState<number>(0);
 
   if (!instrument) {
     return <Spinner />;
   }
 
   const handleSubmit = async (data: FormInstrumentData) => {
-    const now = new Date();
+    const now = Date.now();
     await axios.post('/v1/instruments/records/forms', {
       kind: 'form',
-      dateCollected: DateUtils.toBasicISOString(now),
+      time: Date.now(),
       instrumentName: instrument.name,
       instrumentVersion: instrument.version,
       groupName: currentGroup?.name,
       subjectInfo: activeSubject,
       data: data
     });
-    setDateCollected(now);
+    setTimeCollected(now);
     setResult(data);
     notifications.add({ message: t('formPage.uploadSuccessful'), type: 'success' });
   };
@@ -75,7 +75,7 @@ export const FormPage = () => {
             icon: <HiOutlineQuestionMarkCircle />
           },
           {
-            element: <FormSummary dateCollected={dateCollected} instrument={instrument} result={result} />,
+            element: <FormSummary instrument={instrument} result={result} timeCollected={timeCollected} />,
             label: t('formPage.summary.label'),
             icon: <HiOutlinePrinter />
           }
