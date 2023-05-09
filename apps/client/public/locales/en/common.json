@@ -53,5 +53,8 @@
   "form.radio.labels.true": "True",
   "form.submit": "Submit",
   "form.reset": "Clear",
-  "visualization.selectMode": "Please select a visualization mode"
+  "visualization.selectMode": "Please select a visualization mode",
+  "download": "Download",
+  "selectMeasures": "Please select one or more measures",
+  "selectInstrument": "Please select an instrument"
 }

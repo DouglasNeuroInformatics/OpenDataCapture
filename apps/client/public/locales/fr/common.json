@@ -53,5 +53,8 @@
   "form.radio.labels.true": "Vrai",
   "form.submit": "Soumettre",
   "form.reset": "Réinitialiser",
-  "visualization.selectMode": "Veuillez sélectionner un mode de visualisation"
+  "visualization.selectMode": "Veuillez sélectionner un mode de visualisation",
+  "download": "Télécharger",
+  "selectMeasures": "Veuillez sélectionner au moins une mesure",
+  "selectInstrument": "Veuillez sélectionner un instrument"
 }

@@ -27,7 +27,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
     return response.data;
   };
 
-  const handleExportSelection = (option: string | ('JSON' | 'CSV')) => {
+  const handleExportSelection = (option: 'JSON' | 'CSV') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'JSON':
