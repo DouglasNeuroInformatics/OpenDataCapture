@@ -8,21 +8,37 @@ import { SelectedInstrument, SelectedMeasure } from '../types';
 import { Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
-export const VisualizationContext = createContext<{
+export type VisualizationContextData = {
+  /** Data in the format returned from the API */
   data: SubjectFormRecords[];
+
+  /** An array of all records in the data returned by the API */
   records: Array<
     Pick<FormInstrumentRecord, 'data' | 'time'> & {
       computedMeasures?: Record<string, number> | undefined;
     }
   >;
+
+  /** The selected instrument from among those in the data */
+  selectedInstrument: SelectedInstrument | null;
+
+  /** A function to set the selected instrument */
+  setSelectedInstrument: React.Dispatch<React.SetStateAction<SelectedInstrument | null>>;
+
+  /** All measure options associated with the selected current selected instrument */
   measureOptions: SelectedMeasure[];
+
   /** An object with instrument identifiers mapped to titles */
   instrumentOptions: Record<string, string>;
-  selectedInstrument: SelectedInstrument | null;
-  setSelectedInstrument: React.Dispatch<React.SetStateAction<SelectedInstrument | null>>;
+
+  /** An array of all the measures selected for the current instrument */
   selectedMeasures: SelectedMeasure[];
+
+  /** A function to set the measures selected for the current instrument */
   setSelectedMeasures: React.Dispatch<React.SetStateAction<SelectedMeasure[]>>;
-}>(null!);
+};
+
+export const VisualizationContext = createContext<VisualizationContextData>(null!);
 
 export const VisualizationContextProvider = ({ children }: { children: React.ReactNode }) => {
   const params = useParams();

@@ -1,26 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { useTranslation } from 'react-i18next';
 
-import { SelectedMeasure } from '../types';
+import { VisualizationContext } from '../context/VisualizationContext';
 
 import { SelectDropdown } from '@/components';
 
-export type MeasuresDropdownProps = {
-  options: SelectedMeasure[];
-  selected: SelectedMeasure[];
-  setSelected: React.Dispatch<React.SetStateAction<SelectedMeasure[]>>;
-};
-
-export const MeasuresDropdown = ({ options, selected, setSelected }: MeasuresDropdownProps) => {
+export const MeasuresDropdown = () => {
+  const { measureOptions, selectedMeasures, setSelectedMeasures } = useContext(VisualizationContext);
   const { t } = useTranslation('subjects');
   return (
     <SelectDropdown
       checkPosition="right"
       className="text-sm"
-      options={options}
-      selected={selected}
-      setSelected={setSelected}
+      options={measureOptions}
+      selected={selectedMeasures}
+      setSelected={setSelectedMeasures}
       title={t('subjectPage.graph.measures')}
       variant="light"
     />

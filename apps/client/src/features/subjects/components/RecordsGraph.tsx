@@ -82,11 +82,7 @@ export const RecordsGraph = () => {
                 );
               }}
             />
-            <MeasuresDropdown
-              options={ctx.measureOptions}
-              selected={ctx.selectedMeasures}
-              setSelected={ctx.setSelectedMeasures}
-            />
+            <MeasuresDropdown />
           </div>
           <div>
             <Dropdown
