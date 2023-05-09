@@ -1,17 +1,14 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 
-import { DateUtils, FormInstrumentRecordsSummary, SubjectFormRecords } from '@douglasneuroinformatics/common';
+import { DateUtils, SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
-import { useInstrumentOptions } from '../hooks/useInstrumentOptions';
-import { RecordsGraphData, SelectedInstrument, SelectedMeasure } from '../types';
+import { RecordsGraphData } from '../types';
 
 import { MeasuresDropdown } from './MeasuresDropdown';
 
 import { Dropdown, LineGraph } from '@/components';
-import { useFetch } from '@/hooks/useFetch';
-import { useAuthStore } from '@/stores/auth-store';
 
 /** Apply a callback function to filter items from object */
 function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
@@ -29,48 +26,15 @@ export interface RecordsGraphProps {
 }
 
 export const RecordsGraph = () => {
-  const { data } = useContext(VisualizationContext);
+  const ctx = useContext(VisualizationContext);
   const { t } = useTranslation('subjects');
   const [oldestTime, setOldestTime] = useState<number | null>(null);
-  const [selectedInstrument, setSelectedInstrument] = useState<SelectedInstrument | null>();
-  const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
-  const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
-
-  const { currentGroup } = useAuthStore();
-  const summary = useFetch<FormInstrumentRecordsSummary>('/v1/instruments/records/forms/summary', [], {
-    queryParams: {
-      group: currentGroup?.name,
-      instrument: selectedInstrument?.identifier
-    }
-  });
-
-  /** Instrument identifiers mapped to titles */
-  const instrumentOptions = useInstrumentOptions(data);
-
-  // If language changes
-  useEffect(() => {
-    setSelectedInstrument(null);
-    setSelectedMeasures([]);
-  }, [data]);
-
-  const measureOptions = useMemo(() => {
-    const arr: SelectedMeasure[] = [];
-    if (selectedInstrument) {
-      for (const measure in selectedInstrument.measures) {
-        arr.push({
-          key: measure,
-          label: selectedInstrument.measures[measure].label
-        });
-      }
-    }
-    return arr;
-  }, [selectedInstrument]);
 
   const graphData = useMemo(() => {
     const arr: RecordsGraphData = [];
-    for (const record of records) {
+    for (const record of ctx.records) {
       const measures = filterObj(record.computedMeasures!, ({ key }) => {
-        return selectedMeasures.find((item) => item.key === key);
+        return ctx.selectedMeasures.find((item) => item.key === key);
       });
       // Whether this date contains a point that should be on the x axis
       const isPoint = (oldestTime === null || record.time > oldestTime) && Object.keys(measures).length > 0;
@@ -89,14 +53,14 @@ export const RecordsGraph = () => {
       }
       return 0;
     });
-  }, [records, selectedMeasures, oldestTime]);
+  }, [ctx.records, ctx.selectedMeasures, oldestTime]);
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="ml-[40px] p-2">
         <div className="mb-5">
           <h3 className="text-center text-xl font-medium">
-            {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
+            {ctx.selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
           </h3>
           {oldestTime && (
             <p className="text-center">
@@ -108,15 +72,21 @@ export const RecordsGraph = () => {
           <div className="flex flex-col gap-2 lg:flex-row">
             <Dropdown
               className="text-sm"
-              options={instrumentOptions}
+              options={ctx.instrumentOptions}
               title={t('subjectPage.graph.instrument')}
               variant="light"
               onSelection={(selection) => {
-                setSelectedMeasures([]);
-                setSelectedInstrument(data.find(({ instrument }) => instrument.identifier === selection)?.instrument);
+                ctx.setSelectedMeasures([]);
+                ctx.setSelectedInstrument(
+                  ctx.data.find(({ instrument }) => instrument.identifier === selection)?.instrument ?? null
+                );
               }}
             />
-            <MeasuresDropdown options={measureOptions} selected={selectedMeasures} setSelected={setSelectedMeasures} />
+            <MeasuresDropdown
+              options={ctx.measureOptions}
+              selected={ctx.selectedMeasures}
+              setSelected={ctx.setSelectedMeasures}
+            />
           </div>
           <div>
             <Dropdown
@@ -144,7 +114,7 @@ export const RecordsGraph = () => {
       <div>
         <LineGraph
           data={graphData}
-          lines={selectedMeasures.map((measure) => ({
+          lines={ctx.selectedMeasures.map((measure) => ({
             name: measure.label,
             val: measure.key
           }))}
