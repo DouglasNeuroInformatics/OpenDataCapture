@@ -7,6 +7,7 @@ import { SelectedInstrument, SelectedMeasure } from '../types';
 
 import { Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
+import i18n from '@/services/18n';
 
 export type VisualizationContextData = {
   /** Data in the format returned from the API */
@@ -42,7 +43,12 @@ export const VisualizationContext = createContext<VisualizationContextData>(null
 
 export const VisualizationContextProvider = ({ children }: { children: React.ReactNode }) => {
   const params = useParams();
-  const { data } = useFetch<SubjectFormRecords[]>(`/v1/instruments/records/forms?subject=${params.subjectIdentifier!}`);
+  const { data } = useFetch<SubjectFormRecords[]>(`/v1/instruments/records/forms`, [], {
+    queryParams: {
+      subject: params.subjectIdentifier,
+      lang: i18n.resolvedLanguage
+    }
+  });
 
   const [selectedInstrument, setSelectedInstrument] = useState<SelectedInstrument | null>(null);
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
@@ -81,7 +87,7 @@ export const VisualizationContextProvider = ({ children }: { children: React.Rea
   useEffect(() => {
     setSelectedInstrument(null);
     setSelectedMeasures([]);
-  }, [data]);
+  }, [i18n.resolvedLanguage]);
 
   if (!data) {
     return <Spinner />;
