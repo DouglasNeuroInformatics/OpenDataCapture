@@ -8,6 +8,8 @@ import {
 } from '@douglasneuroinformatics/common';
 import { useTranslation } from 'react-i18next';
 
+import { useInstrumentOptions } from '../hooks/useInstrumentOptions';
+
 import { Dropdown, LineGraph, SelectDropdown } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
@@ -53,11 +55,7 @@ export const RecordsGraph = ({ data }: RecordsGraphProps) => {
   });
 
   /** Instrument identifiers mapped to titles */
-  const instrumentOptions = Object.fromEntries(
-    data
-      .filter(({ instrument }) => instrument.measures)
-      .map(({ instrument }) => [instrument.identifier, instrument.details.title])
-  );
+  const instrumentOptions = useInstrumentOptions(data);
 
   // If language changes
   useEffect(() => {
