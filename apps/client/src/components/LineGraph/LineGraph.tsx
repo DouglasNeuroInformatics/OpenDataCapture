@@ -8,6 +8,7 @@ import {
   Legend,
   Line,
   LineChart,
+  LineProps,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -18,10 +19,19 @@ import { ConditionalKeys } from 'type-fest';
 import i18n from '@/services/18n';
 
 /** An array of arbitrary objects with data to graph  */
-type LineGraphData = readonly object[];
+type LineGraphData = readonly Record<string, any>[];
 
 /** Extract string keys from items in `T` where the value of `T[K]` extends `K` */
 type ExtractValidKeys<T extends LineGraphData, K> = Extract<ConditionalKeys<T[number], K>, string>;
+
+type LineGraphLine<T extends LineGraphData = Record<string, any>[]> = Pick<
+  LineProps,
+  'stroke' | 'strokeWidth' | 'type' | 'legendType' | 'strokeDasharray'
+> & {
+  name: string;
+  val: ExtractValidKeys<T, number>;
+  err?: ExtractValidKeys<T, number>;
+};
 
 // eslint-disable-next-line react/function-component-definition
 function LineGraphComponent<const T extends LineGraphData>({
@@ -31,11 +41,7 @@ function LineGraphComponent<const T extends LineGraphData>({
 }: {
   /** An array of objects, where each object represents one point on the x-axis */
   data: T;
-  lines: Array<{
-    name: string;
-    val: ExtractValidKeys<T, number>;
-    err?: ExtractValidKeys<T, number>;
-  }>;
+  lines: LineGraphLine<T>[];
   xAxis?: {
     key?: ExtractValidKeys<T, number>; // unix time
     label?: string;
@@ -69,8 +75,8 @@ function LineGraphComponent<const T extends LineGraphData>({
           }}
           labelStyle={{ whiteSpace: 'pre-wrap' }}
         />
-        {lines.map(({ name, val, err }) => (
-          <Line dataKey={val} key={val} name={name} stroke={'black'} type="linear">
+        {lines.map(({ name, val, err, stroke, type, ...props }) => (
+          <Line dataKey={val} key={val} name={name} stroke={stroke ?? 'black'} type={type ?? 'linear'} {...props}>
             {err && <ErrorBar dataKey={err} />}
           </Line>
         ))}
@@ -81,3 +87,5 @@ function LineGraphComponent<const T extends LineGraphData>({
 }
 
 export const LineGraph = React.memo(LineGraphComponent) as unknown as typeof LineGraphComponent;
+
+export { type LineGraphLine };

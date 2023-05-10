@@ -11,9 +11,24 @@ import { MeasuresDropdown } from './MeasuresDropdown';
 import { TimeDropdown } from './TimeDropdown';
 import { VisualizationHeader } from './VisualizationHeader';
 
-import { LineGraph } from '@/components';
+import { LineGraph, LineGraphLine } from '@/components';
 
 type RegressionResults = Record<string, { m: number; b: number }>;
+
+const COLOR_PALETTE = [
+  '#000000',
+  '#D81B60',
+  '#1E88E5',
+  '#004D40',
+  '#FD08FA',
+  '#A06771',
+  '#353A9B',
+  '#1D066C',
+  '#D90323',
+  '#9C9218',
+  '#CF0583',
+  '#4075A3'
+];
 
 export interface RecordsGraphProps {
   data: SubjectFormRecords[];
@@ -52,15 +67,21 @@ export const RecordsGraph = () => {
     }
   }, [ctx.selectedInstrument]);
 
-  const lines: Array<{ name: string; val: string }> = [];
-  for (const measure of ctx.selectedMeasures) {
+  const lines: LineGraphLine[] = [];
+  for (let i = 0; i < ctx.selectedMeasures.length; i++) {
+    const measure = ctx.selectedMeasures[i];
     lines.push({
       name: measure.label,
-      val: measure.key
+      val: measure.key,
+      stroke: COLOR_PALETTE[i]
     });
     lines.push({
       name: `${measure.label} (${t('groupTrend')})`,
-      val: measure.key + 'Group'
+      val: measure.key + 'Group',
+      strokeWidth: 0.5,
+      stroke: COLOR_PALETTE[i],
+      legendType: 'none',
+      strokeDasharray: '5 5'
     });
   }
 
