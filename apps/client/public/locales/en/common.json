@@ -57,5 +57,7 @@
   "download": "Download",
   "selectMeasures": "Please select one or more measures",
   "selectInstrument": "Please select an instrument",
-  "groupTrend": "Group Trend"
+  "groupTrend": "Group Trend",
+  "table": "Table",
+  "graph": "Graph"
 }
