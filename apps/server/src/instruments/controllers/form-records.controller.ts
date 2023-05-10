@@ -55,4 +55,15 @@ export class FormRecordsController {
   export(@UserAbility() ability: AppAbility, @Query('group') groupName?: string): Promise<InstrumentRecordsExport> {
     return this.formRecordsService.export(ability, groupName);
   }
+
+  @ApiOperation({ description: 'Compute a Linear Model' })
+  @Get('linear-regression')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  linearRegression(
+    @UserAbility() ability: AppAbility,
+    @Query('group') groupName?: string,
+    @Query('instrument') instrumentIdentifier?: string
+  ): Promise<Record<string, { m: number; b: number }>> {
+    return this.formRecordsService.linearRegression(ability, groupName, instrumentIdentifier);
+  }
 }

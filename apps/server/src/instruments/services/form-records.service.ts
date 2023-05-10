@@ -176,6 +176,44 @@ export class FormRecordsService {
     return data;
   }
 
+  async linearRegression(
+    ability: AppAbility,
+    groupName?: string,
+    instrumentIdentifier?: string
+  ): Promise<Record<string, { m: number; b: number }>> {
+    if (!instrumentIdentifier) {
+      throw new BadRequestException('Must specify instrument identifier');
+    }
+    const instruments = await this.formsService.findByIdentifier(instrumentIdentifier);
+
+    const records = await this.formRecordsModel
+      .find({
+        group: groupName ? await this.groupsService.findByName(groupName, ability) : undefined,
+        instrument: instrumentIdentifier ? { $in: instruments } : undefined
+      })
+      .populate('instrument')
+      .accessibleBy(ability);
+
+    const data: Record<string, [number, number][]> = {};
+    for (const record of records) {
+      for (const measure in record.instrument.measures) {
+        const x = record.time;
+        const y = this.computeMeasure(record.instrument.measures[measure], record.data);
+        if (!data[measure]) {
+          data[measure] = [[x, y]];
+        } else {
+          data[measure].push([x, y]);
+        }
+      }
+    }
+
+    const results: Record<string, { m: number; b: number }> = {};
+    for (const measure in data) {
+      results[measure] = this.statsService.linearRegression(data[measure]);
+    }
+    return results;
+  }
+
   private computeMeasure<T extends FormInstrumentData>(measure: Measure<T>, data: T): number {
     // data[measure.formula.field] should always be a number because only numeric fields may be used for fields in measure
     switch (measure.formula.kind) {
@@ -203,9 +241,7 @@ export class FormRecordsService {
   ): Record<string, number[]> {
     const data: Record<string, number[]> = {};
     for (const record of records) {
-      console.log(record);
       for (const measure in record.instrument.measures) {
-        console.log(measure);
         const value = this.computeMeasure(record.instrument.measures[measure], record.data);
         if (!data[measure]) {
           data[measure] = [value];
