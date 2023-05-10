@@ -13,7 +13,7 @@ import { VisualizationHeader } from './VisualizationHeader';
 
 import { LineGraph, LineGraphLine } from '@/components';
 
-type RegressionResults = Record<string, { m: number; b: number }>;
+type RegressionResults = Record<string, { intercept: number; slope: number; stdErr: number }>;
 
 const COLOR_PALETTE = [
   '#000000',
@@ -54,7 +54,7 @@ export const RecordsGraph = () => {
         if (!model) {
           continue;
         }
-        dataPoint[key + 'Group'] = Number((model.b + model.m * dataPoint.time).toFixed(2));
+        dataPoint[key + 'Group'] = Number((model.intercept + model.slope * dataPoint.time).toFixed(2));
       }
       return dataPoint;
     });

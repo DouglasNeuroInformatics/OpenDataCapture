@@ -180,7 +180,7 @@ export class FormRecordsService {
     ability: AppAbility,
     groupName?: string,
     instrumentIdentifier?: string
-  ): Promise<Record<string, { m: number; b: number }>> {
+  ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {
     if (!instrumentIdentifier) {
       throw new BadRequestException('Must specify instrument identifier');
     }
@@ -207,7 +207,7 @@ export class FormRecordsService {
       }
     }
 
-    const results: Record<string, { m: number; b: number }> = {};
+    const results: Record<string, { intercept: number; slope: number; stdErr: number }> = {};
     for (const measure in data) {
       results[measure] = this.statsService.linearRegression(data[measure]);
     }

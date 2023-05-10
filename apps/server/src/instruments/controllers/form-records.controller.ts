@@ -63,7 +63,7 @@ export class FormRecordsController {
     @UserAbility() ability: AppAbility,
     @Query('group') groupName?: string,
     @Query('instrument') instrumentIdentifier?: string
-  ): Promise<Record<string, { m: number; b: number }>> {
+  ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {
     return this.formRecordsService.linearRegression(ability, groupName, instrumentIdentifier);
   }
 }
