@@ -24,7 +24,7 @@ type LineGraphData = readonly object[];
 type ExtractValidKeys<T extends LineGraphData, K> = Extract<ConditionalKeys<T[number], K>, string>;
 
 // eslint-disable-next-line react/function-component-definition
-export function LineGraph<const T extends LineGraphData>({
+function LineGraphComponent<const T extends LineGraphData>({
   data,
   lines,
   xAxis
@@ -79,3 +79,5 @@ export function LineGraph<const T extends LineGraphData>({
     </ResponsiveContainer>
   );
 }
+
+export const LineGraph = React.memo(LineGraphComponent) as unknown as typeof LineGraphComponent;

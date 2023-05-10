@@ -56,5 +56,6 @@
   "visualization.selectMode": "Please select a visualization mode",
   "download": "Download",
   "selectMeasures": "Please select one or more measures",
-  "selectInstrument": "Please select an instrument"
+  "selectInstrument": "Please select an instrument",
+  "groupTrend": "Group Trend"
 }
