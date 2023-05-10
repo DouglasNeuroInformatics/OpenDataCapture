@@ -20,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly usersService: UsersService
   ) {
     super({
+      ignoreExpiration: config.getOrThrow('NODE_ENV') === 'development',
       passReqToCallback: true,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: config.getOrThrow<string>('SECRET_KEY')

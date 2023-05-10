@@ -25,6 +25,7 @@ import { FormsService } from './forms.service';
 
 import { AjvService } from '@/ajv/ajv.service';
 import { GroupsService } from '@/groups/groups.service';
+import { StatsService } from '@/stats/stats.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
@@ -35,11 +36,12 @@ export class FormRecordsService {
     private readonly ajvService: AjvService,
     private readonly formsService: FormsService,
     private readonly groupsService: GroupsService,
+    private readonly statsService: StatsService,
     private readonly subjectsService: SubjectsService
   ) {}
 
   async create(dto: CreateFormRecordDto, ability: AppAbility): Promise<FormInstrumentRecord> {
-    const { kind, dateCollected, data, instrumentName, groupName, subjectInfo } = dto;
+    const { kind, time, data, instrumentName, groupName, subjectInfo } = dto;
 
     const instrument = await this.formsService.findByName(instrumentName);
     const subject = await this.subjectsService.lookup(subjectInfo);
@@ -54,7 +56,7 @@ export class FormRecordsService {
 
     return this.formRecordsModel.create({
       kind,
-      dateCollected,
+      time,
       data: this.ajvService.validate(data, instrument.validationSchema, (error) => {
         console.error(error);
         throw new BadRequestException();
@@ -93,7 +95,7 @@ export class FormRecordsService {
         .find({ subject, instrument: { $in: instruments } })
         .populate({ path: 'instrument', select: 'identifier details.language' })
         .accessibleBy(ability)
-        .select(['data', 'dateCollected'])
+        .select(['data', 'time'])
         .lean();
 
       if (instrument.measures) {
@@ -111,10 +113,40 @@ export class FormRecordsService {
     return arr;
   }
 
-  async summary(ability: AppAbility, groupName?: string): Promise<FormInstrumentRecordsSummary> {
+  async summary(
+    ability: AppAbility,
+    groupName?: string,
+    instrumentIdentifier?: string
+  ): Promise<FormInstrumentRecordsSummary> {
     const group = groupName ? await this.groupsService.findByName(groupName, ability) : undefined;
+    const instruments = instrumentIdentifier
+      ? await this.formsService.findByIdentifier(instrumentIdentifier)
+      : undefined;
+    const records = await this.formRecordsModel
+      .find({ group, instrument: instrumentIdentifier ? { $in: instruments } : undefined })
+      .populate('instrument')
+      .accessibleBy(ability);
+
+    console.log(groupName, instrumentIdentifier);
+
+    let centralTendency: Record<string, { mean: number; std: number }> | undefined;
+    if (instrumentIdentifier) {
+      centralTendency = Object.fromEntries(
+        Object.entries(this.getMeasuresFromRecords(records)).map(([key, arr]) => {
+          return [
+            key,
+            {
+              mean: this.statsService.mean(arr),
+              std: this.statsService.std(arr)
+            }
+          ];
+        })
+      );
+    }
+
     return {
-      count: await this.formRecordsModel.find({ group }).accessibleBy(ability).count()
+      count: records.length,
+      centralTendency: centralTendency
     };
   }
 
@@ -134,7 +166,7 @@ export class FormRecordsService {
             subjectSex: subject.sex,
             instrumentName: record.instrument.name,
             instrumentVersion: record.instrument.version,
-            timestamp: record.dateCollected.toISOString(),
+            timestamp: new Date(record.time).toISOString(),
             measure: measure,
             value: record.data[measure] as unknown
           });
@@ -142,6 +174,44 @@ export class FormRecordsService {
       }
     }
     return data;
+  }
+
+  async linearRegression(
+    ability: AppAbility,
+    groupName?: string,
+    instrumentIdentifier?: string
+  ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {
+    if (!instrumentIdentifier) {
+      throw new BadRequestException('Must specify instrument identifier');
+    }
+    const instruments = await this.formsService.findByIdentifier(instrumentIdentifier);
+
+    const records = await this.formRecordsModel
+      .find({
+        group: groupName ? await this.groupsService.findByName(groupName, ability) : undefined,
+        instrument: instrumentIdentifier ? { $in: instruments } : undefined
+      })
+      .populate('instrument')
+      .accessibleBy(ability);
+
+    const data: Record<string, [number, number][]> = {};
+    for (const record of records) {
+      for (const measure in record.instrument.measures) {
+        const x = record.time;
+        const y = this.computeMeasure(record.instrument.measures[measure], record.data);
+        if (!data[measure]) {
+          data[measure] = [[x, y]];
+        } else {
+          data[measure].push([x, y]);
+        }
+      }
+    }
+
+    const results: Record<string, { intercept: number; slope: number; stdErr: number }> = {};
+    for (const measure in data) {
+      results[measure] = this.statsService.linearRegression(data[measure]);
+    }
+    return results;
   }
 
   private computeMeasure<T extends FormInstrumentData>(measure: Measure<T>, data: T): number {
@@ -163,5 +233,23 @@ export class FormRecordsService {
           })
           .reduce((a, b) => a + b, 0);
     }
+  }
+
+  /** Return an object with measures corresponding to all outcomes  */
+  private getMeasuresFromRecords<T extends FormInstrumentData>(
+    records: FormInstrumentRecord<T>[]
+  ): Record<string, number[]> {
+    const data: Record<string, number[]> = {};
+    for (const record of records) {
+      for (const measure in record.instrument.measures) {
+        const value = this.computeMeasure(record.instrument.measures[measure], record.data);
+        if (!data[measure]) {
+          data[measure] = [value];
+        } else {
+          data[measure].push(value);
+        }
+      }
+    }
+    return data;
   }
 }

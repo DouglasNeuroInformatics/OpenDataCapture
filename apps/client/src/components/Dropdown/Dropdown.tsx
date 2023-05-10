@@ -6,9 +6,9 @@ import { HiChevronDown } from 'react-icons/hi2';
 
 import { Button, type ButtonProps } from '@/components';
 
-type DropdownOptions = string[] | Record<string, string>;
+type DropdownOptions = readonly string[] | Record<string, string>;
 
-type DropdownOptionKey<T> = T extends string[]
+type DropdownOptionKey<T> = T extends readonly string[]
   ? T[number]
   : T extends Record<string, string>
   ? Extract<keyof T, string>
@@ -30,14 +30,15 @@ export interface DropdownProps<T extends DropdownOptions> {
   className?: string;
 }
 
-export const Dropdown = <T extends DropdownOptions>({
+// eslint-disable-next-line react/function-component-definition
+export function Dropdown<const T extends DropdownOptions>({
   title,
   options,
   onSelection,
   variant,
   className
-}: DropdownProps<T>) => {
-  const optionKeys: string[] = Array.isArray(options) ? options : Object.keys(options);
+}: DropdownProps<T>) {
+  const optionKeys: readonly string[] = options instanceof Array ? options : Object.keys(options);
   return (
     <Menu as="div" className={clsx('relative w-full whitespace-nowrap', className)}>
       <Menu.Button
@@ -68,7 +69,7 @@ export const Dropdown = <T extends DropdownOptions>({
                 style={{ minWidth: 100 }}
                 onClick={() => onSelection(option as DropdownOptionKey<T>)}
               >
-                {Array.isArray(options) ? option : options[option]}
+                {Array.isArray(options) ? option : (options[option as keyof T] as string)}
               </button>
             </Menu.Item>
           ))}
@@ -76,4 +77,4 @@ export const Dropdown = <T extends DropdownOptions>({
       </Transition>
     </Menu>
   );
-};
+}

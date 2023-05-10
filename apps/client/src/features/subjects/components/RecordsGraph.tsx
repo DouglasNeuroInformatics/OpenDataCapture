@@ -1,165 +1,111 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { DateUtils, FormInstrument, SubjectFormRecords } from '@douglasneuroinformatics/common';
+import { SubjectFormRecords } from '@douglasneuroinformatics/common';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-import { Dropdown, LineGraph, SelectDropdown } from '@/components';
+import { VisualizationContext } from '../context/VisualizationContext';
 
-type RecordsGraphData = Array<{
-  [key: string]: any;
-  dateObj: Date;
-  dateString: string;
-}>;
+import { InstrumentDropdown } from './InstrumentDropdown';
+import { MeasuresDropdown } from './MeasuresDropdown';
+import { TimeDropdown } from './TimeDropdown';
+import { VisualizationHeader } from './VisualizationHeader';
 
-type SelectedMeasure = {
-  key: string;
-  label: string;
-};
+import { LineGraph, LineGraphLine } from '@/components';
 
-/** Apply a callback function to filter items from object */
-function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
-  const result: Partial<T> = {};
-  for (const key in obj) {
-    if (fn({ key, value: obj[key] })) {
-      result[key] = obj[key];
-    }
-  }
-  return result;
-}
+type RegressionResults = Record<string, { intercept: number; slope: number; stdErr: number }>;
+
+const COLOR_PALETTE = [
+  '#000000',
+  '#D81B60',
+  '#1E88E5',
+  '#004D40',
+  '#FD08FA',
+  '#A06771',
+  '#353A9B',
+  '#1D066C',
+  '#D90323',
+  '#9C9218',
+  '#CF0583',
+  '#4075A3'
+];
 
 export interface RecordsGraphProps {
   data: SubjectFormRecords[];
 }
 
-export const RecordsGraph = ({ data }: RecordsGraphProps) => {
-  const { t } = useTranslation('subjects');
-  const [oldestDate, setOldestDate] = useState<Date | null>(null);
-  const [selectedInstrument, setSelectedInstrument] = useState<FormInstrument | null>();
-  const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
-  const records = data.find(({ instrument }) => instrument === selectedInstrument)?.records ?? [];
+export const RecordsGraph = () => {
+  const ctx = useContext(VisualizationContext);
+  const { t } = useTranslation(['common', 'subjects']);
+  const [predicted, setPredicted] = useState<RegressionResults>({});
 
-  /** Instrument identifiers mapped to titles */
-  const instrumentOptions = Object.fromEntries(
-    data
-      .filter(({ instrument }) => instrument.measures)
-      .map(({ instrument }) => [instrument.identifier, instrument.details.title])
-  );
+  const fetchPredicted = async () => {
+    new URLSearchParams('');
+    const response = await axios.get<RegressionResults>(
+      `/v1/instruments/records/forms/linear-regression?instrument=${ctx.selectedInstrument!.identifier}`
+    );
+    setPredicted(response.data);
+  };
 
-  // If language changes
-  useEffect(() => {
-    setSelectedInstrument(null);
-    setSelectedMeasures([]);
-  }, [data]);
-
-  const measureOptions = useMemo(() => {
-    const arr: SelectedMeasure[] = [];
-    if (selectedInstrument) {
-      for (const measure in selectedInstrument.measures) {
-        arr.push({
-          key: measure,
-          label: selectedInstrument.measures[measure].label
-        });
+  const data = useMemo(() => {
+    const arr = ctx.measurements.map((dataPoint) => {
+      for (const key in dataPoint) {
+        const model = predicted[key];
+        if (!model) {
+          continue;
+        }
+        dataPoint[key + 'Group'] = Number((model.intercept + model.slope * dataPoint.time).toFixed(2));
       }
-    }
-    return arr;
-  }, [selectedInstrument]);
-
-  const graphData = useMemo(() => {
-    const arr: RecordsGraphData = [];
-    for (const record of records) {
-      const dateCollected = new Date(record.dateCollected);
-      const measures = filterObj(record.computedMeasures!, ({ key }) => {
-        return selectedMeasures.find((item) => item.key === key);
-      });
-      // Whether this date contains a point that should be on the x axis
-      const isPoint = (oldestDate === null || dateCollected > oldestDate) && Object.keys(measures).length > 0;
-      if (isPoint) {
-        arr.push({
-          dateObj: dateCollected,
-          dateString: DateUtils.toBasicISOString(dateCollected),
-          ...measures
-        });
-      }
-    }
-    return arr.sort((a, b) => {
-      if (a.dateObj > b.dateObj) {
-        return 1;
-      } else if (b.dateObj > a.dateObj) {
-        return -1;
-      }
-      return 0;
+      return dataPoint;
     });
-  }, [records, selectedMeasures, oldestDate]);
+    return arr;
+  }, [ctx.measurements]);
+
+  useEffect(() => {
+    if (ctx.selectedInstrument) {
+      void fetchPredicted();
+    }
+  }, [ctx.selectedInstrument]);
+
+  const lines: LineGraphLine[] = [];
+  for (let i = 0; i < ctx.selectedMeasures.length; i++) {
+    const measure = ctx.selectedMeasures[i];
+    lines.push({
+      name: measure.label,
+      val: measure.key,
+      stroke: COLOR_PALETTE[i]
+    });
+    lines.push({
+      name: `${measure.label} (${t('groupTrend')})`,
+      val: measure.key + 'Group',
+      strokeWidth: 0.5,
+      stroke: COLOR_PALETTE[i],
+      legendType: 'none',
+      strokeDasharray: '5 5'
+    });
+  }
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="ml-[40px] p-2">
-        <div className="mb-5">
-          <h3 className="text-center text-xl font-medium">
-            {selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
-          </h3>
-          {oldestDate && (
-            <p className="text-center">
-              {DateUtils.toBasicISOString(oldestDate)} - {DateUtils.toBasicISOString(new Date())}
-            </p>
-          )}
-        </div>
+        <VisualizationHeader />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
-            <Dropdown
-              className="text-sm"
-              options={instrumentOptions}
-              title={t('subjectPage.graph.instrument')}
-              variant="light"
-              onSelection={(selection) => {
-                setSelectedMeasures([]);
-                setSelectedInstrument(data.find(({ instrument }) => instrument.identifier === selection)?.instrument);
-              }}
-            />
-            <SelectDropdown
-              checkPosition="right"
-              className="text-sm"
-              options={measureOptions}
-              selected={selectedMeasures}
-              setSelected={setSelectedMeasures}
-              title={t('subjectPage.graph.measures')}
-              variant="light"
-            />
+            <InstrumentDropdown />
+            <MeasuresDropdown />
           </div>
           <div>
-            <Dropdown
-              className="text-sm"
-              options={{
-                all: t('subjectPage.graph.timeframeOptions.all'),
-                pastYear: t('subjectPage.graph.timeframeOptions.year'),
-                pastMonth: t('subjectPage.graph.timeframeOptions.month')
-              }}
-              title={t('subjectPage.graph.timeframe')}
-              variant="light"
-              onSelection={(selection) => {
-                if (selection === 'pastYear') {
-                  setOldestDate(new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
-                } else if (selection === 'pastMonth') {
-                  setOldestDate(new Date(new Date().setMonth(new Date().getMonth() - 1)));
-                } else {
-                  setOldestDate(null);
-                }
-              }}
-            />
+            <TimeDropdown />
           </div>
         </div>
       </div>
       <div>
         <LineGraph
-          data={graphData}
-          legend="bottom"
-          lines={selectedMeasures.map((measure) => ({
-            name: measure.label,
-            val: measure.key
-          }))}
+          data={data}
+          lines={lines}
           xAxis={{
-            key: 'dateString',
-            label: t('subjectPage.graph.xLabel')
+            key: 'time',
+            label: t('subjects:subjectPage.graph.xLabel')
           }}
         />
       </div>

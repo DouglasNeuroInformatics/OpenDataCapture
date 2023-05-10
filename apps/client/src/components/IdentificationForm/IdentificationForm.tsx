@@ -17,11 +17,14 @@ export interface IdentificationFormProps {
   /** Whether to prefill the form with the active subject, if one exists  */
   fillActiveSubject?: boolean;
 
+  /** Optional override for the default submit button label */
+  submitBtnLabel?: string;
+
   /** Callback function invoked when validation is successful */
   onSubmit: (data: IdentificationFormData) => void;
 }
 
-export const IdentificationForm = ({ fillActiveSubject, onSubmit }: IdentificationFormProps) => {
+export const IdentificationForm = ({ fillActiveSubject, submitBtnLabel, onSubmit }: IdentificationFormProps) => {
   const { activeSubject } = useActiveSubjectStore();
   const { t } = useTranslation(['common']);
 
@@ -55,7 +58,8 @@ export const IdentificationForm = ({ fillActiveSubject, onSubmit }: Identificati
         }
       }}
       initialValues={fillActiveSubject ? activeSubject : undefined}
-      submitBtnLabel={t('identificationForm.submit')}
+      resetBtn={fillActiveSubject}
+      submitBtnLabel={submitBtnLabel ?? t('identificationForm.submit')}
       validationSchema={{
         type: 'object',
         properties: {

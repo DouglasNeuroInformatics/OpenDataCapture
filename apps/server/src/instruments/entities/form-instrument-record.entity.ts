@@ -6,7 +6,7 @@ import { FormInstrumentEntity } from './form-instrument.entity';
 
 export class FormInstrumentRecordEntity implements FormInstrumentRecord {
   kind: 'form';
-  dateCollected: Date;
+  time: number;
   instrument: FormInstrumentEntity;
   group: Group;
   subject: Subject;
