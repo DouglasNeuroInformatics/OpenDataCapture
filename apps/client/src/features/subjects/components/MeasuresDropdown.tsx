@@ -8,7 +8,7 @@ import { SelectDropdown } from '@/components';
 
 export const MeasuresDropdown = () => {
   const { measureOptions, selectedMeasures, setSelectedMeasures } = useContext(VisualizationContext);
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
   return (
     <SelectDropdown
       checkPosition="right"

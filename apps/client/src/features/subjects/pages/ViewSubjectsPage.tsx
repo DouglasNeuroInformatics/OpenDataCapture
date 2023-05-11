@@ -10,7 +10,7 @@ import { useFetch } from '@/hooks/useFetch';
 
 export const ViewSubjectsPage = () => {
   const { data } = useFetch<Subject[]>('/v1/subjects');
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
 
   if (!data) {
     return <Spinner />;

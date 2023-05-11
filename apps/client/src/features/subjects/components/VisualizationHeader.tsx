@@ -7,7 +7,7 @@ import { VisualizationContext } from '../context/VisualizationContext';
 
 export const VisualizationHeader = () => {
   const ctx = useContext(VisualizationContext);
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
   return (
     <div className="mb-5">
       <h3 className="text-center text-xl font-medium">

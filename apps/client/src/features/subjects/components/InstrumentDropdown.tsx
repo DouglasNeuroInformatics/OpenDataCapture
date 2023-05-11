@@ -7,7 +7,7 @@ import { VisualizationContext } from '../context/VisualizationContext';
 import { Dropdown } from '@/components';
 
 export const InstrumentDropdown = () => {
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
   const ctx = useContext(VisualizationContext);
 
   return (
