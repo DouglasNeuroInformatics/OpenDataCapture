@@ -22,17 +22,17 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
   const fingerprint = useFingerprint();
-  const { t } = useTranslation(['auth']);
+  const { t } = useTranslation();
 
   const content: FormInstrumentContent<LoginFormData> = {
     username: {
       kind: 'text',
-      label: t('auth:login.form.username'),
+      label: t('username'),
       variant: 'short'
     },
     password: {
       kind: 'text',
-      label: t('auth:login.form.password'),
+      label: t('password'),
       variant: 'password'
     }
   };
@@ -58,8 +58,8 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     if (response.status === 401) {
       notifications.add({
         type: 'error',
-        title: t('auth:login.form.unauthorizedError.title'),
-        message: t('auth:login.form.unauthorizedError.message')
+        title: t('unauthorizedError.title'),
+        message: t('unauthorizedError.message')
       });
       return;
     }
@@ -70,7 +70,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   return (
     <Form<LoginFormData>
       content={content}
-      submitBtnLabel={t('auth:login.form.submit')}
+      submitBtnLabel={t('login')}
       validationSchema={{
         ...loginCredentialsSchema,
         errorMessage: {
