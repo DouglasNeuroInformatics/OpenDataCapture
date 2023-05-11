@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { FormInstrumentRecord, SubjectFormRecords } from '@douglasneuroinformatics/common';
+import { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@douglasneuroinformatics/common';
 import { useParams } from 'react-router-dom';
 
 import { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
@@ -61,7 +61,16 @@ export type VisualizationContextData = {
 
 export const VisualizationContext = createContext<VisualizationContextData>(null!);
 
-export const VisualizationContextProvider = ({ children }: { children: React.ReactNode }) => {
+export type VisualizationContextProviderProps = {
+  children: React.ReactNode;
+  /** A filter that can be applied to the instrument options based on truthy` */
+  instrumentOptionsFilter?: (instrument: FormInstrument) => any;
+};
+
+export const VisualizationContextProvider = ({
+  children,
+  instrumentOptionsFilter = () => true
+}: VisualizationContextProviderProps) => {
   const params = useParams();
   const { data } = useFetch<SubjectFormRecords[]>(`/v1/instruments/records/forms`, [], {
     queryParams: {
@@ -114,7 +123,7 @@ export const VisualizationContextProvider = ({ children }: { children: React.Rea
     return data
       ? Object.fromEntries(
           data
-            .filter(({ instrument }) => instrument.measures)
+            .filter(({ instrument }) => instrumentOptionsFilter(instrument))
             .map(({ instrument }) => [instrument.identifier, instrument.details.title])
         )
       : {};

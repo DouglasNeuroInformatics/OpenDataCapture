@@ -13,7 +13,7 @@ export const SubjectRecordsGraphPage = () => {
   const { t } = useTranslation('subjects');
 
   return (
-    <VisualizationContextProvider>
+    <VisualizationContextProvider instrumentOptionsFilter={(instrument) => instrument.measures}>
       <PageHeader title={`${t('subjectPage.pageTitle')}: ${params.subjectIdentifier!.slice(0, 6)}`} />
       <RecordsGraph />
     </VisualizationContextProvider>
