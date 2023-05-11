@@ -2,7 +2,6 @@
 import 'i18next';
 
 // import all namespaces (for the default language, only)
-import auth from './public/locales/en/auth.json';
 import common from './public/locales/en/common.json';
 import contact from './public/locales/en/contact.json';
 import instruments from './public/locales/en/instruments.json';
@@ -13,7 +12,6 @@ declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'common';
     resources: {
-      auth: typeof auth;
       common: typeof common;
       contact: typeof contact;
       instruments: typeof instruments;

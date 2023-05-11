@@ -65,13 +65,13 @@ export const RecordsTable = () => {
 
   const fields: { name: string; field: string }[] = [];
   for (const subItem in data[0]) {
-    fields.push({
-      name: subItem,
-      field: subItem
-    });
+    if (subItem !== 'time') {
+      fields.push({
+        name: subItem,
+        field: subItem
+      });
+    }
   }
-
-  // console.log(fields, data);
 
   return (
     <div>
