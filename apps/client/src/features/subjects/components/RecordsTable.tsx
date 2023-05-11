@@ -15,7 +15,7 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const RecordsTable = () => {
   const { selectedInstrument, records } = useContext(VisualizationContext);
-  const { t } = useTranslation(['common', 'subjects']);
+  const { t } = useTranslation();
   const { currentUser } = useAuthStore();
   const download = useDownload();
   const notifications = useNotificationsStore();
@@ -96,7 +96,7 @@ export const RecordsTable = () => {
       <Table
         columns={[
           {
-            name: t('subjects:subjectPage.graph.xLabel'),
+            name: t('subjectPage.graph.xLabel'),
             field: 'time',
             format: (value: number) => new Date(value).toISOString()
           },

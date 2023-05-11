@@ -17,7 +17,7 @@ export interface SubjectTableProps {
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
   const { currentUser, currentGroup } = useAuthStore();
-  const { t } = useTranslation(['common', 'subjects']);
+  const { t } = useTranslation();
 
   const [showLookup, setShowLookup] = useState(false);
 
@@ -37,7 +37,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         });
         break;
       case 'CSV':
-        download('README.txt', () => Promise.resolve(t('subjects:viewSubjects.table.exportHelpText')));
+        download('README.txt', () => Promise.resolve(t('viewSubjects.table.exportHelpText')));
         download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
           const columnNames = Object.keys(data[0]);
@@ -59,10 +59,10 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
         <SearchBar onClick={() => setShowLookup(true)} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <Dropdown options={[]} title={t('subjects:viewSubjects.table.filters')} onSelection={() => null} />
+          <Dropdown options={[]} title={t('viewSubjects.table.filters')} onSelection={() => null} />
           <Dropdown
             options={['CSV', 'JSON']}
-            title={t('subjects:viewSubjects.table.export')}
+            title={t('viewSubjects.table.export')}
             onSelection={handleExportSelection}
           />
         </div>
@@ -70,16 +70,16 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
       <Table<Subject>
         columns={[
           {
-            name: t('subjects:viewSubjects.table.columns.subject'),
+            name: t('viewSubjects.table.columns.subject'),
             field: (subject) => subject.identifier.slice(0, 6)
           },
           {
-            name: t('subjects:viewSubjects.table.columns.dateOfBirth'),
+            name: t('viewSubjects.table.columns.dateOfBirth'),
             field: (subject) => DateUtils.toBasicISOString(new Date(subject.dateOfBirth))
           },
           {
-            name: t('subjects:viewSubjects.table.columns.sex'),
-            field: (subject) => (subject.sex === 'female' ? t('common:sex.female') : t('common:sex.male'))
+            name: t('viewSubjects.table.columns.sex'),
+            field: (subject) => (subject.sex === 'female' ? t('sex.female') : t('sex.male'))
           }
         ]}
         data={data}

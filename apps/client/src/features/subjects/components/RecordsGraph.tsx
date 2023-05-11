@@ -36,7 +36,7 @@ export interface RecordsGraphProps {
 
 export const RecordsGraph = () => {
   const ctx = useContext(VisualizationContext);
-  const { t } = useTranslation(['common', 'subjects']);
+  const { t } = useTranslation();
   const [predicted, setPredicted] = useState<RegressionResults>({});
 
   const fetchPredicted = async () => {
@@ -105,7 +105,7 @@ export const RecordsGraph = () => {
           lines={lines}
           xAxis={{
             key: 'time',
-            label: t('subjects:subjectPage.graph.xLabel')
+            label: t('subjectPage.graph.xLabel')
           }}
         />
       </div>

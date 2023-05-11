@@ -8,7 +8,7 @@ import { Dropdown } from '@/components';
 
 export const TimeDropdown = () => {
   const { setMinTime } = useContext(VisualizationContext);
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
 
   return (
     <Dropdown

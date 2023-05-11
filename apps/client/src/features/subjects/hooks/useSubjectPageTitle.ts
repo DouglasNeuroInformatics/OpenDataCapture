@@ -3,6 +3,6 @@ import { useParams } from 'react-router-dom';
 
 export function useSubjectPageTitle() {
   const params = useParams();
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
   return `${t('subjectPage.pageTitle')}: ${params.subjectIdentifier!.slice(0, 6)}`;
 }

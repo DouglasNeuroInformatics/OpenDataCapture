@@ -10,7 +10,7 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 export const AddSubjectPage = () => {
   const { setActiveSubject } = useActiveSubjectStore();
   const notifications = useNotificationsStore();
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
 
   const handleSubmit = async (data: IdentificationFormData) => {
     const response = await axios.post('/v1/subjects', data, {

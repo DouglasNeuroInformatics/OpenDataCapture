@@ -3,14 +3,12 @@ import 'i18next';
 
 // import all namespaces (for the default language, only)
 import common from './public/locales/en/common.json';
-import subjects from './public/locales/en/subjects.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'common';
     resources: {
       common: typeof common;
-      subjects: typeof subjects;
     };
   }
 }

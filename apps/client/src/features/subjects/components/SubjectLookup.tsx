@@ -13,7 +13,7 @@ interface SubjectLookupProps {
 }
 
 export const SubjectLookup = ({ show, onClose }: SubjectLookupProps) => {
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const lookupSubject = (formData: IdentificationFormData) => {

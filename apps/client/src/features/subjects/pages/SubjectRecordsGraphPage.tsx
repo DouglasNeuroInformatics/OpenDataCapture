@@ -10,7 +10,7 @@ import { PageHeader } from '@/components';
 
 export const SubjectRecordsGraphPage = () => {
   const params = useParams();
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation();
 
   return (
     <VisualizationContextProvider instrumentOptionsFilter={(instrument) => instrument.measures}>
