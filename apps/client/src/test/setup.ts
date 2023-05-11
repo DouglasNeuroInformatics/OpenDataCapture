@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { setGlobalConfig } from '@storybook/testing-react';
+import { setGlobalConfig } from '@storybook/react';
 
 import globalStorybookConfig from '../../.storybook/preview';
 
