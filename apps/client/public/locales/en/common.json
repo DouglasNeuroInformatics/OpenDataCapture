@@ -64,5 +64,12 @@
   "table": "Table",
   "userDropup.logout": "Logout",
   "userDropup.preferences": "Preferences",
-  "visualization.selectMode": "Please select a visualization mode"
+  "visualization.selectMode": "Please select a visualization mode",
+  "contact.message": "Message",
+  "contact.pageTitle": "Contact Us",
+  "contact.reason": "Reason",
+  "contact.reasons.bug": "Bug Report",
+  "contact.reasons.feedback": "Feedback",
+  "contact.reasons.other": "Other",
+  "contact.reasons.request": "Request"
 }
