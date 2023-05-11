@@ -25,7 +25,7 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 export const FormPage = () => {
   const params = useParams();
   const notifications = useNotificationsStore();
-  const { t } = useTranslation('instruments');
+  const { t } = useTranslation();
   const { activeSubject } = useActiveSubjectStore();
   const { currentGroup } = useAuthStore();
 
@@ -51,7 +51,7 @@ export const FormPage = () => {
     });
     setTimeCollected(now);
     setResult(data);
-    notifications.add({ message: t('formPage.uploadSuccessful'), type: 'success' });
+    notifications.add({ message: t('instruments.formPage.uploadSuccessful'), type: 'success' });
   };
 
   return (
@@ -61,22 +61,22 @@ export const FormPage = () => {
         steps={[
           {
             element: <FormOverview details={instrument.details} />,
-            label: t('formPage.overview.label'),
+            label: t('instruments.formPage.overview.label'),
             icon: <HiOutlineDocumentCheck />
           },
           {
             element: <FormIdentification />,
-            label: t('formPage.identification.label'),
+            label: t('instruments.formPage.identification.label'),
             icon: <HiOutlineIdentification />
           },
           {
             element: <FormQuestions instrument={instrument} onSubmit={handleSubmit} />,
-            label: t('formPage.questions.label'),
+            label: t('instruments.formPage.questions.label'),
             icon: <HiOutlineQuestionMarkCircle />
           },
           {
             element: <FormSummary instrument={instrument} result={result} timeCollected={timeCollected} />,
-            label: t('formPage.summary.label'),
+            label: t('instruments.formPage.summary.label'),
             icon: <HiOutlinePrinter />
           }
         ]}

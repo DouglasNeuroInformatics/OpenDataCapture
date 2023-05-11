@@ -29,7 +29,7 @@ export const FormSummary = <T extends FormInstrumentData>({
 }: FormSummaryProps<T>) => {
   const { activeSubject } = useActiveSubjectStore();
   const download = useDownload();
-  const { t } = useTranslation('instruments');
+  const { t } = useTranslation();
 
   if (!result) {
     return <Spinner />;
@@ -42,21 +42,21 @@ export const FormSummary = <T extends FormInstrumentData>({
 
   return (
     <div>
-      <h3 className="my-3 text-xl font-semibold">{t('formPage.summary.subject')}</h3>
+      <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.subject')}</h3>
       <FormSummaryItem
-        label={t('formPage.summary.name')}
+        label={t('instruments.formPage.summary.name')}
         value={`${activeSubject!.firstName} ${activeSubject!.lastName}`}
       />
-      <FormSummaryItem label={t('formPage.summary.dateOfBirth')} value={activeSubject?.dateOfBirth} />
-      <FormSummaryItem label={t('formPage.summary.sex')} value={activeSubject?.sex} />
-      <h3 className="my-3 text-xl font-semibold">{t('formPage.summary.metadata')}</h3>
-      <FormSummaryItem label={t('formPage.summary.instrumentTitle')} value={instrument.details.title} />
-      <FormSummaryItem label={t('formPage.summary.instrumentVersion')} value={instrument.version} />
+      <FormSummaryItem label={t('instruments.formPage.summary.dateOfBirth')} value={activeSubject?.dateOfBirth} />
+      <FormSummaryItem label={t('instruments.formPage.summary.sex')} value={activeSubject?.sex} />
+      <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.metadata')}</h3>
+      <FormSummaryItem label={t('instruments.formPage.summary.instrumentTitle')} value={instrument.details.title} />
+      <FormSummaryItem label={t('instruments.formPage.summary.instrumentVersion')} value={instrument.version} />
       <FormSummaryItem
-        label={t('formPage.summary.timeCollected')}
+        label={t('instruments.formPage.summary.timeCollected')}
         value={new Date(timeCollected).toLocaleString('en-CA')}
       />
-      <h3 className="my-3 text-xl font-semibold">{t('formPage.summary.results')}</h3>
+      <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.results')}</h3>
       <div className="mb-3">
         {Object.keys(result).map((fieldName) => {
           let field: BaseFormField;
@@ -71,8 +71,8 @@ export const FormSummary = <T extends FormInstrumentData>({
         })}
       </div>
       <div className="flex gap-3 print:hidden">
-        <Button label={t('formPage.summary.print')} onClick={() => print()} />
-        <Button label={t('formPage.summary.download')} onClick={downloadResult} />
+        <Button label={t('instruments.formPage.summary.print')} onClick={() => print()} />
+        <Button label={t('instruments.formPage.summary.download')} onClick={downloadResult} />
       </div>
     </div>
   );

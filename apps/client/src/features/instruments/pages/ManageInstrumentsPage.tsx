@@ -10,7 +10,7 @@ import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const ManageInstrumentsPage = () => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const { t } = useTranslation('instruments');
+  const { t } = useTranslation();
   const { data, setData } = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available');
   const notifications = useNotificationsStore();
 
@@ -24,7 +24,7 @@ export const ManageInstrumentsPage = () => {
 
   return (
     <div>
-      <PageHeader title={t('manageInstruments.pageTitle')} />
+      <PageHeader title={t('instruments.manageInstruments.pageTitle')} />
     </div>
   );
 };

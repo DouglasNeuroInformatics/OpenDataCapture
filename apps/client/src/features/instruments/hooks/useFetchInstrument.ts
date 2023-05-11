@@ -12,7 +12,7 @@ import { useNotificationsStore } from '@/stores/notifications-store';
  */
 export function useFetchInstrument(identifier: string) {
   const notifications = useNotificationsStore();
-  const { t, i18n } = useTranslation('instruments');
+  const { t, i18n } = useTranslation();
   const [preferredLanguage, setPreferredLanguage] = useState<Language>(i18n.resolvedLanguage as Language);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export function useFetchInstrument(identifier: string) {
           }
           return 'en';
         });
-        notifications.add({ type: 'warning', message: t('fetchInstrument.notFound') });
+        notifications.add({ type: 'warning', message: t('instruments.fetchInstrument.notFound') });
         console.error(error);
       }
     }

@@ -13,12 +13,12 @@ export interface InstrumentShowcaseProps {
 }
 
 export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => {
-  const { i18n, t } = useTranslation(['common', 'instruments']);
+  const { i18n, t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
 
   const languageOptions = Array.from(new Set(instruments.map((item) => item.details.language))).map((item) => ({
     key: item,
-    label: t(`common:languages.${item}`)
+    label: t(`languages.${item}`)
   }));
 
   const tagOptions = Array.from(new Set(instruments.flatMap((item) => item.tags))).map((item) => ({
@@ -73,13 +73,13 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
             options={tagOptions}
             selected={selectedTags}
             setSelected={setSelectedTags}
-            title={t('instruments:availableInstruments.filters.tags')}
+            title={t('instruments.availableInstruments.filters.tags')}
           />
           <SelectDropdown
             options={languageOptions}
             selected={selectedLanguages}
             setSelected={setSelectedLanguages}
-            title={t('instruments:availableInstruments.filters.language')}
+            title={t('instruments.availableInstruments.filters.language')}
           />
         </div>
       </div>

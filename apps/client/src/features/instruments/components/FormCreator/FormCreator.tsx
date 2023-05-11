@@ -29,7 +29,7 @@ export const FormCreator = () => {
     }
   });
 
-  const { t } = useTranslation('instruments');
+  const { t } = useTranslation();
 
   const handleSubmitDetails = ({ name, tags, version, ...details }: InfoFormData) => {
     setState((prevState) => ({
@@ -53,17 +53,17 @@ export const FormCreator = () => {
     <Stepper
       steps={[
         {
-          label: t('createInstrument.steps.info'),
+          label: t('instruments.createInstrument.steps.info'),
           icon: <HiOutlineQuestionMarkCircle />,
           element: <InfoForm onSubmit={handleSubmitDetails} />
         },
         {
-          label: t('createInstrument.steps.fields'),
+          label: t('instruments.createInstrument.steps.fields'),
           icon: <HiOutlineQuestionMarkCircle />,
           element: <FieldsForm onSubmit={handleSubmitFields} />
         },
         {
-          label: t('createInstrument.steps.review'),
+          label: t('instruments.createInstrument.steps.review'),
           icon: <HiOutlineQuestionMarkCircle />,
           element: <Review form={state} />
         }
