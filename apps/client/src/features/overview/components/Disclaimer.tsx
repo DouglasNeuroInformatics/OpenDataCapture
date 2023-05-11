@@ -14,7 +14,7 @@ export interface DisclaimerProps {
 export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProps) => {
   const { currentUser, logout } = useAuthStore();
   const { isAccepted, username, setIsAccepted } = useDisclaimerStore();
-  const { t } = useTranslation('overview');
+  const { t } = useTranslation();
 
   const handleClose = () => setIsAccepted(true, currentUser!.username);
 

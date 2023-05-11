@@ -119,5 +119,17 @@
   "instruments.manageInstruments.deleteModal.name": "Nom",
   "instruments.manageInstruments.deleteModal.title": "Confirmation de l'effacement",
   "instruments.manageInstruments.deleteModal.version": "Version",
-  "instruments.manageInstruments.pageTitle": "Gérer les instruments"
+  "instruments.manageInstruments.pageTitle": "Gérer les instruments",
+  "currentGroup": "Groupe actuel",
+  "disclaimer.accept": "Accepter",
+  "disclaimer.decline": "Refuser",
+  "disclaimer.message": "Le Douglas Data Capture Platform n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques.",
+  "disclaimer.title": "Avis",
+  "overview.pageTitle": "Vue d'ensemble",
+  "overview.totalInstruments": "Nombre d'instruments",
+  "overview.totalRecords": "Nombre d'enregistrements",
+  "overview.totalSubjects": "Nombre de clients",
+  "overview.totalUsers": "Nombre d'utilisateurs",
+  "overview.summary": "Résumé des données disponibles",
+  "overview.welcome": "Bienvenue"
 }
