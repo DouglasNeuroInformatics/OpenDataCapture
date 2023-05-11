@@ -12,10 +12,10 @@ type ContactFormData = {
 };
 
 export const ContactPage = () => {
-  const { t } = useTranslation(['contact']);
+  const { t } = useTranslation();
 
   const handleSubmit = ({ contactReason, message }: ContactFormData) => {
-    const subject = encodeURIComponent(t(`contact:reasons.${contactReason}`).toUpperCase());
+    const subject = encodeURIComponent(t(`contact.reasons.${contactReason}`).toUpperCase());
     const body = encodeURIComponent(message);
     const emailTemplate = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
     window.open(emailTemplate, '_blank');
@@ -23,22 +23,22 @@ export const ContactPage = () => {
 
   return (
     <div>
-      <PageHeader title={t('contact:pageTitle')} />
+      <PageHeader title={t('contact.pageTitle')} />
       <Form<ContactFormData>
         content={{
           contactReason: {
             kind: 'options',
             label: 'Reason',
             options: {
-              bug: t('contact:reasons.bug'),
-              feedback: t('contact:reasons.feedback'),
-              request: t('contact:reasons.request'),
-              other: t('contact:reasons.other')
+              bug: t('contact.reasons.bug'),
+              feedback: t('contact.reasons.feedback'),
+              request: t('contact.reasons.request'),
+              other: t('contact.reasons.other')
             }
           },
           message: {
             kind: 'text',
-            label: t('contact:message'),
+            label: t('contact.message'),
             variant: 'long'
           }
         }}

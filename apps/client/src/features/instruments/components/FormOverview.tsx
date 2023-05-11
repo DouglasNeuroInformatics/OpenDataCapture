@@ -39,19 +39,19 @@ export const FormOverview = ({
 }: FormOverviewProps) => {
   const { updateIndex } = useContext(StepperContext);
 
-  const { t } = useTranslation(['common', 'instruments']);
+  const { t } = useTranslation();
   return (
     <div className="mb-2">
       <div className="mb-5">
-        <FormOverviewItem heading={t('instruments:formPage.overview.description')} text={description} />
-        <FormOverviewItem heading={t('instruments:formPage.overview.language')} text={t(`languages.${language}`)} />
+        <FormOverviewItem heading={t('instruments.formPage.overview.description')} text={description} />
+        <FormOverviewItem heading={t('instruments.formPage.overview.language')} text={t(`languages.${language}`)} />
         <FormOverviewItem
-          heading={t('instruments:formPage.overview.estimated Duration')}
+          heading={t('instruments.formPage.overview.estimated Duration')}
           text={`${estimatedDuration} Minutes`}
         />
-        <FormOverviewItem heading={t('instruments:formPage.overview.instructions')} text={instructions} />
+        <FormOverviewItem heading={t('instruments.formPage.overview.instructions')} text={instructions} />
       </div>
-      <Button label={t('instruments:formPage.overview.begin')} onClick={() => updateIndex('increment')} />
+      <Button label={t('instruments.formPage.overview.begin')} onClick={() => updateIndex('increment')} />
     </div>
   );
 };

@@ -11,7 +11,7 @@ export interface InstrumentCardProps {
 
 export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
   const navigate = useNavigate();
-  const { t } = useTranslation('instruments');
+  const { t } = useTranslation();
 
   const handleClick = () => {
     navigate(`../forms/${instrument.identifier}`);
@@ -31,9 +31,9 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
         </div>
         <div className="flex-grow">
           <h3 className="title-font mb-1 text-lg font-semibold text-slate-900">{instrument.details.title}</h3>
-          <h5 className="mb-2 text-slate-700">{`${t('availableInstruments.filters.tags')}: ${instrument.tags.join(
-            ', '
-          )}`}</h5>
+          <h5 className="mb-2 text-slate-700">{`${t(
+            'instruments.availableInstruments.filters.tags'
+          )}: ${instrument.tags.join(', ')}`}</h5>
           <p className="text-sm leading-relaxed text-slate-700">{instrument.details.description}</p>
         </div>
       </div>

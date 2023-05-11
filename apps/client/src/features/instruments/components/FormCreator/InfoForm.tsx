@@ -18,27 +18,27 @@ export interface InfoFormProps {
 
 export const InfoForm = ({ onSubmit }: InfoFormProps) => {
   const { updateIndex } = useContext(StepperContext);
-  const { t } = useTranslation(['common', 'instruments']);
+  const { t } = useTranslation();
 
   return (
     <Form<InfoFormData>
       content={[
         {
-          title: t('instruments:createInstrument.form.basics'),
+          title: t('instruments.createInstrument.form.basics'),
           fields: {
             name: {
               kind: 'text',
-              label: t('instruments:createInstrument.form.name.label'),
+              label: t('instruments.createInstrument.form.name.label'),
               variant: 'short'
             },
             tags: {
               kind: 'text',
-              label: t('instruments:createInstrument.form.tags.label'),
+              label: t('instruments.createInstrument.form.tags.label'),
               variant: 'short'
             },
             version: {
               kind: 'numeric',
-              label: t('instruments:createInstrument.form.version.label'),
+              label: t('instruments.createInstrument.form.version.label'),
               min: 0,
               max: 10,
               variant: 'default'
@@ -46,21 +46,21 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
           }
         },
         {
-          title: t('instruments:createInstrument.form.details'),
+          title: t('instruments.createInstrument.form.details'),
           fields: {
             title: {
               kind: 'text',
-              label: t('instruments:createInstrument.form.title.label'),
+              label: t('instruments.createInstrument.form.title.label'),
               variant: 'short'
             },
             description: {
               kind: 'text',
-              label: t('instruments:createInstrument.form.description.label'),
+              label: t('instruments.createInstrument.form.description.label'),
               variant: 'long'
             },
             language: {
               kind: 'options',
-              label: t('instruments:createInstrument.form.language.label'),
+              label: t('instruments.createInstrument.form.language.label'),
               options: {
                 en: t('languages.en'),
                 fr: t('languages.fr')
@@ -68,12 +68,12 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
             },
             instructions: {
               kind: 'text',
-              label: t('instruments:createInstrument.form.instructions.label'),
+              label: t('instruments.createInstrument.form.instructions.label'),
               variant: 'long'
             },
             estimatedDuration: {
               kind: 'numeric',
-              label: t('instruments:createInstrument.form.estimatedDuration.label'),
+              label: t('instruments.createInstrument.form.estimatedDuration.label'),
               min: 1,
               max: 60,
               variant: 'default'

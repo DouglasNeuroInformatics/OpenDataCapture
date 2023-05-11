@@ -10,7 +10,7 @@ import { useFetch } from '@/hooks/useFetch';
 
 export const AvailableInstrumentsPage = () => {
   const { data } = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available');
-  const { t } = useTranslation('instruments');
+  const { t } = useTranslation();
 
   if (!data) {
     return <Spinner />;
@@ -18,7 +18,7 @@ export const AvailableInstrumentsPage = () => {
 
   return (
     <div>
-      <PageHeader title={t('availableInstruments.pageTitle')} />
+      <PageHeader title={t('instruments.availableInstruments.pageTitle')} />
       <InstrumentShowcase instruments={data} />
     </div>
   );
