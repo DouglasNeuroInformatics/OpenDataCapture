@@ -9288,10 +9288,10 @@ neo-async@^2.5.0, neo-async@^2.6.0, neo-async@^2.6.1, neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nest-commander@^3.6.1:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/nest-commander/-/nest-commander-3.7.0.tgz#afebe14652e6c9040e90b2b9a95e1241c9ec8219"
-  integrity sha512-83BLm0jhU4c4p77f4SXjV2yHnY6LhasPW4dFj+6fkdiK+cHBSZqqtWQoSZcEIwSwCpLV/RET+mPRcjaP72YBCA==
+nest-commander@^3.7.1:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/nest-commander/-/nest-commander-3.7.1.tgz#058195a4f94eefd548e00976e7a6bcba1e32684b"
+  integrity sha512-wiRd8gS/kZoqzxKqpfzmT+gCNKWI+XHAYw9ZCnaWdeaYb8RAzNUAK5DKyx79RXcBiVrWq3JCplteLCSqb+6sOg==
   dependencies:
     "@golevelup/nestjs-discovery" "3.0.0"
     commander "10.0.1"
