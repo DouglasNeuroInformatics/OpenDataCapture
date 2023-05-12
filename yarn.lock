@@ -1104,10 +1104,10 @@
   dependencies:
     "@ucast/mongo2js" "^1.3.0"
 
-"@casl/mongoose@^7.1.2":
-  version "7.1.2"
-  resolved "https://registry.yarnpkg.com/@casl/mongoose/-/mongoose-7.1.2.tgz#61e86839ee19df8443158f44b10cbbe5137ed1fb"
-  integrity sha512-YiY5gQlr5J0jsn0ZbjtDJEhqKviPyPj0ErZ2bnOh7li+ENvFMnfp5ZeF2wN7ZVcqK9mn4MCqWH56EzafRF3i+g==
+"@casl/mongoose@^7.1.3":
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/@casl/mongoose/-/mongoose-7.1.3.tgz#9b00cc5dd2d47f4211ad5903eaa0f9633dd977fa"
+  integrity sha512-RWdOHhkE6cSUk63NDqQ729qfWk2sS/kQ7oSfv4NZEkdUSheFIG0QR9O6eXBuPDRbCzOunB62zJ799xWb7na8OA==
 
 "@changesets/apply-release-plan@^6.1.3":
   version "6.1.3"
