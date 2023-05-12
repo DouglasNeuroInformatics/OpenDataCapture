@@ -6,14 +6,8 @@ assignees:
 body:
 - type: textarea
   attributes:
-    label: Current Implementation
-    description: Describe current state of the feature in question
-  validations:
-    required: true
-- type: textarea
-  attributes:
-    label: Limitations of Current Implementation
-    description: Describe the limitations of the current solution
+    label: Current Implementation and Limitations
+    description: Describe current state of the feature in question, particularly any limitations
   validations:
     required: true
 - type: dropdown
