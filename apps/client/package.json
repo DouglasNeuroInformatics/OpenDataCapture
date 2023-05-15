@@ -40,7 +40,7 @@
     "react-icons": "^4.7.1",
     "react-router-dom": "^6.11.1",
     "recharts": "^2.3.2",
-    "type-fest": "^3.9.0",
+    "type-fest": "^3.10.0",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
