@@ -4,7 +4,13 @@ import { FallbackProps } from 'react-error-boundary';
 
 import { Button } from '@/components';
 
-export const ErrorFallback = ({ error }: FallbackProps) => {
+export interface ErrorFallbackProps extends FallbackProps {
+  error: {
+    message: string;
+  };
+}
+
+export const ErrorFallback = ({ error }: ErrorFallbackProps) => {
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center text-red-500" role="alert">
       <h2 className="text-3xl font-semibold">Oops! Something went wrong</h2>

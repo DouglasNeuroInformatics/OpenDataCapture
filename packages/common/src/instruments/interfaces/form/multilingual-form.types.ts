@@ -3,10 +3,10 @@ import { Simplify } from 'type-fest';
 import { FormDetails } from './form-details.types';
 import * as BaseTypes from './form-fields.types';
 import { FormInstrument } from './form-instrument.types';
+import { Measure } from './measures.types';
 
 import { Language } from '@/core';
 import { Nullable } from '@/utils';
-import { Measure } from './measures.types';
 
 /**
  * The details of the form to be displayed to the user. This corresponds to the same
