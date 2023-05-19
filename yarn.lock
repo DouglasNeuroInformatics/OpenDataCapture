@@ -1367,6 +1367,13 @@
     eslint-config-prettier "^8.8.0"
     eslint-import-resolver-typescript "^3.5.5"
 
+"@douglasneuroinformatics/react-components@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/react-components/-/react-components-0.0.3.tgz#7a4d769813fab8504f2313efe269e787bebd55ad"
+  integrity sha512-zH2tVbkfg6RZVTAdVsOHAM4TJ2YJH537mNsCcOavE4R10gkwJ4/hGaJTpHerkQ9UhWFeoFPxL/tH6fEu5JlPqQ==
+  dependencies:
+    clsx "^1.2.1"
+
 "@emotion/is-prop-valid@^0.8.2":
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz#db28b1c4368a259b60a97311d6a952d4fd01ac1a"
