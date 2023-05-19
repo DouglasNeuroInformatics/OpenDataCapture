@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
+import { Button } from '@douglasneuroinformatics/react-components';
 import axios from 'axios';
 
 import { SimpleForm } from './FormCreator';
 
-import { Button } from '@/components';
 import { useNotificationsStore } from '@/stores/notifications-store';
 
 const ReviewItem = ({ label, value }: { label: string; value: any }) => {

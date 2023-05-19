@@ -1,10 +1,9 @@
 import React from 'react';
 
+import { Button, type ButtonProps } from '@douglasneuroinformatics/react-components';
 import { Menu, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 import { HiChevronDown } from 'react-icons/hi2';
-
-import { Button, type ButtonProps } from '@/components';
 
 type DropdownOptions = readonly string[] | Record<string, string>;
 

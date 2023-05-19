@@ -1,10 +1,11 @@
 import React from 'react';
 
+import { Button } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { useDisclaimerStore } from '../stores/disclaimer-store';
 
-import { Button, Modal } from '@/components';
+import { Modal } from '@/components';
 import { useAuthStore } from '@/stores/auth-store';
 
 export interface DisclaimerProps {

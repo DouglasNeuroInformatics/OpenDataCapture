@@ -1,10 +1,9 @@
 import React from 'react';
 
+import { Button } from '@douglasneuroinformatics/react-components';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 
 import { Modal } from './Modal';
-
-import { Button } from '@/components';
 
 export default {
   component: Modal,
@@ -22,8 +21,8 @@ const Template: ComponentStory<typeof Modal> = (args) => (
     </div>
 
     <div className="mt-4 flex">
-      <Button className="mr-2" label="Accept" size="sm" />
-      <Button label="Decline" size="sm" variant="light" />
+      <Button className="mr-2" label="Accept" />
+      <Button label="Decline" variant="light" />
     </div>
   </Modal>
 );

@@ -1,8 +1,7 @@
 import React from 'react';
 
+import { Button } from '@douglasneuroinformatics/react-components';
 import { FallbackProps } from 'react-error-boundary';
-
-import { Button } from '@/components';
 
 export interface ErrorFallbackProps extends FallbackProps {
   error: {

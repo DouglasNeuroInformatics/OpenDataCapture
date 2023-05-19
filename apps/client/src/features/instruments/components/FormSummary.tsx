@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { BaseFormField, FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
+import { Button } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Spinner } from '@/components';
+import { Spinner } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 

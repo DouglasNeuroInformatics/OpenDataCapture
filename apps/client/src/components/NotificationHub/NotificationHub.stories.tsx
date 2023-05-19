@@ -1,8 +1,7 @@
 import React from 'react';
 
+import { Button } from '@douglasneuroinformatics/react-components';
 import type { Meta, StoryObj } from '@storybook/react';
-
-import { Button } from '../Button';
 
 import { NotificationHub } from './NotificationHub';
 
