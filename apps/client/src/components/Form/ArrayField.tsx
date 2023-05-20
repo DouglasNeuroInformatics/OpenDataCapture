@@ -1,8 +1,7 @@
 import React from 'react';
 
 import { ArrayFormField } from '@douglasneuroinformatics/common';
-
-import { Button } from '../Button';
+import { Button } from '@douglasneuroinformatics/react-components';
 
 import { PrimitiveFormField, PrimitiveFormFieldProps } from './PrimitiveFormField';
 import { BaseFieldProps, NullableArrayFieldValue, NullablePrimitiveFieldValue } from './types';

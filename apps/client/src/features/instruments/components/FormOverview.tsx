@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 
 import { FormDetails } from '@douglasneuroinformatics/common';
+import { Button } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
 
 interface FormOverviewItemProps {

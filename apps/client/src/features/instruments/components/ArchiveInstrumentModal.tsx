@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { Button } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Modal } from '@/components';
+import { Modal } from '@/components';
 
 interface ArchiveInstrumentModalProps {
   instrument: FormInstrumentSummary;

@@ -1,10 +1,9 @@
 import React from 'react';
 
+import { Button, type ButtonProps } from '@douglasneuroinformatics/react-components';
 import { Listbox, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 import { HiCheck, HiChevronDown } from 'react-icons/hi2';
-
-import { Button, type ButtonProps } from '../Button';
 
 export interface SelectOption {
   key: string;
