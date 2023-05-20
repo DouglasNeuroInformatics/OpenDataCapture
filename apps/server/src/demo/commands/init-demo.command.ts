@@ -2,8 +2,9 @@ import { Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, FormInstrument, FormInstrumentData, Random } from '@douglasneuroinformatics/common';
+import { AppAbility, FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
 import * as instruments from '@douglasneuroinformatics/instruments';
+import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
 import { Connection } from 'mongoose';
 import { Command, CommandRunner } from 'nest-commander';
@@ -69,7 +70,7 @@ export class InitDemoCommand extends CommandRunner {
     for (let i = 0; i < 100; i++) {
       const createSubjectDto = this.getCreateSubjectDto();
       await this.subjectsService.create(createSubjectDto);
-      const group = await this.groupsService.findByName(Random.value(DEMO_GROUPS).name, this.ability);
+      const group = await this.groupsService.findByName(randomValue(DEMO_GROUPS).name, this.ability);
       await this.createFormRecords(happinessQuestionnaires[0], group.name, createSubjectDto);
       await this.createFormRecords(miniMentalStateExaminations[0], group.name, createSubjectDto);
       await this.createFormRecords(montrealCognitiveAssessments[0], group.name, createSubjectDto);
@@ -132,7 +133,7 @@ export class InitDemoCommand extends CommandRunner {
             data[fieldName] = faker.datatype.number({ min: field.min, max: field.max, precision: 1 });
             break;
           case 'options':
-            data[fieldName] = Random.value(Object.keys(field.options));
+            data[fieldName] = randomValue(Object.keys(field.options));
             break;
           case 'text':
             data[fieldName] = faker.lorem.sentence();

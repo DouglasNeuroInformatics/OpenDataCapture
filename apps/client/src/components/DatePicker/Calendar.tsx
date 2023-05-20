@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { range } from '@douglasneuroinformatics/common';
+import { range } from '@douglasneuroinformatics/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 

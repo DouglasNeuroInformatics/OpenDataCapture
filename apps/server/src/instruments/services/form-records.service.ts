@@ -2,18 +2,18 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import { Language } from '@douglasneuroinformatics/common';
-import { AppAbility } from '@douglasneuroinformatics/common/auth';
-import { Group } from '@douglasneuroinformatics/common/groups';
 import {
+  AppAbility,
   FormInstrumentData,
   FormInstrumentRecord,
   FormInstrumentRecordsSummary,
+  Group,
   InstrumentRecordsExport,
+  Language,
   Measure,
   SubjectFormRecords
-} from '@douglasneuroinformatics/common/instruments';
-import { DateUtils } from '@douglasneuroinformatics/common/utils';
+} from '@douglasneuroinformatics/common';
+import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Model } from 'mongoose';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
@@ -162,7 +162,7 @@ export class FormRecordsService {
         for (const measure of Object.keys(record.data)) {
           data.push({
             subjectId: subject.identifier,
-            subjectAge: DateUtils.yearsPassed(subject.dateOfBirth),
+            subjectAge: yearsPassed(subject.dateOfBirth),
             subjectSex: subject.sex,
             instrumentName: record.instrument.name,
             instrumentVersion: record.instrument.version,

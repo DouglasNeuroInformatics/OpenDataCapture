@@ -1,3 +1,4 @@
+import { Nullable } from '@douglasneuroinformatics/utils';
 import { Simplify } from 'type-fest';
 
 import { FormDetails } from './form-details.types';
@@ -6,7 +7,6 @@ import { FormInstrument } from './form-instrument.types';
 import { Measure } from './measures.types';
 
 import { Language } from '@/core';
-import { Nullable } from '@/utils';
 
 /**
  * The details of the form to be displayed to the user. This corresponds to the same

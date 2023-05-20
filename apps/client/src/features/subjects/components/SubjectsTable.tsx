@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import { DateUtils, InstrumentRecordsExport, Subject } from '@douglasneuroinformatics/common';
+import { InstrumentRecordsExport, Subject } from '@douglasneuroinformatics/common';
+import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -75,7 +76,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
           },
           {
             name: t('viewSubjects.table.columns.dateOfBirth'),
-            field: (subject) => DateUtils.toBasicISOString(new Date(subject.dateOfBirth))
+            field: (subject) => toBasicISOString(new Date(subject.dateOfBirth))
           },
           {
             name: t('viewSubjects.table.columns.sex'),

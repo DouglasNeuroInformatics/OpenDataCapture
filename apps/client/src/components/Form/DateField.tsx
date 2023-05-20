@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import { DateFormField, DateUtils } from '@douglasneuroinformatics/common';
+import { DateFormField } from '@douglasneuroinformatics/common';
+import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 
@@ -25,7 +26,7 @@ export const DateField = ({ description, name, label, error, value, setValue }: 
   };
 
   const handleDatePickerSelection = (date: Date) => {
-    handleChange(DateUtils.toBasicISOString(date));
+    handleChange(toBasicISOString(date));
     setShowDatePicker(false);
   };
 

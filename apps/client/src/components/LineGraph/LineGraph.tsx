@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DateUtils } from '@douglasneuroinformatics/common';
+import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import {
   CartesianGrid,
   ErrorBar,
@@ -57,7 +57,7 @@ function LineGraphComponent<const T extends LineGraphData>({
           height={50}
           interval="preserveStartEnd"
           padding={{ left: 20, right: 20 }}
-          tickFormatter={(time: number) => DateUtils.toBasicISOString(new Date(time))}
+          tickFormatter={(time: number) => toBasicISOString(new Date(time))}
           tickMargin={5}
           tickSize={8}
           type={'number'}

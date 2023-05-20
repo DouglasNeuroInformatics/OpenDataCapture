@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { type AppAbility } from '@douglasneuroinformatics/common/auth';
-import { type Language } from '@douglasneuroinformatics/common/core';
 import {
+  type AppAbility,
   FormInstrumentRecordsSummary,
   InstrumentRecordsExport,
+  type Language,
   SubjectFormRecords
-} from '@douglasneuroinformatics/common/instruments';
+} from '@douglasneuroinformatics/common';
 
 import { CreateFormRecordDto } from '../dto/create-form-record.dto';
 import { FormRecordsService } from '../services/form-records.service';

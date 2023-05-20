@@ -39,9 +39,9 @@
       "require": "./dist/users/index.js",
       "import": "./dist/users/index.mjs"
     },
-    "./utils": {
-      "require": "./dist/utils/index.js",
-      "import": "./dist/utils/index.mjs"
+    "./validation": {
+      "require": "./dist/validation/index.js",
+      "import": "./dist/validation/index.mjs"
     }
   },
   "scripts": {
@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@casl/ability": "^6.3.3",
+    "@douglasneuroinformatics/utils": "latest",
     "ajv": "^8.12.0",
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^2.1.1",
