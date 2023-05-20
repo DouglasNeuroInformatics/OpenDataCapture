@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
-import { BasePermissionLevel, User } from '@douglasneuroinformatics/common';
-import { AppAbility } from '@douglasneuroinformatics/common/auth';
+import { AppAbility, BasePermissionLevel, User } from '@douglasneuroinformatics/common';
 
 @Injectable()
 export class AbilityFactory {

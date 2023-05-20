@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Random, Subject, range } from '@douglasneuroinformatics/common';
+import { Subject } from '@douglasneuroinformatics/common';
+import { randomDate, randomInt, range } from '@douglasneuroinformatics/utils';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -23,8 +24,8 @@ const columns: TableColumn<Subject>[] = [
 
 const data: Subject[] = range(25).map((i) => ({
   identifier: i.toString(),
-  dateOfBirth: Random.birthday(),
-  sex: Random.int(0, 1) === 0 ? 'male' : 'female'
+  dateOfBirth: randomDate(new Date(1950, 0, 1), new Date()),
+  sex: randomInt(0, 1) === 0 ? 'male' : 'female'
 }));
 
 export default {

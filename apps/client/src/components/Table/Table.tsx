@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DateUtils } from '@douglasneuroinformatics/common';
+import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { clsx } from 'clsx';
 import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ function formatValue(value: unknown): string {
   }
 
   if (value instanceof Date) {
-    return DateUtils.toBasicISOString(value);
+    return toBasicISOString(value);
   }
 
   return JSON.stringify(value);

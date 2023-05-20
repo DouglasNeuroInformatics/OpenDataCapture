@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-import { range } from '@douglasneuroinformatics/common';
+import { range } from '@douglasneuroinformatics/utils';
 import { clsx } from 'clsx';
 
 export interface YearSelectorProps {

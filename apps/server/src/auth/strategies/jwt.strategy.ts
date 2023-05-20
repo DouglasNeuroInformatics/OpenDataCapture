@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@n
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { JwtPayload } from '@douglasneuroinformatics/common/auth';
+import { JwtPayload } from '@douglasneuroinformatics/common';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { AbilityFactory } from '@/ability/ability.factory';

@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { type FormInstrumentData, FormInstrumentRecord } from '@douglasneuroinformatics/common/instruments';
 import {
+  type FormInstrumentData,
+  FormInstrumentRecord,
   type SubjectIdentificationData,
   subjectIdentificationDataSchema
-} from '@douglasneuroinformatics/common/subjects';
+} from '@douglasneuroinformatics/common';
 
 import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
