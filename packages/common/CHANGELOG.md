@@ -1,5 +1,11 @@
 # @douglasneuroinformatics/common
 
+## 0.1.0
+
+### Minor Changes
+
+- Fix small errors in types
+
 ## 0.0.4
 
 ### Patch Changes
