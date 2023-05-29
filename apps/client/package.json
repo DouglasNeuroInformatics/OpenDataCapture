@@ -51,7 +51,7 @@
     "@storybook/addon-interactions": "^7.0.12",
     "@storybook/addon-links": "^7.0.10",
     "@storybook/blocks": "^7.0.10",
-    "@storybook/react": "^7.0.10",
+    "@storybook/react": "^7.0.18",
     "@storybook/react-vite": "^7.0.10",
     "@tailwindcss/container-queries": "^0.1.0",
     "@testing-library/jest-dom": "^5.16.5",
