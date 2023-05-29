@@ -25,7 +25,7 @@
     "@douglasneuroinformatics/common": "*",
     "@douglasneuroinformatics/instruments": "*",
     "@douglasneuroinformatics/utils": "latest",
-    "@faker-js/faker": "^7.6.0",
+    "@faker-js/faker": "^8.0.2",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
