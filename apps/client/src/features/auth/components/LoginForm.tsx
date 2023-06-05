@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 
 import { AuthPayload, FormInstrumentContent, loginCredentialsSchema } from '@douglasneuroinformatics/common';
+import { Form } from '@douglasneuroinformatics/react-components';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-import { Form } from '@/components/Form';
 import { useFingerprint } from '@/hooks/useFingerprint';
 import { useAuthStore } from '@/stores/auth-store';
 import { useNotificationsStore } from '@/stores/notifications-store';

@@ -1,5 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 
+import { Dropdown } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
@@ -8,7 +9,7 @@ import { InstrumentDropdown } from './InstrumentDropdown';
 import { TimeDropdown } from './TimeDropdown';
 import { VisualizationHeader } from './VisualizationHeader';
 
-import { Dropdown, Table } from '@/components';
+import { Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
 import { useNotificationsStore } from '@/stores/notifications-store';
@@ -87,7 +88,7 @@ export const RecordsTable = () => {
               className="text-sm"
               options={['CSV', 'JSON']}
               title={t('download')}
-              variant="light"
+              variant="secondary"
               onSelection={handleDownload}
             />
           </div>

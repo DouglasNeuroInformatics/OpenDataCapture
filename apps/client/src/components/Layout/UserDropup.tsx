@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
 
+import { ArrowToggle } from '@douglasneuroinformatics/react-components';
 import { Transition } from '@headlessui/react';
 import { useTranslation } from 'react-i18next';
 import { HiUserCircle } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
-import { ArrowToggle, LanguageToggle } from '@/components';
+import { LanguageToggle } from '@/components';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useAuthStore } from '@/stores/auth-store';
 

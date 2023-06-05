@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
 
+import { Dropdown } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
-
-import { Dropdown } from '@/components';
 
 export const InstrumentDropdown = () => {
   const { t } = useTranslation();
@@ -15,7 +14,7 @@ export const InstrumentDropdown = () => {
       className="text-sm"
       options={ctx.instrumentOptions}
       title={t('subjectPage.graph.instrument')}
-      variant="light"
+      variant="secondary"
       onSelection={(selection) => {
         ctx.setSelectedMeasures([]);
         ctx.setSelectedInstrument(

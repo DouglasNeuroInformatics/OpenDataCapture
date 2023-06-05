@@ -1,11 +1,10 @@
 import React from 'react';
 
-import { Button } from '@douglasneuroinformatics/react-components';
+import { Button, Modal } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { useDisclaimerStore } from '../stores/disclaimer-store';
 
-import { Modal } from '@/components';
 import { useAuthStore } from '@/stores/auth-store';
 
 export interface DisclaimerProps {
@@ -26,7 +25,7 @@ export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProp
       <p>{t('disclaimer.message')}</p>
       <div className="mt-3 flex">
         <Button className="mr-2" label={t('disclaimer.accept')} size="sm" onClick={handleClose} />
-        <Button label={t('disclaimer.decline')} size="sm" variant="light" onClick={() => logout()} />
+        <Button label={t('disclaimer.decline')} size="sm" variant="secondary" onClick={() => logout()} />
       </div>
     </Modal>
   );

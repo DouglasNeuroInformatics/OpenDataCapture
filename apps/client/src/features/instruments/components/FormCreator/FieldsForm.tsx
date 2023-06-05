@@ -2,9 +2,9 @@
 import React, { useContext } from 'react';
 
 import { FormFieldKind, NumericFormField, TextFormField } from '@douglasneuroinformatics/common';
+import { Form } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { Form } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
 import { useNotificationsStore } from '@/stores/notifications-store';
 

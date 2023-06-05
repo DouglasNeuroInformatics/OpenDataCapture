@@ -1,11 +1,12 @@
 import React from 'react';
 
+import { Modal } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { SubjectsAPI } from '../api/subjects-api';
 
-import { IdentificationForm, IdentificationFormData, Modal } from '@/components';
+import { IdentificationForm, IdentificationFormData } from '@/components';
 
 interface SubjectLookupProps {
   show: boolean;

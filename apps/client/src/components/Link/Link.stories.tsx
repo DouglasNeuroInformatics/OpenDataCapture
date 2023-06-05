@@ -26,12 +26,12 @@ export const Default: Story = {};
 
 export const BtnDark: Story = {
   args: {
-    variant: 'btn-dark'
+    variant: 'btn-primary'
   }
 };
 
 export const BtnLight: Story = {
   args: {
-    variant: 'btn-light'
+    variant: 'btn-secondary'
   }
 };

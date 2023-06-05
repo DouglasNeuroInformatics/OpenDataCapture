@@ -1,8 +1,9 @@
 import React from 'react';
 
+import { Form } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { Form, PageHeader } from '@/components';
+import { PageHeader } from '@/components';
 
 const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL;
 

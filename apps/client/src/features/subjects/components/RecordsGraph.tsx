@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { SubjectFormRecords } from '@douglasneuroinformatics/common';
+import { LineGraph, LineGraphLine } from '@douglasneuroinformatics/react-components';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -10,8 +11,6 @@ import { InstrumentDropdown } from './InstrumentDropdown';
 import { MeasuresDropdown } from './MeasuresDropdown';
 import { TimeDropdown } from './TimeDropdown';
 import { VisualizationHeader } from './VisualizationHeader';
-
-import { LineGraph, LineGraphLine } from '@/components';
 
 type RegressionResults = Record<string, { intercept: number; slope: number; stdErr: number }>;
 
