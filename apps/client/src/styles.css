@@ -32,47 +32,6 @@
 }
 
 @layer components {
-  .btn {
-    @apply flex w-fit items-center justify-center rounded-md font-medium shadow-sm hover:opacity-80 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70;
-  }
-
-  .btn-dark {
-    @apply bg-cello-900 text-peppermint-50;
-  }
-
-  .btn-light {
-    @apply border;
-  }
-
-  .btn-red {
-    @apply bg-red-600 text-white;
-  }
-
-  .field-input-base {
-    @apply w-full bg-transparent py-2 text-left text-slate-900 hover:border-slate-300 focus:border-indigo-800 focus:outline-none;
-    min-height: 42px;
-  }
-
-  .field-header {
-    @apply font-medium text-slate-600;
-  }
-
-  .field-input {
-    @apply field-input-base border-b-2;
-  }
-
-  .field-label {
-    @apply pointer-events-none text-slate-600;
-  }
-
-  .field-label-floating {
-    @apply field-label absolute left-0 transition-all;
-  }
-
-  .field-label-floating--active {
-    @apply -translate-y-5 text-sm text-indigo-800;
-  }
-
   .card {
     @apply flex flex-col rounded-lg bg-white px-8 py-4 shadow-lg;
   }
