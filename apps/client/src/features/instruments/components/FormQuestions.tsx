@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 
 import { FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
+import { Form } from '@douglasneuroinformatics/react-components';
 
-import { Form } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
 
 export interface FormQuestionsProps<T extends FormInstrumentData> {

@@ -1,10 +1,8 @@
 import React from 'react';
 
 import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
-import { Button } from '@douglasneuroinformatics/react-components';
+import { Button, Modal } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
-
-import { Modal } from '@/components';
 
 interface ArchiveInstrumentModalProps {
   instrument: FormInstrumentSummary;
@@ -32,7 +30,7 @@ export const ArchiveInstrumentModal = ({ isOpen, setIsOpen, instrument, onArchiv
         <Button
           label={t('instruments.manageInstruments.deleteModal.delete')}
           type="button"
-          variant="red"
+          variant="danger"
           onClick={() => {
             setIsOpen(false);
             void onArchive(instrument);
@@ -41,7 +39,7 @@ export const ArchiveInstrumentModal = ({ isOpen, setIsOpen, instrument, onArchiv
         <Button
           label={t('instruments.manageInstruments.deleteModal.cancel')}
           type="button"
-          variant="light"
+          variant="secondary"
           onClick={() => setIsOpen(false)}
         />
       </div>

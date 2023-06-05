@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 
 import { InstrumentRecordsExport, Subject } from '@douglasneuroinformatics/common';
+import { Dropdown, SearchBar } from '@douglasneuroinformatics/react-components';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { SubjectLookup } from './SubjectLookup';
 
-import { Dropdown, SearchBar, Table } from '@/components';
+import { Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
 

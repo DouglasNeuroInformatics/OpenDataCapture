@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/react-components';
 import { animated, useTrail } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentCard } from './InstrumentCard';
-
-import { SearchBar, SelectDropdown } from '@/components';
 
 export interface InstrumentShowcaseProps {
   instruments: FormInstrumentSummary[];

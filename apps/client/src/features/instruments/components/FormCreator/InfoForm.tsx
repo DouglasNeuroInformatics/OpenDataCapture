@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 
 import { FormDetails, FormInstrument } from '@douglasneuroinformatics/common';
+import { Form } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { Form } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
 
 export type InfoFormData = FormDetails &

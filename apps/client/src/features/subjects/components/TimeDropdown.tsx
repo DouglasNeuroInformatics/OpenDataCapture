@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
 
+import { Dropdown } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
-
-import { Dropdown } from '@/components';
 
 export const TimeDropdown = () => {
   const { setMinTime } = useContext(VisualizationContext);
@@ -19,7 +18,7 @@ export const TimeDropdown = () => {
         pastMonth: t('subjectPage.graph.timeframeOptions.month')
       }}
       title={t('subjectPage.graph.timeframe')}
-      variant="light"
+      variant="secondary"
       onSelection={(selection) => {
         if (selection === 'pastYear') {
           setMinTime(new Date(new Date().setFullYear(new Date().getFullYear() - 1)).getTime());

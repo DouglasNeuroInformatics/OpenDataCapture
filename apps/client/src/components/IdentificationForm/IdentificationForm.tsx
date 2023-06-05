@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { Sex } from '@douglasneuroinformatics/common';
+import { Form } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { Form } from '@/components';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
 type IdentificationFormData = {

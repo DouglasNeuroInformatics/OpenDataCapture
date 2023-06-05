@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
 
+import { SelectDropdown } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
-
-import { SelectDropdown } from '@/components';
 
 export const MeasuresDropdown = () => {
   const { measureOptions, selectedMeasures, setSelectedMeasures } = useContext(VisualizationContext);
@@ -17,7 +16,7 @@ export const MeasuresDropdown = () => {
       selected={selectedMeasures}
       setSelected={setSelectedMeasures}
       title={t('subjectPage.graph.measures')}
-      variant="light"
+      variant="secondary"
     />
   );
 };
