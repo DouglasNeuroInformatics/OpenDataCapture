@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { FormInstrumentData } from '@douglasneuroinformatics/common';
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
@@ -20,7 +21,6 @@ import { useFetchInstrument } from '../hooks/useFetchInstrument';
 import { PageHeader, Spinner, Stepper } from '@/components';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 import { useAuthStore } from '@/stores/auth-store';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const FormPage = () => {
   const params = useParams();
@@ -51,7 +51,7 @@ export const FormPage = () => {
     });
     setTimeCollected(now);
     setResult(data);
-    notifications.add({ message: t('instruments.formPage.uploadSuccessful'), type: 'success' });
+    notifications.addNotification({ message: t('instruments.formPage.uploadSuccessful'), type: 'success' });
   };
 
   return (

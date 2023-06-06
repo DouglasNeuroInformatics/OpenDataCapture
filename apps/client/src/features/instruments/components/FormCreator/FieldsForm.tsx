@@ -2,11 +2,10 @@
 import React, { useContext } from 'react';
 
 import { FormFieldKind, NumericFormField, TextFormField } from '@douglasneuroinformatics/common';
-import { Form } from '@douglasneuroinformatics/react-components';
+import { Form, useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { StepperContext } from '@/context/StepperContext';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 type RawFieldData = {
   name: string;
@@ -71,7 +70,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
       });
     } catch (error) {
       if (error instanceof Error) {
-        notifications.add({ type: 'error', message: error.message });
+        notifications.addNotification({ type: 'error', message: error.message });
       }
       console.error(error);
       return;

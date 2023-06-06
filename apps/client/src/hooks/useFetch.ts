@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { AppAction, AppSubject } from '@douglasneuroinformatics/common';
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 
 import { useAuthStore } from '@/stores/auth-store';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 const baseURL = import.meta.env.VITE_API_HOST;
 
@@ -64,7 +64,7 @@ export function useFetch<T = unknown>(
 
   const setError = (error: unknown) => {
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
-    notifications.add({
+    notifications.addNotification({
       type: 'error',
       message
     });

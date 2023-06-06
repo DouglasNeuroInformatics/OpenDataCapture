@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 
-import { Dropdown } from '@douglasneuroinformatics/react-components';
+import { Dropdown, useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
@@ -12,7 +12,6 @@ import { VisualizationHeader } from './VisualizationHeader';
 import { Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const RecordsTable = () => {
   const { selectedInstrument, records } = useContext(VisualizationContext);
@@ -43,7 +42,7 @@ export const RecordsTable = () => {
 
   const handleDownload = (option: 'CSV' | 'JSON') => {
     if (!selectedInstrument) {
-      notifications.add({ type: 'info', message: t('selectInstrument') });
+      notifications.addNotification({ type: 'info', message: t('selectInstrument') });
       return;
     }
 

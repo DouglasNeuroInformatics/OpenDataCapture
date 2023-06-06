@@ -16,7 +16,6 @@
     },
     "resolveJsonModule": true,
     "target": "ESNext",
-    "types": ["vitest/globals"],
     "useDefineForClassFields": true
   }
 }

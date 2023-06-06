@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 
-import { Button } from '@douglasneuroinformatics/react-components';
+import { Button, useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import axios from 'axios';
 
 import { SimpleForm } from './FormCreator';
-
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 const ReviewItem = ({ label, value }: { label: string; value: any }) => {
   return (
@@ -26,7 +24,7 @@ export const Review = ({ form }: ReviewProps) => {
   const submitForm = async () => {
     await axios.post('/v1/instruments/forms', form);
     setIsSubmitted(true);
-    notifications.add({ type: 'success' });
+    notifications.addNotification({ type: 'success' });
   };
 
   return (

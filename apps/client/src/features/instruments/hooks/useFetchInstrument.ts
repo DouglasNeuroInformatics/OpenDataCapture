@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import { FormInstrument, Language } from '@douglasneuroinformatics/common';
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { useFetch } from '@/hooks/useFetch';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 /**
  * Returns the instrument with the provided identifier in the current language
@@ -30,7 +30,7 @@ export function useFetchInstrument(identifier: string) {
           }
           return 'en';
         });
-        notifications.add({ type: 'warning', message: t('instruments.fetchInstrument.notFound') });
+        notifications.addNotification({ type: 'warning', message: t('instruments.fetchInstrument.notFound') });
         console.error(error);
       }
     }
