@@ -18,7 +18,7 @@
   "dependencies": {
     "@casl/ability": "^6.3.3",
     "@douglasneuroinformatics/common": "*",
-    "@douglasneuroinformatics/react-components": "^1.2.2",
+    "@douglasneuroinformatics/react-components": "^1.2.6",
     "@douglasneuroinformatics/utils": "latest",
     "@fingerprintjs/fingerprintjs": "^3.4.1",
     "@headlessui/react": "^1.7.8",
