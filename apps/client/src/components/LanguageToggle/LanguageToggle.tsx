@@ -1,8 +1,7 @@
 import React from 'react';
 
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import i18next from 'i18next';
-
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 const languages = {
   en: {
@@ -29,7 +28,7 @@ export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
       await i18next.changeLanguage(inactiveLanguage);
     } catch (error) {
       console.error(error);
-      notifications.add({ type: 'error', message: 'Failed to change languages' });
+      notifications.addNotification({ type: 'error', message: 'Failed to change languages' });
     }
     if (onClick) {
       onClick(event);

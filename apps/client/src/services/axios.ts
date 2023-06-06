@@ -1,7 +1,7 @@
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import axios, { AxiosError } from 'axios';
 
 import { useAuthStore } from '@/stores/auth-store';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_HOST;
 
@@ -22,7 +22,7 @@ axios.interceptors.response.use(
   (error) => {
     const notifications = useNotificationsStore.getState();
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
-    notifications.add({
+    notifications.addNotification({
       type: 'error',
       message
     });

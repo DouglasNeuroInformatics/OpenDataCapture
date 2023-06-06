@@ -1,11 +1,11 @@
 import React from 'react';
 
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { IdentificationForm, IdentificationFormData, PageHeader } from '@/components';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const AddSubjectPage = () => {
   const { setActiveSubject } = useActiveSubjectStore();
@@ -17,11 +17,11 @@ export const AddSubjectPage = () => {
       validateStatus: (status) => status === 201 || status === 409
     });
     if (response.status === 409) {
-      notifications.add({ type: 'error', message: t('addSubject.exists') });
+      notifications.addNotification({ type: 'error', message: t('addSubject.exists') });
       return;
     }
     setActiveSubject(data);
-    notifications.add({ type: 'success' });
+    notifications.addNotification({ type: 'success' });
   };
 
   return (

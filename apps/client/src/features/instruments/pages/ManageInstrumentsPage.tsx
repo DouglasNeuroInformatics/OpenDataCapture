@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 
 import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
-import axios from 'axios';
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const ManageInstrumentsPage = () => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -18,7 +17,7 @@ export const ManageInstrumentsPage = () => {
   const deleteInstrument = async (instrument: { _id: string }) => {
     await axios.delete(`instruments/forms/${instrument._id}`);
     setData((prevData) => prevData?.filter((item) => item._id !== instrument._id) ?? null);
-    notifications.add({ type: 'success' });
+    notifications.addNotification({ type: 'success' });
   };
   */
 

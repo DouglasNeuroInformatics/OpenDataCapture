@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useNotificationsStore } from '@/stores/notifications-store';
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 
 export function useDownload() {
   const notifications = useNotificationsStore();
@@ -31,7 +31,7 @@ export function useDownload() {
       })
       .catch((error) => {
         const message = error instanceof Error ? error.message : 'An unknown error occurred';
-        notifications.add({
+        notifications.addNotification({
           type: 'error',
           title: 'Error',
           message

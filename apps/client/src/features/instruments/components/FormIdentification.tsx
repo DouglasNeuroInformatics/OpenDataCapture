@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 
+import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { IdentificationForm, type IdentificationFormData } from '@/components';
 import { StepperContext } from '@/context/StepperContext';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 export const FormIdentification = () => {
   const notifications = useNotificationsStore();
@@ -19,7 +19,7 @@ export const FormIdentification = () => {
       validateStatus: (status) => status === 201 || status === 404
     });
     if (response.status === 404) {
-      notifications.add({ type: 'error', message: t('identificationForm.notFound') });
+      notifications.addNotification({ type: 'error', message: t('identificationForm.notFound') });
       return;
     }
     setActiveSubject(data);

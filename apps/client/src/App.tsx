@@ -1,10 +1,11 @@
 import React from 'react';
 
+import { NotificationHub } from '@douglasneuroinformatics/react-components';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { Router } from './Router';
 
-import { ActiveSubject, NotificationHub } from '@/components';
+import { ActiveSubject } from '@/components';
 import { ErrorFallback, SuspenseFallback } from '@/features/misc';
 
 import './services/18n';

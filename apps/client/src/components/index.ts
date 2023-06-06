@@ -4,7 +4,6 @@ export * from './IdentificationForm';
 export * from './LanguageToggle';
 export * from './Layout';
 export * from './Link';
-export * from './NotificationHub';
 export * from './PageHeader';
 export * from './Spinner';
 export * from './Stepper';

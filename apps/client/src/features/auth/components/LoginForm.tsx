@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 
 import { AuthPayload, FormInstrumentContent, loginCredentialsSchema } from '@douglasneuroinformatics/common';
-import { Form } from '@douglasneuroinformatics/react-components';
+import { Form, useNotificationsStore } from '@douglasneuroinformatics/react-components';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { useFingerprint } from '@/hooks/useFingerprint';
 import { useAuthStore } from '@/stores/auth-store';
-import { useNotificationsStore } from '@/stores/notifications-store';
 
 type LoginFormData = {
   username: string;
@@ -56,7 +55,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       }
     );
     if (response.status === 401) {
-      notifications.add({
+      notifications.addNotification({
         type: 'error',
         title: t('unauthorizedError.title'),
         message: t('unauthorizedError.message')
