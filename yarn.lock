@@ -1688,12 +1688,7 @@
     recharts "^2.6.2"
     zustand "^4.3.8"
 
-"@douglasneuroinformatics/utils@0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/utils/-/utils-0.1.4.tgz#b824c30622e451ddb73fc3cec399d25b98afd973"
-  integrity sha512-Y4Isz9ppTEggAIcfABjM9Wnl5qSdzRTTpfEsFpg8GkfyOYtkUPlcKaMbssigC1ZJmzcct2+KVIAF45FXSB77rA==
-
-"@douglasneuroinformatics/utils@latest":
+"@douglasneuroinformatics/utils@0.2.1", "@douglasneuroinformatics/utils@latest":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/utils/-/utils-0.2.1.tgz#8c7e4e5e838506bdb9f248faaac0b5d4f1fb11c6"
   integrity sha512-9bp7WQSmG4xYbI79gDc2T25J/8GGqzV4XC75erQEFROZhdNHQgNSnrI48u+uR3xszlMCJuZ0K0c5Up/C/I/2Pw==
