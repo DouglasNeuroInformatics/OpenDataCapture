@@ -3,6 +3,8 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: 'weekly'
+      day: 'monday'
+      time: '00:00'
     allow:
       - dependency-type: "direct"
