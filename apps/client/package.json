@@ -58,7 +58,7 @@
     "@types/react-dom": "^18.0.9",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.13",
-    "cypress": "^12.12.0",
+    "cypress": "^12.14.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.32.1",
