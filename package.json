@@ -37,7 +37,7 @@
     "prettier": "^2.8.4",
     "ts-node": "^10.9.1",
     "tsup": "^6.7.0",
-    "turbo": "^1.7.2",
+    "turbo": "^1.10.2",
     "typescript": "^5.0.4"
   },
   "engines": {
