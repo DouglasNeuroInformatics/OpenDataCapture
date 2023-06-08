@@ -2735,7 +2735,7 @@
     memoizerific "^1.11.3"
     prop-types "^15.7.2"
 
-"@storybook/blocks@7.0.20":
+"@storybook/blocks@7.0.20", "@storybook/blocks@^7.0.20":
   version "7.0.20"
   resolved "https://registry.yarnpkg.com/@storybook/blocks/-/blocks-7.0.20.tgz#ce4abe5f16a935a8819416a006d7f3fd664f8bf8"
   integrity sha512-DIKJ8fyuG8Lz5Anp21EZ/dKa0UhMbrRINskxUpInQZ51dgsEYc/0ENp8hm0XmbxdF58BlT8nsEIjIpCc9ZAbVQ==
@@ -2751,34 +2751,6 @@
     "@storybook/preview-api" "7.0.20"
     "@storybook/theming" "7.0.20"
     "@storybook/types" "7.0.20"
-    "@types/lodash" "^4.14.167"
-    color-convert "^2.0.1"
-    dequal "^2.0.2"
-    lodash "^4.17.21"
-    markdown-to-jsx "^7.1.8"
-    memoizerific "^1.11.3"
-    polished "^4.2.2"
-    react-colorful "^5.1.2"
-    telejson "^7.0.3"
-    ts-dedent "^2.0.0"
-    util-deprecate "^1.0.2"
-
-"@storybook/blocks@^7.0.10":
-  version "7.0.18"
-  resolved "https://registry.yarnpkg.com/@storybook/blocks/-/blocks-7.0.18.tgz#996651ac813de2a810ba442ab77266961721d324"
-  integrity sha512-HLsuzmUdVIeFXEP5v5vyjnEePRNYjzltwTjCKQhHAlt8/aQZmREiIMOfoMoAa1Rd+On8Ib2DUd2cN10VS18H8A==
-  dependencies:
-    "@storybook/channels" "7.0.18"
-    "@storybook/client-logger" "7.0.18"
-    "@storybook/components" "7.0.18"
-    "@storybook/core-events" "7.0.18"
-    "@storybook/csf" "^0.1.0"
-    "@storybook/docs-tools" "7.0.18"
-    "@storybook/global" "^5.0.0"
-    "@storybook/manager-api" "7.0.18"
-    "@storybook/preview-api" "7.0.18"
-    "@storybook/theming" "7.0.18"
-    "@storybook/types" "7.0.18"
     "@types/lodash" "^4.14.167"
     color-convert "^2.0.1"
     dequal "^2.0.2"
@@ -3139,19 +3111,6 @@
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@storybook/docs-mdx/-/docs-mdx-0.1.0.tgz#33ba0e39d1461caf048b57db354b2cc410705316"
   integrity sha512-JDaBR9lwVY4eSH5W8EGHrhODjygPd6QImRbwjAuJNEnY0Vw4ie3bPkeGfnacB3OBW6u/agqPv2aRlR46JcAQLg==
-
-"@storybook/docs-tools@7.0.18":
-  version "7.0.18"
-  resolved "https://registry.yarnpkg.com/@storybook/docs-tools/-/docs-tools-7.0.18.tgz#ff1ed8f9e354e310af6872cb742a9a3a5fcb80ca"
-  integrity sha512-H95dW2DquGQ75ZVrFjvznPdCxT0eW6esDnemzLJB61KitcYZrWRavfrZzFtUcpzIa84OgY5pllFYt636v11LHQ==
-  dependencies:
-    "@babel/core" "^7.12.10"
-    "@storybook/core-common" "7.0.18"
-    "@storybook/preview-api" "7.0.18"
-    "@storybook/types" "7.0.18"
-    "@types/doctrine" "^0.0.3"
-    doctrine "^3.0.0"
-    lodash "^4.17.21"
 
 "@storybook/docs-tools@7.0.20":
   version "7.0.20"
