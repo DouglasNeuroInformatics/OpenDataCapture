@@ -59,7 +59,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
     <>
       <SubjectLookup show={showLookup} onClose={handleLookupClose} />
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
-        <SearchBar onClick={() => setShowLookup(true)} />
+        <SearchBar className="px-4 py-3 pl-2" onClick={() => setShowLookup(true)} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <Dropdown options={[]} title={t('viewSubjects.table.filters')} onSelection={() => null} />
           <Dropdown
