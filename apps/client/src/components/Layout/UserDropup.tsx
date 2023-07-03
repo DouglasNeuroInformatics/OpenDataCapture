@@ -14,7 +14,7 @@ export const UserDropup = () => {
   const auth = useAuthStore();
   const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation('common');
+  const { t } = useTranslation();
 
   const closeDropup = () => setIsOpen(false);
 

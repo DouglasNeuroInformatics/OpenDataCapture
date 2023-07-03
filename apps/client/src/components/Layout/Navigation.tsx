@@ -10,7 +10,7 @@ export interface NavigationProps {
 }
 
 export const Navigation = (props: NavigationProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation();
 
   return (
     <nav>

@@ -8,7 +8,7 @@
     "jsx": "react",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "noEmit": true,
     "outDir": "dist",
     "paths": {
@@ -16,6 +16,7 @@
     },
     "resolveJsonModule": true,
     "target": "ESNext",
+    "typeRoots": ["./src/typings", "./node_modules/@types"],
     "useDefineForClassFields": true
   }
 }

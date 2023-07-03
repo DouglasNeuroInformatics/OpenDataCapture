@@ -26,7 +26,7 @@ export interface IdentificationFormProps {
 
 export const IdentificationForm = ({ fillActiveSubject, submitBtnLabel, onSubmit }: IdentificationFormProps) => {
   const { activeSubject } = useActiveSubjectStore();
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation();
 
   return (
     <Form<IdentificationFormData>
