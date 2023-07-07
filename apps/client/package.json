@@ -20,7 +20,7 @@
     "@douglasneuroinformatics/common": "*",
     "@douglasneuroinformatics/react-components": "^1.7.5",
     "@douglasneuroinformatics/utils": "latest",
-    "@fingerprintjs/fingerprintjs": "^3.4.1",
+    "@fingerprintjs/fingerprintjs": "^3.4.2",
     "@headlessui/react": "^1.7.15",
     "@react-spring/web": "^9.7.3",
     "@use-gesture/react": "^10.2.27",
