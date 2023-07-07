@@ -12,7 +12,7 @@ export const FormIdentification = () => {
   const notifications = useNotificationsStore();
   const { setActiveSubject } = useActiveSubjectStore();
   const { updateIndex } = useContext(StepperContext);
-  const { t } = useTranslation('common');
+  const { t } = useTranslation();
 
   const handleSubmit = async (data: IdentificationFormData) => {
     const response = await axios.post('/v1/subjects/lookup', data, {

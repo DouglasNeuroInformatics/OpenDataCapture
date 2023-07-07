@@ -25,7 +25,7 @@ export interface FooterProps {
 }
 
 export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation();
 
   return (
     <footer className="py-3 text-slate-600 print:hidden">

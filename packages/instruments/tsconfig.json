@@ -1,5 +1,5 @@
 {
-  "extends": "@douglasneuroinformatics/tsconfig/base.json",
+  "extends": "../../tsconfig.base.json",
   "include": ["src/**/*"],
   "compilerOptions": {
     "declarationMap": true,

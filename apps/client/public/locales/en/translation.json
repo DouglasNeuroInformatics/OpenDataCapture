@@ -1,0 +1,271 @@
+{
+  "activeSubject": {
+    "header": "Active Subject"
+  },
+  "datetime": {
+    "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
+  },
+  "download": "Download",
+  "footer": {
+    "contact": "Contact Us",
+    "documentation": "Documentation",
+    "license": "License",
+    "sourceCode": "Source Code"
+  },
+  "form": {
+    "errors": {
+      "required": "This field is required"
+    },
+    "radio": {
+      "labels": {
+        "false": "False",
+        "true": "True"
+      }
+    },
+    "reset": "Clear",
+    "submit": "Submit"
+  },
+  "graph": "Graph",
+  "groupTrend": "Group Trend",
+  "identificationForm": {
+    "dateOfBirth": {
+      "label": "Date of Birth"
+    },
+    "firstName": {
+      "description": "The subject's first name, as provided by their birth certificate",
+      "label": "First Name"
+    },
+    "lastName": {
+      "description": "The subject's last name, as provided by their birth certificate",
+      "label": "Last Name"
+    },
+    "notFound": "Not Found",
+    "sex": {
+      "description": "The subject's biological sex, as assigned at birth",
+      "label": "Sex"
+    },
+    "submit": "Submit"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "French"
+  },
+  "password": "Password",
+  "login": "Login",
+  "unauthorizedError": {
+    "message": "Invalid login credentials",
+    "title": "Unauthorized"
+  },
+  "username": "Username",
+  "navLinks": {
+    "addSubject": "Add Subject",
+    "availableInstruments": "View Instruments",
+    "createInstrument": "Add Instrument",
+    "lookupSubject": "Lookup Subject",
+    "manageInstruments": "Manage Instruments",
+    "overview": "Overview",
+    "viewSubjects": "View Subjects"
+  },
+  "notifications": {
+    "types": {
+      "error": "Error",
+      "info": "Info",
+      "success": "Success",
+      "warning": "Warning"
+    }
+  },
+  "organization": {
+    "name": "Douglas Neuroinformatics Platform"
+  },
+  "platform": {
+    "title": "Douglas Data Capture Platform"
+  },
+  "searchBar": {
+    "placeholder": "Search..."
+  },
+  "selectInstrument": "Please select an instrument",
+  "selectMeasures": "Please select one or more measures",
+  "sex": {
+    "female": "Female",
+    "male": "Male"
+  },
+  "table": "Table",
+  "userDropup": {
+    "logout": "Logout",
+    "preferences": "Preferences"
+  },
+  "visualization": {
+    "selectMode": "Please select a visualization mode"
+  },
+  "contact": {
+    "message": "Message",
+    "pageTitle": "Contact Us",
+    "reason": "Reason",
+    "reasons": {
+      "bug": "Bug Report",
+      "feedback": "Feedback",
+      "other": "Other",
+      "request": "Request"
+    }
+  },
+  "instruments": {
+    "availableInstruments": {
+      "filters": {
+        "language": "Language",
+        "tags": "Tags"
+      },
+      "pageTitle": "View Instruments"
+    },
+    "createInstrument": {
+      "errors": {
+        "duplicateField": "Invalid duplicate field name",
+        "invalidOptionFormat": "Invalid format for option"
+      },
+      "form": {
+        "basics": "Basics",
+        "description": {
+          "label": "Description"
+        },
+        "details": "Details",
+        "estimatedDuration": {
+          "label": "Estimated Duration"
+        },
+        "instructions": {
+          "label": "Instructions"
+        },
+        "language": {
+          "label": "Language"
+        },
+        "name": {
+          "label": "Name"
+        },
+        "tags": {
+          "label": "Tags"
+        },
+        "title": {
+          "label": "Title"
+        },
+        "version": {
+          "label": "Version"
+        }
+      },
+      "pageTitle": "Add Instrument",
+      "steps": {
+        "fields": "Fields",
+        "info": "Info",
+        "review": "Review"
+      }
+    },
+    "fetchInstrument": {
+      "notFound": "This instrument does not exist in English"
+    },
+    "formPage": {
+      "identification": {
+        "label": "Identification"
+      },
+      "overview": {
+        "begin": "Begin",
+        "description": "Description",
+        "estimated Duration": "Estimated Duration",
+        "instructions": "Instructions",
+        "label": "Overview",
+        "language": "Language"
+      },
+      "questions": {
+        "label": "Questions"
+      },
+      "summary": {
+        "timeCollected": "Time Collected",
+        "dateOfBirth": "Date of Birth",
+        "download": "Download",
+        "instrumentTitle": "Instrument Title",
+        "instrumentVersion": "Instrument Version",
+        "label": "Summary",
+        "metadata": "Metadata",
+        "name": "Name",
+        "print": "Print",
+        "results": "Results",
+        "sex": "Sex",
+        "subject": "Subject"
+      },
+      "uploadSuccessful": "Upload Successful"
+    },
+    "manageInstruments": {
+      "deleteModal": {
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "language": "Language",
+        "name": "Name",
+        "title": "Confirmation",
+        "version": "Version"
+      },
+      "pageTitle": "Manage Instruments"
+    }
+  },
+  "currentGroup": "Current Group",
+  "disclaimer": {
+    "accept": "Accept",
+    "decline": "Decline",
+    "message": "The Douglas Data Capture Platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
+    "title": "Disclaimer"
+  },
+  "overview": {
+    "pageTitle": "Overview",
+    "totalInstruments": "Total Instruments",
+    "totalRecords": "Total Records",
+    "totalSubjects": "Total Subjects",
+    "totalUsers": "Total Users",
+    "summary": "Summary of Available Data",
+    "welcome": "Welcome Back"
+  },
+  "addSubject": {
+    "exists": "This subject has already been registered",
+    "pageTitle": "Add Subject"
+  },
+  "subjectPage": {
+    "graph": {
+      "defaultTitle": "Please Select an Instrument",
+      "instrument": "Instrument",
+      "measures": "Measures",
+      "timeframe": "Timeframe",
+      "timeframeOptions": {
+        "all": "All-Time",
+        "month": "Past Month",
+        "year": "Past Year"
+      },
+      "xLabel": "Date Collected",
+      "yLabel": "Value"
+    },
+    "pageTitle": "Instrument Records for Subject"
+  },
+  "viewSubjects": {
+    "lookup": {
+      "title": "Subject Lookup"
+    },
+    "pageTitle": "View Subjects",
+    "table": {
+      "columns": {
+        "dateOfBirth": "Date of Birth",
+        "sex": "Sex",
+        "subject": "Subject"
+      },
+      "export": "Export",
+      "exportHelpText": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
+      "filters": "Filters"
+    }
+  }
+}

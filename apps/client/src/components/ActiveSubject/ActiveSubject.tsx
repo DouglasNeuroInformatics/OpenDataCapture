@@ -10,7 +10,7 @@ import { useActiveSubjectStore } from '@/stores/active-subject-store';
 export const ActiveSubject = () => {
   const { activeSubject, setActiveSubject } = useActiveSubjectStore();
   const [isHidden, setIsHidden] = useState(false);
-  const { t } = useTranslation('common');
+  const { t } = useTranslation();
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
 
   const bind = useDrag(

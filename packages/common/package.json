@@ -50,12 +50,12 @@
     "lint": "eslint --fix src"
   },
   "dependencies": {
-    "@casl/ability": "^6.3.3",
+    "@casl/ability": "^6.5.0",
     "@douglasneuroinformatics/utils": "latest",
     "ajv": "^8.12.0",
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^2.1.1",
     "ts-arithmetic": "^0.1.1",
-    "type-fest": "^3.10.0"
+    "type-fest": "^3.12.0"
   }
 }
