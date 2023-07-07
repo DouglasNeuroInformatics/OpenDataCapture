@@ -64,7 +64,7 @@
     "eslint-plugin-react": "^7.32.2",
     "jsdom": "^22.1.0",
     "msw": "^1.2.2",
-    "postcss": "^8.4.24",
+    "postcss": "^8.4.25",
     "prettier-plugin-tailwindcss": "^0.3.0",
     "prop-types": "^15.8.1",
     "storybook": "^7.0.24",
