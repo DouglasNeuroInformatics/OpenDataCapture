@@ -1,20 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Base",
   "compilerOptions": {
-    "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "lib": ["ESNext"],
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "Node",
+    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "preserveWatchOutput": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "skipLibCheck": true,
-    "sourceMap": true,
     "strict": true,
-    "target": "ES2020"
+    "target": "ES2022"
   }
 }

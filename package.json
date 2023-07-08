@@ -1,5 +1,5 @@
 {
-  "name": "@douglasneuroinformatics/ddcp",
+  "name": "ddcp",
   "version": "0.0.1",
   "type": "module",
   "private": true,
@@ -20,7 +20,7 @@
     "publish-packages": "turbo run build lint test && changeset version && changeset publish",
     "storybook": "yarn ws client storybook",
     "test": "env-cmd turbo run test",
-    "ws": "sh -c 'yarn workspace \"@douglasneuroinformatics/$0\" \"${@:1}\"'"
+    "ws": "sh -c 'yarn workspace \"@ddcp/$0\" \"${@:1}\"'"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",

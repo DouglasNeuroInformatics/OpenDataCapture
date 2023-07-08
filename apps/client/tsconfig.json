@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "esModuleInterop": false,
@@ -9,14 +10,10 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "noEmit": true,
-    "outDir": "dist",
     "paths": {
       "@/*": ["*"]
     },
     "resolveJsonModule": true,
-    "target": "ESNext",
-    "typeRoots": ["./src/typings", "./node_modules/@types"],
-    "useDefineForClassFields": true
+    "typeRoots": ["./src/typings", "./node_modules/@types"]
   }
 }

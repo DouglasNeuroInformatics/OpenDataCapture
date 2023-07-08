@@ -9,7 +9,7 @@
     "cli": "NODE_ENV=development nest start --entryFile cli -- $@",
     "debug": "nest start --debug --watch",
     "demo": "NODE_ENV=demo node ./dist/cli.js init-demo && NODE_ENV=demo yarn start",
-    "dev": "NODE_ENV=development nest start --watch",
+    "dev:legacy": "NODE_ENV=development nest start --watch",
     "format": "prettier --write .",
     "lint": "eslint --fix src",
     "prebuild": "rm -rf dist",
