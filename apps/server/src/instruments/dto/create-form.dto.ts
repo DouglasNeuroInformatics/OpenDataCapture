@@ -7,7 +7,7 @@ import {
 } from '@douglasneuroinformatics/common';
 import { JSONSchemaType } from 'ajv';
 
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
+import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
 
 @ValidationSchema<FormInstrument>(formInstrumentSchema)
 export class CreateFormDto implements FormInstrument {

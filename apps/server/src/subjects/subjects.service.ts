@@ -1,15 +1,15 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { AppAbility, Group, Sex } from '@douglasneuroinformatics/common';
 import unidecode from 'unidecode';
 
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { LookupSubjectDto } from './dto/lookup-subject.dto';
-import { SubjectEntity } from './entities/subject.entity';
-import { SubjectsRepository } from './subjects.repository';
+import { CreateSubjectDto } from './dto/create-subject.dto.js';
+import { LookupSubjectDto } from './dto/lookup-subject.dto.js';
+import { SubjectEntity } from './entities/subject.entity.js';
+import { SubjectsRepository } from './subjects.repository.js';
 
-import { CryptoService } from '@/crypto/crypto.service';
-import { GroupsService } from '@/groups/groups.service';
+import { CryptoService } from '@/crypto/crypto.service.js';
+import { GroupsService } from '@/groups/groups.service.js';
 
 @Injectable()
 export class SubjectsService {

@@ -4,9 +4,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AccessibleModel } from '@casl/mongoose';
 import { Model } from 'mongoose';
 
-import { GroupDocument, GroupEntity } from './entities/group.entity';
+import { GroupDocument, GroupEntity } from './entities/group.entity.js';
 
-import { EntityRepository } from '@/core/abstract/entity.repository';
+import { EntityRepository } from '@/core/abstract/entity.repository.js';
 
 @Injectable()
 export class GroupsRepository extends EntityRepository<GroupEntity> {

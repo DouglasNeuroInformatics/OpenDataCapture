@@ -2,34 +2,31 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
 import { Connection } from 'mongoose';
 
-import { AbilityModule } from './ability/ability.module';
-import { AjvModule } from './ajv/ajv.module';
-import { AnalyticsModule } from './analytics/analytics.module';
-import { AuthModule } from './auth/auth.module';
-import { AuthenticationGuard } from './auth/guards/authentication.guard';
-import { AuthorizationGuard } from './auth/guards/authorization.guard';
-import { ExceptionFilter } from './core/exception.filter';
-import { LoggerMiddleware } from './core/middleware/logger.middleware';
-import { ValidationPipe } from './core/pipes/validation.pipe';
-import { DemoModule } from './demo/demo.module';
-import { GroupsModule } from './groups/groups.module';
-import { InstrumentsModule } from './instruments/instruments.module';
-import { SubjectsModule } from './subjects/subjects.module';
-import { UsersModule } from './users/users.module';
+import { AbilityModule } from './ability/ability.module.js';
+import { AjvModule } from './ajv/ajv.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { AuthenticationGuard } from './auth/guards/authentication.guard.js';
+import { AuthorizationGuard } from './auth/guards/authorization.guard.js';
+import { ExceptionFilter } from './core/exception.filter.js';
+import { LoggerMiddleware } from './core/middleware/logger.middleware.js';
+import { ValidationPipe } from './core/pipes/validation.pipe.js';
+import { GroupsModule } from './groups/groups.module.js';
+import { InstrumentsModule } from './instruments/instruments.module.js';
+import { SubjectsModule } from './subjects/subjects.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [
     AjvModule,
-    AnalyticsModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true
     }),
-    DemoModule,
     GroupsModule,
     InstrumentsModule,
     MongooseModule.forRootAsync({
@@ -50,12 +47,20 @@ import { UsersModule } from './users/users.module';
     }),
     AbilityModule,
     SubjectsModule,
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 100
+    }),
     UsersModule
   ],
   providers: [
     {
       provide: APP_FILTER,
       useClass: ExceptionFilter
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
     },
     {
       provide: APP_GUARD,

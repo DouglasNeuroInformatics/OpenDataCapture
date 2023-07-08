@@ -5,10 +5,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { JwtPayload } from '@douglasneuroinformatics/common';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { AbilityFactory } from '@/ability/ability.factory';
-import { AuthenticatedRequest } from '@/core/interfaces/authenticated-request.interface';
-import { UserEntity } from '@/users/entities/user.entity';
-import { UsersService } from '@/users/users.service';
+import { AbilityFactory } from '@/ability/ability.factory.js';
+import { AuthenticatedRequest } from '@/core/interfaces/authenticated-request.interface.js';
+import { UserEntity } from '@/users/entities/user.entity.js';
+import { UsersService } from '@/users/users.service.js';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {

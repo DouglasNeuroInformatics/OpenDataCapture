@@ -1,42 +1,34 @@
+import path from 'node:path';
+import url from 'node:url';
+
 import { VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { AppModule } from './app.module';
+import { json } from 'express';
 
-async function bootstrap(): Promise<void> {
+import { AppModule } from './app.module.js';
+import { setupDocs } from './docs.js';
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['debug', 'error', 'log', 'warn']
+    logger: ['error', 'warn', 'debug', 'log', 'verbose']
   });
+
   app.enableCors();
   app.enableVersioning({
     defaultVersion: '1',
     type: VersioningType.URI
   });
+  app.use(json({ limit: '50MB' }));
 
-  const documentBuilder = new DocumentBuilder()
-    .setTitle('The Douglas Data Capture Platform')
-    .setContact('Joshua Unrau', '', 'joshua.unrau@mail.mcgill.ca')
-    .setDescription('Documentation for the REST API for Douglas Data Capture Platform')
-    .setLicense('AGPL-3.0', 'https://www.gnu.org/licenses/agpl-3.0.txt')
-    .setVersion('1')
-    .setExternalDoc(
-      'Additional Technical Documentation',
-      'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/'
-    )
-    .addTag('Authentication')
-    .addTag('Groups')
-    .addTag('Instruments')
-    .addTag('Instrument Records')
-    .addTag('Subjects')
-    .addTag('Users')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, documentBuilder);
-  SwaggerModule.setup('/', app, document);
-
+  app.useStaticAssets(path.resolve(__dirname, '..', 'public'));
+  setupDocs(app);
+  
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('SERVER_PORT');
 

@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { CreateUserCommand } from './commands/create-user.command';
-import { UserEntity, UserSchema } from './entities/user.entity';
-import { UsersController } from './users.controller';
-import { UsersRepository } from './users.repository';
-import { UsersService } from './users.service';
+import { UserEntity, UserSchema } from './entities/user.entity.js';
+import { UsersController } from './users.controller.js';
+import { UsersRepository } from './users.repository.js';
+import { UsersService } from './users.service.js';
 
-import { AbilityModule } from '@/ability/ability.module';
-import { CryptoModule } from '@/crypto/crypto.module';
-import { GroupsModule } from '@/groups/groups.module';
+import { AbilityModule } from '@/ability/ability.module.js';
+import { CryptoModule } from '@/crypto/crypto.module.js';
+import { GroupsModule } from '@/groups/groups.module.js';
 
 @Module({
   imports: [
@@ -24,7 +23,7 @@ import { GroupsModule } from '@/groups/groups.module';
     AbilityModule
   ],
   controllers: [UsersController],
-  providers: [CreateUserCommand, UsersRepository, UsersService],
+  providers: [UsersRepository, UsersService],
   exports: [UsersService]
 })
 export class UsersModule {}

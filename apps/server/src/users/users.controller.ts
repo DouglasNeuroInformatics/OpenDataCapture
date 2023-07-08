@@ -3,12 +3,12 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { type AppAbility } from '@douglasneuroinformatics/common';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserEntity } from './entities/user.entity';
-import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UserEntity } from './entities/user.entity.js';
+import { UsersService } from './users.service.js';
 
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import { UserAbility } from '@/core/decorators/user-ability.decorator';
+import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
+import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 
 @ApiTags('Users')
 @Controller({ path: 'users' })

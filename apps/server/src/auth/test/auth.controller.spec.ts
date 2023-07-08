@@ -1,9 +1,10 @@
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
+
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AuthController } from '../auth.controller';
-import { AuthService } from '../auth.service';
-
-import { MockAuthService } from './mocks/auth.service.mock';
+import { AuthController } from '../auth.controller.js';
+import { AuthService } from '../auth.service.js';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -14,7 +15,12 @@ describe('AuthController', () => {
       providers: [
         {
           provide: AuthService,
-          useValue: MockAuthService
+          useValue: {
+            login: () =>
+              Promise.resolve({
+                accessToken: 'token'
+              })
+          }
         }
       ]
     }).compile();
@@ -23,6 +29,6 @@ describe('AuthController', () => {
   });
 
   it('should be defined', () => {
-    expect(authController).toBeDefined();
+    assert(authController)
   });
 });

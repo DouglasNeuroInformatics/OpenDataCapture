@@ -1,8 +1,11 @@
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
+
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { BasePermissionLevel } from '@douglasneuroinformatics/common';
 
-import { AbilityFactory } from '../ability.factory';
+import { AbilityFactory } from '../ability.factory.js';
 
 describe('AbilityFactory', () => {
   let abilityFactory: AbilityFactory;
@@ -15,14 +18,10 @@ describe('AbilityFactory', () => {
     abilityFactory = module.get(AbilityFactory);
   });
 
-  it('should be defined', () => {
-    expect(abilityFactory).toBeDefined();
-  });
-
   describe('createForUser', () => {
     it('should return an empty rule set when the user has no basePermissionLevel', () => {
       const ability = abilityFactory.createForUser({ username: 'user', password: 'Password123', groups: [] });
-      expect(ability.rules).toEqual([]);
+      assert(ability.rules.length === 0)
     });
 
     it('should return a rule set with a single rule when the user has a basePermissionLevel of admin', () => {
@@ -32,7 +31,7 @@ describe('AbilityFactory', () => {
         groups: [],
         basePermissionLevel: BasePermissionLevel.Admin
       });
-      expect(ability.rules).toEqual([{ action: 'manage', subject: 'all' }]);
+      assert.deepStrictEqual(ability.rules, [{ action: 'manage', subject: 'all' }]);
     });
   });
 });

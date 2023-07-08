@@ -9,11 +9,11 @@ import {
   SubjectFormRecords
 } from '@douglasneuroinformatics/common';
 
-import { CreateFormRecordDto } from '../dto/create-form-record.dto';
-import { FormRecordsService } from '../services/form-records.service';
+import { CreateFormRecordDto } from '../dto/create-form-record.dto.js';
+import { FormRecordsService } from '../services/form-records.service.js';
 
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import { UserAbility } from '@/core/decorators/user-ability.decorator';
+import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
+import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 
 @ApiTags('Instrument Records')
 @Controller('instruments/records/forms')
@@ -52,8 +52,8 @@ export class FormRecordsController {
   @ApiOperation({ description: 'Export Records' })
   @Get('export')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  export(@UserAbility() ability: AppAbility, @Query('group') groupName?: string): Promise<InstrumentRecordsExport> {
-    return this.formRecordsService.export(ability, groupName);
+  exportRecords(@UserAbility() ability: AppAbility, @Query('group') groupName?: string): Promise<InstrumentRecordsExport> {
+    return this.formRecordsService.exportRecords(ability, groupName);
   }
 
   @ApiOperation({ description: 'Compute a Linear Model' })

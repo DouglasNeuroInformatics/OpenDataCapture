@@ -3,9 +3,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BasePermissionLevel, Fingerprint, type User, type UserPreferences } from '@douglasneuroinformatics/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { UserPreferencesSchema } from './user-preferences.entity';
+import { UserPreferencesSchema } from './user-preferences.entity.js';
 
-import { GroupEntity } from '@/groups/entities/group.entity';
+import { GroupEntity } from '@/groups/entities/group.entity.js';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class UserEntity implements User {

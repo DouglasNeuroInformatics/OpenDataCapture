@@ -2,13 +2,13 @@ import { ConflictException, Injectable, Logger, NotFoundException } from '@nestj
 
 import { AppAbility } from '@douglasneuroinformatics/common';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserDocument } from './entities/user.entity';
-import { UsersRepository } from './users.repository';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UserDocument } from './entities/user.entity.js';
+import { UsersRepository } from './users.repository.js';
 
-import { CryptoService } from '@/crypto/crypto.service';
-import { GroupEntity } from '@/groups/entities/group.entity';
-import { GroupsService } from '@/groups/groups.service';
+import { CryptoService } from '@/crypto/crypto.service.js';
+import { GroupEntity } from '@/groups/entities/group.entity.js';
+import { GroupsService } from '@/groups/groups.service.js';
 
 @Injectable()
 export class UsersService {

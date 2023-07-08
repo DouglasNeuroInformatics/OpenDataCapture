@@ -1,6 +1,6 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 
-import { AuthenticatedRequest } from '../interfaces/authenticated-request.interface';
+import { AuthenticatedRequest } from '../interfaces/authenticated-request.interface.js';
 
 /** Extracts an object of type `AppAbility` from the request */
 export const UserAbility = createParamDecorator((_: unknown, context: ExecutionContext) => {

@@ -16,17 +16,17 @@ import {
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Model } from 'mongoose';
 
-import { CreateFormRecordDto } from '../dto/create-form-record.dto';
-import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
-import { FormInstrumentEntity } from '../entities/form-instrument.entity';
-import { InstrumentRecordEntity } from '../entities/instrument-record.entity';
+import { CreateFormRecordDto } from '../dto/create-form-record.dto.js';
+import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity.js';
+import { FormInstrumentEntity } from '../entities/form-instrument.entity.js';
+import { InstrumentRecordEntity } from '../entities/instrument-record.entity.js';
 
-import { FormsService } from './forms.service';
+import { FormsService } from './forms.service.js';
 
-import { AjvService } from '@/ajv/ajv.service';
-import { GroupsService } from '@/groups/groups.service';
-import { StatsService } from '@/stats/stats.service';
-import { SubjectsService } from '@/subjects/subjects.service';
+import { AjvService } from '@/ajv/ajv.service.js';
+import { GroupsService } from '@/groups/groups.service.js';
+import { StatsService } from '@/stats/stats.service.js';
+import { SubjectsService } from '@/subjects/subjects.service.js';
 
 @Injectable()
 export class FormRecordsService {
@@ -150,7 +150,7 @@ export class FormRecordsService {
     };
   }
 
-  async export(ability: AppAbility, groupName?: string): Promise<InstrumentRecordsExport> {
+  async exportRecords(ability: AppAbility, groupName?: string): Promise<InstrumentRecordsExport> {
     const group = groupName ? await this.groupsService.findByName(groupName, ability) : undefined;
     const subjects = await this.subjectsService.findAll(ability, groupName);
     const data: InstrumentRecordsExport = [];

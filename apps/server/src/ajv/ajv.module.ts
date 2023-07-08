@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { AjvService } from './ajv.service';
+import { AjvService } from './ajv.service.js';
 
 @Module({
   providers: [AjvService],

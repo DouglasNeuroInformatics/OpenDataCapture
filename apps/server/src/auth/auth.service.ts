@@ -4,10 +4,10 @@ import { JwtService } from '@nestjs/jwt';
 
 import { AuthPayload, Fingerprint, JwtPayload } from '@douglasneuroinformatics/common';
 
-import { AbilityFactory } from '@/ability/ability.factory';
-import { CryptoService } from '@/crypto/crypto.service';
-import { UserDocument } from '@/users/entities/user.entity';
-import { UsersService } from '@/users/users.service';
+import { AbilityFactory } from '@/ability/ability.factory.js';
+import { CryptoService } from '@/crypto/crypto.service.js';
+import { UserDocument } from '@/users/entities/user.entity.js';
+import { UsersService } from '@/users/users.service.js';
 
 @Injectable()
 export class AuthService {

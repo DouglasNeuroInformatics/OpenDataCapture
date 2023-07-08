@@ -1,14 +1,14 @@
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
+
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { UsersRepository } from '../users.repository';
-import { UsersService } from '../users.service';
+import { UsersRepository } from '../users.repository.js';
+import { UsersService } from '../users.service.js';
 
-import { MockUsersRepository } from './mocks/users.repository.mock';
-
-import { CryptoService } from '@/crypto/crypto.service';
-import { MockCryptoService } from '@/crypto/test/mocks/crypto.service.mock';
-import { GroupsService } from '@/groups/groups.service';
-import { MockGroupsService } from '@/groups/test/mocks/groups.service.mock';
+import { createMock } from '@/core/testing/create-mock.js';
+import { CryptoService } from '@/crypto/crypto.service.js';
+import { GroupsService } from '@/groups/groups.service.js';
 
 describe('UsersService', () => {
   let usersService: UsersService;
@@ -19,15 +19,15 @@ describe('UsersService', () => {
         UsersService,
         {
           provide: UsersRepository,
-          useValue: MockUsersRepository
+          useValue: createMock(UsersRepository)
         },
         {
           provide: GroupsService,
-          useValue: MockGroupsService
+          useValue: createMock(GroupsService)
         },
         {
           provide: CryptoService,
-          useValue: MockCryptoService
+          useValue: createMock(CryptoService)
         }
       ]
     }).compile();
@@ -36,6 +36,6 @@ describe('UsersService', () => {
   });
 
   it('should be defined', () => {
-    expect(usersService).toBeDefined();
+    assert(usersService)
   });
 });

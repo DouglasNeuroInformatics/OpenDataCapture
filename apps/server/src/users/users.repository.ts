@@ -4,9 +4,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AccessibleModel } from '@casl/mongoose';
 import { Model } from 'mongoose';
 
-import { UserDocument, UserEntity } from './entities/user.entity';
+import { UserDocument, UserEntity } from './entities/user.entity.js';
 
-import { EntityRepository } from '@/core/abstract/entity.repository';
+import { EntityRepository } from '@/core/abstract/entity.repository.js';
 
 @Injectable()
 export class UsersRepository extends EntityRepository<UserEntity> {

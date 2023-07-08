@@ -7,10 +7,10 @@ import { type Language } from '@douglasneuroinformatics/common';
 import { TranslatedForms } from '@douglasneuroinformatics/instruments';
 import { Model, ObjectId } from 'mongoose';
 
-import { FormInstrumentEntity } from '../entities/form-instrument.entity';
-import { InstrumentEntity } from '../entities/instrument.entity';
+import { FormInstrumentEntity } from '../entities/form-instrument.entity.js';
+import { InstrumentEntity } from '../entities/instrument.entity.js';
 
-import { CryptoService } from '@/crypto/crypto.service';
+import { CryptoService } from '@/crypto/crypto.service.js';
 
 @Injectable()
 export class FormsService {

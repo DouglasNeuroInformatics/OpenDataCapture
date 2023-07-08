@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service.js';
+import { JwtStrategy } from './strategies/jwt.strategy.js';
 
-import { AbilityModule } from '@/ability/ability.module';
-import { CryptoModule } from '@/crypto/crypto.module';
-import { UsersModule } from '@/users/users.module';
+import { AbilityModule } from '@/ability/ability.module.js';
+import { CryptoModule } from '@/crypto/crypto.module.js';
+import { UsersModule } from '@/users/users.module.js';
 
 @Module({
   imports: [

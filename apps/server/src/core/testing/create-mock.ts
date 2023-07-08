@@ -12,9 +12,9 @@ export function createMock<T>(constructor: new (...args: any[]) => T, methods: P
       if (property in target) {
         return target[property];
       } else if (property in constructor.prototype) {
-        const value = constructor.prototype[property];
+        const value = (constructor.prototype as Record<string, unknown>)[property];
         if (typeof value === 'function') {
-          return mock.fn(constructor.prototype[property]);
+          return mock.fn(value);
         }
         throw new Error(`Default value not defined for non-function property: ${property}`);
       }

@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { type Sex, Subject } from '@douglasneuroinformatics/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { GroupEntity } from '@/groups/entities/group.entity';
+import { GroupEntity } from '@/groups/entities/group.entity.js';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class SubjectEntity implements Subject {

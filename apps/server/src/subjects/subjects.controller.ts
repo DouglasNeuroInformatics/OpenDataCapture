@@ -3,13 +3,13 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { type AppAbility } from '@douglasneuroinformatics/common';
 
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { LookupSubjectDto } from './dto/lookup-subject.dto';
-import { SubjectEntity } from './entities/subject.entity';
-import { SubjectsService } from './subjects.service';
+import { CreateSubjectDto } from './dto/create-subject.dto.js';
+import { LookupSubjectDto } from './dto/lookup-subject.dto.js';
+import { SubjectEntity } from './entities/subject.entity.js';
+import { SubjectsService } from './subjects.service.js';
 
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import { UserAbility } from '@/core/decorators/user-ability.decorator';
+import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
+import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 
 @ApiTags('Subjects')
 @Controller('subjects')

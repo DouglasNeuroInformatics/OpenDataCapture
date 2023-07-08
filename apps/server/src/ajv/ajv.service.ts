@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
 import { AjvFactory } from '@douglasneuroinformatics/common';
-import Ajv, { ErrorObject, JSONSchemaType } from 'ajv';
+import { default as Ajv, ErrorObject, JSONSchemaType } from 'ajv';
 
 @Injectable()
 export class AjvService {
-  private readonly ajv: Ajv;
+  private readonly ajv: Ajv.default;
 
   constructor() {
     this.ajv = AjvFactory.create();

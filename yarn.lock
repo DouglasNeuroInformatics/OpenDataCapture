@@ -1691,10 +1691,10 @@
     ts-arithmetic "^0.1.1"
     type-fest "^3.10.0"
 
-"@douglasneuroinformatics/eslint-config@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/eslint-config/-/eslint-config-0.0.4.tgz#9577402335d4f1104292960e284c263414b4b528"
-  integrity sha512-4I7QpY37GCP2cpBAfdbGd2XAaZ05/tI9AYpwOAbRSWkQvzYV72pROOdsoPn5AB1d5ryywYwJgYEoBSdqFhGpnQ==
+"@douglasneuroinformatics/eslint-config@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/eslint-config/-/eslint-config-0.0.5.tgz#f9027335f1b5d428393b0b4db7ef4abd281b25bf"
+  integrity sha512-r5bZfhLfrsf45LJBiuGNYlmGb57F7fl6alHlbto6H8e7K7iBLv8CZ87Ap9UvwwzcQzShivBgpANvRkHedP3oEA==
   dependencies:
     "@typescript-eslint/parser" "^5.59.6"
     eslint-config-prettier "^8.8.0"

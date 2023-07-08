@@ -3,13 +3,13 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { type AppAbility } from '@douglasneuroinformatics/common';
 
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
-import { GroupEntity } from './entities/group.entity';
-import { GroupsService } from './groups.service';
+import { CreateGroupDto } from './dto/create-group.dto.js';
+import { UpdateGroupDto } from './dto/update-group.dto.js';
+import { GroupEntity } from './entities/group.entity.js';
+import { GroupsService } from './groups.service.js';
 
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import { UserAbility } from '@/core/decorators/user-ability.decorator';
+import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
+import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 
 @ApiTags('Groups')
 @Controller('groups')

@@ -7,7 +7,7 @@ import {
   subjectIdentificationDataSchema
 } from '@douglasneuroinformatics/common';
 
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
+import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
 
 interface CreateFormRecordData extends Omit<FormInstrumentRecord, 'group' | 'instrument' | 'subject'> {
   groupName?: string;

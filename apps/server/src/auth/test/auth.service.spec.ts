@@ -1,45 +1,19 @@
-import { NotFoundException } from '@nestjs/common';
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
+
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { createMock } from '@golevelup/ts-jest';
+import { AuthService } from '../auth.service.js';
 
-import { AuthService } from '../auth.service';
-
-import { AbilityFactory } from '@/ability/ability.factory';
-import { MockAbilityFactory } from '@/ability/test/mocks/ability.factory.mock';
-import { MockConfigService } from '@/core/test/mocks/config.service.mock';
-import { CryptoService } from '@/crypto/crypto.service';
-import { MockCryptoService } from '@/crypto/test/mocks/crypto.service.mock';
-import { UsersService } from '@/users/users.service';
-
-const MockJwtService = createMock<JwtService>({
-  signAsync: () => {
-    return Promise.resolve('');
-  }
-});
-
-const MockUsersService = createMock<UsersService>({
-  findByUsername: (username: string) => {
-    switch (username) {
-      /*
-      case UserStubs.mockSystemAdmin.username:
-        return Promise.resolve(UserStubs.mockSystemAdmin);
-      case UserStubs.mockGroupManager.username:
-        return Promise.resolve(UserStubs.mockGroupManager);
-      case UserStubs.mockStandardUser.username:
-        return Promise.resolve(UserStubs.mockStandardUser);
-        */
-      default:
-        throw new NotFoundException();
-    }
-  }
-});
+import { AbilityFactory } from '@/ability/ability.factory.js';
+import { createMock } from '@/core/testing/create-mock.js';
+import { CryptoService } from '@/crypto/crypto.service.js';
+import { UsersService } from '@/users/users.service.js';
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let usersService: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -47,32 +21,31 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: AbilityFactory,
-          useValue: MockAbilityFactory
+          useValue: createMock(AbilityFactory)
         },
         {
           provide: ConfigService,
-          useValue: MockConfigService
+          useValue: createMock(ConfigService)
         },
         {
           provide: CryptoService,
-          useValue: MockCryptoService
+          useValue: createMock(CryptoService)
         },
         {
           provide: JwtService,
-          useValue: MockJwtService
+          useValue: createMock(JwtService)
         },
         {
           provide: UsersService,
-          useValue: MockUsersService
+          useValue: createMock(UsersService)
         }
       ]
     }).compile();
 
     authService = module.get(AuthService);
-    usersService = module.get(UsersService);
   });
 
   it('should be defined', () => {
-    expect(usersService).toBeDefined();
+    assert(authService);
   });
 });

@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 
-import { RouteAccessType } from '@/core/decorators/route-access.decorator';
+import { RouteAccessType } from '@/core/decorators/route-access.decorator.js';
 
 /** Allows request to proceed if the route is public or the user provides a valid JWT */
 @Injectable()

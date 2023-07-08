@@ -2,9 +2,9 @@ import { ConflictException, ForbiddenException, Injectable, NotFoundException } 
 
 import { AppAbility, Group } from '@douglasneuroinformatics/common';
 
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
-import { GroupsRepository } from './groups.repository';
+import { CreateGroupDto } from './dto/create-group.dto.js';
+import { UpdateGroupDto } from './dto/update-group.dto.js';
+import { GroupsRepository } from './groups.repository.js';
 
 @Injectable()
 export class GroupsService {

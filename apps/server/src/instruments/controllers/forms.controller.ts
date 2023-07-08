@@ -3,10 +3,10 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { FormInstrument, FormInstrumentSummary, type Language } from '@douglasneuroinformatics/common';
 
-import { CreateFormDto } from '../dto/create-form.dto';
-import { FormsService } from '../services/forms.service';
+import { CreateFormDto } from '../dto/create-form.dto.js';
+import { FormsService } from '../services/forms.service.js';
 
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
 
 @ApiTags('Instruments')
 @Controller('instruments/forms')

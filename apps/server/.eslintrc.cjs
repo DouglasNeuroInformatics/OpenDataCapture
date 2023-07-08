@@ -11,7 +11,6 @@ module.exports = {
     project: path.resolve(__dirname, 'tsconfig.json')
   },
   rules: {
-    '@typescript-eslint/explicit-function-return-type': 'error',
     'import/order': [
       'error',
       {

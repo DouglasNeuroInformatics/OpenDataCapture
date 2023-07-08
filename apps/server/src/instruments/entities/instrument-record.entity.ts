@@ -9,10 +9,10 @@ import {
 } from '@douglasneuroinformatics/common';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { InstrumentEntity } from './instrument.entity';
+import { InstrumentEntity } from './instrument.entity.js';
 
-import { GroupEntity } from '@/groups/entities/group.entity';
-import { SubjectEntity } from '@/subjects/entities/subject.entity';
+import { GroupEntity } from '@/groups/entities/group.entity.js';
+import { SubjectEntity } from '@/subjects/entities/subject.entity.js';
 
 @Schema({ strict: false })
 export class InstrumentRecordEntity implements InstrumentRecord<BaseInstrument> {

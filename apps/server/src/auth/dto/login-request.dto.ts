@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Fingerprint, LoginRequest, loginRequestSchema } from '@douglasneuroinformatics/common';
 
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
+import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
 
 @ValidationSchema<LoginRequest>(loginRequestSchema)
 export class LoginRequestDto implements LoginRequest {

@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { type InstrumentKind } from '@douglasneuroinformatics/common';
 import { HydratedDocument } from 'mongoose';
 
-import { BaseInstrumentEntity } from './base-instrument.entity';
+import { BaseInstrumentEntity } from './base-instrument.entity.js';
 
 @Schema({ discriminatorKey: 'kind', strict: false, timestamps: true })
 export class InstrumentEntity implements BaseInstrumentEntity {

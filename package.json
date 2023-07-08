@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
-    "@douglasneuroinformatics/eslint-config": "^0.0.4",
+    "@douglasneuroinformatics/eslint-config": "^0.0.5",
     "@types/node": "^18.11.18",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
     "cross-env": "^7.0.3",

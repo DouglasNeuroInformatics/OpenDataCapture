@@ -10,8 +10,8 @@ import {
 import { type JSONSchemaType } from 'ajv';
 import { Schema as MongooseSchema } from 'mongoose';
 
-import { BaseInstrumentEntity } from './base-instrument.entity';
-import { FormDetailsSchema } from './form-details.entity';
+import { BaseInstrumentEntity } from './base-instrument.entity.js';
+import { FormDetailsSchema } from './form-details.entity.js';
 
 @Schema()
 export class FormInstrumentEntity<TData extends FormInstrumentData = FormInstrumentData>
@@ -19,9 +19,9 @@ export class FormInstrumentEntity<TData extends FormInstrumentData = FormInstrum
   implements FormInstrument<TData>
 {
   kind: 'form';
-  name: string;
-  tags: string[];
-  version: number;
+  // name: string;
+  // tags: string[];
+  // version: number;
 
   @Prop({ required: true, type: FormDetailsSchema })
   details: FormDetails;

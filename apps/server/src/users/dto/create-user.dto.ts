@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { BasePermissionLevel, type User } from '@douglasneuroinformatics/common';
 
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
+import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
 
 interface CreateUserData extends Omit<User, 'preferences' | 'groups'> {
   groupNames?: string[];

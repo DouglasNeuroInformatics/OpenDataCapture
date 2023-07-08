@@ -1,3 +1,3 @@
-import { CreateSubjectDto } from './create-subject.dto';
+import { CreateSubjectDto } from './create-subject.dto.js';
 
 export class LookupSubjectDto extends CreateSubjectDto {}

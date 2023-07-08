@@ -1,17 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "declaration": true,
+    "baseUrl": "src",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "incremental": true,
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "outDir": "dist",
+    "moduleResolution": "NodeNext",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["*"]
     },
-    "strictPropertyInitialization": false
-  }
+    "strictPropertyInitialization": false,
+    "typeRoots": ["node_modules/@types", "src/typings"]
+  },
+  "include": ["src/**/*"]
 }
