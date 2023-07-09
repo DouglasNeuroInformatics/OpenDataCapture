@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { AjvFactory } from '@douglasneuroinformatics/common';
+import { AjvFactory } from '@douglasneuroinformatics/ajv';
 import { default as Ajv, ErrorObject, JSONSchemaType } from 'ajv';
 
 @Injectable()

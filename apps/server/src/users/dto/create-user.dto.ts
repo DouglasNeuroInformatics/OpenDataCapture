@@ -1,78 +1,44 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { BasePermissionLevel, type User } from '@douglasneuroinformatics/common';
-
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
+import type { BasePermissionLevel, User } from '@ddcp/types';
+import { ArrayMinSize, IsBoolean, IsIn, IsOptional, IsString, Matches } from 'class-validator';
 
 interface CreateUserData extends Omit<User, 'preferences' | 'groups'> {
   groupNames?: string[];
 }
 
 // Matches string with 8 or more characters, minimum one upper case, lowercase, and number
-export const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
-@ValidationSchema<CreateUserData>({
-  type: 'object',
-  properties: {
-    username: {
-      type: 'string',
-      minLength: 1
-    },
-    password: {
-      type: 'string',
-      pattern: isStrongPassword.source
-    },
-    isAdmin: {
-      type: 'boolean',
-      nullable: true
-    },
-    basePermissionLevel: {
-      type: 'string',
-      enum: Object.values(BasePermissionLevel),
-      nullable: true
-    },
-    groupNames: {
-      type: 'array',
-      items: {
-        type: 'string',
-        minLength: 1
-      },
-      nullable: true
-    },
-    firstName: {
-      type: 'string',
-      minLength: 1,
-      nullable: true
-    },
-    lastName: {
-      type: 'string',
-      minLength: 1,
-      nullable: true
-    }
-  },
-  required: ['username', 'password']
-})
-export class CreateUserDto {
+const basePermissionLevels = ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] satisfies BasePermissionLevel[];
+
+export class CreateUserDto implements CreateUserData {
   @ApiProperty({ description: 'A unique descriptive name associated with this user', example: 'JaneDoeMemoryClinic' })
+  @IsString()
   username: string;
 
   @ApiProperty({
     description: 'A minimum of 8 characters, including one number, one upper case, and one lower case letter',
     example: 'TheMinimumLengthIs8ButThereIsNotAMaximumLength'
   })
+  @Matches(isStrongPassword)
   password: string;
 
   @ApiProperty({
     description:
       'Whether the user is an admin, in which case the frontend will render content for all groups the user has permission to access'
   })
+  @IsOptional()
+  @IsBoolean()
   isAdmin?: boolean;
 
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
-    enum: BasePermissionLevel,
+    enum: basePermissionLevels,
     type: String
   })
+  @IsOptional()
+  @IsIn(basePermissionLevels)
   basePermissionLevel?: BasePermissionLevel;
 
   @ApiProperty({
@@ -83,11 +49,18 @@ export class CreateUserDto {
       url: 'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/features/authentication'
     }
   })
+  @IsOptional()
+  @IsString({ each: true })
+  @ArrayMinSize(1)
   groupNames?: string[];
 
-  @ApiProperty({ description: 'First Name ' })
+  @ApiProperty({ description: 'First Name' })
+  @IsOptional()
+  @IsString()
   firstName?: string;
 
   @ApiProperty({ description: 'Last Name' })
+  @IsOptional()
+  @IsString()
   lastName?: string;
 }

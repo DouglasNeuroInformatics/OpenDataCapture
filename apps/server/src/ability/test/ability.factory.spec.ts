@@ -3,8 +3,6 @@ import { beforeEach, describe, it } from 'node:test';
 
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { BasePermissionLevel } from '@douglasneuroinformatics/common';
-
 import { AbilityFactory } from '../ability.factory.js';
 
 describe('AbilityFactory', () => {
@@ -21,7 +19,7 @@ describe('AbilityFactory', () => {
   describe('createForUser', () => {
     it('should return an empty rule set when the user has no basePermissionLevel', () => {
       const ability = abilityFactory.createForUser({ username: 'user', password: 'Password123', groups: [] });
-      assert(ability.rules.length === 0)
+      assert(ability.rules.length === 0);
     });
 
     it('should return a rule set with a single rule when the user has a basePermissionLevel of admin', () => {
@@ -29,7 +27,7 @@ describe('AbilityFactory', () => {
         username: 'admin',
         password: 'Password123',
         groups: [],
-        basePermissionLevel: BasePermissionLevel.Admin
+        basePermissionLevel: 'ADMIN'
       });
       assert.deepStrictEqual(ability.rules, [{ action: 'manage', subject: 'all' }]);
     });

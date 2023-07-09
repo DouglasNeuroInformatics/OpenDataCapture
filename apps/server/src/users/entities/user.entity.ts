@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { BasePermissionLevel, Fingerprint, type User, type UserPreferences } from '@douglasneuroinformatics/common';
+import type { BasePermissionLevel, Fingerprint, User, UserPreferences } from '@ddcp/types';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { UserPreferencesSchema } from './user-preferences.entity.js';
@@ -23,7 +23,7 @@ export class UserEntity implements User {
   @Prop({ required: false })
   isAdmin?: boolean;
 
-  @Prop({ enum: BasePermissionLevel, type: String })
+  @Prop({ enum: ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] satisfies BasePermissionLevel[], type: String })
   basePermissionLevel?: BasePermissionLevel;
 
   @Prop({ required: false, type: String })

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Group } from '@douglasneuroinformatics/common';
+import { Group } from '@ddcp/types';
 import { HydratedDocument } from 'mongoose';
 
 @Schema({ strict: 'throw', timestamps: true })

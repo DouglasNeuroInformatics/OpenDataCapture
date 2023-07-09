@@ -1,13 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import {
-  type FormInstrumentData,
-  FormInstrumentRecord,
-  type SubjectIdentificationData,
-  subjectIdentificationDataSchema
-} from '@douglasneuroinformatics/common';
+import type { FormInstrumentRecord, InstrumentKind, SubjectIdentificationData } from '@ddcp/types';
+import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { Type } from 'class-transformer';
+import { IsIn, IsNumber, IsObject, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator';
 
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
+import { SubjectIdentificationDataDto } from '@/subjects/dto/subject-identification-data.dto.js';
 
 interface CreateFormRecordData extends Omit<FormInstrumentRecord, 'group' | 'instrument' | 'subject'> {
   groupName?: string;
@@ -16,56 +14,36 @@ interface CreateFormRecordData extends Omit<FormInstrumentRecord, 'group' | 'ins
   subjectInfo: SubjectIdentificationData;
 }
 
-@ValidationSchema<CreateFormRecordData>({
-  type: 'object',
-  properties: {
-    kind: {
-      type: 'string',
-      const: 'form'
-    },
-    time: {
-      type: 'number',
-      minimum: 0
-    },
-    instrumentName: {
-      type: 'string',
-      minLength: 1
-    },
-    instrumentVersion: {
-      type: 'number'
-    },
-    groupName: {
-      type: 'string',
-      minLength: 1,
-      nullable: true
-    },
-    subjectInfo: subjectIdentificationDataSchema,
-    data: {
-      type: 'object',
-      required: []
-    }
-  },
-  required: ['kind', 'time', 'instrumentName', 'instrumentVersion', 'subjectInfo', 'data']
-})
 export class CreateFormRecordDto implements CreateFormRecordData {
   @ApiProperty()
+  @IsIn(['form'] satisfies InstrumentKind[])
   kind: 'form';
 
   @ApiProperty()
+  @IsNumber()
+  @Min(0)
   time: number;
 
   @ApiProperty()
+  @IsString()
   instrumentName: string;
 
   @ApiProperty()
+  @IsPositive()
   instrumentVersion: number;
 
   @ApiProperty()
+  @IsOptional()
+  @IsString()
   groupName?: string;
 
   @ApiProperty()
-  subjectInfo: SubjectIdentificationData;
+  @IsObject()
+  @ValidateNested()
+  @Type(() => SubjectIdentificationDataDto)
+  subjectInfo: SubjectIdentificationDataDto;
 
   @ApiProperty()
+  @IsObject()
   data: FormInstrumentData;
 }

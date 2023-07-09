@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { InstrumentKind } from '@douglasneuroinformatics/common';
+import { InstrumentKind } from '@ddcp/types';
 import { Schema } from 'mongoose';
 
 import { FormRecordsController } from './controllers/form-records.controller.js';

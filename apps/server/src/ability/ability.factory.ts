@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
-import { AppAbility, BasePermissionLevel, User } from '@douglasneuroinformatics/common';
+import { AppAbility, User } from '@ddcp/types';
 
 @Injectable()
 export class AbilityFactory {
@@ -11,10 +11,10 @@ export class AbilityFactory {
     this.logger.verbose('Creating ability for user: ' + user.username);
     const ability = new AbilityBuilder<AppAbility>(createMongoAbility);
     switch (user.basePermissionLevel) {
-      case BasePermissionLevel.Admin:
+      case 'ADMIN':
         ability.can('manage', 'all');
         break;
-      case BasePermissionLevel.GroupManager:
+      case 'STANDARD':
         ability.can('read', 'Group', { _id: { $in: user.groups } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
@@ -23,7 +23,7 @@ export class AbilityFactory {
         ability.can('read', 'Subject', { groups: { $in: user.groups } });
         ability.can('read', 'User', { groups: { $in: user.groups } });
         break;
-      case BasePermissionLevel.Standard:
+      case 'GROUP_MANAGER':
         ability.can('read', 'Group', { _id: { $in: user.groups } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');

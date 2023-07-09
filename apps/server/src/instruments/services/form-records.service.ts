@@ -2,9 +2,8 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
-import {
+import type {
   AppAbility,
-  FormInstrumentData,
   FormInstrumentRecord,
   FormInstrumentRecordsSummary,
   Group,
@@ -12,7 +11,8 @@ import {
   Language,
   Measure,
   SubjectFormRecords
-} from '@douglasneuroinformatics/common';
+} from '@ddcp/types';
+import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { Stats } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Model } from 'mongoose';

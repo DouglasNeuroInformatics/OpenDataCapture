@@ -2,11 +2,11 @@ import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@n
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { JwtPayload } from '@douglasneuroinformatics/common';
+import { JwtPayload } from '@ddcp/types';
+import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { AbilityFactory } from '@/ability/ability.factory.js';
-import { AuthenticatedRequest } from '@/core/interfaces/authenticated-request.interface.js';
 import { UserEntity } from '@/users/entities/user.entity.js';
 import { UsersService } from '@/users/users.service.js';
 
@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   /** This method is called after the token is validated by passport  */
-  async validate(request: AuthenticatedRequest, { username }: JwtPayload): Promise<UserEntity> {
+  async validate(request: Request, { username }: JwtPayload): Promise<UserEntity> {
     const user = await this.getUser(username);
     request.ability = this.abilityFactory.createForUser(user);
     this.logger.verbose(`Validated Token for User: ${username}`);

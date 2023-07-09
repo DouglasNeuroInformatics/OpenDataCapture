@@ -1,11 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Group, groupSchema } from '@douglasneuroinformatics/common';
+import { Group } from '@ddcp/types';
+import { IsString } from 'class-validator';
 
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
-
-@ValidationSchema<Group>(groupSchema)
 export class CreateGroupDto implements Group {
   @ApiProperty({ example: 'Depression Clinic' })
+  @IsString()
   name: string;
 }

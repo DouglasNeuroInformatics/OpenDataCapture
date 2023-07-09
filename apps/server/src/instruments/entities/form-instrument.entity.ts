@@ -1,12 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import {
-  type FormDetails,
-  FormInstrument,
-  type FormInstrumentContent,
-  FormInstrumentData,
-  type Measures
-} from '@douglasneuroinformatics/common';
+import type { FormDetails, FormInstrument, Measures } from '@ddcp/types';
+import type { FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { type JSONSchemaType } from 'ajv';
 import { Schema as MongooseSchema } from 'mongoose';
 

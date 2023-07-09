@@ -1,6 +1,6 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { AppAbility, Group } from '@douglasneuroinformatics/common';
+import { AppAbility, Group } from '@ddcp/types';
 
 import { CreateGroupDto } from './dto/create-group.dto.js';
 import { UpdateGroupDto } from './dto/update-group.dto.js';

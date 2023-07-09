@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { AccessibleModel } from '@casl/mongoose';
 import { TranslatedForms } from '@ddcp/instruments';
-import { FormFields, FormInstrument, FormInstrumentData, FormInstrumentSummary } from '@douglasneuroinformatics/common';
-import { type Language } from '@douglasneuroinformatics/common';
+import type { FormInstrument, FormInstrumentSummary, Language } from '@ddcp/types';
+import { FormFields, FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { Model, ObjectId } from 'mongoose';
 
 import { FormInstrumentEntity } from '../entities/form-instrument.entity.js';

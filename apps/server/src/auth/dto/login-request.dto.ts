@@ -1,17 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Fingerprint, LoginRequest, loginRequestSchema } from '@douglasneuroinformatics/common';
+import { Fingerprint, LoginRequest } from '@ddcp/types';
+import { IsNotEmptyObject, IsString } from 'class-validator';
 
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
-
-@ValidationSchema<LoginRequest>(loginRequestSchema)
 export class LoginRequestDto implements LoginRequest {
   @ApiProperty({ example: 'admin' })
+  @IsString()
   username: string;
 
   @ApiProperty({ example: 'password' })
+  @IsString()
   password: string;
 
   @ApiProperty()
+  @IsNotEmptyObject()
   fingerprint?: Fingerprint | null;
 }

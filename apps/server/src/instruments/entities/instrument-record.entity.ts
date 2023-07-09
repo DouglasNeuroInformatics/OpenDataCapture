@@ -1,12 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import {
-  type BaseInstrument,
-  type Group,
-  type InstrumentKind,
-  type InstrumentRecord,
-  type Subject
-} from '@douglasneuroinformatics/common';
+import type { BaseInstrument, Group, InstrumentKind, InstrumentRecord, Subject } from '@ddcp/types';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { InstrumentEntity } from './instrument.entity.js';

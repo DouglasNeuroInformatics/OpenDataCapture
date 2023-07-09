@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { type AppAbility } from '@douglasneuroinformatics/common';
+import { type AppAbility } from '@ddcp/types';
 
 import { CreateSubjectDto } from './dto/create-subject.dto.js';
 import { LookupSubjectDto } from './dto/lookup-subject.dto.js';

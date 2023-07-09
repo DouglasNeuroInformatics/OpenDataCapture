@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { AuthPayload } from '@douglasneuroinformatics/common';
+import { AuthPayload } from '@ddcp/types';
 
 export class AccessTokenDto implements AuthPayload {
   @ApiProperty()

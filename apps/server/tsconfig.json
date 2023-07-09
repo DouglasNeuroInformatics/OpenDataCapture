@@ -9,7 +9,7 @@
       "@/*": ["*"]
     },
     "strictPropertyInitialization": false,
-    "typeRoots": ["node_modules/@types", "src/typings"]
+    "typeRoots": ["./src/typings", "./node_modules/@types", "../../node_modules/@types"]
   },
   "include": ["src/**/*"]
 }

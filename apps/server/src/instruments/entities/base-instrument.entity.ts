@@ -1,4 +1,4 @@
-import { BaseInstrument, InstrumentKind } from '@douglasneuroinformatics/common';
+import { BaseInstrument, InstrumentKind } from '@ddcp/types';
 
 export abstract class BaseInstrumentEntity implements BaseInstrument {
   identifier: string;

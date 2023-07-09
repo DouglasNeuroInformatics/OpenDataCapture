@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { FormInstrument, FormInstrumentSummary, type Language } from '@douglasneuroinformatics/common';
+import type { FormInstrument, FormInstrumentSummary, Language } from '@ddcp/types';
 
 import { CreateFormDto } from '../dto/create-form.dto.js';
 import { FormsService } from '../services/forms.service.js';

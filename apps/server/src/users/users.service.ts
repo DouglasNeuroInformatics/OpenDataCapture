@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
-import { AppAbility } from '@douglasneuroinformatics/common';
+import { AppAbility } from '@ddcp/types';
 
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UserDocument } from './entities/user.entity.js';

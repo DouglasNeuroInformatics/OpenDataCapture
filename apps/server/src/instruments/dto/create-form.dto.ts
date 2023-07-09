@@ -1,21 +1,40 @@
-import {
-  FormDetails,
-  FormInstrument,
-  FormInstrumentContent,
-  FormInstrumentData,
-  formInstrumentSchema
-} from '@douglasneuroinformatics/common';
-import { JSONSchemaType } from 'ajv';
+import { ApiProperty } from '@nestjs/swagger';
 
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator.js';
+import type { FormInstrument, InstrumentKind } from '@ddcp/types';
+import type { FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { JSONSchemaType } from 'ajv';
+import { Type } from 'class-transformer';
+import { IsIn, IsNumber, IsObject, IsPositive, IsString, ValidateNested } from 'class-validator';
 
-@ValidationSchema<FormInstrument>(formInstrumentSchema)
+import { FormDetailsDto } from './form-details.dto.js';
+
 export class CreateFormDto implements FormInstrument {
+  @ApiProperty()
+  @IsIn(['form'] satisfies InstrumentKind[])
   kind: 'form';
+
+  @ApiProperty()
+  @IsString()
   name: string;
+
+  @ApiProperty()
+  @IsString({ each: true })
   tags: string[];
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
   version: number;
-  details: FormDetails;
+
+  @ApiProperty()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => FormDetailsDto)
+  details: FormDetailsDto;
+
+  @ApiProperty()
   content: FormInstrumentContent<FormInstrumentData>;
+
+  @ApiProperty()
   validationSchema: JSONSchemaType<FormInstrumentData>;
 }

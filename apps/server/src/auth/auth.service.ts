@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unauthoriz
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { AuthPayload, Fingerprint, JwtPayload } from '@douglasneuroinformatics/common';
+import { AuthPayload, Fingerprint, JwtPayload } from '@ddcp/types';
 
 import { AbilityFactory } from '@/ability/ability.factory.js';
 import { CryptoService } from '@/crypto/crypto.service.js';

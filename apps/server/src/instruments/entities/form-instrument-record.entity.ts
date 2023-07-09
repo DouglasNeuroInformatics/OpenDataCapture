@@ -1,6 +1,6 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 
-import { FormInstrumentRecord, Group, Subject } from '@douglasneuroinformatics/common';
+import { FormInstrumentRecord, Group, Subject } from '@ddcp/types';
 
 import { FormInstrumentEntity } from './form-instrument.entity.js';
 
