@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 
 export function useDownload() {
   const notifications = useNotificationsStore();

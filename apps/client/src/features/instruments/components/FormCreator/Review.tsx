@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { Button, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 
 import { SimpleForm } from './FormCreator';

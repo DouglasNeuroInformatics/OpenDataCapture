@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Modal } from '@douglasneuroinformatics/react-components';
+import { Modal } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 

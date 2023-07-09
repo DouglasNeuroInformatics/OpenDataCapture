@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { InstrumentRecordsExport, Subject } from '@douglasneuroinformatics/common';
-import { Dropdown, SearchBar } from '@douglasneuroinformatics/react-components';
+import { Dropdown, SearchBar } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';

@@ -1,10 +1,10 @@
 const path = require('path');
 
-const baseConfig = require('@douglasneuroinformatics/react-components/tailwind.config.cjs');
+const baseConfig = require('@douglasneuroinformatics/ui/tailwind.config.cjs');
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 const componentLibraryContent = path.join(
-  path.dirname(require.resolve('@douglasneuroinformatics/react-components')),
+  path.dirname(require.resolve('@douglasneuroinformatics/ui')),
   '**/*.{js,cjs,mjs}'
 );
 

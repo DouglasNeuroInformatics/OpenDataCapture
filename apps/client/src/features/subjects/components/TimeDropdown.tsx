@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { Dropdown } from '@douglasneuroinformatics/react-components';
+import { Dropdown } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';

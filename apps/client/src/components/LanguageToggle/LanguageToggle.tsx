@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import i18next from 'i18next';
 
 const languages = {
@@ -23,7 +23,7 @@ export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
     | keyof typeof languages
     | undefined;
 
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = async (event) => {
+  const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     try {
       await i18next.changeLanguage(inactiveLanguage);
     } catch (error) {
@@ -36,7 +36,7 @@ export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
   };
 
   return (
-    <button onClick={handleClick} {...props}>
+    <button onClick={(e) => void handleClick(e)} {...props}>
       {inactiveLanguage ? languages[inactiveLanguage].nativeName : 'ERROR'}
     </button>
   );

@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 
-import { AuthPayload, FormInstrumentContent, loginCredentialsSchema } from '@douglasneuroinformatics/common';
-import { Form, useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { AuthPayload } from '@ddcp/types';
+import { FormInstrumentContent } from '@douglasneuroinformatics/form-types';
+import { Form, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -71,7 +72,19 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       content={content}
       submitBtnLabel={t('login')}
       validationSchema={{
-        ...loginCredentialsSchema,
+        type: 'object',
+        properties: {
+          username: {
+            type: 'string',
+            minLength: 1
+          },
+          password: {
+            type: 'string',
+            minLength: 1
+          }
+        },
+        additionalProperties: false,
+        required: ['username', 'password'],
         errorMessage: {
           properties: {
             username: t('form.errors.required'),

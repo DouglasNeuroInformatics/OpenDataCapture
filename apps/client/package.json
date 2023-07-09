@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
+    "@douglasneuroinformatics/ui": "^0.1.0",
     "@douglasneuroinformatics/utils": "latest",
     "@fingerprintjs/fingerprintjs": "^3.4.1",
     "@headlessui/react": "^1.7.15",

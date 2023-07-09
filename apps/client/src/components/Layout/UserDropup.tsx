@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 
-import { ArrowToggle } from '@douglasneuroinformatics/react-components';
+import { ArrowToggle } from '@douglasneuroinformatics/ui';
 import { Transition } from '@headlessui/react';
 import { useTranslation } from 'react-i18next';
 import { HiUserCircle } from 'react-icons/hi2';

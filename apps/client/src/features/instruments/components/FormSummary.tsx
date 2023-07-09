@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { BaseFormField, FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
-import { Button } from '@douglasneuroinformatics/react-components';
+import { Button } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 import { Spinner } from '@/components';

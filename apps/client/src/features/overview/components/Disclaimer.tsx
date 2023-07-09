@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Modal } from '@douglasneuroinformatics/react-components';
+import { Button, Modal } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 import { useDisclaimerStore } from '../stores/disclaimer-store';

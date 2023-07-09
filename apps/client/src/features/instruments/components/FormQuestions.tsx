@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 import { FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
-import { Form } from '@douglasneuroinformatics/react-components';
+import { Form } from '@douglasneuroinformatics/ui';
 
 import { StepperContext } from '@/context/StepperContext';
 

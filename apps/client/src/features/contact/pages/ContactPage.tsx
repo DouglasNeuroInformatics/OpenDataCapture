@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Form } from '@douglasneuroinformatics/react-components';
+import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NotificationHub } from '@douglasneuroinformatics/react-components';
+import { NotificationHub } from '@douglasneuroinformatics/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { Router } from './Router';

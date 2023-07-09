@@ -1576,7 +1576,7 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@douglasneuroinformatics/ajv@^0.0.4":
+"@douglasneuroinformatics/ajv@*", "@douglasneuroinformatics/ajv@^0.0.4":
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/ajv/-/ajv-0.0.4.tgz#8291e52ed46e8340b3aa68f528eb8c54619a3cc6"
   integrity sha512-6+o5P4kB4gppq8lUZDSmVjOaTYqlIb5gJ5wcqEMrbge/csYV71tuVoKIF0pf1RGl60zlPGUs/8MTTyx/lj8dBQ==
@@ -1593,7 +1593,7 @@
     eslint-config-prettier "^8.8.0"
     eslint-import-resolver-typescript "^3.5.5"
 
-"@douglasneuroinformatics/form-types@^0.0.2":
+"@douglasneuroinformatics/form-types@*", "@douglasneuroinformatics/form-types@^0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/form-types/-/form-types-0.0.2.tgz#bfbf0f9ca2a1d29c42e7304f6e3910ccc77b5073"
   integrity sha512-NFHbsAwZVMzU3n5qy7j21u6v9EhiJ0CLq89K2Zg3a/zpd3BlTKJTpXMWw0F2QRad/VXygxIKuwRzfdVzMWYDOw==
@@ -1610,15 +1610,38 @@
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/stats/-/stats-0.0.2.tgz#956517d65385f90027300764257f74f18617795d"
   integrity sha512-2b8MAryS4hpZK0Ez8aNAN+g/Scg7isWbmtcXqgJngoq+DkkwX8v4skCz/kvdokLCzCuJfuEWaOQuxxR0wCeZxg==
 
+"@douglasneuroinformatics/ui@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/ui/-/ui-0.1.0.tgz#de8c0040da0593245f3697ea8f9e1c349c0deabe"
+  integrity sha512-l2x885mJ+CW0q2IwIKD1m6ny3tcWY79qOCinveXTZQS7yXCsvOUXHHhWz5/VO/ougMqywMiqcgcR3p7EF0T17g==
+  dependencies:
+    "@douglasneuroinformatics/ajv" "*"
+    "@douglasneuroinformatics/form-types" "*"
+    "@douglasneuroinformatics/utils" "*"
+    "@headlessui/react" "^1.7.15"
+    "@heroicons/react" "^2.0.18"
+    ajv "^8.12.0"
+    clsx "^1.2.1"
+    framer-motion "^10.12.16"
+    i18next "^23.2.3"
+    i18next-browser-languagedetector "^7.0.2"
+    i18next-http-backend "^2.2.1"
+    prop-types "^15.8.1"
+    react-i18next "^13.0.1"
+    recharts "^2.7.2"
+    tailwind-merge "^1.13.2"
+    type-fest "^3.12.0"
+    zustand "^4.3.8"
+
+"@douglasneuroinformatics/utils@*", "@douglasneuroinformatics/utils@latest":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/utils/-/utils-0.4.0.tgz#7d4469bfbf6f711020dac65f7a0b8f82fa54f439"
+  integrity sha512-cU4deWfp8CdPXtqrv6ECbBNf25mzuqZHQs5DemGcQPLZEqEy76Fl2HoHBJKC66gtTDiW1DaLRuq6G2Z3lXa3xg==
+
 "@douglasneuroinformatics/utils@0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/utils/-/utils-0.2.1.tgz#8c7e4e5e838506bdb9f248faaac0b5d4f1fb11c6"
   integrity sha512-9bp7WQSmG4xYbI79gDc2T25J/8GGqzV4XC75erQEFROZhdNHQgNSnrI48u+uR3xszlMCJuZ0K0c5Up/C/I/2Pw==
-
-"@douglasneuroinformatics/utils@latest":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/utils/-/utils-0.4.0.tgz#7d4469bfbf6f711020dac65f7a0b8f82fa54f439"
-  integrity sha512-cU4deWfp8CdPXtqrv6ECbBNf25mzuqZHQs5DemGcQPLZEqEy76Fl2HoHBJKC66gtTDiW1DaLRuq6G2Z3lXa3xg==
 
 "@emotion/is-prop-valid@^0.8.2":
   version "0.8.8"
@@ -1917,6 +1940,11 @@
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@headlessui/tailwindcss/-/tailwindcss-0.1.3.tgz#a9b8b4c2677a7ef37889708d4401c7871b2e6105"
   integrity sha512-3aMdDyYZx9A15euRehpppSyQnb2gIw2s/Uccn2ELIoLQ9oDy0+9oRygNWNjXCD5Dt+w1pxo7C+XoiYvGcqA4Kg==
+
+"@heroicons/react@^2.0.18":
+  version "2.0.18"
+  resolved "https://registry.yarnpkg.com/@heroicons/react/-/react-2.0.18.tgz#f80301907c243df03c7e9fd76c0286e95361f7c1"
+  integrity sha512-7TyMjRrZZMBPa+/5Y8lN0iyvUU/01PeMGX2+RE7cQWpEUIcb4QotzUObFkJDejj/HUH4qjP/eQ0gzzKs2f+6Yw==
 
 "@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"
@@ -6478,7 +6506,7 @@ fraction.js@^4.2.0:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.2.0.tgz#448e5109a313a3527f5a3ab2119ec4cf0e0e2950"
   integrity sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==
 
-framer-motion@^10.12.18:
+framer-motion@^10.12.16, framer-motion@^10.12.18:
   version "10.12.18"
   resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-10.12.18.tgz#92015860b6468a82e76c4739fcae81e1f6723b3f"
   integrity sha512-cfhiUpPbj+0eEWKjuD+5cz5cMqH71xOtMxGiS/cSGfHn2OlHIEAqFnFyzEMENw5PxWR9bMVhatzzpD6lexmHZQ==
@@ -7012,7 +7040,7 @@ husky@^8.0.3:
   resolved "https://registry.yarnpkg.com/husky/-/husky-8.0.3.tgz#4936d7212e46d1dea28fef29bb3a108872cd9184"
   integrity sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==
 
-i18next-browser-languagedetector@^7.1.0:
+i18next-browser-languagedetector@^7.0.2, i18next-browser-languagedetector@^7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/i18next-browser-languagedetector/-/i18next-browser-languagedetector-7.1.0.tgz#01876fac51f86b78975e79b48ccb62e2313a2d7d"
   integrity sha512-cr2k7u1XJJ4HTOjM9GyOMtbOA47RtUoWRAtt52z43r3AoMs2StYKyjS3URPhzHaf+mn10hY9dZWamga5WPQjhA==
@@ -7026,7 +7054,7 @@ i18next-http-backend@^2.2.1:
   dependencies:
     cross-fetch "3.1.6"
 
-i18next@^23.2.6:
+i18next@^23.2.3, i18next@^23.2.6:
   version "23.2.8"
   resolved "https://registry.yarnpkg.com/i18next/-/i18next-23.2.8.tgz#dd54fab8f68c1ef2e0408249e042cf9cef683554"
   integrity sha512-wU0pMlJ91ZbB89i77G3YQ11/pBQrzgWpxJYl7HFyA9aU9v3aHMI/oBKQmAJNURr0A8cLG4EHjgSMK8IqQTp4PQ==
@@ -10440,6 +10468,11 @@ synckit@^0.8.5:
   dependencies:
     "@pkgr/utils" "^2.3.1"
     tslib "^2.5.0"
+
+tailwind-merge@^1.13.2:
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/tailwind-merge/-/tailwind-merge-1.13.2.tgz#1d06c9e95ffda2320efc50ed33c65be0cda23091"
+  integrity sha512-R2/nULkdg1VR/EL4RXg4dEohdoxNUJGLMnWIQnPKL+O9Twu7Cn3Rxi4dlXkDzZrEGtR+G+psSXFouWlpTyLhCQ==
 
 tailwindcss@^3.3.2:
   version "3.3.2"

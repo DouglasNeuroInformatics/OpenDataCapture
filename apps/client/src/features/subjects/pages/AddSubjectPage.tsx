@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 

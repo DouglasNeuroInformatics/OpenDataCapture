@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
-import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/react-components';
+import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/ui';
 import { animated, useTrail } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 

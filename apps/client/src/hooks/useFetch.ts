@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { AppAction, AppSubject } from '@douglasneuroinformatics/common';
-import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 
 import { useAuthStore } from '@/stores/auth-store';
 

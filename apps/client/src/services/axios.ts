@@ -1,4 +1,4 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios, { AxiosError } from 'axios';
 
 import { useAuthStore } from '@/stores/auth-store';

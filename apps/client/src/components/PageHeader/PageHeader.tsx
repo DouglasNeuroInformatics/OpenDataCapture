@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Divider } from '@douglasneuroinformatics/react-components';
+import { Divider } from '@douglasneuroinformatics/ui';
 
 export interface PageHeaderProps {
   title: string;

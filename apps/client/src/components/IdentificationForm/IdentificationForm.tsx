@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Sex } from '@douglasneuroinformatics/common';
-import { Form } from '@douglasneuroinformatics/react-components';
+import { Sex } from '@ddcp/types';
+import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 import { useActiveSubjectStore } from '@/stores/active-subject-store';

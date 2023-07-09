@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 
-import { Dropdown, useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { Dropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';

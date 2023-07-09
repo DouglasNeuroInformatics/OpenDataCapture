@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { FormInstrument, Language } from '@douglasneuroinformatics/common';
-import { useNotificationsStore } from '@douglasneuroinformatics/react-components';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 import { useFetch } from '@/hooks/useFetch';
