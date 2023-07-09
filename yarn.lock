@@ -1608,6 +1608,15 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
+"@douglasneuroinformatics/ajv@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/ajv/-/ajv-0.0.4.tgz#8291e52ed46e8340b3aa68f528eb8c54619a3cc6"
+  integrity sha512-6+o5P4kB4gppq8lUZDSmVjOaTYqlIb5gJ5wcqEMrbge/csYV71tuVoKIF0pf1RGl60zlPGUs/8MTTyx/lj8dBQ==
+  dependencies:
+    ajv "^8.12.0"
+    ajv-errors "^3.0.0"
+    ajv-formats "^2.1.1"
+
 "@douglasneuroinformatics/common@*", "@douglasneuroinformatics/common@latest":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/common/-/common-0.1.0.tgz#133a0fc9bcfd3e1d56f24eba7c6b14ead0ac96c6"
@@ -1637,6 +1646,11 @@
   dependencies:
     type-fest "^3.12.0"
 
+"@douglasneuroinformatics/node-ext@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/node-ext/-/node-ext-0.0.3.tgz#58ab2135d5a2820db0b7f8690e7826c57b2c04fb"
+  integrity sha512-g5XfPFzWy40XBI0VfoR+VYF9x04Gch3t0/O38POnfAS7r35MvveLY+M85a4pS3r/EuCbsaOwl+2n6bLFpgeypQ==
+
 "@douglasneuroinformatics/react-components@^1.7.5":
   version "1.7.5"
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/react-components/-/react-components-1.7.5.tgz#5e3754b8baded8202708caa5e277bbbaaa230b08"
@@ -1656,6 +1670,11 @@
     recharts "^2.7.2"
     tailwind-merge "^1.13.2"
     zustand "^4.3.8"
+
+"@douglasneuroinformatics/stats@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/stats/-/stats-0.0.2.tgz#956517d65385f90027300764257f74f18617795d"
+  integrity sha512-2b8MAryS4hpZK0Ez8aNAN+g/Scg7isWbmtcXqgJngoq+DkkwX8v4skCz/kvdokLCzCuJfuEWaOQuxxR0wCeZxg==
 
 "@douglasneuroinformatics/utils@0.2.1":
   version "0.2.1"

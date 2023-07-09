@@ -13,6 +13,7 @@ import {
   Measure,
   SubjectFormRecords
 } from '@douglasneuroinformatics/common';
+import { Stats } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Model } from 'mongoose';
 
@@ -25,7 +26,6 @@ import { FormsService } from './forms.service.js';
 
 import { AjvService } from '@/ajv/ajv.service.js';
 import { GroupsService } from '@/groups/groups.service.js';
-import { StatsService } from '@/stats/stats.service.js';
 import { SubjectsService } from '@/subjects/subjects.service.js';
 
 @Injectable()
@@ -36,7 +36,6 @@ export class FormRecordsService {
     private readonly ajvService: AjvService,
     private readonly formsService: FormsService,
     private readonly groupsService: GroupsService,
-    private readonly statsService: StatsService,
     private readonly subjectsService: SubjectsService
   ) {}
 
@@ -136,8 +135,8 @@ export class FormRecordsService {
           return [
             key,
             {
-              mean: this.statsService.mean(arr),
-              std: this.statsService.std(arr)
+              mean: Stats.mean(arr),
+              std: Stats.std(arr)
             }
           ];
         })
@@ -209,7 +208,7 @@ export class FormRecordsService {
 
     const results: Record<string, { intercept: number; slope: number; stdErr: number }> = {};
     for (const measure in data) {
-      results[measure] = this.statsService.linearRegression(data[measure]);
+      results[measure] = Stats.linearRegression(data[measure]);
     }
     return results;
   }

@@ -18,7 +18,6 @@ import { FormsService } from './services/forms.service.js';
 import { AjvModule } from '@/ajv/ajv.module.js';
 import { CryptoModule } from '@/crypto/crypto.module.js';
 import { GroupsModule } from '@/groups/groups.module.js';
-import { StatsModule } from '@/stats/stats.module.js';
 import { SubjectsModule } from '@/subjects/subjects.module.js';
 
 interface InstrumentDiscriminator {
@@ -53,7 +52,6 @@ interface InstrumentDiscriminator {
         ] satisfies InstrumentDiscriminator[]
       }
     ]),
-    StatsModule,
     SubjectsModule
   ],
   controllers: [FormsController, FormRecordsController],

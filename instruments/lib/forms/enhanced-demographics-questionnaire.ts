@@ -1,11 +1,14 @@
-import employmentStatus from '../data/employment-status.json';
-import ethnicOrigin from '../data/ethnic-origin.json';
-import firstLanguage from '../data/first-language.json';
-import gender from '../data/gender.json';
-import maritalStatus from '../data/marital-status.json';
-import religion from '../data/religion.json';
+import { readJSON } from '@douglasneuroinformatics/node-ext';
+
 import { createTranslatedForms } from '../utils/create-translated-forms.js';
-import { extractKeys, formatOptions } from '../utils/format-options.js';
+import { type MultilingualOptions, extractKeys, formatOptions } from '../utils/format-options.js';
+
+const employmentStatus = readJSON<MultilingualOptions>('../data/employment-status.json');
+const ethnicOrigin = readJSON<MultilingualOptions>('../data/ethnic-origin.json');
+const firstLanguage = readJSON<MultilingualOptions>('../data/first-language.json');
+const gender = readJSON<MultilingualOptions>('../data/gender.json');
+const maritalStatus = readJSON<MultilingualOptions>('../data/marital-status.json');
+const religion = readJSON<MultilingualOptions>('../data/religion.json');
 
 type EmploymentStatus = keyof typeof employmentStatus;
 type EthnicOrigin = keyof typeof ethnicOrigin;

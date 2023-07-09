@@ -37,3 +37,5 @@ export function extractKeys<T extends MultilingualOptions>(options: T, nullable 
   const keys = Object.keys(options) as Array<keyof T>;
   return nullable ? [...keys, null] : keys;
 }
+
+export type { MultilingualOptions };

@@ -5,9 +5,14 @@
   "type": "module",
   "main": "./lib/index.ts",
   "types": "./lib/index.d.ts",
-  "files": ["lib"],
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "check-types": "tsc",
     "lint": "eslint --fix lib"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/node-ext": "^0.0.3"
   }
 }
