@@ -2,84 +2,9 @@ const path = require('path');
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: [
-    '@douglasneuroinformatics',
-    'plugin:cypress/recommended',
-    'plugin:react/recommended',
-    'plugin:jsx-a11y/recommended'
-  ],
-  env: {
-    browser: true
-  },
+  extends: ['@douglasneuroinformatics/eslint-config/lib/react.cjs'],
+  ignorePatterns: ['dist/**/*'],
   parserOptions: {
     project: path.resolve(__dirname, 'tsconfig.json')
-  },
-  plugins: ['import', 'react'],
-  rules: {
-    '@typescript-eslint/no-misused-promises': [
-      'error',
-      {
-        checksVoidReturn: false
-      }
-    ],
-    'import/order': [
-      'error',
-      {
-        alphabetize: {
-          caseInsensitive: true,
-          order: 'asc'
-        },
-        'newlines-between': 'always',
-        pathGroups: [
-          {
-            group: 'external',
-            pattern: 'react',
-            position: 'before'
-          },
-          {
-            group: 'external',
-            pattern: '{next,next/**}',
-            position: 'before'
-          }
-        ],
-        pathGroupsExcludedImportTypes: ['react']
-      }
-    ],
-    'no-alert': 'error',
-    'no-console': ['error', { allow: ['warn', 'error'] }],
-    'react/function-component-definition': [
-      'error',
-      {
-        namedComponents: 'arrow-function',
-        unnamedComponents: 'arrow-function'
-      }
-    ],
-    'react/jsx-sort-props': [
-      'error',
-      {
-        callbacksLast: true,
-        shorthandFirst: true
-      }
-    ],
-    'react/prop-types': 'off' // to fix bug - this is okay as ts will enforce anyways
-  },
-  overrides: [
-    {
-      files: ['**/*/*.stories.tsx'],
-      rules: {
-        'import/exports-last': 'off',
-        'import/no-default-export': 'off',
-        'no-alert': 'off'
-      }
-    }
-  ],
-  settings: {
-    'import/extensions': ['.ts', '.tsx'],
-    'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx']
-    },
-    react: {
-      version: 'detect'
-    }
   }
 };
