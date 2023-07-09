@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -14,9 +14,9 @@ import { AuthenticationGuard } from './auth/guards/authentication.guard.js';
 import { AuthorizationGuard } from './auth/guards/authorization.guard.js';
 import { ExceptionFilter } from './core/exception.filter.js';
 import { LoggerMiddleware } from './core/middleware/logger.middleware.js';
-import { ValidationPipe } from './core/pipes/validation.pipe.js';
 import { GroupsModule } from './groups/groups.module.js';
 import { InstrumentsModule } from './instruments/instruments.module.js';
+import { SetupModule } from './setup/setup.module.js';
 import { SubjectsModule } from './subjects/subjects.module.js';
 import { UsersModule } from './users/users.module.js';
 
@@ -51,7 +51,8 @@ import { UsersModule } from './users/users.module.js';
       ttl: 60,
       limit: 100
     }),
-    UsersModule
+    UsersModule,
+    SetupModule
   ],
   providers: [
     {
