@@ -1610,10 +1610,10 @@
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/stats/-/stats-0.0.2.tgz#956517d65385f90027300764257f74f18617795d"
   integrity sha512-2b8MAryS4hpZK0Ez8aNAN+g/Scg7isWbmtcXqgJngoq+DkkwX8v4skCz/kvdokLCzCuJfuEWaOQuxxR0wCeZxg==
 
-"@douglasneuroinformatics/ui@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/ui/-/ui-0.1.0.tgz#de8c0040da0593245f3697ea8f9e1c349c0deabe"
-  integrity sha512-l2x885mJ+CW0q2IwIKD1m6ny3tcWY79qOCinveXTZQS7yXCsvOUXHHhWz5/VO/ougMqywMiqcgcR3p7EF0T17g==
+"@douglasneuroinformatics/ui@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/ui/-/ui-0.1.2.tgz#9715ee69bb735a1e87b40538f5486ab166cefc97"
+  integrity sha512-yegs0sgv4GhLRCvZrXItRcw7NnfUit/p2jLfmwLCZDTGv7rxWPy8tGZCTDhIE7q5cG86VBFUBgixuILLIjVZ6Q==
   dependencies:
     "@douglasneuroinformatics/ajv" "*"
     "@douglasneuroinformatics/form-types" "*"
