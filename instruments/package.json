@@ -1,0 +1,13 @@
+{
+  "name": "@ddcp/instruments",
+  "version": "0.0.3",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "./lib/index.ts",
+  "types": "./lib/index.d.ts",
+  "files": ["lib"],
+  "scripts": {
+    "check-types": "tsc",
+    "lint": "eslint --fix lib"
+  }
+}
