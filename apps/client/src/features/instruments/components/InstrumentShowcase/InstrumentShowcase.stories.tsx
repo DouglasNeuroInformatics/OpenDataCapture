@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { FormInstrumentSummary } from '@ddcp/types';
 import type { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 

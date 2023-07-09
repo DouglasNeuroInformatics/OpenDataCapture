@@ -1,4 +1,4 @@
-import { FormInstrument } from '@douglasneuroinformatics/common';
+import { FormInstrument } from '@ddcp/types';
 
 export type Measurements = Array<{
   [key: string]: any;

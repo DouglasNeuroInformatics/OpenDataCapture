@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Fingerprint } from '@douglasneuroinformatics/common';
+import { Fingerprint } from '@ddcp/types';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 export const useFingerprint = () => {

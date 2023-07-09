@@ -1,5 +1,7 @@
-import { AjvFactory } from '@douglasneuroinformatics/common';
+import { AjvFactory } from '@douglasneuroinformatics/ajv';
+import Ajv from 'ajv';
 
-const ajv = AjvFactory.create();
+// Their imports are wrong - see comment in our ajv repo 
+const ajv = AjvFactory.create() as Ajv;
 
 export { ajv };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { FormInstrumentSummary } from '@ddcp/types';
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 

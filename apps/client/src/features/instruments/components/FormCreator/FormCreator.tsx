@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import { BaseFormField, FormInstrument, PrimitiveFieldValue } from '@douglasneuroinformatics/common';
+import { FormInstrument } from '@ddcp/types';
+import { BaseFormField, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 

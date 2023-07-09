@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { AppAction, AppSubject } from '@douglasneuroinformatics/common';
+import { AppAction, AppSubject } from '@ddcp/types';
 import { NavLink } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';

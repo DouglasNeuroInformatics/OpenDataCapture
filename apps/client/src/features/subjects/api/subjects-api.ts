@@ -1,4 +1,4 @@
-import { Subject } from '@douglasneuroinformatics/common';
+import { Subject } from '@ddcp/types';
 import axios from 'axios';
 
 import { IdentificationFormData } from '@/components';

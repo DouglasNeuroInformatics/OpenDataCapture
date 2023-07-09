@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FormInstrumentRecordsSummary, FormInstrumentSummary, Subject, User } from '@douglasneuroinformatics/common';
+import { FormInstrumentRecordsSummary, FormInstrumentSummary, Subject, User } from '@ddcp/types';
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Subject } from '@douglasneuroinformatics/common';
+import { Subject } from '@ddcp/types';
 import { useTranslation } from 'react-i18next';
 
 import { SubjectsTable } from '../components/SubjectsTable';

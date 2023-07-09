@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@douglasneuroinformatics/common';
+import { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@ddcp/types';
 import { useParams } from 'react-router-dom';
 
 import { Measurements, SelectedInstrument, SelectedMeasure } from '../types';

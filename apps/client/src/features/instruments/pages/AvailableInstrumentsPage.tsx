@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FormInstrumentSummary } from '@douglasneuroinformatics/common';
+import { FormInstrumentSummary } from '@ddcp/types';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentShowcase } from '../components/InstrumentShowcase';

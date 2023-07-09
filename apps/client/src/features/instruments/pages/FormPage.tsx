@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { FormInstrumentData } from '@douglasneuroinformatics/common';
+import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';

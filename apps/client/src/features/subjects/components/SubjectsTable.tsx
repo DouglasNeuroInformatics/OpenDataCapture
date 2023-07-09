@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { InstrumentRecordsExport, Subject } from '@douglasneuroinformatics/common';
+import { InstrumentRecordsExport, Subject } from '@ddcp/types';
 import { Dropdown, SearchBar } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import axios from 'axios';

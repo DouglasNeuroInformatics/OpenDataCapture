@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { BaseFormField, FormInstrument, FormInstrumentData } from '@douglasneuroinformatics/common';
+import { FormInstrument } from '@ddcp/types';
+import { BaseFormField, FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { Button } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
