@@ -5,11 +5,7 @@ import { HiBars3 } from 'react-icons/hi2';
 import { Branding } from './Branding';
 import { Navigation } from './Navigation';
 
-export interface NavbarProps {
-  containerRef: React.RefObject<HTMLDivElement>;
-}
-
-export const Navbar = ({ containerRef }: NavbarProps) => {
+export const Navbar = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownHeight, setDropdownHeight] = useState(0);

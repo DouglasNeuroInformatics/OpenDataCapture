@@ -92,7 +92,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
           }
         }
       }}
-      onSubmit={login}
+      onSubmit={(credentials) => void login(credentials)}
     />
   );
 };

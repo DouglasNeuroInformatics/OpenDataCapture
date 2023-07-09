@@ -28,7 +28,7 @@ export const FormIdentification = () => {
 
   return (
     <div>
-      <IdentificationForm fillActiveSubject onSubmit={handleSubmit} />
+      <IdentificationForm fillActiveSubject onSubmit={(data) => void handleSubmit(data)} />
     </div>
   );
 };

@@ -70,7 +70,7 @@ export const FormPage = () => {
             icon: <HiOutlineIdentification />
           },
           {
-            element: <FormQuestions instrument={instrument} onSubmit={handleSubmit} />,
+            element: <FormQuestions instrument={instrument} onSubmit={(data) => void handleSubmit(data)} />,
             label: t('instruments.formPage.questions.label'),
             icon: <HiOutlineQuestionMarkCircle />
           },

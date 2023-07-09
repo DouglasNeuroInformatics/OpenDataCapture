@@ -25,9 +25,9 @@ export const RecordsTable = () => {
       return [];
     }
 
-    const formFields = Array.isArray(selectedInstrument.content)
-      ? selectedInstrument.content.map(({ fields }) => fields)
-      : selectedInstrument.content;
+    // const formFields = Array.isArray(selectedInstrument.content)
+    //   ? selectedInstrument.content.map(({ fields }) => fields)
+    //   : selectedInstrument.content;
 
     const data: Record<string, any>[] = [];
     for (const record of records) {

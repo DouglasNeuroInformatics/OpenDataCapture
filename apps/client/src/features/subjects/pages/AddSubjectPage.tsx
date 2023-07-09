@@ -27,7 +27,7 @@ export const AddSubjectPage = () => {
   return (
     <div className="mx-auto max-w-screen-sm items-center">
       <PageHeader title={t('addSubject.pageTitle')} />
-      <IdentificationForm onSubmit={handleSubmit} />
+      <IdentificationForm onSubmit={(data) => void handleSubmit(data)} />
     </div>
   );
 };

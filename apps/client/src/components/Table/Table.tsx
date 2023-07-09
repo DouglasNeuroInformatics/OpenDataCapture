@@ -36,7 +36,7 @@ export interface TableProps<T> {
 
 export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, entryLinkFactory }: TableProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [entriesPerPage] = useState(10);
   const navigate = useNavigate();
 
   const indexOfLastEntry = currentPage * entriesPerPage;

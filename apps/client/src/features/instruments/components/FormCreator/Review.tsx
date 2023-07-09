@@ -53,7 +53,13 @@ export const Review = ({ form }: ReviewProps) => {
         );
       })}
       <div className="mt-3">
-        <Button className="w-full" disabled={isSubmitted} label="Submit" type="submit" onClick={submitForm} />
+        <Button
+          className="w-full"
+          disabled={isSubmitted}
+          label="Submit"
+          type="submit"
+          onClick={() => void submitForm()}
+        />
       </div>
     </div>
   );

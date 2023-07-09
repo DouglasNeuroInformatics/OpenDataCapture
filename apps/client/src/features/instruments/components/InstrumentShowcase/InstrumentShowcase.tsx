@@ -46,9 +46,9 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
     });
   }, [instruments, searchTerm, selectedLanguages, selectedTags]);
 
-  const [trails, api] = useTrail(
+  const [trails] = useTrail(
     filteredInstruments.length,
-    (index) => ({
+    () => ({
       config: { tension: 280, friction: 60 },
       from: {
         opacity: 0,
