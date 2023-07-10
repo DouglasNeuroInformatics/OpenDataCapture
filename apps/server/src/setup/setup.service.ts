@@ -5,6 +5,7 @@ import { createMongoAbility } from '@casl/ability';
 import { AppAbility } from '@ddcp/types';
 import mongoose from 'mongoose';
 
+import { DemoService } from './demo.service.js';
 import { CreateAdminDto, SetupDto } from './dto/setup.dto.js';
 
 import { UsersService } from '@/users/users.service.js';
@@ -15,6 +16,7 @@ export class SetupService {
 
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
+    private readonly demoService: DemoService,
     private readonly usersService: UsersService
   ) {}
 
@@ -38,6 +40,6 @@ export class SetupService {
   }
 
   private async createAdmin(admin: CreateAdminDto) {
-    return this.usersService.create(admin, this.adminAbility);
+    return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' }, this.adminAbility);
   }
 }

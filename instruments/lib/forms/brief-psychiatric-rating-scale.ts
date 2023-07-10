@@ -22,9 +22,7 @@ const fields = [
   'disorientation'
 ] as const;
 
-export type BriefPsychiatricRatingScaleData = {
-  [K in (typeof fields)[number]]: number;
-};
+export type BriefPsychiatricRatingScaleData = { [K in (typeof fields)[number]]: number };
 
 export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleData> = {
   kind: 'form',
