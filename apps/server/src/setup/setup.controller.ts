@@ -14,9 +14,9 @@ export class SetupController {
   @ApiOperation({
     summary: 'Initialize',
     description: [
-      'Initialize an instance of the application with a default admin user',
+      'Initialize an instance of the application with a default admin user.',
       'Although this route is public, this operation may only be performed when there are no users in the database.'
-    ].join('')
+    ].join(' ')
   })
   @Post()
   @RouteAccess('public')

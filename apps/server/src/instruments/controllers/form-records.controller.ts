@@ -20,14 +20,14 @@ import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 export class FormRecordsController {
   constructor(private readonly formRecordsService: FormRecordsService) {}
 
-  @ApiOperation({ description: 'Create a New Form Record' })
+  @ApiOperation({ description: 'Create a New Form Record', summary: 'Create Form Record' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
   create(@Body() createFormRecordDto: CreateFormRecordDto, @UserAbility() ability: AppAbility): Promise<any> {
     return this.formRecordsService.create(createFormRecordDto, ability);
   }
 
-  @ApiOperation({ description: 'Get Specified Records' })
+  @ApiOperation({ description: 'Get Specified Records', summary: 'Find Records' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   find(
@@ -38,7 +38,7 @@ export class FormRecordsController {
     return this.formRecordsService.find(ability, subjectIdentifier, language);
   }
 
-  @ApiOperation({ description: 'Summarize Available Form Records' })
+  @ApiOperation({ description: 'Summarize all available form records', summary: 'Summarize Records' })
   @Get('summary')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   summary(
@@ -49,7 +49,7 @@ export class FormRecordsController {
     return this.formRecordsService.summary(ability, groupName, instrumentIdentifier);
   }
 
-  @ApiOperation({ description: 'Export Records' })
+  @ApiOperation({ description: 'Export Records', summary: 'Export Records' })
   @Get('export')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   exportRecords(
@@ -59,7 +59,7 @@ export class FormRecordsController {
     return this.formRecordsService.exportRecords(ability, groupName);
   }
 
-  @ApiOperation({ description: 'Compute a Linear Model' })
+  @ApiOperation({ description: 'Compute a Linear Model', summary: 'Linear Model' })
   @Get('linear-regression')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   linearRegression(

@@ -13,7 +13,10 @@ const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 const basePermissionLevels = ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] satisfies BasePermissionLevel[];
 
 export class CreateUserDto implements CreateUserData {
-  @ApiProperty({ description: 'A unique descriptive name associated with this user', example: 'JaneDoeMemoryClinic' })
+  @ApiProperty({
+    description: 'A unique descriptive name associated with this user',
+    example: 'JaneDoeMemoryClinic'
+  })
   @IsString()
   username: string;
 

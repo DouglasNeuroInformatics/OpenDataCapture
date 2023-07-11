@@ -16,35 +16,35 @@ import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
-  @ApiOperation({ description: 'Adds a new group to the database' })
+  @ApiOperation({ description: 'Adds a new group to the database', summary: 'Create Group' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Group' })
   create(@Body() createGroupDto: CreateGroupDto): Promise<GroupEntity> {
     return this.groupsService.create(createGroupDto);
   }
 
-  @ApiOperation({ description: 'Returns all groups in the database' })
+  @ApiOperation({ description: 'Returns all groups in the database', summary: 'Get All Groups' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Group' })
   findAll(@UserAbility() ability: AppAbility): Promise<GroupEntity[]> {
     return this.groupsService.findAll(ability);
   }
 
-  @ApiOperation({ description: 'Returns the group with the provided name' })
+  @ApiOperation({ description: 'Returns the group with the provided name', summary: 'Find Group' })
   @Get(':name')
   @RouteAccess({ action: 'read', subject: 'Group' })
   findByName(@Param('name') name: string, @UserAbility() ability: AppAbility): Promise<GroupEntity> {
     return this.groupsService.findByName(name, ability);
   }
 
-  @ApiOperation({ description: 'Returns the updated group' })
+  @ApiOperation({ description: 'Returns the updated group', summary: 'Update Group' })
   @Patch(':name')
   @RouteAccess({ action: 'update', subject: 'Group' })
   update(@Param('name') name: string, @Body() updateGroupDto: UpdateGroupDto): Promise<GroupEntity> {
     return this.groupsService.update(name, updateGroupDto);
   }
 
-  @ApiOperation({ description: 'Returns the deleted user' })
+  @ApiOperation({ description: 'Returns the deleted user', summary: 'Delete Group' })
   @Delete(':name')
   @RouteAccess({ action: 'delete', subject: 'Group' })
   remove(@Param('name') name: string): Promise<GroupEntity> {

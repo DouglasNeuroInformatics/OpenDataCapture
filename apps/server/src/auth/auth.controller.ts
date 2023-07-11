@@ -14,7 +14,7 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ description: 'Request an access token using credentials' })
+  @ApiOperation({ description: 'Request an access token using credentials', summary: 'Login' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @RouteAccess('public')

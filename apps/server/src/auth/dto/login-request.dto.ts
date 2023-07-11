@@ -3,6 +3,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Fingerprint, LoginRequest } from '@ddcp/types';
 import { IsNotEmptyObject, IsString } from 'class-validator';
 
+class FingerprintDto implements Fingerprint {
+  @ApiProperty({})
+  visitorId: string;
+
+  @ApiProperty()
+  language: string;
+
+  @ApiProperty({ type: [Number] })
+  screenResolution?: [number | null, number | null];
+}
+
 export class LoginRequestDto implements LoginRequest {
   @ApiProperty({ example: 'admin' })
   @IsString()
@@ -12,7 +23,7 @@ export class LoginRequestDto implements LoginRequest {
   @IsString()
   password: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: FingerprintDto })
   @IsNotEmptyObject()
-  fingerprint?: Fingerprint | null;
+  fingerprint?: FingerprintDto | null;
 }
