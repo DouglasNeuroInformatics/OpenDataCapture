@@ -20,12 +20,15 @@ export class SetupService {
     private readonly usersService: UsersService
   ) {}
 
-  async initApp({ admin }: SetupDto) {
+  async initApp({ admin, initDemo }: SetupDto) {
     if (await this.isInitialized()) {
       throw new ForbiddenException();
     }
     await this.connection.dropDatabase();
     await this.createAdmin(admin);
+    if (initDemo) {
+      await this.demoService.init();
+    }
   }
 
   private async isInitialized() {

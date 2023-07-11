@@ -1633,7 +1633,7 @@
     type-fest "^3.12.0"
     zustand "^4.3.8"
 
-"@douglasneuroinformatics/utils@*", "@douglasneuroinformatics/utils@latest":
+"@douglasneuroinformatics/utils@*":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/utils/-/utils-0.4.0.tgz#7d4469bfbf6f711020dac65f7a0b8f82fa54f439"
   integrity sha512-cU4deWfp8CdPXtqrv6ECbBNf25mzuqZHQs5DemGcQPLZEqEy76Fl2HoHBJKC66gtTDiW1DaLRuq6G2Z3lXa3xg==

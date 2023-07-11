@@ -7,7 +7,7 @@ import { AppAbility, FormInstrument } from '@ddcp/types';
 import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
-import { Connection } from 'mongoose';
+import mongoose from 'mongoose';
 
 import { CreateGroupDto } from '@/groups/dto/create-group.dto.js';
 import { GroupsService } from '@/groups/groups.service.js';
@@ -33,7 +33,7 @@ export class DemoService {
   private readonly logger = new Logger(DemoService.name);
 
   constructor(
-    @InjectConnection() private readonly connection: Connection,
+    @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly groupsService: GroupsService,
     private readonly subjectsService: SubjectsService,
     private readonly formsService: FormsService,
@@ -110,10 +110,10 @@ export class DemoService {
             data[fieldName] = faker.datatype.boolean();
             break;
           case 'date':
-            data[fieldName] = faker.datatype.datetime().toISOString();
+            data[fieldName] = faker.date.past({ years: 1 }).toISOString();
             break;
           case 'numeric':
-            data[fieldName] = faker.datatype.number({ min: field.min, max: field.max, precision: 1 });
+            data[fieldName] = faker.number.int({ min: field.min, max: field.max });
             break;
           case 'options':
             data[fieldName] = randomValue(Object.keys(field.options));

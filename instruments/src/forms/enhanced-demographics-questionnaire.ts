@@ -1,14 +1,19 @@
+import path from 'node:path';
+import url from 'node:url';
+
 import { readJSON } from '@douglasneuroinformatics/node-ext';
 
 import { createTranslatedForms } from '../utils/create-translated-forms.js';
 import { type MultilingualOptions, extractKeys, formatOptions } from '../utils/format-options.js';
 
-const employmentStatus = readJSON<MultilingualOptions>('../data/employment-status.json');
-const ethnicOrigin = readJSON<MultilingualOptions>('../data/ethnic-origin.json');
-const firstLanguage = readJSON<MultilingualOptions>('../data/first-language.json');
-const gender = readJSON<MultilingualOptions>('../data/gender.json');
-const maritalStatus = readJSON<MultilingualOptions>('../data/marital-status.json');
-const religion = readJSON<MultilingualOptions>('../data/religion.json');
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+
+const employmentStatus = readJSON<MultilingualOptions>(path.resolve(__dirname, '../data/employment-status.json'));
+const ethnicOrigin = readJSON<MultilingualOptions>(path.resolve(__dirname, '../data/ethnic-origin.json'));
+const firstLanguage = readJSON<MultilingualOptions>(path.resolve(__dirname, '../data/first-language.json'));
+const gender = readJSON<MultilingualOptions>(path.resolve(__dirname, '../data/gender.json'));
+const maritalStatus = readJSON<MultilingualOptions>(path.resolve(__dirname, '../data/marital-status.json'));
+const religion = readJSON<MultilingualOptions>(path.resolve(__dirname, '../data/religion.json'));
 
 type EmploymentStatus = keyof typeof employmentStatus;
 type EthnicOrigin = keyof typeof ethnicOrigin;

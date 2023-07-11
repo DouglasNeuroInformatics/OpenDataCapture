@@ -3,13 +3,14 @@
   "version": "0.0.3",
   "license": "AGPL-3.0",
   "type": "module",
-  "main": "./lib/index.ts",
-  "types": "./lib/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "lib"
+    "dist"
   ],
   "scripts": {
-    "check-types": "tsc",
+    "build": "tsc",
+    "check-types": "tsc --noEmit",
     "lint": "eslint --fix lib"
   },
   "dependencies": {
