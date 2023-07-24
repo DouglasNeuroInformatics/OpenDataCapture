@@ -14,5 +14,9 @@
    "unemployed": {
     "en": "Unemployed",
     "fr": "Au chômage "
+   },
+   "retired": {
+      "en": "Retired",
+      "fr": "Retraité"
    }
 }
