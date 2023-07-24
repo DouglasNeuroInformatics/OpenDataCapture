@@ -1585,10 +1585,10 @@
     ajv-errors "^3.0.0"
     ajv-formats "^2.1.1"
 
-"@douglasneuroinformatics/eslint-config@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/eslint-config/-/eslint-config-0.1.3.tgz#13dec83dbb2489c0f85476f7d53baad86cfec2b6"
-  integrity sha512-/rWt/BCJM9dDpokqE1Oii1PrxEm2eQer2CIECfegMw+nZpzrdUtRFUrCrLd0/CpajULPEUvz2px0NvzOe8fa4g==
+"@douglasneuroinformatics/eslint-config@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@douglasneuroinformatics/eslint-config/-/eslint-config-0.1.5.tgz#e213f30eb42291d0aab9c8fe7f78262242808856"
+  integrity sha512-i2Eg1CzBpT8jqEkbvfHTbVpTxJ5jJaeMKYLIaAWGWKdjRDSPdPvKMegCBltTGrhM76icwa+WekPaCPbbZMPcNg==
   dependencies:
     eslint-config-prettier "^8.8.0"
     eslint-import-resolver-typescript "^3.5.5"
