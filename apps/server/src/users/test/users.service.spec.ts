@@ -3,7 +3,6 @@ import { beforeEach, describe, it } from 'node:test';
 
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { UsersRepository } from '../users.repository.js';
 import { UsersService } from '../users.service.js';
 
 import { createMock } from '@/core/testing/create-mock.js';
@@ -17,10 +16,6 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        {
-          provide: UsersRepository,
-          useValue: createMock(UsersRepository)
-        },
         {
           provide: GroupsService,
           useValue: createMock(GroupsService)
@@ -36,6 +31,6 @@ describe('UsersService', () => {
   });
 
   it('should be defined', () => {
-    assert(usersService)
+    assert(usersService);
   });
 });
