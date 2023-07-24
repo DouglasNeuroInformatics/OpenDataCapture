@@ -28,7 +28,7 @@ async function bootstrap() {
 
   app.useStaticAssets(path.resolve(__dirname, '..', 'public'));
   setupDocs(app);
-  
+
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('SERVER_PORT');
 

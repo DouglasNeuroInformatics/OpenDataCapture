@@ -1,5 +1,5 @@
 {
-  "name": "@ddcp/client",
+  "name": "@ddcp/web",
   "version": "0.0.1",
   "type": "module",
   "private": true,

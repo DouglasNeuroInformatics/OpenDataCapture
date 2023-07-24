@@ -29,6 +29,6 @@ describe('AuthController', () => {
   });
 
   it('should be defined', () => {
-    assert(authController)
+    assert(authController);
   });
 });
