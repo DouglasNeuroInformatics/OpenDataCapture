@@ -3,7 +3,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { UserEntity, UserSchema } from './entities/user.entity.js';
 import { UsersController } from './users.controller.js';
-import { UsersRepository } from './users.repository.js';
 import { UsersService } from './users.service.js';
 
 import { AbilityModule } from '@/ability/ability.module.js';
@@ -23,7 +22,7 @@ import { GroupsModule } from '@/groups/groups.module.js';
     AbilityModule
   ],
   controllers: [UsersController],
-  providers: [UsersRepository, UsersService],
+  providers: [UsersService],
   exports: [UsersService]
 })
 export class UsersModule {}

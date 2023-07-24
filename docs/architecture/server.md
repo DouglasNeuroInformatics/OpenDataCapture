@@ -89,7 +89,7 @@ for administrators.
 
 ## Database
 
-The database is accessed using Mongoose, an Object Data Modeling (ODM) library for MongoDB. This is implemented via repository classes, which inherit from the abstract `EntityRepository` class. This allows us to define the generic type parameters of the repository and obtain type safety. This pattern allows for a separation of concerns and encapsulation of database logic, making the application more maintainable and testable.
+The database is accessed using Mongoose, an Object Data Modeling (ODM) library for MongoDB. 
 
 Database schemas are defined using strict mode, which means that any properties not defined in the schema will not be allowed to be saved in the database. This helps to ensure that the data in the database is consistent and in the expected format.
 

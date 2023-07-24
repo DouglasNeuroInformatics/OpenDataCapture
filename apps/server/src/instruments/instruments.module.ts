@@ -10,8 +10,6 @@ import { FormInstrumentRecordSchema } from './entities/form-instrument-record.en
 import { FormInstrumentSchema } from './entities/form-instrument.entity.js';
 import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity.js';
 import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity.js';
-import { InstrumentRecordsRepository } from './repositories/instrument-records.repository.js';
-import { InstrumentsRepository } from './repositories/instruments.repository.js';
 import { FormRecordsService } from './services/form-records.service.js';
 import { FormsService } from './services/forms.service.js';
 
@@ -55,7 +53,7 @@ interface InstrumentDiscriminator {
     SubjectsModule
   ],
   controllers: [FormsController, FormRecordsController],
-  providers: [InstrumentsRepository, InstrumentRecordsRepository, FormsService, FormRecordsService],
+  providers: [FormsService, FormRecordsService],
   exports: [FormsService, FormRecordsService]
 })
 export class InstrumentsModule {}
