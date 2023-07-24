@@ -398,5 +398,9 @@
   "caribbeanOrigins": {
     "en": "Caribbean origins, n.i.e.",
     "fr": "Origines des Caraïbes, n.i.a."
+  },
+  "mixed": {
+    "en" : "Mixed origin",
+    "fr" : "Origine mixte"
   }
 }

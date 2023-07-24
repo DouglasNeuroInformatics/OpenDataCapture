@@ -34,5 +34,9 @@
   "none": {
     "en": "No religion and secular perspectives",
     "fr": "Aucune religion et perspectives séculières"
+  },
+  "agnostic": {
+    "en": "Agnostic", 
+    "fr": "Agnostique"
   }
 }

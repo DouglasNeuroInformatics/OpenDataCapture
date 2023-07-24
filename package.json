@@ -20,7 +20,7 @@
     "prepare": "husky install",
     "storybook": "yarn ws client storybook",
     "test": "env-cmd turbo run test",
-    "ws": "sh -c 'yarn workspace \"@ddcp/$0\" \"${@:1}\"'"
+    "ws": "bash -c 'yarn workspace \"@ddcp/$0\" \"${@:1}\"'"
   },
   "dependencies": {
     "@douglasneuroinformatics/ajv": "^0.0.4",
