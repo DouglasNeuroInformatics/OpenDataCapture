@@ -70,13 +70,13 @@ cat .env.template <(openssl rand -hex 16) > .env
 
 | Key                   `   | Description                                     |
 | ------------------------- | ----------------------------------------------- |
+| WEB_SERVER_PORT      			| The port to use for the Vite development server |
 | VITE_API_HOST             | The domain name of the host that serves the API |
-| VITE_DEV_SERVER_PORT      | The port to use for the Vite development server |
 | VITE_DEV_USERNAME         | The username to use if VITE_DEV_BYPASS_AUTH is set to true |
 | VITE_DEV_PASSWORD         | The password to use if VITE_DEV_BYPASS_AUTH is set to true |
 | VITE_DEV_BYPASS_AUTH      | If true and NODE_ENV is development, then login is automated |
 | MONGO_URI                 | MongoDB URI not including database name |
-| SERVER_PORT               | The port to use for the Nest development server |
+| API_SERVER_PORT           | The port to use for the Nest development server |
 | SECRET_KEY                | The value to use for various security purposes. |
 
 ## Run Dev Server

@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), viteCompression()],
     server: {
-      port: process.env.VITE_DEV_SERVER_PORT
+      port: process.env.WEB_SERVER_PORT
     },
     resolve: {
       alias: {

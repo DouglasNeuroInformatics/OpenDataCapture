@@ -26,4 +26,4 @@
 * [Server](architecture/server.md)
 
 - **Deployment**
-
+* [Quick Start](deployment/quick-start.md)
