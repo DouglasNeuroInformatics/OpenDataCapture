@@ -6,7 +6,7 @@ RUN apk add --no-cache libc6-compat
 RUN apk update
 WORKDIR /app
 COPY . .
-RUN npx turbo prune --scope=@ddcp/web --docker
+RUN npx turbo prune --scope=@ddcp/api --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
@@ -19,17 +19,17 @@ COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN yarn install --frozen-lockfile
 
 # BUILD THE PROJECT
-ARG VITE_API_HOST
-ARG VITE_DOCS_URL
-ARG VITE_LICENSE_URL
-ARG VITE_GITHUB_REPO_URL
-ARG VITE_CONTACT_EMAIL
 COPY --from=builder /app/out/full/ .
 COPY tsconfig.base.json tsconfig.base.json
 COPY turbo.json turbo.json
-RUN npx turbo run build --filter=@ddcp/web
+RUN npx turbo run build --filter=@ddcp/api
 
 # RUN PRODUCTION IMAGE
-FROM base as runner
-COPY --from=installer /app/web/dist/ /app
-CMD npx http-server -p ${WEB_SERVER_PORT} /app
+FROM base AS runner
+WORKDIR /app
+RUN addgroup --system --gid 1001 nestjs
+RUN adduser --system --uid 1001 nestjs
+USER nestjs
+COPY --from=installer /app .
+
+CMD ["node", "./api/dist/main.js"]
