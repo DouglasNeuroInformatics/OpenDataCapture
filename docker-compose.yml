@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: ./web/Dockerfile
       args:
-        - VITE_API_HOST=https://datacapture.douglasneuroinformatics.ca/api
+        - VITE_API_HOST
         - VITE_DOCS_URL
         - VITE_LICENSE_URL
         - VITE_GITHUB_REPO_URL

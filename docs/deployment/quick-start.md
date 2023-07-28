@@ -12,7 +12,7 @@ All intended configuration is handled via environment variables, which should be
 cat .env.template <(openssl rand -hex 16) > .env
 ```
 
-The environment variable `VITE_API_HOST` is set to `http://localhost:5500` by default. For production, we have set this as a build argument in `docker-compose.yml`, rather than using this value. If you are not associated with the DNP, you will need to modify this to point to your own URL.
+The environment variable `VITE_API_HOST` is set to `http://localhost:5500` by default. If you are evaluating the platform on your local system, you can leave this unchanged. In a production environment, you will need to set this to your own domain in `.env`. For example, in our production setup this should be set to: https://datacapture.douglasneuroinformatics.ca/api.
 
 ## Setup
 
