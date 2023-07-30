@@ -1,5 +1,16 @@
 version: '3'
 services:
+  caddy:
+    image: caddy:2.7
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - HOSTNAME
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - static:/srv
   api:
     build:
       context: .
@@ -16,6 +27,12 @@ services:
     ports:
       - '${API_SERVER_PORT}:${API_SERVER_PORT}'
     restart: always
+  api-docs:
+    image: redocly/redoc
+    environment:
+      - SPEC_URL=https://$HOSTNAME/api/spec.json"
+    ports:
+      - "8080:80"
   web:
     build:
       context: .
@@ -26,16 +43,14 @@ services:
         - VITE_LICENSE_URL
         - VITE_GITHUB_REPO_URL
         - VITE_CONTACT_EMAIL
-    environment:
-      - NODE_ENV=production
-      - WEB_SERVER_PORT
-    expose:
-      - '${WEB_SERVER_PORT}'
-    ports:
-      - '${WEB_SERVER_PORT}:${WEB_SERVER_PORT}'
+    tty: true
+    volumes:
+      - static:/app
     restart: always
   mongo:
     container_name: mongo
     image: mongo:6.0.2
     expose:
       - 27017
+volumes:
+  static:
