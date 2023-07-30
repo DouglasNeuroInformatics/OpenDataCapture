@@ -29,7 +29,7 @@ COPY tsconfig.base.json tsconfig.base.json
 COPY turbo.json turbo.json
 RUN npx turbo run build --filter=@ddcp/web
 
-# RUN PRODUCTION IMAGE
-FROM base as runner
+# MOUNT STATIC CODE
+FROM alpine:3.18.2 as mounter
 COPY --from=installer /app/web/dist/ /app
-CMD npx http-server -p ${WEB_SERVER_PORT} /app
+CMD ["/bin/sh"]

@@ -1,0 +1,14 @@
+{$HOSTNAME} {
+	encode gzip
+	redir /api /api/
+
+	handle_path /api/* {
+		reverse_proxy api
+	}
+	
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
