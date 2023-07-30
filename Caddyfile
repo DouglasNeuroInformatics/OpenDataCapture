@@ -1,9 +1,9 @@
 {$HOSTNAME} {
 	encode gzip
-	rewrite /api /api/
+	redir /api /api/
 
 	handle_path /api/* {
-		reverse_proxy api:5500
+		reverse_proxy api
 	}
 	
 	handle {
