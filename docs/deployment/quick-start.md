@@ -1,8 +1,19 @@
 # Quick Start
 
+
 ## Prerequisites
 
-The easiest way to deploy the platform is with Docker. These instructions assume that you have already installed Docker on your server. For more information, please refer to the [official documentation](https://docs.docker.com/).
+This guide pertains to deployment on a Linux-based server. Please ensure that you have SSH access to a server as root before continuing. If you do not have your own server, you can provision a free virtual machine with most of the large cloud providers (e.g., Amazon Web Services, Microsoft Azure, Google Cloud). Regardless of the platform you use, please ensure that port 80 and 443 are accessible. These instructions also assume that you have already installed Docker on your server. For more information, please refer to the [official documentation](https://docs.docker.com/).
+
+## Basic Architecture
+
+The application consists of a stack of several interrelated services:
+- A static website
+- A REST API
+- A MongoDB database
+- A Caddy web server
+
+These services are communicate through internal networks and/or volumes defined in `docker-compose.yaml`. The entry point to the stack is the Caddy web server, which exposes the standard HTTP and HTTPS ports to the host machine (80 and 443). Requests to API endpoints (`/api/*`) are proxied to the `api` container, while for all other requests Caddy serves the static files mounted by the `web` container.
 
 ## Configuration
 
