@@ -2,13 +2,13 @@
 
 ## Environment Variables
 
-All intended configuration is handled via environment variables, which should be placed in `.env`. The template file `.env.template` contains some default values as well as descriptions of each variable.
+All intended configuration is handled via environment variables, which should be placed in `.env`. You can create an `.env` file from our template with the following command:
 
 ```shell
-cp .env.template .env
+awk -v secret_key="$(openssl rand -hex 16)" '/^SECRET_KEY=/{print $0 secret_key;next}1' .env.template > .env
 ```
 
-Your configuration may vary depending on your exact setup. In general, you will want to set `SITE_ADDRESS` to your own domain name and generate a secure value for `SECRET_KEY`.
+For the rest of the variables, please refer to the descriptions in the newly created `.env` file.
 
 ## Build
 

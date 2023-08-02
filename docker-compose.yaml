@@ -10,7 +10,6 @@ services:
       - SITE_ADDRESS
     volumes:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile
-      - static:/srv
   api:
     build:
       context: .
@@ -23,7 +22,6 @@ services:
       - SECRET_KEY
     expose:
       - 80
-    restart: always
   web:
     build:
       context: .
@@ -33,14 +31,10 @@ services:
         - VITE_LICENSE_URL
         - VITE_GITHUB_REPO_URL
         - VITE_CONTACT_EMAIL
-    tty: true
-    volumes:
-      - static:/app
-    restart: always
+    expose:
+      - 80
   mongo:
     container_name: mongo
     image: mongo:6.0.2
     expose:
       - 27017
-volumes:
-  static:

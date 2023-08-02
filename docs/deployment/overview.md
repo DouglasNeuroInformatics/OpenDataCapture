@@ -1,9 +1,9 @@
 # Overview
 
-The application consists of a stack of several interrelated services:
+The application consists of four interconnected services:
 - A static website
 - A REST API
 - A MongoDB database
 - A Caddy web server
 
-These services are communicate through internal networks and/or volumes defined in `docker-compose.yaml`. The entry point to the stack is the Caddy web server, which exposes the standard HTTP and HTTPS ports to the host machine (80 and 443). Requests to API endpoints (`/api/*`) are proxied to the `api` container, while for all other requests Caddy serves the static files mounted by the `web` container.
+These services communicate via internal networks defined in `docker-compose.yaml`. The Caddy web server acts as the entry point, exposing HTTP (port 80) and HTTPS (port 443) to the host machine. API requests (/api/*) are forwarded to the api container, while other requests are proxied to the web container. The web container serves built static files, if available, or the single-page app otherwise.
