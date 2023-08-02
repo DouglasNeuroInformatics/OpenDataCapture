@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "lint": "eslint --fix src",
     "start": "node ./dist/main.js",
-    "test": "find src -type f -name \"*.spec.ts\" | node --loader @swc-node/register/esm --test"
+    "test": "find src -type f -name \"*.spec.ts\" | node --loader @swc-node/register/esm --no-warnings --test"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",

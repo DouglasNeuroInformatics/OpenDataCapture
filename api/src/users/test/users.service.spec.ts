@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
+import { randomBytes } from 'node:crypto';
 import { beforeEach, describe, it } from 'node:test';
 
+import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { UserEntity } from '../entities/user.entity.js';
 import { UsersService } from '../users.service.js';
 
 import { createMock } from '@/core/testing/create-mock.js';
@@ -17,12 +20,18 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         {
-          provide: GroupsService,
-          useValue: createMock(GroupsService)
+          provide: CryptoService,
+          useValue: createMock<CryptoService>({
+            hashPassword: (source) => Promise.resolve(randomBytes(source.length).toString('ascii'))
+          })
         },
         {
-          provide: CryptoService,
-          useValue: createMock(CryptoService)
+          provide: GroupsService,
+          useValue: createMock<GroupsService>()
+        },
+        {
+          provide: getModelToken(UserEntity.modelName),
+          useValue: {}
         }
       ]
     }).compile();

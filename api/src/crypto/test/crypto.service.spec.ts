@@ -17,7 +17,7 @@ describe('CryptoService', () => {
         CryptoService,
         {
           provide: ConfigService,
-          useValue: createMock(ConfigService, {
+          useValue: createMock<ConfigService>({
             getOrThrow: (propertyPath: string) => propertyPath
           })
         }
