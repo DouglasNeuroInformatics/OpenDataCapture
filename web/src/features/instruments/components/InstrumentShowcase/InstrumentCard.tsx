@@ -19,7 +19,7 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
 
   return (
     <div
-      className="relative transition-all duration-300 ease-in-out hover:scale-[101] hover:cursor-pointer hover:shadow-2xl"
+      className="relative transition-all duration-300 ease-in-out hover:scale-[101] hover:cursor-pointer hover:shadow-lg"
       role="button"
       tabIndex={0}
       onClick={handleClick}
