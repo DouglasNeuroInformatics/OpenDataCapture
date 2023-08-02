@@ -19,7 +19,6 @@ COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN yarn install --frozen-lockfile
 
 # BUILD THE PROJECT
-ARG VITE_API_HOST
 ARG VITE_DOCS_URL
 ARG VITE_LICENSE_URL
 ARG VITE_GITHUB_REPO_URL

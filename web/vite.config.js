@@ -1,3 +1,5 @@
+// @ts-check
+
 import cp from 'child_process';
 import path from 'path';
 import url from 'url';
@@ -23,7 +25,16 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), viteCompression()],
     server: {
-      port: process.env.WEB_SERVER_PORT
+      port: parseInt(process.env.WEB_DEV_SERVER_PORT ?? '3000'),
+      proxy: {
+        '/api/': {
+          target: {
+            host: 'localhost',
+            port: parseInt(process.env.API_DEV_SERVER_PORT ?? '5500')
+          },
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }
+      }
     },
     resolve: {
       alias: {

@@ -3,7 +3,7 @@ import axios, { AxiosError } from 'axios';
 
 import { useAuthStore } from '@/stores/auth-store';
 
-axios.defaults.baseURL = import.meta.env.VITE_API_HOST;
+axios.defaults.baseURL = '/api';
 
 axios.interceptors.request.use((config) => {
   const auth = useAuthStore.getState();

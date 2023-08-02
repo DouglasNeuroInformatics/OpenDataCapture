@@ -30,7 +30,9 @@ async function bootstrap() {
   setupDocs(app);
 
   const configService = app.get(ConfigService);
-  const port = configService.getOrThrow<number>('API_SERVER_PORT');
+
+  const isProduction = configService.get<string>('NODE_ENV') === 'production';
+  const port = isProduction ? 80 : parseInt(configService.getOrThrow('API_DEV_SERVER_PORT'));
 
   await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);

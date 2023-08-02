@@ -1,4 +1,4 @@
-{$HOSTNAME} {
+{$SITE_ADDRESS} {
 	encode gzip
 	redir /api /api/
 

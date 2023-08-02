@@ -5,8 +5,6 @@ import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 
 import { useAuthStore } from '@/stores/auth-store';
 
-const baseURL = import.meta.env.VITE_API_HOST;
-
 export type UseFetchOptions = {
   /** The required ability to fetch the resource. If undefined, it is assumed the user has the required permissions. If the user does not have the provided ability, data will be set to `null` */
   access?: {
@@ -44,6 +42,8 @@ export function useFetch<T = unknown>(
 
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const baseURL = `${window.location.origin}/api`;
 
   const url = useMemo(() => {
     const url = new URL(baseURL + resourceURL);
