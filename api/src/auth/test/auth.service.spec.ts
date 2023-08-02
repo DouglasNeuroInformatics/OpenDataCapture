@@ -5,6 +5,9 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { defineAbility } from '@casl/ability';
+import { AppAbility } from '@ddcp/types';
+
 import { AuthService } from '../auth.service.js';
 
 import { AbilityFactory } from '@/ability/ability.factory.js';
@@ -21,23 +24,35 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: AbilityFactory,
-          useValue: createMock(AbilityFactory)
+          useValue: createMock<AbilityFactory>({
+            createForUser: () => {
+              return defineAbility<AppAbility>((can) => {
+                can('manage', 'all');
+              });
+            }
+          })
         },
         {
           provide: ConfigService,
-          useValue: createMock(ConfigService)
+          useValue: createMock<ConfigService>({
+            getOrThrow: (propertyPath: string) => propertyPath
+          })
         },
         {
           provide: CryptoService,
-          useValue: createMock(CryptoService)
+          useValue: createMock<CryptoService>({
+            comparePassword: () => Promise.resolve(true)
+          })
         },
         {
           provide: JwtService,
-          useValue: createMock(JwtService)
+          useValue: createMock<JwtService>({
+            signAsync: () => Promise.resolve('mock-jwt')
+          })
         },
         {
           provide: UsersService,
-          useValue: createMock(UsersService)
+          useValue: createMock<UsersService>()
         }
       ]
     }).compile();

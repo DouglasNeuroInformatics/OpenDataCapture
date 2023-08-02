@@ -5,13 +5,14 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "swc --copy-files --delete-dir-on-start --out-dir dist src",
+    "build": "yarn check-types && swc --copy-files --delete-dir-on-start --out-dir dist src",
     "check-types": "tsc",
     "dev": "NODE_ENV=development concurrently \"swc --copy-files --out-dir dist -w src\" \"nodemon -L dist/main.js\"",
     "format": "prettier --write .",
     "lint": "eslint --fix src",
     "start": "node ./dist/main.js",
-    "test": "find ./src -name '*.spec.ts' -exec node --loader @swc-node/register/esm --test {} \\;"
+    "test": "node --loader @swc-node/register/esm --no-warnings --test $(find src -type f -name \"*.spec.ts\")",
+    "test:coverage": "c8 yarn test"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",

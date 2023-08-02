@@ -1,5 +1,4 @@
-{$HOSTNAME} {
-	encode gzip
+{$SITE_ADDRESS} {
 	redir /api /api/
 
 	handle_path /api/* {
@@ -7,8 +6,6 @@
 	}
 	
 	handle {
-		root * /srv
-		try_files {path} /index.html
-		file_server
+		reverse_proxy web
 	}
 }

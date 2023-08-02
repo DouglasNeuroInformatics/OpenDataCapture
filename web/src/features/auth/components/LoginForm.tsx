@@ -38,7 +38,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   };
 
   useEffect(() => {
-    if (import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH) {
+    if (import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true') {
       void login({
         username: import.meta.env.VITE_DEV_USERNAME!,
         password: import.meta.env.VITE_DEV_PASSWORD!

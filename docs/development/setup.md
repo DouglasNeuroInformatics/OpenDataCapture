@@ -58,27 +58,17 @@ yarn install
 
 All environment variables are are set in a `.env` file, located in the root directory. For convenience, we provide a template with prefilled values that should work for most users. You can use this to create a fully functional `.env` file with the following command:
 
-> **Note:** If you are running MongoDB on a remote server, or locally on a non-default port, you will need to adjust the connection URL accordingly.
-
-### Quick Start
-
 ```shell
 cat .env.template <(openssl rand -hex 16) > .env
 ```
 
-### Legend
+> **Note:** If you are running MongoDB on a remote server, or locally on a non-default port, you will need to adjust the connection URL accordingly. For more information on the various options available, please refer to the comments in `.env.template`.
 
-| Key                   `   | Description                                     |
-| ------------------------- | ----------------------------------------------- |
-| WEB_SERVER_PORT      			| The port to use for the Vite development server |
-| VITE_API_HOST             | The domain name of the host that serves the API |
-| VITE_DEV_USERNAME         | The username to use if VITE_DEV_BYPASS_AUTH is set to true |
-| VITE_DEV_PASSWORD         | The password to use if VITE_DEV_BYPASS_AUTH is set to true |
-| VITE_DEV_BYPASS_AUTH      | If true and NODE_ENV is development, then login is automated |
-| MONGO_URI                 | MongoDB URI not including database name |
-| API_SERVER_PORT           | The port to use for the Nest development server |
-| SECRET_KEY                | The value to use for various security purposes. |
+Before continuing, ensure that you have sourced these newly defined environment variables:
 
+```shell
+source .env
+```
 ## Run Dev Server
 
 Now, you should be able to start the development server, which is configured with hot module replacement. 
@@ -108,6 +98,6 @@ curl --request POST \
 }'
 ```
 
-If everything worked correctly, you should now be able to login with your username and password. For more information on the API, you can access the (incomplete) documentation on `locahost:5500`.
+If everything worked correctly, you should now be able to login with your username and password. For more information on the API, you can access the (incomplete) documentation on `locahost:5500` or `localhost:3000/api/`.
 
 > **Note:** Although you may now perform additional administrative actions through the API, the `/v1/setup` will no longer work, as it requires an empty database. Therefore, you should always ensure you have at least one admin user. 

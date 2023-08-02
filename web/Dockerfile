@@ -19,7 +19,6 @@ COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN yarn install --frozen-lockfile
 
 # BUILD THE PROJECT
-ARG VITE_API_HOST
 ARG VITE_DOCS_URL
 ARG VITE_LICENSE_URL
 ARG VITE_GITHUB_REPO_URL
@@ -30,6 +29,8 @@ COPY turbo.json turbo.json
 RUN npx turbo run build --filter=@ddcp/web
 
 # MOUNT STATIC CODE
-FROM alpine:3.18.2 as mounter
-COPY --from=installer /app/web/dist/ /app
-CMD ["/bin/sh"]
+FROM caddy:2.7 as runner
+WORKDIR /app
+COPY web/Caddyfile /etc/caddy/Caddyfile
+COPY --from=installer /app/web/dist/ .
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]

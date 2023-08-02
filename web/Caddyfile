@@ -1,0 +1,6 @@
+:80 {
+	root * /app
+	encode gzip
+	try_files {path} /index.html
+	file_server
+}

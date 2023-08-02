@@ -1,24 +1,3 @@
-import { mock } from 'node:test';
-
-/**
- *
- * @param constructor - The ES6 class to mock
- * @param methods - An object with the properties/methods to implement
- * @returns The implemented methods with other methods implemented as
- */
-export function createMock<T>(constructor: new (...args: any[]) => T, methods: Partial<T> = {}): Partial<T> {
-  return new Proxy(methods, {
-    get(target, property: Extract<keyof T, string>) {
-      if (property in target) {
-        return target[property];
-      } else if (property in constructor.prototype) {
-        const value = (constructor.prototype as Record<string, unknown>)[property];
-        if (typeof value === 'function') {
-          return mock.fn(value);
-        }
-        throw new Error(`Default value not defined for non-function property: ${property}`);
-      }
-      throw new Error(`Unexpected property: ${property}`);
-    }
-  });
+export function createMock<T extends object>(methods: Partial<T> = {}) {
+  return methods;
 }

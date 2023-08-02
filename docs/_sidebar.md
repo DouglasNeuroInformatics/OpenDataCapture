@@ -26,4 +26,7 @@
 * [Server](architecture/server.md)
 
 - **Deployment**
-* [Quick Start](deployment/quick-start.md)
+* [Prerequisites](deployment/prerequisites.md)
+* [Overview](deployment/overview.md)
+* [Configuration](deployment/configuration.md)
+* [Setup](deployment/setup.md)
