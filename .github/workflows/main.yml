@@ -13,8 +13,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
+      SITE_ADDRESS: localhost:3000
+      SECRET_KEY: secret-key
       MONGO_URI: mongodb://mongo:27017
-      SECRET_KEY: test123
+      VITE_CONTACT_EMAIL: postmaster@example.org
+      VITE_DOCS_URL: https://google.com
+      VITE_GITHUB_REPO_URL: https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform
+      VITE_LICENSE_URL: https://www.gnu.org/licenses/agpl-3.0.en.html
+      API_DEV_SERVER_PORT: 5500
+      WEB_DEV_SERVER_PORT: 3000
     services:
       mongo:
         image: mongo:6.0.2
