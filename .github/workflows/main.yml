@@ -36,3 +36,11 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn turbo run lint
       - run: yarn turbo run test
+      - name: Create coverage reports
+        run: yarn ws api test:coverage
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: ./api/coverage/coverage-final.json
