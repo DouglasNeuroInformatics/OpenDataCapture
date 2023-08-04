@@ -29,7 +29,7 @@ COPY turbo.json turbo.json
 RUN npx turbo run build --filter=@ddcp/web
 
 # MOUNT STATIC CODE
-FROM caddy:2.7 as runner
+FROM caddy:2.7-alpine as runner
 WORKDIR /app
 COPY web/Caddyfile /etc/caddy/Caddyfile
 COPY --from=installer /app/web/dist/ .
