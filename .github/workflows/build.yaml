@@ -23,8 +23,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            douglasneuroinformatics/data-capture-api:latest
-            douglasneuroinformatics/data-capture-web:latest
+            douglasneuroinformatics/data-capture-api
+            douglasneuroinformatics/data-capture-web
       - name: Build and push Docker images
         uses: docker/build-push-action@v4
         with:
