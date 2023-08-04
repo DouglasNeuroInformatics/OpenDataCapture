@@ -24,9 +24,9 @@
 <!-- PROJECT SHIELDS -->
 <div align="center">
 
-  ![license][license-shield]
-  ![version][version-shield]
-  ![tests][tests-shield]
+  ![license](https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform)
+  ![version](https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/DouglasDataCapturePlatform)
+  ![build](https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/actions/workflows/build.yaml/badge.svg)
   [![codecov](https://codecov.io/gh/DouglasNeuroInformatics/DouglasDataCapturePlatform/branch/main/graph/badge.svg?token=XHC7BY6PJ1)](https://codecov.io/gh/DouglasNeuroInformatics/DouglasDataCapturePlatform)
 </div>
 <hr />
@@ -66,9 +66,3 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
-<!-- MARKDOWN LINKS & IMAGES -->
-[license-shield]: https://img.shields.io/github/license/DouglasNeuroInformatics/DouglasDataCapturePlatform
-[version-shield]: https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/DouglasDataCapturePlatform
-[codecov-shield]: https://codecov.io/gh/DouglasNeuroInformatics/DouglasDataCapturePlatform/branch/main/graph/badge.svg?token=XHC7BY6PJ1
-[tests-shield]: https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform/actions/workflows/main.yml/badge.svg
