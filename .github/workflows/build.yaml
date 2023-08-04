@@ -13,9 +13,9 @@ jobs:
       matrix:
         include:
           - dockerfile: ./api/Dockerfile
-            image: ghcr.io/douglasneuroinformatics/data-capture-api
+            image: ghcr.io/douglasneuroinformatics/data-capture-api:latest
           - dockerfile: ./web/Dockerfile
-            image: ghcr.io/douglasneuroinformatics/data-capture-web
+            image: ghcr.io/douglasneuroinformatics/data-capture-web:latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
