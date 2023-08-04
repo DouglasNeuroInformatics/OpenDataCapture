@@ -2,7 +2,7 @@ version: '3'
 name: data-capture
 services:
   caddy:
-    image: caddy:2.7
+    image: caddy:2.7-alpine
     restart: unless-stopped
     ports:
       - "80:80"

@@ -12,18 +12,6 @@ Once you have installed Node, verify that the correct version is in your path:
 node --version
 ```
 
-We use Yarn as our package manager, which is included in recent versions of Node, but not activated by default. To activate Yarn, run the following command in the shell:
-
-```shell
-corepack enable
-```
-
-Before proceeding, please verify that the correct version of Yarn (v1x) is in your path:
-
-```shell
-yarn --version
-```
-
 ### MongoDB
 
 Next, you will need to connect the application to a database. There are several ways you can do this, including:
@@ -51,7 +39,7 @@ Then, install the required dependencies from the root of the repository:
 
 ```shell
 cd DouglasDataCapturePlatform
-yarn install
+npm install
 ```
 
 ## Environment Variables
@@ -59,7 +47,7 @@ yarn install
 All environment variables are are set in a `.env` file, located in the root directory. For convenience, we provide a template with prefilled values that should work for most users. You can use this to create a fully functional `.env` file with the following command:
 
 ```shell
-cat .env.template <(openssl rand -hex 16) > .env
+awk -v secret_key="$(openssl rand -hex 16)" '/^SECRET_KEY=/{print $0 secret_key;next}1' .env.template > .env
 ```
 
 > **Note:** If you are running MongoDB on a remote server, or locally on a non-default port, you will need to adjust the connection URL accordingly. For more information on the various options available, please refer to the comments in `.env.template`.
@@ -74,7 +62,7 @@ source .env
 Now, you should be able to start the development server, which is configured with hot module replacement. 
 
 ```shell
-yarn dev
+npm run dev
 ```
 
 Next, open your browser and navigate to `localhost:3000`, where you should be greeted with a login prompt. 

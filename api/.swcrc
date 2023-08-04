@@ -1,8 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/swcrc",
-  "env": {
-    "exclude": ["*.spec.ts"]
-  },
   "jsc": {
     "baseUrl": "src",
     "keepClassNames": true,
