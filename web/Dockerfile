@@ -1,17 +1,21 @@
 FROM node:18-alpine AS base
 
+RUN apk upgrade --no-cache
+
 # PRUNE SOURCE CODE
 FROM base AS builder
+
 RUN apk add --no-cache libc6-compat
-RUN apk update
+
 WORKDIR /app
 COPY . .
 RUN npx turbo prune --scope=@ddcp/web --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
+
 RUN apk add --no-cache libc6-compat
-RUN apk update
+
 WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
@@ -30,6 +34,7 @@ RUN npx turbo run build --filter=@ddcp/web
 
 # MOUNT STATIC CODE
 FROM caddy:2.7 as runner
+
 WORKDIR /app
 COPY web/Caddyfile /etc/caddy/Caddyfile
 COPY --from=installer /app/web/dist/ .
