@@ -11,6 +11,13 @@ services:
       - SITE_ADDRESS
     volumes:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile
+  docs:
+    image: ghcr.io/douglasneuroinformatics/data-capture-docs:latest
+    build:
+      context: .
+      dockerfile: ./docs/Dockerfile
+    expose:
+      - 80
   api:
     image: ghcr.io/douglasneuroinformatics/data-capture-api:latest
     build:
