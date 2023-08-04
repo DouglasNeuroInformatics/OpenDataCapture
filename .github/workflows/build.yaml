@@ -3,6 +3,9 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,9 +16,6 @@ jobs:
             image: ghcr.io/douglasneuroinformatics/data-capture-api
           - dockerfile: ./web/Dockerfile
             image: ghcr.io/douglasneuroinformatics/data-capture-web
-    permissions:
-      contents: read
-      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
