@@ -10,9 +10,9 @@ jobs:
       matrix:
         include:
           - dockerfile: ./api/Dockerfile
-            image: douglasneuroinformatics/data-capture-api
+            image: ghcr.io/douglasneuroinformatics/data-capture-api
           - dockerfile: ./web/Dockerfile
-            image: douglasneuroinformatics/data-capture-web
+            image: ghcr.io/douglasneuroinformatics/data-capture-web
     permissions:
       contents: read
       packages: write
