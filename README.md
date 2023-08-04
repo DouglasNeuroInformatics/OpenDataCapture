@@ -50,12 +50,27 @@ The Douglas Data Capture Platform is a modern, easy-to-use web application desig
 
 ## Quick Start (Development)
 
+### Setup Environment, Install Dependencies, and Launch Dev Server
 ```shell
-cat .env.template <(openssl rand -hex 16) > .env
-yarn install
-yarn ws server cli init-demo
-yarn ws server cli create-user admin password --basePermissionLevel ADMIN --isAdmin
-yarn dev
+awk -v secret_key="$(openssl rand -hex 16)" '/^SECRET_KEY=/{print $0 secret_key;next}1' .env.template > .env
+npm install
+npm run dev
+```
+
+### Create Admin User
+```shell
+curl --request POST \
+  --url "${SITE_ADDRESS}/api/v1/setup" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "admin": {
+        "firstName": "Jane",
+        "lastName": "Doe",
+        "username": "admin",
+        "password": "Password123"
+    },
+    "initDemo": true
+}'
 ```
 
 ## License

@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn test
-yarn check-types
+npm test
+npm run check-types
 npx lint-staged --verbose
