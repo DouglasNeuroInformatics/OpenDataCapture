@@ -1,5 +1,8 @@
 version: '3'
 name: data-capture
+volumes:
+  caddy_data:
+  mongo_data:
 services:
   caddy:
     image: caddy:2.7-alpine
@@ -11,6 +14,7 @@ services:
       - SITE_ADDRESS
     volumes:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
   docs:
     image: ghcr.io/douglasneuroinformatics/data-capture-docs:latest
     build:
@@ -47,3 +51,6 @@ services:
     image: mongo:6.0.2
     expose:
       - 27017
+    volumes:
+      - mongo_data:/data/db
+
