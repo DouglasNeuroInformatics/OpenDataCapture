@@ -6,7 +6,7 @@
 		reverse_proxy api
 	}
 
-	handle_path /docs/ {
+	handle_path /docs/* {
 		reverse_proxy docs
 	}
 	
