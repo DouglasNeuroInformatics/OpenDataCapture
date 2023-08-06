@@ -2,7 +2,7 @@
   "name": "@ddcp/mobile",
   "version": "1.0.0",
   "private": true,
-  "main": "index.js",
+  "main": "src/main.ts",
   "scripts": {
     "android": "expo start --android",
     "ios": "expo start --ios",

@@ -22,7 +22,7 @@ const App = () => {
     <View style={styles.app}>
       <View>
         <Text>My App</Text>
-        <Text>Hello World</Text>
+        <Text>Hello World!!!</Text>
       </View>
       <View style={styles.inputContainer}>
         <TextInput placeholder="Item..." style={styles.textInput} />
