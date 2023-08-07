@@ -4,7 +4,7 @@ import cp from 'child_process';
 import path from 'path';
 import url from 'url';
 
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 

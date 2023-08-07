@@ -7,7 +7,7 @@
   "workspaces": [
     "api",
     "instruments",
-    "mobile",
+    "pwa",
     "types",
     "web"
   ],
