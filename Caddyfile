@@ -9,7 +9,7 @@
 	handle_path /docs/* {
 		reverse_proxy docs
 	}
-	
+
 	handle {
 		reverse_proxy web
 	}
