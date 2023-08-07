@@ -8,7 +8,7 @@ import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
-const clientDir = path.dirname(url.fileURLToPath(import.meta.url));
+const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => {
   if (mode === 'development') {
@@ -38,13 +38,13 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        '@': path.resolve(clientDir, 'src')
+        '@': path.resolve(projectDir, 'src')
       }
     },
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: [path.resolve(clientDir, 'src', 'test', 'setup.ts')]
+      setupFiles: [path.resolve(projectDir, 'src', 'test', 'setup.ts')]
     }
   };
 });
