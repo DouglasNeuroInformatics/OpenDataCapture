@@ -12,7 +12,7 @@
     "lint": "eslint --fix src",
     "start": "node ./dist/main.js",
     "test": "node --loader @swc-node/register/esm --no-warnings --test $(find src -type f -name \"*.spec.ts\")",
-    "test:coverage": "c8 --all --src=src -r json -x '**/*.{d,dto,entity,module,spec}.ts' npm test"
+    "test:coverage": "c8 --all --src=src -r json -x '**/*.{d,dto,entity,module,spec}.ts' -x 'src/docs.ts' -x 'src/main.ts' npm test"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
