@@ -24,11 +24,19 @@ export class SetupService {
     if (await this.isInitialized()) {
       throw new ForbiddenException();
     }
-    await this.connection.dropDatabase();
+    await this.dropDatabase();
     await this.createAdmin(admin);
     if (initDemo) {
       await this.demoService.init();
     }
+  }
+
+  async dropDatabase() {
+    return this.connection.dropDatabase();
+  }
+
+  async createAdmin(admin: CreateAdminDto) {
+    return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' }, this.adminAbility);
   }
 
   private async isInitialized() {
@@ -40,9 +48,5 @@ export class SetupService {
       }
     }
     return false;
-  }
-
-  private async createAdmin(admin: CreateAdminDto) {
-    return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' }, this.adminAbility);
   }
 }
