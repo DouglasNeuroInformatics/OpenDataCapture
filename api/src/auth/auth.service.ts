@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unauthoriz
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { AuthPayload, Fingerprint, JwtPayload } from '@ddcp/types';
+import { AuthPayload, JwtPayload } from '@ddcp/types';
 
 import { AbilityFactory } from '@/ability/ability.factory.js';
 import { CryptoService } from '@/crypto/crypto.service.js';
@@ -20,12 +20,7 @@ export class AuthService {
   ) {}
 
   /** Validates the provided credentials and returns an access token */
-  async login(
-    username: string,
-    password: string,
-    fingerprint?: Fingerprint | null,
-    ipAddress?: string
-  ): Promise<AuthPayload> {
+  async login(username: string, password: string, ipAddress?: string): Promise<AuthPayload> {
     const user = await this.getUser(username);
     await user.populate('groups', 'name');
 
@@ -39,7 +34,6 @@ export class AuthService {
         ...user.sessions,
         {
           time: Date.now(),
-          fingerprint,
           ipAddress
         }
       ]

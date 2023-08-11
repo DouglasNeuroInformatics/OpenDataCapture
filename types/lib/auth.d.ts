@@ -13,10 +13,6 @@ export type LoginCredentials = {
   password: string;
 };
 
-export type LoginRequest = LoginCredentials & {
-  fingerprint?: Fingerprint | null;
-};
-
 export type AppAction = 'create' | 'read' | 'update' | 'delete' | 'manage';
 
 export type AppSubject =
@@ -42,10 +38,3 @@ export type JwtPayload = {
   lastName?: string;
   groups: Group[];
 }
-
-/** A subset of other things used to generate visitorId */
-export type Fingerprint = {
-  visitorId: string;
-  language: string;
-  screenResolution?: [number | null, number | null];
-};
