@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { before, describe, it } from 'node:test';
+import { after, before, describe, it } from 'node:test';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -22,5 +22,9 @@ describe('/auth', () => {
 
   it('should be defined', () => {
     assert(typeof app === 'object');
+  });
+
+  after(async () => {
+    await app.close();
   });
 });
