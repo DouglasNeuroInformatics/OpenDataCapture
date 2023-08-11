@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { AccessibleModel } from '@casl/mongoose';
+import { AccessibleModel, accessibleBy } from '@casl/mongoose';
 import type { AppAbility, Group, Sex } from '@ddcp/types';
 import { Model } from 'mongoose';
 import unidecode from 'unidecode';
@@ -39,7 +39,7 @@ export class SubjectsService {
 
   async findAll(ability: AppAbility, groupName?: string): Promise<SubjectEntity[]> {
     const filter = groupName ? { groups: await this.groupsService.findByName(groupName, ability) } : {};
-    return this.subjectModel.find(filter).accessibleBy(ability).lean();
+    return this.subjectModel.find(accessibleBy(ability), filter).lean();
   }
 
   async lookup(dto: LookupSubjectDto): Promise<SubjectEntity> {

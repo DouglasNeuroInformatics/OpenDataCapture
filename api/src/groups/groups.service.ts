@@ -1,7 +1,7 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { AccessibleModel } from '@casl/mongoose';
+import { AccessibleModel, accessibleBy } from '@casl/mongoose';
 import { AppAbility, Group } from '@ddcp/types';
 import { Model } from 'mongoose';
 
@@ -24,7 +24,7 @@ export class GroupsService {
   }
 
   async findAll(ability: AppAbility): Promise<Group[]> {
-    return this.groupModel.find().accessibleBy(ability);
+    return this.groupModel.find(accessibleBy(ability));
   }
 
   async findById(id: string, ability: AppAbility): Promise<Group> {
