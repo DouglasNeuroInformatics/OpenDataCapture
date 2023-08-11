@@ -31,10 +31,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           cache: 'npm'
-          node-version: '18.x'
+          node-version: '20.x'
+      - name: Create environment file
+        run: awk -v secret_key="$(openssl rand -hex 16)" '/^SECRET_KEY=/{print $0 secret_key;next}1' .env.template > .env
       - run: npm ci
       - run: npm run lint
-      - run: npm test
+      - run: npm run test
       - name: Create coverage reports
         run: npm run test:coverage --workspace api
       - name: Upload coverage reports to Codecov
