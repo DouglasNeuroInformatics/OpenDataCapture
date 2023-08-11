@@ -1,4 +1,4 @@
-FROM node:18-alpine AS runtime
+FROM node:20-alpine AS runtime
 FROM runtime as base
 RUN apk upgrade --no-cache
 RUN apk add --no-cache libc6-compat
