@@ -5,11 +5,7 @@ import { IsBoolean, IsNotEmptyObject, ValidateNested } from 'class-validator';
 
 import { CreateUserDto } from '@/users/dto/create-user.dto.js';
 
-export class CreateAdminDto extends OmitType(CreateUserDto, [
-  'basePermissionLevel',
-  'isAdmin',
-  'groupNames'
-] as const) {}
+export class CreateAdminDto extends OmitType(CreateUserDto, ['basePermissionLevel', 'groupNames'] as const) {}
 
 export class SetupDto {
   @ApiProperty()

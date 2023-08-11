@@ -33,7 +33,6 @@ export type Permissions = RawRuleOf<AppAbility>[];
 export type JwtPayload = {
   username: string;
   permissions: Permissions;
-  isAdmin?: boolean;
   firstName?: string;
   lastName?: string;
   groups: Group[];

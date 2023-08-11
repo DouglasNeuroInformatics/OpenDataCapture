@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import type { BasePermissionLevel, User } from '@ddcp/types';
-import { ArrayMinSize, IsBoolean, IsIn, IsOptional, IsString, Matches } from 'class-validator';
+import { ArrayMinSize, IsIn, IsOptional, IsString, Matches } from 'class-validator';
 
 interface CreateUserData extends Omit<User, 'preferences' | 'groups'> {
   groupNames?: string[];
@@ -26,14 +26,6 @@ export class CreateUserDto implements CreateUserData {
   })
   @Matches(isStrongPassword)
   password: string;
-
-  @ApiProperty({
-    description:
-      'Whether the user is an admin, in which case the frontend will render content for all groups the user has permission to access'
-  })
-  @IsOptional()
-  @IsBoolean()
-  isAdmin?: boolean;
 
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
