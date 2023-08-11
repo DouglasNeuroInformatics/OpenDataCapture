@@ -33,7 +33,7 @@ export class CryptoService {
         if (err) {
           reject(err);
         }
-        resolve([key, salt].join('$'));
+        resolve([key.toString('hex'), salt].join('$'));
       });
     });
   }
