@@ -6,7 +6,6 @@ import { Form, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-import { useFingerprint } from '@/hooks/useFingerprint';
 import { useAuthStore } from '@/stores/auth-store';
 
 type LoginFormData = {
@@ -21,7 +20,6 @@ export interface LoginFormProps {
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
-  const fingerprint = useFingerprint();
   const { t } = useTranslation();
 
   const content: FormInstrumentContent<LoginFormData> = {
@@ -47,14 +45,10 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   }, []);
 
   const login = async (credentials: LoginFormData) => {
-    const response = await axios.post<AuthPayload>(
-      '/v1/auth/login',
-      { ...credentials, fingerprint },
-      {
-        // Do not throw if unauthorized
-        validateStatus: (status) => status === 200 || status === 401
-      }
-    );
+    const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
+      // Do not throw if unauthorized
+      validateStatus: (status) => status === 200 || status === 401
+    });
     if (response.status === 401) {
       notifications.addNotification({
         type: 'error',

@@ -18,10 +18,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @RouteAccess('public')
-  login(
-    @Body() { username, password, fingerprint }: LoginRequestDto,
-    @Req() request: Request
-  ): Promise<AccessTokenDto> {
-    return this.authService.login(username, password, fingerprint, request.ip);
+  login(@Body() { username, password }: LoginRequestDto, @Req() request: Request): Promise<AccessTokenDto> {
+    return this.authService.login(username, password, request.ip);
   }
 }

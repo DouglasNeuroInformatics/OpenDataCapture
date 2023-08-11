@@ -5,7 +5,7 @@ import { AccessibleModel } from '@casl/mongoose';
 import { TranslatedForms } from '@ddcp/instruments';
 import type { FormInstrument, FormInstrumentSummary, Language } from '@ddcp/types';
 import { FormFields, FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Model, ObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 
 import { FormInstrumentEntity } from '../entities/form-instrument.entity.js';
 import { InstrumentEntity } from '../entities/instrument.entity.js';
@@ -57,15 +57,6 @@ export class FormsService {
     const result = await this.formModel.findOne({ identifier, 'details.language': language });
     if (!result || result.kind !== 'form') {
       throw new NotFoundException(`Failed to find form with identifier: ${identifier}`);
-    }
-    return result;
-  }
-
-  /** @deprecated */
-  async findById(id: string | ObjectId): Promise<FormInstrumentEntity> {
-    const result = await this.formModel.findById(id);
-    if (!result || result.kind !== 'form') {
-      throw new NotFoundException(`Failed to find form with id: ${id.toString()}`);
     }
     return result;
   }
