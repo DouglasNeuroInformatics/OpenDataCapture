@@ -8,8 +8,8 @@ import { LookupSubjectDto } from './dto/lookup-subject.dto.js';
 import { SubjectEntity } from './entities/subject.entity.js';
 import { SubjectsService } from './subjects.service.js';
 
+import { CurrentUser } from '@/core/decorators/current-user.decorator.js';
 import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
-import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 
 @ApiTags('Subjects')
 @Controller('subjects')
@@ -26,7 +26,7 @@ export class SubjectsController {
   @ApiOperation({ summary: 'Get All Subjects' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  findAll(@UserAbility() ability: AppAbility, @Query('group') groupName?: string): Promise<SubjectEntity[]> {
+  findAll(@CurrentUser('ability') ability: AppAbility, @Query('group') groupName?: string): Promise<SubjectEntity[]> {
     return this.subjectsService.findAll(ability, groupName);
   }
 

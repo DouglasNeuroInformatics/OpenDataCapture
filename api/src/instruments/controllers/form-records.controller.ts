@@ -12,8 +12,8 @@ import type {
 import { CreateFormRecordDto } from '../dto/create-form-record.dto.js';
 import { FormRecordsService } from '../services/form-records.service.js';
 
+import { CurrentUser } from '@/core/decorators/current-user.decorator.js';
 import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
-import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 
 @ApiTags('Instrument Records')
 @Controller('instruments/records/forms')
@@ -23,7 +23,7 @@ export class FormRecordsController {
   @ApiOperation({ description: 'Create a New Form Record', summary: 'Create Form Record' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
-  create(@Body() createFormRecordDto: CreateFormRecordDto, @UserAbility() ability: AppAbility): Promise<any> {
+  create(@Body() createFormRecordDto: CreateFormRecordDto, @CurrentUser('ability') ability: AppAbility): Promise<any> {
     return this.formRecordsService.create(createFormRecordDto, ability);
   }
 
@@ -31,7 +31,7 @@ export class FormRecordsController {
   @Get()
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   find(
-    @UserAbility() ability: AppAbility,
+    @CurrentUser('ability') ability: AppAbility,
     @Query('subject') subjectIdentifier: string,
     @Query('lang') language?: Language
   ): Promise<SubjectFormRecords[]> {
@@ -42,7 +42,7 @@ export class FormRecordsController {
   @Get('summary')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   summary(
-    @UserAbility() ability: AppAbility,
+    @CurrentUser('ability') ability: AppAbility,
     @Query('group') groupName?: string,
     @Query('instrument') instrumentIdentifier?: string
   ): Promise<FormInstrumentRecordsSummary> {
@@ -53,7 +53,7 @@ export class FormRecordsController {
   @Get('export')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   exportRecords(
-    @UserAbility() ability: AppAbility,
+    @CurrentUser('ability') ability: AppAbility,
     @Query('group') groupName?: string
   ): Promise<InstrumentRecordsExport> {
     return this.formRecordsService.exportRecords(ability, groupName);
@@ -63,7 +63,7 @@ export class FormRecordsController {
   @Get('linear-regression')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   linearRegression(
-    @UserAbility() ability: AppAbility,
+    @CurrentUser('ability') ability: AppAbility,
     @Query('group') groupName?: string,
     @Query('instrument') instrumentIdentifier?: string
   ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {

@@ -21,18 +21,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   ) {
     super({
       ignoreExpiration: config.getOrThrow('NODE_ENV') === 'development',
-      passReqToCallback: true,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: config.getOrThrow<string>('SECRET_KEY')
     });
   }
 
   /** This method is called after the token is validated by passport  */
-  async validate(request: Request, { username }: JwtPayload): Promise<UserEntity> {
+  async validate({ username }: JwtPayload): Promise<Request['user']> {
     const user = await this.getUser(username);
-    request.ability = this.abilityFactory.createForUser(user);
+    const ability = this.abilityFactory.createForUser(user);
     this.logger.verbose(`Validated Token for User: ${username}`);
-    return user;
+    return { ...user, ability };
   }
 
   /** Returns the user associated with the JWT if they exist, otherwise throws UnauthorizedException */

@@ -7,8 +7,8 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { UserEntity } from './entities/user.entity.js';
 import { UsersService } from './users.service.js';
 
+import { CurrentUser } from '@/core/decorators/current-user.decorator.js';
 import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
-import { UserAbility } from '@/core/decorators/user-ability.decorator.js';
 
 @ApiTags('Users')
 @Controller({ path: 'users' })
@@ -18,14 +18,14 @@ export class UsersController {
   @ApiOperation({ summary: 'Create User' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'User' })
-  create(@Body() createUserDto: CreateUserDto, @UserAbility() ability: AppAbility): Promise<UserEntity> {
+  create(@Body() createUserDto: CreateUserDto, @CurrentUser('ability') ability: AppAbility): Promise<UserEntity> {
     return this.usersService.create(createUserDto, ability);
   }
 
   @ApiOperation({ summary: 'Get All Users' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'User' })
-  findAll(@UserAbility() ability: AppAbility, @Query('group') groupName?: string): Promise<UserEntity[]> {
+  findAll(@CurrentUser('ability') ability: AppAbility, @Query('group') groupName?: string): Promise<UserEntity[]> {
     return this.usersService.findAll(ability, groupName);
   }
 

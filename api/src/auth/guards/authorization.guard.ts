@@ -27,6 +27,6 @@ export class AuthorizationGuard implements CanActivate {
       return false;
     }
 
-    return request.ability?.can(routeAccess.action, routeAccess.subject) ?? false;
+    return request.user?.ability.can(routeAccess.action, routeAccess.subject) ?? false;
   }
 }
