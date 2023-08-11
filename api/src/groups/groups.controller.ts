@@ -4,8 +4,8 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { type AppAbility } from '@ddcp/types';
 
 import { CreateGroupDto } from './dto/create-group.dto.js';
-import { UpdateGroupDto } from './dto/update-group.dto.js';
 import { GroupEntity } from './entities/group.entity.js';
+import { UpdateGroupDto } from './entities/update-group.dto.js';
 import { GroupsService } from './groups.service.js';
 
 import { CurrentUser } from '@/core/decorators/current-user.decorator.js';

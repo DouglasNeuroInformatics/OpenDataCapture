@@ -6,8 +6,8 @@ import { AppAbility, Group } from '@ddcp/types';
 import { Model } from 'mongoose';
 
 import { CreateGroupDto } from './dto/create-group.dto.js';
-import { UpdateGroupDto } from './dto/update-group.dto.js';
 import { GroupDocument, GroupEntity } from './entities/group.entity.js';
+import { UpdateGroupDto } from './entities/update-group.dto.js';
 
 @Injectable()
 export class GroupsService {
