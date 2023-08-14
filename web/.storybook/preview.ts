@@ -1,9 +1,27 @@
 import type { Preview } from '@storybook/react';
+import { withThemeByDataAttribute } from '@storybook/addon-styling';
 
 import '../src/styles.css';
-import '../src/services/18n.ts';
+import i18n from '../src/services/i18n';
 
 const preview: Preview = {
+  decorators: [
+    withThemeByDataAttribute({
+      themes: {
+        light: 'light',
+        dark: 'dark'
+      },
+      defaultTheme: 'light',
+      attributeName: 'data-mode'
+    })
+  ],
+  globals: {
+    locale: 'en',
+    locales: {
+      en: 'English',
+      fr: 'Français'
+    }
+  },
   parameters: {
     backgrounds: {
       default: 'light'
@@ -14,7 +32,8 @@ const preview: Preview = {
         color: /(background|color)$/i,
         date: /Date$/
       }
-    }
+    },
+    i18n
   }
 };
 

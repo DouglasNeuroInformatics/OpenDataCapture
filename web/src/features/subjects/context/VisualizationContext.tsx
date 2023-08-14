@@ -7,7 +7,7 @@ import { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
 
 import { Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
-import i18n from '@/services/18n';
+import i18n from '@/services/i18n';
 
 /** Apply a callback function to filter items from object */
 function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
