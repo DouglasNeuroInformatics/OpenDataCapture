@@ -8,7 +8,7 @@ import { Router } from './Router';
 import { ActiveSubject } from '@/components';
 import { ErrorFallback, SuspenseFallback } from '@/features/misc';
 
-import './services/18n';
+import './services/i18n';
 import './services/axios';
 
 export const App = () => {
