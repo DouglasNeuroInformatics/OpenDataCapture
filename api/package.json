@@ -8,7 +8,7 @@
     "build": "npm run check-types && swc --copy-files --delete-dir-on-start --out-dir dist src",
     "check-types": "tsc",
     "dev": "NODE_ENV=development concurrently \"swc --copy-files --out-dir dist -w src\" \"nodemon -L dist/main.js\"",
-    "format": "prettier --write .",
+    "format": "prettier --write src",
     "lint": "eslint --fix src",
     "start": "node ./dist/main.js",
     "test": "node --loader @swc-node/register/esm --no-warnings --test $(find src -type f -name \"*.spec.ts\")",

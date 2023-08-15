@@ -11,6 +11,7 @@
     "coverage": "vitest run --coverage",
     "demo": "vite preview --host --port 3000",
     "dev": "vite --host",
+    "format": "prettier --write src",
     "lint": "eslint --fix src",
     "storybook": "storybook dev -p 6006"
   },
@@ -62,7 +63,6 @@
     "jsdom": "^22.1.0",
     "msw": "^1.2.3",
     "postcss": "^8.4.27",
-    "prettier-plugin-tailwindcss": "^0.4.1",
     "prop-types": "^15.8.1",
     "storybook": "^7.2.1",
     "storybook-react-i18next": "^2.0.8",
