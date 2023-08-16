@@ -2,8 +2,9 @@
 import { useTranslations } from '@/i18n';
 import LanguageToggle from './LanguageToggle.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import NavLink from './NavLink.astro';
 
-const { t } = useTranslations(Astro.url);
+const { resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
 <header
@@ -11,9 +12,17 @@ const { t } = useTranslations(Astro.url);
 >
   <div class="container flex flex-wrap items-center py-3 font-medium">
     <a class="text-lg" href={Astro.site}>{t('platform.title')}</a>
-    <div class="flex flex-grow justify-end gap-3 bg-inherit md:order-last">
-      <ThemeToggle />
-      <LanguageToggle />
+    <div class="flex flex-grow justify-end bg-inherit md:order-last gap-3">
+      <nav class="flex gap-3 items-center">
+        <NavLink href={`/${resolvedLanguage}/`}>
+          {t('nav.home')}
+        </NavLink>
+      </nav>
+      <div class="min-h-full m-2 rounded-md w-[1px] dark:bg-slate-300 bg-slate-700"></div>
+      <div class="flex gap-3">
+        <ThemeToggle />
+        <LanguageToggle />
+      </div>
     </div>
   </div>
 </header>
