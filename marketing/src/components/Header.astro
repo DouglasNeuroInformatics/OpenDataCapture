@@ -11,11 +11,14 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
   class="sticky top-0 z-10 bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300"
 >
   <div class="container flex flex-wrap items-center py-3 font-medium md:flex-nowrap">
-    <button class="h-10 [&>svg]:h-full [&>svg]:w-auto" type="button">
+    <button class="h-10 [&>svg]:h-full [&>svg]:w-auto" id="nav-toggle" type="button">
       <Logo class="hidden fill-sky-900 dark:fill-slate-100 md:block" />
-      <MenuIcon class="md:hidden p-1" />
+      <MenuIcon class="md:hidden p-1" id="menu-icon" />
     </button>
-    <nav class="flex flex-col w-full order-last md:order-none md:justify-end md:gap-3 md:flex-row">
+    <nav
+      class="flex flex-col w-full order-last overflow-hidden transition-mh duration-300 md:order-none md:justify-end md:gap-3 md:flex-row"
+      id="nav-dropdown"
+    >
       <a class="p-2" href={`/${resolvedLanguage}/`}>
         {t('home.title')}
       </a>
@@ -30,3 +33,33 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
     </div>
   </div>
 </header>
+<script>
+  const toggle = document.getElementById('nav-toggle')!;
+  const nav = document.getElementById('nav-dropdown')!;
+
+  const setDefaultNavMaxHeight = (isDesktop: boolean) => {
+    if (isDesktop) {
+      nav.style.maxHeight = 'none';
+    } else {
+      nav.style.maxHeight = '0px';
+    }
+  };
+
+  const toggleNavMaxHeight = () => {
+    console.log(nav.offsetHeight);
+    if (nav.offsetHeight) {
+      nav.style.maxHeight = '0px';
+    } else {
+      nav.style.maxHeight = `${nav.scrollHeight}px`;
+    }
+  };
+
+  const desktopQuery = window.matchMedia('(min-width: 768px)');
+  setDefaultNavMaxHeight(desktopQuery.matches);
+
+  desktopQuery.addEventListener('change', ({ matches }) => {
+    setDefaultNavMaxHeight(matches);
+  });
+
+  toggle.addEventListener('click', toggleNavMaxHeight);
+</script>
