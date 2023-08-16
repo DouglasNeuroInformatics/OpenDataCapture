@@ -15,7 +15,10 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
     <div class="flex flex-grow justify-end bg-inherit md:order-last gap-3">
       <nav class="flex gap-3 items-center">
         <NavLink href={`/${resolvedLanguage}/`}>
-          {t('nav.home')}
+          {t('home.title')}
+        </NavLink>
+        <NavLink href={`/${resolvedLanguage}/blog`}>
+          {t('blog.title')}
         </NavLink>
       </nav>
       <div class="min-h-full m-2 rounded-md w-[1px] dark:bg-slate-300 bg-slate-700"></div>

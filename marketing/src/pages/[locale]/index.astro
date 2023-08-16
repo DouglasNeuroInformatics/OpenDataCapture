@@ -10,7 +10,7 @@ export const getStaticPaths = () => {
 const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
-<Page title={t('platform.title')} description={t('platform.description')}>
+<Page>
   <h1>{t('platform.description')}</h1>
 </Page>
 

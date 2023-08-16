@@ -11,10 +11,16 @@ export const translations = {
       fr: 'Collecte de données, Saisie de données, Saisie électronique de données, Clinique, Recherche'
     }
   },
-  nav: {
-    home: {
+  home: {
+    title: {
       en: 'Home',
       fr: 'Accueil'
+    }
+  },
+  blog: {
+    title: {
+      en: 'Blog',
+      fr: 'Blogue'
     }
   },
   languageToggle: {

@@ -1,0 +1,12 @@
+---
+import { useTranslations } from '@/i18n';
+import Page from '@/layouts/Page.astro';
+
+export const getStaticPaths = () => {
+  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
+};
+
+const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
+---
+
+<Page title={`${t('platform.title')} - ${t('blog.title')}`} />

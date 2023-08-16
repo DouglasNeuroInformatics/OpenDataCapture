@@ -1,19 +1,20 @@
 ---
 import Header from '@/components/Header.astro';
-import { extractLanguageFromURL } from '@/i18n';
+import { extractLanguageFromURL, useTranslations } from '@/i18n';
 
 interface Props {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
 }
 
-const { title, description } = Astro.props;
+const { resolvedLanguage, t } = useTranslations(Astro.url)
 
-const lang = extractLanguageFromURL(Astro.url);
+const { title = t('platform.title'), description = t('platform.description') } = Astro.props;
+
 ---
 
 <!DOCTYPE html>
-<html lang={lang}>
+<html lang={resolvedLanguage}>
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
