@@ -46,7 +46,6 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
   };
 
   const toggleNavMaxHeight = () => {
-    console.log(nav.offsetHeight);
     if (nav.offsetHeight) {
       nav.style.maxHeight = '0px';
     } else {
