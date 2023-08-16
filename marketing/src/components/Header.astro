@@ -15,7 +15,7 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
       <Logo class="hidden fill-sky-900 dark:fill-slate-100 md:block" />
       <MenuIcon class="md:hidden p-1" />
     </button>
-    <nav class="flex gap-3 w-full justify-end order-last md:order-none">
+    <nav class="flex flex-col w-full order-last md:order-none md:justify-end md:gap-3 md:flex-row">
       <a class="p-2" href={`/${resolvedLanguage}/`}>
         {t('home.title')}
       </a>
