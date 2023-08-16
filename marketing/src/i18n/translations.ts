@@ -21,6 +21,14 @@ export const translations = {
     title: {
       en: 'Blog',
       fr: 'Blogue'
+    },
+    heading: {
+      en: 'Our Blog',
+      fr: 'Notre blogue'
+    },
+    subheading: {
+      en: 'All the latest news on CliniCollect and the open-source electronic data capture community',
+      fr: 'Toutes les dernières nouvelles sur CliniCollect et la communauté de la saisie électronique de données open-source'
     }
   },
   languageToggle: {
