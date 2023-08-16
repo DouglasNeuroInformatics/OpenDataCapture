@@ -1,0 +1,16 @@
+---
+import LanguageToggle from "./LanguageToggle.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+---
+
+<header
+  class="sticky top-0 z-10 bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300"
+>
+  <div class="container flex flex-wrap items-center py-3 font-medium">
+    <a class="text-lg" href={Astro.site}>Joshua Unrau</a>
+    <div class="flex flex-grow justify-end gap-3 bg-inherit md:order-last">
+      <ThemeToggle />
+      <LanguageToggle />
+    </div>
+  </div>
+</header>

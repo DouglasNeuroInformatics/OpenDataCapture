@@ -1,0 +1,30 @@
+---
+import Header from '@/components/Header.astro';
+import { extractLanguageFromURL } from '@/i18n';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+const lang = extractLanguageFromURL(Astro.url);
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+    <Header />
+    <main class="container">
+      <slot />
+    </main>
+  </body>
+</html>

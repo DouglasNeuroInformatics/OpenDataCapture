@@ -18,11 +18,11 @@ function getTranslation(path: TranslationKey, language: Language) {
     .split('.')
     .filter(Boolean)
     .reduce((accumulator, currentValue) => (accumulator as any)?.[currentValue], translations as any);
-  return value as string;
+  return (value[language] ?? value) as string;
 }
 
 /** Return the locale parsed from the URL */
-export function extractLanguage(url: URL) {
+export function extractLanguageFromURL(url: URL) {
   const locale = url.pathname.split('/')[1];
   if (locale === 'fr') {
     return locale;
@@ -31,7 +31,7 @@ export function extractLanguage(url: URL) {
 }
 
 export function useTranslations(url: URL) {
-  const resolvedLanguage = extractLanguage(url);
+  const resolvedLanguage = extractLanguageFromURL(url);
   const altLanguage = resolvedLanguage === 'en' ? 'fr' : 'en';
   const t = (path: TranslationKey) => {
     return getTranslation(path, resolvedLanguage);
