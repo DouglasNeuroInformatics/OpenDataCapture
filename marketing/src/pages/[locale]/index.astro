@@ -3,7 +3,7 @@ import logo from '@/assets/logo.png';
 import { useTranslations } from '@/i18n';
 
 export const getStaticPaths = () => {
-  return [{ params: { locale: undefined } }, { params: { locale: 'fr' } }];
+  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
 
 const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
@@ -13,10 +13,10 @@ const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
   <head>
     <meta charset="utf-8" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-    <link rel="alternate" href={Astro.site} hreflang="en" />
+    <link rel="alternate" href={new URL('/en/', Astro.site)} hreflang="en" />
     <link rel="alternate" href={new URL('/fr/', Astro.site)} hreflang="fr" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <!-- <link rel="sitemap" href="/sitemap-index.xml" /> -->
     <meta name="viewport" content="width=device-width" />
     <meta name="author" content={t('meta.author')} />
     <meta name="description" content={t('meta.description')} />
