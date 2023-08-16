@@ -1,0 +1,41 @@
+---
+import logo from '@/assets/logo.png';
+import { useTranslations } from '@/i18n';
+
+export const getStaticPaths = () => {
+  return [{ params: { locale: undefined } }, { params: { locale: 'fr' } }];
+};
+
+const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
+---
+
+<html lang={resolvedLanguage}>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="alternate" href={Astro.site} hreflang="en" />
+    <link rel="alternate" href={new URL('/fr/', Astro.site)} hreflang="fr" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="author" content={t('meta.author')} />
+    <meta name="description" content={t('meta.description')} />
+    <meta name="keywords" content={t('meta.keywords')} />
+    <meta property="og:title" content={t('meta.title')} />
+    <meta property="og:description" content={t('meta.description')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:locale" content={resolvedLanguage} />
+    <meta property="og:locale:alternate" content={altLanguage} />
+    <meta property="og:image" content={logo.src} />
+    <meta property="og:image:alt" content="Logo" />
+    <meta property="og:image:height" content={logo.height.toString()} />
+    <meta property="og:image:width" content={logo.width.toString()} />
+    <title>{t('meta.title')}</title>
+  </head>
+  <body class="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+    <main class="container">
+      <h1>{t('meta.title')}</h1>
+    </main>
+  </body>
+</html>

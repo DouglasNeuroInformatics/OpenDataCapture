@@ -14,5 +14,6 @@ export default defineConfig({
   },
   server: {
     port: parseInt(process.env.MARKETING_DEV_SERVER_PORT ?? 4000)
-  }
+  },
+  site: 'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform'
 });
