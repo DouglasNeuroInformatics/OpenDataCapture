@@ -1,5 +1,5 @@
 ---
-title: "Embracing Open Source: The Vital Role of Open-Source Software in Electronic Data Capture Platforms for Research Clinics"
+title: 'Embracing Open Source: The Vital Role of Open-Source Software in Electronic Data Capture Platforms for Research Clinics'
 author: Joshua Unrau
 date: 2023-08-16
 ---
