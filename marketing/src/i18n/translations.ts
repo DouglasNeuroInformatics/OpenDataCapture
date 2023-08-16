@@ -15,6 +15,23 @@ export const translations = {
     title: {
       en: 'Home',
       fr: 'Accueil'
+    },
+    heading: {
+      en: 'Modern, Secure, and User-Friendly Electronic Data Capture',
+      fr: 'Une plateforme de saisie électronique des données moderne, sécurisée et conviviale'
+    },
+    subheading: {
+      en: 'Finally, an easy-to-use, reliable, and open-source solution for clinical researchers',
+      fr: 'Enfin une solution facile à utiliser, fiable et open-source pour les chercheurs cliniques'
+    },
+
+    viewDemo: {
+      en: 'View Demo',
+      fr: 'Voir la démo'
+    },
+    learnMore: {
+      en: 'Learn More',
+      fr: 'En savoir plus'
     }
   },
   blog: {
