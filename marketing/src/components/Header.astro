@@ -2,116 +2,25 @@
 import { useTranslations } from '@/i18n';
 import LanguageToggle from './LanguageToggle.astro';
 import ThemeToggle from './ThemeToggle.astro';
-import Menu from './icons/Menu.astro';
-import Logo from './icons/Logo.astro';
+import Logo from './Logo.astro';
 
 const { resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
-<header class="bg-white text-slate-700 shadow dark:bg-slate-800 dark:text-slate-300">
-  <div class="bg-inherit" style="opacity: 1;">
-    <div class="container flex flex-wrap items-center bg-inherit py-2">
-      <Logo class="m-2 mr-10 hidden h-10 w-auto md:block" />
-    </div><div class="flex flex-grow justify-end gap-3 bg-inherit md:order-last">
-      <button
-        class="rounded-md p-2 transition-transform hover:backdrop-brightness-95 dark:hover:backdrop-brightness-150"
-        type="button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          aria-hidden="true"
-          height="24"
-          width="24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-          >
-          </path>
-        </svg>
-      </button><div class="relative bg-inherit" data-headlessui-state="">
-        <button
-          class="flex items-center justify-center rounded-md p-2 hover:backdrop-brightness-95 dark:hover:backdrop-brightness-150"
-          type="button"
-          id="headlessui-menu-button-:r2:"
-          aria-haspopup="menu"
-          aria-expanded="false"
-          data-headlessui-state=""
-        >
-          <span class="uppercase">en</span><svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-            class="ml-1"
-            height="16"
-            width="16"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z"
-              clip-rule="evenodd"
-            >
-            </path>
-          </svg>
-        </button>
-      </div>
-    </div><nav
-      class="flex max-h-0 w-full flex-col overflow-hidden transition-[max-height] duration-300 md:max-h-fit md:w-auto md:flex-row md:items-center md:space-x-6"
-    >
-      <a class="block p-3 font-medium capitalize" href="/auth/login">Login</a><a
-        class="block p-3 font-medium capitalize"
-        href="/auth/create-account"
-      >
-        Create Account
-      </a>
-    </nav>
-  </div>
-</header>
-
 <header
   class="sticky top-0 z-10 bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300"
 >
-  <div class="container flex flex-wrap items-center justify-between py-3 font-medium">
-    <button>
-      <Menu />
-    </button>
-    <div class="flex gap-3">
-      <ThemeToggle />
-      <LanguageToggle />
-    </div>
-    <nav class="w-full flex flex-col">
-      <a class="p-2" href={`/${resolvedLanguage}/`}>
-        {t('home.title')}
-      </a>
-      <a href={`/${resolvedLanguage}/blog`}>
-        {t('blog.title')}
-      </a>
-    </nav>
-  </div>
-</header>
-
-<!-- <header
-  class="sticky top-0 z-10 bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300"
->
   <div class="container flex flex-wrap items-center py-3 font-medium">
-    <button>
-      <Menu />
-    </button>
+    <Logo class="fill-sky-900 dark:fill-slate-100 h-10 w-auto" />
     <a class="text-lg hidden" href={`/${resolvedLanguage}/`}>{t('platform.title')}</a>
     <div class="flex flex-grow justify-end bg-inherit md:order-last gap-3">
       <nav class="flex gap-3 items-center">
-        <NavLink href={`/${resolvedLanguage}/`}>
+        <a class="p-2" href={`/${resolvedLanguage}/`}>
           {t('home.title')}
-        </NavLink>
-        <NavLink href={`/${resolvedLanguage}/blog`}>
+        </a>
+        <a class="p-2" href={`/${resolvedLanguage}/blog`}>
           {t('blog.title')}
-        </NavLink>
+        </a>
       </nav>
       <div class="min-h-full m-2 rounded-md w-[1px] dark:bg-slate-700 bg-slate-300"></div>
       <div class="flex gap-3">
@@ -120,4 +29,4 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
       </div>
     </div>
   </div>
-</header> -->
+</header>
