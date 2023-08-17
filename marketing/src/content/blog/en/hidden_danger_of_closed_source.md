@@ -1,3 +1,9 @@
+---
+title: 'The Hidden Dangers of Closed-Source Electronic Data Capture Platforms: A Blow to Scientific Research and Patient Care'
+author: Joshua Unrau
+date: 2023-08-17
+---
+
 # The Hidden Dangers of Closed-Source Electronic Data Capture Platforms: A Blow to Scientific Research and Patient Care
 
 ## Introduction
