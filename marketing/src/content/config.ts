@@ -16,7 +16,8 @@ export const collections = {
         suffix: z.string().optional(),
         position: z.string(),
         image: image(),
-        description: z.string()
+        description: z.string(),
+        seniority: z.number().positive().int()
       })
   })
 };
