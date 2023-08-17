@@ -1,14 +1,20 @@
 ---
+import Feature from '@/components/core/Feature.astro';
 import Hero from '@/components/landing/Hero.astro';
 import Testimonials from '@/components/landing/Testimonials.astro';
+import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
+
+const { t } = useTranslations(Astro.url);
+
 ---
 
 <Page>
   <Hero />
+  <Feature heading={t('dataManagement.heading')} subheading={t('dataManagement.subheading')} description="Lorem ipsum dolor, sit amet consectetur adipisicing elit. Mollitia dolorum ab quos ratione. Sunt unde ex fugit consectetur, iure esse fuga voluptas deserunt quis veritatis debitis et animi rem dicta?" />
   <Testimonials />
 </Page>

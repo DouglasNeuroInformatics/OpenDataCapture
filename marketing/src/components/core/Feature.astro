@@ -1,0 +1,22 @@
+---
+import Section from '@/layouts/Section.astro';
+
+type Props = {
+  heading: string;
+  subheading: string;
+  description: string;
+};
+
+const { heading, subheading, description } = Astro.props;
+---
+
+<Section class="grid grid-cols-2">
+  <div>
+    <span>{subheading}</span>
+    <h3>{heading}</h3>
+    <p>{description}</p>
+  </div>
+  <div>
+    <img src="https://placehold.co/600x400" alt="placeholder">
+  </div>
+</Section>
