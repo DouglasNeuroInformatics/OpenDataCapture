@@ -24,7 +24,6 @@ export const translations = {
       en: 'Finally, an easy-to-use, reliable, and open-source solution for clinical researchers',
       fr: 'Enfin une solution facile à utiliser, fiable et open-source pour les chercheurs cliniques'
     },
-
     viewDemo: {
       en: 'View Demo',
       fr: 'Voir la démo'
@@ -32,6 +31,10 @@ export const translations = {
     learnMore: {
       en: 'Learn More',
       fr: 'En savoir plus'
+    },
+    happyPerson: {
+      en: 'Happy Person',
+      fr: 'Personne heureuse'
     }
   },
   blog: {

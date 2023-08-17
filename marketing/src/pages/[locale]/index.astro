@@ -1,6 +1,7 @@
 ---
 import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
+import happyPerson from '@/assets/happy-person.jpg';
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
@@ -31,6 +32,9 @@ const { t } = useTranslations(Astro.url);
             {t('home.learnMore')}
           </button>
         </div>
+      </div>
+      <div class="hidden w-80 xl:block">
+        <img alt={t('home.happyPerson')} {...happyPerson} />
       </div>
     </section>
   </div>
