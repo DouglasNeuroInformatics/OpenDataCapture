@@ -1,0 +1,25 @@
+---
+import gabrielDevenyi from '@/assets/gabriel_devenyi.jpg';
+import Page from '@/layouts/Page.astro';
+import TeamMember from '@/components/team/TeamMember.astro';
+
+export const getStaticPaths = () => {
+  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
+};
+---
+
+<Page>
+  <div class="space-y-12 pt-12">
+    <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-center">Meet Our Team</h2>
+    <ul role="list" class="space-y-12 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8 lg:gap-y-12 lg:space-y-0">
+      <li>
+        <TeamMember
+          fullName="Gabriel Devenyi, PhD"
+          position="Project Lead"
+          image={gabrielDevenyi}
+          description="Gabriel Devenyi leads the Douglas Neuroinformatics Platform (DNP), architecting the software, platforms, and infrastructure of the DNP."
+        />
+      </li>
+    </ul>
+  </div>
+</Page>

@@ -1,0 +1,31 @@
+---
+import type { ImageMetadata } from 'astro';
+
+type Props = {
+  fullName: string;
+  position: string;
+  image: ImageMetadata;
+  description: string;
+};
+
+const { fullName, position, image, description } = Astro.props;
+---
+
+<div class="space-y-4 sm:grid sm:grid-cols-3 sm:gap-6 sm:space-y-0 lg:gap-8">
+  <div class="aspect-w-3 aspect-h-2 sm:aspect-w-3 sm:aspect-h-4 h-0">
+    <img class="rounded-lg object-cover shadow-lg" height={image.height} width={image.width} src={image.src} alt="" />
+  </div>
+  <div class="sm:col-span-2">
+    <div class="space-y-4">
+      <div class="space-y-1 text-lg font-medium leading-6">
+        <h3>{fullName}</h3>
+        <p class="text-indigo-600">{position}</p>
+      </div>
+      <div>
+        <p class="text-slate-600">
+          {description}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

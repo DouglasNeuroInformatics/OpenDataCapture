@@ -47,6 +47,12 @@ export const translations = {
       fr: 'Excel pour la gestion des données, feuilles de calcul non requises'
     }
   },
+  team: {
+    title: {
+      en: 'Team',
+      fr: "L'équipe"
+    }
+  },
   blog: {
     title: {
       en: 'Blog',
