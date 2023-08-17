@@ -1,7 +1,9 @@
 ---
-import gabrielDevenyi from '@/assets/gabriel_devenyi.jpg';
 import Page from '@/layouts/Page.astro';
-import TeamMember from '@/components/team/TeamMember.astro';
+
+import { getCollection } from 'astro:content';
+
+const team = await getCollection('team');
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
@@ -10,16 +12,36 @@ export const getStaticPaths = () => {
 
 <Page>
   <div class="space-y-12 pt-12">
-    <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-center">Meet Our Team</h2>
+    <h2 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Meet Our Team</h2>
     <ul role="list" class="space-y-12 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8 lg:gap-y-12 lg:space-y-0">
-      <li>
-        <TeamMember
-          fullName="Gabriel Devenyi, PhD"
-          position="Project Lead"
-          image={gabrielDevenyi}
-          description="Gabriel Devenyi leads the Douglas Neuroinformatics Platform (DNP), architecting the software, platforms, and infrastructure of the DNP."
-        />
-      </li>
+      {
+        team.map(({ data: { fullName, position, image, description } }) => (
+          <li>
+            <div class="space-y-4 sm:grid sm:grid-cols-3 sm:gap-6 sm:space-y-0 lg:gap-8">
+              <div class="aspect-w-3 aspect-h-2 sm:aspect-w-3 sm:aspect-h-4 h-0">
+                <img
+                  class="rounded-lg object-cover shadow-lg"
+                  height={image.height}
+                  width={image.width}
+                  src={image.src}
+                  alt=""
+                />
+              </div>
+              <div class="sm:col-span-2">
+                <div class="space-y-4">
+                  <div class="space-y-1 text-lg font-medium leading-6">
+                    <h3>{fullName}</h3>
+                    <p class="text-indigo-600">{position}</p>
+                  </div>
+                  <div>
+                    <p class="text-slate-600">{description}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))
+      }
     </ul>
   </div>
 </Page>
