@@ -10,13 +10,13 @@ type Props = {
 const { heading, subheading, description } = Astro.props;
 ---
 
-<Section class="grid grid-cols-2">
-  <div>
-    <span>{subheading}</span>
-    <h3>{heading}</h3>
-    <p>{description}</p>
+<Section class="grid grid-cols-2 gap-8">
+  <div class="flex flex-col justify-center">
+    <h2 class="text-sm font-semibold tracking-wide uppercase">{heading}</h2>
+    <p class="mt-3 text-3xl font-extrabold">{subheading}</p>
+    <p class="mt-6">{description}</p>
   </div>
-  <div>
+  <div class="flex flex-col items-center justify-center">
     <img src="https://placehold.co/600x400" alt="placeholder">
   </div>
 </Section>
