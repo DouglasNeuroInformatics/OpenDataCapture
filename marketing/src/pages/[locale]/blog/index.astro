@@ -1,5 +1,5 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 
@@ -7,14 +7,14 @@ export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
 
-const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
+const { t } = useTranslations(Astro.url);
 
 const allBlogPosts = await getCollection('blog');
 
 console.log(allBlogPosts);
 ---
 
-<Page title={`${t('platform.title')} - ${t('blog.title')}`}>
+<Page meta={{ title: `${t('platform.title')} - ${t('blog.title')}` }}>
   <div class="py-16 divide-y space-y-3 divide-slate-300 dark:divide-slate-700">
     <div>
       <h1 class="text-3xl tracking-tight font-extrabold sm:text-4xl">{t('blog.heading')}</h1>

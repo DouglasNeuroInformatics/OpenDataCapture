@@ -21,8 +21,7 @@ function getTranslation(path: TranslationKey, language: Language) {
   return (value[language] ?? value) as string;
 }
 
-/** Return the locale parsed from the URL */
-export function extractLanguageFromURL(url: URL) {
+function extractLanguageFromURL(url: URL) {
   const locale = url.pathname.split('/')[1];
   if (locale === 'fr') {
     return locale;

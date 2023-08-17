@@ -15,6 +15,7 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
       <Logo class="hidden fill-sky-900 dark:fill-slate-100 md:block" />
       <MenuIcon class="md:hidden p-1" id="menu-icon" />
     </button>
+    <span class="ml-3 font-semibold font-lg hidden md:block">CliniCollect</span>
     <nav
       class="flex flex-col w-full order-last overflow-hidden transition-mh duration-300 md:order-none md:justify-end md:gap-3 md:flex-row"
       id="nav-dropdown"
@@ -37,28 +38,31 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
   const toggle = document.getElementById('nav-toggle')!;
   const nav = document.getElementById('nav-dropdown')!;
 
-  const setDefaultNavMaxHeight = (isDesktop: boolean) => {
-    if (isDesktop) {
-      nav.style.maxHeight = 'none';
-    } else {
-      nav.style.maxHeight = '0px';
-    }
+  const handleToggleClick = () => {
+    nav.style.maxHeight = nav.offsetHeight ? '0px' : `${nav.scrollHeight}px`;
   };
 
-  const toggleNavMaxHeight = () => {
-    if (nav.offsetHeight) {
-      nav.style.maxHeight = '0px';
-    } else {
-      nav.style.maxHeight = `${nav.scrollHeight}px`;
-    }
+  const handleChangeMobile = () => {
+    nav.style.maxHeight = '0px';
+    toggle.addEventListener('click', handleToggleClick);
   };
 
-  const desktopQuery = window.matchMedia('(min-width: 768px)');
-  setDefaultNavMaxHeight(desktopQuery.matches);
+  const handleChangeDesktop = () => {
+    nav.style.maxHeight = 'none';
+    toggle.removeEventListener('click', handleToggleClick);
+  };
 
-  desktopQuery.addEventListener('change', ({ matches }) => {
-    setDefaultNavMaxHeight(matches);
+  const mobileQuery = window.matchMedia('(width < 768px)');
+
+  if (mobileQuery.matches) {
+    handleChangeMobile();
+  }
+
+  mobileQuery.addEventListener('change', ({ matches }) => {
+    if (matches) {
+      handleChangeMobile();
+    } else {
+      handleChangeDesktop();
+    }
   });
-
-  toggle.addEventListener('click', toggleNavMaxHeight);
 </script>
