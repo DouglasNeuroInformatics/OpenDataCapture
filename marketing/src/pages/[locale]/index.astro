@@ -1,5 +1,6 @@
 ---
 import Hero from '@/components/landing/Hero.astro';
+import Testimonials from '@/components/landing/Testimonials.astro';
 import Page from '@/layouts/Page.astro';
 
 export const getStaticPaths = () => {
@@ -8,7 +9,6 @@ export const getStaticPaths = () => {
 ---
 
 <Page>
-  <div class="flex items-center justify-center flex-grow">
-    <Hero />
-  </div>
+  <Hero />
+  <Testimonials />
 </Page>

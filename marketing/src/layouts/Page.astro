@@ -23,9 +23,9 @@ const { meta } = Astro.props;
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>{meta?.title ?? t('platform.title')}</title>
   </head>
-  <body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col dark:bg-slate-900 dark:text-slate-100">
+  <body class="bg-slate-100 text-slate-900 h-screen flex flex-col dark:bg-slate-900 dark:text-slate-100">
     <Header />
-    <main class="container flex flex-col flex-grow">
+    <main class="container">
       <slot />
     </main>
   </body>

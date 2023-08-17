@@ -1,10 +1,15 @@
 ---
 import happyPerson from '@/assets/happy-person.jpg';
 import { useTranslations } from '@/i18n';
+import Section from '@/layouts/Section.astro';
 const { t } = useTranslations(Astro.url);
 ---
 
-<section class="flex gap-5 text-center xl:text-left">
+<Section>
+  <h1>Hero</h1>
+</Section>
+
+<!-- <Section class="flex gap-5 text-center xl:text-left">
   <div class="flex flex-grow flex-col justify-center">
     <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-4xl lg:text-5xl">
       {t('home.heading')}
@@ -28,4 +33,4 @@ const { t } = useTranslations(Astro.url);
   <div class="hidden w-80 xl:block">
     <img alt={t('home.happyPerson')} {...happyPerson} />
   </div>
-</section>
+</Section> -->
