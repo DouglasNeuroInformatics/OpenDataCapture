@@ -21,22 +21,24 @@ export const getStaticPaths = () => {
 <Page>
   <div class="space-y-12 py-12">
     <h2 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Meet Our Team</h2>
-    <ul class="grid grid-cols-2 gap-8">
+    <ul class="grid gap-8 lg:grid-cols-2">
       {
         team.map(({ data: { fullName, position, image, description } }) => (
           <li>
             <div class="grid grid-cols-3 gap-8">
-              <img
-                class="rounded-lg object-cover shadow-lg"
-                height={image.height}
-                width={image.width}
-                src={image.src}
-                alt=""
-              />
-              <div class="col-span-2 space-y-1 leading-relaxed font-medium text-lg">
+              <div class="flex items-center justify-center">
+                <img
+                  class="rounded-lg object-cover shadow-lg"
+                  height={image.height}
+                  width={image.width}
+                  src={image.src}
+                  alt=""
+                />
+              </div>
+              <div class="col-span-2 space-y-1 text-lg font-medium leading-relaxed">
                 <h3>{fullName}</h3>
                 <span class="text-indigo-600">{position}</span>
-                <p class="mt-1 text-slate-600 leading-tight font-normal text-base">{description}</p>
+                <p class="mt-1 text-base font-normal leading-tight text-slate-600">{description}</p>
               </div>
             </div>
           </li>
