@@ -1,0 +1,31 @@
+---
+import happyPerson from '@/assets/happy-person.jpg';
+import { useTranslations } from '@/i18n';
+const { t } = useTranslations(Astro.url);
+---
+
+<section class="flex gap-5 text-center xl:text-left">
+  <div class="flex flex-grow flex-col justify-center">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-4xl lg:text-5xl">
+      {t('home.heading')}
+    </h1>
+    <p class="mx-auto mt-3 w-11/12 text-base text-slate-600 dark:text-slate-300 md:mt-5 md:text-lg xl:mx-0">
+      {t('home.subheading')}
+    </p>
+    <div class="mt-5 flex justify-center gap-3 xl:justify-start">
+      <button
+        class="flex items-center justify-center rounded-md font-medium shadow-md focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 text-md px-6 py-2 bg-slate-800 text-slate-100 hover:bg-slate-700 dark:bg-sky-700 dark:hover:bg-sky-600"
+      >
+        {t('home.viewDemo')}
+      </button>
+      <button
+        class="flex items-center justify-center rounded-md font-medium shadow-md focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 text-md px-6 py-2 border bg-inherit"
+      >
+        {t('home.learnMore')}
+      </button>
+    </div>
+  </div>
+  <div class="hidden w-80 xl:block">
+    <img alt={t('home.happyPerson')} {...happyPerson} />
+  </div>
+</section>
