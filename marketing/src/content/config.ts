@@ -15,7 +15,9 @@ export const collections = {
         fullName: z.string(),
         suffix: z.string().optional(),
         position: z.string(),
-        image: image(),
+        image: image().refine((arg) => arg.height === arg.width, {
+          message: 'Image must be square (1:1 aspect ratio)'
+        }),
         description: z.string(),
         seniority: z.number().positive().int()
       })
