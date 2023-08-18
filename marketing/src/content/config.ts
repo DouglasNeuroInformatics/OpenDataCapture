@@ -5,6 +5,7 @@ export const collections = {
     schema: z.object({
       title: z.string(),
       description: z.string(),
+      language: z.enum(['en', 'fr']),
       author: reference('team'),
       datePublished: z.date(),
       estimatedReadingMinutes: z.number(),

@@ -2,6 +2,7 @@
 title: 'Embracing Open Source: The Vital Role of Open-Source Software in Electronic Data Capture Platforms for Research Clinics'
 description: 'TBD'
 author: joshua-unrau
+language: en
 datePublished: 2023-08-16
 estimatedReadingMinutes: 10
 type: article
