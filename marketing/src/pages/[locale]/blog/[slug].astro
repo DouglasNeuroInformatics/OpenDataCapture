@@ -2,7 +2,9 @@
 import Page from '@/layouts/Page.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-type Props = CollectionEntry<'blog'>;
+type Props = {
+  post: CollectionEntry<'blog'>;
+};
 
 export const getStaticPaths = async () => {
   const posts = await getCollection('blog');
@@ -11,20 +13,26 @@ export const getStaticPaths = async () => {
 
   const paths = posts.map((post) => ({
     params: {
-      locale: post.data.language === 'fr' ? 'fr' : undefined,
+      locale: post.data.language,
       slug: post.slug
     },
-    props: post
+    props: { post }
   }));
 
   return paths;
 };
 
-const post = Astro.props;
+const { post } = Astro.props;
 
 const { Content } = await post.render();
 ---
 
-<Page meta={{ title: post.data.title }}>
+<Page meta={{ title: post.data.title, description: post.data.description }}>
   <Content />
 </Page>
+
+<style>
+  h2 {
+    color: red;
+  }
+</style>

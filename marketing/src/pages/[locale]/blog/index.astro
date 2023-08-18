@@ -5,7 +5,7 @@ import Page from '@/layouts/Page.astro';
 import { getEntry } from 'astro:content';
 
 export const getStaticPaths = () => {
-  return [{ params: { locale: undefined } }, { params: { locale: 'fr' } }];
+  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
 
 const { altLanguage, resolvedLanguage, t, translatePath } = useTranslations(Astro.url);

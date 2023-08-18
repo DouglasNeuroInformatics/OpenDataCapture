@@ -36,7 +36,7 @@ export function useTranslations(url: URL) {
     return getTranslation(key, resolvedLanguage);
   };
   const translatePath = (path: string) => {
-    return resolvedLanguage === 'en' ? path : `/${resolvedLanguage}${path}`;
+    return `/${resolvedLanguage}${path}`;
   };
   return { altLanguage, resolvedLanguage, t, translatePath };
 }

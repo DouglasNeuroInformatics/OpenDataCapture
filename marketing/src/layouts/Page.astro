@@ -3,6 +3,7 @@ import Header from '@/components/core/Header.astro';
 import { useTranslations } from '@/i18n';
 
 type Props = {
+  bilingual?: boolean;
   meta?: {
     title?: string;
     description?: string;
@@ -11,21 +12,24 @@ type Props = {
 
 const { resolvedLanguage, t } = useTranslations(Astro.url);
 
-const { meta } = Astro.props;
+const { bilingual, meta } = Astro.props;
+
+const path = Astro.url.pathname.replace(/^\/fr/, '')
+
 ---
 
 <!DOCTYPE html>
 <html lang={resolvedLanguage}>
   <head>
     <meta charset="UTF-8" />
+    <title>{meta?.title ?? t('platform.title')}</title>
     <meta name="description" content={meta?.description ?? t('platform.description')} />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <title>{meta?.title ?? t('platform.title')}</title>
   </head>
-  <body class="bg-slate-100 text-slate-900 h-screen flex flex-col dark:bg-slate-900 dark:text-slate-100 scroll-smooth">
+  <body class="flex h-screen flex-col scroll-smooth bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <Header />
-    <main class="container px-1 md:px-3 pt-16">
+    <main class="container px-1 pt-16 md:px-3">
       <slot />
     </main>
   </body>
@@ -34,11 +38,10 @@ const { meta } = Astro.props;
 <!-- 
 <html lang={resolvedLanguage}>
   <head>
-    <meta charset="utf-8" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <link rel="alternate" href={new URL('/en/', Astro.site)} hreflang="en" />
     <link rel="alternate" href={new URL('/fr/', Astro.site)} hreflang="fr" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="viewport" content="width=device-width" />
     <meta name="author" content={t('meta.author')} />
