@@ -4,10 +4,10 @@ import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 
 export const getStaticPaths = () => {
-  return [{ params: { locale: undefined } }, { params: { locale: "fr" } }];
+  return [{ params: { locale: undefined } }, { params: { locale: 'fr' } }];
 };
 
-const { t } = useTranslations(Astro.url);
+const { resolvedLanguage, t } = useTranslations(Astro.url);
 
 const allBlogPosts = await getCollection('blog');
 
@@ -19,42 +19,38 @@ console.log(allBlogPosts);
   <div class="mt-12 grid gap-16 pt-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-12">
     {
       allBlogPosts.map((post) => (
-        <div class="rounded-md border p-3">
-          <div>
-            <a href={post.slug} class="inline-block">
-              <span
-                class:list={[
-                  'inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium',
-                  post.data.type === 'article' && 'bg-indigo-100 text-indigo-800',
-                  post.data.type === 'case-study' && 'bg-green-100 text-green-800',
-                  post.data.type === 'video' && 'bg-pink-100 text-pink-800'
-                ]}
-              >
-                {post.data.type}
-              </span>
-            </a>
+        <div class="rounded-md border border-slate-300 bg-slate-50 p-5 shadow-sm dark:border-slate-600 dark:bg-slate-800">
+          <span
+            class:list={[
+              'inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium',
+              post.data.type === 'article' && 'bg-indigo-100 text-indigo-800',
+              post.data.type === 'caseStudy' && 'bg-green-100 text-green-800',
+              post.data.type === 'video' && 'bg-pink-100 text-pink-800'
+            ]}
+          >
+            {t(`blog.${post.data.type}`)}
+          </span>
+          <div class="mt-4">
+            <p class="text-xl font-semibold">{post.data.title}</p>
+            <p class="mt-3 text-base text-slate-600 dark:text-slate-300">{post.data.description}</p>
           </div>
-          <a href="#" class="mt-4 block">
-            <p class="text-xl font-semibold text-gray-900">{post.data.title}</p>
-            <p class="mt-3 text-base text-gray-500">{post.data.description}</p>
-          </a>
           <div class="mt-6 flex items-center">
             <div class="flex-shrink-0">
-              <a href="#">
-                <span class="sr-only">{post.data.author}</span>
-                <img
-                  class="h-10 w-10 rounded-full"
-                  src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
-                />
-              </a>
+              <span class="sr-only">{post.data.author}</span>
+              <img
+                class="h-10 w-10 rounded-full"
+                src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt=""
+              />
             </div>
             <div class="ml-3">
-              <p class="text-sm font-medium text-gray-900">
-                <a href="#">{post.data.author}</a>
-              </p>
-              <div class="flex space-x-1 text-sm text-gray-500">
-                <time datetime="2020-03-10">{post.data.datePublished.toISOString()}</time>
+              <p class="text-sm font-medium">{post.data.author}</p>
+              <div class="flex space-x-1 text-sm text-slate-600 dark:text-slate-300">
+                <time datetime={post.data.datePublished.toISOString()}>
+                  {post.data.datePublished.toLocaleDateString(resolvedLanguage, {
+                    dateStyle: 'long'
+                  })}
+                </time>
                 <span aria-hidden="true">&middot;</span>
                 <span>{post.data.estimatedReadingMinutes} min read</span>
               </div>

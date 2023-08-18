@@ -71,6 +71,15 @@ export const translations = {
     subheading: {
       en: 'All the latest news on CliniCollect and the open-source electronic data capture community',
       fr: 'Toutes les dernières nouvelles sur CliniCollect et la communauté de la saisie électronique de données open-source'
+    },
+    article: 'Article',
+    caseStudy: {
+      en: 'Case Study',
+      fr: 'Étude de cas'
+    },
+    video: {
+      en: 'Video',
+      fr: 'Vidéo'
     }
   },
   languageToggle: {

@@ -8,7 +8,7 @@ export const collections = {
       author: z.string(),
       datePublished: z.date(),
       estimatedReadingMinutes: z.number(),
-      type: z.enum(['article', 'case-study', 'video'])
+      type: z.enum(['article', 'caseStudy', 'video'])
     })
   }),
   team: defineCollection({
