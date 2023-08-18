@@ -1,0 +1,32 @@
+---
+import Page from '@/layouts/Page.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+type Props = {
+  post: CollectionEntry<'blog'>;
+};
+
+export const getStaticPaths = async () => {
+  const posts = await getCollection('blog');
+
+  console.log(JSON.stringify(posts, null, 2));
+
+  const paths = posts.map((post) => ({
+    params: {
+      locale: post.data.language,
+      slug: post.slug
+    },
+    props: { post }
+  }));
+
+  return paths;
+};
+
+const { post } = Astro.props;
+
+const { Content } = await post.render();
+---
+
+<Page meta={{ title: post.data.title, description: post.data.description }}>
+  <Content />
+</Page>

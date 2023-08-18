@@ -3,62 +3,52 @@ import Header from '@/components/core/Header.astro';
 import { useTranslations } from '@/i18n';
 
 type Props = {
+  bilingual?: boolean;
   meta?: {
     title?: string;
     description?: string;
+    author?: string;
+    keywords?: string[];
   };
 };
 
-const { resolvedLanguage, t } = useTranslations(Astro.url);
+const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
 
-const { meta } = Astro.props;
+const { bilingual, meta } = Astro.props;
+
+const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
 ---
 
 <!DOCTYPE html>
 <html lang={resolvedLanguage}>
   <head>
     <meta charset="UTF-8" />
+    <title>{meta?.title ?? t('platform.title')}</title>
     <meta name="description" content={meta?.description ?? t('platform.description')} />
     <meta name="viewport" content="width=device-width" />
+    {meta?.author && <meta name="author" content={meta.author} />}
+    {meta?.keywords && <meta name="keywords" content={meta.keywords.join(', ')} />}
+    <meta property="og:title" content={meta?.title ?? t('platform.title')} />
+    <meta property="og:description" content={meta?.description ?? t('platform.description')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    {
+      bilingual && (
+        <>
+          <meta property="og:locale" content={resolvedLanguage} />
+          <meta property="og:locale:alternate" content={altLanguage} />
+          <link rel="alternate" href={new URL(`/en${path}`, Astro.site)} hreflang="en" />
+          <link rel="alternate" href={new URL(`/fr${path}`, Astro.site)} hreflang="fr" />
+        </>
+      )
+    }
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <title>{meta?.title ?? t('platform.title')}</title>
+    <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
-  <body class="bg-slate-100 text-slate-900 h-screen flex flex-col dark:bg-slate-900 dark:text-slate-100 scroll-smooth">
+  <body class="flex h-screen flex-col scroll-smooth bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <Header />
-    <main class="container px-1 md:px-3 pt-16">
+    <main class="container px-1 pt-16 md:px-3">
       <slot />
     </main>
   </body>
 </html>
-
-<!-- 
-<html lang={resolvedLanguage}>
-  <head>
-    <meta charset="utf-8" />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-    <link rel="alternate" href={new URL('/en/', Astro.site)} hreflang="en" />
-    <link rel="alternate" href={new URL('/fr/', Astro.site)} hreflang="fr" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="author" content={t('meta.author')} />
-    <meta name="description" content={t('meta.description')} />
-    <meta name="keywords" content={t('meta.keywords')} />
-    <meta property="og:title" content={t('meta.title')} />
-    <meta property="og:description" content={t('meta.description')} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
-    <meta property="og:locale" content={resolvedLanguage} />
-    <meta property="og:locale:alternate" content={altLanguage} />
-    <meta property="og:image" content={logo.src} />
-    <meta property="og:image:alt" content="Logo" />
-    <meta property="og:image:height" content={logo.height.toString()} />
-    <meta property="og:image:width" content={logo.width.toString()} />
-    <title>{t('meta.title')}</title>
-  </head>
-  <body class="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
-    <main class="container">
-      <h1>{t('meta.title')}</h1>
-    </main>
-  </body>
-</html> -->

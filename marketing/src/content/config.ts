@@ -1,14 +1,14 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection, reference, z } from 'astro:content';
 
 export const collections = {
   blog: defineCollection({
     schema: z.object({
       title: z.string(),
       description: z.string(),
-      author: z.string(),
+      language: z.enum(['en', 'fr']),
+      author: reference('team'),
       datePublished: z.date(),
-      estimatedReadingMinutes: z.number(),
-      type: z.enum(['article', 'case-study', 'video'])
+      type: z.enum(['article', 'caseStudy', 'video'])
     })
   }),
   team: defineCollection({
