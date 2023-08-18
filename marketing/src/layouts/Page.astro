@@ -7,15 +7,16 @@ type Props = {
   meta?: {
     title?: string;
     description?: string;
+    author?: string;
+    keywords?: string[];
   };
 };
 
-const { resolvedLanguage, t } = useTranslations(Astro.url);
+const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
 
 const { bilingual, meta } = Astro.props;
 
-const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '')
-
+const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
 ---
 
 <!DOCTYPE html>
@@ -25,10 +26,22 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '')
     <title>{meta?.title ?? t('platform.title')}</title>
     <meta name="description" content={meta?.description ?? t('platform.description')} />
     <meta name="viewport" content="width=device-width" />
-    {bilingual && (
-      <link rel="alternate" href={new URL(`/en${path}`, Astro.site)} hreflang="en" />
-      <link rel="alternate" href={new URL(`/fr${path}`, Astro.site)} hreflang="fr" />
-    )}
+    {meta?.author && <meta name="author" content={meta.author} />}
+    {meta?.keywords && <meta name="keywords" content={meta.keywords.join(', ')} />}
+    <meta property="og:title" content={meta?.title ?? t('platform.title')} />
+    <meta property="og:description" content={meta?.description ?? t('platform.description')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    {
+      bilingual && (
+        <>
+          <meta property="og:locale" content={resolvedLanguage} />
+          <meta property="og:locale:alternate" content={altLanguage} />
+          <link rel="alternate" href={new URL(`/en${path}`, Astro.site)} hreflang="en" />
+          <link rel="alternate" href={new URL(`/fr${path}`, Astro.site)} hreflang="fr" />
+        </>
+      )
+    }
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
@@ -39,29 +52,3 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '')
     </main>
   </body>
 </html>
-
-<!-- 
-<html lang={resolvedLanguage}>
-  <head>
-
-    <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="author" content={t('meta.author')} />
-    <meta name="keywords" content={t('meta.keywords')} />
-    <meta property="og:title" content={t('meta.title')} />
-    <meta property="og:description" content={t('meta.description')} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
-    <meta property="og:locale" content={resolvedLanguage} />
-    <meta property="og:locale:alternate" content={altLanguage} />
-    <meta property="og:image" content={logo.src} />
-    <meta property="og:image:alt" content="Logo" />
-    <meta property="og:image:height" content={logo.height.toString()} />
-    <meta property="og:image:width" content={logo.width.toString()} />
-    <title>{t('meta.title')}</title>
-  </head>
-  <body class="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
-    <main class="container">
-      <h1>{t('meta.title')}</h1>
-    </main>
-  </body>
-</html> -->
