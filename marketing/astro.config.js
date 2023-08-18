@@ -3,7 +3,6 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
-  base: 'DouglasDataCapturePlatform',
   build: {
     assets: '_assets'
   },
@@ -18,5 +17,5 @@ export default defineConfig({
   server: {
     port: parseInt(process.env.MARKETING_DEV_SERVER_PORT ?? 4000)
   },
-  site: 'https://douglasneuroinformatics.github.io'
+  // site: 'https://douglasneuroinformatics.github.io'
 });
