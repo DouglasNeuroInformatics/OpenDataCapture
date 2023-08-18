@@ -1,0 +1,9 @@
+---
+type Props = astroHTML.JSX.HTMLAttributes;
+
+const { class: className, ...props } = Astro.props;
+---
+
+<section class:list={["min-h-[calc(100vh-4rem)]", className]} {...props}>
+  <slot />
+</section>

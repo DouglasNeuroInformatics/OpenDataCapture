@@ -37,6 +37,22 @@ export const translations = {
       fr: 'Personne heureuse'
     }
   },
+  dataManagement: {
+    heading: {
+      en: 'Effortless Data Management',
+      fr: 'Rationalisez la gestion de vos données'
+    },
+    subheading: {
+      en: 'Excel at Data Management, Spreadsheets Not Required',
+      fr: 'Excel pour la gestion des données, feuilles de calcul non requises'
+    }
+  },
+  team: {
+    title: {
+      en: 'Team',
+      fr: "L'équipe"
+    }
+  },
   blog: {
     title: {
       en: 'Blog',
