@@ -14,7 +14,7 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
 
 const { bilingual, meta } = Astro.props;
 
-const path = Astro.url.pathname.replace(/^\/fr/, '')
+const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '')
 
 ---
 
@@ -25,6 +25,10 @@ const path = Astro.url.pathname.replace(/^\/fr/, '')
     <title>{meta?.title ?? t('platform.title')}</title>
     <meta name="description" content={meta?.description ?? t('platform.description')} />
     <meta name="viewport" content="width=device-width" />
+    {bilingual && (
+      <link rel="alternate" href={new URL(`/en${path}`, Astro.site)} hreflang="en" />
+      <link rel="alternate" href={new URL(`/fr${path}`, Astro.site)} hreflang="fr" />
+    )}
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   </head>
   <body class="flex h-screen flex-col scroll-smooth bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
@@ -38,9 +42,6 @@ const path = Astro.url.pathname.replace(/^\/fr/, '')
 <!-- 
 <html lang={resolvedLanguage}>
   <head>
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-    <link rel="alternate" href={new URL('/en/', Astro.site)} hreflang="en" />
-    <link rel="alternate" href={new URL('/fr/', Astro.site)} hreflang="fr" />
 
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="viewport" content="width=device-width" />
