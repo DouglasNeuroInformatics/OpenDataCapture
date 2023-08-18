@@ -1,5 +1,8 @@
 ---
-import { getCollection } from 'astro:content';
+import Page from '@/layouts/Page.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+type Props = CollectionEntry<'blog'>;
 
 export const getStaticPaths = async () => {
   const posts = await getCollection('blog');
@@ -10,20 +13,18 @@ export const getStaticPaths = async () => {
     params: {
       locale: post.data.language === 'fr' ? 'fr' : undefined,
       slug: post.slug
-    }
+    },
+    props: post
   }));
 
   return paths;
 };
 
-// const { lang, slug } = Astro.params;
-// const page = Astro.props;
-// const formattedDate = page.data.date.toLocaleString(lang);
+const post = Astro.props;
 
-// const { Content } = await page.render();
+const { Content } = await post.render();
 ---
 
-<h1>Hello!</h1>
-<!-- <h1>{page.data.title}</h1>
-<p>by {page.data.author} • {formattedDate}</p>
-<Content /> -->
+<Page meta={{ title: post.data.title }}>
+  <Content />
+</Page>
