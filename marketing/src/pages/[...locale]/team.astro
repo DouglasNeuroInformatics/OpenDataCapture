@@ -14,8 +14,9 @@ team.sort((a, b) => {
 });
 
 export const getStaticPaths = () => {
-  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
+  return [{ params: { locale: undefined } }, { params: { locale: 'fr' } }];
 };
+
 ---
 
 <Page>

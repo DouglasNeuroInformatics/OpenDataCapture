@@ -13,8 +13,8 @@ type Translations = typeof translations;
 
 type TranslationKey = ExtractTranslationKey<Translations>;
 
-function getTranslation(path: TranslationKey, language: Language) {
-  const value = path
+function getTranslation(key: TranslationKey, language: Language) {
+  const value = key
     .split('.')
     .filter(Boolean)
     .reduce((accumulator, currentValue) => (accumulator as any)?.[currentValue], translations as any);
@@ -32,8 +32,11 @@ function extractLanguageFromURL(url: URL) {
 export function useTranslations(url: URL) {
   const resolvedLanguage = extractLanguageFromURL(url);
   const altLanguage = resolvedLanguage === 'en' ? 'fr' : 'en';
-  const t = (path: TranslationKey) => {
-    return getTranslation(path, resolvedLanguage);
+  const t = (key: TranslationKey) => {
+    return getTranslation(key, resolvedLanguage);
   };
-  return { altLanguage, resolvedLanguage, t };
+  const translatePath = (path: string) => {
+    return resolvedLanguage === 'en' ? path : `/${resolvedLanguage}${path}`;
+  };
+  return { altLanguage, resolvedLanguage, t, translatePath };
 }

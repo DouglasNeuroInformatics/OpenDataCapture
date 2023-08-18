@@ -11,6 +11,12 @@ export const translations = {
       fr: 'Collecte de données, Saisie de données, Saisie électronique de données, Clinique, Recherche'
     }
   },
+  routes: {
+    blog: {
+      en: 'blog',
+      fr: 'blogue'
+    }
+  },
   home: {
     title: {
       en: 'Home',

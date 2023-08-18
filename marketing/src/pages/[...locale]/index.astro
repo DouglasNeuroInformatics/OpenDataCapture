@@ -5,9 +5,8 @@ import Testimonials from '@/components/landing/Testimonials.astro';
 import Page from '@/layouts/Page.astro';
 
 export const getStaticPaths = () => {
-  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
+  return [{ params: { locale: undefined } }, { params: { locale: 'fr' } }];
 };
-
 ---
 
 <Page>
