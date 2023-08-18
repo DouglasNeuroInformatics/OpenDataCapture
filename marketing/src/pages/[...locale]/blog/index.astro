@@ -1,5 +1,5 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 import { getEntry } from 'astro:content';
@@ -10,8 +10,7 @@ export const getStaticPaths = () => {
 
 const { resolvedLanguage, t, translatePath } = useTranslations(Astro.url);
 
-const posts = await getCollection('blog');
-
+const posts = await getCollection('blog', ({ data }) => data.language === resolvedLanguage);
 ---
 
 <Page meta={{ title: `${t('platform.title')} - ${t('blog.title')}` }}>
@@ -21,7 +20,10 @@ const posts = await getCollection('blog');
       posts.map(async (post) => {
         const author = await getEntry(post.data.author);
         return (
-          <a class="cursor-pointer rounded-md border border-slate-300 bg-slate-50 p-5 shadow-sm dark:border-slate-600 dark:bg-slate-800" href={translatePath(`/blog/${post.slug}`)}>
+          <a
+            class="cursor-pointer rounded-md border border-slate-300 bg-slate-50 p-5 shadow-sm dark:border-slate-600 dark:bg-slate-800"
+            href={translatePath(`/blog/${post.slug}`)}
+          >
             <span
               class:list={[
                 'inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium',
