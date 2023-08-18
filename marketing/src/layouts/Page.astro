@@ -30,6 +30,7 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '')
       <link rel="alternate" href={new URL(`/fr${path}`, Astro.site)} hreflang="fr" />
     )}
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body class="flex h-screen flex-col scroll-smooth bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <Header />
@@ -44,9 +45,7 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '')
   <head>
 
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="viewport" content="width=device-width" />
     <meta name="author" content={t('meta.author')} />
-    <meta name="description" content={t('meta.description')} />
     <meta name="keywords" content={t('meta.keywords')} />
     <meta property="og:title" content={t('meta.title')} />
     <meta property="og:description" content={t('meta.description')} />
