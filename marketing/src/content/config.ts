@@ -8,7 +8,6 @@ export const collections = {
       language: z.enum(['en', 'fr']),
       author: reference('team'),
       datePublished: z.date(),
-      estimatedReadingMinutes: z.number(),
       type: z.enum(['article', 'caseStudy', 'video'])
     })
   }),

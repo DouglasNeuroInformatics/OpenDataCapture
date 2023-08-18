@@ -25,6 +25,7 @@ const posts = await getCollection('blog', ({ data }) => data.language === resolv
       <div class="grid gap-4 lg:grid-cols-2">
         {posts.map(async (post) => {
           const author = await getEntry(post.data.author);
+          const { remarkPluginFrontmatter } = await post.render();
           return (
             <a
               class="cursor-pointer rounded-md border border-slate-300 bg-slate-50 p-5 shadow-sm dark:border-slate-600 dark:bg-slate-800"
@@ -58,7 +59,7 @@ const posts = await getCollection('blog', ({ data }) => data.language === resolv
                       })}
                     </time>
                     <span aria-hidden="true">&middot;</span>
-                    <span>{post.data.estimatedReadingMinutes} min read</span>
+                    <span>{Math.round(remarkPluginFrontmatter.readingTime)} min read</span>
                   </div>
                 </div>
               </div>

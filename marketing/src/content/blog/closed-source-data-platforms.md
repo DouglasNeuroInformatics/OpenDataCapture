@@ -6,7 +6,6 @@ high costs, vendor lock-in, and data security risks.'
 author: joshua-unrau
 language: en
 datePublished: 2023-08-18
-estimatedReadingMinutes: 10
 ---
 
 In the digital age, electronic data capture (EDC) platforms have revolutionized the way we collect, manage, and analyze data. In the realms of clinical research and patient care, electronic data capture tools offer numerous benefits, such as streamlining processes, improving accuracy, and facilitating collaboration. However, not all electronic data capture platforms are created equal, and the closed-source nature of many platforms presents a myriad of challenges and risks that need to be critically examined.
