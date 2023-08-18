@@ -4,8 +4,11 @@ export const collections = {
   blog: defineCollection({
     schema: z.object({
       title: z.string(),
+      description: z.string(),
       author: z.string(),
-      date: z.date()
+      datePublished: z.date(),
+      estimatedReadingMinutes: z.number(),
+      type: z.enum(['article', 'case-study', 'video'])
     })
   }),
   team: defineCollection({
