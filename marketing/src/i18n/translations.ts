@@ -72,6 +72,14 @@ export const translations = {
       en: 'All the latest news on CliniCollect and the open-source electronic data capture community',
       fr: 'Toutes les dernières nouvelles sur CliniCollect et la communauté de la saisie électronique de données open-source'
     },
+    noContent: {
+      en: 'There is no content here at the moment',
+      fr: "Il n'y a pas de contenu ici pour le moment"
+    },
+    viewAltLang: {
+      en: 'You can also view our content in French',
+      fr: 'Vous pouvez également consulter notre contenu en anglais'
+    },
     article: 'Article',
     caseStudy: {
       en: 'Case Study',
