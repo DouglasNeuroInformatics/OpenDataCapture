@@ -1,7 +1,7 @@
 ---
 title: 'The Hidden Dangers of Closed-Source Electronic Data Capture Platforms: A Blow to Scientific Research and Patient Care'
 description: 'TBD'
-author: Joshua Unrau
+author: joshua-unrau
 datePublished: 2023-08-17
 estimatedReadingMinutes: 10
 type: article
