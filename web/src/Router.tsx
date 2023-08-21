@@ -12,7 +12,7 @@ import {
   ManageInstrumentsPage
 } from './features/instruments';
 import { OverviewPage } from './features/overview/pages/OverviewPage';
-import { AddSubjectPage, SelectVisualizationPage, ViewSubjectsPage } from './features/subjects';
+import { AddVisitPage, SelectVisualizationPage, ViewSubjectsPage } from './features/subjects';
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
 
@@ -32,7 +32,7 @@ export const Router = () => {
             <Route element={<ContactPage />} path="contact" />
             <Route element={<UserPage />} path="user" />
             <Route path="subjects">
-              <Route element={<AddSubjectPage />} path="add-subject" />
+              <Route element={<AddVisitPage />} path="add-visit" />
               <Route path="view-subjects">
                 <Route index element={<ViewSubjectsPage />} />
                 <Route path=":subjectIdentifier">
@@ -58,17 +58,3 @@ export const Router = () => {
     </BrowserRouter>
   );
 };
-
-/**
-const LoginPage = React.lazy(() => import('./features/auth/pages/LoginPage'));
-const ContactPage = React.lazy(() => import('./features/contact/pages/ContactPage'));
-const AvailableInstrumentsPage = React.lazy(() => import('./features/instruments/pages/AvailableInstrumentsPage'));
-const CreateInstrumentPage = React.lazy(() => import('./features/instruments/pages/CreateInstrumentPage'));
-const FormPage = React.lazy(() => import('./features/instruments/pages/FormPage'));
-const ManageInstrumentsPage = React.lazy(() => import('./features/instruments/pages/ManageInstrumentsPage'));
-const OverviewPage = React.lazy(() => import('@/features/overview/pages/OverviewPage'));
-const AddSubjectPage = React.lazy(() => import('@/features/subjects/pages/AddSubjectPage'));
-const SubjectPage = React.lazy(() => import('@/features/subjects/pages/SubjectPage'));
-const ViewSubjectsPage = React.lazy(() => import('@/features/subjects/pages/ViewSubjectsPage'));
-const UserPage = React.lazy(() => import('@/features/user/pages/UserPage'));
- */

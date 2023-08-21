@@ -17,9 +17,9 @@ export const Navigation = (props: NavigationProps) => {
       <NavigationLink access={null} href="/overview" icon={<HiChartBar />} label={t('navLinks.overview')} {...props} />
       <NavigationLink
         access={{ action: 'create', subject: 'Subject' }}
-        href="/subjects/add-subject"
+        href="/subjects/add-visit"
         icon={<HiUserPlus />}
-        label={t('navLinks.addSubject')}
+        label={t('navLinks.addVisit')}
         {...props}
       />
       <NavigationLink

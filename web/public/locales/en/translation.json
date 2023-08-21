@@ -72,7 +72,7 @@
   },
   "username": "Username",
   "navLinks": {
-    "addSubject": "Add Subject",
+    "addVisit": "Add Visit",
     "availableInstruments": "View Instruments",
     "createInstrument": "Add Instrument",
     "lookupSubject": "Lookup Subject",
@@ -232,9 +232,9 @@
     "summary": "Summary of Available Data",
     "welcome": "Welcome Back"
   },
-  "addSubject": {
+  "addVisit": {
     "exists": "This subject has already been registered",
-    "pageTitle": "Add Subject"
+    "pageTitle": "Add Visit"
   },
   "subjectPage": {
     "graph": {

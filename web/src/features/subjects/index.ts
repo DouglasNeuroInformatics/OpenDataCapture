@@ -1,4 +1,4 @@
-export * from './pages/AddSubjectPage';
+export * from './pages/AddVisitPage';
 export * from './pages/SelectVisualizationPage';
 export * from './pages/SubjectRecordsGraphPage';
 export * from './pages/SubjectRecordsTablePage';
