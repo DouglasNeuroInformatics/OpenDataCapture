@@ -72,7 +72,7 @@
   },
   "username": "Nom d'utilisateur",
   "navLinks": {
-    "addSubject": "Ajouter un client",
+    "addVisit": "Ajouter une visite",
     "availableInstruments": "Afficher tous les instruments",
     "createInstrument": "Ajouter un instrument",
     "lookupSubject": "Trouver un client",
@@ -232,9 +232,9 @@
     "summary": "Résumé des données disponibles",
     "welcome": "Bienvenue"
   },
-  "addSubject": {
+  "addVisit": {
     "exists": "Ce client a déjà été enregistré",
-    "pageTitle": "Ajouter un client"
+    "pageTitle": "Ajouter une visite"
   },
   "subjectPage": {
     "graph": {

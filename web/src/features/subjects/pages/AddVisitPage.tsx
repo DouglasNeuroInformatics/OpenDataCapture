@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { IdentificationForm, IdentificationFormData, PageHeader } from '@/components';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
-export const AddSubjectPage = () => {
+export const AddVisitPage = () => {
   const { setActiveSubject } = useActiveSubjectStore();
   const notifications = useNotificationsStore();
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ export const AddSubjectPage = () => {
       validateStatus: (status) => status === 201 || status === 409
     });
     if (response.status === 409) {
-      notifications.addNotification({ type: 'error', message: t('addSubject.exists') });
+      notifications.addNotification({ type: 'error', message: t('addVisit.exists') });
       return;
     }
     setActiveSubject(data);
@@ -26,10 +26,10 @@ export const AddSubjectPage = () => {
 
   return (
     <div className="mx-auto max-w-screen-sm items-center">
-      <PageHeader title={t('addSubject.pageTitle')} />
+      <PageHeader title={t('addVisit.pageTitle')} />
       <IdentificationForm onSubmit={(data) => void handleSubmit(data)} />
     </div>
   );
 };
 
-export default AddSubjectPage;
+export default AddVisitPage;

@@ -11,46 +11,46 @@ export const translations = {
       fr: 'Collecte de données, Saisie de données, Saisie électronique de données, Clinique, Recherche'
     }
   },
-  routes: {
-    blog: {
-      en: 'blog',
-      fr: 'blogue'
-    }
-  },
-  home: {
+  landing: {
     title: {
-      en: 'Home',
+      en: 'Overview',
       fr: 'Accueil'
     },
-    heading: {
-      en: 'Modern, Secure, and User-Friendly Electronic Data Capture',
-      fr: 'Une plateforme de saisie électronique des données moderne, sécurisée et conviviale'
+    hero: {
+      heading: {
+        en: 'Modern, Secure, and User-Friendly Electronic Data Capture',
+        fr: 'Une plateforme de saisie électronique des données moderne, sécurisée et conviviale'
+      },
+      subheading: {
+        en: 'Finally, an easy-to-use, reliable, and open-source solution for clinical researchers',
+        fr: 'Enfin une solution facile à utiliser, fiable et open-source pour les chercheurs cliniques'
+      },
+      viewDemo: {
+        en: 'View Demo',
+        fr: 'Voir la démo'
+      },
+      learnMore: {
+        en: 'Learn More',
+        fr: 'En savoir plus'
+      },
+      happyPerson: {
+        en: 'Happy Person',
+        fr: 'Personne heureuse'
+      }
     },
-    subheading: {
-      en: 'Finally, an easy-to-use, reliable, and open-source solution for clinical researchers',
-      fr: 'Enfin une solution facile à utiliser, fiable et open-source pour les chercheurs cliniques'
-    },
-    viewDemo: {
-      en: 'View Demo',
-      fr: 'Voir la démo'
-    },
-    learnMore: {
-      en: 'Learn More',
-      fr: 'En savoir plus'
-    },
-    happyPerson: {
-      en: 'Happy Person',
-      fr: 'Personne heureuse'
-    }
-  },
-  dataManagement: {
-    heading: {
-      en: 'Effortless Data Management',
-      fr: 'Rationalisez la gestion de vos données'
-    },
-    subheading: {
-      en: 'Excel at Data Management, Spreadsheets Not Required',
-      fr: 'Excel pour la gestion des données, feuilles de calcul non requises'
+    dataManagement: {
+      heading: {
+        en: 'Effortless Data Management',
+        fr: 'Rationalisez la gestion de vos données'
+      },
+      subheading: {
+        en: 'Excel at Data Management, Spreadsheets Not Required',
+        fr: 'Excel pour la gestion des données, feuilles de calcul non requises'
+      },
+      viewSubjectsScreenshot: {
+        en: 'Screenshot of view subjects page',
+        fr: "Capture d'écran de la page de présentation de tous les sujets"
+      }
     }
   },
   team: {
