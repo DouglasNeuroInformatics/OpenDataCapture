@@ -38,6 +38,20 @@ export const translations = {
         fr: 'Personne heureuse'
       }
     },
+    addVisit: {
+      heading: {
+        en: 'Hash-Based Patient Identification',
+        fr: 'Identification des patients par hachage'
+      },
+      subheading: {
+        en: 'Precision in Anonymity',
+        fr: "La précision dans l'anonymat"
+      },
+      description: {
+        en: 'Using state-of-the-art cryptographic algorithms, we compute patient identifiers based on core demographic characteristics. This innovative approach ensures zero personal data retention while enabling consistent cross-visit association.',
+        fr: "Grâce à des algorithmes cryptographiques de pointe, nous calculons les identifiants des patients en fonction de leurs caractéristiques démographiques de base. Cette approche innovante garantit qu'aucune donnée personnelle n'est conservée tout en permettant une association cohérente entre les visites."
+      }
+    },
     dataManagement: {
       heading: {
         en: 'Effortless Data Management',

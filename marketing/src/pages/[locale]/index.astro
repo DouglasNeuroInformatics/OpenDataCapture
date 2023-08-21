@@ -1,11 +1,30 @@
 ---
 import happyPerson from '@/assets/happy-person.jpg';
-import viewSubjectsScreenshot from '@/assets/view-subjects-screenshot.png';
 import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 import Section from '@/layouts/Section.astro';
+import type { Language } from '@ddcp/types';
 
-const { t } = useTranslations(Astro.url);
+const { resolvedLanguage, t } = useTranslations(Astro.url);
+
+const screenshots = {
+  en: import.meta.glob('../../assets/screenshots/en/*.png', { import: 'default' }),
+  fr: import.meta.glob('../../assets/screenshots/fr/*.png', { import: 'default' })
+};
+
+const resolveScreenshot = (filename: string, language: Language): Promise<typeof import('*.png')> => {
+  return new Promise((resolve, reject) => {
+    for (const filepath in screenshots[language]) {
+      if (filepath.split('/').at(-1) === filename) {
+        resolve(screenshots[language][filepath]() as Promise<typeof import('*.png')>);
+      }
+    }
+    reject(new Error(`Failed to resolve screenshot '${filename}' for language '${language}'`));
+  });
+};
+
+const addVisit = await resolveScreenshot('add-visit.png', resolvedLanguage);
+const viewSubjects = await resolveScreenshot('view-subjects.png', resolvedLanguage);
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
@@ -40,6 +59,18 @@ export const getStaticPaths = () => {
   </Section>
   <Section class="grid grid-cols-2 gap-8">
     <div class="flex flex-col justify-center">
+      <span class="text-sm font-semibold uppercase tracking-wide">{t('landing.addVisit.subheading')}</span>
+      <h2 class="mt-3 text-3xl font-extrabold">{t('landing.addVisit.heading')}</h2>
+      <p class="mt-6">
+        {t('landing.addVisit.description')}
+      </p>
+    </div>
+    <div class="flex flex-col items-center justify-center">
+      <img alt={t('landing.dataManagement.viewSubjectsScreenshot')} {...addVisit} />
+    </div>
+  </Section>
+  <Section class="grid grid-cols-2 gap-8">
+    <div class="flex flex-col justify-center">
       <h2 class="text-sm font-semibold uppercase tracking-wide">{t('landing.dataManagement.heading')}</h2>
       <p class="mt-3 text-3xl font-extrabold">{t('landing.dataManagement.subheading')}</p>
       <p class="mt-6">
@@ -50,7 +81,7 @@ export const getStaticPaths = () => {
       </p>
     </div>
     <div class="flex flex-col items-center justify-center">
-      <img alt={t('landing.dataManagement.viewSubjectsScreenshot')} {...viewSubjectsScreenshot} />
+      <img alt={t('landing.dataManagement.viewSubjectsScreenshot')} {...viewSubjects} />
     </div>
   </Section>
   <Section>
