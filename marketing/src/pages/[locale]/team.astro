@@ -20,10 +20,10 @@ export const getStaticPaths = () => {
 
 <Page bilingual>
   <h2 class="pb-12 pt-8 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Meet Our Team</h2>
-  <ul class="grid gap-8 lg:grid-cols-2">
+  <ul class="grid gap-8 lg:grid-cols-2" id="team-members-list">
     {
       team.map(({ data: { fullName, position, image, description } }) => (
-        <li>
+        <li class="opacity-0 ease-in-out transition-all duration-500 translate-y-6">
           <div class="grid grid-cols-3 gap-8">
             <div class="flex items-center justify-center">
               <img
@@ -45,3 +45,15 @@ export const getStaticPaths = () => {
     }
   </ul>
 </Page>
+<script>
+  window.addEventListener('load', () => {
+    const ul = document.getElementById('team-members-list')!;
+    for (let i = 0; i < ul.children.length; i++) {
+      const li = ul.children.item(i) as HTMLLIElement;
+      setTimeout(() => {
+        li.classList.replace('opacity-0', 'opacity-100');
+        li.classList.replace('translate-y-6', 'translate-y-0');
+      }, i * 100);
+    }
+  });
+</script>
