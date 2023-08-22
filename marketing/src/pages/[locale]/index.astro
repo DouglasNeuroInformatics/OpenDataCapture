@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import happyPerson from '@/assets/happy-person.jpg';
 import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
@@ -12,11 +13,11 @@ const screenshots = {
   fr: import.meta.glob('../../assets/screenshots/fr/*.png', { import: 'default' })
 };
 
-const resolveScreenshot = (filename: string, language: Language): Promise<typeof import('*.png')> => {
+const resolveScreenshot = (filename: string, language: Language): Promise<ImageMetadata> => {
   return new Promise((resolve, reject) => {
     for (const filepath in screenshots[language]) {
       if (filepath.split('/').at(-1) === filename) {
-        resolve(screenshots[language][filepath]() as Promise<typeof import('*.png')>);
+        resolve(screenshots[language][filepath]() as Promise<ImageMetadata>);
       }
     }
     reject(new Error(`Failed to resolve screenshot '${filename}' for language '${language}'`));
@@ -54,7 +55,7 @@ export const getStaticPaths = () => {
       </div>
     </div>
     <div class="hidden lg:col-span-6 lg:flex lg:items-center lg:justify-center xl:col-span-5">
-      <img alt={t('landing.hero.happyPerson')} class="rounded-md brightness-90" {...happyPerson} />
+      <Image alt={t('landing.hero.happyPerson')} class="rounded-md brightness-90" src={happyPerson} />
     </div>
   </Section>
   <Section class="grid grid-cols-2 gap-8">
@@ -66,7 +67,7 @@ export const getStaticPaths = () => {
       </p>
     </div>
     <div class="flex flex-col items-center justify-center">
-      <img alt={t('landing.dataManagement.viewSubjectsScreenshot')} {...addVisit} />
+      <Image alt={t('landing.dataManagement.viewSubjectsScreenshot')} src={addVisit} />
     </div>
   </Section>
   <Section class="grid grid-cols-2 gap-8">
@@ -81,7 +82,7 @@ export const getStaticPaths = () => {
       </p>
     </div>
     <div class="flex flex-col items-center justify-center">
-      <img alt={t('landing.dataManagement.viewSubjectsScreenshot')} {...viewSubjects} />
+      <Image alt={t('landing.dataManagement.viewSubjectsScreenshot')} src={viewSubjects} />
     </div>
   </Section>
   <Section>
