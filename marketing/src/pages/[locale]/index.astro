@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import happyPerson from '@/assets/happy-person.jpg';
+import hero from '@/assets/hero.svg';
 import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 import Section from '@/layouts/Section.astro';
@@ -55,7 +55,7 @@ export const getStaticPaths = () => {
       </div>
     </div>
     <div class="hidden lg:col-span-6 lg:flex lg:items-center lg:justify-center xl:col-span-5">
-      <Image alt={t('landing.hero.happyPerson')} class="rounded-md brightness-90" src={happyPerson} />
+      <Image alt={t('landing.hero.happyPerson')} class="rounded-md brightness-90" src={hero} />
     </div>
   </Section>
   <Section class="grid grid-cols-2 gap-8">
