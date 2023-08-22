@@ -16,13 +16,26 @@ export const collections = {
     schema: ({ image }) =>
       z.object({
         fullName: z.string(),
-        suffix: z.string().optional(),
+        suffix: z.enum(['MD', 'PhD']).optional(),
         position: z.string(),
         image: image().refine((arg) => arg.height === arg.width, {
           message: 'Image must be square (1:1 aspect ratio)'
         }),
         description: z.string(),
         seniority: z.number().positive().int()
+      })
+  }),
+  testimonials: defineCollection({
+    type: 'data',
+    schema: ({ image }) =>
+      z.object({
+        fullName: z.string(),
+        suffix: z.enum(['MD', 'PhD']).optional(),
+        position: z.string(),
+        image: image().refine((arg) => arg.height === arg.width, {
+          message: 'Image must be square (1:1 aspect ratio)'
+        }),
+        quote: z.string()
       })
   })
 };

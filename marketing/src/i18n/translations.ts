@@ -65,6 +65,12 @@ export const translations = {
         en: 'Screenshot of view subjects page',
         fr: "Capture d'écran de la page de présentation de tous les sujets"
       }
+    },
+    testimonials: {
+      heading: {
+        en: 'What People Say About Us',
+        fr: 'Ce que les gens disent de nous'
+      }
     }
   },
   team: {
