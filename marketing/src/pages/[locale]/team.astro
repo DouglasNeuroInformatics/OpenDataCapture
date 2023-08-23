@@ -1,5 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
+import { Image } from 'astro:assets';
 
 import { getCollection } from 'astro:content';
 
@@ -26,11 +27,9 @@ export const getStaticPaths = () => {
         <li class="opacity-0 ease-in-out transition-all duration-500 translate-y-6">
           <div class="grid grid-cols-3 gap-8">
             <div class="flex items-center justify-center">
-              <img
+              <Image
                 class="rounded-lg object-cover shadow-lg"
-                height={image.height}
-                width={image.width}
-                src={image.src}
+                src={image}
                 alt=""
               />
             </div>

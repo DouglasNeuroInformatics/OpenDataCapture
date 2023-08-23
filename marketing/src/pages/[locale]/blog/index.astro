@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
@@ -48,7 +49,7 @@ const posts = await getCollection('blog', ({ data }) => data.language === resolv
               <div class="mt-6 flex items-center">
                 <div class="flex-shrink-0">
                   <span class="sr-only">{author.data.fullName}</span>
-                  <img alt={author.data.fullName} class="h-10 w-10 rounded-full" src={author.data.image.src} />
+                  <Image alt={author.data.fullName} class="h-10 w-10 rounded-full" src={author.data.image} />
                 </div>
                 <div class="ml-3">
                   <p class="text-sm font-medium">{author.data.fullName}</p>
