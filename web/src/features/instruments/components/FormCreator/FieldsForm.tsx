@@ -30,7 +30,7 @@ export type FieldsFormData = {
   fields: FieldData[];
 };
 
-export interface FieldsFormProps {
+export type FieldsFormProps = {
   onSubmit: (data: FieldsFormData) => void;
 }
 
@@ -49,7 +49,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
         }
         fieldNames.push(name);
 
-        if (options === undefined || options === null) {
+        if (options === undefined) {
           return { ...rest, name, options };
         }
 

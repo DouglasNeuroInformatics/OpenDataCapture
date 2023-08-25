@@ -8,7 +8,7 @@ import { SubjectsAPI } from '../api/subjects-api';
 
 import { IdentificationForm, IdentificationFormData } from '@/components';
 
-interface SubjectLookupProps {
+type SubjectLookupProps = {
   show: boolean;
   onClose: () => void;
 }
@@ -22,7 +22,7 @@ export const SubjectLookup = ({ show, onClose }: SubjectLookupProps) => {
       .then(({ data: { identifier } }) => {
         navigate(identifier);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => { console.error(error); });
   };
 
   return (

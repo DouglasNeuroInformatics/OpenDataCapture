@@ -10,7 +10,7 @@ type LinkAccess = {
   subject: AppSubject;
 };
 
-export interface NavigationLinkProps {
+export type NavigationLinkProps = {
   access: LinkAccess | LinkAccess[] | null;
   href: string;
   label: string;

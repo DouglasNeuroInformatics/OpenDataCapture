@@ -34,10 +34,10 @@ export const ActiveSubject = () => {
       style={{ x, y }}
     >
       <div className="pointer-events-auto mb-1 flex justify-end">
-        <button onClick={() => setIsHidden(!isHidden)}>
+        <button onClick={() => { setIsHidden(!isHidden); }}>
           <IoMdRemoveCircle />
         </button>
-        <button onClick={() => setActiveSubject(null)}>
+        <button onClick={() => { setActiveSubject(null); }}>
           <IoMdCloseCircle />
         </button>
       </div>

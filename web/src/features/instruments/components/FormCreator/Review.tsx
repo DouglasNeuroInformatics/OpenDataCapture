@@ -13,7 +13,7 @@ const ReviewItem = ({ label, value }: { label: string; value: any }) => {
     </div>
   );
 };
-export interface ReviewProps {
+export type ReviewProps = {
   form: Partial<SimpleForm>;
 }
 

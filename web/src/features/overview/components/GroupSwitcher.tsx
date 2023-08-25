@@ -18,7 +18,7 @@ export const GroupSwitcher = () => {
   return (
     <Menu as="div" className="relative my-2 w-fit">
       <Menu.Button className="flex items-center justify-center">
-        {t('currentGroup')}:&nbsp;{currentGroup?.name}
+        {t('currentGroup')}:&nbsp;{currentGroup.name}
         <HiChevronDown className="mx-1" />
       </Menu.Button>
       <Transition
@@ -37,7 +37,7 @@ export const GroupSwitcher = () => {
               <button
                 className="w-full bg-slate-50 p-2 text-left hover:bg-slate-200"
                 style={{ minWidth: 100 }}
-                onClick={() => setCurrentGroup(group)}
+                onClick={() => { setCurrentGroup(group); }}
               >
                 {group.name}
               </button>

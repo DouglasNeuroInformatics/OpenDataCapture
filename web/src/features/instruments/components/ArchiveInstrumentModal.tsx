@@ -4,7 +4,7 @@ import { FormInstrumentSummary } from '@ddcp/types';
 import { Button, Modal } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
-interface ArchiveInstrumentModalProps {
+type ArchiveInstrumentModalProps = {
   instrument: FormInstrumentSummary;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -14,7 +14,7 @@ export const ArchiveInstrumentModal = ({ isOpen, setIsOpen, instrument, onArchiv
   const { t } = useTranslation();
 
   return (
-    <Modal open={isOpen} title={t('instruments.manageInstruments.deleteModal.title')} onClose={() => setIsOpen(false)}>
+    <Modal open={isOpen} title={t('instruments.manageInstruments.deleteModal.title')} onClose={() => { setIsOpen(false); }}>
       <div>
         <span className="block">
           {t('instruments.manageInstruments.deleteModal.name')}: {instrument.name}
@@ -40,7 +40,7 @@ export const ArchiveInstrumentModal = ({ isOpen, setIsOpen, instrument, onArchiv
           label={t('instruments.manageInstruments.deleteModal.cancel')}
           type="button"
           variant="secondary"
-          onClick={() => setIsOpen(false)}
+          onClick={() => { setIsOpen(false); }}
         />
       </div>
     </Modal>

@@ -5,11 +5,11 @@ import { create } from 'zustand';
 
 import { useActiveSubjectStore } from './active-subject-store';
 
-export interface CurrentUser extends Omit<JwtPayload, 'permissions'> {
+export type CurrentUser = {
   ability: AppAbility;
-}
+} & Omit<JwtPayload, 'permissions'>
 
-export interface AuthStore {
+export type AuthStore = {
   accessToken: string | null;
   setAccessToken: (accessToken: string) => void;
   currentUser: CurrentUser | null;

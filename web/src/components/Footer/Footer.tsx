@@ -18,7 +18,7 @@ const GIT_COMMIT = import.meta.env.VITE_DEV_GIT_COMMIT?.slice(0, 7);
 const GIT_COMMIT_DATE = import.meta.env.VITE_DEV_GIT_COMMIT_DATE;
 const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL;
 
-export interface FooterProps {
+export type FooterProps = {
   isLogin?: boolean;
   showDevInfo?: boolean;
 }

@@ -18,7 +18,7 @@ const FormSummaryItem = ({ label, value }: { label: string; value: any }) => {
   );
 };
 
-export interface FormSummaryProps<T extends FormInstrumentData> {
+export type FormSummaryProps<T extends FormInstrumentData> = {
   instrument: FormInstrument<T>;
   result?: T;
   timeCollected: number;
@@ -73,7 +73,7 @@ export const FormSummary = <T extends FormInstrumentData>({
         })}
       </div>
       <div className="flex gap-3 print:hidden">
-        <Button label={t('instruments.formPage.summary.print')} onClick={() => print()} />
+        <Button label={t('instruments.formPage.summary.print')} onClick={() => { print(); }} />
         <Button label={t('instruments.formPage.summary.download')} onClick={downloadResult} />
       </div>
     </div>

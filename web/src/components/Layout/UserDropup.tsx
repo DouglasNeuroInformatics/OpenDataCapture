@@ -16,7 +16,7 @@ export const UserDropup = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
 
-  const closeDropup = () => setIsOpen(false);
+  const closeDropup = () => { setIsOpen(false); };
 
   useOnClickOutside(ref, () => {
     if (isOpen) {
@@ -38,7 +38,7 @@ export const UserDropup = () => {
           show={isOpen}
         >
           <div className="absolute bottom-3 w-40 bg-slate-800 shadow-lg">
-            <button className="w-full p-2 hover:bg-slate-700" onClick={() => auth.logout()}>
+            <button className="w-full p-2 hover:bg-slate-700" onClick={() => { auth.logout(); }}>
               {t('userDropup.logout')}
             </button>
             <LanguageToggle className="w-full p-2 hover:bg-slate-700" onClick={closeDropup} />
@@ -59,7 +59,7 @@ export const UserDropup = () => {
         contentPosition="left"
         position="right"
         rotation={-90}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { setIsOpen(!isOpen); }}
       />
     </div>
   );

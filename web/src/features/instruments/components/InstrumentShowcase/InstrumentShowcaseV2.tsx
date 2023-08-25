@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { InstrumentCard } from './InstrumentCard';
 
-export interface InstrumentShowcaseProps {
+export type InstrumentShowcaseProps = {
   instruments: FormInstrumentSummary[];
 }
 
@@ -66,7 +66,7 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
   return (
     <div>
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
-        <SearchBar size="md" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <SearchBar size="md" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); }} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <SelectDropdown
             options={tagOptions}

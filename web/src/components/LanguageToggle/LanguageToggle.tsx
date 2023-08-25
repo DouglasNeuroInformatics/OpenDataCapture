@@ -12,9 +12,9 @@ const languages = {
   }
 };
 
-interface LanguageToggleProps extends React.ComponentPropsWithoutRef<'button'> {
+type LanguageToggleProps = {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
-}
+} & React.ComponentPropsWithoutRef<'button'>
 
 export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
   const notifications = useNotificationsStore();

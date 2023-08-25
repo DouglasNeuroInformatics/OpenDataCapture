@@ -29,7 +29,7 @@ const COLOR_PALETTE = [
   '#4075A3'
 ];
 
-export interface RecordsGraphProps {
+export type RecordsGraphProps = {
   data: SubjectFormRecords[];
 }
 

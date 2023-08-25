@@ -5,13 +5,13 @@ import { StepperIcon } from './StepperIcon';
 
 import { StepperContext } from '@/context/StepperContext';
 
-interface Step {
+type Step = {
   label: string;
   icon: React.ReactElement;
   element: React.ReactElement;
 }
 
-interface StepperProps {
+type StepperProps = {
   steps: Step[];
 }
 

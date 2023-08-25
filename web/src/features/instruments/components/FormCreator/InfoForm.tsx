@@ -12,7 +12,7 @@ export type InfoFormData = FormDetails &
     tags: string;
   };
 
-export interface InfoFormProps {
+export type InfoFormProps = {
   onSubmit: (data: InfoFormData) => void;
 }
 
