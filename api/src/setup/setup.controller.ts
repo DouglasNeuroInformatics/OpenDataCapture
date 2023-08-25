@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { SetupDto } from './dto/setup.dto.js';
@@ -22,5 +22,15 @@ export class SetupController {
   @RouteAccess('public')
   initApp(@Body() setupDto: SetupDto) {
     return this.setupService.initApp(setupDto);
+  }
+
+  @ApiOperation({
+    summary: 'Get Status',
+    description: 'Return whether the application has already been setup'
+  })
+  @Get('status')
+  @RouteAccess('public')
+  getStatus() {
+    return this.setupService.getStatus()
   }
 }

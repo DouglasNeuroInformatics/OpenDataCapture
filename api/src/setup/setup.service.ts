@@ -2,12 +2,13 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility } from '@ddcp/types';
+import { AppAbility, SetupStatus } from '@ddcp/types';
 import mongoose from 'mongoose';
 
 import { DemoService } from './demo.service.js';
 import { CreateAdminDto, SetupDto } from './dto/setup.dto.js';
 
+import { UserEntity } from '@/users/entities/user.entity.js';
 import { UsersService } from '@/users/users.service.js';
 
 @Injectable()
@@ -20,8 +21,8 @@ export class SetupService {
     private readonly usersService: UsersService
   ) {}
 
-  async initApp({ admin, initDemo }: SetupDto) {
-    if (await this.isInitialized()) {
+  async initApp({ admin, initDemo }: SetupDto): Promise<void> {
+    if (await this.isSetup()) {
       throw new ForbiddenException();
     }
     await this.dropDatabase();
@@ -31,15 +32,19 @@ export class SetupService {
     }
   }
 
-  async dropDatabase() {
+  async dropDatabase(): Promise<void> {
     return this.connection.dropDatabase();
   }
 
-  async createAdmin(admin: CreateAdminDto) {
+  async createAdmin(admin: CreateAdminDto): Promise<UserEntity> {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' }, this.adminAbility);
   }
 
-  private async isInitialized() {
+  async getStatus(): Promise<SetupStatus> {
+    return { isSetup: await this.isSetup() };
+  }
+
+  private async isSetup(): Promise<boolean> {
     const collections = await this.connection.db.listCollections().toArray();
     for (const collection of collections) {
       const count = await this.connection.collection(collection.name).countDocuments();

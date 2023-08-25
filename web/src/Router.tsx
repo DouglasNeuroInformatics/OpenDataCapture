@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
@@ -13,6 +13,9 @@ import { useAuthStore } from './stores/auth-store';
 
 export const Router = () => {
   const { accessToken } = useAuthStore();
+  const [isSetup, setIsSetup] = useState<boolean | null>(null);
+
+  
   return (
     <BrowserRouter>
       <Routes>
