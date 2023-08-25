@@ -16,9 +16,8 @@ import { AddVisitPage, SelectVisualizationPage, ViewSubjectsPage } from './featu
 import { UserPage } from './features/user';
 import { useAuthStore } from './stores/auth-store';
 
-/** Recharts library is huge! */
-const SubjectRecordsGraphPage = React.lazy(() => import('@/features/subjects/pages/SubjectRecordsGraphPage'));
-const SubjectRecordsTablePage = React.lazy(() => import('@/features/subjects/pages/SubjectRecordsTablePage'));
+import { SubjectRecordsGraphPage } from '@/features/subjects/pages/SubjectRecordsGraphPage';
+import { SubjectRecordsTablePage } from '@/features/subjects/pages/SubjectRecordsTablePage';
 
 export const Router = () => {
   const { accessToken } = useAuthStore();
