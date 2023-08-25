@@ -1,6 +1,5 @@
 // @ts-check
 
-import cp from 'child_process';
 import path from 'path';
 import url from 'url';
 
@@ -10,18 +9,7 @@ import viteCompression from 'vite-plugin-compression';
 
 const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 
-export default defineConfig(({ mode }) => {
-  if (mode === 'development') {
-    process.env = {
-      ...process.env,
-      VITE_DEV_GIT_BRANCH: cp.execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim(),
-      VITE_DEV_GIT_COMMIT: cp.execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim(),
-      VITE_DEV_GIT_COMMIT_DATE: new Date(
-        cp.execSync('git log -1 --format=%cd --date=format:"%Y-%m-%d"', { encoding: 'utf-8' })
-      ).toDateString()
-    };
-  }
-
+export default defineConfig(() => {
   return {
     plugins: [react(), viteCompression()],
     server: {
