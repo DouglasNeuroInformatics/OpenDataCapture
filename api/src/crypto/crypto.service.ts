@@ -23,7 +23,7 @@ export class CryptoService {
   }
 
   async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
-    const salt = hashedPassword.split('$')[1];
+    const salt = hashedPassword.split('$')[1]!;
     return (await this.pbkdf2(password, salt)) === hashedPassword;
   }
 

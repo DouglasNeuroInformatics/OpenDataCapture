@@ -242,7 +242,7 @@ export class FormRecordsService {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       for (const measure in record.instrument.measures) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-        const value = this.computeMeasure(record.instrument.measures[measure], record.data);
+        const value = this.computeMeasure(record.instrument.measures[measure]!, record.data);
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!data[measure]) {
           data[measure] = [value];

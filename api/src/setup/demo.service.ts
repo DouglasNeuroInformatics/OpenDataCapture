@@ -62,10 +62,10 @@ export class DemoService {
       const createSubjectDto = this.getCreateSubjectDto();
       await this.subjectsService.create(createSubjectDto);
       const group = await this.groupsService.findByName(randomValue(DEMO_GROUPS).name, this.ability);
-      await this.createFormRecords(happinessQuestionnaires[0], group.name, createSubjectDto);
-      await this.createFormRecords(miniMentalStateExaminations[0], group.name, createSubjectDto);
-      await this.createFormRecords(montrealCognitiveAssessments[0], group.name, createSubjectDto);
-      await this.createFormRecords(enhancedDemographicsQuestionnaires[0], group.name, createSubjectDto, {
+      await this.createFormRecords(happinessQuestionnaires[0]!, group.name, createSubjectDto);
+      await this.createFormRecords(miniMentalStateExaminations[0]!, group.name, createSubjectDto);
+      await this.createFormRecords(montrealCognitiveAssessments[0]!, group.name, createSubjectDto);
+      await this.createFormRecords(enhancedDemographicsQuestionnaires[0]!, group.name, createSubjectDto, {
         customValues: {
           postalCode: 'A1A-1A1'
         }

@@ -27,7 +27,7 @@ class MockGroupModel {
 
   findOneAndDelete(group: GroupEntity) {
     for (let i = 0; i < this.groups.length; i++) {
-      if (this.groups[i].name === group.name) {
+      if (this.groups[i]!.name === group.name) {
         return this.groups.splice(i)[0];
       }
     }

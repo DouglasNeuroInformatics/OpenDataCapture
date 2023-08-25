@@ -88,7 +88,7 @@ export class FormsService {
     if (Array.isArray(instrument.content)) {
       fields = instrument.content.reduce(
         (prev: any, current: { fields: any; }) => ({ ...prev, ...current.fields }),
-        instrument.content[0].fields
+        instrument.content[0]?.fields
       ) as FormFields<T>;
     } else {
       fields = instrument.content;
