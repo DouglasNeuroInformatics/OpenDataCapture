@@ -13,7 +13,7 @@ import type {
   SubjectFormRecords
 } from '@ddcp/types';
 import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Stats } from '@douglasneuroinformatics/stats';
+import { linearRegression, mean, std } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Model } from 'mongoose';
 
@@ -98,13 +98,13 @@ export class FormRecordsService {
         .lean();
 
       if (instrument.measures) {
-        for (let i = 0; i < records.length; i++) {
+        for (const record of records) {
           const computedMeasures: Record<string, number> = {};
           for (const key in instrument.measures) {
-            const measure = instrument.measures[key];
-            computedMeasures[key] = this.computeMeasure(measure, records[i].data);
+            const measure = instrument.measures[key]!;
+            computedMeasures[key] = this.computeMeasure(measure, record.data);
           }
-          records[i].computedMeasures = computedMeasures;
+          record.computedMeasures = computedMeasures;
         }
       }
       arr.push({ instrument, records: records });
@@ -135,8 +135,8 @@ export class FormRecordsService {
           return [
             key,
             {
-              mean: Stats.mean(arr),
-              std: Stats.std(arr)
+              mean: mean(arr),
+              std: std(arr)
             }
           ];
         })
@@ -153,11 +153,9 @@ export class FormRecordsService {
     const group = groupName ? await this.groupsService.findByName(groupName, ability) : undefined;
     const subjects = await this.subjectsService.findAll(ability, groupName);
     const data: InstrumentRecordsExport = [];
-    for (let i = 0; i < subjects.length; i++) {
-      const subject = subjects[i];
+    for (const subject of subjects) {
       const records = await this.formRecordsModel.find({ kind: 'form', group, subject }).populate('instrument');
-      for (let j = 0; j < records.length; j++) {
-        const record = records[j];
+      for (const record of records) {
         for (const measure of Object.keys(record.data)) {
           data.push({
             subjectId: subject.identifier,
@@ -197,18 +195,19 @@ export class FormRecordsService {
     for (const record of records) {
       for (const measure in record.instrument.measures) {
         const x = record.time;
-        const y = this.computeMeasure(record.instrument.measures[measure], record.data);
-        if (!data[measure]) {
-          data[measure] = [[x, y]];
+
+        const y = this.computeMeasure(record.instrument.measures[measure]!, record.data);
+        if (Array.isArray(data.measure)) {
+          data[measure]!.push([x, y]);
         } else {
-          data[measure].push([x, y]);
+          data[measure] = [[x, y]];
         }
       }
     }
 
     const results: Record<string, { intercept: number; slope: number; stdErr: number }> = {};
     for (const measure in data) {
-      results[measure] = Stats.linearRegression(data[measure]);
+      results[measure] = linearRegression(data[measure]!);
     }
     return results;
   }
@@ -217,12 +216,12 @@ export class FormRecordsService {
     // data[measure.formula.field] should always be a number because only numeric fields may be used for fields in measure
     switch (measure.formula.kind) {
       case 'const':
-        return data[measure.formula.field] as number;
+        return data[measure.formula.field as keyof T] as number;
       case 'sum':
         // eslint-disable-next-line no-case-declarations
         const coerceBool = measure.formula.options?.coerceBool;
         return measure.formula.fields
-          .map((field) => {
+          .map((field: keyof T) => {
             if (typeof data[field] === 'number') {
               return data[field] as number;
             } else if (typeof data[field] === 'boolean' && coerceBool) {
@@ -240,12 +239,15 @@ export class FormRecordsService {
   ): Record<string, number[]> {
     const data: Record<string, number[]> = {};
     for (const record of records) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       for (const measure in record.instrument.measures) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
         const value = this.computeMeasure(record.instrument.measures[measure], record.data);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!data[measure]) {
           data[measure] = [value];
         } else {
-          data[measure].push(value);
+          data[measure]!.push(value);
         }
       }
     }

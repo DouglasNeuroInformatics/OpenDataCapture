@@ -97,7 +97,7 @@ export class DemoService {
       const fields = this.formsService.getFields(instrument);
       const data: FormInstrumentData = {};
       for (const fieldName in fields) {
-        const field = fields[fieldName];
+        const field = fields[fieldName]!;
         const customValue = options?.customValues?.[fieldName];
         if (customValue) {
           data[fieldName] = customValue;
@@ -124,10 +124,14 @@ export class DemoService {
         }
       }
 
+      instrument
+
       const record = {
         kind: 'form',
         time: faker.date.recent({ days: i * 30 + 5, refDate: new Date() }).getTime(),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         instrumentName: instrument.name,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         instrumentVersion: instrument.version,
         groupName: groupName,
         subjectInfo: subjectInfo,

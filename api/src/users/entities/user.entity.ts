@@ -33,10 +33,10 @@ export class UserEntity implements User {
   preferences?: UserPreferences;
 
   @Prop({ required: true, type: Array })
-  sessions: Array<{
+  sessions: {
     ipAddress?: string | null;
     time: number;
-  }>;
+  }[];
 }
 
 export type UserDocument = HydratedDocument<UserEntity>;

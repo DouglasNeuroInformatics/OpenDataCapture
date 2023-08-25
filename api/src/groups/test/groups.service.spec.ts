@@ -35,10 +35,10 @@ class MockGroupModel {
   }
 
   findOneAndUpdate(group: GroupEntity, updateGroupDto: { name: string }) {
-    for (let i = 0; i < this.groups.length; i++) {
-      if (this.groups[i].name === group.name) {
-        this.groups[i].name = updateGroupDto.name;
-        return this.groups[i];
+    for (const entity of this.groups) {
+      if (entity.name === group.name) {
+        entity.name = updateGroupDto.name;
+        return entity;
       }
     }
     return null;
