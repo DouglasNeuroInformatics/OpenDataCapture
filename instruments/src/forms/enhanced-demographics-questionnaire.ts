@@ -576,7 +576,7 @@ type EnhancedDemographicsQuestionnaireData = {
   // Immigration
   isCanadianCitizen?: boolean;
   ageAtImmigration?: number;
-};
+}
 
 export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
   name: 'EnhancedDemographicsQuestionnaire',

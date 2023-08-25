@@ -52,8 +52,8 @@ function createTranslatedForms<T extends FormInstrumentData>(
       for (const key in multilingualForm.measures) {
         const measure = multilingualForm.measures[key];
         measures[key] = {
-          formula: measure.formula,
-          label: measure.label[language]
+          formula: measure!.formula,
+          label: measure!.label[language]
         };
       }
     }
