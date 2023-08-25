@@ -41,7 +41,7 @@ export const Review = ({ form }: ReviewProps) => {
       <ReviewItem label="Estimated Duration" value={form.details?.estimatedDuration} />
       <h3 className="my-2 text-lg font-semibold">Fields</h3>
       {Object.keys(form.content!).map((fieldName) => {
-        const field = form.content![fieldName];
+        const field = form.content![fieldName]!
         return (
           <div key={fieldName}>
             <h5 className="font-semibold italic">{fieldName}</h5>

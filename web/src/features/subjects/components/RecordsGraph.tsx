@@ -70,13 +70,13 @@ export const RecordsGraph = () => {
   for (let i = 0; i < ctx.selectedMeasures.length; i++) {
     const measure = ctx.selectedMeasures[i];
     lines.push({
-      name: measure.label,
-      val: measure.key,
+      name: measure!.label,
+      val: measure!.key,
       stroke: COLOR_PALETTE[i]
     });
     lines.push({
-      name: `${measure.label} (${t('groupTrend')})`,
-      val: measure.key + 'Group',
+      name: `${measure!.label} (${t('groupTrend')})`,
+      val: measure!.key + 'Group',
       strokeWidth: 0.5,
       stroke: COLOR_PALETTE[i],
       legendType: 'none',

@@ -133,7 +133,7 @@ export const VisualizationContextProvider = ({
       for (const measure in selectedInstrument.measures) {
         arr.push({
           key: measure,
-          label: selectedInstrument.measures[measure].label
+          label: selectedInstrument.measures[measure]!.label
         });
       }
     }

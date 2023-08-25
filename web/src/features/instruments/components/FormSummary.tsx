@@ -22,7 +22,7 @@ export type FormSummaryProps<T extends FormInstrumentData> = {
   instrument: FormInstrument<T>;
   result?: T;
   timeCollected: number;
-}
+};
 
 export const FormSummary = <T extends FormInstrumentData>({
   timeCollected,
@@ -67,13 +67,18 @@ export const FormSummary = <T extends FormInstrumentData>({
               .map((group) => group.fields)
               .reduce((prev, current) => ({ ...prev, ...current }))[fieldName]!;
           } else {
-            field = instrument.content[fieldName];
+            field = instrument.content[fieldName]!;
           }
           return <FormSummaryItem key={fieldName} label={field.label} value={result[fieldName]} />;
         })}
       </div>
       <div className="flex gap-3 print:hidden">
-        <Button label={t('instruments.formPage.summary.print')} onClick={() => { print(); }} />
+        <Button
+          label={t('instruments.formPage.summary.print')}
+          onClick={() => {
+            print();
+          }}
+        />
         <Button label={t('instruments.formPage.summary.download')} onClick={downloadResult} />
       </div>
     </div>

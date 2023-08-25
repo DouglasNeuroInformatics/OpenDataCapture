@@ -85,7 +85,7 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
       <div className="relative grid grid-cols-1 gap-5">
         {trails.map((style, i) => (
           <animated.div key={i} style={style}>
-            <InstrumentCard instrument={filteredInstruments[i]} />
+            <InstrumentCard instrument={filteredInstruments[i]!} />
           </animated.div>
         ))}
       </div>

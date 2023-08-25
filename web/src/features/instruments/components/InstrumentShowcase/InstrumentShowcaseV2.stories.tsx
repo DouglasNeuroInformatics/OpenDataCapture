@@ -29,7 +29,7 @@ const instruments: FormInstrumentSummary[] = [];
 for (let i = 0; i < 10; i++) {
   instruments.push(createDummyInstrument(i));
 }
-instruments[0].tags.push('other');
+instruments[0]!.tags.push('other');
 
 export default {
   args: {
