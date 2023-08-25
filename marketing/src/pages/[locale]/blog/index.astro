@@ -15,7 +15,7 @@ const posts = await getCollection('blog', ({ data }) => data.language === resolv
 ---
 
 <Page bilingual meta={{ title: `${t('platform.title')} - ${t('blog.title')}` }}>
-  <h2 class="pb-12 pt-8 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">{t('blog.heading')}</h2>
+  <h2 class="pb-12 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">{t('blog.heading')}</h2>
   {
     posts.length === 0 ? (
       <div class="mt-16 text-center">

@@ -28,5 +28,8 @@ const { Content } = await post.render();
 ---
 
 <Page meta={{ title: post.data.title, description: post.data.description }}>
-  <Content />
+  <article class="prose prose-slate dark:prose-invert mx-auto max-w-none">
+    <h1>{post.data.title}</h1>
+    <Content />
+  </article>
 </Page>
