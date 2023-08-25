@@ -12,6 +12,16 @@ export class SetupController {
   constructor(private readonly setupService: SetupService) {}
 
   @ApiOperation({
+    summary: 'Get State',
+    description: 'Return the current setup state'
+  })
+  @Get()
+  @RouteAccess('public')
+  getState() {
+    return this.setupService.getState();
+  }
+
+  @ApiOperation({
     summary: 'Initialize',
     description: [
       'Initialize an instance of the application with a default admin user.',
@@ -22,15 +32,5 @@ export class SetupController {
   @RouteAccess('public')
   initApp(@Body() setupDto: SetupDto) {
     return this.setupService.initApp(setupDto);
-  }
-
-  @ApiOperation({
-    summary: 'Get Status',
-    description: 'Return whether the application has already been setup'
-  })
-  @Get('status')
-  @RouteAccess('public')
-  getStatus() {
-    return this.setupService.getStatus()
   }
 }

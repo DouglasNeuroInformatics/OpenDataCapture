@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, SetupStatus } from '@ddcp/types';
+import { AppAbility, SetupState } from '@ddcp/types';
 import mongoose from 'mongoose';
 
 import { DemoService } from './demo.service.js';
@@ -40,7 +40,7 @@ export class SetupService {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' }, this.adminAbility);
   }
 
-  async getStatus(): Promise<SetupStatus> {
+  async getState(): Promise<SetupState> {
     return { isSetup: await this.isSetup() };
   }
 

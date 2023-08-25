@@ -1,3 +1,3 @@
-export type SetupStatus = {
-  isSetup: boolean;
+export type SetupState = {
+  isSetup: boolean | null;
 };
