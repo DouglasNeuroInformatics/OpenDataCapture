@@ -15,11 +15,12 @@ node --version
 ### MongoDB
 
 Next, you will need to connect the application to a database. There are several ways you can do this, including:
+
 - Connecting to a remote instance (e.g., MongoDB Atlas)
 - Running directly on your OS
 - Running a Docker container
 
-We recommend running MongoDB in a Docker container. To install MongoDB natively on your system, please refer to the  [official documentation](https://www.mongodb.com/docs/manual/administration/install-community/).
+We recommend running MongoDB in a Docker container. To install MongoDB natively on your system, please refer to the [official documentation](https://www.mongodb.com/docs/manual/administration/install-community/).
 
 To run the Docker image on the default port, you can use the following command:
 
@@ -32,7 +33,7 @@ docker run -d --name mongodb -p 27017:27017 mongo:6
 First, clone (download) the source code from our GitHub:
 
 ```shell
-git clone https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform
+git clone https://github.com/DouglasNeuroInformatics/OpenDataCapture
 ```
 
 Then, install the required dependencies from the root of the repository:
@@ -57,19 +58,20 @@ Before continuing, ensure that you have sourced these newly defined environment 
 ```shell
 source .env
 ```
+
 ## Run Dev Server
 
-Now, you should be able to start the development server, which is configured with hot module replacement. 
+Now, you should be able to start the development server, which is configured with hot module replacement.
 
 ```shell
 npm run dev
 ```
 
-Next, open your browser and navigate to `localhost:3000`, where you should be greeted with a login prompt. 
+Next, open your browser and navigate to `localhost:3000`, where you should be greeted with a login prompt.
 
 ## Create First User
 
-Now that the application is running, the final step is to create the first user (who must be an admin). This is done through an HTTP request to the API. 
+Now that the application is running, the final step is to create the first user (who must be an admin). This is done through an HTTP request to the API.
 
 ```shell
 curl --request POST \
@@ -88,4 +90,4 @@ curl --request POST \
 
 If everything worked correctly, you should now be able to login with your username and password. For more information on the API, you can access the (incomplete) documentation on `locahost:5500` or `localhost:3000/api/`.
 
-> **Note:** Although you may now perform additional administrative actions through the API, the `/v1/setup` will no longer work, as it requires an empty database. Therefore, you should always ensure you have at least one admin user. 
+> **Note:** Although you may now perform additional administrative actions through the API, the `/v1/setup` will no longer work, as it requires an empty database. Therefore, you should always ensure you have at least one admin user.

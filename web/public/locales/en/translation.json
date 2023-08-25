@@ -92,7 +92,7 @@
     "name": "Douglas Neuroinformatics Platform"
   },
   "platform": {
-    "title": "Douglas Data Capture Platform"
+    "title": "Open Data Capture"
   },
   "searchBar": {
     "placeholder": "Search..."
@@ -220,7 +220,7 @@
   "disclaimer": {
     "accept": "Accept",
     "decline": "Decline",
-    "message": "The Douglas Data Capture Platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
+    "message": "This platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
     "title": "Disclaimer"
   },
   "overview": {

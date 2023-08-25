@@ -5,15 +5,12 @@ export function setupDocs(app: NestExpressApplication) {
   const httpAdapter = app.getHttpAdapter().getInstance();
 
   const config = new DocumentBuilder()
-    .setTitle('The Douglas Data Capture Platform')
+    .setTitle('Open Data Capture')
     .setContact('Joshua Unrau', '', 'joshua.unrau@mail.mcgill.ca')
-    .setDescription('Documentation for the REST API for Douglas Data Capture Platform')
+    .setDescription('Documentation for the REST API for Open Data Capture')
     .setLicense('AGPL-3.0', 'https://www.gnu.org/licenses/agpl-3.0.txt')
     .setVersion('1')
-    .setExternalDoc(
-      'Additional Technical Documentation',
-      'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/'
-    )
+    .setExternalDoc('Homepage', 'https://opendatacapture.org')
     .addTag('Authentication')
     .addTag('Groups')
     .addTag('Instruments')
