@@ -1,3 +1,5 @@
+import typographyPlugin from '@tailwindcss/typography';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,ts}'],
@@ -11,5 +13,6 @@ export default {
         mh: 'max-height'
       }
     }
-  }
+  },
+  plugins: [typographyPlugin]
 };

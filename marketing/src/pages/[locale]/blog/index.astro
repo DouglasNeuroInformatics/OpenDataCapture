@@ -1,21 +1,21 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 import { getEntry } from 'astro:content';
+import PostInfoCard from '@/components/PostInfoCard.astro';
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
 
-const { altLanguage, resolvedLanguage, t, translatePath } = useTranslations(Astro.url);
+const { resolvedLanguage, t, translatePath } = useTranslations(Astro.url);
 
 const posts = await getCollection('blog', ({ data }) => data.language === resolvedLanguage);
 ---
 
 <Page bilingual meta={{ title: `${t('platform.title')} - ${t('blog.title')}` }}>
-  <h2 class="pb-12 pt-8 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">{t('blog.heading')}</h2>
+  <h2 class="pb-12 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">{t('blog.heading')}</h2>
   {
     posts.length === 0 ? (
       <div class="mt-16 text-center">
@@ -46,24 +46,12 @@ const posts = await getCollection('blog', ({ data }) => data.language === resolv
                 <p class="text-xl font-semibold">{post.data.title}</p>
                 <p class="mt-3 text-base text-slate-600 dark:text-slate-300">{post.data.description}</p>
               </div>
-              <div class="mt-6 flex items-center">
-                <div class="flex-shrink-0">
-                  <span class="sr-only">{author.data.fullName}</span>
-                  <Image alt={author.data.fullName} class="h-10 w-10 rounded-full" src={author.data.image} />
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm font-medium">{author.data.fullName}</p>
-                  <div class="flex space-x-1 text-sm text-slate-600 dark:text-slate-300">
-                    <time datetime={post.data.datePublished.toISOString()}>
-                      {post.data.datePublished.toLocaleDateString(resolvedLanguage, {
-                        dateStyle: 'long'
-                      })}
-                    </time>
-                    <span aria-hidden="true">&middot;</span>
-                    <span>{Math.round(remarkPluginFrontmatter.readingTime)} min read</span>
-                  </div>
-                </div>
-              </div>
+              <PostInfoCard
+                author={author}
+                className="mt-6"
+                datePublished={post.data.datePublished}
+                readingTime={remarkPluginFrontmatter.readingTime}
+              />
             </a>
           );
         })}

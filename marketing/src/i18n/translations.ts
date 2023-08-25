@@ -1,6 +1,6 @@
 export const translations = {
   platform: {
-    title: 'CliniCollect',
+    title: 'Open Data Capture',
     author: 'Douglas Neuroinformatics Platform',
     description: {
       en: 'An open-source, easy-to-use web application for electronic data capture',
@@ -89,8 +89,8 @@ export const translations = {
       fr: 'Notre blogue'
     },
     subheading: {
-      en: 'All the latest news on CliniCollect and the open-source electronic data capture community',
-      fr: 'Toutes les dernières nouvelles sur CliniCollect et la communauté de la saisie électronique de données open-source'
+      en: 'All the latest news on Open Data Capture and the open-source electronic data capture community',
+      fr: 'Toutes les dernières nouvelles sur Open Data Capture et la communauté de la saisie électronique de données open-source'
     },
     noContent: {
       en: 'There is no content here at the moment',

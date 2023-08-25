@@ -1,6 +1,9 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry, getEntry } from 'astro:content';
+import { useTranslations } from '@/i18n';
+import { Image } from 'astro:assets';
+import PostInfoCard from '@/components/PostInfoCard.astro';
 
 type Props = {
   post: CollectionEntry<'blog'>;
@@ -22,11 +25,26 @@ export const getStaticPaths = async () => {
   return paths;
 };
 
+const { resolvedLanguage } = useTranslations(Astro.url);
+
 const { post } = Astro.props;
 
-const { Content } = await post.render();
+const { Content, remarkPluginFrontmatter } = await post.render();
+
+const author = await getEntry(post.data.author);
 ---
 
 <Page meta={{ title: post.data.title, description: post.data.description }}>
-  <Content />
+  <article class="prose prose-slate dark:prose-invert relative mx-auto max-w-3xl">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 md:text-3xl">
+      {post.data.title}
+    </h1>
+    <PostInfoCard
+      author={author}
+      className="not-prose"
+      datePublished={post.data.datePublished}
+      readingTime={remarkPluginFrontmatter.readingTime}
+    />
+    <Content />
+  </article>
 </Page>

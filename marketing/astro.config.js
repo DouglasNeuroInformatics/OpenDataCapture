@@ -9,7 +9,7 @@ export default defineConfig({
   build: {
     assets: '_assets'
   },
-  //compressHTML: true,
+  compressHTML: true,
   experimental: {
     assets: true
   },
@@ -42,5 +42,5 @@ export default defineConfig({
   server: {
     port: parseInt(process.env.MARKETING_DEV_SERVER_PORT ?? 4000)
   },
-  site: 'https://douglasneuroinformatics.github.io'
+  site: 'https://opendatacapture.org'
 });
