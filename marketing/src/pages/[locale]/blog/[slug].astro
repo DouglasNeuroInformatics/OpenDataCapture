@@ -1,6 +1,8 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry, getEntry } from 'astro:content';
+import { useTranslations } from '@/i18n';
+import { Image } from 'astro:assets';
 
 type Props = {
   post: CollectionEntry<'blog'>;
@@ -22,14 +24,43 @@ export const getStaticPaths = async () => {
   return paths;
 };
 
+const { resolvedLanguage } = useTranslations(Astro.url);
+
 const { post } = Astro.props;
 
 const { Content } = await post.render();
+
+const author = await getEntry(post.data.author);
 ---
 
 <Page meta={{ title: post.data.title, description: post.data.description }}>
-  <article class="prose prose-slate dark:prose-invert mx-auto max-w-none">
-    <h1>{post.data.title}</h1>
+  <article class="prose prose-slate dark:prose-invert relative mx-auto max-w-3xl pt-10">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 md:text-3xl">
+      {post.data.title}
+    </h1>
+    <div class="text-sm leading-6">
+      <dl>
+        <dt class="sr-only">Date</dt>
+        <dd class="absolute inset-x-0 top-0 text-slate-600 dark:text-slate-300">
+          <time datetime={post.data.datePublished.toISOString()}>
+            {
+              post.data.datePublished.toLocaleDateString(resolvedLanguage, {
+                dateStyle: 'long'
+              })
+            }
+          </time>
+        </dd>
+      </dl>
+    </div>
+    <div class="not-prose flex items-center text-sm leading-snug pb-4">
+      <Image alt={author.data.fullName} class="h-10 w-10 rounded-full" src={author.data.image} />
+      <div class="ml-3 flex flex-col">
+        <span class="font-semibold">
+          {`${author.data.fullName}${author.data.suffix ? `, ${author.data.suffix}` : ''}`}
+        </span>
+        <span>{`${author.data.position}`}</span>
+      </div>
+    </div>
     <Content />
   </article>
 </Page>
