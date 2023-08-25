@@ -16,12 +16,12 @@ export const ViewSubjectsPage = () => {
     return <Spinner />;
   }
 
-  return data ? (
+  return (
     <div>
       <PageHeader title={t('viewSubjects.pageTitle')} />
       <SubjectsTable data={data} />
     </div>
-  ) : null;
+  );
 };
 
 export default ViewSubjectsPage;

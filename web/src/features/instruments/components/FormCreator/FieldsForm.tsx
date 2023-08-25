@@ -32,7 +32,7 @@ export type FieldsFormData = {
 
 export type FieldsFormProps = {
   onSubmit: (data: FieldsFormData) => void;
-}
+};
 
 export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
   const { updateIndex } = useContext(StepperContext);
@@ -53,7 +53,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
           return { ...rest, name, options };
         }
 
-        const formattedOptions: Record<string, string> = Object.fromEntries(
+        const formattedOptions = Object.fromEntries(
           options
             .split('\n')
             .filter((s) => s)
@@ -64,7 +64,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
               }
               return [items[0], items[1]];
             })
-        );
+        ) as Record<string, string>;
 
         return { ...rest, name, options: formattedOptions };
       });
