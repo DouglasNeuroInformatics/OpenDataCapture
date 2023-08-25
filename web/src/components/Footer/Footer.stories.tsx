@@ -9,10 +9,7 @@ type Story = StoryObj<typeof Footer>;
 
 export default { component: Footer } as Meta<typeof Footer>;
 
-export const Production: Story = {
-  args: {
-    showDevInfo: false
-  },
+export const Default: Story = {
   decorators: [
     (Story) => {
       return (
@@ -32,10 +29,4 @@ export const Production: Story = {
       );
     }
   ]
-};
-
-export const Development: Story = {
-  args: {
-    showDevInfo: true
-  }
 };

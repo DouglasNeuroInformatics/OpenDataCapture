@@ -7,23 +7,15 @@ import { LanguageToggle } from '../LanguageToggle';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-const DEV = import.meta.env.DEV;
-
 const LICENSE_URL = import.meta.env.VITE_LICENSE_URL;
-const SOURCE_URL = import.meta.env.DEV
-  ? `${import.meta.env.VITE_GITHUB_REPO_URL}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT}`
-  : import.meta.env.VITE_GITHUB_REPO_URL;
-const GIT_BRANCH = import.meta.env.VITE_DEV_GIT_BRANCH;
-const GIT_COMMIT = import.meta.env.VITE_DEV_GIT_COMMIT?.slice(0, 7);
-const GIT_COMMIT_DATE = import.meta.env.VITE_DEV_GIT_COMMIT_DATE;
+const GITHUB_REPO_URL = import.meta.env.VITE_GITHUB_REPO_URL;
 const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL;
 
 export type FooterProps = {
   isLogin?: boolean;
-  showDevInfo?: boolean;
-}
+};
 
-export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
+export const Footer = ({ isLogin = false }: FooterProps) => {
   const { t } = useTranslation();
 
   return (
@@ -49,7 +41,7 @@ export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
           <a className="text-center" href={LICENSE_URL} rel="noreferrer" target="_blank">
             {t('footer.license')}
           </a>
-          <a className="text-center" href={SOURCE_URL} rel="noreferrer" target="_blank">
+          <a className="text-center" href={GITHUB_REPO_URL} rel="noreferrer" target="_blank">
             {t('footer.sourceCode')}
           </a>
           <Link className="text-center" to="/contact">
@@ -60,9 +52,6 @@ export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
       <p className="text-center text-sm">
         &copy; {CURRENT_YEAR} {t('organization.name')}
       </p>
-      {showDevInfo && (
-        <p className="text-center text-sm">{`Last Commit '${GIT_COMMIT}' to Branch '${GIT_BRANCH}' on ${GIT_COMMIT_DATE}`}</p>
-      )}
     </footer>
   );
 };
