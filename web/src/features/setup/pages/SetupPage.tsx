@@ -1,5 +1,13 @@
 import React from 'react';
 
+import { SetupForm } from '../components/SetupForm';
+
+import { EntryPageWrapper } from '@/components/EntryPageWrapper';
+
 export const SetupPage = () => {
-  return <h1>Setup</h1>;
+  return (
+    <EntryPageWrapper title="Setup">
+      <SetupForm onSubmit={() => null} />
+    </EntryPageWrapper>
+  );
 };
