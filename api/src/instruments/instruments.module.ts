@@ -18,7 +18,7 @@ import { CryptoModule } from '@/crypto/crypto.module.js';
 import { GroupsModule } from '@/groups/groups.module.js';
 import { SubjectsModule } from '@/subjects/subjects.module.js';
 
-interface InstrumentDiscriminator {
+type InstrumentDiscriminator = {
   name: InstrumentKind;
   schema: Schema;
 }

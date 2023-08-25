@@ -4,7 +4,7 @@ import { AppAction, AppSubject } from '@ddcp/types';
 
 type PublicRouteAccess = 'public';
 
-export interface ProtectedRouteAccess {
+export type ProtectedRouteAccess = {
   action: AppAction;
   subject: AppSubject;
 }
