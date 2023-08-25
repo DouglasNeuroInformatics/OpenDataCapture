@@ -15,7 +15,7 @@ const { resolvedLanguage, t, translatePath } = useTranslations(Astro.url);
     <button class="flex h-10 items-center [&>svg]:h-full [&>svg]:w-auto" id="nav-toggle" type="button">
       <Logo class="hidden fill-sky-900 dark:fill-slate-100 md:block" />
       <MenuIcon class="p-1 md:hidden" id="menu-icon" />
-      <span class="font-lg ml-3 hidden font-semibold md:block">CliniCollect</span>
+      <span class="font-lg ml-3 hidden font-semibold md:block whitespace-nowrap">{t('platform.title')}</span>
     </button>
     <nav
       class="transition-mh order-last flex w-full flex-col overflow-hidden duration-300 md:order-none md:flex-row md:justify-end md:gap-3"
