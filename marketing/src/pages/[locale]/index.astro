@@ -36,7 +36,7 @@ export const getStaticPaths = () => {
 ---
 
 <Page bilingual>
-  <Section class="grid grid-cols-12 gap-8 text-center -mt-8 lg:text-left">
+  <Section class="-mt-8 grid grid-cols-12 gap-8 text-center lg:text-left">
     <div class="col-span-12 flex flex-col justify-center lg:col-span-6 xl:col-span-7">
       <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-4xl xl:text-5xl">
         {t('landing.hero.heading')}
@@ -90,10 +90,10 @@ export const getStaticPaths = () => {
   </Section>
   <Section class="flex flex-col items-center justify-center">
     <h2 class="pb-12 text-3xl font-extrabold">{t('landing.testimonials.heading')}</h2>
-    <div class="grid sm:grid-cols-3">
+    <div class="grid divide-y lg:grid-cols-3 lg:gap-8 lg:divide-none">
       {
         testimonials.map((testimonial) => (
-          <div class="h-full text-center">
+          <div class="h-full p-8 text-center lg:p-0">
             <Image
               alt="headshot"
               class="mb-8 inline-block h-24 w-24 rounded-full border-2 border-slate-300 bg-slate-100 object-cover object-center"
@@ -101,7 +101,9 @@ export const getStaticPaths = () => {
             />
             <p class="leading-relaxed">{testimonial.data.quote}</p>
             <span class="mb-4 mt-6 inline-block h-1 w-10 rounded bg-sky-700" />
-            <h2 class="title-font text-lg font-medium tracking-wider text-slate-900 dark:text-slate-100">{`${testimonial.data.fullName}${testimonial.data.suffix ? `, ${testimonial.data.suffix}` : ''}`}</h2>
+            <h2 class="title-font text-lg font-medium tracking-wider text-slate-900 dark:text-slate-100">{`${
+              testimonial.data.fullName
+            }${testimonial.data.suffix ? `, ${testimonial.data.suffix}` : ''}`}</h2>
             <p class="text-slate-600 dark:text-slate-300">{testimonial.data.position}</p>
           </div>
         ))
