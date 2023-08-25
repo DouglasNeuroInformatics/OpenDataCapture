@@ -5,7 +5,7 @@ import { HiAdjustmentsHorizontal, HiChartBar, HiEye, HiPlus, HiUserPlus } from '
 
 import { NavigationLink } from './NavigationLink';
 
-export interface NavigationProps {
+export type NavigationProps = {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 

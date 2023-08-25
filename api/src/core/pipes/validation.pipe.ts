@@ -27,7 +27,7 @@ export class ValidationPipe implements PipeTransform {
       throw new InternalServerErrorException('Metatype must be defined!');
     }
 
-    const schema = this.reflector.get<JSONSchemaType<T | undefined>>('ValidationSchema', metatype);
+    const schema = this.reflector.get<JSONSchemaType<T> | undefined>('ValidationSchema', metatype);
     if (!schema) {
       throw new InternalServerErrorException('Schema must be defined!');
     }

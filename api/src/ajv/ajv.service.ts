@@ -21,7 +21,7 @@ export class AjvService {
   }
 
   private formatErrorMessage(
-    errors?: ErrorObject<string, Record<string, any>, unknown>[] | null
+    errors?: ErrorObject[] | null
   ): string | Record<string, any> {
     if (!errors) {
       return 'Schema validation failed, yet errors is ' + errors;

@@ -34,7 +34,7 @@ export class UsersService {
 
     const groups: GroupEntity[] = [];
     for (let i = 0; i < (groupNames?.length ?? 0); i++) {
-      groups.push(await this.groupsService.findByName(groupNames![i], ability));
+      groups.push(await this.groupsService.findByName(groupNames![i]!, ability));
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(password);

@@ -21,14 +21,14 @@ function formatValue(value: unknown): string {
   return JSON.stringify(value);
 }
 
-export interface TableColumn<T> {
+export type TableColumn<T> = {
   name: string;
   field: keyof T | ((entry: T) => unknown);
   /** Override the default formatter for this field */
   format?: (value: any) => string;
 }
 
-export interface TableProps<T> {
+export type TableProps<T> = {
   columns: TableColumn<T>[];
   data: T[];
   entryLinkFactory?: (entry: T) => string;
@@ -97,7 +97,7 @@ export const Table = <T extends Record<PropertyKey, unknown>>({ columns, data, e
               'hover:bg-slate-200': currentPage !== page
             })}
             key={page}
-            onClick={() => setCurrentPage(page)}
+            onClick={() => { setCurrentPage(page); }}
           >
             {page}
           </button>

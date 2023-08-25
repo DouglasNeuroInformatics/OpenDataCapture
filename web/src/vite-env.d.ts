@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 
@@ -19,4 +20,4 @@ interface ImportMetaEnv extends ImportMetaDevEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
-}
+};

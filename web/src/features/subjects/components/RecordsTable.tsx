@@ -56,7 +56,7 @@ export const RecordsTable = () => {
         break;
       case 'CSV':
         download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(data[0]);
+          const columnNames = Object.keys(data[0]!);
           const rows = data.map((item) => Object.values(item).join(',')).join('\n');
           return Promise.resolve(columnNames + '\n' + rows);
         });

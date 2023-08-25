@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { HiPencilSquare } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 
-export interface InstrumentCardProps {
+export type InstrumentCardProps = {
   instrument: FormInstrumentSummary;
 }
 

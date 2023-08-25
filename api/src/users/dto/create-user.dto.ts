@@ -3,9 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import type { BasePermissionLevel, User } from '@ddcp/types';
 import { ArrayMinSize, IsIn, IsOptional, IsString, Matches } from 'class-validator';
 
-interface CreateUserData extends Omit<User, 'preferences' | 'groups'> {
+type CreateUserData = {
   groupNames?: string[];
-}
+} & Omit<User, 'preferences' | 'groups'>
 
 // Matches string with 8 or more characters, minimum one upper case, lowercase, and number
 const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;

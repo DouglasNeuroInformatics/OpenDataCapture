@@ -3,9 +3,9 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 
-export interface LinkProps extends RouterLinkProps {
+export type LinkProps = {
   variant?: 'default' | 'btn-primary' | 'btn-secondary';
-}
+} & RouterLinkProps
 
 export const Link = ({ className, children, variant = 'default', ...props }: LinkProps) => {
   return (

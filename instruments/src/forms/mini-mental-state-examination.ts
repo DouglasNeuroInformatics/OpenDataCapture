@@ -21,7 +21,7 @@ export type MiniMentalStateExaminationData = {
   canFollowWrittenInstructions: number;
   canWriteSentence: number;
   canCopyDesign: number;
-};
+}
 
 export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateExaminationData>({
   name: 'Mini Mental State Examination',

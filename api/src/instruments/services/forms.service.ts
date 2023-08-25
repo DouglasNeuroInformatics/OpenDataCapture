@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -81,8 +87,8 @@ export class FormsService {
     let fields: FormFields<T>;
     if (Array.isArray(instrument.content)) {
       fields = instrument.content.reduce(
-        (prev, current) => ({ ...prev, ...current.fields }),
-        instrument.content[0].fields
+        (prev: any, current: { fields: any; }) => ({ ...prev, ...current.fields }),
+        instrument.content[0]?.fields
       ) as FormFields<T>;
     } else {
       fields = instrument.content;

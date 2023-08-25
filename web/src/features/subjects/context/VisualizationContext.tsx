@@ -25,11 +25,9 @@ export type VisualizationContextData = {
   data: SubjectFormRecords[];
 
   /** An array of records in the data returned by the API, after applying filters */
-  records: Array<
-    Pick<FormInstrumentRecord, 'data' | 'time'> & {
+  records: (Pick<FormInstrumentRecord, 'data' | 'time'> & {
       computedMeasures?: Record<string, number> | undefined;
-    }
-  >;
+    })[];
 
   /** Merger of `computedMeasures` and `time` for all records  */
   measurements: Measurements;
@@ -135,7 +133,7 @@ export const VisualizationContextProvider = ({
       for (const measure in selectedInstrument.measures) {
         arr.push({
           key: measure,
-          label: selectedInstrument.measures[measure].label
+          label: selectedInstrument.measures[measure]!.label
         });
       }
     }

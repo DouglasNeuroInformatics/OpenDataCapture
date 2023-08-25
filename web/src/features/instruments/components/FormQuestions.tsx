@@ -6,7 +6,7 @@ import { Form } from '@douglasneuroinformatics/ui';
 
 import { StepperContext } from '@/context/StepperContext';
 
-export interface FormQuestionsProps<T extends FormInstrumentData> {
+export type FormQuestionsProps<T extends FormInstrumentData> = {
   instrument: FormInstrument<T>;
   onSubmit: (data: T) => void;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Divider } from '@douglasneuroinformatics/ui';
 
-export interface PageHeaderProps {
+export type PageHeaderProps = {
   title: string;
   subtitle?: string;
 }

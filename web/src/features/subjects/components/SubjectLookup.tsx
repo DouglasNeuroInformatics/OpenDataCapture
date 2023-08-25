@@ -1,28 +1,31 @@
 import React from 'react';
 
+import { Subject } from '@ddcp/types';
 import { Modal } from '@douglasneuroinformatics/ui';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { SubjectsAPI } from '../api/subjects-api';
-
 import { IdentificationForm, IdentificationFormData } from '@/components';
 
-interface SubjectLookupProps {
+type SubjectLookupProps = {
   show: boolean;
   onClose: () => void;
-}
+};
 
 export const SubjectLookup = ({ show, onClose }: SubjectLookupProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const lookupSubject = (formData: IdentificationFormData) => {
-    SubjectsAPI.lookupSubject(formData)
+    axios
+      .post<Subject>('/v1/subjects/lookup', formData)
       .then(({ data: { identifier } }) => {
         navigate(identifier);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (

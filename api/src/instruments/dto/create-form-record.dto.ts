@@ -7,12 +7,12 @@ import { IsIn, IsNumber, IsObject, IsOptional, IsPositive, IsString, Min, Valida
 
 import { SubjectIdentificationDataDto } from '@/subjects/dto/subject-identification-data.dto.js';
 
-interface CreateFormRecordData extends Omit<FormInstrumentRecord, 'group' | 'instrument' | 'subject'> {
+type CreateFormRecordData = {
   groupName?: string;
   instrumentName: string;
   instrumentVersion: number;
   subjectInfo: SubjectIdentificationData;
-}
+} & Omit<FormInstrumentRecord, 'group' | 'instrument' | 'subject'>
 
 export class CreateFormRecordDto implements CreateFormRecordData {
   @ApiProperty()

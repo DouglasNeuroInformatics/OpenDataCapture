@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { StepperContext } from '@/context/StepperContext';
 
-interface FormOverviewItemProps {
+type FormOverviewItemProps = {
   heading: string;
   text: string | string[];
 }
@@ -30,7 +30,7 @@ const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
   );
 };
 
-interface FormOverviewProps {
+type FormOverviewProps = {
   details: FormDetails;
 }
 
@@ -51,7 +51,7 @@ export const FormOverview = ({
         />
         <FormOverviewItem heading={t('instruments.formPage.overview.instructions')} text={instructions} />
       </div>
-      <Button label={t('instruments.formPage.overview.begin')} onClick={() => updateIndex('increment')} />
+      <Button label={t('instruments.formPage.overview.begin')} onClick={() => { updateIndex('increment'); }} />
     </div>
   );
 };

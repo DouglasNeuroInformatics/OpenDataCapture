@@ -7,7 +7,7 @@ import { useDisclaimerStore } from '../stores/disclaimer-store';
 
 import { useAuthStore } from '@/stores/auth-store';
 
-export interface DisclaimerProps {
+export type DisclaimerProps = {
   isRequired: boolean;
 }
 
@@ -16,7 +16,7 @@ export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProp
   const { isAccepted, username, setIsAccepted } = useDisclaimerStore();
   const { t } = useTranslation();
 
-  const handleClose = () => setIsAccepted(true, currentUser!.username);
+  const handleClose = () => { setIsAccepted(true, currentUser!.username); };
 
   const show = (!isAccepted || currentUser?.username !== username) && isRequired;
 
@@ -25,7 +25,7 @@ export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProp
       <p>{t('disclaimer.message')}</p>
       <div className="mt-3 flex">
         <Button className="mr-2" label={t('disclaimer.accept')} size="sm" onClick={handleClose} />
-        <Button label={t('disclaimer.decline')} size="sm" variant="secondary" onClick={() => logout()} />
+        <Button label={t('disclaimer.decline')} size="sm" variant="secondary" onClick={() => { logout(); }} />
       </div>
     </Modal>
   );

@@ -1,10 +1,8 @@
 import { Language } from '@ddcp/types';
 
-type MultilingualOptions = {
-  [key: string]: {
+type MultilingualOptions = Record<string, {
     [L in Language]: string;
-  };
-};
+  }>;
 
 type TranslatedOptions<T extends MultilingualOptions> = {
   [K in keyof T]: string;
@@ -20,7 +18,7 @@ type FormattedOptions<T extends MultilingualOptions> = {
 function getTranslatedOptions<T extends MultilingualOptions>(options: T, language: Language): TranslatedOptions<T> {
   const translatedOptions: Partial<TranslatedOptions<T>> = {};
   for (const option in options) {
-    translatedOptions[option] = options[option][language];
+    translatedOptions[option] = options[option]?.[language];
   }
   return translatedOptions as TranslatedOptions<T>;
 }
@@ -34,7 +32,7 @@ export function formatOptions<T extends MultilingualOptions>(options: T): Format
 }
 
 export function extractKeys<T extends MultilingualOptions>(options: T, nullable = false) {
-  const keys = Object.keys(options) as Array<keyof T>;
+  const keys = Object.keys(options) as (keyof T)[];
   return nullable ? [...keys, null] : keys;
 }
 

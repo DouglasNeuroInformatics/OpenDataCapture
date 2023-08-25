@@ -33,7 +33,7 @@ export class CreateFormDto implements FormInstrument {
   details: FormDetailsDto;
 
   @ApiProperty()
-  content: FormInstrumentContent<FormInstrumentData>;
+  content: FormInstrumentContent;
 
   @ApiProperty()
   validationSchema: JSONSchemaType<FormInstrumentData>;

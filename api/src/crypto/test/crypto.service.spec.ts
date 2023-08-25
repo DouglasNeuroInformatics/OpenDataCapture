@@ -48,13 +48,13 @@ describe('CryptoService', () => {
       const h1 = await cryptoService.hashPassword('foo');
       const h2 = await cryptoService.hashPassword('foo');
       assert(h1 !== h2);
-      assert((await cryptoService.comparePassword('foo', h1)) === true);
-      assert((await cryptoService.comparePassword('foo', h2)) === true);
+      assert(await cryptoService.comparePassword('foo', h1));
+      assert(await cryptoService.comparePassword('foo', h2));
     });
 
     it('should return false when comparing a hash with an incorrect value', async () => {
       const hash = await cryptoService.hashPassword('foo');
-      assert((await cryptoService.comparePassword('bar', hash)) === false);
+      assert(!(await cryptoService.comparePassword('bar', hash)));
     });
   });
 });

@@ -5,13 +5,13 @@ import { StepperIcon } from './StepperIcon';
 
 import { StepperContext } from '@/context/StepperContext';
 
-interface Step {
+type Step = {
   label: string;
   icon: React.ReactElement;
   element: React.ReactElement;
 }
 
-interface StepperProps {
+type StepperProps = {
   steps: Step[];
 }
 
@@ -35,8 +35,8 @@ const Stepper = ({ steps }: StepperProps) => {
           </React.Fragment>
         ))}
       </div>
-      <h3 className="mb-5 text-2xl font-semibold text-slate-900">{steps[index].label}</h3>
-      <div>{steps[index].element}</div>
+      <h3 className="mb-5 text-2xl font-semibold text-slate-900">{steps[index]?.label}</h3>
+      <div>{steps[index]?.element}</div>
     </StepperContext.Provider>
   );
 };

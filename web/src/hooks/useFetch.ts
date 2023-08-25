@@ -49,7 +49,7 @@ export function useFetch<T = unknown>(
     const url = new URL(baseURL + resourceURL);
     for (const key in options.queryParams) {
       if (options.queryParams[key]) {
-        url.searchParams.append(key, options.queryParams[key] as string);
+        url.searchParams.append(key, options.queryParams[key]!);
       }
     }
     return url;
@@ -87,9 +87,9 @@ export function useFetch<T = unknown>(
           }
           return response.json();
         })
-        .then((data: T) => setData(data))
-        .catch(options?.onError ?? setError)
-        .finally(() => setIsLoading(false));
+        .then((data: T) => { setData(data); })
+        .catch(options.onError ?? setError)
+        .finally(() => { setIsLoading(false); });
     } else {
       setData(null);
     }

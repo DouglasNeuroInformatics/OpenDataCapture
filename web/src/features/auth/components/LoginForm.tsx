@@ -13,7 +13,7 @@ type LoginFormData = {
   password: string;
 };
 
-export interface LoginFormProps {
+export type LoginFormProps = {
   onSuccess: () => void;
 }
 

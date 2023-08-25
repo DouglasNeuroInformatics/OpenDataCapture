@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { type MotionValue, motion, useSpring, useTransform } from 'framer-motion';
 
-interface StatisticCardProps {
+type StatisticCardProps = {
   label: string;
   icon?: JSX.Element;
   value: number;

@@ -11,14 +11,14 @@ const DEV = import.meta.env.DEV;
 
 const LICENSE_URL = import.meta.env.VITE_LICENSE_URL;
 const SOURCE_URL = import.meta.env.DEV
-  ? `${import.meta.env.VITE_GITHUB_REPO_URL}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT!}`
+  ? `${import.meta.env.VITE_GITHUB_REPO_URL}/tree/${import.meta.env.VITE_DEV_GIT_COMMIT}`
   : import.meta.env.VITE_GITHUB_REPO_URL;
 const GIT_BRANCH = import.meta.env.VITE_DEV_GIT_BRANCH;
 const GIT_COMMIT = import.meta.env.VITE_DEV_GIT_COMMIT?.slice(0, 7);
 const GIT_COMMIT_DATE = import.meta.env.VITE_DEV_GIT_COMMIT_DATE;
 const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL;
 
-export interface FooterProps {
+export type FooterProps = {
   isLogin?: boolean;
   showDevInfo?: boolean;
 }
@@ -61,7 +61,7 @@ export const Footer = ({ isLogin = false, showDevInfo = DEV }: FooterProps) => {
         &copy; {CURRENT_YEAR} {t('organization.name')}
       </p>
       {showDevInfo && (
-        <p className="text-center text-sm">{`Last Commit '${GIT_COMMIT!}' to Branch '${GIT_BRANCH!}' on ${GIT_COMMIT_DATE!}`}</p>
+        <p className="text-center text-sm">{`Last Commit '${GIT_COMMIT}' to Branch '${GIT_BRANCH}' on ${GIT_COMMIT_DATE}`}</p>
       )}
     </footer>
   );

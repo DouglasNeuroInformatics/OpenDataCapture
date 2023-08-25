@@ -13,7 +13,7 @@ type IdentificationFormData = {
   dateOfBirth: string;
 };
 
-export interface IdentificationFormProps {
+export type IdentificationFormProps = {
   /** Whether to prefill the form with the active subject, if one exists  */
   fillActiveSubject?: boolean;
 

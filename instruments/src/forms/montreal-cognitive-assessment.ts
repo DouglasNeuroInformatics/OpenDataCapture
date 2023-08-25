@@ -9,7 +9,7 @@ export type MontrealCognitiveAssessmentData = {
   delayedRecall: number;
   orientation: number;
   lowEdu: boolean;
-};
+}
 
 export const montrealCognitiveAssessment = createTranslatedForms<MontrealCognitiveAssessmentData>({
   name: 'MontrealCognitiveAssessment',
