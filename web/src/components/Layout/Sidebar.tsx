@@ -15,7 +15,7 @@ export const Sidebar = () => {
       <hr className="my-1 mt-auto" />
       <div className="flex items-center">
         <UserDropup />
-        <ThemeToggle />
+        <ThemeToggle className="hover:backdrop-brightness-150" />
       </div>
     </div>
   );
