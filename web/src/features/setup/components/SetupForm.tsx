@@ -4,14 +4,17 @@ import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 type SetupData = {
-  adminUsername: string;
-  adminPassword: string;
+  username: string;
+  password: string;
   initDemo: boolean;
 };
 
 type SetupFormProps = {
   onSubmit: (data: SetupData) => void;
 };
+
+// Matches string with 8 or more characters, minimum one upper case, lowercase, and number
+const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
 export const SetupForm = ({ onSubmit }: SetupFormProps) => {
   const { t } = useTranslation();
@@ -22,12 +25,12 @@ export const SetupForm = ({ onSubmit }: SetupFormProps) => {
           title: t('setup.admin.title'),
           description: t('setup.admin.description'),
           fields: {
-            adminUsername: {
+            username: {
               kind: 'text',
               label: t('username'),
               variant: 'short'
             },
-            adminPassword: {
+            password: {
               kind: 'text',
               label: t('password'),
               variant: 'password'
@@ -54,19 +57,19 @@ export const SetupForm = ({ onSubmit }: SetupFormProps) => {
       validationSchema={{
         type: 'object',
         properties: {
-          adminUsername: {
+          username: {
             type: 'string',
             minLength: 1
           },
-          adminPassword: {
+          password: {
             type: 'string',
-            minLength: 8
+            pattern: isStrongPassword.source
           },
           initDemo: {
             type: 'boolean'
           }
         },
-        required: ['adminUsername', 'adminPassword', 'initDemo']
+        required: ['username', 'password', 'initDemo']
       }}
       onSubmit={onSubmit}
     />

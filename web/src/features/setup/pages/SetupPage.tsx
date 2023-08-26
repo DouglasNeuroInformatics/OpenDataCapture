@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { FormPageWrapper } from '@douglasneuroinformatics/ui';
+import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { SetupForm } from '../components/SetupForm';
@@ -9,6 +10,8 @@ import logo from '@/assets/logo.png';
 
 export const SetupPage = () => {
   const { t } = useTranslation();
+  const notifications = useNotificationsStore();
+
   return (
     <FormPageWrapper
       languageToggle={{
@@ -19,7 +22,19 @@ export const SetupPage = () => {
       title={t('setup.pageTitle')}
       widthMultiplier={1.5}
     >
-      <SetupForm onSubmit={() => null} />
+      <SetupForm
+        onSubmit={({ username, password, initDemo }) => {
+          axios
+            .post('/v1/setup', {
+              admin: { username, password },
+              initDemo
+            })
+            .then(() => {
+              notifications.addNotification({ type: 'success' });
+            })
+            .catch(console.error);
+        }}
+      />
     </FormPageWrapper>
   );
 };
