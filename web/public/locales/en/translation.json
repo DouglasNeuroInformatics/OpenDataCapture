@@ -267,5 +267,17 @@
       "exportHelpText": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
       "filters": "Filters"
     }
+  },
+  "setup": {
+    "pageTitle": "Setup",
+    "admin": {
+      "title": "Admin",
+      "description": "To use the application, there must be at least one platform administrator. Ensure you remember these credentials, as failure to do so may result in data loss."
+    },
+    "demo": {
+      "title": "Demo",
+      "description": "If you're testing the platform, you have the option to populate the database with sample data.",
+      "init": "Initialize Demo"
+    }
   }
 }
