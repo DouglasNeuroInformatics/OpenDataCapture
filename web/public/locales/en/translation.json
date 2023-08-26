@@ -279,5 +279,7 @@
       "description": "If you're testing the platform, you have the option to populate the database with sample data.",
       "init": "Initialize Demo"
     }
-  }
+  },
+  "yes": "Yes",
+  "no": "No"
 }

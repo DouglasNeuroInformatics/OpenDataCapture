@@ -41,15 +41,16 @@ export const SetupForm = ({ onSubmit }: SetupFormProps) => {
             initDemo: {
               kind: 'binary',
               label: t('setup.demo.init'),
-              variant: 'radio'
+              variant: 'radio',
+              options: {
+                t: t('yes'),
+                f: t('no')
+              }
             }
           }
         }
       ]}
-      errorMessages={{
-        adminUsername: 'Please enter at least 1 character',
-        adminPassword: 'Please enter at least 8 characters'
-      }}
+      submitBtnLabel={t('form.submit')}
       validationSchema={{
         type: 'object',
         properties: {

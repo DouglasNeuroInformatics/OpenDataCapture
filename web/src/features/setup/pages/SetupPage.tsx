@@ -10,7 +10,15 @@ import logo from '@/assets/logo.png';
 export const SetupPage = () => {
   const { t } = useTranslation();
   return (
-    <FormPageWrapper languageOptions={['en', 'fr']} logo={logo} title={t('setup.pageTitle')} widthMultiplier={1.5}>
+    <FormPageWrapper
+      languageToggle={{
+        dropdownDirection: 'up',
+        options: ['en', 'fr']
+      }}
+      logo={logo}
+      title={t('setup.pageTitle')}
+      widthMultiplier={1.5}
+    >
       <SetupForm onSubmit={() => null} />
     </FormPageWrapper>
   );

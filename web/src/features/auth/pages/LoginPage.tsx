@@ -13,7 +13,14 @@ export const LoginPage = () => {
   const { t } = useTranslation();
 
   return (
-    <FormPageWrapper languageOptions={['en', 'fr']} logo={logo} title={t('login')}>
+    <FormPageWrapper
+      languageToggle={{
+        dropdownDirection: 'up',
+        options: ['en', 'fr']
+      }}
+      logo={logo}
+      title={t('login')}
+    >
       <LoginForm
         onSuccess={() => {
           navigate('/overview');
