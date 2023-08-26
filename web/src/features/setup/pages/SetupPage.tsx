@@ -1,13 +1,15 @@
 import React from 'react';
 
+import { FormPageWrapper } from '@douglasneuroinformatics/ui';
+
 import { SetupForm } from '../components/SetupForm';
 
-import { EntryPageWrapper } from '@/components/EntryPageWrapper';
+import logo from '@/assets/logo.png';
 
 export const SetupPage = () => {
   return (
-    <EntryPageWrapper title="Setup">
+    <FormPageWrapper languageOptions={['en', 'fr']} logo={logo} title="Setup">
       <SetupForm onSubmit={() => null} />
-    </EntryPageWrapper>
+    </FormPageWrapper>
   );
 };

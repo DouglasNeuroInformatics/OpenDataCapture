@@ -11,6 +11,7 @@ const componentLibraryContent = path.join(
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}', componentLibraryContent],
+  darkMode: 'class',
   presets: [baseConfig],
   theme: {
     extend: {

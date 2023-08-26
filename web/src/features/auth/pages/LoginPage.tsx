@@ -1,24 +1,25 @@
 import React from 'react';
 
+import { FormPageWrapper } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { LoginForm } from '../components/LoginForm';
 
-import { EntryPageWrapper } from '@/components/EntryPageWrapper';
+import logo from '@/assets/logo.png';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   return (
-    <EntryPageWrapper title={t('login')}>
+    <FormPageWrapper languageOptions={['en', 'fr']} logo={logo} title={t('login')}>
       <LoginForm
         onSuccess={() => {
           navigate('/overview');
         }}
       />
-    </EntryPageWrapper>
+    </FormPageWrapper>
   );
 };
 
