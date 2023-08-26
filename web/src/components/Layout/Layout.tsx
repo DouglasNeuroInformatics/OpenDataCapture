@@ -20,7 +20,6 @@ export const Layout = () => {
         <main className="container flex-grow">
           <Outlet />
         </main>
-        <hr className="mb-2 mt-4 print:hidden" />
         <Footer />
       </div>
     </div>
