@@ -23,8 +23,9 @@ import { useAuthStore } from './stores/auth-store';
  * that can serve to redirect the user (e.g., after a successful setup or login)
  */
 export const Router = () => {
+  const { setup } = useContext(SetupContext);
+  const { isSetup } = setup;
   const { accessToken } = useAuthStore();
-  const { isSetup } = useContext(SetupContext);
 
   return (
     <BrowserRouter>

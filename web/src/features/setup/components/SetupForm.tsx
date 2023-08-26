@@ -16,7 +16,7 @@ type SetupFormProps = {
 // Matches string with 8 or more characters, minimum one upper case, lowercase, and number
 const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
-export const SetupForm = ({ onSubmit }: SetupFormProps) => {
+const SetupForm = ({ onSubmit }: SetupFormProps) => {
   const { t } = useTranslation();
   return (
     <Form<SetupData>
@@ -75,3 +75,5 @@ export const SetupForm = ({ onSubmit }: SetupFormProps) => {
     />
   );
 };
+
+export { SetupForm, type SetupData };

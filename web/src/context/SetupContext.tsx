@@ -3,7 +3,10 @@ import React, { createContext, useEffect, useState } from 'react';
 import { SetupState } from '@ddcp/types';
 import axios from 'axios';
 
-export const SetupContext = createContext<SetupState>(null!);
+export const SetupContext = createContext<{
+  setup: SetupState;
+  updateSetup: (data: Partial<SetupState>) => void;
+}>(null!);
 
 export const SetupContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, setState] = useState<SetupState>(() => {
@@ -24,7 +27,22 @@ export const SetupContextProvider = ({ children }: { children: React.ReactNode }
         })
         .catch(console.error);
     }
-  }, [state, setState]);
+  }, []);
 
-  return <SetupContext.Provider value={state}>{children}</SetupContext.Provider>;
+  return (
+    <SetupContext.Provider
+      value={{
+        setup: state,
+        updateSetup: (data) => {
+          setState((prevState) => {
+            const updatedState = { ...prevState, ...data };
+            window.localStorage.setItem('setup', JSON.stringify(data));
+            return updatedState;
+          });
+        }
+      }}
+    >
+      {children}
+    </SetupContext.Provider>
+  );
 };
