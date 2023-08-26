@@ -17,7 +17,7 @@ jobs:
       SECRET_KEY: secret-key
       MONGO_URI: mongodb://mongo:27017
       VITE_CONTACT_EMAIL: postmaster@example.org
-      VITE_GITHUB_REPO_URL: https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform
+      VITE_GITHUB_REPO_URL: https://github.com/DouglasNeuroInformatics/OpenDataCapture
       VITE_LICENSE_URL: https://www.gnu.org/licenses/agpl-3.0.en.html
       API_DEV_SERVER_PORT: 5500
       WEB_DEV_SERVER_PORT: 3000

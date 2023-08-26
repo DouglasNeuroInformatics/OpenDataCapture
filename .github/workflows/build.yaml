@@ -49,5 +49,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VITE_CONTACT_EMAIL=support@douglasneuroinformatics.ca
-            VITE_GITHUB_REPO_URL=https://github.com/DouglasNeuroInformatics/DouglasDataCapturePlatform
+            VITE_GITHUB_REPO_URL=https://github.com/DouglasNeuroInformatics/OpenDataCapture
             VITE_LICENSE_URL=https://www.gnu.org/licenses/agpl-3.0.en.html

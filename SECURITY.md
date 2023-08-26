@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-The most recent version of the Douglas Data Capture Platform will receive security updates.
+The most recent version of the platform will receive security updates.
 
 ## Reporting a Vulnerability
 

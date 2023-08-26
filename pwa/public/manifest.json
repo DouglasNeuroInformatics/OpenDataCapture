@@ -1,6 +1,6 @@
 {
-  "short_name": "DDCP",
-  "name": "Douglas Data Capture Platform",
+  "short_name": "ODCap",
+  "name": "Open Data Capture",
   "icons": [
     {
       "src": "/images/icons-vector.svg",

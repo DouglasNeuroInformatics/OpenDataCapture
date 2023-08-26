@@ -2,7 +2,7 @@
 
 ## Background
 
-The Douglas Data Capture Platform is designed to be secure by design. Here, we provide a detailed overview of all major aspects of our security system, including authentication and authorization.
+Open Data Capture is designed to be secure by design. Here, we provide a detailed overview of all major aspects of our security system, including authentication and authorization.
 
 The following sections were primarily created for future developers and system administrators. While there may be some short code snippets and commands referenced throughout, they are not crucial for understanding the fundamental principles that underpin our security system. Therefore, these sections are also suitable for non-technical users who are interested in learning about our security system.
 

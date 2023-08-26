@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { ThemeToggle } from '@douglasneuroinformatics/ui';
+
 import { Branding } from './Branding';
 import { Navigation } from './Navigation';
 import { UserDropup } from './UserDropup';
@@ -13,6 +15,7 @@ export const Sidebar = () => {
       <hr className="my-1 mt-auto" />
       <div className="flex items-center">
         <UserDropup />
+        <ThemeToggle />
       </div>
     </div>
   );

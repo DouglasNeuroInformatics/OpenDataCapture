@@ -2,7 +2,7 @@
 
 ## Main Components
 
-The Douglas Data Capture Platform comprises three main components:
+Open Data Capture comprises three main components:
 1. A Single Page Application (SPA)
 2. A Representational State Transfer (REST) API
 3. A MongoDB database

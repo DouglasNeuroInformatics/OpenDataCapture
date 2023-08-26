@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { SetupDto } from './dto/setup.dto.js';
@@ -10,6 +10,16 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
 @Controller({ path: 'setup' })
 export class SetupController {
   constructor(private readonly setupService: SetupService) {}
+
+  @ApiOperation({
+    summary: 'Get State',
+    description: 'Return the current setup state'
+  })
+  @Get()
+  @RouteAccess('public')
+  getState() {
+    return this.setupService.getState();
+  }
 
   @ApiOperation({
     summary: 'Initialize',

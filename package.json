@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/ajv": "^0.0.5",
-    "@douglasneuroinformatics/utils": "0.4.1"
+    "@douglasneuroinformatics/utils": "0.4.1",
+    "ts-pattern": "^5.0.5"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",

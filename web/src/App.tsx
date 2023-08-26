@@ -6,6 +6,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Router } from './Router';
 
 import { ActiveSubject } from '@/components';
+import { SetupContextProvider } from '@/context/SetupContext';
 import { ErrorFallback, SuspenseFallback } from '@/features/misc';
 
 import './services/i18n';
@@ -15,9 +16,11 @@ export const App = () => {
   return (
     <React.Suspense fallback={<SuspenseFallback />}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <ActiveSubject />
-        <NotificationHub />
-        <Router />
+        <SetupContextProvider>
+          <ActiveSubject />
+          <NotificationHub />
+          <Router />
+        </SetupContextProvider>
       </ErrorBoundary>
     </React.Suspense>
   );

@@ -5,7 +5,7 @@ import { ArrayMinSize, IsIn, IsOptional, IsString, Matches } from 'class-validat
 
 type CreateUserData = {
   groupNames?: string[];
-} & Omit<User, 'preferences' | 'groups'>
+} & Omit<User, 'preferences' | 'groups'>;
 
 // Matches string with 8 or more characters, minimum one upper case, lowercase, and number
 const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
@@ -38,11 +38,7 @@ export class CreateUserDto implements CreateUserData {
 
   @ApiProperty({
     description: 'The names of the group(s) to which the user belongs',
-    example: ['Memory Clinic', 'Depression Clinic'],
-    externalDocs: {
-      description: 'Additional Information',
-      url: 'https://douglasneuroinformatics.github.io/DouglasDataCapturePlatform/#/features/authentication'
-    }
+    example: ['Memory Clinic', 'Depression Clinic']
   })
   @IsOptional()
   @IsString({ each: true })

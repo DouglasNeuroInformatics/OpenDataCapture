@@ -92,7 +92,7 @@
     "name": "Douglas Neuroinformatics Platform"
   },
   "platform": {
-    "title": "Douglas Data Capture Platform"
+    "title": "Open Data Capture"
   },
   "searchBar": {
     "placeholder": "Rechercher..."
@@ -220,7 +220,7 @@
   "disclaimer": {
     "accept": "Accepter",
     "decline": "Refuser",
-    "message": "Le Douglas Data Capture Platform n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques.",
+    "message": "Cette plateforme n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques.",
     "title": "Avis"
   },
   "overview": {
@@ -267,5 +267,19 @@
       "exportHelpText": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants.",
       "filters": "Filtres"
     }
-  }
+  },
+  "setup": {
+    "pageTitle": "Mise en service",
+    "admin": {
+      "title": "Administrateur",
+      "description": "Pour utiliser l'application, il faut qu'il y ait au moins un administrateur. Assurez-vous de vous souvenir de ces informations d'identification, faute de quoi vous risquez de perdre des données."
+    },
+    "demo": {
+      "title": "Démonstration",
+      "description": "Si vous testez la plateforme, vous avez la possibilité d'alimenter la base de données avec des échantillons de données.",
+      "init": "Initialiser la démonstration"
+    }
+  },
+  "yes": "Oui",
+  "no": "Non"
 }

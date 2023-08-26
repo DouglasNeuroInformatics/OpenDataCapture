@@ -45,11 +45,14 @@ export const getStaticPaths = () => {
         {t('landing.hero.subheading')}
       </p>
       <div class="mt-5 flex justify-center gap-3 lg:justify-start">
-        <button
+        <a
           class="text-md flex items-center justify-center rounded-md bg-slate-800 px-6 py-2 font-medium text-slate-100 shadow-md hover:bg-slate-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 dark:bg-sky-700 dark:hover:bg-sky-600"
+          href="https://demo.opendatacapture.org"
+          rel="noreferrer"
+          target="_blank"
         >
           {t('landing.hero.viewDemo')}
-        </button>
+      </a>
         <button
           class="text-md flex items-center justify-center rounded-md border bg-inherit px-6 py-2 font-medium shadow-md focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
         >
