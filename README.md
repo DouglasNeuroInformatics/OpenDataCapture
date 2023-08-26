@@ -38,6 +38,22 @@ Open Data Capture is an integrated suite of applications tailored for the contin
 - User-Friendly Design: Designed with the user in mind, its intuitive interface ensures that even those without specialized knowledge can navigate and utilize the platform with ease.
 - Streamlined Deployment: With our one-liner deployment solution, leverage Docker Compose for a hassle-free, automated setup.
 
+## Deployment
+
+### Download Repository
+```shell
+git clone https://github.com/DouglasNeuroInformatics/OpenDataCapture
+cd OpenDataCapture
+```
+
+### Launch Application
+```
+awk -v secret_key="$(openssl rand -hex 16)" '/^SECRET_KEY=/{print $0 secret_key;next}1' .env.template > .env
+docker compose up
+```
+
+By default, the application will run on port 80. So, navigate to `localhost` in your browser and you should be greeted with the setup screen.
+
 ## Key Features
 
 - Interactive form creation tool with seamless registration and database retrieval
