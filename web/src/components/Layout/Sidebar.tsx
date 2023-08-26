@@ -8,7 +8,7 @@ import { UserDropup } from './UserDropup';
 
 export const Sidebar = () => {
   return (
-    <div className="flex h-screen w-80 flex-col bg-slate-900 p-3 text-slate-300">
+    <div className="flex h-screen w-80 flex-col bg-slate-900 p-3 text-slate-300 shadow-lg ring-1 ring-black">
       <Branding />
       <hr className="my-1" />
       <Navigation />
