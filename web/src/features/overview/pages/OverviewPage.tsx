@@ -57,7 +57,7 @@ export const OverviewPage = () => {
           <h3 className="text-center text-xl font-medium lg:text-left">{t('overview.summary')}</h3>
           <GroupSwitcher />
         </div>
-        <div className="body-font text-slate-600">
+        <div className="body-font">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
             {forms.data && records.data && subjects.data && users.data && (
               <>
