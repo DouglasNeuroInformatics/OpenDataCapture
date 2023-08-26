@@ -33,7 +33,10 @@
 
 ## About
 
-Open Data Capture is a modern, easy-to-use web application designed to enable the continuous collection and storage of research data. It was developed to meet the specific needs of clinical researchers at the Douglas Research Centre, one of the world’s leading mental health research institutions. However, it is fully open-source and can be easily adapted for use by other research institutions and organizations. This repository is a monorepo containing all source code for the application. 
+Open Data Capture is an integrated suite of applications tailored for the continuous and longitudinal collection of both clinical and research data. This platform is anchored on a few foundational principles:
+- Versatility in Instruments: Whether it's surveys, clinical questionnaires, interactive tasks, or neuroimaging data, our platform can handle it all under the umbrella of a generic instrument.
+- User-Friendly Design: Designed with the user in mind, its intuitive interface ensures that even those without specialized knowledge can navigate and utilize the platform with ease.
+- Streamlined Deployment: With our one-liner deployment solution, leverage Docker Compose for a hassle-free, automated setup.
 
 ## Key Features
 

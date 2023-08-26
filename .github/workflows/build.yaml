@@ -14,8 +14,6 @@ jobs:
         include:
           - dockerfile: ./api/Dockerfile
             image: ghcr.io/douglasneuroinformatics/data-capture-api
-          - dockerfile: ./docs/Dockerfile
-            image: ghcr.io/douglasneuroinformatics/data-capture-docs
           - dockerfile: ./web/Dockerfile
             image: ghcr.io/douglasneuroinformatics/data-capture-web
     steps:
