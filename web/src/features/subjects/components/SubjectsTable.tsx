@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 
 import { InstrumentRecordsExport, Subject } from '@ddcp/types';
-import { Dropdown, SearchBar } from '@douglasneuroinformatics/ui';
+import { ClientTable, Dropdown, SearchBar } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { SubjectLookup } from './SubjectLookup';
 
-import { Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
 
 export type SubjectTableProps = {
   data: Subject[];
-}
+};
 
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
+  const navigate = useNavigate();
   const { currentUser, currentGroup } = useAuthStore();
   const { t } = useTranslation();
 
@@ -59,7 +60,13 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
     <>
       <SubjectLookup show={showLookup} onClose={handleLookupClose} />
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
-        <SearchBar className="px-4 py-3 pl-2" size="md" onClick={() => { setShowLookup(true); }} />
+        <SearchBar
+          className="px-4 py-3 pl-2"
+          size="md"
+          onClick={() => {
+            setShowLookup(true);
+          }}
+        />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <Dropdown options={[]} title={t('viewSubjects.table.filters')} onSelection={() => null} />
           <Dropdown
@@ -69,23 +76,25 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
           />
         </div>
       </div>
-      <Table<Subject>
+      <ClientTable<Subject>
         columns={[
           {
-            name: t('viewSubjects.table.columns.subject'),
+            label: t('viewSubjects.table.columns.subject'),
             field: (subject) => subject.identifier.slice(0, 6)
           },
           {
-            name: t('viewSubjects.table.columns.dateOfBirth'),
+            label: t('viewSubjects.table.columns.dateOfBirth'),
             field: (subject) => toBasicISOString(new Date(subject.dateOfBirth))
           },
           {
-            name: t('viewSubjects.table.columns.sex'),
+            label: t('viewSubjects.table.columns.sex'),
             field: (subject) => (subject.sex === 'female' ? t('sex.female') : t('sex.male'))
           }
         ]}
         data={data}
-        entryLinkFactory={(subject) => subject.identifier}
+        onEntryClick={(subject) => {
+          navigate(subject.identifier);
+        }}
       />
     </>
   );
