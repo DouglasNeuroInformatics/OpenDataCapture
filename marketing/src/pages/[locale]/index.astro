@@ -36,8 +36,8 @@ export const getStaticPaths = () => {
 ---
 
 <Page bilingual>
-  <Section class="-mt-8 grid grid-cols-12 gap-8 text-center lg:text-left">
-    <div class="col-span-12 flex flex-col justify-center lg:col-span-6 xl:col-span-7">
+  <Section class="-mt-8 flex gap-8 text-center lg:text-left">
+    <div class="flex flex-col justify-center lg:w-1/2 xl:w-7/12">
       <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-4xl xl:text-5xl">
         {t('landing.hero.heading')}
       </h1>
@@ -52,7 +52,7 @@ export const getStaticPaths = () => {
           target="_blank"
         >
           {t('landing.hero.viewDemo')}
-      </a>
+        </a>
         <button
           class="text-md flex items-center justify-center rounded-md border bg-inherit px-6 py-2 font-medium shadow-md focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
         >
@@ -60,7 +60,7 @@ export const getStaticPaths = () => {
         </button>
       </div>
     </div>
-    <div class="hidden lg:col-span-6 lg:flex lg:items-center lg:justify-center xl:col-span-5">
+    <div class="hidden lg:flex lg:w-1/2 lg:items-center lg:justify-center xl:w-5/12">
       <Image alt={t('landing.hero.happyPerson')} class="rounded-md brightness-90" src={hero} />
     </div>
   </Section>
