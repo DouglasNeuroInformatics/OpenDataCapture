@@ -15,14 +15,11 @@ import { VisualizationHeader } from './VisualizationHeader';
 type RegressionResults = Record<string, { intercept: number; slope: number; stdErr: number }>;
 
 const COLOR_PALETTE = [
-  '#000000',
   '#D81B60',
   '#1E88E5',
-  '#004D40',
   '#FD08FA',
   '#A06771',
   '#353A9B',
-  '#1D066C',
   '#D90323',
   '#9C9218',
   '#CF0583',
@@ -31,7 +28,7 @@ const COLOR_PALETTE = [
 
 export type RecordsGraphProps = {
   data: SubjectFormRecords[];
-}
+};
 
 export const RecordsGraph = () => {
   const ctx = useContext(VisualizationContext);
@@ -86,7 +83,7 @@ export const RecordsGraph = () => {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="ml-[40px] p-2">
+      <div className="py-3">
         <VisualizationHeader />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
