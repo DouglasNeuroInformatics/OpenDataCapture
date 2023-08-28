@@ -6,5 +6,4 @@ export * from './Layout';
 export * from './Link';
 export * from './PageHeader';
 export * from './Spinner';
-export * from './Stepper';
 export * from './TransitionOpacity';

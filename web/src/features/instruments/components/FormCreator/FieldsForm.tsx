@@ -2,10 +2,8 @@
 import React, { useContext } from 'react';
 
 import { FormFieldKind, NumericFormField, TextFormField } from '@douglasneuroinformatics/form-types';
-import { Form, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { Form, StepperContext, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
-
-import { StepperContext } from '@/context/StepperContext';
 
 type RawFieldData = {
   name: string;
