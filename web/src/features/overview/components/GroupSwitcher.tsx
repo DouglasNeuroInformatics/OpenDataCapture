@@ -31,13 +31,15 @@ export const GroupSwitcher = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute z-10 mt-2 flex w-full flex-col border">
+        <Menu.Items className="absolute z-10 mt-2 flex w-full flex-col border border-slate-300 dark:border-slate-600">
           {currentUser?.groups.map((group) => (
             <Menu.Item key={group.name}>
               <button
-                className="w-full bg-slate-50 p-2 text-left hover:bg-slate-200"
+                className="w-full bg-slate-50 p-2 text-left hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
                 style={{ minWidth: 100 }}
-                onClick={() => { setCurrentGroup(group); }}
+                onClick={() => {
+                  setCurrentGroup(group);
+                }}
               >
                 {group.name}
               </button>
