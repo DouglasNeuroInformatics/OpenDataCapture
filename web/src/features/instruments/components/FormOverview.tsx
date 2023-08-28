@@ -12,7 +12,7 @@ type FormOverviewItemProps = {
 const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
   return (
     <div className="my-5">
-      <h5 className="mb-1 text-xl font-semibold text-slate-900">{heading}</h5>
+      <h5 className="mb-1 text-xl font-semibold text-slate-900 dark:text-slate-100">{heading}</h5>
       {Array.isArray(text) ? (
         <ul>
           {text.map((s, i) => (
@@ -22,7 +22,7 @@ const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
           ))}
         </ul>
       ) : (
-        <p className="text-slate-700">{text}</p>
+        <p className="text-slate-600 dark:text-slate-300">{text}</p>
       )}
     </div>
   );
