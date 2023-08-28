@@ -14,7 +14,7 @@ export class AbilityFactory {
       case 'ADMIN':
         ability.can('manage', 'all');
         break;
-      case 'STANDARD':
+      case 'GROUP_MANAGER':
         ability.can('read', 'Group', { _id: { $in: user.groups } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
@@ -23,7 +23,7 @@ export class AbilityFactory {
         ability.can('read', 'Subject', { groups: { $in: user.groups } });
         ability.can('read', 'User', { groups: { $in: user.groups } });
         break;
-      case 'GROUP_MANAGER':
+      case 'STANDARD':
         ability.can('read', 'Group', { _id: { $in: user.groups } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
