@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Spinner } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
+import { formatDataAsString } from '@/utils/form-utils';
 
 const FormSummaryItem = ({ label, value }: { label: string; value: any }) => {
   return (
@@ -31,15 +32,15 @@ export const FormSummary = <T extends FormInstrumentData>({
 }: FormSummaryProps<T>) => {
   const { activeSubject } = useActiveSubjectStore();
   const download = useDownload();
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   if (!result) {
     return <Spinner />;
   }
 
   const downloadResult = () => {
-    const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.json`;
-    download(filename, () => Promise.resolve(JSON.stringify(result, null, 2)));
+    const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.txt`;
+    download(filename, () => Promise.resolve(formatDataAsString(result)));
   };
 
   return (
@@ -56,7 +57,7 @@ export const FormSummary = <T extends FormInstrumentData>({
       <FormSummaryItem label={t('instruments.formPage.summary.instrumentVersion')} value={instrument.version} />
       <FormSummaryItem
         label={t('instruments.formPage.summary.timeCollected')}
-        value={new Date(timeCollected).toLocaleString('en-CA')}
+        value={new Date(timeCollected).toLocaleString(i18n.resolvedLanguage)}
       />
       <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.results')}</h3>
       <div className="mb-3">
