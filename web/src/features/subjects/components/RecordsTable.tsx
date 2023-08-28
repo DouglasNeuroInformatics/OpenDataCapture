@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 
-import { FormFields } from '@douglasneuroinformatics/form-types';
 import { ClientTable, Dropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
@@ -12,8 +12,7 @@ import { VisualizationHeader } from './VisualizationHeader';
 
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
-import { extractFields } from '@/utils/form-utils';
-import { toBasicISOString } from '@douglasneuroinformatics/utils';
+import { camelToSnakeCase } from '@/utils/form-utils';
 
 export const RecordsTable = () => {
   const { selectedInstrument, records } = useContext(VisualizationContext);
@@ -21,27 +20,6 @@ export const RecordsTable = () => {
   const { currentUser } = useAuthStore();
   const download = useDownload();
   const notifications = useNotificationsStore();
-
-  // the keys of all fields + measures mapped to labels
-  const itemLabels = useMemo(() => {
-    if (!selectedInstrument) {
-      return {};
-    }
-    const labels: Record<string, string> = {};
-    for (const key in selectedInstrument.measures) {
-      labels[key] = selectedInstrument.measures[key]!.label;
-    }
-
-    const fields = extractFields(selectedInstrument);
-    for (const key in fields) {
-      if (key in labels) {
-        console.warn(`Key'${key}' in fields overlaps with measures and will be ignored`);
-        continue;
-      }
-      labels[key] = fields[key]!.label;
-    }
-    return labels;
-  }, [selectedInstrument]);
 
   const data = useMemo(() => {
     if (!selectedInstrument) {
@@ -86,7 +64,7 @@ export const RecordsTable = () => {
   for (const subItem in data[0]) {
     if (subItem !== 'time') {
       fields.push({
-        label: subItem,
+        label: camelToSnakeCase(subItem).toUpperCase(),
         field: subItem
       });
     }
@@ -115,7 +93,7 @@ export const RecordsTable = () => {
       <ClientTable
         columns={[
           {
-            label: t('subjectPage.graph.xLabel'),
+            label: 'DATE_COLLECTED',
             field: 'time',
             formatter: (value: number) => toBasicISOString(new Date(value))
           },
