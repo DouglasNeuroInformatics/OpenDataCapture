@@ -195,9 +195,8 @@ export class FormRecordsService {
     for (const record of records) {
       for (const measure in record.instrument.measures) {
         const x = record.time;
-
         const y = this.computeMeasure(record.instrument.measures[measure]!, record.data);
-        if (Array.isArray(data.measure)) {
+        if (Array.isArray(data[measure])) {
           data[measure]!.push([x, y]);
         } else {
           data[measure] = [[x, y]];
