@@ -1,5 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 
+import { FormFields } from '@douglasneuroinformatics/form-types';
 import { ClientTable, Dropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -11,6 +12,8 @@ import { VisualizationHeader } from './VisualizationHeader';
 
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
+import { extractFields } from '@/utils/form-utils';
+import { toBasicISOString } from '@douglasneuroinformatics/utils';
 
 export const RecordsTable = () => {
   const { selectedInstrument, records } = useContext(VisualizationContext);
@@ -19,14 +22,31 @@ export const RecordsTable = () => {
   const download = useDownload();
   const notifications = useNotificationsStore();
 
+  // the keys of all fields + measures mapped to labels
+  const itemLabels = useMemo(() => {
+    if (!selectedInstrument) {
+      return {};
+    }
+    const labels: Record<string, string> = {};
+    for (const key in selectedInstrument.measures) {
+      labels[key] = selectedInstrument.measures[key]!.label;
+    }
+
+    const fields = extractFields(selectedInstrument);
+    for (const key in fields) {
+      if (key in labels) {
+        console.warn(`Key'${key}' in fields overlaps with measures and will be ignored`);
+        continue;
+      }
+      labels[key] = fields[key]!.label;
+    }
+    return labels;
+  }, [selectedInstrument]);
+
   const data = useMemo(() => {
     if (!selectedInstrument) {
       return [];
     }
-
-    // const formFields = Array.isArray(selectedInstrument.content)
-    //   ? selectedInstrument.content.map(({ fields }) => fields)
-    //   : selectedInstrument.content;
 
     const data: Record<string, any>[] = [];
     for (const record of records) {
@@ -97,7 +117,7 @@ export const RecordsTable = () => {
           {
             label: t('subjectPage.graph.xLabel'),
             field: 'time',
-            formatter: (value: number) => new Date(value).toISOString()
+            formatter: (value: number) => toBasicISOString(new Date(value))
           },
           ...fields
         ]}
