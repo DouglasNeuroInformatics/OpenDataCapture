@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { FormInstrument } from '@ddcp/types';
 import { BaseFormField, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
+import { Stepper } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 
@@ -9,14 +10,15 @@ import { FieldsForm, FieldsFormData } from './FieldsForm';
 import { InfoForm, InfoFormData } from './InfoForm';
 import { Review } from './Review';
 
-import { Stepper } from '@/components';
-
 export type SimpleFormData = Record<string, PrimitiveFieldValue>;
 
 export type SimpleForm<T extends SimpleFormData = SimpleFormData> = Omit<FormInstrument<T>, 'content'> & {
-  content: Record<string, BaseFormField & {
+  content: Record<
+    string,
+    BaseFormField & {
       variant?: string;
-    }>;
+    }
+  >;
 };
 
 export const FormCreator = () => {

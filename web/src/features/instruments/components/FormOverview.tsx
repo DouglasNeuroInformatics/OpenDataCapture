@@ -1,20 +1,18 @@
 import React, { useContext } from 'react';
 
 import { FormDetails } from '@ddcp/types';
-import { Button } from '@douglasneuroinformatics/ui';
+import { Button, StepperContext } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
-
-import { StepperContext } from '@/context/StepperContext';
 
 type FormOverviewItemProps = {
   heading: string;
   text: string | string[];
-}
+};
 
 const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
   return (
     <div className="my-5">
-      <h5 className="mb-1 text-xl font-semibold text-slate-900">{heading}</h5>
+      <h5 className="mb-1 text-xl font-semibold text-slate-900 dark:text-slate-100">{heading}</h5>
       {Array.isArray(text) ? (
         <ul>
           {text.map((s, i) => (
@@ -24,7 +22,7 @@ const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
           ))}
         </ul>
       ) : (
-        <p className="text-slate-700">{text}</p>
+        <p className="text-slate-600 dark:text-slate-300">{text}</p>
       )}
     </div>
   );
@@ -32,7 +30,7 @@ const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
 
 type FormOverviewProps = {
   details: FormDetails;
-}
+};
 
 export const FormOverview = ({
   details: { description, language, estimatedDuration, instructions }
@@ -51,7 +49,12 @@ export const FormOverview = ({
         />
         <FormOverviewItem heading={t('instruments.formPage.overview.instructions')} text={instructions} />
       </div>
-      <Button label={t('instruments.formPage.overview.begin')} onClick={() => { updateIndex('increment'); }} />
+      <Button
+        label={t('instruments.formPage.overview.begin')}
+        onClick={() => {
+          updateIndex('increment');
+        }}
+      />
     </div>
   );
 };

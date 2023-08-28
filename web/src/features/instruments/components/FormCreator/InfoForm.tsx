@@ -1,10 +1,8 @@
 import React, { useContext } from 'react';
 
 import { FormDetails, FormInstrument } from '@ddcp/types';
-import { Form } from '@douglasneuroinformatics/ui';
+import { Form, StepperContext } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
-
-import { StepperContext } from '@/context/StepperContext';
 
 export type InfoFormData = FormDetails &
   Pick<FormInstrument, 'name' | 'version'> & {
@@ -14,7 +12,7 @@ export type InfoFormData = FormDetails &
 
 export type InfoFormProps = {
   onSubmit: (data: InfoFormData) => void;
-}
+};
 
 export const InfoForm = ({ onSubmit }: InfoFormProps) => {
   const { updateIndex } = useContext(StepperContext);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,7 +18,8 @@ import { FormQuestions } from '../components/FormQuestions';
 import { FormSummary } from '../components/FormSummary';
 import { useFetchInstrument } from '../hooks/useFetchInstrument';
 
-import { PageHeader, Spinner, Stepper } from '@/components';
+import { PageHeader } from '@/components/PageHeader';
+import { Spinner } from '@/components/Spinner';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 import { useAuthStore } from '@/stores/auth-store';
 

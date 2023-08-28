@@ -1,6 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 
-import { Dropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { ClientTable, Dropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
@@ -9,9 +10,9 @@ import { InstrumentDropdown } from './InstrumentDropdown';
 import { TimeDropdown } from './TimeDropdown';
 import { VisualizationHeader } from './VisualizationHeader';
 
-import { Table } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
+import { camelToSnakeCase } from '@/utils/form-utils';
 
 export const RecordsTable = () => {
   const { selectedInstrument, records } = useContext(VisualizationContext);
@@ -24,10 +25,6 @@ export const RecordsTable = () => {
     if (!selectedInstrument) {
       return [];
     }
-
-    // const formFields = Array.isArray(selectedInstrument.content)
-    //   ? selectedInstrument.content.map(({ fields }) => fields)
-    //   : selectedInstrument.content;
 
     const data: Record<string, any>[] = [];
     for (const record of records) {
@@ -63,11 +60,11 @@ export const RecordsTable = () => {
     }
   };
 
-  const fields: { name: string; field: string }[] = [];
+  const fields: { label: string; field: string }[] = [];
   for (const subItem in data[0]) {
     if (subItem !== 'time') {
       fields.push({
-        name: subItem,
+        label: camelToSnakeCase(subItem).toUpperCase(),
         field: subItem
       });
     }
@@ -93,12 +90,12 @@ export const RecordsTable = () => {
           </div>
         </div>
       </div>
-      <Table
+      <ClientTable
         columns={[
           {
-            name: t('subjectPage.graph.xLabel'),
+            label: 'DATE_COLLECTED',
             field: 'time',
-            format: (value: number) => new Date(value).toISOString()
+            formatter: (value: number) => toBasicISOString(new Date(value))
           },
           ...fields
         ]}

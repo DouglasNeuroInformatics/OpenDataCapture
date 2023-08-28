@@ -1,10 +1,9 @@
 import React from 'react';
 
+import { StepperContext } from '@douglasneuroinformatics/ui';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { FieldsForm } from './FieldsForm';
-
-import { StepperContext } from '@/context/StepperContext';
 
 type Story = StoryObj<typeof FieldsForm>;
 

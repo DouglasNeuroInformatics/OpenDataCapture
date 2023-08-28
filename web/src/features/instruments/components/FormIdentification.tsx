@@ -1,11 +1,10 @@
 import React, { useContext } from 'react';
 
-import { useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { StepperContext, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { IdentificationForm, type IdentificationFormData } from '@/components';
-import { StepperContext } from '@/context/StepperContext';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
 export const FormIdentification = () => {

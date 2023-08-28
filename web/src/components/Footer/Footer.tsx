@@ -14,7 +14,7 @@ export const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="container py-3 text-slate-500 dark:text-slate-400 print:hidden">
+    <footer className="container py-3 text-slate-600 dark:text-slate-300 print:hidden">
       <hr className="my-4 border-slate-200 dark:border-slate-700 print:hidden" />
       <div className="mb-3 flex flex-col justify-center gap-4 lg:flex-row">
         <LanguageToggle className="lg:hidden" />

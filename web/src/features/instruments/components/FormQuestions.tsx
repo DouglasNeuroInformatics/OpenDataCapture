@@ -2,14 +2,12 @@ import React, { useContext } from 'react';
 
 import { FormInstrument } from '@ddcp/types';
 import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Form } from '@douglasneuroinformatics/ui';
-
-import { StepperContext } from '@/context/StepperContext';
+import { Form, StepperContext } from '@douglasneuroinformatics/ui';
 
 export type FormQuestionsProps<T extends FormInstrumentData> = {
   instrument: FormInstrument<T>;
   onSubmit: (data: T) => void;
-}
+};
 
 export const FormQuestions = <T extends FormInstrumentData>({
   instrument: { content, validationSchema },
