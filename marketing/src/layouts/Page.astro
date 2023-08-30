@@ -16,10 +16,11 @@ const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
 
 const { bilingual, meta } = Astro.props;
 
+const hostname = Astro.url.hostname;
 const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang={resolvedLanguage}>
   <head>
     <meta charset="UTF-8" />
@@ -44,10 +45,11 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
     }
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <script defer data-domain={hostname} src="https://plausible.io/js/script.js"></script>
   </head>
   <body class="flex h-screen flex-col scroll-smooth bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <Header />
-    <main class="container pt-24 pb-8">
+    <main class="container pb-8 pt-24">
       <slot />
     </main>
   </body>
