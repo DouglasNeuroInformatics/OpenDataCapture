@@ -33,6 +33,7 @@ services:
       context: .
       dockerfile: ./web/Dockerfile
       args:
+        - VITE_DOCS_URL
         - VITE_LICENSE_URL
         - VITE_GITHUB_REPO_URL
         - VITE_CONTACT_EMAIL

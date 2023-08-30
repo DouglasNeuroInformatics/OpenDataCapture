@@ -7,6 +7,7 @@ import { LanguageToggle } from '../LanguageToggle';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+const DOC_URL = import.meta.env.VITE_DOCS_URL;
 const LICENSE_URL = import.meta.env.VITE_LICENSE_URL;
 const GITHUB_REPO_URL = import.meta.env.VITE_GITHUB_REPO_URL;
 
@@ -18,7 +19,7 @@ export const Footer = () => {
       <hr className="my-4 border-slate-200 dark:border-slate-700 print:hidden" />
       <div className="mb-3 flex flex-col justify-center gap-4 lg:flex-row">
         <LanguageToggle className="lg:hidden" />
-        <a className="text-center" href="/docs" rel="noreferrer" target="_blank">
+        <a className="text-center" href={DOC_URL} rel="noreferrer" target="_blank">
           {t('footer.documentation')}
         </a>
         <a className="text-center" href={LICENSE_URL} rel="noreferrer" target="_blank">

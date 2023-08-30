@@ -1,13 +1,8 @@
 {$SITE_ADDRESS} {
 	redir /api /api/
-	redir /docs /docs/
 
 	handle_path /api/* {
 		reverse_proxy api
-	}
-
-	handle_path /docs/* {
-		reverse_proxy docs
 	}
 
 	handle {
