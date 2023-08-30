@@ -18,6 +18,7 @@ COPY --from=builder /app/out/package-lock.json ./package-lock.json
 RUN npm ci
 
 # BUILD THE PROJECT
+ARG VITE_DOCS_URL
 ARG VITE_LICENSE_URL
 ARG VITE_GITHUB_REPO_URL
 ARG VITE_CONTACT_EMAIL
