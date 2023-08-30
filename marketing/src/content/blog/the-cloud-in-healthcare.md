@@ -15,7 +15,7 @@ In a rapidly evolving digital landscape, the healthcare sector is at a significa
 
 1. **Physical Vulnerabilities with Paper Records**: While romanticized by some as the "safe, old-fashioned way," paper records come with a slew of risks. From fires and floods to simple misplacement or theft, tangible documents aren't as foolproof as some suggest.
   
-2. **The Windows Computer Conundrum**: Local computers, especially Windows systems, have historically been prime targets for malware and ransomware attacks. Without consistent and meticulous updates, they can become security nightmares. Contrary to popular belief, the average hospital computer system may be far more susceptible to breaches than a well-maintained cloud environment.
+2. **The Windows Computer Conundrum**: Local computers, especially Microsoft Windows systems, have historically been prime targets for malware and ransomware attacks. Without consistent and meticulous updates, they can become security nightmares. Contrary to popular belief, the average hospital computer system may be far more susceptible to breaches than a well-maintained cloud environment.
 
 ### The Cloud's Undeniable Benefits
 
