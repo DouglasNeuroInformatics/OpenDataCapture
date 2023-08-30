@@ -1,0 +1,46 @@
+version: '3'
+name: data-capture
+volumes:
+  caddy_data:
+  mongo_data:
+services:
+  caddy:
+    image: caddy:2.7-alpine
+    restart: unless-stopped
+    ports:
+      - "5500:80"
+    environment:
+      - SITE_ADDRESS
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+  api:
+    image: ghcr.io/douglasneuroinformatics/data-capture-api:latest
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017
+      - SECRET_KEY
+    expose:
+      - 80
+  web:
+    image: ghcr.io/douglasneuroinformatics/data-capture-web:latest
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
+      args:
+        - VITE_LICENSE_URL
+        - VITE_GITHUB_REPO_URL
+        - VITE_CONTACT_EMAIL
+    expose:
+      - 80
+  mongo:
+    image: mongo:6.0.2
+    expose:
+      - 27017
+    volumes:
+      - mongo_data:/data/db
