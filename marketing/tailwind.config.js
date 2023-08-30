@@ -16,7 +16,8 @@ export default {
         }
       },
       transitionProperty: {
-        mh: 'max-height'
+        mh: 'max-height',
+        'opacity-transform': 'opacity, transform'
       }
     }
   },
