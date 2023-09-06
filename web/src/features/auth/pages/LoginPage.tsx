@@ -1,16 +1,47 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-import { FormPageWrapper } from '@douglasneuroinformatics/ui';
+import { AuthPayload, LoginCredentials } from '@ddcp/types';
+import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { LoginForm } from '../components/LoginForm';
 
 import logo from '@/assets/logo.png';
+import { useAuthStore } from '@/stores/auth-store';
 
 export const LoginPage = () => {
+  const auth = useAuthStore();
+  const notifications = useNotificationsStore();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const login = async (credentials: LoginCredentials) => {
+    const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
+      // Do not throw if unauthorized
+      validateStatus: (status) => status === 200 || status === 401
+    });
+    if (response.status === 401) {
+      notifications.addNotification({
+        type: 'error',
+        title: t('unauthorizedError.title'),
+        message: t('unauthorizedError.message')
+      });
+      return;
+    }
+    auth.setAccessToken(response.data.accessToken);
+    navigate('/overview');
+  };
+
+  useEffect(() => {
+    if (import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true') {
+      void login({
+        username: import.meta.env.VITE_DEV_USERNAME!,
+        password: import.meta.env.VITE_DEV_PASSWORD!
+      });
+    }
+  }, []);
 
   return (
     <FormPageWrapper
@@ -21,11 +52,7 @@ export const LoginPage = () => {
       logo={logo}
       title={t('login')}
     >
-      <LoginForm
-        onSuccess={() => {
-          navigate('/overview');
-        }}
-      />
+      <LoginForm onSubmit={(credentials) => void login(credentials)} />
     </FormPageWrapper>
   );
 };
