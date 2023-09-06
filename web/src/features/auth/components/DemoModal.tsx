@@ -13,7 +13,7 @@ export type DemoModalProps = {
 export const DemoModal = ({ isOpen, onClose }: DemoModalProps) => {
   const { t } = useTranslation();
   return (
-    <Modal open={isOpen} title={t('demo.info')} width="xl" onClose={onClose}>
+    <Modal showCloseButton open={isOpen} title={t('demo.info')} width="xl" onClose={onClose}>
       <div className="my-3">
         <p className="leading-tight">{t('demo.summary')}</p>
         <h5 className="my-3 text-lg font-semibold">{t('demo.loginCredentials')}</h5>
