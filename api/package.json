@@ -18,6 +18,7 @@
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@casl/mongoose": "^7.2.1",
+    "@ddcp/demo": "*",
     "@ddcp/instruments": "*",
     "@douglasneuroinformatics/node-ext": "^0.0.5",
     "@douglasneuroinformatics/stats": "^1.0.0",
