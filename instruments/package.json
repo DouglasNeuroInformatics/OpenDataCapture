@@ -12,8 +12,5 @@
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "lint": "eslint --fix src"
-  },
-  "dependencies": {
-    "@douglasneuroinformatics/node-ext": "^0.0.5"
   }
 }
