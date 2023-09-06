@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
+import { demoGroups, demoUsers } from '@ddcp/demo';
 import * as instruments from '@ddcp/instruments';
 import { AppAbility, FormInstrument } from '@ddcp/types';
 import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
@@ -9,23 +10,14 @@ import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
 import mongoose from 'mongoose';
 
-import { CreateGroupDto } from '@/groups/dto/create-group.dto.js';
 import { GroupsService } from '@/groups/groups.service.js';
 import { FormRecordsService } from '@/instruments/services/form-records.service.js';
 import { FormsService } from '@/instruments/services/forms.service.js';
 import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto.js';
 import { SubjectsService } from '@/subjects/subjects.service.js';
+import { UsersService } from '@/users/users.service.js';
 
 faker.seed(123);
-
-const DEMO_GROUPS: CreateGroupDto[] = [
-  {
-    name: 'Depression Clinic'
-  },
-  {
-    name: 'Psychosis Clinic'
-  }
-];
 
 @Injectable()
 export class DemoService {
@@ -37,14 +29,19 @@ export class DemoService {
     private readonly groupsService: GroupsService,
     private readonly subjectsService: SubjectsService,
     private readonly formsService: FormsService,
-    private readonly formRecordsService: FormRecordsService
+    private readonly formRecordsService: FormRecordsService,
+    private readonly usersService: UsersService
   ) {}
 
   async init(): Promise<void> {
     this.logger.verbose(`Initializing demo for database: '${this.connection.name}'`);
 
-    for (const group of DEMO_GROUPS) {
+    for (const group of demoGroups) {
       await this.groupsService.create(group);
+    }
+
+    for (const user of demoUsers) {
+      await this.usersService.create(user, this.ability);
     }
 
     const happinessQuestionnaires = await this.formsService.createTranslatedForms(instruments.happinessQuestionnaire);
@@ -61,7 +58,7 @@ export class DemoService {
     for (let i = 0; i < 100; i++) {
       const createSubjectDto = this.getCreateSubjectDto();
       await this.subjectsService.create(createSubjectDto);
-      const group = await this.groupsService.findByName(randomValue(DEMO_GROUPS).name, this.ability);
+      const group = await this.groupsService.findByName(randomValue(demoGroups).name, this.ability);
       await this.createFormRecords(happinessQuestionnaires[0]!, group.name, createSubjectDto);
       await this.createFormRecords(miniMentalStateExaminations[0]!, group.name, createSubjectDto);
       await this.createFormRecords(montrealCognitiveAssessments[0]!, group.name, createSubjectDto);
@@ -124,7 +121,7 @@ export class DemoService {
         }
       }
 
-      instrument
+      instrument;
 
       const record = {
         kind: 'form',

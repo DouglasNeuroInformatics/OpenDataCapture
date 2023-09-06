@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 
 import { ClientTable, Dropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { toBasicISOString } from '@douglasneuroinformatics/utils';
+import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
@@ -12,7 +12,6 @@ import { VisualizationHeader } from './VisualizationHeader';
 
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
-import { camelToSnakeCase } from '@/utils/form-utils';
 
 export const RecordsTable = () => {
   const { selectedInstrument, records } = useContext(VisualizationContext);

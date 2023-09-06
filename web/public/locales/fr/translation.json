@@ -281,5 +281,24 @@
     }
   },
   "yes": "Oui",
-  "no": "Non"
+  "no": "Non",
+  "demo": {
+    "welcome": "Bienvenue sur la version de démonstration de la plateforme Open Data Capture",
+    "info": "Informations sur la démonstration",
+    "summary": "Cette démo est conçue à des fins de test et de démonstration. Elle présente deux groupes fictifs : Clinique de la Dépression et Clinique de la Psychose, tous deux pourvus de plusieurs mois de données simulées pour illustrer la présentation des données. La base de données est réinitialisée quotidiennement à 6h00 UTC.",
+    "loginCredentials": "Identifiants de connexion",
+    "username": "Nom d'utilisateur : {{value}}",
+    "password": "Mot de passe : {{value}}",
+    "role": "Rôle d'utilisateur : {{value}}",
+    "groups": "Groupe(s) : {{value}}"
+  },
+  "learnMore": "En savoir plus",
+  "firstName": "Prénom",
+  "lastName": "Nom",
+  "basePermissionLevel": {
+    "admin": "Administrateur",
+    "groupManager": "Responsable de groupe",
+    "standard": "Utilisateur standard"
+  },
+  "close": "Fermer"
 }

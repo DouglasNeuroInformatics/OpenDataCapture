@@ -22,6 +22,7 @@ import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [
+    AbilityModule,
     AjvModule,
     AuthModule,
     ConfigModule.forRoot({
@@ -41,11 +42,10 @@ import { UsersModule } from './users/users.module.js';
             return connection;
           },
           ignoreUndefined: true,
-          uri: `${mongoUri}/${env}`
+          uri: `${mongoUri}/data-capture-${env}`
         };
       }
     }),
-    AbilityModule,
     SubjectsModule,
     ThrottlerModule.forRoot({
       ttl: 60,
