@@ -292,5 +292,7 @@
     "role": "Role: {{value}}",
     "groups": "Group(s): {{value}}"
   },
-  "learnMore": "Learn More"
+  "learnMore": "Learn More",
+  "firstName": "First Name",
+  "lastName": "Last Name"
 }

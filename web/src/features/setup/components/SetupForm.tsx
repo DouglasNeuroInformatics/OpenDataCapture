@@ -4,6 +4,8 @@ import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 type SetupData = {
+  firstName: string;
+  lastName: string;
   username: string;
   password: string;
   initDemo: boolean;
@@ -25,6 +27,16 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
           title: t('setup.admin.title'),
           description: t('setup.admin.description'),
           fields: {
+            firstName: {
+              kind: 'text',
+              label: t('firstName'),
+              variant: 'short'
+            },
+            lastName: {
+              kind: 'text',
+              label: t('lastName'),
+              variant: 'short'
+            },
             username: {
               kind: 'text',
               label: t('username'),
@@ -69,7 +81,7 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
             type: 'boolean'
           }
         },
-        required: ['username', 'password', 'initDemo']
+        required: ['firstName', 'lastName', 'username', 'password', 'initDemo']
       }}
       onSubmit={onSubmit}
     />

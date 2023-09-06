@@ -292,5 +292,7 @@
     "role": "Rôle d'utilisateur : {{value}}",
     "groups": "Groupe(s) : {{value}}"
   },
-  "learnMore": "En savoir plus"
+  "learnMore": "En savoir plus",
+  "firstName": "Prénom",
+  "lastName": "Nom"
 }
