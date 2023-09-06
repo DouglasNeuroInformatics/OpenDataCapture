@@ -16,10 +16,6 @@ export function extractFields<T extends FormInstrumentData>(instrument: FormInst
   return instrument.content;
 }
 
-export function camelToSnakeCase(s: string) {
-  return s.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-}
-
 export function formatDataAsString<T extends FormInstrumentData>(data: T) {
   const lines: string[] = [];
   for (const key in data) {

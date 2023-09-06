@@ -294,5 +294,11 @@
   },
   "learnMore": "En savoir plus",
   "firstName": "Prénom",
-  "lastName": "Nom"
+  "lastName": "Nom",
+  "basePermissionLevel": {
+    "admin": "Administrateur",
+    "groupManager": "Responsable de groupe",
+    "standard": "Utilisateur standard"
+  },
+  "close": "Fermer"
 }

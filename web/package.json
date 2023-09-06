@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
+    "@ddcp/demo": "*",
     "@douglasneuroinformatics/ui": "^1.0.13",
-    "@douglasneuroinformatics/utils": "0.4.1",
     "@headlessui/react": "^1.7.17",
     "@react-spring/web": "^9.7.3",
     "@use-gesture/react": "^10.2.27",

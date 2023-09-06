@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
-import { Modal } from '@douglasneuroinformatics/ui';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
+
+import { DemoModal } from './DemoModal';
 
 export const DemoBanner = () => {
   const { t } = useTranslation();
@@ -35,16 +36,7 @@ export const DemoBanner = () => {
           </div>
         </div>
       </div>
-      <Modal open={isModalOpen} title={t('demo.info')} width="xl" onClose={closeModal}>
-        <div className="space-y-2">
-          <p>{t('demo.summary')}</p>
-          <h5 className="text-lg font-semibold">{t('demo.loginCredentials')}</h5>
-          <p>{t('demo.username', { value: 'JaneDoe' })}</p>
-          <p>{t('demo.password', { value: 'DataCapture2023' })}</p>
-          <p>{t('demo.role', { value: 'Group Manager' })}</p>
-          <p>{t('demo.groups', { value: 'Group Manager' })}</p>
-        </div>
-      </Modal>
+      <DemoModal isOpen={isModalOpen} onClose={closeModal} />
     </>
   );
 };
