@@ -281,5 +281,16 @@
     }
   },
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "demo": {
+    "welcome": "Welcome to the Demo Version of Open Data Capture",
+    "info": "Demo Information",
+    "summary": "This demo is intended for testing and showcasing purposes. It features two fictional groups: Depression Clinic and Psychosis Clinic, both filled with several months of simulated example data to highlight data presentation. The database resets daily at 6:00 AM UTC.",
+    "loginCredentials": "Login Credentials",
+    "username": "Username: {{value}}",
+    "password": "Password: {{value}}",
+    "role": "Role: {{value}}",
+    "groups": "Group(s): {{value}}"
+  },
+  "learnMore": "Learn More"
 }

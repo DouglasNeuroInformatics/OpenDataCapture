@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { DemoBanner } from '../components/DemoBanner';
 import { LoginForm } from '../components/LoginForm';
 
 import logo from '@/assets/logo.png';
@@ -44,16 +45,20 @@ export const LoginPage = () => {
   }, []);
 
   return (
-    <FormPageWrapper
-      languageToggle={{
-        dropdownDirection: 'up',
-        options: ['en', 'fr']
-      }}
-      logo={logo}
-      title={t('login')}
-    >
-      <LoginForm onSubmit={(credentials) => void login(credentials)} />
-    </FormPageWrapper>
+    <div className="flex min-h-screen flex-col">
+      <DemoBanner />
+      <FormPageWrapper
+        className="min-h-0 flex-grow"
+        languageToggle={{
+          dropdownDirection: 'up',
+          options: ['en', 'fr']
+        }}
+        logo={logo}
+        title={t('login')}
+      >
+        <LoginForm onSubmit={(credentials) => void login(credentials)} />
+      </FormPageWrapper>
+    </div>
   );
 };
 
