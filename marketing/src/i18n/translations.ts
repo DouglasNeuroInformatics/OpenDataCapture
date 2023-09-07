@@ -81,6 +81,10 @@ export const translations = {
     title: {
       en: 'Team',
       fr: "L'équipe"
+    },
+    heading: {
+      en: 'Meet Our Team',
+      fr: 'Rencontrez notre équipe'
     }
   },
   blog: {

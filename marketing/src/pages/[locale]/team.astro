@@ -1,8 +1,11 @@
 ---
+import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 import { Image } from 'astro:assets';
 
 import { getCollection } from 'astro:content';
+
+const { t } = useTranslations(Astro.url);
 
 const team = await getCollection('team');
 team.sort((a, b) => {
@@ -20,18 +23,14 @@ export const getStaticPaths = () => {
 ---
 
 <Page bilingual>
-  <h2 class="pb-12 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Meet Our Team</h2>
+  <h2 class="pb-12 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">{t('team.heading')}</h2>
   <ul class="grid gap-8 lg:grid-cols-2" id="team-members-list">
     {
       team.map(({ data: { fullName, suffix, position, image, description } }) => (
-        <li class="opacity-0 ease-in-out transition-all duration-500 translate-y-6">
+        <li class="translate-y-6 opacity-0 transition-all duration-500 ease-in-out">
           <div class="grid grid-cols-3 gap-8">
             <div class="flex items-center justify-center">
-              <Image
-                class="rounded-lg object-cover shadow-lg"
-                src={image}
-                alt={fullName}
-              />
+              <Image class="rounded-lg object-cover shadow-lg" src={image} alt={fullName} />
             </div>
             <div class="col-span-2 space-y-1 text-lg font-medium leading-relaxed">
               <h3>{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h3>
