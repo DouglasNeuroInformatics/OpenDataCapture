@@ -61,6 +61,10 @@ export const translations = {
         en: 'Excel at Data Management, Spreadsheets Not Required',
         fr: 'Excel pour la gestion des données, feuilles de calcul non requises'
       },
+      description: {
+        en: "When you're prepared to export, choose between CSV or TSV formats. With Open Data Capture, you're guaranteed access to the most recent version of your data. Move beyond scattered spreadsheets and embrace centralized, secure data storage.",
+        fr: "Lorsque vous êtes prêt à exporter, choisissez entre les formats CSV ou TSV. Avec Open Data Capture, vous avez la garantie d'accéder à la version la plus récente de vos données. Laissez derrière vous les feuilles de calcul éparpillées et adoptez un stockage de données centralisé et sécurisé."
+      },
       viewSubjectsScreenshot: {
         en: 'Screenshot of view subjects page',
         fr: "Capture d'écran de la page de présentation de tous les sujets"
@@ -77,6 +81,10 @@ export const translations = {
     title: {
       en: 'Team',
       fr: "L'équipe"
+    },
+    heading: {
+      en: 'Meet Our Team',
+      fr: 'Rencontrez notre équipe'
     }
   },
   blog: {

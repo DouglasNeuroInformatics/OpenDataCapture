@@ -1,5 +1,7 @@
 fullName: Massimiliano Orri
 suffix: PhD
-position: Clinical Psychologist, Douglas Institute
+position: 
+  en: Clinical Psychologist, Douglas Institute
+  fr: Psychologue clinicienne, Institut Douglas
 image: '@/assets/headshots/massimiliano-orri.jpeg'
 quote: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda rerum nemo tempora cupiditate consectetur non.'
