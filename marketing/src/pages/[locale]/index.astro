@@ -108,7 +108,7 @@ export const getStaticPaths = () => {
             <h2 class="title-font text-lg font-medium tracking-wider text-slate-900 dark:text-slate-100">{`${
               testimonial.data.fullName
             }${testimonial.data.suffix ? `, ${testimonial.data.suffix}` : ''}`}</h2>
-            <p class="text-slate-600 dark:text-slate-300">{testimonial.data.position}</p>
+            <p class="text-slate-600 dark:text-slate-300">{testimonial.data.position[resolvedLanguage]}</p>
           </div>
         ))
       }

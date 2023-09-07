@@ -31,7 +31,10 @@ export const collections = {
       z.object({
         fullName: z.string(),
         suffix: z.enum(['MD', 'PhD']).optional(),
-        position: z.string(),
+        position: z.object({
+          en: z.string(),
+          fr: z.string()
+        }),
         image: image().refine((arg) => arg.height === arg.width, {
           message: 'Image must be square (1:1 aspect ratio)'
         }),
