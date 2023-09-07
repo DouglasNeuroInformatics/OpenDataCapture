@@ -62,12 +62,14 @@ export const getStaticPaths = () => {
         </button>
       </div>
     </div>
-    <div class="hidden opacity-0 transition-opacity duration-1000  lg:flex lg:w-1/2 lg:items-center lg:justify-center xl:w-5/12">
+    <div
+      class="hidden opacity-0 transition-opacity duration-1000 lg:flex lg:w-1/2 lg:items-center lg:justify-center xl:w-5/12"
+    >
       <Image alt={t('landing.hero.happyPerson')} class="rounded-md brightness-90" src={hero} />
     </div>
   </Section>
   <Section class="grid gap-8 lg:grid-cols-2" id="add-visit-section">
-    <div class="flex flex-col justify-end lg:justify-center">
+    <div class="flex flex-col justify-end lg:order-last lg:justify-center">
       <span class="text-sm font-semibold uppercase tracking-wide">{t('landing.addVisit.subheading')}</span>
       <h2 class="mt-3 text-3xl font-extrabold">{t('landing.addVisit.heading')}</h2>
       <p class="mt-6">
