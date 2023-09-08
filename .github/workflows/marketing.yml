@@ -28,4 +28,4 @@ jobs:
       - name: Build Site
         run: npm run build --workspace marketing
       - name: Deploy with rsync
-        run: rsync -avz ./marketing/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/unrjos/www/opendatacapture.org/
+        run: rsync -avz ./marketing/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/www/opendatacapture.org/
