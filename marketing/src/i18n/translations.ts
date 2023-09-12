@@ -129,5 +129,12 @@ export const translations = {
       en: 'Change Theme',
       fr: 'Changer le thème'
     }
+  },
+  footer: {
+    aboutUs: {
+      en: 'About Us',
+      fr: 'À propos de nous'
+    },
+    gitHub: 'GitHub'
   }
 } as const;
