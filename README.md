@@ -54,43 +54,9 @@ docker compose up
 
 By default, the application will run on port 80. So, navigate to `localhost` in your browser and you should be greeted with the setup screen.
 
-## Key Features
+## Contribution
 
-- Interactive form creation tool with seamless registration and database retrieval
-- Overview page to summarize available data
-- Active subject concept for easy input of multiple instruments for a single client during a session
-- Fully bilingual with support for additional languages 🇬🇧🇫🇷
-- Interface for easy graphing of measures from multiple instruments for a subject
-- Data export capability
-- Subject search in the database based on identifying information (e.g., full name, age, sex)
-- Printable/copyable summary at the end of each instrument
-- Fine-grained user permissions for enhanced security
-- Well-documented REST API
-
-## Quick Start (Development)
-
-### Setup Environment, Install Dependencies, and Launch Dev Server
-```shell
-awk -v secret_key="$(openssl rand -hex 16)" '/^SECRET_KEY=/{print $0 secret_key;next}1' .env.template > .env
-npm install
-npm run dev
-```
-
-### Create Admin User
-```shell
-curl --request POST \
-  --url "${SITE_ADDRESS}/api/v1/setup" \
-  --header "Content-Type: application/json" \
-  --data '{
-    "admin": {
-        "firstName": "Jane",
-        "lastName": "Doe",
-        "username": "admin",
-        "password": "Password123"
-    },
-    "initDemo": true
-}'
-```
+We welcome contributions! If you're interested in improving the Data Bank platform or adding new features, please refer to our Contribution Guide.
 
 ## License
 

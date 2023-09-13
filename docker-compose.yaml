@@ -19,7 +19,7 @@ services:
     image: ghcr.io/douglasneuroinformatics/data-capture-api:latest
     build:
       context: .
-      dockerfile: ./api/Dockerfile
+      dockerfile: ./apps/core-api/Dockerfile
     depends_on:
       - mongo
     environment:
@@ -32,7 +32,7 @@ services:
     image: ghcr.io/douglasneuroinformatics/data-capture-web:latest
     build:
       context: .
-      dockerfile: ./web/Dockerfile
+      dockerfile: ./apps/core-web/Dockerfile
       args:
         - VITE_DOCS_URL
         - VITE_LICENSE_URL
