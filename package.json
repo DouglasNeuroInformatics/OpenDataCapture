@@ -1,17 +1,12 @@
 {
-  "name": "ddcp",
+  "name": "open-data-capture",
   "version": "0.0.0",
   "private": true,
   "license": "AGPL-3.0",
   "type": "module",
   "workspaces": [
-    "api",
-    "demo",
-    "instruments",
-    "marketing",
-    "pwa",
-    "types",
-    "web"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "build": "env-cmd cross-env NODE_ENV=production turbo run build",
@@ -21,7 +16,6 @@
     "format": "turbo run format",
     "lint": "turbo run lint",
     "prepare": "husky install",
-    "storybook": "npm run storybook --workspace web",
     "test": "env-cmd turbo run test"
   },
   "dependencies": {
@@ -31,7 +25,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
-    "@ddcp/types": "*",
+    "@open-data-capture/types": "*",
     "@douglasneuroinformatics/eslint-config": "^1.1.0",
     "@douglasneuroinformatics/form-types": "^0.0.3",
     "@types/node": "^20.5.7",
