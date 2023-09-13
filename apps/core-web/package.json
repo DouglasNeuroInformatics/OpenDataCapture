@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/web",
+  "name": "@open-data-capture/core-web",
   "version": "0.0.0",
   "type": "module",
   "private": true,

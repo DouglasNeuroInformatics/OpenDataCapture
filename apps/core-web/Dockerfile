@@ -1,5 +1,4 @@
-FROM node:20.5-alpine AS runtime
-FROM runtime as base
+FROM node:20-alpine AS base
 RUN apk upgrade --no-cache
 RUN apk add --no-cache libc6-compat
 RUN npm install -g turbo
@@ -8,7 +7,7 @@ RUN npm install -g turbo
 FROM base AS builder
 WORKDIR /app
 COPY . .
-RUN turbo prune --scope=@ddcp/api --docker
+RUN turbo prune --scope=@open-data-capture/core-web --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
@@ -19,17 +18,18 @@ COPY --from=builder /app/out/package-lock.json ./package-lock.json
 RUN npm ci
 
 # BUILD THE PROJECT
+ARG VITE_DOCS_URL
+ARG VITE_LICENSE_URL
+ARG VITE_GITHUB_REPO_URL
+ARG VITE_CONTACT_EMAIL
 COPY --from=builder /app/out/full/ .
 COPY tsconfig.base.json tsconfig.base.json
 COPY turbo.json turbo.json
-RUN turbo run build --filter=@ddcp/api
+RUN turbo run build --filter=@open-data-capture/core-web
 
-# RUN PRODUCTION IMAGE
-FROM runtime AS runner
+# MOUNT STATIC CODE
+FROM caddy:2.7-alpine as runner
 WORKDIR /app
-RUN addgroup --system --gid 1001 nestjs
-RUN adduser --system --uid 1001 nestjs
-USER nestjs
-COPY --from=installer /app .
-
-CMD ["node", "./api/dist/main.js"]
+COPY apps/core-web/Caddyfile /etc/caddy/Caddyfile
+COPY --from=installer /app/apps/core-web/dist/ .
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]

@@ -38,10 +38,10 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - name: Create coverage reports
-        run: npm run test:coverage --workspace api
+        run: npm run test:coverage --workspace apps/core-api
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          files: ./api/coverage/coverage-final.json
+          files: ./apps/core-api/coverage/coverage-final.json

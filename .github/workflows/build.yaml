@@ -12,9 +12,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - dockerfile: ./api/Dockerfile
+          - dockerfile: ./apps/core-api/Dockerfile
             image: ghcr.io/douglasneuroinformatics/data-capture-api
-          - dockerfile: ./web/Dockerfile
+          - dockerfile: ./apps/core-web/Dockerfile
             image: ghcr.io/douglasneuroinformatics/data-capture-web
     steps:
       - name: Checkout repository

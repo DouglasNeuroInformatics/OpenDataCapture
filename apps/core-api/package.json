@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/api",
+  "name": "@open-data-capture/core-api",
   "version": "0.0.0",
   "private": true,
   "license": "AGPL-3.0",
