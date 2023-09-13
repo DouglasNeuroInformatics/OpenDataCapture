@@ -16,7 +16,8 @@
     "format": "turbo run format",
     "lint": "turbo run lint",
     "prepare": "husky install",
-    "test": "env-cmd turbo run test"
+    "test": "env-cmd turbo run test",
+    "ws": "./scripts/workspace.sh $@"
   },
   "dependencies": {
     "@douglasneuroinformatics/ajv": "^0.0.5",
