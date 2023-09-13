@@ -1,4 +1,4 @@
-import { defineConfig, sharpImageService } from 'astro/config';
+import { defineConfig, squooshImageService } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import getReadingTime from 'reading-time';
@@ -10,11 +10,8 @@ export default defineConfig({
     assets: '_assets'
   },
   compressHTML: true,
-  experimental: {
-    assets: true
-  },
   image: {
-    service: sharpImageService()
+    service: squooshImageService()
   },
   integrations: [
     sitemap({
