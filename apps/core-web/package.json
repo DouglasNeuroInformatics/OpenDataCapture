@@ -65,5 +65,14 @@
     "tailwindcss": "^3.3.3",
     "vite": "^4.4.9",
     "vite-plugin-compression": "^0.5.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,cjs,mjs,json,html,css}": [
+      "prettier --write"
+    ]
   }
 }
