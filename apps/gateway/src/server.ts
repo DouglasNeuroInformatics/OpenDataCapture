@@ -2,7 +2,7 @@ import { App } from './App.tsx';
 import { renderToReadableStream } from 'react-dom/server';
 
 const server = Bun.serve({
-  async fetch() {
+  fetch: async () => {
     const stream = await renderToReadableStream(App());
     return new Response(stream, {
       headers: { 'Content-Type': 'text/html' }
