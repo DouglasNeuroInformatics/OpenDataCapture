@@ -1,8 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": "src",
     "jsx": "react",
+    "paths": {
+      "@/*": ["*"]
+    },
     "types": ["bun-types"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "server.ts"]
 }

@@ -1,5 +1,6 @@
-import { App } from './App.tsx';
 import { renderToReadableStream } from 'react-dom/server';
+
+import { App } from './App.tsx';
 
 const server = Bun.serve({
   fetch: async () => {
@@ -10,4 +11,5 @@ const server = Bun.serve({
   }
 });
 
+// eslint-disable-next-line no-console
 console.log(`Listening on localhost:${server.port}`);

@@ -5,7 +5,7 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development bun run --watch src/server.ts",
+    "dev": "bunx --bun vite",
     "format": "prettier --write src",
     "lint": "eslint --fix src"
   },
@@ -25,8 +25,10 @@
   "devDependencies": {
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react-swc": "^3.3.2",
     "autoprefixer": "^10.4.15",
     "postcss": "^8.4.29",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "^3.3.3",
+    "vite": "^4.4.9"
   }
 }
