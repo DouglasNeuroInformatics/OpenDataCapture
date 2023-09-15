@@ -7,6 +7,7 @@ import esbuild from 'esbuild';
 import { Root } from './Root.tsx';
 
 const bundleFile = path.resolve(import.meta.dir, '..', 'dist', 'main.js');
+const bundleFileCss = path.resolve(import.meta.dir, '..', 'dist', 'main.css');
 
 const ctx = await esbuild.context({
   bundle: true,
@@ -34,6 +35,8 @@ const server = Bun.serve({
         return new Response(await renderClientSide(), {
           headers: { 'Content-Type': 'text/html' }
         });
+      case '/main.css':
+        return new Response(Bun.file(bundleFileCss));
       case '/main.js':
         return new Response(Bun.file(bundleFile));
       default:

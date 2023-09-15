@@ -8,6 +8,7 @@ export const Root = () => {
         <link href="/favicon.ico" rel="icon" type="image/svg+xml" />
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
         <title>Open Data Capture</title>
+        <link href="main.css" rel="stylesheet" />
       </head>
       <body className="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
         <div id="root"></div>
