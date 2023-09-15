@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
-import { WebModule } from './web/web.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -15,9 +15,9 @@ import { WebModule } from './web/web.module';
         ttl: 60000,
         limit: 100
       }
-    ]),
-    WebModule
+    ])
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,

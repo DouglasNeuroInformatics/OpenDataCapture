@@ -5,12 +5,14 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import { AppModule } from './app.module';
+import { build } from './build';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors();
-  app.useStaticAssets(path.resolve(__dirname, '..', 'public'));
+  app.useStaticAssets(path.resolve(import.meta.dir, '..', 'dist'));
+  app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
 
   const configService = app.get(ConfigService);
 
@@ -21,4 +23,5 @@ async function bootstrap() {
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
+await build();
 void bootstrap();
