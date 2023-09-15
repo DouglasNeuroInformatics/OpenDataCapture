@@ -8,7 +8,7 @@ RUN npm install -g turbo
 FROM base AS builder
 WORKDIR /app
 COPY . .
-RUN turbo prune --scope=@open-data-capture/core-api --docker
+RUN turbo prune --scope=@open-data-capture/api --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
@@ -22,7 +22,7 @@ RUN npm ci
 COPY --from=builder /app/out/full/ .
 COPY tsconfig.base.json tsconfig.base.json
 COPY turbo.json turbo.json
-RUN turbo run build --filter=@open-data-capture/core-api
+RUN turbo run build --filter=@open-data-capture/api
 
 # RUN PRODUCTION IMAGE
 FROM runtime AS runner
@@ -32,4 +32,4 @@ RUN adduser --system --uid 1001 nestjs
 USER nestjs
 COPY --from=installer /app .
 
-CMD ["node", "./apps/core-api/dist/main.js"]
+CMD ["node", "./apps/api/dist/main.js"]

@@ -7,7 +7,7 @@ RUN npm install -g turbo
 FROM base AS builder
 WORKDIR /app
 COPY . .
-RUN turbo prune --scope=@open-data-capture/core-web --docker
+RUN turbo prune --scope=@open-data-capture/web --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
@@ -25,11 +25,11 @@ ARG VITE_CONTACT_EMAIL
 COPY --from=builder /app/out/full/ .
 COPY tsconfig.base.json tsconfig.base.json
 COPY turbo.json turbo.json
-RUN turbo run build --filter=@open-data-capture/core-web
+RUN turbo run build --filter=@open-data-capture/web
 
 # MOUNT STATIC CODE
 FROM caddy:2.7-alpine as runner
 WORKDIR /app
-COPY apps/core-web/Caddyfile /etc/caddy/Caddyfile
-COPY --from=installer /app/apps/core-web/dist/ .
+COPY apps/web/Caddyfile /etc/caddy/Caddyfile
+COPY --from=installer /app/apps/web/dist/ .
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]

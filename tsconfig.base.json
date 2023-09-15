@@ -17,7 +17,6 @@
     "noUnusedParameters": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2022",
-    "types": ["bun-types"]
+    "target": "ES2022"
   }
 }

@@ -9,8 +9,8 @@ fi
 # Associative array (dictionary) mapping workspaces to directories
 declare -A WORKSPACE_DIRS
 WORKSPACE_DIRS=(
-    ["core-api"]="${PWD}/apps/core-api"
-    ["core-web"]="${PWD}/apps/core-web"
+    ["api"]="${PWD}/apps/api"
+    ["web"]="${PWD}/apps/web"
 )
 
 # Check if at least two arguments are provided
