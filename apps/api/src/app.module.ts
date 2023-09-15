@@ -47,10 +47,12 @@ import { UsersModule } from './users/users.module.js';
       }
     }),
     SubjectsModule,
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 100
-    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100
+      }
+    ]),
     UsersModule,
     SetupModule
   ],
