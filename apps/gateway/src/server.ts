@@ -1,29 +1,17 @@
-import path from 'path';
-
 import { renderToReadableStream } from 'react-dom/server';
 
-import esbuild from 'esbuild';
-
+import { build } from './build.ts';
 import { Root } from './Root.tsx';
 
-const bundleFile = path.resolve(import.meta.dir, '..', 'dist', 'main.js');
-const bundleFileCss = path.resolve(import.meta.dir, '..', 'dist', 'main.css');
-
-const ctx = await esbuild.context({
-  bundle: true,
-  entryPoints: [path.resolve(import.meta.dir, 'client', 'main.tsx')],
-  minify: true,
-  outfile: bundleFile,
-  platform: 'browser'
-});
-
-await ctx.watch();
+await build();
 
 async function renderClientSide() {
   return renderToReadableStream(Root(), {
     bootstrapScripts: ['/main.js']
   });
 }
+
+
 
 const server = Bun.serve({
   fetch: async (req) => {
