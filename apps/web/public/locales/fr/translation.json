@@ -300,5 +300,6 @@
     "groupManager": "Responsable de groupe",
     "standard": "Utilisateur standard"
   },
-  "close": "Fermer"
+  "close": "Fermer",
+  "networkError": "Erreur de réseau"
 }
