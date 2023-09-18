@@ -12,19 +12,27 @@
     "lint": "eslint --fix src",
     "start": "node ./dist/main.js",
     "test": "node --loader @swc-node/register/esm --no-warnings --test $(find src -type f -name \"*.spec.ts\")",
-    "test:e2e": "NODE_ENV=testing node --loader @swc-node/register/esm --no-warnings --test $(find test -type f -name \"*.spec.ts\")",
-    "test:coverage": "c8 --all --src=src -r json -r 'text' -x '**/*.{d,dto,entity,module,spec}.ts' -x 'src/docs.ts' -x 'src/main.ts' npm test"
+    "test:coverage": "c8 --all --src=src -r json -r 'text' -x '**/*.{d,dto,entity,module,spec}.ts' -x 'src/docs.ts' -x 'src/main.ts' npm test",
+    "test:e2e": "NODE_ENV=testing node --loader @swc-node/register/esm --no-warnings --test $(find test -type f -name \"*.spec.ts\")"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,cjs,mjs,json}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@casl/mongoose": "^7.2.1",
-    "@open-data-capture/demo": "*",
-    "@open-data-capture/instruments": "*",
     "@douglasneuroinformatics/stats": "^1.0.0",
     "@faker-js/faker": "^8.0.2",
     "@nestjs/common": "^10.2.5",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.2.5",
+    "@nestjs/devtools-integration": "^0.1.5",
     "@nestjs/jwt": "^10.1.1",
     "@nestjs/mapped-types": "2.0.2",
     "@nestjs/mongoose": "^10.0.1",
@@ -32,6 +40,8 @@
     "@nestjs/platform-express": "^10.2.5",
     "@nestjs/swagger": "^7.1.11",
     "@nestjs/throttler": "^5.0.0",
+    "@open-data-capture/demo": "workspace:*",
+    "@open-data-capture/instruments": "workspace:*",
     "@swc/helpers": "^0.5.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -57,14 +67,5 @@
     "esbuild-plugin-tsc": "^0.4.0",
     "nodemon": "^3.0.1",
     "supertest": "^6.3.3"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{js,cjs,mjs,json}": [
-      "prettier --write"
-    ]
   }
 }

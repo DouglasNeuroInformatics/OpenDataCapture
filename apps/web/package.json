@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
-    "@open-data-capture/demo": "*",
+    "@open-data-capture/demo": "workspace:*",
     "@douglasneuroinformatics/ui": "^1.0.14",
     "@headlessui/react": "^1.7.17",
     "@react-spring/web": "^9.7.3",

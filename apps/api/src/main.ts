@@ -16,7 +16,8 @@ const __dirname = path.dirname(__filename);
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['error', 'warn', 'debug', 'log', 'verbose']
+    logger: ['error', 'warn', 'debug', 'log', 'verbose'],
+    snapshot: true
   });
 
   app.enableCors();

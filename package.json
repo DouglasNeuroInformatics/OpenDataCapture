@@ -28,7 +28,7 @@
     "@changesets/cli": "^2.26.2",
     "@douglasneuroinformatics/eslint-config": "^1.1.0",
     "@douglasneuroinformatics/form-types": "^0.0.3",
-    "@open-data-capture/types": "*",
+    "@open-data-capture/types": "workspace:*",
     "@types/node": "^20.6.2",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
