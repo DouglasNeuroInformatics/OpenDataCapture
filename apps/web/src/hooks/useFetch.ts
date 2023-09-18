@@ -63,6 +63,8 @@ export function useFetch<T = unknown>(
           console.error(`Failed to fetch data for resource: ${resourceURL}`);
           if (options.onError) {
             options.onError(err);
+          } else {
+            console.error(err);
           }
         })
         .finally(() => {
