@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import i18next from 'i18next';
 
 import { useAuthStore } from '@/stores/auth-store';
@@ -25,15 +25,7 @@ axios.interceptors.response.use(
   (error) => {
     const notifications = useNotificationsStore.getState();
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
-    notifications.addNotification({
-      type: 'error',
-      message
-    });
-
-    if (error instanceof AxiosError) {
-      console.error(error.response);
-    }
-
+    notifications.addNotification({ type: 'error', message });
     return Promise.reject(error);
   }
 );
