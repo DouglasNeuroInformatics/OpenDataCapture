@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { AppAction, AppSubject } from '@open-data-capture/types';
+import axios from 'axios';
 
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -37,23 +37,10 @@ export function useFetch<T = unknown>(
   deps: readonly unknown[] = [],
   options: UseFetchOptions = {}
 ): UseFetchReturn<T> {
-  const { accessToken, currentUser } = useAuthStore();
-  const notifications = useNotificationsStore();
+  const { currentUser } = useAuthStore();
 
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const baseURL = `${window.location.origin}/api`;
-
-  const url = useMemo(() => {
-    const url = new URL(baseURL + resourceURL);
-    for (const key in options.queryParams) {
-      if (options.queryParams[key]) {
-        url.searchParams.append(key, options.queryParams[key]!);
-      }
-    }
-    return url;
-  }, [baseURL, resourceURL, options.queryParams]);
 
   const isAuthorized = useMemo(() => {
     if (!options.access) {
@@ -62,42 +49,29 @@ export function useFetch<T = unknown>(
     return Boolean(currentUser?.ability.can(options.access.action, options.access.subject));
   }, [options.access]);
 
-  const setError = (error: unknown) => {
-    const message = error instanceof Error ? error.message : 'An unknown error occurred';
-    notifications.addNotification({
-      type: 'error',
-      message
-    });
-  };
-
   useEffect(() => {
     if (isAuthorized) {
       setIsLoading(true);
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${accessToken!}`
-        }
-      })
+      axios
+        .get<T>(resourceURL, {
+          params: options.queryParams
+        })
         .then((response) => {
-          if (!response.ok) {
-            console.error(response);
-            throw new Error(`${response.status}: ${response.statusText}`);
+          setData(response.data);
+        })
+        .catch((err) => {
+          console.error(`Failed to fetch data for resource: ${resourceURL}`);
+          if (options.onError) {
+            options.onError(err);
           }
-          return response.json();
         })
-        .then((data: T) => {
-          setData(data);
-        })
-        .catch(options.onError ?? setError)
         .finally(() => {
           setIsLoading(false);
         });
     } else {
       setData(null);
     }
-  }, [...deps, url.href]);
+  }, [...deps, resourceURL]);
 
   return { data, setData, isLoading };
 }
