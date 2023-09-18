@@ -1,1 +1,1 @@
-export * from './pages/SetupPage';
+export * from './providers/SetupProvider';
