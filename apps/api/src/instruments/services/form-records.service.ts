@@ -126,8 +126,6 @@ export class FormRecordsService {
       .populate('instrument')
       .accessibleBy(ability);
 
-    console.log(groupName, instrumentIdentifier);
-
     let centralTendency: Record<string, { mean: number; std: number }> | undefined;
     if (instrumentIdentifier) {
       centralTendency = Object.fromEntries(
