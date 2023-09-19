@@ -1,8 +1,6 @@
-// @ts-check
-
 /** @type {import("prettier").Options} */
-module.exports = {
-  plugins: [require.resolve('prettier-plugin-astro'), require.resolve('prettier-plugin-tailwindcss')],
+export default {
+  plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
   htmlWhitespaceSensitivity: 'ignore',
   printWidth: 120,
   singleQuote: true,
