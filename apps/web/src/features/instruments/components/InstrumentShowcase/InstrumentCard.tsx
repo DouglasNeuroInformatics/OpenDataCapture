@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { HiPencilSquare } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 
+import toolBrain from '@/assets/toolbrain.svg';
+
+
 export type InstrumentCardProps = {
   instrument: FormInstrumentSummary;
 };
@@ -15,6 +18,8 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
     navigate(`../forms/${instrument.identifier}`);
   };
 
+  console.log(instrument.details.title.includes("Questionnaire"))
+
   return (
     <div
       className="relative transition-all duration-300 ease-in-out hover:scale-[1.03] hover:cursor-pointer hover:shadow-lg"
@@ -25,7 +30,11 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
     >
       <div className="flex flex-col rounded-lg border-2 border-slate-200 border-opacity-50 p-8 dark:border-slate-700 sm:flex-row">
         <div className="mb-4 inline-flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-500 sm:mb-0 sm:mr-8">
-          <HiPencilSquare className="h-8 w-8" />
+          {(instrument.details.title.includes("Questionnaire")) ?
+             <HiPencilSquare className="h-8 w-8" /> : <img alt="tool brain" className="h-16 w-16 rounded-full"  src={toolBrain}/>
+          }
+          
+          
         </div>
         <div className="flex-grow">
           <h3 className="title-font mb-1 text-lg font-semibold text-slate-900 dark:text-slate-100">
