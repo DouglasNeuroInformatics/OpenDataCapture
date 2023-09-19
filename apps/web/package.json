@@ -8,7 +8,7 @@
     "build": "tsc && NODE_ENV=production vite build",
     "build-storybook": "storybook build",
     "check-types": "tsc --noEmit",
-    "dev": "bunx --bun vite",
+    "dev": "vite",
     "format": "prettier --write src",
     "lint": "eslint --fix src",
     "storybook": "storybook dev -p 6006"
