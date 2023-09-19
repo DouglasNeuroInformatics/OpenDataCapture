@@ -1,0 +1,305 @@
+{
+  "activeSubject": {
+    "header": "Sujet actif"
+  },
+  "datetime": {
+    "days": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+    "months": [
+      "Janvier",
+      "Février",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juillet",
+      "Août",
+      "Septembre",
+      "Octobre",
+      "Novembre",
+      "Décembre"
+    ]
+  },
+  "download": "Télécharger",
+  "footer": {
+    "contact": "Contactez-nous",
+    "documentation": "Documentation",
+    "license": "Licence",
+    "sourceCode": "Code source"
+  },
+  "form": {
+    "errors": {
+      "required": "Ce champ est obligatoire"
+    },
+    "radio": {
+      "labels": {
+        "false": "Faux",
+        "true": "Vrai"
+      }
+    },
+    "reset": "Réinitialiser",
+    "submit": "Soumettre"
+  },
+  "graph": "Graphique",
+  "groupTrend": "Tendance du groupe",
+  "identificationForm": {
+    "dateOfBirth": {
+      "label": "Date de naissance"
+    },
+    "firstName": {
+      "description": "Le prénom du sujet, tel qu'il figure dans son acte de naissance",
+      "label": "Prénom"
+    },
+    "lastName": {
+      "description": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance",
+      "label": "Nom de famille"
+    },
+    "notFound": "Pas trouvé",
+    "sex": {
+      "description": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance",
+      "label": "Sexe"
+    },
+    "submit": "Soumettre"
+  },
+  "languages": {
+    "en": "Anglais",
+    "fr": "Français"
+  },
+  "password": "Mot de passe",
+  "login": "Se connecter",
+  "unauthorizedError": {
+    "message": "Informations d'identification invalides",
+    "title": "Non autorisé"
+  },
+  "username": "Nom d'utilisateur",
+  "navLinks": {
+    "addVisit": "Ajouter une visite",
+    "availableInstruments": "Afficher tous les instruments",
+    "createInstrument": "Ajouter un instrument",
+    "lookupSubject": "Trouver un client",
+    "manageInstruments": "Gérer les instruments",
+    "overview": "Vue d'ensemble",
+    "viewSubjects": "Afficher tous les clients"
+  },
+  "notifications": {
+    "types": {
+      "error": "Erreur",
+      "info": "Attention",
+      "success": "Succès",
+      "warning": "Avertissement"
+    }
+  },
+  "organization": {
+    "name": "Douglas Neuroinformatics Platform"
+  },
+  "platform": {
+    "title": "Open Data Capture"
+  },
+  "searchBar": {
+    "placeholder": "Rechercher..."
+  },
+  "selectInstrument": "Veuillez sélectionner un instrument",
+  "selectMeasures": "Veuillez sélectionner au moins une mesure",
+  "sex": {
+    "female": "Féminin",
+    "male": "Masculin"
+  },
+  "table": "Tableau",
+  "userDropup": {
+    "logout": "Se déconnecter",
+    "preferences": "Préférences"
+  },
+  "visualization": {
+    "selectMode": "Veuillez sélectionner un mode de visualisation"
+  },
+  "contact": {
+    "message": "Message",
+    "pageTitle": "Nous contacter",
+    "reason": "Raison",
+    "reasons": {
+      "bug": "Rapport de bug",
+      "feedback": "Retour d'information",
+      "other": "Autre",
+      "request": "Demande"
+    }
+  },
+  "instruments": {
+    "availableInstruments": {
+      "filters": {
+        "language": "Langue",
+        "tags": "Tags"
+      },
+      "pageTitle": "Tous les instruments"
+    },
+    "createInstrument": {
+      "errors": {
+        "duplicateField": "Nom de champ en double invalide",
+        "invalidOptionFormat": "Format non valide pour l'option"
+      },
+      "form": {
+        "basics": "De base",
+        "description": {
+          "label": "Description"
+        },
+        "details": "Détails",
+        "estimatedDuration": {
+          "label": "Durée prévue"
+        },
+        "instructions": {
+          "label": "Instructions"
+        },
+        "language": {
+          "label": "Langue"
+        },
+        "name": {
+          "label": "Nom"
+        },
+        "tags": {
+          "label": "Tags"
+        },
+        "title": {
+          "label": "Titre"
+        },
+        "version": {
+          "label": "Version"
+        }
+      },
+      "pageTitle": "Ajouter un instrument",
+      "steps": {
+        "fields": "Champs",
+        "info": "Info",
+        "review": "Révision"
+      }
+    },
+    "fetchInstrument": {
+      "notFound": "Cet instrument n'existe pas en français"
+    },
+    "formPage": {
+      "identification": {
+        "label": "Identification"
+      },
+      "overview": {
+        "begin": "Commencer",
+        "description": "Description",
+        "estimated Duration": "Durée estimée",
+        "instructions": "Instructions",
+        "label": "Aperçu",
+        "language": "Langue"
+      },
+      "questions": {
+        "label": "Questions"
+      },
+      "summary": {
+        "timeCollected": "Horodatage",
+        "dateOfBirth": "Date de naissance",
+        "download": "Télécharger",
+        "instrumentTitle": "Titre de l'instrument",
+        "instrumentVersion": "Version de l'instrument",
+        "label": "Résumé",
+        "metadata": "Métadonnées",
+        "name": "Nom",
+        "print": "Imprimer",
+        "results": "Résultats",
+        "sex": "Sexe",
+        "subject": "Client"
+      },
+      "uploadSuccessful": "Téléchargement réussi"
+    },
+    "manageInstruments": {
+      "deleteModal": {
+        "cancel": "Annuler",
+        "delete": "Effacer",
+        "language": "Langue",
+        "name": "Nom",
+        "title": "Confirmation de l'effacement",
+        "version": "Version"
+      },
+      "pageTitle": "Gérer les instruments"
+    }
+  },
+  "currentGroup": "Groupe actuel",
+  "disclaimer": {
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "message": "Cette plateforme n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques.",
+    "title": "Avis"
+  },
+  "overview": {
+    "pageTitle": "Vue d'ensemble",
+    "totalInstruments": "Nombre d'instruments",
+    "totalRecords": "Nombre d'enregistrements",
+    "totalSubjects": "Nombre de clients",
+    "totalUsers": "Nombre d'utilisateurs",
+    "summary": "Résumé des données disponibles",
+    "welcome": "Bienvenue"
+  },
+  "addVisit": {
+    "exists": "Ce client a déjà été enregistré",
+    "pageTitle": "Ajouter une visite"
+  },
+  "subjectPage": {
+    "graph": {
+      "defaultTitle": "Veuillez sélectionner un instrument",
+      "instrument": "Instrument",
+      "measures": "Mesures",
+      "timeframe": "Période",
+      "timeframeOptions": {
+        "all": "Toujours",
+        "month": "Mois écoulé",
+        "year": "Année écoulée"
+      },
+      "xLabel": "Date d'enregistrement",
+      "yLabel": "Valeur"
+    },
+    "pageTitle": "Dossiers d'instruments pour le client"
+  },
+  "viewSubjects": {
+    "lookup": {
+      "title": "Trouver un client"
+    },
+    "pageTitle": "Tous les clients",
+    "table": {
+      "columns": {
+        "dateOfBirth": "Date de naissance",
+        "sex": "Sexe",
+        "subject": "Client"
+      },
+      "export": "Exporter",
+      "exportHelpText": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants.",
+      "filters": "Filtres"
+    }
+  },
+  "setup": {
+    "pageTitle": "Mise en service",
+    "admin": {
+      "title": "Administrateur",
+      "description": "Pour utiliser l'application, il faut qu'il y ait au moins un administrateur. Assurez-vous de vous souvenir de ces informations d'identification, faute de quoi vous risquez de perdre des données."
+    },
+    "demo": {
+      "title": "Démonstration",
+      "description": "Si vous testez la plateforme, vous avez la possibilité d'alimenter la base de données avec des échantillons de données.",
+      "init": "Initialiser la démonstration"
+    }
+  },
+  "yes": "Oui",
+  "no": "Non",
+  "demo": {
+    "welcome": "Bienvenue sur la version de démonstration de la plateforme Open Data Capture",
+    "info": "Informations sur la démonstration",
+    "summary": "Cette démo est conçue à des fins de test et de démonstration. Elle présente deux groupes fictifs : Clinique de la Dépression et Clinique de la Psychose, tous deux pourvus de plusieurs mois de données simulées pour illustrer la présentation des données. La base de données est réinitialisée quotidiennement à 6h00 UTC.",
+    "loginCredentials": "Identifiants de connexion",
+    "username": "Nom d'utilisateur : {{value}}",
+    "password": "Mot de passe : {{value}}",
+    "role": "Rôle d'utilisateur : {{value}}",
+    "groups": "Groupe(s) : {{value}}"
+  },
+  "learnMore": "En savoir plus",
+  "firstName": "Prénom",
+  "lastName": "Nom",
+  "basePermissionLevel": {
+    "admin": "Administrateur",
+    "groupManager": "Responsable de groupe",
+    "standard": "Utilisateur standard"
+  },
+  "close": "Fermer",
+  "networkError": "Erreur de réseau"
+}

@@ -8,7 +8,7 @@ services:
     image: caddy:2.7-alpine
     restart: unless-stopped
     ports:
-      - "5500:80"
+      - '5500:80'
     environment:
       - SITE_ADDRESS
     volumes:
@@ -18,7 +18,7 @@ services:
     image: ghcr.io/douglasneuroinformatics/data-capture-api:latest
     build:
       context: .
-      dockerfile: ./apps/core-api/Dockerfile
+      dockerfile: ./apps/api/Dockerfile
     depends_on:
       - mongo
     environment:
@@ -31,7 +31,7 @@ services:
     image: ghcr.io/douglasneuroinformatics/data-capture-web:latest
     build:
       context: .
-      dockerfile: ./apps/core-web/Dockerfile
+      dockerfile: ./apps/web/Dockerfile
       args:
         - VITE_DOCS_URL
         - VITE_LICENSE_URL

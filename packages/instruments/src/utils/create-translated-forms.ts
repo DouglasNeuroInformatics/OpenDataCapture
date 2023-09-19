@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { FormInstrument, Language, Measures, MultilingualForm, MultilingualFormFields } from '@open-data-capture/types';
 import { FormFields, FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { FormInstrument, Language, Measures, MultilingualForm, MultilingualFormFields } from '@open-data-capture/types';
 
 type TranslatedForms<T extends FormInstrumentData> = {
   [L in Language]: FormInstrument<T>;

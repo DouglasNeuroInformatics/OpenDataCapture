@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "NodeNext",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "strictPropertyInitialization": false,
+    "typeRoots": [
+      "./src/typings",
+      "./node_modules/@types",
+      "../../node_modules/@types"
+    ]
+  },
+  "extends": "../../tsconfig.base.json",
+  "include": [
+    "src/**/*",
+    "test/**/*"
+  ]
+}
