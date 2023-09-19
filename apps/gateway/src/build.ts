@@ -25,7 +25,7 @@ const createBuildContext = () => {
     entryPoints: [path.resolve(import.meta.dir, 'static', 'main.tsx')],
     minify: true,
     outfile: BUNDLE_FILE,
-    platform: 'browser',
+    platform: 'browser'
     // plugins: [
     //   {
     //     name: 'postcss',

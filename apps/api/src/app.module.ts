@@ -51,7 +51,7 @@ import { UsersModule } from './users/users.module.js';
       {
         name: 'short',
         ttl: 1000,
-        limit: 10,
+        limit: 10
       },
       {
         name: 'medium',

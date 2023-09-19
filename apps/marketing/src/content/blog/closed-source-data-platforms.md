@@ -18,8 +18,8 @@ These exorbitant fees can cripple all but the most well-funded research projects
 
 ## The Illusion of Convenience
 
-Closed-source electronic data capture platforms, while often offering a smooth onboarding experience, 
-also present significant long-term risks. These platforms are typically owned and operated by private companies, leaving users at the mercy of the platform's development roadmap and pricing strategy. The company may decide to raise licensing fees at any time, crippling ongoing research studies. 
+Closed-source electronic data capture platforms, while often offering a smooth onboarding experience,
+also present significant long-term risks. These platforms are typically owned and operated by private companies, leaving users at the mercy of the platform's development roadmap and pricing strategy. The company may decide to raise licensing fees at any time, crippling ongoing research studies.
 
 ## Barriers to Collaboration
 
@@ -35,7 +35,7 @@ In the context of healthcare, this risk is especially pronounced. Should an EDC 
 
 Data privacy is paramount, especially when handling sensitive information such as patient records or groundbreaking research data. With closed-source platforms, there's an inherent trust that the vendor is implementing robust security measures. But without the possibility for independent audits or verification, users have to rely solely on the vendor's assurances.
 
-Additionally, some platforms may have ambiguous terms of service regarding data ownership. Researchers and institutions must be vigilant to ensure they don’t unknowingly cede rights to their valuable data. 
+Additionally, some platforms may have ambiguous terms of service regarding data ownership. Researchers and institutions must be vigilant to ensure they don’t unknowingly cede rights to their valuable data.
 
 ## Stifling Innovation and Collaboration
 
