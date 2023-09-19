@@ -18,7 +18,6 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
     navigate(`../forms/${instrument.identifier}`);
   };
 
-  console.log(instrument.details.title.includes("Questionnaire"))
 
   return (
     <div
