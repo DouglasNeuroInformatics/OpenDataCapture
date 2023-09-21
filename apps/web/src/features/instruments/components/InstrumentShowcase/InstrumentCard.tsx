@@ -20,9 +20,10 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
   };
 
   const pictureRender = () => {
-    if(instrument.name.includes("Questionnaire")){
+    const instrumentName = instrument.name.toLocaleLowerCase();
+    if(instrumentName.includes("questionnaire")){
       return <HiPencilSquare className="h-8 w-8" />
-    } else if (instrument.name.includes("Assessment")){
+    } else if (instrumentName.includes("Assessment")){
       return <img alt="tool brain" className="h-16 w-16 rounded-full"  src={toolBrain}/>
     } 
     return <img alt="tool brain" className="h-16 w-16 rounded-full"  src={handBrain}/>
