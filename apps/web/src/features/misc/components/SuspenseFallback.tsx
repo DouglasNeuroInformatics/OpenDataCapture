@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-import { Spinner } from '@/components';
+import { LoadingFallback } from './LoadingFallback';
 
 export const SuspenseFallback = () => (
   <motion.div 
@@ -9,6 +9,6 @@ export const SuspenseFallback = () => (
   exit = {{opacity: 0}}
   initial = {{opacity: 0}}
   transition={{ease: "ease-out", delay: 0.2, duration: 1}}>
-    <Spinner />
+    <LoadingFallback/>
   </motion.div>
 );
