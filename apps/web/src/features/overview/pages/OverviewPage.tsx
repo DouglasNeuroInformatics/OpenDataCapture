@@ -6,7 +6,8 @@ import { Disclaimer } from '../components/Disclaimer';
 import { GroupSwitcher } from '../components/GroupSwitcher';
 import { StatisticCard } from '../components/StatisticCard';
 
-import { PageHeader, Spinner } from '@/components';
+import { PageHeader } from '@/components';
+import { showSpinner } from '@/features/misc/components/LoadingFallback';
 import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -43,7 +44,10 @@ export const OverviewPage = () => {
 
   // If it is the first time loading data
   if (!isAllDataDefined && isAnyLoading) {
-    return <Spinner />;
+    setTimeout(
+      showSpinner, 100
+    );
+    //return <Spinner />;
   }
 
   return (
