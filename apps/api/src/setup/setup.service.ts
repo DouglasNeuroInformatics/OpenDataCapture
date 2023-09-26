@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, SetupState } from '@open-data-capture/types';
+import type { AppAbility, SetupState } from '@open-data-capture/types';
 import mongoose from 'mongoose';
 
 import { DemoService } from './demo.service';

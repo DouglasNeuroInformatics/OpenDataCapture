@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
-import { SetupOptions } from '@open-data-capture/types';
+import type { SetupOptions } from '@open-data-capture/types';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsNotEmptyObject, ValidateNested } from 'class-validator';
 

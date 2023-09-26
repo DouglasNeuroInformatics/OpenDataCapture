@@ -2,12 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { type FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
 import * as instruments from '@open-data-capture/instruments';
-import { AppAbility, FormInstrument } from '@open-data-capture/types';
+import type { AppAbility, FormInstrument } from '@open-data-capture/types';
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
@@ -58,7 +58,7 @@ export class DemoService {
     for (let i = 0; i < 100; i++) {
       const createSubjectDto = this.getCreateSubjectDto();
       await this.subjectsService.create(createSubjectDto);
-      const group = await this.groupsService.findByName(randomValue(demoGroups).name, this.ability);
+      const group = await this.groupsService.findByName(randomValue(demoGroups)!.name, this.ability);
       await this.createFormRecords(happinessQuestionnaires[0]!, group.name, createSubjectDto);
       await this.createFormRecords(miniMentalStateExaminations[0]!, group.name, createSubjectDto);
       await this.createFormRecords(montrealCognitiveAssessments[0]!, group.name, createSubjectDto);
