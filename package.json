@@ -19,11 +19,6 @@
     "test": "env-cmd turbo run test",
     "ws": "./scripts/workspace.sh $@"
   },
-  "dependencies": {
-    "@douglasneuroinformatics/ajv": "^1.0.0",
-    "@douglasneuroinformatics/utils": "1.0.1",
-    "ts-pattern": "^5.0.5"
-  },
   "devDependencies": {
     "@douglasneuroinformatics/eslint-config": "^2.0.0",
     "@douglasneuroinformatics/form-types": "^1.0.0",

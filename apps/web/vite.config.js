@@ -28,11 +28,6 @@ export default defineConfig(() => {
       alias: {
         '@': path.resolve(projectDir, 'src')
       }
-    },
-    test: {
-      globals: true,
-      environment: 'jsdom',
-      setupFiles: [path.resolve(projectDir, 'src', 'test', 'setup.ts')]
     }
   };
 });
