@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { AppAction, AppSubject } from '@open-data-capture/types';
+import type { AppAction, AppSubject } from '@open-data-capture/types';
 import { NavLink } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';

@@ -1,7 +1,5 @@
-import React from 'react';
-
 import { Form } from '@douglasneuroinformatics/ui';
-import { Sex } from '@open-data-capture/types';
+import type { Sex } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
