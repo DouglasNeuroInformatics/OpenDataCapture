@@ -23,6 +23,7 @@
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@casl/mongoose": "^7.2.1",
+    "@douglasneuroinformatics/nestjs": "^1.5.0",
     "@douglasneuroinformatics/stats": "^2.0.0",
     "@faker-js/faker": "^8.1.0",
     "@nestjs/common": "^10.2.6",
