@@ -10,8 +10,12 @@ axios.interceptors.request.use((config) => {
   const auth = useAuthStore.getState();
 
   config.headers.setAccept('application/json');
-  config.timeout = 5000; // abort request after 5 seconds
-  config.timeoutErrorMessage = i18next.t('networkError');
+
+  // Do not set timeout for setup (can be CPU intensive, especially on slow server)
+  if (config.url !== '/v1/setup') {
+    config.timeout = 10000; // abort request after 10 seconds
+    config.timeoutErrorMessage = i18next.t('networkError');
+  }
 
   if (auth.accessToken) {
     config.headers.set('Authorization', `Bearer ${auth.accessToken}`);
