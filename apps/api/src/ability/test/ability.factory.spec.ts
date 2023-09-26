@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from 'node:test';
 
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AbilityFactory } from '../ability.factory.js';
+import { AbilityFactory } from '../ability.factory';
 
 describe('AbilityFactory', () => {
   let abilityFactory: AbilityFactory;

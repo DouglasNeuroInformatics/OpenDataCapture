@@ -5,9 +5,9 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { GroupEntity } from '../entities/group.entity.js';
+import { GroupEntity } from '../entities/group.entity';
 
-import { GroupsService } from '@/groups/groups.service.js';
+import { GroupsService } from '@/groups/groups.service';
 
 const mockGroup = Object.freeze({
   name: 'Test Group'

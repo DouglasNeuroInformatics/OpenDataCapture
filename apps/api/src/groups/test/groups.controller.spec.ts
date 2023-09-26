@@ -3,10 +3,10 @@ import { beforeEach, describe, it } from 'node:test';
 
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { GroupsController } from '../groups.controller.js';
-import { GroupsService } from '../groups.service.js';
+import { GroupsController } from '../groups.controller';
+import { GroupsService } from '../groups.service';
 
-import { createMock } from '@/core/testing/create-mock.js';
+import { createMock } from '@/core/testing/create-mock';
 
 describe('GroupsController', () => {
   let groupsController: GroupsController;

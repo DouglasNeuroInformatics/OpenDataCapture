@@ -5,9 +5,9 @@ import { AccessibleModel } from '@casl/mongoose';
 import { AppAbility, Group } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
-import { CreateGroupDto } from './dto/create-group.dto.js';
-import { UpdateGroupDto } from './dto/update-group.dto.js';
-import { GroupDocument, GroupEntity } from './entities/group.entity.js';
+import { CreateGroupDto } from './dto/create-group.dto';
+import { UpdateGroupDto } from './dto/update-group.dto';
+import { GroupDocument, GroupEntity } from './entities/group.entity';
 
 @Injectable()
 export class GroupsService {
