@@ -5,15 +5,11 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "npm run check-types && swc --copy-files --delete-dir-on-start --out-dir dist src",
+    "build": "bun ./src/build.ts",
     "check-types": "tsc",
-    "dev": "NODE_ENV=development concurrently \"swc --copy-files --out-dir dist -w src\" \"nodemon -L dist/main.js\"",
+    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --watch src/main.ts",
     "format": "prettier --write src",
-    "lint": "eslint --fix src",
-    "start": "node ./dist/main.js",
-    "test": "node --loader @swc-node/register/esm --no-warnings --test $(find src -type f -name \"*.spec.ts\")",
-    "test:coverage": "c8 --all --src=src -r json -r 'text' -x '**/*.{d,dto,entity,module,spec}.ts' -x 'src/docs.ts' -x 'src/main.ts' npm test",
-    "test:e2e": "NODE_ENV=testing node --loader @swc-node/register/esm --no-warnings --test $(find test -type f -name \"*.spec.ts\")"
+    "lint": "eslint --fix src"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
