@@ -1,7 +1,5 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-
-import { type Request } from 'express';
 
 import { AuthService } from './auth.service';
 import { AccessTokenDto } from './dto/access-token.dto';
@@ -18,7 +16,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @RouteAccess('public')
-  login(@Body() { username, password }: LoginRequestDto, @Req() request: Request): Promise<AccessTokenDto> {
-    return this.authService.login(username, password, request.ip);
+  login(@Body() { username, password }: LoginRequestDto): Promise<AccessTokenDto> {
+    return this.authService.login(username, password);
   }
 }

@@ -18,12 +18,20 @@ import { InstrumentsModule } from './instruments/instruments.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
+import { CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 
 @Module({
   imports: [
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true
+    }),
+    CryptoModule.registerAsync({
+      isGlobal: true,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secretKey: configService.getOrThrow('SECRET_KEY')
+      })
     }),
     GroupsModule,
     InstrumentsModule,
