@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Menu, Transition } from '@headlessui/react';
 import { useTranslation } from 'react-i18next';
 import { HiChevronDown } from 'react-icons/hi';

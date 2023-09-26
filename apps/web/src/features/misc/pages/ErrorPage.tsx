@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
 type ErrorInfo = {

@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
-import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { Form, StepperContext } from '@douglasneuroinformatics/ui';
-import { FormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/types';
 
 export type FormQuestionsProps<T extends FormInstrumentData> = {
   instrument: FormInstrument<T>;

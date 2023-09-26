@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
 import { Form, StepperContext } from '@douglasneuroinformatics/ui';
-import { FormDetails, FormInstrument } from '@open-data-capture/types';
+import type { FormDetails, FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 export type InfoFormData = FormDetails &

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { Card } from '@douglasneuroinformatics/ui';
 import { type MotionValue, motion, useSpring, useTransform } from 'framer-motion';

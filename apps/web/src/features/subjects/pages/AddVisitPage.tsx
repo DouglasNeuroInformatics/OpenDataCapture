@@ -1,10 +1,8 @@
-import React from 'react';
-
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-import { IdentificationForm, IdentificationFormData, PageHeader } from '@/components';
+import { IdentificationForm, type IdentificationFormData, PageHeader } from '@/components';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
 export const AddVisitPage = () => {

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { RecordsTable } from '../components/RecordsTable';
 import { VisualizationContextProvider } from '../context/VisualizationContext';
 import { useSubjectPageTitle } from '../hooks/useSubjectPageTitle';

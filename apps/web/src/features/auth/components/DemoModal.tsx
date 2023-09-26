@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Modal } from '@douglasneuroinformatics/ui';
 import { snakeToCamelCase } from '@douglasneuroinformatics/utils';
 import { demoUsers } from '@open-data-capture/demo';

@@ -1,4 +1,4 @@
-import { FormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/types';
 
 export type Measurements = {
   [key: string]: any;

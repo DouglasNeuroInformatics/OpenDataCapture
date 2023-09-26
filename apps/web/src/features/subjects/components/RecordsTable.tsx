@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { ClientTable, Dropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';

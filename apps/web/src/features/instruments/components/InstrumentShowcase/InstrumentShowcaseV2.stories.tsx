@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { FormInstrumentSummary } from '@open-data-capture/types';
+import type { FormInstrumentSummary } from '@open-data-capture/types';
 import type { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 

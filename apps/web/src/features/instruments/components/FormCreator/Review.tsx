@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 
-import { SimpleForm } from './FormCreator';
+import { type SimpleForm } from './FormCreator';
 
 const ReviewItem = ({ label, value }: { label: string; value: any }) => {
   return (

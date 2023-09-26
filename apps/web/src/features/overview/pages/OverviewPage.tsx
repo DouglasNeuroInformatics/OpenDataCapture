@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { FormInstrumentRecordsSummary, FormInstrumentSummary, Subject, User } from '@open-data-capture/types';
+import type { FormInstrumentRecordsSummary, FormInstrumentSummary, Subject, User } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 

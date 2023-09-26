@@ -1,7 +1,5 @@
-import React from 'react';
-
 import { Form } from '@douglasneuroinformatics/ui';
-import { LoginCredentials } from '@open-data-capture/types';
+import type { LoginCredentials } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 export type LoginFormProps = {

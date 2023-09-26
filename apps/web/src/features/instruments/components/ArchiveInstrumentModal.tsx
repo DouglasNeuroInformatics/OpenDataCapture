@@ -1,7 +1,5 @@
-import React from 'react';
-
 import { Button, Modal } from '@douglasneuroinformatics/ui';
-import { FormInstrumentSummary } from '@open-data-capture/types';
+import type { FormInstrumentSummary } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 type ArchiveInstrumentModalProps = {

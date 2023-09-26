@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
 import { Button, StepperContext } from '@douglasneuroinformatics/ui';
-import { FormDetails } from '@open-data-capture/types';
+import type { FormDetails } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 type FormOverviewItemProps = {

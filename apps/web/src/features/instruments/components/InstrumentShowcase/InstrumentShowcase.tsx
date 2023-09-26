@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/ui';
-import { FormInstrumentSummary } from '@open-data-capture/types';
+import type { FormInstrumentSummary } from '@open-data-capture/types';
 import { animated, useTrail } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 

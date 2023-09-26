@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { StepperContext } from '@douglasneuroinformatics/ui';
 import type { Meta, StoryObj } from '@storybook/react';
 
