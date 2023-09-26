@@ -7,7 +7,7 @@ import { GroupSwitcher } from '../components/GroupSwitcher';
 import { StatisticCard } from '../components/StatisticCard';
 
 import { PageHeader } from '@/components';
-import { showSpinner } from '@/features/misc/components/LoadingFallback';
+import { LoadingFallback } from '@/features/misc/components/LoadingFallback';
 import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -45,14 +45,16 @@ export const OverviewPage = () => {
   // If it is the first time loading data
   if (!isAllDataDefined && isAnyLoading) {
     setTimeout(
-      showSpinner, 100
+      LoadingFallback, 100
     );
     //return <Spinner />;
   }
 
   return (
-    <div>
-      <Disclaimer isRequired={import.meta.env.PROD} />
+    <LoadingFallback>
+      {() => (
+        <>
+              <Disclaimer isRequired={import.meta.env.PROD} />
       <PageHeader title={pageTitle} />
       <section>
         <div className="mb-5">
@@ -80,7 +82,9 @@ export const OverviewPage = () => {
           </div>
         </div>
       </section>
-    </div>
+        </>
+      )}
+    </LoadingFallback>
   );
 };
 
