@@ -1,5 +1,4 @@
 import type FormTypes from '@douglasneuroinformatics/form-types';
-
 import type { FormInstrument } from '@open-data-capture/types';
 
 /** Return the `FormFields` for an instrument */
