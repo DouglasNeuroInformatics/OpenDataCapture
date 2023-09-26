@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { Subject } from '@open-data-capture/types';
+import type { Subject } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 import { SubjectsTable } from '../components/SubjectsTable';
