@@ -3,10 +3,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import type { BaseInstrument, Group, InstrumentKind, InstrumentRecord, Subject } from '@open-data-capture/types';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { InstrumentEntity } from './instrument.entity.js';
+import { InstrumentEntity } from './instrument.entity';
 
-import { GroupEntity } from '@/groups/entities/group.entity.js';
-import { SubjectEntity } from '@/subjects/entities/subject.entity.js';
+import { GroupEntity } from '@/groups/entities/group.entity';
+import { SubjectEntity } from '@/subjects/entities/subject.entity';
 
 @Schema({ strict: false })
 export class InstrumentRecordEntity implements InstrumentRecord<BaseInstrument> {

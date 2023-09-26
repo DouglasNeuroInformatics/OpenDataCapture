@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import type { JSONSchemaType } from 'ajv/dist/types/json-schema.js';
+import type { JSONSchemaType } from 'ajv/dist/types/json-schema';
 
-import { AjvService } from '@/ajv/ajv.service.js';
+import { AjvService } from '@/ajv/ajv.service';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform {

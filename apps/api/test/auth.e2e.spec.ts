@@ -7,8 +7,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import request from 'supertest';
 
-import { AppModule } from '@/app.module.js';
-import { SetupService } from '@/setup/setup.service.js';
+import { AppModule } from '@/app.module';
+import { SetupService } from '@/setup/setup.service';
 
 describe('/auth', () => {
   let app: NestExpressApplication;

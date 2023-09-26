@@ -5,8 +5,8 @@ import { beforeEach, describe, it, mock } from 'node:test';
 
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { SubjectsController } from '../subjects.controller.js';
-import { SubjectsService } from '../subjects.service.js';
+import { SubjectsController } from '../subjects.controller';
+import { SubjectsService } from '../subjects.service';
 
 const mockSubject = Object.freeze({ firstName: 'John', lastName: 'Smith', sex: 'male', dateOfBirth: '2000-01-01' });
 

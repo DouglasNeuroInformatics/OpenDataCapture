@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 
-import { RouteAccessType } from '@/core/decorators/route-access.decorator.js';
+import { RouteAccessType } from '@/core/decorators/route-access.decorator';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {

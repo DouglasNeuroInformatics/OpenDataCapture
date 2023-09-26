@@ -3,11 +3,11 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { type Request } from 'express';
 
-import { AuthService } from './auth.service.js';
-import { AccessTokenDto } from './dto/access-token.dto.js';
-import { LoginRequestDto } from './dto/login-request.dto.js';
+import { AuthService } from './auth.service';
+import { AccessTokenDto } from './dto/access-token.dto';
+import { LoginRequestDto } from './dto/login-request.dto';
 
-import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 @ApiTags('Authentication')
 @Controller({ path: 'auth' })

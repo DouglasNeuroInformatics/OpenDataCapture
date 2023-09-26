@@ -6,12 +6,12 @@ import type { AppAbility, Group, Sex } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 import unidecode from 'unidecode';
 
-import { CreateSubjectDto } from './dto/create-subject.dto.js';
-import { LookupSubjectDto } from './dto/lookup-subject.dto.js';
-import { SubjectDocument, SubjectEntity } from './entities/subject.entity.js';
+import { CreateSubjectDto } from './dto/create-subject.dto';
+import { LookupSubjectDto } from './dto/lookup-subject.dto';
+import { SubjectDocument, SubjectEntity } from './entities/subject.entity';
 
-import { CryptoService } from '@/crypto/crypto.service.js';
-import { GroupsService } from '@/groups/groups.service.js';
+import { CryptoService } from '@/crypto/crypto.service';
+import { GroupsService } from '@/groups/groups.service';
 
 @Injectable()
 export class SubjectsService {

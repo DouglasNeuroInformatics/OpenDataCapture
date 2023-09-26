@@ -5,12 +5,12 @@ import { AccessibleModel } from '@casl/mongoose';
 import { AppAbility } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { UserDocument, UserEntity } from './entities/user.entity.js';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserDocument, UserEntity } from './entities/user.entity';
 
-import { CryptoService } from '@/crypto/crypto.service.js';
-import { GroupEntity } from '@/groups/entities/group.entity.js';
-import { GroupsService } from '@/groups/groups.service.js';
+import { CryptoService } from '@/crypto/crypto.service';
+import { GroupEntity } from '@/groups/entities/group.entity';
+import { GroupsService } from '@/groups/groups.service';
 
 @Injectable()
 export class UsersService {

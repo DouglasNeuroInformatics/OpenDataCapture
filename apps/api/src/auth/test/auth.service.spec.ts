@@ -8,12 +8,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { defineAbility } from '@casl/ability';
 import { AppAbility } from '@open-data-capture/types';
 
-import { AuthService } from '../auth.service.js';
+import { AuthService } from '../auth.service';
 
-import { AbilityFactory } from '@/ability/ability.factory.js';
-import { createMock } from '@/core/testing/create-mock.js';
-import { CryptoService } from '@/crypto/crypto.service.js';
-import { UsersService } from '@/users/users.service.js';
+import { AbilityFactory } from '@/ability/ability.factory';
+import { createMock } from '@/core/testing/create-mock';
+import { CryptoService } from '@/crypto/crypto.service';
+import { UsersService } from '@/users/users.service';
 
 describe('AuthService', () => {
   let authService: AuthService;

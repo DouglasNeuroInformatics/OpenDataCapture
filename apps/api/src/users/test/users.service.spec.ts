@@ -5,12 +5,12 @@ import { beforeEach, describe, it } from 'node:test';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { UserEntity } from '../entities/user.entity.js';
-import { UsersService } from '../users.service.js';
+import { UserEntity } from '../entities/user.entity';
+import { UsersService } from '../users.service';
 
-import { createMock } from '@/core/testing/create-mock.js';
-import { CryptoService } from '@/crypto/crypto.service.js';
-import { GroupsService } from '@/groups/groups.service.js';
+import { createMock } from '@/core/testing/create-mock';
+import { CryptoService } from '@/crypto/crypto.service';
+import { GroupsService } from '@/groups/groups.service';
 
 describe('UsersService', () => {
   let usersService: UsersService;

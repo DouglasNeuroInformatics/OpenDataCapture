@@ -4,9 +4,9 @@ import { beforeEach, describe, it } from 'node:test';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { CryptoService } from '../crypto.service.js';
+import { CryptoService } from '../crypto.service';
 
-import { createMock } from '@/core/testing/create-mock.js';
+import { createMock } from '@/core/testing/create-mock';
 
 describe('CryptoService', () => {
   let cryptoService: CryptoService;

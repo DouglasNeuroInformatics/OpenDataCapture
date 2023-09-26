@@ -5,12 +5,12 @@ import { ConflictException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { SubjectEntity } from '../entities/subject.entity.js';
-import { SubjectsService } from '../subjects.service.js';
+import { SubjectEntity } from '../entities/subject.entity';
+import { SubjectsService } from '../subjects.service';
 
-import { createMock } from '@/core/testing/create-mock.js';
-import { CryptoService } from '@/crypto/crypto.service.js';
-import { GroupsService } from '@/groups/groups.service.js';
+import { createMock } from '@/core/testing/create-mock';
+import { CryptoService } from '@/crypto/crypto.service';
+import { GroupsService } from '@/groups/groups.service';
 
 const mockSubject = Object.freeze({
   firstName: 'John',

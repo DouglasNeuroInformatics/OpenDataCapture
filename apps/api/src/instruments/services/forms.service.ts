@@ -13,10 +13,10 @@ import { TranslatedForms } from '@open-data-capture/instruments';
 import type { FormInstrument, FormInstrumentSummary, Language } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
-import { FormInstrumentEntity } from '../entities/form-instrument.entity.js';
-import { InstrumentEntity } from '../entities/instrument.entity.js';
+import { FormInstrumentEntity } from '../entities/form-instrument.entity';
+import { InstrumentEntity } from '../entities/instrument.entity';
 
-import { CryptoService } from '@/crypto/crypto.service.js';
+import { CryptoService } from '@/crypto/crypto.service';
 
 @Injectable()
 export class FormsService {

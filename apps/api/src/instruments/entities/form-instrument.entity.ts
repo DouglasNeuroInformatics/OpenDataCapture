@@ -5,8 +5,8 @@ import type { FormDetails, FormInstrument, Measures } from '@open-data-capture/t
 import { type JSONSchemaType } from 'ajv';
 import { Schema as MongooseSchema } from 'mongoose';
 
-import { BaseInstrumentEntity } from './base-instrument.entity.js';
-import { FormDetailsSchema } from './form-details.entity.js';
+import { BaseInstrumentEntity } from './base-instrument.entity';
+import { FormDetailsSchema } from './form-details.entity';
 
 @Schema()
 export class FormInstrumentEntity<TData extends FormInstrumentData = FormInstrumentData>

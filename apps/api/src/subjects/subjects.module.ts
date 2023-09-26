@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { SubjectEntity, SubjectSchema } from './entities/subject.entity.js';
-import { SubjectsController } from './subjects.controller.js';
-import { SubjectsService } from './subjects.service.js';
+import { SubjectEntity, SubjectSchema } from './entities/subject.entity';
+import { SubjectsController } from './subjects.controller';
+import { SubjectsService } from './subjects.service';
 
-import { CryptoModule } from '@/crypto/crypto.module.js';
-import { GroupsModule } from '@/groups/groups.module.js';
+import { CryptoModule } from '@/crypto/crypto.module';
+import { GroupsModule } from '@/groups/groups.module';
 
 @Module({
   imports: [
