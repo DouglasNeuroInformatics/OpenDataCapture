@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { type InstrumentKind } from '@open-data-capture/types';
-import { HydratedDocument } from 'mongoose';
+import { type HydratedDocument } from 'mongoose';
 
 import { BaseInstrumentEntity } from './base-instrument.entity';
 

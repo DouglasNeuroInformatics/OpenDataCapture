@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { InstrumentKind } from '@open-data-capture/types';
+import type { InstrumentKind } from '@open-data-capture/types';
 import { Schema } from 'mongoose';
 
 import { FormRecordsController } from './controllers/form-records.controller';
@@ -13,10 +13,10 @@ import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity
 import { FormRecordsService } from './services/form-records.service';
 import { FormsService } from './services/forms.service';
 
-import { AjvModule } from '@/ajv/ajv.module';
-import { CryptoModule } from '@/crypto/crypto.module';
 import { GroupsModule } from '@/groups/groups.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
+
+import { AjvModule } from '@douglasneuroinformatics/nestjs/modules';
 
 type InstrumentDiscriminator = {
   name: InstrumentKind;
@@ -26,7 +26,6 @@ type InstrumentDiscriminator = {
 @Module({
   imports: [
     AjvModule,
-    CryptoModule,
     GroupsModule,
     MongooseModule.forFeature([
       {

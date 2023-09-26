@@ -1,4 +1,4 @@
-import { BaseInstrument, InstrumentKind } from '@open-data-capture/types';
+import type { BaseInstrument, InstrumentKind } from '@open-data-capture/types';
 
 export abstract class BaseInstrumentEntity implements BaseInstrument {
   identifier: string;
