@@ -1,13 +1,13 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { AccessibleModel } from '@casl/mongoose';
-import { AppAbility, Group } from '@open-data-capture/types';
+import type { AccessibleModel } from '@casl/mongoose';
+import type { AppAbility, Group } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { GroupDocument, GroupEntity } from './entities/group.entity';
+import { type GroupDocument, GroupEntity } from './entities/group.entity';
 
 @Injectable()
 export class GroupsService {

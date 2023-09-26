@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Group } from '@open-data-capture/types';
-import { IsString } from 'class-validator';
+import { type Group } from '@open-data-capture/types';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateGroupDto implements Group {
   @ApiProperty({ example: 'Depression Clinic' })
   @IsString()
+  @IsNotEmpty()
   name: string;
 }
