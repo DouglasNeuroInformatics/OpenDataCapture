@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict';
-import { beforeEach, describe, it } from 'node:test';
-
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { beforeEach, describe, expect, it } from 'bun:test';
 
 import { AbilityFactory } from '../ability.factory';
 
@@ -19,17 +18,17 @@ describe('AbilityFactory', () => {
   describe('createForUser', () => {
     it('should return an empty rule set when the user has no basePermissionLevel', () => {
       const ability = abilityFactory.createForUser({ username: 'user', password: 'Password123', groups: [] });
-      assert(ability.rules.length === 0);
+      expect(ability.rules).toBeArrayOfSize(0);
     });
 
-    it('should return a rule set with a single rule when the user has a basePermissionLevel of admin', () => {
+    it('should return permission to manage all for an admin', () => {
       const ability = abilityFactory.createForUser({
         username: 'admin',
         password: 'Password123',
         groups: [],
         basePermissionLevel: 'ADMIN'
       });
-      assert.deepStrictEqual(ability.rules, [{ action: 'manage', subject: 'all' }]);
+      expect(ability.rules).toMatchObject([{ action: 'manage', subject: 'all' }]);
     });
   });
 });
