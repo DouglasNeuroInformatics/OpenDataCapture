@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/react';
-import { withThemeByDataAttribute } from '@storybook/addon-styling';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
 
 import '../src/styles.css';
 import i18n from '../src/services/i18n';

@@ -24,7 +24,7 @@
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@douglasneuroinformatics/ajv": "^1.0.0",
-    "@douglasneuroinformatics/ui": "^2.1.0",
+    "@douglasneuroinformatics/ui": "^2.1.1",
     "@douglasneuroinformatics/utils": "1.0.1",
     "@headlessui/react": "^1.7.17",
     "@open-data-capture/demo": "workspace:*",
