@@ -11,6 +11,11 @@ const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig(() => {
   return {
+    optimizeDeps: {
+      esbuildOptions: {
+        jsx: 'automatic'
+      }
+    },
     plugins: [react(), viteCompression()],
     server: {
       port: parseInt(process.env.WEB_DEV_SERVER_PORT ?? '3000'),
