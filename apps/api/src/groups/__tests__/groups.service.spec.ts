@@ -2,16 +2,13 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
 
-import { type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { beforeEach, describe, expect, it } from 'bun:test';
-import { Model } from 'mongoose';
 
 import { GroupEntity } from '../entities/group.entity';
 import { GroupsService } from '../groups.service';
 
 describe('GroupsService', () => {
   let groupsService: GroupsService;
-  let groupModel: MockedInstance<Model<GroupEntity>>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -24,7 +21,6 @@ describe('GroupsService', () => {
       ]
     }).compile();
     groupsService = moduleRef.get(GroupsService);
-    groupModel = moduleRef.get(getModelToken(GroupEntity.modelName));
   });
 
   it('should be defined', () => {

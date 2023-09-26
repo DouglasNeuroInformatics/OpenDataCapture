@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { AjvModule } from '@douglasneuroinformatics/nestjs/modules';
 import type { InstrumentKind } from '@open-data-capture/types';
 import { Schema } from 'mongoose';
 
@@ -16,7 +17,6 @@ import { FormsService } from './services/forms.service';
 import { GroupsModule } from '@/groups/groups.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
-import { AjvModule } from '@douglasneuroinformatics/nestjs/modules';
 
 type InstrumentDiscriminator = {
   name: InstrumentKind;

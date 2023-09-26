@@ -1,9 +1,8 @@
-import assert from 'node:assert/strict';
-import { after, before, describe, it } from 'node:test';
+import { beforeAll, describe, expect, it, afterAll } from 'bun:test';
 
 import { HttpStatus } from '@nestjs/common';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { Test, TestingModule } from '@nestjs/testing';
+import { type NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
 
 import request from 'supertest';
 
@@ -14,12 +13,12 @@ describe('/auth', () => {
   let app: NestExpressApplication;
   let server: any;
 
-  before(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
       imports: [AppModule]
     }).compile();
 
-    app = moduleFixture.createNestApplication({
+    app = moduleRef.createNestApplication({
       logger: false
     });
 
@@ -37,33 +36,33 @@ describe('/auth', () => {
   describe('POST /auth/login', () => {
     it('should reject a request with an empty body', async () => {
       const response = await request(server).post('/auth/login').send();
-      assert.strictEqual(response.status, HttpStatus.BAD_REQUEST);
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST)
     });
     it('should reject a request with a valid username but no password', async () => {
       const response = await request(server).post('/auth/login').send({
         username: 'admin'
       });
-      assert.strictEqual(response.status, HttpStatus.BAD_REQUEST);
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST)
     });
     it('should reject a request that contains an invalid password', async () => {
       const response = await request(server).post('/auth/login').send({
         username: 'admin',
         password: 'foo'
       });
-      assert.strictEqual(response.status, HttpStatus.UNAUTHORIZED);
-      assert.strictEqual(response.body.message, 'Invalid password');
+      expect(response.status).toBe(HttpStatus.UNAUTHORIZED)
+      expect(response.body.message).toMatch('Invalid password')
     });
     it('should return a JSON web token when provided the correct credentials', async () => {
       const response = await request(server).post('/auth/login').send({
         username: 'admin',
         password: 'Password123'
       });
-      assert.strictEqual(response.status, HttpStatus.OK);
-      assert(typeof response.body.accessToken === 'string');
+      expect(response.status).toBe(HttpStatus.OK)
+      expect(typeof response.body.accessToken === 'string').toBeTrue()
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await app.close();
   });
 });

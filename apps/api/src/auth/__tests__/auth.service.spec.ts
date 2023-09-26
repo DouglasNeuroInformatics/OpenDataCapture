@@ -1,23 +1,23 @@
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { createMock, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
-
+import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { beforeEach, describe, expect, it } from 'bun:test';
 
 import { AuthService } from '../auth.service';
+import type { LoginRequestDto } from '../dto/login-request.dto';
+
+import { createLoginRequestStub } from './stubs/login-request.stub';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { UsersService } from '@/users/users.service';
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
-import type { LoginRequestDto } from '../dto/login-request.dto';
-import { createLoginRequestStub } from './stubs/login-request.stub';
+
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let cryptoService: MockedInstance<CryptoService>;
   let usersService: MockedInstance<UsersService>;
 
   beforeEach(async () => {
@@ -49,7 +49,6 @@ describe('AuthService', () => {
       ]
     }).compile();
     authService = moduleRef.get(AuthService);
-    cryptoService = moduleRef.get(CryptoService);
     usersService = moduleRef.get(UsersService);
   });
 

@@ -9,7 +9,9 @@
     "check-types": "tsc",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --watch src/main.ts",
     "format": "prettier --write src",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix src",
+    "test": "bun test src/",
+    "test:e2e": "cross-env NODE_ENV=testing env-cmd -f ../../.env bun test test/"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

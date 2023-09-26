@@ -7,6 +7,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
 import { ExceptionsFilter } from '@douglasneuroinformatics/nestjs/core';
+import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Connection } from 'mongoose';
 
 import { AuthModule } from './auth/auth.module';
@@ -18,7 +19,6 @@ import { InstrumentsModule } from './instruments/instruments.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
-import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 
 @Module({
   imports: [

@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { type AccessibleModel } from '@casl/mongoose';
 import type { FormFields, FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import type { TranslatedForms } from '@open-data-capture/instruments';
 import type { FormInstrument, FormInstrumentSummary, Language } from '@open-data-capture/types';
 import { Model } from 'mongoose';
@@ -16,7 +17,6 @@ import { Model } from 'mongoose';
 import { FormInstrumentEntity } from '../entities/form-instrument.entity';
 import { InstrumentEntity } from '../entities/instrument.entity';
 
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 
 @Injectable()
 export class FormsService {

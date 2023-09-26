@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectModel } from '@nestjs/mongoose';
 
 import { type AccessibleModel } from '@casl/mongoose';
+import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import type { AppAbility, Group, Sex } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 import unidecode from 'unidecode';
@@ -12,7 +13,6 @@ import { type SubjectDocument, SubjectEntity } from './entities/subject.entity';
 
 import { GroupsService } from '@/groups/groups.service';
 
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 
 @Injectable()
 export class SubjectsService {

@@ -58,7 +58,7 @@ export class DemoService {
     for (let i = 0; i < 100; i++) {
       const createSubjectDto = this.getCreateSubjectDto();
       await this.subjectsService.create(createSubjectDto);
-      const group = await this.groupsService.findByName(randomValue(demoGroups)!.name, this.ability);
+      const group = await this.groupsService.findByName(randomValue(demoGroups).name, this.ability);
       await this.createFormRecords(happinessQuestionnaires[0]!, group.name, createSubjectDto);
       await this.createFormRecords(miniMentalStateExaminations[0]!, group.name, createSubjectDto);
       await this.createFormRecords(montrealCognitiveAssessments[0]!, group.name, createSubjectDto);

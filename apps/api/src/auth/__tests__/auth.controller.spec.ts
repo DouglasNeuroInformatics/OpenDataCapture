@@ -1,5 +1,6 @@
 import { Test } from '@nestjs/testing';
 
+import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { beforeEach, describe, expect, it } from 'bun:test';
 
 import { AuthController } from '../auth.controller';
@@ -7,7 +8,6 @@ import { AuthService } from '../auth.service';
 import type { LoginRequestDto } from '../dto/login-request.dto';
 
 import { createLoginRequestStub } from './stubs/login-request.stub';
-import { createMock, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 
 describe('AuthController', () => {
   let authController: AuthController;

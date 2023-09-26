@@ -2,9 +2,9 @@ import { BadRequestException, Injectable, InternalServerErrorException, Logger }
 import type { ArgumentMetadata, PipeTransform } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
+import { AjvService } from '@douglasneuroinformatics/nestjs/modules';
 import type { JSONSchemaType } from 'ajv/dist/types/json-schema';
 
-import { AjvService } from '@douglasneuroinformatics/nestjs/modules';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform {
