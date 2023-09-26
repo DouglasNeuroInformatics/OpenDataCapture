@@ -1,23 +1,18 @@
 import path from 'node:path';
-import url from 'node:url';
 
 import { VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { type NestExpressApplication } from '@nestjs/platform-express';
 
 import { json } from 'express';
 
 import { AppModule } from './app.module';
 import { setupDocs } from './docs';
 
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['error', 'warn', 'debug', 'log', 'verbose'],
-    snapshot: true
+    logger: ['error', 'warn', 'debug', 'log', 'verbose']
   });
 
   app.enableCors();
@@ -27,7 +22,7 @@ async function bootstrap() {
   });
   app.use(json({ limit: '50MB' }));
 
-  app.useStaticAssets(path.resolve(__dirname, '..', 'public'));
+  app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
   setupDocs(app);
 
   const configService = app.get(ConfigService);
