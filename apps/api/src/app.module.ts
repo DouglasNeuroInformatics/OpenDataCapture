@@ -6,22 +6,23 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
+import { ExceptionsFilter } from '@douglasneuroinformatics/nestjs/core';
 import { Connection } from 'mongoose';
 
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
-import { ExceptionFilter } from './core/exception.filter';
 import { LoggerMiddleware } from './core/middleware/logger.middleware';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
-import { CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
+import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 
 @Module({
   imports: [
+    AjvModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true
@@ -75,7 +76,7 @@ import { CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: ExceptionFilter
+      useClass: ExceptionsFilter
     },
     {
       provide: APP_GUARD,
