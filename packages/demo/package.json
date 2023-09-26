@@ -5,5 +5,9 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc",
+    "lint": "eslint --fix src"
   }
 }

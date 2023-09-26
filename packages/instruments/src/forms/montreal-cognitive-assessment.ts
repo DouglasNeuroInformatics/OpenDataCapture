@@ -1,4 +1,4 @@
-import { createTranslatedForms } from '../utils/create-translated-forms.js';
+import { createTranslatedForms } from '../utils/create-translated-forms';
 
 export type MontrealCognitiveAssessmentData = {
   visuospatialExecutive: number;
@@ -9,7 +9,7 @@ export type MontrealCognitiveAssessmentData = {
   delayedRecall: number;
   orientation: number;
   lowEdu: boolean;
-}
+};
 
 export const montrealCognitiveAssessment = createTranslatedForms<MontrealCognitiveAssessmentData>({
   name: 'MontrealCognitiveAssessment',

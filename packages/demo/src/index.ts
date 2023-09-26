@@ -1,4 +1,4 @@
-import { Group, User } from '@open-data-capture/types';
+import type { Group, User } from '@open-data-capture/types';
 
 export type DemoUser = Omit<User, 'groups'> & {
   groupNames: string[];

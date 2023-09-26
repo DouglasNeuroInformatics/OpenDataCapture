@@ -1,4 +1,4 @@
-import { Language } from '@open-data-capture/types';
+import type { Language } from '@open-data-capture/types';
 
 type MultilingualOptions = Record<string, {
     [L in Language]: string;

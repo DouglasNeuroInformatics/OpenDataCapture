@@ -1,4 +1,4 @@
-import { createTranslatedForms } from '../utils/create-translated-forms.js';
+import { createTranslatedForms } from '../utils/create-translated-forms';
 
 export type MiniMentalStateExaminationData = {
   year: number;
@@ -21,7 +21,7 @@ export type MiniMentalStateExaminationData = {
   canFollowWrittenInstructions: number;
   canWriteSentence: number;
   canCopyDesign: number;
-}
+};
 
 export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateExaminationData>({
   name: 'Mini Mental State Examination',
