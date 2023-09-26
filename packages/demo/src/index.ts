@@ -1,7 +1,10 @@
-// @ts-check
+import { Group, User } from '@open-data-capture/types';
 
-/** @type {import('@open-data-capture/types').Group[]} */
-export const demoGroups = [
+export type DemoUser = Omit<User, 'groups'> & {
+  groupNames: string[];
+};
+
+export const demoGroups: Group[] = [
   {
     name: 'Depression Clinic'
   },
@@ -10,8 +13,7 @@ export const demoGroups = [
   }
 ];
 
-/** @type {import('.').DemoUser[]} */
-export const demoUsers = [
+export const demoUsers: DemoUser[] = [
   {
     firstName: 'Jane',
     lastName: 'Doe',
