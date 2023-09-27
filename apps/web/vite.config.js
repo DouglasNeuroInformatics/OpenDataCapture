@@ -12,6 +12,7 @@ const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 export default defineConfig(() => {
   return {
     optimizeDeps: {
+      disabled: false,
       esbuildOptions: {
         jsx: 'automatic'
       }
