@@ -7,10 +7,18 @@ import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
+
 const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig(() => {
   return {
+    css: {
+      postcss: {
+        plugins: [tailwindcss, autoprefixer]
+      }
+    },
     optimizeDeps: {
       disabled: false,
       esbuildOptions: {
