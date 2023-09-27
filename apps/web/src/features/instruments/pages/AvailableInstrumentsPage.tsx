@@ -1,10 +1,9 @@
 import type { FormInstrumentSummary } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
-import { Spinner } from '@douglasneuroinformatics/ui';
 import { InstrumentShowcase } from '../components/InstrumentShowcase';
 
-import { PageHeader } from '@/components';
+import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 
 export const AvailableInstrumentsPage = () => {
