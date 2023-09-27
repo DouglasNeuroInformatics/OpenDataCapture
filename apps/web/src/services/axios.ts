@@ -8,7 +8,7 @@ axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 
 axios.interceptors.request.use((config) => {
   const auth = useAuthStore.getState();
-
+  
   config.headers.setAccept('application/json');
 
   // Do not set timeout for setup (can be CPU intensive, especially on slow server)
