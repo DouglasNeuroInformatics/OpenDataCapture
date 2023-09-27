@@ -9,8 +9,9 @@ RUN bunx turbo run build --filter=@open-data-capture/api
 
 FROM runtime as runner
 WORKDIR /app
-COPY --from=builder /root/apps/api/dist/ .
+COPY --from=builder /root/apps/api/dist/ /app/dist/
+COPY --from=builder /root/apps/api/public/ /app/public/
 RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 USER app
-CMD [ "bun", "main.js" ]
+CMD [ "bun", "./dist/main.js" ]
