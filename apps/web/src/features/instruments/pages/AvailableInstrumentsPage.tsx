@@ -9,11 +9,11 @@ import { useFetch } from '@/hooks/useFetch';
 export const AvailableInstrumentsPage = () => {
   const { data } = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available');
   const { t } = useTranslation();
-  
+
   if (!data) {
-    return <Spinner/>
+    return <Spinner />;
   }
-  
+
   return (
     <div>
       <PageHeader title={t('instruments.availableInstruments.pageTitle')} />
