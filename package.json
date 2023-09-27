@@ -10,9 +10,12 @@
   ],
   "scripts": {
     "build": "env-cmd cross-env NODE_ENV=production turbo run build",
+    "build:api": "env-cmd cross-env NODE_ENV=production turbo run build --filter=@open-data-capture/api",
+    "build:web": "env-cmd cross-env NODE_ENV=production turbo run build --filter=@open-data-capture/web",
     "check-types": "turbo run check-types",
     "clean": "fd -H -I --prune \".turbo|dist|node_modules\" --exec rm -rf",
-    "dev": "env-cmd cross-env NODE_ENV=development turbo run dev",
+    "dev": "bun dev:core",
+    "dev:all": "env-cmd cross-env NODE_ENV=development turbo run dev",
     "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --filter=@open-data-capture/api --filter=@open-data-capture/web",
     "format": "turbo run format",
     "lint": "turbo run lint",
