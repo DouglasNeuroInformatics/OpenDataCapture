@@ -5,7 +5,7 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "tsc && cross-env NODE_ENV=production bunx --bun vite build",
+    "build": "tsc && cross-env NODE_ENV=production bunx vite build",
     "check-types": "tsc",
     "dev": "bunx --bun vite",
     "format": "prettier --write src",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@douglasneuroinformatics/ajv": "^1.0.0",
-    "@douglasneuroinformatics/ui": "^2.1.4",
+    "@douglasneuroinformatics/ui": "^2.1.5",
     "@douglasneuroinformatics/utils": "1.0.1",
     "@headlessui/react": "^1.7.17",
     "@open-data-capture/demo": "workspace:*",

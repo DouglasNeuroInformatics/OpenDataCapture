@@ -19,12 +19,12 @@ export default defineConfig(() => {
         plugins: [tailwindcss, autoprefixer]
       }
     },
-    optimizeDeps: {
-      disabled: false,
-      esbuildOptions: {
-        jsx: 'automatic'
-      }
-    },
+    // Note: This is for bun imports, which are currently broken
+    // optimizeDeps: {
+    //   esbuildOptions: {
+    //     jsx: 'automatic'
+    //   }
+    // },
     plugins: [react(), viteCompression()],
     server: {
       port: parseInt(process.env.WEB_DEV_SERVER_PORT ?? '3000'),

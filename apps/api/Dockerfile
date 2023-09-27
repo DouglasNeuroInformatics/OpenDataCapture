@@ -1,7 +1,7 @@
-FROM oven/bun:1.0 as runtime
+FROM oven/bun:canary as runtime
 
 # COMPILE SOURCE CODE
-FROM oven/bun:1.0 AS builder
+FROM runtime AS builder
 WORKDIR /root
 COPY . .
 RUN bun install --ignore-scripts
