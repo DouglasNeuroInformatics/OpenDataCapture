@@ -3,7 +3,7 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [...config.content, './src/**/*.{js,ts,jsx,tsx}'],
+  content: [...config.content, 'index.html', './src/**/*.{js,ts,jsx,tsx}'],
   presets: [config],
   theme: {
     extend: {
