@@ -11,13 +11,13 @@ import { UsersModule } from '@/users/users.module';
 
 @Module({
   imports: [
+    AbilityModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.getOrThrow<string>('SECRET_KEY')
       })
     }),
-    AbilityModule,
     UsersModule
   ],
   controllers: [AuthController],

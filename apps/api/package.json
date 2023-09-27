@@ -57,6 +57,7 @@
     "@types/passport-jwt": "^3.0.10",
     "@types/supertest": "^2.0.13",
     "@types/unidecode": "^0.1.1",
+    "bun-plugin-swc": "^0.0.1",
     "supertest": "^6.3.3"
   }
 }
