@@ -6,8 +6,7 @@ import { Disclaimer } from '../components/Disclaimer';
 import { GroupSwitcher } from '../components/GroupSwitcher';
 import { StatisticCard } from '../components/StatisticCard';
 
-import { PageHeader } from '@/components';
-import { LoadingFallback } from '@/features/misc/components/LoadingFallback';
+import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -44,17 +43,12 @@ export const OverviewPage = () => {
 
   // If it is the first time loading data
   if (!isAllDataDefined && isAnyLoading) {
-    setTimeout(
-      LoadingFallback, 100
-    );
-    //return <Spinner />;
+    return <Spinner />;
   }
 
   return (
-    <LoadingFallback>
-      {() => (
-        <>
-              <Disclaimer isRequired={import.meta.env.PROD} />
+    <div>
+      <Disclaimer isRequired={import.meta.env.PROD} />
       <PageHeader title={pageTitle} />
       <section>
         <div className="mb-5">
@@ -82,9 +76,7 @@ export const OverviewPage = () => {
           </div>
         </div>
       </section>
-        </>
-      )}
-    </LoadingFallback>
+    </div>
   );
 };
 
