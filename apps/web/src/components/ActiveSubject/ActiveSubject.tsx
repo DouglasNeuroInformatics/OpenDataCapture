@@ -39,14 +39,14 @@ export const ActiveSubject = () => {
             setIsHidden(!isHidden);
           }}
         >
-          <IoMdRemoveCircle />
+          <IoMdRemoveCircle className="w-6 h-6 sm:w-4 sm:h-4"/>
         </button>
         <button
           onClick={() => {
             setActiveSubject(null);
           }}
         >
-          <IoMdCloseCircle />
+          <IoMdCloseCircle className="w-6 h-6 sm:w-4 sm:h-4"/>
         </button>
       </div>
       {isHidden && (
