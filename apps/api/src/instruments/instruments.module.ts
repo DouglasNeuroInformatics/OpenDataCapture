@@ -1,22 +1,22 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { InstrumentKind } from '@open-data-capture/types';
+import { AjvModule } from '@douglasneuroinformatics/nestjs/modules';
+import type { InstrumentKind } from '@open-data-capture/types';
 import { Schema } from 'mongoose';
 
-import { FormRecordsController } from './controllers/form-records.controller.js';
-import { FormsController } from './controllers/forms.controller.js';
-import { FormInstrumentRecordSchema } from './entities/form-instrument-record.entity.js';
-import { FormInstrumentSchema } from './entities/form-instrument.entity.js';
-import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity.js';
-import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity.js';
-import { FormRecordsService } from './services/form-records.service.js';
-import { FormsService } from './services/forms.service.js';
+import { FormRecordsController } from './controllers/form-records.controller';
+import { FormsController } from './controllers/forms.controller';
+import { FormInstrumentRecordSchema } from './entities/form-instrument-record.entity';
+import { FormInstrumentSchema } from './entities/form-instrument.entity';
+import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity';
+import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
+import { FormRecordsService } from './services/form-records.service';
+import { FormsService } from './services/forms.service';
 
-import { AjvModule } from '@/ajv/ajv.module.js';
-import { CryptoModule } from '@/crypto/crypto.module.js';
-import { GroupsModule } from '@/groups/groups.module.js';
-import { SubjectsModule } from '@/subjects/subjects.module.js';
+import { GroupsModule } from '@/groups/groups.module';
+import { SubjectsModule } from '@/subjects/subjects.module';
+
 
 type InstrumentDiscriminator = {
   name: InstrumentKind;
@@ -26,7 +26,6 @@ type InstrumentDiscriminator = {
 @Module({
   imports: [
     AjvModule,
-    CryptoModule,
     GroupsModule,
     MongooseModule.forFeature([
       {

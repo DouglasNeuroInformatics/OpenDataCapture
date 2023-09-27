@@ -1,15 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import type { BasePermissionLevel, User, UserPreferences } from '@open-data-capture/types';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import type { BasePermissionLevel, User } from '@open-data-capture/types';
+import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { UserPreferencesSchema } from './user-preferences.entity.js';
-
-import { GroupEntity } from '@/groups/entities/group.entity.js';
+import { GroupEntity } from '@/groups/entities/group.entity';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class UserEntity implements User {
   static readonly modelName = 'User';
+
+  @Prop({ required: false, type: String })
+  firstName?: string;
+
+  @Prop({ required: false, type: String })
+  lastName?: string;
 
   @Prop({ required: true, unique: true })
   username: string;
@@ -22,21 +26,6 @@ export class UserEntity implements User {
 
   @Prop({ enum: ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] satisfies BasePermissionLevel[], type: String })
   basePermissionLevel?: BasePermissionLevel;
-
-  @Prop({ required: false, type: String })
-  firstName?: string;
-
-  @Prop({ required: false, type: String })
-  lastName?: string;
-
-  @Prop({ required: false, type: UserPreferencesSchema })
-  preferences?: UserPreferences;
-
-  @Prop({ required: true, type: Array })
-  sessions: {
-    ipAddress?: string | null;
-    time: number;
-  }[];
 }
 
 export type UserDocument = HydratedDocument<UserEntity>;

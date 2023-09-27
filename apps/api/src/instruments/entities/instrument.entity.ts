@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { type InstrumentKind } from '@open-data-capture/types';
-import { HydratedDocument } from 'mongoose';
+import { type HydratedDocument } from 'mongoose';
 
-import { BaseInstrumentEntity } from './base-instrument.entity.js';
+import { BaseInstrumentEntity } from './base-instrument.entity';
 
 @Schema({ discriminatorKey: 'kind', strict: false, timestamps: true })
 export class InstrumentEntity implements BaseInstrumentEntity {

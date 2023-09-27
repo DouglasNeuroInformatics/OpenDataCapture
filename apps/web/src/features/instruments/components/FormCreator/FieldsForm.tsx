@@ -1,7 +1,7 @@
 /* eslint-disable no-alert */
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
-import { FormFieldKind, NumericFormField, TextFormField } from '@douglasneuroinformatics/form-types';
+import type { FormFieldKind, NumericFormField, TextFormField } from '@douglasneuroinformatics/form-types';
 import { Form, StepperContext, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 

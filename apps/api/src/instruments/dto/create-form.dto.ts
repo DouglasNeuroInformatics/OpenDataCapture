@@ -6,7 +6,7 @@ import type { JSONSchemaType } from 'ajv';
 import { Type } from 'class-transformer';
 import { IsIn, IsNumber, IsObject, IsPositive, IsString, ValidateNested } from 'class-validator';
 
-import { FormDetailsDto } from './form-details.dto.js';
+import { FormDetailsDto } from './form-details.dto';
 
 export class CreateFormDto implements FormInstrument {
   @ApiProperty()

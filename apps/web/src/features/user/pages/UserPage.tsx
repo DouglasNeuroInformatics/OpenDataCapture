@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { HiUserCircle } from 'react-icons/hi2';
 
 import { useAuthStore } from '@/stores/auth-store';

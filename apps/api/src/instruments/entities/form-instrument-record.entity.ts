@@ -1,8 +1,8 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 
-import { FormInstrumentRecord, Group, Subject } from '@open-data-capture/types';
+import type { FormInstrumentRecord, Group, Subject } from '@open-data-capture/types';
 
-import { FormInstrumentEntity } from './form-instrument.entity.js';
+import { FormInstrumentEntity } from './form-instrument.entity';
 
 export class FormInstrumentRecordEntity implements FormInstrumentRecord {
   kind: 'form';

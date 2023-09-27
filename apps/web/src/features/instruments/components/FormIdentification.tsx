@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
 import { StepperContext, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';

@@ -1,17 +1,15 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { UserEntity, UserSchema } from './entities/user.entity.js';
-import { UsersController } from './users.controller.js';
-import { UsersService } from './users.service.js';
+import { UserEntity, UserSchema } from './entities/user.entity';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
 
-import { AbilityModule } from '@/ability/ability.module.js';
-import { CryptoModule } from '@/crypto/crypto.module.js';
-import { GroupsModule } from '@/groups/groups.module.js';
+import { AbilityModule } from '@/ability/ability.module';
+import { GroupsModule } from '@/groups/groups.module';
 
 @Module({
   imports: [
-    CryptoModule,
     MongooseModule.forFeature([
       {
         name: UserEntity.modelName,

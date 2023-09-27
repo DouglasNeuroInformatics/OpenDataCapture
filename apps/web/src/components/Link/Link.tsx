@@ -1,7 +1,5 @@
-import React from 'react';
-
 import { clsx } from 'clsx';
-import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
+import { Link as RouterLink, type LinkProps as RouterLinkProps } from 'react-router-dom';
 
 export type LinkProps = {
   variant?: 'default' | 'btn-primary' | 'btn-secondary';

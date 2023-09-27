@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { AccessibleModel } from '@casl/mongoose';
+import { type AccessibleModel } from '@casl/mongoose';
 import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { AjvService } from '@douglasneuroinformatics/nestjs/modules';
 import { linearRegression, mean, std } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import type {
@@ -17,16 +18,15 @@ import type {
 } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
-import { CreateFormRecordDto } from '../dto/create-form-record.dto.js';
-import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity.js';
-import { FormInstrumentEntity } from '../entities/form-instrument.entity.js';
-import { InstrumentRecordEntity } from '../entities/instrument-record.entity.js';
+import { CreateFormRecordDto } from '../dto/create-form-record.dto';
+import { FormInstrumentRecordEntity } from '../entities/form-instrument-record.entity';
+import { FormInstrumentEntity } from '../entities/form-instrument.entity';
+import { InstrumentRecordEntity } from '../entities/instrument-record.entity';
 
-import { FormsService } from './forms.service.js';
+import { FormsService } from './forms.service';
 
-import { AjvService } from '@/ajv/ajv.service.js';
-import { GroupsService } from '@/groups/groups.service.js';
-import { SubjectsService } from '@/subjects/subjects.service.js';
+import { GroupsService } from '@/groups/groups.service';
+import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
 export class FormRecordsService {

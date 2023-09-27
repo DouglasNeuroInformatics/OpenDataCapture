@@ -1,3 +1,3 @@
-import { SubjectIdentificationDataDto } from './subject-identification-data.dto.js';
+import { SubjectIdentificationDataDto } from './subject-identification-data.dto';
 
 export class CreateSubjectDto extends SubjectIdentificationDataDto {}

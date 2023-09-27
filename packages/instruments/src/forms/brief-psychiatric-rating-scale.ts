@@ -1,5 +1,5 @@
-import { FormInstrument } from '@open-data-capture/types';
-import { PropertiesSchema } from 'ajv/dist/types/json-schema.js';
+import type { FormInstrument } from '@open-data-capture/types';
+import type { PropertiesSchema } from 'ajv/dist/types/json-schema';
 
 const fields = [
   'somaticConcern',

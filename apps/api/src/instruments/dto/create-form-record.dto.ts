@@ -5,7 +5,7 @@ import type { FormInstrumentRecord, InstrumentKind, SubjectIdentificationData } 
 import { Type } from 'class-transformer';
 import { IsIn, IsNumber, IsObject, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator';
 
-import { SubjectIdentificationDataDto } from '@/subjects/dto/subject-identification-data.dto.js';
+import { SubjectIdentificationDataDto } from '@/subjects/dto/subject-identification-data.dto';
 
 type CreateFormRecordData = {
   groupName?: string;

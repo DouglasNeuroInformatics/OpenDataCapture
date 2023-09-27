@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
-/// <reference types="vitest" />
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
 /// <reference types="vite/client" />
 
 // All of these should be undefined in production
@@ -17,6 +18,7 @@ interface ImportMetaEnv extends ImportMetaDevEnv {
   readonly VITE_GITHUB_REPO_URL: string;
   readonly VITE_CONTACT_EMAIL: string;
   readonly VITE_DOCS_URL: string;
+  readonly VITE_API_BASE_URL: string;
 }
 
 interface ImportMeta {

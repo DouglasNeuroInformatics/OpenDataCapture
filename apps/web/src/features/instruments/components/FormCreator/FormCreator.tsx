@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import { BaseFormField, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
+import type { BaseFormField, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
 import { Stepper } from '@douglasneuroinformatics/ui';
-import { FormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 
-import { FieldsForm, FieldsFormData } from './FieldsForm';
-import { InfoForm, InfoFormData } from './InfoForm';
+import { FieldsForm, type FieldsFormData } from './FieldsForm';
+import { InfoForm, type InfoFormData } from './InfoForm';
 import { Review } from './Review';
 
 export type SimpleFormData = Record<string, PrimitiveFieldValue>;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { SetupState } from '@open-data-capture/types';
+import type { SetupState } from '@open-data-capture/types';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { P, match } from 'ts-pattern';

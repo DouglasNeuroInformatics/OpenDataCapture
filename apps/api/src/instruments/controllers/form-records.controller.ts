@@ -9,11 +9,11 @@ import type {
   SubjectFormRecords
 } from '@open-data-capture/types';
 
-import { CreateFormRecordDto } from '../dto/create-form-record.dto.js';
-import { FormRecordsService } from '../services/form-records.service.js';
+import { CreateFormRecordDto } from '../dto/create-form-record.dto';
+import { FormRecordsService } from '../services/form-records.service';
 
-import { CurrentUser } from '@/core/decorators/current-user.decorator.js';
-import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
+import { CurrentUser } from '@/core/decorators/current-user.decorator';
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 @ApiTags('Instrument Records')
 @Controller('instruments/records/forms')

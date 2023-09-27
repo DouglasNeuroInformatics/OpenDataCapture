@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { AppAction, AppSubject } from '@open-data-capture/types';
+import type { AppAction, AppSubject } from '@open-data-capture/types';
 import axios from 'axios';
 
 import { useAuthStore } from '@/stores/auth-store';

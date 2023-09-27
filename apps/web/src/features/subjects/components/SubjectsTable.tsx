@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { ClientTable, Dropdown, SearchBar } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
-import { InstrumentRecordsExport, Subject } from '@open-data-capture/types';
+import type { InstrumentRecordsExport, Subject } from '@open-data-capture/types';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

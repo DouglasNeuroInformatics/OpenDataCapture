@@ -1,9 +1,9 @@
-import { ExecutionContext, createParamDecorator } from '@nestjs/common';
+import { type ExecutionContext, createParamDecorator } from '@nestjs/common';
 
-import { AppAbility } from '@open-data-capture/types';
-import { Request } from 'express';
+import { type AppAbility } from '@open-data-capture/types';
+import { type Request } from 'express';
 
-import type { UserEntity } from '@/users/entities/user.entity.js';
+import type { UserEntity } from '@/users/entities/user.entity';
 
 export type AppUser = UserEntity & {
   ability: AppAbility;

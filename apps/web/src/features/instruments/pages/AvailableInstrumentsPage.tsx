@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { FormInstrumentSummary } from '@open-data-capture/types';
+import type { FormInstrumentSummary } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentShowcase } from '../components/InstrumentShowcase';

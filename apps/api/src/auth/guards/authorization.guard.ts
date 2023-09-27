@@ -1,10 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { Request } from 'express';
+import type { Request } from 'express';
 import { Observable } from 'rxjs';
 
-import { RouteAccessType } from '@/core/decorators/route-access.decorator.js';
+import type { RouteAccessType } from '@/core/decorators/route-access.decorator';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {

@@ -1,9 +1,9 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@open-data-capture/types';
+import type { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@open-data-capture/types';
 import { useParams } from 'react-router-dom';
 
-import { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
+import type { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
 
 import { Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';

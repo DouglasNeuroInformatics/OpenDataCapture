@@ -1,13 +1,13 @@
 {
   "name": "@open-data-capture/instruments",
-  "version": "0.0.3",
+  "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "build": "tsc",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc",
     "lint": "eslint --fix src"
   }
 }

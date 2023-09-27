@@ -2,14 +2,14 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { AppAbility, SetupState } from '@open-data-capture/types';
+import type { AppAbility, SetupState } from '@open-data-capture/types';
 import mongoose from 'mongoose';
 
-import { DemoService } from './demo.service.js';
-import { CreateAdminDto, SetupDto } from './dto/setup.dto.js';
+import { DemoService } from './demo.service';
+import { CreateAdminDto, SetupDto } from './dto/setup.dto';
 
-import { UserEntity } from '@/users/entities/user.entity.js';
-import { UsersService } from '@/users/users.service.js';
+import { UserEntity } from '@/users/entities/user.entity';
+import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class SetupService {

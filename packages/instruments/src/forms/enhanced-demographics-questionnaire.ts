@@ -1,5 +1,5 @@
-import { createTranslatedForms } from '../utils/create-translated-forms.js';
-import { extractKeys, formatOptions } from '../utils/format-options.js';
+import { createTranslatedForms } from '../utils/create-translated-forms';
+import { extractKeys, formatOptions } from '../utils/format-options';
 
 const employmentStatus = {
   fullTime: {
@@ -576,7 +576,7 @@ type EnhancedDemographicsQuestionnaireData = {
   // Immigration
   isCanadianCitizen?: boolean;
   ageAtImmigration?: number;
-}
+};
 
 export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
   name: 'EnhancedDemographicsQuestionnaire',

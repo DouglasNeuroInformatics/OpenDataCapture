@@ -1,8 +1,6 @@
-import React from 'react';
-
-import { BaseFormField, FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { BaseFormField, FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { Button } from '@douglasneuroinformatics/ui';
-import { FormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 import { Spinner } from '@/components';

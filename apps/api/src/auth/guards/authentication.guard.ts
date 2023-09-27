@@ -1,11 +1,11 @@
-import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
+import { type ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
-import { Request } from 'express';
+import { type Request } from 'express';
 import { Observable } from 'rxjs';
 
-import { RouteAccessType } from '@/core/decorators/route-access.decorator.js';
+import { type RouteAccessType } from '@/core/decorators/route-access.decorator';
 
 /** Allows request to proceed if the route is public or the user provides a valid JWT */
 @Injectable()

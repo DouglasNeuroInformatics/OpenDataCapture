@@ -1,19 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "esModuleInterop": false,
-    "isolatedModules": false,
-    "jsx": "react",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
     "paths": {
       "@/*": ["*"]
     },
-    "resolveJsonModule": true,
-    "typeRoots": ["./src/typings", "./node_modules/@types"]
-  }
+    "resolveJsonModule": true
+  },
+  "include": ["src"]
 }

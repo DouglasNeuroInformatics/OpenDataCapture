@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import type { Sex, Subject } from '@open-data-capture/types';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { GroupEntity } from '@/groups/entities/group.entity.js';
+import { GroupEntity } from '@/groups/entities/group.entity';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class SubjectEntity implements Subject {

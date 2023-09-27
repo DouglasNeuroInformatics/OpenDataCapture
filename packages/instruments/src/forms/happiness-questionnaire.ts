@@ -1,8 +1,8 @@
-import { createTranslatedForms } from '../utils/create-translated-forms.js';
+import { createTranslatedForms } from '../utils/create-translated-forms';
 
 export type HappinessQuestionnaireData = {
   overallHappiness: number;
-}
+};
 
 export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnaireData>({
   name: 'HappinessQuestionnaire',

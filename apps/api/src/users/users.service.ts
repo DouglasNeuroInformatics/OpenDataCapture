@@ -1,16 +1,16 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { AccessibleModel } from '@casl/mongoose';
-import { AppAbility } from '@open-data-capture/types';
+import { type AccessibleModel } from '@casl/mongoose';
+import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { type  AppAbility } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { UserDocument, UserEntity } from './entities/user.entity.js';
+import { CreateUserDto } from './dto/create-user.dto';
+import { type UserDocument, UserEntity } from './entities/user.entity';
 
-import { CryptoService } from '@/crypto/crypto.service.js';
-import { GroupEntity } from '@/groups/entities/group.entity.js';
-import { GroupsService } from '@/groups/groups.service.js';
+import { GroupEntity } from '@/groups/entities/group.entity';
+import { GroupsService } from '@/groups/groups.service';
 
 @Injectable()
 export class UsersService {
@@ -44,7 +44,6 @@ export class UsersService {
       password: hashedPassword,
       groups: groups,
       basePermissionLevel: basePermissionLevel,
-      sessions: [],
       ...rest
     });
   }

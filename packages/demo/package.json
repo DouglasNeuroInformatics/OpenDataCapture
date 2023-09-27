@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
-  "main": "index.js",
-  "types": "index.d.ts"
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc",
+    "lint": "eslint --fix src"
+  }
 }

@@ -1,32 +1,38 @@
-import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
+import type { MiddlewareConsumer, NestModule} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
+import { ExceptionsFilter } from '@douglasneuroinformatics/nestjs/core';
+import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Connection } from 'mongoose';
 
-import { AbilityModule } from './ability/ability.module.js';
-import { AjvModule } from './ajv/ajv.module.js';
-import { AuthModule } from './auth/auth.module.js';
-import { AuthenticationGuard } from './auth/guards/authentication.guard.js';
-import { AuthorizationGuard } from './auth/guards/authorization.guard.js';
-import { ExceptionFilter } from './core/exception.filter.js';
-import { LoggerMiddleware } from './core/middleware/logger.middleware.js';
-import { GroupsModule } from './groups/groups.module.js';
-import { InstrumentsModule } from './instruments/instruments.module.js';
-import { SetupModule } from './setup/setup.module.js';
-import { SubjectsModule } from './subjects/subjects.module.js';
-import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module';
+import { AuthenticationGuard } from './auth/guards/authentication.guard';
+import { AuthorizationGuard } from './auth/guards/authorization.guard';
+import { LoggerMiddleware } from './core/middleware/logger.middleware';
+import { GroupsModule } from './groups/groups.module';
+import { InstrumentsModule } from './instruments/instruments.module';
+import { SetupModule } from './setup/setup.module';
+import { SubjectsModule } from './subjects/subjects.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    AbilityModule,
     AjvModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true
+    }),
+    CryptoModule.registerAsync({
+      isGlobal: true,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secretKey: configService.getOrThrow('SECRET_KEY')
+      })
     }),
     GroupsModule,
     InstrumentsModule,
@@ -70,7 +76,7 @@ import { UsersModule } from './users/users.module.js';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: ExceptionFilter
+      useClass: ExceptionsFilter
     },
     {
       provide: APP_GUARD,

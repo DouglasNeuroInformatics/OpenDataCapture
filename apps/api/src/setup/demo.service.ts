@@ -2,20 +2,20 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 
 import { createMongoAbility } from '@casl/ability';
-import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { type FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
 import * as instruments from '@open-data-capture/instruments';
-import { AppAbility, FormInstrument } from '@open-data-capture/types';
+import type { AppAbility, FormInstrument } from '@open-data-capture/types';
 import mongoose from 'mongoose';
 
-import { GroupsService } from '@/groups/groups.service.js';
-import { FormRecordsService } from '@/instruments/services/form-records.service.js';
-import { FormsService } from '@/instruments/services/forms.service.js';
-import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto.js';
-import { SubjectsService } from '@/subjects/subjects.service.js';
-import { UsersService } from '@/users/users.service.js';
+import { GroupsService } from '@/groups/groups.service';
+import { FormRecordsService } from '@/instruments/services/form-records.service';
+import { FormsService } from '@/instruments/services/forms.service';
+import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
+import { SubjectsService } from '@/subjects/subjects.service';
+import { UsersService } from '@/users/users.service';
 
 faker.seed(123);
 

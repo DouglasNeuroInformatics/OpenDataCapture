@@ -1,12 +1,10 @@
-import React from 'react';
-
 import { Modal } from '@douglasneuroinformatics/ui';
-import { Subject } from '@open-data-capture/types';
+import type { Subject } from '@open-data-capture/types';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { IdentificationForm, IdentificationFormData } from '@/components';
+import { IdentificationForm, type IdentificationFormData } from '@/components';
 
 type SubjectLookupProps = {
   show: boolean;
