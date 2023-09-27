@@ -1,35 +1,17 @@
-FROM node:20.5-alpine AS runtime
-FROM runtime as base
-RUN apk upgrade --no-cache
-RUN apk add --no-cache libc6-compat
-RUN npm install -g turbo
+FROM oven/bun:canary as runtime
 
-# PRUNE SOURCE CODE
-FROM base AS builder
-WORKDIR /app
+# COMPILE SOURCE CODE
+FROM runtime AS builder
+WORKDIR /root
 COPY . .
-RUN turbo prune --scope=@open-data-capture/api --docker
+RUN bun install --ignore-scripts
+RUN bunx turbo run build --filter=@open-data-capture/api
 
-# INSTALL DEPENDENCIES
-FROM base AS installer
+FROM runtime as runner
 WORKDIR /app
-COPY .gitignore .gitignore
-COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm ci
-
-# BUILD THE PROJECT
-COPY --from=builder /app/out/full/ .
-COPY tsconfig.base.json tsconfig.base.json
-COPY turbo.json turbo.json
-RUN turbo run build --filter=@open-data-capture/api
-
-# RUN PRODUCTION IMAGE
-FROM runtime AS runner
-WORKDIR /app
-RUN addgroup --system --gid 1001 nestjs
-RUN adduser --system --uid 1001 nestjs
-USER nestjs
-COPY --from=installer /app .
-
-CMD ["node", "./apps/api/dist/main.js"]
+COPY --from=builder /root/apps/api/dist/ /app/dist/
+COPY --from=builder /root/apps/api/public/ /app/public/
+RUN addgroup --system --gid 1001 app
+RUN adduser --system --uid 1001 app
+USER app
+CMD [ "bun", "./dist/main.js" ]

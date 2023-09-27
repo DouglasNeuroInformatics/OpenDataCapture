@@ -1,35 +1,11 @@
-FROM node:20-alpine AS base
-RUN apk upgrade --no-cache
-RUN apk add --no-cache libc6-compat
-RUN npm install -g turbo
-
-# PRUNE SOURCE CODE
-FROM base AS builder
-WORKDIR /app
+FROM oven/bun:canary AS builder
+WORKDIR /root
 COPY . .
-RUN turbo prune --scope=@open-data-capture/web --docker
+RUN bun install --ignore-scripts
+RUN bunx turbo run build --filter=@open-data-capture/web
 
-# INSTALL DEPENDENCIES
-FROM base AS installer
-WORKDIR /app
-COPY .gitignore .gitignore
-COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm ci
-
-# BUILD THE PROJECT
-ARG VITE_DOCS_URL
-ARG VITE_LICENSE_URL
-ARG VITE_GITHUB_REPO_URL
-ARG VITE_CONTACT_EMAIL
-COPY --from=builder /app/out/full/ .
-COPY tsconfig.base.json tsconfig.base.json
-COPY turbo.json turbo.json
-RUN turbo run build --filter=@open-data-capture/web
-
-# MOUNT STATIC CODE
 FROM caddy:2.7-alpine as runner
 WORKDIR /app
-COPY apps/web/Caddyfile /etc/caddy/Caddyfile
-COPY --from=installer /app/apps/web/dist/ .
+COPY --from=builder /root/apps/web/Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /root/apps/web/dist/ .
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
