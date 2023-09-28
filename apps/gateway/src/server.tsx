@@ -1,6 +1,3 @@
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-
 import type { ComponentType } from 'react';
 import { renderToReadableStream } from 'react-dom/server';
 
