@@ -1,8 +1,13 @@
+import config from '@douglasneuroinformatics/ui/tailwind.config';
+import defaultTheme from 'tailwindcss/defaultTheme';
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  content: [...config.content, './src/**/*.{js,ts,jsx,tsx}'],
+  presets: [config],
   theme: {
-    extend: {}
-  },
-  plugins: []
+    fontFamily: {
+      sans: ['Inter var', ...defaultTheme.fontFamily.sans]
+    }
+  }
 };

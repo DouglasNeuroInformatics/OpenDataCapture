@@ -2,14 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": "src",
-    "experimentalDecorators": true,
-    "jsx": "react",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
     "paths": {
       "@/*": ["*"]
     },
     "types": ["bun-types"]
   },
-  "include": ["src/**/*", "server.ts"]
+  "include": ["src"]
 }
