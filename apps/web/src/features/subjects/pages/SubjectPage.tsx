@@ -30,9 +30,9 @@ export const SubjectPage = () => {
     <div>
       <PageHeader title={`${t('subjectPage.pageTitle')}: ${subjectIdentifier.slice(0, 7)}`} />
       <div className="mb-5 flex">
-        <TabLink label="Overview" pathname={basePathname} />
-        <TabLink label="Records Table" pathname={`${basePathname}/table`} />
-        <TabLink label="Records Graph" pathname={`${basePathname}/graph`} />
+        <TabLink label="Manage" pathname={basePathname} />
+        <TabLink label="Table" pathname={`${basePathname}/table`} />
+        <TabLink label="Graph" pathname={`${basePathname}/graph`} />
       </div>
       <Outlet />
     </div>

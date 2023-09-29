@@ -3,7 +3,7 @@ import { RxBarChart, RxTable } from 'react-icons/rx';
 
 import { VisualizationMode } from '../components/VisualizationMode';
 
-export const SubjectRecordsPage = () => {
+export const SubjectManagementPage = () => {
   const { t } = useTranslation();
 
   return (
@@ -16,4 +16,4 @@ export const SubjectRecordsPage = () => {
   );
 };
 
-export default SubjectRecordsPage;
+export default SubjectManagementPage;
