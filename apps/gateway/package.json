@@ -25,8 +25,6 @@
   "devDependencies": {
     "@types/react": "^18.2.23",
     "@types/react-dom": "^18.2.8",
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.30",
-    "tailwindcss": "^3.3.3"
+    "bun-plugin-tailwindcss": "^0.0.3"
   }
 }
