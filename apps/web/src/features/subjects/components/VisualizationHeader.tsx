@@ -16,7 +16,7 @@ export const VisualizationHeader = () => {
         })}
       </h3>
       {ctx.minTime && (
-        <p className="text-center">
+        <p className="text-sm font-medium">
           {toBasicISOString(new Date(ctx.minTime))} - {toBasicISOString(new Date())}
         </p>
       )}
