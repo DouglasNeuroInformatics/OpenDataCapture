@@ -5,6 +5,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import { Router } from './utils/router';
 
+import tailwindcssPlugin from 'bun-plugin-tailwindcss';
+
 const PROJECT_ROOT = path.resolve(import.meta.dir, '..');
 const PUBLIC_DIR = path.resolve(PROJECT_ROOT, 'public');
 const BUILD_DIR = path.resolve(PROJECT_ROOT, 'dist');
@@ -18,6 +20,7 @@ await Bun.build({
   entrypoints: [path.resolve(import.meta.dir, 'hydrate.tsx'), ...Object.values(srcRouter.routes)],
   minify: true,
   outdir: BUILD_DIR,
+  plugins: [tailwindcssPlugin()],
   target: 'browser',
   splitting: true
 });
