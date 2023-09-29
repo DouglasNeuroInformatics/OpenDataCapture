@@ -10,11 +10,8 @@ import { beforeEach, describe, expect, it } from 'bun:test';
 import { AuthService } from '../auth.service';
 import type { LoginRequestDto } from '../dto/login-request.dto';
 
-import { createLoginRequestStub } from './stubs/login-request.stub';
-
 import { AbilityFactory } from '@/ability/ability.factory';
 import { UsersService } from '@/users/users.service';
-
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -60,7 +57,10 @@ describe('AuthService', () => {
     let loginRequest: LoginRequestDto;
 
     beforeEach(() => {
-      loginRequest = createLoginRequestStub();
+      loginRequest = Object.freeze({
+        username: 'admin',
+        password: 'Password123'
+      });
     });
 
     it('should raise an `UnauthorizedException` if the `UsersService` throws a `NotFoundException', () => {
