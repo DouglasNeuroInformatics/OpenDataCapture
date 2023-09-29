@@ -10,5 +10,5 @@
     "strictPropertyInitialization": false,
     "types": ["bun-types"]
   },
-  "include": ["src", "test"]
+  "include": ["src", "scripts", "test"]
 }
