@@ -250,7 +250,7 @@
       "xLabel": "Date Collected",
       "yLabel": "Value"
     },
-    "pageTitle": "Instrument Records for Subject"
+    "pageTitle": "Subject Identifier: {{id}}"
   },
   "viewSubjects": {
     "lookup": {
