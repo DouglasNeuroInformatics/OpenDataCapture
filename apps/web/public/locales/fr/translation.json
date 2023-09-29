@@ -108,9 +108,6 @@
     "logout": "Se déconnecter",
     "preferences": "Préférences"
   },
-  "visualization": {
-    "selectMode": "Veuillez sélectionner un mode de visualisation"
-  },
   "contact": {
     "message": "Message",
     "pageTitle": "Nous contacter",
