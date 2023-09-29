@@ -6,14 +6,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
-import { ExceptionsFilter } from '@douglasneuroinformatics/nestjs/core';
+import { ExceptionsFilter, LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
 import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Connection } from 'mongoose';
 
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
-import { LoggerMiddleware } from './core/middleware/logger.middleware';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
 import { SetupModule } from './setup/setup.module';
