@@ -235,7 +235,8 @@
   },
   "subjectPage": {
     "visualization": {
-      "defaultTitle": "Please Select an Instrument",
+      "selectedInstrument": "Selected Instrument: {{title}}",
+      "selectedInstrumentNone": "None",
       "instrument": "Instrument",
       "measures": "Measures",
       "timeframe": "Timeframe",

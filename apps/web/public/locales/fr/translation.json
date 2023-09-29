@@ -234,8 +234,9 @@
     "pageTitle": "Ajouter une visite"
   },
   "subjectPage": {
-    "graph": {
-      "defaultTitle": "Veuillez sélectionner un instrument",
+    "visualization": {
+      "selectedInstrumentNone": "Instrument sélectionné : {{title}}",
+      "defaultSelected": "aucun",
       "instrument": "Instrument",
       "measures": "Mesures",
       "timeframe": "Période",
