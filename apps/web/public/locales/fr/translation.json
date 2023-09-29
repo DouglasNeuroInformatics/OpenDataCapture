@@ -250,7 +250,7 @@
       "xLabel": "Date d'enregistrement",
       "yLabel": "Valeur"
     },
-    "pageTitle": "Identifiant du client : {{id}}"
+    "pageTitle": "Dossiers d'instruments pour le client"
   },
   "viewSubjects": {
     "lookup": {
