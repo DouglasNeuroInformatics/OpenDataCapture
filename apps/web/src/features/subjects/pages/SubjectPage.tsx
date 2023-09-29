@@ -5,7 +5,7 @@ import { VisualizationMode } from '../components/VisualizationMode';
 
 import { PageHeader } from '@/components';
 
-export const SelectVisualizationPage = () => {
+export const SubjectPage = () => {
   const { t } = useTranslation();
 
   return (
@@ -19,4 +19,4 @@ export const SelectVisualizationPage = () => {
   );
 };
 
-export default SelectVisualizationPage;
+export default SubjectPage;
