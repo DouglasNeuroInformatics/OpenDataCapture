@@ -234,7 +234,7 @@
     "pageTitle": "Add Visit"
   },
   "subjectPage": {
-    "graph": {
+    "visualization": {
       "defaultTitle": "Please Select an Instrument",
       "instrument": "Instrument",
       "measures": "Measures",

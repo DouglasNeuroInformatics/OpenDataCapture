@@ -15,7 +15,7 @@ export const MeasuresDropdown = () => {
       options={measureOptions}
       selected={selectedMeasures}
       setSelected={setSelectedMeasures}
-      title={t('subjectPage.graph.measures')}
+      title={t('subjectPage.visualization.measures')}
       variant="secondary"
     />
   );

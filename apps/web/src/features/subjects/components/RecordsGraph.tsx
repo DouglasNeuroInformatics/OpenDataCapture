@@ -101,7 +101,7 @@ export const RecordsGraph = () => {
           lines={lines}
           xAxis={{
             key: 'time',
-            label: t('subjectPage.graph.xLabel')
+            label: t('subjectPage.visualization.xLabel')
           }}
         />
       </div>

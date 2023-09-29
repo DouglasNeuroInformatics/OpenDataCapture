@@ -11,7 +11,7 @@ export const VisualizationHeader = () => {
   return (
     <div className="mb-5">
       <h3 className="text-center text-xl font-medium">
-        {ctx.selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
+        {ctx.selectedInstrument?.details.title ?? t('subjectPage.visualization.defaultTitle')}
       </h3>
       {ctx.minTime && (
         <p className="text-center">

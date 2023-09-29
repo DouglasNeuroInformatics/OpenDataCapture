@@ -13,11 +13,11 @@ export const TimeDropdown = () => {
     <Dropdown
       className="text-sm"
       options={{
-        all: t('subjectPage.graph.timeframeOptions.all'),
-        pastYear: t('subjectPage.graph.timeframeOptions.year'),
-        pastMonth: t('subjectPage.graph.timeframeOptions.month')
+        all: t('subjectPage.visualization.timeframeOptions.all'),
+        pastYear: t('subjectPage.visualization.timeframeOptions.year'),
+        pastMonth: t('subjectPage.visualization.timeframeOptions.month')
       }}
-      title={t('subjectPage.graph.timeframe')}
+      title={t('subjectPage.visualization.timeframe')}
       variant="secondary"
       onSelection={(selection) => {
         if (selection === 'pastYear') {
