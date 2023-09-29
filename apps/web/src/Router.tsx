@@ -30,8 +30,8 @@ export const Router = () => {
                 <Route element={<SubjectsModule.AddVisitPage />} path="add-visit" />
                 <Route path="view-subjects">
                   <Route index element={<SubjectsModule.ViewSubjectsPage />} />
-                  <Route path=":subjectIdentifier">
-                    <Route index element={<SubjectsModule.SubjectPage />} />
+                  <Route element={<SubjectsModule.SubjectPage />} path=":subjectIdentifier">
+                    <Route index element={<SubjectsModule.SubjectRecordsPage />} />
                     <Route element={<SubjectsModule.SubjectRecordsGraphPage />} path="graph" />
                     <Route element={<SubjectsModule.SubjectRecordsTablePage />} path="table" />
                   </Route>
