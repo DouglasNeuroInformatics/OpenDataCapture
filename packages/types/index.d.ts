@@ -1,3 +1,4 @@
+export * from './lib/assignment';
 export * from './lib/auth';
 export * from './lib/core';
 export * from './lib/group';

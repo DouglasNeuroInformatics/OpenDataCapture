@@ -2,27 +2,19 @@ import { useState } from 'react';
 
 import { ClientTable, Slider } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
+import type { Assignment } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
-
-type AssignedInstrumentStatus = 'COMPLETE' | 'OUTSTANDING' | 'EXPIRED' | 'CANCELED';
-
-type AssignedInstrument = {
-  title: string;
-  timeAssigned: number;
-  timeExpires: number;
-  status: AssignedInstrumentStatus;
-};
 
 export const SubjectManagementPage = () => {
   const { t } = useTranslation();
-  const [selectedAssignment, setSelectedAssignment] = useState<AssignedInstrument | null>(null);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   return (
     <div>
       <div className="my-5">
         <h3 className="text-lg font-semibold">Assigned Instruments</h3>
       </div>
-      <ClientTable<AssignedInstrument>
+      <ClientTable<Assignment>
         columns={[
           {
             label: 'Title',
