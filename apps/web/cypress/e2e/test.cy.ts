@@ -17,5 +17,9 @@ describe('look at questionaire', () => {
       cy.url().should('include', 'instruments/available')
       cy.wait(2000)
       cy.get('div').contains('Questionnaire').first().click()
+
+      cy.get('button').contains('Begin').click()
+      cy.get('input[name=firstName]').should('include','test')
+      cy.get('input[name=lastName]').should('include','patient')
     })
   })
