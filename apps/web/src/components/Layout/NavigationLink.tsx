@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import type { AppAction, AppSubject } from '@open-data-capture/types';
+import clsx from 'clsx';
 import { NavLink } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';
@@ -41,7 +42,16 @@ export const NavigationLink = ({ href, label, icon, access, onClick }: Navigatio
   }, [currentUser]);
 
   return isAuthorized ? (
-    <NavLink className="flex items-center p-2 text-sm hover:bg-slate-800 md:text-base" to={href} onClick={onClick}>
+    <NavLink
+      className={({ isActive }) =>
+        clsx(
+          'flex items-center p-2 text-sm hover:bg-slate-800 md:text-base',
+          isActive ? 'bg-slate-800 text-slate-200' : 'bg-slate-900 text-slate-300'
+        )
+      }
+      to={href}
+      onClick={onClick}
+    >
       {icon}
       <span className="ml-2">{label}</span>
     </NavLink>
