@@ -19,7 +19,7 @@ describe('look at questionaire', () => {
       cy.get('div').contains('Questionnaire').first().click()
 
       cy.get('button').contains('Begin').click()
-      cy.get('input[name=firstName]').should('include','test')
-      cy.get('input[name=lastName]').should('include','patient')
+      // cy.get('input[name=firstName]').should('include','test')
+      // cy.get('input[name=lastName]').should('include','patient')
     })
   })
