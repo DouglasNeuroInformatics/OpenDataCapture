@@ -21,9 +21,13 @@ process.env.VITE_GITHUB_REPO_URL = process.env.GITHUB_REPO_URL;
  * Recurse through the combined translations and include only the provided locale
  * @param {Record<string, any>} translations
  * @param {string} locale
- * @returns {string}
+ * @returns {Record<string, any>}
  */
-export const transformTranslations = (translations, locale) => {
+const transformTranslations = (translations, locale) => {
+  const isPlainObject = Object.getPrototypeOf(translations) === Object.prototype;
+  if (!isPlainObject) {
+    throw new Error('Invalid format of translations: must be plain object');
+  }
   const result = {};
   for (const key in translations) {
     if (Object.hasOwn(translations[key], locale)) {
@@ -32,10 +36,13 @@ export const transformTranslations = (translations, locale) => {
       result[key] = transformTranslations(translations[key], locale);
     }
   }
-  return JSON.stringify(translations, null, 2);
+  return result;
 };
 
 export default defineConfig({
+  build: {
+    emptyOutDir: false
+  },
   css: {
     postcss: {
       plugins: [tailwindcss, autoprefixer]
@@ -46,17 +53,18 @@ export default defineConfig({
     viteCompression(),
     {
       ...copy({
+        copySync: true,
         targets: [
           {
             src: 'src/translations/*',
-            dest: 'dist/locales',
+            dest: 'dist/locales/en',
             transform: (contents) => {
               const translations = JSON.parse(contents.toString());
-              return transformTranslations(translations, 'en');
+              return JSON.stringify(transformTranslations(translations, 'en'), null, 2);
             }
           }
         ],
-        hook: 'writeBundle'
+        hook: 'buildStart'
       })
     }
   ],
