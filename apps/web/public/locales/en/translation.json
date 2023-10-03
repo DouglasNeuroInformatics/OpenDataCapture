@@ -2,8 +2,38 @@
   "activeSubject": {
     "header": "Active Subject"
   },
+  "addVisit": {
+    "exists": "This subject has already been registered",
+    "pageTitle": "Add Visit"
+  },
+  "basePermissionLevel": {
+    "admin": "Admin",
+    "groupManager": "Group Manager",
+    "standard": "Standard User"
+  },
+  "close": "Close",
+  "contact": {
+    "message": "Message",
+    "pageTitle": "Contact Us",
+    "reason": "Reason",
+    "reasons": {
+      "bug": "Bug Report",
+      "feedback": "Feedback",
+      "other": "Other",
+      "request": "Request"
+    }
+  },
+  "currentGroup": "Current Group",
   "datetime": {
-    "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "days": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
     "months": [
       "January",
       "February",
@@ -19,7 +49,24 @@
       "December"
     ]
   },
+  "demo": {
+    "groups": "Group(s): {{value}}",
+    "info": "Demo Information",
+    "loginCredentials": "Login Credentials",
+    "password": "Password: {{value}}",
+    "role": "Role: {{value}}",
+    "summary": "This demo is intended for testing and showcasing purposes. It features two fictional groups: Depression Clinic and Psychosis Clinic, both filled with several months of simulated example data to highlight data presentation. The database resets daily at 6:00 AM UTC.",
+    "username": "Username: {{value}}",
+    "welcome": "Welcome to the Demo Version of Open Data Capture"
+  },
+  "disclaimer": {
+    "accept": "Accept",
+    "decline": "Decline",
+    "message": "This platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
+    "title": "Disclaimer"
+  },
   "download": "Download",
+  "firstName": "First Name",
   "footer": {
     "contact": "Contact Us",
     "documentation": "Documentation",
@@ -59,65 +106,6 @@
       "label": "Sex"
     },
     "submit": "Submit"
-  },
-  "languages": {
-    "en": "English",
-    "fr": "French"
-  },
-  "password": "Password",
-  "login": "Login",
-  "unauthorizedError": {
-    "message": "Invalid login credentials",
-    "title": "Unauthorized"
-  },
-  "username": "Username",
-  "navLinks": {
-    "addVisit": "Add Visit",
-    "availableInstruments": "View Instruments",
-    "createInstrument": "Add Instrument",
-    "lookupSubject": "Lookup Subject",
-    "manageInstruments": "Manage Instruments",
-    "overview": "Overview",
-    "viewSubjects": "View Subjects"
-  },
-  "notifications": {
-    "types": {
-      "error": "Error",
-      "info": "Info",
-      "success": "Success",
-      "warning": "Warning"
-    }
-  },
-  "organization": {
-    "name": "Douglas Neuroinformatics Platform"
-  },
-  "platform": {
-    "title": "Open Data Capture"
-  },
-  "searchBar": {
-    "placeholder": "Search..."
-  },
-  "selectInstrument": "Please select an instrument",
-  "selectMeasures": "Please select one or more measures",
-  "sex": {
-    "female": "Female",
-    "male": "Male"
-  },
-  "table": "Table",
-  "userDropup": {
-    "logout": "Logout",
-    "preferences": "Preferences"
-  },
-  "contact": {
-    "message": "Message",
-    "pageTitle": "Contact Us",
-    "reason": "Reason",
-    "reasons": {
-      "bug": "Bug Report",
-      "feedback": "Feedback",
-      "other": "Other",
-      "request": "Request"
-    }
   },
   "instruments": {
     "availableInstruments": {
@@ -186,7 +174,6 @@
         "label": "Questions"
       },
       "summary": {
-        "timeCollected": "Time Collected",
         "dateOfBirth": "Date of Birth",
         "download": "Download",
         "instrumentTitle": "Instrument Title",
@@ -197,7 +184,8 @@
         "print": "Print",
         "results": "Results",
         "sex": "Sex",
-        "subject": "Subject"
+        "subject": "Subject",
+        "timeCollected": "Time Collected"
       },
       "uploadSuccessful": "Upload Successful"
     },
@@ -213,32 +201,76 @@
       "pageTitle": "Manage Instruments"
     }
   },
-  "currentGroup": "Current Group",
-  "disclaimer": {
-    "accept": "Accept",
-    "decline": "Decline",
-    "message": "This platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
-    "title": "Disclaimer"
+  "languages": {
+    "en": "English",
+    "fr": "French"
+  },
+  "lastName": "Last Name",
+  "learnMore": "Learn More",
+  "login": "Login",
+  "navLinks": {
+    "addVisit": "Add Visit",
+    "availableInstruments": "View Instruments",
+    "createInstrument": "Add Instrument",
+    "lookupSubject": "Lookup Subject",
+    "manageInstruments": "Manage Instruments",
+    "overview": "Overview",
+    "viewSubjects": "View Subjects"
+  },
+  "networkError": "Network Error",
+  "no": "No",
+  "notifications": {
+    "types": {
+      "error": "Error",
+      "info": "Info",
+      "success": "Success",
+      "warning": "Warning"
+    }
+  },
+  "organization": {
+    "name": "Douglas Neuroinformatics Platform"
   },
   "overview": {
     "pageTitle": "Overview",
+    "summary": "Summary of Available Data",
     "totalInstruments": "Total Instruments",
     "totalRecords": "Total Records",
     "totalSubjects": "Total Subjects",
     "totalUsers": "Total Users",
-    "summary": "Summary of Available Data",
     "welcome": "Welcome Back"
   },
-  "addVisit": {
-    "exists": "This subject has already been registered",
-    "pageTitle": "Add Visit"
+  "password": "Password",
+  "platform": {
+    "title": "Open Data Capture"
+  },
+  "searchBar": {
+    "placeholder": "Search..."
+  },
+  "selectInstrument": "Please select an instrument",
+  "selectMeasures": "Please select one or more measures",
+  "setup": {
+    "admin": {
+      "description": "To use the application, there must be at least one platform administrator. Ensure you remember these credentials, as failure to do so may result in data loss.",
+      "title": "Admin"
+    },
+    "demo": {
+      "description": "If you're testing the platform, you have the option to populate the database with sample data.",
+      "init": "Initialize Demo",
+      "title": "Demo"
+    },
+    "pageTitle": "Setup"
+  },
+  "sex": {
+    "female": "Female",
+    "male": "Male"
   },
   "subjectPage": {
+    "pageTitle": "Instrument Records for Subject",
     "visualization": {
-      "selectedInstrument": "Selected Instrument: {{title}}",
-      "selectedInstrumentNone": "None",
       "instrument": "Instrument",
       "measures": "Measures",
+      "selectedInstrument": "Selected Instrument: {{title}}",
+      "selectedInstrumentNone": "None",
       "timeframe": "Timeframe",
       "timeframeOptions": {
         "all": "All-Time",
@@ -247,9 +279,18 @@
       },
       "xLabel": "Date Collected",
       "yLabel": "Value"
-    },
-    "pageTitle": "Instrument Records for Subject"
+    }
   },
+  "table": "Table",
+  "unauthorizedError": {
+    "message": "Invalid login credentials",
+    "title": "Unauthorized"
+  },
+  "userDropup": {
+    "logout": "Logout",
+    "preferences": "Preferences"
+  },
+  "username": "Username",
   "viewSubjects": {
     "lookup": {
       "title": "Subject Lookup"
@@ -266,38 +307,5 @@
       "filters": "Filters"
     }
   },
-  "setup": {
-    "pageTitle": "Setup",
-    "admin": {
-      "title": "Admin",
-      "description": "To use the application, there must be at least one platform administrator. Ensure you remember these credentials, as failure to do so may result in data loss."
-    },
-    "demo": {
-      "title": "Demo",
-      "description": "If you're testing the platform, you have the option to populate the database with sample data.",
-      "init": "Initialize Demo"
-    }
-  },
-  "yes": "Yes",
-  "no": "No",
-  "demo": {
-    "welcome": "Welcome to the Demo Version of Open Data Capture",
-    "info": "Demo Information",
-    "summary": "This demo is intended for testing and showcasing purposes. It features two fictional groups: Depression Clinic and Psychosis Clinic, both filled with several months of simulated example data to highlight data presentation. The database resets daily at 6:00 AM UTC.",
-    "loginCredentials": "Login Credentials",
-    "username": "Username: {{value}}",
-    "password": "Password: {{value}}",
-    "role": "Role: {{value}}",
-    "groups": "Group(s): {{value}}"
-  },
-  "learnMore": "Learn More",
-  "firstName": "First Name",
-  "lastName": "Last Name",
-  "basePermissionLevel": {
-    "admin": "Admin",
-    "groupManager": "Group Manager",
-    "standard": "Standard User"
-  },
-  "close": "Close",
-  "networkError": "Network Error"
+  "yes": "Yes"
 }

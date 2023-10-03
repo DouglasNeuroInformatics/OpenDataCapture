@@ -2,8 +2,38 @@
   "activeSubject": {
     "header": "Sujet actif"
   },
+  "addVisit": {
+    "exists": "Ce client a déjà été enregistré",
+    "pageTitle": "Ajouter une visite"
+  },
+  "basePermissionLevel": {
+    "admin": "Administrateur",
+    "groupManager": "Responsable de groupe",
+    "standard": "Utilisateur standard"
+  },
+  "close": "Fermer",
+  "contact": {
+    "message": "Message",
+    "pageTitle": "Nous contacter",
+    "reason": "Raison",
+    "reasons": {
+      "bug": "Rapport de bug",
+      "feedback": "Retour d'information",
+      "other": "Autre",
+      "request": "Demande"
+    }
+  },
+  "currentGroup": "Groupe actuel",
   "datetime": {
-    "days": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+    "days": [
+      "Dimanche",
+      "Lundi",
+      "Mardi",
+      "Mercredi",
+      "Jeudi",
+      "Vendredi",
+      "Samedi"
+    ],
     "months": [
       "Janvier",
       "Février",
@@ -19,7 +49,24 @@
       "Décembre"
     ]
   },
+  "demo": {
+    "groups": "Groupe(s) : {{value}}",
+    "info": "Informations sur la démonstration",
+    "loginCredentials": "Identifiants de connexion",
+    "password": "Mot de passe : {{value}}",
+    "role": "Rôle d'utilisateur : {{value}}",
+    "summary": "Cette démo est conçue à des fins de test et de démonstration. Elle présente deux groupes fictifs : Clinique de la Dépression et Clinique de la Psychose, tous deux pourvus de plusieurs mois de données simulées pour illustrer la présentation des données. La base de données est réinitialisée quotidiennement à 6h00 UTC.",
+    "username": "Nom d'utilisateur : {{value}}",
+    "welcome": "Bienvenue sur la version de démonstration de la plateforme Open Data Capture"
+  },
+  "disclaimer": {
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "message": "Cette plateforme n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques.",
+    "title": "Avis"
+  },
   "download": "Télécharger",
+  "firstName": "Prénom",
   "footer": {
     "contact": "Contactez-nous",
     "documentation": "Documentation",
@@ -59,65 +106,6 @@
       "label": "Sexe"
     },
     "submit": "Soumettre"
-  },
-  "languages": {
-    "en": "Anglais",
-    "fr": "Français"
-  },
-  "password": "Mot de passe",
-  "login": "Se connecter",
-  "unauthorizedError": {
-    "message": "Informations d'identification invalides",
-    "title": "Non autorisé"
-  },
-  "username": "Nom d'utilisateur",
-  "navLinks": {
-    "addVisit": "Ajouter une visite",
-    "availableInstruments": "Afficher tous les instruments",
-    "createInstrument": "Ajouter un instrument",
-    "lookupSubject": "Trouver un client",
-    "manageInstruments": "Gérer les instruments",
-    "overview": "Vue d'ensemble",
-    "viewSubjects": "Afficher tous les clients"
-  },
-  "notifications": {
-    "types": {
-      "error": "Erreur",
-      "info": "Attention",
-      "success": "Succès",
-      "warning": "Avertissement"
-    }
-  },
-  "organization": {
-    "name": "Douglas Neuroinformatics Platform"
-  },
-  "platform": {
-    "title": "Open Data Capture"
-  },
-  "searchBar": {
-    "placeholder": "Rechercher..."
-  },
-  "selectInstrument": "Veuillez sélectionner un instrument",
-  "selectMeasures": "Veuillez sélectionner au moins une mesure",
-  "sex": {
-    "female": "Féminin",
-    "male": "Masculin"
-  },
-  "table": "Tableau",
-  "userDropup": {
-    "logout": "Se déconnecter",
-    "preferences": "Préférences"
-  },
-  "contact": {
-    "message": "Message",
-    "pageTitle": "Nous contacter",
-    "reason": "Raison",
-    "reasons": {
-      "bug": "Rapport de bug",
-      "feedback": "Retour d'information",
-      "other": "Autre",
-      "request": "Demande"
-    }
   },
   "instruments": {
     "availableInstruments": {
@@ -186,7 +174,6 @@
         "label": "Questions"
       },
       "summary": {
-        "timeCollected": "Horodatage",
         "dateOfBirth": "Date de naissance",
         "download": "Télécharger",
         "instrumentTitle": "Titre de l'instrument",
@@ -197,7 +184,8 @@
         "print": "Imprimer",
         "results": "Résultats",
         "sex": "Sexe",
-        "subject": "Client"
+        "subject": "Client",
+        "timeCollected": "Horodatage"
       },
       "uploadSuccessful": "Téléchargement réussi"
     },
@@ -213,32 +201,76 @@
       "pageTitle": "Gérer les instruments"
     }
   },
-  "currentGroup": "Groupe actuel",
-  "disclaimer": {
-    "accept": "Accepter",
-    "decline": "Refuser",
-    "message": "Cette plateforme n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques.",
-    "title": "Avis"
+  "languages": {
+    "en": "Anglais",
+    "fr": "Français"
+  },
+  "lastName": "Nom",
+  "learnMore": "En savoir plus",
+  "login": "Se connecter",
+  "navLinks": {
+    "addVisit": "Ajouter une visite",
+    "availableInstruments": "Afficher tous les instruments",
+    "createInstrument": "Ajouter un instrument",
+    "lookupSubject": "Trouver un client",
+    "manageInstruments": "Gérer les instruments",
+    "overview": "Vue d'ensemble",
+    "viewSubjects": "Afficher tous les clients"
+  },
+  "networkError": "Erreur de réseau",
+  "no": "Non",
+  "notifications": {
+    "types": {
+      "error": "Erreur",
+      "info": "Attention",
+      "success": "Succès",
+      "warning": "Avertissement"
+    }
+  },
+  "organization": {
+    "name": "Douglas Neuroinformatics Platform"
   },
   "overview": {
     "pageTitle": "Vue d'ensemble",
+    "summary": "Résumé des données disponibles",
     "totalInstruments": "Nombre d'instruments",
     "totalRecords": "Nombre d'enregistrements",
     "totalSubjects": "Nombre de clients",
     "totalUsers": "Nombre d'utilisateurs",
-    "summary": "Résumé des données disponibles",
     "welcome": "Bienvenue"
   },
-  "addVisit": {
-    "exists": "Ce client a déjà été enregistré",
-    "pageTitle": "Ajouter une visite"
+  "password": "Mot de passe",
+  "platform": {
+    "title": "Open Data Capture"
+  },
+  "searchBar": {
+    "placeholder": "Rechercher..."
+  },
+  "selectInstrument": "Veuillez sélectionner un instrument",
+  "selectMeasures": "Veuillez sélectionner au moins une mesure",
+  "setup": {
+    "admin": {
+      "description": "Pour utiliser l'application, il faut qu'il y ait au moins un administrateur. Assurez-vous de vous souvenir de ces informations d'identification, faute de quoi vous risquez de perdre des données.",
+      "title": "Administrateur"
+    },
+    "demo": {
+      "description": "Si vous testez la plateforme, vous avez la possibilité d'alimenter la base de données avec des échantillons de données.",
+      "init": "Initialiser la démonstration",
+      "title": "Démonstration"
+    },
+    "pageTitle": "Mise en service"
+  },
+  "sex": {
+    "female": "Féminin",
+    "male": "Masculin"
   },
   "subjectPage": {
+    "pageTitle": "Dossiers d'instruments pour le client",
     "visualization": {
-      "selectedInstrument": "Instrument sélectionné : {{title}}",
-      "selectedInstrumentNone": "aucun",
       "instrument": "Instrument",
       "measures": "Mesures",
+      "selectedInstrument": "Instrument sélectionné : {{title}}",
+      "selectedInstrumentNone": "aucun",
       "timeframe": "Période",
       "timeframeOptions": {
         "all": "Toujours",
@@ -247,9 +279,18 @@
       },
       "xLabel": "Date d'enregistrement",
       "yLabel": "Valeur"
-    },
-    "pageTitle": "Dossiers d'instruments pour le client"
+    }
   },
+  "table": "Tableau",
+  "unauthorizedError": {
+    "message": "Informations d'identification invalides",
+    "title": "Non autorisé"
+  },
+  "userDropup": {
+    "logout": "Se déconnecter",
+    "preferences": "Préférences"
+  },
+  "username": "Nom d'utilisateur",
   "viewSubjects": {
     "lookup": {
       "title": "Trouver un client"
@@ -266,38 +307,5 @@
       "filters": "Filtres"
     }
   },
-  "setup": {
-    "pageTitle": "Mise en service",
-    "admin": {
-      "title": "Administrateur",
-      "description": "Pour utiliser l'application, il faut qu'il y ait au moins un administrateur. Assurez-vous de vous souvenir de ces informations d'identification, faute de quoi vous risquez de perdre des données."
-    },
-    "demo": {
-      "title": "Démonstration",
-      "description": "Si vous testez la plateforme, vous avez la possibilité d'alimenter la base de données avec des échantillons de données.",
-      "init": "Initialiser la démonstration"
-    }
-  },
-  "yes": "Oui",
-  "no": "Non",
-  "demo": {
-    "welcome": "Bienvenue sur la version de démonstration de la plateforme Open Data Capture",
-    "info": "Informations sur la démonstration",
-    "summary": "Cette démo est conçue à des fins de test et de démonstration. Elle présente deux groupes fictifs : Clinique de la Dépression et Clinique de la Psychose, tous deux pourvus de plusieurs mois de données simulées pour illustrer la présentation des données. La base de données est réinitialisée quotidiennement à 6h00 UTC.",
-    "loginCredentials": "Identifiants de connexion",
-    "username": "Nom d'utilisateur : {{value}}",
-    "password": "Mot de passe : {{value}}",
-    "role": "Rôle d'utilisateur : {{value}}",
-    "groups": "Groupe(s) : {{value}}"
-  },
-  "learnMore": "En savoir plus",
-  "firstName": "Prénom",
-  "lastName": "Nom",
-  "basePermissionLevel": {
-    "admin": "Administrateur",
-    "groupManager": "Responsable de groupe",
-    "standard": "Utilisateur standard"
-  },
-  "close": "Fermer",
-  "networkError": "Erreur de réseau"
+  "yes": "Oui"
 }
