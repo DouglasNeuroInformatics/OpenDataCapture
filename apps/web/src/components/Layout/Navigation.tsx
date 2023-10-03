@@ -13,7 +13,7 @@ export const Navigation = (props: NavigationProps) => {
   const { t } = useTranslation();
 
   return (
-    <nav>
+    <nav className="flex-grow">
       <NavigationLink access={null} href="/overview" icon={<HiChartBar />} label={t('navLinks.overview')} {...props} />
       <NavigationLink
         access={{ action: 'create', subject: 'Subject' }}

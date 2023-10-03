@@ -45,8 +45,10 @@ export const NavigationLink = ({ href, label, icon, access, onClick }: Navigatio
     <NavLink
       className={({ isActive }) =>
         clsx(
-          'flex items-center p-2 text-sm hover:bg-slate-800 md:text-base',
-          isActive ? 'bg-slate-800 text-slate-200' : 'bg-slate-900 text-slate-300'
+          'flex items-center p-2 hover:bg-slate-200 dark:hover:bg-slate-700 md:text-base md:hover:bg-slate-800',
+          isActive
+            ? 'bg-slate-200 dark:bg-slate-700 md:bg-slate-800 md:text-slate-200'
+            : 'md:bg-slate-900 md:text-slate-300'
         )
       }
       to={href}

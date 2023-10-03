@@ -4,13 +4,17 @@ import path from 'path';
 import url from 'url';
 
 import react from '@vitejs/plugin-react-swc';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
-import autoprefixer from 'autoprefixer';
-import tailwindcss from 'tailwindcss';
-
 const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
+
+// Until import meta env (external package) is setup
+process.env.VITE_DOCS_URL = process.env.DOCS_URL;
+process.env.VITE_LICENSE_URL = process.env.LICENSE_URL;
+process.env.VITE_GITHUB_REPO_URL = process.env.GITHUB_REPO_URL;
 
 export default defineConfig(() => {
   return {
