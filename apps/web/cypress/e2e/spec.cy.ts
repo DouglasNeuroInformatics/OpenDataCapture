@@ -35,7 +35,5 @@ describe('tags test', () => {
     cy.get('[data-cy="instrument-card"]').first().contains('Tags: Demographics')
 
 
-
-
   })
 })
