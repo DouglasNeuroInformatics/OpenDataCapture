@@ -1,0 +1,808 @@
+{
+  "activeSubject": {
+    "header": {
+      "en": "Active Subject",
+      "fr": "Sujet actif"
+    }
+  },
+  "addVisit": {
+    "exists": {
+      "en": "This subject has already been registered",
+      "fr": "Ce client a déjà été enregistré"
+    },
+    "pageTitle": {
+      "en": "Add Visit",
+      "fr": "Ajouter une visite"
+    }
+  },
+  "basePermissionLevel": {
+    "admin": {
+      "en": "Admin",
+      "fr": "Administrateur"
+    },
+    "groupManager": {
+      "en": "Group Manager",
+      "fr": "Responsable de groupe"
+    },
+    "standard": {
+      "en": "Standard User",
+      "fr": "Utilisateur standard"
+    }
+  },
+  "close": {
+    "en": "Close",
+    "fr": "Fermer"
+  },
+  "contact": {
+    "message": {
+      "en": "Message",
+      "fr": "Message"
+    },
+    "pageTitle": {
+      "en": "Contact Us",
+      "fr": "Nous contacter"
+    },
+    "reason": {
+      "en": "Reason",
+      "fr": "Raison"
+    },
+    "reasons": {
+      "bug": {
+        "en": "Bug Report",
+        "fr": "Rapport de bug"
+      },
+      "feedback": {
+        "en": "Feedback",
+        "fr": "Retour d'information"
+      },
+      "other": {
+        "en": "Other",
+        "fr": "Autre"
+      },
+      "request": {
+        "en": "Request",
+        "fr": "Demande"
+      }
+    }
+  },
+  "currentGroup": {
+    "en": "Current Group",
+    "fr": "Groupe actuel"
+  },
+  "datetime": {
+    "days": {
+      "en": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "fr": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+    },
+    "months": {
+      "en": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "fr": [
+        "Janvier",
+        "Février",
+        "Mars",
+        "Avril",
+        "Mai",
+        "Juin",
+        "Juillet",
+        "Août",
+        "Septembre",
+        "Octobre",
+        "Novembre",
+        "Décembre"
+      ]
+    }
+  },
+  "demo": {
+    "groups": {
+      "en": "Group(s): {{value}}",
+      "fr": "Groupe(s) : {{value}}"
+    },
+    "info": {
+      "en": "Demo Information",
+      "fr": "Informations sur la démonstration"
+    },
+    "loginCredentials": {
+      "en": "Login Credentials",
+      "fr": "Identifiants de connexion"
+    },
+    "password": {
+      "en": "Password: {{value}}",
+      "fr": "Mot de passe : {{value}}"
+    },
+    "role": {
+      "en": "Role: {{value}}",
+      "fr": "Rôle d'utilisateur : {{value}}"
+    },
+    "summary": {
+      "en": "This demo is intended for testing and showcasing purposes. It features two fictional groups: Depression Clinic and Psychosis Clinic, both filled with several months of simulated example data to highlight data presentation. The database resets daily at 6:00 AM UTC.",
+      "fr": "Cette démo est conçue à des fins de test et de démonstration. Elle présente deux groupes fictifs : Clinique de la Dépression et Clinique de la Psychose, tous deux pourvus de plusieurs mois de données simulées pour illustrer la présentation des données. La base de données est réinitialisée quotidiennement à 6h00 UTC."
+    },
+    "username": {
+      "en": "Username: {{value}}",
+      "fr": "Nom d'utilisateur : {{value}}"
+    },
+    "welcome": {
+      "en": "Welcome to the Demo Version of Open Data Capture",
+      "fr": "Bienvenue sur la version de démonstration de la plateforme Open Data Capture"
+    }
+  },
+  "disclaimer": {
+    "accept": {
+      "en": "Accept",
+      "fr": "Accepter"
+    },
+    "decline": {
+      "en": "Decline",
+      "fr": "Refuser"
+    },
+    "message": {
+      "en": "This platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
+      "fr": "Cette plateforme n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques."
+    },
+    "title": {
+      "en": "Disclaimer",
+      "fr": "Avis"
+    }
+  },
+  "download": {
+    "en": "Download",
+    "fr": "Télécharger"
+  },
+  "firstName": {
+    "en": "First Name",
+    "fr": "Prénom"
+  },
+  "footer": {
+    "contact": {
+      "en": "Contact Us",
+      "fr": "Contactez-nous"
+    },
+    "documentation": {
+      "en": "Documentation",
+      "fr": "Documentation"
+    },
+    "license": {
+      "en": "License",
+      "fr": "Licence"
+    },
+    "sourceCode": {
+      "en": "Source Code",
+      "fr": "Code source"
+    }
+  },
+  "form": {
+    "errors": {
+      "required": {
+        "en": "This field is required",
+        "fr": "Ce champ est obligatoire"
+      }
+    },
+    "radio": {
+      "labels": {
+        "false": {
+          "en": "False",
+          "fr": "Faux"
+        },
+        "true": {
+          "en": "True",
+          "fr": "Vrai"
+        }
+      }
+    },
+    "reset": {
+      "en": "Clear",
+      "fr": "Réinitialiser"
+    },
+    "submit": {
+      "en": "Submit",
+      "fr": "Soumettre"
+    }
+  },
+  "graph": {
+    "en": "Graph",
+    "fr": "Graphique"
+  },
+  "groupTrend": {
+    "en": "Group Trend",
+    "fr": "Tendance du groupe"
+  },
+  "identificationForm": {
+    "dateOfBirth": {
+      "label": {
+        "en": "Date of Birth",
+        "fr": "Date de naissance"
+      }
+    },
+    "firstName": {
+      "description": {
+        "en": "The subject's first name, as provided by their birth certificate",
+        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance"
+      },
+      "label": {
+        "en": "First Name",
+        "fr": "Prénom"
+      }
+    },
+    "lastName": {
+      "description": {
+        "en": "The subject's last name, as provided by their birth certificate",
+        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance"
+      },
+      "label": {
+        "en": "Last Name",
+        "fr": "Nom de famille"
+      }
+    },
+    "notFound": {
+      "en": "Not Found",
+      "fr": "Pas trouvé"
+    },
+    "sex": {
+      "description": {
+        "en": "The subject's biological sex, as assigned at birth",
+        "fr": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance"
+      },
+      "label": {
+        "en": "Sex",
+        "fr": "Sexe"
+      }
+    },
+    "submit": {
+      "en": "Submit",
+      "fr": "Soumettre"
+    }
+  },
+  "instruments": {
+    "availableInstruments": {
+      "filters": {
+        "language": {
+          "en": "Language",
+          "fr": "Langue"
+        },
+        "tags": {
+          "en": "Tags",
+          "fr": "Tags"
+        }
+      },
+      "pageTitle": {
+        "en": "View Instruments",
+        "fr": "Tous les instruments"
+      }
+    },
+    "createInstrument": {
+      "errors": {
+        "duplicateField": {
+          "en": "Invalid duplicate field name",
+          "fr": "Nom de champ en double invalide"
+        },
+        "invalidOptionFormat": {
+          "en": "Invalid format for option",
+          "fr": "Format non valide pour l'option"
+        }
+      },
+      "form": {
+        "basics": {
+          "en": "Basics",
+          "fr": "De base"
+        },
+        "description": {
+          "label": {
+            "en": "Description",
+            "fr": "Description"
+          }
+        },
+        "details": {
+          "en": "Details",
+          "fr": "Détails"
+        },
+        "estimatedDuration": {
+          "label": {
+            "en": "Estimated Duration",
+            "fr": "Durée prévue"
+          }
+        },
+        "instructions": {
+          "label": {
+            "en": "Instructions",
+            "fr": "Instructions"
+          }
+        },
+        "language": {
+          "label": {
+            "en": "Language",
+            "fr": "Langue"
+          }
+        },
+        "name": {
+          "label": {
+            "en": "Name",
+            "fr": "Nom"
+          }
+        },
+        "tags": {
+          "label": {
+            "en": "Tags",
+            "fr": "Tags"
+          }
+        },
+        "title": {
+          "label": {
+            "en": "Title",
+            "fr": "Titre"
+          }
+        },
+        "version": {
+          "label": {
+            "en": "Version",
+            "fr": "Version"
+          }
+        }
+      },
+      "pageTitle": {
+        "en": "Add Instrument",
+        "fr": "Ajouter un instrument"
+      },
+      "steps": {
+        "fields": {
+          "en": "Fields",
+          "fr": "Champs"
+        },
+        "info": {
+          "en": "Info",
+          "fr": "Info"
+        },
+        "review": {
+          "en": "Review",
+          "fr": "Révision"
+        }
+      }
+    },
+    "fetchInstrument": {
+      "notFound": {
+        "en": "This instrument does not exist in English",
+        "fr": "Cet instrument n'existe pas en français"
+      }
+    },
+    "formPage": {
+      "identification": {
+        "label": {
+          "en": "Identification",
+          "fr": "Identification"
+        }
+      },
+      "overview": {
+        "begin": {
+          "en": "Begin",
+          "fr": "Commencer"
+        },
+        "description": {
+          "en": "Description",
+          "fr": "Description"
+        },
+        "estimated Duration": {
+          "en": "Estimated Duration",
+          "fr": "Durée estimée"
+        },
+        "instructions": {
+          "en": "Instructions",
+          "fr": "Instructions"
+        },
+        "label": {
+          "en": "Overview",
+          "fr": "Aperçu"
+        },
+        "language": {
+          "en": "Language",
+          "fr": "Langue"
+        }
+      },
+      "questions": {
+        "label": {
+          "en": "Questions",
+          "fr": "Questions"
+        }
+      },
+      "summary": {
+        "dateOfBirth": {
+          "en": "Date of Birth",
+          "fr": "Date de naissance"
+        },
+        "download": {
+          "en": "Download",
+          "fr": "Télécharger"
+        },
+        "instrumentTitle": {
+          "en": "Instrument Title",
+          "fr": "Titre de l'instrument"
+        },
+        "instrumentVersion": {
+          "en": "Instrument Version",
+          "fr": "Version de l'instrument"
+        },
+        "label": {
+          "en": "Summary",
+          "fr": "Résumé"
+        },
+        "metadata": {
+          "en": "Metadata",
+          "fr": "Métadonnées"
+        },
+        "name": {
+          "en": "Name",
+          "fr": "Nom"
+        },
+        "print": {
+          "en": "Print",
+          "fr": "Imprimer"
+        },
+        "results": {
+          "en": "Results",
+          "fr": "Résultats"
+        },
+        "sex": {
+          "en": "Sex",
+          "fr": "Sexe"
+        },
+        "subject": {
+          "en": "Subject",
+          "fr": "Client"
+        },
+        "timeCollected": {
+          "en": "Time Collected",
+          "fr": "Horodatage"
+        }
+      },
+      "uploadSuccessful": {
+        "en": "Upload Successful",
+        "fr": "Téléchargement réussi"
+      }
+    },
+    "manageInstruments": {
+      "deleteModal": {
+        "cancel": {
+          "en": "Cancel",
+          "fr": "Annuler"
+        },
+        "delete": {
+          "en": "Delete",
+          "fr": "Effacer"
+        },
+        "language": {
+          "en": "Language",
+          "fr": "Langue"
+        },
+        "name": {
+          "en": "Name",
+          "fr": "Nom"
+        },
+        "title": {
+          "en": "Confirmation",
+          "fr": "Confirmation de l'effacement"
+        },
+        "version": {
+          "en": "Version",
+          "fr": "Version"
+        }
+      },
+      "pageTitle": {
+        "en": "Manage Instruments",
+        "fr": "Gérer les instruments"
+      }
+    }
+  },
+  "languages": {
+    "en": {
+      "en": "English",
+      "fr": "Anglais"
+    },
+    "fr": {
+      "en": "French",
+      "fr": "Français"
+    }
+  },
+  "lastName": {
+    "en": "Last Name",
+    "fr": "Nom"
+  },
+  "learnMore": {
+    "en": "Learn More",
+    "fr": "En savoir plus"
+  },
+  "login": {
+    "en": "Login",
+    "fr": "Se connecter"
+  },
+  "navLinks": {
+    "addVisit": {
+      "en": "Add Visit",
+      "fr": "Ajouter une visite"
+    },
+    "availableInstruments": {
+      "en": "View Instruments",
+      "fr": "Afficher tous les instruments"
+    },
+    "createInstrument": {
+      "en": "Add Instrument",
+      "fr": "Ajouter un instrument"
+    },
+    "lookupSubject": {
+      "en": "Lookup Subject",
+      "fr": "Trouver un client"
+    },
+    "manageInstruments": {
+      "en": "Manage Instruments",
+      "fr": "Gérer les instruments"
+    },
+    "overview": {
+      "en": "Overview",
+      "fr": "Vue d'ensemble"
+    },
+    "viewSubjects": {
+      "en": "View Subjects",
+      "fr": "Afficher tous les clients"
+    }
+  },
+  "networkError": {
+    "en": "Network Error",
+    "fr": "Erreur de réseau"
+  },
+  "no": {
+    "en": "No",
+    "fr": "Non"
+  },
+  "notifications": {
+    "types": {
+      "error": {
+        "en": "Error",
+        "fr": "Erreur"
+      },
+      "info": {
+        "en": "Info",
+        "fr": "Attention"
+      },
+      "success": {
+        "en": "Success",
+        "fr": "Succès"
+      },
+      "warning": {
+        "en": "Warning",
+        "fr": "Avertissement"
+      }
+    }
+  },
+  "organization": {
+    "name": {
+      "en": "Douglas Neuroinformatics Platform",
+      "fr": "Douglas Neuroinformatics Platform"
+    }
+  },
+  "overview": {
+    "pageTitle": {
+      "en": "Overview",
+      "fr": "Vue d'ensemble"
+    },
+    "summary": {
+      "en": "Summary of Available Data",
+      "fr": "Résumé des données disponibles"
+    },
+    "totalInstruments": {
+      "en": "Total Instruments",
+      "fr": "Nombre d'instruments"
+    },
+    "totalRecords": {
+      "en": "Total Records",
+      "fr": "Nombre d'enregistrements"
+    },
+    "totalSubjects": {
+      "en": "Total Subjects",
+      "fr": "Nombre de clients"
+    },
+    "totalUsers": {
+      "en": "Total Users",
+      "fr": "Nombre d'utilisateurs"
+    },
+    "welcome": {
+      "en": "Welcome Back",
+      "fr": "Bienvenue"
+    }
+  },
+  "password": {
+    "en": "Password",
+    "fr": "Mot de passe"
+  },
+  "platform": {
+    "title": {
+      "en": "Open Data Capture",
+      "fr": "Open Data Capture"
+    }
+  },
+  "searchBar": {
+    "placeholder": {
+      "en": "Search...",
+      "fr": "Rechercher..."
+    }
+  },
+  "selectInstrument": {
+    "en": "Please select an instrument",
+    "fr": "Veuillez sélectionner un instrument"
+  },
+  "selectMeasures": {
+    "en": "Please select one or more measures",
+    "fr": "Veuillez sélectionner au moins une mesure"
+  },
+  "setup": {
+    "admin": {
+      "description": {
+        "en": "To use the application, there must be at least one platform administrator. Ensure you remember these credentials, as failure to do so may result in data loss.",
+        "fr": "Pour utiliser l'application, il faut qu'il y ait au moins un administrateur. Assurez-vous de vous souvenir de ces informations d'identification, faute de quoi vous risquez de perdre des données."
+      },
+      "title": {
+        "en": "Admin",
+        "fr": "Administrateur"
+      }
+    },
+    "demo": {
+      "description": {
+        "en": "If you're testing the platform, you have the option to populate the database with sample data.",
+        "fr": "Si vous testez la plateforme, vous avez la possibilité d'alimenter la base de données avec des échantillons de données."
+      },
+      "init": {
+        "en": "Initialize Demo",
+        "fr": "Initialiser la démonstration"
+      },
+      "title": {
+        "en": "Demo",
+        "fr": "Démonstration"
+      }
+    },
+    "pageTitle": {
+      "en": "Setup",
+      "fr": "Mise en service"
+    }
+  },
+  "sex": {
+    "female": {
+      "en": "Female",
+      "fr": "Féminin"
+    },
+    "male": {
+      "en": "Male",
+      "fr": "Masculin"
+    }
+  },
+  "subjectPage": {
+    "pageTitle": {
+      "en": "Instrument Records for Subject",
+      "fr": "Dossiers d'instruments pour le client"
+    },
+    "visualization": {
+      "instrument": {
+        "en": "Instrument",
+        "fr": "Instrument"
+      },
+      "measures": {
+        "en": "Measures",
+        "fr": "Mesures"
+      },
+      "selectedInstrument": {
+        "en": "Selected Instrument: {{title}}",
+        "fr": "Instrument sélectionné : {{title}}"
+      },
+      "selectedInstrumentNone": {
+        "en": "None",
+        "fr": "aucun"
+      },
+      "timeframe": {
+        "en": "Timeframe",
+        "fr": "Période"
+      },
+      "timeframeOptions": {
+        "all": {
+          "en": "All-Time",
+          "fr": "Toujours"
+        },
+        "month": {
+          "en": "Past Month",
+          "fr": "Mois écoulé"
+        },
+        "year": {
+          "en": "Past Year",
+          "fr": "Année écoulée"
+        }
+      },
+      "xLabel": {
+        "en": "Date Collected",
+        "fr": "Date d'enregistrement"
+      },
+      "yLabel": {
+        "en": "Value",
+        "fr": "Valeur"
+      }
+    }
+  },
+  "table": {
+    "en": "Table",
+    "fr": "Tableau"
+  },
+  "unauthorizedError": {
+    "message": {
+      "en": "Invalid login credentials",
+      "fr": "Informations d'identification invalides"
+    },
+    "title": {
+      "en": "Unauthorized",
+      "fr": "Non autorisé"
+    }
+  },
+  "userDropup": {
+    "logout": {
+      "en": "Logout",
+      "fr": "Se déconnecter"
+    },
+    "preferences": {
+      "en": "Preferences",
+      "fr": "Préférences"
+    }
+  },
+  "username": {
+    "en": "Username",
+    "fr": "Nom d'utilisateur"
+  },
+  "viewSubjects": {
+    "lookup": {
+      "title": {
+        "en": "Subject Lookup",
+        "fr": "Trouver un client"
+      }
+    },
+    "pageTitle": {
+      "en": "View Subjects",
+      "fr": "Tous les clients"
+    },
+    "table": {
+      "columns": {
+        "dateOfBirth": {
+          "en": "Date of Birth",
+          "fr": "Date de naissance"
+        },
+        "sex": {
+          "en": "Sex",
+          "fr": "Sexe"
+        },
+        "subject": {
+          "en": "Subject",
+          "fr": "Client"
+        }
+      },
+      "export": {
+        "en": "Export",
+        "fr": "Exporter"
+      },
+      "exportHelpText": {
+        "en": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
+        "fr": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants."
+      },
+      "filters": {
+        "en": "Filters",
+        "fr": "Filtres"
+      }
+    }
+  },
+  "yes": {
+    "en": "Yes",
+    "fr": "Oui"
+  }
+}

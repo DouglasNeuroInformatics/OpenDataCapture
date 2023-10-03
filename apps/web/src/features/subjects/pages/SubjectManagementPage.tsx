@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { ClientTable, Slider } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment } from '@open-data-capture/types';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 
 export const SubjectManagementPage = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   return (
