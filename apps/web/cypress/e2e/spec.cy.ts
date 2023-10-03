@@ -22,17 +22,37 @@ describe('tags test', () => {
     cy.get('span').contains('View Instruments').click({force: true})
     cy.get('button').contains('Tags').click()
     cy.get('span').contains('Well-Being').click({force: true})
-    cy.get('[data-cy="instrument-card"]').first().contains('Tags: Well-Being')
+    cy.get('h5[data-cy="instrument-card"]').first().should('have.text','Tags: Well-Being')
 
    
     cy.get('span').contains('Well-Being').click({force: true})
     cy.get('span').contains('Cognitive').click({force: true})
-    cy.get('[data-cy="instrument-card"]').first().contains('Tags: Cognitive')
+    cy.get('h5[data-cy="instrument-card"]').first().should('have.text','Tags: Cognitive')
 
    
     cy.get('span').contains('Cognitive').click({force: true})
     cy.get('span').contains('Demographics').click({force: true})
-    cy.get('[data-cy="instrument-card"]').first().contains('Tags: Demographics')
+    cy.get('h5[data-cy="instrument-card"]').first().should('have.text','Tags: Demographics')
+
+
+  })
+})
+
+
+describe('Graph test', () => {
+  it('passes', () => {
+    
+    cy.login(username, password)
+    
+    
+    cy.get('span').contains('View Subjects').click({force: true})
+    cy.get('td').first().click()
+    cy.get('a').contains('Graph').click()
+    cy.get('button').contains('Instrument').click()
+    cy.get('button').contains('Happiness Questionnaire').click()
+
+    cy.get('button').contains('Measures').click()
+    cy.get('span').contains('Overall Happiness').click()
 
 
   })
