@@ -13,7 +13,7 @@
 // -- This is a parent command --
 
 
-
+//This is a login script for the 
 Cypress.Commands.add('login', (username, password) => { 
 cy.visit('http://127.0.0.1:3000/auth/login')
 cy.get('input[name="username"]').type(username)

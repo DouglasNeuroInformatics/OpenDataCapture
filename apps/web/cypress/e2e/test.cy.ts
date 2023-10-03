@@ -1,7 +1,10 @@
+const username = 'david'
+const password = 'Password123'
+
 describe('look at questionaire', () => {
     it('passes', () => {
       
-      cy.login('david','Password123')
+      cy.login(username, password)
       cy.get('span').contains('Add Visit').click({force: true})
       cy.get('input[name=firstName]').type('test')
       cy.get('input[name=lastName]').type('patient')
@@ -19,7 +22,6 @@ describe('look at questionaire', () => {
       cy.get('div').contains('Questionnaire').first().click()
 
       cy.get('button').contains('Begin').click()
-      // cy.get('input[name=firstName]').should('include','test')
-      // cy.get('input[name=lastName]').should('include','patient')
+  
     })
   })
