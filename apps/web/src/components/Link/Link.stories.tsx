@@ -6,11 +6,11 @@ import { Link } from './Link';
 type Story = StoryObj<typeof Link>;
 
 export default {
-  component: Link,
   args: {
     children: 'Hello World',
     to: '#'
   },
+  component: Link,
   decorators: [
     (Story) => (
       <MemoryRouter>

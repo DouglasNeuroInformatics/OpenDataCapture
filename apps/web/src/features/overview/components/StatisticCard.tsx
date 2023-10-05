@@ -4,12 +4,12 @@ import { Card } from '@douglasneuroinformatics/ui';
 import { type MotionValue, motion, useSpring, useTransform } from 'framer-motion';
 
 type StatisticCardProps = {
-  label: string;
   icon?: JSX.Element;
+  label: string;
   value: number;
 };
 
-export const StatisticCard = ({ label, icon, value }: StatisticCardProps) => {
+export const StatisticCard = ({ icon, label, value }: StatisticCardProps) => {
   const spring = useSpring(0, { bounce: 0 }) as MotionValue<number>;
   const rounded = useTransform(spring, (latest: number) => Math.floor(latest));
 

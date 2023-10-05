@@ -14,8 +14,8 @@ export const TimeDropdown = () => {
       className="text-sm"
       options={{
         all: t('subjectPage.visualization.timeframeOptions.all'),
-        pastYear: t('subjectPage.visualization.timeframeOptions.year'),
-        pastMonth: t('subjectPage.visualization.timeframeOptions.month')
+        pastMonth: t('subjectPage.visualization.timeframeOptions.month'),
+        pastYear: t('subjectPage.visualization.timeframeOptions.year')
       }}
       title={t('subjectPage.visualization.timeframe')}
       variant="secondary"

@@ -5,11 +5,11 @@ import axios from 'axios';
 
 import { type SimpleForm } from './FormCreator';
 
-const ReviewItem = ({ label, value }: { label: string; value: any }) => {
+const ReviewItem = ({ label, value }: { label: string; value: unknown }) => {
   return (
     <div>
       <span className="font-semibold">{label}: </span>
-      <span>{value}</span>
+      <span>{JSON.stringify(value)}</span>
     </div>
   );
 };

@@ -9,7 +9,7 @@ export type VisualizationModeProps = Omit<LinkProps, 'children'> & {
   title: string;
 };
 
-export const VisualizationMode = ({ title, icon, className, ...props }: VisualizationModeProps) => {
+export const VisualizationMode = ({ className, icon, title, ...props }: VisualizationModeProps) => {
   return (
     <Link
       className={clsx(

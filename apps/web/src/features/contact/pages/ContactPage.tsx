@@ -6,7 +6,7 @@ import { PageHeader } from '@/components';
 const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL;
 
 type ContactFormData = {
-  contactReason: 'bug' | 'feedback' | 'request' | 'other';
+  contactReason: 'bug' | 'feedback' | 'other' | 'request';
   message: string;
 };
 
@@ -31,8 +31,8 @@ export const ContactPage = () => {
             options: {
               bug: t('contact.reasons.bug'),
               feedback: t('contact.reasons.feedback'),
-              request: t('contact.reasons.request'),
-              other: t('contact.reasons.other')
+              other: t('contact.reasons.other'),
+              request: t('contact.reasons.request')
             }
           },
           message: {
@@ -42,23 +42,23 @@ export const ContactPage = () => {
           }
         }}
         validationSchema={{
-          type: 'object',
-          properties: {
-            contactReason: {
-              type: 'string',
-              enum: ['bug', 'feedback', 'other', 'request']
-            },
-            message: {
-              type: 'string',
-              minLength: 1
-            }
-          },
-          required: ['contactReason'],
           errorMessage: {
             properties: {
               reason: t('form.errors.required')
             }
-          }
+          },
+          properties: {
+            contactReason: {
+              enum: ['bug', 'feedback', 'other', 'request'],
+              type: 'string'
+            },
+            message: {
+              minLength: 1,
+              type: 'string'
+            }
+          },
+          required: ['contactReason'],
+          type: 'object'
         }}
         onSubmit={handleSubmit}
       />

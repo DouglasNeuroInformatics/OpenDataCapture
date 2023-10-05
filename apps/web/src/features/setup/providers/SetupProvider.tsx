@@ -6,10 +6,10 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { P, match } from 'ts-pattern';
 
-import { type SetupData, SetupForm } from '../components/SetupForm';
-
 import logo from '@/assets/logo.png';
 import { Spinner } from '@/components';
+
+import { type SetupData, SetupForm } from '../components/SetupForm';
 
 const SETUP_KEY = 'DATA_CAPTURE_SETUP';
 
@@ -33,10 +33,10 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
     setSetupState(response.data);
   };
 
-  const handleSubmit = async ({ username, password, initDemo }: SetupData) => {
+  const handleSubmit = async ({ initDemo, password, username }: SetupData) => {
     setIsLoading(true);
     await axios.post('/v1/setup', {
-      admin: { username, password },
+      admin: { password, username },
       initDemo
     });
     setIsLoading(false);

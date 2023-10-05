@@ -7,11 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import { IdentificationForm, type IdentificationFormData } from '@/components';
 
 type SubjectLookupProps = {
-  show: boolean;
   onClose: () => void;
+  show: boolean;
 };
 
-export const SubjectLookup = ({ show, onClose }: SubjectLookupProps) => {
+export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 

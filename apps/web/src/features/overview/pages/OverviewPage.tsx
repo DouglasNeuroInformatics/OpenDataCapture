@@ -2,16 +2,16 @@ import type { FormInstrumentRecordsSummary, FormInstrumentSummary, Subject, User
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 
-import { Disclaimer } from '../components/Disclaimer';
-import { GroupSwitcher } from '../components/GroupSwitcher';
-import { StatisticCard } from '../components/StatisticCard';
-
 import { PageHeader, Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 
+import { Disclaimer } from '../components/Disclaimer';
+import { GroupSwitcher } from '../components/GroupSwitcher';
+import { StatisticCard } from '../components/StatisticCard';
+
 export const OverviewPage = () => {
-  const { currentUser, currentGroup } = useAuthStore();
+  const { currentGroup, currentUser } = useAuthStore();
   const { t } = useTranslation();
   const pageTitle = currentUser?.firstName
     ? `${t('overview.welcome')}, ${currentUser.firstName}`

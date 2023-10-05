@@ -49,16 +49,16 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
   const [trails] = useTrail(
     filteredInstruments.length,
     () => ({
-      config: { tension: 280, friction: 60 },
+      config: { friction: 60, tension: 280 },
       from: {
         opacity: 0,
         y: 80
       },
+      reset: true,
       to: {
         opacity: 1,
         y: 0
-      },
-      reset: true
+      }
     }),
     [filteredInstruments]
   );

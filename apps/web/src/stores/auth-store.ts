@@ -10,32 +10,32 @@ export type CurrentUser = {
 } & Omit<JwtPayload, 'permissions'>;
 
 export type AuthStore = {
-  accessToken: string | null;
-  setAccessToken: (accessToken: string) => void;
-  currentUser: CurrentUser | null;
+  accessToken: null | string;
   currentGroup: Group | null;
-  setCurrentGroup: (group: Group) => void;
+  currentUser: CurrentUser | null;
   logout: () => void;
+  setAccessToken: (accessToken: string) => void;
+  setCurrentGroup: (group: Group) => void;
 };
 
 export const useAuthStore = create<AuthStore>((set) => ({
   accessToken: null,
-  setAccessToken: (accessToken) => {
-    const { permissions, groups, ...rest } = jwtDecode<JwtPayload>(accessToken);
-    const ability = createMongoAbility<AppAbility>(permissions);
-    set({
-      accessToken,
-      currentUser: { ability, groups, ...rest },
-      currentGroup: groups[0]
-    });
-  },
-  currentUser: null,
   currentGroup: null,
-  setCurrentGroup: (group) => {
-    set({ currentGroup: group });
-  },
+  currentUser: null,
   logout: () => {
     useActiveSubjectStore.setState({ activeSubject: null });
     set({ accessToken: null, currentUser: null });
+  },
+  setAccessToken: (accessToken) => {
+    const { groups, permissions, ...rest } = jwtDecode<JwtPayload>(accessToken);
+    const ability = createMongoAbility<AppAbility>(permissions);
+    set({
+      accessToken,
+      currentGroup: groups[0],
+      currentUser: { ability, groups, ...rest }
+    });
+  },
+  setCurrentGroup: (group) => {
+    set({ currentGroup: group });
   }
 }));

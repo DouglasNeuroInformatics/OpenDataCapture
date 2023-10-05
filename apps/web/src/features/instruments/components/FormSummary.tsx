@@ -1,18 +1,17 @@
 import type { BaseFormField, FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Button } from '@douglasneuroinformatics/ui';
+import { Button, formatFormDataAsString } from '@douglasneuroinformatics/ui';
 import type { FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 import { Spinner } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
-import { formatDataAsString } from '@/utils/form-utils';
 
-const FormSummaryItem = ({ label, value }: { label: string; value: any }) => {
+const FormSummaryItem = ({ label, value }: { label: string; value: unknown }) => {
   return (
     <div className="my-1">
       <span className="font-semibold">{label}: </span>
-      <span>{String(value)}</span>
+      <span>{JSON.stringify(value)}</span>
     </div>
   );
 };
@@ -24,9 +23,9 @@ export type FormSummaryProps<T extends FormInstrumentData> = {
 };
 
 export const FormSummary = <T extends FormInstrumentData>({
-  timeCollected,
   instrument,
-  result
+  result,
+  timeCollected
 }: FormSummaryProps<T>) => {
   const { activeSubject } = useActiveSubjectStore();
   const download = useDownload();
@@ -38,7 +37,7 @@ export const FormSummary = <T extends FormInstrumentData>({
 
   const downloadResult = () => {
     const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.txt`;
-    download(filename, () => Promise.resolve(formatDataAsString(result)));
+    download(filename, () => Promise.resolve(formatFormDataAsString(result)));
   };
 
   return (

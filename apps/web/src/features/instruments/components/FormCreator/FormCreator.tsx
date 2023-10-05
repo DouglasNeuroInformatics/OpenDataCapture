@@ -25,8 +25,8 @@ export const FormCreator = () => {
   const [state, setState] = useState<Partial<SimpleForm>>({
     kind: 'form',
     validationSchema: {
-      type: 'object',
-      required: []
+      required: [],
+      type: 'object'
     }
   });
 
@@ -54,19 +54,19 @@ export const FormCreator = () => {
     <Stepper
       steps={[
         {
-          label: t('instruments.createInstrument.steps.info'),
+          element: <InfoForm onSubmit={handleSubmitDetails} />,
           icon: <HiOutlineQuestionMarkCircle />,
-          element: <InfoForm onSubmit={handleSubmitDetails} />
+          label: t('instruments.createInstrument.steps.info')
         },
         {
-          label: t('instruments.createInstrument.steps.fields'),
+          element: <FieldsForm onSubmit={handleSubmitFields} />,
           icon: <HiOutlineQuestionMarkCircle />,
-          element: <FieldsForm onSubmit={handleSubmitFields} />
+          label: t('instruments.createInstrument.steps.fields')
         },
         {
-          label: t('instruments.createInstrument.steps.review'),
+          element: <Review form={state} />,
           icon: <HiOutlineQuestionMarkCircle />,
-          element: <Review form={state} />
+          label: t('instruments.createInstrument.steps.review')
         }
       ]}
     />

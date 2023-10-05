@@ -15,7 +15,7 @@ export const ActiveSubject = () => {
 
   const bind = useDrag(
     ({ down, offset: [ox, oy] }) => {
-      api.start({ x: ox, y: oy, immediate: down });
+      api.start({ immediate: down, x: ox, y: oy });
     },
     {
       bounds: document.body,

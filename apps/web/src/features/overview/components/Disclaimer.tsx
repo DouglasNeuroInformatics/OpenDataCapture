@@ -1,9 +1,9 @@
 import { Button, Modal } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
-import { useDisclaimerStore } from '../stores/disclaimer-store';
-
 import { useAuthStore } from '@/stores/auth-store';
+
+import { useDisclaimerStore } from '../stores/disclaimer-store';
 
 export type DisclaimerProps = {
   isRequired: boolean;
@@ -11,7 +11,7 @@ export type DisclaimerProps = {
 
 export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProps) => {
   const { currentUser, logout } = useAuthStore();
-  const { isAccepted, username, setIsAccepted } = useDisclaimerStore();
+  const { isAccepted, setIsAccepted, username } = useDisclaimerStore();
   const { t } = useTranslation();
 
   const handleClose = () => {

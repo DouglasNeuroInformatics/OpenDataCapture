@@ -11,38 +11,38 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   return (
     <Form<LoginCredentials>
       content={{
-        username: {
-          kind: 'text',
-          label: t('username'),
-          variant: 'short'
-        },
         password: {
           kind: 'text',
           label: t('password'),
           variant: 'password'
+        },
+        username: {
+          kind: 'text',
+          label: t('username'),
+          variant: 'short'
         }
       }}
       submitBtnLabel={t('login')}
       validationSchema={{
-        type: 'object',
-        properties: {
-          username: {
-            type: 'string',
-            minLength: 1
-          },
-          password: {
-            type: 'string',
-            minLength: 1
-          }
-        },
         additionalProperties: false,
-        required: ['username', 'password'],
         errorMessage: {
           properties: {
-            username: t('form.errors.required'),
-            password: t('form.errors.required')
+            password: t('form.errors.required'),
+            username: t('form.errors.required')
           }
-        }
+        },
+        properties: {
+          password: {
+            minLength: 1,
+            type: 'string'
+          },
+          username: {
+            minLength: 1,
+            type: 'string'
+          }
+        },
+        required: ['username', 'password'],
+        type: 'object'
       }}
       onSubmit={onSubmit}
     />

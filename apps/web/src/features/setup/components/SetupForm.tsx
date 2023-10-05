@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 type SetupData = {
   firstName: string;
-  lastName: string;
-  username: string;
-  password: string;
   initDemo: boolean;
+  lastName: string;
+  password: string;
+  username: string;
 };
 
 type SetupFormProps = {
@@ -22,7 +22,6 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
     <Form<SetupData>
       content={[
         {
-          title: t('setup.admin.title'),
           description: t('setup.admin.description'),
           fields: {
             firstName: {
@@ -35,63 +34,64 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
               label: t('lastName'),
               variant: 'short'
             },
-            username: {
-              kind: 'text',
-              label: t('username'),
-              variant: 'short'
-            },
             password: {
               kind: 'text',
               label: t('password'),
               variant: 'password'
+            },
+            username: {
+              kind: 'text',
+              label: t('username'),
+              variant: 'short'
             }
-          }
+          },
+          title: t('setup.admin.title')
         },
         {
-          title: t('setup.demo.title'),
           description: t('setup.demo.description'),
           fields: {
             initDemo: {
               kind: 'binary',
               label: t('setup.demo.init'),
-              variant: 'radio',
               options: {
-                t: t('yes'),
-                f: t('no')
-              }
+                f: t('no'),
+                t: t('yes')
+              },
+              variant: 'radio'
             }
-          }
+          },
+          title: t('setup.demo.title')
         }
       ]}
       submitBtnLabel={t('form.submit')}
       validationSchema={{
-        type: 'object',
         properties: {
           firstName: {
-            type: 'string',
-            minLength: 1
-          },
-          lastName: {
-            type: 'string',
-            minLength: 1
-          },
-          username: {
-            type: 'string',
-            minLength: 1
-          },
-          password: {
-            type: 'string',
-            pattern: isStrongPassword.source
+            minLength: 1,
+            type: 'string'
           },
           initDemo: {
             type: 'boolean'
+          },
+          lastName: {
+            minLength: 1,
+            type: 'string'
+          },
+          password: {
+            pattern: isStrongPassword.source,
+            type: 'string'
+          },
+          username: {
+            minLength: 1,
+            type: 'string'
           }
         },
-        required: ['firstName', 'lastName', 'username', 'password', 'initDemo']
+        required: ['firstName', 'lastName', 'username', 'password', 'initDemo'],
+        type: 'object'
       }}
       onSubmit={onSubmit}
     />
   );
 };
 
-export { SetupForm, type SetupData };
+export { type SetupData, SetupForm };

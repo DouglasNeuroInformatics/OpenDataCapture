@@ -5,7 +5,7 @@ import { HiChevronDown } from 'react-icons/hi';
 import { useAuthStore } from '@/stores/auth-store';
 
 export const GroupSwitcher = () => {
-  const { currentUser, currentGroup, setCurrentGroup } = useAuthStore();
+  const { currentGroup, currentUser, setCurrentGroup } = useAuthStore();
   const { t } = useTranslation();
 
   // unless the user is an admin, this is set at login

@@ -6,7 +6,6 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
-
 import { InstrumentDropdown } from './InstrumentDropdown';
 import { MeasuresDropdown } from './MeasuresDropdown';
 import { TimeDropdown } from './TimeDropdown';
@@ -68,16 +67,16 @@ export const RecordsGraph = () => {
     const measure = ctx.selectedMeasures[i];
     lines.push({
       name: measure!.label,
-      val: measure!.key,
-      stroke: COLOR_PALETTE[i]
+      stroke: COLOR_PALETTE[i],
+      val: measure!.key
     });
     lines.push({
-      name: `${measure!.label} (${t('groupTrend')})`,
-      val: measure!.key + 'Group',
-      strokeWidth: 0.5,
-      stroke: COLOR_PALETTE[i],
       legendType: 'none',
-      strokeDasharray: '5 5'
+      name: `${measure!.label} (${t('groupTrend')})`,
+      stroke: COLOR_PALETTE[i],
+      strokeDasharray: '5 5',
+      strokeWidth: 0.5,
+      val: measure!.key + 'Group'
     });
   }
 

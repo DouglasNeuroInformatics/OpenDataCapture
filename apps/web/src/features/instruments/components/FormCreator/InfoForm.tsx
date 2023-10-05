@@ -22,7 +22,6 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
     <Form<InfoFormData>
       content={[
         {
-          title: t('instruments.createInstrument.form.basics'),
           fields: {
             name: {
               kind: 'text',
@@ -37,23 +36,30 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
             version: {
               kind: 'numeric',
               label: t('instruments.createInstrument.form.version.label'),
-              min: 0,
               max: 10,
+              min: 0,
               variant: 'default'
             }
-          }
+          },
+          title: t('instruments.createInstrument.form.basics')
         },
         {
-          title: t('instruments.createInstrument.form.details'),
           fields: {
-            title: {
-              kind: 'text',
-              label: t('instruments.createInstrument.form.title.label'),
-              variant: 'short'
-            },
             description: {
               kind: 'text',
               label: t('instruments.createInstrument.form.description.label'),
+              variant: 'long'
+            },
+            estimatedDuration: {
+              kind: 'numeric',
+              label: t('instruments.createInstrument.form.estimatedDuration.label'),
+              max: 60,
+              min: 1,
+              variant: 'default'
+            },
+            instructions: {
+              kind: 'text',
+              label: t('instruments.createInstrument.form.instructions.label'),
               variant: 'long'
             },
             language: {
@@ -64,59 +70,53 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
                 fr: t('languages.fr')
               }
             },
-            instructions: {
+            title: {
               kind: 'text',
-              label: t('instruments.createInstrument.form.instructions.label'),
-              variant: 'long'
-            },
-            estimatedDuration: {
-              kind: 'numeric',
-              label: t('instruments.createInstrument.form.estimatedDuration.label'),
-              min: 1,
-              max: 60,
-              variant: 'default'
+              label: t('instruments.createInstrument.form.title.label'),
+              variant: 'short'
             }
-          }
+          },
+          title: t('instruments.createInstrument.form.details')
         }
       ]}
       validationSchema={{
-        type: 'object',
         properties: {
-          name: {
-            type: 'string',
+          description: {
             minLength: 1,
-            pattern: /^\S+$/.source
+            type: 'string'
+          },
+          estimatedDuration: {
+            maximum: 60,
+            minimum: 1,
+            type: 'integer'
+          },
+          instructions: {
+            minLength: 1,
+            type: 'string'
+          },
+          language: {
+            enum: ['en', 'fr'],
+            type: 'string'
+          },
+          name: {
+            minLength: 1,
+            pattern: /^\S+$/.source,
+            type: 'string'
           },
           tags: {
-            type: 'string',
-            minLength: 1
+            minLength: 1,
+            type: 'string'
+          },
+          title: {
+            minLength: 1,
+            type: 'string'
           },
           version: {
             type: 'number'
-          },
-          title: {
-            type: 'string',
-            minLength: 1
-          },
-          description: {
-            type: 'string',
-            minLength: 1
-          },
-          language: {
-            type: 'string',
-            enum: ['en', 'fr']
-          },
-          instructions: {
-            type: 'string',
-            minLength: 1
-          },
-          estimatedDuration: {
-            type: 'integer',
-            minimum: 1,
-            maximum: 60
           }
         },
-        required: ['description', 'estimatedDuration', 'instructions', 'language', 'title']
+        required: ['description', 'estimatedDuration', 'instructions', 'language', 'title'],
+        type: 'object'
       }}
       onSubmit={(data) => {
         onSubmit(data);

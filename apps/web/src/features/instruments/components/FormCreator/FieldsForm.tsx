@@ -6,14 +6,14 @@ import { Form, StepperContext, useNotificationsStore } from '@douglasneuroinform
 import { useTranslation } from 'react-i18next';
 
 type RawFieldData = {
-  name: string;
+  description?: string;
   kind: FormFieldKind;
   label: string;
-  description?: string;
-  variant?: TextFormField['variant'] | NumericFormField['variant'];
-  options?: string;
-  min?: number;
   max?: number;
+  min?: number;
+  name: string;
+  options?: string;
+  variant?: NumericFormField['variant'] | TextFormField['variant'];
 };
 
 type FieldData = Omit<RawFieldData, 'options'> & {
@@ -41,7 +41,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
     const fieldNames: string[] = [];
     let formattedFields: FieldData[];
     try {
-      formattedFields = data.fields.map(({ options, name, ...rest }) => {
+      formattedFields = data.fields.map(({ name, options, ...rest }) => {
         if (fieldNames.includes(name)) {
           throw new Error(`${t('instruments.createInstrument.errors.duplicateField')}: '${name}'`);
         }
@@ -68,7 +68,7 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
       });
     } catch (error) {
       if (error instanceof Error) {
-        notifications.addNotification({ type: 'error', message: error.message });
+        notifications.addNotification({ message: error.message, type: 'error' });
       }
       console.error(error);
       return;
@@ -82,23 +82,21 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
     <Form<RawFieldsFormData>
       content={{
         fields: {
-          kind: 'array',
-          label: 'Field',
           fieldset: {
-            name: {
+            description: {
               kind: 'text',
-              label: 'Name',
+              label: 'Description',
               variant: 'short'
             },
             kind: {
               kind: 'options',
               label: 'Kind',
               options: {
-                text: 'Text',
+                binary: 'Binary',
+                date: 'Date',
                 numeric: 'Numeric',
                 options: 'Options',
-                date: 'Date',
-                binary: 'Binary'
+                text: 'Text'
               }
             },
             label: {
@@ -106,10 +104,42 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
               label: 'Label',
               variant: 'short'
             },
-            description: {
+            max: ({ kind }) => {
+              return kind === 'numeric'
+                ? {
+                    kind: 'numeric',
+                    label: 'Maximum Value',
+                    max: Number.MAX_SAFE_INTEGER,
+                    min: 0,
+                    variant: 'default'
+                  }
+                : null;
+            },
+            min: ({ kind }) => {
+              return kind === 'numeric'
+                ? {
+                    kind: 'numeric',
+                    label: 'Minimum Value',
+                    max: Number.MAX_SAFE_INTEGER,
+                    min: 0,
+                    variant: 'default'
+                  }
+                : null;
+            },
+            name: {
               kind: 'text',
-              label: 'Description',
+              label: 'Name',
               variant: 'short'
+            },
+            options: ({ kind }) => {
+              return kind === 'options'
+                ? {
+                    description: 'Please enter options in the format {KEY}:{LABEL}, separated by newlines',
+                    kind: 'text',
+                    label: 'Options',
+                    variant: 'long'
+                  }
+                : null;
             },
             variant: ({ kind }) => {
               const base = { kind: 'options', label: 'Variant' } as const;
@@ -126,94 +156,24 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                   return {
                     ...base,
                     options: {
-                      short: 'Short',
                       long: 'Long',
-                      password: 'Password'
+                      password: 'Password',
+                      short: 'Short'
                     }
                   };
                 default:
                   return null;
               }
-            },
-            options: ({ kind }) => {
-              return kind === 'options'
-                ? {
-                    description: 'Please enter options in the format {KEY}:{LABEL}, separated by newlines',
-                    kind: 'text',
-                    label: 'Options',
-                    variant: 'long'
-                  }
-                : null;
-            },
-            min: ({ kind }) => {
-              return kind === 'numeric'
-                ? {
-                    kind: 'numeric',
-                    label: 'Minimum Value',
-                    variant: 'default',
-                    min: 0,
-                    max: Number.MAX_SAFE_INTEGER
-                  }
-                : null;
-            },
-            max: ({ kind }) => {
-              return kind === 'numeric'
-                ? {
-                    kind: 'numeric',
-                    label: 'Maximum Value',
-                    variant: 'default',
-                    min: 0,
-                    max: Number.MAX_SAFE_INTEGER
-                  }
-                : null;
             }
-          }
+          },
+          kind: 'array',
+          label: 'Field'
         }
       }}
       validationSchema={{
-        type: 'object',
         properties: {
           fields: {
-            type: 'array',
             items: {
-              type: 'object',
-              properties: {
-                kind: {
-                  type: 'string',
-                  enum: ['binary', 'date', 'numeric', 'options', 'text']
-                },
-                name: {
-                  type: 'string',
-                  pattern: /^\S+$/.source,
-                  minLength: 1
-                },
-                label: {
-                  type: 'string',
-                  minLength: 1
-                },
-                description: {
-                  type: 'string',
-                  minLength: 1,
-                  nullable: true
-                },
-                variant: {
-                  type: 'string',
-                  nullable: true
-                },
-                options: {
-                  type: 'string',
-                  nullable: true
-                },
-                min: {
-                  type: 'number',
-                  nullable: true
-                },
-                max: {
-                  type: 'number',
-                  nullable: true
-                }
-              },
-              required: ['kind', 'name', 'label'],
               allOf: [
                 {
                   if: {
@@ -226,8 +186,8 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                   then: {
                     properties: {
                       variant: {
-                        type: 'string',
-                        enum: ['short', 'long', 'password']
+                        enum: ['short', 'long', 'password'],
+                        type: 'string'
                       }
                     }
                   }
@@ -243,9 +203,9 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                   then: {
                     properties: {
                       options: {
-                        type: 'string',
                         minLength: 1,
-                        nullable: false
+                        nullable: false,
+                        type: 'string'
                       }
                     }
                   }
@@ -260,30 +220,70 @@ export const FieldsForm = ({ onSubmit }: FieldsFormProps) => {
                   },
                   then: {
                     properties: {
-                      variant: {
-                        type: 'string',
-                        enum: ['default', 'slider']
+                      max: {
+                        maximum: Number.MAX_SAFE_INTEGER,
+                        minimum: 0,
+                        nullable: false,
+                        type: 'number'
                       },
                       min: {
-                        type: 'number',
-                        minimum: 0,
                         maximum: Number.MAX_SAFE_INTEGER,
-                        nullable: false
+                        minimum: 0,
+                        nullable: false,
+                        type: 'number'
                       },
-                      max: {
-                        type: 'number',
-                        minimum: 0,
-                        maximum: Number.MAX_SAFE_INTEGER,
-                        nullable: false
+                      variant: {
+                        enum: ['default', 'slider'],
+                        type: 'string'
                       }
                     }
                   }
                 }
-              ]
-            }
+              ],
+              properties: {
+                description: {
+                  minLength: 1,
+                  nullable: true,
+                  type: 'string'
+                },
+                kind: {
+                  enum: ['binary', 'date', 'numeric', 'options', 'text'],
+                  type: 'string'
+                },
+                label: {
+                  minLength: 1,
+                  type: 'string'
+                },
+                max: {
+                  nullable: true,
+                  type: 'number'
+                },
+                min: {
+                  nullable: true,
+                  type: 'number'
+                },
+                name: {
+                  minLength: 1,
+                  pattern: /^\S+$/.source,
+                  type: 'string'
+                },
+                options: {
+                  nullable: true,
+                  type: 'string'
+                },
+                variant: {
+                  nullable: true,
+                  type: 'string'
+                }
+              },
+              required: ['kind', 'name', 'label'],
+              type: 'object'
+            },
+            type: 'array'
           }
         },
-        required: ['fields']
+        required: ['fields'],
+        type: 'object'
       }}
       onSubmit={handleSubmit}
     />

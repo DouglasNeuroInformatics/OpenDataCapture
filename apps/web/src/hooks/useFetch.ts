@@ -15,13 +15,13 @@ export type UseFetchOptions = {
   onError?: (error: unknown) => void;
 
   /** Query params to add to the URL */
-  queryParams?: Record<string, string | null | undefined>;
+  queryParams?: Record<string, null | string | undefined>;
 };
 
 export type UseFetchReturn<T> = {
   data: T | null;
-  setData: React.Dispatch<React.SetStateAction<T | null>>;
   isLoading: boolean;
+  setData: React.Dispatch<React.SetStateAction<T | null>>;
 };
 
 /**
@@ -75,5 +75,5 @@ export function useFetch<T = unknown>(
     }
   }, [...deps, resourceURL]);
 
-  return { data, setData, isLoading };
+  return { data, isLoading, setData };
 }

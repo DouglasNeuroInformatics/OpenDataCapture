@@ -18,7 +18,7 @@ export const FormIdentification = () => {
       validateStatus: (status) => status === 201 || status === 404
     });
     if (response.status === 404) {
-      notifications.addNotification({ type: 'error', message: t('identificationForm.notFound') });
+      notifications.addNotification({ message: t('identificationForm.notFound'), type: 'error' });
       return;
     }
     setActiveSubject(data);

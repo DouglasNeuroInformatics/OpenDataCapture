@@ -14,12 +14,12 @@ type LinkAccess = {
 export type NavigationLinkProps = {
   access: LinkAccess | LinkAccess[] | null;
   href: string;
-  label: string;
   icon: React.ReactElement;
+  label: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
-export const NavigationLink = ({ href, label, icon, access, onClick }: NavigationLinkProps) => {
+export const NavigationLink = ({ access, href, icon, label, onClick }: NavigationLinkProps) => {
   const { currentUser } = useAuthStore();
 
   // Whether the user has all permissions or access is undefined

@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { ActiveSubject } from './ActiveSubject';
-
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
+
+import { ActiveSubject } from './ActiveSubject';
 
 type Story = StoryObj<typeof ActiveSubject>;
 
@@ -15,10 +15,10 @@ export default {
       const { setActiveSubject } = useActiveSubjectStore();
       useEffect(() => {
         setActiveSubject({
+          dateOfBirth: '2000-01-01',
           firstName: 'John',
           lastName: 'Appleseed',
-          sex: 'male',
-          dateOfBirth: '2000-01-01'
+          sex: 'male'
         });
       }, []);
       return <Story />;

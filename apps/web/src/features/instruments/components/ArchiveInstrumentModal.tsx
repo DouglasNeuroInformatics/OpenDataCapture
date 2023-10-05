@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 type ArchiveInstrumentModalProps = {
   instrument: FormInstrumentSummary;
   isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
   onArchive: (instrument: FormInstrumentSummary) => Promise<void>;
+  setIsOpen: (isOpen: boolean) => void;
 };
-export const ArchiveInstrumentModal = ({ isOpen, setIsOpen, instrument, onArchive }: ArchiveInstrumentModalProps) => {
+export const ArchiveInstrumentModal = ({ instrument, isOpen, onArchive, setIsOpen }: ArchiveInstrumentModalProps) => {
   const { t } = useTranslation();
 
   return (

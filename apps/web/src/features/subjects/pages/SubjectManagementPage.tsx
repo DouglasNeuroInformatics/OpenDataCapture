@@ -17,31 +17,31 @@ export const SubjectManagementPage = () => {
       <ClientTable<Assignment>
         columns={[
           {
-            label: 'Title',
-            field: 'title'
+            field: 'title',
+            label: 'Title'
           },
           {
-            label: 'Date Assigned',
             field: 'timeAssigned',
-            formatter: (value: number) => toBasicISOString(new Date(value))
+            formatter: (value: number) => toBasicISOString(new Date(value)),
+            label: 'Date Assigned'
           },
           {
-            label: 'Date Expires',
             field: 'timeExpires',
-            formatter: (value: number) => toBasicISOString(new Date(value))
+            formatter: (value: number) => toBasicISOString(new Date(value)),
+            label: 'Date Expires'
           },
           {
-            label: 'Status',
             field: 'status',
-            formatter: (value: string) => value.charAt(0) + value.slice(1).toLowerCase()
+            formatter: (value: string) => value.charAt(0) + value.slice(1).toLowerCase(),
+            label: 'Status'
           }
         ]}
         data={[
           {
-            title: 'SANS',
+            status: 'CANCELED',
             timeAssigned: Date.now(),
             timeExpires: Date.now() + 100000,
-            status: 'CANCELED'
+            title: 'SANS'
           }
         ]}
         onEntryClick={setSelectedAssignment}
