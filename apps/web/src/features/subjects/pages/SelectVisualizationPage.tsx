@@ -12,8 +12,8 @@ export const SelectVisualizationPage = () => {
     <div>
       <PageHeader title={t('visualization.selectMode')} />
       <div className="my-16 flex items-center justify-center gap-8">
-        <VisualizationMode icon={<RxTable />} title={t('table')} to="table" />
-        <VisualizationMode icon={<RxBarChart />} title={t('graph')} to="graph" />
+        <VisualizationMode cyTestId='table' icon={<RxTable />} title={t('table')} to="table" />
+        <VisualizationMode cyTestId='graph' icon={<RxBarChart />} title={t('graph')} to="graph" />
       </div>
     </div>
   );
