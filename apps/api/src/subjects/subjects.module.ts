@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { GroupsModule } from '@/groups/groups.module';
+
 import { SubjectEntity, SubjectSchema } from './entities/subject.entity';
 import { SubjectsController } from './subjects.controller';
 import { SubjectsService } from './subjects.service';
 
-import { GroupsModule } from '@/groups/groups.module';
-
 @Module({
+  controllers: [SubjectsController],
+  exports: [SubjectsService],
   imports: [
     GroupsModule,
     MongooseModule.forFeature([
@@ -17,8 +19,6 @@ import { GroupsModule } from '@/groups/groups.module';
       }
     ])
   ],
-  controllers: [SubjectsController],
-  providers: [SubjectsService],
-  exports: [SubjectsService]
+  providers: [SubjectsService]
 })
 export class SubjectsModule {}

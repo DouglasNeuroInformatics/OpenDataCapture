@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
 import type { Sex, Subject } from '@open-data-capture/types';
 import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
@@ -10,22 +9,22 @@ export class SubjectEntity implements Subject {
   static readonly modelName = 'Subject';
 
   @Prop({ required: true })
-  identifier: string;
+  dateOfBirth: Date;
 
   @Prop({ required: false })
   firstName?: string;
 
+  @Prop({ default: [], required: false, type: [{ ref: GroupEntity.name, type: MongooseSchema.Types.ObjectId }] })
+  groups: GroupEntity[];
+
+  @Prop({ required: true })
+  identifier: string;
+
   @Prop({ required: false })
   lastName?: string;
 
-  @Prop({ required: true })
-  dateOfBirth: Date;
-
   @Prop({ enum: ['male', 'female'] satisfies Sex[], required: true, type: String })
   sex: Sex;
-
-  @Prop({ required: false, default: [], type: [{ ref: GroupEntity.name, type: MongooseSchema.Types.ObjectId }] })
-  groups: GroupEntity[];
 }
 
 export type SubjectDocument = HydratedDocument<SubjectEntity>;

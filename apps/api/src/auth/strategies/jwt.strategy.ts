@@ -1,7 +1,6 @@
 import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-
 import type { JwtPayload } from '@open-data-capture/types';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -26,14 +25,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  /** This method is called after the token is validated by passport  */
-  async validate({ username }: JwtPayload): Promise<Request['user']> {
-    const user = await this.getUser(username);
-    const ability = this.abilityFactory.createForUser(user);
-    this.logger.verbose(`Validated Token for User: ${username}`);
-    return { ...user, ability };
-  }
-
   /** Returns the user associated with the JWT if they exist, otherwise throws UnauthorizedException */
   private async getUser(username: string): Promise<UserEntity> {
     let user: UserEntity;
@@ -46,5 +37,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw error;
     }
     return user;
+  }
+
+  /** This method is called after the token is validated by passport  */
+  async validate({ username }: JwtPayload): Promise<Request['user']> {
+    const user = await this.getUser(username);
+    const ability = this.abilityFactory.createForUser(user);
+    this.logger.verbose(`Validated Token for User: ${username}`);
+    return { ...user, ability };
   }
 }

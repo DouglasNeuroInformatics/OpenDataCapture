@@ -1,6 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { ApiProperty } from '@nestjs/swagger';
 import type { FormInstrumentRecord, InstrumentKind, SubjectIdentificationData } from '@open-data-capture/types';
 import { Type } from 'class-transformer';
 import { IsIn, IsNumber, IsObject, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator';
@@ -16,13 +15,13 @@ type CreateFormRecordData = {
 
 export class CreateFormRecordDto implements CreateFormRecordData {
   @ApiProperty()
-  @IsIn(['form'] satisfies InstrumentKind[])
-  kind: 'form';
+  @IsObject()
+  data: FormInstrumentData;
 
   @ApiProperty()
-  @IsNumber()
-  @Min(0)
-  time: number;
+  @IsOptional()
+  @IsString()
+  groupName?: string;
 
   @ApiProperty()
   @IsString()
@@ -33,9 +32,8 @@ export class CreateFormRecordDto implements CreateFormRecordData {
   instrumentVersion: number;
 
   @ApiProperty()
-  @IsOptional()
-  @IsString()
-  groupName?: string;
+  @IsIn(['form'] satisfies InstrumentKind[])
+  kind: 'form';
 
   @ApiProperty()
   @IsObject()
@@ -44,6 +42,7 @@ export class CreateFormRecordDto implements CreateFormRecordData {
   subjectInfo: SubjectIdentificationDataDto;
 
   @ApiProperty()
-  @IsObject()
-  data: FormInstrumentData;
+  @IsNumber()
+  @Min(0)
+  time: number;
 }

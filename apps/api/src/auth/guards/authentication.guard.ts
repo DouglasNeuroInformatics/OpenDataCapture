@@ -1,7 +1,6 @@
 import { type ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-
 import { type Request } from 'express';
 import { Observable } from 'rxjs';
 
@@ -16,11 +15,6 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
     super();
   }
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    this.logger.verbose(`Request URL: ${context.switchToHttp().getRequest<Request>().url}`);
-    return this.isPublicRoute(context) || super.canActivate(context);
-  }
-
   private isPublicRoute(context: ExecutionContext): boolean {
     const routeAccess = this.reflector.getAllAndOverride<RouteAccessType | undefined>('RouteAccess', [
       context.getHandler(),
@@ -29,5 +23,10 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
     const result = routeAccess === 'public';
     this.logger.verbose(`Public Route: ${result}`);
     return result;
+  }
+
+  canActivate(context: ExecutionContext): Observable<boolean> | Promise<boolean> | boolean {
+    this.logger.verbose(`Request URL: ${context.switchToHttp().getRequest<Request>().url}`);
+    return this.isPublicRoute(context) || super.canActivate(context);
   }
 }

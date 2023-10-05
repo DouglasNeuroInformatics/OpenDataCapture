@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-
 import { type Group } from '@open-data-capture/types';
 import { type HydratedDocument } from 'mongoose';
 

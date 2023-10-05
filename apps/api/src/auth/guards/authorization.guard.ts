@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-
 import type { Request } from 'express';
 import { Observable } from 'rxjs';
 
@@ -13,7 +12,7 @@ export class AuthorizationGuard implements CanActivate {
 
   constructor(private readonly reflector: Reflector) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): Observable<boolean> | Promise<boolean> | boolean {
     const request = context.switchToHttp().getRequest<Request>();
     this.logger.verbose(`Request URL: ${request.url}`);
 

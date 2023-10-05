@@ -1,22 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-
 import { type AccessibleModel } from '@casl/mongoose';
 import type { FormFields, FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import type { TranslatedForms } from '@open-data-capture/instruments';
 import type { FormInstrument, FormInstrumentSummary, Language } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
 import { FormInstrumentEntity } from '../entities/form-instrument.entity';
 import { InstrumentEntity } from '../entities/instrument.entity';
-
 
 @Injectable()
 export class FormsService {
@@ -26,11 +25,15 @@ export class FormsService {
     private readonly cryptoService: CryptoService
   ) {}
 
+  private createIdentifier(name: string, version: number): string {
+    return this.cryptoService.hash(name + version);
+  }
+
   async create<T extends FormInstrumentData>(formInstrument: FormInstrument<T>): Promise<FormInstrument> {
     const identifier = this.createIdentifier(formInstrument.name, formInstrument.version);
     const conflict = await this.formModel.exists({
-      identifier,
-      'details.language': formInstrument.details.language
+      'details.language': formInstrument.details.language,
+      identifier
     });
     if (conflict) {
       throw new ConflictException('Instrument already exists');
@@ -51,20 +54,8 @@ export class FormsService {
     return this.formModel.find({ kind: 'form' });
   }
 
-  async getAvailable(): Promise<FormInstrumentSummary[]> {
-    return this.formModel.find({ kind: 'form' }).select('identifier name tags version details').lean();
-  }
-
   async findByIdentifier(identifier: string): Promise<FormInstrumentEntity[]> {
     return this.formModel.find({ identifier });
-  }
-
-  async findOne(identifier: string, language?: Language): Promise<FormInstrumentEntity> {
-    const result = await this.formModel.findOne({ identifier, 'details.language': language });
-    if (!result || result.kind !== 'form') {
-      throw new NotFoundException(`Failed to find form with identifier: ${identifier}`);
-    }
-    return result;
   }
 
   async findByName(name: string): Promise<FormInstrumentEntity> {
@@ -75,12 +66,16 @@ export class FormsService {
     return result;
   }
 
-  async remove(id: string): Promise<FormInstrumentEntity> {
-    const result = await this.formModel.findByIdAndDelete(id, { new: true });
-    if (!result) {
-      throw new NotFoundException(`Failed to find form with id: ${id}`);
+  async findOne(identifier: string, language?: Language): Promise<FormInstrumentEntity> {
+    const result = await this.formModel.findOne({ 'details.language': language, identifier });
+    if (!result || result.kind !== 'form') {
+      throw new NotFoundException(`Failed to find form with identifier: ${identifier}`);
     }
     return result;
+  }
+
+  async getAvailable(): Promise<FormInstrumentSummary[]> {
+    return this.formModel.find({ kind: 'form' }).select('identifier name tags version details').lean();
   }
 
   getFields<T extends FormInstrumentData>(instrument: FormInstrument<T>): FormFields<T> {
@@ -96,7 +91,11 @@ export class FormsService {
     return fields;
   }
 
-  private createIdentifier(name: string, version: number): string {
-    return this.cryptoService.hash(name + version);
+  async remove(id: string): Promise<FormInstrumentEntity> {
+    const result = await this.formModel.findByIdAndDelete(id, { new: true });
+    if (!result) {
+      throw new NotFoundException(`Failed to find form with id: ${id}`);
+    }
+    return result;
   }
 }

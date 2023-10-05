@@ -1,17 +1,17 @@
+import { beforeEach, describe, expect, it } from 'bun:test';
+
+import type { LoginRequestDto } from '../dto/login-request.dto';
+import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
-import { beforeEach, describe, expect, it } from 'bun:test';
-
-import { AuthService } from '../auth.service';
-import type { LoginRequestDto } from '../dto/login-request.dto';
-
 import { AbilityFactory } from '@/ability/ability.factory';
 import { UsersService } from '@/users/users.service';
+
+import { AuthService } from '../auth.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -58,8 +58,8 @@ describe('AuthService', () => {
 
     beforeEach(() => {
       loginRequest = Object.freeze({
-        username: 'admin',
-        password: 'Password123'
+        password: 'Password123',
+        username: 'admin'
       });
     });
 

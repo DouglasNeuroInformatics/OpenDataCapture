@@ -1,8 +1,7 @@
+import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import type { AuthPayload, JwtPayload } from '@open-data-capture/types';
 
 import { AbilityFactory } from '@/ability/ability.factory';
@@ -18,31 +17,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService
   ) {}
-
-  /** Validates the provided credentials and returns an access token */
-  async login(username: string, password: string): Promise<AuthPayload> {
-    const user = await this.getUser(username);
-    await user.populate('groups', 'name');
-
-    const isAuth = await this.cryptoService.comparePassword(password, user.password);
-    if (!isAuth) {
-      throw new UnauthorizedException('Invalid password');
-    }
-
-    const ability = this.abilityFactory.createForUser(user);
-
-    const payload: JwtPayload = {
-      username: user.username,
-      permissions: ability.rules,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      groups: user.groups
-    };
-
-    const accessToken = await this.signToken(payload);
-
-    return { accessToken };
-  }
 
   /** Wraps UserService.getByUsername with appropriate exception handling */
   private async getUser(username: string): Promise<UserDocument> {
@@ -65,5 +39,30 @@ export class AuthService {
       expiresIn: '1d',
       secret: this.configService.getOrThrow<string>('SECRET_KEY')
     });
+  }
+
+  /** Validates the provided credentials and returns an access token */
+  async login(username: string, password: string): Promise<AuthPayload> {
+    const user = await this.getUser(username);
+    await user.populate('groups', 'name');
+
+    const isAuth = await this.cryptoService.comparePassword(password, user.password);
+    if (!isAuth) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    const ability = this.abilityFactory.createForUser(user);
+
+    const payload: JwtPayload = {
+      firstName: user.firstName,
+      groups: user.groups,
+      lastName: user.lastName,
+      permissions: ability.rules,
+      username: user.username
+    };
+
+    const accessToken = await this.signToken(payload);
+
+    return { accessToken };
   }
 }

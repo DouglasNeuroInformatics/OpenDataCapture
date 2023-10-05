@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
+
 import { SetupDto } from './dto/setup.dto';
 import { SetupService } from './setup.service';
-
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 @ApiTags('Setup')
 @Controller({ path: 'setup' })
@@ -12,8 +12,8 @@ export class SetupController {
   constructor(private readonly setupService: SetupService) {}
 
   @ApiOperation({
-    summary: 'Get State',
-    description: 'Return the current setup state'
+    description: 'Return the current setup state',
+    summary: 'Get State'
   })
   @Get()
   @RouteAccess('public')
@@ -22,11 +22,11 @@ export class SetupController {
   }
 
   @ApiOperation({
-    summary: 'Initialize',
     description: [
       'Initialize an instance of the application with a default admin user.',
       'Although this route is public, this operation may only be performed when there are no users in the database.'
-    ].join(' ')
+    ].join(' '),
+    summary: 'Initialize'
   })
   @Post()
   @RouteAccess('public')

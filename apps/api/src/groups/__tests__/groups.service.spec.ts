@@ -1,8 +1,8 @@
 // import { ConflictException, NotFoundException } from '@nestjs/common';
+import { beforeEach, describe, expect, it } from 'bun:test';
+
 import { getModelToken } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
-
-import { beforeEach, describe, expect, it } from 'bun:test';
 
 import { GroupEntity } from '../entities/group.entity';
 import { GroupsService } from '../groups.service';

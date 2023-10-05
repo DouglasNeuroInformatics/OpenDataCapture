@@ -1,13 +1,12 @@
+import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
+import { ExceptionsFilter, LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
+import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module, ValidationPipe } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-
-import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
-import { ExceptionsFilter, LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
-import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Connection } from 'mongoose';
 
 import { AuthModule } from './auth/auth.module';
@@ -27,8 +26,8 @@ import { UsersModule } from './users/users.module';
       isGlobal: true
     }),
     CryptoModule.registerAsync({
-      isGlobal: true,
       inject: [ConfigService],
+      isGlobal: true,
       useFactory: (configService: ConfigService) => ({
         secretKey: configService.getOrThrow('SECRET_KEY')
       })
@@ -54,19 +53,19 @@ import { UsersModule } from './users/users.module';
     SubjectsModule,
     ThrottlerModule.forRoot([
       {
+        limit: 25,
         name: 'short',
-        ttl: 1000,
-        limit: 25
+        ttl: 1000
       },
       {
+        limit: 100,
         name: 'medium',
-        ttl: 10000,
-        limit: 100
+        ttl: 10000
       },
       {
+        limit: 250,
         name: 'long',
-        ttl: 60000,
-        limit: 250
+        ttl: 60000
       }
     ]),
     UsersModule,

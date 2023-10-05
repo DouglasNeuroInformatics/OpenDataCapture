@@ -1,15 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-
 import { type AppAbility } from '@open-data-capture/types';
+
+import { CurrentUser } from '@/core/decorators/current-user.decorator';
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupEntity } from './entities/group.entity';
 import { GroupsService } from './groups.service';
-
-import { CurrentUser } from '@/core/decorators/current-user.decorator';
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 @ApiTags('Groups')
 @Controller('groups')
@@ -37,17 +36,17 @@ export class GroupsController {
     return this.groupsService.findByName(name, ability);
   }
 
-  @ApiOperation({ description: 'Returns the updated group', summary: 'Update Group' })
-  @Patch(':name')
-  @RouteAccess({ action: 'update', subject: 'Group' })
-  update(@Param('name') name: string, @Body() updateGroupDto: UpdateGroupDto): Promise<GroupEntity> {
-    return this.groupsService.update(name, updateGroupDto);
-  }
-
   @ApiOperation({ description: 'Returns the deleted user', summary: 'Delete Group' })
   @Delete(':name')
   @RouteAccess({ action: 'delete', subject: 'Group' })
   remove(@Param('name') name: string): Promise<GroupEntity> {
     return this.groupsService.remove(name);
+  }
+
+  @ApiOperation({ description: 'Returns the updated group', summary: 'Update Group' })
+  @Patch(':name')
+  @RouteAccess({ action: 'update', subject: 'Group' })
+  update(@Param('name') name: string, @Body() updateGroupDto: UpdateGroupDto): Promise<GroupEntity> {
+    return this.groupsService.update(name, updateGroupDto);
   }
 }

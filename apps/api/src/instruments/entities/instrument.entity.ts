@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
 import { type InstrumentKind } from '@open-data-capture/types';
 import { type HydratedDocument } from 'mongoose';
 
@@ -9,11 +8,13 @@ import { BaseInstrumentEntity } from './base-instrument.entity';
 export class InstrumentEntity implements BaseInstrumentEntity {
   static readonly modelName = 'Instrument';
 
-  @Prop({ enum: ['form'] satisfies InstrumentKind[], required: true, type: String })
-  kind: InstrumentKind;
+  content: unknown;
 
   @Prop({ required: true })
   identifier: string;
+
+  @Prop({ enum: ['form'] satisfies InstrumentKind[], required: true, type: String })
+  kind: InstrumentKind;
 
   @Prop({ required: true })
   name: string;
@@ -23,8 +24,6 @@ export class InstrumentEntity implements BaseInstrumentEntity {
 
   @Prop({ required: true })
   version: number;
-
-  content: any;
 }
 
 export type InstrumentDocument = HydratedDocument<InstrumentEntity>;
