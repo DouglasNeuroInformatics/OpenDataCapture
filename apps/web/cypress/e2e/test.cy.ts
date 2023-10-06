@@ -28,7 +28,7 @@ describe('look at questionaire', () => {
       cy.get('input[class=field-input]').type('2023-09-21')
       cy.get('button[class="field-input capitalize"]').click({force:true})
       cy.get('body').click()
-      cy.get('li').contains('Male').click()
+      cy.get('li[id="headlessui-listbox-option-:rp:"]').first().click()
       cy.get('button[type="submit"]').click()
 
       cy.wait(2000)
