@@ -20,7 +20,7 @@ describe('tags test', () => {
     
     
     cy.get('span[data-cy="view-instrument"]').first().click({force: true})
-    cy.get('button').contains('Tags').click()
+    cy.get('div[data-cy="tags"]').click()
     cy.get('span').contains('Well-Being').click({force: true})
     cy.get('h5[data-cy="instrument-card"]').first().should('have.text','Tags: Well-Being')
 
