@@ -26,19 +26,20 @@ export class FormsController {
     return this.formsService.findAll();
   }
 
-  @ApiOperation({ description: 'Returns the provided form', summary: 'Find Form' })
-  @Get(':id')
-  @RouteAccess({ action: 'read', subject: 'Instrument' })
-  findOne(@Param('id') identifier: string, @Query('lang') language?: Language): Promise<FormInstrument> {
-    return this.formsService.findOne(identifier, language);
-  }
-
   @ApiOperation({ description: 'Returns a summary of all available forms', summary: 'Get Summary of All Forms' })
   @Get('available')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   getAvailable(): Promise<FormInstrumentSummary[]> {
     console.log('Checking available');
     return this.formsService.getAvailable();
+  }
+
+  // eslint-disable-next-line perfectionist/sort-classes
+  @ApiOperation({ description: 'Returns the provided form', summary: 'Find Form' })
+  @Get(':id')
+  @RouteAccess({ action: 'read', subject: 'Instrument' })
+  findOne(@Param('id') identifier: string, @Query('lang') language?: Language): Promise<FormInstrument> {
+    return this.formsService.findOne(identifier, language);
   }
 
   @ApiOperation({ description: 'Returns the deleted instrument', summary: 'Delete Form' })
