@@ -37,6 +37,7 @@ export class FormsController {
   @Get('available')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   getAvailable(): Promise<FormInstrumentSummary[]> {
+    console.log('Checking available');
     return this.formsService.getAvailable();
   }
 
