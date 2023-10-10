@@ -1,4 +1,4 @@
-name: build
+name: Build Release
 on:
   release:
     types: [published]
@@ -46,7 +46,9 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            VITE_DOCS_URL=https://docs.opendatacapture.org
-            VITE_CONTACT_EMAIL=support@douglasneuroinformatics.ca
-            VITE_GITHUB_REPO_URL=https://github.com/DouglasNeuroInformatics/OpenDataCapture
-            VITE_LICENSE_URL=https://www.gnu.org/licenses/agpl-3.0.en.html
+            CONTACT_EMAIL=support@douglasneuroinformatics.ca
+            DOCS_URL=https://docs.opendatacapture.org
+            GITHUB_REPO_URL=https://github.com/DouglasNeuroInformatics/OpenDataCapture
+            LICENSE_URL=https://www.gnu.org/licenses/agpl-3.0.en.html
+            VITE_API_BASE_URL=/api
+  
