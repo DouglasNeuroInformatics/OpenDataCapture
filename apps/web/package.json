@@ -6,10 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "tsc && cross-env NODE_ENV=production bunx vite build",
-    "check-types": "tsc",
     "dev": "bunx --bun vite",
     "format": "prettier --write src",
-    "lint": "eslint --fix src",
+    "lint": "tsc && eslint --fix src",
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {

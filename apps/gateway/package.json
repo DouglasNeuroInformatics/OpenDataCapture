@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "bun run --watch src/server.tsx",
     "format": "prettier --write src",
-    "lint": "eslint --fix src"
+    "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "react": "^18.2.0",

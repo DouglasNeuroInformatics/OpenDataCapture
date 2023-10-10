@@ -6,10 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "bun ./src/build.ts",
-    "check-types": "tsc",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --watch src/main.ts",
     "format": "prettier --write src",
-    "lint": "eslint --fix src"
+    "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
