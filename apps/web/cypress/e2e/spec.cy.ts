@@ -48,11 +48,11 @@ describe('Graph test', () => {
     cy.get('span[data-cy="view-subjects"]').first().click({force: true})
     cy.get('td').first().click()
     cy.get('a[data-cy="graph"]').first().click()
-    cy.get('button').contains('Instrument').click()
-    cy.get('button').contains('Happiness Questionnaire').click()
+    cy.get('div[data-cy="instrument-select"]').contains('Instrument').click()
+    cy.get('button[id*="headlessui-menu-item-:"]').first().click()
 
-    cy.get('button').contains('Measures').click()
-    cy.get('span').contains('Overall Happiness').click()
+    cy.get('div[data-cy="measure-select"]').contains('Measures').click()
+    cy.get('li[id*="headlessui-listbox-option-:"]').first().click()
 
 
   })

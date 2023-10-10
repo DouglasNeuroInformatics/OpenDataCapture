@@ -36,7 +36,7 @@ describe('look at questionaire', () => {
       cy.get('span[data-cy="view-instrument"]').first().click({force: true})
       cy.url().should('include', 'instruments/available')
       cy.wait(2000)
-      cy.get('div').contains('Questionnaire').first().click()
+      cy.get('h3[data-cy="instrument-title"]').first().click()
 
       cy.get('button').contains('Begin').click()
       cy.get('input[name=firstName]').should('have.value', name)

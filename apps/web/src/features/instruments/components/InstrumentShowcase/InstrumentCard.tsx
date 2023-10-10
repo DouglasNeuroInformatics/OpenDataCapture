@@ -29,7 +29,7 @@ export const InstrumentCard = ({ instrument }: InstrumentCardProps) => {
           <InstrumentImage kind={instrument.kind} />
         </div>
         <div className="flex-grow">
-          <h3 className="title-font mb-1 text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="title-font mb-1 text-lg font-semibold text-slate-900 dark:text-slate-100" data-cy="instrument-title">
             {instrument.details.title}
           </h3>
           <h5 className="mb-2 text-slate-600 dark:text-slate-300" data-cy='instrument-card'>{`${t(
