@@ -54,35 +54,35 @@ export default defineConfig({
     {
       ...copy({
         copySync: true,
+        hook: 'buildStart',
         targets: [
           {
-            src: 'src/translations/*',
             dest: 'dist/locales/en',
+            src: 'src/translations/*',
             transform: (contents) => {
               const translations = JSON.parse(contents.toString());
               return JSON.stringify(transformTranslations(translations, 'en'), null, 2);
             }
           }
-        ],
-        hook: 'buildStart'
+        ]
       })
     }
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(projectDir, 'src')
+    }
+  },
   server: {
     port: parseInt(process.env.WEB_DEV_SERVER_PORT ?? '3000'),
     proxy: {
       '/api/': {
+        rewrite: (path) => path.replace(/^\/api/, ''),
         target: {
           host: 'localhost',
           port: parseInt(process.env.API_DEV_SERVER_PORT ?? '5500')
-        },
-        rewrite: (path) => path.replace(/^\/api/, '')
+        }
       }
-    }
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(projectDir, 'src')
     }
   }
 });
