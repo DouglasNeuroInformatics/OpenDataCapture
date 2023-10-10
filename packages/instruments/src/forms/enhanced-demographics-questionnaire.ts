@@ -10,6 +10,10 @@ const employmentStatus = {
     en: 'Part-Time',
     fr: 'Temps partiel'
   },
+  retired: {
+    en: 'Retired',
+    fr: 'Retraité'
+  },
   student: {
     en: 'Student',
     fr: 'Étudiant'
@@ -17,417 +21,413 @@ const employmentStatus = {
   unemployed: {
     en: 'Unemployed',
     fr: 'Au chômage'
-  },
-  retired: {
-    en: 'Retired',
-    fr: 'Retraité'
   }
 };
 
 const ethnicOrigin = {
-  canadian: {
-    en: 'Canadian',
-    fr: 'Canadien'
-  },
-  english: {
-    en: 'English',
-    fr: 'Anglais'
-  },
-  scottish: {
-    en: 'Scottish',
-    fr: 'Écossais'
-  },
-  french: {
-    en: 'French',
-    fr: 'Français'
-  },
-  irish: {
-    en: 'Irish',
-    fr: 'Irlandais'
-  },
-  german: {
-    en: 'German',
-    fr: 'Allemand'
-  },
-  chinese: {
-    en: 'Chinese',
-    fr: 'Chinois'
-  },
-  italian: {
-    en: 'Italian',
-    fr: 'Italien'
-  },
-  firstNations: {
-    en: 'First Nations (North American Indian)',
-    fr: "Premières Nations (Indien de l'Amérique du Nord)"
-  },
-  eastIndian: {
-    en: 'East Indian',
-    fr: "Indien de l'Inde"
-  },
-  ukrainian: {
-    en: 'Ukrainian',
-    fr: 'Ukrainien'
-  },
-  dutch: {
-    en: 'Dutch',
-    fr: 'Hollandais'
-  },
-  polish: {
-    en: 'Polish',
-    fr: 'Polonais'
-  },
-  filipino: {
-    en: 'Filipino',
-    fr: 'Philippin'
-  },
-  britishIslesOrigins: {
-    en: 'British Isles origins, n.i.e.',
-    fr: 'Origines des îles britanniques, n.i.a.'
-  },
-  russian: {
-    en: 'Russian',
-    fr: 'Russe'
-  },
-  métis: {
-    en: 'Métis',
-    fr: 'Métis'
-  },
-  portuguese: {
-    en: 'Portuguese',
-    fr: 'Portugais'
-  },
-  welsh: {
-    en: 'Welsh',
-    fr: 'Gallois'
-  },
-  norwegian: {
-    en: 'Norwegian',
-    fr: 'Norvégien'
-  },
-  spanish: {
-    en: 'Spanish',
-    fr: 'Espagnol'
-  },
-  american: {
-    en: 'American',
-    fr: 'Américain'
-  },
-  swedish: {
-    en: 'Swedish',
-    fr: 'Suédois'
-  },
-  hungarian: {
-    en: 'Hungarian',
-    fr: 'Hongrois'
-  },
-  jamaican: {
-    en: 'Jamaican',
-    fr: 'Jamaïquain'
-  },
-  greek: {
-    en: 'Greek',
-    fr: 'Grec'
-  },
-  vietnamese: {
-    en: 'Vietnamese',
-    fr: 'Vietnamien'
-  },
-  romanian: {
-    en: 'Romanian',
-    fr: 'Roumain'
-  },
-  lebanese: {
-    en: 'Lebanese',
-    fr: 'Libanais'
-  },
-  pakistani: {
-    en: 'Pakistani',
-    fr: 'Pakistanais'
-  },
-  otherAfricanOrigins: {
-    en: 'Other African origins, n.i.e.',
-    fr: 'Autres origines africaines, n.i.a.'
-  },
-  iranian: {
-    en: 'Iranian',
-    fr: 'Iranien'
-  },
-  danish: {
-    en: 'Danish',
-    fr: 'Danois'
-  },
-  austrian: {
-    en: 'Austrian',
-    fr: 'Autrichien'
-  },
-  korean: {
-    en: 'Korean',
-    fr: 'Coréen'
-  },
-  québécois: {
-    en: 'Québécois',
-    fr: 'Québécois'
-  },
-  belgian: {
-    en: 'Belgian',
-    fr: 'Belge'
-  },
-  haitian: {
-    en: 'Haitian',
-    fr: 'Haïtien'
-  },
-  swiss: {
-    en: 'Swiss',
-    fr: 'Suisse'
-  },
-  sriLankan: {
-    en: 'Sri Lankan',
-    fr: 'Sri-Lankais'
-  },
-  jewish: {
-    en: 'Jewish',
-    fr: 'Juif'
-  },
-  finnish: {
-    en: 'Finnish',
-    fr: 'Finlandais'
-  },
-  croatian: {
-    en: 'Croatian',
-    fr: 'Croate'
-  },
-  mexican: {
-    en: 'Mexican',
-    fr: 'Mexicain'
-  },
-  japanese: {
-    en: 'Japanese',
-    fr: 'Japonais'
-  },
   acadian: {
     en: 'Acadian',
     fr: 'Acadien'
-  },
-  punjabi: {
-    en: 'Punjabi',
-    fr: 'Pendjabi'
-  },
-  arab: {
-    en: 'Arab, n.o.s.',
-    fr: 'Arabe, n.d.a.'
-  },
-  czech: {
-    en: 'Czech',
-    fr: 'Tchèque'
-  },
-  moroccan: {
-    en: 'Moroccan',
-    fr: 'Marocain'
-  },
-  icelandic: {
-    en: 'Icelandic',
-    fr: 'Islandais'
-  },
-  egyptian: {
-    en: 'Egyptian',
-    fr: 'Égyptien'
-  },
-  serbian: {
-    en: 'Serbian',
-    fr: 'Serbe'
-  },
-  colombian: {
-    en: 'Colombian',
-    fr: 'Colombien'
-  },
-  guyanese: {
-    en: 'Guyanese',
-    fr: 'Guyanais'
   },
   afghan: {
     en: 'Afghan',
     fr: 'Afghan'
   },
-  inuit: {
-    en: 'Inuit',
-    fr: 'Inuit'
-  },
-  trinidadianTobagonian: {
-    en: 'Trinidadian/Tobagonian',
-    fr: 'Trinidadien/Tobagonien'
-  },
-  syrian: {
-    en: 'Syrian',
-    fr: 'Syrien'
-  },
-  southAsianOrigins: {
-    en: 'South Asian origins, n.i.e.',
-    fr: 'Origines sud-asiatiques, n.i.a.'
-  },
-  slovak: {
-    en: 'Slovak',
-    fr: 'Slovaque'
-  },
-  iraqi: {
-    en: 'Iraqi',
-    fr: 'Irakien'
-  },
-  westIndian: {
-    en: 'West Indian, n.o.s.',
-    fr: 'Antillais Britannique, n.d.a.'
-  },
-  otherEuropeanOrigins: {
-    en: 'Other European origins, n.i.e.',
-    fr: 'Autres origines européennes, n.i.a.'
+  albanian: {
+    en: 'Albanian',
+    fr: 'Albanais'
   },
   algerian: {
     en: 'Algerian',
     fr: 'Algérien'
   },
-  salvadorean: {
-    en: 'Salvadorean',
-    fr: 'Salvadorien'
+  american: {
+    en: 'American',
+    fr: 'Américain'
   },
-  turk: {
-    en: 'Turk',
-    fr: 'Turc'
+  arab: {
+    en: 'Arab, n.o.s.',
+    fr: 'Arabe, n.d.a.'
   },
   armenian: {
     en: 'Armenian',
     fr: 'Arménien'
   },
-  somali: {
-    en: 'Somali',
-    fr: 'Somalien'
+  australian: {
+    en: 'Australian',
+    fr: 'Australien'
   },
-  lithuanian: {
-    en: 'Lithuanian',
-    fr: 'Lituanien'
-  },
-  northernEuropeanOrigins: {
-    en: 'Northern European origins, n.i.e.',
-    fr: "Origines d'Europe du Nord, n.i.a."
-  },
-  nigerian: {
-    en: 'Nigerian',
-    fr: 'Nigérian'
-  },
-  tamil: {
-    en: 'Tamil',
-    fr: 'Tamoul'
+  austrian: {
+    en: 'Austrian',
+    fr: 'Autrichien'
   },
   bangladeshi: {
     en: 'Bangladeshi',
     fr: 'Bangladeshi'
   },
-  chilean: {
-    en: 'Chilean',
-    fr: 'Chilien'
-  },
-  palestinian: {
-    en: 'Palestinian',
-    fr: 'Palestinien'
-  },
-  ethiopian: {
-    en: 'Ethiopian',
-    fr: 'Éthiopien'
-  },
-  macedonian: {
-    en: 'Macedonian',
-    fr: 'Macédonien'
-  },
-  australian: {
-    en: 'Australian',
-    fr: 'Australien'
-  },
-  peruvian: {
-    en: 'Peruvian',
-    fr: 'Péruvien'
-  },
-  maltese: {
-    en: 'Maltese',
-    fr: 'Maltais'
-  },
-  southAfrican: {
-    en: 'South African',
-    fr: 'Sud-Africain'
-  },
-  czechoslovakian: {
-    en: 'Czechoslovakian, n.o.s.',
-    fr: 'Tchécoslovaque, n.d.a.'
-  },
-  slovenian: {
-    en: 'Slovenian',
-    fr: 'Slovène'
-  },
-  cambodian: {
-    en: 'Cambodian (Khmer)',
-    fr: 'Cambodgien (Khmer)'
-  },
-  yugoslavian: {
-    en: 'Yugoslavian, n.o.s.',
-    fr: 'Yougoslave, n.d.a.'
-  },
-  congolese: {
-    en: 'Congolese',
-    fr: 'Congolais'
-  },
   barbadian: {
     en: 'Barbadian',
     fr: 'Barbadien'
+  },
+  belgian: {
+    en: 'Belgian',
+    fr: 'Belge'
   },
   berber: {
     en: 'Berber',
     fr: 'Berbère'
   },
+  black: {
+    en: 'Black, n.o.s.',
+    fr: 'Noir, n.d.a.'
+  },
   brazilian: {
     en: 'Brazilian',
     fr: 'Brésilien'
   },
-  taiwanese: {
-    en: 'Taiwanese',
-    fr: 'Taïwanais'
-  },
-  albanian: {
-    en: 'Albanian',
-    fr: 'Albanais'
-  },
-  ghanaian: {
-    en: 'Ghanaian',
-    fr: 'Ghanéen'
+  britishIslesOrigins: {
+    en: 'British Isles origins, n.i.e.',
+    fr: 'Origines des îles britanniques, n.i.a.'
   },
   bulgarian: {
     en: 'Bulgarian',
     fr: 'Bulgare'
   },
-  latvian: {
-    en: 'Latvian',
-    fr: 'Letton'
+  cambodian: {
+    en: 'Cambodian (Khmer)',
+    fr: 'Cambodgien (Khmer)'
   },
-  black: {
-    en: 'Black, n.o.s.',
-    fr: 'Noir, n.d.a.'
-  },
-  cuban: {
-    en: 'Cuban',
-    fr: 'Cubain'
-  },
-  israeli: {
-    en: 'Israeli',
-    fr: 'Israélien'
-  },
-  latinCentralAndSouthAmericanOrigins: {
-    en: 'Latin, Central and South American origins, n.i.e.',
-    fr: "Origines de l'Amérique latine, centrale et du Sud, n.i.a."
+  canadian: {
+    en: 'Canadian',
+    fr: 'Canadien'
   },
   caribbeanOrigins: {
     en: 'Caribbean origins, n.i.e.',
     fr: 'Origines des Caraïbes, n.i.a.'
   },
+  chilean: {
+    en: 'Chilean',
+    fr: 'Chilien'
+  },
+  chinese: {
+    en: 'Chinese',
+    fr: 'Chinois'
+  },
+  colombian: {
+    en: 'Colombian',
+    fr: 'Colombien'
+  },
+  congolese: {
+    en: 'Congolese',
+    fr: 'Congolais'
+  },
+  croatian: {
+    en: 'Croatian',
+    fr: 'Croate'
+  },
+  cuban: {
+    en: 'Cuban',
+    fr: 'Cubain'
+  },
+  czech: {
+    en: 'Czech',
+    fr: 'Tchèque'
+  },
+  czechoslovakian: {
+    en: 'Czechoslovakian, n.o.s.',
+    fr: 'Tchécoslovaque, n.d.a.'
+  },
+  danish: {
+    en: 'Danish',
+    fr: 'Danois'
+  },
+  dutch: {
+    en: 'Dutch',
+    fr: 'Hollandais'
+  },
+  eastIndian: {
+    en: 'East Indian',
+    fr: "Indien de l'Inde"
+  },
+  egyptian: {
+    en: 'Egyptian',
+    fr: 'Égyptien'
+  },
+  english: {
+    en: 'English',
+    fr: 'Anglais'
+  },
+  ethiopian: {
+    en: 'Ethiopian',
+    fr: 'Éthiopien'
+  },
+  filipino: {
+    en: 'Filipino',
+    fr: 'Philippin'
+  },
+  finnish: {
+    en: 'Finnish',
+    fr: 'Finlandais'
+  },
+  firstNations: {
+    en: 'First Nations (North American Indian)',
+    fr: "Premières Nations (Indien de l'Amérique du Nord)"
+  },
+  french: {
+    en: 'French',
+    fr: 'Français'
+  },
+  german: {
+    en: 'German',
+    fr: 'Allemand'
+  },
+  ghanaian: {
+    en: 'Ghanaian',
+    fr: 'Ghanéen'
+  },
+  greek: {
+    en: 'Greek',
+    fr: 'Grec'
+  },
+  guyanese: {
+    en: 'Guyanese',
+    fr: 'Guyanais'
+  },
+  haitian: {
+    en: 'Haitian',
+    fr: 'Haïtien'
+  },
+  hungarian: {
+    en: 'Hungarian',
+    fr: 'Hongrois'
+  },
+  icelandic: {
+    en: 'Icelandic',
+    fr: 'Islandais'
+  },
+  inuit: {
+    en: 'Inuit',
+    fr: 'Inuit'
+  },
+  iranian: {
+    en: 'Iranian',
+    fr: 'Iranien'
+  },
+  iraqi: {
+    en: 'Iraqi',
+    fr: 'Irakien'
+  },
+  irish: {
+    en: 'Irish',
+    fr: 'Irlandais'
+  },
+  israeli: {
+    en: 'Israeli',
+    fr: 'Israélien'
+  },
+  italian: {
+    en: 'Italian',
+    fr: 'Italien'
+  },
+  jamaican: {
+    en: 'Jamaican',
+    fr: 'Jamaïquain'
+  },
+  japanese: {
+    en: 'Japanese',
+    fr: 'Japonais'
+  },
+  jewish: {
+    en: 'Jewish',
+    fr: 'Juif'
+  },
+  korean: {
+    en: 'Korean',
+    fr: 'Coréen'
+  },
+  latinCentralAndSouthAmericanOrigins: {
+    en: 'Latin, Central and South American origins, n.i.e.',
+    fr: "Origines de l'Amérique latine, centrale et du Sud, n.i.a."
+  },
+  latvian: {
+    en: 'Latvian',
+    fr: 'Letton'
+  },
+  lebanese: {
+    en: 'Lebanese',
+    fr: 'Libanais'
+  },
+  lithuanian: {
+    en: 'Lithuanian',
+    fr: 'Lituanien'
+  },
+  macedonian: {
+    en: 'Macedonian',
+    fr: 'Macédonien'
+  },
+  maltese: {
+    en: 'Maltese',
+    fr: 'Maltais'
+  },
+  mexican: {
+    en: 'Mexican',
+    fr: 'Mexicain'
+  },
   mixed: {
     en: 'Mixed origin',
     fr: 'Origine mixte'
+  },
+  moroccan: {
+    en: 'Moroccan',
+    fr: 'Marocain'
+  },
+  métis: {
+    en: 'Métis',
+    fr: 'Métis'
+  },
+  nigerian: {
+    en: 'Nigerian',
+    fr: 'Nigérian'
+  },
+  northernEuropeanOrigins: {
+    en: 'Northern European origins, n.i.e.',
+    fr: "Origines d'Europe du Nord, n.i.a."
+  },
+  norwegian: {
+    en: 'Norwegian',
+    fr: 'Norvégien'
+  },
+  otherAfricanOrigins: {
+    en: 'Other African origins, n.i.e.',
+    fr: 'Autres origines africaines, n.i.a.'
+  },
+  otherEuropeanOrigins: {
+    en: 'Other European origins, n.i.e.',
+    fr: 'Autres origines européennes, n.i.a.'
+  },
+  pakistani: {
+    en: 'Pakistani',
+    fr: 'Pakistanais'
+  },
+  palestinian: {
+    en: 'Palestinian',
+    fr: 'Palestinien'
+  },
+  peruvian: {
+    en: 'Peruvian',
+    fr: 'Péruvien'
+  },
+  polish: {
+    en: 'Polish',
+    fr: 'Polonais'
+  },
+  portuguese: {
+    en: 'Portuguese',
+    fr: 'Portugais'
+  },
+  punjabi: {
+    en: 'Punjabi',
+    fr: 'Pendjabi'
+  },
+  québécois: {
+    en: 'Québécois',
+    fr: 'Québécois'
+  },
+  romanian: {
+    en: 'Romanian',
+    fr: 'Roumain'
+  },
+  russian: {
+    en: 'Russian',
+    fr: 'Russe'
+  },
+  salvadorean: {
+    en: 'Salvadorean',
+    fr: 'Salvadorien'
+  },
+  scottish: {
+    en: 'Scottish',
+    fr: 'Écossais'
+  },
+  serbian: {
+    en: 'Serbian',
+    fr: 'Serbe'
+  },
+  slovak: {
+    en: 'Slovak',
+    fr: 'Slovaque'
+  },
+  slovenian: {
+    en: 'Slovenian',
+    fr: 'Slovène'
+  },
+  somali: {
+    en: 'Somali',
+    fr: 'Somalien'
+  },
+  southAfrican: {
+    en: 'South African',
+    fr: 'Sud-Africain'
+  },
+  southAsianOrigins: {
+    en: 'South Asian origins, n.i.e.',
+    fr: 'Origines sud-asiatiques, n.i.a.'
+  },
+  spanish: {
+    en: 'Spanish',
+    fr: 'Espagnol'
+  },
+  sriLankan: {
+    en: 'Sri Lankan',
+    fr: 'Sri-Lankais'
+  },
+  swedish: {
+    en: 'Swedish',
+    fr: 'Suédois'
+  },
+  swiss: {
+    en: 'Swiss',
+    fr: 'Suisse'
+  },
+  syrian: {
+    en: 'Syrian',
+    fr: 'Syrien'
+  },
+  taiwanese: {
+    en: 'Taiwanese',
+    fr: 'Taïwanais'
+  },
+  tamil: {
+    en: 'Tamil',
+    fr: 'Tamoul'
+  },
+  trinidadianTobagonian: {
+    en: 'Trinidadian/Tobagonian',
+    fr: 'Trinidadien/Tobagonien'
+  },
+  turk: {
+    en: 'Turk',
+    fr: 'Turc'
+  },
+  ukrainian: {
+    en: 'Ukrainian',
+    fr: 'Ukrainien'
+  },
+  vietnamese: {
+    en: 'Vietnamese',
+    fr: 'Vietnamien'
+  },
+  welsh: {
+    en: 'Welsh',
+    fr: 'Gallois'
+  },
+  westIndian: {
+    en: 'West Indian, n.o.s.',
+    fr: 'Antillais Britannique, n.d.a.'
+  },
+  yugoslavian: {
+    en: 'Yugoslavian, n.o.s.',
+    fr: 'Yougoslave, n.d.a.'
   }
 };
 
@@ -447,13 +447,13 @@ const firstLanguage = {
 };
 
 const gender = {
-  male: {
-    en: 'Man',
-    fr: 'Homme'
-  },
   female: {
     en: 'Woman',
     fr: 'Femme'
+  },
+  male: {
+    en: 'Man',
+    fr: 'Homme'
   },
   nonBinary: {
     en: 'Non-Binary',
@@ -462,13 +462,17 @@ const gender = {
 };
 
 const maritalStatus = {
-  married: {
-    en: 'Married',
-    fr: 'Marié'
-  },
   commonLaw: {
     en: 'Living common law',
     fr: 'Vivant en union libre'
+  },
+  divorced: {
+    en: 'Divorced (not living common law)',
+    fr: 'Divorcé (ne vivant pas en union libre)'
+  },
+  married: {
+    en: 'Married',
+    fr: 'Marié'
   },
   neverMarried: {
     en: 'Never married (not living common law)',
@@ -478,10 +482,6 @@ const maritalStatus = {
     en: 'Separated (not living common law)',
     fr: 'Séparé (ne vivant pas en union libre)'
   },
-  divorced: {
-    en: 'Divorced (not living common law)',
-    fr: 'Divorcé (ne vivant pas en union libre)'
-  },
   widowed: {
     en: 'Widowed (not living common law)',
     fr: 'Veuf (ne vivant pas en union libre)'
@@ -489,6 +489,10 @@ const maritalStatus = {
 };
 
 const religion = {
+  agnostic: {
+    en: 'Agnostic',
+    fr: 'Agnostique'
+  },
   buddhist: {
     en: 'Buddhist',
     fr: 'Bouddhiste'
@@ -501,6 +505,10 @@ const religion = {
     en: 'Hindu',
     fr: 'Hindoue'
   },
+  indigenous: {
+    en: 'Traditional (North American Indigenous) spirituality',
+    fr: "Spiritualité traditionnelle (Autochtone d'Amérique du Nord)"
+  },
   jewish: {
     en: 'Jewish',
     fr: 'Juive'
@@ -509,25 +517,17 @@ const religion = {
     en: 'Muslim',
     fr: 'Musulmane'
   },
-  sikh: {
-    en: 'Sikh',
-    fr: 'Sikhe'
-  },
-  indigenous: {
-    en: 'Traditional (North American Indigenous) spirituality',
-    fr: "Spiritualité traditionnelle (Autochtone d'Amérique du Nord)"
+  none: {
+    en: 'No religion and secular perspectives',
+    fr: 'Aucune religion et perspectives séculières'
   },
   other: {
     en: 'Other religions and spiritual traditions',
     fr: 'Autres traditions religieuses et spirituelles'
   },
-  none: {
-    en: 'No religion and secular perspectives',
-    fr: 'Aucune religion et perspectives séculières'
-  },
-  agnostic: {
-    en: 'Agnostic',
-    fr: 'Agnostique'
+  sikh: {
+    en: 'Sikh',
+    fr: 'Sikhe'
   }
 };
 
@@ -540,78 +540,48 @@ type Religion = keyof typeof religion;
 
 const yesNoOptions = {
   en: {
-    t: 'Yes',
-    f: 'No'
+    f: 'No',
+    t: 'Yes'
   },
   fr: {
-    t: 'Oui',
-    f: 'Non'
+    f: 'Non',
+    t: 'Oui'
   }
 } as const;
 
 type EnhancedDemographicsQuestionnaireData = {
-  // Personal Characteristics
-  gender?: Gender;
-  ethnicOrigin?: EthnicOrigin;
-  religion?: Religion;
-
-  // Language
-  firstLanguage?: FirstLanguage;
-  speaksEnglish?: boolean;
-  speaksFrench?: boolean;
-
-  // Living Situation
-  postalCode?: string;
-  householdSize?: number;
-  numberChildren?: number;
-  maritalStatus?: MartialStatus;
-
+  ageAtImmigration?: number;
   // Economic
   annualIncome?: number;
   employmentStatus?: EmploymentStatus;
 
-  // Education
-  yearsOfEducation?: number;
+  ethnicOrigin?: EthnicOrigin;
+  // Language
+  firstLanguage?: FirstLanguage;
+  // Personal Characteristics
+  gender?: Gender;
 
+  householdSize?: number;
   // Immigration
   isCanadianCitizen?: boolean;
-  ageAtImmigration?: number;
+  maritalStatus?: MartialStatus;
+  numberChildren?: number;
+
+  // Living Situation
+  postalCode?: string;
+  religion?: Religion;
+
+  speaksEnglish?: boolean;
+
+  speaksFrench?: boolean;
+  // Education
+  yearsOfEducation?: number;
 };
 
 export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
-  name: 'EnhancedDemographicsQuestionnaire',
-  tags: ['Demographics'],
-  version: 1,
-  details: {
-    title: {
-      en: 'Enhanced Demographics Questionnaire',
-      fr: 'Questionnaire démographique détaillé'
-    },
-    description: {
-      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
-      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
-    },
-    instructions: {
-      en: 'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.',
-      fr: "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
-    },
-    estimatedDuration: 5
-  },
   content: [
     {
-      title: {
-        en: 'Personal Characteristics',
-        fr: 'Caractéristiques individuelles'
-      },
       fields: {
-        gender: {
-          kind: 'options',
-          label: {
-            en: 'Gender Identity',
-            fr: 'Identité de genre'
-          },
-          options: formatOptions(gender)
-        },
         ethnicOrigin: {
           kind: 'options',
           label: {
@@ -619,6 +589,14 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             fr: 'Origine ethnique'
           },
           options: formatOptions(ethnicOrigin)
+        },
+        gender: {
+          kind: 'options',
+          label: {
+            en: 'Gender Identity',
+            fr: 'Identité de genre'
+          },
+          options: formatOptions(gender)
         },
         religion: {
           kind: 'options',
@@ -628,13 +606,13 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
           },
           options: formatOptions(religion)
         }
+      },
+      title: {
+        en: 'Personal Characteristics',
+        fr: 'Caractéristiques individuelles'
       }
     },
     {
-      title: {
-        en: 'Language',
-        fr: 'Langue'
-      },
       fields: {
         firstLanguage: {
           kind: 'options',
@@ -650,8 +628,8 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Speak and Understand English',
             fr: "Parler et comprendre l'anglais"
           },
-          variant: 'radio',
-          options: yesNoOptions
+          options: yesNoOptions,
+          variant: 'radio'
         },
         speaksFrench: {
           kind: 'binary',
@@ -659,44 +637,26 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Speak and Understand French',
             fr: 'Parler et comprendre le français'
           },
-          variant: 'radio',
-          options: yesNoOptions
+          options: yesNoOptions,
+          variant: 'radio'
         }
+      },
+      title: {
+        en: 'Language',
+        fr: 'Langue'
       }
     },
     {
-      title: {
-        en: 'Living Situation',
-        fr: 'Situation de vie'
-      },
       fields: {
-        postalCode: {
-          kind: 'text',
-          label: {
-            en: 'Postal Code',
-            fr: 'Code postal'
-          },
-          variant: 'short'
-        },
         householdSize: {
           kind: 'numeric',
           label: {
             en: 'Household Size',
             fr: 'Taille du ménage'
           },
-          variant: 'default',
+          max: 20,
           min: 0,
-          max: 20
-        },
-        numberChildren: {
-          kind: 'numeric',
-          label: {
-            en: 'Number of Children',
-            fr: "Nombre d'enfants"
-          },
-          variant: 'default',
-          min: 0,
-          max: 20
+          variant: 'default'
         },
         maritalStatus: {
           kind: 'options',
@@ -705,14 +665,32 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             fr: 'État matrimonial'
           },
           options: formatOptions(maritalStatus)
+        },
+        numberChildren: {
+          kind: 'numeric',
+          label: {
+            en: 'Number of Children',
+            fr: "Nombre d'enfants"
+          },
+          max: 20,
+          min: 0,
+          variant: 'default'
+        },
+        postalCode: {
+          kind: 'text',
+          label: {
+            en: 'Postal Code',
+            fr: 'Code postal'
+          },
+          variant: 'short'
         }
+      },
+      title: {
+        en: 'Living Situation',
+        fr: 'Situation de vie'
       }
     },
     {
-      title: {
-        en: 'Economic Situation',
-        fr: 'Situation économique'
-      },
       fields: {
         annualIncome: {
           kind: 'numeric',
@@ -720,9 +698,9 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Annual Income',
             fr: 'Revenu annuel'
           },
-          variant: 'default',
+          max: 1000000,
           min: 0,
-          max: 1000000
+          variant: 'default'
         },
         employmentStatus: {
           kind: 'options',
@@ -732,13 +710,13 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
           },
           options: formatOptions(employmentStatus)
         }
+      },
+      title: {
+        en: 'Economic Situation',
+        fr: 'Situation économique'
       }
     },
     {
-      title: {
-        en: 'Education',
-        fr: 'Éducation'
-      },
       fields: {
         yearsOfEducation: {
           kind: 'numeric',
@@ -746,121 +724,143 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Years of Education',
             fr: "Années d'études"
           },
-          variant: 'default',
+          max: 30,
           min: 0,
-          max: 30
+          variant: 'default'
         }
+      },
+      title: {
+        en: 'Education',
+        fr: 'Éducation'
       }
     },
     {
-      title: {
-        en: 'Immigration',
-        fr: 'Immigration'
-      },
       fields: {
-        isCanadianCitizen: {
-          kind: 'binary',
-          label: {
-            en: 'Canadian Citizen',
-            fr: 'Citoyen canadien'
-          },
-          variant: 'radio',
-          options: yesNoOptions
-        },
         ageAtImmigration: {
           kind: 'numeric',
           label: {
             en: 'Age at Immigration',
             fr: "Âge à l'immigration (le cas échéant)"
           },
-          variant: 'default',
+          max: 100,
           min: 1,
-          max: 100
+          variant: 'default'
+        },
+        isCanadianCitizen: {
+          kind: 'binary',
+          label: {
+            en: 'Canadian Citizen',
+            fr: 'Citoyen canadien'
+          },
+          options: yesNoOptions,
+          variant: 'radio'
         }
+      },
+      title: {
+        en: 'Immigration',
+        fr: 'Immigration'
       }
     }
   ],
+  details: {
+    description: {
+      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
+      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
+    },
+    estimatedDuration: 5,
+    instructions: {
+      en: 'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.',
+      fr: "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
+    },
+    title: {
+      en: 'Enhanced Demographics Questionnaire',
+      fr: 'Questionnaire démographique détaillé'
+    }
+  },
+  name: 'EnhancedDemographicsQuestionnaire',
+  tags: ['Demographics'],
   validationSchema: {
-    type: 'object',
     properties: {
-      ethnicOrigin: {
-        type: 'string',
-        enum: extractKeys(ethnicOrigin, true),
-        nullable: true
-      },
-      gender: {
-        type: 'string',
-        enum: extractKeys(gender, true),
-        nullable: true
-      },
-      religion: {
-        type: 'string',
-        enum: extractKeys(religion, true),
-        nullable: true
-      },
-      firstLanguage: {
-        type: 'string',
-        enum: extractKeys(firstLanguage, true),
-        nullable: true
-      },
-      speaksEnglish: {
-        type: 'boolean',
-        nullable: true
-      },
-      speaksFrench: {
-        type: 'boolean',
-        nullable: true
-      },
-      postalCode: {
-        type: 'string',
-        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source,
-        nullable: true
-      },
-      householdSize: {
-        type: 'integer',
-        minimum: 0,
-        maximum: 20,
-        nullable: true
-      },
-      numberChildren: {
-        type: 'integer',
-        minimum: 0,
-        maximum: 20,
-        nullable: true
-      },
-      maritalStatus: {
-        type: 'string',
-        enum: extractKeys(maritalStatus, true),
-        nullable: true
+      ageAtImmigration: {
+        maximum: 100,
+        minimum: 1,
+        nullable: true,
+        type: 'integer'
       },
       annualIncome: {
-        type: 'integer',
-        minimum: 0,
         maximum: 1000000,
-        nullable: true
+        minimum: 0,
+        nullable: true,
+        type: 'integer'
       },
       employmentStatus: {
-        type: 'string',
         enum: extractKeys(employmentStatus, true),
-        nullable: true
+        nullable: true,
+        type: 'string'
       },
-      yearsOfEducation: {
-        type: 'integer',
+      ethnicOrigin: {
+        enum: extractKeys(ethnicOrigin, true),
+        nullable: true,
+        type: 'string'
+      },
+      firstLanguage: {
+        enum: extractKeys(firstLanguage, true),
+        nullable: true,
+        type: 'string'
+      },
+      gender: {
+        enum: extractKeys(gender, true),
+        nullable: true,
+        type: 'string'
+      },
+      householdSize: {
+        maximum: 20,
         minimum: 0,
-        maximum: 30,
-        nullable: true
+        nullable: true,
+        type: 'integer'
       },
       isCanadianCitizen: {
-        type: 'boolean',
-        nullable: true
+        nullable: true,
+        type: 'boolean'
       },
-      ageAtImmigration: {
-        type: 'integer',
-        minimum: 1,
-        maximum: 100,
-        nullable: true
+      maritalStatus: {
+        enum: extractKeys(maritalStatus, true),
+        nullable: true,
+        type: 'string'
+      },
+      numberChildren: {
+        maximum: 20,
+        minimum: 0,
+        nullable: true,
+        type: 'integer'
+      },
+      postalCode: {
+        nullable: true,
+        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source,
+        type: 'string'
+      },
+      religion: {
+        enum: extractKeys(religion, true),
+        nullable: true,
+        type: 'string'
+      },
+      speaksEnglish: {
+        nullable: true,
+        type: 'boolean'
+      },
+      speaksFrench: {
+        nullable: true,
+        type: 'boolean'
+      },
+      yearsOfEducation: {
+        maximum: 30,
+        minimum: 0,
+        nullable: true,
+        type: 'integer'
       }
     },
-    required: []
-  }
+    required: [],
+    type: 'object'
+  },
+  version: 1
 });

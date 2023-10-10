@@ -1,5 +1,7 @@
-import type { BaseFormField, FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Button, formatFormDataAsString } from '@douglasneuroinformatics/ui';
+import { useMemo } from 'react';
+
+import type { FormInstrumentData, NullableFormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { Button, formatFormDataAsString, resolveStaticFormFields } from '@douglasneuroinformatics/ui';
 import type { FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
@@ -40,6 +42,11 @@ export const FormSummary = <T extends FormInstrumentData>({
     download(filename, () => Promise.resolve(formatFormDataAsString(result)));
   };
 
+  const formFields = useMemo(
+    () => resolveStaticFormFields(instrument.content, result as NullableFormInstrumentData<T>),
+    [instrument, result]
+  );
+
   return (
     <div>
       <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.subject')}</h3>
@@ -59,13 +66,9 @@ export const FormSummary = <T extends FormInstrumentData>({
       <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.results')}</h3>
       <div className="mb-3">
         {Object.keys(result).map((fieldName) => {
-          let field: BaseFormField;
-          if (instrument.content instanceof Array) {
-            field = instrument.content
-              .map((group) => group.fields)
-              .reduce((prev, current) => ({ ...prev, ...current }))[fieldName]!;
-          } else {
-            field = instrument.content[fieldName]!;
+          const field = formFields[fieldName];
+          if (!field) {
+            return null;
           }
           return <FormSummaryItem key={fieldName} label={field.label} value={result[fieldName]} />;
         })}
