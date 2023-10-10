@@ -1,8 +1,8 @@
 import React from 'react';
 
 export type LayoutProps = {
-  title: string;
   children: React.ReactNode
+  title: string;
 };
 
 export const Layout = (props: LayoutProps) => {
@@ -18,7 +18,7 @@ export const Layout = (props: LayoutProps) => {
       <body className="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
         <div className="App" role="main">
           <article className="App-article">
-            <img src={'/bunlogo.svg'} className="App-logo" alt="logo" />
+            <img alt="logo" className="App-logo" src={'/bunlogo.svg'} />
 
             <div style={{ height: '30px' }}></div>
             <h3>{props.title}</h3>

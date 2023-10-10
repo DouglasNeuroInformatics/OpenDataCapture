@@ -27,16 +27,16 @@ const apiConfig = createConfig({
   }
 });
 
-// const gatewayConfig = createConfig({
-//   base: {
-//     env: 'node',
-//     filesRoot: 'apps/gateway/src'
-//   },
-//   jsx: true,
-//   ts: {
-//     project: path.resolve(__dirname, 'apps', 'gateway', 'tsconfig.json')
-//   }
-// });
+const gatewayConfig = createConfig({
+  base: {
+    env: 'node',
+    filesRoot: 'apps/gateway/src'
+  },
+  jsx: true,
+  ts: {
+    project: path.resolve(__dirname, 'apps', 'gateway', 'tsconfig.json')
+  }
+});
 
 // const marketingConfig = createConfig({
 //   astro: true,
@@ -61,4 +61,4 @@ const webConfig = createConfig({
   }
 });
 
-export default [...baseConfig, ...apiConfig, ...webConfig];
+export default [...baseConfig, ...apiConfig, ...gatewayConfig, ...webConfig];
