@@ -15,27 +15,27 @@ export const demoGroups: Group[] = [
 
 export const demoUsers: DemoUser[] = [
   {
+    basePermissionLevel: 'GROUP_MANAGER',
     firstName: 'Jane',
-    lastName: 'Doe',
-    username: 'JaneDoe',
-    password: 'DataCapture2023',
     groupNames: ['Depression Clinic', 'Psychosis Clinic'],
-    basePermissionLevel: 'GROUP_MANAGER'
+    lastName: 'Doe',
+    password: 'DataCapture2023',
+    username: 'JaneDoe'
   },
   {
+    basePermissionLevel: 'GROUP_MANAGER',
     firstName: 'John',
-    lastName: 'Smith',
-    username: 'JohnSmith',
-    password: 'DataCapture2023',
     groupNames: ['Depression Clinic'],
-    basePermissionLevel: 'GROUP_MANAGER'
+    lastName: 'Smith',
+    password: 'DataCapture2023',
+    username: 'JohnSmith'
   },
   {
+    basePermissionLevel: 'STANDARD',
     firstName: 'François',
-    lastName: 'Bouchard',
-    username: 'FrançoisBouchard',
-    password: 'DataCapture2023',
     groupNames: ['Psychosis Clinic'],
-    basePermissionLevel: 'STANDARD'
+    lastName: 'Bouchard',
+    password: 'DataCapture2023',
+    username: 'FrançoisBouchard'
   }
 ];
