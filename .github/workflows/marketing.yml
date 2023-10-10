@@ -27,4 +27,4 @@ jobs:
       - name: Build Site
         run: bunx turbo run build --filter=@open-data-capture/marketing
       - name: Deploy with rsync
-        run: rsync -avz ./marketing/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/www/opendatacapture.org/
+        run: rsync -avz ./apps/marketing/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/www/opendatacapture.org/
