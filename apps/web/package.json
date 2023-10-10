@@ -12,15 +12,6 @@
     "lint": "eslint --fix src",
     "storybook": "storybook dev -p 6006"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{js,cjs,mjs,json,html,css}": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@douglasneuroinformatics/ajv": "latest",

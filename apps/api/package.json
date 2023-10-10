@@ -11,15 +11,6 @@
     "format": "prettier --write src",
     "lint": "eslint --fix src"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{js,cjs,mjs,json}": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@casl/mongoose": "^7.2.1",

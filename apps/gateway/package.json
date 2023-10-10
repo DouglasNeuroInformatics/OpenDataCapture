@@ -9,15 +9,6 @@
     "format": "prettier --write src",
     "lint": "eslint --fix src"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{js,cjs,mjs,json}": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
