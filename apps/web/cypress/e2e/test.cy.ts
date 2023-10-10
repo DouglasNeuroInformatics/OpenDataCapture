@@ -21,6 +21,7 @@ const name = makeid(6);
 describe('look at questionaire', () => {
     it('passes', () => {
       
+      //navigate to add visit page, fill in subject form
       cy.login(username, password)
       cy.get('span[data-cy="add-visit"]').first().click({force: true})
       cy.get('input[name=firstName]').type(name)
@@ -32,6 +33,7 @@ describe('look at questionaire', () => {
 
       cy.wait(2000)
 
+      //navigate to view instrument page, select a form and confirm subject info is autofilled
       cy.get('span[data-cy="view-instrument"]').first().click({force: true})
       cy.url().should('include', 'instruments/available')
       cy.wait(2000)
