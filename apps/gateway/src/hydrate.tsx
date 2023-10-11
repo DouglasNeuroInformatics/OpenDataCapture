@@ -1,7 +1,7 @@
 import { hydrateRoot } from 'react-dom/client';
 
-import { App } from './App';
+import IndexPage from './pages';
 
 import './styles.css';
 
-hydrateRoot(document, <App />);
+hydrateRoot(document, <IndexPage />);

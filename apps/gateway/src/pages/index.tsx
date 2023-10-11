@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
-import { Layout } from './Layout';
-
-export const App = () => {
+const IndexPage = () => {
   const [count, setCount] = useState(0);
   return (
-    <Layout title="App">
+    <div>
       <p>Count: {count}</p>
       <button onClick={() => setCount(count + 1)}>Increment Count</button>
-    </Layout>
+    </div>
   );
 };
+
+export default IndexPage;
