@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-const DOC_URL = import.meta.env.VITE_DOCS_URL;
-const LICENSE_URL = import.meta.env.VITE_LICENSE_URL;
-const GITHUB_REPO_URL = import.meta.env.VITE_GITHUB_REPO_URL;
+const { DOCS_URL, GITHUB_REPO_URL, LICENSE_URL } = import.meta.env;
 
 export const Footer = () => {
   const { t } = useTranslation();
@@ -18,7 +16,7 @@ export const Footer = () => {
           <div className="flex w-1/2 items-center justify-center lg:w-auto">
             <a
               className="underline-offset-3 p-1 text-center text-sm hover:underline lg:mx-2 xl:text-base"
-              href={DOC_URL}
+              href={DOCS_URL}
               rel="noreferrer"
               target="_blank"
             >

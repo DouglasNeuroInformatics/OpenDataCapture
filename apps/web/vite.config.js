@@ -13,11 +13,6 @@ import viteCompression from 'vite-plugin-compression';
 
 const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 
-// Until import meta env (external package) is setup
-process.env.VITE_DOCS_URL = process.env.DOCS_URL;
-process.env.VITE_LICENSE_URL = process.env.LICENSE_URL;
-process.env.VITE_GITHUB_REPO_URL = process.env.GITHUB_REPO_URL;
-
 /**
  * Recurse through the combined translations and include only the provided locale
  * @param {Record<string, any>} translations

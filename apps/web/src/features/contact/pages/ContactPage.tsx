@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components';
 
-const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL;
+const CONTACT_EMAIL = import.meta.env.CONTACT_EMAIL;
 
 type ContactFormData = {
   contactReason: 'bug' | 'feedback' | 'other' | 'request';
