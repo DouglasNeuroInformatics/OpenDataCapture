@@ -6,20 +6,24 @@ import type { Assignment } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiPlus } from 'react-icons/hi2';
 
+import { AssignmentModal } from '../components/AssignmentModal';
+
 export const SubjectManagementPage = () => {
   const { t } = useTranslation('subjects');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   return (
     <div>
-      <div className="my-5 gap-2 flex flex-col items-center justify-start lg:flex-row md:justify-between">
+      <div className="my-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
         <h3 className="text-lg font-semibold">{t('subjectManagementPage.assignedInstruments')}</h3>
         <Button
-          className="text-sm w-full lg:w-auto"
+          className="w-full text-sm lg:w-auto"
           icon={<HiPlus />}
           iconPosition="right"
           label={t('subjectManagementPage.addAssignment')}
           variant="secondary"
+          onClick={() => setIsCreateModalOpen(true)}
         />
       </div>
       <ClientTable<Assignment>
@@ -65,6 +69,8 @@ export const SubjectManagementPage = () => {
         numquam voluptatum repellendus soluta harum nulla! Consequuntur sunt laudantium praesentium iure possimus soluta
         et alias tempora?
       </Slider>
+
+      <AssignmentModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
     </div>
   );
 };
