@@ -20,17 +20,6 @@ export class SetupService {
     private readonly usersService: UsersService
   ) {}
 
-  private async isSetup(): Promise<boolean> {
-    const collections = await this.connection.db.listCollections().toArray();
-    for (const collection of collections) {
-      const count = await this.connection.collection(collection.name).countDocuments();
-      if (count > 0) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   async createAdmin(admin: CreateAdminDto): Promise<UserEntity> {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' }, this.adminAbility);
   }
@@ -52,5 +41,16 @@ export class SetupService {
     if (initDemo) {
       await this.demoService.init();
     }
+  }
+
+  private async isSetup(): Promise<boolean> {
+    const collections = await this.connection.db.listCollections().toArray();
+    for (const collection of collections) {
+      const count = await this.connection.collection(collection.name).countDocuments();
+      if (count > 0) {
+        return true;
+      }
+    }
+    return false;
   }
 }

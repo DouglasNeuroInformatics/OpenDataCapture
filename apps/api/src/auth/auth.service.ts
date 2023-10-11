@@ -18,29 +18,6 @@ export class AuthService {
     private readonly usersService: UsersService
   ) {}
 
-  /** Wraps UserService.getByUsername with appropriate exception handling */
-  private async getUser(username: string): Promise<UserDocument> {
-    let user: UserDocument;
-    try {
-      user = await this.usersService.findByUsername(username);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new UnauthorizedException('Invalid username');
-      }
-      throw new InternalServerErrorException('Internal Server Error', {
-        cause: error instanceof Error ? error : undefined
-      });
-    }
-    return user;
-  }
-
-  private async signToken(payload: object): Promise<string> {
-    return this.jwtService.signAsync(payload, {
-      expiresIn: '1d',
-      secret: this.configService.getOrThrow<string>('SECRET_KEY')
-    });
-  }
-
   /** Validates the provided credentials and returns an access token */
   async login(username: string, password: string): Promise<AuthPayload> {
     const user = await this.getUser(username);
@@ -64,5 +41,28 @@ export class AuthService {
     const accessToken = await this.signToken(payload);
 
     return { accessToken };
+  }
+
+  /** Wraps UserService.getByUsername with appropriate exception handling */
+  private async getUser(username: string): Promise<UserDocument> {
+    let user: UserDocument;
+    try {
+      user = await this.usersService.findByUsername(username);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnauthorizedException('Invalid username');
+      }
+      throw new InternalServerErrorException('Internal Server Error', {
+        cause: error instanceof Error ? error : undefined
+      });
+    }
+    return user;
+  }
+
+  private async signToken(payload: object): Promise<string> {
+    return this.jwtService.signAsync(payload, {
+      expiresIn: '1d',
+      secret: this.configService.getOrThrow<string>('SECRET_KEY')
+    });
   }
 }

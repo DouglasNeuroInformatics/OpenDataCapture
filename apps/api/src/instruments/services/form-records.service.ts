@@ -37,48 +37,6 @@ export class FormRecordsService {
     private readonly subjectsService: SubjectsService
   ) {}
 
-  private computeMeasure<T extends FormInstrumentData>(measure: Measure<T>, data: T): number {
-    // data[measure.formula.field] should always be a number because only numeric fields may be used for fields in measure
-    switch (measure.formula.kind) {
-      case 'const':
-        return data[measure.formula.field as keyof T] as number;
-      case 'sum':
-        // eslint-disable-next-line no-case-declarations
-        const coerceBool = measure.formula.options?.coerceBool;
-        return measure.formula.fields
-          .map((field: keyof T) => {
-            if (typeof data[field] === 'number') {
-              return data[field] as number;
-            } else if (typeof data[field] === 'boolean' && coerceBool) {
-              return Number(data[field]);
-            }
-            throw new Error(`Unexpected type of field '${field.toString()}': ${typeof data[field]}`);
-          })
-          .reduce((a, b) => a + b, 0);
-    }
-  }
-
-  /** Return an object with measures corresponding to all outcomes  */
-  private getMeasuresFromRecords<T extends FormInstrumentData>(
-    records: FormInstrumentRecord<T>[]
-  ): Record<string, number[]> {
-    const data: Record<string, number[]> = {};
-    for (const record of records) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      for (const measure in record.instrument.measures) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-        const value = this.computeMeasure(record.instrument.measures[measure]!, record.data);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (!data[measure]) {
-          data[measure] = [value];
-        } else {
-          data[measure]!.push(value);
-        }
-      }
-    }
-    return data;
-  }
-
   async create(dto: CreateFormRecordDto, ability: AppAbility): Promise<FormInstrumentRecord> {
     const { data, groupName, instrumentName, kind, subjectInfo, time } = dto;
 
@@ -247,5 +205,47 @@ export class FormRecordsService {
       centralTendency: centralTendency,
       count: records.length
     };
+  }
+
+  private computeMeasure<T extends FormInstrumentData>(measure: Measure<T>, data: T): number {
+    // data[measure.formula.field] should always be a number because only numeric fields may be used for fields in measure
+    switch (measure.formula.kind) {
+      case 'const':
+        return data[measure.formula.field as keyof T] as number;
+      case 'sum':
+        // eslint-disable-next-line no-case-declarations
+        const coerceBool = measure.formula.options?.coerceBool;
+        return measure.formula.fields
+          .map((field: keyof T) => {
+            if (typeof data[field] === 'number') {
+              return data[field] as number;
+            } else if (typeof data[field] === 'boolean' && coerceBool) {
+              return Number(data[field]);
+            }
+            throw new Error(`Unexpected type of field '${field.toString()}': ${typeof data[field]}`);
+          })
+          .reduce((a, b) => a + b, 0);
+    }
+  }
+
+  /** Return an object with measures corresponding to all outcomes  */
+  private getMeasuresFromRecords<T extends FormInstrumentData>(
+    records: FormInstrumentRecord<T>[]
+  ): Record<string, number[]> {
+    const data: Record<string, number[]> = {};
+    for (const record of records) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      for (const measure in record.instrument.measures) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        const value = this.computeMeasure(record.instrument.measures[measure]!, record.data);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (!data[measure]) {
+          data[measure] = [value];
+        } else {
+          data[measure]!.push(value);
+        }
+      }
+    }
+    return data;
   }
 }

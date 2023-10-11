@@ -32,6 +32,43 @@ export class DemoService {
     private readonly usersService: UsersService
   ) {}
 
+  async init(): Promise<void> {
+    this.logger.verbose(`Initializing demo for database: '${this.connection.name}'`);
+
+    for (const group of demoGroups) {
+      await this.groupsService.create(group);
+    }
+
+    for (const user of demoUsers) {
+      await this.usersService.create(user, this.ability);
+    }
+
+    const happinessQuestionnaires = await this.formsService.createTranslatedForms(instruments.happinessQuestionnaire);
+    const miniMentalStateExaminations = await this.formsService.createTranslatedForms(
+      instruments.miniMentalStateExamination
+    );
+    const montrealCognitiveAssessments = await this.formsService.createTranslatedForms(
+      instruments.montrealCognitiveAssessment
+    );
+    const enhancedDemographicsQuestionnaires = await this.formsService.createTranslatedForms(
+      instruments.enhancedDemographicsQuestionnaire
+    );
+
+    for (let i = 0; i < 100; i++) {
+      const createSubjectDto = this.getCreateSubjectDto();
+      await this.subjectsService.create(createSubjectDto);
+      const group = await this.groupsService.findByName(randomValue(demoGroups).name, this.ability);
+      await this.createFormRecords(happinessQuestionnaires[0]!, group.name, createSubjectDto);
+      await this.createFormRecords(miniMentalStateExaminations[0]!, group.name, createSubjectDto);
+      await this.createFormRecords(montrealCognitiveAssessments[0]!, group.name, createSubjectDto);
+      await this.createFormRecords(enhancedDemographicsQuestionnaires[0]!, group.name, createSubjectDto, {
+        customValues: {
+          postalCode: 'A1A-1A1'
+        }
+      });
+    }
+  }
+
   /** Create form records for translated instruments */
   private async createFormRecords<T extends FormInstrumentData = FormInstrumentData>(
     instrument: FormInstrument<T>,
@@ -101,42 +138,5 @@ export class DemoService {
       lastName: faker.person.lastName(),
       sex: faker.person.sexType()
     };
-  }
-
-  async init(): Promise<void> {
-    this.logger.verbose(`Initializing demo for database: '${this.connection.name}'`);
-
-    for (const group of demoGroups) {
-      await this.groupsService.create(group);
-    }
-
-    for (const user of demoUsers) {
-      await this.usersService.create(user, this.ability);
-    }
-
-    const happinessQuestionnaires = await this.formsService.createTranslatedForms(instruments.happinessQuestionnaire);
-    const miniMentalStateExaminations = await this.formsService.createTranslatedForms(
-      instruments.miniMentalStateExamination
-    );
-    const montrealCognitiveAssessments = await this.formsService.createTranslatedForms(
-      instruments.montrealCognitiveAssessment
-    );
-    const enhancedDemographicsQuestionnaires = await this.formsService.createTranslatedForms(
-      instruments.enhancedDemographicsQuestionnaire
-    );
-
-    for (let i = 0; i < 100; i++) {
-      const createSubjectDto = this.getCreateSubjectDto();
-      await this.subjectsService.create(createSubjectDto);
-      const group = await this.groupsService.findByName(randomValue(demoGroups).name, this.ability);
-      await this.createFormRecords(happinessQuestionnaires[0]!, group.name, createSubjectDto);
-      await this.createFormRecords(miniMentalStateExaminations[0]!, group.name, createSubjectDto);
-      await this.createFormRecords(montrealCognitiveAssessments[0]!, group.name, createSubjectDto);
-      await this.createFormRecords(enhancedDemographicsQuestionnaires[0]!, group.name, createSubjectDto, {
-        customValues: {
-          postalCode: 'A1A-1A1'
-        }
-      });
-    }
   }
 }
