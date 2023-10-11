@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 import { Form } from '@douglasneuroinformatics/ui';
 import type { LoginCredentials } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
@@ -11,15 +12,15 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   return (
     <Form<LoginCredentials>
       content={{
-        password: {
-          kind: 'text',
-          label: t('password'),
-          variant: 'password'
-        },
         username: {
           kind: 'text',
           label: t('username'),
           variant: 'short'
+        },
+        password: {
+          kind: 'text',
+          label: t('password'),
+          variant: 'password'
         }
       }}
       submitBtnLabel={t('login')}
