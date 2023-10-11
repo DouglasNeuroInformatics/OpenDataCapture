@@ -1,19 +1,13 @@
-import { renderToReadableStream } from 'react-dom/server';
+import { Controller, Get } from '@nestjs/common';
 
-import { Controller, Get, Header, StreamableFile } from '@nestjs/common';
-
+import { Page } from './decorators/page.decorator';
 import IndexPage from './pages';
 
 @Controller()
 export class AppController {
   @Get()
-  @Header('Content-Type', 'text/html')
-  async render() {
-    const stream = await renderToReadableStream(<IndexPage />, {
-      bootstrapModules: ['/hydrate.js']
-    });
-    const arrBuf = await Bun.readableStreamToArrayBuffer(stream);
-    const buffer = Buffer.from(arrBuf);
-    return new StreamableFile(buffer);
+  @Page()
+  render() {
+    return <IndexPage />;
   }
 }

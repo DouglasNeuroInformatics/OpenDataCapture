@@ -2,7 +2,6 @@ import React from 'react';
 
 export type LayoutProps = {
   children: React.ReactNode;
-  title: string;
 };
 
 export const Layout = (props: LayoutProps) => {
