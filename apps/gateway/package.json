@@ -5,12 +5,13 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/server.tsx",
+    "dev": "bun run --watch src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@nestjs/common": "^10.2.5",
+    "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.2.5",
     "@nestjs/platform-express": "^10.2.5",
     "@nestjs/throttler": "^5.0.0",
