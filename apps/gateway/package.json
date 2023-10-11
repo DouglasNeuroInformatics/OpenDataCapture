@@ -10,6 +10,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
+    "@douglasneuroinformatics/ui": "latest",
     "@nestjs/common": "^10.2.5",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.2.5",
