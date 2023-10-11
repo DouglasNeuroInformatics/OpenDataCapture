@@ -31,12 +31,12 @@ describe('look at questionaire', () => {
       cy.get('body').click()
       cy.get('button[type="submit"]').click()
 
-      cy.wait(2000)
+      cy.wait(1000)
 
       //navigate to view instrument page, select a form and confirm subject info is autofilled
       cy.get('span[data-cy="view-instrument"]').first().click({force: true})
       cy.url().should('include', 'instruments/available')
-      cy.wait(2000)
+      cy.wait(1000)
       cy.get('h3[data-cy="instrument-title"]').first().click()
 
       cy.get('button').contains('Begin').click()

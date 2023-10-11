@@ -74,8 +74,8 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
           }}
         />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <div className="flex flex-grow gap-2 lg:flex-shrink"
-          data-cy="tags">
+          <div className="flex flex-grow"
+          data-cy="tags-btn-dropdown">
           <SelectDropdown
             options={tagOptions}
             selected={selectedTags}
@@ -83,8 +83,8 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
             title={t('instruments.availableInstruments.filters.tags')}
           />
           </div>
-          <div className="flex flex-grow gap-2 lg:flex-shrink"
-          data-cy="language">
+          <div className="flex flex-grow"
+          data-cy="language-btn-dropdown">
           <SelectDropdown
             options={languageOptions}
             selected={selectedLanguages}
