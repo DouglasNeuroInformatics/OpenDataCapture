@@ -1,11 +1,8 @@
-name: test
+name: Code Review
 on:
   pull_request:
     types:
-      - opened
-    branches:
-      - main
-  push:
+      - review_requested
     branches:
       - main
   workflow_dispatch:
