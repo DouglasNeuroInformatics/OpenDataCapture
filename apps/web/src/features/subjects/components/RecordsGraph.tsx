@@ -85,11 +85,13 @@ export const RecordsGraph = () => {
       <div className="py-2">
         <VisualizationHeader />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
-          <div className="flex" data-cy="instrument-select">
-            <InstrumentDropdown />
-          </div>
-          <div className="flex" data-cy="measure-select">
-            <MeasuresDropdown />
+          <div className="flex flex-col gap-2 lg:flex-row">
+            <div data-cy="instrument-select">
+              <InstrumentDropdown />
+            </div>
+            <div data-cy="measure-select">
+              <MeasuresDropdown />
+            </div>
           </div>
           <div data-cy="time-select">
             <TimeDropdown />
