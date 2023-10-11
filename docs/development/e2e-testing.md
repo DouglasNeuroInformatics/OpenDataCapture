@@ -3,7 +3,7 @@
 ## Editing E2E Test Suite
 
 ```
-cd /apps/web
+cd apps/web
 bunx cypress open
 ```
 
@@ -12,7 +12,7 @@ This command will open the cypress UI which allows for a live demonstration of t
 ## Run E2E Test Suite
 
 ```
-cd /apps/web
+cd apps/web
 bunx cypress run
 ```
 
