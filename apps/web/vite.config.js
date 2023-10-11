@@ -3,6 +3,7 @@
 import path from 'path';
 import url from 'url';
 
+import importMetaEnv from '@import-meta-env/unplugin';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import copy from 'rollup-plugin-copy';
@@ -52,22 +53,23 @@ export default defineConfig({
   plugins: [
     react(),
     viteCompression(),
-    {
-      ...copy({
-        copySync: true,
-        hook: 'buildStart',
-        targets: [
-          {
-            dest: 'dist/locales/en',
-            src: 'src/translations/*',
-            transform: (contents) => {
-              const translations = JSON.parse(contents.toString());
-              return JSON.stringify(transformTranslations(translations, 'en'), null, 2);
-            }
+    importMetaEnv.vite({
+      example: path.resolve(projectDir, '.env.public')
+    }),
+    copy({
+      copySync: true,
+      hook: 'buildStart',
+      targets: [
+        {
+          dest: 'dist/locales/en',
+          src: 'src/translations/*',
+          transform: (contents) => {
+            const translations = JSON.parse(contents.toString());
+            return JSON.stringify(transformTranslations(translations, 'en'), null, 2);
           }
-        ]
-      })
-    },
+        }
+      ]
+    }),
     {
       apply: 'build',
       name: 'inject-analytics-script',
