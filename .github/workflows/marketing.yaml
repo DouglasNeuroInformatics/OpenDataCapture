@@ -1,4 +1,4 @@
-name: Build and Deploy Marketing Site
+name: Marketing Site
 on:
   push:
     branches: ["main"]
@@ -6,18 +6,11 @@ on:
       - 'marketing/**'
   workflow_dispatch:
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
@@ -26,5 +19,17 @@ jobs:
         run: bun install
       - name: Build Site
         run: bunx turbo run build --filter=@open-data-capture/marketing
-      - name: Deploy with rsync
-        run: rsync -avz ./apps/marketing/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/www/opendatacapture.org/
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: ./apps/marketing/dist/
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+      - name: Display structure of downloaded files
+        run: ls -R
