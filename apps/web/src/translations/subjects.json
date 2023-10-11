@@ -1,0 +1,26 @@
+{
+  "subjectManagementPage": {
+    "assignedInstruments": {
+      "en": "Assigned Instruments",
+      "fr": "Instruments assignés"
+    },
+    "tableColumns": {
+      "title": {
+        "en": "Title",
+        "fr": "Titre"
+      },
+      "timeAssigned": {
+        "en": "Assigned",
+        "fr": "Attribué"
+      },
+      "timeExpires": {
+        "en": "Expires",
+        "fr": "Expiration"
+      },
+      "status": {
+        "en": "Status",
+        "fr": "État"
+      }
+    }
+  }
+}
