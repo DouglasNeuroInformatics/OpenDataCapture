@@ -1,5 +1,6 @@
 import { hydrateRoot } from 'react-dom/client';
-const { default: App } = (await import(PATH_TO_PAGE)) as { default: () => JSX.Element };
+
+import { App } from './App';
 
 import './styles.css';
 
