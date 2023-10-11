@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
-import { ClientTable, Slider } from '@douglasneuroinformatics/ui';
+import { Button, ClientTable, Slider } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
+import { HiPlus } from 'react-icons/hi2';
 
 export const SubjectManagementPage = () => {
   const { t } = useTranslation('subjects');
@@ -11,8 +12,15 @@ export const SubjectManagementPage = () => {
 
   return (
     <div>
-      <div className="my-5">
+      <div className="my-5 gap-2 flex flex-col items-center justify-start lg:flex-row md:justify-between">
         <h3 className="text-lg font-semibold">{t('subjectManagementPage.assignedInstruments')}</h3>
+        <Button
+          className="text-sm w-full lg:w-auto"
+          icon={<HiPlus />}
+          iconPosition="right"
+          label={t('subjectManagementPage.addAssignment')}
+          variant="secondary"
+        />
       </div>
       <ClientTable<Assignment>
         columns={[

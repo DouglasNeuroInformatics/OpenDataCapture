@@ -4,6 +4,10 @@
       "en": "Assigned Instruments",
       "fr": "Instruments assignés"
     },
+    "addAssignment": {
+      "en": "Add Assignment",
+      "fr": "Assigner un instrument"
+    },
     "tableColumns": {
       "title": {
         "en": "Title",
