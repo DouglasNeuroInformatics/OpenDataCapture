@@ -2,10 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": "src",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["*"]
     },
+    "strictPropertyInitialization": false,
     "types": ["bun-types"]
   },
   "include": ["src"]
