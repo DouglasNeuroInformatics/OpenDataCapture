@@ -12,13 +12,14 @@ type LinkAccess = {
 
 export type NavigationLinkProps = {
   access: LinkAccess | LinkAccess[] | null;
+  cyTestId?: string;
   href: string;
   label: string;
   icon: React.ReactElement;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
-export const NavigationLink = ({ href, label, icon, access, onClick }: NavigationLinkProps) => {
+export const NavigationLink = ({ href, label, icon, access, cyTestId, onClick }: NavigationLinkProps) => {
   const { currentUser } = useAuthStore();
 
   // Whether the user has all permissions or access is undefined
@@ -43,7 +44,7 @@ export const NavigationLink = ({ href, label, icon, access, onClick }: Navigatio
   return isAuthorized ? (
     <NavLink className="flex items-center p-2 text-sm hover:bg-slate-800 md:text-base" to={href} onClick={onClick}>
       {icon}
-      <span className="ml-2">{label}</span>
+      <span className="ml-2" data-cy={cyTestId}>{label}</span>
     </NavLink>
   ) : null;
 };

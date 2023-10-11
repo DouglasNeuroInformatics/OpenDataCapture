@@ -5,6 +5,7 @@ node_modules
 
 # testing
 coverage
+apps/web/cypress/screenshots
 
 # build
 build

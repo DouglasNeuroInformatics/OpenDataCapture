@@ -19,6 +19,7 @@
 * [Setup](development/setup.md)
 * [Coding Conventions](development/coding-conventions.md)
 * [Continuous Integration](development/continuous-integration.md)
+* [E2E Testing](development/e2e-testing.md)
 
 - **Architecture**
 * [Overview](architecture/overview.md)

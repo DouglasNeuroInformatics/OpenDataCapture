@@ -16,6 +16,7 @@ export const VisualizationMode = ({ title, icon, className, ...props }: Visualiz
         'flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 [&>svg]:h-24 [&>svg]:w-24',
         className
       )}
+     
       {...props}
     >
       {icon}
