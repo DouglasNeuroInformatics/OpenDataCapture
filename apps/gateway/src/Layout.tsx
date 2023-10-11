@@ -13,7 +13,9 @@ export const Layout = (props: LayoutProps) => {
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
         <title>Open Data Capture</title>
       </head>
-      <body className="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">{props.children}</body>
+      <body className="container bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+        {props.children}
+      </body>
     </html>
   );
 };
