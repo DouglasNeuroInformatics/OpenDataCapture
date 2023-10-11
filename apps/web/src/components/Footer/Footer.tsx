@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-const { DOCS_URL, GITHUB_REPO_URL, LICENSE_URL } = import.meta.env;
+const DOCS_URL = import.meta.env.DOCS_URL;
+const GITHUB_REPO_URL = import.meta.env.GITHUB_REPO_URL;
+const LICENSE_URL = import.meta.env.LICENSE_URL;
 
 export const Footer = () => {
   const { t } = useTranslation();
