@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 import { Form } from '@douglasneuroinformatics/ui';
 import type { Sex } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +30,6 @@ export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel
   return (
     <Form<IdentificationFormData>
       content={{
-        dateOfBirth: {
-          kind: 'date',
-          label: t('identificationForm.dateOfBirth.label')
-        },
         firstName: {
           description: t('identificationForm.firstName.description'),
           kind: 'text',
@@ -44,6 +41,10 @@ export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel
           kind: 'text',
           label: t('identificationForm.lastName.label'),
           variant: 'short'
+        },
+        dateOfBirth: {
+          kind: 'date',
+          label: t('identificationForm.dateOfBirth.label')
         },
         sex: {
           description: t('identificationForm.sex.description'),
