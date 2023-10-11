@@ -33,7 +33,6 @@
     "ajv": "^8.12.0",
     "axios": "^1.5.1",
     "clsx": "^2.0.0",
-    "cypress": "^13.3.0",
     "framer-motion": "^10.16.4",
     "i18next": "^23.5.1",
     "i18next-browser-languagedetector": "^7.1.0",
