@@ -14,9 +14,17 @@ export const Navigation = (props: NavigationProps) => {
 
   return (
     <nav className="flex-grow">
-      <NavigationLink access={null} href="/overview" icon={<HiChartBar />} label={t('navLinks.overview')} {...props} />
+      <NavigationLink
+        access={null}
+        cyTestId="overview"
+        href="/overview"
+        icon={<HiChartBar />}
+        label={t('navLinks.overview')}
+        {...props}
+      />
       <NavigationLink
         access={{ action: 'create', subject: 'Subject' }}
+        cyTestId="add-visit"
         href="/subjects/add-visit"
         icon={<HiUserPlus />}
         label={t('navLinks.addVisit')}
@@ -33,6 +41,7 @@ export const Navigation = (props: NavigationProps) => {
             subject: 'InstrumentRecord'
           }
         ]}
+        cyTestId="view-subjects"
         href="/subjects/view-subjects"
         icon={<HiEye />}
         label={t(`navLinks.viewSubjects`)}
@@ -40,6 +49,7 @@ export const Navigation = (props: NavigationProps) => {
       />
       <NavigationLink
         access={{ action: 'create', subject: 'Instrument' }}
+        cyTestId="create-instrument"
         href="/instruments/create"
         icon={<HiPlus />}
         label={t('navLinks.createInstrument')}
@@ -47,6 +57,7 @@ export const Navigation = (props: NavigationProps) => {
       />
       <NavigationLink
         access={{ action: 'delete', subject: 'Instrument' }}
+        cyTestId="manage-instrument"
         href="instruments/manage"
         icon={<HiAdjustmentsHorizontal />}
         label={t('navLinks.manageInstruments')}
@@ -54,6 +65,7 @@ export const Navigation = (props: NavigationProps) => {
       />
       <NavigationLink
         access={{ action: 'create', subject: 'InstrumentRecord' }}
+        cyTestId="view-instrument"
         href="/instruments/available"
         icon={<HiEye />}
         label={t('navLinks.availableInstruments')}

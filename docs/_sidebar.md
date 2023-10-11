@@ -1,10 +1,12 @@
 - **Introduction**
+
 * [Background](introduction/background.md)
 * [Project Scope](introduction/project-scope.md)
 * [Target Users](introduction/target-users.md)
 * [Design Principles](introduction/design-principles.md)
 
 - **Features**
+
 * [Security](features/security.md)
 * [Internationalization](features/internationalization.md)
 * [Subject Registration](features/subject-registration.md)
@@ -16,16 +18,20 @@
 * [Date Visualization](features/data-visualization.md)
 
 - **Development**
+
 * [Setup](development/setup.md)
 * [Coding Conventions](development/coding-conventions.md)
 * [Continuous Integration](development/continuous-integration.md)
+* [E2E Testing](development/e2e-testing.md)
 
 - **Architecture**
+
 * [Overview](architecture/overview.md)
 * [Client](architecture/client.md)
 * [Server](architecture/server.md)
 
 - **Deployment**
+
 * [Prerequisites](deployment/prerequisites.md)
 * [Overview](deployment/overview.md)
 * [Configuration](deployment/configuration.md)
