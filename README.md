@@ -55,8 +55,15 @@ docker compose up
 
 ###  Install E2E test runner
 
+Install cypress in Bun
+
 ```
 bun install cypress
+```
+
+Then run this command if you do not already have the cypress boiler player folder and files already in the apps/web directory.
+
+```
 cd /apps/web
 bunx cypress install
 ```
