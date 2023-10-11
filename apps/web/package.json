@@ -40,6 +40,7 @@
     "zustand": "^4.4.2"
   },
   "devDependencies": {
+    "@import-meta-env/unplugin": "^0.4.10",
     "@storybook/addon-essentials": "^7.4.6",
     "@storybook/addon-interactions": "^7.4.6",
     "@storybook/addon-links": "^7.4.6",
