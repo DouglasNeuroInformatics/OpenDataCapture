@@ -7,17 +7,16 @@ import { Link, type LinkProps } from 'react-router-dom';
 export type VisualizationModeProps = Omit<LinkProps, 'children'> & {
   icon: React.ReactElement<IconType>;
   title: string;
-  cyTestId?: string;
 };
 
-export const VisualizationMode = ({ title, icon, className, cyTestId, ...props }: VisualizationModeProps) => {
+export const VisualizationMode = ({ title, icon, className, ...props }: VisualizationModeProps) => {
   return (
     <Link
       className={clsx(
         'flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 [&>svg]:h-24 [&>svg]:w-24',
         className
       )}
-      data-cy = {cyTestId}
+     
       {...props}
     >
       {icon}
