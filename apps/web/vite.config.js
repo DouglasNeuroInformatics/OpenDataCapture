@@ -1,8 +1,10 @@
 // @ts-check
 
+import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
+import { transformTranslations } from '@douglasneuroinformatics/ui';
 import importMetaEnv from '@import-meta-env/unplugin';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
@@ -13,27 +15,65 @@ import viteCompression from 'vite-plugin-compression';
 
 const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 
-/**
- * Recurse through the combined translations and include only the provided locale
- * @param {Record<string, any>} translations
- * @param {string} locale
- * @returns {Record<string, any>}
- */
-const transformTranslations = (translations, locale) => {
-  const isPlainObject = Object.getPrototypeOf(translations) === Object.prototype;
-  if (!isPlainObject) {
-    throw new Error('Invalid format of translations: must be plain object');
-  }
-  const result = {};
-  for (const key in translations) {
-    if (Object.hasOwn(translations[key], locale)) {
-      result[key] = translations[key][locale];
-    } else {
-      result[key] = transformTranslations(translations[key], locale);
+/** @returns {import('vite').Plugin} */
+const analyticsPlugin = () => ({
+  apply: 'build',
+  name: 'inject-analytics-script',
+  transformIndexHtml: () => {
+    if (!(process.env.PLAUSIBLE_BASE_URL && process.env.PLAUSIBLE_DATA_DOMAIN)) {
+      return;
     }
+    return [
+      {
+        attrs: {
+          'data-api': process.env.PLAUSIBLE_BASE_URL + '/api/event',
+          'data-domain': process.env.PLAUSIBLE_DATA_DOMAIN,
+          defer: true,
+          src: process.env.PLAUSIBLE_BASE_URL + '/js/script.js'
+        },
+        tag: 'script'
+      }
+    ];
   }
-  return result;
-};
+});
+
+/** @returns {import('vite').Plugin} */
+const translationsPlugin = () => ({
+  ...copy({
+    copySync: true,
+    hook: 'buildStart',
+    targets: [
+      {
+        dest: 'dist/locales/en',
+        src: 'src/translations/*',
+        transform: (contents) => {
+          const translations = JSON.parse(contents.toString());
+          return JSON.stringify(transformTranslations(translations, 'en'), null, 2);
+        }
+      }
+    ]
+  }),
+  configureServer(server) {
+    server.middlewares.use('/locales', (req, res, next) => {
+      const [locale, namespace] = req.url?.split('/').filter(Boolean) ?? [];
+      if (locale && namespace) {
+        const translationsFile = path.resolve(projectDir, 'src', 'translations', namespace);
+        fs.readFile(translationsFile, 'utf8')
+          .then((text) => JSON.parse(text))
+          .then((translations) => {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(transformTranslations(translations, locale)));
+          })
+          .catch((error) => {
+            console.error(error);
+            next(new Error(`Failed to read file: ${translationsFile}`));
+          });
+      } else {
+        next();
+      }
+    });
+  }
+});
 
 export default defineConfig({
   build: {
@@ -51,40 +91,8 @@ export default defineConfig({
     importMetaEnv.vite({
       example: path.resolve(projectDir, '.env.public')
     }),
-    copy({
-      copySync: true,
-      hook: 'buildStart',
-      targets: [
-        {
-          dest: 'dist/locales/en',
-          src: 'src/translations/*',
-          transform: (contents) => {
-            const translations = JSON.parse(contents.toString());
-            return JSON.stringify(transformTranslations(translations, 'en'), null, 2);
-          }
-        }
-      ]
-    }),
-    {
-      apply: 'build',
-      name: 'inject-analytics-script',
-      transformIndexHtml: () => {
-        if (!(process.env.PLAUSIBLE_BASE_URL && process.env.PLAUSIBLE_DATA_DOMAIN)) {
-          return;
-        }
-        return [
-          {
-            attrs: {
-              'data-api': process.env.PLAUSIBLE_BASE_URL + '/api/event',
-              'data-domain': process.env.PLAUSIBLE_DATA_DOMAIN,
-              defer: true,
-              src: process.env.PLAUSIBLE_BASE_URL + '/js/script.js'
-            },
-            tag: 'script'
-          }
-        ];
-      }
-    }
+    analyticsPlugin(),
+    translationsPlugin()
   ],
   resolve: {
     alias: {
