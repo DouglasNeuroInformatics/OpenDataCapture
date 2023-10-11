@@ -4,8 +4,8 @@ import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 
 export function useDownload() {
   const notifications = useNotificationsStore();
-  const [data, setData] = useState<string | null>(null);
-  const [filename, setFilename] = useState<string | null>(null);
+  const [data, setData] = useState<null | string>(null);
+  const [filename, setFilename] = useState<null | string>(null);
 
   useEffect(() => {
     if (data && filename) {
@@ -32,9 +32,9 @@ export function useDownload() {
       .catch((error) => {
         const message = error instanceof Error ? error.message : 'An unknown error occurred';
         notifications.addNotification({
-          type: 'error',
+          message,
           title: 'Error',
-          message
+          type: 'error'
         });
       });
   };

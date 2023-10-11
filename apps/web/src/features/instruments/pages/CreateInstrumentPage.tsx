@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import { FormCreator } from '../components/FormCreator';
-
 import { PageHeader } from '@/components';
+
+import { FormCreator } from '../components/FormCreator';
 
 export const CreateInstrumentPage = () => {
   const { t } = useTranslation();

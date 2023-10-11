@@ -1,18 +1,19 @@
+import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-
 import type { FormInstrumentRecord, Group, Subject } from '@open-data-capture/types';
 
 import { FormInstrumentEntity } from './form-instrument.entity';
 
-export class FormInstrumentRecordEntity implements FormInstrumentRecord {
-  kind: 'form';
-  time: number;
-  instrument: FormInstrumentEntity;
-  group: Group;
-  subject: Subject;
-
+export class FormInstrumentRecordEntity<T extends FormInstrumentData = FormInstrumentData>
+  implements FormInstrumentRecord<T>
+{
   @Prop({ required: true, type: Object })
-  data: Record<string, any>;
+  data: T;
+  group: Group;
+  instrument: FormInstrumentEntity<T>;
+  kind: 'form';
+  subject: Subject;
+  time: number;
 }
 
 export const FormInstrumentRecordSchema = SchemaFactory.createForClass(FormInstrumentRecordEntity);

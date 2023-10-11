@@ -10,11 +10,13 @@ export const VisualizationHeader = () => {
   const { t } = useTranslation();
   return (
     <div className="mb-5">
-      <h3 className="text-center text-xl font-medium">
-        {ctx.selectedInstrument?.details.title ?? t('subjectPage.graph.defaultTitle')}
+      <h3 className="text-lg font-semibold">
+        {t('subjectPage.visualization.selectedInstrument', {
+          title: ctx.selectedInstrument?.details.title ?? t('subjectPage.visualization.selectedInstrumentNone')
+        })}
       </h3>
       {ctx.minTime && (
-        <p className="text-center">
+        <p className="text-sm font-medium">
           {toBasicISOString(new Date(ctx.minTime))} - {toBasicISOString(new Date())}
         </p>
       )}

@@ -6,20 +6,12 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
-    "check-types": {},
-    "demo": {
-      "dependsOn": ["build"]
-    },
     "dev": {
-      "dependsOn": ["^build"],
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "format": {},
-    "lint": {
-      "dependsOn": ["^build"]
-    },
-    "test": {
-      "dependsOn": ["^build"]
-    }
+    "lint": {},
+    "test": {}
   }
 }

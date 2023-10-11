@@ -1,15 +1,14 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-
 import { type AppAbility } from '@open-data-capture/types';
+
+import { CurrentUser } from '@/core/decorators/current-user.decorator';
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { LookupSubjectDto } from './dto/lookup-subject.dto';
 import { SubjectEntity } from './entities/subject.entity';
 import { SubjectsService } from './subjects.service';
-
-import { CurrentUser } from '@/core/decorators/current-user.decorator';
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 @ApiTags('Subjects')
 @Controller('subjects')

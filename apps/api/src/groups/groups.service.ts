@@ -1,7 +1,6 @@
+import type { AccessibleModel } from '@casl/mongoose';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-
-import type { AccessibleModel } from '@casl/mongoose';
 import type { AppAbility, Group } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
@@ -49,16 +48,16 @@ export class GroupsService {
     return group;
   }
 
-  async update(name: string, updateGroupDto: UpdateGroupDto): Promise<Group> {
-    const result = await this.groupModel.findOneAndUpdate({ name }, updateGroupDto);
+  async remove(name: string): Promise<Group> {
+    const result = await this.groupModel.findOneAndDelete({ name });
     if (!result) {
       throw new NotFoundException(`Failed to find group with name: ${name}`);
     }
     return result;
   }
 
-  async remove(name: string): Promise<Group> {
-    const result = await this.groupModel.findOneAndDelete({ name });
+  async update(name: string, updateGroupDto: UpdateGroupDto): Promise<Group> {
+    const result = await this.groupModel.findOneAndUpdate({ name }, updateGroupDto);
     if (!result) {
       throw new NotFoundException(`Failed to find group with name: ${name}`);
     }

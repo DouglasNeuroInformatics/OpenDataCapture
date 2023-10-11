@@ -1,6 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
-
 import { beforeEach, describe, expect, it } from 'bun:test';
+
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AbilityFactory } from '../ability.factory';
 
@@ -17,16 +17,16 @@ describe('AbilityFactory', () => {
 
   describe('createForUser', () => {
     it('should return an empty rule set when the user has no basePermissionLevel', () => {
-      const ability = abilityFactory.createForUser({ username: 'user', password: 'Password123', groups: [] });
+      const ability = abilityFactory.createForUser({ groups: [], password: 'Password123', username: 'user' });
       expect(ability.rules).toBeArrayOfSize(0);
     });
 
     it('should return permission to manage all for an admin', () => {
       const ability = abilityFactory.createForUser({
-        username: 'admin',
-        password: 'Password123',
+        basePermissionLevel: 'ADMIN',
         groups: [],
-        basePermissionLevel: 'ADMIN'
+        password: 'Password123',
+        username: 'admin'
       });
       expect(ability.rules).toMatchObject([{ action: 'manage', subject: 'all' }]);
     });

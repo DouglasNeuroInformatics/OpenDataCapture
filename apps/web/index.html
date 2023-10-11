@@ -5,12 +5,9 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Open Data Capture</title>
-    <script
-      defer
-      data-api="/analytics/api/event"
-      data-domain="demo.opendatacapture.org"
-      src="/analytics/js/script.js"
-    ></script>
+    <script>
+      globalThis.import_meta_env = JSON.parse('"import_meta_env_placeholder"');
+    </script>
   </head>
   <body class="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <div id="root"></div>

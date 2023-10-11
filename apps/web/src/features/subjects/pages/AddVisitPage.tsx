@@ -15,7 +15,7 @@ export const AddVisitPage = () => {
       validateStatus: (status) => status === 201 || status === 409
     });
     if (response.status === 409) {
-      notifications.addNotification({ type: 'error', message: t('addVisit.exists') });
+      notifications.addNotification({ message: t('addVisit.exists'), type: 'error' });
       return;
     }
     setActiveSubject(data);

@@ -5,19 +5,16 @@
 
 // All of these should be undefined in production
 interface ImportMetaDevEnv {
-  readonly VITE_DEV_USERNAME?: string;
-  readonly VITE_DEV_PASSWORD?: string;
   readonly VITE_DEV_BYPASS_AUTH?: string;
-  readonly VITE_DEV_GIT_BRANCH?: string;
-  readonly VITE_DEV_GIT_COMMIT?: string;
-  readonly VITE_DEV_GIT_COMMIT_DATE?: string;
+  readonly VITE_DEV_PASSWORD?: string;
+  readonly VITE_DEV_USERNAME?: string;
 }
 
 interface ImportMetaEnv extends ImportMetaDevEnv {
-  readonly VITE_LICENSE_URL: string;
-  readonly VITE_GITHUB_REPO_URL: string;
-  readonly VITE_CONTACT_EMAIL: string;
-  readonly VITE_DOCS_URL: string;
+  readonly CONTACT_EMAIL: string;
+  readonly DOCS_URL: string;
+  readonly GITHUB_REPO_URL: string;
+  readonly LICENSE_URL: string;
   readonly VITE_API_BASE_URL: string;
 }
 

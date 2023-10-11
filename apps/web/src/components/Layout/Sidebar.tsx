@@ -8,9 +8,9 @@ export const Sidebar = () => {
   return (
     <div className="flex h-screen w-80 flex-col bg-slate-900 p-3 text-slate-300 shadow-lg dark:border-r dark:border-slate-700">
       <Branding />
-      <hr className="my-1" />
+      <hr className="my-1 h-[1px] border-none bg-slate-700" />
       <Navigation />
-      <hr className="my-1 mt-auto" />
+      <hr className="my-1 mt-auto h-[1px] border-none bg-slate-700" />
       <div className="flex items-center">
         <UserDropup />
         <ThemeToggle className="hover:backdrop-brightness-150" />

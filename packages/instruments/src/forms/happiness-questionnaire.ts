@@ -5,62 +5,62 @@ export type HappinessQuestionnaireData = {
 };
 
 export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnaireData>({
-  name: 'HappinessQuestionnaire',
-  tags: ['Well-Being'],
-  version: 1,
-  details: {
-    title: {
-      en: 'Happiness Questionnaire',
-      fr: 'Questionnaire sur le bonheur'
-    },
-    description: {
-      en: 'The Happiness Questionnaire is a questionnaire about happiness.',
-      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
-    },
-    instructions: {
-      en: 'Please answer the question based on your current feelings.',
-      fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'
-    },
-    estimatedDuration: 1
-  },
   content: {
     overallHappiness: {
-      kind: 'numeric',
-      label: {
-        en: 'Overall Happiness',
-        fr: 'Bonheur général'
-      },
       description: {
         en: 'Overall happiness from 1 through 10 (inclusive)',
         fr: 'Bonheur général de 1 à 10 (inclus)'
       },
       isRequired: true,
-      min: 1,
-      max: 10,
-      variant: 'slider'
-    }
-  },
-  measures: {
-    overallHappiness: {
+      kind: 'numeric',
       label: {
         en: 'Overall Happiness',
         fr: 'Bonheur général'
       },
+      max: 10,
+      min: 1,
+      variant: 'slider'
+    }
+  },
+  details: {
+    description: {
+      en: 'The Happiness Questionnaire is a questionnaire about happiness.',
+      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
+    },
+    estimatedDuration: 1,
+    instructions: {
+      en: 'Please answer the question based on your current feelings.',
+      fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'
+    },
+    title: {
+      en: 'Happiness Questionnaire',
+      fr: 'Questionnaire sur le bonheur'
+    }
+  },
+  measures: {
+    overallHappiness: {
       formula: {
-        kind: 'const',
-        field: 'overallHappiness'
+        field: 'overallHappiness',
+        kind: 'const'
+      },
+      label: {
+        en: 'Overall Happiness',
+        fr: 'Bonheur général'
       }
     }
   },
+  name: 'HappinessQuestionnaire',
+  tags: ['Well-Being'],
   validationSchema: {
-    type: 'object',
     properties: {
       overallHappiness: {
-        type: 'integer',
+        maximum: 10,
         minimum: 1,
-        maximum: 10
+        type: 'integer'
       }
     },
-    required: ['overallHappiness']
-  }
+    required: ['overallHappiness'],
+    type: 'object'
+  },
+  version: 1
 });

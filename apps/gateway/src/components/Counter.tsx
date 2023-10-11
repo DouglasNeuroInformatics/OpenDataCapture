@@ -6,9 +6,9 @@ export const Counter = () => {
     <div style={{ display: 'flex' }}>
       <button
         style={{
-          cursor: 'pointer',
           border: 'none',
           borderRadius: '4px',
+          cursor: 'pointer',
           width: '20px'
         }}
         onClick={() => setCount(count - 1)}
@@ -17,10 +17,10 @@ export const Counter = () => {
       </button>
       <span
         style={{
-          paddingLeft: '10px',
-          paddingRight: '10px',
+          fontFamily: 'monospace',
           fontSize: '14pt',
-          fontFamily: 'monospace'
+          paddingLeft: '10px',
+          paddingRight: '10px'
         }}
       >
         {count}
@@ -28,9 +28,9 @@ export const Counter = () => {
       <h1 className="text-3xl">Hello World</h1>
       <button
         style={{
-          cursor: 'pointer',
           border: 'none',
           borderRadius: '4px',
+          cursor: 'pointer',
           width: '20px'
         }}
         onClick={() => {

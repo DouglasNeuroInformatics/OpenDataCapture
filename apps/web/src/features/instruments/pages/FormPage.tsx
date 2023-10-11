@@ -12,16 +12,16 @@ import {
 } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
+import { PageHeader } from '@/components/PageHeader';
+import { Spinner } from '@/components/Spinner';
+import { useActiveSubjectStore } from '@/stores/active-subject-store';
+import { useAuthStore } from '@/stores/auth-store';
+
 import { FormIdentification } from '../components/FormIdentification';
 import { FormOverview } from '../components/FormOverview';
 import { FormQuestions } from '../components/FormQuestions';
 import { FormSummary } from '../components/FormSummary';
 import { useFetchInstrument } from '../hooks/useFetchInstrument';
-
-import { PageHeader } from '@/components/PageHeader';
-import { Spinner } from '@/components/Spinner';
-import { useActiveSubjectStore } from '@/stores/active-subject-store';
-import { useAuthStore } from '@/stores/auth-store';
 
 export const FormPage = () => {
   const params = useParams();
@@ -42,13 +42,13 @@ export const FormPage = () => {
   const handleSubmit = async (data: FormInstrumentData) => {
     const now = Date.now();
     await axios.post('/v1/instruments/records/forms', {
-      kind: 'form',
-      time: Date.now(),
+      data: data,
+      groupName: currentGroup?.name,
       instrumentName: instrument.name,
       instrumentVersion: instrument.version,
-      groupName: currentGroup?.name,
+      kind: 'form',
       subjectInfo: activeSubject,
-      data: data
+      time: Date.now()
     });
     setTimeCollected(now);
     setResult(data);
@@ -62,23 +62,23 @@ export const FormPage = () => {
         steps={[
           {
             element: <FormOverview details={instrument.details} />,
-            label: t('instruments.formPage.overview.label'),
-            icon: <HiOutlineDocumentCheck />
+            icon: <HiOutlineDocumentCheck />,
+            label: t('instruments.formPage.overview.label')
           },
           {
             element: <FormIdentification />,
-            label: t('instruments.formPage.identification.label'),
-            icon: <HiOutlineIdentification />
+            icon: <HiOutlineIdentification />,
+            label: t('instruments.formPage.identification.label')
           },
           {
             element: <FormQuestions instrument={instrument} onSubmit={(data) => void handleSubmit(data)} />,
-            label: t('instruments.formPage.questions.label'),
-            icon: <HiOutlineQuestionMarkCircle />
+            icon: <HiOutlineQuestionMarkCircle />,
+            label: t('instruments.formPage.questions.label')
           },
           {
             element: <FormSummary instrument={instrument} result={result} timeCollected={timeCollected} />,
-            label: t('instruments.formPage.summary.label'),
-            icon: <HiOutlinePrinter />
+            icon: <HiOutlinePrinter />,
+            label: t('instruments.formPage.summary.label')
           }
         ]}
       />

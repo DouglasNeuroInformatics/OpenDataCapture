@@ -28,7 +28,7 @@ export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
       await i18next.changeLanguage(inactiveLanguage);
     } catch (error) {
       console.error(error);
-      notifications.addNotification({ type: 'error', message: 'Failed to change languages' });
+      notifications.addNotification({ message: 'Failed to change languages', type: 'error' });
     }
     if (onClick) {
       onClick(event);

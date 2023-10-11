@@ -6,11 +6,11 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { DemoBanner } from '../components/DemoBanner';
-import { LoginForm } from '../components/LoginForm';
-
 import logo from '@/assets/logo.png';
 import { useAuthStore } from '@/stores/auth-store';
+
+import { DemoBanner } from '../components/DemoBanner';
+import { LoginForm } from '../components/LoginForm';
 
 export const LoginPage = () => {
   const auth = useAuthStore();
@@ -25,9 +25,9 @@ export const LoginPage = () => {
     });
     if (response.status === 401) {
       notifications.addNotification({
-        type: 'error',
+        message: t('unauthorizedError.message'),
         title: t('unauthorizedError.title'),
-        message: t('unauthorizedError.message')
+        type: 'error'
       });
       return;
     }
@@ -38,8 +38,8 @@ export const LoginPage = () => {
   useEffect(() => {
     if (import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true') {
       void login({
-        username: import.meta.env.VITE_DEV_USERNAME!,
-        password: import.meta.env.VITE_DEV_PASSWORD!
+        password: import.meta.env.VITE_DEV_PASSWORD!,
+        username: import.meta.env.VITE_DEV_USERNAME!
       });
     }
   }, []);

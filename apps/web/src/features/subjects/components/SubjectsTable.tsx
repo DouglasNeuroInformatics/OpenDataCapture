@@ -7,10 +7,10 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { SubjectLookup } from './SubjectLookup';
-
 import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
+
+import { SubjectLookup } from './SubjectLookup';
 
 export type SubjectTableProps = {
   data: Subject[];
@@ -19,7 +19,7 @@ export type SubjectTableProps = {
 export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
   const navigate = useNavigate();
-  const { currentUser, currentGroup } = useAuthStore();
+  const { currentGroup, currentUser } = useAuthStore();
   const { t } = useTranslation();
 
   const [showLookup, setShowLookup] = useState(false);
@@ -30,7 +30,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
     return response.data;
   };
 
-  const handleExportSelection = (option: 'JSON' | 'CSV') => {
+  const handleExportSelection = (option: 'CSV' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'JSON':
@@ -80,16 +80,16 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
       <ClientTable<Subject>
         columns={[
           {
-            label: t('viewSubjects.table.columns.subject'),
-            field: (subject) => subject.identifier.slice(0, 6)
+            field: (subject) => subject.identifier.slice(0, 6),
+            label: t('viewSubjects.table.columns.subject')
           },
           {
-            label: t('viewSubjects.table.columns.dateOfBirth'),
-            field: (subject) => toBasicISOString(new Date(subject.dateOfBirth))
+            field: (subject) => toBasicISOString(new Date(subject.dateOfBirth)),
+            label: t('viewSubjects.table.columns.dateOfBirth')
           },
           {
-            label: t('viewSubjects.table.columns.sex'),
-            field: (subject) => (subject.sex === 'female' ? t('sex.female') : t('sex.male'))
+            field: (subject) => (subject.sex === 'female' ? t('sex.female') : t('sex.male')),
+            label: t('viewSubjects.table.columns.sex')
           }
         ]}
         data={data}

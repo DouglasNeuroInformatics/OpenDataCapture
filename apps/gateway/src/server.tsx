@@ -1,17 +1,19 @@
+/* eslint-disable no-console */
 import type { ComponentType } from 'react';
 import { renderToReadableStream } from 'react-dom/server';
 
 import fs from 'fs/promises';
 import path from 'path';
-import { Router } from './utils/router';
 
 import tailwindcssPlugin from 'bun-plugin-tailwindcss';
+
+import { Router } from './utils/router';
 
 const PROJECT_ROOT = path.resolve(import.meta.dir, '..');
 const PUBLIC_DIR = path.resolve(PROJECT_ROOT, 'public');
 const BUILD_DIR = path.resolve(PROJECT_ROOT, 'dist');
 
-await fs.rm(BUILD_DIR, { recursive: true, force: true });
+await fs.rm(BUILD_DIR, { force: true, recursive: true });
 await fs.mkdir(BUILD_DIR);
 
 const srcRouter = new Router(path.resolve(import.meta.dir, 'pages'));
@@ -21,8 +23,8 @@ await Bun.build({
   minify: true,
   outdir: BUILD_DIR,
   plugins: [tailwindcssPlugin()],
-  target: 'browser',
-  splitting: true
+  splitting: true,
+  target: 'browser'
 });
 
 const buildRouter = new Router(BUILD_DIR + '/pages');
@@ -38,7 +40,9 @@ async function serveFromDir(config: { directory: string; path: string }): Promis
       if (stat && stat.isFile()) {
         return new Response(Bun.file(pathWithSuffix));
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return null;
@@ -57,10 +61,11 @@ const server = Bun.serve({
         return new Response('Unknown error', { status: 500 });
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       const Page: ComponentType = (await import(match.filePath)).default;
       const stream = await renderToReadableStream(<Page />, {
-        bootstrapScriptContent: `globalThis.PATH_TO_PAGE = "/${builtMatch.src}";`,
-        bootstrapModules: ['/hydrate.js']
+        bootstrapModules: ['/hydrate.js'],
+        bootstrapScriptContent: `globalThis.PATH_TO_PAGE = "/${builtMatch.src}";`
       });
       return new Response(stream, {
         headers: { 'Content-Type': 'text/html; charset=utf-8' }

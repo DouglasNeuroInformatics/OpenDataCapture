@@ -3,14 +3,13 @@ import React from 'react';
 import { NotificationHub } from '@douglasneuroinformatics/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { Router } from './Router';
-
 import { ActiveSubject } from '@/components';
 import { ErrorFallback, SuspenseFallback } from '@/features/misc';
 import { SetupProvider } from '@/features/setup';
 
-import './services/i18n';
+import { Router } from './Router';
 import './services/axios';
+import './services/i18n';
 
 export const App = () => {
   return (

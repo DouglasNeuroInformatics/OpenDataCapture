@@ -1,13 +1,11 @@
-import { Test } from '@nestjs/testing';
-
-import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { beforeEach, describe, expect, it } from 'bun:test';
+
+import type { LoginRequestDto } from '../dto/login-request.dto';
+import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
+import { Test } from '@nestjs/testing';
 
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
-import type { LoginRequestDto } from '../dto/login-request.dto';
-
-import { createLoginRequestStub } from './stubs/login-request.stub';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -31,7 +29,10 @@ describe('AuthController', () => {
     let loginRequest: LoginRequestDto;
 
     beforeEach(() => {
-      loginRequest = createLoginRequestStub();
+      loginRequest = Object.freeze({
+        password: 'Password123',
+        username: 'admin'
+      });
     });
 
     it('should call the `AuthService` with a username and password', async () => {

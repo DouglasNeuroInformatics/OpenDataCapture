@@ -6,7 +6,6 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { VisualizationContext } from '../context/VisualizationContext';
-
 import { InstrumentDropdown } from './InstrumentDropdown';
 import { MeasuresDropdown } from './MeasuresDropdown';
 import { TimeDropdown } from './TimeDropdown';
@@ -68,31 +67,31 @@ export const RecordsGraph = () => {
     const measure = ctx.selectedMeasures[i];
     lines.push({
       name: measure!.label,
-      val: measure!.key,
-      stroke: COLOR_PALETTE[i]
+      stroke: COLOR_PALETTE[i],
+      val: measure!.key
     });
     lines.push({
-      name: `${measure!.label} (${t('groupTrend')})`,
-      val: measure!.key + 'Group',
-      strokeWidth: 0.5,
-      stroke: COLOR_PALETTE[i],
       legendType: 'none',
-      strokeDasharray: '5 5'
+      name: `${measure!.label} (${t('groupTrend')})`,
+      stroke: COLOR_PALETTE[i],
+      strokeDasharray: '5 5',
+      strokeWidth: 0.5,
+      val: measure!.key + 'Group'
     });
   }
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="py-3">
+      <div className="py-2">
         <VisualizationHeader />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
-          <div className="flex flex-col gap-2 lg:flex-row" data-cy='instrument-select'>
-            <InstrumentDropdown/>
-            </div>
-            <div className="flex flex-col gap-2 lg:flex-row" data-cy='measure-select'>
+          <div className="flex" data-cy="instrument-select">
+            <InstrumentDropdown />
+          </div>
+          <div className="flex" data-cy="measure-select">
             <MeasuresDropdown />
-            </div>
-          <div data-cy='time-select'>
+          </div>
+          <div data-cy="time-select">
             <TimeDropdown />
           </div>
         </div>
@@ -103,7 +102,7 @@ export const RecordsGraph = () => {
           lines={lines}
           xAxis={{
             key: 'time',
-            label: t('subjectPage.graph.xLabel')
+            label: t('subjectPage.visualization.xLabel')
           }}
         />
       </div>

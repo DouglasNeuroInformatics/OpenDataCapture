@@ -1,6 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
+import { Injectable, Logger } from '@nestjs/common';
 import type { AppAbility, User } from '@open-data-capture/types';
 
 @Injectable()

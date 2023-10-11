@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import type { AppAction, AppSubject } from '@open-data-capture/types';
+import clsx from 'clsx';
 import { NavLink } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';
@@ -14,12 +15,12 @@ export type NavigationLinkProps = {
   access: LinkAccess | LinkAccess[] | null;
   cyTestId?: string;
   href: string;
-  label: string;
   icon: React.ReactElement;
+  label: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
-export const NavigationLink = ({ href, label, icon, access, cyTestId, onClick }: NavigationLinkProps) => {
+export const NavigationLink = ({ access, cyTestId, href, icon, label, onClick }: NavigationLinkProps) => {
   const { currentUser } = useAuthStore();
 
   // Whether the user has all permissions or access is undefined
@@ -42,9 +43,22 @@ export const NavigationLink = ({ href, label, icon, access, cyTestId, onClick }:
   }, [currentUser]);
 
   return isAuthorized ? (
-    <NavLink className="flex items-center p-2 text-sm hover:bg-slate-800 md:text-base" to={href} onClick={onClick}>
+    <NavLink
+      className={({ isActive }) =>
+        clsx(
+          'flex items-center p-2 hover:bg-slate-200 dark:hover:bg-slate-700 md:text-base md:hover:bg-slate-800',
+          isActive
+            ? 'bg-slate-200 dark:bg-slate-700 md:bg-slate-800 md:text-slate-200'
+            : 'md:bg-slate-900 md:text-slate-300'
+        )
+      }
+      to={href}
+      onClick={onClick}
+    >
       {icon}
-      <span className="ml-2" data-cy={cyTestId}>{label}</span>
+      <span className="ml-2" data-cy={cyTestId}>
+        {label}
+      </span>
     </NavLink>
   ) : null;
 };

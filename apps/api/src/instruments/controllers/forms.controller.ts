@@ -1,12 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-
 import type { FormInstrument, FormInstrumentSummary, Language } from '@open-data-capture/types';
+
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateFormDto } from '../dto/create-form.dto';
 import { FormsService } from '../services/forms.service';
-
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 @ApiTags('Instruments')
 @Controller('instruments/forms')
@@ -31,9 +30,11 @@ export class FormsController {
   @Get('available')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   getAvailable(): Promise<FormInstrumentSummary[]> {
+    console.log('Checking available');
     return this.formsService.getAvailable();
   }
 
+  // eslint-disable-next-line perfectionist/sort-classes
   @ApiOperation({ description: 'Returns the provided form', summary: 'Find Form' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Instrument' })

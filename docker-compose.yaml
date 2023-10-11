@@ -31,13 +31,15 @@ services:
   web:
     image: ghcr.io/douglasneuroinformatics/data-capture-web:latest
     build:
+      args:
+        VITE_API_BASE_URL: /api
       context: .
       dockerfile: ./apps/web/Dockerfile
-      args:
-        - VITE_DOCS_URL
-        - VITE_LICENSE_URL
-        - VITE_GITHUB_REPO_URL
-        - VITE_CONTACT_EMAIL
+    environment:
+      - CONTACT_EMAIL
+      - DOCS_URL
+      - GITHUB_REPO_URL
+      - LICENSE_URL
     expose:
       - 80
   mongo:

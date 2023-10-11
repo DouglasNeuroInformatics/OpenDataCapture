@@ -9,14 +9,13 @@ export type VisualizationModeProps = Omit<LinkProps, 'children'> & {
   title: string;
 };
 
-export const VisualizationMode = ({ title, icon, className, ...props }: VisualizationModeProps) => {
+export const VisualizationMode = ({ className, icon, title, ...props }: VisualizationModeProps) => {
   return (
     <Link
       className={clsx(
         'flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 [&>svg]:h-24 [&>svg]:w-24',
         className
       )}
-     
       {...props}
     >
       {icon}

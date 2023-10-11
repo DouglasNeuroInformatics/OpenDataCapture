@@ -12,23 +12,23 @@
 //
 // -- This is a parent command --
 
-
-//This is a login script for the 
-Cypress.Commands.add('login', (username, password) => { 
-cy.visit('http://127.0.0.1:3000/auth/login')
-cy.get('input[name="username"]').type(username)
-cy.get('input[name="password"]').type(password) 
-cy.get('button').contains('Login').click()})
+//This is a login script for the
+Cypress.Commands.add('login', (username, password) => {
+  cy.visit('http://127.0.0.1:3000/auth/login');
+  cy.get('input[name="username"]').type(username);
+  cy.get('input[name="password"]').type(password);
+  cy.get('button').contains('Login').click();
+});
 
 declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace Cypress {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-      interface Chainable {
-        login(username: string, password: string): Chainable<void>
-      }
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Cypress {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+    interface Chainable {
+      login(username: string, password: string): Chainable<void>;
     }
   }
+}
 //
 //
 // -- This is a child command --

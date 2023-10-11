@@ -1,7 +1,7 @@
 import type { FormInstrument } from '@open-data-capture/types';
 
 export type Measurements = {
-  [key: string]: any;
+  [key: string]: unknown;
   time: number;
 }[];
 

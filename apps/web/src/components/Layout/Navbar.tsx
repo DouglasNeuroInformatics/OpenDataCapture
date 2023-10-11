@@ -1,53 +1,61 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { HiBars3 } from 'react-icons/hi2';
+import { Slider, ThemeToggle, useMediaQuery } from '@douglasneuroinformatics/ui';
+import { Bars3Icon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 
 import { Branding } from './Branding';
 import { Navigation } from './Navigation';
 
 export const Navbar = () => {
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [dropdownHeight, setDropdownHeight] = useState(0);
+  const { i18n } = useTranslation();
+
+  // This is to prevent ugly styling when resizing the viewport
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useEffect(() => {
-    if (dropdownRef.current) {
-      let sum = 0;
-      Array.from(dropdownRef.current.childNodes).forEach((node) => {
-        if (node instanceof HTMLElement) {
-          sum += node.offsetHeight;
-        }
-      });
-      setDropdownHeight(sum);
+    if (isDesktop) {
+      setIsOpen(false);
     }
-  }, [isOpen]);
+  }, [isDesktop]);
 
   return (
-    <div className="flex flex-col bg-slate-900 px-2 text-slate-300 duration-700">
-      <div className="flex w-full justify-between py-2">
-        <Branding />
+    <>
+      <div className="flex w-full items-center justify-between bg-slate-900 p-2 dark:bg-slate-800">
+        <Branding showText={false} />
         <button
-          type="button"
+          className="text-slate-300 hover:text-slate-200"
           onClick={() => {
-            setIsOpen(!isOpen);
+            setIsOpen(true);
           }}
         >
-          <HiBars3 className="h-9 w-9" />
+          <Bars3Icon height={36} width={36} />
         </button>
       </div>
-      <div
-        className="overflow-hidden transition-all duration-500"
-        ref={dropdownRef}
-        style={{ height: isOpen ? dropdownHeight : 0 }}
-      >
-        <div className="border-spacing-2 border-t py-2">
-          <Navigation
-            onClick={() => {
-              setIsOpen(false);
-            }}
-          />
-        </div>
-      </div>
-    </div>
+      {!isDesktop && (
+        <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={<Branding />}>
+          <div className="flex h-full flex-col">
+            <Navigation
+              onClick={() => {
+                setIsOpen(false);
+              }}
+            />
+            <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+              <button
+                className="rounded-md p-2 font-medium hover:backdrop-brightness-95 dark:hover:backdrop-brightness-150"
+                type="button"
+                onClick={() => {
+                  void i18n.changeLanguage(i18n.resolvedLanguage === 'en' ? 'fr' : 'en');
+                }}
+              >
+                {i18n.resolvedLanguage === 'en' ? 'Français' : 'English'}
+              </button>
+              <ThemeToggle />
+            </div>
+          </div>
+        </Slider>
+      )}
+    </>
   );
 };

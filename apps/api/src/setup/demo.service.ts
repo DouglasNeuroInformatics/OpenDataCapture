@@ -1,10 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/mongoose';
-
 import { createMongoAbility } from '@casl/ability';
 import { type FormInstrumentData } from '@douglasneuroinformatics/form-types';
 import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
+import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/mongoose';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
 import * as instruments from '@open-data-capture/instruments';
 import type { AppAbility, FormInstrument } from '@open-data-capture/types';
@@ -32,6 +31,77 @@ export class DemoService {
     private readonly formRecordsService: FormRecordsService,
     private readonly usersService: UsersService
   ) {}
+
+  /** Create form records for translated instruments */
+  private async createFormRecords<T extends FormInstrumentData = FormInstrumentData>(
+    instrument: FormInstrument<T>,
+    groupName: string,
+    subjectInfo: CreateSubjectDto,
+    options?: {
+      customValues?: {
+        [K in keyof T]?: T[K];
+      };
+    }
+  ) {
+    for (let i = 0; i < 5; i++) {
+      const fields = this.formsService.getFields(instrument);
+      const data: FormInstrumentData = {};
+      for (const fieldName in fields) {
+        const field = fields[fieldName]!;
+        const customValue = options?.customValues?.[fieldName];
+        if (customValue) {
+          data[fieldName] = customValue;
+          continue;
+        }
+        if (typeof field === 'function') {
+          throw new NotImplementedException();
+        }
+        switch (field.kind) {
+          case 'array':
+            throw new NotImplementedException();
+          case 'binary':
+            data[fieldName] = faker.datatype.boolean();
+            break;
+          case 'date':
+            data[fieldName] = faker.date.past({ years: 1 }).toISOString();
+            break;
+          case 'numeric':
+            data[fieldName] = faker.number.int({ max: field.max, min: field.min });
+            break;
+          case 'options':
+            data[fieldName] = randomValue(Object.keys(field.options));
+            break;
+          case 'text':
+            data[fieldName] = faker.lorem.sentence();
+            break;
+        }
+      }
+
+      instrument;
+
+      const record = {
+        data: data,
+        groupName: groupName,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        instrumentName: instrument.name,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        instrumentVersion: instrument.version,
+        kind: 'form',
+        subjectInfo: subjectInfo,
+        time: faker.date.recent({ days: i * 30 + 5, refDate: new Date() }).getTime()
+      } as const;
+      await this.formRecordsService.create(record, this.ability);
+    }
+  }
+
+  private getCreateSubjectDto(): CreateSubjectDto {
+    return {
+      dateOfBirth: faker.date.birthdate().toISOString(),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      sex: faker.person.sexType()
+    };
+  }
 
   async init(): Promise<void> {
     this.logger.verbose(`Initializing demo for database: '${this.connection.name}'`);
@@ -67,74 +137,6 @@ export class DemoService {
           postalCode: 'A1A-1A1'
         }
       });
-    }
-  }
-
-  private getCreateSubjectDto(): CreateSubjectDto {
-    return {
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      dateOfBirth: faker.date.birthdate().toISOString(),
-      sex: faker.person.sexType()
-    };
-  }
-
-  /** Create form records for translated instruments */
-  private async createFormRecords<T extends FormInstrumentData = FormInstrumentData>(
-    instrument: FormInstrument<T>,
-    groupName: string,
-    subjectInfo: CreateSubjectDto,
-    options?: {
-      customValues?: {
-        [K in keyof T]?: T[K];
-      };
-    }
-  ): Promise<any> {
-    for (let i = 0; i < 5; i++) {
-      const fields = this.formsService.getFields(instrument);
-      const data: FormInstrumentData = {};
-      for (const fieldName in fields) {
-        const field = fields[fieldName]!;
-        const customValue = options?.customValues?.[fieldName];
-        if (customValue) {
-          data[fieldName] = customValue;
-          continue;
-        }
-        switch (field.kind) {
-          case 'array':
-            throw new Error('Not supported');
-          case 'binary':
-            data[fieldName] = faker.datatype.boolean();
-            break;
-          case 'date':
-            data[fieldName] = faker.date.past({ years: 1 }).toISOString();
-            break;
-          case 'numeric':
-            data[fieldName] = faker.number.int({ min: field.min, max: field.max });
-            break;
-          case 'options':
-            data[fieldName] = randomValue(Object.keys(field.options));
-            break;
-          case 'text':
-            data[fieldName] = faker.lorem.sentence();
-            break;
-        }
-      }
-
-      instrument;
-
-      const record = {
-        kind: 'form',
-        time: faker.date.recent({ days: i * 30 + 5, refDate: new Date() }).getTime(),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        instrumentName: instrument.name,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        instrumentVersion: instrument.version,
-        groupName: groupName,
-        subjectInfo: subjectInfo,
-        data: data
-      } as const;
-      await this.formRecordsService.create(record, this.ability);
     }
   }
 }

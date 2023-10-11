@@ -5,6 +5,6 @@ export abstract class BaseInstrumentEntity implements BaseInstrument {
   name: string;
   tags: string[];
   version: number;
+  abstract content: unknown;
   abstract kind: InstrumentKind;
-  abstract content: any;
 }

@@ -8,18 +8,18 @@ type Story = StoryObj<typeof InstrumentShowcase>;
 
 function createDummyInstrument(n: number): FormInstrumentSummary {
   return {
+    details: {
+      description: 'This is my instrument',
+      estimatedDuration: 15,
+      instructions: 'Please complete all questions',
+      language: n % 2 ? 'en' : 'fr',
+      title: 'My Instrument ' + n
+    },
     identifier: n.toString(),
     kind: 'form',
     name: 'MyInstrument' + n,
     tags: ['foo'],
-    version: 1.0,
-    details: {
-      title: 'My Instrument ' + n,
-      description: 'This is my instrument',
-      language: n % 2 ? 'en' : 'fr',
-      instructions: 'Please complete all questions',
-      estimatedDuration: 15
-    }
+    version: 1.0
   };
 }
 
@@ -32,6 +32,7 @@ export default {
   args: {
     instruments
   },
+  component: InstrumentShowcase,
   decorators: [
     (Story) => (
       <MemoryRouter>
@@ -40,8 +41,7 @@ export default {
         </div>
       </MemoryRouter>
     )
-  ],
-  component: InstrumentShowcase
+  ]
 } as Meta<typeof InstrumentShowcase>;
 
 export const Default: Story = {};

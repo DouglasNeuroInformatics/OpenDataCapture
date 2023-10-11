@@ -4,17 +4,16 @@ import { ClientTable, Dropdown, useNotificationsStore } from '@douglasneuroinfor
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';
 import { useTranslation } from 'react-i18next';
 
-import { VisualizationContext } from '../context/VisualizationContext';
+import { useDownload } from '@/hooks/useDownload';
+import { useAuthStore } from '@/stores/auth-store';
 
+import { VisualizationContext } from '../context/VisualizationContext';
 import { InstrumentDropdown } from './InstrumentDropdown';
 import { TimeDropdown } from './TimeDropdown';
 import { VisualizationHeader } from './VisualizationHeader';
 
-import { useDownload } from '@/hooks/useDownload';
-import { useAuthStore } from '@/stores/auth-store';
-
 export const RecordsTable = () => {
-  const { selectedInstrument, records } = useContext(VisualizationContext);
+  const { records, selectedInstrument } = useContext(VisualizationContext);
   const { t } = useTranslation();
   const { currentUser } = useAuthStore();
   const download = useDownload();
@@ -25,7 +24,7 @@ export const RecordsTable = () => {
       return [];
     }
 
-    const data: Record<string, any>[] = [];
+    const data: Record<string, unknown>[] = [];
     for (const record of records) {
       data.push({
         time: record.time,
@@ -38,7 +37,7 @@ export const RecordsTable = () => {
 
   const handleDownload = (option: 'CSV' | 'JSON') => {
     if (!selectedInstrument) {
-      notifications.addNotification({ type: 'info', message: t('selectInstrument') });
+      notifications.addNotification({ message: t('selectInstrument'), type: 'info' });
       return;
     }
 
@@ -59,12 +58,12 @@ export const RecordsTable = () => {
     }
   };
 
-  const fields: { label: string; field: string }[] = [];
+  const fields: { field: string; label: string }[] = [];
   for (const subItem in data[0]) {
     if (subItem !== 'time') {
       fields.push({
-        label: camelToSnakeCase(subItem).toUpperCase(),
-        field: subItem
+        field: subItem,
+        label: camelToSnakeCase(subItem).toUpperCase()
       });
     }
   }
@@ -92,9 +91,9 @@ export const RecordsTable = () => {
       <ClientTable
         columns={[
           {
-            label: 'DATE_COLLECTED',
             field: 'time',
-            formatter: (value: number) => toBasicISOString(new Date(value))
+            formatter: (value) => toBasicISOString(new Date(value as number)),
+            label: 'DATE_COLLECTED'
           },
           ...fields
         ]}

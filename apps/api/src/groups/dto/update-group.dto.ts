@@ -1,5 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-
 import { type Group } from '@open-data-capture/types';
 import { IsOptional } from 'class-validator';
 

@@ -1,6 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
 import type { FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import type { FormDetails, FormInstrument, Measures } from '@open-data-capture/types';
 import { type JSONSchemaType } from 'ajv';
 import { Schema as MongooseSchema } from 'mongoose';
@@ -13,7 +12,8 @@ export class FormInstrumentEntity<TData extends FormInstrumentData = FormInstrum
   extends BaseInstrumentEntity
   implements FormInstrument<TData>
 {
-  kind: 'form';
+  @Prop({ required: true, type: MongooseSchema.Types.Mixed })
+  content: FormInstrumentContent<TData>;
   // name: string;
   // tags: string[];
   // version: number;
@@ -21,14 +21,13 @@ export class FormInstrumentEntity<TData extends FormInstrumentData = FormInstrum
   @Prop({ required: true, type: FormDetailsSchema })
   details: FormDetails;
 
-  @Prop({ required: true, type: MongooseSchema.Types.Mixed })
-  content: FormInstrumentContent<TData>;
-
-  @Prop({ required: true, type: Object })
-  validationSchema: JSONSchemaType<TData>;
+  kind: 'form';
 
   @Prop({ required: false, type: Object })
   measures?: Measures<TData>;
+
+  @Prop({ required: true, type: Object })
+  validationSchema: JSONSchemaType<TData>;
 }
 
 export const FormInstrumentSchema = SchemaFactory.createForClass(FormInstrumentEntity);

@@ -1,16 +1,15 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
+import type { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
 import type { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@open-data-capture/types';
 import { useParams } from 'react-router-dom';
-
-import type { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
 
 import { Spinner } from '@/components';
 import { useFetch } from '@/hooks/useFetch';
 import i18n from '@/services/i18n';
 
 /** Apply a callback function to filter items from object */
-function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => any) {
+function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => unknown) {
   const result: Partial<T> = {};
   for (const key in obj) {
     if (fn({ key, value: obj[key] })) {
@@ -24,34 +23,34 @@ export type VisualizationContextData = {
   /** Data in the format returned from the API */
   data: SubjectFormRecords[];
 
-  /** An array of records in the data returned by the API, after applying filters */
-  records: (Pick<FormInstrumentRecord, 'data' | 'time'> & {
-    computedMeasures?: Record<string, number> | undefined;
-  })[];
+  /** An object with instrument identifiers mapped to titles */
+  instrumentOptions: Record<string, string>;
+
+  /** All measure options associated with the selected current selected instrument */
+  measureOptions: SelectedMeasure[];
 
   /** Merger of `computedMeasures` and `time` for all records  */
   measurements: Measurements;
 
   /** Minimum unix timestamp for a record */
-  minTime: number | null;
+  minTime: null | number;
 
-  /** A function to set the minimum time */
-  setMinTime: React.Dispatch<React.SetStateAction<number | null>>;
+  /** An array of records in the data returned by the API, after applying filters */
+  records: (Pick<FormInstrumentRecord, 'data' | 'time'> & {
+    computedMeasures?: Record<string, number> | undefined;
+  })[];
 
   /** The selected instrument from among those in the data */
   selectedInstrument: SelectedInstrument | null;
 
-  /** A function to set the selected instrument */
-  setSelectedInstrument: React.Dispatch<React.SetStateAction<SelectedInstrument | null>>;
-
-  /** All measure options associated with the selected current selected instrument */
-  measureOptions: SelectedMeasure[];
-
-  /** An object with instrument identifiers mapped to titles */
-  instrumentOptions: Record<string, string>;
-
   /** An array of all the measures selected for the current instrument */
   selectedMeasures: SelectedMeasure[];
+
+  /** A function to set the minimum time */
+  setMinTime: React.Dispatch<React.SetStateAction<null | number>>;
+
+  /** A function to set the selected instrument */
+  setSelectedInstrument: React.Dispatch<React.SetStateAction<SelectedInstrument | null>>;
 
   /** A function to set the measures selected for the current instrument */
   setSelectedMeasures: React.Dispatch<React.SetStateAction<SelectedMeasure[]>>;
@@ -62,7 +61,7 @@ export const VisualizationContext = createContext<VisualizationContextData>(null
 export type VisualizationContextProviderProps = {
   children: React.ReactNode;
   /** A filter that can be applied to the instrument options based on truthy` */
-  instrumentOptionsFilter?: (instrument: FormInstrument) => any;
+  instrumentOptionsFilter?: (instrument: FormInstrument) => unknown;
 };
 
 export const VisualizationContextProvider = ({
@@ -72,12 +71,12 @@ export const VisualizationContextProvider = ({
   const params = useParams();
   const { data } = useFetch<SubjectFormRecords[]>(`/v1/instruments/records/forms`, [], {
     queryParams: {
-      subject: params.subjectIdentifier,
-      lang: i18n.resolvedLanguage
+      lang: i18n.resolvedLanguage,
+      subject: params.subjectIdentifier
     }
   });
 
-  const [minTime, setMinTime] = useState<number | null>(null);
+  const [minTime, setMinTime] = useState<null | number>(null);
   const [selectedInstrument, setSelectedInstrument] = useState<SelectedInstrument | null>(null);
   const [selectedMeasures, setSelectedMeasures] = useState<SelectedMeasure[]>([]);
 
@@ -148,15 +147,15 @@ export const VisualizationContextProvider = ({
     <VisualizationContext.Provider
       value={{
         data,
-        records,
-        measurements,
-        measureOptions,
         instrumentOptions,
+        measureOptions,
+        measurements,
         minTime,
-        setMinTime,
+        records,
         selectedInstrument,
-        setSelectedInstrument,
         selectedMeasures,
+        setMinTime,
+        setSelectedInstrument,
         setSelectedMeasures
       }}
     >

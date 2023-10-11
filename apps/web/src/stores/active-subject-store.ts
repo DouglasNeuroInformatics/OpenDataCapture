@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 
 export type ActiveSubject = {
+  dateOfBirth: string;
   firstName: string;
   lastName: string;
-  sex: 'male' | 'female';
-  dateOfBirth: string;
+  sex: 'female' | 'male';
 };
 
 export type ActiveSubjectStore = {

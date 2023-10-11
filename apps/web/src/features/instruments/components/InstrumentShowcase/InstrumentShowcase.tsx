@@ -49,16 +49,16 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
   const [trails] = useTrail(
     filteredInstruments.length,
     () => ({
-      config: { tension: 280, friction: 60 },
+      config: { friction: 60, tension: 280 },
       from: {
         opacity: 0,
         y: 80
       },
+      reset: true,
       to: {
         opacity: 1,
         y: 0
-      },
-      reset: true
+      }
     }),
     [filteredInstruments]
   );
@@ -74,23 +74,21 @@ export const InstrumentShowcase = ({ instruments }: InstrumentShowcaseProps) => 
           }}
         />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <div className="flex flex-grow"
-          data-cy="tags-btn-dropdown">
-          <SelectDropdown
-            options={tagOptions}
-            selected={selectedTags}
-            setSelected={setSelectedTags}
-            title={t('instruments.availableInstruments.filters.tags')}
-          />
+          <div className="flex flex-grow" data-cy="tags-btn-dropdown">
+            <SelectDropdown
+              options={tagOptions}
+              selected={selectedTags}
+              setSelected={setSelectedTags}
+              title={t('instruments.availableInstruments.filters.tags')}
+            />
           </div>
-          <div className="flex flex-grow"
-          data-cy="language-btn-dropdown">
-          <SelectDropdown
-            options={languageOptions}
-            selected={selectedLanguages}
-            setSelected={setSelectedLanguages}
-            title={t('instruments.availableInstruments.filters.language')}
-          />
+          <div className="flex flex-grow" data-cy="language-btn-dropdown">
+            <SelectDropdown
+              options={languageOptions}
+              selected={selectedLanguages}
+              setSelected={setSelectedLanguages}
+              title={t('instruments.availableInstruments.filters.language')}
+            />
           </div>
         </div>
       </div>

@@ -1,8 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import type { FormFields, FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import type { FormInstrument, Language, Measures, MultilingualForm, MultilingualFormFields } from '@open-data-capture/types';
+import type {
+  FormInstrument,
+  Language,
+  Measures,
+  MultilingualForm,
+  MultilingualFormFields
+} from '@open-data-capture/types';
 
 type TranslatedForms<T extends FormInstrumentData> = {
   [L in Language]: FormInstrument<T>;
@@ -15,10 +22,10 @@ function getTranslatedFields<T extends FormInstrumentData>(
 ) {
   const fields: { [K in keyof T]?: any } = {};
   for (const fieldName in multilingualFields) {
-    const { label, description, options, ...rest } = multilingualFields[fieldName] as any;
+    const { description, label, options, ...rest } = multilingualFields[fieldName] as any;
     fields[fieldName] = {
-      label: label[language],
       description: description?.[language],
+      label: label[language],
       options: options?.[language],
       ...rest
     };
@@ -38,9 +45,9 @@ function createTranslatedForms<T extends FormInstrumentData>(
     let content: FormInstrumentContent<T>;
     if (multilingualForm.content instanceof Array) {
       content = multilingualForm.content.map((group) => ({
-        title: group.title[language],
         description: group.description?.[language],
-        fields: getTranslatedFields(group.fields as MultilingualFormFields<T>, language)
+        fields: getTranslatedFields(group.fields as MultilingualFormFields<T>, language),
+        title: group.title[language]
       }));
     } else {
       content = getTranslatedFields(multilingualForm.content, language);
@@ -59,23 +66,23 @@ function createTranslatedForms<T extends FormInstrumentData>(
     }
 
     forms[language] = {
-      kind: 'form',
-      name: multilingualForm.name,
-      tags: multilingualForm.tags,
-      version: multilingualForm.version,
+      content,
       details: {
-        language,
-        estimatedDuration: multilingualForm.details.estimatedDuration,
         description: multilingualForm.details.description[language],
+        estimatedDuration: multilingualForm.details.estimatedDuration,
         instructions: multilingualForm.details.instructions[language],
+        language,
         title: multilingualForm.details.title[language]
       },
-      content,
+      kind: 'form',
       measures,
-      validationSchema: multilingualForm.validationSchema
+      name: multilingualForm.name,
+      tags: multilingualForm.tags,
+      validationSchema: multilingualForm.validationSchema,
+      version: multilingualForm.version
     };
   }
   return forms as TranslatedForms<T>;
 }
 
-export { createTranslatedForms, type TranslatedForms };
+export { type TranslatedForms, createTranslatedForms };

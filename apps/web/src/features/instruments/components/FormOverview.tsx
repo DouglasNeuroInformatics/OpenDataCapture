@@ -33,7 +33,7 @@ type FormOverviewProps = {
 };
 
 export const FormOverview = ({
-  details: { description, language, estimatedDuration, instructions }
+  details: { description, estimatedDuration, instructions, language }
 }: FormOverviewProps) => {
   const { updateIndex } = useContext(StepperContext);
 

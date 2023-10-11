@@ -1,18 +1,19 @@
-import type { BaseFormField, FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Button } from '@douglasneuroinformatics/ui';
+import { useMemo } from 'react';
+
+import type { FormInstrumentData, NullableFormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { Button, formatFormDataAsString, resolveStaticFormFields } from '@douglasneuroinformatics/ui';
 import type { FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 import { Spinner } from '@/components';
 import { useDownload } from '@/hooks/useDownload';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
-import { formatDataAsString } from '@/utils/form-utils';
 
-const FormSummaryItem = ({ label, value }: { label: string; value: any }) => {
+const FormSummaryItem = ({ label, value }: { label: string; value: unknown }) => {
   return (
     <div className="my-1">
       <span className="font-semibold">{label}: </span>
-      <span>{String(value)}</span>
+      <span>{JSON.stringify(value)}</span>
     </div>
   );
 };
@@ -24,9 +25,9 @@ export type FormSummaryProps<T extends FormInstrumentData> = {
 };
 
 export const FormSummary = <T extends FormInstrumentData>({
-  timeCollected,
   instrument,
-  result
+  result,
+  timeCollected
 }: FormSummaryProps<T>) => {
   const { activeSubject } = useActiveSubjectStore();
   const download = useDownload();
@@ -38,8 +39,13 @@ export const FormSummary = <T extends FormInstrumentData>({
 
   const downloadResult = () => {
     const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.txt`;
-    download(filename, () => Promise.resolve(formatDataAsString(result)));
+    download(filename, () => Promise.resolve(formatFormDataAsString(result)));
   };
+
+  const formFields = useMemo(
+    () => resolveStaticFormFields(instrument.content, result as NullableFormInstrumentData<T>),
+    [instrument, result]
+  );
 
   return (
     <div>
@@ -60,13 +66,9 @@ export const FormSummary = <T extends FormInstrumentData>({
       <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.results')}</h3>
       <div className="mb-3">
         {Object.keys(result).map((fieldName) => {
-          let field: BaseFormField;
-          if (instrument.content instanceof Array) {
-            field = instrument.content
-              .map((group) => group.fields)
-              .reduce((prev, current) => ({ ...prev, ...current }))[fieldName]!;
-          } else {
-            field = instrument.content[fieldName]!;
+          const field = formFields[fieldName];
+          if (!field) {
+            return null;
           }
           return <FormSummaryItem key={fieldName} label={field.label} value={result[fieldName]} />;
         })}

@@ -6,12 +6,6 @@ export default {
   content: [...config.content, 'index.html', './src/**/*.{js,ts,jsx,tsx}'],
   presets: [config],
   theme: {
-    extend: {
-      transitionProperty: {
-        height: 'height',
-        'max-h': 'max-height'
-      }
-    },
     fontFamily: {
       sans: ['Inter var', ...defaultTheme.fontFamily.sans]
     }

@@ -1,16 +1,15 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-
 import { type AccessibleModel } from '@casl/mongoose';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { type  AppAbility } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { type UserDocument, UserEntity } from './entities/user.entity';
-
 import { GroupEntity } from '@/groups/entities/group.entity';
 import { GroupsService } from '@/groups/groups.service';
+
+import { CreateUserDto } from './dto/create-user.dto';
+import { type UserDocument, UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +23,7 @@ export class UsersService {
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
   async create(createUserDto: CreateUserDto, ability: AppAbility): Promise<UserDocument> {
-    const { username, password, basePermissionLevel, groupNames, ...rest } = createUserDto;
+    const { basePermissionLevel, groupNames, password, username, ...rest } = createUserDto;
     this.logger.verbose(`Attempting to create user: ${username}`);
 
     const userExists = await this.userModel.exists({ username });
@@ -40,12 +39,21 @@ export class UsersService {
     const hashedPassword = await this.cryptoService.hashPassword(password);
 
     return this.userModel.create({
-      username: username,
-      password: hashedPassword,
-      groups: groups,
       basePermissionLevel: basePermissionLevel,
+      groups: groups,
+      password: hashedPassword,
+      username: username,
       ...rest
     });
+  }
+
+  /** Delete the user with the provided username, otherwise throws */
+  async deleteByUsername(username: string): Promise<UserDocument> {
+    const deletedUser = await this.userModel.findOneAndDelete({ username });
+    if (!deletedUser) {
+      throw new NotFoundException(`Failed to find user with username: ${username}`);
+    }
+    return deletedUser;
   }
 
   /** Returns an array of all users */
@@ -61,14 +69,5 @@ export class UsersService {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
     return user;
-  }
-
-  /** Delete the user with the provided username, otherwise throws */
-  async deleteByUsername(username: string): Promise<UserDocument> {
-    const deletedUser = await this.userModel.findOneAndDelete({ username });
-    if (!deletedUser) {
-      throw new NotFoundException(`Failed to find user with username: ${username}`);
-    }
-    return deletedUser;
   }
 }

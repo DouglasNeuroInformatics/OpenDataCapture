@@ -1,7 +1,7 @@
 import { Counter } from '@/components/Counter';
 import { Layout } from '@/components/Layout';
 
-export default () => {
+const SettingsPage = () => {
   return (
     <Layout title="Settings">
       <Counter />
@@ -15,3 +15,5 @@ export default () => {
     </Layout>
   );
 };
+
+export default SettingsPage;

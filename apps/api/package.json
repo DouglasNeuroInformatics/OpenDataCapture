@@ -6,28 +6,16 @@
   "type": "module",
   "scripts": {
     "build": "bun ./src/build.ts",
-    "check-types": "tsc",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --watch src/main.ts",
     "format": "prettier --write src",
-    "lint": "eslint --fix src",
-    "test": "bun test src/",
-    "test:e2e": "cross-env NODE_ENV=testing env-cmd -f ../../.env bun test test/"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{js,cjs,mjs,json}": [
-      "prettier --write"
-    ]
+    "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@casl/mongoose": "^7.2.1",
-    "@douglasneuroinformatics/nestjs": "^1.6.0",
-    "@douglasneuroinformatics/stats": "^2.0.0",
-    "@douglasneuroinformatics/utils": "1.0.1",
+    "@douglasneuroinformatics/nestjs": "latest",
+    "@douglasneuroinformatics/stats": "latest",
+    "@douglasneuroinformatics/utils": "latest",
     "@faker-js/faker": "^8.1.0",
     "@nestjs/common": "^10.2.6",
     "@nestjs/config": "^3.1.1",
@@ -37,7 +25,7 @@
     "@nestjs/mongoose": "^10.0.1",
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.2.6",
-    "@nestjs/swagger": "^7.1.12",
+    "@nestjs/swagger": "^7.1.13",
     "@nestjs/throttler": "^5.0.0",
     "@open-data-capture/demo": "workspace:*",
     "@open-data-capture/instruments": "workspace:*",
@@ -55,9 +43,10 @@
     "@types/express": "^4.17.18",
     "@types/passport": "^1.0.13",
     "@types/passport-jwt": "^3.0.10",
-    "@types/supertest": "^2.0.13",
+    "@types/supertest": "^2.0.14",
     "@types/unidecode": "^0.1.1",
     "bun-plugin-swc": "^0.0.1",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.3",
+    "type-fest": "^4.3.3"
   }
 }

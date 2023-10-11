@@ -13,7 +13,7 @@ export const InstrumentDropdown = () => {
     <Dropdown
       className="text-sm"
       options={ctx.instrumentOptions}
-      title={t('subjectPage.graph.instrument')}
+      title={t('subjectPage.visualization.instrument')}
       variant="secondary"
       onSelection={(selection) => {
         ctx.setSelectedMeasures([]);
