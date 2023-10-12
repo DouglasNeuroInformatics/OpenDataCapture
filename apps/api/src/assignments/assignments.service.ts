@@ -19,21 +19,21 @@ export class AssignmentsService {
   ) {}
 
   async create({ instrumentIdentifier, subjectIdentifier }: CreateAssignmentDto) {
-    const form = await this.formsService.findByIdentifier(instrumentIdentifier);
+    const form = (await this.formsService.findByIdentifier(instrumentIdentifier))[0];
     const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
-    if (!form[0]) {
+    if (!form) {
       throw new NotFoundException(`Failed to find form with identifier: ${instrumentIdentifier}`);
     }
     return this.assignmentModel.create({
+      instrument: form,
       status: 'OUTSTANDING',
       subject,
       timeAssigned: Date.now(),
-      timeExpires: Date.now() + 1000000,
-      title: form[0].details.title
+      timeExpires: Date.now() + 1000000
     });
   }
 
   findAll() {
-    return this.assignmentModel.find();
+    return this.assignmentModel.find().populate('instrument');
   }
 }

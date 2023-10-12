@@ -14,6 +14,8 @@ import { AssignmentSlider } from '../components/AssignmentSlider';
 export const SubjectManagementPage = () => {
   const { t } = useTranslation('subjects');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
+
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const { data } = useFetch<Assignment[]>('/v1/assignments', [isCreateModalOpen]);
 
@@ -37,7 +39,7 @@ export const SubjectManagementPage = () => {
       <ClientTable<Assignment>
         columns={[
           {
-            field: 'title',
+            field: (entry) => entry.instrument.details.title,
             label: t('subjectManagementPage.tableColumns.title')
           },
           {
@@ -57,9 +59,12 @@ export const SubjectManagementPage = () => {
           }
         ]}
         data={data}
-        onEntryClick={setSelectedAssignment}
+        onEntryClick={(assignment) => {
+          setSelectedAssignment(assignment);
+          setIsEditSliderOpen(true);
+        }}
       />
-      <AssignmentSlider assignment={selectedAssignment} onClose={() => setSelectedAssignment(null)} />
+      <AssignmentSlider assignment={selectedAssignment} isOpen={isEditSliderOpen} setIsOpen={setIsEditSliderOpen} />
       <AssignmentModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
     </div>
   );

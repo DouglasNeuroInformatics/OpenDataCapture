@@ -1,4 +1,10 @@
 {
+  "assignmentSlider": {
+    "resendNotification": {
+      "en": "Resend Notification",
+      "fr": "Renvoyer la notification"
+    }
+  },
   "subjectManagementPage": {
     "assignedInstruments": {
       "en": "Assigned Instruments",

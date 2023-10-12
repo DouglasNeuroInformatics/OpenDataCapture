@@ -1,20 +1,25 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { type Assignment, type AssignmentStatus } from '@open-data-capture/types';
-import { type HydratedDocument } from 'mongoose';
+import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { type SubjectDocument, SubjectSchema } from '@/subjects/entities/subject.entity';
+import type { FormInstrumentEntity } from '@/instruments/entities/form-instrument.entity';
+import { InstrumentEntity } from '@/instruments/entities/instrument.entity';
+import { type SubjectDocument, SubjectEntity } from '@/subjects/entities/subject.entity';
 
 @Schema({ strict: 'throw', timestamps: true })
 export class AssignmentEntity implements Assignment {
   static readonly modelName = 'Assignment';
+
+  @Prop({ ref: InstrumentEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
+  instrument: FormInstrumentEntity;
 
   @ApiProperty()
   @Prop({ enum: ['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING'] satisfies AssignmentStatus[], type: String })
   status: AssignmentStatus;
 
   @ApiProperty()
-  @Prop({ required: true, type: SubjectSchema })
+  @Prop({ ref: SubjectEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
   subject: SubjectDocument;
 
   @ApiProperty()
@@ -24,10 +29,6 @@ export class AssignmentEntity implements Assignment {
   @ApiProperty()
   @Prop({ required: true })
   timeExpires: number;
-
-  @ApiProperty()
-  @Prop({ required: true })
-  title: string;
 }
 
 export type AssignmentDocument = HydratedDocument<AssignmentEntity>;
