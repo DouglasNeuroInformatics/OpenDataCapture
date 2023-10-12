@@ -13,6 +13,7 @@ export type AssignmentModalProps = {
   setIsOpen: (isOpen: boolean) => void;
 };
 
+/** Component for creating a new assignment */
 export const AssignmentModal = ({ isOpen, setIsOpen }: AssignmentModalProps) => {
   const { data } = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available');
   const { i18n } = useTranslation();

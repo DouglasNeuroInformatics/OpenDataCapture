@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button, ClientTable, Slider } from '@douglasneuroinformatics/ui';
+import { Button, ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { HiPlus } from 'react-icons/hi2';
 import { useFetch } from '@/hooks/useFetch';
 
 import { AssignmentModal } from '../components/AssignmentModal';
+import { AssignmentSlider } from '../components/AssignmentSlider';
 
 export const SubjectManagementPage = () => {
   const { t } = useTranslation('subjects');
@@ -58,18 +59,7 @@ export const SubjectManagementPage = () => {
         data={data}
         onEntryClick={setSelectedAssignment}
       />
-      <Slider
-        isOpen={selectedAssignment !== null}
-        setIsOpen={() => {
-          setSelectedAssignment(null);
-        }}
-        title={selectedAssignment?.title}
-      >
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deserunt architecto libero incidunt, quaerat quidem
-        numquam voluptatum repellendus soluta harum nulla! Consequuntur sunt laudantium praesentium iure possimus soluta
-        et alias tempora?
-      </Slider>
-
+      <AssignmentSlider assignment={selectedAssignment} onClose={() => setSelectedAssignment(null)} />
       <AssignmentModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
     </div>
   );
