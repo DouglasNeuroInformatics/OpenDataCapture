@@ -6,12 +6,19 @@ import type { Assignment } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiPlus } from 'react-icons/hi2';
 
+import { useFetch } from '@/hooks/useFetch';
+
 import { AssignmentModal } from '../components/AssignmentModal';
 
 export const SubjectManagementPage = () => {
   const { t } = useTranslation('subjects');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const { data } = useFetch<Assignment[]>('/v1/assignments', [isCreateModalOpen]);
+
+  if (!data) {
+    return null;
+  }
 
   return (
     <div>
@@ -48,14 +55,7 @@ export const SubjectManagementPage = () => {
             label: t('subjectManagementPage.tableColumns.status')
           }
         ]}
-        data={[
-          {
-            status: 'CANCELED',
-            timeAssigned: Date.now(),
-            timeExpires: Date.now() + 100000,
-            title: 'SANS'
-          }
-        ]}
+        data={data}
         onEntryClick={setSelectedAssignment}
       />
       <Slider

@@ -8,7 +8,7 @@ export class AssignmentEntity implements Assignment {
   static readonly modelName = 'Assignment';
 
   @ApiProperty()
-  @Prop({ enum: ['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING'] satisfies AssignmentStatus[] })
+  @Prop({ enum: ['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING'] satisfies AssignmentStatus[], type: String })
   status: AssignmentStatus;
 
   @ApiProperty()
@@ -20,7 +20,7 @@ export class AssignmentEntity implements Assignment {
   timeExpires: number;
 
   @ApiProperty()
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   title: string;
 }
 
