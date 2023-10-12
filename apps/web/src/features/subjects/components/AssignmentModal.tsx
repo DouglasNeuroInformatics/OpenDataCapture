@@ -11,10 +11,11 @@ type AssignmentFormData = Omit<CreateAssignmentData, 'subjectIdentifier'>;
 export type AssignmentModalProps = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  subjectIdentifier: string;
 };
 
 /** Component for creating a new assignment */
-export const AssignmentModal = ({ isOpen, setIsOpen }: AssignmentModalProps) => {
+export const AssignmentModal = ({ isOpen, setIsOpen, subjectIdentifier }: AssignmentModalProps) => {
   const { data } = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available');
   const { i18n } = useTranslation();
   const notifications = useNotificationsStore();
@@ -39,7 +40,8 @@ export const AssignmentModal = ({ isOpen, setIsOpen }: AssignmentModalProps) => 
 
   const handleSubmit = async ({ instrumentIdentifier }: AssignmentFormData) => {
     await axios.post('/v1/assignments', {
-      instrumentIdentifier
+      instrumentIdentifier,
+      subjectIdentifier
     });
     notifications.addNotification({ type: 'success' });
     setIsOpen(false);

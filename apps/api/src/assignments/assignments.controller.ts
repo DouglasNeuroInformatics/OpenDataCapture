@@ -1,10 +1,13 @@
-import type { CreateAssignmentDto } from './dto/create-assignment.dto';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { AssignmentsService } from './assignments.service';
+import { CreateAssignmentDto } from './dto/create-assignment.dto';
+import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 
 @Controller('assignments')
 export class AssignmentsController {
@@ -19,8 +22,15 @@ export class AssignmentsController {
 
   @ApiOperation({ summary: 'Get All Assignments' })
   @Get()
-  @RouteAccess({ action: 'create', subject: 'Assignment' })
+  @RouteAccess({ action: 'read', subject: 'Assignment' })
   findAll() {
     return this.assignmentsService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Cancel' })
+  @Patch(':id')
+  @RouteAccess({ action: 'update', subject: 'Assignment' })
+  updateById(@Param('id', ParseIdPipe) id: Types.ObjectId, @Body() updateAssignmentDto: UpdateAssignmentDto) {
+    return this.assignmentsService.updateById(id, updateAssignmentDto);
   }
 }

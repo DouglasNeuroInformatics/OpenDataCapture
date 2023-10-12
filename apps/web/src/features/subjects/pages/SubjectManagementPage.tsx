@@ -5,6 +5,7 @@ import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiPlus } from 'react-icons/hi2';
+import { useParams } from 'react-router-dom';
 
 import { useFetch } from '@/hooks/useFetch';
 
@@ -12,12 +13,13 @@ import { AssignmentModal } from '../components/AssignmentModal';
 import { AssignmentSlider } from '../components/AssignmentSlider';
 
 export const SubjectManagementPage = () => {
+  const params = useParams();
   const { t } = useTranslation('subjects');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
 
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  const { data } = useFetch<Assignment[]>('/v1/assignments', [isCreateModalOpen]);
+  const { data } = useFetch<Assignment[]>('/v1/assignments', [isCreateModalOpen, isEditSliderOpen]);
 
   if (!data) {
     return null;
@@ -65,7 +67,11 @@ export const SubjectManagementPage = () => {
         }}
       />
       <AssignmentSlider assignment={selectedAssignment} isOpen={isEditSliderOpen} setIsOpen={setIsEditSliderOpen} />
-      <AssignmentModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
+      <AssignmentModal
+        isOpen={isCreateModalOpen}
+        setIsOpen={setIsCreateModalOpen}
+        subjectIdentifier={params.subjectIdentifier!}
+      />
     </div>
   );
 };
