@@ -1,193 +1,213 @@
 import type Base from '@douglasneuroinformatics/form-types';
 import type { JSONSchemaType } from 'ajv';
-import type { ConditionalKeys, Simplify } from 'type-fest';
+import type { Simplify } from 'type-fest';
 
 import { Language } from './core';
 
 export type InstrumentKind = 'form';
 
+type InstrumentLanguage = Language | Language[];
+
+type InstrumentUIOption<L extends InstrumentLanguage, V> = L extends Language
+  ? V
+  : L extends (infer K extends Language)[]
+  ? Record<K, V>
+  : never;
+
 /** Defines the basic properties of all instruments */
-export type BaseInstrument = {
+export type BaseInstrument<L extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
   content: unknown;
 
   /** The discriminator key for the type of instrument */
   kind: InstrumentKind;
 
-  /** The English name of the instrument which is used to associate alternative versions of the same instrument */
+  /** The language(s) in which the instrument is written */
+  language: InstrumentLanguage;
+
+  /** The name of the instrument, which must be unique for a given version */
   name: string;
 
   /** A list of tags that users can use to filter instruments */
-  tags: string[];
+  tags: InstrumentUIOption<L, string[]>;
 
   /** The version of the instrument */
   version: number;
 };
 
 /** The details of the form to be displayed to the user */
-export type FormDetails = {
+export type FormInstrumentDetails<L extends InstrumentLanguage> = {
   /** A brief description of the instrument, such as the purpose and history of the instrument */
-  description: string;
+  description: InstrumentUIOption<L, string>;
 
   /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
   estimatedDuration: number;
 
   /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
-  instructions: string | string[];
-
-  /** The language in which the fields of the instrument are written */
-  language: Language;
+  instructions: InstrumentUIOption<L, string | string[]>;
 
   /** The title of the instrument in the language it is written, omitting the definite article */
-  title: string;
+  title: InstrumentUIOption<L, string>;
 };
 
-export type Measure<TData extends Base.FormInstrumentData = Base.FormInstrumentData> = {
-  formula:
-    | {
-        field: ConditionalKeys<TData, number>;
-        kind: 'const';
-      }
-    | {
-        fields: ConditionalKeys<TData, boolean | number>[];
-        kind: 'sum';
-        options?: {
-          coerceBool?: boolean;
-        };
-      };
-  label: string;
-};
-
-export type Measures<TData extends Base.FormInstrumentData = Base.FormInstrumentData> = Record<string, Measure<TData>>;
-
-export type FormInstrument<TData extends Base.FormInstrumentData = Base.FormInstrumentData> = Simplify<
-  BaseInstrument & {
-    content: Base.FormInstrumentContent<TData>;
-    details: FormDetails;
-    measures?: Measures<TData>;
-    validationSchema: JSONSchemaType<TData>;
-  }
+export type FormInstrumentFieldMixin<
+  TLanguage extends InstrumentLanguage,
+  TBase extends Base.BaseFormField,
+  TField extends object = object
+> = Simplify<
+  Omit<TBase, 'description' | 'label' | keyof TField> & {
+    description?: InstrumentUIOption<TLanguage, string>;
+    label: InstrumentUIOption<TLanguage, string>;
+  } & TField
 >;
 
-export type FormInstrumentSummary = Simplify<
-  Omit<FormInstrument, 'content' | 'validationSchema'> & {
-    identifier: string;
-  }
+export type FormInstrumentTextField<TLanguage extends InstrumentLanguage> = FormInstrumentFieldMixin<
+  TLanguage,
+  Base.TextFormField
 >;
 
-/**
- * The details of the form to be displayed to the user. This corresponds to the same
- * properties as `FormDetails`, excluding language, but with multilingual options
- */
-type MultilingualFormDetails = Simplify<
-  Pick<FormDetails, 'estimatedDuration'> & {
-    [K in keyof Pick<FormDetails, 'description' | 'instructions' | 'title'>]: {
-      [L in Language]: FormDetails[K];
-    };
-  }
->;
-
-type MultilingualFormFieldMixin<T, U extends object = object> = T extends Base.BaseFormField
-  ? Simplify<
-      Omit<T, 'description' | 'label' | keyof U> & {
-        description?: { [L in Language]: string };
-        label: { [L in Language]: string };
-      } & U
-    >
-  : never;
-
-type MultilingualTextFormField = MultilingualFormFieldMixin<Base.TextFormField>;
-
-type MultilingualOptionsFormField<TValue extends string = string> = MultilingualFormFieldMixin<
+export type FormInstrumentOptionsField<
+  TLanguage extends InstrumentLanguage,
+  TValue extends string = string
+> = FormInstrumentFieldMixin<
+  TLanguage,
   Base.OptionsFormField<TValue>,
   {
-    options: {
-      [L in Language]: {
+    options: InstrumentUIOption<
+      TLanguage,
+      {
         [K in TValue]: string;
-      };
-    };
+      }
+    >;
   }
 >;
 
-type MultilingualDateFormField = MultilingualFormFieldMixin<Base.DateFormField>;
+type FormInstrumentDateField<TLanguage extends InstrumentLanguage> = FormInstrumentFieldMixin<
+  TLanguage,
+  Base.DateFormField
+>;
 
-type MultilingualNumericFormField = MultilingualFormFieldMixin<Base.NumericFormField>;
+type FormInstrumentNumericField<TLanguage extends InstrumentLanguage> = FormInstrumentFieldMixin<
+  TLanguage,
+  Base.NumericFormField
+>;
 
-type MultilingualBinaryFormField<T extends Base.BinaryFormField = Base.BinaryFormField> = T extends {
-  variant: 'radio';
+type FormInstrumentBinaryField<
+  TLanguage extends InstrumentLanguage,
+  TField extends Base.BinaryFormField = Base.BinaryFormField
+> = TField extends {
+  variant: 'checkbox';
 }
-  ? MultilingualFormFieldMixin<
-      T,
+  ? FormInstrumentFieldMixin<TLanguage, TField>
+  : FormInstrumentFieldMixin<
+      TLanguage,
+      TField,
       {
-        options?: {
-          [L in Language]: {
+        options?: InstrumentUIOption<
+          TLanguage,
+          {
             f: string;
             t: string;
-          };
-        };
+          }
+        >;
       }
-    >
-  : MultilingualFormFieldMixin<T>;
+    >;
 
-type MultilingualPrimitiveFormField<TValue extends Base.PrimitiveFieldValue = Base.PrimitiveFieldValue> =
-  TValue extends string
-    ? MultilingualDateFormField | MultilingualOptionsFormField<TValue> | MultilingualTextFormField
-    : TValue extends number
-    ? MultilingualNumericFormField
-    : TValue extends boolean
-    ? MultilingualBinaryFormField
-    : never;
+type FormInstrumentPrimitiveField<
+  TLanguage extends InstrumentLanguage,
+  TValue extends Base.PrimitiveFieldValue = Base.PrimitiveFieldValue
+> = TValue extends string
+  ?
+      | FormInstrumentDateField<TLanguage>
+      | FormInstrumentOptionsField<TLanguage, TValue>
+      | FormInstrumentTextField<TLanguage>
+  : TValue extends number
+  ? FormInstrumentNumericField<TLanguage>
+  : TValue extends boolean
+  ? FormInstrumentBinaryField<TLanguage>
+  : never;
 
-type MultilingualArrayFieldset<T extends Base.ArrayFieldValue[number]> = {
-  [K in keyof T]:
-    | ((fieldset: { [K in keyof T]?: T[K] | null | undefined }) => MultilingualPrimitiveFormField<T[K]> | null)
-    | MultilingualPrimitiveFormField<T[K]>;
+export type FormInstrumentArrayFieldset<
+  TLanguage extends InstrumentLanguage,
+  TFieldset extends Base.ArrayFieldValue[number]
+> = {
+  [K in keyof TFieldset]:
+    | ((fieldset: { [K in keyof TFieldset]?: TFieldset[K] | null | undefined }) => FormInstrumentPrimitiveField<
+        TLanguage,
+        TFieldset[K]
+      > | null)
+    | FormInstrumentPrimitiveField<TLanguage, TFieldset[K]>;
 };
 
-type MultilingualArrayFormField<TValue extends Base.ArrayFieldValue = Base.ArrayFieldValue> =
-  MultilingualFormFieldMixin<
-    Base.ArrayFormField,
-    {
-      fieldset: MultilingualArrayFieldset<TValue[number]>;
-    }
-  >;
-
-export type MultilingualFormField<TValue> = [TValue] extends [Base.PrimitiveFieldValue]
-  ? MultilingualPrimitiveFormField<TValue>
-  : [TValue] extends [Base.ArrayFieldValue]
-  ? MultilingualArrayFormField<TValue>
-  : MultilingualArrayFormField | MultilingualPrimitiveFormField;
-
-export type MultilingualFormFields<TData extends Base.FormInstrumentData> = {
-  [K in keyof TData]: MultilingualFormField<TData[K]>;
-};
-
-export type MultilingualFormFieldsGroup<TData extends Base.FormInstrumentData> = {
-  description?: { [L in Language]: string };
-  fields: {
-    [K in keyof TData]?: MultilingualFormField<TData[K]>;
-  };
-  title: { [L in Language]: string };
-};
-
-export type MultilingualFormContent<TData extends Base.FormInstrumentData> =
-  | MultilingualFormFields<TData>
-  | MultilingualFormFieldsGroup<TData>[];
-
-export type MultilingualFormMeasures<TData extends Base.FormInstrumentData> = Record<
-  string,
-  Omit<Measure<TData>, 'label'> & {
-    label: {
-      [L in Language]: string;
-    };
+export type FormInstrumentArrayField<
+  TLanguage extends InstrumentLanguage,
+  TValue extends Base.ArrayFieldValue = Base.ArrayFieldValue
+> = FormInstrumentFieldMixin<
+  TLanguage,
+  Base.ArrayFormField<TValue>,
+  {
+    fieldset: FormInstrumentArrayFieldset<TLanguage, TValue[number]>;
   }
 >;
 
-/** The definition of a multilingual form, which can be used to derive actual forms */
-export type MultilingualForm<TData extends Base.FormInstrumentData> = Simplify<
-  Omit<FormInstrument<TData>, 'content' | 'details' | 'kind' | 'measures'> & {
-    content: MultilingualFormContent<TData>;
-    details: MultilingualFormDetails;
-    measures?: MultilingualFormMeasures<TData>;
+export type FormInstrumentStaticField<
+  TLanguage extends InstrumentLanguage,
+  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue
+> = [TValue] extends [Base.PrimitiveFieldValue]
+  ? FormInstrumentPrimitiveField<TLanguage, TValue>
+  : [TValue] extends [Base.ArrayFieldValue]
+  ? FormInstrumentArrayField<TLanguage, TValue>
+  : FormInstrumentArrayField<TLanguage> | FormInstrumentPrimitiveField<TLanguage>;
+
+export type FormInstrumentStaticFields<
+  TLanguage extends InstrumentLanguage,
+  TData extends Base.FormDataType = Base.FormDataType
+> = {
+  [K in keyof TData]: FormInstrumentStaticField<TLanguage, TData[K]>;
+};
+
+export type FormInstrumentDynamicField<
+  TLanguage extends InstrumentLanguage,
+  TData extends Base.FormDataType,
+  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue
+> = (data: Base.NullableFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
+
+export type FormInstrumentUnknownField<
+  TLanguage extends InstrumentLanguage,
+  TData extends Base.FormDataType,
+  TKey extends keyof TData = keyof TData
+> = FormInstrumentDynamicField<TLanguage, TData, TData[TKey]> | FormInstrumentStaticField<TLanguage, TData[TKey]>;
+
+export type FormInstrumentFields<
+  TLanguage extends InstrumentLanguage,
+  TData extends Base.FormDataType = Base.FormDataType
+> = {
+  [K in keyof TData]: FormInstrumentUnknownField<TLanguage, TData, K>;
+};
+
+export type FormInstrumentFieldsGroup<
+  TLanguage extends InstrumentLanguage,
+  TData extends Base.FormDataType = Base.FormDataType
+> = {
+  description?: InstrumentUIOption<TLanguage, string>;
+  fields: {
+    [K in keyof TData]?: FormInstrumentUnknownField<TLanguage, TData, K>;
+  };
+  title: InstrumentUIOption<TLanguage, string>;
+};
+
+export type FormInstrumentContent<
+  TLanguage extends InstrumentLanguage,
+  TData extends Base.FormDataType = Base.FormDataType
+> = FormInstrumentFields<TLanguage, TData> | FormInstrumentFieldsGroup<TLanguage, TData>[];
+
+export type FormInstrument<
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
+> = Simplify<
+  BaseInstrument<TLanguage> & {
+    content: FormInstrumentContent<TLanguage, TData>;
+    details: FormInstrumentDetails<TLanguage>;
+    validationSchema: JSONSchemaType<TData>;
   }
 >;

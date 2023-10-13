@@ -1,4 +1,4 @@
-import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { FormDataType } from '@douglasneuroinformatics/form-types';
 
 import { Group } from './group';
 import { BaseInstrument, FormInstrument, InstrumentKind } from './instrument';
@@ -13,13 +13,10 @@ export type InstrumentRecord<TInstrument extends BaseInstrument, TData = unknown
   time: number;
 };
 
-export type FormInstrumentRecord<T extends FormInstrumentData = FormInstrumentData> = InstrumentRecord<
-  FormInstrument<T>,
-  T
->;
+export type FormInstrumentRecord<T extends FormDataType = FormDataType> = InstrumentRecord<FormInstrument<T>, T>;
 
 /** An object containing all of the records for a given form and subject */
-export type SubjectFormRecords<TData extends FormInstrumentData = FormInstrumentData> = {
+export type SubjectFormRecords<TData extends FormDataType = FormDataType> = {
   instrument: FormInstrument<TData> & {
     identifier: string;
   };
@@ -36,7 +33,7 @@ export type InstrumentRecordsExport = {
   subjectId: string;
   subjectSex: string;
   timestamp: string;
-  value: any;
+  value: unknown;
 }[];
 
 export type FormInstrumentRecordsSummary = {
