@@ -1,11 +1,10 @@
 import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
 import { ExceptionsFilter, LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
-import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
+import { AjvModule, CryptoModule, DatabaseModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module, ValidationPipe } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { Connection } from 'mongoose';
 
@@ -34,24 +33,22 @@ import { UsersModule } from './users/users.module';
         secretKey: configService.getOrThrow('SECRET_KEY')
       })
     }),
-    GroupsModule,
-    InstrumentsModule,
-    MongooseModule.forRootAsync({
+    DatabaseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const env = configService.getOrThrow<string>('NODE_ENV');
-        const mongoUri = configService.getOrThrow<string>('MONGO_URI');
         return {
           connectionFactory: (connection: Connection): Connection => {
             connection.plugin(accessibleFieldsPlugin);
             connection.plugin(accessibleRecordsPlugin);
             return connection;
           },
-          ignoreUndefined: true,
-          uri: `${mongoUri}/data-capture-${env}`
+          dbName: configService.getOrThrow<string>('NODE_ENV'),
+          mongoUri: configService.getOrThrow<string>('MONGO_URI')
         };
       }
     }),
+    GroupsModule,
+    InstrumentsModule,
     SubjectsModule,
     ThrottlerModule.forRoot([
       {
