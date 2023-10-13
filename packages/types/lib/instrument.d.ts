@@ -36,7 +36,7 @@ export type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLang
 };
 
 /** The details of the form to be displayed to the user */
-export type FormInstrumentDetails<TLanguage extends InstrumentLanguage> = {
+export type FormInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
 
@@ -197,12 +197,12 @@ export type FormInstrumentFieldsGroup<
 };
 
 export type FormInstrumentContent<
-  TLanguage extends InstrumentLanguage,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TData extends Base.FormDataType = Base.FormDataType
 > = FormInstrumentFields<TLanguage, TData> | FormInstrumentFieldsGroup<TLanguage, TData>[];
 
 export type FormInstrumentMeasures<
-  TLanguage extends InstrumentLanguage,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TData extends Base.FormDataType = Base.FormDataType
 > = Record<
   string,
