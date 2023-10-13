@@ -8,11 +8,11 @@ export type UserPreferences = {
 export type BasePermissionLevel = 'ADMIN' | 'GROUP_MANAGER' | 'STANDARD';
 
 export type User = {
-  username: string;
-  password: string;
-  groups: Group[];
   basePermissionLevel?: BasePermissionLevel;
   firstName?: string;
+  groups: Group[];
   lastName?: string;
+  password: string;
   preferences?: UserPreferences;
+  username: string;
 };

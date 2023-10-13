@@ -1,16 +1,16 @@
 import { FormInstrumentData } from '@douglasneuroinformatics/form-types';
 
-import { BaseInstrument, FormInstrument, InstrumentKind } from './instrument';
 import { Group } from './group';
+import { BaseInstrument, FormInstrument, InstrumentKind } from './instrument';
 import { Subject } from './subject';
 
 export type InstrumentRecord<TInstrument extends BaseInstrument, TData = unknown> = {
-  kind: InstrumentKind;
-  time: number;
-  instrument: TInstrument;
-  group?: Group;
-  subject: Subject;
   data: TData;
+  group?: Group;
+  instrument: TInstrument;
+  kind: InstrumentKind;
+  subject: Subject;
+  time: number;
 };
 
 export type FormInstrumentRecord<T extends FormInstrumentData = FormInstrumentData> = InstrumentRecord<
@@ -23,31 +23,29 @@ export type SubjectFormRecords<TData extends FormInstrumentData = FormInstrument
   instrument: FormInstrument<TData> & {
     identifier: string;
   };
-  records: Array<
-    Pick<FormInstrumentRecord<TData>, 'data' | 'time'> & {
-      computedMeasures?: Record<string, number>;
-    }
-  >;
+  records: (Pick<FormInstrumentRecord<TData>, 'data' | 'time'> & {
+    computedMeasures?: Record<string, number>;
+  })[];
 };
 
-export type InstrumentRecordsExport = Array<{
-  subjectId: string;
-  subjectAge: number;
-  subjectSex: string;
+export type InstrumentRecordsExport = {
   instrumentName: string;
   instrumentVersion: number;
-  timestamp: string;
   measure: string;
+  subjectAge: number;
+  subjectId: string;
+  subjectSex: string;
+  timestamp: string;
   value: any;
-}>;
+}[];
 
 export type FormInstrumentRecordsSummary = {
-  count: number;
-  centralTendency?: {
-    // Measures
-    [key: string]: {
+  centralTendency?: Record<
+    string,
+    {
       mean: number;
       std: number;
-    };
-  };
+    }
+  >;
+  count: number;
 };

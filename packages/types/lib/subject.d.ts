@@ -1,16 +1,16 @@
-export type Sex = 'male' | 'female';
+export type Sex = 'female' | 'male';
 
 export type SubjectIdentificationData = {
+  dateOfBirth: string;
   firstName: string;
   lastName: string;
-  dateOfBirth: string;
   sex: Sex;
 };
 
 export type Subject = {
-  identifier: string;
-  firstName?: string;
-  lastName?: string;
   dateOfBirth: Date;
+  firstName?: string;
+  identifier: string;
+  lastName?: string;
   sex: Sex;
 };

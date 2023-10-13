@@ -8,6 +8,9 @@ export type InstrumentKind = 'form';
 
 /** Defines the basic properties of all instruments */
 export type BaseInstrument = {
+  /** The content in the instrument to be rendered to the user */
+  content: unknown;
+
   /** The discriminator key for the type of instrument */
   kind: InstrumentKind;
 
@@ -19,55 +22,50 @@ export type BaseInstrument = {
 
   /** The version of the instrument */
   version: number;
-
-  /** The content in the instrument to be rendered to the user */
-  content: unknown;
 };
 
 /** The details of the form to be displayed to the user */
 export type FormDetails = {
-  /** The title of the instrument in the language it is written, omitting the definite article */
-  title: string;
-
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: string;
 
-  /** The language in which the fields of the instrument are written */
-  language: Language;
+  /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
+  estimatedDuration: number;
 
   /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
   instructions: string | string[];
 
-  /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
-  estimatedDuration: number;
+  /** The language in which the fields of the instrument are written */
+  language: Language;
+
+  /** The title of the instrument in the language it is written, omitting the definite article */
+  title: string;
 };
 
 export type Measure<TData extends Base.FormInstrumentData = Base.FormInstrumentData> = {
-  label: string;
   formula:
     | {
+        field: ConditionalKeys<TData, number>;
+        kind: 'const';
+      }
+    | {
+        fields: ConditionalKeys<TData, boolean | number>[];
         kind: 'sum';
-        fields: Array<ConditionalKeys<TData, number | boolean>>;
         options?: {
           coerceBool?: boolean;
         };
-      }
-    | {
-        kind: 'const';
-        field: ConditionalKeys<TData, number>;
       };
+  label: string;
 };
 
-export type Measures<TData extends Base.FormInstrumentData = Base.FormInstrumentData> = {
-  [key: string]: Measure<TData>;
-};
+export type Measures<TData extends Base.FormInstrumentData = Base.FormInstrumentData> = Record<string, Measure<TData>>;
 
 export type FormInstrument<TData extends Base.FormInstrumentData = Base.FormInstrumentData> = Simplify<
   BaseInstrument & {
     content: Base.FormInstrumentContent<TData>;
     details: FormDetails;
-    validationSchema: JSONSchemaType<TData>;
     measures?: Measures<TData>;
+    validationSchema: JSONSchemaType<TData>;
   }
 >;
 
@@ -91,7 +89,7 @@ type MultilingualFormDetails = Simplify<
 
 type MultilingualFormFieldMixin<T, U extends object = object> = T extends Base.BaseFormField
   ? Simplify<
-      Omit<T, keyof U | 'description' | 'label'> & {
+      Omit<T, 'description' | 'label' | keyof U> & {
         description?: { [L in Language]: string };
         label: { [L in Language]: string };
       } & U
@@ -123,8 +121,8 @@ type MultilingualBinaryFormField<T extends Base.BinaryFormField = Base.BinaryFor
       {
         options?: {
           [L in Language]: {
-            t: string;
             f: string;
+            t: string;
           };
         };
       }
@@ -133,7 +131,7 @@ type MultilingualBinaryFormField<T extends Base.BinaryFormField = Base.BinaryFor
 
 type MultilingualPrimitiveFormField<TValue extends Base.PrimitiveFieldValue = Base.PrimitiveFieldValue> =
   TValue extends string
-    ? MultilingualTextFormField | MultilingualOptionsFormField<TValue> | MultilingualDateFormField
+    ? MultilingualDateFormField | MultilingualOptionsFormField<TValue> | MultilingualTextFormField
     : TValue extends number
     ? MultilingualNumericFormField
     : TValue extends boolean
@@ -142,8 +140,8 @@ type MultilingualPrimitiveFormField<TValue extends Base.PrimitiveFieldValue = Ba
 
 type MultilingualArrayFieldset<T extends Base.ArrayFieldValue[number]> = {
   [K in keyof T]:
-    | MultilingualPrimitiveFormField<T[K]>
-    | ((fieldset: { [K in keyof T]?: T[K] | null | undefined }) => MultilingualPrimitiveFormField<T[K]> | null);
+    | ((fieldset: { [K in keyof T]?: T[K] | null | undefined }) => MultilingualPrimitiveFormField<T[K]> | null)
+    | MultilingualPrimitiveFormField<T[K]>;
 };
 
 type MultilingualArrayFormField<TValue extends Base.ArrayFieldValue = Base.ArrayFieldValue> =
@@ -158,37 +156,38 @@ export type MultilingualFormField<TValue> = [TValue] extends [Base.PrimitiveFiel
   ? MultilingualPrimitiveFormField<TValue>
   : [TValue] extends [Base.ArrayFieldValue]
   ? MultilingualArrayFormField<TValue>
-  : MultilingualPrimitiveFormField | MultilingualArrayFormField;
+  : MultilingualArrayFormField | MultilingualPrimitiveFormField;
 
 export type MultilingualFormFields<TData extends Base.FormInstrumentData> = {
   [K in keyof TData]: MultilingualFormField<TData[K]>;
 };
 
 export type MultilingualFormFieldsGroup<TData extends Base.FormInstrumentData> = {
-  title: { [L in Language]: string };
   description?: { [L in Language]: string };
   fields: {
     [K in keyof TData]?: MultilingualFormField<TData[K]>;
   };
+  title: { [L in Language]: string };
 };
 
 export type MultilingualFormContent<TData extends Base.FormInstrumentData> =
   | MultilingualFormFields<TData>
   | MultilingualFormFieldsGroup<TData>[];
 
-export type MultilingualFormMeasures<TData extends Base.FormInstrumentData> = {
-  [key: string]: Omit<Measure<TData>, 'label'> & {
+export type MultilingualFormMeasures<TData extends Base.FormInstrumentData> = Record<
+  string,
+  Omit<Measure<TData>, 'label'> & {
     label: {
       [L in Language]: string;
     };
-  };
-};
+  }
+>;
 
 /** The definition of a multilingual form, which can be used to derive actual forms */
 export type MultilingualForm<TData extends Base.FormInstrumentData> = Simplify<
-  Omit<FormInstrument<TData>, 'details' | 'content' | 'kind' | 'measures'> & {
-    details: MultilingualFormDetails;
+  Omit<FormInstrument<TData>, 'content' | 'details' | 'kind' | 'measures'> & {
     content: MultilingualFormContent<TData>;
+    details: MultilingualFormDetails;
     measures?: MultilingualFormMeasures<TData>;
   }
 >;

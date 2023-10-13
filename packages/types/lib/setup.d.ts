@@ -4,8 +4,8 @@ export type SetupState = {
 
 export type SetupOptions = {
   admin: {
-    username: string;
     password: string;
+    username: string;
   };
   initDemo?: boolean;
 };
