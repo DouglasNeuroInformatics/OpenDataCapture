@@ -2,13 +2,14 @@ import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose'
 import { ExceptionsFilter, LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
 import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module, ValidationPipe } from '@nestjs/common';
-import type { MiddlewareConsumer, NestModule} from '@nestjs/common';
+import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { Connection } from 'mongoose';
 
+import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
@@ -21,6 +22,7 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     AjvModule,
+    AssignmentsModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true

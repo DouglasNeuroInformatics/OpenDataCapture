@@ -1,62 +1,77 @@
 import { useState } from 'react';
 
-import { ClientTable, Slider } from '@douglasneuroinformatics/ui';
+import { Button, ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment } from '@open-data-capture/types';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { HiPlus } from 'react-icons/hi2';
+import { useParams } from 'react-router-dom';
+
+import { useFetch } from '@/hooks/useFetch';
+
+import { AssignmentModal } from '../components/AssignmentModal';
+import { AssignmentSlider } from '../components/AssignmentSlider';
 
 export const SubjectManagementPage = () => {
-  // const { t } = useTranslation();
+  const params = useParams();
+  const { t } = useTranslation('subjects');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
+
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const { data } = useFetch<Assignment[]>('/v1/assignments', [isCreateModalOpen, isEditSliderOpen]);
+
+  if (!data) {
+    return null;
+  }
 
   return (
     <div>
-      <div className="my-5">
-        <h3 className="text-lg font-semibold">Assigned Instruments</h3>
+      <div className="my-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
+        <h3 className="text-lg font-semibold">{t('subjectManagementPage.assignedInstruments')}</h3>
+        <Button
+          className="w-full text-sm lg:w-auto"
+          icon={<HiPlus />}
+          iconPosition="right"
+          label={t('subjectManagementPage.addAssignment')}
+          variant="secondary"
+          onClick={() => setIsCreateModalOpen(true)}
+        />
       </div>
       <ClientTable<Assignment>
         columns={[
           {
-            field: 'title',
-            label: 'Title'
+            field: (entry) => entry.instrument.details.title,
+            label: t('subjectManagementPage.tableColumns.title')
           },
           {
             field: 'timeAssigned',
             formatter: (value: number) => toBasicISOString(new Date(value)),
-            label: 'Date Assigned'
+            label: t('subjectManagementPage.tableColumns.timeAssigned')
           },
           {
             field: 'timeExpires',
             formatter: (value: number) => toBasicISOString(new Date(value)),
-            label: 'Date Expires'
+            label: t('subjectManagementPage.tableColumns.timeExpires')
           },
           {
             field: 'status',
             formatter: (value: string) => value.charAt(0) + value.slice(1).toLowerCase(),
-            label: 'Status'
+            label: t('subjectManagementPage.tableColumns.status')
           }
         ]}
-        data={[
-          {
-            status: 'CANCELED',
-            timeAssigned: Date.now(),
-            timeExpires: Date.now() + 100000,
-            title: 'SANS'
-          }
-        ]}
-        onEntryClick={setSelectedAssignment}
-      />
-      <Slider
-        isOpen={selectedAssignment !== null}
-        setIsOpen={() => {
-          setSelectedAssignment(null);
+        data={data}
+        onEntryClick={(assignment) => {
+          setSelectedAssignment(assignment);
+          setIsEditSliderOpen(true);
         }}
-        title={selectedAssignment?.title}
-      >
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deserunt architecto libero incidunt, quaerat quidem
-        numquam voluptatum repellendus soluta harum nulla! Consequuntur sunt laudantium praesentium iure possimus soluta
-        et alias tempora?
-      </Slider>
+      />
+      <AssignmentSlider assignment={selectedAssignment} isOpen={isEditSliderOpen} setIsOpen={setIsEditSliderOpen} />
+      <AssignmentModal
+        isOpen={isCreateModalOpen}
+        setIsOpen={setIsCreateModalOpen}
+        subjectIdentifier={params.subjectIdentifier!}
+      />
     </div>
   );
 };
