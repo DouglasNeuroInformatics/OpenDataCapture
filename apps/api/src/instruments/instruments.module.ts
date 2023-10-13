@@ -54,4 +54,4 @@ type InstrumentDiscriminator = {
   ],
   providers: [FormsService, FormRecordsService]
 })
-export class InstrumentsModule {}
+export class LegacyInstrumentsModule {}

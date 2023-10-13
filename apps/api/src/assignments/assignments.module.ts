@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { InstrumentsModule } from '@/instruments/instruments.module';
+import { LegacyInstrumentsModule } from '@/instruments/instruments.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
 import { AssignmentsController } from './assignments.controller';
@@ -11,7 +11,7 @@ import { AssignmentEntity, AssignmentSchema } from './entities/assignment.entity
 @Module({
   controllers: [AssignmentsController],
   imports: [
-    InstrumentsModule,
+    LegacyInstrumentsModule,
     MongooseModule.forFeature([
       {
         name: AssignmentEntity.modelName,
