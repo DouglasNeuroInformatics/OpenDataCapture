@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
 
+import { FormsController } from './controllers/forms.controller';
 import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
-import { InstrumentRepository } from './instrument.repository';
-import { InstrumentsController } from './instruments.controller';
-import { InstrumentsService } from './instruments.service';
+import { InstrumentRepository } from './repositories/instrument.repository';
+import { FormsService } from './services/forms.service';
 
 @Module({
-  controllers: [InstrumentsController],
+  controllers: [FormsController],
   imports: [
     MongooseModule.forFeature([
       {
@@ -16,6 +16,6 @@ import { InstrumentsService } from './instruments.service';
       }
     ])
   ],
-  providers: [InstrumentRepository, InstrumentsService]
+  providers: [FormsService, InstrumentRepository]
 })
 export class InstrumentsModule {}

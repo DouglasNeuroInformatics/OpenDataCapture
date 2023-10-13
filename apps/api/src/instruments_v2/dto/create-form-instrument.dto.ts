@@ -1,8 +1,7 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import type Types from '@open-data-capture/types';
 import type { JSONSchemaType } from 'ajv';
-
-import { ValidationSchema } from '@/core/decorators/validation-schema.decorator';
 
 import { formInstrumentSchema } from '../schemas/form-instrument.schema';
 

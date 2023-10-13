@@ -1,27 +1,27 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
+import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
+import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { happinessQuestionnaire } from '@open-data-capture/instruments';
 import request from 'supertest';
 
-import { ValidationPipe } from '@/core/pipes/validation.pipe';
+import { FormsController } from '../controllers/forms.controller';
+import { InstrumentRepository } from '../repositories/instrument.repository';
+import { FormsService } from '../services/forms.service';
 
-import { InstrumentRepository } from '../instrument.repository';
-import { InstrumentsController } from '../instruments.controller';
-import { InstrumentsService } from '../instruments.service';
-
-describe('InstrumentsModule', () => {
+describe('/instruments/forms', () => {
   let app: NestExpressApplication;
   let server: unknown;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      controllers: [InstrumentsController],
+      controllers: [FormsController],
       providers: [
-        InstrumentsService,
+        FormsService,
         {
           provide: InstrumentRepository,
           useValue: createMock(InstrumentRepository)
@@ -32,6 +32,8 @@ describe('InstrumentsModule', () => {
     app = moduleRef.createNestApplication({
       logger: false
     });
+
+    app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
     await app.init();
