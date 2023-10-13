@@ -1,4 +1,4 @@
-import type { FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { FormInstrumentContent, FormDataType } from '@douglasneuroinformatics/form-types';
 import { ApiProperty } from '@nestjs/swagger';
 import type { FormInstrument, InstrumentKind } from '@open-data-capture/types';
 import type { JSONSchemaType } from 'ajv';
@@ -30,7 +30,7 @@ export class CreateFormDto implements FormInstrument {
   tags: string[];
 
   @ApiProperty()
-  validationSchema: JSONSchemaType<FormInstrumentData>;
+  validationSchema: JSONSchemaType<FormDataType>;
 
   @ApiProperty()
   @IsNumber()

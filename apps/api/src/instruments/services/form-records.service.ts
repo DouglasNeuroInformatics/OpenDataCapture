@@ -1,5 +1,5 @@
 import { type AccessibleModel } from '@casl/mongoose';
-import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { AjvService } from '@douglasneuroinformatics/nestjs/modules';
 import { linearRegression, mean, std } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
@@ -207,7 +207,7 @@ export class FormRecordsService {
     };
   }
 
-  private computeMeasure<T extends FormInstrumentData>(measure: Measure<T>, data: T): number {
+  private computeMeasure<T extends FormDataType>(measure: Measure<T>, data: T): number {
     // data[measure.formula.field] should always be a number because only numeric fields may be used for fields in measure
     switch (measure.formula.kind) {
       case 'const':
@@ -229,9 +229,7 @@ export class FormRecordsService {
   }
 
   /** Return an object with measures corresponding to all outcomes  */
-  private getMeasuresFromRecords<T extends FormInstrumentData>(
-    records: FormInstrumentRecord<T>[]
-  ): Record<string, number[]> {
+  private getMeasuresFromRecords<T extends FormDataType>(records: FormInstrumentRecord<T>[]): Record<string, number[]> {
     const data: Record<string, number[]> = {};
     for (const record of records) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

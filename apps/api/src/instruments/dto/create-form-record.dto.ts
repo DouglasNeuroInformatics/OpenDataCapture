@@ -1,4 +1,4 @@
-import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { ApiProperty } from '@nestjs/swagger';
 import type { FormInstrumentRecord, InstrumentKind, SubjectIdentificationData } from '@open-data-capture/types';
 import { Type } from 'class-transformer';
@@ -16,7 +16,7 @@ type CreateFormRecordData = {
 export class CreateFormRecordDto implements CreateFormRecordData {
   @ApiProperty()
   @IsObject()
-  data: FormInstrumentData;
+  data: FormDataType;
 
   @ApiProperty()
   @IsOptional()

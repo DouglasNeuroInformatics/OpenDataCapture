@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { type AccessibleModel } from '@casl/mongoose';
-import type { FormFields, FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { FormFields, FormDataType } from '@douglasneuroinformatics/form-types';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
@@ -25,7 +25,7 @@ export class FormsService {
     private readonly cryptoService: CryptoService
   ) {}
 
-  async create<T extends FormInstrumentData>(formInstrument: FormInstrument<T>): Promise<FormInstrument> {
+  async create<T extends FormDataType>(formInstrument: FormInstrument<T>): Promise<FormInstrument> {
     const identifier = this.createIdentifier(formInstrument.name, formInstrument.version);
     const conflict = await this.formModel.exists({
       'details.language': formInstrument.details.language,
@@ -40,9 +40,7 @@ export class FormsService {
     });
   }
 
-  async createTranslatedForms<T extends FormInstrumentData>(
-    translatedForms: TranslatedForms<T>
-  ): Promise<FormInstrument[]> {
+  async createTranslatedForms<T extends FormDataType>(translatedForms: TranslatedForms<T>): Promise<FormInstrument[]> {
     return Promise.all(Object.values(translatedForms).map(async (form) => await this.create(form)));
   }
 
@@ -74,7 +72,7 @@ export class FormsService {
     return this.formModel.find({ kind: 'form' }).select('identifier name tags version details').lean();
   }
 
-  getFields<T extends FormInstrumentData>(instrument: FormInstrument<T>): FormFields<T> {
+  getFields<T extends FormDataType>(instrument: FormInstrument<T>): FormFields<T> {
     let fields: FormFields<T>;
     if (Array.isArray(instrument.content)) {
       fields = instrument.content.reduce(

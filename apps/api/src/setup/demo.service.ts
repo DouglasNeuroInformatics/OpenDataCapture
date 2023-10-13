@@ -1,5 +1,5 @@
 import { createMongoAbility } from '@casl/ability';
-import { type FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import { type FormDataType } from '@douglasneuroinformatics/form-types';
 import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
@@ -70,7 +70,7 @@ export class DemoService {
   }
 
   /** Create form records for translated instruments */
-  private async createFormRecords<T extends FormInstrumentData = FormInstrumentData>(
+  private async createFormRecords<T extends FormDataType = FormDataType>(
     instrument: FormInstrument<T>,
     groupName: string,
     subjectInfo: CreateSubjectDto,
@@ -82,7 +82,7 @@ export class DemoService {
   ) {
     for (let i = 0; i < 5; i++) {
       const fields = this.formsService.getFields(instrument);
-      const data: FormInstrumentData = {};
+      const data: FormDataType = {};
       for (const fieldName in fields) {
         const field = fields[fieldName]!;
         const customValue = options?.customValues?.[fieldName];

@@ -1,4 +1,4 @@
-import type { FormInstrumentContent, FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { FormInstrumentContent, FormDataType } from '@douglasneuroinformatics/form-types';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import type { FormDetails, FormInstrument, Measures } from '@open-data-capture/types';
 import { type JSONSchemaType } from 'ajv';
@@ -8,7 +8,7 @@ import { BaseInstrumentEntity } from './base-instrument.entity';
 import { FormDetailsSchema } from './form-details.entity';
 
 @Schema()
-export class FormInstrumentEntity<TData extends FormInstrumentData = FormInstrumentData>
+export class FormInstrumentEntity<TData extends FormDataType = FormDataType>
   extends BaseInstrumentEntity
   implements FormInstrument<TData>
 {
