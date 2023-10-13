@@ -3,3 +3,4 @@ export * from './forms/enhanced-demographics-questionnaire';
 export * from './forms/happiness-questionnaire';
 export * from './forms/mini-mental-state-examination';
 export * from './forms/montreal-cognitive-assessment';
+export * from './utils/validation';
