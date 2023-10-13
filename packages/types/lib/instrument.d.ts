@@ -15,7 +15,7 @@ type InstrumentUIOption<L extends InstrumentLanguage, V> = L extends Language
   : never;
 
 /** Defines the basic properties of all instruments */
-export type BaseInstrument<L extends InstrumentLanguage = InstrumentLanguage> = {
+export type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
   content: unknown;
 
@@ -23,31 +23,31 @@ export type BaseInstrument<L extends InstrumentLanguage = InstrumentLanguage> = 
   kind: InstrumentKind;
 
   /** The language(s) in which the instrument is written */
-  language: InstrumentLanguage;
+  language: TLanguage;
 
   /** The name of the instrument, which must be unique for a given version */
   name: string;
 
   /** A list of tags that users can use to filter instruments */
-  tags: InstrumentUIOption<L, string[]>;
+  tags: InstrumentUIOption<TLanguage, string[]>;
 
   /** The version of the instrument */
   version: number;
 };
 
 /** The details of the form to be displayed to the user */
-export type FormInstrumentDetails<L extends InstrumentLanguage> = {
+export type FormInstrumentDetails<TLanguage extends InstrumentLanguage> = {
   /** A brief description of the instrument, such as the purpose and history of the instrument */
-  description: InstrumentUIOption<L, string>;
+  description: InstrumentUIOption<TLanguage, string>;
 
   /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
   estimatedDuration: number;
 
   /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
-  instructions: InstrumentUIOption<L, string | string[]>;
+  instructions: InstrumentUIOption<TLanguage, string | string[]>;
 
   /** The title of the instrument in the language it is written, omitting the definite article */
-  title: InstrumentUIOption<L, string>;
+  title: InstrumentUIOption<TLanguage, string>;
 };
 
 export type FormInstrumentFieldMixin<
@@ -211,3 +211,5 @@ export type FormInstrument<
     validationSchema: JSONSchemaType<TData>;
   }
 >;
+
+export type MultilingualFormInstrument<TData extends Base.FormDataType> = FormInstrument<TData, ['en', 'fr']>;
