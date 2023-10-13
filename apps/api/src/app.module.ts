@@ -1,7 +1,7 @@
 import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
-import { ExceptionsFilter, LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
+import { ExceptionsFilter, LoggerMiddleware, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { AjvModule, CryptoModule, DatabaseModule } from '@douglasneuroinformatics/nestjs/modules';
-import { Module, ValidationPipe } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';

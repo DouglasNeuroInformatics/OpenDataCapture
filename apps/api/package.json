@@ -37,7 +37,8 @@
     "passport-jwt": "4.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "unidecode": "^0.1.8"
+    "unidecode": "^0.1.8",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@nestjs/testing": "^10.2.6",
