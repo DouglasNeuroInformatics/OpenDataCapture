@@ -1,4 +1,6 @@
-import { createTranslatedForms } from '../utils/create-translated-forms';
+/* eslint-disable perfectionist/sort-objects */
+
+import type { MultilingualFormInstrument } from '@open-data-capture/types';
 
 export type MiniMentalStateExaminationData = {
   canCopyDesign: number;
@@ -23,7 +25,15 @@ export type MiniMentalStateExaminationData = {
   year: number;
 };
 
-export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateExaminationData>({
+export const miniMentalStateExamination: MultilingualFormInstrument<MiniMentalStateExaminationData> = {
+  kind: 'form',
+  name: 'Mini Mental State Examination',
+  language: ['en', 'fr'],
+  tags: {
+    en: ['Cognitive'],
+    fr: ['Cognitif']
+  },
+  version: 1,
   content: [
     {
       fields: {
@@ -439,39 +449,19 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
   },
   measures: {
     totalScore: {
-      formula: {
-        fields: [
-          'canCopyDesign',
-          'canFollowOralInstructions',
-          'canFollowWrittenInstructions',
-          'canNamePencil',
-          'canNameWatch',
-          'canRepeatPhrase',
-          'canWriteSentence',
-          'city',
-          'country',
-          'date',
-          'day',
-          'floor',
-          'institution',
-          'learningScore',
-          'month',
-          'province',
-          'recallScore',
-          'season',
-          'spellWorldScore',
-          'year'
-        ],
-        kind: 'sum'
-      },
       label: {
         en: 'Total Score',
         fr: 'Score total'
+      },
+      value: (data) => {
+        let sum = 0;
+        Object.values(data).forEach((value) => {
+          sum += value;
+        });
+        return sum;
       }
     }
   },
-  name: 'Mini Mental State Examination',
-  tags: ['Cognitive'],
   validationSchema: {
     properties: {
       canCopyDesign: {
@@ -598,6 +588,5 @@ export const miniMentalStateExamination = createTranslatedForms<MiniMentalStateE
       'year'
     ],
     type: 'object'
-  },
-  version: 1.0
-});
+  }
+};

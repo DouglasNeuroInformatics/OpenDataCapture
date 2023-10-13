@@ -1,4 +1,6 @@
-import { createTranslatedForms } from '../utils/create-translated-forms';
+/* eslint-disable perfectionist/sort-objects */
+
+import type { MultilingualFormInstrument } from '@open-data-capture/types';
 
 export type MontrealCognitiveAssessmentData = {
   abstraction: number;
@@ -11,7 +13,15 @@ export type MontrealCognitiveAssessmentData = {
   visuospatialExecutive: number;
 };
 
-export const montrealCognitiveAssessment = createTranslatedForms<MontrealCognitiveAssessmentData>({
+export const montrealCognitiveAssessment: MultilingualFormInstrument<MontrealCognitiveAssessmentData> = {
+  kind: 'form',
+  name: 'MontrealCognitiveAssessment',
+  language: ['en', 'fr'],
+  tags: {
+    en: ['Cognitive'],
+    fr: ['Cognitif']
+  },
+  version: 8.1,
   content: {
     abstraction: {
       kind: 'numeric',
@@ -119,100 +129,68 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
   },
   measures: {
     abstraction: {
-      formula: {
-        field: 'abstraction',
-        kind: 'const'
-      },
       label: {
         en: 'Abstraction',
         fr: 'Abstraction'
-      }
+      },
+      value: ({ abstraction }) => abstraction
     },
     attention: {
-      formula: {
-        field: 'attention',
-        kind: 'const'
-      },
       label: {
         en: 'Attention',
         fr: 'Attention'
-      }
+      },
+      value: ({ attention }) => attention
     },
     delayedRecall: {
-      formula: {
-        field: 'delayedRecall',
-        kind: 'const'
-      },
       label: {
         en: 'Delayed Recall',
         fr: 'Rappel'
-      }
+      },
+      value: ({ delayedRecall }) => delayedRecall
     },
     language: {
-      formula: {
-        field: 'language',
-        kind: 'const'
-      },
       label: {
         en: 'Language',
         fr: 'Langue'
-      }
+      },
+      value: ({ language }) => language
     },
     naming: {
-      formula: {
-        field: 'naming',
-        kind: 'const'
-      },
       label: {
         en: 'Naming',
         fr: 'Dénomination'
-      }
+      },
+      value: ({ naming }) => naming
     },
     orientation: {
-      formula: {
-        field: 'orientation',
-        kind: 'const'
-      },
       label: {
         en: 'Orientation',
         fr: 'Orientation'
-      }
+      },
+      value: ({ orientation }) => orientation
     },
     totalScore: {
-      formula: {
-        fields: [
-          'abstraction',
-          'attention',
-          'delayedRecall',
-          'language',
-          'lowEdu',
-          'naming',
-          'orientation',
-          'visuospatialExecutive'
-        ],
-        kind: 'sum',
-        options: {
-          coerceBool: true
-        }
-      },
       label: {
         en: 'Total Score',
         fr: 'Score total'
+      },
+      value: (data) => {
+        let sum = 0;
+        Object.values(data).forEach((value) => {
+          sum += Number(value);
+        });
+        return sum;
       }
     },
     visuospatialExecutive: {
-      formula: {
-        field: 'visuospatialExecutive',
-        kind: 'const'
-      },
       label: {
         en: 'Visuospatial/Executive',
         fr: 'Visuospatial/Exécutif'
-      }
+      },
+      value: ({ visuospatialExecutive }) => visuospatialExecutive
     }
   },
-  name: 'MontrealCognitiveAssessment',
-  tags: ['Cognitive'],
   validationSchema: {
     properties: {
       abstraction: {
@@ -264,6 +242,5 @@ export const montrealCognitiveAssessment = createTranslatedForms<MontrealCogniti
       'visuospatialExecutive'
     ],
     type: 'object'
-  },
-  version: 8.1
-});
+  }
+};

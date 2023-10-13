@@ -1,8 +1,11 @@
 import type { Language } from '@open-data-capture/types';
 
-type MultilingualOptions = Record<string, {
+type MultilingualOptions = Record<
+  string,
+  {
     [L in Language]: string;
-  }>;
+  }
+>;
 
 type TranslatedOptions<T extends MultilingualOptions> = {
   [K in keyof T]: string;

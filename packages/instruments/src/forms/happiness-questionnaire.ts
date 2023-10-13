@@ -1,10 +1,19 @@
-import { createTranslatedForms } from '../utils/create-translated-forms';
+/* eslint-disable perfectionist/sort-objects */
+import type { MultilingualFormInstrument } from '@open-data-capture/types';
 
 export type HappinessQuestionnaireData = {
   overallHappiness: number;
 };
 
-export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnaireData>({
+export const happinessQuestionnaire: MultilingualFormInstrument<HappinessQuestionnaireData> = {
+  kind: 'form',
+  name: 'HappinessQuestionnaire',
+  language: ['en', 'fr'],
+  tags: {
+    en: ['Well-Being'],
+    fr: ['Bien-être']
+  },
+  version: 1,
   content: {
     overallHappiness: {
       description: {
@@ -37,20 +46,6 @@ export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnai
       fr: 'Questionnaire sur le bonheur'
     }
   },
-  measures: {
-    overallHappiness: {
-      formula: {
-        field: 'overallHappiness',
-        kind: 'const'
-      },
-      label: {
-        en: 'Overall Happiness',
-        fr: 'Bonheur général'
-      }
-    }
-  },
-  name: 'HappinessQuestionnaire',
-  tags: ['Well-Being'],
   validationSchema: {
     properties: {
       overallHappiness: {
@@ -61,6 +56,5 @@ export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnai
     },
     required: ['overallHappiness'],
     type: 'object'
-  },
-  version: 1
-});
+  }
+};

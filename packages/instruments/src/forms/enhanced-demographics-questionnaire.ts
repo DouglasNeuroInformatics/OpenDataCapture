@@ -1,4 +1,6 @@
-import { createTranslatedForms } from '../utils/create-translated-forms';
+/* eslint-disable perfectionist/sort-objects */
+import type { MultilingualFormInstrument } from '@open-data-capture/types';
+
 import { extractKeys, formatOptions } from '../utils/format-options';
 
 const employmentStatus = {
@@ -578,7 +580,15 @@ type EnhancedDemographicsQuestionnaireData = {
   yearsOfEducation?: number;
 };
 
-export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
+export const enhancedDemographicsQuestionnaire: MultilingualFormInstrument<EnhancedDemographicsQuestionnaireData> = {
+  kind: 'form',
+  name: 'EnhancedDemographicsQuestionnaire',
+  language: ['en', 'fr'],
+  tags: {
+    en: ['Demographics'],
+    fr: ['Démographie']
+  },
+  version: 1,
   content: [
     {
       fields: {
@@ -777,8 +787,6 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
       fr: 'Questionnaire démographique détaillé'
     }
   },
-  name: 'EnhancedDemographicsQuestionnaire',
-  tags: ['Demographics'],
   validationSchema: {
     properties: {
       ageAtImmigration: {
@@ -861,6 +869,5 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
     },
     required: [],
     type: 'object'
-  },
-  version: 1
-});
+  }
+};

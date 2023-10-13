@@ -201,6 +201,17 @@ export type FormInstrumentContent<
   TData extends Base.FormDataType = Base.FormDataType
 > = FormInstrumentFields<TLanguage, TData> | FormInstrumentFieldsGroup<TLanguage, TData>[];
 
+export type FormInstrumentMeasures<
+  TLanguage extends InstrumentLanguage,
+  TData extends Base.FormDataType = Base.FormDataType
+> = Record<
+  string,
+  {
+    label: InstrumentUIOption<TLanguage, string>;
+    value: (data: TData) => number;
+  }
+>;
+
 export type FormInstrument<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
@@ -208,6 +219,7 @@ export type FormInstrument<
   BaseInstrument<TLanguage> & {
     content: FormInstrumentContent<TLanguage, TData>;
     details: FormInstrumentDetails<TLanguage>;
+    measures?: FormInstrumentMeasures<TLanguage, TData>;
     validationSchema: JSONSchemaType<TData>;
   }
 >;
