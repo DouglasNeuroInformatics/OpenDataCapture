@@ -8,7 +8,7 @@ import type { CreateFormInstrumentDto } from '../dto/create-form-instrument.dto'
 export class FormsService {
   constructor(private readonly instrumentsRepository: InstrumentRepository) {}
 
-  create(createFormInstrumentDto: CreateFormInstrumentDto) {
+  async create(createFormInstrumentDto: CreateFormInstrumentDto) {
     return this.instrumentsRepository.create(createFormInstrumentDto);
   }
 

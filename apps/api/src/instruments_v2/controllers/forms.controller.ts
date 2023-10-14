@@ -11,13 +11,13 @@ export class FormsController {
 
   @Post()
   @RouteAccess({ action: 'create', subject: 'Instrument' })
-  create(@Body() createFormInstrumentDto: CreateFormInstrumentDto) {
+  async create(@Body() createFormInstrumentDto: CreateFormInstrumentDto) {
     return this.formsService.create(createFormInstrumentDto);
   }
 
   @Get()
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  findAll() {
+  async findAll() {
     return this.formsService.findAll();
   }
 }
