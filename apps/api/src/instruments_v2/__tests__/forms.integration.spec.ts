@@ -6,7 +6,7 @@ import { HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import { happinessQuestionnaire } from '@open-data-capture/instruments';
+import * as Instruments from '@open-data-capture/instruments';
 import request from 'supertest';
 
 import { FormsController } from '../controllers/forms.controller';
@@ -40,10 +40,6 @@ describe('/instruments/forms', () => {
     server = app.getHttpServer();
   });
 
-  it('should be defined', () => {
-    expect(app).toBeDefined();
-  });
-
   describe('POST /instruments/forms', () => {
     it('should reject a request with an empty body', async () => {
       const response = await request(server).post('/instruments/forms').send();
@@ -62,8 +58,27 @@ describe('/instruments/forms', () => {
       });
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
+    it('should return status code 201 when attempting to create the BPRS', async () => {
+      const response = await request(server).post('/instruments/forms').send(Instruments.briefPsychiatricRatingScale);
+      expect(response.status).toBe(HttpStatus.CREATED);
+    });
+    it('should return status code 201 when attempting to create the enhanced demographics questionnaire', async () => {
+      const response = await request(server)
+        .post('/instruments/forms')
+        .send(Instruments.enhancedDemographicsQuestionnaire);
+      console.log(JSON.stringify(response.body, null, 2));
+      expect(response.status).toBe(HttpStatus.CREATED);
+    });
     it('should return status code 201 when attempting to create the happiness questionnaire', async () => {
-      const response = await request(server).post('/instruments/forms').send(happinessQuestionnaire);
+      const response = await request(server).post('/instruments/forms').send(Instruments.happinessQuestionnaire);
+      expect(response.status).toBe(HttpStatus.CREATED);
+    });
+    it('should return status code 201 when attempting to create the MMSE', async () => {
+      const response = await request(server).post('/instruments/forms').send(Instruments.miniMentalStateExamination);
+      expect(response.status).toBe(HttpStatus.CREATED);
+    });
+    it('should return status code 201 when attempting to create the MoCA', async () => {
+      const response = await request(server).post('/instruments/forms').send(Instruments.montrealCognitiveAssessment);
       expect(response.status).toBe(HttpStatus.CREATED);
     });
   });

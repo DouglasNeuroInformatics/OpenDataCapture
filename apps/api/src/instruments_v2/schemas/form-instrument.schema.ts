@@ -17,7 +17,7 @@ const instrumentUIOption = <T extends ZodTypeAny>(schema: T) => {
 const formFieldKindSchema: ZodType<FormFieldKind> = z.enum(['options', 'date', 'array', 'binary', 'numeric', 'text']);
 
 const formInstrumentBaseFieldSchema = z.object({
-  description: instrumentUIOption(z.string()),
+  description: instrumentUIOption(z.string()).optional(),
   isRequired: z.boolean().optional(),
   kind: formFieldKindSchema,
   label: instrumentUIOption(z.string())
@@ -48,12 +48,12 @@ const formInstrumentNumericFieldSchema: ZodType<Types.FormInstrumentNumericField
 
 const formInstrumentBinaryFieldSchema: ZodType<Types.FormInstrumentBinaryField> = formInstrumentBaseFieldSchema.extend({
   kind: z.literal('binary'),
-  options: z
-    .object({
+  options: instrumentUIOption(
+    z.object({
       f: z.string(),
       t: z.string()
     })
-    .optional(),
+  ).optional(),
   variant: z.enum(['checkbox', 'radio'])
 });
 
@@ -76,7 +76,7 @@ const formInstrumentStaticFieldsSchema: ZodType<Types.FormInstrumentStaticFields
 );
 
 const formInstrumentFieldsGroupSchema: ZodType<Types.FormInstrumentFieldsGroup> = z.object({
-  description: instrumentUIOption(z.string()),
+  description: instrumentUIOption(z.string()).optional(),
   fields: formInstrumentStaticFieldsSchema,
   title: instrumentUIOption(z.string())
 });
