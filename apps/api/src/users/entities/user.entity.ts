@@ -4,7 +4,7 @@ import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';
 
-@Schema({ id: true, strict: 'throw', timestamps: true, toObject: { virtuals: true } })
+@Schema({ strict: 'throw', timestamps: true })
 export class UserEntity implements User {
   static readonly modelName = 'User';
 

@@ -1,8 +1,8 @@
-import { accessibleBy } from '@casl/mongoose';
+import { type AccessibleModel } from '@casl/mongoose';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { type AppAbility, type User } from '@open-data-capture/types';
+import { type  AppAbility } from '@open-data-capture/types';
 import { Model } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';
@@ -16,7 +16,7 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(
-    @InjectModel(UserEntity.modelName) private readonly userModel: Model<UserEntity>,
+    @InjectModel(UserEntity.modelName) private readonly userModel: Model<UserDocument, AccessibleModel<UserDocument>>,
     private readonly cryptoService: CryptoService,
     private readonly groupsService: GroupsService
   ) {}
@@ -57,11 +57,9 @@ export class UsersService {
   }
 
   /** Returns an array of all users */
-  async findAll(ability: AppAbility, groupName?: string): Promise<User[]> {
+  async findAll(ability: AppAbility, groupName?: string): Promise<UserDocument[]> {
     const filter = groupName ? { groups: await this.groupsService.findByName(groupName, ability) } : {};
-    return (await this.userModel.find({ $and: [filter, accessibleBy(ability, 'read').User!] })).map((doc) => {
-      return doc.toObject();
-    });
+    return this.userModel.find(filter).accessibleBy(ability);
   }
 
   /** Returns user with provided username if found, otherwise throws */
@@ -70,6 +68,6 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
-    return user.toObject();
+    return user;
   }
 }
