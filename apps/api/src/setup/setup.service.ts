@@ -8,7 +8,7 @@ import { UserEntity } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 import { DemoService } from './demo.service';
-import { CreateAdminDto, SetupDto } from './dto/setup.dto';
+import { type Admin, SetupDto } from './dto/setup.dto';
 
 @Injectable()
 export class SetupService {
@@ -20,7 +20,7 @@ export class SetupService {
     private readonly usersService: UsersService
   ) {}
 
-  async createAdmin(admin: CreateAdminDto): Promise<UserEntity> {
+  async createAdmin(admin: Admin): Promise<UserEntity> {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' }, this.adminAbility);
   }
 

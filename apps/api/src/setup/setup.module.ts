@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { GroupsModule } from '@/groups/groups.module';
-import { LegacyInstrumentsModule } from '@/instruments/instruments.module';
+import { InstrumentsModule } from '@/instruments_v2/instruments.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 import { UsersModule } from '@/users/users.module';
 
@@ -11,7 +11,7 @@ import { SetupService } from './setup.service';
 
 @Module({
   controllers: [SetupController],
-  imports: [GroupsModule, LegacyInstrumentsModule, SubjectsModule, UsersModule],
+  imports: [GroupsModule, InstrumentsModule, SubjectsModule, UsersModule],
   providers: [DemoService, SetupService]
 })
 export class SetupModule {}
