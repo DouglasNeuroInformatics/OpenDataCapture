@@ -108,6 +108,25 @@ describe('/instruments/forms', () => {
     });
   });
 
+  describe('GET /instruments/forms', () => {
+    it('should return status code 200', async () => {
+      const response = await request(server).get('/instruments/forms');
+      expect(response.status).toBe(HttpStatus.OK);
+    });
+    it('should return all the instruments returned by the repository', async () => {
+      instrumentsRepository.findAll.mockResolvedValueOnce([{ id: 1 }]);
+      const response = await request(server).get('/instruments/forms');
+      expect(response.body).toMatchObject([{ id: 1 }]);
+    });
+  });
+
+  describe('GET /instruments/forms/:id', () => {
+    it('should reject a request with an invalid id', async () => {
+      const response = await request(server).get('/instruments/forms/123');
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+  });
+
   afterAll(async () => {
     await app.close();
   });

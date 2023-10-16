@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { Types } from 'mongoose';
 
 import { InstrumentRepository } from '../repositories/instrument.repository';
 
@@ -12,7 +13,11 @@ export class FormsService {
     return this.instrumentsRepository.create(createFormInstrumentDto);
   }
 
-  findAll() {
+  async findAll() {
     return this.instrumentsRepository.findAll();
+  }
+
+  async findById(id: Types.ObjectId) {
+    return this.instrumentsRepository.findById(id);
   }
 }
