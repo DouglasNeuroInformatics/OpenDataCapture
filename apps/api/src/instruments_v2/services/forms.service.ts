@@ -1,16 +1,18 @@
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Injectable } from '@nestjs/common';
+import type { FormInstrument, InstrumentLanguage } from '@open-data-capture/types';
 import type { Types } from 'mongoose';
 
 import { InstrumentRepository } from '../repositories/instrument.repository';
-
-import type { CreateFormInstrumentDto } from '../dto/create-form-instrument.dto';
 
 @Injectable()
 export class FormsService {
   constructor(private readonly instrumentsRepository: InstrumentRepository) {}
 
-  async create(createFormInstrumentDto: CreateFormInstrumentDto) {
-    return this.instrumentsRepository.create(createFormInstrumentDto);
+  async create<TData extends FormDataType = FormDataType, TLanguage extends InstrumentLanguage = InstrumentLanguage>(
+    formInstrument: FormInstrument<TData, TLanguage>
+  ) {
+    return this.instrumentsRepository.create(formInstrument);
   }
 
   async findAll() {
