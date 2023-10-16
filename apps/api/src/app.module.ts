@@ -43,7 +43,7 @@ import { UsersModule } from './users/users.module';
             connection.plugin(accessibleRecordsPlugin);
             return connection;
           },
-          dbName: configService.getOrThrow<string>('NODE_ENV'),
+          dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
           mongoUri: configService.getOrThrow<string>('MONGO_URI')
         };
       }
