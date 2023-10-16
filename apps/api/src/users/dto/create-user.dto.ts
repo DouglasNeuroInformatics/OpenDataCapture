@@ -1,7 +1,7 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
 import type { BasePermissionLevel, User } from '@open-data-capture/types';
-import { type ZodType, z } from 'zod';
+import { z } from 'zod';
 
 type CreateUserData = {
   groupNames?: string[];
@@ -12,7 +12,7 @@ const basePermissionLevels = ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] as const;
 // Matches string with 8 or more characters, minimum one upper case, lowercase, and number
 const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
-export const createUserDtoSchema: ZodType<CreateUserData> = z.object({
+export const createUserDtoSchema = z.object({
   basePermissionLevels: z.enum(basePermissionLevels).optional(),
   firstName: z.string().optional(),
   groupNames: z.array(z.string()).min(1).optional(),
