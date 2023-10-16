@@ -14,6 +14,7 @@
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@casl/mongoose": "^7.2.1",
+    "@douglasneuroinformatics/ajv": "latest",
     "@douglasneuroinformatics/nestjs": "latest",
     "@douglasneuroinformatics/stats": "latest",
     "@douglasneuroinformatics/utils": "latest",
