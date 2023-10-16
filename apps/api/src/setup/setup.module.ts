@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { GroupsModule } from '@/groups/groups.module';
-import { InstrumentsModule } from '@/instruments_v2/instruments.module';
+import { InstrumentsModule } from '@/instruments/instruments.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 import { UsersModule } from '@/users/users.module';
 

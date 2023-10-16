@@ -13,8 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { GroupsModule } from './groups/groups.module';
-import { LegacyInstrumentsModule } from './instruments/instruments.module';
-import { InstrumentsModule } from './instruments_v2/instruments.module';
+import { InstrumentsModule } from './instruments/instruments.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UsersModule } from './users/users.module';
@@ -50,7 +49,6 @@ import { UsersModule } from './users/users.module';
     }),
     GroupsModule,
     InstrumentsModule,
-    LegacyInstrumentsModule,
     SubjectsModule,
     ThrottlerModule.forRoot([
       {

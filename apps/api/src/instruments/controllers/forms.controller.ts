@@ -1,51 +1,36 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { FormInstrument, FormInstrumentSummary, Language } from '@open-data-capture/types';
+import type { Types } from 'mongoose';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { CreateFormDto } from '../dto/create-form.dto';
+import { CreateFormInstrumentDto } from '../dto/create-form-instrument.dto';
 import { FormsService } from '../services/forms.service';
 
 @ApiTags('Instruments')
-@Controller('instruments/forms')
+@Controller({ path: 'instruments/forms', version: '2' })
 export class FormsController {
   constructor(private readonly formsService: FormsService) {}
 
-  @ApiOperation({ description: 'Create a new form instrument', summary: 'Create Form' })
+  @ApiOperation({ summary: 'Create Form' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Instrument' })
-  create(@Body() createFormDto: CreateFormDto): Promise<FormInstrument> {
-    return this.formsService.create(createFormDto);
+  async create(@Body() createFormInstrumentDto: CreateFormInstrumentDto) {
+    return this.formsService.create(createFormInstrumentDto);
   }
 
-  @ApiOperation({ description: 'Returns all forms in the database', summary: 'Get All Forms' })
+  @ApiOperation({ summary: 'Get All Forms' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  findAll(): Promise<FormInstrument[]> {
+  async findAll() {
     return this.formsService.findAll();
   }
 
-  @ApiOperation({ description: 'Returns a summary of all available forms', summary: 'Get Summary of All Forms' })
-  @Get('available')
-  @RouteAccess({ action: 'read', subject: 'Instrument' })
-  getAvailable(): Promise<FormInstrumentSummary[]> {
-    console.log('Checking available');
-    return this.formsService.getAvailable();
-  }
-
-  // eslint-disable-next-line perfectionist/sort-classes
-  @ApiOperation({ description: 'Returns the provided form', summary: 'Find Form' })
+  @ApiOperation({ summary: 'Get Form With ID' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  findOne(@Param('id') identifier: string, @Query('lang') language?: Language): Promise<FormInstrument> {
-    return this.formsService.findOne(identifier, language);
-  }
-
-  @ApiOperation({ description: 'Returns the deleted instrument', summary: 'Delete Form' })
-  @Delete(':id')
-  @RouteAccess({ action: 'delete', subject: 'Instrument' })
-  remove(@Param('id') id: string): Promise<FormInstrument> {
-    return this.formsService.remove(id);
+  async findById(@Query('id', ParseIdPipe) id: Types.ObjectId) {
+    return this.formsService.findById(id);
   }
 }
