@@ -12,7 +12,7 @@ describe('AbilityFactory', () => {
       providers: [AbilityFactory]
     }).compile();
 
-    abilityFactory = module.get(AbilityFactory);
+    abilityFactory = await module.resolve(AbilityFactory);
   });
 
   describe('createForUser', () => {
