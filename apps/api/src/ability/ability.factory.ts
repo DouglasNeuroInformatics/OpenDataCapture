@@ -1,21 +1,10 @@
 import { AbilityBuilder, createMongoAbility } from '@casl/ability';
-import { Inject, Injectable, InternalServerErrorException, Logger, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable, Logger } from '@nestjs/common';
 import type { AppAbility, User } from '@open-data-capture/types';
-import type { Request } from 'express';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class AbilityFactory {
   private readonly logger = new Logger(AbilityFactory.name);
-
-  constructor(@Inject(REQUEST) private readonly request: Request) {}
-
-  createForCurrentUser(): AppAbility {
-    if (!this.request.user) {
-      throw new InternalServerErrorException('Unexpected error: request.user is undefined');
-    }
-    return this.createForUser(this.request.user);
-  }
 
   createForUser(user: User): AppAbility {
     this.logger.verbose('Creating ability for user: ' + user.username);
