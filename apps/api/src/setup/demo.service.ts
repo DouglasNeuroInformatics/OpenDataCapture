@@ -8,7 +8,7 @@ import type { AppAbility, Subject } from '@open-data-capture/types';
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
-import { FormsService } from '@/instruments/services/forms.service';
+import { FormsService } from '@/instruments/forms.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 

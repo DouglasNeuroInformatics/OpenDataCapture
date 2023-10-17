@@ -5,8 +5,8 @@ import type { Types } from 'mongoose';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { CreateFormInstrumentDto } from '../dto/create-form-instrument.dto';
-import { FormsService } from '../services/forms.service';
+import { CreateFormInstrumentDto } from './dto/create-form-instrument.dto';
+import { FormsService } from './forms.service';
 
 @ApiTags('Instruments')
 @Controller({ path: 'instruments/forms', version: '2' })

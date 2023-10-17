@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it } from 'bun:test';
 import { createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
-import { InstrumentRepository } from '../repositories/instrument.repository';
-import { FormsService } from '../services/forms.service';
+import { FormsService } from '../forms.service';
+import { InstrumentsRepository } from '../instruments.repository';
 
 describe('FormsService', () => {
   let formsService: FormsService;
@@ -14,8 +14,8 @@ describe('FormsService', () => {
       providers: [
         FormsService,
         {
-          provide: InstrumentRepository,
-          useValue: createMock<InstrumentRepository>
+          provide: InstrumentsRepository,
+          useValue: createMock<InstrumentsRepository>
         }
       ]
     }).compile();

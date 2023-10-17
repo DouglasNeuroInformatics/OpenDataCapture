@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it } from 'bun:test';
 import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
-import { FormsController } from '../controllers/forms.controller';
-import { FormsService } from '../services/forms.service';
+import { FormsController } from '../forms.controller';
+import { FormsService } from '../forms.service';
 
 describe('FormsController', () => {
   let formsController: FormsController;

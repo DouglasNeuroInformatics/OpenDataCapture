@@ -11,15 +11,15 @@ import type { FormInstrument, FormInstrumentStaticFields } from '@open-data-capt
 import request from 'supertest';
 import type { PartialDeep } from 'type-fest';
 
-import { FormsController } from '../controllers/forms.controller';
-import { InstrumentRepository } from '../repositories/instrument.repository';
-import { FormsService } from '../services/forms.service';
+import { FormsController } from '../forms.controller';
+import { FormsService } from '../forms.service';
+import { InstrumentsRepository } from '../instruments.repository';
 
 describe('/instruments/forms', () => {
   let app: NestExpressApplication;
   let server: unknown;
 
-  let instrumentsRepository: MockedInstance<InstrumentRepository>;
+  let instrumentsRepository: MockedInstance<InstrumentsRepository>;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -27,8 +27,8 @@ describe('/instruments/forms', () => {
       providers: [
         FormsService,
         {
-          provide: InstrumentRepository,
-          useValue: createMock(InstrumentRepository)
+          provide: InstrumentsRepository,
+          useValue: createMock(InstrumentsRepository)
         }
       ]
     }).compile();
@@ -40,7 +40,7 @@ describe('/instruments/forms', () => {
     app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
-    instrumentsRepository = app.get(InstrumentRepository);
+    instrumentsRepository = app.get(InstrumentsRepository);
 
     await app.init();
     server = app.getHttpServer();

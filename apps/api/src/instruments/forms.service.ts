@@ -3,11 +3,11 @@ import { Injectable } from '@nestjs/common';
 import type { FormInstrument, InstrumentLanguage } from '@open-data-capture/types';
 import type { Types } from 'mongoose';
 
-import { InstrumentRepository } from '../repositories/instrument.repository';
+import { InstrumentsRepository } from './instruments.repository';
 
 @Injectable()
 export class FormsService {
-  constructor(private readonly instrumentsRepository: InstrumentRepository) {}
+  constructor(private readonly instrumentsRepository: InstrumentsRepository) {}
 
   async create<TData extends FormDataType = FormDataType, TLanguage extends InstrumentLanguage = InstrumentLanguage>(
     formInstrument: FormInstrument<TData, TLanguage>
