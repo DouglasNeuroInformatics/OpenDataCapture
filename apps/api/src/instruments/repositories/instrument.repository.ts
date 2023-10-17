@@ -1,22 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose/dist/common';
-import type { Model, Types } from 'mongoose';
+import { EntityRepository } from '@/database/entity.repository';
 
 import { InstrumentEntity } from '../entities/instrument.entity';
 
-@Injectable()
-export class InstrumentRepository {
-  constructor(@InjectModel(InstrumentEntity.modelName) private model: Model<InstrumentEntity>) {}
+export class InstrumentRepository extends EntityRepository(InstrumentEntity) {}
 
-  create(entity: InstrumentEntity) {
-    return this.model.create(entity);
-  }
-
-  findAll() {
-    return this.model.find();
-  }
-
-  findById(id: Types.ObjectId) {
-    return this.model.findById(id);
-  }
-}
