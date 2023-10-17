@@ -3,9 +3,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import type { Group } from '@open-data-capture/types';
 import { type HydratedDocument } from 'mongoose';
 
-import { BaseEntity } from '@/base/base.entity';
+import { EntitySchema } from '@/core/decorators/entity-schema.decorator';
 
-export class GroupEntity extends BaseEntity('Group') implements Group {
+@EntitySchema<Group>()
+export class GroupEntity {
+  static modelName = 'Group';
+
   @ApiProperty({ example: 'Depression Clinic' })
   @Prop({ required: true, unique: true })
   name: string;
