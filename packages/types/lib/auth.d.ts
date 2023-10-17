@@ -20,7 +20,9 @@ export type LoginCredentials = {
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
-export type AppEntity = Assignment | Group | Instrument | InstrumentRecord | Subject | Summary | User;
+export type AppEntityType<T> = T extends object ? Omit<T, 'id'> : never;
+
+export type AppEntity = AppEntityType<Assignment | Group | Instrument | InstrumentRecord | Subject | Summary | User>;
 
 export type AppEntityName = 'Assignment' | 'Group' | 'Instrument' | 'InstrumentRecord' | 'Subject' | 'Summary' | 'User';
 
