@@ -1,4 +1,5 @@
 import { Schema, type SchemaOptions } from '@nestjs/mongoose';
+import type { AppEntityName } from '@open-data-capture/types';
 
 const defaultEntitySchemaOptions = {
   id: true,
@@ -11,7 +12,7 @@ type EntitySchemaOptions = {
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
-export function BaseEntity(name: string, options?: EntitySchemaOptions) {
+export function BaseEntity<T extends AppEntityName>(name: T, options?: EntitySchemaOptions) {
   @Schema({ ...defaultEntitySchemaOptions, ...options })
   class Base {
     static readonly modelName = name;

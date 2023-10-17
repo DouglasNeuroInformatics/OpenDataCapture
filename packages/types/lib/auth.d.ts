@@ -1,7 +1,10 @@
 import { MongoAbility, RawRuleOf } from '@casl/ability';
+import type { Class } from 'type-fest';
 
 import type { Assignment } from './assignment';
 import type { Group } from './group';
+import type { Instrument } from './instrument';
+import type { InstrumentRecord } from './instrument-record';
 import type { Subject } from './subject';
 import type { Summary } from './summary';
 import type { User } from './user';
@@ -17,22 +20,15 @@ export type LoginCredentials = {
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
-export type AppSubject =
-  | 'Assignment'
-  | 'Group'
-  | 'Instrument'
-  | 'InstrumentRecord'
-  | 'Subject'
-  | 'Summary'
-  | 'User'
-  | 'all'
-  | Assignment
-  | Group
-  | Subject
-  | Summary
-  | User;
+export type AppEntity = Assignment | Group | Instrument | InstrumentRecord | Subject | Summary | User;
 
-export type AppEntityName = Exclude<Extract<AppSubject, string>, 'all'>;
+export type AppEntityName = 'Assignment' | 'Group' | 'Instrument' | 'InstrumentRecord' | 'Subject' | 'Summary' | 'User';
+
+export type AppEntityClass<TEntity extends AppEntity> = Class<TEntity> & {
+  readonly modelName: AppEntityName;
+};
+
+export type AppSubject = 'all' | AppEntity | AppEntityName;
 
 export type AppAbility = MongoAbility<[AppAction, AppSubject]>;
 

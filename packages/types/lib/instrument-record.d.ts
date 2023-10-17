@@ -4,7 +4,7 @@ import { Group } from './group';
 import { BaseInstrument, FormInstrument, InstrumentKind } from './instrument';
 import { Subject } from './subject';
 
-export type InstrumentRecord<TInstrument extends BaseInstrument, TData = unknown> = {
+export type InstrumentRecord<TInstrument extends BaseInstrument = BaseInstrument, TData = unknown> = {
   data: TData;
   group?: Group;
   instrument: TInstrument;

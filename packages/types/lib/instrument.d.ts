@@ -223,3 +223,5 @@ export type FormInstrument<
 >;
 
 export type MultilingualFormInstrument<TData extends Base.FormDataType> = FormInstrument<TData, ['en', 'fr']>;
+
+export type Instrument = FormInstrument;

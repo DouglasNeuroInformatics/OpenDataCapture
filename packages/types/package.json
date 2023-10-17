@@ -6,5 +6,8 @@
   "scripts": {
     "format": "prettier --write lib",
     "lint": "tsc && eslint --fix lib"
+  },
+  "dependencies": {
+    "type-fest": "^4.4.0"
   }
 }

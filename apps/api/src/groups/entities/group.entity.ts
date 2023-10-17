@@ -1,12 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { type Group } from '@open-data-capture/types';
+import type { Group } from '@open-data-capture/types';
 import { type HydratedDocument } from 'mongoose';
 
-@Schema({ strict: 'throw', timestamps: true })
-export class GroupEntity implements Group {
-  static readonly modelName = 'Group';
+import { BaseEntity } from '@/base/base.entity';
 
+export class GroupEntity extends BaseEntity('Group') implements Group {
   @ApiProperty({ example: 'Depression Clinic' })
   @Prop({ required: true, unique: true })
   name: string;
