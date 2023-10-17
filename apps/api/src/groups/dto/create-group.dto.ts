@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 @ValidationSchema(
   z.object({
-    name: z.string()
+    name: z.string().min(1)
   })
 )
 export class CreateGroupDto implements Omit<Group, 'id'> {
