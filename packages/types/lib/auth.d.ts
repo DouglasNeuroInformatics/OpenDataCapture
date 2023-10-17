@@ -32,6 +32,8 @@ export type AppSubject =
   | Summary
   | User;
 
+export type AppEntityName = Exclude<Extract<AppSubject, string>, 'all'>;
+
 export type AppAbility = MongoAbility<[AppAction, AppSubject]>;
 
 export type Permissions = RawRuleOf<AppAbility>[];
