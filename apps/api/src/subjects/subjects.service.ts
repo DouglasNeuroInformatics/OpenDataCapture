@@ -9,14 +9,12 @@ import { AbilityService } from '@/ability/ability.service';
 import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
 import { SubjectsRepository } from './subjects.repository';
 
-import type { UpdateSubjectDto } from './dto/update-subject.dto';
-
 /**
  * Please note that although the SubjectsService implements EntityService, the `id` methods
  * get the subject by the custom identifier rather than the default ObjectId
  */
 @Injectable()
-export class SubjectsService implements EntityService<Partial<Subject>> {
+export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'updateById'> {
   constructor(
     private readonly abilityService: AbilityService,
     private readonly cryptoService: CryptoService,
@@ -72,16 +70,6 @@ export class SubjectsService implements EntityService<Partial<Subject>> {
 
   async findByLookup(data: SubjectIdentificationDataDto) {
     return this.findById(this.generateIdentifier(data));
-  }
-
-  async updateById(identifier: string, update: UpdateSubjectDto, { validateAbility = true } = {}) {
-    const subject = await this.subjectsRepository.findById(identifier);
-    if (!subject) {
-      throw new NotFoundException(`Failed to find subject with ID: ${identifier}`);
-    } else if (validateAbility && !this.abilityService.can('update', subject)) {
-      throw new ForbiddenException(`Insufficient rights to update subject with ID: ${identifier}`);
-    }
-    return (await this.subjectsRepository.updateOne({ identifier }, update))!;
   }
 
   private generateIdentifier({ dateOfBirth, firstName, lastName, sex }: SubjectIdentificationDataDto): string {

@@ -1,5 +1,5 @@
 import type { EntityController } from '@douglasneuroinformatics/nestjs/core';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Subject } from '@open-data-capture/types';
 
@@ -8,11 +8,9 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
 import { SubjectsService } from './subjects.service';
 
-import type { UpdateSubjectDto } from './dto/update-subject.dto';
-
 @ApiTags('Subjects')
 @Controller('subjects')
-export class SubjectsController implements EntityController<Partial<Subject>> {
+export class SubjectsController implements Omit<EntityController<Partial<Subject>>, 'updateById'> {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @ApiOperation({ summary: 'Create Subject' })
@@ -49,12 +47,5 @@ export class SubjectsController implements EntityController<Partial<Subject>> {
   @HttpCode(HttpStatus.OK)
   findByLookup(@Body() data: SubjectIdentificationDataDto) {
     return this.subjectsService.findByLookup(data);
-  }
-
-  @ApiOperation({ summary: 'Update Subject' })
-  @Patch(':id')
-  @RouteAccess({ action: 'update', subject: 'Subject' })
-  updateById(@Param('id') id: string, @Body() update: UpdateSubjectDto) {
-    return this.subjectsService.updateById(id, update);
   }
 }
