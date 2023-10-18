@@ -10,6 +10,6 @@ export type Assignment = {
 };
 
 export type CreateAssignmentData = {
-  instrumentIdentifier: string;
-  subjectIdentifier: string;
+  instrumentId: string;
+  subjectId: string;
 };
