@@ -11,21 +11,20 @@ import type {
 } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
-import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' }
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
+import { resolveInstrumentSource } from '@/instruments/instruments.utils';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
-import { VisitsService } from '@/visits/visits.service';
 
-const BPRS_SOURCE = importInstrumentSource('forms/brief-psychiatric-rating-scale');
-const EDQ_SOURCE = importInstrumentSource('forms/enhanced-demographics-questionnaire');
-const HQ_SOURCE = importInstrumentSource('forms/happiness-questionnaire');
-const MMSE_SOURCE = importInstrumentSource('forms/mini-mental-state-examination');
-const MOCA_SOURCE = importInstrumentSource('forms/montreal-cognitive-assessment');
+const BPRS_SOURCE = await resolveInstrumentSource('forms/brief-psychiatric-rating-scale');
+const EDQ_SOURCE = await resolveInstrumentSource('forms/enhanced-demographics-questionnaire');
+const HQ_SOURCE = await resolveInstrumentSource('forms/happiness-questionnaire');
+const MMSE_SOURCE = await resolveInstrumentSource('forms/mini-mental-state-examination');
+const MOCA_SOURCE = await resolveInstrumentSource('forms/montreal-cognitive-assessment');
 
 faker.seed(123);
 
@@ -39,8 +38,7 @@ export class DemoService {
     private readonly instrumentRecordsService: InstrumentRecordsService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService,
-    private readonly usersService: UsersService,
-    private readonly visitsService: VisitsService
+    private readonly usersService: UsersService
   ) {}
 
   async init(): Promise<void> {
@@ -53,11 +51,6 @@ export class DemoService {
     for (let i = 0; i < 100; i++) {
       const group = await this.groupsService.findByName(randomValue(demoGroups).name);
       const subject = await this.createSubject();
-      await this.visitsService.create({
-        date: new Date(),
-        groupId: group._id.toString(),
-        subjectIdData: subject as Required<typeof subject>
-      })
       for (const form of forms) {
         for (let i = 0; i < 10; i++) {
           const data = this.createFormRecordData(
