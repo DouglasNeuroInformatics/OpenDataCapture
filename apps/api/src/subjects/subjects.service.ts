@@ -1,75 +1,93 @@
-import { type AccessibleModel } from '@casl/mongoose';
+import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import type { AppAbility, Group, Sex } from '@open-data-capture/types';
-import { Model } from 'mongoose';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Subject } from '@open-data-capture/types';
 import unidecode from 'unidecode';
 
-import { GroupsService } from '@/groups/groups.service';
+import { AbilityService } from '@/ability/ability.service';
 
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { LookupSubjectDto } from './dto/lookup-subject.dto';
-import { type SubjectDocument, SubjectEntity } from './entities/subject.entity';
+import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
+import { SubjectsRepository } from './subjects.repository';
 
+import type { UpdateSubjectDto } from './dto/update-subject.dto';
+
+/**
+ * Please note that although the SubjectsService implements EntityService, the `id` methods
+ * get the subject by the custom identifier rather than the default ObjectId
+ */
 @Injectable()
-export class SubjectsService {
+export class SubjectsService implements EntityService<Partial<Subject>> {
   constructor(
-    @InjectModel(SubjectEntity.modelName)
-    private readonly subjectModel: Model<SubjectDocument, AccessibleModel<SubjectDocument>>,
+    private readonly abilityService: AbilityService,
     private readonly cryptoService: CryptoService,
-    private readonly groupsService: GroupsService
+    private readonly subjectsRepository: SubjectsRepository
   ) {}
 
-  /** Append a group to the subject with the provided identifier */
-  async appendGroup(identifier: string, group: Group): Promise<SubjectEntity> {
-    const subject = await this.subjectModel.findOne({ identifier });
-    if (!subject) {
-      throw new NotFoundException(`Subject with identifier does not exist: ${identifier}`);
-    }
-    return subject.updateOne({ groups: [group, ...subject.groups] });
-  }
-
-  async create({ dateOfBirth, firstName, lastName, sex }: CreateSubjectDto): Promise<SubjectEntity> {
-    const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
-    if (await this.subjectModel.exists({ identifier })) {
+  async create(data: SubjectIdentificationDataDto) {
+    const identifier = this.generateIdentifier({ ...data });
+    if (await this.subjectsRepository.exists({ identifier })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
     }
-    return this.subjectModel.create({
-      dateOfBirth: new Date(dateOfBirth),
-      firstName,
+    return this.subjectsRepository.create({
       groups: [],
       identifier,
-      lastName,
-      sex
+      ...data
     });
   }
 
-  async findAll(ability: AppAbility, groupName?: string): Promise<SubjectEntity[]> {
-    const filter = groupName ? { groups: await this.groupsService.findByName(groupName, ability) } : {};
-    return this.subjectModel.find(filter).accessibleBy(ability).lean();
-  }
-
-  /** Returns the subject with the provided identifier */
-  async findByIdentifier(identifier: string): Promise<SubjectDocument> {
-    const result = await this.subjectModel.findOne({ identifier });
-    if (!result) {
-      throw new NotFoundException(`Subject with identifier does not exist: ${identifier}`);
+  async deleteById(identifier: string, { validateAbility = true } = {}) {
+    const subject = await this.subjectsRepository.findOne({ identifier });
+    if (!subject) {
+      throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
+    } else if (validateAbility && !this.abilityService.can('delete', subject)) {
+      throw new ForbiddenException(`Insufficient rights to delete subject with identifier: ${identifier}`);
     }
-    return result;
+    return (await this.subjectsRepository.deleteOne({ identifier }))!;
   }
 
-  generateIdentifier(firstName: string, lastName: string, dateOfBirth: Date, sex: Sex): string {
+  async findAll({ validateAbility = true } = {}) {
+    if (!validateAbility) {
+      return this.subjectsRepository.find();
+    }
+    return this.subjectsRepository.find(this.abilityService.accessibleQuery('read'));
+  }
+
+  async findByGroup(groupName: string, { validateAbility = true } = {}) {
+    const groupQuery = { groups: { name: groupName } };
+    if (!validateAbility) {
+      return this.subjectsRepository.find(groupQuery);
+    }
+    return this.subjectsRepository.find(this.abilityService.accessibleQuery('read', groupQuery));
+  }
+
+  async findById(identifier: string, { validateAbility = true } = {}) {
+    const subject = await this.subjectsRepository.findById(identifier);
+    if (!subject) {
+      throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
+    } else if (validateAbility && !this.abilityService.can('delete', subject)) {
+      throw new ForbiddenException(`Insufficient rights to read subject with identifier: ${identifier}`);
+    }
+    return subject;
+  }
+
+  async findByLookup(data: SubjectIdentificationDataDto) {
+    return this.findById(this.generateIdentifier(data));
+  }
+
+  async updateById(identifier: string, update: UpdateSubjectDto, { validateAbility = true } = {}) {
+    const subject = await this.subjectsRepository.findById(identifier);
+    if (!subject) {
+      throw new NotFoundException(`Failed to find subject with ID: ${identifier}`);
+    } else if (validateAbility && !this.abilityService.can('update', subject)) {
+      throw new ForbiddenException(`Insufficient rights to update subject with ID: ${identifier}`);
+    }
+    return (await this.subjectsRepository.updateOne({ identifier }, update))!;
+  }
+
+  private generateIdentifier({ dateOfBirth, firstName, lastName, sex }: SubjectIdentificationDataDto): string {
     const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
     const info = firstName + lastName + shortDateOfBirth + sex;
     const source = unidecode(info.toUpperCase().replaceAll('-', ''));
     return this.cryptoService.hash(source);
-  }
-
-  async lookup(dto: LookupSubjectDto): Promise<SubjectEntity> {
-    const { dateOfBirth, firstName, lastName, sex } = dto;
-    const identifier = this.generateIdentifier(firstName, lastName, new Date(dateOfBirth), sex);
-    const subject = await this.findByIdentifier(identifier);
-    return subject;
   }
 }

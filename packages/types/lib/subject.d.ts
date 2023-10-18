@@ -8,4 +8,4 @@ export type Subject = {
   sex: Sex;
 };
 
-export type SubjectIdentificationData = Omit<Subject, 'identifier'>;
+export type SubjectIdentificationData = Omit<Required<Subject>, 'identifier'>;

@@ -5,7 +5,7 @@ import { ZodType, z } from 'zod';
 
 const SexSchema: ZodType<Sex> = z.enum(['male', 'female']);
 
-const SubjectIdentificationDataSchema = z.object({
+export const SubjectIdentificationDataSchema = z.object({
   dateOfBirth: z.coerce.date(),
   firstName: z.string(),
   lastName: z.string(),
