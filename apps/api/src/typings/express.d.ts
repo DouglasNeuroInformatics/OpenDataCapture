@@ -1,4 +1,4 @@
-import { AppUser } from '@/core/decorators/current-user.decorator.ts';
+import type { User as AppUser } from '@open-data-capture/types';
 
 declare global {
   namespace Express {

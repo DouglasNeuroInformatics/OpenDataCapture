@@ -6,7 +6,6 @@ import type { JwtPayload } from '@open-data-capture/types';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { AbilityFactory } from '@/ability/ability.factory';
 import { UserEntity } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
@@ -31,7 +30,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     // First, we need to resolve the module for this request scope
     // For more info, see: https://docs.nestjs.com/recipes/passport#request-scoped-strategies
     const contextId = ContextIdFactory.getByRequest(request);
-    const abilityFactory = await this.moduleRef.resolve(AbilityFactory, contextId, { strict: false });
     const usersService = await this.moduleRef.resolve(UsersService, contextId, { strict: false });
 
     // Get the user associated with the JWT if they exist, otherwise throws UnauthorizedException
@@ -45,8 +43,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw error;
     }
 
-    const ability = abilityFactory.createForUser(user);
     this.logger.verbose(`Validated Token for User: ${username}`);
-    return { ...user, ability };
+    return user;
   }
 }
