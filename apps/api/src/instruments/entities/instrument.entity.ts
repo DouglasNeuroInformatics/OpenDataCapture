@@ -1,5 +1,6 @@
 import type { JSONSchemaType } from '@douglasneuroinformatics/ajv';
 import type FormTypes from '@douglasneuroinformatics/form-types';
+import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import type BaseTypes from '@open-data-capture/types';
@@ -16,7 +17,7 @@ abstract class BaseInstrumentEntity<TLanguage extends BaseTypes.InstrumentLangua
   abstract kind: BaseTypes.InstrumentKind;
 }
 
-@Schema({ discriminatorKey: 'kind', strict: 'throw', timestamps: true })
+@EntitySchema({ discriminatorKey: 'kind' })
 export class InstrumentEntity<TLanguage extends BaseTypes.InstrumentLanguage = BaseTypes.InstrumentLanguage>
   implements BaseInstrumentEntity<TLanguage>
 {
@@ -61,7 +62,7 @@ export class FormInstrumentEntity<
   @ApiProperty()
   @Prop({ required: true, type: Object })
   declare content: BaseTypes.FormInstrumentContent<TLanguage, TData>;
-  
+
   @ApiProperty()
   @Prop({ required: true, type: Object })
   declare details: BaseTypes.FormInstrumentDetails<TLanguage>;
