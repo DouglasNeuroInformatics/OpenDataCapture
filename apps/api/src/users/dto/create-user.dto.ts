@@ -15,7 +15,7 @@ const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 export const CreateUserDataSchema = z.object({
   basePermissionLevel: z.enum(BASE_PERMISSION_LEVELS).optional(),
   firstName: z.string().min(1).optional(),
-  groupNames: z.array(z.string().min(1)).min(1).optional(),
+  groupNames: z.array(z.string().min(1)).optional(),
   lastName: z.string().min(1).optional(),
   password: z.string().regex(isStrongPassword),
   username: z.string().min(1)

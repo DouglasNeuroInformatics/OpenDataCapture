@@ -3,6 +3,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import type { AppAbility, AppAction, AppSubject, User } from '@open-data-capture/types';
 import type { Request } from 'express';
+import { FilterQuery } from 'mongoose';
 
 import { AbilityFactory } from './ability.factory';
 
@@ -16,10 +17,13 @@ export class AbilityService {
     this.userAbility = request.user ? abilityFactory.createForUser(request.user) : null;
   }
 
-  accessibleQuery(action: AppAction) {
+  accessibleQuery<T>(action: AppAction, filter?: FilterQuery<T>): FilterQuery<T> {
     if (this.userAbility) {
-      this.userAbility.can('read', {});
-      return accessibleBy(this.userAbility, action);
+      return filter
+        ? {
+            $and: [accessibleBy(this.userAbility, action), filter]
+          }
+        : accessibleBy(this.userAbility, action);
     }
     return {};
   }

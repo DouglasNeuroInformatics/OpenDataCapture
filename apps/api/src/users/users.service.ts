@@ -70,11 +70,13 @@ export class UsersService implements EntityService<User> {
     return this.usersRepository.find(this.abilityService.accessibleQuery('read'));
   }
 
-  // /** Returns an array of all users */
-  // async findAll(ability: AppAbility, groupName?: string): Promise<UserDocument[]> {
-  //   const filter = groupName ? { groups: await this.groupsService.findByName(groupName, ability) } : {};
-  //   return this.userModel.find(filter).accessibleBy(ability);
-  // }
+  async findByGroup(groupName: string, { validateAbility = true } = {}) {
+    const groupQuery = { groups: { name: groupName } };
+    if (!validateAbility) {
+      return this.usersRepository.find(groupQuery);
+    }
+    return this.usersRepository.find(this.abilityService.accessibleQuery('read', groupQuery));
+  }
 
   async findById(id: string, { validateAbility = true } = {}) {
     const user = await this.usersRepository.findById(id);
