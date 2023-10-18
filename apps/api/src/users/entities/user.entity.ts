@@ -1,10 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import type { BasePermissionLevel, User } from '@open-data-capture/types';
-import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import type { BasePermissionLevel, Group, User } from '@open-data-capture/types';
+import { Schema as MongooseSchema } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';
 
-@Schema({ strict: 'throw', timestamps: true })
+@EntitySchema()
 export class UserEntity implements User {
   static readonly modelName = 'User';
 
@@ -15,7 +16,7 @@ export class UserEntity implements User {
   firstName?: string;
 
   @Prop({ required: true, type: [{ ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId }] })
-  groups: GroupEntity[];
+  groups: Group[];
 
   @Prop({ required: false, type: String })
   lastName?: string;
@@ -26,7 +27,5 @@ export class UserEntity implements User {
   @Prop({ required: true, unique: true })
   username: string;
 }
-
-export type UserDocument = HydratedDocument<UserEntity>;
 
 export const UserSchema = SchemaFactory.createForClass(UserEntity);
