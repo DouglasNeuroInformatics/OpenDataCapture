@@ -88,7 +88,6 @@ describe('/groups', () => {
     let id: string;
     beforeAll(() => {
       id = new Types.ObjectId().toString();
-      groupsRepository.findById.mockResolvedValue({ id });
     });
 
     it('should reject a request with an invalid id', async () => {
@@ -97,6 +96,7 @@ describe('/groups', () => {
     });
     it('should return status code 200 with a valid ID', async () => {
       abilityService.can.mockReturnValueOnce(true);
+      groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).get(`/groups/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });
@@ -107,13 +107,75 @@ describe('/groups', () => {
     });
     it('should reject a request if the user has insufficient permissions', async () => {
       abilityService.can.mockReturnValueOnce(false);
+      groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).get(`/groups/${id}`);
       expect(response.status).toBe(HttpStatus.FORBIDDEN);
     });
     it('should return the group if it exists', async () => {
       abilityService.can.mockReturnValueOnce(true);
+      groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).get(`/groups/${id}`);
       expect(response.body).toMatchObject({ id });
+    });
+  });
+
+  describe('PATCH /groups/:id', () => {
+    let id: string;
+    beforeAll(() => {
+      id = new Types.ObjectId().toString();
+    });
+
+    it('should reject a request with an invalid id', async () => {
+      const response = await request(server).patch('/groups/123');
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+    it('should reject a request to set the group name to an empty string', async () => {
+      abilityService.can.mockReturnValueOnce(true);
+      groupsRepository.findById.mockResolvedValueOnce({ id });
+      const response = await request(server).patch(`/groups/${id}`).send({ name: '' });
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+    it('should reject a request to set the group name to a number', async () => {
+      abilityService.can.mockReturnValueOnce(true);
+      groupsRepository.findById.mockResolvedValueOnce({ id });
+      const response = await request(server).patch(`/groups/${id}`).send({ name: 100 });
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+    it('should return status code 200 with a valid ID, even if nothing is modified', async () => {
+      abilityService.can.mockReturnValueOnce(true);
+      groupsRepository.findById.mockResolvedValueOnce({ id });
+      const response = await request(server).patch(`/groups/${id}`);
+      expect(response.status).toBe(HttpStatus.OK);
+    });
+    it('should return status code 200 with a valid ID and valid data', async () => {
+      abilityService.can.mockReturnValueOnce(true);
+      groupsRepository.findById.mockResolvedValueOnce({ id });
+      const response = await request(server).patch(`/groups/${id}`).send({ name: 'foo' });
+      expect(response.status).toBe(HttpStatus.OK);
+    });
+    it('should return the modified group', async () => {
+      abilityService.can.mockReturnValueOnce(true);
+      groupsRepository.findById.mockResolvedValueOnce({ id });
+      groupsRepository.updateById.mockImplementationOnce((id: string, obj: object) => ({ id, ...obj }));
+      const response = await request(server).patch(`/groups/${id}`).send({ name: 'foo' });
+      expect(response.body).toMatchObject({ name: 'foo' });
+    });
+  });
+
+  describe('DELETE /group/:id', () => {
+    let id: string;
+    beforeAll(() => {
+      id = new Types.ObjectId().toString();
+    });
+
+    it('should reject a request with an invalid id', async () => {
+      const response = await request(server).delete('/groups/123');
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+    it('should return status code 200 with a valid ID', async () => {
+      abilityService.can.mockReturnValueOnce(true);
+      const response = await request(server).delete(`/groups/${id}`);
+      expect(response.status).toBe(HttpStatus.OK);
     });
   });
 
