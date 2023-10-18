@@ -45,7 +45,7 @@ export class UsersService implements EntityService<User> {
   async deleteById(id: string, { validateAbility = true } = {}) {
     const user = await this.usersRepository.findById(id);
     if (!user) {
-      throw new NotFoundException(`Failed to find group with ID: ${id}`);
+      throw new NotFoundException(`Failed to find user with ID: ${id}`);
     } else if (validateAbility && !this.abilityService.can('delete', user)) {
       throw new ForbiddenException(`Insufficient rights to delete user with ID: ${id}`);
     }
