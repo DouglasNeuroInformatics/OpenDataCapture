@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import type { BasePermissionLevel, User } from '@open-data-capture/types';
 import { ZodType, z } from 'zod';
 
-type CreateUserData = Omit<User, 'groups' | 'preferences'> & {
+type CreateUserData = Omit<User, 'groups'> & {
   groupNames?: string[];
 };
 
