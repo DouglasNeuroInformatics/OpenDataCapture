@@ -9,7 +9,7 @@ import { CreateFormInstrumentDto } from './dto/create-form-instrument.dto';
 import { FormsService } from './forms.service';
 
 @ApiTags('Instruments')
-@Controller({ path: 'instruments/forms', version: '2' })
+@Controller({ path: 'instruments/forms' })
 export class FormsController {
   constructor(private readonly formsService: FormsService) {}
 
