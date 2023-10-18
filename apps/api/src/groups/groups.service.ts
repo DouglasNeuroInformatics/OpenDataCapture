@@ -24,7 +24,7 @@ export class GroupsService extends EntityService<Group, { validateAbility?: bool
     return this.groupsRepository.create(group);
   }
 
-  async deleteById(id: string, { validateAbility = true }) {
+  async deleteById(id: string, { validateAbility = true } = {}) {
     const group = await this.groupsRepository.findById(id);
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
@@ -34,14 +34,14 @@ export class GroupsService extends EntityService<Group, { validateAbility?: bool
     return (await this.groupsRepository.deleteById(id))!;
   }
 
-  async findAll({ validateAbility = true }) {
+  async findAll({ validateAbility = true } = {}) {
     if (!validateAbility) {
       return this.groupsRepository.find();
     }
     return this.groupsRepository.find(this.abilityService.accessibleQuery('read'));
   }
 
-  async findById(id: string, { validateAbility = true }) {
+  async findById(id: string, { validateAbility = true } = {}) {
     const group = await this.groupsRepository.findById(id);
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
@@ -51,7 +51,7 @@ export class GroupsService extends EntityService<Group, { validateAbility?: bool
     return group;
   }
 
-  async updateById(id: string, update: UpdateGroupDto, { validateAbility = true }) {
+  async updateById(id: string, update: UpdateGroupDto, { validateAbility = true } = {}) {
     const group = await this.groupsRepository.findById(id);
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
