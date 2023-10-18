@@ -1,16 +1,28 @@
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
+import { ApiProperty } from '@nestjs/swagger';
 import type { Sex, SubjectIdentificationData } from '@open-data-capture/types';
-import { IsDateString, IsIn, IsString } from 'class-validator';
+import { ZodType, z } from 'zod';
 
+const SexSchema: ZodType<Sex> = z.enum(['male', 'female']);
+
+const SubjectIdentificationDataSchema = z.object({
+  dateOfBirth: z.coerce.date(),
+  firstName: z.string(),
+  lastName: z.string(),
+  sex: SexSchema
+});
+
+@ValidationSchema(SubjectIdentificationDataSchema)
 export class SubjectIdentificationDataDto implements SubjectIdentificationData {
-  @IsDateString()
-  dateOfBirth: string;
+  @ApiProperty()
+  dateOfBirth: Date;
 
-  @IsString()
+  @ApiProperty()
   firstName: string;
 
-  @IsString()
+  @ApiProperty()
   lastName: string;
 
-  @IsIn(['male', 'female'] satisfies Sex[])
+  @ApiProperty()
   sex: Sex;
 }
