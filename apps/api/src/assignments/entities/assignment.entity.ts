@@ -1,13 +1,14 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { type Assignment, type AssignmentStatus } from '@open-data-capture/types';
-import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 
 import type { FormInstrumentEntity } from '@/instruments/entities/instrument.entity';
 import { InstrumentEntity } from '@/instruments/entities/instrument.entity';
-import { type SubjectDocument, SubjectEntity } from '@/subjects/entities/subject.entity';
+import { SubjectEntity } from '@/subjects/entities/subject.entity';
 
-@Schema({ strict: 'throw', timestamps: true })
+@EntitySchema()
 export class AssignmentEntity implements Assignment {
   static readonly modelName = 'Assignment';
 
@@ -20,7 +21,7 @@ export class AssignmentEntity implements Assignment {
 
   @ApiProperty()
   @Prop({ ref: SubjectEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
-  subject: SubjectDocument;
+  subject: SubjectEntity;
 
   @ApiProperty()
   @Prop({ required: true })
@@ -30,7 +31,5 @@ export class AssignmentEntity implements Assignment {
   @Prop({ required: true })
   timeExpires: number;
 }
-
-export type AssignmentDocument = HydratedDocument<AssignmentEntity>;
 
 export const AssignmentSchema = SchemaFactory.createForClass(AssignmentEntity);
