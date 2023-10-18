@@ -3,29 +3,29 @@ import { ApiProperty } from '@nestjs/swagger';
 import type { BasePermissionLevel, User } from '@open-data-capture/types';
 import { z } from 'zod';
 
-type CreateUserData = {
+type CreateUserData = Omit<User, 'groups' | 'preferences'> & {
   groupNames?: string[];
-} & Omit<User, 'groups' | 'preferences'>;
+};
 
-const basePermissionLevels = ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] as const;
+const BASE_PERMISSION_LEVELS = ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] as const;
 
 // Matches string with 8 or more characters, minimum one upper case, lowercase, and number
 const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
-export const createUserDtoSchema = z.object({
-  basePermissionLevels: z.enum(basePermissionLevels).optional(),
-  firstName: z.string().optional(),
-  groupNames: z.array(z.string()).min(1).optional(),
-  lastName: z.string().optional(),
+export const CreateUserDataSchema = z.object({
+  basePermissionLevels: z.enum(BASE_PERMISSION_LEVELS).optional(),
+  firstName: z.string().min(1).optional(),
+  groupNames: z.array(z.string().min(1)).min(1).optional(),
+  lastName: z.string().min(1).optional(),
   password: z.string().regex(isStrongPassword),
   username: z.string().min(1)
 });
 
-@ValidationSchema(createUserDtoSchema)
+@ValidationSchema(CreateUserDataSchema)
 export class CreateUserDto implements CreateUserData {
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
-    enum: basePermissionLevels,
+    enum: BASE_PERMISSION_LEVELS,
     type: String
   })
   basePermissionLevel?: BasePermissionLevel;
