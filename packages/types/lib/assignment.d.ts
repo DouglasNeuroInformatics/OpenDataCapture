@@ -13,3 +13,5 @@ export type CreateAssignmentData = {
   instrumentId: string;
   subjectId: string;
 };
+
+export type UpdateAssignmentData = Pick<Assignment, 'status' | 'timeExpires'>;
