@@ -1,8 +1,15 @@
-export type AssignmentStatus = 'COMPLETE' | 'OUTSTANDING' | 'EXPIRED' | 'CANCELED';
+import type { FormInstrument } from './instrument';
+
+export type AssignmentStatus = 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDING';
 
 export type Assignment = {
-  title: string;
+  instrument: FormInstrument;
+  status: AssignmentStatus;
   timeAssigned: number;
   timeExpires: number;
-  status: AssignmentStatus;
+};
+
+export type CreateAssignmentData = {
+  instrumentIdentifier: string;
+  subjectIdentifier: string;
 };

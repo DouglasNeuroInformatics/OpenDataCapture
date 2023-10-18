@@ -8,7 +8,7 @@ import request from 'supertest';
 import { AppModule } from '@/app.module';
 import { SetupService } from '@/setup/setup.service';
 
-describe('/auth', () => {
+describe('/assignments', () => {
   let app: NestExpressApplication;
   let server: unknown;
 
@@ -32,7 +32,7 @@ describe('/auth', () => {
     });
   });
 
-  describe('POST /auth/login', () => {
+  describe('POST /assignments', () => {
     it('should reject a request with an empty body', async () => {
       const response = await request(server).post('/auth/login').send();
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);

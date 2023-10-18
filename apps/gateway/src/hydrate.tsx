@@ -1,6 +1,13 @@
 import { hydrateRoot } from 'react-dom/client';
-const { default: App } = (await import(PATH_TO_PAGE)) as { default: () => JSX.Element };
+
+import { Layout } from './Layout';
+import IndexPage from './pages';
 
 import './styles.css';
 
-hydrateRoot(document, <App />);
+hydrateRoot(
+  document,
+  <Layout>
+    <IndexPage />
+  </Layout>
+);

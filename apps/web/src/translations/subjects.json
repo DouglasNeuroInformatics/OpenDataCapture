@@ -1,0 +1,36 @@
+{
+  "assignmentSlider": {
+    "resendNotification": {
+      "en": "Resend Notification",
+      "fr": "Renvoyer la notification"
+    }
+  },
+  "subjectManagementPage": {
+    "assignedInstruments": {
+      "en": "Assigned Instruments",
+      "fr": "Instruments assignés"
+    },
+    "addAssignment": {
+      "en": "Add Assignment",
+      "fr": "Assigner un instrument"
+    },
+    "tableColumns": {
+      "title": {
+        "en": "Title",
+        "fr": "Titre"
+      },
+      "timeAssigned": {
+        "en": "Assigned",
+        "fr": "Attribué"
+      },
+      "timeExpires": {
+        "en": "Expires",
+        "fr": "Expiration"
+      },
+      "status": {
+        "en": "Status",
+        "fr": "État"
+      }
+    }
+  }
+}

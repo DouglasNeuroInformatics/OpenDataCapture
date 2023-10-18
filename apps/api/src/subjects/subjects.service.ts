@@ -12,7 +12,6 @@ import { CreateSubjectDto } from './dto/create-subject.dto';
 import { LookupSubjectDto } from './dto/lookup-subject.dto';
 import { type SubjectDocument, SubjectEntity } from './entities/subject.entity';
 
-
 @Injectable()
 export class SubjectsService {
   constructor(
@@ -52,8 +51,8 @@ export class SubjectsService {
   }
 
   /** Returns the subject with the provided identifier */
-  async findByIdentifier(identifier: string): Promise<SubjectEntity> {
-    const result = await this.subjectModel.findOne({ identifier }).lean();
+  async findByIdentifier(identifier: string): Promise<SubjectDocument> {
+    const result = await this.subjectModel.findOne({ identifier });
     if (!result) {
       throw new NotFoundException(`Subject with identifier does not exist: ${identifier}`);
     }
