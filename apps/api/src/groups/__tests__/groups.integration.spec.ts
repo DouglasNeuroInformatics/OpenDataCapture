@@ -8,6 +8,8 @@ import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
+import { AbilityService } from '@/ability/ability.service';
+
 import { GroupsController } from '../groups.controller';
 import { GroupsRepository } from '../groups.repository';
 import { GroupsService } from '../groups.service';
@@ -23,6 +25,10 @@ describe('/groups', () => {
       controllers: [GroupsController],
       providers: [
         GroupsService,
+        {
+          provide: AbilityService,
+          useValue: createMock(AbilityService)
+        },
         {
           provide: GroupsRepository,
           useValue: createMock(GroupsRepository)

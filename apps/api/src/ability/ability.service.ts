@@ -1,7 +1,7 @@
 import { accessibleBy } from '@casl/mongoose';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import type { AppAbility, AppAction, User } from '@open-data-capture/types';
+import type { AppAbility, AppAction, AppSubject, User } from '@open-data-capture/types';
 import type { Request } from 'express';
 
 import { AbilityFactory } from './ability.factory';
@@ -16,10 +16,15 @@ export class AbilityService {
     this.userAbility = request.user ? abilityFactory.createForUser(request.user) : null;
   }
 
-  createAccessibleQuery(action: AppAction) {
+  accessibleQuery(action: AppAction) {
     if (this.userAbility) {
+      this.userAbility.can('read', {});
       return accessibleBy(this.userAbility, action);
     }
     return {};
+  }
+
+  can(action: AppAction, subject: AppSubject) {
+    return this.userAbility === null || this.userAbility.can(action, subject);
   }
 }

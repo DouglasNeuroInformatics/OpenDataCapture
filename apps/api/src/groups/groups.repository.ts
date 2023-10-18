@@ -1,4 +1,4 @@
-import { EntityRepository } from '@/base/entity.repository';
+import { EntityRepository } from '@douglasneuroinformatics/nestjs/core';
 
 import { GroupEntity } from './entities/group.entity';
 
