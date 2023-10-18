@@ -1,38 +1,60 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import type { EntityController } from '@douglasneuroinformatics/nestjs/core';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { type AppAbility } from '@open-data-capture/types';
+import type { Subject } from '@open-data-capture/types';
 
-import { CurrentUser } from '@/core/decorators/current-user.decorator';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { LookupSubjectDto } from './dto/lookup-subject.dto';
-import { SubjectEntity } from './entities/subject.entity';
+import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
 import { SubjectsService } from './subjects.service';
+
+import type { UpdateSubjectDto } from './dto/update-subject.dto';
 
 @ApiTags('Subjects')
 @Controller('subjects')
-export class SubjectsController {
+export class SubjectsController implements EntityController<Partial<Subject>> {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @ApiOperation({ summary: 'Create Subject' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Subject' })
-  create(@Body() createSubjectDto: CreateSubjectDto): Promise<SubjectEntity> {
-    return this.subjectsService.create(createSubjectDto);
+  create(@Body() subject: SubjectIdentificationDataDto) {
+    return this.subjectsService.create(subject);
+  }
+
+  @ApiOperation({ summary: 'Delete Subject' })
+  @Delete(':id')
+  @RouteAccess({ action: 'delete', subject: 'Subject' })
+  deleteById(@Param('id') id: string) {
+    return this.subjectsService.deleteById(id);
   }
 
   @ApiOperation({ summary: 'Get All Subjects' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  findAll(@CurrentUser('ability') ability: AppAbility, @Query('group') groupName?: string): Promise<SubjectEntity[]> {
-    return this.subjectsService.findAll(ability, groupName);
+  findAll(@Query('group') groupName?: string) {
+    return groupName ? this.subjectsService.findByGroup(groupName) : this.subjectsService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Get Subject' })
+  @Get(':id')
+  @RouteAccess({ action: 'read', subject: 'Subject' })
+  findById(@Param('id') id: string) {
+    return this.subjectsService.findById(id);
   }
 
   @ApiOperation({ summary: 'Lookup Subject' })
   @Post('lookup')
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  lookup(@Body() lookupSubjectDto: LookupSubjectDto): Promise<SubjectEntity> {
-    return this.subjectsService.lookup(lookupSubjectDto);
+  @HttpCode(HttpStatus.OK)
+  findByLookup(@Body() data: SubjectIdentificationDataDto) {
+    return this.subjectsService.findByLookup(data);
+  }
+
+  @ApiOperation({ summary: 'Update Subject' })
+  @Patch(':id')
+  @RouteAccess({ action: 'update', subject: 'Subject' })
+  updateById(@Param('id') id: string, @Body() update: UpdateSubjectDto) {
+    return this.subjectsService.updateById(id, update);
   }
 }
