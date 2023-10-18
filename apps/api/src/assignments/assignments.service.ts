@@ -1,49 +1,70 @@
-import type { AccessibleModel } from '@casl/mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import type { Model, Types } from 'mongoose';
+import { EntityService } from '@douglasneuroinformatics/nestjs/core';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Assignment } from '@open-data-capture/types';
 
-// import { FormsService } from '@/instruments/services/forms.service';
-// import { SubjectsService } from '@/subjects/subjects.service';
+import { AbilityService } from '@/ability/ability.service';
+import { FormsService } from '@/instruments/forms.service';
+import { SubjectsService } from '@/subjects/subjects.service';
 
-import { type AssignmentDocument, AssignmentEntity } from './entities/assignment.entity';
-
-import type { CreateAssignmentDto } from './dto/create-assignment.dto';
-import type { UpdateAssignmentDto } from './dto/update-assignment.dto';
+import { AssignmentsRepository } from './assignments.repository';
+import { CreateAssignmentDto } from './dto/create-assignment.dto';
+import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 
 @Injectable()
-export class AssignmentsService {
+export class AssignmentsService implements EntityService<Assignment> {
   constructor(
-    @InjectModel(AssignmentEntity.modelName)
-    private readonly assignmentModel: Model<AssignmentDocument, AccessibleModel<AssignmentDocument>> // private readonly formsService: FormsService,
-  ) // private readonly subjectsService: SubjectsService
-  {}
+    private readonly abilityService: AbilityService,
+    private readonly assignmentsRepository: AssignmentsRepository,
+    private readonly formsService: FormsService,
+    private readonly subjectsService: SubjectsService
+  ) {}
 
-  async create({ instrumentIdentifier, subjectIdentifier }: CreateAssignmentDto) {
-    return Promise.resolve({ instrumentIdentifier, subjectIdentifier });
-    // const form = (await this.formsService.findByIdentifier(instrumentIdentifier))[0];
-    // const subject = await this.subjectsService.findByIdentifier(subjectIdentifier);
-    // if (!form) {
-    //   throw new NotFoundException(`Failed to find form with identifier: ${instrumentIdentifier}`);
-    // }
-    // return this.assignmentModel.create({
-    //   instrument: form,
-    //   status: 'OUTSTANDING',
-    //   subject,
-    //   timeAssigned: Date.now(),
-    //   timeExpires: Date.now() + 1000000
-    // });
+  async create({ instrumentId, subjectId }: CreateAssignmentDto) {
+    const instrument = await this.formsService.findById(instrumentId);
+    const subject = await this.subjectsService.findById(subjectId);
+    return this.assignmentsRepository.create({
+      instrument,
+      status: 'OUTSTANDING',
+      subject,
+      timeAssigned: Date.now(),
+      timeExpires: Date.now() + 604800000 // 1 week,
+    });
   }
 
-  findAll() {
-    return this.assignmentModel.find().populate('instrument');
-  }
-
-  async updateById(id: Types.ObjectId, updateGroupDto: UpdateAssignmentDto): Promise<AssignmentDocument> {
-    const result = await this.assignmentModel.findByIdAndUpdate(id, updateGroupDto);
-    if (!result) {
-      throw new NotFoundException(`Failed to find assignment with ID: ${id.toString()}`);
+  async deleteById(id: string, { validateAbility = true } = {}) {
+    const assignment = await this.assignmentsRepository.findById(id);
+    if (!assignment) {
+      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
+    } else if (validateAbility && !this.abilityService.can('delete', assignment)) {
+      throw new ForbiddenException(`Insufficient rights to delete assignment with ID: ${id}`);
     }
-    return result;
+    return (await this.assignmentsRepository.deleteById(id))!;
+  }
+
+  async findAll({ validateAbility = true } = {}) {
+    if (!validateAbility) {
+      return this.assignmentsRepository.find();
+    }
+    return this.assignmentsRepository.find(this.abilityService.accessibleQuery('read'));
+  }
+
+  async findById(id: string, { validateAbility = true } = {}) {
+    const assignment = await this.assignmentsRepository.findById(id);
+    if (!assignment) {
+      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
+    } else if (validateAbility && !this.abilityService.can('delete', assignment)) {
+      throw new ForbiddenException(`Insufficient rights to read assignment with ID: ${id}`);
+    }
+    return assignment;
+  }
+
+  async updateById(id: string, update: UpdateAssignmentDto, { validateAbility = true } = {}) {
+    const assignment = await this.assignmentsRepository.findById(id);
+    if (!assignment) {
+      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
+    } else if (validateAbility && !this.abilityService.can('update', assignment)) {
+      throw new ForbiddenException(`Insufficient rights to update assignment with ID: ${id}`);
+    }
+    return (await this.assignmentsRepository.updateById(id, update))!;
   }
 }
