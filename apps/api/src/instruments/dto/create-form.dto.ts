@@ -18,10 +18,10 @@ const UIOptionSchema = <T extends ZodTypeAny>(schema: T) =>
 const FieldKindSchema: ZodType<FormFieldKind> = z.enum(['options', 'date', 'array', 'binary', 'numeric', 'text']);
 
 const BaseFieldSchema = z.object({
-  description: UIOptionSchema(z.string()).optional(),
+  description: UIOptionSchema(z.string().min(1)).optional(),
   isRequired: z.boolean().optional(),
   kind: FieldKindSchema,
-  label: UIOptionSchema(z.string())
+  label: UIOptionSchema(z.string().min(1))
 });
 
 const TextFieldSchema: ZodType<Types.FormInstrumentTextField> = BaseFieldSchema.extend({
@@ -31,7 +31,7 @@ const TextFieldSchema: ZodType<Types.FormInstrumentTextField> = BaseFieldSchema.
 
 const OptionsFieldSchema: ZodType<Types.FormInstrumentOptionsField> = BaseFieldSchema.extend({
   kind: z.literal('options'),
-  options: UIOptionSchema(z.record(z.string()))
+  options: UIOptionSchema(z.record(z.string().min(1)))
 });
 
 const DateFieldSchema: ZodType<Types.FormInstrumentDateField> = BaseFieldSchema.extend({
@@ -49,8 +49,8 @@ const BinaryFieldSchema: ZodType<Types.FormInstrumentBinaryField> = BaseFieldSch
   kind: z.literal('binary'),
   options: UIOptionSchema(
     z.object({
-      f: z.string(),
-      t: z.string()
+      f: z.string().min(1),
+      t: z.string().min(1)
     })
   ).optional(),
   variant: z.enum(['checkbox', 'radio'])
@@ -75,9 +75,9 @@ const StaticFieldsSchema: ZodType<Types.FormInstrumentStaticFields> = z.record(
 );
 
 const FieldsGroupSchema: ZodType<Types.FormInstrumentFieldsGroup> = z.object({
-  description: UIOptionSchema(z.string()).optional(),
+  description: UIOptionSchema(z.string().min(1)).optional(),
   fields: StaticFieldsSchema,
-  title: UIOptionSchema(z.string())
+  title: UIOptionSchema(z.string().min(1))
 });
 
 const ContentSchema: ZodType<Types.FormInstrumentContent> = z.union([StaticFieldsSchema, FieldsGroupSchema.array()]);
@@ -85,15 +85,15 @@ const ContentSchema: ZodType<Types.FormInstrumentContent> = z.union([StaticField
 export const FormValidationSchema = z.object({
   content: ContentSchema,
   details: z.object({
-    description: UIOptionSchema(z.string()),
+    description: UIOptionSchema(z.string().min(1)),
     estimatedDuration: z.number(),
-    instructions: UIOptionSchema(z.union([z.string(), z.string().array()])),
-    title: UIOptionSchema(z.string())
+    instructions: UIOptionSchema(z.union([z.string().min(1), z.array(z.string().min(1))])),
+    title: UIOptionSchema(z.string().min(1))
   }),
   kind: z.literal('form'),
   language: z.union([LanguageSchema, z.array(LanguageSchema)]),
-  name: z.string(),
-  tags: UIOptionSchema(z.string().array()),
+  name: z.string().min(1),
+  tags: UIOptionSchema(z.array(z.string().min(1))),
   validationSchema: z.object({
     properties: z.record(z.any()),
     required: z.string().array(),
