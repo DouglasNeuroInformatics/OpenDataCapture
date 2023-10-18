@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["bun-types", "cypress"]
   },
-  "include": ["../../../node_modules/cypress", "./**/*.ts"]
+  "include": ["../../../node_modules/cypress", "./**/*.ts", "support/setup.js"]
 }
