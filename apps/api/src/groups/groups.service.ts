@@ -51,6 +51,16 @@ export class GroupsService extends EntityService<Group, { validateAbility?: bool
     return group;
   }
 
+  async findByName(name: string, { validateAbility = true } = {}) {
+    const group = await this.groupsRepository.findOne({ name });
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with name: ${name}`);
+    } else if (validateAbility && !this.abilityService.can('read', group)) {
+      throw new ForbiddenException(`Insufficient rights to read group with name: ${name}`);
+    }
+    return group;
+  }
+
   async updateById(id: string, update: UpdateGroupDto, { validateAbility = true } = {}) {
     const group = await this.groupsRepository.findById(id);
     if (!group) {
