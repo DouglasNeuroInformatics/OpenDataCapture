@@ -3,9 +3,9 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unauthoriz
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { AuthPayload, JwtPayload } from '@open-data-capture/types';
+import type { User } from '@open-data-capture/types';
 
 import { AbilityFactory } from '@/ability/ability.factory';
-import { type UserDocument } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class AuthService {
   /** Validates the provided credentials and returns an access token */
   async login(username: string, password: string): Promise<AuthPayload> {
     const user = await this.getUser(username);
-    await user.populate('groups', 'name');
+    // await user.populate('groups', 'name');
 
     const isAuth = await this.cryptoService.comparePassword(password, user.password);
     if (!isAuth) {
@@ -44,8 +44,8 @@ export class AuthService {
   }
 
   /** Wraps UserService.getByUsername with appropriate exception handling */
-  private async getUser(username: string): Promise<UserDocument> {
-    let user: UserDocument;
+  private async getUser(username: string): Promise<User> {
+    let user: User;
     try {
       user = await this.usersService.findByUsername(username);
     } catch (error) {

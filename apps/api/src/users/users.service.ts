@@ -88,6 +88,16 @@ export class UsersService implements EntityService<User> {
     return user;
   }
 
+  async findByUsername(username: string, { validateAbility = true } = {}) {
+    const user = await this.usersRepository.findByUsername(username);
+    if (!user) {
+      throw new NotFoundException(`Failed to find user with username: ${username}`);
+    } else if (validateAbility && !this.abilityService.can('delete', user)) {
+      throw new ForbiddenException(`Insufficient rights to read user with username: ${username}`);
+    }
+    return user;
+  }
+
   async updateById(id: string, update: UpdateUserDto, { validateAbility = true } = {}) {
     const user = await this.usersRepository.findById(id);
     if (!user) {
