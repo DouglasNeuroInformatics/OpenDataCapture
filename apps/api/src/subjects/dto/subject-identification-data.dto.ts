@@ -7,8 +7,8 @@ const SexSchema: ZodType<Sex> = z.enum(['male', 'female']);
 
 export const SubjectIdentificationDataSchema = z.object({
   dateOfBirth: z.coerce.date(),
-  firstName: z.string(),
-  lastName: z.string(),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
   sex: SexSchema
 });
 
