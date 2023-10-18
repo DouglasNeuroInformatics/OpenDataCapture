@@ -3,18 +3,18 @@ import { ApiProperty } from '@nestjs/swagger';
 import type { SetupOptions } from '@open-data-capture/types';
 import { z } from 'zod';
 
-import { createUserDtoSchema } from '@/users/dto/create-user.dto';
+import { CreateUserDataSchema } from '@/users/dto/create-user.dto';
 
-const adminSchema = createUserDtoSchema.omit({ basePermissionLevels: true, groupNames: true });
+const AdminSchema = CreateUserDataSchema.omit({ basePermissionLevels: true, groupNames: true });
 
-const setupDtoSchema = z.object({
-  admin: adminSchema,
+const SetupDataSchema = z.object({
+  admin: AdminSchema,
   initDemo: z.boolean()
 });
 
-export type Admin = z.infer<typeof adminSchema>;
+export type Admin = z.infer<typeof AdminSchema>;
 
-@ValidationSchema(setupDtoSchema)
+@ValidationSchema(SetupDataSchema)
 export class SetupDto implements SetupOptions {
   @ApiProperty()
   admin: Admin;
