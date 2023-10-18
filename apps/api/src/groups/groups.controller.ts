@@ -36,7 +36,7 @@ export class GroupsController implements EntityController<Group> {
   }
 
   @ApiOperation({ summary: 'Get Group' })
-  @Get()
+  @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Group' })
   findById(@Param('id', ParseIdPipe) id: string) {
     return this.groupsService.findById(id);

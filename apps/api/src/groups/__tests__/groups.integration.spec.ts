@@ -6,6 +6,7 @@ import { HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
+import { Types } from 'mongoose';
 import request from 'supertest';
 
 import { AbilityService } from '@/ability/ability.service';
@@ -18,6 +19,7 @@ describe('/groups', () => {
   let app: NestExpressApplication;
   let server: unknown;
 
+  let abilityService: MockedInstance<AbilityService>;
   let groupsRepository: MockedInstance<GroupsRepository>;
 
   beforeAll(async () => {
@@ -43,6 +45,7 @@ describe('/groups', () => {
     app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
+    abilityService = app.get(AbilityService);
     groupsRepository = app.get(GroupsRepository);
 
     await app.init();
@@ -66,6 +69,51 @@ describe('/groups', () => {
     it('should return status code 201 if successful', async () => {
       const response = await request(server).post('/groups').send({ name: 'foo' });
       expect(response.status).toBe(HttpStatus.CREATED);
+    });
+  });
+
+  describe('GET /groups', () => {
+    it('should return status code 200', async () => {
+      const response = await request(server).get('/groups');
+      expect(response.status).toBe(HttpStatus.OK);
+    });
+    it('should return an array of all groups', async () => {
+      groupsRepository.find.mockResolvedValueOnce([{ name: 'foo' }]);
+      const response = await request(server).get('/groups');
+      expect(response.body).toMatchObject([{ name: 'foo' }]);
+    });
+  });
+
+  describe('GET /groups/:id', () => {
+    let id: string;
+    beforeAll(() => {
+      id = new Types.ObjectId().toString();
+      groupsRepository.findById.mockResolvedValue({ id });
+    });
+
+    it('should reject a request with an invalid id', async () => {
+      const response = await request(server).get('/groups/123');
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+    it('should return status code 200 with a valid ID', async () => {
+      abilityService.can.mockReturnValueOnce(true);
+      const response = await request(server).get(`/groups/${id}`);
+      expect(response.status).toBe(HttpStatus.OK);
+    });
+    it('should throw a not found exception if the group does not exist', async () => {
+      groupsRepository.findById.mockResolvedValueOnce(null);
+      const response = await request(server).get(`/groups/${id}`);
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+    it('should reject a request if the user has insufficient permissions', async () => {
+      abilityService.can.mockReturnValueOnce(false);
+      const response = await request(server).get(`/groups/${id}`);
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+    });
+    it('should return the group if it exists', async () => {
+      abilityService.can.mockReturnValueOnce(true);
+      const response = await request(server).get(`/groups/${id}`);
+      expect(response.body).toMatchObject({ id });
     });
   });
 
