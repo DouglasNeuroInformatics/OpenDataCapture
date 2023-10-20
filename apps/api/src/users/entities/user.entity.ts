@@ -15,7 +15,10 @@ export class UserEntity implements User {
   @Prop({ required: false, type: String })
   firstName?: string;
 
-  @Prop({ required: true, type: [{ ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId }] })
+  @Prop({
+    required: true,
+    type: [{ autopopulate: true, ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId }]
+  })
   groups: Group[];
 
   @Prop({ required: false, type: String })

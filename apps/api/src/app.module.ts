@@ -1,4 +1,3 @@
-import { accessibleFieldsPlugin, accessibleRecordsPlugin } from '@casl/mongoose';
 import { ExceptionsFilter, LoggerMiddleware, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { AjvModule, CryptoModule, DatabaseModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module } from '@nestjs/common';
@@ -7,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { Connection } from 'mongoose';
+import mongooseAutoPopulate from 'mongoose-autopopulate';
 
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
@@ -39,8 +39,7 @@ import { UsersModule } from './users/users.module';
       useFactory: (configService: ConfigService) => {
         return {
           connectionFactory: (connection: Connection): Connection => {
-            connection.plugin(accessibleFieldsPlugin);
-            connection.plugin(accessibleRecordsPlugin);
+            connection.plugin(mongooseAutoPopulate);
             return connection;
           },
           dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
