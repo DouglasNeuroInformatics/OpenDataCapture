@@ -19,7 +19,11 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
     private readonly abilityService: AbilityService,
     private readonly cryptoService: CryptoService,
     private readonly subjectsRepository: SubjectsRepository
-  ) {}
+  ) { }
+  
+  async count() {
+    return this.subjectsRepository.count()
+  }
 
   async create(data: SubjectIdentificationDataDto) {
     const identifier = this.generateIdentifier({ ...data });

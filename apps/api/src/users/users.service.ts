@@ -21,6 +21,10 @@ export class UsersService implements EntityService<User> {
     private readonly usersRepository: UsersRepository
   ) {}
 
+  async count() {
+    return this.usersRepository.count();
+  }
+
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
   async create({ groupNames, password, username, ...rest }: CreateUserDto, { validateAbility = true } = {}) {
     if (await this.usersRepository.exists({ name: username })) {

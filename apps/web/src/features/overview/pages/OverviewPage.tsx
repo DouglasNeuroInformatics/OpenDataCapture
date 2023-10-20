@@ -1,10 +1,4 @@
-import type {
-  FormInstrumentRecordsSummary,
-  FormInstrumentSummary,
-  Subject,
-  Summary,
-  User
-} from '@open-data-capture/types';
+import type { Summary } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 
@@ -23,42 +17,16 @@ export const OverviewPage = () => {
     ? `${t('overview.welcome')}, ${currentUser.firstName}`
     : t('overview.welcome');
 
-  const summary = useFetch<Summary[]>('/v1/summary', [], {
+  const summary = useFetch<Summary>('/v1/summary', [], {
     access: { action: 'read', subject: 'User' }
   });
 
-  console.log(summary);
-  
-  return null;
-
-  // const groupQuery = currentGroup ? `?group=${currentGroup.name}` : '';
-
-  // const forms = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available', [], {
-  //   access: { action: 'read', subject: 'User' }
-  // });
-
-  // const records = useFetch<FormInstrumentRecordsSummary>(
-  //   '/v1/instruments/records/forms/summary' + groupQuery,
-  //   [currentGroup],
-  //   {
-  //     access: { action: 'read', subject: 'User' }
-  //   }
-  // );
-
-  // const subjects = useFetch<Subject[]>('/v1/subjects' + groupQuery, [currentGroup], {
-  //   access: { action: 'read', subject: 'User' }
-  // });
-  // const users = useFetch<User[]>('/v1/users' + groupQuery, [currentGroup], {
-  //   access: { action: 'read', subject: 'User' }
-  // });
-
-  // const isAllDataDefined = forms.data && records.data && subjects.data && users.data;
-  // const isAnyLoading = forms.isLoading || records.isLoading || subjects.isLoading || users.isLoading;
-
   // // If it is the first time loading data
-  // if (!isAllDataDefined && isAnyLoading) {
-  //   return <Spinner />;
-  // }
+  if (summary.isLoading) {
+    return <Spinner />;
+  } else if (!summary.data) {
+    return null;
+  }
 
   return (
     <div>
@@ -71,22 +39,18 @@ export const OverviewPage = () => {
         </div>
         <div className="body-font">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            {forms.data && records.data && subjects.data && users.data && (
-              <>
-                <StatisticCard icon={<HiUsers />} label={t('overview.totalUsers')} value={users.data.length} />
-                <StatisticCard icon={<HiUser />} label={t('overview.totalSubjects')} value={subjects.data.length} />
-                <StatisticCard
-                  icon={<HiClipboardDocument />}
-                  label={t('overview.totalInstruments')}
-                  value={forms.data.length}
-                />
-                <StatisticCard
-                  icon={<HiDocumentText />}
-                  label={t('overview.totalRecords')}
-                  value={records.data.count}
-                />
-              </>
-            )}
+            <StatisticCard icon={<HiUsers />} label={t('overview.totalUsers')} value={summary.data.counts.users} />
+            <StatisticCard icon={<HiUser />} label={t('overview.totalSubjects')} value={summary.data.counts.subjects} />
+            <StatisticCard
+              icon={<HiClipboardDocument />}
+              label={t('overview.totalInstruments')}
+              value={summary.data.counts.instruments}
+            />
+            <StatisticCard
+              icon={<HiDocumentText />}
+              label={t('overview.totalRecords')}
+              value={summary.data.counts.records}
+            />
           </div>
         </div>
       </section>
