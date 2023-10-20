@@ -4,13 +4,13 @@ import { ConflictException, ForbiddenException, Injectable, NotFoundException } 
 import { type User } from '@open-data-capture/types';
 
 import { AbilityService } from '@/ability/ability.service';
+import type { GroupEntity } from '@/groups/entities/group.entity';
 import { GroupsService } from '@/groups/groups.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRepository } from './users.repository';
 
 import type { UpdateUserDto } from './dto/update-user.dto';
-import type { GroupEntity } from '@/groups/entities/group.entity';
 
 @Injectable()
 export class UsersService implements EntityService<User> {
@@ -22,14 +22,14 @@ export class UsersService implements EntityService<User> {
   ) {}
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
-  async create({ groupNames, password, username, ...rest }: CreateUserDto) {
+  async create({ groupNames, password, username, ...rest }: CreateUserDto, { validateAbility = true } = {}) {
     if (await this.usersRepository.exists({ name: username })) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
     const groups: GroupEntity[] = [];
     for (const groupName of groupNames ?? []) {
-      const group = await this.groupsService.findByName(groupName);
+      const group = await this.groupsService.findByName(groupName, { validateAbility });
       groups.push(group);
     }
 
