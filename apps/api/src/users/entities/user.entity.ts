@@ -1,6 +1,6 @@
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import type { BasePermissionLevel, Group, User } from '@open-data-capture/types';
+import type { BasePermissionLevel, User } from '@open-data-capture/types';
 import { Schema as MongooseSchema } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';
@@ -19,7 +19,7 @@ export class UserEntity implements User {
     required: true,
     type: [{ autopopulate: true, ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId }]
   })
-  groups: Group[];
+  groups: GroupEntity[];
 
   @Prop({ required: false, type: String })
   lastName?: string;

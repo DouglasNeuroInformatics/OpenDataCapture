@@ -1,7 +1,7 @@
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { type Group, type User } from '@open-data-capture/types';
+import { type User } from '@open-data-capture/types';
 
 import { AbilityService } from '@/ability/ability.service';
 import { GroupsService } from '@/groups/groups.service';
@@ -10,6 +10,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRepository } from './users.repository';
 
 import type { UpdateUserDto } from './dto/update-user.dto';
+import type { GroupEntity } from '@/groups/entities/group.entity';
 
 @Injectable()
 export class UsersService implements EntityService<User> {
@@ -26,7 +27,7 @@ export class UsersService implements EntityService<User> {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
-    const groups: Group[] = [];
+    const groups: GroupEntity[] = [];
     for (const groupName of groupNames ?? []) {
       const group = await this.groupsService.findByName(groupName);
       groups.push(group);

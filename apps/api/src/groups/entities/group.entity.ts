@@ -5,7 +5,7 @@ import type { Group } from '@open-data-capture/types';
 import { type HydratedDocument } from 'mongoose';
 
 @EntitySchema<Group>()
-export class GroupEntity {
+export class GroupEntity implements Group {
   static readonly modelName = 'Group';
 
   @ApiProperty({ example: 'Depression Clinic' })

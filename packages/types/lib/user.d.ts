@@ -6,6 +6,7 @@ export type User = {
   basePermissionLevel?: BasePermissionLevel;
   firstName?: string;
   groups: Group[];
+  id?: string;
   lastName?: string;
   password: string;
   username: string;
