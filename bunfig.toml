@@ -4,4 +4,4 @@ disableManifest = true
 
 [install.lockfile]
 save = false
-print = "yarn"
+
