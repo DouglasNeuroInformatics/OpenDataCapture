@@ -9,7 +9,7 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupsRepository } from './groups.repository';
 
 @Injectable()
-export class GroupsService extends EntityService<Group, { validateAbility?: boolean }> {
+export class GroupsService extends EntityService<Group> {
   constructor(
     private readonly abilityService: AbilityService,
     private readonly groupsRepository: GroupsRepository

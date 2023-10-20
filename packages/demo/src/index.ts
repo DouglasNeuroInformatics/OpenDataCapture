@@ -4,7 +4,7 @@ export type DemoUser = Omit<User, 'groups'> & {
   groupNames: string[];
 };
 
-export const demoGroups: Group[] = [
+export const demoGroups: Omit<Group, 'id'>[] = [
   {
     name: 'Depression Clinic'
   },

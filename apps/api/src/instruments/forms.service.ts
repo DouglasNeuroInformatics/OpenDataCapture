@@ -1,7 +1,8 @@
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import type { EntityController } from '@douglasneuroinformatics/nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
-import type { FormInstrument } from '@open-data-capture/types';
+import type { FormInstrument, InstrumentLanguage } from '@open-data-capture/types';
 
 import { AbilityService } from '@/ability/ability.service';
 
@@ -14,11 +15,13 @@ export class FormsService implements EntityController<FormInstrument> {
     private readonly instrumentsRepository: InstrumentsRepository
   ) {}
 
-  async create<T extends FormInstrument>(form: T) {
+  async create<TData extends FormDataType, TLanguage extends InstrumentLanguage>(
+    form: FormInstrument<TData, TLanguage>
+  ) {
     if (await this.instrumentsRepository.exists({ name: form.name })) {
       throw new ConflictException(`Instrument with name '${form.name}' already exists!`);
     }
-    return this.instrumentsRepository.create<T>(form);
+    return this.instrumentsRepository.create<FormInstrument<TData, TLanguage>>(form);
   }
 
   async deleteById(id: string) {

@@ -1,10 +1,9 @@
-import { createMongoAbility } from '@casl/ability';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
-import * as Instruments from '@open-data-capture/instruments';
-import type { AppAbility, Subject } from '@open-data-capture/types';
+import * as instruments from '@open-data-capture/instruments';
+import type { Subject } from '@open-data-capture/types';
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
@@ -16,7 +15,6 @@ faker.seed(123);
 
 @Injectable()
 export class DemoService {
-  private readonly ability = createMongoAbility<AppAbility>([{ action: 'manage', subject: 'all' }]);
   private readonly logger = new Logger(DemoService.name);
 
   constructor(
@@ -116,11 +114,11 @@ export class DemoService {
   // }
 
   private async createForms(): Promise<void> {
-    await this.formsService.create(Instruments.briefPsychiatricRatingScale);
-    await this.formsService.create(Instruments.enhancedDemographicsQuestionnaire);
-    await this.formsService.create(Instruments.happinessQuestionnaire);
-    await this.formsService.create(Instruments.miniMentalStateExamination);
-    await this.formsService.create(Instruments.montrealCognitiveAssessment);
+    await this.formsService.create(instruments.briefPsychiatricRatingScale);
+    await this.formsService.create(instruments.enhancedDemographicsQuestionnaire);
+    await this.formsService.create(instruments.happinessQuestionnaire);
+    await this.formsService.create(instruments.miniMentalStateExamination);
+    await this.formsService.create(instruments.montrealCognitiveAssessment);
   }
 
   private async createGroups(): Promise<void> {
@@ -131,7 +129,7 @@ export class DemoService {
 
   private async createSubject(): Promise<Subject> {
     return this.subjectsService.create({
-      dateOfBirth: faker.date.birthdate().toISOString(),
+      dateOfBirth: faker.date.birthdate(),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       sex: faker.person.sexType()
@@ -140,7 +138,7 @@ export class DemoService {
 
   private async createUsers(): Promise<void> {
     for (const user of demoUsers) {
-      await this.usersService.create(user, this.ability);
+      await this.usersService.create(user);
     }
   }
 }

@@ -3,7 +3,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import type { AppAbility, AppAction, AppSubject, User } from '@open-data-capture/types';
 import type { Request } from 'express';
-import { FilterQuery } from 'mongoose';
+import type { FilterQuery } from 'mongoose';
 
 import { AbilityFactory } from './ability.factory';
 
