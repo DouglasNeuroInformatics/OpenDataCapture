@@ -8,4 +8,4 @@ import { SummaryService } from './summary.service';
   exports: [SummaryService],
   providers: [SummaryService]
 })
-export class GroupsModule {}
+export class SummaryModule {}
