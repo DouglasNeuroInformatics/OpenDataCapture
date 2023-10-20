@@ -16,7 +16,7 @@
     "dev": "bun dev:core",
     "dev:all": "env-cmd cross-env NODE_ENV=development turbo run dev",
     "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --filter=@open-data-capture/api --filter=@open-data-capture/web",
-    "force-reinstall": "rm -f bun.lockb && bun pm cache rm && bun clean && bun install",
+    "force-reinstall": "bun pm cache rm && bun clean && bun install",
     "format": "turbo run format",
     "lint": "turbo run lint",
     "prepare": "husky install",
