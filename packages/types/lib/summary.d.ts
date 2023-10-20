@@ -1,1 +1,5 @@
-export type Summary = Record<string, number | string>;
+export type Summary = {
+  counts: {
+    instruments: number;
+  };
+};

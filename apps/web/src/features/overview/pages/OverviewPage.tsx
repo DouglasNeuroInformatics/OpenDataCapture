@@ -1,4 +1,10 @@
-import type { FormInstrumentRecordsSummary, FormInstrumentSummary, Subject, User } from '@open-data-capture/types';
+import type {
+  FormInstrumentRecordsSummary,
+  FormInstrumentSummary,
+  Subject,
+  Summary,
+  User
+} from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 
@@ -17,34 +23,42 @@ export const OverviewPage = () => {
     ? `${t('overview.welcome')}, ${currentUser.firstName}`
     : t('overview.welcome');
 
-  const groupQuery = currentGroup ? `?group=${currentGroup.name}` : '';
-
-  const forms = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available', [], {
+  const summary = useFetch<Summary[]>('/v1/summary', [], {
     access: { action: 'read', subject: 'User' }
   });
 
-  const records = useFetch<FormInstrumentRecordsSummary>(
-    '/v1/instruments/records/forms/summary' + groupQuery,
-    [currentGroup],
-    {
-      access: { action: 'read', subject: 'User' }
-    }
-  );
+  console.log(summary);
+  
+  return null;
 
-  const subjects = useFetch<Subject[]>('/v1/subjects' + groupQuery, [currentGroup], {
-    access: { action: 'read', subject: 'User' }
-  });
-  const users = useFetch<User[]>('/v1/users' + groupQuery, [currentGroup], {
-    access: { action: 'read', subject: 'User' }
-  });
+  // const groupQuery = currentGroup ? `?group=${currentGroup.name}` : '';
 
-  const isAllDataDefined = forms.data && records.data && subjects.data && users.data;
-  const isAnyLoading = forms.isLoading || records.isLoading || subjects.isLoading || users.isLoading;
+  // const forms = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available', [], {
+  //   access: { action: 'read', subject: 'User' }
+  // });
 
-  // If it is the first time loading data
-  if (!isAllDataDefined && isAnyLoading) {
-    return <Spinner />;
-  }
+  // const records = useFetch<FormInstrumentRecordsSummary>(
+  //   '/v1/instruments/records/forms/summary' + groupQuery,
+  //   [currentGroup],
+  //   {
+  //     access: { action: 'read', subject: 'User' }
+  //   }
+  // );
+
+  // const subjects = useFetch<Subject[]>('/v1/subjects' + groupQuery, [currentGroup], {
+  //   access: { action: 'read', subject: 'User' }
+  // });
+  // const users = useFetch<User[]>('/v1/users' + groupQuery, [currentGroup], {
+  //   access: { action: 'read', subject: 'User' }
+  // });
+
+  // const isAllDataDefined = forms.data && records.data && subjects.data && users.data;
+  // const isAnyLoading = forms.isLoading || records.isLoading || subjects.isLoading || users.isLoading;
+
+  // // If it is the first time loading data
+  // if (!isAllDataDefined && isAnyLoading) {
+  //   return <Spinner />;
+  // }
 
   return (
     <div>

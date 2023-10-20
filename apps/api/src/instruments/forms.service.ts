@@ -15,6 +15,10 @@ export class FormsService implements EntityController<FormInstrument> {
     private readonly instrumentsRepository: InstrumentsRepository
   ) {}
 
+  async count() {
+    return this.instrumentsRepository.count(this.abilityService.accessibleQuery('read', { kind: 'form' }));
+  }
+
   async create<TData extends FormDataType, TLanguage extends InstrumentLanguage>(
     form: FormInstrument<TData, TLanguage>
   ) {
