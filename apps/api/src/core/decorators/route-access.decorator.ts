@@ -3,10 +3,12 @@ import type { AppAction, AppSubject } from '@open-data-capture/types';
 
 type PublicRouteAccess = 'public';
 
-export type ProtectedRouteAccess = {
+export type ProtectedRoutePermissionSet = {
   action: AppAction;
   subject: AppSubject;
 };
+
+export type ProtectedRouteAccess = ProtectedRoutePermissionSet | ProtectedRoutePermissionSet[];
 
 export type RouteAccessType = ProtectedRouteAccess | PublicRouteAccess;
 

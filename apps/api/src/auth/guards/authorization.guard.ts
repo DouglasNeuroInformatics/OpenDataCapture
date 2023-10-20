@@ -32,6 +32,8 @@ export class AuthorizationGuard implements CanActivate {
     }
 
     const ability = this.abilityFactory.createForUser(request.user);
-    return ability.can(routeAccess.action, routeAccess.subject);
+    return Array.isArray(routeAccess)
+      ? routeAccess.every(({ action, subject }) => ability.can(action, subject))
+      : ability.can(routeAccess.action, routeAccess.subject);
   }
 }
