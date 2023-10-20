@@ -41,5 +41,6 @@
   },
   "dependencies": {
     "@joshunrau/eslint-config": ""
-  }
+  },
+  "packageManager": "bun@1.0.6"
 }
