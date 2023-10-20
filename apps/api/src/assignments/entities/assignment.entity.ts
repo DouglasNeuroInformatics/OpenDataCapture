@@ -12,7 +12,7 @@ import { SubjectEntity } from '@/subjects/entities/subject.entity';
 export class AssignmentEntity implements Assignment {
   static readonly modelName = 'Assignment';
 
-  @Prop({ ref: InstrumentEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
+  @Prop({ autopopulate: true, ref: InstrumentEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
   instrument: FormInstrumentEntity;
 
   @ApiProperty()
