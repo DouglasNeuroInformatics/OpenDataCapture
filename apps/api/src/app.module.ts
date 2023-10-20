@@ -16,6 +16,7 @@ import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
+import { SummaryModule } from './summary/summary.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -68,7 +69,8 @@ import { UsersModule } from './users/users.module';
       }
     ]),
     UsersModule,
-    SetupModule
+    SetupModule,
+    SummaryModule
   ],
   providers: [
     {
