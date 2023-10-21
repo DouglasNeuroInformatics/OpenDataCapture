@@ -5,15 +5,20 @@ import axios from 'axios';
 
 import { useAuthStore } from '@/stores/auth-store';
 
+type ResourceAccess = {
+  action: AppAction;
+  subject: AppSubject;
+};
+
 export type UseFetchOptions = {
-  /** The required ability to fetch the resource. If undefined, it is assumed the user has the required permissions. If the user does not have the provided ability, data will be set to `null` */
-  access?: {
-    action: AppAction;
-    subject: AppSubject;
-  };
+  /**
+   * The required permissions to fetch the resource. If undefined, it is assumed the user has the required
+   * permissions. If the user does not have the provided ability, data will be  set to `null`. If an array,
+   * the user must have all of the required permission for fetching to be performed.
+   */
+  access?: ResourceAccess | ResourceAccess[];
   /** a callback to override the default error handler which is to add a notification */
   onError?: (error: unknown) => void;
-
   /** Query params to add to the URL */
   queryParams?: Record<string, null | string | undefined>;
 };
@@ -46,8 +51,10 @@ export function useFetch<T = unknown>(
     if (!options.access) {
       return true;
     }
-    return Boolean(currentUser?.ability.can(options.access.action, options.access.subject));
-  }, [options.access]);
+    return Array.isArray(options.access)
+      ? options.access.every(({ action, subject }) => currentUser?.ability.can(action, subject))
+      : Boolean(currentUser?.ability.can(options.access.action, options.access.subject));
+  }, [currentUser, options.access]);
 
   useEffect(() => {
     if (isAuthorized) {
