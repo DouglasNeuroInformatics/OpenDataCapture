@@ -1,9 +1,10 @@
-import { ExceptionsFilter, LoggerMiddleware, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
-import { AjvModule, CryptoModule, DatabaseModule } from '@douglasneuroinformatics/nestjs/modules';
+import { LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
+import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
+import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { Connection } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
@@ -34,7 +35,9 @@ import { UsersModule } from './users/users.module';
         secretKey: configService.getOrThrow('SECRET_KEY')
       })
     }),
-    DatabaseModule.forRootAsync({
+    GroupsModule,
+    InstrumentsModule,
+    MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
@@ -43,12 +46,10 @@ import { UsersModule } from './users/users.module';
             return connection;
           },
           dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
-          mongoUri: configService.getOrThrow<string>('MONGO_URI')
+          uri: configService.getOrThrow<string>('MONGO_URI')
         };
       }
     }),
-    GroupsModule,
-    InstrumentsModule,
     SubjectsModule,
     ThrottlerModule.forRoot([
       {
@@ -73,10 +74,6 @@ import { UsersModule } from './users/users.module';
   ],
   providers: [
     {
-      provide: APP_FILTER,
-      useClass: ExceptionsFilter
-    },
-    {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
     },
@@ -87,10 +84,6 @@ import { UsersModule } from './users/users.module';
     {
       provide: APP_GUARD,
       useClass: AuthorizationGuard
-    },
-    {
-      provide: APP_PIPE,
-      useClass: ValidationPipe
     }
   ]
 })
