@@ -21,7 +21,6 @@ export class AuthService {
   /** Validates the provided credentials and returns an access token */
   async login(username: string, password: string): Promise<AuthPayload> {
     const user = await this.getUser(username);
-    // await user.populate('groups', 'name');
 
     const isAuth = await this.cryptoService.comparePassword(password, user.password);
     if (!isAuth) {

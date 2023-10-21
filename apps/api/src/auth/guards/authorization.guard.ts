@@ -4,17 +4,13 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { Observable } from 'rxjs';
 
-import { AbilityFactory } from '@/ability/ability.factory';
 import type { RouteAccessType } from '@/core/decorators/route-access.decorator';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
   private readonly logger = new Logger(AuthorizationGuard.name);
 
-  constructor(
-    private readonly abilityFactory: AbilityFactory,
-    private readonly reflector: Reflector
-  ) {}
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): Observable<boolean> | Promise<boolean> | boolean {
     const request = context.switchToHttp().getRequest<Request>();
@@ -27,13 +23,12 @@ export class AuthorizationGuard implements CanActivate {
 
     if (routeAccess === 'public') {
       return true;
-    } else if (!(routeAccess && request.user)) {
+    } else if (!(routeAccess && request.user?.ability)) {
       return false;
     }
 
-    const ability = this.abilityFactory.createForUser(request.user);
     return Array.isArray(routeAccess)
-      ? routeAccess.every(({ action, subject }) => ability.can(action, subject))
-      : ability.can(routeAccess.action, routeAccess.subject);
+      ? routeAccess.every(({ action, subject }) => request.user!.ability.can(action, subject))
+      : request.user.ability.can(routeAccess.action, routeAccess.subject);
   }
 }
