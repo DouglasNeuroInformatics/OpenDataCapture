@@ -8,6 +8,7 @@ import * as InstrumentsModule from './features/instruments';
 import * as OverviewModule from './features/overview';
 import * as SubjectsModule from './features/subjects';
 import * as UserModule from './features/user';
+import * as Visits from './features/visits';
 import { useAuthStore } from './stores/auth-store';
 
 export const Router = () => {
@@ -26,8 +27,15 @@ export const Router = () => {
               <Route index element={<OverviewModule.OverviewPage />} path="overview" />
               <Route element={<ContactModule.ContactPage />} path="contact" />
               <Route element={<UserModule.UserPage />} path="user" />
+              <Route path="instruments">
+                <Route element={<InstrumentsModule.AvailableInstrumentsPage />} path="available" />
+                <Route element={<InstrumentsModule.ManageInstrumentsPage />} path="manage" />
+                <Route element={<InstrumentsModule.CreateInstrumentPage />} path="create" />
+                <Route path="forms">
+                  <Route element={<InstrumentsModule.FormPage />} path=":id" />
+                </Route>
+              </Route>
               <Route path="subjects">
-                <Route element={<SubjectsModule.AddVisitPage />} path="add-visit" />
                 <Route path="view-subjects">
                   <Route index element={<SubjectsModule.ViewSubjectsPage />} />
                   <Route element={<SubjectsModule.SubjectPage />} path=":subjectIdentifier">
@@ -37,13 +45,8 @@ export const Router = () => {
                   </Route>
                 </Route>
               </Route>
-              <Route path="instruments">
-                <Route element={<InstrumentsModule.AvailableInstrumentsPage />} path="available" />
-                <Route element={<InstrumentsModule.ManageInstrumentsPage />} path="manage" />
-                <Route element={<InstrumentsModule.CreateInstrumentPage />} path="create" />
-                <Route path="forms">
-                  <Route element={<InstrumentsModule.FormPage />} path=":id" />
-                </Route>
+              <Route path="visits">
+                <Route element={<Visits.AddVisit />} path="add-visit" />
               </Route>
             </Route>
           ))

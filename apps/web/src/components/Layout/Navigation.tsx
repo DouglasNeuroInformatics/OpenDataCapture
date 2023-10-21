@@ -25,7 +25,7 @@ export const Navigation = (props: NavigationProps) => {
       <NavigationLink
         access={{ action: 'create', subject: 'Subject' }}
         cyTestId="add-visit"
-        href="/subjects/add-visit"
+        href="/visits/add-visit"
         icon={<HiUserPlus />}
         label={t('navLinks.addVisit')}
         {...props}

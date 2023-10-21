@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { IdentificationForm, type IdentificationFormData, PageHeader } from '@/components';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
-export const AddVisitPage = () => {
+export const AddVisit = () => {
   const { setActiveSubject } = useActiveSubjectStore();
   const notifications = useNotificationsStore();
   const { t } = useTranslation();
@@ -29,5 +29,3 @@ export const AddVisitPage = () => {
     </div>
   );
 };
-
-export default AddVisitPage;
