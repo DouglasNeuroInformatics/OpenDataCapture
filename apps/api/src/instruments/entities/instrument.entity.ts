@@ -21,7 +21,7 @@ abstract class BaseInstrumentEntity<TLanguage extends BaseTypes.InstrumentLangua
 export class InstrumentEntity<TLanguage extends BaseTypes.InstrumentLanguage = BaseTypes.InstrumentLanguage>
   implements BaseInstrumentEntity<TLanguage>
 {
-  static readonly modelName = 'Instrument2';
+  static readonly modelName = 'Instrument';
 
   @ApiProperty({ description: 'The content in the instrument to be rendered to the user' })
   content: unknown;
