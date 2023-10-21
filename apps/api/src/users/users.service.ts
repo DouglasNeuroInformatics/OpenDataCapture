@@ -1,10 +1,11 @@
+import { accessibleBy } from '@casl/mongoose';
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { type User } from '@open-data-capture/types';
 import type { FilterQuery } from 'mongoose';
 
-import { AbilityService } from '@/ability/ability.service';
+import type { EntityOperationOptions } from '@/core/types';
 import type { GroupEntity } from '@/groups/entities/group.entity';
 import { GroupsService } from '@/groups/groups.service';
 
@@ -16,25 +17,24 @@ import type { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService implements EntityService<User> {
   constructor(
-    private readonly abilityService: AbilityService,
     private readonly cryptoService: CryptoService,
     private readonly groupsService: GroupsService,
     private readonly usersRepository: UsersRepository
   ) {}
 
-  async count(filter?: FilterQuery<User>) {
-    return this.usersRepository.count(this.abilityService.accessibleQuery('read', filter));
+  async count(filter: FilterQuery<User> = {}, { ability }: EntityOperationOptions = {}) {
+    return this.usersRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read') : {}] });
   }
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
-  async create({ groupNames, password, username, ...rest }: CreateUserDto, { validateAbility = true } = {}) {
+  async create({ groupNames, password, username, ...rest }: CreateUserDto, options?: EntityOperationOptions) {
     if (await this.usersRepository.exists({ name: username })) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
     const groups: GroupEntity[] = [];
     for (const groupName of groupNames ?? []) {
-      const group = await this.groupsService.findByName(groupName, { validateAbility });
+      const group = await this.groupsService.findByName(groupName, options);
       groups.push(group);
     }
 
@@ -48,67 +48,66 @@ export class UsersService implements EntityService<User> {
     });
   }
 
-  async deleteById(id: string, { validateAbility = true } = {}) {
+  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.usersRepository.findById(id);
     if (!user) {
       throw new NotFoundException(`Failed to find user with ID: ${id}`);
-    } else if (validateAbility && !this.abilityService.can('delete', user)) {
+    } else if (ability && !ability.can('delete', user)) {
       throw new ForbiddenException(`Insufficient rights to delete user with ID: ${id}`);
     }
     return (await this.usersRepository.deleteById(id))!;
   }
 
   /** Delete the user with the provided username, otherwise throws */
-  async deleteByUsername(username: string, { validateAbility = true } = {}) {
+  async deleteByUsername(username: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.usersRepository.findByUsername(username);
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
-    } else if (validateAbility && !this.abilityService.can('delete', user)) {
+    } else if (ability && !ability.can('delete', user)) {
       throw new ForbiddenException(`Insufficient rights to delete user with username: ${username}`);
     }
     return (await this.usersRepository.deleteByUsername(username))!;
   }
 
-  async findAll({ validateAbility = true } = {}) {
-    if (!validateAbility) {
+  async findAll({ ability }: EntityOperationOptions = {}) {
+    if (!ability) {
       return this.usersRepository.find();
     }
-    return this.usersRepository.find(this.abilityService.accessibleQuery('read'));
+    return this.usersRepository.find(accessibleBy(ability, 'read'));
   }
 
-  async findByGroup(groupName: string, { validateAbility = true } = {}) {
-    const groupQuery = { groups: { name: groupName } };
-    if (!validateAbility) {
-      return this.usersRepository.find(groupQuery);
-    }
-    return this.usersRepository.find(this.abilityService.accessibleQuery('read', groupQuery));
+  async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
+    const group = await this.groupsService.findByName(groupName);
+    return this.usersRepository.find({
+      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read') : {}]
+    });
   }
 
-  async findById(id: string, { validateAbility = true } = {}) {
+  async findById(id: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.usersRepository.findById(id);
     if (!user) {
       throw new NotFoundException(`Failed to find user with ID: ${id}`);
-    } else if (validateAbility && !this.abilityService.can('delete', user)) {
+    } else if (ability && !ability.can('delete', user)) {
       throw new ForbiddenException(`Insufficient rights to read user with ID: ${id}`);
     }
     return user;
   }
 
-  async findByUsername(username: string, { validateAbility = true } = {}) {
+  async findByUsername(username: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.usersRepository.findByUsername(username);
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
-    } else if (validateAbility && !this.abilityService.can('delete', user)) {
+    } else if (ability && !ability.can('delete', user)) {
       throw new ForbiddenException(`Insufficient rights to read user with username: ${username}`);
     }
     return user;
   }
 
-  async updateById(id: string, update: UpdateUserDto, { validateAbility = true } = {}) {
+  async updateById(id: string, update: UpdateUserDto, { ability }: EntityOperationOptions = {}) {
     const user = await this.usersRepository.findById(id);
     if (!user) {
       throw new NotFoundException(`Failed to find user with ID: ${id}`);
-    } else if (validateAbility && !this.abilityService.can('update', user)) {
+    } else if (ability && !ability.can('update', user)) {
       throw new ForbiddenException(`Insufficient rights to update user with ID: ${id}`);
     }
     return (await this.usersRepository.updateById(id, update))!;

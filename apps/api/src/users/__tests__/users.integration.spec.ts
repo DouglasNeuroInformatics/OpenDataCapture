@@ -10,7 +10,6 @@ import { Test } from '@nestjs/testing';
 import { Types } from 'mongoose';
 import request from 'supertest';
 
-import { AbilityService } from '@/ability/ability.service';
 import { GroupsService } from '@/groups/groups.service';
 
 import { UsersController } from '../users.controller';
@@ -21,7 +20,6 @@ describe('/users', () => {
   let app: NestExpressApplication;
   let server: unknown;
 
-  let abilityService: MockedInstance<AbilityService>;
   let groupsService: MockedInstance<GroupsService>;
   let usersRepository: MockedInstance<UsersRepository>;
 
@@ -30,10 +28,6 @@ describe('/users', () => {
       controllers: [UsersController],
       providers: [
         UsersService,
-        {
-          provide: AbilityService,
-          useValue: createMock(AbilityService)
-        },
         {
           provide: CryptoService,
           useValue: createMock(CryptoService)
@@ -56,7 +50,6 @@ describe('/users', () => {
     app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
-    abilityService = app.get(AbilityService);
     groupsService = app.get(GroupsService);
     usersRepository = app.get(UsersRepository);
 
@@ -138,7 +131,6 @@ describe('/users', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       usersRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).get(`/users/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
@@ -148,14 +140,7 @@ describe('/users', () => {
       const response = await request(server).get(`/users/${id}`);
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
-    it('should reject a request if the user has insufficient permissions', async () => {
-      abilityService.can.mockReturnValueOnce(false);
-      usersRepository.findById.mockResolvedValueOnce({ id });
-      const response = await request(server).get(`/users/${id}`);
-      expect(response.status).toBe(HttpStatus.FORBIDDEN);
-    });
     it('should return the user if it exists', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       usersRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).get(`/users/${id}`);
       expect(response.body).toMatchObject({ id });
@@ -173,31 +158,26 @@ describe('/users', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request to set the username to an empty string', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       usersRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).patch(`/users/${id}`).send({ username: '' });
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request to set the username to a number', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       usersRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).patch(`/users/${id}`).send({ username: 100 });
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID, even if nothing is modified', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       usersRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).patch(`/users/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return status code 200 with a valid ID and valid data', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       usersRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).patch(`/users/${id}`).send({ username: 'foo' });
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return the modified user', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       usersRepository.findById.mockResolvedValueOnce({ id });
       usersRepository.updateById.mockImplementationOnce((id: string, obj: object) => ({ id, ...obj }));
       const response = await request(server).patch(`/users/${id}`).send({ username: 'foo' });
@@ -216,7 +196,6 @@ describe('/users', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       const response = await request(server).delete(`/users/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });
