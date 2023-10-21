@@ -219,52 +219,6 @@
     "en": "Group Trend",
     "fr": "Tendance du groupe"
   },
-  "identificationForm": {
-    "dateOfBirth": {
-      "label": {
-        "en": "Date of Birth",
-        "fr": "Date de naissance"
-      }
-    },
-    "firstName": {
-      "description": {
-        "en": "The subject's first name, as provided by their birth certificate",
-        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance"
-      },
-      "label": {
-        "en": "First Name",
-        "fr": "Prénom"
-      }
-    },
-    "lastName": {
-      "description": {
-        "en": "The subject's last name, as provided by their birth certificate",
-        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance"
-      },
-      "label": {
-        "en": "Last Name",
-        "fr": "Nom de famille"
-      }
-    },
-    "notFound": {
-      "en": "Not Found",
-      "fr": "Pas trouvé"
-    },
-    "sex": {
-      "description": {
-        "en": "The subject's biological sex, as assigned at birth",
-        "fr": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance"
-      },
-      "label": {
-        "en": "Sex",
-        "fr": "Sexe"
-      }
-    },
-    "submit": {
-      "en": "Submit",
-      "fr": "Soumettre"
-    }
-  },
   "instruments": {
     "availableInstruments": {
       "filters": {
