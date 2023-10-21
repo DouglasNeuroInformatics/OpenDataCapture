@@ -2,8 +2,7 @@ import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import type { AuthPayload, JwtPayload } from '@open-data-capture/types';
-import type { User } from '@open-data-capture/types';
+import type { AuthPayload, JwtPayload, User } from '@open-data-capture/types';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { UsersService } from '@/users/users.service';
@@ -46,7 +45,7 @@ export class AuthService {
   private async getUser(username: string): Promise<User> {
     let user: User;
     try {
-      user = await this.usersService.findByUsername(username);
+      user = await this.usersService.findByUsername(username).then((doc) => doc.toObject({ virtuals: true }));
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException('Invalid username');
