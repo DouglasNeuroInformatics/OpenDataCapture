@@ -39,8 +39,5 @@
     "turbo": "^1.10.14",
     "typescript": "^5.2.2"
   },
-  "dependencies": {
-    "@joshunrau/eslint-config": ""
-  },
   "packageManager": "bun@1.0.6"
 }
