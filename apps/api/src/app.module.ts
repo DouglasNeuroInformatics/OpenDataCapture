@@ -46,6 +46,7 @@ import { UsersModule } from './users/users.module';
             return connection;
           },
           dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
+          ignoreUndefined: true,
           uri: configService.getOrThrow<string>('MONGO_URI')
         };
       }
