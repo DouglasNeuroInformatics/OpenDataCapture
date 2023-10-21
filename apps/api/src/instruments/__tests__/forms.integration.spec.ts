@@ -10,8 +10,6 @@ import * as instruments from '@open-data-capture/instruments';
 import { Types } from 'mongoose';
 import request from 'supertest';
 
-import { AbilityService } from '@/ability/ability.service';
-
 import { FormsController } from '../forms.controller';
 import { FormsService } from '../forms.service';
 import { InstrumentsRepository } from '../instruments.repository';
@@ -20,7 +18,6 @@ describe('/instruments/forms', () => {
   let app: NestExpressApplication;
   let server: unknown;
 
-  let abilityService: MockedInstance<AbilityService>;
   let instrumentsRepository: MockedInstance<InstrumentsRepository>;
 
   beforeAll(async () => {
@@ -28,10 +25,6 @@ describe('/instruments/forms', () => {
       controllers: [FormsController],
       providers: [
         FormsService,
-        {
-          provide: AbilityService,
-          useValue: createMock(AbilityService)
-        },
         {
           provide: InstrumentsRepository,
           useValue: createMock(InstrumentsRepository)
@@ -46,7 +39,6 @@ describe('/instruments/forms', () => {
     app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
-    abilityService = app.get(AbilityService);
     instrumentsRepository = app.get(InstrumentsRepository);
 
     await app.init();
@@ -116,7 +108,7 @@ describe('/instruments/forms', () => {
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return all the instruments returned by the repository', async () => {
-      instrumentsRepository.find.mockResolvedValueOnce([{ id: 1 }]);
+      instrumentsRepository.find.mockResolvedValueOnce([{ id: 1, kind: 'form' }]);
       const response = await request(server).get('/instruments/forms');
       expect(response.body).toMatchObject([{ id: 1 }]);
     });
@@ -133,25 +125,22 @@ describe('/instruments/forms', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      abilityService.can.mockReturnValueOnce(true);
-      instrumentsRepository.findById.mockResolvedValueOnce({ id });
+      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).get(`/instruments/forms/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
+    });
+    it('should throw a not found exception if the instrument exists, but is not a form', async () => {
+      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'other' });
+      const response = await request(server).get(`/instruments/forms/${id}`);
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
     it('should throw a not found exception if the form does not exist', async () => {
       instrumentsRepository.findById.mockResolvedValueOnce(null);
       const response = await request(server).get(`/instruments/forms/${id}`);
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
-    it('should reject a request if the user has insufficient permissions', async () => {
-      abilityService.can.mockReturnValueOnce(false);
-      instrumentsRepository.findById.mockResolvedValueOnce({ id });
-      const response = await request(server).get(`/instruments/forms/${id}`);
-      expect(response.status).toBe(HttpStatus.FORBIDDEN);
-    });
     it('should return the form if it exists', async () => {
-      abilityService.can.mockReturnValueOnce(true);
-      instrumentsRepository.findById.mockResolvedValueOnce({ id });
+      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).get(`/instruments/forms/${id}`);
       expect(response.body).toMatchObject({ id });
     });
@@ -168,32 +157,27 @@ describe('/instruments/forms', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request to set the instrument name to an empty string', async () => {
-      abilityService.can.mockReturnValueOnce(true);
-      instrumentsRepository.findById.mockResolvedValueOnce({ id });
+      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).patch(`/instruments/forms/${id}`).send({ name: '' });
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request to set the instrument name to a number', async () => {
-      abilityService.can.mockReturnValueOnce(true);
-      instrumentsRepository.findById.mockResolvedValueOnce({ id });
+      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).patch(`/instruments/forms/${id}`).send({ name: 100 });
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID, even if nothing is modified', async () => {
-      abilityService.can.mockReturnValueOnce(true);
-      instrumentsRepository.findById.mockResolvedValueOnce({ id });
+      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).patch(`/instruments/forms/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return status code 200 with a valid ID and valid data', async () => {
-      abilityService.can.mockReturnValueOnce(true);
-      instrumentsRepository.findById.mockResolvedValueOnce({ id });
+      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).patch(`/instruments/forms/${id}`).send({ name: 'foo' });
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return the modified instrument', async () => {
-      abilityService.can.mockReturnValueOnce(true);
-      instrumentsRepository.findById.mockResolvedValueOnce({ id });
+      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
       instrumentsRepository.updateById.mockImplementationOnce((id: string, obj: object) => ({ id, ...obj }));
       const response = await request(server).patch(`/instruments/forms/${id}`).send({ name: 'foo' });
       expect(response.body).toMatchObject({ name: 'foo' });
@@ -211,7 +195,6 @@ describe('/instruments/forms', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       const response = await request(server).delete(`/instruments/forms/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });

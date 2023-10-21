@@ -1,7 +1,7 @@
-import { type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser, type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { FormInstrument } from '@open-data-capture/types';
+import type { AppAbility, FormInstrument } from '@open-data-capture/types';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -24,28 +24,32 @@ export class FormsController implements EntityController<FormInstrument> {
   @ApiOperation({ summary: 'Delete Form' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Instrument' })
-  deleteById(@Param('id', ParseIdPipe) id: string) {
-    return this.formsService.deleteById(id);
+  deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.formsService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Get All Forms' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findAll() {
-    return this.formsService.findAll();
+  async findAll(@CurrentUser('ability') ability: AppAbility) {
+    return this.formsService.findAll({ ability });
   }
 
   @ApiOperation({ summary: 'Get Form' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findById(@Param('id', ParseIdPipe) id: string) {
-    return this.formsService.findById(id);
+  async findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.formsService.findById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Update Form' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Instrument' })
-  updateById(@Param('id', ParseIdPipe) id: string, @Body() update: UpdateFormDto) {
-    return this.formsService.updateById(id, update);
+  updateById(
+    @Param('id', ParseIdPipe) id: string,
+    @Body() update: UpdateFormDto,
+    @CurrentUser('ability') ability: AppAbility
+  ) {
+    return this.formsService.updateById(id, update, { ability });
   }
 }
