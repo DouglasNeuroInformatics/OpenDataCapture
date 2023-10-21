@@ -1,41 +1,30 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
-import type { Group, Summary } from '@open-data-capture/types';
-import type { Request } from 'express';
+import { Injectable } from '@nestjs/common';
+import type { Summary } from '@open-data-capture/types';
 
+import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { FormsService } from '@/instruments/forms.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class SummaryService {
   constructor(
     private readonly formsService: FormsService,
     private readonly groupsService: GroupsService,
     private readonly usersService: UsersService,
-    private readonly subjectsService: SubjectsService,
-    @Inject(REQUEST) private request: Request
+    private readonly subjectsService: SubjectsService
   ) {}
 
-  async getSummary(groupId?: string): Promise<Summary> {
-    let group: Group;
-    // const group = await this.groupsService.findById(groupId);
+  async getSummary(groupId?: string, { ability }: EntityOperationOptions = {}): Promise<Summary> {
+    const group = groupId ? await this.groupsService.findById(groupId) : undefined;
     return {
       counts: {
         instruments: await this.formsService.count(),
         records: NaN,
         subjects: await this.subjectsService.count(),
-        users: await this.usersService.count()
+        users: await this.usersService.count({ groups: group }, { ability })
       }
     };
-  }
-
-  private async createGroupQuery(groupId?: string) {
-    if (!groupId) {
-      return {};
-    }
-    const group = await this.groupsService.findById(groupId);
-    return { group };
   }
 }

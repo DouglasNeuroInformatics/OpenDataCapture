@@ -1,5 +1,6 @@
+import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Controller, Get, Query } from '@nestjs/common';
-import type { Summary } from '@open-data-capture/types';
+import type { AppAbility, Summary } from '@open-data-capture/types';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -11,7 +12,7 @@ export class SummaryController {
 
   @Get()
   @RouteAccess([{ action: 'read', subject: 'Instrument' }])
-  async getSummary(@Query('group') groupId?: string): Promise<Summary> {
-    return this.summaryService.getSummary(groupId);
+  async getSummary(@CurrentUser('ability') ability: AppAbility, @Query('group') groupId?: string): Promise<Summary> {
+    return this.summaryService.getSummary(groupId, { ability });
   }
 }
