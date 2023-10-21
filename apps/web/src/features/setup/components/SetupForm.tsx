@@ -1,3 +1,5 @@
+/* eslint-disable perfectionist/sort-objects */
+
 import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -34,15 +36,15 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
               label: t('lastName'),
               variant: 'short'
             },
-            password: {
-              kind: 'text',
-              label: t('password'),
-              variant: 'password'
-            },
             username: {
               kind: 'text',
               label: t('username'),
               variant: 'short'
+            },
+            password: {
+              kind: 'text',
+              label: t('password'),
+              variant: 'password'
             }
           },
           title: t('setup.admin.title')
