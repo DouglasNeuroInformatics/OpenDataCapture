@@ -9,7 +9,7 @@ import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
-import { AbilityService } from '@/ability/ability.service';
+import { GroupsService } from '@/groups/groups.service';
 
 import { SubjectsController } from '../subjects.controller';
 import { SubjectsRepository } from '../subjects.repository';
@@ -18,8 +18,6 @@ import { SubjectsService } from '../subjects.service';
 describe('/subjects', () => {
   let app: NestExpressApplication;
   let server: unknown;
-
-  let abilityService: MockedInstance<AbilityService>;
   let subjectsRepository: MockedInstance<SubjectsRepository>;
 
   beforeAll(async () => {
@@ -28,12 +26,12 @@ describe('/subjects', () => {
       providers: [
         SubjectsService,
         {
-          provide: AbilityService,
-          useValue: createMock(AbilityService)
-        },
-        {
           provide: CryptoService,
           useValue: createMock(CryptoService)
+        },
+        {
+          provide: GroupsService,
+          useValue: createMock(GroupsService)
         },
         {
           provide: SubjectsRepository,
@@ -49,7 +47,6 @@ describe('/subjects', () => {
     app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
-    abilityService = app.get(AbilityService);
     subjectsRepository = app.get(SubjectsRepository);
 
     await app.init();
@@ -107,7 +104,6 @@ describe('/subjects', () => {
 
   describe('GET /subjects/:id', () => {
     it('should return status code 200 with a valid ID', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       subjectsRepository.findById.mockResolvedValueOnce({ name: 'foo' });
       const response = await request(server).get('/subjects/123');
       expect(response.status).toBe(HttpStatus.OK);
@@ -117,14 +113,7 @@ describe('/subjects', () => {
       const response = await request(server).get(`/subjects/123`);
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
-    it('should reject a request if the subject has insufficient permissions', async () => {
-      abilityService.can.mockReturnValueOnce(false);
-      subjectsRepository.findById.mockResolvedValueOnce({ name: 'foo' });
-      const response = await request(server).get('/subjects/123');
-      expect(response.status).toBe(HttpStatus.FORBIDDEN);
-    });
     it('should return the subject if it exists', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       subjectsRepository.findById.mockResolvedValueOnce({ name: 'foo' });
       const response = await request(server).get('/subjects/123');
       expect(response.body).toMatchObject({ name: 'foo' });
@@ -133,7 +122,6 @@ describe('/subjects', () => {
 
   describe('DELETE /subjects/:id', () => {
     it('should return status code 200 with a valid ID', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       subjectsRepository.findOne.mockResolvedValue({});
       const response = await request(server).delete('/subjects/123');
       expect(response.status).toBe(HttpStatus.OK);

@@ -1,3 +1,4 @@
+import { accessibleBy } from '@casl/mongoose';
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
@@ -5,7 +6,8 @@ import type { Subject } from '@open-data-capture/types';
 import type { FilterQuery } from 'mongoose';
 import unidecode from 'unidecode';
 
-import { AbilityService } from '@/ability/ability.service';
+import type { EntityOperationOptions } from '@/core/types';
+import { GroupsService } from '@/groups/groups.service';
 
 import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
 import { SubjectsRepository } from './subjects.repository';
@@ -17,13 +19,13 @@ import { SubjectsRepository } from './subjects.repository';
 @Injectable()
 export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'updateById'> {
   constructor(
-    private readonly abilityService: AbilityService,
     private readonly cryptoService: CryptoService,
+    private readonly groupsService: GroupsService,
     private readonly subjectsRepository: SubjectsRepository
   ) {}
 
-  async count(filter?: FilterQuery<Subject>) {
-    return this.subjectsRepository.count(this.abilityService.accessibleQuery('read', filter));
+  async count(filter: FilterQuery<Subject> = {}, { ability }: EntityOperationOptions = {}) {
+    return this.subjectsRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read') : {}] });
   }
 
   async create(data: SubjectIdentificationDataDto) {
@@ -38,43 +40,42 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
     });
   }
 
-  async deleteById(identifier: string, { validateAbility = true } = {}) {
+  async deleteById(identifier: string, { ability }: EntityOperationOptions = {}) {
     const subject = await this.subjectsRepository.findOne({ identifier });
     if (!subject) {
       throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
-    } else if (validateAbility && !this.abilityService.can('delete', subject)) {
+    } else if (ability && !ability.can('delete', subject)) {
       throw new ForbiddenException(`Insufficient rights to delete subject with identifier: ${identifier}`);
     }
     return (await this.subjectsRepository.deleteOne({ identifier }))!;
   }
 
-  async findAll({ validateAbility = true } = {}) {
-    if (!validateAbility) {
+  async findAll({ ability }: EntityOperationOptions = {}) {
+    if (!ability) {
       return this.subjectsRepository.find();
     }
-    return this.subjectsRepository.find(this.abilityService.accessibleQuery('read'));
+    return this.subjectsRepository.find(accessibleBy(ability, 'read'));
   }
 
-  async findByGroup(groupName: string, { validateAbility = true } = {}) {
-    const groupQuery = { groups: { name: groupName } };
-    if (!validateAbility) {
-      return this.subjectsRepository.find(groupQuery);
-    }
-    return this.subjectsRepository.find(this.abilityService.accessibleQuery('read', groupQuery));
+  async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
+    const group = await this.groupsService.findByName(groupName);
+    return this.subjectsRepository.find({
+      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read') : {}]
+    });
   }
 
-  async findById(identifier: string, { validateAbility = true } = {}) {
+  async findById(identifier: string, { ability }: EntityOperationOptions = {}) {
     const subject = await this.subjectsRepository.findById(identifier);
     if (!subject) {
       throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
-    } else if (validateAbility && !this.abilityService.can('delete', subject)) {
+    } else if (ability && !ability.can('delete', subject)) {
       throw new ForbiddenException(`Insufficient rights to read subject with identifier: ${identifier}`);
     }
     return subject;
   }
 
-  async findByLookup(data: SubjectIdentificationDataDto) {
-    return this.findById(this.generateIdentifier(data));
+  async findByLookup(data: SubjectIdentificationDataDto, options?: EntityOperationOptions) {
+    return this.findById(this.generateIdentifier(data), options);
   }
 
   private generateIdentifier({ dateOfBirth, firstName, lastName, sex }: SubjectIdentificationDataDto): string {
