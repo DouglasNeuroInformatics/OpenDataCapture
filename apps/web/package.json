@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc && cross-env NODE_ENV=production bunx --bun vite build",
-    "dev": "bunx --bun vite",
+    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx --bun vite",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
     "storybook": "storybook dev -p 6006"
