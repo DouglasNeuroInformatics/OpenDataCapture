@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import type { Summary } from '@open-data-capture/types';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -11,7 +11,7 @@ export class SummaryController {
 
   @Get()
   @RouteAccess([{ action: 'read', subject: 'Instrument' }])
-  async getSummary(): Promise<Summary> {
-    return this.summaryService.getSummary();
+  async getSummary(@Query('group') groupId?: string): Promise<Summary> {
+    return this.summaryService.getSummary(groupId);
   }
 }
