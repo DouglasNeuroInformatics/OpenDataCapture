@@ -45,7 +45,7 @@ export class AssignmentsService implements EntityService<Assignment> {
     if (!ability) {
       return this.assignmentsRepository.find();
     }
-    return this.assignmentsRepository.find(accessibleBy(ability, 'read'));
+    return this.assignmentsRepository.find(accessibleBy(ability, 'read').Assignment);
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {

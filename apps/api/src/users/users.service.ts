@@ -23,7 +23,7 @@ export class UsersService implements EntityService<User> {
   ) {}
 
   async count(filter: FilterQuery<User> = {}, { ability }: EntityOperationOptions = {}) {
-    return this.usersRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read') : {}] });
+    return this.usersRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read').User : {}] });
   }
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
@@ -73,13 +73,13 @@ export class UsersService implements EntityService<User> {
     if (!ability) {
       return this.usersRepository.find();
     }
-    return this.usersRepository.find(accessibleBy(ability, 'read'));
+    return this.usersRepository.find(accessibleBy(ability, 'read').User);
   }
 
   async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
     const group = await this.groupsService.findByName(groupName);
     return this.usersRepository.find({
-      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read') : {}]
+      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read').User : {}]
     });
   }
 

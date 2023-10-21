@@ -34,7 +34,7 @@ export class GroupsService implements EntityService<Group> {
     if (!ability) {
       return this.groupsRepository.find();
     }
-    return this.groupsRepository.find(accessibleBy(ability, 'read'));
+    return this.groupsRepository.find(accessibleBy(ability, 'read').Group);
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {

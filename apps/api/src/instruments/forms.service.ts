@@ -16,7 +16,7 @@ export class FormsService implements EntityController<FormInstrument> {
 
   async count(filter: FilterQuery<FormInstrument> = {}, { ability }: EntityOperationOptions = {}) {
     return this.instrumentsRepository.count({
-      $and: [{ kind: 'form' }, filter, ability ? accessibleBy(ability, 'read') : {}]
+      $and: [{ kind: 'form' }, filter, ability ? accessibleBy(ability, 'read').Instrument : {}]
     });
   }
 
@@ -45,7 +45,7 @@ export class FormsService implements EntityController<FormInstrument> {
     if (!ability) {
       return this.instrumentsRepository.find<FormInstrument>({ kind: 'form' });
     }
-    return this.instrumentsRepository.find<FormInstrument>({ $and: [{ kind: 'form' }, accessibleBy(ability, 'read')] });
+    return this.instrumentsRepository.find<FormInstrument>({ $and: [{ kind: 'form' }, accessibleBy(ability, 'read').Instrument] });
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {

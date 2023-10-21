@@ -25,7 +25,7 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
   ) {}
 
   async count(filter: FilterQuery<Subject> = {}, { ability }: EntityOperationOptions = {}) {
-    return this.subjectsRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read') : {}] });
+    return this.subjectsRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read').Subject : {}] });
   }
 
   async create(data: SubjectIdentificationDataDto) {
@@ -54,13 +54,13 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
     if (!ability) {
       return this.subjectsRepository.find();
     }
-    return this.subjectsRepository.find(accessibleBy(ability, 'read'));
+    return this.subjectsRepository.find(accessibleBy(ability, 'read').Subject);
   }
 
   async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
     const group = await this.groupsService.findByName(groupName);
     return this.subjectsRepository.find({
-      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read') : {}]
+      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read').Subject : {}]
     });
   }
 
