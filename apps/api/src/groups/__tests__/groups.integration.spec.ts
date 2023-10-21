@@ -9,8 +9,6 @@ import { Test } from '@nestjs/testing';
 import { Types } from 'mongoose';
 import request from 'supertest';
 
-import { AbilityService } from '@/ability/ability.service';
-
 import { GroupsController } from '../groups.controller';
 import { GroupsRepository } from '../groups.repository';
 import { GroupsService } from '../groups.service';
@@ -19,7 +17,6 @@ describe('/groups', () => {
   let app: NestExpressApplication;
   let server: unknown;
 
-  let abilityService: MockedInstance<AbilityService>;
   let groupsRepository: MockedInstance<GroupsRepository>;
 
   beforeAll(async () => {
@@ -27,10 +24,6 @@ describe('/groups', () => {
       controllers: [GroupsController],
       providers: [
         GroupsService,
-        {
-          provide: AbilityService,
-          useValue: createMock(AbilityService)
-        },
         {
           provide: GroupsRepository,
           useValue: createMock(GroupsRepository)
@@ -45,7 +38,6 @@ describe('/groups', () => {
     app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
-    abilityService = app.get(AbilityService);
     groupsRepository = app.get(GroupsRepository);
 
     await app.init();
@@ -95,7 +87,6 @@ describe('/groups', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).get(`/groups/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
@@ -105,14 +96,7 @@ describe('/groups', () => {
       const response = await request(server).get(`/groups/${id}`);
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
-    it('should reject a request if the user has insufficient permissions', async () => {
-      abilityService.can.mockReturnValueOnce(false);
-      groupsRepository.findById.mockResolvedValueOnce({ id });
-      const response = await request(server).get(`/groups/${id}`);
-      expect(response.status).toBe(HttpStatus.FORBIDDEN);
-    });
     it('should return the group if it exists', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).get(`/groups/${id}`);
       expect(response.body).toMatchObject({ id });
@@ -130,31 +114,26 @@ describe('/groups', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request to set the group name to an empty string', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).patch(`/groups/${id}`).send({ name: '' });
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request to set the group name to a number', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).patch(`/groups/${id}`).send({ name: 100 });
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID, even if nothing is modified', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).patch(`/groups/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return status code 200 with a valid ID and valid data', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       groupsRepository.findById.mockResolvedValueOnce({ id });
       const response = await request(server).patch(`/groups/${id}`).send({ name: 'foo' });
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return the modified group', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       groupsRepository.findById.mockResolvedValueOnce({ id });
       groupsRepository.updateById.mockImplementationOnce((id: string, obj: object) => ({ id, ...obj }));
       const response = await request(server).patch(`/groups/${id}`).send({ name: 'foo' });
@@ -173,7 +152,6 @@ describe('/groups', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      abilityService.can.mockReturnValueOnce(true);
       const response = await request(server).delete(`/groups/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });

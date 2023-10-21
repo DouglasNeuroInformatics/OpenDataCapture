@@ -1,7 +1,7 @@
-import { type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser, type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { type Group } from '@open-data-capture/types';
+import { type AppAbility, type Group } from '@open-data-capture/types';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -24,28 +24,32 @@ export class GroupsController implements EntityController<Group> {
   @ApiOperation({ summary: 'Delete Group' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Group' })
-  deleteById(@Param('id', ParseIdPipe) id: string) {
-    return this.groupsService.deleteById(id);
+  deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.groupsService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Get All Groups' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findAll() {
-    return this.groupsService.findAll();
+  findAll(@CurrentUser('ability') ability: AppAbility) {
+    return this.groupsService.findAll({ ability });
   }
 
   @ApiOperation({ summary: 'Get Group' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findById(@Param('id', ParseIdPipe) id: string) {
-    return this.groupsService.findById(id);
+  findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.groupsService.findById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Update Group' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Group' })
-  updateById(@Param('id', ParseIdPipe) id: string, @Body() update: UpdateGroupDto) {
-    return this.groupsService.updateById(id, update);
+  updateById(
+    @Param('id', ParseIdPipe) id: string,
+    @Body() update: UpdateGroupDto,
+    @CurrentUser('ability') ability: AppAbility
+  ) {
+    return this.groupsService.updateById(id, update, { ability });
   }
 }

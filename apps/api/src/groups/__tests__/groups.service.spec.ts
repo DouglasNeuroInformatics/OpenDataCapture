@@ -4,8 +4,6 @@ import { beforeEach, describe, expect, it } from 'bun:test';
 import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
-import { AbilityService } from '@/ability/ability.service';
-
 import { GroupsRepository } from '../groups.repository';
 import { GroupsService } from '../groups.service';
 
@@ -17,10 +15,6 @@ describe('GroupsService', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         GroupsService,
-        {
-          provide: AbilityService,
-          useValue: createMock(AbilityService)
-        },
         {
           provide: GroupsRepository,
           useValue: createMock(GroupsRepository)
