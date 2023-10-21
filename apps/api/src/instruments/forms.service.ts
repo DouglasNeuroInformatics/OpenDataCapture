@@ -3,6 +3,7 @@ import type { EntityController } from '@douglasneuroinformatics/nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
 import type { FormInstrument, InstrumentLanguage } from '@open-data-capture/types';
+import type { FilterQuery } from 'mongoose';
 
 import { AbilityService } from '@/ability/ability.service';
 
@@ -15,8 +16,10 @@ export class FormsService implements EntityController<FormInstrument> {
     private readonly instrumentsRepository: InstrumentsRepository
   ) {}
 
-  async count() {
-    return this.instrumentsRepository.count(this.abilityService.accessibleQuery('read', { kind: 'form' }));
+  async count(filter?: FilterQuery<FormInstrument>) {
+    return this.instrumentsRepository.count(
+      this.abilityService.accessibleQuery('read', { $and: [{ kind: 'form' }, filter ?? {}] })
+    );
   }
 
   async create<TData extends FormDataType, TLanguage extends InstrumentLanguage>(

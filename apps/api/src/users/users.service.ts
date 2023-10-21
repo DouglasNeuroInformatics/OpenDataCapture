@@ -2,6 +2,7 @@ import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { type User } from '@open-data-capture/types';
+import type { FilterQuery } from 'mongoose';
 
 import { AbilityService } from '@/ability/ability.service';
 import type { GroupEntity } from '@/groups/entities/group.entity';
@@ -21,8 +22,8 @@ export class UsersService implements EntityService<User> {
     private readonly usersRepository: UsersRepository
   ) {}
 
-  async count() {
-    return this.usersRepository.count();
+  async count(filter?: FilterQuery<User>) {
+    return this.usersRepository.count(this.abilityService.accessibleQuery('read', filter));
   }
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */

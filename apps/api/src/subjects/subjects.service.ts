@@ -2,6 +2,7 @@ import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Subject } from '@open-data-capture/types';
+import type { FilterQuery } from 'mongoose';
 import unidecode from 'unidecode';
 
 import { AbilityService } from '@/ability/ability.service';
@@ -19,10 +20,10 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
     private readonly abilityService: AbilityService,
     private readonly cryptoService: CryptoService,
     private readonly subjectsRepository: SubjectsRepository
-  ) { }
-  
-  async count() {
-    return this.subjectsRepository.count()
+  ) {}
+
+  async count(filter?: FilterQuery<Subject>) {
+    return this.subjectsRepository.count(this.abilityService.accessibleQuery('read', filter));
   }
 
   async create(data: SubjectIdentificationDataDto) {
