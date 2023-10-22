@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth-store';
 
 export const GroupSwitcher = () => {
   const { currentGroup, currentUser, setCurrentGroup } = useAuthStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation('overview');
 
   // unless the user is an admin, this is set at login
   if (!currentGroup) {

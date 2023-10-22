@@ -9,10 +9,6 @@
     "en": "Close",
     "fr": "Fermer"
   },
-  "currentGroup": {
-    "en": "Current Group",
-    "fr": "Groupe actuel"
-  },
   "datetime": {
     "days": {
       "en": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
@@ -47,24 +43,6 @@
         "Novembre",
         "Décembre"
       ]
-    }
-  },
-  "disclaimer": {
-    "accept": {
-      "en": "Accept",
-      "fr": "Accepter"
-    },
-    "decline": {
-      "en": "Decline",
-      "fr": "Refuser"
-    },
-    "message": {
-      "en": "This platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.",
-      "fr": "Cette plateforme n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques."
-    },
-    "title": {
-      "en": "Disclaimer",
-      "fr": "Avis"
     }
   },
   "download": {
@@ -443,36 +421,6 @@
     "name": {
       "en": "Douglas Neuroinformatics Platform",
       "fr": "Douglas Neuroinformatics Platform"
-    }
-  },
-  "overview": {
-    "pageTitle": {
-      "en": "Overview",
-      "fr": "Vue d'ensemble"
-    },
-    "summary": {
-      "en": "Summary of Available Data",
-      "fr": "Résumé des données disponibles"
-    },
-    "totalInstruments": {
-      "en": "Total Instruments",
-      "fr": "Nombre d'instruments"
-    },
-    "totalRecords": {
-      "en": "Total Records",
-      "fr": "Nombre d'enregistrements"
-    },
-    "totalSubjects": {
-      "en": "Total Subjects",
-      "fr": "Nombre de clients"
-    },
-    "totalUsers": {
-      "en": "Total Users",
-      "fr": "Nombre d'utilisateurs"
-    },
-    "welcome": {
-      "en": "Welcome Back",
-      "fr": "Bienvenue"
     }
   },
   "platform": {

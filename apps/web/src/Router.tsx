@@ -5,7 +5,7 @@ import { Layout } from './components';
 import * as Auth from './features/auth';
 import * as Contact from './features/contact';
 import * as InstrumentsModule from './features/instruments';
-import * as OverviewModule from './features/overview';
+import * as Overview from './features/overview';
 import * as SubjectsModule from './features/subjects';
 import * as UserModule from './features/user';
 import * as Visits from './features/visits';
@@ -26,7 +26,7 @@ export const Router = () => {
               <Route path="contact">
                 <Route index element={<Contact.IndexPage />} />
               </Route>
-              <Route index element={<OverviewModule.OverviewPage />} path="overview" />
+              <Route index element={<Overview.OverviewPage />} path="overview" />
               <Route element={<UserModule.UserPage />} path="user" />
               <Route path="instruments">
                 <Route element={<InstrumentsModule.AvailableInstrumentsPage />} path="available" />

@@ -12,11 +12,9 @@ import { StatisticCard } from '../components/StatisticCard';
 
 export const OverviewPage = () => {
   const { currentGroup, currentUser } = useAuthStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation('overview');
 
-  const pageTitle = currentUser?.firstName
-    ? `${t('overview.welcome')}, ${currentUser.firstName}`
-    : t('overview.welcome');
+  const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
   const summary = useFetch<Summary>('/v1/summary', [currentGroup], {
     access: { action: 'read', subject: 'User' },
@@ -38,21 +36,21 @@ export const OverviewPage = () => {
       <PageHeader title={pageTitle} />
       <section>
         <div className="mb-5">
-          <h3 className="text-center text-xl font-medium lg:text-left">{t('overview.summary')}</h3>
+          <h3 className="text-center text-xl font-medium lg:text-left">{t('summary')}</h3>
           <GroupSwitcher />
         </div>
         <div className="body-font">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            <StatisticCard icon={<HiUsers />} label={t('overview.totalUsers')} value={summary.data.counts.users} />
-            <StatisticCard icon={<HiUser />} label={t('overview.totalSubjects')} value={summary.data.counts.subjects} />
+            <StatisticCard icon={<HiUsers />} label={t('totalUsers')} value={summary.data.counts.users} />
+            <StatisticCard icon={<HiUser />} label={t('totalSubjects')} value={summary.data.counts.subjects} />
             <StatisticCard
               icon={<HiClipboardDocument />}
-              label={t('overview.totalInstruments')}
+              label={t('totalInstruments')}
               value={summary.data.counts.instruments}
             />
             <StatisticCard
               icon={<HiDocumentText />}
-              label={t('overview.totalRecords')}
+              label={t('totalRecords')}
               value={summary.data.counts.records}
             />
           </div>
@@ -61,5 +59,3 @@ export const OverviewPage = () => {
     </div>
   );
 };
-
-export default OverviewPage;
