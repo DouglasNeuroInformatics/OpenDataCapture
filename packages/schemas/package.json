@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./assignment": "./src/assignment.schema.ts",
+    "./auth": "./src/auth.schema.ts",
     "./core": "./src/core.schema.ts",
     "./subject": "./src/subject.schema.ts"
   },
