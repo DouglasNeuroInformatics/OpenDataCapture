@@ -4,7 +4,7 @@ import type { Measurements, SelectedInstrument, SelectedMeasure } from '../types
 import type { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@open-data-capture/types';
 import { useParams } from 'react-router-dom';
 
-import { Spinner } from '@/components';
+import { Spinner } from '@/components/Spinner';
 import { useFetch } from '@/hooks/useFetch';
 import i18n from '@/services/i18n';
 

@@ -2,7 +2,7 @@ import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/components/PageHeader';
 import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 import { AddVisitForm, type AddVisitFormData } from '../components/AddVisitForm';

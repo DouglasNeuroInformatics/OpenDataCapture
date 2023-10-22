@@ -4,7 +4,7 @@ import { StepperContext, useNotificationsStore } from '@douglasneuroinformatics/
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-import { IdentificationForm, type IdentificationFormData } from '@/components';
+import { IdentificationForm, type IdentificationFormData } from '@/components/IdentificationForm';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
 export const FormIdentification = () => {

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/components/PageHeader';
 
 import { FormCreator } from '../components/FormCreator';
 
