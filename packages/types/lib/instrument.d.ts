@@ -222,4 +222,11 @@ export type FormInstrument<
   }
 >;
 
+export type SterilizedFormInstrument<
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
+> = Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {
+  validationSchema: string;
+};
+
 export type Instrument = FormInstrument;
