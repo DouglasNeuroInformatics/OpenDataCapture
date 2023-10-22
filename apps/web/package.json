@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
-    "@douglasneuroinformatics/ajv": "latest",
     "@douglasneuroinformatics/ui": "latest",
     "@douglasneuroinformatics/utils": "latest",
     "@headlessui/react": "^1.7.17",
