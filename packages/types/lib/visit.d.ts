@@ -1,6 +1,10 @@
-import { Subject } from '@open-data-capture/types';
+import { Subject, type SubjectIdentificationData } from '@open-data-capture/types';
 
 export type Visit = {
-  dateAssessed: Date;
+  date: Date;
   subject: Subject;
+};
+
+export type CreateVisitData = Omit<Visit, 'subject'> & {
+  subjectIdData: SubjectIdentificationData;
 };

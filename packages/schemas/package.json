@@ -11,7 +11,8 @@
     "./group": "./src/group.schema.ts",
     "./setup": "./src/setup.schema.ts",
     "./subject": "./src/subject.schema.ts",
-    "./user": "./src/user.schema.ts"
+    "./user": "./src/user.schema.ts",
+    "./visit": "./src/visit.schema.ts"
   },
   "scripts": {
     "format": "prettier --write src",
