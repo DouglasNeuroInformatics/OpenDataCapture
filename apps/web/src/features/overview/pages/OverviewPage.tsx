@@ -13,12 +13,16 @@ import { StatisticCard } from '../components/StatisticCard';
 export const OverviewPage = () => {
   const { currentGroup, currentUser } = useAuthStore();
   const { t } = useTranslation();
+
   const pageTitle = currentUser?.firstName
     ? `${t('overview.welcome')}, ${currentUser.firstName}`
     : t('overview.welcome');
 
-  const summary = useFetch<Summary>('/v1/summary', [], {
-    access: { action: 'read', subject: 'User' }
+  const summary = useFetch<Summary>('/v1/summary', [currentGroup], {
+    access: { action: 'read', subject: 'User' },
+    queryParams: {
+      group: currentGroup?.id
+    }
   });
 
   // // If it is the first time loading data

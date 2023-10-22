@@ -3,6 +3,12 @@
     "en": "Cancel",
     "fr": "Annuler"
   },
+  "form": {
+    "requiredField": {
+      "en": "This field is required",
+      "fr": "Ce champ est obligatoire"
+    }
+  },
   "identificationData": {
     "dateOfBirth": {
       "label": {

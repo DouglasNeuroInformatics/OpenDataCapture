@@ -5,16 +5,6 @@
       "fr": "Sujet actif"
     }
   },
-  "addVisit": {
-    "exists": {
-      "en": "This subject has already been registered",
-      "fr": "Ce client a déjà été enregistré"
-    },
-    "pageTitle": {
-      "en": "Add Visit",
-      "fr": "Ajouter une visite"
-    }
-  },
   "basePermissionLevel": {
     "admin": {
       "en": "Admin",

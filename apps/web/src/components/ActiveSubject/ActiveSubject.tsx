@@ -10,7 +10,7 @@ import { useActiveSubjectStore } from '@/stores/active-subject-store';
 export const ActiveSubject = () => {
   const { activeSubject, setActiveSubject } = useActiveSubjectStore();
   const [isHidden, setIsHidden] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
 
   const bind = useDrag(
@@ -54,16 +54,16 @@ export const ActiveSubject = () => {
           <h3 className="mb-2 text-xl font-medium text-inherit">{t('activeSubject.header')}</h3>
           <hr className="mb-2" />
           <span>
-            {t('identificationForm.firstName.label')}: {activeSubject.firstName}
+            {t('identificationData.firstName.label')}: {activeSubject.firstName}
           </span>
           <span>
-            {t('identificationForm.lastName.label')}: {activeSubject.lastName}
+            {t('identificationData.lastName.label')}: {activeSubject.lastName}
           </span>
           <span>
-            {t('identificationForm.dateOfBirth.label')}: {activeSubject.dateOfBirth}
+            {t('identificationData.dateOfBirth.label')}: {activeSubject.dateOfBirth}
           </span>
           <span>
-            {t('identificationForm.sex.label')}: {t(`sex.${activeSubject.sex}`)}
+            {t('identificationData.sex.label')}: {t(`sex.${activeSubject.sex}`)}
           </span>
         </React.Fragment>
       )}
