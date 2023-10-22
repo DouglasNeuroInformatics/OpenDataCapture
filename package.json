@@ -28,7 +28,6 @@
     "@douglasneuroinformatics/form-types": "latest",
     "@open-data-capture/types": "workspace:*",
     "@turbo/workspaces": "^1.10.14",
-    "@types/json-schema": "^7.0.14",
     "bun-types": "^1.0.4",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",

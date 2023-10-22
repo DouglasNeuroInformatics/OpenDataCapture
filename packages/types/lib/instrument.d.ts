@@ -1,6 +1,6 @@
 import type Base from '@douglasneuroinformatics/form-types';
-import type { JSONSchemaType } from 'ajv';
 import type { Simplify } from 'type-fest';
+import type { ZodType } from 'zod';
 
 import { Language } from './core';
 
@@ -218,10 +218,8 @@ export type FormInstrument<
     content: FormInstrumentContent<TLanguage, TData>;
     details: FormInstrumentDetails<TLanguage>;
     measures?: FormInstrumentMeasures<TLanguage, TData>;
-    validationSchema: JSONSchemaType<TData>;
+    validationSchema: ZodType<TData>;
   }
 >;
-
-export type MultilingualFormInstrument<TData extends Base.FormDataType> = FormInstrument<TData, ['en', 'fr']>;
 
 export type Instrument = FormInstrument;

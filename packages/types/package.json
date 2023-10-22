@@ -8,6 +8,7 @@
     "lint": "tsc && eslint --fix lib"
   },
   "dependencies": {
-    "type-fest": "^4.4.0"
+    "type-fest": "^4.4.0",
+    "zod": "^3.22.4"
   }
 }
