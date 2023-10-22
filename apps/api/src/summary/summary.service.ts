@@ -18,12 +18,13 @@ export class SummaryService {
 
   async getSummary(groupId?: string, { ability }: EntityOperationOptions = {}): Promise<Summary> {
     const group = groupId ? await this.groupsService.findById(groupId) : undefined;
+    const args = [{ groups: group }, { ability }];
     return {
       counts: {
         instruments: await this.formsService.count(),
         records: NaN,
-        subjects: await this.subjectsService.count(),
-        users: await this.usersService.count({ groups: group }, { ability })
+        subjects: await this.subjectsService.count(...args),
+        users: await this.usersService.count(...args)
       }
     };
   }
