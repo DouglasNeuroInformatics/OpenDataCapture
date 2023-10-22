@@ -2,5 +2,29 @@
   "addVisit": {
     "en": "Add Visit",
     "fr": "Ajouter une visite"
+  },
+  "subjectIdentification": {
+    "title": {
+      "en": "Subject Identification",
+      "fr": "Identification du client"
+    },
+    "description": {
+      "en": "To accurately identify an individual, ensure the information is correct to prevent data loss. For identification, white space, special characters, and accents are removed from names, with accented characters treated as their ASCII equivalents.",
+      "fr": "Pour identifier un individu avec précision, assurez-vous que les informations sont correctes afin d'éviter une perte de données. Pour l'identification, les espaces, les caractères spéciaux et les accents sont supprimés des noms, les caractères accentués étant traités comme leurs équivalents ASCII."
+    }
+  },
+  "additionalData": {
+    "title": {
+      "en": "Additional Data",
+      "fr": "Données supplémentaires"
+    },
+    "description": {
+      "en": "You can optionally modify the following metadata, for example, to log past visits.",
+      "fr": "Vous pouvez éventuellement modifier les métadonnées suivantes, par exemple, pour enregistrer des visites passées."
+    }
+  },
+  "dateAssessed": {
+    "en": "Date Assessed",
+    "fr": "Date d'évaluation"
   }
 }

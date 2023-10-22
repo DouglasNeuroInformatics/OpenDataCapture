@@ -19,7 +19,7 @@ export const AddVisit = () => {
   };
 
   return (
-    <div className="mx-auto max-w-screen-sm items-center">
+    <div>
       <PageHeader title={t('addVisit')} />
       <AddVisitForm onSubmit={(data) => void handleSubmit(data)} />
     </div>
