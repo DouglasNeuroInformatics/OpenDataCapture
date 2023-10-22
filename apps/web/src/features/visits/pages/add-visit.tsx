@@ -1,4 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
+import type { CreateVisitData, Visit } from '@open-data-capture/types';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -12,9 +13,12 @@ export const AddVisit = () => {
   const notifications = useNotificationsStore();
   const { t } = useTranslation('visits');
 
-  const handleSubmit = async (data: AddVisitFormData) => {
-    const response = await axios.post('/v1/subjects', data);
-    setActiveVisit(data);
+  const handleSubmit = async ({ date, ...subjectIdData }: AddVisitFormData) => {
+    const response = await axios.post<Visit>('/v1/visits', {
+      date,
+      subjectIdData
+    } satisfies CreateVisitData);
+    setActiveVisit(response.data);
     notifications.addNotification({ type: 'success' });
   };
 

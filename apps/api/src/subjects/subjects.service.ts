@@ -65,7 +65,7 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
   }
 
   async findById(identifier: string, { ability }: EntityOperationOptions = {}) {
-    const subject = await this.subjectsRepository.findById(identifier);
+    const subject = await this.subjectsRepository.findOne({ identifier });
     if (!subject) {
       throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
     } else if (ability && !ability.can('delete', subject)) {

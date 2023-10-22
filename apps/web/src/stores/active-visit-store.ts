@@ -1,13 +1,9 @@
-import type { SubjectIdentificationData } from '@open-data-capture/types';
+import type { Visit } from '@open-data-capture/types';
 import { create } from 'zustand';
 
-export type ActiveVisit = {
-  subject: SubjectIdentificationData;
-};
-
 export type ActiveVisitStore = {
-  activeVisit: ActiveVisit | null;
-  setActiveVisit: (activeVisit: ActiveVisit | null) => void;
+  activeVisit: Visit | null;
+  setActiveVisit: (activeVisit: Visit | null) => void;
 };
 
 export const useActiveVisitStore = create<ActiveVisitStore>((set) => ({

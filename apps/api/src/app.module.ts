@@ -19,6 +19,7 @@ import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';
 import { UsersModule } from './users/users.module';
+import { VisitsModule } from './visits/visits.module';
 
 @Module({
   imports: [
@@ -71,7 +72,8 @@ import { UsersModule } from './users/users.module';
     ]),
     UsersModule,
     SetupModule,
-    SummaryModule
+    SummaryModule,
+    VisitsModule
   ],
   providers: [
     {

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 export type AddVisitFormData = SubjectIdentificationData & {
-  dateAssessed: Date;
+  date: Date;
 };
 
 export type AddVisitFormProps = {
@@ -55,7 +55,7 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
           title: t('visits:additionalData.title'),
           description: t('visits:additionalData.description'),
           fields: {
-            dateAssessed: {
+            date: {
               kind: 'date',
               label: t('visits:dateAssessed')
             }
@@ -67,7 +67,7 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
         lastName: null,
         dateOfBirth: null,
         sex: null,
-        dateAssessed: new Date()
+        date: new Date()
       }}
       submitBtnLabel={t('submit')}
       validationSchema={z.object({
@@ -75,7 +75,7 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
         lastName: z.string(),
         dateOfBirth: z.date(),
         sex: z.enum(['male', 'female']),
-        dateAssessed: z.date()
+        date: z.date()
       })}
       onSubmit={onSubmit}
     />
