@@ -1,4 +1,3 @@
-import type { JSONSchemaType } from '@douglasneuroinformatics/ajv';
 import type FormTypes from '@douglasneuroinformatics/form-types';
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -75,7 +74,7 @@ export class FormInstrumentEntity<
 
   @ApiProperty()
   @Prop({ required: true, type: Object })
-  declare validationSchema: JSONSchemaType<TData>;
+  declare validationSchema: Zod.ZodType<TData>;
 }
 
 export const FormInstrumentSchema = SchemaFactory.createForClass(FormInstrumentEntity);

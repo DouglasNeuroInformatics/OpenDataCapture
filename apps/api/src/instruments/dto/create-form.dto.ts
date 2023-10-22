@@ -1,8 +1,8 @@
-import type { JSONSchemaType } from '@douglasneuroinformatics/ajv';
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { formInstrumentSchema } from '@open-data-capture/schemas/form-instrument';
 import type Types from '@open-data-capture/types';
+import type Z from 'zod';
 
 @ValidationSchema(formInstrumentSchema)
 export class CreateFormDto implements Types.FormInstrument {
@@ -13,6 +13,6 @@ export class CreateFormDto implements Types.FormInstrument {
   measures?: Types.FormInstrumentMeasures;
   name: string;
   tags: Record<Types.Language, string[]> | string[];
-  validationSchema: JSONSchemaType<FormDataType>;
+  validationSchema: Z.ZodType<FormDataType>;
   version: number;
 }

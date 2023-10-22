@@ -11,7 +11,7 @@ import { AppModule } from '@/app.module';
 
 let app: NestExpressApplication;
 let connection: Connection;
-let server: any;
+let server: unknown;
 
 beforeAll(async () => {
   const moduleRef = await Test.createTestingModule({

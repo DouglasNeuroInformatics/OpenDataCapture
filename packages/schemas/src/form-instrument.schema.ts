@@ -1,10 +1,10 @@
-import type { FormFieldKind } from '@douglasneuroinformatics/form-types';
+import type { FormDataType, FormFieldKind } from '@douglasneuroinformatics/form-types';
 import type Types from '@open-data-capture/types';
-import { type ZodType, type ZodTypeAny, z } from 'zod';
+import { ZodType, z } from 'zod';
 
 import { languageSchema } from './core.schema';
 
-const uiOptionSchema = <T extends ZodTypeAny>(schema: T) =>
+const uiOptionSchema = <T extends ZodType>(schema: T) =>
   z.union([
     schema,
     z.object({
@@ -95,10 +95,6 @@ export const formInstrumentSchema = z.object({
   language: z.union([languageSchema, z.array(languageSchema)]),
   name: z.string().min(1),
   tags: uiOptionSchema(z.array(z.string().min(1))),
-  validationSchema: z.object({
-    properties: z.record(z.any()),
-    required: z.string().array(),
-    type: z.literal('object')
-  }),
+  validationSchema: z.instanceof(ZodType<FormDataType>),
   version: z.number()
 }) satisfies ZodType<Types.FormInstrument>;
