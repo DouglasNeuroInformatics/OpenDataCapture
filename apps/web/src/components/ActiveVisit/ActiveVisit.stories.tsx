@@ -15,9 +15,11 @@ export default {
       const { setActiveVisit } = useActiveVisitStore();
       useEffect(() => {
         setActiveVisit({
+          date: new Date(),
           subject: {
             dateOfBirth: new Date('2000-01-01'),
             firstName: 'John',
+            identifier: '12345',
             lastName: 'Appleseed',
             sex: 'male'
           }

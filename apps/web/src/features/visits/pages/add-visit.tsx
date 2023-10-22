@@ -1,5 +1,6 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
-import type { CreateVisitData, Visit } from '@open-data-capture/types';
+import { visitSchema } from '@open-data-capture/schemas/visit';
+import type { CreateVisitData } from '@open-data-capture/types';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -7,18 +8,17 @@ import { PageHeader } from '@/components/PageHeader';
 import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 import { AddVisitForm, type AddVisitFormData } from '../components/AddVisitForm';
-
 export const AddVisit = () => {
   const { setActiveVisit } = useActiveVisitStore();
   const notifications = useNotificationsStore();
   const { t } = useTranslation('visits');
 
   const handleSubmit = async ({ date, ...subjectIdData }: AddVisitFormData) => {
-    const response = await axios.post<Visit>('/v1/visits', {
+    const response = await axios.post('/v1/visits', {
       date,
       subjectIdData
     } satisfies CreateVisitData);
-    setActiveVisit(response.data);
+    setActiveVisit(visitSchema.parse(response.data));
     notifications.addNotification({ type: 'success' });
   };
 
