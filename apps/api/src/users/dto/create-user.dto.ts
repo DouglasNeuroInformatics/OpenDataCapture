@@ -1,31 +1,13 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import type { BasePermissionLevel, User } from '@open-data-capture/types';
-import { ZodType, z } from 'zod';
+import { createUserDataSchema } from '@open-data-capture/schemas/user';
+import type { BasePermissionLevel, CreateUserData } from '@open-data-capture/types';
 
-type CreateUserData = Omit<User, 'groups'> & {
-  groupNames?: string[];
-};
-
-const BASE_PERMISSION_LEVELS = ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] as const;
-
-// Matches string with 8 or more characters, minimum one upper case, lowercase, and number
-const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-
-export const CreateUserDataSchema = z.object({
-  basePermissionLevel: z.enum(BASE_PERMISSION_LEVELS).optional(),
-  firstName: z.string().min(1).optional(),
-  groupNames: z.array(z.string().min(1)).optional(),
-  lastName: z.string().min(1).optional(),
-  password: z.string().regex(isStrongPassword),
-  username: z.string().min(1)
-}) satisfies ZodType<CreateUserData>;
-
-@ValidationSchema(CreateUserDataSchema)
+@ValidationSchema(createUserDataSchema)
 export class CreateUserDto implements CreateUserData {
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
-    enum: BASE_PERMISSION_LEVELS,
+    enum: ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] satisfies BasePermissionLevel[],
     type: String
   })
   basePermissionLevel?: BasePermissionLevel;

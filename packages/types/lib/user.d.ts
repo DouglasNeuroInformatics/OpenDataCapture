@@ -11,3 +11,7 @@ export type User = {
   password: string;
   username: string;
 };
+
+export type CreateUserData = Omit<User, 'groups'> & {
+  groupNames?: string[];
+};

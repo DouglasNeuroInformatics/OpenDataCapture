@@ -1,7 +1,8 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { PartialType } from '@nestjs/swagger';
+import { createUserDataSchema } from '@open-data-capture/schemas/user';
 
-import { CreateUserDataSchema, CreateUserDto } from './create-user.dto';
+import { CreateUserDto } from './create-user.dto';
 
-@ValidationSchema(CreateUserDataSchema.partial())
+@ValidationSchema(createUserDataSchema.partial())
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

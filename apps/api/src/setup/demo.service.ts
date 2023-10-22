@@ -138,7 +138,7 @@ export class DemoService {
 
   private async createUsers(): Promise<void> {
     for (const user of demoUsers) {
-      await this.usersService.create(user, { validateAbility: false });
+      await this.usersService.create(user);
     }
   }
 }

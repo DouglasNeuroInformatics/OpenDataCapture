@@ -11,9 +11,10 @@ import { AppModule } from './app.module';
 import { setupDocs } from './docs';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+  // Type assertion is due to issue with linked dependency
+  const app = (await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'debug', 'log', 'verbose']
-  });
+  })) as NestExpressApplication;
 
   app.enableCors();
   app.enableVersioning({

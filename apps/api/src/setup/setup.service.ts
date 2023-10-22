@@ -1,13 +1,13 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
-import type { SetupState } from '@open-data-capture/types';
+import type { CreateAdminData, SetupState } from '@open-data-capture/types';
 import mongoose from 'mongoose';
 
 import { UserEntity } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 import { DemoService } from './demo.service';
-import { type Admin, SetupDto } from './dto/setup.dto';
+import { SetupDto } from './dto/setup.dto';
 
 @Injectable()
 export class SetupService {
@@ -17,7 +17,7 @@ export class SetupService {
     private readonly usersService: UsersService
   ) {}
 
-  async createAdmin(admin: Admin): Promise<UserEntity> {
+  async createAdmin(admin: CreateAdminData): Promise<UserEntity> {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' });
   }
 
