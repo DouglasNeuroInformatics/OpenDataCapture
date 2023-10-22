@@ -1,4 +1,8 @@
 {
+  "activeVisit": {
+    "en": "Active Visit",
+    "fr": "Visite active"
+  },
   "basePermissionLevel": {
     "admin": {
       "en": "Admin",
@@ -55,9 +59,17 @@
         "en": "The subject's biological sex, as assigned at birth",
         "fr": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance"
       },
+      "female": {
+        "en": "Female",
+        "fr": "Féminin"
+      },
       "label": {
         "en": "Sex",
         "fr": "Sexe"
+      },
+      "male": {
+        "en": "Male",
+        "fr": "Masculin"
       }
     }
   },

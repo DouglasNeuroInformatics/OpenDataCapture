@@ -1,10 +1,10 @@
 import { Modal } from '@douglasneuroinformatics/ui';
-import type { Subject } from '@open-data-capture/types';
+import type { Subject, SubjectIdentificationData } from '@open-data-capture/types';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { IdentificationForm, type IdentificationFormData } from '@/components';
+import { IdentificationForm } from '@/components/IdentificationForm';
 
 type SubjectLookupProps = {
   onClose: () => void;
@@ -15,7 +15,7 @@ export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const lookupSubject = (formData: IdentificationFormData) => {
+  const lookupSubject = (formData: SubjectIdentificationData) => {
     axios
       .post<Subject>('/v1/subjects/lookup', formData)
       .then(({ data: { identifier } }) => {

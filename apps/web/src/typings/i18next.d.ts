@@ -9,6 +9,7 @@ import common from '../translations/common.json';
 import contact from '../translations/contact.json';
 import layout from '../translations/layout.json';
 import overview from '../translations/overview.json';
+import visits from '../translations/visits.json';
 
 type TranslatedResource<T> = {
   [K in keyof T]: T[K] extends Record<string, unknown>
@@ -28,6 +29,7 @@ declare module 'i18next' {
       contact: TranslatedResource<typeof contact>;
       layout: TranslatedResource<typeof layout>;
       overview: TranslatedResource<typeof overview>;
+      visits: TranslatedResource<typeof visits>;
     };
   }
 }

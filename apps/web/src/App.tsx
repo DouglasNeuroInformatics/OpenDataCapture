@@ -3,8 +3,9 @@ import React from 'react';
 import { NotificationHub } from '@douglasneuroinformatics/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { ActiveSubject } from '@/components';
-import { ErrorFallback, SuspenseFallback } from '@/features/misc';
+import { ActiveVisit } from '@/components/ActiveVisit';
+import { ErrorFallback } from '@/components/ErrorFallback';
+import { SuspenseFallback } from '@/components/SuspenseFallback';
 import { SetupProvider } from '@/features/setup';
 
 import { Router } from './Router';
@@ -15,7 +16,7 @@ export const App = () => {
   return (
     <React.Suspense fallback={<SuspenseFallback />}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <ActiveSubject />
+        <ActiveVisit />
         <NotificationHub />
         <SetupProvider>
           <Router />

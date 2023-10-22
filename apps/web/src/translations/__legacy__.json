@@ -1,10 +1,4 @@
 {
-  "activeSubject": {
-    "header": {
-      "en": "Active Subject",
-      "fr": "Sujet actif"
-    }
-  },
   "close": {
     "en": "Close",
     "fr": "Fermer"
@@ -411,16 +405,6 @@
     "pageTitle": {
       "en": "Setup",
       "fr": "Mise en service"
-    }
-  },
-  "sex": {
-    "female": {
-      "en": "Female",
-      "fr": "Féminin"
-    },
-    "male": {
-      "en": "Male",
-      "fr": "Masculin"
     }
   },
   "subjectPage": {

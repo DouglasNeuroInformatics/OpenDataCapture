@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 
+import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 import { useTranslation } from 'react-i18next';
 import { IoMdCloseCircle, IoMdRemoveCircle } from 'react-icons/io';
 
-import { useActiveSubjectStore } from '@/stores/active-subject-store';
+import { useActiveVisitStore } from '@/stores/active-visit-store';
 
-export const ActiveSubject = () => {
-  const { activeSubject, setActiveSubject } = useActiveSubjectStore();
+export const ActiveVisit = () => {
+  const { activeVisit, setActiveVisit } = useActiveVisitStore();
   const [isHidden, setIsHidden] = useState(false);
   const { t } = useTranslation('common');
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
@@ -23,7 +24,7 @@ export const ActiveSubject = () => {
     }
   );
 
-  if (!activeSubject) {
+  if (!activeVisit) {
     return null;
   }
 
@@ -43,7 +44,7 @@ export const ActiveSubject = () => {
         </button>
         <button
           onClick={() => {
-            setActiveSubject(null);
+            setActiveVisit(null);
           }}
         >
           <IoMdCloseCircle className="h-6 w-6 sm:h-4 sm:w-4" />
@@ -51,19 +52,19 @@ export const ActiveSubject = () => {
       </div>
       {isHidden && (
         <React.Fragment>
-          <h3 className="mb-2 text-xl font-medium text-inherit">{t('activeSubject.header')}</h3>
+          <h3 className="mb-2 text-xl font-medium text-inherit">{t('activeVisit')}</h3>
           <hr className="mb-2" />
           <span>
-            {t('identificationData.firstName.label')}: {activeSubject.firstName}
+            {t('identificationData.firstName.label')}: {activeVisit.subject.firstName}
           </span>
           <span>
-            {t('identificationData.lastName.label')}: {activeSubject.lastName}
+            {t('identificationData.lastName.label')}: {activeVisit.subject.lastName}
           </span>
           <span>
-            {t('identificationData.dateOfBirth.label')}: {activeSubject.dateOfBirth}
+            {t('identificationData.dateOfBirth.label')}: {toBasicISOString(activeVisit.subject.dateOfBirth)}
           </span>
           <span>
-            {t('identificationData.sex.label')}: {t(`sex.${activeSubject.sex}`)}
+            {t('identificationData.sex.label')}: {t(`identificationData.sex.${activeVisit.subject.sex}`)}
           </span>
         </React.Fragment>
       )}

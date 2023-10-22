@@ -5,7 +5,7 @@ import { Button, formatFormDataAsString, resolveStaticFormFields } from '@dougla
 import type { FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
-import { Spinner } from '@/components';
+import { Spinner } from '@/components/Spinner';
 import { useDownload } from '@/hooks/useDownload';
 import { useActiveSubjectStore } from '@/stores/active-subject-store';
 
