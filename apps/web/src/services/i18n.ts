@@ -15,7 +15,7 @@ void i18n
     interpolation: {
       escapeValue: false
     },
-    ns: ['auth', 'common'],
+    ns: ['auth', 'common', 'contact'],
     returnObjects: true,
     supportedLngs: ['en', 'fr']
   });

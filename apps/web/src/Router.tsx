@@ -3,7 +3,7 @@ import { P, match } from 'ts-pattern';
 
 import { Layout } from './components';
 import * as AuthModule from './features/auth';
-import * as ContactModule from './features/contact';
+import * as Contact from './features/contact';
 import * as InstrumentsModule from './features/instruments';
 import * as OverviewModule from './features/overview';
 import * as SubjectsModule from './features/subjects';
@@ -24,8 +24,10 @@ export const Router = () => {
         {match({ accessToken })
           .with({ accessToken: P.string }, () => (
             <Route element={<Layout />}>
+              <Route path="contact">
+                <Route index element={<Contact.IndexPage />} />
+              </Route>
               <Route index element={<OverviewModule.OverviewPage />} path="overview" />
-              <Route element={<ContactModule.ContactPage />} path="contact" />
               <Route element={<UserModule.UserPage />} path="user" />
               <Route path="instruments">
                 <Route element={<InstrumentsModule.AvailableInstrumentsPage />} path="available" />

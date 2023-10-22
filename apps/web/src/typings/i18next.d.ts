@@ -6,6 +6,7 @@ import type { ValueOf } from 'type-fest';
 // import all namespaces (for the default language, only)
 import auth from '../translations/auth.json';
 import common from '../translations/common.json';
+import contact from '../translations/contact.json';
 
 type TranslatedResource<T> = {
   [K in keyof T]: T[K] extends Record<string, unknown>
@@ -22,6 +23,7 @@ declare module 'i18next' {
     resources: {
       auth: TranslatedResource<typeof auth>;
       common: TranslatedResource<typeof common>;
+      contact: TranslatedResource<typeof contact>;
     };
   }
 }

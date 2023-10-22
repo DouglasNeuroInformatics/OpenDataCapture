@@ -1,1 +1,1 @@
-export * from './pages/ContactPage';
+export * from './pages';
