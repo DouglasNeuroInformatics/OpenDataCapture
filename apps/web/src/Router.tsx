@@ -2,7 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { P, match } from 'ts-pattern';
 
 import { Layout } from './components';
-import * as AuthModule from './features/auth';
+import * as Auth from './features/auth';
 import * as Contact from './features/contact';
 import * as InstrumentsModule from './features/instruments';
 import * as OverviewModule from './features/overview';
@@ -18,8 +18,7 @@ export const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route path="auth">
-          <Route index element={<Navigate to="login" />} />
-          <Route element={<AuthModule.LoginPage />} path="login" />
+          <Route element={<Auth.LoginPage />} path="login" />
         </Route>
         {match({ accessToken })
           .with({ accessToken: P.string }, () => (
