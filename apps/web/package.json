@@ -37,6 +37,7 @@
     "recharts": "^2.8.0",
     "ts-pattern": "^5.0.5",
     "type-fest": "^4.3.3",
+    "zod": "^3.22.4",
     "zustand": "^4.4.2"
   },
   "devDependencies": {
