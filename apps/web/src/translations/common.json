@@ -3,14 +3,6 @@
     "en": "Active Visit",
     "fr": "Visite active"
   },
-  "networkError": {
-    "en": "Network Error",
-    "fr": "Erreur de réseau"
-  },
-  "unknownError": {
-    "en": "Unknown Error",
-    "fr": "Erreur inconnue"
-  },
   "basePermissionLevel": {
     "admin": {
       "en": "Admin",
@@ -28,6 +20,10 @@
   "cancel": {
     "en": "Cancel",
     "fr": "Annuler"
+  },
+  "error": {
+    "en": "Error",
+    "fr": "Erreur"
   },
   "form": {
     "requiredField": {
@@ -81,6 +77,10 @@
       }
     }
   },
+  "networkError": {
+    "en": "Network Error",
+    "fr": "Erreur de réseau"
+  },
   "no": {
     "en": "No",
     "fr": "Non"
@@ -92,6 +92,10 @@
   "submit": {
     "en": "Submit",
     "fr": "Soumettre"
+  },
+  "unknownError": {
+    "en": "Unknown Error",
+    "fr": "Erreur inconnue"
   },
   "yes": {
     "en": "Yes",

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { useTranslation } from 'react-i18next';
 
 export function useDownload() {
   const notifications = useNotificationsStore();
+  const { t } = useTranslation();
   const [data, setData] = useState<null | string>(null);
   const [filename, setFilename] = useState<null | string>(null);
 
@@ -30,10 +32,10 @@ export function useDownload() {
         setFilename(filename);
       })
       .catch((error) => {
-        const message = error instanceof Error ? error.message : 'An unknown error occurred';
+        const message = error instanceof Error ? error.message : t('unknownError');
         notifications.addNotification({
           message,
-          title: 'Error',
+          title: t('error'),
           type: 'error'
         });
       });
