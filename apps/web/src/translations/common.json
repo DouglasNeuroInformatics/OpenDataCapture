@@ -1,4 +1,18 @@
 {
+  "basePermissionLevel": {
+    "admin": {
+      "en": "Admin",
+      "fr": "Administrateur"
+    },
+    "groupManager": {
+      "en": "Group Manager",
+      "fr": "Responsable de groupe"
+    },
+    "standard": {
+      "en": "Standard User",
+      "fr": "Utilisateur standard"
+    }
+  },
   "cancel": {
     "en": "Cancel",
     "fr": "Annuler"

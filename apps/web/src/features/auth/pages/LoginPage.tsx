@@ -16,7 +16,7 @@ export const LoginPage = () => {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
 
   const login = async (credentials: LoginCredentials) => {
     const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {

@@ -5,20 +5,6 @@
       "fr": "Sujet actif"
     }
   },
-  "basePermissionLevel": {
-    "admin": {
-      "en": "Admin",
-      "fr": "Administrateur"
-    },
-    "groupManager": {
-      "en": "Group Manager",
-      "fr": "Responsable de groupe"
-    },
-    "standard": {
-      "en": "Standard User",
-      "fr": "Utilisateur standard"
-    }
-  },
   "close": {
     "en": "Close",
     "fr": "Fermer"
@@ -93,40 +79,6 @@
         "Novembre",
         "Décembre"
       ]
-    }
-  },
-  "demo": {
-    "groups": {
-      "en": "Group(s): {{value}}",
-      "fr": "Groupe(s) : {{value}}"
-    },
-    "info": {
-      "en": "Demo Information",
-      "fr": "Informations sur la démonstration"
-    },
-    "loginCredentials": {
-      "en": "Login Credentials",
-      "fr": "Identifiants de connexion"
-    },
-    "password": {
-      "en": "Password: {{value}}",
-      "fr": "Mot de passe : {{value}}"
-    },
-    "role": {
-      "en": "Role: {{value}}",
-      "fr": "Rôle d'utilisateur : {{value}}"
-    },
-    "summary": {
-      "en": "This demo is intended for testing and showcasing purposes. It features two fictional groups: Depression Clinic and Psychosis Clinic, both filled with several months of simulated example data to highlight data presentation. The database resets daily at 6:00 AM UTC.",
-      "fr": "Cette démo est conçue à des fins de test et de démonstration. Elle présente deux groupes fictifs : Clinique de la Dépression et Clinique de la Psychose, tous deux pourvus de plusieurs mois de données simulées pour illustrer la présentation des données. La base de données est réinitialisée quotidiennement à 6h00 UTC."
-    },
-    "username": {
-      "en": "Username: {{value}}",
-      "fr": "Nom d'utilisateur : {{value}}"
-    },
-    "welcome": {
-      "en": "Welcome to the Demo Version of Open Data Capture",
-      "fr": "Bienvenue sur la version de démonstration de la plateforme Open Data Capture"
     }
   },
   "disclaimer": {
@@ -461,14 +413,6 @@
     "en": "Last Name",
     "fr": "Nom"
   },
-  "learnMore": {
-    "en": "Learn More",
-    "fr": "En savoir plus"
-  },
-  "login": {
-    "en": "Login",
-    "fr": "Se connecter"
-  },
   "navLinks": {
     "addVisit": {
       "en": "Add Visit",
@@ -562,10 +506,6 @@
       "en": "Welcome Back",
       "fr": "Bienvenue"
     }
-  },
-  "password": {
-    "en": "Password",
-    "fr": "Mot de passe"
   },
   "platform": {
     "title": {
@@ -681,16 +621,6 @@
     "en": "Table",
     "fr": "Tableau"
   },
-  "unauthorizedError": {
-    "message": {
-      "en": "Invalid login credentials",
-      "fr": "Informations d'identification invalides"
-    },
-    "title": {
-      "en": "Unauthorized",
-      "fr": "Non autorisé"
-    }
-  },
   "userDropup": {
     "logout": {
       "en": "Logout",
@@ -701,10 +631,7 @@
       "fr": "Préférences"
     }
   },
-  "username": {
-    "en": "Username",
-    "fr": "Nom d'utilisateur"
-  },
+
   "viewSubjects": {
     "lookup": {
       "title": {

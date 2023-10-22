@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { DemoModal } from './DemoModal';
 
 export const DemoBanner = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
@@ -31,7 +31,7 @@ export const DemoBanner = () => {
               type="button"
               onClick={openModal}
             >
-              {t('learnMore')}
+              {t('demo.learnMore')}
             </button>
           </div>
         </div>
