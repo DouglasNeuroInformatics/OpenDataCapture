@@ -8,3 +8,4 @@ export * from './lib/instrument-record';
 export * from './lib/subject';
 export * from './lib/summary';
 export * from './lib/user';
+export * from './lib/visit';

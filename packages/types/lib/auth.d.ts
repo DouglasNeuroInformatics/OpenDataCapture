@@ -8,6 +8,7 @@ import type { InstrumentRecord } from './instrument-record';
 import type { Subject } from './subject';
 import type { Summary } from './summary';
 import type { User } from './user';
+import type { Visit } from './visit';
 
 export type AuthPayload = {
   accessToken: string;
@@ -22,9 +23,19 @@ export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
 export type AppEntityType<T> = T extends object ? Omit<T, 'id'> : never;
 
-export type AppEntity = AppEntityType<Assignment | Group | Instrument | InstrumentRecord | Subject | Summary | User>;
+export type AppEntity = AppEntityType<
+  Assignment | Group | Instrument | InstrumentRecord | Subject | Summary | User | Visit
+>;
 
-export type AppEntityName = 'Assignment' | 'Group' | 'Instrument' | 'InstrumentRecord' | 'Subject' | 'Summary' | 'User';
+export type AppEntityName =
+  | 'Assignment'
+  | 'Group'
+  | 'Instrument'
+  | 'InstrumentRecord'
+  | 'Subject'
+  | 'Summary'
+  | 'User'
+  | 'Visit';
 
 export type AppEntityClass<TEntity extends AppEntity> = Class<TEntity> & {
   readonly modelName: AppEntityName;
