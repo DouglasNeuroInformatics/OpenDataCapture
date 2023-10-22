@@ -2,7 +2,8 @@ import type { Summary } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 
-import { PageHeader, Spinner } from '@/components';
+import { PageHeader } from '@/components/PageHeader';
+import { Spinner } from '@/components/Spinner';
 import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 

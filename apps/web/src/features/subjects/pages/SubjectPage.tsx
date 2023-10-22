@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useParams } from 'react-router-dom';
 
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/components/PageHeader';
 
 const TabLink = ({ label, pathname }: { label: string; pathname: string }) => (
   <NavLink

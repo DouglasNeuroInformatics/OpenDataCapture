@@ -5,11 +5,11 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { IdentificationForm, type IdentificationFormData } from '@/components/IdentificationForm';
-import { useActiveSubjectStore } from '@/stores/active-subject-store';
+import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 export const FormIdentification = () => {
   const notifications = useNotificationsStore();
-  const { setActiveSubject } = useActiveSubjectStore();
+  const { setActiveVisit } = useActiveVisitStore();
   const { updateIndex } = useContext(StepperContext);
   const { t } = useTranslation();
 
@@ -21,7 +21,7 @@ export const FormIdentification = () => {
       notifications.addNotification({ message: t('identificationForm.notFound'), type: 'error' });
       return;
     }
-    setActiveSubject(data);
+    setActiveVisit(data);
     updateIndex('increment');
   };
 

@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
 import { Spinner } from '@/components/Spinner';
-import { useActiveSubjectStore } from '@/stores/active-subject-store';
+import { useActiveVisitStore } from '@/stores/active-visit-store';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { FormIdentification } from '../components/FormIdentification';
@@ -27,7 +27,7 @@ export const FormPage = () => {
   const params = useParams();
   const notifications = useNotificationsStore();
   const { t } = useTranslation();
-  const { activeSubject } = useActiveSubjectStore();
+  const { activeVisit } = useActiveVisitStore();
   const { currentGroup } = useAuthStore();
 
   const instrument = useFetchInstrument(params.id!);
@@ -47,7 +47,7 @@ export const FormPage = () => {
       instrumentName: instrument.name,
       instrumentVersion: instrument.version,
       kind: 'form',
-      subjectInfo: activeSubject,
+      subjectInfo: activeVisit,
       time: Date.now()
     });
     setTimeCollected(now);
