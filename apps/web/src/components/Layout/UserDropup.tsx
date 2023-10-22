@@ -6,14 +6,15 @@ import { useTranslation } from 'react-i18next';
 import { HiUserCircle } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
-import { LanguageToggle } from '@/components';
 import { useAuthStore } from '@/stores/auth-store';
+
+import { LanguageToggle } from './LanguageToggle';
 
 export const UserDropup = () => {
   const auth = useAuthStore();
   const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation('layout');
 
   const closeDropup = () => {
     setIsOpen(false);

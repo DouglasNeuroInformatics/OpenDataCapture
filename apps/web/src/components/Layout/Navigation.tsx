@@ -10,7 +10,7 @@ export type NavigationProps = {
 };
 
 export const Navigation = (props: NavigationProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('layout');
 
   return (
     <nav className="flex-grow">

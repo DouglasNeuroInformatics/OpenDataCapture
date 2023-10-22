@@ -1,7 +1,5 @@
 export * from './ActiveSubject';
-export * from './Footer';
 export * from './IdentificationForm';
-export * from './LanguageToggle';
 export * from './Layout';
 export * from './Link';
 export * from './PageHeader';

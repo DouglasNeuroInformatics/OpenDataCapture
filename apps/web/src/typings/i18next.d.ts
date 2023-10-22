@@ -7,6 +7,7 @@ import type { ValueOf } from 'type-fest';
 import auth from '../translations/auth.json';
 import common from '../translations/common.json';
 import contact from '../translations/contact.json';
+import layout from '../translations/layout.json';
 import overview from '../translations/overview.json';
 
 type TranslatedResource<T> = {
@@ -25,6 +26,7 @@ declare module 'i18next' {
       auth: TranslatedResource<typeof auth>;
       common: TranslatedResource<typeof common>;
       contact: TranslatedResource<typeof contact>;
+      layout: TranslatedResource<typeof layout>;
       overview: TranslatedResource<typeof overview>;
     };
   }

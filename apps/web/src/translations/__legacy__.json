@@ -53,24 +53,6 @@
     "en": "First Name",
     "fr": "Prénom"
   },
-  "footer": {
-    "contact": {
-      "en": "Contact Us",
-      "fr": "Contactez-nous"
-    },
-    "documentation": {
-      "en": "Documentation",
-      "fr": "Documentation"
-    },
-    "license": {
-      "en": "License",
-      "fr": "Licence"
-    },
-    "sourceCode": {
-      "en": "Source Code",
-      "fr": "Code source"
-    }
-  },
   "form": {
     "errors": {
       "required": {
@@ -359,36 +341,6 @@
     "en": "Last Name",
     "fr": "Nom"
   },
-  "navLinks": {
-    "addVisit": {
-      "en": "Add Visit",
-      "fr": "Ajouter une visite"
-    },
-    "availableInstruments": {
-      "en": "View Instruments",
-      "fr": "Afficher tous les instruments"
-    },
-    "createInstrument": {
-      "en": "Add Instrument",
-      "fr": "Ajouter un instrument"
-    },
-    "lookupSubject": {
-      "en": "Lookup Subject",
-      "fr": "Trouver un client"
-    },
-    "manageInstruments": {
-      "en": "Manage Instruments",
-      "fr": "Gérer les instruments"
-    },
-    "overview": {
-      "en": "Overview",
-      "fr": "Vue d'ensemble"
-    },
-    "viewSubjects": {
-      "en": "View Subjects",
-      "fr": "Afficher tous les clients"
-    }
-  },
   "networkError": {
     "en": "Network Error",
     "fr": "Erreur de réseau"
@@ -415,18 +367,6 @@
         "en": "Warning",
         "fr": "Avertissement"
       }
-    }
-  },
-  "organization": {
-    "name": {
-      "en": "Douglas Neuroinformatics Platform",
-      "fr": "Douglas Neuroinformatics Platform"
-    }
-  },
-  "platform": {
-    "title": {
-      "en": "Open Data Capture",
-      "fr": "Open Data Capture"
     }
   },
   "searchBar": {
@@ -536,16 +476,6 @@
   "table": {
     "en": "Table",
     "fr": "Tableau"
-  },
-  "userDropup": {
-    "logout": {
-      "en": "Logout",
-      "fr": "Se déconnecter"
-    },
-    "preferences": {
-      "en": "Preferences",
-      "fr": "Préférences"
-    }
   },
 
   "viewSubjects": {

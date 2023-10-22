@@ -8,7 +8,7 @@ const GITHUB_REPO_URL = import.meta.env.GITHUB_REPO_URL;
 const LICENSE_URL = import.meta.env.LICENSE_URL;
 
 export const Footer = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('layout');
 
   return (
     <footer className="container py-3 text-slate-600 dark:text-slate-300 print:hidden">
