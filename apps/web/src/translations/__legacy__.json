@@ -335,10 +335,6 @@
     "en": "Last Name",
     "fr": "Nom"
   },
-  "networkError": {
-    "en": "Network Error",
-    "fr": "Erreur de réseau"
-  },
   "notifications": {
     "types": {
       "error": {

@@ -3,6 +3,14 @@
     "en": "Active Visit",
     "fr": "Visite active"
   },
+  "networkError": {
+    "en": "Network Error",
+    "fr": "Erreur de réseau"
+  },
+  "unknownError": {
+    "en": "Unknown Error",
+    "fr": "Erreur inconnue"
+  },
   "basePermissionLevel": {
     "admin": {
       "en": "Admin",
