@@ -20,7 +20,6 @@
     "@open-data-capture/demo": "workspace:*",
     "@react-spring/web": "^9.7.3",
     "@use-gesture/react": "^10.3.0",
-    "ajv": "^8.12.0",
     "axios": "^1.5.1",
     "clsx": "^2.0.0",
     "framer-motion": "^10.16.4",
