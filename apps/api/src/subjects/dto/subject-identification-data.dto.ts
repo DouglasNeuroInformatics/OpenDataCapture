@@ -1,18 +1,9 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
+import { subjectIdentificationDataSchema } from '@open-data-capture/schemas/subject';
 import type { Sex, SubjectIdentificationData } from '@open-data-capture/types';
-import { ZodType, z } from 'zod';
 
-const SexSchema: ZodType<Sex> = z.enum(['male', 'female']);
-
-export const SubjectIdentificationDataSchema = z.object({
-  dateOfBirth: z.coerce.date(),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  sex: SexSchema
-});
-
-@ValidationSchema(SubjectIdentificationDataSchema)
+@ValidationSchema(subjectIdentificationDataSchema)
 export class SubjectIdentificationDataDto implements SubjectIdentificationData {
   @ApiProperty()
   dateOfBirth: Date;
