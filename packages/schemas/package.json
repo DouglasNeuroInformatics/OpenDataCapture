@@ -4,6 +4,8 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
+    "./assignment": "./src/assignment.schema.ts",
+    "./core": "./src/core.schema.ts",
     "./subject": "./src/subject.schema.ts"
   },
   "scripts": {

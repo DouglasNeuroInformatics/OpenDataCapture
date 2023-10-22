@@ -1,5 +1,5 @@
 import type { Sex, Subject, SubjectIdentificationData } from '@open-data-capture/types';
-import { ZodType, z } from 'zod';
+import { type ZodType, z } from 'zod';
 
 export const sexSchema = z.enum(['male', 'female']) satisfies ZodType<Sex>;
 
