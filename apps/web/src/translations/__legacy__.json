@@ -339,10 +339,6 @@
     "en": "Network Error",
     "fr": "Erreur de réseau"
   },
-  "no": {
-    "en": "No",
-    "fr": "Non"
-  },
   "notifications": {
     "types": {
       "error": {
@@ -376,36 +372,6 @@
   "selectMeasures": {
     "en": "Please select one or more measures",
     "fr": "Veuillez sélectionner au moins une mesure"
-  },
-  "setup": {
-    "admin": {
-      "description": {
-        "en": "To use the application, there must be at least one platform administrator. Ensure you remember these credentials, as failure to do so may result in data loss.",
-        "fr": "Pour utiliser l'application, il faut qu'il y ait au moins un administrateur. Assurez-vous de vous souvenir de ces informations d'identification, faute de quoi vous risquez de perdre des données."
-      },
-      "title": {
-        "en": "Admin",
-        "fr": "Administrateur"
-      }
-    },
-    "demo": {
-      "description": {
-        "en": "If you're testing the platform, you have the option to populate the database with sample data.",
-        "fr": "Si vous testez la plateforme, vous avez la possibilité d'alimenter la base de données avec des échantillons de données."
-      },
-      "init": {
-        "en": "Initialize Demo",
-        "fr": "Initialiser la démonstration"
-      },
-      "title": {
-        "en": "Demo",
-        "fr": "Démonstration"
-      }
-    },
-    "pageTitle": {
-      "en": "Setup",
-      "fr": "Mise en service"
-    }
   },
   "subjectPage": {
     "pageTitle": {
@@ -501,9 +467,5 @@
         "fr": "Filtres"
       }
     }
-  },
-  "yes": {
-    "en": "Yes",
-    "fr": "Oui"
   }
 }

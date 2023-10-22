@@ -9,6 +9,8 @@ import common from '../translations/common.json';
 import contact from '../translations/contact.json';
 import layout from '../translations/layout.json';
 import overview from '../translations/overview.json';
+import setup from '../translations/setup.json';
+import subjects from '../translations/subjects.json';
 import visits from '../translations/visits.json';
 
 type TranslatedResource<T> = {
@@ -29,6 +31,8 @@ declare module 'i18next' {
       contact: TranslatedResource<typeof contact>;
       layout: TranslatedResource<typeof layout>;
       overview: TranslatedResource<typeof overview>;
+      setup: TranslatedResource<typeof setup>;
+      subjects: TranslatedResource<typeof subjects>;
       visits: TranslatedResource<typeof visits>;
     };
   }

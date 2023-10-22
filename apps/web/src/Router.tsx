@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { P, match } from 'ts-pattern';
 
-import { Layout } from './components';
+import { Layout } from './components/Layout';
 import * as Auth from './features/auth';
 import * as Contact from './features/contact';
 import * as InstrumentsModule from './features/instruments';

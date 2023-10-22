@@ -7,20 +7,20 @@ import { useTranslation } from 'react-i18next';
 import { P, match } from 'ts-pattern';
 
 import logo from '@/assets/logo.png';
-import { Spinner } from '@/components';
+import { Spinner } from '@/components/Spinner';
 
 import { type SetupData, SetupForm } from '../components/SetupForm';
 
 const SETUP_KEY = 'DATA_CAPTURE_SETUP';
 
 export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('setup');
   const notifications = useNotificationsStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [setupState, setSetupState] = useState<SetupState>(() => {
     const savedSetup = window.localStorage.getItem(SETUP_KEY);
-    if (!savedSetup) {
+    if (!savedSetup || import.meta.env.DEV) {
       return { isSetup: null };
     }
     return JSON.parse(savedSetup) as SetupState;
@@ -74,7 +74,7 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
           options: ['en', 'fr']
         }}
         logo={logo}
-        title={t('setup.pageTitle')}
+        title={t('pageTitle')}
         widthMultiplier={1.5}
       >
         <SetupForm onSubmit={(data) => void handleSubmit(data)} />

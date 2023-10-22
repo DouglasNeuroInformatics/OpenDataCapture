@@ -2,6 +2,7 @@
 
 import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 type SetupData = {
   firstName: string;
@@ -19,42 +20,42 @@ type SetupFormProps = {
 const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
 const SetupForm = ({ onSubmit }: SetupFormProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['common', 'setup']);
   return (
     <Form<SetupData>
       content={[
         {
-          description: t('setup.admin.description'),
+          description: t('setup:admin.description'),
           fields: {
             firstName: {
               kind: 'text',
-              label: t('firstName'),
+              label: t('identificationData.firstName.label'),
               variant: 'short'
             },
             lastName: {
               kind: 'text',
-              label: t('lastName'),
+              label: t('identificationData.lastName.label'),
               variant: 'short'
             },
             username: {
               kind: 'text',
-              label: t('username'),
+              label: t('setup:admin.username'),
               variant: 'short'
             },
             password: {
               kind: 'text',
-              label: t('password'),
+              label: t('setup:admin.password'),
               variant: 'password'
             }
           },
-          title: t('setup.admin.title')
+          title: t('setup:admin.title')
         },
         {
-          description: t('setup.demo.description'),
+          description: t('setup:demo.description'),
           fields: {
             initDemo: {
               kind: 'binary',
-              label: t('setup.demo.init'),
+              label: t('setup:demo.init'),
               options: {
                 f: t('no'),
                 t: t('yes')
@@ -62,35 +63,17 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
               variant: 'radio'
             }
           },
-          title: t('setup.demo.title')
+          title: t('setup:demo.title')
         }
       ]}
-      submitBtnLabel={t('form.submit')}
-      validationSchema={{
-        properties: {
-          firstName: {
-            minLength: 1,
-            type: 'string'
-          },
-          initDemo: {
-            type: 'boolean'
-          },
-          lastName: {
-            minLength: 1,
-            type: 'string'
-          },
-          password: {
-            pattern: isStrongPassword.source,
-            type: 'string'
-          },
-          username: {
-            minLength: 1,
-            type: 'string'
-          }
-        },
-        required: ['firstName', 'lastName', 'username', 'password', 'initDemo'],
-        type: 'object'
-      }}
+      submitBtnLabel={t('submit')}
+      validationSchema={z.object({
+        firstName: z.string(),
+        lastName: z.string(),
+        username: z.string(),
+        password: z.string().regex(isStrongPassword),
+        initDemo: z.boolean()
+      })}
       onSubmit={onSubmit}
     />
   );

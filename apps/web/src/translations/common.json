@@ -73,6 +73,10 @@
       }
     }
   },
+  "no": {
+    "en": "No",
+    "fr": "Non"
+  },
   "notFound": {
     "en": "Not Found",
     "fr": "Pas trouvé"
@@ -80,5 +84,9 @@
   "submit": {
     "en": "Submit",
     "fr": "Soumettre"
+  },
+  "yes": {
+    "en": "Yes",
+    "fr": "Oui"
   }
 }
