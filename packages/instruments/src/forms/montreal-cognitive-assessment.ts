@@ -1,6 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import type { MultilingualFormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/types';
+import { z } from 'zod';
 
 export type MontrealCognitiveAssessmentData = {
   abstraction: number;
@@ -13,7 +14,7 @@ export type MontrealCognitiveAssessmentData = {
   visuospatialExecutive: number;
 };
 
-export const montrealCognitiveAssessment: MultilingualFormInstrument<MontrealCognitiveAssessmentData> = {
+export const montrealCognitiveAssessment: FormInstrument<MontrealCognitiveAssessmentData> = {
   kind: 'form',
   name: 'MontrealCognitiveAssessment',
   language: ['en', 'fr'],
@@ -191,56 +192,14 @@ export const montrealCognitiveAssessment: MultilingualFormInstrument<MontrealCog
       value: ({ visuospatialExecutive }) => visuospatialExecutive
     }
   },
-  validationSchema: {
-    properties: {
-      abstraction: {
-        maximum: 2,
-        minimum: 0,
-        type: 'integer'
-      },
-      attention: {
-        maximum: 6,
-        minimum: 0,
-        type: 'integer'
-      },
-      delayedRecall: {
-        maximum: 5,
-        minimum: 0,
-        type: 'integer'
-      },
-      language: {
-        maximum: 3,
-        minimum: 0,
-        type: 'integer'
-      },
-      lowEdu: {
-        type: 'boolean'
-      },
-      naming: {
-        maximum: 3,
-        minimum: 0,
-        type: 'integer'
-      },
-      orientation: {
-        maximum: 6,
-        minimum: 0,
-        type: 'integer'
-      },
-      visuospatialExecutive: {
-        maximum: 5,
-        minimum: 0,
-        type: 'integer'
-      }
-    },
-    required: [
-      'abstraction',
-      'attention',
-      'delayedRecall',
-      'language',
-      'naming',
-      'orientation',
-      'visuospatialExecutive'
-    ],
-    type: 'object'
-  }
+  validationSchema: z.object({
+    abstraction: z.number().int().gte(0).lte(2),
+    attention: z.number().int().gte(0).lte(6),
+    delayedRecall: z.number().int().gte(0).lte(5),
+    language: z.number().int().gte(0).lte(3),
+    lowEdu: z.boolean(),
+    naming: z.number().int().gte(0).lte(3),
+    orientation: z.number().int().gte(0).lte(6),
+    visuospatialExecutive: z.number().int().gte(0).lte(5)
+  })
 };

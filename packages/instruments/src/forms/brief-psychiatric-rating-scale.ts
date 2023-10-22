@@ -1,29 +1,28 @@
 /* eslint-disable perfectionist/sort-objects */
+
 import type { FormInstrument } from '@open-data-capture/types';
-import type { PropertiesSchema } from 'ajv/dist/types/json-schema';
+import { z } from 'zod';
 
-const fields = [
-  'somaticConcern',
-  'anxiety',
-  'emotionalWithdrawal',
-  'conceptualDisorganization',
-  'guiltFeelings',
-  'tension',
-  'mannerismsAndPosturing',
-  'grandiosity',
-  'depressiveMood',
-  'hostility',
-  'suspiciousness',
-  'hallucinatoryBehavior',
-  'motorRetardation',
-  'uncooperativeness',
-  'unusualThoughtContent',
-  'bluntedAffect',
-  'excitement',
-  'disorientation'
-] as const;
-
-export type BriefPsychiatricRatingScaleData = { [K in (typeof fields)[number]]: number };
+export type BriefPsychiatricRatingScaleData = {
+  anxiety: number;
+  bluntedAffect: number;
+  conceptualDisorganization: number;
+  depressiveMood: number;
+  disorientation: number;
+  emotionalWithdrawal: number;
+  excitement: number;
+  grandiosity: number;
+  guiltFeelings: number;
+  hallucinatoryBehavior: number;
+  hostility: number;
+  mannerismsAndPosturing: number;
+  motorRetardation: number;
+  somaticConcern: number;
+  suspiciousness: number;
+  tension: number;
+  uncooperativeness: number;
+  unusualThoughtContent: number;
+};
 
 export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleData, 'en'> = {
   kind: 'form',
@@ -234,18 +233,24 @@ export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingS
       }
     }
   },
-  validationSchema: {
-    properties: Object.fromEntries(
-      fields.map((fieldName) => [
-        fieldName,
-        {
-          maximum: 7,
-          minimum: 0,
-          type: 'integer'
-        }
-      ])
-    ) as PropertiesSchema<BriefPsychiatricRatingScaleData>,
-    required: fields,
-    type: 'object'
-  }
+  validationSchema: z.object({
+    somaticConcern: z.number().int().min(0).max(7),
+    anxiety: z.number().int().min(0).max(7),
+    emotionalWithdrawal: z.number().int().min(0).max(7),
+    conceptualDisorganization: z.number().int().min(0).max(7),
+    guiltFeelings: z.number().int().min(0).max(7),
+    tension: z.number().int().min(0).max(7),
+    mannerismsAndPosturing: z.number().int().min(0).max(7),
+    grandiosity: z.number().int().min(0).max(7),
+    depressiveMood: z.number().int().min(0).max(7),
+    hostility: z.number().int().min(0).max(7),
+    suspiciousness: z.number().int().min(0).max(7),
+    hallucinatoryBehavior: z.number().int().min(0).max(7),
+    motorRetardation: z.number().int().min(0).max(7),
+    uncooperativeness: z.number().int().min(0).max(7),
+    unusualThoughtContent: z.number().int().min(0).max(7),
+    bluntedAffect: z.number().int().min(0).max(7),
+    excitement: z.number().int().min(0).max(7),
+    disorientation: z.number().int().min(0).max(7)
+  })
 };

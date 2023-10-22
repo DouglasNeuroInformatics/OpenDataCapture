@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
-import type { MultilingualFormInstrument } from '@open-data-capture/types';
+
+import type { FormInstrument } from '@open-data-capture/types';
+import { z } from 'zod';
 
 import { extractKeys, formatOptions } from '../utils/format-options';
 
@@ -580,7 +582,7 @@ type EnhancedDemographicsQuestionnaireData = {
   yearsOfEducation?: number;
 };
 
-export const enhancedDemographicsQuestionnaire: MultilingualFormInstrument<EnhancedDemographicsQuestionnaireData> = {
+export const enhancedDemographicsQuestionnaire: FormInstrument<EnhancedDemographicsQuestionnaireData> = {
   kind: 'form',
   name: 'EnhancedDemographicsQuestionnaire',
   language: ['en', 'fr'],
@@ -787,87 +789,23 @@ export const enhancedDemographicsQuestionnaire: MultilingualFormInstrument<Enhan
       fr: 'Questionnaire démographique détaillé'
     }
   },
-  validationSchema: {
-    properties: {
-      ageAtImmigration: {
-        maximum: 100,
-        minimum: 1,
-        nullable: true,
-        type: 'integer'
-      },
-      annualIncome: {
-        maximum: 1000000,
-        minimum: 0,
-        nullable: true,
-        type: 'integer'
-      },
-      employmentStatus: {
-        enum: extractKeys(employmentStatus, true),
-        nullable: true,
-        type: 'string'
-      },
-      ethnicOrigin: {
-        enum: extractKeys(ethnicOrigin, true),
-        nullable: true,
-        type: 'string'
-      },
-      firstLanguage: {
-        enum: extractKeys(firstLanguage, true),
-        nullable: true,
-        type: 'string'
-      },
-      gender: {
-        enum: extractKeys(gender, true),
-        nullable: true,
-        type: 'string'
-      },
-      householdSize: {
-        maximum: 20,
-        minimum: 0,
-        nullable: true,
-        type: 'integer'
-      },
-      isCanadianCitizen: {
-        nullable: true,
-        type: 'boolean'
-      },
-      maritalStatus: {
-        enum: extractKeys(maritalStatus, true),
-        nullable: true,
-        type: 'string'
-      },
-      numberChildren: {
-        maximum: 20,
-        minimum: 0,
-        nullable: true,
-        type: 'integer'
-      },
-      postalCode: {
-        nullable: true,
-        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source,
-        type: 'string'
-      },
-      religion: {
-        enum: extractKeys(religion, true),
-        nullable: true,
-        type: 'string'
-      },
-      speaksEnglish: {
-        nullable: true,
-        type: 'boolean'
-      },
-      speaksFrench: {
-        nullable: true,
-        type: 'boolean'
-      },
-      yearsOfEducation: {
-        maximum: 30,
-        minimum: 0,
-        nullable: true,
-        type: 'integer'
-      }
-    },
-    required: [],
-    type: 'object'
-  }
+  validationSchema: z
+    .object({
+      ageAtImmigration: z.number().int().gte(1).lte(100),
+      annualIncome: z.number().int().gte(0).lte(1000000),
+      employmentStatus: z.enum(extractKeys(employmentStatus)),
+      ethnicOrigin: z.enum(extractKeys(ethnicOrigin)),
+      firstLanguage: z.enum(extractKeys(firstLanguage)),
+      gender: z.enum(extractKeys(gender)),
+      householdSize: z.number().int().gte(0).lte(20),
+      isCanadianCitizen: z.boolean(),
+      maritalStatus: z.enum(extractKeys(maritalStatus)),
+      numberChildren: z.number().int().gte(0).lte(20),
+      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
+      religion: z.enum(extractKeys(religion)),
+      speaksEnglish: z.boolean(),
+      speaksFrench: z.boolean(),
+      yearsOfEducation: z.number().int().gte(0).lte(30)
+    })
+    .partial()
 };

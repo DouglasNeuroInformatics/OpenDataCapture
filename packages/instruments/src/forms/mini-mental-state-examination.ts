@@ -1,6 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import type { MultilingualFormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/types';
+import { z } from 'zod';
 
 export type MiniMentalStateExaminationData = {
   canCopyDesign: number;
@@ -25,7 +26,7 @@ export type MiniMentalStateExaminationData = {
   year: number;
 };
 
-export const miniMentalStateExamination: MultilingualFormInstrument<MiniMentalStateExaminationData> = {
+export const miniMentalStateExamination: FormInstrument<MiniMentalStateExaminationData> = {
   kind: 'form',
   name: 'Mini Mental State Examination',
   language: ['en', 'fr'],
@@ -462,131 +463,26 @@ export const miniMentalStateExamination: MultilingualFormInstrument<MiniMentalSt
       }
     }
   },
-  validationSchema: {
-    properties: {
-      canCopyDesign: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      canFollowOralInstructions: {
-        maximum: 3,
-        minimum: 0,
-        type: 'integer'
-      },
-      canFollowWrittenInstructions: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      canNamePencil: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      canNameWatch: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      canRepeatPhrase: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      canWriteSentence: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      city: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      country: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      date: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      day: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      floor: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      institution: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      learningScore: {
-        maximum: 3,
-        minimum: 0,
-        type: 'integer'
-      },
-      month: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      province: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      recallScore: {
-        maximum: 3,
-        minimum: 0,
-        type: 'integer'
-      },
-      season: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      },
-      spellWorldScore: {
-        maximum: 5,
-        minimum: 0,
-        type: 'integer'
-      },
-      year: {
-        maximum: 1,
-        minimum: 0,
-        type: 'integer'
-      }
-    },
-    required: [
-      'canCopyDesign',
-      'canFollowOralInstructions',
-      'canFollowWrittenInstructions',
-      'canNamePencil',
-      'canNameWatch',
-      'canRepeatPhrase',
-      'canWriteSentence',
-      'city',
-      'country',
-      'date',
-      'day',
-      'floor',
-      'institution',
-      'learningScore',
-      'month',
-      'province',
-      'recallScore',
-      'season',
-      'spellWorldScore',
-      'year'
-    ],
-    type: 'object'
-  }
+  validationSchema: z.object({
+    canCopyDesign: z.number().int().gte(0).lte(1),
+    canFollowOralInstructions: z.number().int().gte(0).lte(3),
+    canFollowWrittenInstructions: z.number().int().gte(0).lte(1),
+    canNamePencil: z.number().int().gte(0).lte(1),
+    canNameWatch: z.number().int().gte(0).lte(1),
+    canRepeatPhrase: z.number().int().gte(0).lte(1),
+    canWriteSentence: z.number().int().gte(0).lte(1),
+    city: z.number().int().gte(0).lte(1),
+    country: z.number().int().gte(0).lte(1),
+    date: z.number().int().gte(0).lte(1),
+    day: z.number().int().gte(0).lte(1),
+    floor: z.number().int().gte(0).lte(1),
+    institution: z.number().int().gte(0).lte(1),
+    learningScore: z.number().int().gte(0).lte(3),
+    month: z.number().int().gte(0).lte(1),
+    province: z.number().int().gte(0).lte(1),
+    recallScore: z.number().int().gte(0).lte(3),
+    season: z.number().int().gte(0).lte(1),
+    spellWorldScore: z.number().int().gte(0).lte(5),
+    year: z.number().int().gte(0).lte(1)
+  })
 };

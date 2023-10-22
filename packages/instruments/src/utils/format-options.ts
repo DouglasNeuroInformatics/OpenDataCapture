@@ -34,9 +34,7 @@ export function formatOptions<T extends MultilingualOptions>(options: T): Format
   };
 }
 
-export function extractKeys<T extends MultilingualOptions>(options: T, nullable = false) {
-  const keys = Object.keys(options) as (keyof T)[];
-  return nullable ? [...keys, null] : keys;
+export function extractKeys<T extends Record<string, unknown>>(options: T) {
+  return Object.keys(options) as [keyof T, ...(keyof T)[]];
 }
 
-export type { MultilingualOptions };

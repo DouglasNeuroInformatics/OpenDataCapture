@@ -1,11 +1,13 @@
 /* eslint-disable perfectionist/sort-objects */
-import type { MultilingualFormInstrument } from '@open-data-capture/types';
+
+import type { FormInstrument } from '@open-data-capture/types';
+import { z } from 'zod';
 
 export type HappinessQuestionnaireData = {
   overallHappiness: number;
 };
 
-export const happinessQuestionnaire: MultilingualFormInstrument<HappinessQuestionnaireData> = {
+export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData> = {
   kind: 'form',
   name: 'HappinessQuestionnaire',
   language: ['en', 'fr'],
@@ -46,15 +48,7 @@ export const happinessQuestionnaire: MultilingualFormInstrument<HappinessQuestio
       fr: 'Questionnaire sur le bonheur'
     }
   },
-  validationSchema: {
-    properties: {
-      overallHappiness: {
-        maximum: 10,
-        minimum: 1,
-        type: 'integer'
-      }
-    },
-    required: ['overallHappiness'],
-    type: 'object'
-  }
+  validationSchema: z.object({
+    overallHappiness: z.number().int().gte(1).lte(10)
+  })
 };
