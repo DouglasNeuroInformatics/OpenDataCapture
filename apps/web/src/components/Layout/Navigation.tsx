@@ -42,7 +42,7 @@ export const Navigation = (props: NavigationProps) => {
           }
         ]}
         cyTestId="view-subjects"
-        href="/subjects/view-subjects"
+        href="/subjects"
         icon={<HiEye />}
         label={t(`navLinks.viewSubjects`)}
         {...props}

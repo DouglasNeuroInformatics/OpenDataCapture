@@ -5,19 +5,113 @@
       "fr": "Renvoyer la notification"
     }
   },
-  "subjectManagementPage": {
-    "assignedInstruments": {
-      "en": "Assigned Instruments",
-      "fr": "Instruments assignés"
+  "index": {
+    "lookup": {
+      "title": {
+        "en": "Subject Lookup",
+        "fr": "Trouver un client"
+      }
     },
+    "table": {
+      "subject": {
+        "en": "Subject",
+        "fr": "Client"
+      },
+      "export": {
+        "en": "Export",
+        "fr": "Exporter"
+      },
+      "exportHelpText": {
+        "en": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
+        "fr": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants."
+      },
+      "filters": {
+        "en": "Filters",
+        "fr": "Filtres"
+      }
+    },
+    "title": {
+      "en": "View Subjects",
+      "fr": "Tous les clients"
+    }
+  },
+  "layout": {
+    "tabs": {
+      "assignments": {
+        "en": "Assignments",
+        "fr": "Tâches"
+      },
+      "graph": {
+        "en": "Graph",
+        "fr": "Graphique"
+      },
+      "table": {
+        "en": "Table",
+        "fr": "Tableau"
+      }
+    },
+    "title": {
+      "en": "Instrument Records for Subject {{id}}",
+      "fr": "Dossiers d'instruments pour le client {{id}}"
+    }
+  },
+  "visualization": {
+    "instrument": {
+      "en": "Instrument",
+      "fr": "Instrument"
+    },
+    "measures": {
+      "en": "Measures",
+      "fr": "Mesures"
+    },
+    "selectedInstrument": {
+      "en": "Selected Instrument: {{title}}",
+      "fr": "Instrument sélectionné : {{title}}"
+    },
+    "selectedInstrumentNone": {
+      "en": "None",
+      "fr": "aucun"
+    },
+    "timeframe": {
+      "en": "Timeframe",
+      "fr": "Période"
+    },
+    "timeframeOptions": {
+      "all": {
+        "en": "All-Time",
+        "fr": "Toujours"
+      },
+      "month": {
+        "en": "Past Month",
+        "fr": "Mois écoulé"
+      },
+      "year": {
+        "en": "Past Year",
+        "fr": "Année écoulée"
+      }
+    },
+    "xLabel": {
+      "en": "Date Collected",
+      "fr": "Date d'enregistrement"
+    },
+    "yLabel": {
+      "en": "Value",
+      "fr": "Valeur"
+    }
+  },
+  "subjectManagementPage": {
     "addAssignment": {
       "en": "Add Assignment",
       "fr": "Assigner un instrument"
     },
+    "assignedInstruments": {
+      "en": "Assigned Instruments",
+      "fr": "Instruments assignés"
+    },
     "tableColumns": {
-      "title": {
-        "en": "Title",
-        "fr": "Titre"
+      "status": {
+        "en": "Status",
+        "fr": "État"
       },
       "timeAssigned": {
         "en": "Assigned",
@@ -27,9 +121,9 @@
         "en": "Expires",
         "fr": "Expiration"
       },
-      "status": {
-        "en": "Status",
-        "fr": "État"
+      "title": {
+        "en": "Title",
+        "fr": "Titre"
       }
     }
   }

@@ -7,9 +7,9 @@ import { useFetch } from '@/hooks/useFetch';
 
 import { SubjectsTable } from '../components/SubjectsTable';
 
-export const ViewSubjectsPage = () => {
+export const IndexPage = () => {
   const { data } = useFetch<Subject[]>('/v1/subjects');
-  const { t } = useTranslation();
+  const { t } = useTranslation('subjects');
 
   if (!data) {
     return <Spinner />;
@@ -17,10 +17,8 @@ export const ViewSubjectsPage = () => {
 
   return (
     <div>
-      <PageHeader title={t('viewSubjects.pageTitle')} />
+      <PageHeader title={t('index.title')} />
       <SubjectsTable data={data} />
     </div>
   );
 };
-
-export default ViewSubjectsPage;

@@ -6,7 +6,7 @@ import * as Auth from './features/auth';
 import * as Contact from './features/contact';
 import * as InstrumentsModule from './features/instruments';
 import * as Overview from './features/overview';
-import * as SubjectsModule from './features/subjects';
+import * as Subjects from './features/subjects';
 import * as UserModule from './features/user';
 import * as Visits from './features/visits';
 import { useAuthStore } from './stores/auth-store';
@@ -37,13 +37,11 @@ export const Router = () => {
                 </Route>
               </Route>
               <Route path="subjects">
-                <Route path="view-subjects">
-                  <Route index element={<SubjectsModule.ViewSubjectsPage />} />
-                  <Route element={<SubjectsModule.SubjectPage />} path=":subjectIdentifier">
-                    <Route index element={<SubjectsModule.SubjectManagementPage />} />
-                    <Route element={<SubjectsModule.SubjectRecordsGraphPage />} path="graph" />
-                    <Route element={<SubjectsModule.SubjectRecordsTablePage />} path="table" />
-                  </Route>
+                <Route index element={<Subjects.IndexPage />} />
+                <Route element={<Subjects.SubjectLayout />} path=":subjectIdentifier">
+                  <Route element={<Subjects.AssignmentsPage />} path="assignments" />
+                  <Route element={<Subjects.GraphPage />} path="graph" />
+                  <Route element={<Subjects.TablePage />} path="table" />
                 </Route>
               </Route>
               <Route path="visits">

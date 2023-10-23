@@ -9,10 +9,10 @@ import { useParams } from 'react-router-dom';
 
 import { useFetch } from '@/hooks/useFetch';
 
-import { AssignmentModal } from '../components/AssignmentModal';
-import { AssignmentSlider } from '../components/AssignmentSlider';
+import { AssignmentModal } from '../../components/AssignmentModal';
+import { AssignmentSlider } from '../../components/AssignmentSlider';
 
-export const SubjectManagementPage = () => {
+export const AssignmentsPage = () => {
   const params = useParams();
   const { t } = useTranslation('subjects');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -76,4 +76,3 @@ export const SubjectManagementPage = () => {
   );
 };
 
-export default SubjectManagementPage;

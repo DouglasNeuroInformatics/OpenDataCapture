@@ -20,7 +20,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
   const navigate = useNavigate();
   const { currentGroup, currentUser } = useAuthStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['subjects', 'common']);
 
   const [showLookup, setShowLookup] = useState(false);
 
@@ -40,7 +40,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         });
         break;
       case 'CSV':
-        download('README.txt', () => Promise.resolve(t('viewSubjects.table.exportHelpText')));
+        download('README.txt', () => Promise.resolve(t('index.table.exportHelpText')));
         download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
           const columnNames = Object.keys(data[0]!);
@@ -68,11 +68,11 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
           }}
         />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <Dropdown options={[]} size="sm" title={t('viewSubjects.table.filters')} onSelection={() => null} />
+          <Dropdown options={[]} size="sm" title={t('index.table.filters')} onSelection={() => null} />
           <Dropdown
             options={['CSV', 'JSON']}
             size="sm"
-            title={t('viewSubjects.table.export')}
+            title={t('index.table.export')}
             onSelection={handleExportSelection}
           />
         </div>
@@ -81,20 +81,23 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         columns={[
           {
             field: (subject) => subject.identifier.slice(0, 6),
-            label: t('viewSubjects.table.columns.subject')
+            label: t('index.table.subject')
           },
           {
             field: (subject) => toBasicISOString(new Date(subject.dateOfBirth)),
-            label: t('viewSubjects.table.columns.dateOfBirth')
+            label: t('common:identificationData.dateOfBirth.label')
           },
           {
-            field: (subject) => (subject.sex === 'female' ? t('sex.female') : t('sex.male')),
-            label: t('viewSubjects.table.columns.sex')
+            field: (subject) =>
+              subject.sex === 'female'
+                ? t('common:identificationData.sex.female')
+                : t('common:identificationData.sex.male'),
+            label: t('common:identificationData.sex.label')
           }
         ]}
         data={data}
         onEntryClick={(subject) => {
-          navigate(subject.identifier);
+          navigate(`${subject.identifier}/assignments`);
         }}
       />
     </>

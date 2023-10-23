@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { useFetch } from '@/hooks/useFetch';
+
 type AssignmentFormData = Omit<CreateAssignmentData, 'subjectIdentifier'>;
 
 export type AssignmentModalProps = {
