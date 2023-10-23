@@ -3,7 +3,7 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import type { EntityController } from '@douglasneuroinformatics/nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
-import type { FormInstrument, InstrumentLanguage } from '@open-data-capture/types';
+import type { FormInstrument, FormInstrumentSummary, InstrumentLanguage } from '@open-data-capture/types';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
@@ -45,7 +45,9 @@ export class FormsService implements EntityController<FormInstrument> {
     if (!ability) {
       return this.instrumentsRepository.find<FormInstrument>({ kind: 'form' });
     }
-    return this.instrumentsRepository.find<FormInstrument>({ $and: [{ kind: 'form' }, accessibleBy(ability, 'read').Instrument] });
+    return this.instrumentsRepository.find<FormInstrument>({
+      $and: [{ kind: 'form' }, accessibleBy(ability, 'read').Instrument]
+    });
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -58,6 +60,22 @@ export class FormsService implements EntityController<FormInstrument> {
       throw new ForbiddenException(`Insufficient rights to read form with ID: ${id}`);
     }
     return form;
+  }
+
+  async getSummary(): Promise<FormInstrumentSummary[]> {
+    return this.instrumentsRepository.find<FormInstrument>(
+      { kind: 'form' },
+      {
+        projection: {
+          details: true,
+          kind: true,
+          language: true,
+          name: true,
+          tags: true,
+          version: true
+        }
+      }
+    );
   }
 
   async updateById(id: string, update: Partial<FormInstrument>, { ability }: EntityOperationOptions = {}) {

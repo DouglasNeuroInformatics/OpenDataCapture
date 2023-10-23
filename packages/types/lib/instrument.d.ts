@@ -222,6 +222,8 @@ export type FormInstrument<
   }
 >;
 
+export type FormInstrumentSummary = Omit<FormInstrument, 'content' | 'measures' | 'validationSchema'>;
+
 export type SterilizedFormInstrument<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage

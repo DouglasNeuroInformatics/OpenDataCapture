@@ -1,3 +1,5 @@
+/* eslint-disable perfectionist/sort-classes */
+
 import { CurrentUser, type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -33,6 +35,13 @@ export class FormsController implements EntityController<FormInstrument> {
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async findAll(@CurrentUser('ability') ability: AppAbility) {
     return this.formsService.findAll({ ability });
+  }
+
+  @ApiOperation({ summary: 'Summarize Available Forms' })
+  @Get('summary')
+  @RouteAccess({ action: 'read', subject: 'Instrument' })
+  async getSummary() {
+    return this.formsService.getSummary();
   }
 
   @ApiOperation({ summary: 'Get Form' })
