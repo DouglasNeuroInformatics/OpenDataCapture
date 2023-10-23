@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 import i18next from 'i18next';
 
 import { useAuthStore } from '@/stores/auth-store';
@@ -28,9 +28,17 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     const notifications = useNotificationsStore.getState();
-    const message = error instanceof Error ? error.message : i18next.t('unknownError');
-    notifications.addNotification({ message, type: 'error' });
-    return Promise.reject(error);
+    if (!isAxiosError(error)) {
+      notifications.addNotification({ message: i18next.t('unknownError'), type: 'error' });
+      return Promise.reject(error);
+    }
+    notifications.addNotification({
+      message: i18next.t('httpRequestFailed'),
+      title: error.response?.status.toString(),
+      type: 'error'
+    });
+    console.error(error.response);
+    return Promise.resolve();
   }
 );
 

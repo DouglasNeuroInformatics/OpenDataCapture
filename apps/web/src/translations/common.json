@@ -31,6 +31,10 @@
       "fr": "Ce champ est obligatoire"
     }
   },
+  "httpRequestFailed": {
+    "en": "HTTP Request Failed",
+    "fr": "Échec de la requête HTTP"
+  },
   "identificationData": {
     "dateOfBirth": {
       "label": {
@@ -76,6 +80,10 @@
         "fr": "Masculin"
       }
     }
+  },
+  "instrument": {
+    "en": "Instrument",
+    "fr": "Instrument"
   },
   "networkError": {
     "en": "Network Error",
