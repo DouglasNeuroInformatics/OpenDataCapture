@@ -1,10 +1,9 @@
 import { useContext, useMemo } from 'react';
 
-import { ClientTable, Dropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { ClientTable, Dropdown, useNotificationsStore, useDownload } from '@douglasneuroinformatics/ui';
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';
 import { useTranslation } from 'react-i18next';
 
-import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { VisualizationContext } from '../context/VisualizationContext';

@@ -1,13 +1,12 @@
 import { useState } from 'react';
 
-import { ClientTable, Dropdown, SearchBar } from '@douglasneuroinformatics/ui';
+import { ClientTable, Dropdown, SearchBar, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { InstrumentRecordsExport, Subject } from '@open-data-capture/types';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { SubjectLookup } from './SubjectLookup';
