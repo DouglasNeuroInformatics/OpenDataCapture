@@ -8,16 +8,17 @@ import { SubjectGraphPage } from './pages/SubjectGraphPage';
 import { SubjectIndexPage } from './pages/SubjectIndexPage';
 import { SubjectTablePage } from './pages/SubjectTablePage';
 
-export const subjectsRoutes: RouteObject = {
+export const subjectsRoute: RouteObject = {
   path: 'subjects',
   children: [
     {
+      index: true,
+      element: <SubjectIndexPage />
+    },
+    {
+      path: ':subjectIdentifier',
       element: <SubjectLayout />,
       children: [
-        {
-          index: true,
-          element: <SubjectIndexPage />
-        },
         {
           path: 'assignments',
           element: <SubjectAssignmentsPage />

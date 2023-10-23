@@ -7,7 +7,7 @@ import { authRoutes } from './features/auth';
 import { contactRoute } from './features/contact';
 import * as InstrumentsModule from './features/instruments';
 import { overviewRoute } from './features/overview';
-import * as Subjects from './features/subjects';
+import { subjectsRoute } from './features/subjects';
 import { userRoute } from './features/user';
 import { visitsRoute } from './features/visits';
 import { useAuthStore } from './stores/auth-store';
@@ -24,14 +24,13 @@ const protectedRoutes: RouteObject[] = [
   authRoutes,
   {
     element: <Layout />,
-    children: [contactRoute, overviewRoute, userRoute, visitsRoute]
+    children: [contactRoute, overviewRoute, subjectsRoute, userRoute, visitsRoute]
   }
 ];
 
 export const AppRoutes = () => {
   const { accessToken } = useAuthStore();
-  const element = useRoutes(accessToken ? protectedRoutes : publicRoutes);
-  return element;
+  return useRoutes(accessToken ? protectedRoutes : publicRoutes);
 };
 
 export const Router = () => {
