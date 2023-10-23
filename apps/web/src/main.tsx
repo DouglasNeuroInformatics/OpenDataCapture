@@ -7,6 +7,10 @@ import './styles.css';
 
 const root = document.getElementById('root')!;
 
+if (process.env.NODE_ENV === 'development') {
+  // import('../msw/mocks/browser.jsx')
+}
+
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <App />
