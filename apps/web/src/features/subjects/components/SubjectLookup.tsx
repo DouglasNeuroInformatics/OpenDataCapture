@@ -12,7 +12,7 @@ type SubjectLookupProps = {
 };
 
 export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('subjects');
   const navigate = useNavigate();
 
   const lookupSubject = (formData: SubjectIdentificationData) => {
@@ -27,7 +27,7 @@ export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
   };
 
   return (
-    <Modal open={show} title={t('viewSubjects.lookup.title')} onClose={onClose}>
+    <Modal open={show} title={t('index.lookup.title')} onClose={onClose}>
       <div>
         <IdentificationForm fillActiveSubject onSubmit={lookupSubject} />
       </div>

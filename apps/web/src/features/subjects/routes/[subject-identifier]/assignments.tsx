@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button, ClientTable } from '@douglasneuroinformatics/ui';
+import { Button, ClientTable, Spinner } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
@@ -75,4 +75,3 @@ export const AssignmentsPage = () => {
     </div>
   );
 };
-

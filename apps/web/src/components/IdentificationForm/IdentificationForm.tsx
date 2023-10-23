@@ -51,7 +51,7 @@ export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel
           }
         }
       }}
-      initialValues={fillActiveSubject ? activeVisit?.subject : undefined}
+      initialValues={fillActiveSubject ? activeVisit?.subject ?? null : null}
       resetBtn={fillActiveSubject}
       submitBtnLabel={submitBtnLabel ?? t('submit')}
       validationSchema={z.object({

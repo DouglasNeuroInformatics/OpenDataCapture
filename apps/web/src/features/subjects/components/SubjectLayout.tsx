@@ -13,7 +13,7 @@ export const SubjectLayout = () => {
   const basePathname = `/subjects/${subjectIdentifier}`;
 
   return (
-    <div>
+    <div className="h-full">
       <PageHeader title={t('layout.title', { id: subjectIdentifier.slice(0, 7) })} />
       <div className="mb-5 flex">
         <TabLink label={t('layout.tabs.assignments')} pathname={`${basePathname}/assignments`} />
