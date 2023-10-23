@@ -1,24 +1,30 @@
-import { Spinner } from '@douglasneuroinformatics/ui';
 import type { Subject } from '@open-data-capture/types';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components/PageHeader';
-import { useFetch } from '@/hooks/useFetch';
+import { useAuthStore } from '@/stores/auth-store';
 
 import { SubjectsTable } from '../components/SubjectsTable';
 
 export const SubjectIndexPage = () => {
-  const { data } = useFetch<Subject[]>('/v1/subjects');
+  const { currentGroup } = useAuthStore();
+  const query = useQuery({
+    queryFn: () => axios.get<Subject[]>('/v1/subjects').then((response) => response.data),
+    queryKey: ['subjects', currentGroup?.id]
+  });
+
   const { t } = useTranslation('subjects');
 
-  if (!data) {
-    return <Spinner />;
+  if (!query.data) {
+    return null;
   }
 
   return (
     <div>
       <PageHeader title={t('index.title')} />
-      <SubjectsTable data={data} />
+      <SubjectsTable data={query.data} />
     </div>
   );
 };
