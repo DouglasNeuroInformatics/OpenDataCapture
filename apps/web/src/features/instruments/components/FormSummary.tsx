@@ -1,14 +1,12 @@
 import { useMemo } from 'react';
 
 import type { FormInstrumentData, NullableFormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Button, formatFormDataAsString, resolveStaticFormFields } from '@douglasneuroinformatics/ui';
+import { Button, Spinner, formatFormDataAsString, resolveStaticFormFields } from '@douglasneuroinformatics/ui';
 import type { FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
-import { Spinner } from '@/components/Spinner';
 import { useDownload } from '@/hooks/useDownload';
 import { useActiveVisitStore } from '@/stores/active-visit-store';
-
 const FormSummaryItem = ({ label, value }: { label: string; value: unknown }) => {
   return (
     <div className="my-1">

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { Stepper, Spinner, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
@@ -13,7 +13,6 @@ import {
 import { useParams } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
-import { Spinner } from '@/components/Spinner';
 import { useActiveVisitStore } from '@/stores/active-visit-store';
 import { useAuthStore } from '@/stores/auth-store';
 

@@ -1,12 +1,13 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import type { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
+import { Spinner } from '@douglasneuroinformatics/ui';
 import type { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@open-data-capture/types';
 import { useParams } from 'react-router-dom';
 
-import { Spinner } from '@/components/Spinner';
 import { useFetch } from '@/hooks/useFetch';
 import i18n from '@/services/i18n';
+
+import type { Measurements, SelectedInstrument, SelectedMeasure } from '../types';
 
 /** Apply a callback function to filter items from object */
 function filterObj<T extends object>(obj: T, fn: (entry: { key: keyof T; value: T[keyof T] }) => unknown) {

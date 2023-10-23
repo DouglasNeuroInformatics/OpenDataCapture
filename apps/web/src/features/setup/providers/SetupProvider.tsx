@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
 import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { Spinner } from '@douglasneuroinformatics/ui';
 import type { SetupState } from '@open-data-capture/types';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { P, match } from 'ts-pattern';
 
 import logo from '@/assets/logo.png';
-import { Spinner } from '@/components/Spinner';
 
 import { type SetupData, SetupForm } from '../components/SetupForm';
 

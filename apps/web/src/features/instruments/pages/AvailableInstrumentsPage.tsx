@@ -1,8 +1,8 @@
+import { Spinner } from '@douglasneuroinformatics/ui';
 import type { FormInstrumentSummary } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components/PageHeader';
-import { Spinner } from '@/components/Spinner';
 import { useFetch } from '@/hooks/useFetch';
 
 import { InstrumentShowcase } from '../components/InstrumentShowcase';
