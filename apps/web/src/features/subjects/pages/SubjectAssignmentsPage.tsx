@@ -9,10 +9,10 @@ import { useParams } from 'react-router-dom';
 
 import { useFetch } from '@/hooks/useFetch';
 
-import { AssignmentModal } from '../../components/AssignmentModal';
-import { AssignmentSlider } from '../../components/AssignmentSlider';
+import { AssignmentModal } from '../components/AssignmentModal';
+import { AssignmentSlider } from '../components/AssignmentSlider';
 
-export const AssignmentsPage = () => {
+export const SubjectAssignmentsPage = () => {
   const params = useParams();
   const { t } = useTranslation('subjects');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

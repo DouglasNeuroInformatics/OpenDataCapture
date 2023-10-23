@@ -7,7 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 
 import { SubjectsTable } from '../components/SubjectsTable';
 
-export const IndexPage = () => {
+export const SubjectIndexPage = () => {
   const { data } = useFetch<Subject[]>('/v1/subjects');
   const { t } = useTranslation('subjects');
 

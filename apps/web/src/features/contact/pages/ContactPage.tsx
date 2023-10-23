@@ -6,7 +6,7 @@ import { ContactForm, type ContactFormData } from '../components/ContactForm';
 
 const CONTACT_EMAIL = import.meta.env.CONTACT_EMAIL;
 
-export const IndexPage = () => {
+export const ContactPage = () => {
   const { t } = useTranslation('contact');
 
   const handleSubmit = ({ contactReason, message }: ContactFormData) => {

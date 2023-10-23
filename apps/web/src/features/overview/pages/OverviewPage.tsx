@@ -1,5 +1,5 @@
-import type { Summary } from '@open-data-capture/types';
 import { Spinner } from '@douglasneuroinformatics/ui';
+import type { Summary } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 

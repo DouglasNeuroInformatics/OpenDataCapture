@@ -23,4 +23,3 @@ export const UserPage = () => {
   );
 };
 
-export default UserPage;

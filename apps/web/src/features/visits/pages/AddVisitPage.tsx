@@ -8,7 +8,8 @@ import { PageHeader } from '@/components/PageHeader';
 import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 import { AddVisitForm, type AddVisitFormData } from '../components/AddVisitForm';
-export const AddVisit = () => {
+
+export const AddVisitPage = () => {
   const { setActiveVisit } = useActiveVisitStore();
   const notifications = useNotificationsStore();
   const { t } = useTranslation('visits');
