@@ -1,10 +1,10 @@
-import { Spinner } from '@douglasneuroinformatics/ui';
 import type { Summary } from '@open-data-capture/types';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 
 import { PageHeader } from '@/components/PageHeader';
-import { useFetch } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { Disclaimer } from '../components/Disclaimer';
@@ -17,17 +17,21 @@ export const OverviewPage = () => {
 
   const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
-  const summary = useFetch<Summary>('/v1/summary', [currentGroup], {
-    access: { action: 'read', subject: 'User' },
-    queryParams: {
-      group: currentGroup?.id
-    }
+  const query = useQuery({
+    enabled: currentUser?.ability.can('read', 'Summary'),
+    queryFn: () => {
+      return axios
+        .get<Summary>('/v1/summary', {
+          params: {
+            groupId: currentGroup?.id
+          }
+        })
+        .then((response) => response.data);
+    },
+    queryKey: ['summary', currentGroup?.id]
   });
 
-  // // If it is the first time loading data
-  if (summary.isLoading) {
-    return <Spinner />;
-  } else if (!summary.data) {
+  if (!query.data) {
     return null;
   }
 
@@ -42,18 +46,14 @@ export const OverviewPage = () => {
         </div>
         <div className="body-font">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            <StatisticCard icon={<HiUsers />} label={t('totalUsers')} value={summary.data.counts.users} />
-            <StatisticCard icon={<HiUser />} label={t('totalSubjects')} value={summary.data.counts.subjects} />
+            <StatisticCard icon={<HiUsers />} label={t('totalUsers')} value={query.data.counts.users} />
+            <StatisticCard icon={<HiUser />} label={t('totalSubjects')} value={query.data.counts.subjects} />
             <StatisticCard
               icon={<HiClipboardDocument />}
               label={t('totalInstruments')}
-              value={summary.data.counts.instruments}
+              value={query.data.counts.instruments}
             />
-            <StatisticCard
-              icon={<HiDocumentText />}
-              label={t('totalRecords')}
-              value={summary.data.counts.records}
-            />
+            <StatisticCard icon={<HiDocumentText />} label={t('totalRecords')} value={query.data.counts.records} />
           </div>
         </div>
       </section>
