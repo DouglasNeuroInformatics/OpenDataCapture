@@ -1,5 +1,6 @@
 import type { FormDataType, FormFieldKind } from '@douglasneuroinformatics/form-types';
 import type Types from '@open-data-capture/types';
+import type { FormInstrumentSummary } from '@open-data-capture/types';
 import { ZodType, z } from 'zod';
 
 import { languageSchema } from './core.schema';
@@ -98,3 +99,9 @@ export const formInstrumentSchema = z.object({
   validationSchema: z.instanceof(ZodType<FormDataType>),
   version: z.number()
 }) satisfies ZodType<Types.FormInstrument>;
+
+export const formInstrumentSummarySchema = formInstrumentSchema.omit({
+  content: true,
+  measures: true,
+  validationSchema: true
+}) satisfies ZodType<FormInstrumentSummary>;

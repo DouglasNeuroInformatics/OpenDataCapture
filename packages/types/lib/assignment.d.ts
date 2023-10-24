@@ -1,17 +1,23 @@
-import type { FormInstrument } from './instrument';
+import type { FormInstrument, FormInstrumentSummary } from './instrument';
 
 export type AssignmentStatus = 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDING';
 
 export type Assignment = {
+  assignedAt: Date;
+  expiresAt: Date;
+  id?: string;
   instrument: FormInstrument;
   status: AssignmentStatus;
-  timeAssigned: number;
-  timeExpires: number;
+};
+
+export type AssignmentSummary = Omit<Assignment, 'instrument'> & {
+  instrument: FormInstrumentSummary;
 };
 
 export type CreateAssignmentData = {
+  expiresAt: Date;
   instrumentId: string;
-  subjectId: string;
+  subjectIdentifier: string;
 };
 
-export type UpdateAssignmentData = Pick<Assignment, 'status' | 'timeExpires'>;
+export type UpdateAssignmentData = Pick<Assignment, 'expiresAt' | 'status'>;

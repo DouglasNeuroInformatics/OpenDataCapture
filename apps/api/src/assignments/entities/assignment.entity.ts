@@ -12,7 +12,15 @@ import { SubjectEntity } from '@/subjects/entities/subject.entity';
 export class AssignmentEntity implements Assignment {
   static readonly modelName = 'Assignment';
 
-  @Prop({ autopopulate: true, ref: InstrumentEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
+  @ApiProperty()
+  @Prop({ required: true, type: Object })
+  assignedAt: Date;
+
+  @ApiProperty()
+  @Prop({ required: true, type: Object })
+  expiresAt: Date;
+
+  @Prop({ ref: InstrumentEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
   instrument: FormInstrumentEntity;
 
   @ApiProperty()
@@ -22,14 +30,6 @@ export class AssignmentEntity implements Assignment {
   @ApiProperty()
   @Prop({ ref: SubjectEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
   subject: SubjectEntity;
-
-  @ApiProperty()
-  @Prop({ required: true })
-  timeAssigned: number;
-
-  @ApiProperty()
-  @Prop({ required: true })
-  timeExpires: number;
 }
 
 export const AssignmentSchema = SchemaFactory.createForClass(AssignmentEntity);

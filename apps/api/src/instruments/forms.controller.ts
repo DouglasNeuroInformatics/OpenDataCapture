@@ -26,7 +26,7 @@ export class FormsController implements EntityController<FormInstrument> {
   @ApiOperation({ summary: 'Delete Form' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Instrument' })
-  deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+  async deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.formsService.deleteById(id, { ability });
   }
 
@@ -38,10 +38,10 @@ export class FormsController implements EntityController<FormInstrument> {
   }
 
   @ApiOperation({ summary: 'Summarize Available Forms' })
-  @Get('summary')
+  @Get('available')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async getSummary() {
-    return this.formsService.getSummary();
+  async getAvailable(@CurrentUser('ability') ability: AppAbility) {
+    return this.formsService.getAvailable({ ability });
   }
 
   @ApiOperation({ summary: 'Get Form' })
@@ -54,7 +54,7 @@ export class FormsController implements EntityController<FormInstrument> {
   @ApiOperation({ summary: 'Update Form' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Instrument' })
-  updateById(
+  async updateById(
     @Param('id', ParseIdPipe) id: string,
     @Body() update: UpdateFormDto,
     @CurrentUser('ability') ability: AppAbility

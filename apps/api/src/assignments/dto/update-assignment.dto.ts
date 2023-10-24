@@ -6,8 +6,8 @@ import type { AssignmentStatus, UpdateAssignmentData } from '@open-data-capture/
 @ValidationSchema(updateAssignmentDataSchema)
 export class UpdateAssignmentDto implements UpdateAssignmentData {
   @ApiProperty()
-  status: AssignmentStatus;
+  expiresAt: Date;
 
   @ApiProperty()
-  timeExpires: number;
+  status: AssignmentStatus;
 }

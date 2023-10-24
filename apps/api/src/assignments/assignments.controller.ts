@@ -1,7 +1,9 @@
-import { EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
+/* eslint-disable perfectionist/sort-classes */
+
+import { CurrentUser, EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import type { Assignment } from '@open-data-capture/types';
+import type { AppAbility, Assignment } from '@open-data-capture/types';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -23,28 +25,39 @@ export class AssignmentsController implements EntityController<Assignment> {
   @ApiOperation({ summary: 'Delete Assignment' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Assignment' })
-  deleteById(@Param('id', ParseIdPipe) id: string) {
-    return this.assignmentsService.deleteById(id);
+  deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability?: AppAbility) {
+    return this.assignmentsService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Get All Assignments' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Assignment' })
-  findAll() {
-    return this.assignmentsService.findAll();
+  findAll(@CurrentUser('ability') ability?: AppAbility) {
+    return this.assignmentsService.findAll({ ability });
+  }
+
+  @ApiOperation({ summary: 'Get Summary of Assignments' })
+  @Get('summary')
+  @RouteAccess({ action: 'read', subject: 'Assignment' })
+  getSummary(@CurrentUser('ability') ability?: AppAbility) {
+    return this.assignmentsService.getSummary({ ability });
   }
 
   @ApiOperation({ summary: 'Get Assignment' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Assignment' })
-  findById(@Param('id', ParseIdPipe) id: string) {
-    return this.assignmentsService.findById(id);
+  findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability?: AppAbility) {
+    return this.assignmentsService.findById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Cancel' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Assignment' })
-  updateById(@Param('id', ParseIdPipe) id: string, @Body() updateAssignmentDto: UpdateAssignmentDto) {
-    return this.assignmentsService.updateById(id, updateAssignmentDto);
+  updateById(
+    @Param('id', ParseIdPipe) id: string,
+    @Body() updateAssignmentDto: UpdateAssignmentDto,
+    @CurrentUser('ability') ability?: AppAbility
+  ) {
+    return this.assignmentsService.updateById(id, updateAssignmentDto, { ability });
   }
 }

@@ -99,7 +99,7 @@
       "fr": "Valeur"
     }
   },
-  "subjectManagementPage": {
+  "assignments": {
     "addAssignment": {
       "en": "Add Assignment",
       "fr": "Assigner un instrument"
@@ -108,23 +108,21 @@
       "en": "Assigned Instruments",
       "fr": "Instruments assignés"
     },
-    "tableColumns": {
-      "status": {
-        "en": "Status",
-        "fr": "État"
-      },
-      "timeAssigned": {
-        "en": "Assigned",
-        "fr": "Attribué"
-      },
-      "timeExpires": {
-        "en": "Expires",
-        "fr": "Expiration"
-      },
-      "title": {
-        "en": "Title",
-        "fr": "Titre"
-      }
+    "status": {
+      "en": "Status",
+      "fr": "État"
+    },
+    "assignedAt": {
+      "en": "Assigned",
+      "fr": "Attribué"
+    },
+    "expiresAt": {
+      "en": "Expires",
+      "fr": "Expiration"
+    },
+    "title": {
+      "en": "Title",
+      "fr": "Titre"
     }
   }
 }

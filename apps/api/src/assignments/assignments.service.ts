@@ -1,7 +1,7 @@
 import { accessibleBy } from '@casl/mongoose';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Assignment } from '@open-data-capture/types';
+import type { Assignment, AssignmentSummary } from '@open-data-capture/types';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { FormsService } from '@/instruments/forms.service';
@@ -19,15 +19,15 @@ export class AssignmentsService implements EntityService<Assignment> {
     private readonly subjectsService: SubjectsService
   ) {}
 
-  async create({ instrumentId, subjectId }: CreateAssignmentDto) {
+  async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto) {
     const instrument = await this.formsService.findById(instrumentId);
-    const subject = await this.subjectsService.findById(subjectId);
+    const subject = await this.subjectsService.findById(subjectIdentifier);
     return this.assignmentsRepository.create({
+      assignedAt: new Date(),
+      expiresAt,
       instrument,
       status: 'OUTSTANDING',
-      subject,
-      timeAssigned: Date.now(),
-      timeExpires: Date.now() + 604800000 // 1 week,
+      subject
     });
   }
 
@@ -56,6 +56,15 @@ export class AssignmentsService implements EntityService<Assignment> {
       throw new ForbiddenException(`Insufficient rights to read assignment with ID: ${id}`);
     }
     return assignment;
+  }
+
+  async getSummary({ ability }: EntityOperationOptions = {}): Promise<AssignmentSummary[]> {
+    return this.assignmentsRepository.find(ability ? accessibleBy(ability, 'read').Assignment : {}, {
+      populate: {
+        path: 'instrument',
+        select: '-content -measures -validationSchema'
+      }
+    });
   }
 
   async updateById(id: string, update: UpdateAssignmentDto, { ability }: EntityOperationOptions = {}) {

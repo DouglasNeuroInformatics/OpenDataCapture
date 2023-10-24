@@ -6,8 +6,11 @@ import { type CreateAssignmentData } from '@open-data-capture/types';
 @ValidationSchema(createAssignmentDataSchema)
 export class CreateAssignmentDto implements CreateAssignmentData {
   @ApiProperty()
+  expiresAt: Date;
+  
+  @ApiProperty()
   instrumentId: string;
 
   @ApiProperty()
-  subjectId: string;
+  subjectIdentifier: string;
 }

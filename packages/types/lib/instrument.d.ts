@@ -1,5 +1,5 @@
 import type Base from '@douglasneuroinformatics/form-types';
-import type { Simplify } from 'type-fest';
+import type { Primitive, Simplify } from 'type-fest';
 import type { ZodType } from 'zod';
 
 import { Language } from './core';
@@ -18,6 +18,8 @@ type InstrumentUIOption<L extends InstrumentLanguage, V> = L extends Language
 export type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
   content: unknown;
+
+  id?: string;
 
   /** The discriminator key for the type of instrument */
   kind: InstrumentKind;
@@ -150,7 +152,7 @@ export type FormInstrumentArrayField<
 
 export type FormInstrumentStaticField<
   TLanguage extends InstrumentLanguage,
-  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue
+  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue = Base.ArrayFieldValue | Base.PrimitiveFieldValue
 > = [TValue] extends [Base.PrimitiveFieldValue]
   ? FormInstrumentPrimitiveField<TLanguage, TValue>
   : [TValue] extends [Base.ArrayFieldValue]
@@ -167,7 +169,7 @@ export type FormInstrumentStaticFields<
 export type FormInstrumentDynamicField<
   TLanguage extends InstrumentLanguage,
   TData extends Base.FormDataType,
-  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue
+  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue = Base.ArrayFieldValue | Base.PrimitiveFieldValue
 > = (data: Base.NullableFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
 
 export type FormInstrumentUnknownField<
@@ -231,4 +233,31 @@ export type SterilizedFormInstrument<
   validationSchema: string;
 };
 
+export type UnilingualFormInstrument<TData extends Base.FormDataType = Base.FormDataType> = FormInstrument<
+  TData,
+  Language
+>;
+
+export type MultilingualFormInstrument<TData extends Base.FormDataType = Base.FormDataType> = FormInstrument<
+  TData,
+  Language[]
+>;
+
+export type TranslatedItem<T> = T extends object
+  ? T extends Record<Language, unknown>
+    ? T[Language]
+    : {
+        [K in keyof T]: TranslatedItem<T[K]>;
+      }
+  : never;
+
+export type TranslatableFormInstrumentElements<
+  TData extends Base.FormDataType = Base.FormDataType,
+  TForm extends FormInstrument<TData, Language[]> = FormInstrument<TData, Language[]>
+> = {
+  [K in keyof Omit<TForm, 'validationSchema'> as TForm[K] extends Primitive ? never : K]: unknown;
+};
+
+type T = TranslatedItem<FormInstrument>;
+type X = T['tags'];
 export type Instrument = FormInstrument;
