@@ -80,10 +80,14 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false
   },
+
   css: {
     postcss: {
       plugins: [tailwindcss, autoprefixer]
     }
+  },
+  optimizeDeps: {
+    exclude: ['@douglasneuroinformatics/ui']
   },
   plugins: [
     react(),
