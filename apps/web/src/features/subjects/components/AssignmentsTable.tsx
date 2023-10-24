@@ -1,6 +1,6 @@
 import { ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
-import type { AssignmentSummary, Language } from '@open-data-capture/types';
+import type { AssignmentStatus, AssignmentSummary, Language } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 
 export type AssignmentTableProps = {
@@ -15,11 +15,12 @@ export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTablePr
       columns={[
         {
           field: (entry) => {
+            const altLanguage = i18n.resolvedLanguage === 'en' ? 'fr' : 'en';
             const title = entry.instrument.details.title;
             if (typeof title === 'string') {
               return title;
             }
-            return title[i18n.resolvedLanguage as Language] ?? entry.instrument.name;
+            return title[i18n.resolvedLanguage as Language] ?? title[altLanguage];
           },
           label: t('assignments.title')
         },
@@ -35,7 +36,18 @@ export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTablePr
         },
         {
           field: 'status',
-          formatter: (value: string) => value.charAt(0) + value.slice(1).toLowerCase(),
+          formatter: (value: AssignmentStatus) => {
+            switch (value) {
+              case 'CANCELED':
+                return t('assignments.statusOptions.canceled');
+              case 'COMPLETE':
+                return t('assignments.statusOptions.complete');
+              case 'EXPIRED':
+                return t('assignments.statusOptions.expired');
+              case 'OUTSTANDING':
+                return t('assignments.statusOptions.outstanding');
+            }
+          },
           label: t('assignments.status')
         }
       ]}

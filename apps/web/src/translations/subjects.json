@@ -1,10 +1,4 @@
 {
-  "assignmentSlider": {
-    "resendNotification": {
-      "en": "Resend Notification",
-      "fr": "Renvoyer la notification"
-    }
-  },
   "index": {
     "lookup": {
       "title": {
@@ -112,6 +106,24 @@
       "en": "Status",
       "fr": "État"
     },
+    "statusOptions": {
+      "canceled": {
+        "en": "Canceled",
+        "fr": "Annulé"
+      },
+      "complete": {
+        "en": "Complete",
+        "fr": "Terminé"
+      },
+      "expired": {
+        "en": "Expired",
+        "fr": "Expiré"
+      },
+      "outstanding": {
+        "en": "Outstanding",
+        "fr": "À compléter"
+      }
+    },
     "assignedAt": {
       "en": "Assigned",
       "fr": "Attribué"
@@ -123,6 +135,10 @@
     "title": {
       "en": "Title",
       "fr": "Titre"
+    },
+    "resendNotification": {
+      "en": "Resend Notification",
+      "fr": "Renvoyer la notification"
     }
   }
 }

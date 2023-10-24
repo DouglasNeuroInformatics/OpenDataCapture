@@ -32,7 +32,7 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
             <Button
               disabled
               className="w-full whitespace-nowrap text-sm"
-              label={t('subjects:assignmentSlider.resendNotification')}
+              label={t('subjects:assignments.resendNotification')}
               variant="secondary"
             />
           </div>
