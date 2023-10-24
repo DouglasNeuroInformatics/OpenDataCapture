@@ -5,7 +5,7 @@ import { BrowserRouter, Navigate, type RouteObject, useRoutes } from 'react-rout
 import { Layout } from './components/Layout';
 import { authRoutes } from './features/auth';
 import { contactRoute } from './features/contact';
-import * as InstrumentsModule from './features/instruments';
+import { instrumentsRoute } from './features/instruments';
 import { overviewRoute } from './features/overview';
 import { subjectsRoute } from './features/subjects';
 import { userRoute } from './features/user';
@@ -24,7 +24,7 @@ const protectedRoutes: RouteObject[] = [
   authRoutes,
   {
     element: <Layout />,
-    children: [contactRoute, overviewRoute, subjectsRoute, userRoute, visitsRoute]
+    children: [contactRoute, instrumentsRoute, overviewRoute, subjectsRoute, userRoute, visitsRoute]
   }
 ];
 
@@ -40,38 +40,3 @@ export const Router = () => {
     </BrowserRouter>
   );
 };
-
-// export const Router = () => {
-//   const { accessToken } = useAuthStore();
-
-//   return (
-//     <BrowserRouter>
-//       <Routes>
-//         {match({ accessToken })
-//           .with({ accessToken: P.string }, () => (
-//             <Route element={<Layout />}>
-//               <Route path="instruments">
-//                 <Route element={<InstrumentsModule.AvailableInstrumentsPage />} path="available" />
-//                 <Route element={<InstrumentsModule.ManageInstrumentsPage />} path="manage" />
-//                 <Route element={<InstrumentsModule.CreateInstrumentPage />} path="create" />
-//                 <Route path="forms">
-//                   <Route element={<InstrumentsModule.FormPage />} path=":id" />
-//                 </Route>
-//               </Route>
-//               <Route path="subjects">
-//                 <Route index element={<Subjects.IndexPage />} />
-//                 <Route element={<Subjects.SubjectLayout />} path=":subjectIdentifier">
-//                   <Route element={<Subjects.AssignmentsPage />} path="assignments" />
-//                   <Route element={<Subjects.GraphPage />} path="graph" />
-//                   <Route element={<Subjects.TablePage />} path="table" />
-//                 </Route>
-//               </Route>
-//             </Route>
-//           ))
-//           .otherwise(() => (
-//             <Route element={<Navigate to="/auth/login" />} path="*" />
-//           ))}
-//       </Routes>
-//     </BrowserRouter>
-//   );
-// };

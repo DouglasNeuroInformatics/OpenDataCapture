@@ -1,6 +1,15 @@
 /* eslint-disable perfectionist/sort-objects */
 
-export * from './pages/AvailableInstrumentsPage';
-export * from './pages/CreateInstrumentPage';
-export * from './pages/ManageInstrumentsPage';
-export * from './pages/FormPage';
+import type { RouteObject } from 'react-router-dom';
+
+import { CreateInstrumentPage } from './pages/CreateInstrumentPage';
+
+export const instrumentsRoute: RouteObject = {
+  path: 'instruments',
+  children: [
+    {
+      path: 'create-instrument',
+      element: <CreateInstrumentPage />
+    }
+  ]
+};
