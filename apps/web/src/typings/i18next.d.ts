@@ -7,10 +7,12 @@ import type { ValueOf } from 'type-fest';
 import auth from '../translations/auth.json';
 import common from '../translations/common.json';
 import contact from '../translations/contact.json';
+import instruments from '../translations/instruments.json';
 import layout from '../translations/layout.json';
 import overview from '../translations/overview.json';
 import setup from '../translations/setup.json';
 import subjects from '../translations/subjects.json';
+import user from '../translations/user.json';
 import visits from '../translations/visits.json';
 
 type TranslatedResource<T> = {
@@ -29,10 +31,12 @@ declare module 'i18next' {
       auth: TranslatedResource<typeof auth>;
       common: TranslatedResource<typeof common>;
       contact: TranslatedResource<typeof contact>;
+      instruments: TranslatedResource<typeof instruments>;
       layout: TranslatedResource<typeof layout>;
       overview: TranslatedResource<typeof overview>;
       setup: TranslatedResource<typeof setup>;
       subjects: TranslatedResource<typeof subjects>;
+      user: TranslatedResource<typeof user>;
       visits: TranslatedResource<typeof visits>;
     };
   }
