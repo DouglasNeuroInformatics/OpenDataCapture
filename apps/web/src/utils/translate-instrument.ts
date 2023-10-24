@@ -138,3 +138,11 @@ export function translateFormInstrument<TData extends Base.FormDataType>(
   }
   return null;
 }
+
+export function resolveFormInstrument<TData extends Base.FormDataType>(
+  form: Types.FormInstrument<TData>,
+  preferredLanguage: Types.Language
+) {
+  const altLanguage = preferredLanguage === 'en' ? 'fr' : 'en';
+  return (translateFormInstrument(form, preferredLanguage) ?? translateFormInstrument(form, altLanguage))!;
+}
