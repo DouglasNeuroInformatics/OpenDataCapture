@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 
 import { Button, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { assignmentSummarySchema } from '@open-data-capture/schemas/assignment';
-import type { AssignmentSummary, Language } from '@open-data-capture/types';
-import { useQuery } from '@tanstack/react-query';
+import type { AssignmentSummary, CreateAssignmentData, Language, UpdateAssignmentData } from '@open-data-capture/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { HiPlus } from 'react-icons/hi2';
@@ -15,6 +15,17 @@ import { AssignmentModal } from '../components/AssignmentModal';
 import { AssignmentSlider } from '../components/AssignmentSlider';
 import { AssignmentsTable } from '../components/AssignmentsTable';
 
+type AssignmentMutationOptions =
+  | {
+      id: string;
+      kind: 'update';
+      payload: UpdateAssignmentData;
+    }
+  | {
+      kind: 'create';
+      payload: Omit<CreateAssignmentData, 'subjectIdentifier'>;
+    };
+
 export const SubjectAssignmentsPage = () => {
   const params = useParams();
   const { i18n, t } = useTranslation('subjects');
@@ -24,7 +35,6 @@ export const SubjectAssignmentsPage = () => {
 
   const [selectedAssignment, setSelectedAssignment] = useState<AssignmentSummary | null>(null);
 
-  const formsQuery = useAvailableForms();
   const assignmentsQuery = useQuery({
     queryFn: async () => {
       const response = await axios.get('/v1/assignments/summary');
@@ -32,6 +42,18 @@ export const SubjectAssignmentsPage = () => {
     },
     queryKey: ['assignments']
   });
+  const assignmentsMutation = useMutation({
+    mutationFn: async (data: AssignmentMutationOptions) => {
+      if (data.kind === 'create') {
+        await axios.post('/v1/assignments', { ...data.payload, subjectIdentifier: params.subjectIdentifier! });
+      } else if (data.kind === 'update') {
+        await axios.patch(`/v1/assignments/${data.id}`, data.payload);
+      }
+      notifications.addNotification({ type: 'success' });
+      return assignmentsQuery.refetch();
+    }
+  });
+  const formsQuery = useAvailableForms();
 
   const instrumentOptions: Record<string, string> = useMemo(() => {
     if (!formsQuery.data) {
@@ -75,20 +97,22 @@ export const SubjectAssignmentsPage = () => {
           setIsEditSliderOpen(true);
         }}
       />
-      <AssignmentSlider assignment={selectedAssignment} isOpen={isEditSliderOpen} setIsOpen={setIsEditSliderOpen} />
+      <AssignmentSlider
+        assignment={selectedAssignment}
+        isOpen={isEditSliderOpen}
+        setIsOpen={setIsEditSliderOpen}
+        onCancel={({ id }) => {
+          assignmentsMutation.mutate({ id: id!, kind: 'update', payload: { status: 'CANCELED' } });
+          setIsEditSliderOpen(false);
+        }}
+      />
       <AssignmentModal
         instrumentOptions={instrumentOptions}
         isOpen={isCreateModalOpen}
         setIsOpen={setIsCreateModalOpen}
         onSubmit={(data) => {
-          axios
-            .post('/v1/assignments', { ...data, subjectIdentifier: params.subjectIdentifier })
-            .then(() => {
-              notifications.addNotification({ type: 'success' });
-              setIsCreateModalOpen(false);
-              return assignmentsQuery.refetch();
-            })
-            .catch(console.error);
+          assignmentsMutation.mutate({ kind: 'create', payload: data });
+          setIsCreateModalOpen(false);
         }}
       />
     </div>

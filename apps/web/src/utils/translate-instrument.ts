@@ -2,12 +2,26 @@ import type Base from '@douglasneuroinformatics/form-types';
 import type Types from '@open-data-capture/types';
 import { mapValues, merge } from 'lodash';
 
+function isUnilingualFormSummary<TData extends Base.FormDataType>(
+  summary: Types.FormInstrumentSummary<TData>,
+  language: Types.Language
+): summary is Types.FormInstrumentSummary<TData, Types.Language> {
+  return summary.language === language;
+}
+
+function isMultilingualFormSummary<TData extends Base.FormDataType>(
+  summary: Types.FormInstrumentSummary<TData>,
+  language: Types.Language
+): summary is Types.FormInstrumentSummary<TData, Types.Language[]> {
+  return Array.isArray(summary.language) && summary.language.includes(language);
+}
+
 /** Return whether the instrument is a unilingual form in the provided language */
-function isUnilingualForm<TData extends Base.FormDataType, TLanguage extends Types.Language>(
+function isUnilingualForm<TData extends Base.FormDataType>(
   instrument: Types.FormInstrument<TData>,
-  language: TLanguage
+  language: Types.Language
 ): instrument is Types.UnilingualFormInstrument<TData> {
-  return instrument.language === language;
+  return isUnilingualFormSummary(instrument, language);
 }
 
 /** Return whether the instrument is a multilingual form, with the provided language as an option */
@@ -15,7 +29,7 @@ function isMultilingualForm<TData extends Base.FormDataType>(
   instrument: Types.FormInstrument<TData>,
   language: Types.Language
 ): instrument is Types.MultilingualFormInstrument<TData> {
-  return Array.isArray(instrument.language) && instrument.language.includes(language);
+  return isMultilingualFormSummary(instrument, language);
 }
 
 function isDynamicFormField<TData extends Base.FormDataType>(
@@ -111,7 +125,28 @@ function translateFormFields(
   });
 }
 
-export function translateFormInstrument<TData extends Base.FormDataType>(
+function translateFormSummary<TData extends Base.FormDataType>(
+  summary: Types.FormInstrumentSummary<TData>,
+  language: Types.Language
+): Types.FormInstrumentSummary<TData, Types.Language> | null {
+  if (isUnilingualFormSummary(summary, language)) {
+    return summary;
+  } else if (isMultilingualFormSummary(summary, language)) {
+    summary.details.description;
+    return merge(summary, {
+      details: {
+        description: summary.details.description[language],
+        instructions: summary.details.instructions[language],
+        title: summary.details.title[language]
+      },
+      language: language,
+      tags: summary.tags[language]
+    });
+  }
+  return null;
+}
+
+function translateFormInstrument<TData extends Base.FormDataType>(
   form: Types.FormInstrument<TData>,
   language: Types.Language
 ): Types.UnilingualFormInstrument<TData> | null {
@@ -145,4 +180,12 @@ export function resolveFormInstrument<TData extends Base.FormDataType>(
 ) {
   const altLanguage = preferredLanguage === 'en' ? 'fr' : 'en';
   return (translateFormInstrument(form, preferredLanguage) ?? translateFormInstrument(form, altLanguage))!;
+}
+
+export function resolveFormSummary<TData extends Base.FormDataType>(
+  summary: Types.FormInstrumentSummary,
+  preferredLanguage: Types.Language
+): Types.FormInstrumentSummary<TData, Types.Language> {
+  const altLanguage = preferredLanguage === 'en' ? 'fr' : 'en';
+  return (translateFormSummary(summary, preferredLanguage) ?? translateFormSummary(summary, altLanguage))!;
 }

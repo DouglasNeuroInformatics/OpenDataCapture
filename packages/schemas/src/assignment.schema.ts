@@ -29,8 +29,10 @@ export const createAssignmentDataSchema = z.object({
   subjectIdentifier: z.string()
 }) satisfies Zod.ZodType<Types.CreateAssignmentData>;
 
-export const updateAssignmentDataSchema = z.object({
-  assignedAt: z.coerce.date(),
-  expiresAt: z.coerce.date(),
-  status: assignmentStatusSchema
-}) satisfies Zod.ZodType<Types.UpdateAssignmentData>;
+export const updateAssignmentDataSchema = z
+  .object({
+    assignedAt: z.coerce.date(),
+    expiresAt: z.coerce.date(),
+    status: assignmentStatusSchema
+  })
+  .partial() satisfies Zod.ZodType<Types.UpdateAssignmentData>;

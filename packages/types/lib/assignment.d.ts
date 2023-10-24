@@ -20,4 +20,4 @@ export type CreateAssignmentData = {
   subjectIdentifier: string;
 };
 
-export type UpdateAssignmentData = Pick<Assignment, 'expiresAt' | 'status'>;
+export type UpdateAssignmentData = Partial<Pick<Assignment, 'expiresAt' | 'status'>>;
