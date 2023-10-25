@@ -79,7 +79,7 @@ export function createBilingualFieldGroup({
         deps: ['language'],
         kind: 'dynamic',
         render: (data) => {
-          return (!data && defaultLanguage === 'english') ||
+          return (!data?.language && defaultLanguage === 'english') ||
             data?.language === 'english' ||
             data?.language === 'bilingual'
             ? {
@@ -94,7 +94,7 @@ export function createBilingualFieldGroup({
         deps: ['language'],
         kind: 'dynamic',
         render: (data) => {
-          return (!data && defaultLanguage === 'french') ||
+          return (!data?.language && defaultLanguage === 'french') ||
             data?.language === 'french' ||
             data?.language === 'bilingual'
             ? {
