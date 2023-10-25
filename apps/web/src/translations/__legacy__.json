@@ -84,22 +84,6 @@
     "fr": "Tendance du groupe"
   },
   "instruments": {
-    "availableInstruments": {
-      "filters": {
-        "language": {
-          "en": "Language",
-          "fr": "Langue"
-        },
-        "tags": {
-          "en": "Tags",
-          "fr": "Tags"
-        }
-      },
-      "pageTitle": {
-        "en": "View Instruments",
-        "fr": "Tous les instruments"
-      }
-    },
     "createInstrument": {
       "errors": {
         "duplicateField": {
@@ -172,20 +156,6 @@
       "pageTitle": {
         "en": "Add Instrument",
         "fr": "Ajouter un instrument"
-      },
-      "steps": {
-        "fields": {
-          "en": "Fields",
-          "fr": "Champs"
-        },
-        "info": {
-          "en": "Info",
-          "fr": "Info"
-        },
-        "review": {
-          "en": "Review",
-          "fr": "Révision"
-        }
       }
     },
     "fetchInstrument": {
@@ -319,16 +289,6 @@
         "en": "Manage Instruments",
         "fr": "Gérer les instruments"
       }
-    }
-  },
-  "languages": {
-    "en": {
-      "en": "English",
-      "fr": "Anglais"
-    },
-    "fr": {
-      "en": "French",
-      "fr": "Français"
     }
   },
   "lastName": {

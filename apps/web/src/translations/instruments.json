@@ -1,1 +1,74 @@
-{}
+{
+  "create": {
+    "title": {
+      "en": "Create Instrument",
+      "fr": "Créer un instrument"
+    },
+    "steps": {
+      "fields": {
+        "en": "Fields",
+        "fr": "Champs"
+      },
+      "info": {
+        "en": "Info",
+        "fr": "Info"
+      },
+      "review": {
+        "en": "Review",
+        "fr": "Révision"
+      }
+    },
+    "info": {
+      "basicMetadata": {
+        "en": "Basic Metadata",
+        "fr": "Métadonnées de base"
+      },
+      "name": {
+        "en": "Instrument Name",
+        "fr": "Nom de l'instrument"
+      },
+      "language": {
+        "en": "Language",
+        "fr": "Langue"
+      },
+      "tags": {
+        "en": "Tags",
+        "fr": "Tags"
+      },
+      "tag": {
+        "en": "Tag",
+        "fr": "Tag"
+      },
+      "details": {
+        "en": "Details",
+        "fr": "Détails"
+      },
+      "description": {
+        "en": "Description",
+        "fr": "Description"
+      }
+    }
+  },
+  "manage": {
+    "title": {
+      "en": "Manage Instruments",
+      "fr": "Gérer les instruments"
+    }
+  },
+  "view": {
+    "title": {
+      "en": "Available Instruments",
+      "fr": "Tous les instruments"
+    },
+    "filters": {
+      "language": {
+        "en": "Language",
+        "fr": "Langue"
+      },
+      "tags": {
+        "en": "Tags",
+        "fr": "Tags"
+      }
+    }
+  }
+}

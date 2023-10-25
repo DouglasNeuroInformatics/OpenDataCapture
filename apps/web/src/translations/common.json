@@ -3,6 +3,10 @@
     "en": "Active Visit",
     "fr": "Visite active"
   },
+  "bilingual": {
+    "en": "Bilingual",
+    "fr": "Bilingue"
+  },
   "basePermissionLevel": {
     "admin": {
       "en": "Admin",
@@ -84,6 +88,16 @@
   "instrument": {
     "en": "Instrument",
     "fr": "Instrument"
+  },
+  "languages": {
+    "english": {
+      "en": "English",
+      "fr": "Anglais"
+    },
+    "french": {
+      "en": "French",
+      "fr": "Français"
+    }
   },
   "networkError": {
     "en": "Network Error",
