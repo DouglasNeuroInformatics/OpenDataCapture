@@ -1,7 +1,6 @@
 /* eslint-disable perfectionist/sort-object-types */
 /* eslint-disable perfectionist/sort-objects */
 
-import type { ArrayFormField } from '@douglasneuroinformatics/form-types';
 import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -58,39 +57,10 @@ export const InstrumentInfoForm = ({ onSubmit }: InstrumentInfoFormProps) => {
         {
           title: t('create.info.tags'),
           fields: {
-            tags: {
-              deps: ['language'],
-              kind: 'dynamic',
-              render: (data) => {
-                const field: ArrayFormField = {
-                  kind: 'array',
-                  label: t('create.info.tag'),
-                  fieldset: {}
-                };
-                const fieldset = {
-                  english: {
-                    kind: 'text',
-                    label: t('common:languages.english'),
-                    variant: 'short'
-                  },
-                  french: {
-                    kind: 'text',
-                    label: t('common:languages.french'),
-                    variant: 'short'
-                  }
-                } as const;
-                if (!data?.language) {
-                  field.fieldset[defaultLanguage] = fieldset[defaultLanguage];
-                }
-                if (data?.language === 'english' || data?.language === 'bilingual') {
-                  field.fieldset.english = fieldset.english;
-                }
-                if (data?.language === 'french' || data?.language === 'bilingual') {
-                  field.fieldset.french = fieldset.french;
-                }
-                return field;
-              }
-            }
+            tags: createBilingualField({
+              defaultLanguage,
+              label: t('create.info.tag')
+            })
           }
         }
       ]}

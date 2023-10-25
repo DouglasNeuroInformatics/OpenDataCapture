@@ -22,23 +22,23 @@ export const bilingualFieldSchema = z.array(
   })
 );
 
-const fieldsetOptions = {
-  english: {
-    kind: 'text',
-    label: i18n.t('common:languages.english'),
-    variant: 'short'
-  },
-  french: {
-    kind: 'text',
-    label: i18n.t('common:languages.french'),
-    variant: 'short'
-  }
-} as const;
-
 export function createBilingualField({
   defaultLanguage,
   label
 }: CreateBilingualFieldOptions): Types.DynamicFormField<BilingualFormData> {
+  const fieldsetOptions = {
+    english: {
+      kind: 'text',
+      label: i18n.t('common:languages.english'),
+      variant: 'short'
+    },
+    french: {
+      kind: 'text',
+      label: i18n.t('common:languages.french'),
+      variant: 'short'
+    }
+  } as const;
+
   return {
     deps: ['language'],
     kind: 'dynamic',
