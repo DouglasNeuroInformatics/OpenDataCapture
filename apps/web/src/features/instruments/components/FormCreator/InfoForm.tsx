@@ -81,39 +81,16 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
       ]}
       validationSchema={{
         properties: {
-          description: {
-            minLength: 1,
-            type: 'string'
-          },
-          estimatedDuration: {
-            maximum: 60,
-            minimum: 1,
-            type: 'integer'
-          },
+
+
           instructions: {
             minLength: 1,
             type: 'string'
           },
-          language: {
-            enum: ['en', 'fr'],
-            type: 'string'
-          },
-          name: {
-            minLength: 1,
-            pattern: /^\S+$/.source,
-            type: 'string'
-          },
-          tags: {
-            minLength: 1,
-            type: 'string'
-          },
-          title: {
-            minLength: 1,
-            type: 'string'
-          },
-          version: {
-            type: 'number'
-          }
+
+
+
+
         },
         required: ['description', 'estimatedDuration', 'instructions', 'language', 'title'],
         type: 'object'

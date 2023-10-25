@@ -46,6 +46,14 @@
       "description": {
         "en": "Description",
         "fr": "Description"
+      },
+      "estimatedDuration": {
+        "en": "Estimated Duration",
+        "fr": "Durée estimée"
+      },
+      "title": {
+        "en": "Title",
+        "fr": "Titre"
       }
     }
   },

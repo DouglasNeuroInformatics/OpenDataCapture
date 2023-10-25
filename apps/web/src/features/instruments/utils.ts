@@ -2,7 +2,6 @@
 
 import type Types from '@douglasneuroinformatics/form-types';
 import type { FormFieldsGroup } from '@douglasneuroinformatics/form-types';
-import { z } from 'zod';
 
 import i18n from '@/services/i18n';
 
@@ -13,20 +12,13 @@ type BilingualFormData = {
   language: SelectedLanguage;
 };
 
-export const bilingualArrayFieldSchema = z.array(
-  z.object({
-    english: z.string().optional(),
-    french: z.string().optional()
-  })
-);
-
 export function createBilingualArrayField({
   defaultLanguage,
   label
 }: {
   defaultLanguage: 'english' | 'french';
   label: string;
-}): Types.DynamicFormField<BilingualFormData> {
+}): Types.DynamicFormField<BilingualFormData, Types.ArrayFieldValue> {
   const fieldsetOptions = {
     english: {
       kind: 'text',
@@ -44,6 +36,7 @@ export function createBilingualArrayField({
     deps: ['language'],
     kind: 'dynamic',
     render: (data) => {
+      console.log('Rerender dynamic');
       const field: Types.ArrayFormField = {
         fieldset: {},
         kind: 'array',
