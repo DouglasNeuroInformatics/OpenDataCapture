@@ -14,6 +14,8 @@ export type InstrumentInfoFormData = {
   descriptionFrench?: string;
   estimatedDuration: number;
   language: SelectedLanguage;
+  instructionsEnglish: string;
+  instructionsFrench: string;
   name: string;
   tags: {
     [K in SelectedLanguage]?: string;
@@ -72,6 +74,11 @@ export const InstrumentInfoForm = ({ onSubmit }: InstrumentInfoFormProps) => {
           defaultLanguage,
           label: t('create.info.description')
         }),
+        createBilingualFieldGroup({
+          baseFieldName: 'instructions',
+          defaultLanguage,
+          label: t('create.info.instructions')
+        }),
         {
           title: t('create.info.tags'),
           fields: {
@@ -88,6 +95,8 @@ export const InstrumentInfoForm = ({ onSubmit }: InstrumentInfoFormProps) => {
         estimatedDuration: z.number(),
         language: z.enum(['english', 'french', 'bilingual']),
         name: z.string(),
+        instructionsEnglish: z.string(),
+        instructionsFrench: z.string(),
         tags: z.array(
           z.object({
             english: z.string().optional(),

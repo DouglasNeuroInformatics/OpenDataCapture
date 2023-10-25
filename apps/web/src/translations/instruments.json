@@ -1,8 +1,46 @@
 {
   "create": {
-    "title": {
-      "en": "Create Instrument",
-      "fr": "Créer un instrument"
+    "info": {
+      "basicMetadata": {
+        "en": "Basic Metadata",
+        "fr": "Métadonnées de base"
+      },
+      "description": {
+        "en": "Description",
+        "fr": "Description"
+      },
+      "details": {
+        "en": "Details",
+        "fr": "Détails"
+      },
+      "estimatedDuration": {
+        "en": "Estimated Duration",
+        "fr": "Durée estimée"
+      },
+      "instructions": {
+        "en": "Instructions",
+        "fr": "Instructions"
+      },
+      "language": {
+        "en": "Language",
+        "fr": "Langue"
+      },
+      "name": {
+        "en": "Instrument Name",
+        "fr": "Nom de l'instrument"
+      },
+      "tag": {
+        "en": "Tag",
+        "fr": "Tag"
+      },
+      "tags": {
+        "en": "Tags",
+        "fr": "Tags"
+      },
+      "title": {
+        "en": "Title",
+        "fr": "Titre"
+      }
     },
     "steps": {
       "fields": {
@@ -18,43 +56,9 @@
         "fr": "Révision"
       }
     },
-    "info": {
-      "basicMetadata": {
-        "en": "Basic Metadata",
-        "fr": "Métadonnées de base"
-      },
-      "name": {
-        "en": "Instrument Name",
-        "fr": "Nom de l'instrument"
-      },
-      "language": {
-        "en": "Language",
-        "fr": "Langue"
-      },
-      "tags": {
-        "en": "Tags",
-        "fr": "Tags"
-      },
-      "tag": {
-        "en": "Tag",
-        "fr": "Tag"
-      },
-      "details": {
-        "en": "Details",
-        "fr": "Détails"
-      },
-      "description": {
-        "en": "Description",
-        "fr": "Description"
-      },
-      "estimatedDuration": {
-        "en": "Estimated Duration",
-        "fr": "Durée estimée"
-      },
-      "title": {
-        "en": "Title",
-        "fr": "Titre"
-      }
+    "title": {
+      "en": "Create Instrument",
+      "fr": "Créer un instrument"
     }
   },
   "manage": {
@@ -64,10 +68,6 @@
     }
   },
   "view": {
-    "title": {
-      "en": "Available Instruments",
-      "fr": "Tous les instruments"
-    },
     "filters": {
       "language": {
         "en": "Language",
@@ -77,6 +77,10 @@
         "en": "Tags",
         "fr": "Tags"
       }
+    },
+    "title": {
+      "en": "Available Instruments",
+      "fr": "Tous les instruments"
     }
   }
 }
