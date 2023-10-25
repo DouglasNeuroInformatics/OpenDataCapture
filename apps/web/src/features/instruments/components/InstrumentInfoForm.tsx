@@ -5,9 +5,20 @@ import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { bilingualFieldSchema, createBilingualField } from '../utils';
+import { bilingualArrayFieldSchema, createBilingualArrayField, createBilingualFieldGroup } from '../utils';
 
-import type { InstrumentInfoFormData } from '../types';
+import type { SelectedLanguage } from '../types';
+
+export type InstrumentInfoFormData = {
+  descriptionEnglish?: string;
+  descriptionFrench?: string;
+  language: SelectedLanguage;
+  name: string;
+  tags: {
+    [K in SelectedLanguage]?: string;
+  }[];
+  version: number;
+};
 
 export type InstrumentInfoFormProps = {
   onSubmit: (data: InstrumentInfoFormData) => void;
@@ -45,19 +56,15 @@ export const InstrumentInfoForm = ({ onSubmit }: InstrumentInfoFormProps) => {
             }
           }
         },
-        {
-          title: t('create.info.details'),
-          fields: {
-            description: createBilingualField({
-              defaultLanguage,
-              label: t('create.info.description')
-            })
-          }
-        },
+        createBilingualFieldGroup({
+          baseFieldName: 'description',
+          defaultLanguage,
+          label: t('create.info.description')
+        }),
         {
           title: t('create.info.tags'),
           fields: {
-            tags: createBilingualField({
+            tags: createBilingualArrayField({
               defaultLanguage,
               label: t('create.info.tag')
             })
@@ -65,11 +72,12 @@ export const InstrumentInfoForm = ({ onSubmit }: InstrumentInfoFormProps) => {
         }
       ]}
       validationSchema={z.object({
-        description: bilingualFieldSchema,
+        descriptionEnglish: z.string().optional(),
+        descriptionFrench: z.string().optional(),
         name: z.string(),
         language: z.enum(['english', 'french', 'bilingual']),
         version: z.number(),
-        tags: bilingualFieldSchema
+        tags: bilingualArrayFieldSchema
       })}
       onSubmit={onSubmit}
     />
