@@ -16,7 +16,7 @@ export const CreateInstrumentPage = () => {
   return (
     <div>
       <PageHeader title={t('create.title')} />
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-3xl">
         <Stepper
           steps={[
             {
