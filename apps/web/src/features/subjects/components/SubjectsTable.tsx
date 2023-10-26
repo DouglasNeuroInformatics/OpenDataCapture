@@ -60,7 +60,6 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
       <SubjectLookup show={showLookup} onClose={handleLookupClose} />
       <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
         <SearchBar
-          className="px-4 py-2.5 pl-2"
           size="md"
           onClick={() => {
             setShowLookup(true);
