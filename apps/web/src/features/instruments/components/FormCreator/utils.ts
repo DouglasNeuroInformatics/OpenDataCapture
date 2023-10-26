@@ -5,18 +5,18 @@ import type { FormFieldsGroup } from '@douglasneuroinformatics/form-types';
 
 import i18n from '@/services/i18n';
 
-import type { SelectedLanguage } from './types';
+import type { LanguageOption } from './types';
 
 type BilingualFormData = {
   [key: string]: Types.ArrayFieldValue | Types.PrimitiveFieldValue;
-  language: SelectedLanguage;
+  language: LanguageOption;
 };
 
 export function createBilingualArrayField({
   defaultLanguage,
   label
 }: {
-  defaultLanguage: 'english' | 'french';
+  defaultLanguage: Exclude<LanguageOption, 'bilingual'>;
   label: string;
 }): Types.DynamicFormField<BilingualFormData, Types.ArrayFieldValue> {
   const fieldsetOptions = {
@@ -62,7 +62,7 @@ export function createBilingualFieldGroup({
   label
 }: {
   baseFieldName: string;
-  defaultLanguage: 'english' | 'french';
+  defaultLanguage: Exclude<LanguageOption, 'bilingual'>;
   label: string;
 }): FormFieldsGroup {
   return {

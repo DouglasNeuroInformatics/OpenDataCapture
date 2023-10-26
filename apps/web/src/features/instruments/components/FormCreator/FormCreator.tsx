@@ -1,72 +1,39 @@
 import { useState } from 'react';
 
-import type { BaseFormField, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
-import { Stepper } from '@douglasneuroinformatics/ui';
+import { Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import type { FormInstrument } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
+import type { PartialDeep } from 'type-fest';
 
-import { FieldsForm, type FieldsFormData } from './FieldsForm';
-import { InfoForm, type InfoFormData } from './InfoForm';
-import { Review } from './Review';
+import { InfoForm } from './InfoForm';
 
-export type SimpleFormData = Record<string, PrimitiveFieldValue>;
-
-export type SimpleForm<T extends SimpleFormData = SimpleFormData> = Omit<FormInstrument<T>, 'content'> & {
-  content: Record<
-    string,
-    BaseFormField & {
-      variant?: string;
-    }
-  >;
+export type FormCreatorProps = {
+  onSubmit: (form: FormInstrument) => void;
 };
 
 export const FormCreator = () => {
-  const [state, setState] = useState<Partial<SimpleForm>>({
-    kind: 'form',
-    validationSchema: {
-      required: [],
-      type: 'object'
-    }
-  });
-
-  const { t } = useTranslation();
-
-  const handleSubmitDetails = ({ name, tags, version, ...details }: InfoFormData) => {
-    setState((prevState) => ({
-      ...prevState,
-      details,
-      name,
-      tags: tags.split(',').map((s) => s.trim()),
-      version
-    }));
-  };
-
-  const handleSubmitFields = ({ fields }: FieldsFormData) => {
-    const content = Object.fromEntries(fields.map(({ name, ...rest }) => [name, rest]));
-    setState((prevState) => ({
-      ...prevState,
-      content
-    }));
-  };
+  const notifications = useNotificationsStore();
+  const [state, setState] = useState<PartialDeep<FormInstrument>>({});
+  const { t } = useTranslation('instruments');
 
   return (
     <Stepper
       steps={[
         {
-          element: <InfoForm onSubmit={handleSubmitDetails} />,
+          element: <InfoForm onSubmit={() => null} />,
           icon: <HiOutlineQuestionMarkCircle />,
-          label: t('instruments.createInstrument.steps.info')
+          label: t('create.steps.info')
         },
         {
-          element: <FieldsForm onSubmit={handleSubmitFields} />,
+          element: <p>Fields</p>,
           icon: <HiOutlineQuestionMarkCircle />,
-          label: t('instruments.createInstrument.steps.fields')
+          label: t('create.steps.fields')
         },
         {
-          element: <Review form={state} />,
+          element: <p>Review</p>,
           icon: <HiOutlineQuestionMarkCircle />,
-          label: t('instruments.createInstrument.steps.review')
+          label: t('create.steps.review')
         }
       ]}
     />
