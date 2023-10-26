@@ -3,12 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 
 export const ManageInstrumentsPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('instruments');
   return (
     <div>
-      <PageHeader title={t('instruments.manageInstruments.pageTitle')} />
+      <PageHeader title={t('manage.title')} />
     </div>
   );
 };
 
-export default ManageInstrumentsPage;

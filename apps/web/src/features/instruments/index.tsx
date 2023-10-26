@@ -3,6 +3,7 @@
 import type { RouteObject } from 'react-router-dom';
 
 import { CreateInstrumentPage } from './pages/CreateInstrumentPage';
+import { ManageInstrumentsPage } from './pages/ManageInstrumentsPage';
 
 export const instrumentsRoute: RouteObject = {
   path: 'instruments',
@@ -10,6 +11,10 @@ export const instrumentsRoute: RouteObject = {
     {
       path: 'create-instrument',
       element: <CreateInstrumentPage />
+    },
+    {
+      path: 'manage-instruments',
+      element: <ManageInstrumentsPage />
     }
   ]
 };
