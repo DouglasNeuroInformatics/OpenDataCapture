@@ -3,7 +3,7 @@
 
 import { useContext } from 'react';
 
-import { Form, StepperContext } from '@douglasneuroinformatics/ui';
+import { Form, StepperContext, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import type { Language } from '@open-data-capture/types';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
@@ -71,6 +71,7 @@ export type InfoFormProps = {
 export const InfoForm = ({ onSubmit }: InfoFormProps) => {
   const { updateIndex } = useContext(StepperContext);
   const { i18n, t } = useTranslation(['instruments', 'common']);
+  const notifications = useNotificationsStore();
   const defaultLanguage = i18n.resolvedLanguage === 'en' ? 'english' : 'french';
 
   return (
@@ -131,6 +132,9 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
         }
       ]}
       validationSchema={infoFormDataSchema}
+      onError={() => {
+        notifications.addNotification({ message: t('create.validationFailedNotification'), type: 'error' });
+      }}
       onSubmit={(data) => {
         onSubmit({
           details: {
