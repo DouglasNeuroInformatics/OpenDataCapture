@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { Button, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { assignmentSummarySchema } from '@open-data-capture/schemas/assignment';
-import type { AssignmentSummary, CreateAssignmentData, Language, UpdateAssignmentData } from '@open-data-capture/types';
+import type { AssignmentSummary, CreateAssignmentData,  UpdateAssignmentData } from '@open-data-capture/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -53,27 +53,24 @@ export const SubjectAssignmentsPage = () => {
       return assignmentsQuery.refetch();
     }
   });
-  const formsQuery = useAvailableForms();
+  const forms = useAvailableForms();
 
   const instrumentOptions: Record<string, string> = useMemo(() => {
-    if (!formsQuery.data) {
+    if (!forms.data) {
       return {};
     }
     const options: Record<string, string> = {};
-    for (const form of formsQuery.data) {
+    for (const form of forms.data) {
       if (!form.id) {
         console.error('Form ID does not exist');
         continue;
-      } else if (typeof form.details.title === 'string') {
-        options[form.id] = form.details.title;
-      } else {
-        options[form.id] = form.details.title[i18n.resolvedLanguage as Language] ?? form.name;
       }
+      options[form.id] = form.details.title;
     }
     return options;
-  }, [formsQuery.data, i18n.resolvedLanguage]);
+  }, [forms.data, i18n.resolvedLanguage]);
 
-  if (!(assignmentsQuery.data && formsQuery.data)) {
+  if (!(assignmentsQuery.data && forms.data)) {
     return null;
   }
 
