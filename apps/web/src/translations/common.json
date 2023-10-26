@@ -3,10 +3,6 @@
     "en": "Active Visit",
     "fr": "Visite active"
   },
-  "bilingual": {
-    "en": "Bilingual",
-    "fr": "Bilingue"
-  },
   "basePermissionLevel": {
     "admin": {
       "en": "Admin",
@@ -21,9 +17,17 @@
       "fr": "Utilisateur standard"
     }
   },
+  "bilingual": {
+    "en": "Bilingual",
+    "fr": "Bilingue"
+  },
   "cancel": {
     "en": "Cancel",
     "fr": "Annuler"
+  },
+  "delete": {
+    "en": "Delete",
+    "fr": "Effacer"
   },
   "error": {
     "en": "Error",
@@ -89,6 +93,10 @@
     "en": "Instrument",
     "fr": "Instrument"
   },
+  "language": {
+    "en": "Language",
+    "fr": "Langue"
+  },
   "languages": {
     "english": {
       "en": "English",
@@ -114,6 +122,10 @@
   "submit": {
     "en": "Submit",
     "fr": "Soumettre"
+  },
+  "tags": {
+    "en": "Tags",
+    "fr": "Tags"
   },
   "unknownError": {
     "en": "Unknown Error",

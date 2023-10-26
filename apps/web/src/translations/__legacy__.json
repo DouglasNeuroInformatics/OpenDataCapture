@@ -94,74 +94,6 @@
           "en": "Invalid format for option",
           "fr": "Format non valide pour l'option"
         }
-      },
-      "form": {
-        "basics": {
-          "en": "Basics",
-          "fr": "De base"
-        },
-        "description": {
-          "label": {
-            "en": "Description",
-            "fr": "Description"
-          }
-        },
-        "details": {
-          "en": "Details",
-          "fr": "Détails"
-        },
-        "estimatedDuration": {
-          "label": {
-            "en": "Estimated Duration",
-            "fr": "Durée prévue"
-          }
-        },
-        "instructions": {
-          "label": {
-            "en": "Instructions",
-            "fr": "Instructions"
-          }
-        },
-        "language": {
-          "label": {
-            "en": "Language",
-            "fr": "Langue"
-          }
-        },
-        "name": {
-          "label": {
-            "en": "Name",
-            "fr": "Nom"
-          }
-        },
-        "tags": {
-          "label": {
-            "en": "Tags",
-            "fr": "Tags"
-          }
-        },
-        "title": {
-          "label": {
-            "en": "Title",
-            "fr": "Titre"
-          }
-        },
-        "version": {
-          "label": {
-            "en": "Version",
-            "fr": "Version"
-          }
-        }
-      },
-      "pageTitle": {
-        "en": "Add Instrument",
-        "fr": "Ajouter un instrument"
-      }
-    },
-    "fetchInstrument": {
-      "notFound": {
-        "en": "This instrument does not exist in English",
-        "fr": "Cet instrument n'existe pas en français"
       }
     },
     "formPage": {
@@ -268,10 +200,7 @@
           "en": "Delete",
           "fr": "Effacer"
         },
-        "language": {
-          "en": "Language",
-          "fr": "Langue"
-        },
+
         "name": {
           "en": "Name",
           "fr": "Nom"
@@ -284,10 +213,6 @@
           "en": "Version",
           "fr": "Version"
         }
-      },
-      "pageTitle": {
-        "en": "Manage Instruments",
-        "fr": "Gérer les instruments"
       }
     }
   },

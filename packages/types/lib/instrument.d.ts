@@ -229,6 +229,8 @@ export type FormInstrumentSummary<
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Omit<FormInstrument<TData, TLanguage>, 'content' | 'measures' | 'validationSchema'>;
 
+export type UnilingualFormInstrumentSummary = FormInstrumentSummary<Base.FormDataType, Language>;
+
 export type SterilizedFormInstrument<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
