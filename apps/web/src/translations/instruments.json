@@ -1,5 +1,27 @@
 {
   "create": {
+    "content": {
+      "structure": {
+        "en": "Structure",
+        "fr": "Structure"
+      },
+      "flat": {
+        "en": "Flat",
+        "fr": "Uniforme"
+      },
+      "grouped": {
+        "en": "Grouped",
+        "fr": "Groupée"
+      },
+      "fields": {
+        "en": "Fields",
+        "fr": "Champs"
+      },
+      "field": {
+        "en": "Field",
+        "fr": "Champ"
+      }
+    },
     "info": {
       "basicMetadata": {
         "en": "Basic Metadata",
@@ -43,9 +65,9 @@
       }
     },
     "steps": {
-      "fields": {
-        "en": "Fields",
-        "fr": "Champs"
+      "content": {
+        "en": "Content",
+        "fr": "Contenu"
       },
       "info": {
         "en": "Info",
