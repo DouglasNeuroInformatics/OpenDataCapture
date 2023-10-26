@@ -86,9 +86,9 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer]
     }
   },
-  optimizeDeps: {
-    exclude: ['@douglasneuroinformatics/ui']
-  },
+  // optimizeDeps: {
+  //   exclude: ['@douglasneuroinformatics/ui']
+  // },
   plugins: [
     react(),
     viteCompression(),
