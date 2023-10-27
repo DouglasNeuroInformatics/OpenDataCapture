@@ -4,6 +4,7 @@ import type { RouteObject } from 'react-router-dom';
 
 import { AvailableInstrumentsPage } from './pages/AvailableInstrumentsPage';
 import { CreateInstrumentPage } from './pages/CreateInstrumentPage';
+import { FormPage } from './pages/FormPage';
 import { ManageInstrumentsPage } from './pages/ManageInstrumentsPage';
 
 export const instrumentsRoute: RouteObject = {
@@ -20,6 +21,10 @@ export const instrumentsRoute: RouteObject = {
     {
       path: 'available-instruments',
       element: <AvailableInstrumentsPage />
+    },
+    {
+      path: 'forms/:id',
+      element: <FormPage />
     }
   ]
 };

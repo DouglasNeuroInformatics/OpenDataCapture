@@ -24,7 +24,7 @@ export const FormCreator = ({ onSubmit }: FormCreatorProps) => {
   const handleSubmit = () => {
     const result = formInstrumentSchema.safeParse(state);
     if (!result.success) {
-      notifications.addNotification({ message: t('create.validationFailedNotification'), type: 'error' });
+      notifications.addNotification({ message: t('create.errors.validationFailed'), type: 'error' });
       return;
     }
     onSubmit(result.data);

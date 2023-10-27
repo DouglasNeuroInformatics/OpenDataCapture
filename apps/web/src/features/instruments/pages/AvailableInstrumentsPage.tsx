@@ -94,7 +94,6 @@ export const AvailableInstrumentsPage = () => {
         </div>
         <div className="relative grid grid-cols-1 gap-5">
           {filteredInstruments.map((instrument, i) => {
-            console.log(instrument.id);
             return (
               <motion.div
                 animate={{ opacity: 1, y: 0 }}

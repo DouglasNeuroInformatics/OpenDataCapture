@@ -111,7 +111,7 @@ export const ContentForm = ({ onSubmit }: ContentFormProps) => {
         structure: z.enum(['flat', 'grouped'])
       })}
       onError={() => {
-        notifications.addNotification({ message: t('create.validationFailedNotification'), type: 'error' });
+        notifications.addNotification({ message: t('create.errors.validationFailed'), type: 'error' });
       }}
       onSubmit={() => {
         onSubmit({});

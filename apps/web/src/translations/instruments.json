@@ -88,11 +88,18 @@
       "en": "Create Instrument",
       "fr": "Créer un instrument"
     },
-    "validationFailedNotification": {
-      "en": "Input validation failed. Please refer to the browser console for additional details.",
-      "fr": "La validation de l'entrée a échoué. Veuillez vous référer à la console du navigateur pour plus de détails."
+    "errors": {
+      "duplicateField": {
+        "en": "Invalid duplicate field name",
+        "fr": "Nom de champ en double invalide"
+      },
+      "validationFailed": {
+        "en": "Input validation failed. Please refer to the browser console for additional details.",
+        "fr": "La validation de l'entrée a échoué. Veuillez vous référer à la console du navigateur pour plus de détails."
+      }
     }
   },
+  "form": {},
   "manage": {
     "title": {
       "en": "Manage Instruments",

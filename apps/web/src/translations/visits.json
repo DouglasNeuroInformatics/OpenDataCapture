@@ -3,11 +3,23 @@
     "en": "Add Visit",
     "fr": "Ajouter une visite"
   },
-  "subjectIdentification": {
+  "additionalData": {
     "title": {
-      "en": "Subject Identification",
-      "fr": "Identification du client"
+      "en": "Additional Data",
+      "fr": "Données supplémentaires"
+    }
+  },
+  "dateAssessed": {
+    "description": {
+      "en": "If the visit took place on a date other than today, you can change it here.",
+      "fr": "Si la visite a eu lieu à une date autre qu'aujourd'hui, vous pouvez la modifier ici."
     },
+    "label": {
+      "en": "Date Assessed",
+      "fr": "Date d'évaluation"
+    }
+  },
+  "subjectIdentification": {
     "description": {
       "en": "The following items are used to compute a unique identifier that enables consistent cross-visit identification.",
       "fr": "Les données suivantes sont utilisées pour calculer un identifiant unique permettant une identification cohérente lors de visites successives."
@@ -31,22 +43,10 @@
         "en": "Last Name",
         "fr": "Nom de famille"
       }
-    }
-  },
-  "additionalData": {
-    "title": {
-      "en": "Additional Data",
-      "fr": "Données supplémentaires"
-    }
-  },
-  "dateAssessed": {
-    "label": {
-      "en": "Date Assessed",
-      "fr": "Date d'évaluation"
     },
-    "description": {
-      "en": "If the visit took place on a date other than today, you can change it here.",
-      "fr": "Si la visite a eu lieu à une date autre qu'aujourd'hui, vous pouvez la modifier ici."
+    "title": {
+      "en": "Subject Identification",
+      "fr": "Identification du client"
     }
   }
 }

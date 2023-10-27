@@ -1,4 +1,52 @@
 {
+  "assignments": {
+    "addAssignment": {
+      "en": "Add Assignment",
+      "fr": "Assigner un instrument"
+    },
+    "assignedAt": {
+      "en": "Assigned",
+      "fr": "Attribué"
+    },
+    "assignedInstruments": {
+      "en": "Assigned Instruments",
+      "fr": "Instruments assignés"
+    },
+    "expiresAt": {
+      "en": "Expires",
+      "fr": "Expiration"
+    },
+    "resendNotification": {
+      "en": "Resend Notification",
+      "fr": "Renvoyer la notification"
+    },
+    "status": {
+      "en": "Status",
+      "fr": "État"
+    },
+    "statusOptions": {
+      "canceled": {
+        "en": "Canceled",
+        "fr": "Annulé"
+      },
+      "complete": {
+        "en": "Complete",
+        "fr": "Terminé"
+      },
+      "expired": {
+        "en": "Expired",
+        "fr": "Expiré"
+      },
+      "outstanding": {
+        "en": "Outstanding",
+        "fr": "À compléter"
+      }
+    },
+    "title": {
+      "en": "Title",
+      "fr": "Titre"
+    }
+  },
   "index": {
     "lookup": {
       "title": {
@@ -7,10 +55,6 @@
       }
     },
     "table": {
-      "subject": {
-        "en": "Subject",
-        "fr": "Client"
-      },
       "export": {
         "en": "Export",
         "fr": "Exporter"
@@ -22,6 +66,10 @@
       "filters": {
         "en": "Filters",
         "fr": "Filtres"
+      },
+      "subject": {
+        "en": "Subject",
+        "fr": "Client"
       }
     },
     "title": {
@@ -58,6 +106,14 @@
       "en": "Measures",
       "fr": "Mesures"
     },
+    "selectInstrument": {
+      "en": "Please select an instrument",
+      "fr": "Veuillez sélectionner un instrument"
+    },
+    "selectMeasures": {
+      "en": "Please select one or more measures",
+      "fr": "Veuillez sélectionner au moins une mesure"
+    },
     "selectedInstrument": {
       "en": "Selected Instrument: {{title}}",
       "fr": "Instrument sélectionné : {{title}}"
@@ -91,54 +147,6 @@
     "yLabel": {
       "en": "Value",
       "fr": "Valeur"
-    }
-  },
-  "assignments": {
-    "addAssignment": {
-      "en": "Add Assignment",
-      "fr": "Assigner un instrument"
-    },
-    "assignedInstruments": {
-      "en": "Assigned Instruments",
-      "fr": "Instruments assignés"
-    },
-    "status": {
-      "en": "Status",
-      "fr": "État"
-    },
-    "statusOptions": {
-      "canceled": {
-        "en": "Canceled",
-        "fr": "Annulé"
-      },
-      "complete": {
-        "en": "Complete",
-        "fr": "Terminé"
-      },
-      "expired": {
-        "en": "Expired",
-        "fr": "Expiré"
-      },
-      "outstanding": {
-        "en": "Outstanding",
-        "fr": "À compléter"
-      }
-    },
-    "assignedAt": {
-      "en": "Assigned",
-      "fr": "Attribué"
-    },
-    "expiresAt": {
-      "en": "Expires",
-      "fr": "Expiration"
-    },
-    "title": {
-      "en": "Title",
-      "fr": "Titre"
-    },
-    "resendNotification": {
-      "en": "Resend Notification",
-      "fr": "Renvoyer la notification"
     }
   }
 }

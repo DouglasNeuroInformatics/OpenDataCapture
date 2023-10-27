@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Stepper, Spinner, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
+import { Spinner, Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
@@ -31,14 +31,14 @@ export const FormPage = () => {
 
   const instrument = useFetchInstrument(params.id!);
 
-  const [result, setResult] = useState<FormInstrumentData>();
+  const [result, setResult] = useState<FormDataType>();
   const [timeCollected, setTimeCollected] = useState<number>(0);
 
   if (!instrument) {
     return <Spinner />;
   }
 
-  const handleSubmit = async (data: FormInstrumentData) => {
+  const handleSubmit = async (data: FormDataType) => {
     const now = Date.now();
     await axios.post('/v1/instruments/records/forms', {
       data: data,
@@ -84,5 +84,3 @@ export const FormPage = () => {
     </div>
   );
 };
-
-export default FormPage;

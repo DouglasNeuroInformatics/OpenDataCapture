@@ -25,9 +25,17 @@
     "en": "Cancel",
     "fr": "Annuler"
   },
+  "close": {
+    "en": "Close",
+    "fr": "Fermer"
+  },
   "delete": {
     "en": "Delete",
     "fr": "Effacer"
+  },
+  "download": {
+    "en": "Download",
+    "fr": "Télécharger"
   },
   "error": {
     "en": "Error",
@@ -38,6 +46,14 @@
       "en": "This field is required",
       "fr": "Ce champ est obligatoire"
     }
+  },
+  "graph": {
+    "en": "Graph",
+    "fr": "Graphique"
+  },
+  "groupTrend": {
+    "en": "Group Trend",
+    "fr": "Tendance du groupe"
   },
   "httpRequestFailed": {
     "en": "HTTP Request Failed",
@@ -123,6 +139,10 @@
     "en": "Submit",
     "fr": "Soumettre"
   },
+  "table": {
+    "en": "Table",
+    "fr": "Tableau"
+  },
   "tags": {
     "en": "Tags",
     "fr": "Tags"
@@ -130,6 +150,10 @@
   "unknownError": {
     "en": "Unknown Error",
     "fr": "Erreur inconnue"
+  },
+  "uploadSuccessful": {
+    "en": "Upload Successful",
+    "fr": "Téléchargement réussi"
   },
   "yes": {
     "en": "Yes",

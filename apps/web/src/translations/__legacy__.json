@@ -1,108 +1,6 @@
 {
-  "close": {
-    "en": "Close",
-    "fr": "Fermer"
-  },
-  "datetime": {
-    "days": {
-      "en": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      "fr": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
-    },
-    "months": {
-      "en": [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-      ],
-      "fr": [
-        "Janvier",
-        "Février",
-        "Mars",
-        "Avril",
-        "Mai",
-        "Juin",
-        "Juillet",
-        "Août",
-        "Septembre",
-        "Octobre",
-        "Novembre",
-        "Décembre"
-      ]
-    }
-  },
-  "download": {
-    "en": "Download",
-    "fr": "Télécharger"
-  },
-  "firstName": {
-    "en": "First Name",
-    "fr": "Prénom"
-  },
-  "form": {
-    "errors": {
-      "required": {
-        "en": "This field is required",
-        "fr": "Ce champ est obligatoire"
-      }
-    },
-    "radio": {
-      "labels": {
-        "false": {
-          "en": "False",
-          "fr": "Faux"
-        },
-        "true": {
-          "en": "True",
-          "fr": "Vrai"
-        }
-      }
-    },
-    "reset": {
-      "en": "Clear",
-      "fr": "Réinitialiser"
-    },
-    "submit": {
-      "en": "Submit",
-      "fr": "Soumettre"
-    }
-  },
-  "graph": {
-    "en": "Graph",
-    "fr": "Graphique"
-  },
-  "groupTrend": {
-    "en": "Group Trend",
-    "fr": "Tendance du groupe"
-  },
   "instruments": {
-    "createInstrument": {
-      "errors": {
-        "duplicateField": {
-          "en": "Invalid duplicate field name",
-          "fr": "Nom de champ en double invalide"
-        },
-        "invalidOptionFormat": {
-          "en": "Invalid format for option",
-          "fr": "Format non valide pour l'option"
-        }
-      }
-    },
     "formPage": {
-      "identification": {
-        "label": {
-          "en": "Identification",
-          "fr": "Identification"
-        }
-      },
       "overview": {
         "begin": {
           "en": "Begin",
@@ -139,10 +37,6 @@
         "dateOfBirth": {
           "en": "Date of Birth",
           "fr": "Date de naissance"
-        },
-        "download": {
-          "en": "Download",
-          "fr": "Télécharger"
         },
         "instrumentTitle": {
           "en": "Instrument Title",
@@ -184,10 +78,6 @@
           "en": "Time Collected",
           "fr": "Horodatage"
         }
-      },
-      "uploadSuccessful": {
-        "en": "Upload Successful",
-        "fr": "Téléchargement réussi"
       }
     },
     "manageInstruments": {
@@ -200,7 +90,6 @@
           "en": "Delete",
           "fr": "Effacer"
         },
-
         "name": {
           "en": "Name",
           "fr": "Nom"
@@ -215,47 +104,5 @@
         }
       }
     }
-  },
-  "lastName": {
-    "en": "Last Name",
-    "fr": "Nom"
-  },
-  "notifications": {
-    "types": {
-      "error": {
-        "en": "Error",
-        "fr": "Erreur"
-      },
-      "info": {
-        "en": "Info",
-        "fr": "Attention"
-      },
-      "success": {
-        "en": "Success",
-        "fr": "Succès"
-      },
-      "warning": {
-        "en": "Warning",
-        "fr": "Avertissement"
-      }
-    }
-  },
-  "searchBar": {
-    "placeholder": {
-      "en": "Search...",
-      "fr": "Rechercher..."
-    }
-  },
-  "selectInstrument": {
-    "en": "Please select an instrument",
-    "fr": "Veuillez sélectionner un instrument"
-  },
-  "selectMeasures": {
-    "en": "Please select one or more measures",
-    "fr": "Veuillez sélectionner au moins une mesure"
-  },
-  "table": {
-    "en": "Table",
-    "fr": "Tableau"
   }
 }

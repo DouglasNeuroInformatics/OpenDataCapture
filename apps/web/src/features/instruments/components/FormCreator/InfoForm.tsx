@@ -133,7 +133,7 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
       ]}
       validationSchema={infoFormDataSchema}
       onError={() => {
-        notifications.addNotification({ message: t('create.validationFailedNotification'), type: 'error' });
+        notifications.addNotification({ message: t('create.errors.validationFailed'), type: 'error' });
       }}
       onSubmit={(data) => {
         onSubmit({
