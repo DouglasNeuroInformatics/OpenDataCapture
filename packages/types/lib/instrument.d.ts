@@ -1,5 +1,5 @@
 import type Base from '@douglasneuroinformatics/form-types';
-import type { Primitive, Simplify } from 'type-fest';
+import type { Simplify } from 'type-fest';
 import type { ZodType } from 'zod';
 
 import { Language } from './core';
@@ -248,21 +248,4 @@ export type MultilingualFormInstrument<TData extends Base.FormDataType = Base.Fo
   Language[]
 >;
 
-export type TranslatedItem<T> = T extends object
-  ? T extends Record<Language, unknown>
-    ? T[Language]
-    : {
-        [K in keyof T]: TranslatedItem<T[K]>;
-      }
-  : never;
-
-export type TranslatableFormInstrumentElements<
-  TData extends Base.FormDataType = Base.FormDataType,
-  TForm extends FormInstrument<TData, Language[]> = FormInstrument<TData, Language[]>
-> = {
-  [K in keyof Omit<TForm, 'validationSchema'> as TForm[K] extends Primitive ? never : K]: unknown;
-};
-
-type T = TranslatedItem<FormInstrument>;
-type X = T['tags'];
 export type Instrument = FormInstrument;
