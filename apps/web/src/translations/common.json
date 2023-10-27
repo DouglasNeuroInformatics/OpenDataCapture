@@ -52,8 +52,8 @@
     },
     "firstName": {
       "description": {
-        "en": "The subject's first name, as provided by their birth certificate",
-        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance"
+        "en": "The subject's first name, as provided by their birth certificate.",
+        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance."
       },
       "label": {
         "en": "First Name",
@@ -62,8 +62,8 @@
     },
     "lastName": {
       "description": {
-        "en": "The subject's last name, as provided by their birth certificate",
-        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance"
+        "en": "The subject's last name, as provided by their birth certificate.",
+        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance."
       },
       "label": {
         "en": "Last Name",
@@ -72,16 +72,16 @@
     },
     "sex": {
       "description": {
-        "en": "The subject's biological sex, as assigned at birth",
-        "fr": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance"
+        "en": "The subject's biological sex, as assigned at birth.",
+        "fr": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance."
       },
       "female": {
         "en": "Female",
         "fr": "Féminin"
       },
       "label": {
-        "en": "Sex",
-        "fr": "Sexe"
+        "en": "Sex at Birth",
+        "fr": "Sexe à la naissance"
       },
       "male": {
         "en": "Male",

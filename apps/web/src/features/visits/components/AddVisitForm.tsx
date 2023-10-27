@@ -25,15 +25,15 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
           description: t('visits:subjectIdentification.description'),
           fields: {
             firstName: {
-              description: t('identificationData.firstName.description'),
+              description: t('visits:subjectIdentification.firstName.description'),
               kind: 'text',
-              label: t('identificationData.firstName.label'),
+              label: t('visits:subjectIdentification.firstName.label'),
               variant: 'short'
             },
             lastName: {
-              description: t('identificationData.lastName.description'),
+              description: t('visits:subjectIdentification.lastName.description'),
               kind: 'text',
-              label: t('identificationData.lastName.label'),
+              label: t('visits:subjectIdentification.lastName.label'),
               variant: 'short'
             },
             dateOfBirth: {
@@ -53,11 +53,11 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
         },
         {
           title: t('visits:additionalData.title'),
-          description: t('visits:additionalData.description'),
           fields: {
             date: {
+              description: t('visits:dateAssessed.description'),
               kind: 'date',
-              label: t('visits:dateAssessed')
+              label: t('visits:dateAssessed.label')
             }
           }
         }

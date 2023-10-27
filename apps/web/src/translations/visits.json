@@ -9,22 +9,44 @@
       "fr": "Identification du client"
     },
     "description": {
-      "en": "To accurately identify an individual, ensure the information is correct to prevent data loss. For identification, white space, special characters, and accents are removed from names, with accented characters treated as their ASCII equivalents.",
-      "fr": "Pour identifier un individu avec précision, assurez-vous que les informations sont correctes afin d'éviter une perte de données. Pour l'identification, les espaces, les caractères spéciaux et les accents sont supprimés des noms, les caractères accentués étant traités comme leurs équivalents ASCII."
+      "en": "The following items are used to compute a unique identifier that enables consistent cross-visit identification.",
+      "fr": "Les données suivantes sont utilisées pour calculer un identifiant unique permettant une identification cohérente lors de visites successives."
+    },
+    "firstName": {
+      "description": {
+        "en": "The subject's first name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as their ASCII equivalents.",
+        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance. Aux fins d'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme leurs équivalents ASCII."
+      },
+      "label": {
+        "en": "First Name",
+        "fr": "Prénom"
+      }
+    },
+    "lastName": {
+      "description": {
+        "en": "The subject's last name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as their ASCII equivalents.",
+        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance. Aux fins d'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme leurs équivalents ASCII."
+      },
+      "label": {
+        "en": "Last Name",
+        "fr": "Nom de famille"
+      }
     }
   },
   "additionalData": {
     "title": {
       "en": "Additional Data",
       "fr": "Données supplémentaires"
-    },
-    "description": {
-      "en": "You can optionally modify the following metadata, for example, to log past visits.",
-      "fr": "Vous pouvez éventuellement modifier les métadonnées suivantes, par exemple, pour enregistrer des visites passées."
     }
   },
   "dateAssessed": {
-    "en": "Date Assessed",
-    "fr": "Date d'évaluation"
+    "label": {
+      "en": "Date Assessed",
+      "fr": "Date d'évaluation"
+    },
+    "description": {
+      "en": "If the visit took place on a date other than today, you can change it here.",
+      "fr": "Si la visite a eu lieu à une date autre qu'aujourd'hui, vous pouvez la modifier ici."
+    }
   }
 }
