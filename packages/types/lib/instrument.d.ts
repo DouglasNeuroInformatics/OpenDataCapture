@@ -17,7 +17,7 @@ type InstrumentUIOption<L extends InstrumentLanguage, V> = L extends Language
 /** Defines the basic properties of all instruments */
 export type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
-  content: unknown;
+  content?: unknown;
 
   id?: string;
 

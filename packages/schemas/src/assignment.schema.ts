@@ -2,7 +2,7 @@ import type Types from '@open-data-capture/types';
 import { z } from 'zod';
 
 import { validObjectIdSchema } from './core.schema';
-import { formInstrumentSchema, formInstrumentSummarySchema } from './form-instrument.schema';
+import { formInstrumentSchema, formInstrumentSummarySchema } from './instrument.schema';
 
 export const assignmentStatusSchema = z.enum([
   'CANCELED',

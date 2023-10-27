@@ -1,6 +1,6 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
-import { formInstrumentSchema } from '@open-data-capture/schemas/form-instrument';
+import { formInstrumentSchema } from '@open-data-capture/schemas/instrument';
 import type Types from '@open-data-capture/types';
 import type Z from 'zod';
 

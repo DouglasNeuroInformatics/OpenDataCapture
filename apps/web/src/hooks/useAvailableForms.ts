@@ -1,4 +1,4 @@
-import { formInstrumentSummarySchema } from '@open-data-capture/schemas/form-instrument';
+import { formInstrumentSummarySchema } from '@open-data-capture/schemas/instrument';
 import type { FormInstrumentSummary, Language } from '@open-data-capture/types';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';

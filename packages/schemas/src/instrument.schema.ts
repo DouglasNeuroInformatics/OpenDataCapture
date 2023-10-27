@@ -1,11 +1,13 @@
 import type { FormDataType, FormFieldKind } from '@douglasneuroinformatics/form-types';
 import type Types from '@open-data-capture/types';
-import type { FormInstrumentSummary } from '@open-data-capture/types';
-import { ZodType, z } from 'zod';
+import type { BaseInstrument, FormInstrumentSummary, InstrumentKind } from '@open-data-capture/types';
+import { z } from 'zod';
 
 import { languageSchema } from './core.schema';
 
-const uiOptionSchema = <T extends ZodType>(schema: T) =>
+const instrumentKindSchema = z.enum(['form']) satisfies Zod.ZodType<InstrumentKind>;
+
+const uiOptionSchema = <T extends Zod.ZodType>(schema: T) =>
   z.union([
     schema,
     z.object({
@@ -14,7 +16,17 @@ const uiOptionSchema = <T extends ZodType>(schema: T) =>
     })
   ]);
 
-const fieldKindSchema: ZodType<FormFieldKind> = z.enum(['options', 'date', 'array', 'binary', 'numeric', 'text']);
+export const baseInstrumentSchema = z.object({
+  content: z.unknown(),
+  id: z.string().optional(),
+  kind: instrumentKindSchema,
+  language: z.union([languageSchema, z.array(languageSchema)]),
+  name: z.string().min(1),
+  tags: uiOptionSchema(z.array(z.string().min(1))),
+  version: z.number()
+}) satisfies Zod.ZodType<BaseInstrument>;
+
+const fieldKindSchema: Zod.ZodType<FormFieldKind> = z.enum(['options', 'date', 'array', 'binary', 'numeric', 'text']);
 
 const baseFieldSchema = z.object({
   description: uiOptionSchema(z.string().min(1)).optional(),
@@ -26,23 +38,23 @@ const baseFieldSchema = z.object({
 const textFieldSchema = baseFieldSchema.extend({
   kind: z.literal('text'),
   variant: z.enum(['long', 'password', 'short'])
-}) satisfies ZodType<Types.FormInstrumentTextField>;
+}) satisfies Zod.ZodType<Types.FormInstrumentTextField>;
 
 const optionsFieldSchema = baseFieldSchema.extend({
   kind: z.literal('options'),
   options: uiOptionSchema(z.record(z.string().min(1)))
-}) satisfies ZodType<Types.FormInstrumentOptionsField>;
+}) satisfies Zod.ZodType<Types.FormInstrumentOptionsField>;
 
 const dateFieldSchema = baseFieldSchema.extend({
   kind: z.literal('date')
-}) satisfies ZodType<Types.FormInstrumentDateField>;
+}) satisfies Zod.ZodType<Types.FormInstrumentDateField>;
 
 const numericFieldSchema = baseFieldSchema.extend({
   kind: z.literal('numeric'),
   max: z.number(),
   min: z.number(),
   variant: z.enum(['default', 'slider'])
-}) satisfies ZodType<Types.FormInstrumentNumericField>;
+}) satisfies Zod.ZodType<Types.FormInstrumentNumericField>;
 
 const binaryFieldSchema = baseFieldSchema.extend({
   kind: z.literal('binary'),
@@ -53,7 +65,7 @@ const binaryFieldSchema = baseFieldSchema.extend({
     })
   ).optional(),
   variant: z.enum(['checkbox', 'radio'])
-}) satisfies ZodType<Types.FormInstrumentBinaryField>;
+}) satisfies Zod.ZodType<Types.FormInstrumentBinaryField>;
 
 const primitiveFieldSchema = z.union([
   textFieldSchema,
@@ -61,30 +73,30 @@ const primitiveFieldSchema = z.union([
   dateFieldSchema,
   numericFieldSchema,
   binaryFieldSchema
-]) satisfies ZodType<Types.FormInstrumentPrimitiveField>;
+]) satisfies Zod.ZodType<Types.FormInstrumentPrimitiveField>;
 
 // This schema excludes dynamic fieldset
 const arrayFieldSchema = baseFieldSchema.extend({
   fieldset: z.record(primitiveFieldSchema),
   kind: z.literal('array')
-}) satisfies ZodType<Types.FormInstrumentArrayField>;
+}) satisfies Zod.ZodType<Types.FormInstrumentArrayField>;
 
 const staticFieldsSchema = z.record(
   z.union([primitiveFieldSchema, arrayFieldSchema])
-) satisfies ZodType<Types.FormInstrumentStaticFields>;
+) satisfies Zod.ZodType<Types.FormInstrumentStaticFields>;
 
 const fieldsGroupSchema = z.object({
   description: uiOptionSchema(z.string().min(1)).optional(),
   fields: staticFieldsSchema,
   title: uiOptionSchema(z.string().min(1))
-}) satisfies ZodType<Types.FormInstrumentFieldsGroup>;
+}) satisfies Zod.ZodType<Types.FormInstrumentFieldsGroup>;
 
 const contentSchema = z.union([
   staticFieldsSchema,
   fieldsGroupSchema.array()
-]) satisfies ZodType<Types.FormInstrumentContent>;
+]) satisfies Zod.ZodType<Types.FormInstrumentContent>;
 
-export const formInstrumentSchema = z.object({
+export const formInstrumentSchema = baseInstrumentSchema.extend({
   content: contentSchema,
   details: z.object({
     description: uiOptionSchema(z.string().min(1)),
@@ -93,15 +105,11 @@ export const formInstrumentSchema = z.object({
     title: uiOptionSchema(z.string().min(1))
   }),
   kind: z.literal('form'),
-  language: z.union([languageSchema, z.array(languageSchema)]),
-  name: z.string().min(1),
-  tags: uiOptionSchema(z.array(z.string().min(1))),
-  validationSchema: z.instanceof(ZodType<FormDataType>),
-  version: z.number()
-}) satisfies ZodType<Types.FormInstrument>;
+  validationSchema: z.instanceof(z.ZodType<FormDataType>)
+}) satisfies Zod.ZodType<Types.FormInstrument>;
 
 export const formInstrumentSummarySchema = formInstrumentSchema.omit({
   content: true,
   measures: true,
   validationSchema: true
-}) satisfies ZodType<FormInstrumentSummary>;
+}) satisfies Zod.ZodType<FormInstrumentSummary>;

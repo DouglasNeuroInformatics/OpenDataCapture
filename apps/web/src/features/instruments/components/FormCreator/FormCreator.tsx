@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { formInstrumentSchema } from '@open-data-capture/schemas/form-instrument';
+import { formInstrumentSchema } from '@open-data-capture/schemas/instrument';
 import type { FormInstrument } from '@open-data-capture/types';
 import { merge } from 'lodash';
 import { useTranslation } from 'react-i18next';
