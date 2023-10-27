@@ -18,19 +18,9 @@
           "en": "Instructions",
           "fr": "Instructions"
         },
-        "label": {
-          "en": "Overview",
-          "fr": "Aperçu"
-        },
         "language": {
           "en": "Language",
           "fr": "Langue"
-        }
-      },
-      "questions": {
-        "label": {
-          "en": "Questions",
-          "fr": "Questions"
         }
       },
       "summary": {

@@ -99,7 +99,22 @@
       }
     }
   },
-  "form": {},
+  "form": {
+    "steps": {
+      "overview": {
+        "en": "Overview",
+        "fr": "Aperçu"
+      },
+      "questions": {
+        "en": "Questions",
+        "fr": "Questions"
+      },
+      "summary": {
+        "en": "Summary",
+        "fr": "Résumé"
+      }
+    }
+  },
   "manage": {
     "title": {
       "en": "Manage Instruments",

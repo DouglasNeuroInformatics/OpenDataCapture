@@ -105,8 +105,7 @@ export const AvailableInstrumentsPage = () => {
                 <InstrumentCard
                   instrument={instrument}
                   onClick={() => {
-                    console.log('Click!');
-                    navigate(instrument.id!);
+                    navigate(`/instruments/forms/${instrument.id!}`);
                   }}
                 />
               </motion.div>
