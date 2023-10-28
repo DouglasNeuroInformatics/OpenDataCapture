@@ -1,9 +1,12 @@
 import type * as Base from '@douglasneuroinformatics/form-types';
+import type Zod from 'zod';
 
 import type * as Types from './instrument.types';
 
-export abstract class BaseInstrument<TLanguage extends Types.InstrumentLanguage = Types.InstrumentLanguage>
-  implements Types.BaseInstrumentType<TLanguage>
+export abstract class BaseInstrument<
+  TData = unknown,
+  TLanguage extends Types.InstrumentLanguage = Types.InstrumentLanguage
+> implements Types.BaseInstrumentType<TData, TLanguage>
 {
   /** The details of the instrument to be displayed to the user */
   details: Types.InstrumentDetails;
@@ -20,6 +23,8 @@ export abstract class BaseInstrument<TLanguage extends Types.InstrumentLanguage 
   /** A list of tags that users can use to filter instruments */
   tags: Types.InstrumentUIOption<TLanguage, string[]>;
 
+  validate: (z: Omit<typeof Zod, 'z'>) => Zod.ZodType<TData>;
+
   /** The version of the instrument */
   version: number;
 
@@ -29,13 +34,15 @@ export abstract class BaseInstrument<TLanguage extends Types.InstrumentLanguage 
     language,
     name,
     tags,
+    validate,
     version
-  }: Omit<Types.BaseInstrumentType<TLanguage>, 'content' | 'kind'>) {
+  }: Omit<Types.BaseInstrumentType<TData, TLanguage>, 'content' | 'kind'>) {
     this.details = details;
     this.id = id;
     this.language = language;
     this.name = name;
     this.tags = tags;
+    this.validate = validate;
     this.version = version;
   }
 
@@ -50,7 +57,7 @@ export class FormInstrument<
     TData extends Base.FormDataType = Base.FormDataType,
     TLanguage extends Types.InstrumentLanguage = Types.InstrumentLanguage
   >
-  extends BaseInstrument<TLanguage>
+  extends BaseInstrument<TData, TLanguage>
   implements Types.FormInstrumentType<TData, TLanguage>
 {
   content: Types.FormInstrumentContent<TData, TLanguage>;

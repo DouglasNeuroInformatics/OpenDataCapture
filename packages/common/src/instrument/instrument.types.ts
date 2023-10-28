@@ -1,5 +1,6 @@
 import type Base from '@douglasneuroinformatics/form-types';
 import type { Simplify } from 'type-fest';
+import type Zod from 'zod';
 
 import type { Language } from '../core/core.types';
 
@@ -28,7 +29,7 @@ export type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentL
   title: InstrumentUIOption<TLanguage, string>;
 };
 
-export type BaseInstrumentType<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+export type BaseInstrumentType<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
   content?: unknown;
 
@@ -50,12 +51,14 @@ export type BaseInstrumentType<TLanguage extends InstrumentLanguage = Instrument
   /** A list of tags that users can use to filter instruments */
   tags: InstrumentUIOption<TLanguage, string[]>;
 
+  validate: (z: Omit<typeof Zod, 'z'>) => Zod.ZodType<TData>;
+
   /** The version of the instrument */
   version: number;
 };
 
-export type InstrumentSummary<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Omit<
-  BaseInstrumentType<TLanguage>,
+export type InstrumentSummary<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Omit<
+  BaseInstrumentType<TData, TLanguage>,
   'content'
 >;
 
@@ -219,7 +222,7 @@ export type FormInstrumentType<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Simplify<
-  BaseInstrumentType<TLanguage> & {
+  BaseInstrumentType<TData, TLanguage> & {
     content: FormInstrumentContent<TData, TLanguage>;
     measures?: FormInstrumentMeasures<TData, TLanguage>;
   }
