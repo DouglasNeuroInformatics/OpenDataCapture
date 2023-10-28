@@ -11,6 +11,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
+    "@open-data-capture/common": "workspace:*",
     "zod": "^3.22.4"
   }
 }

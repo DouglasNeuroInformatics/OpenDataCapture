@@ -26,7 +26,6 @@
   "devDependencies": {
     "@douglasneuroinformatics/eslint-config": "latest",
     "@douglasneuroinformatics/form-types": "latest",
-    "@open-data-capture/types": "workspace:*",
     "@turbo/workspaces": "^1.10.14",
     "bun-types": "^1.0.4",
     "cross-env": "^7.0.3",
@@ -39,5 +38,5 @@
     "turbo": "^1.10.14",
     "typescript": "^5.2.2"
   },
-  "packageManager": "bun@1.0.6"
+  "packageManager": "bun@1.0.7"
 }
