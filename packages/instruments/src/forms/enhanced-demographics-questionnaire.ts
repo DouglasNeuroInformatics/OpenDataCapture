@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import type { FormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/common/instrument';
 import { z } from 'zod';
 
 import { extractKeys, formatOptions } from '../utils/format-options';

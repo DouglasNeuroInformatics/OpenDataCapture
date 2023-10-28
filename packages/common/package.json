@@ -5,15 +5,15 @@
   "type": "module",
   "exports": {
     "./assignment": "./src/assignment.index.ts",
-    "./auth": "./src/auth.index.ts",
-    "./core": "./src/core.index.ts",
-    "./group": "./src/group.index.ts",
-    "./instrument": "./src/instrument.index.ts",
-    "./setup": "./src/setup.index.ts",
-    "./subject": "./src/subject.index.ts",
-    "./summary": "./src/summary.index.ts",
-    "./user": "./src/user.index.ts",
-    "./visit": "./src/visit.index.ts"
+    "./auth": "./src/auth/auth.index.ts",
+    "./core": "./src/core/core.index.ts",
+    "./group": "./src/group/group.index.ts",
+    "./instrument": "./src/instrument/instrument.index.ts",
+    "./setup": "./src/setup/setup.index.ts",
+    "./subject": "./src/subject/subject.index.ts",
+    "./summary": "./src/summary/summary.index.ts",
+    "./user": "./src/user/user.index.ts",
+    "./visit": "./src/visit/visit.index.ts"
   },
   "scripts": {
     "format": "prettier --write src",

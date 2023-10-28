@@ -1,4 +1,4 @@
-import type { Language } from '@open-data-capture/types';
+import type { Language } from '@open-data-capture/common/core';
 
 type MultilingualOptions = Record<
   string,
@@ -37,4 +37,3 @@ export function formatOptions<T extends MultilingualOptions>(options: T): Format
 export function extractKeys<T extends Record<string, unknown>>(options: T) {
   return Object.keys(options) as [keyof T, ...(keyof T)[]];
 }
-
