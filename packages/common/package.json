@@ -1,0 +1,29 @@
+{
+  "name": "@open-data-capture/common",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "exports": {
+    "./assignment": "./src/assignment.index.ts",
+    "./auth": "./src/auth.index.ts",
+    "./core": "./src/core.index.ts",
+    "./group": "./src/group.index.ts",
+    "./instrument": "./src/instrument.index.ts",
+    "./setup": "./src/setup.index.ts",
+    "./subject": "./src/subject.index.ts",
+    "./summary": "./src/summary.index.ts",
+    "./user": "./src/user.index.ts",
+    "./visit": "./src/visit.index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src"
+  },
+  "dependencies": {
+    "type-fest": "^4.4.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@douglasneuroinformatics/form-types": "latest"
+  }
+}
