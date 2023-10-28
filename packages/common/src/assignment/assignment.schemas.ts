@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { validObjectIdSchema } from '../core/core.schemas';
-import { formInstrumentSchema, formInstrumentSummarySchema } from '../instrument/instrument.schemas';
+import { formInstrumentSchema, instrumentSummarySchema } from '../instrument/instrument.schemas';
 
 import type * as Types from './assignment.types';
 
@@ -21,7 +21,7 @@ export const assignmentSchema = z.object({
 }) satisfies Zod.ZodType<Types.Assignment>;
 
 export const assignmentSummarySchema = assignmentSchema.extend({
-  instrument: formInstrumentSummarySchema
+  instrument: instrumentSummarySchema
 }) satisfies Zod.ZodType<Types.AssignmentSummary>;
 
 export const createAssignmentDataSchema = z.object({

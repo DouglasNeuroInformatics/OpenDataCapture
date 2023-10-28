@@ -13,11 +13,29 @@ export type InstrumentUIOption<L extends InstrumentLanguage, V> = L extends Lang
   ? Record<K, V>
   : never;
 
-/** Defines the basic properties of all instruments */
-export type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+/** The details of the instrument to be displayed to the user */
+export type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+  /** A brief description of the instrument, such as the purpose and history of the instrument */
+  description: InstrumentUIOption<TLanguage, string>;
+
+  /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
+  estimatedDuration: number;
+
+  /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
+  instructions: InstrumentUIOption<TLanguage, string | string[]>;
+
+  /** The title of the instrument in the language it is written, omitting the definite article */
+  title: InstrumentUIOption<TLanguage, string>;
+};
+
+export type BaseInstrumentType<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
   content?: unknown;
 
+  /** The details of the instrument to be displayed to the user */
+  details: InstrumentDetails;
+
+  /** The MongoDB ObjectId represented as a hex string */
   id?: string;
 
   /** The discriminator key for the type of instrument */
@@ -36,20 +54,10 @@ export type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLang
   version: number;
 };
 
-/** The details of the form to be displayed to the user */
-export type FormInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
-  /** A brief description of the instrument, such as the purpose and history of the instrument */
-  description: InstrumentUIOption<TLanguage, string>;
-
-  /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
-  estimatedDuration: number;
-
-  /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
-  instructions: InstrumentUIOption<TLanguage, string | string[]>;
-
-  /** The title of the instrument in the language it is written, omitting the definite article */
-  title: InstrumentUIOption<TLanguage, string>;
-};
+export type InstrumentSummary<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Omit<
+  BaseInstrumentType<TLanguage>,
+  'content'
+>;
 
 export type FormInstrumentFieldMixin<
   TLanguage extends InstrumentLanguage,
@@ -81,15 +89,11 @@ export type FormInstrumentOptionsField<
   }
 >;
 
-export type FormInstrumentDateField<TLanguage extends InstrumentLanguage = InstrumentLanguage> = FormInstrumentFieldMixin<
-  TLanguage,
-  Base.DateFormField
->;
+export type FormInstrumentDateField<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
+  FormInstrumentFieldMixin<TLanguage, Base.DateFormField>;
 
-export type FormInstrumentNumericField<TLanguage extends InstrumentLanguage = InstrumentLanguage> = FormInstrumentFieldMixin<
-  TLanguage,
-  Base.NumericFormField
->;
+export type FormInstrumentNumericField<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
+  FormInstrumentFieldMixin<TLanguage, Base.NumericFormField>;
 
 export type FormInstrumentBinaryField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
@@ -150,7 +154,7 @@ export type FormInstrumentArrayField<
 >;
 
 export type FormInstrumentStaticField<
-  TLanguage extends InstrumentLanguage,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue = Base.ArrayFieldValue | Base.PrimitiveFieldValue
 > = [TValue] extends [Base.PrimitiveFieldValue]
   ? FormInstrumentPrimitiveField<TLanguage, TValue>
@@ -159,50 +163,50 @@ export type FormInstrumentStaticField<
   : FormInstrumentArrayField<TLanguage> | FormInstrumentPrimitiveField<TLanguage>;
 
 export type FormInstrumentStaticFields<
-  TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TData extends Base.FormDataType = Base.FormDataType
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
   [K in keyof TData]: FormInstrumentStaticField<TLanguage, TData[K]>;
 };
 
 export type FormInstrumentDynamicField<
-  TLanguage extends InstrumentLanguage,
-  TData extends Base.FormDataType,
-  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue = Base.ArrayFieldValue | Base.PrimitiveFieldValue
+  TData extends Base.FormDataType = Base.FormDataType,
+  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue = Base.ArrayFieldValue | Base.PrimitiveFieldValue,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = (data: Base.NullableFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
 
 export type FormInstrumentUnknownField<
-  TLanguage extends InstrumentLanguage,
-  TData extends Base.FormDataType,
-  TKey extends keyof TData = keyof TData
-> = FormInstrumentDynamicField<TLanguage, TData, TData[TKey]> | FormInstrumentStaticField<TLanguage, TData[TKey]>;
+  TData extends Base.FormDataType = Base.FormDataType,
+  TKey extends keyof TData = keyof TData,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
+> = FormInstrumentDynamicField<TData, TData[TKey], TLanguage> | FormInstrumentStaticField<TLanguage, TData[TKey]>;
 
 export type FormInstrumentFields<
-  TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TData extends Base.FormDataType = Base.FormDataType
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
-  [K in keyof TData]: FormInstrumentUnknownField<TLanguage, TData, K>;
+  [K in keyof TData]: FormInstrumentUnknownField<TData, K, TLanguage>;
 };
 
 export type FormInstrumentFieldsGroup<
-  TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TData extends Base.FormDataType = Base.FormDataType
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
   description?: InstrumentUIOption<TLanguage, string>;
   fields: {
-    [K in keyof TData]?: FormInstrumentUnknownField<TLanguage, TData, K>;
+    [K in keyof TData]?: FormInstrumentUnknownField<TData, K, TLanguage>;
   };
   title: InstrumentUIOption<TLanguage, string>;
 };
 
 export type FormInstrumentContent<
-  TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TData extends Base.FormDataType = Base.FormDataType
-> = FormInstrumentFields<TLanguage, TData> | FormInstrumentFieldsGroup<TLanguage, TData>[];
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
+> = FormInstrumentFields<TData, TLanguage> | FormInstrumentFieldsGroup<TData, TLanguage>[];
 
 export type FormInstrumentMeasures<
-  TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TData extends Base.FormDataType = Base.FormDataType
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Record<
   string,
   {
@@ -211,40 +215,14 @@ export type FormInstrumentMeasures<
   }
 >;
 
-export type FormInstrument<
+export type FormInstrumentType<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Simplify<
-  BaseInstrument<TLanguage> & {
-    content: FormInstrumentContent<TLanguage, TData>;
-    details: FormInstrumentDetails<TLanguage>;
-    measures?: FormInstrumentMeasures<TLanguage, TData>;
-    validationSchema: Zod.ZodType<TData>;
+  BaseInstrumentType<TLanguage> & {
+    content: FormInstrumentContent<TData, TLanguage>;
+    measures?: FormInstrumentMeasures<TData, TLanguage>;
   }
 >;
 
-export type FormInstrumentSummary<
-  TData extends Base.FormDataType = Base.FormDataType,
-  TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = Omit<FormInstrument<TData, TLanguage>, 'content' | 'measures' | 'validationSchema'>;
-
-export type UnilingualFormInstrumentSummary = FormInstrumentSummary<Base.FormDataType, Language>;
-
-export type SterilizedFormInstrument<
-  TData extends Base.FormDataType = Base.FormDataType,
-  TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {
-  validationSchema: string;
-};
-
-export type UnilingualFormInstrument<TData extends Base.FormDataType = Base.FormDataType> = FormInstrument<
-  TData,
-  Language
->;
-
-export type MultilingualFormInstrument<TData extends Base.FormDataType = Base.FormDataType> = FormInstrument<
-  TData,
-  Language[]
->;
-
-export type Instrument = FormInstrument;
+export type Instrument = FormInstrumentType;

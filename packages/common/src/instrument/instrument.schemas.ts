@@ -1,8 +1,9 @@
-import type { FormDataType, FormFieldKind } from '@douglasneuroinformatics/form-types';
+import type { FormFieldKind } from '@douglasneuroinformatics/form-types';
 import { z } from 'zod';
 
 import { languageSchema } from '../core/core.schemas';
 
+import type { BaseInstrument, FormInstrument } from './instrument.models';
 import type * as Types from './instrument.types';
 
 const instrumentKindSchema = z.enum(['form']) satisfies Zod.ZodType<Types.InstrumentKind>;
@@ -18,13 +19,23 @@ const uiOptionSchema = <T extends Zod.ZodType>(schema: T) =>
 
 export const baseInstrumentSchema = z.object({
   content: z.unknown(),
+  details: z.object({
+    description: uiOptionSchema(z.string().min(1)),
+    estimatedDuration: z.number(),
+    instructions: uiOptionSchema(z.union([z.string().min(1), z.array(z.string().min(1))])),
+    title: uiOptionSchema(z.string().min(1))
+  }),
   id: z.string().optional(),
   kind: instrumentKindSchema,
   language: z.union([languageSchema, z.array(languageSchema)]),
   name: z.string().min(1),
   tags: uiOptionSchema(z.array(z.string().min(1))),
   version: z.number()
-}) satisfies Zod.ZodType<Types.BaseInstrument>;
+}) satisfies Zod.ZodType<BaseInstrument>;
+
+export const instrumentSummarySchema = baseInstrumentSchema.omit({
+  content: true
+}) satisfies Zod.ZodType<Types.InstrumentSummary>;
 
 const fieldKindSchema: Zod.ZodType<FormFieldKind> = z.enum(['options', 'date', 'array', 'binary', 'numeric', 'text']);
 
@@ -98,18 +109,5 @@ const contentSchema = z.union([
 
 export const formInstrumentSchema = baseInstrumentSchema.extend({
   content: contentSchema,
-  details: z.object({
-    description: uiOptionSchema(z.string().min(1)),
-    estimatedDuration: z.number(),
-    instructions: uiOptionSchema(z.union([z.string().min(1), z.array(z.string().min(1))])),
-    title: uiOptionSchema(z.string().min(1))
-  }),
-  kind: z.literal('form'),
-  validationSchema: z.instanceof(z.ZodType<FormDataType>)
-}) satisfies Zod.ZodType<Types.FormInstrument>;
-
-export const formInstrumentSummarySchema = formInstrumentSchema.omit({
-  content: true,
-  measures: true,
-  validationSchema: true
-}) satisfies Zod.ZodType<Types.FormInstrumentSummary>;
+  kind: z.literal('form')
+}) satisfies Zod.ZodType<FormInstrument>;
