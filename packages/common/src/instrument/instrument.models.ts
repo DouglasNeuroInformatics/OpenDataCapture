@@ -1,3 +1,5 @@
+import fs from 'fs/promises';
+
 import type * as Base from '@douglasneuroinformatics/form-types';
 import type Zod from 'zod';
 
@@ -20,10 +22,14 @@ export abstract class BaseInstrument<
   /** The name of the instrument, which must be unique for a given version */
   name: string;
 
+  /** The source code to define the attributes of the instrument, excluding source itself */
+  source?: string;
+
   /** A list of tags that users can use to filter instruments */
   tags: Types.InstrumentUIOption<TLanguage, string[]>;
 
-  validate: (z: Omit<typeof Zod, 'z'>) => Zod.ZodType<TData>;
+  /** The zod validation schema for the instrument data */
+  validationSchema: Zod.ZodType<TData>;
 
   /** The version of the instrument */
   version: number;
@@ -34,7 +40,7 @@ export abstract class BaseInstrument<
     language,
     name,
     tags,
-    validate,
+    validationSchema,
     version
   }: Omit<Types.BaseInstrumentType<TData, TLanguage>, 'content' | 'kind'>) {
     this.details = details;
@@ -42,8 +48,13 @@ export abstract class BaseInstrument<
     this.language = language;
     this.name = name;
     this.tags = tags;
-    this.validate = validate;
+    this.validationSchema = validationSchema;
     this.version = version;
+  }
+
+  async setSource(filepath: string) {
+    const file = await fs.readFile(filepath, 'utf-8');
+    console.log(file);
   }
 
   /** The content in the instrument to be rendered to the user */

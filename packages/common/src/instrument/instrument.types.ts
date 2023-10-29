@@ -51,7 +51,8 @@ export type BaseInstrumentType<TData = unknown, TLanguage extends InstrumentLang
   /** A list of tags that users can use to filter instruments */
   tags: InstrumentUIOption<TLanguage, string[]>;
 
-  validate: (z: Omit<typeof Zod, 'z'>) => Zod.ZodType<TData>;
+  /** The zod validation schema for the instrument data */
+  validationSchema: Zod.ZodType<TData>;
 
   /** The version of the instrument */
   version: number;
