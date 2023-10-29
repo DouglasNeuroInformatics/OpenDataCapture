@@ -4,6 +4,10 @@ import type Zod from 'zod';
 
 import type { Language } from '../core/core.types';
 
+export type InstrumentContext = {
+  z: Omit<typeof Zod, 'z'>;
+};
+
 export type InstrumentKind = 'form';
 
 export type InstrumentLanguage = Language | Language[];
