@@ -36,7 +36,9 @@ export const baseInstrumentSchema = z.object({
 }) satisfies Zod.ZodType<Types.BaseInstrument>;
 
 export const instrumentSummarySchema = baseInstrumentSchema.omit({
-  content: true
+  content: true,
+  source: true,
+  validationSchema: true
 }) satisfies Zod.ZodType<Types.InstrumentSummary>;
 
 const fieldKindSchema: Zod.ZodType<FormFieldKind> = z.enum(['options', 'date', 'array', 'binary', 'numeric', 'text']);

@@ -57,7 +57,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
 
 export type InstrumentSummary<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Omit<
   BaseInstrument<TData, TLanguage>,
-  'content'
+  'content' | 'source' | 'validationSchema'
 >;
 
 export type FormInstrumentFieldMixin<
