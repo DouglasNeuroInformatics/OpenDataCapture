@@ -49,7 +49,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   name: string;
 
   /** The source code to define the attributes of the instrument, excluding source itself */
-  source?: string;
+  source: string;
 
   /** A list of tags that users can use to filter instruments */
   tags: InstrumentUIOption<TLanguage, string[]>;

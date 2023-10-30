@@ -6,12 +6,12 @@ export abstract class BaseInstrumentEntity<
   TLanguage extends Types.InstrumentLanguage = Types.InstrumentLanguage
 > implements Types.BaseInstrument<TData, TLanguage>
 {
+  content: unknown;
   details: Types.InstrumentDetails<TLanguage>;
+  kind: Types.InstrumentKind;
   language: TLanguage;
   name: string;
   tags: Types.InstrumentUIOption<TLanguage, string[]>;
   validationSchema: Zod.ZodType<TData>;
   version: number;
-  abstract content: unknown;
-  abstract kind: Types.InstrumentKind;
 }

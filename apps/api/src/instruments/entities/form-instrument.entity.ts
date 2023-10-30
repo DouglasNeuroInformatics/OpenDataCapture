@@ -13,19 +13,12 @@ export class FormInstrumentEntity<
   extends BaseInstrumentEntity<TData, TLanguage>
   implements Types.FormInstrument<TData, TLanguage>
 {
-  @ApiProperty()
-  @Prop({ required: true, type: Object })
   declare content: Types.FormInstrumentContent<TData, TLanguage>;
-
   declare kind: 'form';
-
+  
   @ApiProperty()
   @Prop({ required: false, type: Object })
   declare measures?: Types.FormInstrumentMeasures<TData, TLanguage>;
-
-  @ApiProperty()
-  @Prop({ required: true, type: Object })
-  declare validationSchema: Zod.ZodType<TData>;
 }
 
 export const FormInstrumentSchema = SchemaFactory.createForClass(FormInstrumentEntity);

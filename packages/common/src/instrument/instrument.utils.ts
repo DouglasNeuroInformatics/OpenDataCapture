@@ -7,7 +7,7 @@ export type InstrumentContext = {
   z: Omit<typeof Zod, 'z'>;
 };
 
-export type InstrumentFactory<T extends BaseInstrument> = (ctx: InstrumentContext) => T;
+export type InstrumentFactory<T extends BaseInstrument> = (ctx: InstrumentContext) => Omit<T, 'source'>;
 
 type DefineInstrumentOptions<T extends BaseInstrument> = {
   factory: InstrumentFactory<T>;
@@ -15,7 +15,7 @@ type DefineInstrumentOptions<T extends BaseInstrument> = {
 
 export function defineInstrument<T extends BaseInstrument>({ factory }: DefineInstrumentOptions<T>) {
   const transpiler = new Bun.Transpiler({ deadCodeElimination: false, minifyWhitespace: true, target: 'browser' });
-  const instrument = factory({ z });
+  const instrument = factory({ z }) as T;
   instrument.source = transpiler.transformSync(factory.toString());
   return instrument;
 }
