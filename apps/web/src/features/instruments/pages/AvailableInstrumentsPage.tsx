@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import { SearchBar, SelectDropdown, type SelectOption, Spinner } from '@douglasneuroinformatics/ui';
+import {
+  SearchBar,
+  SelectDropdown,
+  type SelectOption,
+  Spinner,
+  useNotificationsStore
+} from '@douglasneuroinformatics/ui';
 import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
 import { motion } from 'framer-motion';
@@ -9,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useAvailableForms } from '@/hooks/useAvailableForms';
+import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 import { InstrumentCard } from '../components/InstrumentCard';
 
@@ -21,6 +28,9 @@ export const AvailableInstrumentsPage = () => {
   const [selectedLanguages, setSelectedLanguages] = useState<SelectOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<SelectOption[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const { activeVisit } = useActiveVisitStore();
+  const notifications = useNotificationsStore();
 
   const languageOptions = [
     {
@@ -105,7 +115,14 @@ export const AvailableInstrumentsPage = () => {
                 <InstrumentCard
                   instrument={instrument}
                   onClick={() => {
-                    navigate(`/instruments/forms/${instrument.id!}`);
+                    if (activeVisit) {
+                      navigate(`/instruments/forms/${instrument.id!}`);
+                    } else {
+                      notifications.addNotification({
+                        message: t('instruments:available.nullActiveVisitError'),
+                        type: 'info'
+                      });
+                    }
                   }}
                 />
               </motion.div>

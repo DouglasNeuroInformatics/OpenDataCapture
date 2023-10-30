@@ -3,6 +3,10 @@
     "title": {
       "en": "Available Instruments",
       "fr": "Instruments disponibles"
+    },
+    "nullActiveVisitError": {
+      "en": "Please begin a visit to continue",
+      "fr": "Veuillez commencer une visite pour continuer"
     }
   },
   "create": {

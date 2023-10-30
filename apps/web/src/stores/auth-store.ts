@@ -2,7 +2,7 @@ import { createMongoAbility } from '@casl/ability';
 import type { JwtPayload } from '@open-data-capture/common/auth';
 import type { AppAbility } from '@open-data-capture/common/core';
 import type { Group } from '@open-data-capture/common/group';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { create } from 'zustand';
 
 import { useActiveVisitStore } from './active-visit-store';
