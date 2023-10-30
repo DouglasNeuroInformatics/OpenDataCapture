@@ -1,11 +1,20 @@
 import type FormTypes from '@douglasneuroinformatics/form-types';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import type * as Types from '@open-data-capture/common/instrument';
 
 import { BaseInstrumentEntity } from './base-instrument.entity';
 
-@Schema()
+@Schema({
+  toObject: { virtuals: true },
+  virtuals: {
+    measures: {
+      get(this: FormInstrumentEntity) {
+        return this.measures;
+      }
+    }
+  }
+})
 export class FormInstrumentEntity<
     TData extends FormTypes.FormDataType = FormTypes.FormDataType,
     TLanguage extends Types.InstrumentLanguage = Types.InstrumentLanguage
@@ -15,9 +24,8 @@ export class FormInstrumentEntity<
 {
   declare content: Types.FormInstrumentContent<TData, TLanguage>;
   declare kind: 'form';
-  
+
   @ApiProperty()
-  @Prop({ required: false, type: Object })
   declare measures?: Types.FormInstrumentMeasures<TData, TLanguage>;
 }
 

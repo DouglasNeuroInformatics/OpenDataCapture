@@ -6,7 +6,10 @@ import type { HydratedDocument } from 'mongoose';
 
 import type { BaseInstrumentEntity } from './base-instrument.entity';
 
-@EntitySchema({ discriminatorKey: 'kind' })
+@EntitySchema({
+  discriminatorKey: 'kind',
+  virtuals: {}
+})
 export class InstrumentEntity<TData = unknown, TLanguage extends Types.InstrumentLanguage = Types.InstrumentLanguage>
   implements BaseInstrumentEntity<TData, TLanguage>
 {

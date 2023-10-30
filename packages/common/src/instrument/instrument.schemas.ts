@@ -2,9 +2,9 @@ import type { FormDataType, FormFieldKind } from '@douglasneuroinformatics/form-
 import { z } from 'zod';
 
 import { languageSchema } from '../core/core.schemas';
+import { evaluateInstrument } from './instrument.utils';
 
 import type * as Types from './instrument.types';
-import type { InstrumentFactory } from './instrument.utils';
 
 const instrumentKindSchema = z.enum(['form']) satisfies Zod.ZodType<Types.InstrumentKind>;
 
@@ -120,11 +120,5 @@ export const formInstrumentDtoSchema: z.ZodType<
   z.ZodTypeDef,
   Pick<Types.FormInstrument, 'source'>
 > = z
-  .object({
-    source: z.string()
-  })
-  .transform(({ source }) => {
-    const factory = (0, eval)(`"use strict"; ${source}`) as InstrumentFactory<Types.FormInstrument>;
-    const form = factory({ z });
-    return { ...form, source } satisfies Types.FormInstrument;
-  });
+  .object({ source: z.string() })
+  .transform(({ source }) => evaluateInstrument<Types.FormInstrument>(source));
