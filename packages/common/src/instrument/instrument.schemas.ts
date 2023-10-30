@@ -16,14 +16,14 @@ const uiOptionSchema = <T extends Zod.ZodType>(schema: T) =>
     })
   ]);
 
+const baseInstrumentDetailsSchema = z.object({
+  description: uiOptionSchema(z.string().min(1)),
+  title: uiOptionSchema(z.string().min(1))
+}) satisfies Zod.ZodType<Types.BaseInstrumentDetails>;
+
 export const baseInstrumentSchema = z.object({
   content: z.unknown(),
-  details: z.object({
-    description: uiOptionSchema(z.string().min(1)),
-    estimatedDuration: z.number(),
-    instructions: uiOptionSchema(z.union([z.string().min(1), z.array(z.string().min(1))])),
-    title: uiOptionSchema(z.string().min(1))
-  }),
+  details: baseInstrumentDetailsSchema,
   id: z.string().optional(),
   kind: instrumentKindSchema,
   language: z.union([languageSchema, z.array(languageSchema)]),
@@ -107,8 +107,14 @@ const contentSchema = z.union([
   fieldsGroupSchema.array()
 ]) satisfies Zod.ZodType<Types.FormInstrumentContent>;
 
+const formInstrumentDetailsSchema = baseInstrumentDetailsSchema.extend({
+  estimatedDuration: z.number(),
+  instructions: uiOptionSchema(z.union([z.string().min(1), z.array(z.string().min(1))]))
+}) satisfies Zod.ZodType<Types.BaseInstrumentDetails>;
+
 export const formInstrumentSchema = baseInstrumentSchema.extend({
   content: contentSchema,
+  details: formInstrumentDetailsSchema,
   kind: z.literal('form'),
   validationSchema: z.instanceof(z.ZodType<FormDataType>)
 }) satisfies Zod.ZodType<Types.FormInstrument>;
