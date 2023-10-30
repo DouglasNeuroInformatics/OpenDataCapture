@@ -78,21 +78,21 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
     <Form<InfoFormData>
       content={[
         {
-          title: t('create.info.basicMetadata'),
+          title: t('create.basicMetadata'),
           fields: {
             name: {
               kind: 'text',
-              label: t('instruments:create.info.name'),
+              label: t('instruments:props.name'),
               variant: 'short'
             },
             estimatedDuration: {
               kind: 'numeric',
-              label: t('create.info.estimatedDuration'),
+              label: t('instruments:props.estimatedDuration'),
               variant: 'default'
             },
             language: {
               kind: 'options',
-              label: t('create.info.language'),
+              label: t('common:language'),
               options: {
                 english: t('common:languages.english'),
                 french: t('common:languages.french'),
@@ -109,24 +109,24 @@ export const InfoForm = ({ onSubmit }: InfoFormProps) => {
         createBilingualFieldGroup({
           baseFieldName: 'title',
           defaultLanguage,
-          label: t('create.info.title')
+          label: t('props.title')
         }),
         createBilingualFieldGroup({
           baseFieldName: 'description',
           defaultLanguage,
-          label: t('create.info.description')
+          label: t('props.description')
         }),
         createBilingualFieldGroup({
           baseFieldName: 'instructions',
           defaultLanguage,
-          label: t('create.info.instructions')
+          label: t('props.instructions')
         }),
         {
-          title: t('create.info.tags'),
+          title: t('props.tags'),
           fields: {
             tags: createBilingualArrayField({
               defaultLanguage,
-              label: t('create.info.tag')
+              label: t('props.tag')
             })
           }
         }

@@ -17,6 +17,10 @@
       "fr": "Utilisateur standard"
     }
   },
+  "begin": {
+    "en": "Begin",
+    "fr": "Commencer"
+  },
   "bilingual": {
     "en": "Bilingual",
     "fr": "Bilingue"
@@ -123,6 +127,10 @@
       "fr": "Français"
     }
   },
+  "name": {
+    "en": "Name",
+    "fr": "Nom"
+  },
   "networkError": {
     "en": "Network Error",
     "fr": "Erreur de réseau"
@@ -134,6 +142,18 @@
   "notFound": {
     "en": "Not Found",
     "fr": "Pas trouvé"
+  },
+  "print": {
+    "en": "Print",
+    "fr": "Imprimer"
+  },
+  "results": {
+    "en": "Results",
+    "fr": "Résultats"
+  },
+  "subject": {
+    "en": "Subject",
+    "fr": "Client"
   },
   "submit": {
     "en": "Submit",
@@ -147,6 +167,10 @@
     "en": "Tags",
     "fr": "Tags"
   },
+  "timeCollected": {
+    "en": "Time Collected",
+    "fr": "Horodatage"
+  },
   "unknownError": {
     "en": "Unknown Error",
     "fr": "Erreur inconnue"
@@ -154,6 +178,10 @@
   "uploadSuccessful": {
     "en": "Upload Successful",
     "fr": "Téléchargement réussi"
+  },
+  "version": {
+    "en": "Version",
+    "fr": "Version"
   },
   "yes": {
     "en": "Yes",
