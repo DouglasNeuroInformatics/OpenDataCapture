@@ -7,7 +7,7 @@ export abstract class BaseInstrumentEntity<
 > implements Types.BaseInstrument<TData, TLanguage>
 {
   content: unknown;
-  details: Types.InstrumentDetails<TLanguage>;
+  details: Types.BaseInstrumentDetails<TLanguage>;
   kind: Types.InstrumentKind;
   language: TLanguage;
   name: string;

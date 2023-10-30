@@ -11,12 +11,12 @@ export const useAvailableForms = () => {
   return useQuery({
     queryFn: () => {
       return axios.get('/v1/instruments/forms/available').then((response) => {
+        console.log(response.data);
         const result = instrumentSummarySchema.array().safeParse(response.data);
         if (!result.success) {
           console.error('Failed to parse form instrument summaries', result.error.issues);
           return [];
         }
-        result.data
         return result.data.map((summary) => resolveFormSummary(summary, i18n.resolvedLanguage as Language));
       });
     },

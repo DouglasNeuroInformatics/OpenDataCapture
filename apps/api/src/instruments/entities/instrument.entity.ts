@@ -1,12 +1,11 @@
-import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import type * as Types from '@open-data-capture/common/instrument';
 import type { HydratedDocument } from 'mongoose';
 
 import type { BaseInstrumentEntity } from './base-instrument.entity';
 
-@EntitySchema({
+@Schema({
   discriminatorKey: 'kind',
   virtuals: {}
 })
@@ -21,7 +20,7 @@ export class InstrumentEntity<TData = unknown, TLanguage extends Types.Instrumen
 
   @ApiProperty({ description: 'Details of the instrument to be displayed to the user' })
   @Prop({ required: true, type: Object })
-  details: Types.InstrumentDetails<TLanguage>;
+  details: Types.BaseInstrumentDetails<TLanguage>;
 
   @ApiProperty({ description: 'The discriminator key for the type of instrument' })
   @Prop({ enum: ['form'] satisfies Types.InstrumentKind[], required: true, type: String })

@@ -15,15 +15,9 @@ export type InstrumentUIOption<L extends InstrumentLanguage, V> = L extends Lang
   : never;
 
 /** The details of the instrument to be displayed to the user */
-export type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
-
-  /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
-  estimatedDuration?: number;
-
-  /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
-  instructions?: InstrumentUIOption<TLanguage, string | string[]>;
 
   /** The title of the instrument in the language it is written, omitting the definite article */
   title: InstrumentUIOption<TLanguage, string>;
@@ -34,7 +28,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   content?: unknown;
 
   /** The details of the instrument to be displayed to the user */
-  details: InstrumentDetails<TLanguage>;
+  details: BaseInstrumentDetails<TLanguage>;
 
   /** The MongoDB ObjectId represented as a hex string */
   id?: string;
@@ -234,12 +228,21 @@ export type FormInstrumentMeasures<
   }
 >;
 
+export type FormInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
+  BaseInstrumentDetails<TLanguage> & {
+    /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
+    estimatedDuration: number;
+    /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
+    instructions: InstrumentUIOption<TLanguage, string | string[]>;
+  };
+
 export type FormInstrument<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Simplify<
-  BaseInstrument<TData, TLanguage> & {
+  Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
     content: FormInstrumentContent<TData, TLanguage>;
+    details: FormInstrumentDetails<TLanguage>;
     measures?: FormInstrumentMeasures<TData, TLanguage>;
   }
 >;

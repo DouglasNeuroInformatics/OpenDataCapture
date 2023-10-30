@@ -8,7 +8,7 @@ import type Z from 'zod';
 @ValidationSchema(formInstrumentDtoSchema)
 export class CreateFormDto implements Types.FormInstrument {
   content: Types.FormInstrumentContent;
-  details: Types.InstrumentDetails;
+  details: Types.FormInstrumentDetails;
   kind: 'form';
   language: Types.InstrumentLanguage;
   measures?: Types.FormInstrumentMeasures;

@@ -17,6 +17,7 @@ export class FormInstrumentEntity<
   implements Types.FormInstrument<TData, TLanguage>
 {
   declare content: Types.FormInstrumentContent<TData, TLanguage>;
+  declare details: Types.FormInstrumentDetails<TLanguage>;
   declare kind: 'form';
 
   @ApiProperty()
