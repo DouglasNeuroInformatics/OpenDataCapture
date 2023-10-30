@@ -7,7 +7,7 @@ import { InstrumentEditor } from '../components/InstrumentEditor';
 export const ManageInstrumentsPage = () => {
   const { t } = useTranslation('instruments');
   return (
-    <div className="h-full">
+    <div className="flex flex-grow flex-col">
       <PageHeader title={t('manage.title')} />
       <InstrumentEditor />
     </div>

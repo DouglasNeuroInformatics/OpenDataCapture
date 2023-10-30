@@ -23,4 +23,22 @@ self.MonacoEnvironment = {
   }
 };
 
+monaco.editor.defineTheme('odc-light', {
+  base: 'vs',
+  colors: {
+    'editor.background': '#F8FAFC'
+  },
+  inherit: true,
+  rules: []
+});
+
+monaco.editor.defineTheme('odc-dark', {
+  base: 'vs-dark',
+  colors: {
+    'editor.background': '#1E313B'
+  },
+  inherit: true,
+  rules: []
+});
+
 monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
