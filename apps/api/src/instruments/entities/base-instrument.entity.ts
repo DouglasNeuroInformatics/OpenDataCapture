@@ -11,6 +11,7 @@ export abstract class BaseInstrumentEntity<
   kind: Types.InstrumentKind;
   language: TLanguage;
   name: string;
+  source: string;
   tags: Types.InstrumentUIOption<TLanguage, string[]>;
   validationSchema: Zod.ZodType<TData>;
   version: number;

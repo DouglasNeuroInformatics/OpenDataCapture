@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { languageSchema } from '../core/core.schemas';
 
 import type * as Types from './instrument.types';
+import type { InstrumentFactory } from './instrument.utils';
 
 const instrumentKindSchema = z.enum(['form']) satisfies Zod.ZodType<Types.InstrumentKind>;
 
@@ -113,3 +114,18 @@ export const formInstrumentSchema = baseInstrumentSchema.extend({
   kind: z.literal('form'),
   validationSchema: z.instanceof(z.ZodType<FormDataType>)
 }) satisfies Zod.ZodType<Types.FormInstrument>;
+
+export const formInstrumentDtoSchema: z.ZodType<
+  Types.FormInstrument,
+  z.ZodTypeDef,
+  Pick<Types.FormInstrument, 'source'>
+> = z
+  .object({
+    source: z.string()
+  })
+  .transform(({ source }) => {
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const factory = new Function('ctx', source) as InstrumentFactory<Types.FormInstrument>;
+    const form = factory({ z });
+    return { ...form, source } satisfies Types.FormInstrument;
+  });
