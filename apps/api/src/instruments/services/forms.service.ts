@@ -25,6 +25,10 @@ export class FormsService {
     private readonly cryptoService: CryptoService
   ) {}
 
+  private createIdentifier(name: string, version: number): string {
+    return this.cryptoService.hash(name + version);
+  }
+
   async create<T extends FormInstrumentData>(formInstrument: FormInstrument<T>): Promise<FormInstrument> {
     const identifier = this.createIdentifier(formInstrument.name, formInstrument.version);
     const conflict = await this.formModel.exists({
@@ -93,9 +97,5 @@ export class FormsService {
       throw new NotFoundException(`Failed to find form with id: ${id}`);
     }
     return result;
-  }
-
-  private createIdentifier(name: string, version: number): string {
-    return this.cryptoService.hash(name + version);
   }
 }

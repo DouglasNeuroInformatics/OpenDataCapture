@@ -15,11 +15,6 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
     super();
   }
 
-  canActivate(context: ExecutionContext): Observable<boolean> | Promise<boolean> | boolean {
-    this.logger.verbose(`Request URL: ${context.switchToHttp().getRequest<Request>().url}`);
-    return this.isPublicRoute(context) || super.canActivate(context);
-  }
-
   private isPublicRoute(context: ExecutionContext): boolean {
     const routeAccess = this.reflector.getAllAndOverride<RouteAccessType | undefined>('RouteAccess', [
       context.getHandler(),
@@ -28,5 +23,10 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
     const result = routeAccess === 'public';
     this.logger.verbose(`Public Route: ${result}`);
     return result;
+  }
+
+  canActivate(context: ExecutionContext): Observable<boolean> | Promise<boolean> | boolean {
+    this.logger.verbose(`Request URL: ${context.switchToHttp().getRequest<Request>().url}`);
+    return this.isPublicRoute(context) || super.canActivate(context);
   }
 }

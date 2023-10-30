@@ -17,6 +17,14 @@ export type RenderInterceptorOptions<T extends RootComponentType> = {
 export class RenderInterceptor<T extends RootComponentType> implements NestInterceptor {
   constructor(private readonly options: RenderInterceptorOptions<T>) {}
 
+  private async render(element: JSX.Element): Promise<StreamableFile> {
+    const stream = await renderToReadableStream(this.options.root({ children: element }), {
+      bootstrapModules: ['/hydrate.js']
+    });
+    const buffer = Buffer.from(await arrayBuffer(stream));
+    return new StreamableFile(buffer);
+  }
+
   intercept(context: ExecutionContext, next: CallHandler<JSX.Element>): Observable<Promise<StreamableFile>> {
     console.log(context);
     return next.handle().pipe(
@@ -24,13 +32,5 @@ export class RenderInterceptor<T extends RootComponentType> implements NestInter
         return await this.render(element);
       })
     );
-  }
-
-  private async render(element: JSX.Element): Promise<StreamableFile> {
-    const stream = await renderToReadableStream(this.options.root({ children: element }), {
-      bootstrapModules: ['/hydrate.js']
-    });
-    const buffer = Buffer.from(await arrayBuffer(stream));
-    return new StreamableFile(buffer);
   }
 }
