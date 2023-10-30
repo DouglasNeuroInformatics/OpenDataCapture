@@ -124,8 +124,7 @@ export const formInstrumentDtoSchema: z.ZodType<
     source: z.string()
   })
   .transform(({ source }) => {
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
-    const factory = new Function('ctx', source) as InstrumentFactory<Types.FormInstrument>;
+    const factory = (0, eval)(`"use strict"; ${source}`) as InstrumentFactory<Types.FormInstrument>;
     const form = factory({ z });
     return { ...form, source } satisfies Types.FormInstrument;
   });
