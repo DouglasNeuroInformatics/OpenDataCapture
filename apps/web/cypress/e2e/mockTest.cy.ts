@@ -9,7 +9,7 @@ describe('login test', () => {
       const { worker, rest } = window.msw;
 
       worker.use(
-        rest.post('/overview', (req, res, ctx) => {
+        rest.post('/auth/login', (req, res, ctx) => {
           return res(ctx.json({ success: true }));
         })
       );
