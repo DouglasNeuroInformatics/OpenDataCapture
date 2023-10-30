@@ -20,10 +20,10 @@ export type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentL
   description: InstrumentUIOption<TLanguage, string>;
 
   /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
-  estimatedDuration: number;
+  estimatedDuration?: number;
 
   /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
-  instructions: InstrumentUIOption<TLanguage, string | string[]>;
+  instructions?: InstrumentUIOption<TLanguage, string | string[]>;
 
   /** The title of the instrument in the language it is written, omitting the definite article */
   title: InstrumentUIOption<TLanguage, string>;

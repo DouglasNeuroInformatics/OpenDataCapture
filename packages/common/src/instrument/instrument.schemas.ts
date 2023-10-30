@@ -20,8 +20,8 @@ export const baseInstrumentSchema = z.object({
   content: z.unknown(),
   details: z.object({
     description: uiOptionSchema(z.string().min(1)),
-    estimatedDuration: z.number(),
-    instructions: uiOptionSchema(z.union([z.string().min(1), z.array(z.string().min(1))])),
+    estimatedDuration: z.number().positive().optional(),
+    instructions: uiOptionSchema(z.union([z.string().min(1), z.array(z.string().min(1))])).optional(),
     title: uiOptionSchema(z.string().min(1))
   }),
   id: z.string().optional(),
