@@ -1,6 +1,7 @@
 import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Controller, Get, Query } from '@nestjs/common';
-import type { AppAbility, Summary } from '@open-data-capture/types';
+import type { AppAbility } from '@open-data-capture/common/core';
+import type { Summary } from '@open-data-capture/common/summary';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 

@@ -1,6 +1,7 @@
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop } from '@nestjs/mongoose';
-import type { Subject, Visit } from '@open-data-capture/types';
+import type { Subject } from '@open-data-capture/common/subject';
+import type { Visit } from '@open-data-capture/common/visit';
 import { Schema as MongooseSchema } from 'mongoose';
 
 import { SubjectEntity } from '@/subjects/entities/subject.entity';

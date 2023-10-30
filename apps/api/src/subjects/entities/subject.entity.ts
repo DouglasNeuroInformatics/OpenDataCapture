@@ -1,6 +1,6 @@
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import type { Sex, Subject } from '@open-data-capture/types';
+import type { Sex, Subject } from '@open-data-capture/common/subject';
 import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';

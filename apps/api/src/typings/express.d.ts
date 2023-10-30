@@ -1,4 +1,5 @@
-import type { AppAbility, User as AppUser } from '@open-data-capture/types';
+import type { AppAbility } from '@open-data-capture/common/core';
+import type { User as AppUser } from '@open-data-capture/common/user';
 
 declare global {
   namespace Express {

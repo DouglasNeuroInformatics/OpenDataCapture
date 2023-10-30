@@ -1,7 +1,7 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { createUserDataSchema } from '@open-data-capture/schemas/user';
-import type { BasePermissionLevel, CreateUserData } from '@open-data-capture/types';
+import { createUserDataSchema } from '@open-data-capture/common/user';
+import type { BasePermissionLevel, CreateUserData } from '@open-data-capture/common/user';
 
 @ValidationSchema(createUserDataSchema)
 export class CreateUserDto implements CreateUserData {

@@ -1,7 +1,8 @@
 import { CurrentUser, type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { AppAbility, User } from '@open-data-capture/types';
+import type { AppAbility } from '@open-data-capture/common/core';
+import type { User } from '@open-data-capture/common/user';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 

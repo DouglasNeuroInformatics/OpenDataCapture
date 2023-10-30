@@ -1,7 +1,7 @@
 import { accessibleBy } from '@casl/mongoose';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Assignment, AssignmentSummary } from '@open-data-capture/types';
+import type { Assignment, AssignmentSummary } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { FormsService } from '@/instruments/forms.service';

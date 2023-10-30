@@ -1,7 +1,6 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { loginCredentialsSchema } from '@open-data-capture/schemas/auth';
-import type { LoginCredentials } from '@open-data-capture/types';
+import { type LoginCredentials, loginCredentialsSchema } from '@open-data-capture/common/auth';
 
 @ValidationSchema(loginCredentialsSchema)
 export class LoginRequestDto implements LoginCredentials {

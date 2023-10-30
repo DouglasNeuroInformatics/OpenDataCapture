@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
+import type { Subject } from '@open-data-capture/common/subject';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
 import * as instruments from '@open-data-capture/instruments';
-import type { Subject } from '@open-data-capture/types';
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';

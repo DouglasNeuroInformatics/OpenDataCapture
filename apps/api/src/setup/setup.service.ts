@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
-import type { CreateAdminData, SetupState } from '@open-data-capture/types';
+import type { CreateAdminData, SetupState } from '@open-data-capture/common/setup';
 import mongoose from 'mongoose';
 
 import { UserEntity } from '@/users/entities/user.entity';

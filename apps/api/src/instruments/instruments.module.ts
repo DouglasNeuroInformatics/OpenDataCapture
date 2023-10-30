@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
-import type { InstrumentKind } from '@open-data-capture/types';
+import type { InstrumentKind } from '@open-data-capture/common/instrument';
 import type { Schema } from 'mongoose';
 
-import { FormInstrumentSchema, InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
+import { FormInstrumentSchema } from './entities/form-instrument.entity';
+import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
 import { FormsController } from './forms.controller';
 import { FormsService } from './forms.service';
 import { InstrumentsRepository } from './instruments.repository';

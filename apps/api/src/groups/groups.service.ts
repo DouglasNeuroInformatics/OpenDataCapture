@@ -1,7 +1,7 @@
 import { accessibleBy } from '@casl/mongoose';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Group } from '@open-data-capture/types';
+import type { Group } from '@open-data-capture/common/group';
 
 import type { EntityOperationOptions } from '@/core/types';
 

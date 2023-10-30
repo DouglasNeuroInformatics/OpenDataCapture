@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
 import '@casl/mongoose';
-import type { AppEntityName } from '@open-data-capture/types';
+import type { AppEntityName } from '@open-data-capture/common/core';
 
 type Records = {
   [K in AppEntityName]: true;

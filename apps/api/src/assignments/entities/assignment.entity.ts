@@ -1,10 +1,10 @@
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { type Assignment, type AssignmentStatus } from '@open-data-capture/types';
+import { type Assignment, type AssignmentStatus } from '@open-data-capture/common/assignment';
 import { Schema as MongooseSchema } from 'mongoose';
 
-import type { FormInstrumentEntity } from '@/instruments/entities/instrument.entity';
+import type { FormInstrumentEntity } from '@/instruments/entities/form-instrument.entity';
 import { InstrumentEntity } from '@/instruments/entities/instrument.entity';
 import { SubjectEntity } from '@/subjects/entities/subject.entity';
 

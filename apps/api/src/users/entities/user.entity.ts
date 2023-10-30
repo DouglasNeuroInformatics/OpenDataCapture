@@ -1,6 +1,6 @@
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import type { BasePermissionLevel, User } from '@open-data-capture/types';
+import type { BasePermissionLevel, User } from '@open-data-capture/common/user';
 import { Schema as MongooseSchema } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { Summary } from '@open-data-capture/types';
+import type { Summary } from '@open-data-capture/common/summary';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';

@@ -4,7 +4,7 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    "./assignment": "./src/assignment.index.ts",
+    "./assignment": "./src/assignment/assignment.index.ts",
     "./auth": "./src/auth/auth.index.ts",
     "./core": "./src/core/core.index.ts",
     "./group": "./src/group/group.index.ts",

@@ -1,7 +1,7 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { createGroupDataSchema } from '@open-data-capture/schemas/group';
-import type { CreateGroupData } from '@open-data-capture/types';
+import { createGroupDataSchema } from '@open-data-capture/common/group';
+import type { CreateGroupData } from '@open-data-capture/common/group';
 
 @ValidationSchema(createGroupDataSchema)
 export class CreateGroupDto implements CreateGroupData {

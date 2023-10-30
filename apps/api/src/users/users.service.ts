@@ -2,7 +2,7 @@ import { accessibleBy } from '@casl/mongoose';
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { type User } from '@open-data-capture/types';
+import { type User } from '@open-data-capture/common/user';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';

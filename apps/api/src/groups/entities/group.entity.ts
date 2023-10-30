@@ -1,7 +1,7 @@
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import type { Group } from '@open-data-capture/types';
+import type { Group } from '@open-data-capture/common/group';
 import { type HydratedDocument } from 'mongoose';
 
 @EntitySchema<Group>()

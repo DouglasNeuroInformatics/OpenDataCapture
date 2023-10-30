@@ -3,7 +3,8 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import type { EntityController } from '@douglasneuroinformatics/nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
-import type { AppAbility, FormInstrument, FormInstrumentSummary, InstrumentLanguage } from '@open-data-capture/types';
+import type { AppAbility } from '@open-data-capture/common/core';
+import type { FormInstrument, InstrumentLanguage, InstrumentSummary } from '@open-data-capture/common/instrument';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
@@ -62,7 +63,7 @@ export class FormsService implements EntityController<FormInstrument> {
     return form;
   }
 
-  async getAvailable({ ability }: { ability?: AppAbility } = {}): Promise<FormInstrumentSummary[]> {
+  async getAvailable({ ability }: { ability?: AppAbility } = {}): Promise<InstrumentSummary[]> {
     return this.instrumentsRepository.find<FormInstrument>(
       { $and: [{ kind: 'form' }, ability ? accessibleBy(ability, 'read').Instrument : {}] },
       {

@@ -1,7 +1,7 @@
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
-import type { CreateVisitData, Visit } from '@open-data-capture/types';
+import type { CreateVisitData, Visit } from '@open-data-capture/common/visit';
 
 import type { SubjectDocument } from '@/subjects/entities/subject.entity';
 import { SubjectsService } from '@/subjects/subjects.service';
