@@ -21,7 +21,11 @@ export const InstrumentEditor = () => {
       setEditor((editor) => {
         if (editor) return editor;
         return monaco.editor.create(monacoEl.current!, {
+          extraEditorClassName: 'rounded-md',
           language: 'typescript',
+          minimap: {
+            enabled: false
+          },
           theme: `odc-${theme}`,
           value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n')
         });
@@ -33,7 +37,7 @@ export const InstrumentEditor = () => {
 
   return (
     <div
-      className="flex flex-grow overflow-hidden rounded-md shadow-sm ring-1 ring-slate-900/10 dark:ring-slate-100/25"
+      className="flex flex-grow rounded-md shadow-sm ring-1 ring-slate-900/10 dark:ring-slate-100/25"
       ref={monacoEl}
     />
   );

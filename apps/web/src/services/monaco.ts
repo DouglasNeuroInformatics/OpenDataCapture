@@ -23,6 +23,30 @@ self.MonacoEnvironment = {
   }
 };
 
+monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+  //jsx: monaco.languages.typescript.JsxEmit.Preserve,
+  strict: true,
+  target: monaco.languages.typescript.ScriptTarget.ESNext
+});
+
+// extra libraries
+const libSource = [
+	"declare class Facts {",
+	"    /**",
+	"     * Returns the next fact",
+	"     */",
+	"    static next():string",
+	"}",
+].join("\n");
+
+const libUri = "ts:filename/facts.d.ts";
+
+monaco.languages.typescript.javascriptDefaults.addExtraLib(libSource, libUri);
+
+// When resolving definitions and references, the editor will try to use created models.
+// Creating a model for the library allows "peek definition/references" commands to work with the library.
+monaco.editor.createModel(libSource, "typescript", monaco.Uri.parse(libUri));
+
 monaco.editor.defineTheme('odc-light', {
   base: 'vs',
   colors: {
