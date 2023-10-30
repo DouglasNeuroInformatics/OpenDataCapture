@@ -1,10 +1,10 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 
 import type { Group } from '../group/group.types';
-import type { BaseInstrumentType, FormInstrumentType, InstrumentKind } from '../instrument/instrument.types';
+import type { BaseInstrument, FormInstrument, InstrumentKind } from '../instrument/instrument.types';
 import type { Subject } from '../subject/subject.types';
 
-export type InstrumentRecord<TInstrument extends BaseInstrumentType = BaseInstrumentType, TData = unknown> = {
+export type InstrumentRecord<TInstrument extends BaseInstrument = BaseInstrument, TData = unknown> = {
   data: TData;
   group?: Group;
   instrument: TInstrument;
@@ -13,11 +13,11 @@ export type InstrumentRecord<TInstrument extends BaseInstrumentType = BaseInstru
   time: number;
 };
 
-export type FormInstrumentRecord<T extends FormDataType = FormDataType> = InstrumentRecord<FormInstrumentType<T>, T>;
+export type FormInstrumentRecord<T extends FormDataType = FormDataType> = InstrumentRecord<FormInstrument<T>, T>;
 
 /** An object containing all of the records for a given form and subject */
 export type SubjectFormRecords<TData extends FormDataType = FormDataType> = {
-  instrument: FormInstrumentType<TData> & {
+  instrument: FormInstrument<TData> & {
     identifier: string;
   };
   records: (Pick<FormInstrumentRecord<TData>, 'data' | 'time'> & {

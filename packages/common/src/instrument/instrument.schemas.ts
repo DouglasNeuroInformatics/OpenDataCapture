@@ -1,9 +1,8 @@
-import type { FormFieldKind } from '@douglasneuroinformatics/form-types';
+import type { FormDataType, FormFieldKind } from '@douglasneuroinformatics/form-types';
 import { z } from 'zod';
 
 import { languageSchema } from '../core/core.schemas';
 
-import type { BaseInstrument, FormInstrument } from './instrument.models';
 import type * as Types from './instrument.types';
 
 const instrumentKindSchema = z.enum(['form']) satisfies Zod.ZodType<Types.InstrumentKind>;
@@ -30,8 +29,9 @@ export const baseInstrumentSchema = z.object({
   language: z.union([languageSchema, z.array(languageSchema)]),
   name: z.string().min(1),
   tags: uiOptionSchema(z.array(z.string().min(1))),
+  validationSchema: z.instanceof(z.ZodType),
   version: z.number()
-}) satisfies Zod.ZodType<BaseInstrument>;
+}) satisfies Zod.ZodType<Types.BaseInstrument>;
 
 export const instrumentSummarySchema = baseInstrumentSchema.omit({
   content: true
@@ -109,5 +109,6 @@ const contentSchema = z.union([
 
 export const formInstrumentSchema = baseInstrumentSchema.extend({
   content: contentSchema,
-  kind: z.literal('form')
-}) satisfies Zod.ZodType<FormInstrument>;
+  kind: z.literal('form'),
+  validationSchema: z.instanceof(z.ZodType<FormDataType>)
+}) satisfies Zod.ZodType<Types.FormInstrument>;

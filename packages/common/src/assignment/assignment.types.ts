@@ -1,4 +1,4 @@
-import type { FormInstrumentType, InstrumentSummary } from '../instrument/instrument.types';
+import type { FormInstrument, InstrumentSummary } from '../instrument/instrument.types';
 
 export type AssignmentStatus = 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDING';
 
@@ -6,7 +6,7 @@ export type Assignment = {
   assignedAt: Date;
   expiresAt: Date;
   id?: string;
-  instrument: FormInstrumentType;
+  instrument: FormInstrument;
   status: AssignmentStatus;
 };
 

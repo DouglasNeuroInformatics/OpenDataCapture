@@ -4,10 +4,6 @@ import type Zod from 'zod';
 
 import type { Language } from '../core/core.types';
 
-export type InstrumentContext = {
-  z: Omit<typeof Zod, 'z'>;
-};
-
 export type InstrumentKind = 'form';
 
 export type InstrumentLanguage = Language | Language[];
@@ -33,7 +29,7 @@ export type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentL
   title: InstrumentUIOption<TLanguage, string>;
 };
 
-export type BaseInstrumentType<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
   content?: unknown;
 
@@ -52,6 +48,9 @@ export type BaseInstrumentType<TData = unknown, TLanguage extends InstrumentLang
   /** The name of the instrument, which must be unique for a given version */
   name: string;
 
+  /** The source code to define the attributes of the instrument, excluding source itself */
+  source?: string;
+
   /** A list of tags that users can use to filter instruments */
   tags: InstrumentUIOption<TLanguage, string[]>;
 
@@ -63,7 +62,7 @@ export type BaseInstrumentType<TData = unknown, TLanguage extends InstrumentLang
 };
 
 export type InstrumentSummary<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Omit<
-  BaseInstrumentType<TData, TLanguage>,
+  BaseInstrument<TData, TLanguage>,
   'content'
 >;
 
@@ -223,14 +222,16 @@ export type FormInstrumentMeasures<
   }
 >;
 
-export type FormInstrumentType<
+export type FormInstrument<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Simplify<
-  BaseInstrumentType<TData, TLanguage> & {
+  BaseInstrument<TData, TLanguage> & {
     content: FormInstrumentContent<TData, TLanguage>;
     measures?: FormInstrumentMeasures<TData, TLanguage>;
   }
 >;
 
-export type Instrument = FormInstrumentType;
+export type BilingualFormInstrument<TData extends Base.FormDataType> = FormInstrument<TData, Language[]>;
+
+export type Instrument = FormInstrument;
