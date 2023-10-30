@@ -1,8 +1,12 @@
 import { useMemo, useState } from 'react';
 
 import { Button, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { assignmentSummarySchema } from '@open-data-capture/schemas/assignment';
-import type { AssignmentSummary, CreateAssignmentData,  UpdateAssignmentData } from '@open-data-capture/types';
+import { assignmentSummarySchema } from '@open-data-capture/common/assignment';
+import type {
+  AssignmentSummary,
+  CreateAssignmentData,
+  UpdateAssignmentData
+} from '@open-data-capture/common/assignment';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';

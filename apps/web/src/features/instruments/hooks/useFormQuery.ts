@@ -1,5 +1,5 @@
-import { formInstrumentSchema } from '@open-data-capture/schemas/instrument';
-import type { FormInstrument, Language } from '@open-data-capture/types';
+import type { Language } from '@open-data-capture/common/core';
+import { type FormInstrument, formInstrumentSchema } from '@open-data-capture/common/instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';

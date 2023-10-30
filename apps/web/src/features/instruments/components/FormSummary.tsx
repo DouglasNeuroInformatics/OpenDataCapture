@@ -1,8 +1,14 @@
 import { useMemo } from 'react';
 
-import type { FormInstrumentData, NullableFormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Button, Spinner, formatFormDataAsString, resolveStaticFormFields, useDownload } from '@douglasneuroinformatics/ui';
-import type { FormInstrument } from '@open-data-capture/types';
+import type { FormDataType, NullableFormDataType } from '@douglasneuroinformatics/form-types';
+import {
+  Button,
+  Spinner,
+  formatFormDataAsString,
+  resolveStaticFormFields,
+  useDownload
+} from '@douglasneuroinformatics/ui';
+import type { FormInstrument } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { useActiveVisitStore } from '@/stores/active-visit-store';
@@ -15,17 +21,13 @@ const FormSummaryItem = ({ label, value }: { label: string; value: unknown }) =>
   );
 };
 
-export type FormSummaryProps<T extends FormInstrumentData> = {
+export type FormSummaryProps<T extends FormDataType> = {
   instrument: FormInstrument<T>;
   result?: T;
   timeCollected: number;
 };
 
-export const FormSummary = <T extends FormInstrumentData>({
-  instrument,
-  result,
-  timeCollected
-}: FormSummaryProps<T>) => {
+export const FormSummary = <T extends FormDataType>({ instrument, result, timeCollected }: FormSummaryProps<T>) => {
   const { activeVisit } = useActiveVisitStore();
   const download = useDownload();
   const { i18n, t } = useTranslation();
@@ -40,7 +42,7 @@ export const FormSummary = <T extends FormInstrumentData>({
   };
 
   const formFields = useMemo(
-    () => resolveStaticFormFields(instrument.content, result as NullableFormInstrumentData<T>),
+    () => resolveStaticFormFields(instrument.content, result as NullableFormDataType<T>),
     [instrument, result]
   );
 

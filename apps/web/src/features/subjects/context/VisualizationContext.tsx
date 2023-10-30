@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
 import { Spinner } from '@douglasneuroinformatics/ui';
-import type { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@open-data-capture/types';
+import type { FormInstrument, FormInstrumentRecord, SubjectFormRecords } from '@open-data-capture/common/instrument';
 import { useParams } from 'react-router-dom';
 
 import { useFetch } from '@/hooks/useFetch';

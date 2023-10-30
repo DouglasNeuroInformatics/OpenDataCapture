@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
 import { Button, StepperContext } from '@douglasneuroinformatics/ui';
-import type { FormDetails } from '@open-data-capture/types';
+import type { InstrumentDetails } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
 type FormOverviewItemProps = {
@@ -29,7 +29,7 @@ const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
 };
 
 type FormOverviewProps = {
-  details: FormDetails;
+  details: InstrumentDetails;
 };
 
 export const FormOverview = ({

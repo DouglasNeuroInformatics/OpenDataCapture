@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form } from '@douglasneuroinformatics/ui';
-import type { SubjectIdentificationData } from '@open-data-capture/types';
+import type { SubjectIdentificationData } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 

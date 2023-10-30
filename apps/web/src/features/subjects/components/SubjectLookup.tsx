@@ -1,5 +1,5 @@
 import { Modal, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import type { Subject, SubjectIdentificationData } from '@open-data-capture/types';
+import type { Subject, SubjectIdentificationData } from '@open-data-capture/common/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

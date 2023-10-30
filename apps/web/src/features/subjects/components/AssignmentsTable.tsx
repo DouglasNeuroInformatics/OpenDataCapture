@@ -1,6 +1,7 @@
 import { ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
-import type { AssignmentStatus, AssignmentSummary, Language } from '@open-data-capture/types';
+import type { AssignmentStatus, AssignmentSummary } from '@open-data-capture/common/assignment';
+import type { Language } from '@open-data-capture/common/core';
 import { useTranslation } from 'react-i18next';
 
 export type AssignmentTableProps = {

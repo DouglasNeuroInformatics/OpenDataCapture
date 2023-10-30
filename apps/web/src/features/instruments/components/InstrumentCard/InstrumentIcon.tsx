@@ -1,4 +1,4 @@
-import type { InstrumentKind } from '@open-data-capture/types';
+import type { InstrumentKind } from '@open-data-capture/common/instrument';
 import { HiPencilSquare } from 'react-icons/hi2';
 
 // import handBrain from '@/assets/hand-brain.png';

@@ -34,7 +34,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   content?: unknown;
 
   /** The details of the instrument to be displayed to the user */
-  details: InstrumentDetails;
+  details: InstrumentDetails<TLanguage>;
 
   /** The MongoDB ObjectId represented as a hex string */
   id?: string;
@@ -137,15 +137,23 @@ export type FormInstrumentPrimitiveField<
   ? FormInstrumentBinaryField<TLanguage>
   : never;
 
+export type FormInstrumentDynamicFieldsetField<
+  TLanguage extends InstrumentLanguage = InstrumentLanguage,
+  TFieldset extends Base.ArrayFieldValue[number] = Base.ArrayFieldValue[number],
+  TValue extends Base.PrimitiveFieldValue = Base.PrimitiveFieldValue
+> = {
+  kind: 'dynamic-fieldset';
+  render: (fieldset: {
+    [K in keyof TFieldset]?: TFieldset[K] | null | undefined;
+  }) => FormInstrumentPrimitiveField<TLanguage, TValue> | null;
+};
+
 export type FormInstrumentArrayFieldset<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TFieldset extends Base.ArrayFieldValue[number] = Base.ArrayFieldValue[number]
 > = {
   [K in keyof TFieldset]:
-    | ((fieldset: { [K in keyof TFieldset]?: TFieldset[K] | null | undefined }) => FormInstrumentPrimitiveField<
-        TLanguage,
-        TFieldset[K]
-      > | null)
+    | FormInstrumentDynamicFieldsetField<TLanguage, TFieldset, TFieldset[K]>
     | FormInstrumentPrimitiveField<TLanguage, TFieldset[K]>;
 };
 
@@ -180,7 +188,11 @@ export type FormInstrumentDynamicField<
   TData extends Base.FormDataType = Base.FormDataType,
   TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue = Base.ArrayFieldValue | Base.PrimitiveFieldValue,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = (data: Base.NullableFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
+> = {
+  deps: readonly Extract<keyof TData, string>[];
+  kind: 'dynamic';
+  render: (data: Base.NullableFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
+};
 
 export type FormInstrumentUnknownField<
   TData extends Base.FormDataType = Base.FormDataType,

@@ -1,5 +1,5 @@
 // import the original type declarations
-import type { Language } from '@open-data-capture/types';
+import type { Language } from '@open-data-capture/common/core';
 import 'i18next';
 import type { ValueOf } from 'type-fest';
 

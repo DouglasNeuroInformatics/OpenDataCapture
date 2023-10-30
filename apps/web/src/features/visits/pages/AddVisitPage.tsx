@@ -1,6 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { visitSchema } from '@open-data-capture/schemas/visit';
-import type { CreateVisitData } from '@open-data-capture/types';
+import { type CreateVisitData, visitSchema } from '@open-data-capture/common/visit';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 

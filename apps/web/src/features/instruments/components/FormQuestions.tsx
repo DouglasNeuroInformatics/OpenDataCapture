@@ -1,15 +1,15 @@
 import { useContext } from 'react';
 
-import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Form, StepperContext } from '@douglasneuroinformatics/ui';
-import type { FormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/common/instrument';
 
-export type FormQuestionsProps<T extends FormInstrumentData> = {
+export type FormQuestionsProps<T extends FormDataType> = {
   instrument: FormInstrument<T>;
   onSubmit: (data: T) => void;
 };
 
-export const FormQuestions = <T extends FormInstrumentData>({
+export const FormQuestions = <T extends FormDataType>({
   instrument: { content, validationSchema },
   onSubmit
 }: FormQuestionsProps<T>) => {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import type { AuthPayload, LoginCredentials } from '@open-data-capture/types';
+import type { AuthPayload, LoginCredentials } from '@open-data-capture/common/auth';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

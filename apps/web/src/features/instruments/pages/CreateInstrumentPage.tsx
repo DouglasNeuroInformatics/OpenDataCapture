@@ -1,4 +1,4 @@
-import type { FormInstrument } from '@open-data-capture/types';
+import type { FormInstrument } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components/PageHeader';

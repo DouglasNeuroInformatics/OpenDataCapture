@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 
 import { LineGraph, type LineGraphLine } from '@douglasneuroinformatics/ui';
-import type { SubjectFormRecords } from '@open-data-capture/types';
+import type { SubjectFormRecords } from '@open-data-capture/common/instrument';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 

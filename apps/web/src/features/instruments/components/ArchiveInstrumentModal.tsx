@@ -1,11 +1,11 @@
 import { Button, Modal } from '@douglasneuroinformatics/ui';
-import type { FormInstrumentSummary } from '@open-data-capture/types';
+import type { InstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
 type ArchiveInstrumentModalProps = {
-  instrument: FormInstrumentSummary;
+  instrument: InstrumentSummary;
   isOpen: boolean;
-  onArchive: (instrument: FormInstrumentSummary) => Promise<void>;
+  onArchive: (instrument: InstrumentSummary) => Promise<void>;
   setIsOpen: (isOpen: boolean) => void;
 };
 export const ArchiveInstrumentModal = ({ instrument, isOpen, onArchive, setIsOpen }: ArchiveInstrumentModalProps) => {

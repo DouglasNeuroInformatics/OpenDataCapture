@@ -1,46 +1,41 @@
 import type Base from '@douglasneuroinformatics/form-types';
-import type Types from '@open-data-capture/types';
+import type { Language } from '@open-data-capture/common/core';
+import type * as Types from '@open-data-capture/common/instrument';
 import { mapValues, merge } from 'lodash';
 
 function isUnilingualFormSummary<TData extends Base.FormDataType>(
-  summary: Types.FormInstrumentSummary<TData>,
-  language: Types.Language
-): summary is Types.FormInstrumentSummary<TData, Types.Language> {
+  summary: Types.InstrumentSummary<TData>,
+  language: Language
+): summary is Types.InstrumentSummary<TData, Language> {
   return summary.language === language;
 }
 
 function isMultilingualFormSummary<TData extends Base.FormDataType>(
-  summary: Types.FormInstrumentSummary<TData>,
-  language: Types.Language
-): summary is Types.FormInstrumentSummary<TData, Types.Language[]> {
+  summary: Types.InstrumentSummary<TData>,
+  language: Language
+): summary is Types.InstrumentSummary<TData, Language[]> {
   return Array.isArray(summary.language) && summary.language.includes(language);
 }
 
 /** Return whether the instrument is a unilingual form in the provided language */
 function isUnilingualForm<TData extends Base.FormDataType>(
   instrument: Types.FormInstrument<TData>,
-  language: Types.Language
-): instrument is Types.UnilingualFormInstrument<TData> {
+  language: Language
+): instrument is Types.FormInstrument<TData, Language> {
   return isUnilingualFormSummary(instrument, language);
 }
 
 /** Return whether the instrument is a multilingual form, with the provided language as an option */
 function isMultilingualForm<TData extends Base.FormDataType>(
   instrument: Types.FormInstrument<TData>,
-  language: Types.Language
-): instrument is Types.MultilingualFormInstrument<TData> {
+  language: Language
+): instrument is Types.FormInstrument<TData, Language[]> {
   return isMultilingualFormSummary(instrument, language);
 }
 
-function isDynamicFormField<TData extends Base.FormDataType>(
-  field: Types.FormInstrumentUnknownField<Types.Language[], TData>
-): field is Types.FormInstrumentDynamicField<Types.Language[], TData> {
-  return typeof field === 'function';
-}
-
 function translatePrimitiveField(
-  field: Types.FormInstrumentPrimitiveField<Types.Language[]>,
-  language: Types.Language
+  field: Types.FormInstrumentPrimitiveField<Language[]>,
+  language: Language
 ): Base.PrimitiveFormField {
   const base = {
     description: field.description?.[language],
@@ -70,19 +65,22 @@ function translatePrimitiveField(
 }
 
 function translateArrayFieldset(
-  fieldset: Types.FormInstrumentArrayFieldset<Types.Language[]>,
-  language: Types.Language
+  fieldset: Types.FormInstrumentArrayFieldset<Language[]>,
+  language: Language
 ): Base.ArrayFieldset<Base.ArrayFieldValue[number]> {
-  const transformedFieldset: Types.FormInstrumentArrayFieldset<Types.Language> = {};
+  const transformedFieldset: Types.FormInstrumentArrayFieldset<Language> = {};
   for (const key in fieldset) {
     const field = fieldset[key]!;
-    if (typeof field === 'function') {
-      transformedFieldset[key] = (fieldset: Record<string, Base.PrimitiveFieldValue | null | undefined>) => {
-        const result: Types.FormInstrumentPrimitiveField<Types.Language[]> | null = field(fieldset);
-        if (result === null) {
-          return null;
+    if (field.kind === 'dynamic-fieldset') {
+      transformedFieldset[key] = {
+        kind: 'dynamic-fieldset',
+        render: (fieldset: Record<string, Base.PrimitiveFieldValue | null | undefined>) => {
+          const result: Types.FormInstrumentPrimitiveField<Language[]> | null = field.render(fieldset);
+          if (result === null) {
+            return null;
+          }
+          return translatePrimitiveField(result, language);
         }
-        return translatePrimitiveField(result, language);
       };
     } else {
       transformedFieldset[key] = translatePrimitiveField(field, language);
@@ -92,8 +90,8 @@ function translateArrayFieldset(
 }
 
 function translateStaticField(
-  field: Types.FormInstrumentStaticField<Types.Language[]>,
-  language: Types.Language
+  field: Types.FormInstrumentStaticField<Language[]>,
+  language: Language
 ): Base.StaticFormField<Base.ArrayFieldValue | Base.PrimitiveFieldValue> {
   if (field.kind === 'array') {
     return {
@@ -108,35 +106,42 @@ function translateStaticField(
 }
 
 function translateFormFields(
-  fields: Types.FormInstrumentFields<Types.Language[]>,
-  language: Types.Language
+  fields: Types.FormInstrumentFields<Base.FormDataType, Language[]>,
+  language: Language
 ): Base.FormFields {
-  return mapValues(fields, (field) => {
-    if (isDynamicFormField(field)) {
-      return (data: Base.NullableFormDataType | null) => {
-        const result = field(data);
-        if (result === null) {
-          return null;
+  const translatedFields: Base.FormFields = {};
+  for (const fieldName in fields) {
+    const field = fields[fieldName]!;
+    if (field.kind === 'dynamic') {
+      translatedFields[fieldName] = {
+        deps: field.deps,
+        kind: 'dynamic',
+        render: (data: Base.NullableFormDataType | null) => {
+          const result = field.render(data);
+          if (result === null) {
+            return null;
+          }
+          return translateStaticField(result, language);
         }
-        return translateStaticField(result, language);
       };
+    } else {
+      translatedFields[fieldName] = translateStaticField(field, language);
     }
-    return translateStaticField(field, language);
-  });
+  }
+  return translatedFields;
 }
 
 function translateFormSummary<TData extends Base.FormDataType>(
-  summary: Types.FormInstrumentSummary<TData>,
-  language: Types.Language
-): Types.FormInstrumentSummary<TData, Types.Language> | null {
+  summary: Types.InstrumentSummary<TData>,
+  language: Language
+): Types.InstrumentSummary<TData, Language> | null {
   if (isUnilingualFormSummary(summary, language)) {
     return summary;
   } else if (isMultilingualFormSummary(summary, language)) {
-    summary.details.description;
     return merge(summary, {
       details: {
         description: summary.details.description[language],
-        instructions: summary.details.instructions[language],
+        instructions: summary.details.instructions?.[language],
         title: summary.details.title[language]
       },
       language: language,
@@ -148,8 +153,8 @@ function translateFormSummary<TData extends Base.FormDataType>(
 
 function translateFormInstrument<TData extends Base.FormDataType>(
   form: Types.FormInstrument<TData>,
-  language: Types.Language
-): Types.UnilingualFormInstrument<TData> | null {
+  language: Language
+): Types.FormInstrument<TData, Language> | null {
   if (isUnilingualForm(form, language)) {
     return form;
   } else if (isMultilingualForm(form, language)) {
@@ -163,29 +168,29 @@ function translateFormInstrument<TData extends Base.FormDataType>(
         : translateFormFields(form.content as Types.FormInstrumentFields, language),
       details: {
         description: form.details.description[language],
-        instructions: form.details.instructions[language],
+        instructions: form.details.instructions?.[language],
         title: form.details.title[language]
       },
       language: language,
       measures: mapValues(form.measures, (measure) => ({ label: measure.label[language], value: measure.value })),
       tags: form.tags[language]
-    }) as Types.UnilingualFormInstrument<TData>;
+    }) as Types.FormInstrument<TData, Language>;
   }
   return null;
 }
 
 export function resolveFormInstrument<TData extends Base.FormDataType>(
   form: Types.FormInstrument<TData>,
-  preferredLanguage: Types.Language
+  preferredLanguage: Language
 ) {
   const altLanguage = preferredLanguage === 'en' ? 'fr' : 'en';
   return (translateFormInstrument(form, preferredLanguage) ?? translateFormInstrument(form, altLanguage))!;
 }
 
 export function resolveFormSummary<TData extends Base.FormDataType>(
-  summary: Types.FormInstrumentSummary,
-  preferredLanguage: Types.Language
-): Types.FormInstrumentSummary<TData, Types.Language> {
+  summary: Types.InstrumentSummary<TData>,
+  preferredLanguage: Language
+): Types.InstrumentSummary<TData, Language> {
   const altLanguage = preferredLanguage === 'en' ? 'fr' : 'en';
   return (translateFormSummary(summary, preferredLanguage) ?? translateFormSummary(summary, altLanguage))!;
 }

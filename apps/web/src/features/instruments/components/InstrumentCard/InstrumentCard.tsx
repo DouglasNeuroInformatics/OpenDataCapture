@@ -1,11 +1,12 @@
 import { Card } from '@douglasneuroinformatics/ui';
-import type { UnilingualFormInstrumentSummary } from '@open-data-capture/types';
+import type { Language } from '@open-data-capture/common/core';
+import type { FormInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentIcon } from './InstrumentIcon';
 
 export type InstrumentCardProps = {
-  instrument: UnilingualFormInstrumentSummary;
+  instrument: InstrumentSummary<FormInstrument, Language>;
   onClick: () => void;
 };
 

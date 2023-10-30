@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 import { Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { formInstrumentSchema } from '@open-data-capture/schemas/instrument';
-import type { FormInstrument } from '@open-data-capture/types';
+import { formInstrumentSchema } from '@open-data-capture/common/instrument';
+import type { FormInstrument } from '@open-data-capture/common/instrument';
 import { merge } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi2';

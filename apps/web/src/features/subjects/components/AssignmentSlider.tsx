@@ -1,5 +1,6 @@
 import { Button, Slider } from '@douglasneuroinformatics/ui';
-import type { AssignmentSummary, Language } from '@open-data-capture/types';
+import type { AssignmentSummary } from '@open-data-capture/common/assignment';
+import type { Language } from '@open-data-capture/common/core';
 import { useTranslation } from 'react-i18next';
 
 import { resolveFormSummary } from '@/utils/translate-instrument';

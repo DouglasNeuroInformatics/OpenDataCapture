@@ -1,8 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form, Modal } from '@douglasneuroinformatics/ui';
-import { createAssignmentDataSchema } from '@open-data-capture/schemas/assignment';
-import type { CreateAssignmentData } from '@open-data-capture/types';
+import { createAssignmentDataSchema } from '@open-data-capture/common/assignment';
+import type { CreateAssignmentData } from '@open-data-capture/common/assignment';
 import { useTranslation } from 'react-i18next';
 
 export type AssignmentModalProps = {

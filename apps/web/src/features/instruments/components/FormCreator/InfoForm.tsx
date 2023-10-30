@@ -4,7 +4,7 @@
 import { useContext } from 'react';
 
 import { Form, StepperContext, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import type { Language } from '@open-data-capture/types';
+import type { Language } from '@open-data-capture/common/core';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 import { z } from 'zod';

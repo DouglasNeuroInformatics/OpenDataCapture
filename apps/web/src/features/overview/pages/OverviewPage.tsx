@@ -1,4 +1,4 @@
-import type { Summary } from '@open-data-capture/types';
+import type { Summary } from '@open-data-capture/common/summary';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
