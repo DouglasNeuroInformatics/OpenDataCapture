@@ -7,13 +7,7 @@ import { BaseInstrumentEntity } from './base-instrument.entity';
 
 @Schema({
   toObject: { virtuals: true },
-  virtuals: {
-    measures: {
-      get(this: FormInstrumentEntity) {
-        return this.measures;
-      }
-    }
-  }
+  virtuals: {}
 })
 export class FormInstrumentEntity<
     TData extends FormTypes.FormDataType = FormTypes.FormDataType,

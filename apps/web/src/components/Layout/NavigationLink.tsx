@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import type { AppAction, AppSubject } from '@open-data-capture/types';
+import type { AppAction, AppSubject } from '@open-data-capture/common/core';
 import clsx from 'clsx';
 import { NavLink } from 'react-router-dom';
 

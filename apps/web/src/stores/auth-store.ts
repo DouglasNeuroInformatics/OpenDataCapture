@@ -1,5 +1,7 @@
 import { createMongoAbility } from '@casl/ability';
-import type { AppAbility, Group, JwtPayload } from '@open-data-capture/types';
+import type { JwtPayload } from '@open-data-capture/common/auth';
+import type { AppAbility } from '@open-data-capture/common/core';
+import type { Group } from '@open-data-capture/common/group';
 import jwtDecode from 'jwt-decode';
 import { create } from 'zustand';
 

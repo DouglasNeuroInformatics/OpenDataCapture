@@ -1,4 +1,4 @@
-import type { Visit } from '@open-data-capture/types';
+import type { Visit } from '@open-data-capture/common/visit';
 import { create } from 'zustand';
 
 export type ActiveVisitStore = {
