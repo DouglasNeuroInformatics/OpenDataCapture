@@ -34,7 +34,7 @@ export const FormStepper = ({ form, onSubmit }: FormStepperProps) => {
           label: t('instruments:form.steps.questions')
         },
         {
-          element: <FormSummary instrument={form} result={result} timeCollected={Date.now()} />,
+          element: <FormSummary form={form} result={result} timeCollected={Date.now()} />,
           icon: <HiOutlinePrinter />,
           label: t('instruments:form.steps.summary')
         }

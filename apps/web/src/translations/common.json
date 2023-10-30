@@ -3,6 +3,10 @@
     "en": "Active Visit",
     "fr": "Visite active"
   },
+  "anonymous": {
+    "en": "Anonymous",
+    "fr": "Anonyme"
+  },
   "basePermissionLevel": {
     "admin": {
       "en": "Admin",
@@ -174,6 +178,10 @@
   "unknownError": {
     "en": "Unknown Error",
     "fr": "Erreur inconnue"
+  },
+  "fullName": {
+    "en": "Full Name",
+    "fr": "Nom et prénom"
   },
   "uploadSuccessful": {
     "en": "Upload Successful",

@@ -4,8 +4,9 @@ import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
-import { FormRecordList } from '@/components/FormRecordList';
 import { useActiveVisitStore } from '@/stores/active-visit-store';
+
+import { FormRecordList } from './FormRecordList';
 
 export type FormSummaryProps = {
   form: FormInstrument<FormDataType, Language>;
@@ -18,16 +19,12 @@ export const FormSummary = ({ form, result, timeCollected }: FormSummaryProps) =
   const download = useDownload();
   const { i18n, t } = useTranslation();
 
-  if (!result) {
-    return <Spinner />;
-  }
-
   const downloadResult = () => {
     const filename = `${form.name}_v${form.version}_${new Date(timeCollected).toISOString()}.txt`;
     download(filename, () => Promise.resolve(formatFormDataAsString(result)));
   };
 
-  return <FormRecordList />;
+  return <FormRecordList form={form} subject={activeVisit!.subject} />;
 
   // return (
   //   <div>

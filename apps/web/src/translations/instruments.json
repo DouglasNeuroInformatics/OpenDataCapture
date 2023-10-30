@@ -1,12 +1,12 @@
 {
   "available": {
-    "title": {
-      "en": "Available Instruments",
-      "fr": "Instruments disponibles"
-    },
     "nullActiveVisitError": {
       "en": "Please begin a visit to continue",
       "fr": "Veuillez commencer une visite pour continuer"
+    },
+    "title": {
+      "en": "Available Instruments",
+      "fr": "Instruments disponibles"
     }
   },
   "create": {
@@ -119,6 +119,16 @@
     "title": {
       "en": "Title",
       "fr": "Titre"
+    }
+  },
+  "summary": {
+    "subtitle": {
+      "en": "Completed on {{ dateCompleted }}",
+      "fr": "Remplie le {{ dateCompleted }}"
+    },
+    "title": {
+      "en": "Summary of Results for the {{title}}",
+      "fr": "Synthèse des résultats du formulaire « {{title}} »"
     }
   },
   "view": {
