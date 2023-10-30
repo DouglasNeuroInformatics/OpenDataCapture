@@ -141,7 +141,6 @@ function translateFormSummary<TData extends Base.FormDataType>(
     return merge(summary, {
       details: {
         description: summary.details.description[language],
-        instructions: summary.details.instructions?.[language],
         title: summary.details.title[language]
       },
       language: language,
@@ -168,6 +167,7 @@ function translateFormInstrument<TData extends Base.FormDataType>(
         : translateFormFields(form.content as Types.FormInstrumentFields, language),
       details: {
         description: form.details.description[language],
+        estimatedDuration: form.details.estimatedDuration,
         instructions: form.details.instructions?.[language],
         title: form.details.title[language]
       },

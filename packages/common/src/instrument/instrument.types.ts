@@ -247,6 +247,10 @@ export type FormInstrument<
   }
 >;
 
+export type InstrumentBundle = {
+  source: string;
+};
+
 export type BilingualFormInstrument<TData extends Base.FormDataType> = FormInstrument<TData, Language[]>;
 
 export type Instrument = FormInstrument;
