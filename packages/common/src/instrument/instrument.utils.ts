@@ -1,10 +1,9 @@
 import { z } from 'zod';
-import type Zod from 'zod';
 
 import type { BaseInstrument } from './instrument.types';
 
 export type InstrumentContext = {
-  z: Omit<typeof Zod, 'z'>;
+  z: typeof z;
 };
 
 export type InstrumentFactory<T extends BaseInstrument> = (ctx: InstrumentContext) => Omit<T, 'source'>;
