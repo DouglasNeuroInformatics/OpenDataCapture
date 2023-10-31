@@ -10,6 +10,7 @@ import prettier from 'prettier/standalone';
 
 import reactDeclarations from '../../../../node_modules/@types/react/index.d.ts?raw';
 import zodTypes from '../../../../node_modules/zod/index.d.ts?raw';
+import commonDeclarations from '../../../../packages/common/dist/index.d.ts?raw';
 
 self.MonacoEnvironment = {
   getWorker(_: unknown, label: string) {
@@ -82,8 +83,8 @@ addLibraries([
     path: 'ts:filename/react.d.ts'
   },
   {
-    content: 'declare const foo: string;',
-    path: 'index.d.ts'
+    content: commonDeclarations,
+    path: 'ts:filename/common.d.ts'
   },
   {
     content: zodTypes,

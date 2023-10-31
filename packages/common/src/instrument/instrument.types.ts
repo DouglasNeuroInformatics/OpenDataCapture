@@ -1,4 +1,4 @@
-import type * as Base from '@douglasneuroinformatics/form-types';
+import type Base from '@douglasneuroinformatics/form-types';
 import type { Simplify } from 'type-fest';
 
 import type { Language } from '../core/core.types';
