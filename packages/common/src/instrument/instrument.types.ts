@@ -1,6 +1,5 @@
-import type Base from '@douglasneuroinformatics/form-types';
+import type * as Base from '@douglasneuroinformatics/form-types';
 import type { Simplify } from 'type-fest';
-import type Zod from 'zod';
 
 import type { Language } from '../core/core.types';
 
