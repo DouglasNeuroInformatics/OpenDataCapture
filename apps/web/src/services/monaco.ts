@@ -4,6 +4,9 @@ import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import prettierPluginBabel from 'prettier/plugins/babel';
+import prettierPluginEstree from 'prettier/plugins/estree';
+import prettier from 'prettier/standalone';
 
 import reactDeclarations from '../../../../node_modules/@types/react/index.d.ts?raw';
 
@@ -25,49 +28,79 @@ self.MonacoEnvironment = {
   }
 };
 
-monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-  jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
-  module: monaco.languages.typescript.ModuleKind.ESNext,
-  //moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-  strict: true,
-  target: monaco.languages.typescript.ScriptTarget.ESNext
-});
+function setCompilerOptions() {
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
+    module: monaco.languages.typescript.ModuleKind.ESNext,
+    strict: true,
+    target: monaco.languages.typescript.ScriptTarget.ESNext
+  });
+}
 
-const reactPath = 'ts:filename/react.d.ts';
+function addLibraries(libraries: { content: string; path: string }[]) {
+  for (const lib of libraries) {
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(lib.content, lib.path);
+    monaco.editor.createModel(lib.content, 'typescript', monaco.Uri.parse(lib.path));
+  }
+}
 
-monaco.languages.typescript.javascriptDefaults.addExtraLib(reactDeclarations, reactPath);
-monaco.editor.createModel(reactDeclarations, 'typescript', monaco.Uri.parse(reactPath));
+function defineThemes() {
+  monaco.editor.defineTheme('odc-light', {
+    base: 'vs',
+    colors: {
+      'editor.background': '#F8FAFC'
+    },
+    inherit: true,
+    rules: []
+  });
 
-monaco.editor.defineTheme('odc-light', {
-  base: 'vs',
-  colors: {
-    'editor.background': '#F8FAFC'
-  },
-  inherit: true,
-  rules: []
-});
+  monaco.editor.defineTheme('odc-dark', {
+    base: 'vs-dark',
+    colors: {
+      'editor.background': '#1E313B'
+    },
+    inherit: true,
+    rules: []
+  });
+}
 
-monaco.editor.defineTheme('odc-dark', {
-  base: 'vs-dark',
-  colors: {
-    'editor.background': '#1E313B'
-  },
-  inherit: true,
-  rules: []
+function setupESLint() {
+  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+    noSemanticValidation: true,
+    noSyntaxValidation: true
+  });
+}
+
+setCompilerOptions();
+defineThemes();
+setupESLint();
+addLibraries([
+  {
+    content: reactDeclarations,
+    path: 'ts:filename/react.d.ts'
+  }
+]);
+
+monaco.editor.addKeybindingRule({
+  command: 'editor.action.formatDocument',
+  keybinding: monaco.KeyMod.Alt | monaco.KeyCode.KeyF
 });
 
 monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
 monaco.languages.registerDocumentFormattingEditProvider('typescript', {
-  provideDocumentFormattingEdits(model, options, token) {
+  async provideDocumentFormattingEdits(model) {
     const range = model.getFullModelRange();
-    const text = model.getValue();
-    console.log(text);
-    return [
-      {
-        range,
-        text
-      }
-    ];
+    const value = model.getValue();
+    console.log('Will format', value);
+
+    const text = await prettier.format(value, {
+      parser: 'babel-ts',
+      plugins: [prettierPluginBabel, prettierPluginEstree],
+      printWidth: 120,
+      singleQuote: true,
+      trailingComma: 'none'
+    });
+    return [{ range, text }];
   }
 });

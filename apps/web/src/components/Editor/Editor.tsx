@@ -40,7 +40,10 @@ export const Editor = ({ className, value }: EditorProps) => {
             });
       });
     }
-    return () => editor?.dispose();
+    return () => {
+      console.log('Will dispose');
+      editor?.dispose();
+    };
   }, [monacoEl.current]);
 
   return <Card className={twMerge('h-full min-h-[576px] w-full overflow-hidden', className)} ref={monacoEl} />;
