@@ -10,5 +10,5 @@
     },
     "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": ["config", "src", "vite.config.ts"]
 }
