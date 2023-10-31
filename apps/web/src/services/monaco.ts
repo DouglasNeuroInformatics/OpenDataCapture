@@ -5,6 +5,8 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
+import reactDeclarations from '../../../../node_modules/@types/react/index.d.ts?raw';
+
 self.MonacoEnvironment = {
   getWorker(_: unknown, label: string) {
     if (label === 'json') {
@@ -24,28 +26,17 @@ self.MonacoEnvironment = {
 };
 
 monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-  //jsx: monaco.languages.typescript.JsxEmit.Preserve,
+  jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
+  module: monaco.languages.typescript.ModuleKind.ESNext,
+  //moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
   strict: true,
   target: monaco.languages.typescript.ScriptTarget.ESNext
 });
 
-// extra libraries
-const libSource = [
-	"declare class Facts {",
-	"    /**",
-	"     * Returns the next fact",
-	"     */",
-	"    static next():string",
-	"}",
-].join("\n");
+const reactPath = 'ts:filename/react.d.ts';
 
-const libUri = "ts:filename/facts.d.ts";
-
-monaco.languages.typescript.javascriptDefaults.addExtraLib(libSource, libUri);
-
-// When resolving definitions and references, the editor will try to use created models.
-// Creating a model for the library allows "peek definition/references" commands to work with the library.
-monaco.editor.createModel(libSource, "typescript", monaco.Uri.parse(libUri));
+monaco.languages.typescript.javascriptDefaults.addExtraLib(reactDeclarations, reactPath);
+monaco.editor.createModel(reactDeclarations, 'typescript', monaco.Uri.parse(reactPath));
 
 monaco.editor.defineTheme('odc-light', {
   base: 'vs',
