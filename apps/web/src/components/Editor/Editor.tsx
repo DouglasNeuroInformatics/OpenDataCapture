@@ -35,13 +35,13 @@ export const Editor = ({ className, value }: EditorProps) => {
               minimap: {
                 enabled: false
               },
+              scrollBeyondLastLine: false,
               theme: `odc-${theme}`,
               value
             });
       });
     }
     return () => {
-      console.log('Will dispose');
       editor?.dispose();
     };
   }, [monacoEl.current]);

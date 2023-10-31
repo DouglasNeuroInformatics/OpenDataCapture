@@ -9,6 +9,7 @@ import prettierPluginEstree from 'prettier/plugins/estree';
 import prettier from 'prettier/standalone';
 
 import reactDeclarations from '../../../../node_modules/@types/react/index.d.ts?raw';
+import zodTypes from '../../../../node_modules/zod/index.d.ts?raw';
 
 self.MonacoEnvironment = {
   getWorker(_: unknown, label: string) {
@@ -32,6 +33,7 @@ function setCompilerOptions() {
   monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
     jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
     module: monaco.languages.typescript.ModuleKind.ESNext,
+    moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
     strict: true,
     target: monaco.languages.typescript.ScriptTarget.ESNext
   });
@@ -78,6 +80,14 @@ addLibraries([
   {
     content: reactDeclarations,
     path: 'ts:filename/react.d.ts'
+  },
+  {
+    content: 'declare const foo: string;',
+    path: 'index.d.ts'
+  },
+  {
+    content: zodTypes,
+    path: 'ts:filename/node_modules/zod/zod.d.ts'
   }
 ]);
 
