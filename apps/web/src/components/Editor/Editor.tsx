@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useTheme } from '@douglasneuroinformatics/ui';
+import { Card, useTheme } from '@douglasneuroinformatics/ui';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { twMerge } from 'tailwind-merge';
 
 export type EditorProps = {
+  /** Additional classes to be passed to the card component wrapping the editor */
+  className?: string;
+
   /** The initial text to be displayed in the editor */
   value?: string;
 };
 
-export const Editor = ({ value }: EditorProps) => {
+export const Editor = ({ className, value }: EditorProps) => {
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoEl = useRef(null);
   const [theme] = useTheme();
@@ -39,5 +43,5 @@ export const Editor = ({ value }: EditorProps) => {
     return () => editor?.dispose();
   }, [monacoEl.current]);
 
-  return <div className="shadow-sm h-96  ring-1 ring-slate-900/10 dark:ring-slate-100/25" ref={monacoEl} />;
+  return <Card className={twMerge('h-full min-h-[576px] w-full overflow-hidden', className)} ref={monacoEl} />;
 };

@@ -40,6 +40,7 @@
     "react-icons": "^4.11.0",
     "react-router-dom": "^6.17.0",
     "recharts": "^2.9.1",
+    "tailwind-merge": "^2.0.0",
     "ts-pattern": "^5.0.5",
     "type-fest": "^4.6.0",
     "zod": "^3.22.4",
