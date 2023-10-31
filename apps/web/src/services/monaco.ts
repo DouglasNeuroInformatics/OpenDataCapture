@@ -57,3 +57,17 @@ monaco.editor.defineTheme('odc-dark', {
 });
 
 monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+
+monaco.languages.registerDocumentFormattingEditProvider('typescript', {
+  provideDocumentFormattingEdits(model, options, token) {
+    const range = model.getFullModelRange();
+    const text = model.getValue();
+    console.log(text);
+    return [
+      {
+        range,
+        text
+      }
+    ];
+  }
+});
