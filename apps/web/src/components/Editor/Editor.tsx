@@ -48,10 +48,16 @@ export const Editor = ({ className, files }: EditorProps) => {
             setIsSidebarOpen(!isSidebarOpen);
           }}
         />
-        <EditorTab label="index.ts" />
+        {selectedModel && <EditorTab label={selectedModel?.uri.path.slice(1)} />}
       </div>
       <div className="flex min-h-[576px]">
-        <EditorSidebar isOpen={isSidebarOpen} models={models} onSelection={(id) => alert(id)} />
+        <EditorSidebar
+          isOpen={isSidebarOpen}
+          models={models}
+          onSelection={(id) => {
+            setSelectedModel(models.find((model) => model.id === id) ?? null);
+          }}
+        />
         {selectedModel ? <EditorPane model={selectedModel} /> : <EditorEmptyState />}
       </div>
     </Card>
