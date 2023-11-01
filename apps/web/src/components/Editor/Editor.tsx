@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { ArrowToggle, Card, useTheme } from '@douglasneuroinformatics/ui';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { twMerge } from 'tailwind-merge';
 
+import { MobileBlocker } from '../MobileBlocker';
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorHelpModal } from './EditorHelpModal';
 import { EditorSidebar } from './EditorSidebar';
@@ -86,7 +87,7 @@ export const Editor = ({ className, files }: EditorProps) => {
     setOpenModels((prevModels) => {
       const currentIndex = prevModels.findIndex((model) => model.id === id);
       const updatedModels = prevModels.filter((model) => model.id !== id);
-      setSelectedModel(updatedModels[currentIndex] ?? null);
+      setSelectedModel(updatedModels.at(currentIndex - 1) ?? null);
       return updatedModels;
     });
   };
@@ -105,7 +106,7 @@ export const Editor = ({ className, files }: EditorProps) => {
   };
 
   return (
-    <React.Fragment>
+    <MobileBlocker>
       <Card className={twMerge('h-full w-full overflow-hidden', className)}>
         <div className="flex justify-between border-b border-slate-900/10 dark:border-slate-100/25">
           <div className="flex divide-x divide-slate-900/10 text-sm dark:divide-slate-100/25">
@@ -154,6 +155,6 @@ export const Editor = ({ className, files }: EditorProps) => {
         </div>
       </Card>
       <EditorHelpModal isOpen={isHelpModalOpen} setIsOpen={setIsHelpModalOpen} />
-    </React.Fragment>
+    </MobileBlocker>
   );
 };

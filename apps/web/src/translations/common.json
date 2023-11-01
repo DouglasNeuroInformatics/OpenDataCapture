@@ -155,6 +155,16 @@
       "fr": "Français"
     }
   },
+  "mobileBlocker": {
+    "subtitle": {
+      "en": "Please try again on a device with a larger screen",
+      "fr": "Veuillez réessayer sur un appareil doté d'un écran plus grand"
+    },
+    "title": {
+      "en": "Sorry, this feature is not available on mobile",
+      "fr": "Désolé, cette fonctionnalité n'est pas disponible sur mobile"
+    }
+  },
   "name": {
     "en": "Name",
     "fr": "Nom"
