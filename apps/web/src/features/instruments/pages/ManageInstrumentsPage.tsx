@@ -12,7 +12,7 @@ export const ManageInstrumentsPage = () => {
   const files: EditorFile[] | null =
     query.data?.map((form) => ({
       content: form.source,
-      filename: `${form.name}.ts`
+      path: `${form.name}.ts`
     })) ?? null;
 
   return (
