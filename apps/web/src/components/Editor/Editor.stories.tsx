@@ -14,6 +14,11 @@ export default { component: Editor } satisfies Meta<typeof Editor>;
 
 export const Default: Story = {
   args: {
-    value: sayHello.toString()
+    files: [
+      {
+        content: sayHello.toString(),
+        filename: 'hello.ts'
+      }
+    ]
   }
 };

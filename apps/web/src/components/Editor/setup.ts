@@ -28,8 +28,6 @@ self.MonacoEnvironment = {
   }
 };
 
-console.log(zodTypes);
-
 const configurer = new MonacoConfigurer(monaco);
 configurer.configure({
   libraries: [

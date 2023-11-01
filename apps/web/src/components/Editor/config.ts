@@ -2,9 +2,9 @@ import prettierPluginBabel from 'prettier/plugins/babel';
 import prettierPluginEstree from 'prettier/plugins/estree';
 import prettier from 'prettier/standalone';
 
-type Monaco = typeof import('monaco-editor');
+import type { Monaco } from './types';
 
-export type LibraryDefinition = {
+type LibraryDefinition = {
   content: string;
   path: string;
 };

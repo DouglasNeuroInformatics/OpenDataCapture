@@ -8,20 +8,23 @@ import { EditorPane } from './EditorPane';
 import { EditorTab } from './EditorTab';
 import './setup';
 
+import type { EditorFile } from './types';
+
 export type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
   className?: string;
 
-  /** The initial text to be displayed in the editor */
-  value?: string;
+  /** A list of files to be interpreted as models by the editor */
+  files: EditorFile[];
 };
 
-export const Editor = ({ className, value }: EditorProps) => {
-  const [model, setModel] = useState<monaco.editor.IModel | null>(null);
+export const Editor = ({ className, files }: EditorProps) => {
+  const [selectedModel, setSelectedModel] = useState<monaco.editor.IModel | null>(null);
 
   useEffect(() => {
-    const model = monaco.editor.createModel(value ?? '', 'typescript', monaco.Uri.parse('file:///main.tsx'));
-    setModel(model);
+    for (const file of files) {
+      monaco.editor.createModel(file.content, 'typescript', monaco.Uri.parse(file.filename));
+    }
     return () => {
       monaco.editor.getModels().forEach((model) => model.dispose());
     };
@@ -32,7 +35,7 @@ export const Editor = ({ className, value }: EditorProps) => {
       <div className="mb-2 border-b border-slate-200 text-sm">
         <EditorTab label="index.ts" />
       </div>
-      <EditorPane model={model} />
+      <EditorPane model={selectedModel} />
     </Card>
   );
 };
