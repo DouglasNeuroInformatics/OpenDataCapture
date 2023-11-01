@@ -15,7 +15,7 @@ export type MonacoConfigureOptions = {
 
 /**
  * The `MonacoConfigurer` class is responsible for setting default options
- * for a variety of monaco options. After creating an instance, the `configure` 
+ * for a variety of monaco options. After creating an instance, the `configure`
  * method must be called to preform the setup operations. As the only public method,
  * users have the option to specify options for various aspects of monaco here.
  */
@@ -31,14 +31,14 @@ export class MonacoConfigurer {
   }
 
   /**
-   * Setup the TypeScript compiler options as similarly as possible to 
-   * the  project setup. This is limited by an absence of modern options 
+   * Setup the TypeScript compiler options as similarly as possible to
+   * the  project setup. This is limited by an absence of modern options
    * (e.g., module resolution) in the monaco enum options.
    */
   private setCompilerOptions() {
-    this.monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    this.monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
       allowSyntheticDefaultImports: true,
-      jsx: this.monaco.languages.typescript.JsxEmit.ReactJSX,
+      jsx: this.monaco.languages.typescript.JsxEmit.React,
       module: this.monaco.languages.typescript.ModuleKind.ESNext,
       moduleResolution: this.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
       strict: true,
@@ -46,8 +46,8 @@ export class MonacoConfigurer {
     });
   }
 
-  /** 
-   * Given a list of library definitions, add them to the instance and create 
+  /**
+   * Given a list of library definitions, add them to the instance and create
    * models to allow users to inspect the source definitions as required.
    */
   private setLibraries(libraries: LibraryDefinition[]) {
