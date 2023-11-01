@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
+import { MinusCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 import { useTranslation } from 'react-i18next';
-import { IoMdCloseCircle, IoMdRemoveCircle } from 'react-icons/io';
 
 import { useActiveVisitStore } from '@/stores/active-visit-store';
 
@@ -40,14 +40,14 @@ export const ActiveVisit = () => {
             setIsHidden(!isHidden);
           }}
         >
-          <IoMdRemoveCircle className="h-6 w-6 sm:h-4 sm:w-4" />
+          <MinusCircleIcon className="h-6 w-6 sm:h-4 sm:w-4" />
         </button>
         <button
           onClick={() => {
             setActiveVisit(null);
           }}
         >
-          <IoMdCloseCircle className="h-6 w-6 sm:h-4 sm:w-4" />
+          <XCircleIcon className="h-6 w-6 sm:h-4 sm:w-4" />
         </button>
       </div>
       {isHidden && (

@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { AdjustmentsHorizontalIcon, ChartBarIcon, EyeIcon, PlusIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
-import { HiAdjustmentsHorizontal, HiChartBar, HiEye, HiPlus, HiUserPlus } from 'react-icons/hi2';
 
 import { NavigationLink } from './NavigationLink';
 
@@ -18,7 +18,7 @@ export const Navigation = (props: NavigationProps) => {
         access={null}
         cyTestId="overview"
         href="/overview"
-        icon={<HiChartBar />}
+        icon={<ChartBarIcon />}
         label={t('navLinks.overview')}
         {...props}
       />
@@ -26,7 +26,7 @@ export const Navigation = (props: NavigationProps) => {
         access={{ action: 'create', subject: 'Subject' }}
         cyTestId="add-visit"
         href="/visits/add-visit"
-        icon={<HiUserPlus />}
+        icon={<UserPlusIcon />}
         label={t('navLinks.addVisit')}
         {...props}
       />
@@ -43,7 +43,7 @@ export const Navigation = (props: NavigationProps) => {
         ]}
         cyTestId="view-subjects"
         href="/subjects"
-        icon={<HiEye />}
+        icon={<EyeIcon />}
         label={t(`navLinks.viewSubjects`)}
         {...props}
       />
@@ -51,7 +51,7 @@ export const Navigation = (props: NavigationProps) => {
         access={{ action: 'create', subject: 'Instrument' }}
         cyTestId="create-instrument"
         href="/instruments/create-instrument"
-        icon={<HiPlus />}
+        icon={<PlusIcon />}
         label={t('navLinks.createInstrument')}
         {...props}
       />
@@ -59,7 +59,7 @@ export const Navigation = (props: NavigationProps) => {
         access={{ action: 'delete', subject: 'Instrument' }}
         cyTestId="manage-instrument"
         href="/instruments/manage-instruments"
-        icon={<HiAdjustmentsHorizontal />}
+        icon={<AdjustmentsHorizontalIcon />}
         label={t('navLinks.manageInstruments')}
         {...props}
       />
@@ -67,7 +67,7 @@ export const Navigation = (props: NavigationProps) => {
         access={{ action: 'create', subject: 'InstrumentRecord' }}
         cyTestId="view-instrument"
         href="/instruments/available-instruments"
-        icon={<HiEye />}
+        icon={<EyeIcon />}
         label={t('navLinks.availableInstruments')}
         {...props}
       />

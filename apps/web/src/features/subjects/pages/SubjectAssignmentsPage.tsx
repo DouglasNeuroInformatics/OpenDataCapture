@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { Button, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { PlusIcon } from '@heroicons/react/24/solid';
 import { assignmentSummarySchema } from '@open-data-capture/common/assignment';
 import type {
   AssignmentSummary,
@@ -10,7 +11,6 @@ import type {
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { HiPlus } from 'react-icons/hi2';
 import { useParams } from 'react-router-dom';
 
 import { useAvailableForms } from '@/hooks/useAvailableForms';
@@ -84,7 +84,7 @@ export const SubjectAssignmentsPage = () => {
         <h3 className="text-lg font-semibold">{t('assignments.assignedInstruments')}</h3>
         <Button
           className="w-full text-sm lg:w-auto"
-          icon={<HiPlus />}
+          icon={<PlusIcon />}
           iconPosition="right"
           label={t('assignments.addAssignment')}
           variant="secondary"

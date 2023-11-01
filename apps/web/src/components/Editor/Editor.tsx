@@ -48,7 +48,7 @@ export const Editor = ({ className, files }: EditorProps) => {
         <EditorTab label="index.ts" />
       </div>
       <div className="flex min-h-[576px]">
-        <EditorSidebar isOpen={isSidebarOpen} />
+        <EditorSidebar files={files} isOpen={isSidebarOpen} />
         {selectedModel ? <EditorPane model={selectedModel} /> : <EditorEmptyState />}
       </div>
     </Card>
