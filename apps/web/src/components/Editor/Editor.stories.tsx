@@ -2,8 +2,6 @@
 
 import type { Meta, StoryObj } from '@storybook/react';
 
-import '@/services/monaco';
-
 import { Editor } from './Editor';
 
 type Story = StoryObj<typeof Editor>;

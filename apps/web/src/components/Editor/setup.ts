@@ -8,9 +8,9 @@ import prettierPluginBabel from 'prettier/plugins/babel';
 import prettierPluginEstree from 'prettier/plugins/estree';
 import prettier from 'prettier/standalone';
 
-import reactDeclarations from '../../../../node_modules/@types/react/index.d.ts?raw';
-import zodTypes from '../../../../node_modules/zod/index.d.ts?raw';
-import commonDeclarations from '../../../../packages/common/dist/index.d.ts?raw';
+import reactDeclarations from '../../../../../node_modules/@types/react/index.d.ts?raw';
+import zodTypes from '../../../../../node_modules/zod/index.d.ts?raw';
+import commonDeclarations from '../../../../../packages/common/dist/index.d.ts?raw';
 
 self.MonacoEnvironment = {
   getWorker(_: unknown, label: string) {

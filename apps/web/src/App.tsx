@@ -14,7 +14,6 @@ import { queryClient } from '@/services/react-query';
 
 import './services/axios';
 import './services/i18n';
-import './services/monaco';
 
 export const App = () => {
   return (

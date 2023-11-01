@@ -5,6 +5,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { twMerge } from 'tailwind-merge';
 
 import { EditorTab } from './EditorTab';
+import './setup';
 
 export type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
