@@ -2,7 +2,7 @@ import prettierPluginBabel from 'prettier/plugins/babel';
 import prettierPluginEstree from 'prettier/plugins/estree';
 import prettier from 'prettier/standalone';
 
-import type { Monaco } from './types';
+import type { MonacoType } from './types';
 
 type LibraryDefinition = {
   content: string;
@@ -20,7 +20,7 @@ export type MonacoConfigureOptions = {
  * users have the option to specify options for various aspects of monaco here.
  */
 export class MonacoConfigurer {
-  constructor(private readonly monaco: Monaco) {}
+  constructor(private readonly monaco: MonacoType) {}
 
   configure({ libraries }: MonacoConfigureOptions) {
     this.setCompilerOptions();

@@ -2,16 +2,16 @@ import { DocumentIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { twMerge } from 'tailwind-merge';
 
-import type { EditorModel } from './types';
+import type { EditorFile } from './types';
 
 export type EditorSidebarProps = {
+  files: EditorFile[];
   isOpen: boolean;
-  models: EditorModel[];
-  onSelection: (id: string) => void;
-  selectedModel: EditorModel | null;
+  onSelection: (file: EditorFile) => void;
+  selectedFile: EditorFile | null;
 };
 
-export const EditorSidebar = ({ isOpen, models, onSelection, selectedModel }: EditorSidebarProps) => {
+export const EditorSidebar = ({ files, isOpen, onSelection, selectedFile }: EditorSidebarProps) => {
   return (
     <motion.div
       animate={{ width: isOpen ? 320 : 0 }}
@@ -19,18 +19,18 @@ export const EditorSidebar = ({ isOpen, models, onSelection, selectedModel }: Ed
       initial={{ width: 0 }}
     >
       <div className="h-full w-full border-r border-slate-900/10 dark:border-slate-100/25">
-        {models.map((model) => (
+        {files.map((file) => (
           <button
             className={twMerge(
               'flex w-full items-center gap-2 p-2 text-sm',
-              selectedModel?.id === model.id && 'bg-slate-100 dark:bg-slate-700'
+              selectedFile?.path === file.path && 'bg-slate-100 dark:bg-slate-700'
             )}
-            key={model.id}
+            key={file.path}
             type="button"
-            onClick={() => onSelection(model.id)}
+            onClick={() => onSelection(file)}
           >
             <DocumentIcon height={14} width={14} />
-            <span>{model.uri.path.slice(1)}</span>
+            <span>{file.path}</span>
           </button>
         ))}
       </div>

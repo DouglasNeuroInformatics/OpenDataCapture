@@ -1,3 +1,4 @@
+import { loader } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
@@ -7,11 +8,10 @@ import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
 import reactDeclarations from '../../../../../node_modules/@types/react/index.d.ts?raw';
 import zodTypes from '../../../../../node_modules/zod/index.d.ts?raw';
-import commonDeclarations from '../../../../../packages/common/dist/index.d.ts?raw';
-import { MonacoConfigurer } from './config';
+import { MonacoConfigurer } from './config'
 
 self.MonacoEnvironment = {
-  getWorker(_: unknown, label: string) {
+  getWorker(_, label) {
     if (label === 'json') {
       return new jsonWorker();
     }
@@ -28,20 +28,20 @@ self.MonacoEnvironment = {
   }
 };
 
-const configurer = new MonacoConfigurer(monaco);
-configurer.configure({
-  libraries: [
-    {
-      content: reactDeclarations,
-      path: 'node_modules/@types/react/index.d.ts'
-    },
-    {
-      content: commonDeclarations,
-      path: 'ts:filename/common.d.ts'
-    },
-    {
-      content: zodTypes,
-      path: 'node_modules/@types/zod/index.d.ts'
-    }
-  ]
+loader.config({ monaco });
+
+void loader.init().then((monaco) => {
+  const configurer = new MonacoConfigurer(monaco);
+  configurer.configure({
+    libraries: [
+      {
+        content: reactDeclarations,
+        path: 'node_modules/@types/react/index.d.ts'
+      },
+      {
+        content: zodTypes,
+        path: 'node_modules/@types/zod/index.d.ts'
+      }
+    ]
+  });
 });

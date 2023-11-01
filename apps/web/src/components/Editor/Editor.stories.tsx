@@ -13,11 +13,11 @@ export const Default: Story = {
     files: [
       {
         content: "export const sayHello = () => console.log('hello world')",
-        filename: 'hello.ts'
+        path: 'hello.ts'
       },
       {
         content: "export * from './hello'",
-        filename: 'index.ts'
+        path: 'index.ts'
       }
     ]
   }

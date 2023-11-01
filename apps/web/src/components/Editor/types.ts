@@ -1,6 +1,8 @@
-export type Monaco = typeof import('monaco-editor');
+export type MonacoType = typeof import('monaco-editor');
 
-export type EditorModel = import('monaco-editor').editor.IModel;
+export type MonacoEditorType = import('monaco-editor').editor.IStandaloneCodeEditor
+
+export type MonacoModelType = import('monaco-editor').editor.IModel;
 
 /**
  * A TypeScript source file to be displayed in the editor
@@ -15,5 +17,5 @@ export type EditorModel = import('monaco-editor').editor.IModel;
  */
 export type EditorFile = {
   content: string;
-  filename: string;
+  path: string;
 };

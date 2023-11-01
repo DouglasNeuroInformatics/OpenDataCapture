@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { ArrowToggle, Card, useTheme } from '@douglasneuroinformatics/ui';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
-import clsx from 'clsx';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { default as MonacoEditor } from '@monaco-editor/react';
 import { twMerge } from 'tailwind-merge';
 
 import { MobileBlocker } from '../MobileBlocker';
@@ -13,7 +12,7 @@ import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
 import './setup';
 
-import type { EditorFile, EditorModel } from './types';
+import type { EditorFile, MonacoEditorType, MonacoType } from './types';
 
 export type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
@@ -26,83 +25,38 @@ export type EditorProps = {
 export const Editor = ({ className, files }: EditorProps) => {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const [models, setModels] = useState<EditorModel[]>([]);
-  const [openModels, setOpenModels] = useState<EditorModel[]>([]);
-  const [selectedModel, setSelectedModel] = useState<EditorModel | null>(null);
-
-  const ref = useRef<HTMLDivElement>(null);
+  const [openFiles, setOpenFiles] = useState<EditorFile[]>([]);
+  const [selectedFile, setSelectedFile] = useState<EditorFile | null>(null);
   const [theme] = useTheme();
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  // On initial mount, generate models for the given files
+  const editorRef = useRef<MonacoEditorType | null>(null);
+  const monacoRef = useRef<MonacoType | null>(null);
+
   useEffect(() => {
-    setModels(() =>
-      files.map((file) => {
-        return monaco.editor.createModel(file.content, 'typescript', monaco.Uri.parse(file.filename));
-      })
-    );
-    return () => {
-      monaco.editor.getModels().forEach((model) => model.dispose());
-    };
+    setOpenFiles([]);
+    setSelectedFile(null);
   }, [files]);
 
-  // Once the ref and models are assigned, create the editor and assign it to the state variable
-  useEffect(() => {
-    if (ref.current) {
-      setEditor((editor) => {
-        return editor
-          ? editor
-          : monaco.editor.create(ref.current!, {
-              automaticLayout: true,
-              language: 'typescript',
-              minimap: {
-                enabled: false
-              },
-              model: null,
-              scrollBeyondLastLine: false,
-              tabSize: 2,
-              theme: `odc-${theme}`
-            });
-      });
-    }
-    return () => {
-      editor?.dispose();
-    };
-  }, [ref.current]);
+  const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
+    editorRef.current = editor;
+    monacoRef.current = monaco;
+  };
 
-  useEffect(() => {
-    if (editor) {
-      editor.updateOptions({
-        theme: `odc-${theme}`
-      });
-    }
-  }, [theme]);
-
-  useEffect(() => {
-    editor?.setModel(selectedModel);
-  }, [selectedModel]);
-
-  const handleCloseModel = (id: string) => {
-    setOpenModels((prevModels) => {
-      const currentIndex = prevModels.findIndex((model) => model.id === id);
-      const updatedModels = prevModels.filter((model) => model.id !== id);
-      setSelectedModel(updatedModels.at(currentIndex - 1) ?? null);
-      return updatedModels;
+  const handleCloseFile = (closedFile: EditorFile) => {
+    setOpenFiles((prevFiles) => {
+      const currentIndex = prevFiles.indexOf(closedFile);
+      const updatedFiles = prevFiles.filter((file) => file !== closedFile);
+      setSelectedFile(updatedFiles.at(currentIndex - 1) ?? null);
+      return updatedFiles;
     });
   };
 
-  const handleSelectModel = (id: string) => {
-    const model = models.find((model) => model.id === id);
-    if (!model) {
-      console.error(`Failed to find model with ID: ${id}`);
-      return;
-    }
-    const isOpen = openModels.some(({ id }) => id === model.id);
+  const handleSelectFile = (file: EditorFile) => {
+    const isOpen = openFiles.includes(file);
     if (!isOpen) {
-      setOpenModels((prevModels) => [...prevModels, model]);
+      setOpenFiles((prevFiles) => [...prevFiles, file]);
     }
-    setSelectedModel(model);
+    setSelectedFile(file);
   };
 
   return (
@@ -119,13 +73,13 @@ export const Editor = ({ className, files }: EditorProps) => {
                 setIsSidebarOpen(!isSidebarOpen);
               }}
             />
-            {openModels.map((model) => (
+            {openFiles.map((file) => (
               <EditorTab
-                isActive={model.id === selectedModel?.id}
-                key={model.id}
-                model={model}
-                onClose={handleCloseModel}
-                onSelection={handleSelectModel}
+                file={file}
+                isActive={file.path === selectedFile?.path}
+                key={file.path}
+                onClose={handleCloseFile}
+                onSelection={handleSelectFile}
               />
             ))}
           </div>
@@ -141,17 +95,31 @@ export const Editor = ({ className, files }: EditorProps) => {
         </div>
         <div className="flex min-h-[576px]">
           <EditorSidebar
+            files={files}
             isOpen={isSidebarOpen}
-            models={models}
-            selectedModel={selectedModel}
-            onSelection={handleSelectModel}
+            selectedFile={selectedFile}
+            onSelection={handleSelectFile}
           />
-          <div
-            className={clsx('h-full w-full', !selectedModel && 'hidden')}
-            ref={ref}
-            style={{ minHeight: 'inherit' }}
-          />
-          {!selectedModel && <EditorEmptyState />}
+          {selectedFile ? (
+            <MonacoEditor
+              className="min-h-[576px]"
+              defaultLanguage="typescript"
+              defaultValue={selectedFile.content}
+              options={{
+                automaticLayout: true,
+                minimap: {
+                  enabled: false
+                },
+                scrollBeyondLastLine: false,
+                tabSize: 2
+              }}
+              path={selectedFile.path}
+              theme={`odc-${theme}`}
+              onMount={handleEditorDidMount}
+            />
+          ) : (
+            <EditorEmptyState />
+          )}
         </div>
       </Card>
       <EditorHelpModal isOpen={isHelpModalOpen} setIsOpen={setIsHelpModalOpen} />

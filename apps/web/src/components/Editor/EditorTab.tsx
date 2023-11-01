@@ -3,16 +3,16 @@ import { useRef } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { twMerge } from 'tailwind-merge';
 
-import type { EditorModel } from './types';
+import type { EditorFile } from './types';
 
 export type EditorTabProps = {
+  file: EditorFile;
   isActive: boolean;
-  model: EditorModel;
-  onClose: (id: string) => void;
-  onSelection: (id: string) => void;
+  onClose: (file: EditorFile) => void;
+  onSelection: (file: EditorFile) => void;
 };
 
-export const EditorTab = ({ isActive, model, onClose, onSelection }: EditorTabProps) => {
+export const EditorTab = ({ file, isActive, onClose, onSelection }: EditorTabProps) => {
   const xRef = useRef<HTMLDivElement>(null);
   return (
     <button
@@ -24,13 +24,13 @@ export const EditorTab = ({ isActive, model, onClose, onSelection }: EditorTabPr
       onClick={(event) => {
         const isClose = xRef.current?.contains(event.target as HTMLElement);
         if (isClose) {
-          onClose(model.id);
+          onClose(file);
         } else {
-          onSelection(model.id);
+          onSelection(file);
         }
       }}
     >
-      <span className="leading-non truncate">{model.uri.path.slice(1)}</span>
+      <span className="leading-non truncate">{file.path}</span>
       <div className="rounded-md p-0.5 hover:bg-slate-200 dark:hover:bg-slate-600" ref={xRef}>
         <XMarkIcon height={14} width={14} />
       </div>
