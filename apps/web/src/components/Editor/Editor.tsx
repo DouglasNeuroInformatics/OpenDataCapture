@@ -38,7 +38,7 @@ export const Editor = ({ className, files }: EditorProps) => {
 
   return (
     <Card className={twMerge('h-full w-full overflow-hidden', className)}>
-      <div className="flex divide-x divide-slate-200 border-b border-slate-200 text-sm">
+      <div className="flex divide-x divide-slate-900/10 border-b border-slate-900/10 text-sm dark:divide-slate-100/25 dark:border-slate-100/25">
         <ArrowToggle
           className="p-2"
           position="right"
