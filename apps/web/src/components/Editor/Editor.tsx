@@ -17,7 +17,19 @@ export type EditorProps = {
 export const Editor = ({ className, value }: EditorProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [model, setModel] = useState<monaco.editor.IModel | null>(null);
   const [theme] = useTheme();
+
+  useEffect(() => {
+    const model = monaco.editor.createModel(value ?? '', 'typescript', monaco.Uri.parse('file:///main.tsx'));
+    setModel(model);
+  }, []);
+
+  useEffect(() => {
+    if (editor && model) {
+      editor.setModel(model);
+    }
+  }, [editor, model]);
 
   useEffect(() => {
     if (editor) {
@@ -39,8 +51,7 @@ export const Editor = ({ className, value }: EditorProps) => {
                 enabled: false
               },
               scrollBeyondLastLine: false,
-              theme: `odc-${theme}`,
-              value
+              theme: `odc-${theme}`
             });
       });
     }
