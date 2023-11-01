@@ -6,18 +6,18 @@ import { Editor } from './Editor';
 
 type Story = StoryObj<typeof Editor>;
 
-function sayHello() {
-  console.log('hello world');
-}
-
 export default { component: Editor } satisfies Meta<typeof Editor>;
 
 export const Default: Story = {
   args: {
     files: [
       {
-        content: sayHello.toString(),
+        content: "export const sayHello = () => console.log('hello world')",
         filename: 'hello.ts'
+      },
+      {
+        content: "export * from './hello'",
+        filename: 'index.ts'
       }
     ]
   }

@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { ArrowToggle, Card } from '@douglasneuroinformatics/ui';
+import { ArrowToggle, Card, useTheme } from '@douglasneuroinformatics/ui';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { twMerge } from 'tailwind-merge';
 
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorHelpModal } from './EditorHelpModal';
-import { EditorPane } from './EditorPane';
 import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
 import './setup';
@@ -25,9 +25,16 @@ export type EditorProps = {
 export const Editor = ({ className, files }: EditorProps) => {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [models, setModels] = useState<EditorModel[]>([]);
-  const [selectedModel, setSelectedModel] = useState<monaco.editor.IModel | null>(null);
 
+  const [models, setModels] = useState<EditorModel[]>([]);
+  const [openModels, setOpenModels] = useState<EditorModel[]>([]);
+  const [selectedModel, setSelectedModel] = useState<EditorModel | null>(null);
+
+  const ref = useRef<HTMLDivElement>(null);
+  const [theme] = useTheme();
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+
+  // On initial mount, generate models for the given files
   useEffect(() => {
     setModels(() =>
       files.map((file) => {
@@ -37,7 +44,64 @@ export const Editor = ({ className, files }: EditorProps) => {
     return () => {
       monaco.editor.getModels().forEach((model) => model.dispose());
     };
-  }, []);
+  }, [files]);
+
+  // Once the ref and models are assigned, create the editor and assign it to the state variable
+  useEffect(() => {
+    if (ref.current) {
+      setEditor((editor) => {
+        return editor
+          ? editor
+          : monaco.editor.create(ref.current!, {
+              automaticLayout: true,
+              language: 'typescript',
+              minimap: {
+                enabled: false
+              },
+              model: null,
+              scrollBeyondLastLine: false,
+              theme: `odc-${theme}`
+            });
+      });
+    }
+    return () => {
+      editor?.dispose();
+    };
+  }, [ref.current]);
+
+  useEffect(() => {
+    if (editor) {
+      editor.updateOptions({
+        theme: `odc-${theme}`
+      });
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    editor?.setModel(selectedModel);
+  }, [selectedModel]);
+
+  const handleCloseModel = (id: string) => {
+    setOpenModels((prevModels) => {
+      const currentIndex = prevModels.findIndex((model) => model.id === id);
+      const updatedModels = prevModels.filter((model) => model.id !== id);
+      setSelectedModel(updatedModels[currentIndex] ?? null);
+      return updatedModels;
+    });
+  };
+
+  const handleSelectModel = (id: string) => {
+    const model = models.find((model) => model.id === id);
+    if (!model) {
+      console.error(`Failed to find model with ID: ${id}`);
+      return;
+    }
+    const isOpen = openModels.some(({ id }) => id === model.id);
+    if (!isOpen) {
+      setOpenModels((prevModels) => [...prevModels, model]);
+    }
+    setSelectedModel(model);
+  };
 
   return (
     <React.Fragment>
@@ -53,7 +117,9 @@ export const Editor = ({ className, files }: EditorProps) => {
                 setIsSidebarOpen(!isSidebarOpen);
               }}
             />
-            {selectedModel && <EditorTab label={selectedModel?.uri.path.slice(1)} />}
+            {openModels.map((model) => (
+              <EditorTab key={model.id} model={model} onClose={handleCloseModel} />
+            ))}
           </div>
           <button
             className="flex items-center justify-center p-2"
@@ -66,14 +132,13 @@ export const Editor = ({ className, files }: EditorProps) => {
           </button>
         </div>
         <div className="flex min-h-[576px]">
-          <EditorSidebar
-            isOpen={isSidebarOpen}
-            models={models}
-            onSelection={(id) => {
-              setSelectedModel(models.find((model) => model.id === id) ?? null);
-            }}
+          <EditorSidebar isOpen={isSidebarOpen} models={models} onSelection={handleSelectModel} />
+          <div
+            className={clsx('h-full w-full', !selectedModel && 'hidden')}
+            ref={ref}
+            style={{ minHeight: 'inherit' }}
           />
-          {selectedModel ? <EditorPane model={selectedModel} /> : <EditorEmptyState />}
+          {!selectedModel && <EditorEmptyState />}
         </div>
       </Card>
       <EditorHelpModal isOpen={isHelpModalOpen} setIsOpen={setIsHelpModalOpen} />
