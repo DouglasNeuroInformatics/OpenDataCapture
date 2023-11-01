@@ -47,5 +47,5 @@ export const EditorPane = ({ model }: EditorPaneProps) => {
     }
   }, [theme]);
 
-  return <div className="h-full min-h-[576px] w-full" ref={ref} />;
+  return <div className="h-full w-full" ref={ref} />;
 };

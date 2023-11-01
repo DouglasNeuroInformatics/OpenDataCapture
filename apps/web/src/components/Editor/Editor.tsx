@@ -4,6 +4,7 @@ import { ArrowToggle, Card } from '@douglasneuroinformatics/ui';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { twMerge } from 'tailwind-merge';
 
+import { EditorEmptyState } from './EditorEmptyState';
 import { EditorPane } from './EditorPane';
 import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
@@ -46,9 +47,9 @@ export const Editor = ({ className, files }: EditorProps) => {
         />
         <EditorTab label="index.ts" />
       </div>
-      <div className="flex">
+      <div className="flex min-h-[576px]">
         <EditorSidebar isOpen={isSidebarOpen} />
-        <EditorPane model={selectedModel} />
+        {selectedModel ? <EditorPane model={selectedModel} /> : <EditorEmptyState />}
       </div>
     </Card>
   );

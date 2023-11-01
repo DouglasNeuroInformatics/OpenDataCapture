@@ -194,5 +194,15 @@
   "yes": {
     "en": "Yes",
     "fr": "Oui"
+  },
+  "editor": {
+    "noFileSelected": {
+      "en": "No File Selected",
+      "fr": "Aucun fichier sélectionné"
+    },
+    "pleaseSelectFile": {
+      "en": "Please Select a File to Begin",
+      "fr": "Veuillez sélectionner un fichier pour commencer"
+    }
   }
 }
