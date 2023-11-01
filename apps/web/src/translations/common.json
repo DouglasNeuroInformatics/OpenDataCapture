@@ -45,6 +45,22 @@
     "en": "Download",
     "fr": "Télécharger"
   },
+  "editor": {
+    "keyboardShortcuts": {
+      "format": {
+        "en": "Format Document: {{keybinding}}",
+        "fr": "Appliquer le formatage du code : {{keybinding}}"
+      }
+    },
+    "noFileSelected": {
+      "en": "No File Selected",
+      "fr": "Aucun fichier sélectionné"
+    },
+    "pleaseSelectFile": {
+      "en": "Please Select a File to Begin",
+      "fr": "Veuillez sélectionner un fichier pour commencer"
+    }
+  },
   "error": {
     "en": "Error",
     "fr": "Erreur"
@@ -55,6 +71,10 @@
       "fr": "Ce champ est obligatoire"
     }
   },
+  "fullName": {
+    "en": "Full Name",
+    "fr": "Nom et prénom"
+  },
   "graph": {
     "en": "Graph",
     "fr": "Graphique"
@@ -62,6 +82,10 @@
   "groupTrend": {
     "en": "Group Trend",
     "fr": "Tendance du groupe"
+  },
+  "help": {
+    "en": "Help",
+    "fr": "Aide"
   },
   "httpRequestFailed": {
     "en": "HTTP Request Failed",
@@ -179,10 +203,6 @@
     "en": "Unknown Error",
     "fr": "Erreur inconnue"
   },
-  "fullName": {
-    "en": "Full Name",
-    "fr": "Nom et prénom"
-  },
   "uploadSuccessful": {
     "en": "Upload Successful",
     "fr": "Téléchargement réussi"
@@ -194,15 +214,5 @@
   "yes": {
     "en": "Yes",
     "fr": "Oui"
-  },
-  "editor": {
-    "noFileSelected": {
-      "en": "No File Selected",
-      "fr": "Aucun fichier sélectionné"
-    },
-    "pleaseSelectFile": {
-      "en": "Please Select a File to Begin",
-      "fr": "Veuillez sélectionner un fichier pour commencer"
-    }
   }
 }
