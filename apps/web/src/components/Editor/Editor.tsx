@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { Card } from '@douglasneuroinformatics/ui';
+import { ArrowToggle, Card } from '@douglasneuroinformatics/ui';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { twMerge } from 'tailwind-merge';
 
 import { EditorPane } from './EditorPane';
+import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
 import './setup';
 
@@ -19,6 +20,7 @@ export type EditorProps = {
 };
 
 export const Editor = ({ className, files }: EditorProps) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState<monaco.editor.IModel | null>(null);
 
   useEffect(() => {
@@ -32,10 +34,22 @@ export const Editor = ({ className, files }: EditorProps) => {
 
   return (
     <Card className={twMerge('h-full w-full overflow-hidden', className)}>
-      <div className="mb-2 border-b border-slate-200 text-sm">
+      <div className="flex divide-x divide-slate-200 border-b border-slate-200 text-sm">
+        <ArrowToggle
+          className="p-2"
+          position="right"
+          rotation={180}
+          type="button"
+          onClick={() => {
+            setIsSidebarOpen(!isSidebarOpen);
+          }}
+        />
         <EditorTab label="index.ts" />
       </div>
-      <EditorPane model={selectedModel} />
+      <div className="flex">
+        <EditorSidebar isOpen={isSidebarOpen} />
+        <EditorPane model={selectedModel} />
+      </div>
     </Card>
   );
 };
