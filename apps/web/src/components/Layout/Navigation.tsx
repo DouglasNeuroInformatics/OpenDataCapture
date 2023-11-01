@@ -18,7 +18,7 @@ export const Navigation = (props: NavigationProps) => {
         access={null}
         cyTestId="overview"
         href="/overview"
-        icon={<ChartBarIcon />}
+        icon={<ChartBarIcon height={16} width={16} />}
         label={t('navLinks.overview')}
         {...props}
       />
@@ -26,7 +26,7 @@ export const Navigation = (props: NavigationProps) => {
         access={{ action: 'create', subject: 'Subject' }}
         cyTestId="add-visit"
         href="/visits/add-visit"
-        icon={<UserPlusIcon />}
+        icon={<UserPlusIcon height={16} width={16} />}
         label={t('navLinks.addVisit')}
         {...props}
       />
@@ -43,7 +43,7 @@ export const Navigation = (props: NavigationProps) => {
         ]}
         cyTestId="view-subjects"
         href="/subjects"
-        icon={<EyeIcon />}
+        icon={<EyeIcon height={16} width={16} />}
         label={t(`navLinks.viewSubjects`)}
         {...props}
       />
@@ -51,7 +51,7 @@ export const Navigation = (props: NavigationProps) => {
         access={{ action: 'create', subject: 'Instrument' }}
         cyTestId="create-instrument"
         href="/instruments/create-instrument"
-        icon={<PlusIcon />}
+        icon={<PlusIcon height={16} width={16} />}
         label={t('navLinks.createInstrument')}
         {...props}
       />
@@ -59,7 +59,7 @@ export const Navigation = (props: NavigationProps) => {
         access={{ action: 'delete', subject: 'Instrument' }}
         cyTestId="manage-instrument"
         href="/instruments/manage-instruments"
-        icon={<AdjustmentsHorizontalIcon />}
+        icon={<AdjustmentsHorizontalIcon height={16} width={16} />}
         label={t('navLinks.manageInstruments')}
         {...props}
       />
@@ -67,7 +67,7 @@ export const Navigation = (props: NavigationProps) => {
         access={{ action: 'create', subject: 'InstrumentRecord' }}
         cyTestId="view-instrument"
         href="/instruments/available-instruments"
-        icon={<EyeIcon />}
+        icon={<EyeIcon height={16} width={16} />}
         label={t('navLinks.availableInstruments')}
         {...props}
       />
