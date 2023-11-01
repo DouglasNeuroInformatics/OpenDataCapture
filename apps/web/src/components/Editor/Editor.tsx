@@ -15,8 +15,8 @@ export type EditorProps = {
 };
 
 export const Editor = ({ className, value }: EditorProps) => {
+  const ref = useRef<HTMLDivElement>(null);
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const monacoEl = useRef(null);
   const [theme] = useTheme();
 
   useEffect(() => {
@@ -28,11 +28,12 @@ export const Editor = ({ className, value }: EditorProps) => {
   }, [theme]);
 
   useEffect(() => {
-    if (monacoEl) {
+    if (ref.current) {
       setEditor((editor) => {
         return editor
           ? editor
-          : monaco.editor.create(monacoEl.current!, {
+          : monaco.editor.create(ref.current!, {
+              automaticLayout: true,
               language: 'typescript',
               minimap: {
                 enabled: false
@@ -46,14 +47,14 @@ export const Editor = ({ className, value }: EditorProps) => {
     return () => {
       editor?.dispose();
     };
-  }, [monacoEl.current]);
+  }, [ref.current]);
 
   return (
     <Card className={twMerge('h-full w-full overflow-hidden', className)}>
       <div className="mb-2 border-b border-slate-200 text-sm">
         <EditorTab label="index.ts" />
       </div>
-      <div className="h-full min-h-[576px] w-full" ref={monacoEl} />
+      <div className="h-full min-h-[576px] w-full" ref={ref} />
     </Card>
   );
 };
