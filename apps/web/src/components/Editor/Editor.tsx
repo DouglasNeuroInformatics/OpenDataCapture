@@ -60,6 +60,7 @@ export const Editor = ({ className, files }: EditorProps) => {
               },
               model: null,
               scrollBeyondLastLine: false,
+              tabSize: 2,
               theme: `odc-${theme}`
             });
       });
