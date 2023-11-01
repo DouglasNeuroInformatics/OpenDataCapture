@@ -28,12 +28,14 @@ self.MonacoEnvironment = {
   }
 };
 
+console.log(zodTypes);
+
 const configurer = new MonacoConfigurer(monaco);
 configurer.configure({
   libraries: [
     {
       content: reactDeclarations,
-      path: 'ts:filename/react.d.ts'
+      path: 'node_modules/@types/react/index.d.ts'
     },
     {
       content: commonDeclarations,
@@ -41,7 +43,7 @@ configurer.configure({
     },
     {
       content: zodTypes,
-      path: 'ts:filename/node_modules/zod/zod.d.ts'
+      path: 'node_modules/@types/zod/index.d.ts'
     }
   ]
 });

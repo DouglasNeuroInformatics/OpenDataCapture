@@ -37,6 +37,7 @@ export class MonacoConfigurer {
    */
   private setCompilerOptions() {
     this.monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+      allowSyntheticDefaultImports: true,
       jsx: this.monaco.languages.typescript.JsxEmit.ReactJSX,
       module: this.monaco.languages.typescript.ModuleKind.ESNext,
       moduleResolution: this.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
