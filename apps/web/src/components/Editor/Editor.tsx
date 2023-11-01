@@ -24,6 +24,9 @@ export const Editor = ({ className, value }: EditorProps) => {
   useEffect(() => {
     const model = monaco.editor.createModel(value ?? '', 'typescript', monaco.Uri.parse('file:///main.tsx'));
     setModel(model);
+    return () => {
+      monaco.editor.getModels().forEach((model) => model.dispose());
+    };
   }, []);
 
   useEffect(() => {
