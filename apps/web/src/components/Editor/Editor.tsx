@@ -118,7 +118,13 @@ export const Editor = ({ className, files }: EditorProps) => {
               }}
             />
             {openModels.map((model) => (
-              <EditorTab key={model.id} model={model} onClose={handleCloseModel} />
+              <EditorTab
+                isActive={model.id === selectedModel?.id}
+                key={model.id}
+                model={model}
+                onClose={handleCloseModel}
+                onSelection={handleSelectModel}
+              />
             ))}
           </div>
           <button
@@ -132,7 +138,12 @@ export const Editor = ({ className, files }: EditorProps) => {
           </button>
         </div>
         <div className="flex min-h-[576px]">
-          <EditorSidebar isOpen={isSidebarOpen} models={models} onSelection={handleSelectModel} />
+          <EditorSidebar
+            isOpen={isSidebarOpen}
+            models={models}
+            selectedModel={selectedModel}
+            onSelection={handleSelectModel}
+          />
           <div
             className={clsx('h-full w-full', !selectedModel && 'hidden')}
             ref={ref}
