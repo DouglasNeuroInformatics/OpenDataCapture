@@ -109,7 +109,7 @@ export const Editor = ({ className, files }: EditorProps) => {
     <MobileBlocker>
       <Card className={twMerge('h-full w-full overflow-hidden', className)}>
         <div className="flex justify-between border-b border-slate-900/10 dark:border-slate-100/25">
-          <div className="flex divide-x divide-slate-900/10 text-sm dark:divide-slate-100/25">
+          <div className="flex w-full text-sm">
             <ArrowToggle
               className="p-2"
               position="right"

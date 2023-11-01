@@ -17,8 +17,8 @@ export const EditorTab = ({ isActive, model, onClose, onSelection }: EditorTabPr
   return (
     <button
       className={twMerge(
-        'flex w-fit items-center justify-between gap-10 px-6 py-2',
-        isActive && 'bg-slate-100 dark:bg-slate-700'
+        'flex w-full max-w-[18rem] items-center justify-between gap-12 border-l border-slate-900/10 px-4 py-1.5 last:border-r dark:border-slate-100/25',
+        isActive && 'bg-slate-100 shadow-sm dark:bg-slate-700'
       )}
       type="button"
       onClick={(event) => {
@@ -30,9 +30,9 @@ export const EditorTab = ({ isActive, model, onClose, onSelection }: EditorTabPr
         }
       }}
     >
-      {model.uri.path.slice(1)}
-      <div className="justify-self-end rounded-md p-0.5 hover:bg-slate-200 dark:hover:bg-slate-600" ref={xRef}>
-        <XMarkIcon className="h-4 w-4" />
+      <span className="leading-non truncate">{model.uri.path.slice(1)}</span>
+      <div className="rounded-md p-0.5 hover:bg-slate-200 dark:hover:bg-slate-600" ref={xRef}>
+        <XMarkIcon height={14} width={14} />
       </div>
     </button>
   );
