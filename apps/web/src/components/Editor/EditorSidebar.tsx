@@ -1,14 +1,15 @@
 import { DocumentIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 
-import type { EditorFile } from './types';
+import type { EditorModel } from './types';
 
 export type EditorSidebarProps = {
-  files: EditorFile[];
   isOpen: boolean;
+  models: EditorModel[];
+  onSelection: (id: string) => void;
 };
 
-export const EditorSidebar = ({ files, isOpen }: EditorSidebarProps) => {
+export const EditorSidebar = ({ isOpen, models, onSelection }: EditorSidebarProps) => {
   return (
     <motion.div
       animate={{ width: isOpen ? 320 : 0 }}
@@ -16,11 +17,16 @@ export const EditorSidebar = ({ files, isOpen }: EditorSidebarProps) => {
       initial={{ width: 0 }}
     >
       <div className="h-full w-full border-r border-slate-900/10 p-2 dark:border-slate-100/25">
-        {files.map((file) => (
-          <div className="flex items-center gap-2 text-sm" key={file.filename}>
+        {models.map((model) => (
+          <button
+            className="flex items-center gap-2 text-sm"
+            key={model.id}
+            type="button"
+            onClick={() => onSelection(model.id)}
+          >
             <DocumentIcon height={14} width={14} />
-            <span>{file.filename}</span>
-          </div>
+            <span>{model.uri.toString()}</span>
+          </button>
         ))}
       </div>
     </motion.div>

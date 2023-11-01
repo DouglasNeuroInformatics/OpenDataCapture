@@ -10,7 +10,7 @@ import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
 import './setup';
 
-import type { EditorFile } from './types';
+import type { EditorFile, EditorModel } from './types';
 
 export type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
@@ -22,12 +22,15 @@ export type EditorProps = {
 
 export const Editor = ({ className, files }: EditorProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [models, setModels] = useState<EditorModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<monaco.editor.IModel | null>(null);
 
   useEffect(() => {
-    for (const file of files) {
-      monaco.editor.createModel(file.content, 'typescript', monaco.Uri.parse(file.filename));
-    }
+    setModels(() =>
+      files.map((file) => {
+        return monaco.editor.createModel(file.content, 'typescript', monaco.Uri.parse(file.filename));
+      })
+    );
     return () => {
       monaco.editor.getModels().forEach((model) => model.dispose());
     };
@@ -48,7 +51,7 @@ export const Editor = ({ className, files }: EditorProps) => {
         <EditorTab label="index.ts" />
       </div>
       <div className="flex min-h-[576px]">
-        <EditorSidebar files={files} isOpen={isSidebarOpen} />
+        <EditorSidebar isOpen={isSidebarOpen} models={models} onSelection={(id) => alert(id)} />
         {selectedModel ? <EditorPane model={selectedModel} /> : <EditorEmptyState />}
       </div>
     </Card>
