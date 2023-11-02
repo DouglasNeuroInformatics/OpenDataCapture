@@ -45,11 +45,8 @@ export class InstrumentsService {
   }
 
   async find(query: FilterQuery<BaseInstrument> = {}, { ability }: EntityOperationOptions = {}) {
-    if (!ability) {
-      return this.instrumentsRepository.find(query);
-    }
     return this.instrumentsRepository.find({
-      $and: [query, accessibleBy(ability, 'read').Instrument]
+      $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
     });
   }
 
@@ -95,6 +92,12 @@ export class InstrumentsService {
       throw new ForbiddenException(`Insufficient rights to read instrument with ID: ${id}`);
     }
     return instrument;
+  }
+
+  async findSources(query: FilterQuery<BaseInstrument> = {}, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentsRepository.find({
+      $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
+    });
   }
 
   async updateById(id: string, { source }: MutateInstrumentDto, { ability }: EntityOperationOptions = {}) {
