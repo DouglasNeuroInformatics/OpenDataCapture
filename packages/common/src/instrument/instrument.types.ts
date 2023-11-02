@@ -39,6 +39,9 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   /** The language(s) in which the instrument is written */
   language: TLanguage;
 
+  /** Arbitrary measures derived from the data */
+  measures?: unknown;
+
   /** The name of the instrument, which must be unique for a given version */
   name: string;
 

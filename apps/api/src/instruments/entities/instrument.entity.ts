@@ -19,6 +19,11 @@ import { generateBundle } from '../instruments.utils';
         return evaluateInstrument(this.bundle).content;
       }
     },
+    measures: {
+      get(this: InstrumentDocument) {
+        return evaluateInstrument(this.bundle).measures;
+      }
+    },
     source: {
       get(this: InstrumentDocument) {
         return this._source;
@@ -63,6 +68,8 @@ export class InstrumentEntity<TData = unknown, TLanguage extends Types.Instrumen
 
   @Prop({ required: true, type: Object })
   language: TLanguage;
+
+  measures?: unknown;
 
   @Prop({ required: true, unique: true })
   name: string;
