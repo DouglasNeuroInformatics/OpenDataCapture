@@ -29,7 +29,6 @@ export const baseInstrumentSchema = z.object({
   kind: instrumentKindSchema,
   language: z.union([languageSchema, z.array(languageSchema)]),
   name: z.string().min(1),
-  source: z.string(),
   tags: uiOptionSchema(z.array(z.string().min(1))),
   validationSchema: z.instanceof(z.ZodType),
   version: z.number()
@@ -37,7 +36,6 @@ export const baseInstrumentSchema = z.object({
 
 export const instrumentSummarySchema = baseInstrumentSchema.omit({
   content: true,
-  source: true,
   validationSchema: true
 }) satisfies Zod.ZodType<Types.InstrumentSummary>;
 

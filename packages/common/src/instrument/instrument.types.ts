@@ -41,9 +41,6 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   /** The name of the instrument, which must be unique for a given version */
   name: string;
 
-  /** The source code to define the attributes of the instrument, excluding source itself */
-  source: string;
-
   /** A list of tags that users can use to filter instruments */
   tags: InstrumentUIOption<TLanguage, string[]>;
 
@@ -56,7 +53,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
 
 export type InstrumentSummary<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Omit<
   BaseInstrument<TData, TLanguage>,
-  'content' | 'source' | 'validationSchema'
+  'content' | 'validationSchema'
 >;
 
 export type FormInstrumentFieldMixin<

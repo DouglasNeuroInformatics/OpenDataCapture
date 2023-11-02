@@ -1,27 +1,43 @@
-import { z } from 'zod';
-
+import type { Language } from '../core/core.types';
 import type { BaseInstrument } from './instrument.types';
 
-export type InstrumentContext = {
-  z: typeof z;
+type MultilingualOptions = Record<
+  string,
+  {
+    [L in Language]: string;
+  }
+>;
+
+type TranslatedOptions<T extends MultilingualOptions> = {
+  [K in keyof T]: string;
 };
 
-export type InstrumentFactory<T extends BaseInstrument> = (ctx: InstrumentContext) => Omit<T, 'source'>;
-
-type DefineInstrumentOptions<T extends BaseInstrument> = {
-  factory: InstrumentFactory<T>;
+type FormattedOptions<T extends MultilingualOptions> = {
+  [L in Language]: {
+    [K in keyof T]: string;
+  };
 };
 
-export function defineInstrument<T extends BaseInstrument>({ factory }: DefineInstrumentOptions<T>) {
-  const transpiler = new Bun.Transpiler({ deadCodeElimination: false, minifyWhitespace: true, target: 'browser' });
-  const instrument = factory({ z }) as T;
-  instrument.source = transpiler.transformSync(factory.toString());
-  return instrument;
+function translateOptions<T extends MultilingualOptions>(options: T, language: Language): TranslatedOptions<T> {
+  const translatedOptions: Partial<TranslatedOptions<T>> = {};
+  for (const option in options) {
+    translatedOptions[option] = options[option]?.[language];
+  }
+  return translatedOptions as TranslatedOptions<T>;
+}
+
+/** Transform multilingual options to options for a multilingual instrument */
+export function formatTranslatedOptions<T extends MultilingualOptions>(options: T): FormattedOptions<T> {
+  return {
+    en: translateOptions(options, 'en'),
+    fr: translateOptions(options, 'fr')
+  };
+}
+
+export function extractKeysAsTuple<T extends Record<string, unknown>>(options: T) {
+  return Object.keys(options) as [keyof T, ...(keyof T)[]];
 }
 
 export function evaluateInstrument<T extends BaseInstrument>(source: string) {
-  const factory = (0, eval)(`"use strict"; ${source}`) as InstrumentFactory<T>;
-  const instrument = factory({ z }) as T;
-  instrument.source = source;
-  return instrument;
+  return (0, eval)(`"use strict"; ${source}`) as T;
 }
