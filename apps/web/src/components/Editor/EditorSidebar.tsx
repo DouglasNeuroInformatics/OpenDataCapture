@@ -30,7 +30,7 @@ export const EditorSidebar = ({ files, isOpen, onSelection, selectedFile }: Edit
             onClick={() => onSelection(file)}
           >
             <DocumentIcon height={14} width={14} />
-            <span>{file.path}</span>
+            <span className="truncate">{file.path}</span>
           </button>
         ))}
       </div>

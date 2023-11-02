@@ -1,24 +1,36 @@
-import { useTranslation } from 'react-i18next';
+import { Spinner } from '@douglasneuroinformatics/ui';
+import { instrumentSourceContainerSchema } from '@open-data-capture/common/instrument';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
-import { Editor, type EditorFile } from '@/components/Editor';
-import { PageHeader } from '@/components/PageHeader';
-
-import { useFormsQuery } from '../hooks/useFormsQuery';
+import { Editor } from '@/components/Editor';
 
 export const ManageInstrumentsPage = () => {
-  const { t } = useTranslation('instruments');
-  const query = useFormsQuery();
+  const query = useQuery({
+    queryFn: async () => {
+      const response = await axios.get('/v1/instruments/sources');
+      const result = await instrumentSourceContainerSchema.array().safeParseAsync(response.data);
+      if (!result.success) {
+        throw new Error('Failed to parse form instrument bundle', { cause: result.error });
+      }
+      return result.data;
+    },
+    queryKey: ['instrument-sources'],
+    throwOnError: true
+  });
 
-  const files: EditorFile[] | null =
-    query.data?.map((form) => ({
-      content: form.source,
-      path: `${form.name}.ts`
-    })) ?? null;
+  if (!query.data) {
+    return <Spinner />;
+  }
 
   return (
-    <div className="flex flex-grow flex-col">
-      <PageHeader title={t('manage.title')} />
-      {files && <Editor files={files} />}
+    <div className="h-screen py-8">
+      <Editor
+        files={query.data.map((instrument) => ({
+          content: instrument.source,
+          path: `${instrument.name}.ts`
+        }))}
+      />
     </div>
   );
 };

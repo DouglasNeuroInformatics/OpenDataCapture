@@ -134,3 +134,12 @@ export const instrumentBundleSchema = z
 
 // z.ZodType<Types.FormInstrument, z.ZodTypeDef, Types.InstrumentBundle>
 export const formInstrumentBundleSchema = instrumentBundleSchema.pipe(formInstrumentSchema);
+
+export const instrumentSourceContainerSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  source: z.string(),
+  version: z.number()
+});
+
+export type InstrumentSourceContainer = z.infer<typeof instrumentSourceContainerSchema>;
