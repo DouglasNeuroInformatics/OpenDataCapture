@@ -104,17 +104,17 @@ describe('/subjects', () => {
 
   describe('GET /subjects/:id', () => {
     it('should return status code 200 with a valid ID', async () => {
-      subjectsRepository.findById.mockResolvedValueOnce({ name: 'foo' });
+      subjectsRepository.findOne.mockResolvedValueOnce({ name: 'foo' });
       const response = await request(server).get('/subjects/123');
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should throw a not found exception if the subject does not exist', async () => {
-      subjectsRepository.findById.mockResolvedValueOnce(null);
+      subjectsRepository.findOne.mockResolvedValueOnce(null);
       const response = await request(server).get(`/subjects/123`);
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
     it('should return the subject if it exists', async () => {
-      subjectsRepository.findById.mockResolvedValueOnce({ name: 'foo' });
+      subjectsRepository.findOne.mockResolvedValueOnce({ name: 'foo' });
       const response = await request(server).get('/subjects/123');
       expect(response.body).toMatchObject({ name: 'foo' });
     });
