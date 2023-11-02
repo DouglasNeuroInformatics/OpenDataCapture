@@ -4,39 +4,9 @@ import { evaluateInstrument } from '@open-data-capture/common/instrument';
 import type * as Types from '@open-data-capture/common/instrument';
 import type { HydratedDocument } from 'mongoose';
 
+import { generateBundle } from '../instruments.utils';
+
 @EntitySchema({
-  methods: {
-    generateBundle(source: string) {
-      const transpiler = new Bun.Transpiler({
-        deadCodeElimination: false,
-        loader: 'tsx',
-        minifyWhitespace: true,
-        target: 'browser'
-      });
-
-      // Throw an error if the source code contains any imports or non-default exports
-      const { exports, imports } = transpiler.scan(source);
-      if (imports.length > 0) {
-        throw new Error(`Unexpected import token '${imports[0]!.kind}' with path '${imports[0]!.path}'`);
-      } else if (exports.length !== 1 || exports[0] !== 'default') {
-        throw new Error(
-          `Unexpected non-default exports: ${exports
-            .filter((s) => s !== 'default')
-            .map((s) => `'${s}'`)
-            .join(', ')}`
-        );
-      }
-
-      let output = source;
-      output = output.replace('export default', 'const __instrument__ =');
-      output = `(({ z }) => {
-        ${output}
-        return __instrument__
-      })`;
-      output = transpiler.transformSync(output);
-      return output;
-    }
-  },
   toObject: {
     transform: (_, ret) => {
       delete ret._source;
@@ -54,7 +24,7 @@ import type { HydratedDocument } from 'mongoose';
         return this._source;
       },
       set(this: InstrumentDocument, source: string) {
-        const bundle = this.generateBundle(source);
+        const bundle = generateBundle(source);
         const instance = evaluateInstrument(bundle);
         this.set({
           ...instance,
@@ -112,8 +82,6 @@ export class InstrumentEntity<TData = unknown, TLanguage extends Types.Instrumen
     select: false
   })
   private _source: string;
-
-  private generateBundle: (source: string) => string;
 }
 
 export type InstrumentDocument = HydratedDocument<InstrumentEntity>;

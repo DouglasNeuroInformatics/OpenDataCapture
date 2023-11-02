@@ -3,26 +3,26 @@ import { beforeEach, describe, expect, it } from 'bun:test';
 import { createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
-import { FormsService } from '../forms.service';
 import { InstrumentsRepository } from '../instruments.repository';
+import { InstrumentsService } from '../instruments.service';
 
-describe('FormsService', () => {
-  let formsService: FormsService;
+describe('InstrumentsService', () => {
+  let instrumentsService: InstrumentsService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
-        FormsService,
+        InstrumentsService,
         {
           provide: InstrumentsRepository,
           useValue: createMock<InstrumentsRepository>
         }
       ]
     }).compile();
-    formsService = moduleRef.get(FormsService);
+    instrumentsService = moduleRef.get(InstrumentsService);
   });
 
   it('should be defined', () => {
-    expect(formsService).toBeDefined();
+    expect(instrumentsService).toBeDefined();
   });
 });

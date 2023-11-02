@@ -9,8 +9,4 @@ declare type FormInstrument<
   TLanguage extends InstrumentLanguage
 > = import('@open-data-capture/common').Instrument.FormInstrument<TData, TLanguage>;
 
-declare const extractKeysAsTuple: typeof import('@open-data-capture/common').Instrument.extractKeysAsTuple;
-
-declare const formatTranslatedOptions: typeof import('@open-data-capture/common').Instrument.formatTranslatedOptions;
-
 declare const z: typeof import('zod').z;

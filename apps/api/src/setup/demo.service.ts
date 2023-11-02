@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import type { Subject } from '@open-data-capture/common/subject';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
-import * as instruments from '@open-data-capture/instruments';
+// import * as instruments from '@open-data-capture/instruments';
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
@@ -113,13 +113,13 @@ export class DemoService {
   //   }
   // }
 
-  private async createForms(): Promise<void> {
-    await this.formsService.create(instruments.briefPsychiatricRatingScale);
-    await this.formsService.create(instruments.enhancedDemographicsQuestionnaire);
-    await this.formsService.create(instruments.happinessQuestionnaire);
-    await this.formsService.create(instruments.miniMentalStateExamination);
-    await this.formsService.create(instruments.montrealCognitiveAssessment);
-  }
+  // private async createForms(): Promise<void> {
+  //   await this.formsService.create(instruments.briefPsychiatricRatingScale);
+  //   await this.formsService.create(instruments.enhancedDemographicsQuestionnaire);
+  //   await this.formsService.create(instruments.happinessQuestionnaire);
+  //   await this.formsService.create(instruments.miniMentalStateExamination);
+  //   await this.formsService.create(instruments.montrealCognitiveAssessment);
+  // }
 
   private async createGroups(): Promise<void> {
     for (const group of demoGroups) {
