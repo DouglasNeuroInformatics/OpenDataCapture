@@ -121,8 +121,16 @@ export const formInstrumentSchema = baseInstrumentSchema.extend({
   validationSchema: z.instanceof(z.ZodType<FormDataType>)
 }) satisfies Zod.ZodType<Types.FormInstrument>;
 
+export const instrumentSourceSchema = z.object({
+  source: z.string()
+}) satisfies Zod.ZodType<Types.InstrumentSource>;
+
+export const instrumentBundleSchema = z
+  .object({
+    bundle: z.string()
+  })
+  .transform(({ bundle }) => evaluateInstrument(bundle))
+  .pipe(baseInstrumentSchema);
+
 // z.ZodType<Types.FormInstrument, z.ZodTypeDef, Types.InstrumentBundle>
-export const formInstrumentBundleSchema = z
-  .object({ bundle: z.string() })
-  .transform(({ bundle }) => evaluateInstrument<Types.FormInstrument>(bundle))
-  .pipe(formInstrumentSchema);
+export const formInstrumentBundleSchema = instrumentBundleSchema.pipe(formInstrumentSchema);
