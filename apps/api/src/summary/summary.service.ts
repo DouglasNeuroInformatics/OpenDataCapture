@@ -3,15 +3,15 @@ import type { Summary } from '@open-data-capture/common/summary';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
-import { FormsService } from '@/instruments/forms.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class SummaryService {
   constructor(
-    private readonly formsService: FormsService,
     private readonly groupsService: GroupsService,
+    private readonly instrumentsService: InstrumentsService,
     private readonly usersService: UsersService,
     private readonly subjectsService: SubjectsService
   ) {}
@@ -21,7 +21,7 @@ export class SummaryService {
     const args = [{ groups: group }, { ability }];
     return {
       counts: {
-        instruments: await this.formsService.count(),
+        instruments: await this.instrumentsService.count(),
         records: NaN,
         subjects: await this.subjectsService.count(...args),
         users: await this.usersService.count(...args)

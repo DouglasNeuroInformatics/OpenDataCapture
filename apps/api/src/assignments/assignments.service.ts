@@ -4,7 +4,7 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import type { Assignment, AssignmentSummary } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
-import { FormsService } from '@/instruments/forms.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { AssignmentsRepository } from './assignments.repository';
@@ -15,12 +15,12 @@ import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 export class AssignmentsService implements EntityService<Assignment> {
   constructor(
     private readonly assignmentsRepository: AssignmentsRepository,
-    private readonly formsService: FormsService,
+    private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService
   ) {}
 
   async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto) {
-    const instrument = await this.formsService.findById(instrumentId);
+    const instrument = await this.instrumentsService.findById(instrumentId);
     const subject = await this.subjectsService.findById(subjectIdentifier);
     return this.assignmentsRepository.create({
       assignedAt: new Date(),

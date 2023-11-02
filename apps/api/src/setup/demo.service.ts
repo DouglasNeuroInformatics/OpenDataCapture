@@ -3,13 +3,19 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import type { Subject } from '@open-data-capture/common/subject';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
-// import * as instruments from '@open-data-capture/instruments';
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
-import { FormsService } from '@/instruments/forms.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
+import { resolveInstrumentSource } from '@/instruments/instruments.utils';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
+
+const BPRS_SOURCE = await resolveInstrumentSource('forms/brief-psychiatric-rating-scale');
+const EDQ_SOURCE = await resolveInstrumentSource('forms/enhanced-demographics-questionnaire');
+const HQ_SOURCE = await resolveInstrumentSource('forms/happiness-questionnaire');
+const MMSE_SOURCE = await resolveInstrumentSource('forms/mini-mental-state-examination');
+const MOCA_SOURCE = await resolveInstrumentSource('forms/montreal-cognitive-assessment');
 
 faker.seed(123);
 
@@ -20,8 +26,8 @@ export class DemoService {
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly groupsService: GroupsService,
+    private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService,
-    private readonly formsService: FormsService,
     private readonly usersService: UsersService
   ) {}
 
@@ -113,13 +119,13 @@ export class DemoService {
   //   }
   // }
 
-  // private async createForms(): Promise<void> {
-  //   await this.formsService.create(instruments.briefPsychiatricRatingScale);
-  //   await this.formsService.create(instruments.enhancedDemographicsQuestionnaire);
-  //   await this.formsService.create(instruments.happinessQuestionnaire);
-  //   await this.formsService.create(instruments.miniMentalStateExamination);
-  //   await this.formsService.create(instruments.montrealCognitiveAssessment);
-  // }
+  private async createForms(): Promise<void> {
+    await this.instrumentsService.create({ source: BPRS_SOURCE });
+    await this.instrumentsService.create({ source: EDQ_SOURCE });
+    await this.instrumentsService.create({ source: HQ_SOURCE });
+    await this.instrumentsService.create({ source: MMSE_SOURCE });
+    await this.instrumentsService.create({ source: MOCA_SOURCE });
+  }
 
   private async createGroups(): Promise<void> {
     for (const group of demoGroups) {

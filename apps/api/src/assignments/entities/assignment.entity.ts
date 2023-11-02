@@ -4,7 +4,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { type Assignment, type AssignmentStatus } from '@open-data-capture/common/assignment';
 import { Schema as MongooseSchema } from 'mongoose';
 
-import type { FormInstrumentEntity } from '@/instruments/entities/form-instrument.entity';
 import { InstrumentEntity } from '@/instruments/entities/instrument.entity';
 import { SubjectEntity } from '@/subjects/entities/subject.entity';
 
@@ -21,7 +20,7 @@ export class AssignmentEntity implements Assignment {
   expiresAt: Date;
 
   @Prop({ ref: InstrumentEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
-  instrument: FormInstrumentEntity;
+  instrument: InstrumentEntity;
 
   @ApiProperty()
   @Prop({ enum: ['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING'] satisfies AssignmentStatus[], type: String })

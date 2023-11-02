@@ -1,13 +1,20 @@
 import { accessibleBy } from '@casl/mongoose';
 import { Injectable } from '@nestjs/common';
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common/exceptions';
 import type { BaseInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
+import { baseInstrumentSchema, evaluateInstrument } from '@open-data-capture/common/instrument';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
 
 import { MutateInstrumentDto } from './dto/mutate-instrument.dto';
 import { InstrumentsRepository } from './instruments.repository';
+import { generateBundle } from './instruments.utils';
 
 @Injectable()
 export class InstrumentsService {
@@ -19,7 +26,8 @@ export class InstrumentsService {
     });
   }
 
-  async create({ instance, source }: MutateInstrumentDto) {
+  async create({ source }: MutateInstrumentDto) {
+    const { instance } = await this.parseSource(source, baseInstrumentSchema);
     if (await this.instrumentsRepository.exists({ name: instance.name })) {
       throw new ConflictException(`Instrument with name '${instance.name}' already exists!`);
     }
@@ -76,5 +84,32 @@ export class InstrumentsService {
       throw new ForbiddenException(`Insufficient rights to update instrument with ID: ${id}`);
     }
     return (await this.instrumentsRepository.updateById(id, { source }))!;
+  }
+
+  /**
+   * Attempt to resolve an instance of an instrument from the TypeScript source code.
+   * If this fails, then throws an UnprocessableContentException
+   */
+  private async parseSource<T extends BaseInstrument>(source: string, schema: Zod.ZodType<T>) {
+    let bundle: string;
+    let instance: unknown;
+    try {
+      bundle = generateBundle(source);
+      instance = evaluateInstrument(bundle);
+    } catch (err) {
+      throw new UnprocessableEntityException('Failed to parse instrument', {
+        cause: err
+      });
+    }
+    const result = await schema.safeParseAsync(instance);
+    if (!result.success) {
+      throw new UnprocessableEntityException(
+        'Successfully parsed instrument, but resolved object does not conform to expected format',
+        {
+          cause: result.error
+        }
+      );
+    }
+    return { bundle, instance: result.data };
   }
 }

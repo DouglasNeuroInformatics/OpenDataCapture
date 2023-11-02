@@ -58,17 +58,17 @@ describe('/instruments', () => {
     it('should reject a request where name is an empty string', async () => {
       const source = HQ_SOURCE.replace("name: 'HappinessQuestionnaire'", "name: ''");
       const response = await request(server).post('/instruments').send({ source });
-      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
     it('should reject a request with an invalid language', async () => {
       const source = HQ_SOURCE.replace("language: ['en', 'fr']", 'language: -1');
       const response = await request(server).post('/instruments').send({ source });
-      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
     it('should reject a request if one of the language translations is missing', async () => {
       const source = HQ_SOURCE.replace("fr: 'Questionnaire sur le bonheur'", '');
       const response = await request(server).post('/instruments').send({ source });
-      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
     it('should return status code 201 when attempting to create the BPRS', async () => {
       const response = await request(server).post('/instruments').send({ source: BPRS_SOURCE });
