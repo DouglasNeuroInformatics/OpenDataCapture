@@ -1,5 +1,8 @@
+import { z } from 'zod';
+
 import type { Language } from '../core/core.types';
-import type { BaseInstrument } from './instrument.types';
+import type { BaseInstrument, InstrumentFactory } from './instrument.types';
+import { baseInstrumentSchema } from './instrument.schemas';
 
 type MultilingualOptions = Record<
   string,
@@ -38,6 +41,7 @@ export function extractKeysAsTuple<T extends Record<string, unknown>>(options: T
   return Object.keys(options) as [keyof T, ...(keyof T)[]];
 }
 
-export function evaluateInstrument<T extends BaseInstrument>(source: string) {
-  return (0, eval)(`"use strict"; ${source}`) as T;
+export function evaluateInstrument<T extends BaseInstrument>(bundle: string) {
+  const factory = (0, eval)(`"use strict"; ${bundle}`) as InstrumentFactory<T>;
+  return factory({ z });
 }
