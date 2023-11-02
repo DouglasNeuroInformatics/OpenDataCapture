@@ -9,8 +9,10 @@ describe('login test', () => {
       const { worker, rest } = window.msw;
 
       worker.use(
-        rest.post('/auth/login', (req, res, ctx) => {
-          return res(ctx.json({ success: true }));
+        rest.post('/auth/login', async ({request}) => {
+          const info = await request.formData();
+
+          return info.username;
         })
       );
     });
