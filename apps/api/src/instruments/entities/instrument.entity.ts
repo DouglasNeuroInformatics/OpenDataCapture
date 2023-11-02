@@ -84,10 +84,7 @@ export class InstrumentEntity<TData = unknown, TLanguage extends Types.Instrumen
   @Prop({ required: true })
   version: number;
 
-  @Prop({
-    required: true,
-    select: false
-  })
+  @Prop({ required: true })
   private _source: string;
 }
 
