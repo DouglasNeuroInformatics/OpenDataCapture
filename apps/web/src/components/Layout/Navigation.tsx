@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AdjustmentsHorizontalIcon, ChartBarIcon, EyeIcon, PlusIcon, UserPlusIcon } from '@heroicons/react/24/solid';
+import { AdjustmentsHorizontalIcon, ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 
 import { NavigationLink } from './NavigationLink';
@@ -45,14 +45,6 @@ export const Navigation = (props: NavigationProps) => {
         href="/subjects"
         icon={<EyeIcon height={16} width={16} />}
         label={t(`navLinks.viewSubjects`)}
-        {...props}
-      />
-      <NavigationLink
-        access={{ action: 'create', subject: 'Instrument' }}
-        cyTestId="create-instrument"
-        href="/instruments/create-instrument"
-        icon={<PlusIcon height={16} width={16} />}
-        label={t('navLinks.createInstrument')}
         {...props}
       />
       <NavigationLink
