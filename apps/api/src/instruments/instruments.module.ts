@@ -7,6 +7,7 @@ import { FormInstrumentSchema } from './entities/form-instrument.entity';
 import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
 import { FormsController } from './forms.controller';
 import { FormsService } from './forms.service';
+import { InstrumentTranspiler } from './instrument.transpiler';
 import { InstrumentsRepository } from './instruments.repository';
 
 type InstrumentDiscriminator = {
@@ -31,6 +32,6 @@ type InstrumentDiscriminator = {
       }
     ])
   ],
-  providers: [FormsService, InstrumentsRepository]
+  providers: [FormsService, InstrumentTranspiler, InstrumentsRepository]
 })
 export class InstrumentsModule {}

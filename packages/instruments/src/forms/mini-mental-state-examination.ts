@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-export type MiniMentalStateExaminationData = {
+type MiniMentalStateExaminationData = {
   canCopyDesign: number;
   canFollowOralInstructions: number;
   canFollowWrittenInstructions: number;
@@ -23,7 +23,7 @@ export type MiniMentalStateExaminationData = {
   year: number;
 };
 
-export const miniMentalStateExamination: FormInstrument<MiniMentalStateExaminationData, Language[]> = {
+const miniMentalStateExamination: FormInstrument<MiniMentalStateExaminationData, Language[]> = {
   kind: 'form',
   name: 'Mini Mental State Examination',
   language: ['en', 'fr'],
@@ -483,3 +483,5 @@ export const miniMentalStateExamination: FormInstrument<MiniMentalStateExaminati
     year: z.number().int().gte(0).lte(1)
   })
 };
+
+export default miniMentalStateExamination;

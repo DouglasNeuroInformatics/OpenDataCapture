@@ -577,10 +577,7 @@ type EnhancedDemographicsQuestionnaireData = {
   yearsOfEducation?: number;
 };
 
-export const enhancedDemographicsQuestionnaire: FormInstrument<
-  EnhancedDemographicsQuestionnaireData,
-  InstrumentLanguage
-> = {
+const enhancedDemographicsQuestionnaire: FormInstrument<EnhancedDemographicsQuestionnaireData, InstrumentLanguage> = {
   kind: 'form',
   name: 'EnhancedDemographicsQuestionnaire',
   language: ['en', 'fr'],
@@ -807,3 +804,5 @@ export const enhancedDemographicsQuestionnaire: FormInstrument<
     })
     .partial()
 };
+
+export default enhancedDemographicsQuestionnaire;

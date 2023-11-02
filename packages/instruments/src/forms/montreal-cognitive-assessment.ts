@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-export type MontrealCognitiveAssessmentData = {
+type MontrealCognitiveAssessmentData = {
   abstraction: number;
   attention: number;
   delayedRecall: number;
@@ -11,7 +11,7 @@ export type MontrealCognitiveAssessmentData = {
   visuospatialExecutive: number;
 };
 
-export const montrealCognitiveAssessment: FormInstrument<MontrealCognitiveAssessmentData, Language[]> = {
+const montrealCognitiveAssessment: FormInstrument<MontrealCognitiveAssessmentData, Language[]> = {
   kind: 'form',
   name: 'MontrealCognitiveAssessment',
   language: ['en', 'fr'],
@@ -200,3 +200,5 @@ export const montrealCognitiveAssessment: FormInstrument<MontrealCognitiveAssess
     visuospatialExecutive: z.number().int().gte(0).lte(5)
   })
 };
+
+export default montrealCognitiveAssessment;

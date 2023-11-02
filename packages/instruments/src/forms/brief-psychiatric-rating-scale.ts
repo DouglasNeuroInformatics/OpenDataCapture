@@ -21,7 +21,7 @@ type BriefPsychiatricRatingScaleData = {
   unusualThoughtContent: number;
 };
 
-export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleData, 'en'> = {
+const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleData, 'en'> = {
   kind: 'form',
   name: 'BriefPsychiatricRatingScale',
   language: 'en',
@@ -223,7 +223,7 @@ export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingS
       label: 'Total Score',
       value: (data) => {
         let sum = 0;
-        data
+        data;
         Object.values(data).forEach((value) => {
           sum += value;
         });
@@ -252,3 +252,5 @@ export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingS
     disorientation: z.number().int().min(0).max(7)
   })
 };
+
+export default briefPsychiatricRatingScale;

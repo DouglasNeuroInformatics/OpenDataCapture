@@ -1,5 +1,6 @@
 import type Base from '@douglasneuroinformatics/form-types';
 import type { Simplify } from 'type-fest';
+import type { z } from 'zod';
 
 import type { Language } from '../core/core.types';
 
@@ -244,9 +245,19 @@ export type FormInstrument<
 >;
 
 export type InstrumentBundle = {
+  bundle: string;
+};
+
+export type InstrumentSource = {
   source: string;
 };
 
 export type BilingualFormInstrument<TData extends Base.FormDataType> = FormInstrument<TData, Language[]>;
 
 export type Instrument = FormInstrument;
+
+export type InstrumentContext = {
+  z: typeof z;
+};
+
+export type InstrumentFactory<T extends BaseInstrument = BaseInstrument> = (ctx: InstrumentContext) => T;

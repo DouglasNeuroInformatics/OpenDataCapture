@@ -123,6 +123,6 @@ export const formInstrumentSchema = baseInstrumentSchema.extend({
 
 // z.ZodType<Types.FormInstrument, z.ZodTypeDef, Types.InstrumentBundle>
 export const formInstrumentBundleSchema = z
-  .object({ source: z.string() })
-  .transform(({ source }) => evaluateInstrument<Types.FormInstrument>(source))
+  .object({ bundle: z.string() })
+  .transform(({ bundle }) => evaluateInstrument<Types.FormInstrument>(bundle))
   .pipe(formInstrumentSchema);

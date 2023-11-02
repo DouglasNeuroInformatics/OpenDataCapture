@@ -1,10 +1,10 @@
 /* eslint-disable perfectionist/sort-objects */
 
-export type HappinessQuestionnaireData = {
+type HappinessQuestionnaireData = {
   overallHappiness: number;
 };
 
-export const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, InstrumentLanguage> = {
+const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, InstrumentLanguage> = {
   kind: 'form',
   name: 'HappinessQuestionnaire',
   language: ['en', 'fr'],
