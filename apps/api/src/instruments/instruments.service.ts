@@ -44,26 +44,47 @@ export class InstrumentsService {
     return (await this.instrumentsRepository.deleteById(id))!;
   }
 
-  async findAll({ ability }: EntityOperationOptions = {}) {
+  async find(query: FilterQuery<BaseInstrument> = {}, { ability }: EntityOperationOptions = {}) {
     if (!ability) {
-      return this.instrumentsRepository.find();
+      return this.instrumentsRepository.find(query);
     }
     return this.instrumentsRepository.find({
-      $and: [accessibleBy(ability, 'read').Instrument]
+      $and: [query, accessibleBy(ability, 'read').Instrument]
     });
   }
 
-  async findAvailable({ ability }: EntityOperationOptions = {}): Promise<InstrumentSummary[]> {
-    return this.instrumentsRepository.find(ability ? accessibleBy(ability, 'read').Instrument : {}, {
-      projection: {
-        details: true,
-        kind: true,
-        language: true,
-        name: true,
-        tags: true,
-        version: true
+  async findAvailable(
+    query: FilterQuery<BaseInstrument> = {},
+    { ability }: EntityOperationOptions = {}
+  ): Promise<InstrumentSummary[]> {
+    // TBD: Figure out a better way to do this
+    const summaries = await this.instrumentsRepository.find(
+      {
+        $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
+      },
+      {
+        projection: {
+          bundle: true,
+          details: true,
+          kind: true,
+          language: true,
+          name: true,
+          tags: true,
+          version: true
+        }
       }
-    });
+    );
+    return summaries.map((doc) =>
+      doc.toObject({
+        transform: (_, ret) => {
+          delete ret._id;
+          delete ret.bundle;
+          delete ret.content;
+          delete ret.validationSchema;
+        },
+        virtuals: true
+      })
+    );
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {

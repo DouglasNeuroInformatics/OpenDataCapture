@@ -10,14 +10,20 @@ export const useAvailableForms = () => {
   const { i18n } = useTranslation();
   return useQuery({
     queryFn: () => {
-      return axios.get('/v1/instruments/forms/available').then((response) => {
-        const result = instrumentSummarySchema.array().safeParse(response.data);
-        if (!result.success) {
-          console.error('Failed to parse form instrument summaries', result.error.issues);
-          return [];
-        }
-        return result.data.map((summary) => resolveFormSummary(summary, i18n.resolvedLanguage as Language));
-      });
+      return axios
+        .get('/v1/instruments/available', {
+          params: {
+            kind: 'form'
+          }
+        })
+        .then((response) => {
+          const result = instrumentSummarySchema.array().safeParse(response.data);
+          if (!result.success) {
+            console.error('Failed to parse form instrument summaries', result.error.issues);
+            return [];
+          }
+          return result.data.map((summary) => resolveFormSummary(summary, i18n.resolvedLanguage as Language));
+        });
     },
     queryKey: ['available-forms']
   });

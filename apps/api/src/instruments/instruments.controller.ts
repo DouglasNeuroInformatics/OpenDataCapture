@@ -1,7 +1,8 @@
 import { CurrentUser, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AppAbility } from '@open-data-capture/common/core';
+import type { InstrumentKind } from '@open-data-capture/common/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -30,15 +31,15 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'Find All Instruments' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findAll(@CurrentUser('ability') ability: AppAbility) {
-    return this.instrumentsService.findAll({ ability });
+  async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+    return this.instrumentsService.find({ kind }, { ability });
   }
 
   @ApiOperation({ summary: 'Summarize Available Instruments' })
   @Get('available')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findAvailable(@CurrentUser('ability') ability: AppAbility) {
-    return this.instrumentsService.findAvailable({ ability });
+  async findAvailable(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+    return this.instrumentsService.findAvailable({ kind }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Instrument' })
