@@ -22,13 +22,26 @@ export const Default: Story = {
     form: {
       content: {
         overallHappiness: {
-          description: 'Overall happiness from 1 through 10 (inclusive)',
           isRequired: true,
           kind: 'numeric',
           label: 'Overall Happiness',
           max: 10,
           min: 1,
           variant: 'slider'
+        },
+        reasonForSadness: {
+          deps: ['overallHappiness'],
+          kind: 'dynamic',
+          render(data) {
+            if (!data?.overallHappiness || data.overallHappiness as number > 5) {
+              return null;
+            }
+            return {
+              kind: 'text',
+              label: 'Reason for Sadness',
+              variant: 'long'
+            };
+          }
         }
       },
       details: {
@@ -42,7 +55,8 @@ export const Default: Story = {
       name: 'HappinessQuestionnaire',
       tags: ['Well-Being'],
       validationSchema: z.object({
-        overallHappiness: z.number().int().gte(1).lte(10)
+        overallHappiness: z.number().int().gte(1).lte(10),
+        reasonForSadness: z.string().optional()
       }),
       version: 1
     }

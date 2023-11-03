@@ -1,10 +1,11 @@
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { Button, Card, formatFormDataAsString, useDownload } from '@douglasneuroinformatics/ui';
+import type { FormDataType, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
+import { Button, Card, formatFormDataAsString, getFormFields, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Visit } from '@open-data-capture/common/visit';
 import { useTranslation } from 'react-i18next';
+import { match } from 'ts-pattern';
 
 import { FormSummaryGroup } from './FormSummaryGroup';
 
@@ -25,6 +26,8 @@ export const FormSummary = ({ activeVisit, data, form, timeCollected }: FormSumm
   };
 
   const subject = activeVisit.subject;
+
+  const fields = getFormFields(form.content);
 
   return (
     <Card>
@@ -68,13 +71,46 @@ export const FormSummary = ({ activeVisit, data, form, timeCollected }: FormSumm
             value: form.details.title
           },
           {
+            label: t('common:language'),
+            value: match(form.language)
+              .with('en', () => t('common:languages.english'))
+              .with('fr', () => t('common:languages.french'))
+              .otherwise(() => form.language)
+          },
+          {
             label: t('instruments:props.version'),
             value: form.version
           }
         ]}
         title={t('common:instrument')}
       />
-      <FormSummaryGroup items={[]} title={t('common:responses')} />
+      <FormSummaryGroup
+        items={Object.keys(fields).map((fieldName) => {
+          return match(fields[fieldName]!)
+            .with({ kind: 'array' }, (field) => ({
+              label: field.label,
+              value: 'NA'
+            }))
+            .with({ kind: 'dynamic' }, (field) => {
+              const staticField = field.render(data);
+              if (!staticField || staticField.kind === 'array') {
+                return {
+                  label: staticField?.label ?? '',
+                  value: 'NA'
+                };
+              }
+              return {
+                label: staticField.label,
+                value: (data[fieldName] ?? 'NA') as PrimitiveFieldValue
+              };
+            })
+            .otherwise((field) => ({
+              label: field.label,
+              value: data[fieldName] as PrimitiveFieldValue
+            }));
+        })}
+        title={t('common:responses')}
+      />
       <div className="flex gap-6 px-4 py-5 sm:px-6">
         <Button className="w-full" label={t('common:download')} variant="secondary" onClick={handleDownload} />
         <Button className="w-full" label={t('common:print')} variant="secondary" />
