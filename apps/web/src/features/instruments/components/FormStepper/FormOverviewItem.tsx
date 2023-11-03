@@ -5,18 +5,18 @@ export type FormOverviewItemProps = {
 
 export const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
   return (
-    <div className="my-5">
-      <h5 className="mb-1 text-xl font-semibold text-slate-900 dark:text-slate-100">{heading}</h5>
+    <div className="my-5 text-slate-600 dark:text-slate-300">
+      <h5 className="mb-1 text-lg font-medium text-slate-900 dark:text-slate-100">{heading}</h5>
       {Array.isArray(text) ? (
         <ul>
           {text.map((s, i) => (
-            <li className="my-3" key={i}>
+            <li className="my-3 text-sm" key={i}>
               {s}
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-slate-600 dark:text-slate-300">{text}</p>
+        <p>{text}</p>
       )}
     </div>
   );

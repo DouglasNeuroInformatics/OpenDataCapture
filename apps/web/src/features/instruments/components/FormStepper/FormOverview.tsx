@@ -18,7 +18,8 @@ export const FormOverview = ({ form }: FormOverviewProps) => {
   const { t } = useTranslation(['instruments', 'common']);
   return (
     <div className="mb-2">
-      <div className="mb-5">
+      <h3 className="text-xl font-semibold">{t('form.steps.overview')}</h3>
+      <div className="mb-8">
         <FormOverviewItem heading={t('props.description')} text={form.details.description} />
         <FormOverviewItem
           heading={t('common:language')}
@@ -36,6 +37,7 @@ export const FormOverview = ({ form }: FormOverviewProps) => {
         <FormOverviewItem heading={t('props.instructions')} text={form.details.instructions} />
       </div>
       <Button
+        className="w-full"
         label={t('common:begin')}
         onClick={() => {
           updateIndex('increment');
