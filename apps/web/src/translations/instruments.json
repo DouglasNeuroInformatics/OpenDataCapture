@@ -87,6 +87,12 @@
       "fr": "Gérer les instruments"
     }
   },
+  "overview": {
+    "estimatedDuration": {
+      "en": "{{minutes}} minutes",
+      "fr": "{{minutes}} minutes"
+    }
+  },
   "props": {
     "description": {
       "en": "Description",

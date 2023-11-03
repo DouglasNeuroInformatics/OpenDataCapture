@@ -22,7 +22,7 @@ export function useFormQuery(id: string) {
           return resolveFormInstrument(instrument, i18n.resolvedLanguage as Language);
         });
     },
-    queryKey: ['form', id],
+    queryKey: ['form', id, i18n.resolvedLanguage],
     throwOnError: true
   });
 }
