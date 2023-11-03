@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { resolveFormInstrument } from '@/utils/translate-instrument';
+
 export function useFormQuery(id: string) {
   const { i18n } = useTranslation();
   return useQuery({
