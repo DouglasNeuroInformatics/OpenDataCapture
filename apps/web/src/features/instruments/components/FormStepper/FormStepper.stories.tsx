@@ -46,5 +46,12 @@ export const Default: Story = {
       }),
       version: 1
     }
-  }
+  },
+  decorators: [
+    (Story) => (
+      <div className="mx-auto max-w-3xl">
+        <Story />
+      </div>
+    )
+  ]
 };

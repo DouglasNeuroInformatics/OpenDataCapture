@@ -23,8 +23,9 @@ export const FormRecordList = ({ form, subject }: FormRecordListProps) => {
         </h3>
         <p className="mt-1 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
           {t('summary.subtitle', {
-            dateCompleted: new Date().toLocaleDateString(i18n.resolvedLanguage, {
-              dateStyle: 'long'
+            dateCompleted: new Date().toLocaleString(i18n.resolvedLanguage, {
+              dateStyle: 'long',
+              timeStyle: 'long'
             })
           })}
         </p>
@@ -48,6 +49,19 @@ export const FormRecordList = ({ form, subject }: FormRecordListProps) => {
           }
         ]}
         title={t('common:subject')}
+      />
+      <FormRecordListGroup
+        items={[
+          {
+            label: t('instruments:props.title'),
+            value: form.details.title
+          },
+          {
+            label: t('instruments:props.version'),
+            value: form.version
+          }
+        ]}
+        title={t('common:instrument')}
       />
     </Card>
   );

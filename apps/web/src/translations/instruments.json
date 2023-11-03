@@ -125,6 +125,10 @@
     "title": {
       "en": "Title",
       "fr": "Titre"
+    },
+    "version": {
+      "en": "Version",
+      "fr": "Version"
     }
   },
   "summary": {
@@ -134,7 +138,7 @@
     },
     "title": {
       "en": "Summary of Results for the {{title}}",
-      "fr": "Synthèse des résultats du formulaire « {{title}} »"
+      "fr": "{{title}} : résumé des résultats"
     }
   },
   "view": {
