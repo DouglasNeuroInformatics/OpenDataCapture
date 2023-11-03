@@ -28,12 +28,8 @@ export const FormSummary = ({ activeVisit, form, result, timeCollected }: FormSu
   // return (
   //   <div>
   //     <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.subject')}</h3>
-  //     <FormSummaryItem
-  //       label={t('instruments.formPage.summary.name')}
-  //       value={`${activeVisit!.subject.firstName} ${activeVisit!.subject.lastName}`}
-  //     />
-  //     <FormSummaryItem label={t('instruments.formPage.summary.dateOfBirth')} value={activeVisit?.subject.dateOfBirth} />
-  //     <FormSummaryItem label={t('instruments.formPage.summary.sex')} value={activeVisit?.subject.sex} />
+
+
   //     <h3 className="my-3 text-xl font-semibold">{t('instruments.formPage.summary.metadata')}</h3>
   //     <FormSummaryItem label={t('instruments.formPage.summary.instrumentTitle')} value={instrument.details.title} />
   //     <FormSummaryItem label={t('instruments.formPage.summary.instrumentVersion')} value={instrument.version} />
