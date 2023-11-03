@@ -3,14 +3,16 @@ import { rest, http, HttpResponse } from 'msw';
 // src/mocks/handlers.js
 
 export const handlers = [
-  rest.post('/auth/login', (req, res, ctx) => {
+  http.post('/auth/login', async ({request}) => {
     // eslint-disable-next-line perfectionist/sort-objects
-    const { username, password } = req.json();
+    const data = await request.formData();
+    const username = data.get('username');
+    const password = data.get('password')
 
     if (username === 'testUsername123' && password === 'testPassword123') {
-      return res(ctx.status(200), ctx.json({ message: 'Login successful', token: 'yourtoken' }));
+      return new HttpResponse('Hello ' + username);
     } else {
-      return res(ctx.status(401), ctx.json({ message: 'Login failure' }));
+      return new HttpResponse('error');
     }
   }),
 

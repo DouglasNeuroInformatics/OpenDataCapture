@@ -15,6 +15,9 @@ describe('login test', () => {
           return info.username;
         })
       );
+      cy.get('input[name="username"]').type('testUsername123');
+      cy.get('input[name="password"]').type('testPassword123');
+      cy.get('button').contains('Login').click();
     });
   });
 });
