@@ -2,7 +2,6 @@ import type { FormDataType, FormFieldKind } from '@douglasneuroinformatics/form-
 import { z } from 'zod';
 
 import { languageSchema } from '../core/core.schemas';
-import { evaluateInstrument } from './instrument.utils';
 
 import type * as Types from './instrument.types';
 
@@ -124,16 +123,6 @@ export const formInstrumentSchema = baseInstrumentSchema.extend({
 export const instrumentSourceSchema = z.object({
   source: z.string()
 }) satisfies Zod.ZodType<Types.InstrumentSource>;
-
-export const instrumentBundleSchema = z
-  .object({
-    bundle: z.string()
-  })
-  .transform(({ bundle }) => evaluateInstrument(bundle))
-  .pipe(baseInstrumentSchema);
-
-// z.ZodType<Types.FormInstrument, z.ZodTypeDef, Types.InstrumentBundle>
-export const formInstrumentBundleSchema = instrumentBundleSchema.pipe(formInstrumentSchema);
 
 export const instrumentSourceContainerSchema = z.object({
   id: z.string(),
