@@ -2,6 +2,7 @@
 
 type HappinessQuestionnaireData = {
   overallHappiness: number;
+  reasonForSadness?: string;
 };
 
 const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, InstrumentLanguage> = {
@@ -28,6 +29,24 @@ const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, Instrum
       max: 10,
       min: 1,
       variant: 'slider'
+    },
+    reasonForSadness: {
+      deps: ['overallHappiness'],
+      kind: 'dynamic',
+      render: (data) => {
+        if (!data?.overallHappiness || data.overallHappiness >= 5) {
+          return null;
+        }
+        return {
+          label: {
+            en: 'Reason for Sadness',
+            fr: 'Raison de la tristesse'
+          },
+          isRequired: false,
+          kind: 'text',
+          variant: 'long'
+        };
+      }
     }
   },
   details: {
@@ -46,7 +65,8 @@ const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, Instrum
     }
   },
   validationSchema: z.object({
-    overallHappiness: z.number().int().gte(1).lte(10)
+    overallHappiness: z.number().int().gte(1).lte(10),
+    reasonForSadness: z.string().optional()
   })
 };
 
