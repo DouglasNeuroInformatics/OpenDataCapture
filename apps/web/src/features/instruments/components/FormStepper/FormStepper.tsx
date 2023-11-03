@@ -5,6 +5,7 @@ import { Stepper } from '@douglasneuroinformatics/ui';
 import { DocumentCheckIcon, PrinterIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
+import type { Visit } from '@open-data-capture/common/visit';
 import { useTranslation } from 'react-i18next';
 
 import { FormOverview } from './FormOverview';
@@ -12,11 +13,12 @@ import { FormQuestions } from './FormQuestions';
 import { FormSummary } from './FormSummary';
 
 export type FormStepperProps = {
+  activeVisit: Visit;
   form: FormInstrument<FormDataType, Language>;
   onSubmit: (data: FormDataType) => void;
 };
 
-export const FormStepper = ({ form, onSubmit }: FormStepperProps) => {
+export const FormStepper = ({ activeVisit, form }: FormStepperProps) => {
   const [result, setResult] = useState<FormDataType>();
   const { t } = useTranslation(['common', 'instruments']);
 
@@ -34,7 +36,7 @@ export const FormStepper = ({ form, onSubmit }: FormStepperProps) => {
           label: t('instruments:form.steps.questions')
         },
         {
-          element: <FormSummary form={form} result={result} timeCollected={Date.now()} />,
+          element: <FormSummary activeVisit={activeVisit} form={form} result={result!} timeCollected={Date.now()} />,
           icon: <PrinterIcon />,
           label: t('instruments:form.steps.summary')
         }

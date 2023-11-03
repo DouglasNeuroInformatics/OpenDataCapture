@@ -1,21 +1,20 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { Spinner, formatFormDataAsString, useDownload } from '@douglasneuroinformatics/ui';
+import { formatFormDataAsString, useDownload } from '@douglasneuroinformatics/ui';
 import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
+import type { Visit } from '@open-data-capture/common/visit';
 import { useTranslation } from 'react-i18next';
-
-import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 import { FormRecordList } from './FormRecordList';
 
 export type FormSummaryProps = {
+  activeVisit: Visit;
   form: FormInstrument<FormDataType, Language>;
   result: FormDataType;
   timeCollected: number;
 };
 
-export const FormSummary = ({ form, result, timeCollected }: FormSummaryProps) => {
-  const { activeVisit } = useActiveVisitStore();
+export const FormSummary = ({ activeVisit, form, result, timeCollected }: FormSummaryProps) => {
   const download = useDownload();
   const { i18n, t } = useTranslation();
 
@@ -24,7 +23,7 @@ export const FormSummary = ({ form, result, timeCollected }: FormSummaryProps) =
     download(filename, () => Promise.resolve(formatFormDataAsString(result)));
   };
 
-  return <FormRecordList form={form} subject={activeVisit!.subject} />;
+  return <FormRecordList form={form} subject={activeVisit.subject} />;
 
   // return (
   //   <div>
