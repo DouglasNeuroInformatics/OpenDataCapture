@@ -1,4 +1,4 @@
-export type FormRecordListGroupProps = {
+export type FormSummaryGroupProps = {
   items: {
     label: string;
     value: number | string;
@@ -6,7 +6,7 @@ export type FormRecordListGroupProps = {
   title: string;
 };
 
-export const FormRecordListGroup = ({ items, title }: FormRecordListGroupProps) => {
+export const FormSummaryGroup = ({ items, title }: FormSummaryGroupProps) => {
   return (
     <div className="px-4 py-5 sm:px-6">
       <h5 className="font-medium">{title}</h5>

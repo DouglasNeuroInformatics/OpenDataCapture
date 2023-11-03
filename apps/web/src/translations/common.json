@@ -185,6 +185,10 @@
     "en": "Print",
     "fr": "Imprimer"
   },
+  "responses": {
+    "en": "Responses",
+    "fr": "Réponses"
+  },
   "results": {
     "en": "Results",
     "fr": "Résultats"

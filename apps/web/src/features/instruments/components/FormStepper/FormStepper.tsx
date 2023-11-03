@@ -19,7 +19,7 @@ export type FormStepperProps = {
 };
 
 export const FormStepper = ({ activeVisit, form }: FormStepperProps) => {
-  const [result, setResult] = useState<FormDataType>();
+  const [data, setData] = useState<FormDataType>();
   const { t } = useTranslation(['common', 'instruments']);
 
   return (
@@ -31,12 +31,12 @@ export const FormStepper = ({ activeVisit, form }: FormStepperProps) => {
           label: t('instruments:form.steps.overview')
         },
         {
-          element: <FormQuestions form={form} onSubmit={setResult} />,
+          element: <FormQuestions form={form} onSubmit={setData} />,
           icon: <QuestionMarkCircleIcon />,
           label: t('instruments:form.steps.questions')
         },
         {
-          element: <FormSummary activeVisit={activeVisit} form={form} result={result!} timeCollected={Date.now()} />,
+          element: <FormSummary activeVisit={activeVisit} data={data!} form={form} timeCollected={Date.now()} />,
           icon: <PrinterIcon />,
           label: t('instruments:form.steps.summary')
         }
