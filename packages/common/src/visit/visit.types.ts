@@ -10,6 +10,6 @@ export type Visit = {
 
 export type CreateVisitData = {
   date: Date;
-  groupId?: string;
+  groupId: null | string;
   subjectIdData: SubjectIdentificationData;
 };
