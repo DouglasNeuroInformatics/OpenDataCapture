@@ -1,12 +1,16 @@
-declare type Language = import('@open-data-capture/common').Core.Language;
+declare global {
+  type Language = import('@open-data-capture/common').Core.Language;
+  
+  type FormDataType = import('@douglasneuroinformatics/form-types').FormDataType;
+  
+  type InstrumentLanguage = import('@open-data-capture/common').Instrument.InstrumentLanguage;
+  
+  type FormInstrument<
+    TData extends FormDataType,
+    TLanguage extends InstrumentLanguage
+  > = import('@open-data-capture/common').Instrument.FormInstrument<TData, TLanguage>;
 
-declare type FormDataType = import('@douglasneuroinformatics/form-types').FormDataType;
+  const z: typeof import('zod').z;
+}
 
-declare type InstrumentLanguage = import('@open-data-capture/common').Instrument.InstrumentLanguage;
-
-declare type FormInstrument<
-  TData extends FormDataType,
-  TLanguage extends InstrumentLanguage
-> = import('@open-data-capture/common').Instrument.FormInstrument<TData, TLanguage>;
-
-declare const z: typeof import('zod').z;
+export {};
