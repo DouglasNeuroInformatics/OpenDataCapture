@@ -1,5 +1,5 @@
 import type { Language } from '@open-data-capture/common/core';
-import { instrumentSummarySchema } from '@open-data-capture/common/instrument';
+import { formInstrumentSummarySchema } from '@open-data-capture/common/instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ export const useAvailableForms = () => {
           }
         })
         .then((response) => {
-          const result = instrumentSummarySchema.array().safeParse(response.data);
+          const result = formInstrumentSummarySchema.array().safeParse(response.data);
           if (!result.success) {
             console.error('Failed to parse form instrument summaries', result.error.issues);
             return [];
