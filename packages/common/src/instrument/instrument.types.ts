@@ -247,6 +247,13 @@ export type FormInstrument<
   }
 >;
 
+export type FormInstrumentSummary<
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
+> = InstrumentSummary<TData, TLanguage> & {
+  measures?: FormInstrumentMeasures<TData, TLanguage>;
+};
+
 export type InstrumentBundle = {
   bundle: string;
 };

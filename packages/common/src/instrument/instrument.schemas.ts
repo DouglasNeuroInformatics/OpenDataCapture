@@ -140,6 +140,16 @@ export const formDataTypeSchema = z.record(
   z.union([primitiveFieldValueSchema, arrayFieldValueSchema])
 ) satisfies Zod.ZodType<FormDataType>;
 
+export const formInstrumentSummarySchema = instrumentSummarySchema.extend({
+  measures: z
+    .record(
+      z.object({
+        label: uiOptionSchema(z.string())
+      })
+    )
+    .optional()
+});
+
 export const instrumentSourceSchema = z.object({
   source: z.string()
 }) satisfies Zod.ZodType<Types.InstrumentSource>;
