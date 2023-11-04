@@ -15,4 +15,6 @@ export type InstrumentRecord<TData = unknown, TInstrument extends BaseInstrument
 export type FormInstrumentRecord<TData extends FormDataType = FormDataType> = InstrumentRecord<
   TData,
   FormInstrument<TData>
->;
+> & {
+  computedMeasures?: Record<string, number>;
+};
