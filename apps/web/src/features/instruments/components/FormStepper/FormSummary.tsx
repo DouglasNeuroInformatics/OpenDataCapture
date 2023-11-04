@@ -1,6 +1,7 @@
 import type { FormDataType, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
-import { Button, Card, formatFormDataAsString, getFormFields, useDownload } from '@douglasneuroinformatics/ui';
+import { Card, formatFormDataAsString, getFormFields, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
+import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
 import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Visit } from '@open-data-capture/common/visit';
@@ -35,14 +36,30 @@ export const FormSummary = ({ activeVisit, data, form, timeCollected }: FormSumm
         <h3 className="text-lg font-medium leading-6 text-slate-900 dark:text-slate-100">
           {t('summary.title', { title: form.details.title })}
         </h3>
-        <p className="mt-1 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
-          {t('summary.subtitle', {
-            dateCompleted: new Date().toLocaleString(i18n.resolvedLanguage, {
-              dateStyle: 'long',
-              timeStyle: 'long'
-            })
-          })}
-        </p>
+        <div className="mt-1 grid grid-cols-3">
+          <p className="col-span-2 text-sm text-slate-600 dark:text-slate-300">
+            {t('summary.subtitle', {
+              dateCompleted: new Date().toLocaleString(i18n.resolvedLanguage, {
+                dateStyle: 'long',
+                timeStyle: 'long'
+              })
+            })}
+          </p>
+          <div className="flex justify-end gap-4 text-slate-600 dark:text-slate-300 print:hidden">
+            <button type="button">
+              <ArrowDownTrayIcon height={20} width={20} onClick={handleDownload} />
+            </button>
+            <button type="button">
+              <PrinterIcon
+                height={20}
+                width={20}
+                onClick={() => {
+                  print();
+                }}
+              />
+            </button>
+          </div>
+        </div>
       </div>
       <FormSummaryGroup
         items={[
@@ -111,24 +128,6 @@ export const FormSummary = ({ activeVisit, data, form, timeCollected }: FormSumm
         })}
         title={t('common:responses')}
       />
-      <div className="flex gap-6 px-4 py-5 sm:px-6 print:hidden">
-        <Button
-          className="w-full"
-          label={t('common:download')}
-          type="button"
-          variant="secondary"
-          onClick={handleDownload}
-        />
-        <Button
-          className="w-full"
-          label={t('common:print')}
-          type="button"
-          variant="secondary"
-          onClick={() => {
-            print();
-          }}
-        />
-      </div>
     </Card>
   );
 };
