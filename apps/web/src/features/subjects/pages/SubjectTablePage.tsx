@@ -12,6 +12,7 @@ import { useAvailableForms } from '@/hooks/useAvailableForms';
 import { useFormRecords } from '@/hooks/useFormRecords';
 import { useAuthStore } from '@/stores/auth-store';
 
+import { TimeDropdown } from '../components/TimeDropdown';
 import { VisualizationHeader } from '../components/VisualizationHeader';
 
 export const SubjectTablePage = () => {
@@ -106,25 +107,7 @@ export const SubjectTablePage = () => {
             />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <Dropdown
-              className="text-sm"
-              options={{
-                all: t('visualization.timeframeOptions.all'),
-                pastMonth: t('visualization.timeframeOptions.month'),
-                pastYear: t('visualization.timeframeOptions.year')
-              }}
-              title={t('visualization.timeframe')}
-              variant="secondary"
-              onSelection={(selection) => {
-                if (selection === 'pastYear') {
-                  setMinDate(new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
-                } else if (selection === 'pastMonth') {
-                  setMinDate(new Date(new Date().setMonth(new Date().getMonth() - 1)));
-                } else {
-                  setMinDate(null);
-                }
-              }}
-            />
+            <TimeDropdown setMinTime={setMinDate} />
             <Dropdown
               className="text-sm"
               options={['CSV', 'JSON']}
