@@ -12,6 +12,8 @@ import { useAvailableForms } from '@/hooks/useAvailableForms';
 import { useFormRecords } from '@/hooks/useFormRecords';
 import { useAuthStore } from '@/stores/auth-store';
 
+import { VisualizationHeader } from '../components/VisualizationHeader';
+
 export const SubjectTablePage = () => {
   const { currentGroup, currentUser } = useAuthStore();
   const download = useDownload();
@@ -92,18 +94,7 @@ export const SubjectTablePage = () => {
   return (
     <div>
       <div className="my-2">
-        <div className="mb-5">
-          <h3 className="text-lg font-semibold">
-            {t('visualization.selectedInstrument', {
-              title: selectedForm?.details.title ?? t('visualization.selectedInstrumentNone')
-            })}
-          </h3>
-          {minDate && (
-            <p className="text-sm font-medium">
-              {toBasicISOString(minDate)} - {toBasicISOString(new Date())}
-            </p>
-          )}
-        </div>
+        <VisualizationHeader minDate={minDate} title={selectedForm?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <Dropdown

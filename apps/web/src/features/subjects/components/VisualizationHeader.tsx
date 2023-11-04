@@ -1,23 +1,23 @@
-import { useContext } from 'react';
-
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { useTranslation } from 'react-i18next';
 
-import { VisualizationContext } from '../context/VisualizationContext';
+export type VisualizationHeaderProps = {
+  minDate?: Date | null;
+  title?: string;
+};
 
-export const VisualizationHeader = () => {
-  const ctx = useContext(VisualizationContext);
-  const { t } = useTranslation();
+export const VisualizationHeader = ({ minDate, title }: VisualizationHeaderProps) => {
+  const { t } = useTranslation('subjects');
   return (
     <div className="mb-5">
       <h3 className="text-lg font-semibold">
-        {t('subjectPage.visualization.selectedInstrument', {
-          title: ctx.selectedInstrument?.details.title ?? t('subjectPage.visualization.selectedInstrumentNone')
+        {t('visualization.selectedInstrument', {
+          title: title ?? t('visualization.selectedInstrumentNone')
         })}
       </h3>
-      {ctx.minTime && (
+      {minDate && (
         <p className="text-sm font-medium">
-          {toBasicISOString(new Date(ctx.minTime))} - {toBasicISOString(new Date())}
+          {toBasicISOString(minDate)} - {toBasicISOString(new Date())}
         </p>
       )}
     </div>
