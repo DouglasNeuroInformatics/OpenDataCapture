@@ -1,4 +1,9 @@
-import type { FormDataType, FormFieldKind } from '@douglasneuroinformatics/form-types';
+import type {
+  ArrayFieldValue,
+  FormDataType,
+  FormFieldKind,
+  PrimitiveFieldValue
+} from '@douglasneuroinformatics/form-types';
 import { z } from 'zod';
 
 import { languageSchema } from '../core/core.schemas';
@@ -119,6 +124,21 @@ export const formInstrumentSchema = baseInstrumentSchema.extend({
   kind: z.literal('form'),
   validationSchema: z.instanceof(z.ZodType<FormDataType>)
 }) satisfies Zod.ZodType<Types.FormInstrument>;
+
+export const primitiveFieldValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.coerce.date()
+]) satisfies Zod.ZodType<PrimitiveFieldValue>;
+
+export const arrayFieldValueSchema = z.array(
+  z.record(primitiveFieldValueSchema)
+) satisfies Zod.ZodType<ArrayFieldValue>;
+
+export const formDataTypeSchema = z.record(
+  z.union([primitiveFieldValueSchema, arrayFieldValueSchema])
+) satisfies Zod.ZodType<FormDataType>;
 
 export const instrumentSourceSchema = z.object({
   source: z.string()
