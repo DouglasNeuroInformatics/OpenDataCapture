@@ -33,7 +33,7 @@ export class UsersService implements EntityService<User> {
     }
 
     const groups: GroupEntity[] = [];
-    for (const groupName of groupNames) {
+    for (const groupName of groupNames ?? []) {
       const group = await this.groupsService.findByName(groupName, options);
       groups.push(group);
     }

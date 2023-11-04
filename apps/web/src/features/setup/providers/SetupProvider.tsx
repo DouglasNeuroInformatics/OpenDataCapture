@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { Spinner } from '@douglasneuroinformatics/ui';
-import type { SetupOptions, SetupState } from '@open-data-capture/common/setup';
+import type { SetupState } from '@open-data-capture/common/setup';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { P, match } from 'ts-pattern';
@@ -33,15 +33,12 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
     setSetupState(response.data);
   };
 
-  const handleSubmit = async ({ firstName, groupName, initDemo, lastName, password, username }: SetupData) => {
+  const handleSubmit = async ({ initDemo, password, username }: SetupData) => {
     setIsLoading(true);
     await axios.post('/v1/setup', {
-      admin: { firstName, lastName, password, username },
-      adminGroup: {
-        name: groupName
-      },
+      admin: { password, username },
       initDemo
-    } satisfies SetupOptions);
+    });
     setIsLoading(false);
     setSetupState({ isSetup: true });
     notifications.addNotification({ type: 'success' });

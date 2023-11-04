@@ -18,12 +18,12 @@ export const basePermissionLevelSchema = z.enum([
 export const userSchema = z.object({
   basePermissionLevel: basePermissionLevelSchema.optional(),
   firstName: z.string().min(1).optional(),
-  groups: groupSchema.array().min(1),
+  groups: groupSchema.array(),
   lastName: z.string().min(1).optional(),
   password: passwordSchema,
   username: z.string().min(1)
 }) satisfies Zod.ZodType<User>;
 
 export const createUserDataSchema = userSchema.omit({ groups: true }).extend({
-  groupNames: z.array(z.string().min(1))
+  groupNames: z.array(z.string().min(1)).optional()
 }) satisfies Zod.ZodType<CreateUserData>;

@@ -19,7 +19,7 @@ export class CreateUserDto implements CreateUserData {
     description: 'The names of the group(s) to which the user belongs',
     example: ['Memory Clinic', 'Depression Clinic']
   })
-  groupNames: string[];
+  groupNames?: string[];
 
   @ApiProperty({ description: 'Last Name' })
   lastName?: string;

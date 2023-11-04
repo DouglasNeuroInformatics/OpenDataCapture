@@ -3,7 +3,6 @@ import { InjectConnection } from '@nestjs/mongoose';
 import type { CreateAdminData, SetupState } from '@open-data-capture/common/setup';
 import mongoose from 'mongoose';
 
-import { GroupsService } from '@/groups/groups.service';
 import { UserEntity } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
@@ -15,11 +14,10 @@ export class SetupService {
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly demoService: DemoService,
-    private readonly groupsService: GroupsService,
     private readonly usersService: UsersService
   ) {}
 
-  async createAdmin(admin: CreateAdminData & { groupNames: string[] }): Promise<UserEntity> {
+  async createAdmin(admin: CreateAdminData): Promise<UserEntity> {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' });
   }
 
@@ -31,13 +29,12 @@ export class SetupService {
     return { isSetup: await this.isSetup() };
   }
 
-  async initApp({ admin, adminGroup, initDemo }: SetupDto): Promise<void> {
+  async initApp({ admin, initDemo }: SetupDto): Promise<void> {
     if (await this.isSetup()) {
       throw new ForbiddenException();
     }
     await this.dropDatabase();
-    await this.groupsService.create(adminGroup);
-    await this.createAdmin({ ...admin, groupNames: [adminGroup.name] });
+    await this.createAdmin(admin);
     if (initDemo) {
       await this.demoService.init();
     }
