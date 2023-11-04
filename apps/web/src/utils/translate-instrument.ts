@@ -4,16 +4,16 @@ import type * as Types from '@open-data-capture/common/instrument';
 import { mapValues, merge } from 'lodash';
 
 function isUnilingualFormSummary<TData extends Base.FormDataType>(
-  summary: Types.InstrumentSummary<TData>,
+  summary: Types.FormInstrumentSummary<TData>,
   language: Language
-): summary is Types.InstrumentSummary<TData, Language> {
+): summary is Types.FormInstrumentSummary<TData, Language> {
   return summary.language === language;
 }
 
 function isMultilingualFormSummary<TData extends Base.FormDataType>(
-  summary: Types.InstrumentSummary<TData>,
+  summary: Types.FormInstrumentSummary<TData>,
   language: Language
-): summary is Types.InstrumentSummary<TData, Language[]> {
+): summary is Types.FormInstrumentSummary<TData, Language[]> {
   return Array.isArray(summary.language) && summary.language.includes(language);
 }
 
@@ -132,9 +132,9 @@ function translateFormFields(
 }
 
 function translateFormSummary<TData extends Base.FormDataType>(
-  summary: Types.InstrumentSummary<TData>,
+  summary: Types.FormInstrumentSummary<TData>,
   language: Language
-): Types.InstrumentSummary<TData, Language> | null {
+): Types.FormInstrumentSummary<TData, Language> | null {
   if (isUnilingualFormSummary(summary, language)) {
     return summary;
   } else if (isMultilingualFormSummary(summary, language)) {
@@ -144,6 +144,9 @@ function translateFormSummary<TData extends Base.FormDataType>(
         title: summary.details.title[language]
       },
       language: language,
+      measures: mapValues(summary.measures, (measure) => ({
+        label: measure.label[language]
+      })),
       tags: summary.tags[language]
     });
   }
@@ -188,9 +191,9 @@ export function resolveFormInstrument<TData extends Base.FormDataType>(
 }
 
 export function resolveFormSummary<TData extends Base.FormDataType>(
-  summary: Types.InstrumentSummary<TData>,
+  summary: Types.FormInstrumentSummary<TData>,
   preferredLanguage: Language
-): Types.InstrumentSummary<TData, Language> {
+): Types.FormInstrumentSummary<TData, Language> {
   const altLanguage = preferredLanguage === 'en' ? 'fr' : 'en';
   return (translateFormSummary(summary, preferredLanguage) ?? translateFormSummary(summary, altLanguage))!;
 }
