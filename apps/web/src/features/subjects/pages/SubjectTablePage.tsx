@@ -37,6 +37,7 @@ export const SubjectTablePage = () => {
       for (const record of recordsQuery.data) {
         data.push({
           date: record.date,
+          ...record.computedMeasures,
           ...record.data
         });
       }

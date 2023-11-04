@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 const schema = z.array(
   z.object({
+    computedMeasures: z.record(z.number()).optional(),
     data: z.record(z.any()),
     date: z.coerce.date()
   })
