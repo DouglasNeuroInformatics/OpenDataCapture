@@ -1,11 +1,20 @@
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
+import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
+import type {
+  FormInstrument,
+  FormInstrumentFields,
+  FormInstrumentStaticField,
+  FormInstrumentUnknownField
+} from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
+import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { resolveInstrumentSource } from '@/instruments/instruments.utils';
 import { SubjectsService } from '@/subjects/subjects.service';
@@ -26,6 +35,7 @@ export class DemoService {
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly groupsService: GroupsService,
+    private readonly instrumentRecordsService: InstrumentRecordsService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService,
     private readonly usersService: UsersService
@@ -34,102 +44,93 @@ export class DemoService {
   async init(): Promise<void> {
     this.logger.log(`Initializing demo for database: '${this.connection.name}'`);
 
-    await this.createForms();
+    const forms = await this.createForms();
     await this.createGroups();
     await this.createUsers();
 
     for (let i = 0; i < 100; i++) {
-      await this.createSubject();
+      const group = await this.groupsService.findByName(randomValue(demoGroups).name);
+      const subject = await this.createSubject();
+      for (const form of forms) {
+        const data = this.createFormRecordData(form);
+        await this.instrumentRecordsService.create({
+          data,
+          date: faker.date.past({ years: 1 }),
+          groupId: group.id as string,
+          instrumentId: form.id!,
+          subjectIdentifier: subject.identifier
+        });
+      }
     }
   }
 
-  // private async createFormRecords(): Promise<void> {
-  //   for (let i = 0; i < 100; i++) {
-  //     const group = await this.groupsService.findByName(randomValue(demoGroups).name, this.ability);
-  //     await this.createFormRecords(happinessQuestionnaires[0]!, group.name, createSubjectDto);
-  //     await this.createFormRecords(miniMentalStateExaminations[0]!, group.name, createSubjectDto);
-  //     await this.createFormRecords(montrealCognitiveAssessments[0]!, group.name, createSubjectDto);
-  //     await this.createFormRecords(enhancedDemographicsQuestionnaires[0]!, group.name, createSubjectDto, {
-  //       customValues: {
-  //         postalCode: 'A1A-1A1'
-  //       }
-  //     });
-  //   }
-  // }
+  private createFormRecordData<TData extends FormDataType>(
+    form: FormInstrument<TData>,
+    options?: {
+      customValues?: {
+        [K in keyof TData]?: TData[K];
+      };
+    }
+  ) {
+    let fields: FormInstrumentFields<TData>;
+    if (!Array.isArray(form.content)) {
+      fields = form.content;
+    } else {
+      fields = form.content.reduce((prev, current) => {
+        return { ...prev, ...current.fields };
+      }, form.content[0]!.fields) as FormInstrumentFields<TData>;
+    }
 
-  // /** Create form records for translated instruments */
-  // private async createFormRecords<T extends FormDataType = FormDataType>(
-  //   instrument: FormInstrument<T>,
-  //   groupName: string,
-  //   subjectInfo: CreateSubjectDto,
-  //   options?: {
-  //     customValues?: {
-  //       [K in keyof T]?: T[K];
-  //     };
-  //   }
-  // ) {
-  //   for (let i = 0; i < 5; i++) {
-  //     const fields = this.formsService.getFields(instrument);
-  //     const data: FormDataType = {};
-  //     for (const fieldName in fields) {
-  //       const field = fields[fieldName]!;
-  //       const customValue = options?.customValues?.[fieldName];
-  //       if (customValue) {
-  //         data[fieldName] = customValue;
-  //         continue;
-  //       }
-  //       if (typeof field === 'function') {
-  //         throw new NotImplementedException();
-  //       }
-  //       switch (field.kind) {
-  //         case 'array':
-  //           throw new NotImplementedException();
-  //         case 'binary':
-  //           data[fieldName] = faker.datatype.boolean();
-  //           break;
-  //         case 'date':
-  //           data[fieldName] = faker.date.past({ years: 1 }).toISOString();
-  //           break;
-  //         case 'numeric':
-  //           data[fieldName] = faker.number.int({ max: field.max, min: field.min });
-  //           break;
-  //         case 'options':
-  //           data[fieldName] = randomValue(Object.keys(field.options));
-  //           break;
-  //         case 'text':
-  //           data[fieldName] = faker.lorem.sentence();
-  //           break;
-  //       }
-  //     }
+    const data: Partial<TData> = {};
+    for (const fieldName in fields) {
+      const field = fields[fieldName] as FormInstrumentUnknownField<TData>;
+      const customValue = options?.customValues?.[fieldName];
+      if (customValue) {
+        data[fieldName] = customValue;
+        continue;
+      } else if (field.kind === 'dynamic') {
+        const staticField = field.render(null);
+        if (!staticField) {
+          continue;
+        }
+        data[fieldName] = this.createMockStaticFieldValue(staticField) as TData[typeof fieldName];
+      } else {
+        data[fieldName] = this.createMockStaticFieldValue(field) as TData[typeof fieldName];
+      }
+    }
+    return data as TData;
+  }
 
-  //     instrument;
-
-  //     const record = {
-  //       data: data,
-  //       groupName: groupName,
-  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  //       instrumentName: instrument.name,
-  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  //       instrumentVersion: instrument.version,
-  //       kind: 'form',
-  //       subjectInfo: subjectInfo,
-  //       time: faker.date.recent({ days: i * 30 + 5, refDate: new Date() }).getTime()
-  //     } as const;
-  //     await this.formRecordsService.create(record, this.ability);
-  //   }
-  // }
-
-  private async createForms(): Promise<void> {
-    await this.instrumentsService.create({ source: BPRS_SOURCE });
-    await this.instrumentsService.create({ source: EDQ_SOURCE });
-    await this.instrumentsService.create({ source: HQ_SOURCE });
-    await this.instrumentsService.create({ source: MMSE_SOURCE });
-    await this.instrumentsService.create({ source: MOCA_SOURCE });
+  private async createForms() {
+    return [
+      await this.instrumentsService.create({ source: BPRS_SOURCE }),
+      await this.instrumentsService.create({ source: EDQ_SOURCE }),
+      await this.instrumentsService.create({ source: HQ_SOURCE }),
+      await this.instrumentsService.create({ source: MMSE_SOURCE }),
+      await this.instrumentsService.create({ source: MOCA_SOURCE })
+    ] as unknown as FormInstrument[];
   }
 
   private async createGroups(): Promise<void> {
     for (const group of demoGroups) {
       await this.groupsService.create(group);
+    }
+  }
+
+  private createMockStaticFieldValue(field: FormInstrumentStaticField) {
+    switch (field.kind) {
+      case 'array':
+        throw new NotImplementedException();
+      case 'binary':
+        return faker.datatype.boolean();
+      case 'date':
+        return faker.date.past({ years: 1 }).toISOString();
+      case 'numeric':
+        return faker.number.int({ max: field.max, min: field.min });
+      case 'options':
+        return randomValue(Object.keys(field.options));
+      case 'text':
+        return faker.lorem.sentence();
     }
   }
 
