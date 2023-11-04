@@ -1,5 +1,5 @@
 import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AppAbility } from '@open-data-capture/common/core';
 
@@ -18,6 +18,18 @@ export class InstrumentRecordsController {
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
   create(@Body() data: CreateInstrumentRecordDto, @CurrentUser('ability') ability: AppAbility) {
     return this.instrumentRecordsService.create(data, { ability });
+  }
+
+  @ApiOperation({ summary: 'Get Records for Instrument ' })
+  @Get()
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  find(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('groupId') groupId?: string,
+    @Query('instrumentId') instrumentId?: string,
+    @Query('subjectIdentifier') subjectIdentifier?: string
+  ) {
+    return this.instrumentRecordsService.find({ groupId, instrumentId, subjectIdentifier }, { ability });
   }
 
   // @ApiOperation({ description: 'Export Records', summary: 'Export Records' })

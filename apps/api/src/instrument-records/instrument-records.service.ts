@@ -43,4 +43,21 @@ export class InstrumentRecordsService {
       subject
     });
   }
+
+  async find(
+    {
+      groupId,
+      instrumentId,
+      subjectIdentifier
+    }: { groupId?: string; instrumentId?: string; subjectIdentifier?: string },
+    { ability }: EntityOperationOptions = {}
+  ) {
+    const group = groupId ? await this.groupsService.findById(groupId) : undefined;
+    const instrument = instrumentId ? await this.instrumentsService.findById(instrumentId) : undefined;
+    const subject = subjectIdentifier ? await this.subjectsService.findById(subjectIdentifier) : undefined;
+
+    return this.instrumentRecordsRepository.find({
+      $and: [ability ? accessibleBy(ability).InstrumentRecord : {}, { group, instrument, subject }]
+    });
+  }
 }
