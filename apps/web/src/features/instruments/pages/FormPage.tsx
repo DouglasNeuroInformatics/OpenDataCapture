@@ -19,7 +19,7 @@ export const FormPage = () => {
 
   return (
     <div>
-      <PageHeader title={query.data.details.title} />
+      <PageHeader className="print:hidden" title={query.data.details.title} />
       <div className="mx-auto max-w-3xl">
         <FormStepper
           activeVisit={activeVisit!}

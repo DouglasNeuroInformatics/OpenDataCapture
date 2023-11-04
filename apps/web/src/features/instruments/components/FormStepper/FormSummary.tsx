@@ -111,9 +111,23 @@ export const FormSummary = ({ activeVisit, data, form, timeCollected }: FormSumm
         })}
         title={t('common:responses')}
       />
-      <div className="flex gap-6 px-4 py-5 sm:px-6">
-        <Button className="w-full" label={t('common:download')} variant="secondary" onClick={handleDownload} />
-        <Button className="w-full" label={t('common:print')} variant="secondary" />
+      <div className="flex gap-6 px-4 py-5 sm:px-6 print:hidden">
+        <Button
+          className="w-full"
+          label={t('common:download')}
+          type="button"
+          variant="secondary"
+          onClick={handleDownload}
+        />
+        <Button
+          className="w-full"
+          label={t('common:print')}
+          type="button"
+          variant="secondary"
+          onClick={() => {
+            print();
+          }}
+        />
       </div>
     </Card>
   );
