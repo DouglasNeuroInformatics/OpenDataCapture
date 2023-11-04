@@ -1,5 +1,7 @@
 import { accessibleBy } from '@casl/mongoose';
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Injectable } from '@nestjs/common';
+import type { FormInstrumentMeasures } from '@open-data-capture/common/instrument';
 import type { CreateInstrumentRecordData } from '@open-data-capture/common/instrument-records';
 import type { FilterQuery } from 'mongoose';
 
@@ -56,8 +58,42 @@ export class InstrumentRecordsService {
     const instrument = instrumentId ? await this.instrumentsService.findById(instrumentId) : undefined;
     const subject = subjectIdentifier ? await this.subjectsService.findById(subjectIdentifier) : undefined;
 
-    return this.instrumentRecordsRepository.find({
-      $and: [ability ? accessibleBy(ability).InstrumentRecord : {}, { group, instrument, subject }]
+    const records = await this.instrumentRecordsRepository.find(
+      {
+        $and: [ability ? accessibleBy(ability).InstrumentRecord : {}, { group, instrument, subject }]
+      },
+      {
+        populate: {
+          path: 'instrument',
+          select: ['bundle', 'kind', 'measures']
+        }
+      }
+    );
+
+    return records.map((doc) => {
+      const obj = doc.toObject({
+        depopulate: true,
+        transform: (_, ret) => {
+          delete ret._id;
+          delete ret.__v;
+        },
+        virtuals: true
+      });
+      if (doc.instrument.kind === 'form' && doc.instrument.measures) {
+        obj.computedMeasures = this.computeMeasure(
+          doc.instrument.measures as FormInstrumentMeasures,
+          doc.data as FormDataType
+        );
+      }
+      return obj;
     });
+  }
+
+  private computeMeasure(measures: FormInstrumentMeasures, data: FormDataType) {
+    const computedMeasures: Record<string, number> = {};
+    for (const key in measures) {
+      computedMeasures[key] = measures[key]!.value(data);
+    }
+    return computedMeasures;
   }
 }

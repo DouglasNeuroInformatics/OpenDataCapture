@@ -12,6 +12,8 @@ import { SubjectEntity } from '@/subjects/entities/subject.entity';
 export class InstrumentRecordEntity {
   static readonly modelName = 'InstrumentRecord';
 
+  computedMeasures?: Record<string, number>;
+  
   @Prop({ required: true, type: Object })
   data: unknown;
 
