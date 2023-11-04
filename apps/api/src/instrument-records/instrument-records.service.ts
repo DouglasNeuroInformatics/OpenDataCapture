@@ -1,0 +1,46 @@
+import { accessibleBy } from '@casl/mongoose';
+import { Injectable } from '@nestjs/common';
+import type { CreateInstrumentRecordData } from '@open-data-capture/common/instrument-records';
+import type { FilterQuery } from 'mongoose';
+
+import type { EntityOperationOptions } from '@/core/types';
+import { GroupsService } from '@/groups/groups.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
+import { SubjectsService } from '@/subjects/subjects.service';
+
+import { InstrumentRecordsRepository } from './instrument-records.repository';
+
+import type { InstrumentRecordEntity } from './entities/instrument-record.entity';
+
+@Injectable()
+export class InstrumentRecordsService {
+  constructor(
+    private readonly groupsService: GroupsService,
+    private readonly instrumentRecordsRepository: InstrumentRecordsRepository,
+    private readonly instrumentsService: InstrumentsService,
+    private readonly subjectsService: SubjectsService
+  ) {}
+
+  async count(filter: FilterQuery<InstrumentRecordEntity> = {}, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentRecordsRepository.count({
+      $and: [filter, ability ? accessibleBy(ability, 'read').InstrumentRecord : {}]
+    });
+  }
+
+  async create(
+    { data, groupId, instrumentId, subjectIdentifier }: CreateInstrumentRecordData,
+    options?: EntityOperationOptions
+  ) {
+    const group = groupId ? await this.groupsService.findById(groupId, options) : undefined;
+    const instrument = await this.instrumentsService.findById(instrumentId);
+    const subject = await this.subjectsService.findById(subjectIdentifier);
+
+    return this.instrumentRecordsRepository.create({
+      data,
+      date: new Date(),
+      group,
+      instrument,
+      subject
+    });
+  }
+}

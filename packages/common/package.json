@@ -9,6 +9,7 @@
     "./core": "./src/core/core.index.ts",
     "./group": "./src/group/group.index.ts",
     "./instrument": "./src/instrument/instrument.index.ts",
+    "./instrument-records": "./src/instrument-records/instrument-records.index.ts",
     "./setup": "./src/setup/setup.index.ts",
     "./subject": "./src/subject/subject.index.ts",
     "./summary": "./src/summary/summary.index.ts",
