@@ -25,7 +25,7 @@ type MiniMentalStateExaminationData = {
 
 const miniMentalStateExamination: FormInstrument<MiniMentalStateExaminationData, Language[]> = {
   kind: 'form',
-  name: 'Mini Mental State Examination',
+  name: 'MiniMentalStateExamination',
   language: ['en', 'fr'],
   tags: {
     en: ['Cognitive'],

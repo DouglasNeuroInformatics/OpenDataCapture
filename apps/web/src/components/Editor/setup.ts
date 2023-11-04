@@ -6,9 +6,8 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-import reactDeclarations from '../../../../../node_modules/@types/react/index.d.ts?raw';
-import zodTypes from '../../../../../node_modules/zod/index.d.ts?raw';
-import { MonacoConfigurer } from './config'
+import types from '../../../../../packages/instruments/dist/lib.d.ts?raw';
+import { MonacoConfigurer } from './config';
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -35,13 +34,9 @@ void loader.init().then((monaco) => {
   configurer.configure({
     libraries: [
       {
-        content: reactDeclarations,
-        path: 'node_modules/@types/react/index.d.ts'
+        content: types,
+        path: 'index.d.ts'
       },
-      {
-        content: zodTypes,
-        path: 'node_modules/@types/zod/index.d.ts'
-      }
     ]
   });
 });
