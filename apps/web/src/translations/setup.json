@@ -34,5 +34,19 @@
   "pageTitle": {
     "en": "Setup",
     "fr": "Mise en service"
+  },
+  "group": {
+    "description": {
+      "en": "All users belong to one or more groups. Please define an initial group which the platform administrator will belong to.",
+      "fr": "Tous les utilisateurs appartiennent à un ou plusieurs groupes. Veuillez définir un groupe initial auquel appartiendra l'administrateur de la plateforme."
+    },
+    "groupName": {
+      "en": "Group Name",
+      "fr": "Nom de groupe"
+    },
+    "title": {
+      "en": "Administrator Group",
+      "fr": "Groupe d'administrateurs"
+    }
   }
 }

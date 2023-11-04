@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 type SetupData = {
   firstName: string;
+  groupName: string;
   initDemo: boolean;
   lastName: string;
   password: string;
@@ -51,6 +52,17 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
           title: t('setup:admin.title')
         },
         {
+          description: t('setup:group.description'),
+          fields: {
+            groupName: {
+              kind: 'text',
+              label: t('setup:group.groupName'),
+              variant: 'short'
+            }
+          },
+          title: t('setup:group.title')
+        },
+        {
           description: t('setup:demo.description'),
           fields: {
             initDemo: {
@@ -72,6 +84,7 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
         lastName: z.string(),
         username: z.string(),
         password: z.string().regex(isStrongPassword),
+        groupName: z.string(),
         initDemo: z.boolean()
       })}
       onSubmit={onSubmit}

@@ -13,5 +13,5 @@ export type User = {
 };
 
 export type CreateUserData = Omit<User, 'groups'> & {
-  groupNames?: string[];
+  groupNames: string[];
 };

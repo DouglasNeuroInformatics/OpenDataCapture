@@ -1,3 +1,4 @@
+import type { CreateGroupData } from '../group/group.types';
 import type { CreateUserData } from '../user/user.types';
 
 export type SetupState = {
@@ -8,5 +9,6 @@ export type CreateAdminData = Omit<CreateUserData, 'basePermissionLevel' | 'grou
 
 export type SetupOptions = {
   admin: CreateAdminData;
+  adminGroup: CreateGroupData;
   initDemo: boolean;
 };
