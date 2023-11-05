@@ -26,7 +26,7 @@ export const assignmentSummarySchema = assignmentSchema.extend({
 }) satisfies Zod.ZodType<Types.AssignmentSummary>;
 
 export const createAssignmentDataSchema = z.object({
-  expiresAt: z.coerce.date(),
+  expiresAt: z.coerce.date().min(new Date()),
   instrumentId: validObjectIdSchema,
   subjectIdentifier: z.string()
 }) satisfies Zod.ZodType<Types.CreateAssignmentData>;
