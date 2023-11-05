@@ -84,13 +84,14 @@ export const SubjectAssignmentsPage = () => {
 
   return (
     <div>
-      <div className="my-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
+      <div className="mb-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
         <h3 className="text-lg font-semibold">{t('assignments.assignedInstruments')}</h3>
         <Button
           className="w-full text-sm lg:w-auto"
           icon={<PlusIcon />}
           iconPosition="right"
           label={t('assignments.addAssignment')}
+          size="sm"
           variant="secondary"
           onClick={() => setIsCreateModalOpen(true)}
         />

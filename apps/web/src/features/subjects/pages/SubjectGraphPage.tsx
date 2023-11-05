@@ -116,8 +116,8 @@ export const SubjectGraphPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <div className="py-2">
+    <div>
+      <div className="my-2">
         <VisualizationHeader minDate={minDate} title={selectedForm?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">

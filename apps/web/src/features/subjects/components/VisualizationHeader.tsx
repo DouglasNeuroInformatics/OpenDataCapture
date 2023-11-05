@@ -9,7 +9,7 @@ export type VisualizationHeaderProps = {
 export const VisualizationHeader = ({ minDate, title }: VisualizationHeaderProps) => {
   const { t } = useTranslation('subjects');
   return (
-    <div className="mb-5">
+    <div className="mb-5" style={{ paddingTop: 5 }}>
       <h3 className="text-lg font-semibold">
         {t('visualization.selectedInstrument', {
           title: title ?? t('visualization.selectedInstrumentNone')

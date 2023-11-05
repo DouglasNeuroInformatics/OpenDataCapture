@@ -128,6 +128,7 @@ export const SubjectTablePage = () => {
           ...fields
         ]}
         data={tableData}
+        minRows={10}
       />
     </div>
   );
