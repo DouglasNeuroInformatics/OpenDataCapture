@@ -50,36 +50,14 @@ export class InstrumentRecordsController {
     return this.instrumentRecordsService.exportRecords({ groupId }, { ability });
   }
 
-  // @ApiOperation({ description: 'Get Specified Records', summary: 'Find Records' })
-  // @Get()
-  // @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  // find(
-  //   @CurrentUser('ability') ability: AppAbility,
-  //   @Query('subject') subjectIdentifier: string,
-  //   @Query('lang') language?: Language
-  // ): Promise<SubjectFormRecords[]> {
-  //   return this.formRecordsService.find(ability, subjectIdentifier, language);
-  // }
-
-  // @ApiOperation({ description: 'Compute a Linear Model', summary: 'Linear Model' })
-  // @Get('linear-regression')
-  // @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  // linearRegression(
-  //   @CurrentUser('ability') ability: AppAbility,
-  //   @Query('group') groupName?: string,
-  //   @Query('instrument') instrumentIdentifier?: string
-  // ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {
-  //   return this.formRecordsService.linearRegression(ability, groupName, instrumentIdentifier);
-  // }
-
-  // @ApiOperation({ description: 'Summarize all available form records', summary: 'Summarize Records' })
-  // @Get('summary')
-  // @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  // summary(
-  //   @CurrentUser('ability') ability: AppAbility,
-  //   @Query('group') groupName?: string,
-  //   @Query('instrument') instrumentIdentifier?: string
-  // ): Promise<FormInstrumentRecordsSummary> {
-  //   return this.formRecordsService.summary(ability, groupName, instrumentIdentifier);
-  // }
+  @ApiOperation({ description: 'Compute a Linear Model', summary: 'Linear Model' })
+  @Get('linear-model')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  linearModel(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('instrumentId') instrumentId: string,
+    @Query('groupId') groupId?: string
+  ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {
+    return this.instrumentRecordsService.linearModel({ groupId, instrumentId }, { ability });
+  }
 }

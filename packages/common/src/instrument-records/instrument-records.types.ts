@@ -29,3 +29,5 @@ export type InstrumentRecordsExport = {
   timestamp: string;
   value: unknown;
 }[];
+
+export type LinearRegressionResults = Record<string, { intercept: number; slope: number; stdErr: number }>;

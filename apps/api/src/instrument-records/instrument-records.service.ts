@@ -1,9 +1,14 @@
 import { accessibleBy } from '@casl/mongoose';
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
+import { linearRegression } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Injectable } from '@nestjs/common';
-import type { FormInstrumentMeasures } from '@open-data-capture/common/instrument';
-import type { CreateInstrumentRecordData, InstrumentRecordsExport } from '@open-data-capture/common/instrument-records';
+import type { FormInstrument, FormInstrumentMeasures } from '@open-data-capture/common/instrument';
+import type {
+  CreateInstrumentRecordData,
+  InstrumentRecordsExport,
+  LinearRegressionResults
+} from '@open-data-capture/common/instrument-records';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
@@ -121,6 +126,8 @@ export class InstrumentRecordsService {
       }
     );
 
+    console.log(records.length);
+
     return records.map((doc) => {
       const obj = doc.toObject({
         depopulate: true,
@@ -138,6 +145,45 @@ export class InstrumentRecordsService {
       }
       return obj;
     });
+  }
+
+  async linearModel(
+    { groupId, instrumentId }: { groupId?: string; instrumentId: string },
+    { ability }: EntityOperationOptions = {}
+  ) {
+    const group = groupId ? await this.groupsService.findById(groupId) : undefined;
+    const instrument = (await this.instrumentsService.findById(instrumentId)) as unknown as FormInstrument;
+    if (!instrument.measures) {
+      throw new Error('Instrument must contain measures');
+    }
+    const records = await this.instrumentRecordsRepository.find(
+      {
+        $and: [ability ? accessibleBy(ability).InstrumentRecord : {}, { group, instrument }]
+      },
+      {
+        populate: 'instrument'
+      }
+    );
+
+    const data: Record<string, [number, number][]> = {};
+    for (const record of records) {
+      const computedMeasures = this.computeMeasure(instrument.measures, record.data as FormDataType);
+      for (const measure in computedMeasures) {
+        const x = record.date.getTime();
+        const y = computedMeasures[measure]!;
+        if (Array.isArray(data[measure])) {
+          data[measure]!.push([x, y]);
+        } else {
+          data[measure] = [[x, y]];
+        }
+      }
+    }
+
+    const results: LinearRegressionResults = {};
+    for (const measure in data) {
+      results[measure] = linearRegression(data[measure]!);
+    }
+    return results;
   }
 
   private computeMeasure(measures: FormInstrumentMeasures, data: FormDataType) {
