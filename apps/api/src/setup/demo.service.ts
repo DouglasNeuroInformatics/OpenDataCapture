@@ -52,14 +52,25 @@ export class DemoService {
       const group = await this.groupsService.findByName(randomValue(demoGroups).name);
       const subject = await this.createSubject();
       for (const form of forms) {
-        const data = this.createFormRecordData(form);
-        await this.instrumentRecordsService.create({
-          data,
-          date: faker.date.past({ years: 1 }),
-          groupId: group.id as string,
-          instrumentId: form.id!,
-          subjectIdentifier: subject.identifier
-        });
+        for (let i = 0; i < 5; i++) {
+          const data = this.createFormRecordData(
+            form,
+            form.name === 'EnhancedDemographicsQuestionnaire'
+              ? {
+                  customValues: {
+                    postalCode: 'A1A-1A1'
+                  }
+                }
+              : undefined
+          );
+          await this.instrumentRecordsService.create({
+            data,
+            date: faker.date.past({ years: 1 }),
+            groupId: group.id as string,
+            instrumentId: form.id!,
+            subjectIdentifier: subject.identifier
+          });
+        }
       }
     }
   }
@@ -128,7 +139,9 @@ export class DemoService {
       case 'numeric':
         return faker.number.int({ max: field.max, min: field.min });
       case 'options':
-        return randomValue(Object.keys(field.options));
+        return typeof field.options.en === 'string'
+          ? randomValue(Object.keys(field.options))
+          : randomValue(Object.keys(field.options.en));
       case 'text':
         return faker.lorem.sentence();
     }
