@@ -10,6 +10,9 @@ import {
 } from '@douglasneuroinformatics/ui';
 import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { LinearRegressionResults } from '@open-data-capture/common/instrument-records';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { pickBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -48,6 +51,30 @@ export const SubjectGraphPage = () => {
   const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
   const { t } = useTranslation(['subjects', 'common']);
 
+  const formsQuery = useAvailableForms();
+  const recordsQuery = useFormRecords({
+    enabled: selectedForm !== null,
+    params: {
+      groupId: currentGroup?.id,
+      instrumentId: selectedForm?.id,
+      minDate: minDate ?? undefined,
+      subjectIdentifier: params.subjectIdentifier!
+    }
+  });
+  const lmQuery = useQuery({
+    enabled: Boolean(selectedForm),
+    queryFn: async () => {
+      const response = await axios.get<LinearRegressionResults>('/v1/instrument-records/linear-model', {
+        params: {
+          groupId: currentGroup?.id,
+          instrumentId: selectedForm?.id
+        }
+      });
+      return response.data;
+    },
+    queryKey: [selectedForm]
+  });
+
   useEffect(() => {
     const arr: SelectOption[] = [];
     if (selectedForm) {
@@ -61,27 +88,22 @@ export const SubjectGraphPage = () => {
     return setMeasureOptions(arr);
   }, [selectedForm]);
 
-  const formsQuery = useAvailableForms();
-  const recordsQuery = useFormRecords({
-    enabled: selectedForm !== null,
-    params: {
-      groupId: currentGroup?.id,
-      instrumentId: selectedForm?.id,
-      minDate: minDate ?? undefined,
-      subjectIdentifier: params.subjectIdentifier!
-    }
-  });
-
   useEffect(() => {
     if (recordsQuery.data) {
       const data: GraphData = [];
       for (const record of recordsQuery.data) {
-        data.push({
-          ...pickBy(record.computedMeasures, (_, key) => {
-            return selectedMeasures.find((item) => item.key === key);
-          }),
+        const dataPoint: Record<string, number> & { time: number } = {
+          ...pickBy(record.computedMeasures, (_, key) => selectedMeasures.find((item) => item.key === key)),
           time: record.date.getTime()
-        });
+        };
+        for (const key in dataPoint) {
+          const model = lmQuery.data?.[key];
+          if (!model) {
+            continue;
+          }
+          dataPoint[key + 'Group'] = Number((model.intercept + model.slope * dataPoint.time).toFixed(2));
+        }
+        data.push(dataPoint);
       }
       data.sort((a, b) => {
         if (a.time > b.time) {
@@ -93,7 +115,7 @@ export const SubjectGraphPage = () => {
       });
       setGraphData(data);
     }
-  }, [recordsQuery.data, selectedForm, selectedMeasures]);
+  }, [lmQuery.data, recordsQuery.data, selectedForm, selectedMeasures]);
 
   if (!formsQuery.data) {
     return null;
@@ -114,18 +136,19 @@ export const SubjectGraphPage = () => {
       stroke: COLOR_PALETTE[i],
       val: measure.key
     });
-    // lines.push({
-    //   legendType: 'none',
-    //   name: `${measure.label} (${t('common:groupTrend')})`,
-    //   stroke: COLOR_PALETTE[i],
-    //   strokeDasharray: '5 5',
-    //   strokeWidth: 0.5,
-    //   val: measure.key + 'Group'
-    // });
+    lines.push({
+      legendType: 'none',
+      name: `${measure.label} (${t('common:groupTrend')})`,
+      stroke: COLOR_PALETTE[i],
+      strokeDasharray: '5 5',
+      strokeWidth: 0.5,
+      val: measure.key + 'Group'
+    });
   }
 
   const handleSelectForm = (id: string) => {
     setSelectedForm(formsQuery.data.find((form) => form.id === id) ?? null);
+    setSelectedMeasures([]);
   };
 
   return (
