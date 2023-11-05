@@ -46,14 +46,26 @@ export const OverviewPage = () => {
         </div>
         <div className="body-font">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            <StatisticCard icon={<UsersIcon />} label={t('totalUsers')} value={query.data.counts.users} />
-            <StatisticCard icon={<UserIcon />} label={t('totalSubjects')} value={query.data.counts.subjects} />
             <StatisticCard
-              icon={<ClipboardDocumentIcon />}
+              icon={<UsersIcon className="h-12 w-12" />}
+              label={t('totalUsers')}
+              value={query.data.counts.users}
+            />
+            <StatisticCard
+              icon={<UserIcon className="h-12 w-12" />}
+              label={t('totalSubjects')}
+              value={query.data.counts.subjects}
+            />
+            <StatisticCard
+              icon={<ClipboardDocumentIcon className="h-12 w-12" />}
               label={t('totalInstruments')}
               value={query.data.counts.instruments}
             />
-            <StatisticCard icon={<DocumentTextIcon />} label={t('totalRecords')} value={query.data.counts.records} />
+            <StatisticCard
+              icon={<DocumentTextIcon className="h-12 w-12" />}
+              label={t('totalRecords')}
+              value={query.data.counts.records}
+            />
           </div>
         </div>
       </section>
