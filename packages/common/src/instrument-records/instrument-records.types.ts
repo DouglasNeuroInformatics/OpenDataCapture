@@ -18,3 +18,14 @@ export type FormInstrumentRecord<TData extends FormDataType = FormDataType> = In
 > & {
   computedMeasures?: Record<string, number>;
 };
+
+export type InstrumentRecordsExport = {
+  instrumentName: string;
+  instrumentVersion: number;
+  measure: string;
+  subjectAge: number;
+  subjectId: string;
+  subjectSex: string;
+  timestamp: string;
+  value: unknown;
+}[];

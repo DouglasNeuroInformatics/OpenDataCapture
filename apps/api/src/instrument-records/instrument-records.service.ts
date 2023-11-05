@@ -1,8 +1,9 @@
 import { accessibleBy } from '@casl/mongoose';
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
+import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Injectable } from '@nestjs/common';
 import type { FormInstrumentMeasures } from '@open-data-capture/common/instrument';
-import type { CreateInstrumentRecordData } from '@open-data-capture/common/instrument-records';
+import type { CreateInstrumentRecordData, InstrumentRecordsExport } from '@open-data-capture/common/instrument-records';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
@@ -44,6 +45,47 @@ export class InstrumentRecordsService {
       instrument,
       subject
     });
+  }
+
+  async exportRecords(
+    { groupId }: { groupId?: string } = {},
+    { ability }: EntityOperationOptions = {}
+  ): Promise<InstrumentRecordsExport> {
+    const group = groupId ? await this.groupsService.findById(groupId, { ability }) : undefined;
+    const subjects = group
+      ? await this.subjectsService.findByGroup(group.name, { ability })
+      : await this.subjectsService.findAll({ ability });
+    const data: InstrumentRecordsExport = [];
+    for (const subject of subjects) {
+      const records = await this.instrumentRecordsRepository.find(
+        {
+          group,
+          subject
+        },
+        {
+          populate: 'instrument'
+        }
+      );
+      for (const record of records) {
+        if (record.instrument.kind !== 'form') {
+          continue;
+        }
+        const formData = record.data as FormDataType;
+        for (const measure of Object.keys(formData)) {
+          data.push({
+            instrumentName: record.instrument.name,
+            instrumentVersion: record.instrument.version,
+            measure: measure,
+            subjectAge: yearsPassed(subject.dateOfBirth),
+            subjectId: subject.identifier,
+            subjectSex: subject.sex,
+            timestamp: record.date.toISOString(),
+            value: formData[measure] as unknown
+          });
+        }
+      }
+    }
+    return data;
   }
 
   async find(

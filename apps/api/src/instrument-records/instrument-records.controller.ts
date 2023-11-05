@@ -1,3 +1,5 @@
+/* eslint-disable perfectionist/sort-classes */
+
 import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -32,15 +34,12 @@ export class InstrumentRecordsController {
     return this.instrumentRecordsService.find({ groupId, instrumentId, subjectIdentifier }, { ability });
   }
 
-  // @ApiOperation({ description: 'Export Records', summary: 'Export Records' })
-  // @Get('export')
-  // @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  // exportRecords(
-  //   @CurrentUser('ability') ability: AppAbility,
-  //   @Query('group') groupName?: string
-  // ): Promise<InstrumentRecordsExport> {
-  //   return this.formRecordsService.exportRecords(ability, groupName);
-  // }
+  @ApiOperation({ summary: 'Export Records' })
+  @Get('export')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  exportRecords(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
+    return this.instrumentRecordsService.exportRecords({ groupId }, { ability });
+  }
 
   // @ApiOperation({ description: 'Get Specified Records', summary: 'Find Records' })
   // @Get()
