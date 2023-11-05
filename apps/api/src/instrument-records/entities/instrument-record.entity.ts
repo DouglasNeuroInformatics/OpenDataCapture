@@ -13,7 +13,7 @@ export class InstrumentRecordEntity {
   static readonly modelName = 'InstrumentRecord';
 
   computedMeasures?: Record<string, number>;
-  
+
   @Prop({ required: true, type: Object })
   data: unknown;
 

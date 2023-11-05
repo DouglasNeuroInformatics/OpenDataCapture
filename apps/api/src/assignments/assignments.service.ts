@@ -1,7 +1,7 @@
 import { accessibleBy } from '@casl/mongoose';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Assignment, AssignmentSummary } from '@open-data-capture/common/assignment';
+import type { Assignment } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -58,7 +58,7 @@ export class AssignmentsService implements EntityService<Assignment> {
     return assignment;
   }
 
-  async getSummary({ ability }: EntityOperationOptions = {}): Promise<AssignmentSummary[]> {
+  async getSummary({ ability }: EntityOperationOptions = {}) {
     return this.assignmentsRepository.find(ability ? accessibleBy(ability, 'read').Assignment : {}, {
       populate: {
         path: 'instrument',

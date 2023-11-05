@@ -36,7 +36,7 @@ void loader.init().then((monaco) => {
       {
         content: types,
         path: 'index.d.ts'
-      },
+      }
     ]
   });
 });

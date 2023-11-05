@@ -1,4 +1,4 @@
-import type { BaseInstrument, InstrumentSummary } from '../instrument/instrument.types';
+import type { BaseInstrument, FormInstrumentSummary } from '../instrument/instrument.types';
 
 export type AssignmentStatus = 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDING';
 
@@ -11,7 +11,7 @@ export type Assignment<TInstrument extends BaseInstrument = BaseInstrument> = {
 };
 
 export type AssignmentSummary = Omit<Assignment, 'instrument'> & {
-  instrument: InstrumentSummary;
+  instrument: FormInstrumentSummary;
 };
 
 export type CreateAssignmentData = {

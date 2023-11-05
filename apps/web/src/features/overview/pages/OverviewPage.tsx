@@ -1,8 +1,8 @@
+import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import type { Summary } from '@open-data-capture/common/summary';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useAuthStore } from '@/stores/auth-store';
@@ -46,14 +46,14 @@ export const OverviewPage = () => {
         </div>
         <div className="body-font">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            <StatisticCard icon={<HiUsers />} label={t('totalUsers')} value={query.data.counts.users} />
-            <StatisticCard icon={<HiUser />} label={t('totalSubjects')} value={query.data.counts.subjects} />
+            <StatisticCard icon={<UsersIcon />} label={t('totalUsers')} value={query.data.counts.users} />
+            <StatisticCard icon={<UserIcon />} label={t('totalSubjects')} value={query.data.counts.subjects} />
             <StatisticCard
-              icon={<HiClipboardDocument />}
+              icon={<ClipboardDocumentIcon />}
               label={t('totalInstruments')}
               value={query.data.counts.instruments}
             />
-            <StatisticCard icon={<HiDocumentText />} label={t('totalRecords')} value={query.data.counts.records} />
+            <StatisticCard icon={<DocumentTextIcon />} label={t('totalRecords')} value={query.data.counts.records} />
           </div>
         </div>
       </section>

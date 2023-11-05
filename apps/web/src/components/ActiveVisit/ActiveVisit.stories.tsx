@@ -16,6 +16,7 @@ export default {
       useEffect(() => {
         setActiveVisit({
           date: new Date(),
+          id: '123',
           subject: {
             dateOfBirth: new Date('2000-01-01'),
             firstName: 'John',

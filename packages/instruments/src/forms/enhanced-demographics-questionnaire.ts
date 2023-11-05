@@ -26,7 +26,8 @@ function translateOptions<T extends MultilingualOptions>(options: T, language: L
 }
 
 /** Transform multilingual options to options for a multilingual instrument */
- function formatTranslatedOptions<T extends MultilingualOptions>(options: T): FormattedOptions<T> {  return {
+function formatTranslatedOptions<T extends MultilingualOptions>(options: T): FormattedOptions<T> {
+  return {
     en: translateOptions(options, 'en'),
     fr: translateOptions(options, 'fr')
   };

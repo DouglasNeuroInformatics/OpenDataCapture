@@ -11,6 +11,7 @@ export const Default: Story = {
   args: {
     activeVisit: {
       date: new Date(),
+      id: '123',
       subject: {
         dateOfBirth: new Date(2000, 0, 1),
         firstName: 'Jane',
@@ -33,7 +34,7 @@ export const Default: Story = {
           deps: ['overallHappiness'],
           kind: 'dynamic',
           render(data) {
-            if (!data?.overallHappiness || data.overallHappiness as number > 5) {
+            if (!data?.overallHappiness || (data.overallHappiness as number) > 5) {
               return null;
             }
             return {

@@ -1,6 +1,6 @@
 import { Menu, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
-import { HiChevronDown } from 'react-icons/hi';
 
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -17,7 +17,7 @@ export const GroupSwitcher = () => {
     <Menu as="div" className="relative my-2 w-fit">
       <Menu.Button className="flex items-center justify-center">
         {t('currentGroup')}:&nbsp;{currentGroup.name}
-        <HiChevronDown className="mx-1" />
+        <ChevronDownIcon className="mx-1" />
       </Menu.Button>
       <Transition
         as="div"

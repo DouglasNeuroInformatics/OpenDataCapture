@@ -1,5 +1,5 @@
+import { PencilSquareIcon } from '@heroicons/react/24/solid';
 import type { InstrumentKind } from '@open-data-capture/common/instrument';
-import { HiPencilSquare } from 'react-icons/hi2';
 
 // import handBrain from '@/assets/hand-brain.png';
 import toolBrain from '@/assets/tool-brain.png';
@@ -15,6 +15,6 @@ export const InstrumentIcon = ({ kind }: InstrumentIconProps) => {
     // case 'interactive':
     //   return <img alt="tool brain" className="h-10 w-auto rounded-full" src={handBrain} />;
     default:
-      return <HiPencilSquare className="h-8 w-8" />;
+      return <PencilSquareIcon className="h-8 w-8" />;
   }
 };
