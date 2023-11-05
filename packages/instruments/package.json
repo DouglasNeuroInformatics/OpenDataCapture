@@ -7,11 +7,16 @@
     "./forms/*": "./src/forms/*.ts"
   },
   "scripts": {
+    "build:types": "rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@open-data-capture/common": "workspace:*",
     "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "rollup": "^4.3.0",
+    "rollup-plugin-dts": "^6.1.0"
   }
 }

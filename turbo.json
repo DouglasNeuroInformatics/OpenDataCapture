@@ -3,11 +3,15 @@
   "globalDependencies": [".env"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^build:types"],
+      "outputs": ["dist/**"]
+    },
+    "build:types": {
       "outputs": ["dist/**"]
     },
     "dev": {
       "cache": false,
+      "dependsOn": ["^build:types"],
       "persistent": true
     },
     "format": {},
