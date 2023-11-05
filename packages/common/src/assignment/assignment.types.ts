@@ -8,6 +8,7 @@ export type Assignment<TInstrument extends BaseInstrument = BaseInstrument> = {
   id?: string;
   instrument: TInstrument;
   status: AssignmentStatus;
+  url: string;
 };
 
 export type AssignmentSummary = Omit<Assignment, 'instrument'> & {

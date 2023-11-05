@@ -17,7 +17,8 @@ export const assignmentSchema = z.object({
   expiresAt: z.coerce.date(),
   id: z.string().optional(),
   instrument: formInstrumentSchema,
-  status: assignmentStatusSchema
+  status: assignmentStatusSchema,
+  url: z.string().url()
 }) satisfies Zod.ZodType<Types.Assignment>;
 
 export const assignmentSummarySchema = assignmentSchema.extend({

@@ -20,9 +20,19 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
   return (
     <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={instrument?.details.title}>
       {instrument && (
-        <>
-          <p>{instrument.details.description}</p>
-          <div className="mt-3 flex gap-2">
+        <div className="flex h-full flex-col">
+          <div className="flex gap-1 text-sm">
+            <a
+              className="overflow-hidden text-ellipsis whitespace-nowrap text-sm"
+              href={assignment!.url}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <span className="font-medium">URL: </span>
+              {assignment!.url}
+            </a>
+          </div>
+          <div className="mt-auto flex gap-2">
             <Button
               className="w-full text-sm"
               disabled={assignment?.status === 'CANCELED'}
@@ -37,7 +47,7 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
               variant="secondary"
             />
           </div>
-        </>
+        </div>
       )}
     </Slider>
   );

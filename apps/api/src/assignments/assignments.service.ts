@@ -1,6 +1,9 @@
+import crypto from 'crypto';
+
 import { accessibleBy } from '@casl/mongoose';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { Assignment } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
@@ -15,6 +18,7 @@ import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 export class AssignmentsService implements EntityService<Assignment> {
   constructor(
     private readonly assignmentsRepository: AssignmentsRepository,
+    private readonly configService: ConfigService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService
   ) {}
@@ -27,7 +31,8 @@ export class AssignmentsService implements EntityService<Assignment> {
       expiresAt,
       instrument,
       status: 'OUTSTANDING',
-      subject
+      subject,
+      url: new URL(crypto.randomUUID(), this.configService.getOrThrow('GATEWAY_URL')).toString()
     });
   }
 

@@ -29,6 +29,10 @@ export class AssignmentEntity implements Assignment {
   @ApiProperty()
   @Prop({ ref: SubjectEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
   subject: SubjectEntity;
+
+  @ApiProperty()
+  @Prop({ required: true })
+  url: string;
 }
 
 export const AssignmentSchema = SchemaFactory.createForClass(AssignmentEntity);
