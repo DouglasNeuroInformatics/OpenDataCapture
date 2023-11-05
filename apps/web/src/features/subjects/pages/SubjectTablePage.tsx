@@ -39,7 +39,7 @@ export const SubjectTablePage = () => {
       const data: Record<string, unknown>[] = [];
       for (const record of recordsQuery.data) {
         data.push({
-          date: record.date,
+          __date__: record.date,
           ...record.computedMeasures,
           ...record.data
         });
@@ -84,7 +84,7 @@ export const SubjectTablePage = () => {
 
   const fields: { field: string; label: string }[] = [];
   for (const subItem in tableData[0]) {
-    if (subItem !== 'date') {
+    if (subItem !== '__date__') {
       fields.push({
         field: subItem,
         label: camelToSnakeCase(subItem).toUpperCase()
@@ -121,7 +121,7 @@ export const SubjectTablePage = () => {
       <ClientTable
         columns={[
           {
-            field: 'date',
+            field: '__date__',
             formatter: (value: Date) => toBasicISOString(value),
             label: 'DATE_COLLECTED'
           },
