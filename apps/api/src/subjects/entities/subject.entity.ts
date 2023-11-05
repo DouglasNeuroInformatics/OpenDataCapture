@@ -1,11 +1,12 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import type { Sex, Subject } from '@open-data-capture/types';
+import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import type { Sex, Subject } from '@open-data-capture/common/subject';
 import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 import { GroupEntity } from '@/groups/entities/group.entity';
 
-@Schema({ timestamps: true })
-export class SubjectEntity implements Subject {
+@EntitySchema<Subject>()
+export class SubjectEntity {
   static readonly modelName = 'Subject';
 
   @Prop({ required: true })

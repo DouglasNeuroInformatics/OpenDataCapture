@@ -1,5 +1,41 @@
-import { createTranslatedForms } from '../utils/create-translated-forms';
-import { extractKeys, formatOptions } from '../utils/format-options';
+/* eslint-disable perfectionist/sort-objects */
+
+type MultilingualOptions = Record<
+  string,
+  {
+    [L in Language]: string;
+  }
+>;
+
+type TranslatedOptions<T extends MultilingualOptions> = {
+  [K in keyof T]: string;
+};
+
+type FormattedOptions<T extends MultilingualOptions> = {
+  [L in Language]: {
+    [K in keyof T]: string;
+  };
+};
+
+function translateOptions<T extends MultilingualOptions>(options: T, language: Language): TranslatedOptions<T> {
+  const translatedOptions: Partial<TranslatedOptions<T>> = {};
+  for (const option in options) {
+    translatedOptions[option] = options[option]?.[language];
+  }
+  return translatedOptions as TranslatedOptions<T>;
+}
+
+/** Transform multilingual options to options for a multilingual instrument */
+function formatTranslatedOptions<T extends MultilingualOptions>(options: T): FormattedOptions<T> {
+  return {
+    en: translateOptions(options, 'en'),
+    fr: translateOptions(options, 'fr')
+  };
+}
+
+function extractKeysAsTuple<T extends Record<string, unknown>>(options: T) {
+  return Object.keys(options) as [keyof T, ...(keyof T)[]];
+}
 
 const employmentStatus = {
   fullTime: {
@@ -578,7 +614,15 @@ type EnhancedDemographicsQuestionnaireData = {
   yearsOfEducation?: number;
 };
 
-export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedDemographicsQuestionnaireData>({
+const enhancedDemographicsQuestionnaire: FormInstrument<EnhancedDemographicsQuestionnaireData, InstrumentLanguage> = {
+  kind: 'form',
+  name: 'EnhancedDemographicsQuestionnaire',
+  language: ['en', 'fr'],
+  tags: {
+    en: ['Demographics'],
+    fr: ['Démographie']
+  },
+  version: 1,
   content: [
     {
       fields: {
@@ -588,7 +632,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Ethnic Origin',
             fr: 'Origine ethnique'
           },
-          options: formatOptions(ethnicOrigin)
+          options: formatTranslatedOptions(ethnicOrigin)
         },
         gender: {
           kind: 'options',
@@ -596,7 +640,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Gender Identity',
             fr: 'Identité de genre'
           },
-          options: formatOptions(gender)
+          options: formatTranslatedOptions(gender)
         },
         religion: {
           kind: 'options',
@@ -604,7 +648,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Religion',
             fr: 'Religion'
           },
-          options: formatOptions(religion)
+          options: formatTranslatedOptions(religion)
         }
       },
       title: {
@@ -620,7 +664,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'First Language',
             fr: 'Langue maternelle'
           },
-          options: formatOptions(firstLanguage)
+          options: formatTranslatedOptions(firstLanguage)
         },
         speaksEnglish: {
           kind: 'binary',
@@ -664,7 +708,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Martial Status',
             fr: 'État matrimonial'
           },
-          options: formatOptions(maritalStatus)
+          options: formatTranslatedOptions(maritalStatus)
         },
         numberChildren: {
           kind: 'numeric',
@@ -708,7 +752,7 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
             en: 'Employment Status',
             fr: "Statut de l'emploi"
           },
-          options: formatOptions(employmentStatus)
+          options: formatTranslatedOptions(employmentStatus)
         }
       },
       title: {
@@ -777,90 +821,25 @@ export const enhancedDemographicsQuestionnaire = createTranslatedForms<EnhancedD
       fr: 'Questionnaire démographique détaillé'
     }
   },
-  name: 'EnhancedDemographicsQuestionnaire',
-  tags: ['Demographics'],
-  validationSchema: {
-    properties: {
-      ageAtImmigration: {
-        maximum: 100,
-        minimum: 1,
-        nullable: true,
-        type: 'integer'
-      },
-      annualIncome: {
-        maximum: 1000000,
-        minimum: 0,
-        nullable: true,
-        type: 'integer'
-      },
-      employmentStatus: {
-        enum: extractKeys(employmentStatus, true),
-        nullable: true,
-        type: 'string'
-      },
-      ethnicOrigin: {
-        enum: extractKeys(ethnicOrigin, true),
-        nullable: true,
-        type: 'string'
-      },
-      firstLanguage: {
-        enum: extractKeys(firstLanguage, true),
-        nullable: true,
-        type: 'string'
-      },
-      gender: {
-        enum: extractKeys(gender, true),
-        nullable: true,
-        type: 'string'
-      },
-      householdSize: {
-        maximum: 20,
-        minimum: 0,
-        nullable: true,
-        type: 'integer'
-      },
-      isCanadianCitizen: {
-        nullable: true,
-        type: 'boolean'
-      },
-      maritalStatus: {
-        enum: extractKeys(maritalStatus, true),
-        nullable: true,
-        type: 'string'
-      },
-      numberChildren: {
-        maximum: 20,
-        minimum: 0,
-        nullable: true,
-        type: 'integer'
-      },
-      postalCode: {
-        nullable: true,
-        pattern: /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.source,
-        type: 'string'
-      },
-      religion: {
-        enum: extractKeys(religion, true),
-        nullable: true,
-        type: 'string'
-      },
-      speaksEnglish: {
-        nullable: true,
-        type: 'boolean'
-      },
-      speaksFrench: {
-        nullable: true,
-        type: 'boolean'
-      },
-      yearsOfEducation: {
-        maximum: 30,
-        minimum: 0,
-        nullable: true,
-        type: 'integer'
-      }
-    },
-    required: [],
-    type: 'object'
-  },
-  version: 1
-});
+  validationSchema: z
+    .object({
+      ageAtImmigration: z.number().int().gte(1).lte(100),
+      annualIncome: z.number().int().gte(0).lte(1000000),
+      employmentStatus: z.enum(extractKeysAsTuple(employmentStatus)),
+      ethnicOrigin: z.enum(extractKeysAsTuple(ethnicOrigin)),
+      firstLanguage: z.enum(extractKeysAsTuple(firstLanguage)),
+      gender: z.enum(extractKeysAsTuple(gender)),
+      householdSize: z.number().int().gte(0).lte(20),
+      isCanadianCitizen: z.boolean(),
+      maritalStatus: z.enum(extractKeysAsTuple(maritalStatus)),
+      numberChildren: z.number().int().gte(0).lte(20),
+      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
+      religion: z.enum(extractKeysAsTuple(religion)),
+      speaksEnglish: z.boolean(),
+      speaksFrench: z.boolean(),
+      yearsOfEducation: z.number().int().gte(0).lte(30)
+    })
+    .partial()
+};
+
+export default enhancedDemographicsQuestionnaire;

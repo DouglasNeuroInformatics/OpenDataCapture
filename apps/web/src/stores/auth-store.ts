@@ -1,9 +1,11 @@
 import { createMongoAbility } from '@casl/ability';
-import type { AppAbility, Group, JwtPayload } from '@open-data-capture/types';
-import jwtDecode from 'jwt-decode';
+import type { JwtPayload } from '@open-data-capture/common/auth';
+import type { AppAbility } from '@open-data-capture/common/core';
+import type { Group } from '@open-data-capture/common/group';
+import { jwtDecode } from 'jwt-decode';
 import { create } from 'zustand';
 
-import { useActiveSubjectStore } from './active-subject-store';
+import { useActiveVisitStore } from './active-visit-store';
 
 export type CurrentUser = {
   ability: AppAbility;
@@ -23,7 +25,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   currentGroup: null,
   currentUser: null,
   logout: () => {
-    useActiveSubjectStore.setState({ activeSubject: null });
+    useActiveVisitStore.setState({ activeVisit: null });
     set({ accessToken: null, currentUser: null });
   },
   setAccessToken: (accessToken) => {

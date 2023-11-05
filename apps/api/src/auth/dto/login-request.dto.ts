@@ -1,13 +1,12 @@
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import type { LoginCredentials } from '@open-data-capture/types';
-import { IsString } from 'class-validator';
+import { type LoginCredentials, loginCredentialsSchema } from '@open-data-capture/common/auth';
 
+@ValidationSchema(loginCredentialsSchema)
 export class LoginRequestDto implements LoginCredentials {
   @ApiProperty({ example: 'password' })
-  @IsString()
   password: string;
 
   @ApiProperty({ example: 'admin' })
-  @IsString()
   username: string;
 }

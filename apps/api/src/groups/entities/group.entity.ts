@@ -1,9 +1,10 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { type Group } from '@open-data-capture/types';
+import type { Group } from '@open-data-capture/common/group';
 import { type HydratedDocument } from 'mongoose';
 
-@Schema({ strict: 'throw', timestamps: true })
+@EntitySchema<Group>()
 export class GroupEntity implements Group {
   static readonly modelName = 'Group';
 

@@ -1,89 +1,35 @@
-import { useState } from 'react';
-
-import type { FormInstrumentData } from '@douglasneuroinformatics/form-types';
-import { Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import axios from 'axios';
-import { useTranslation } from 'react-i18next';
-import {
-  HiOutlineDocumentCheck,
-  HiOutlineIdentification,
-  HiOutlinePrinter,
-  HiOutlineQuestionMarkCircle
-} from 'react-icons/hi2';
+import { Spinner } from '@douglasneuroinformatics/ui';
 import { useParams } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
-import { Spinner } from '@/components/Spinner';
-import { useActiveSubjectStore } from '@/stores/active-subject-store';
-import { useAuthStore } from '@/stores/auth-store';
+import { useActiveVisitStore } from '@/stores/active-visit-store';
 
-import { FormIdentification } from '../components/FormIdentification';
-import { FormOverview } from '../components/FormOverview';
-import { FormQuestions } from '../components/FormQuestions';
-import { FormSummary } from '../components/FormSummary';
-import { useFetchInstrument } from '../hooks/useFetchInstrument';
+import { FormStepper } from '../components/FormStepper';
+import { useFormQuery } from '../hooks/useFormQuery';
 
 export const FormPage = () => {
+  const { activeVisit } = useActiveVisitStore();
   const params = useParams();
-  const notifications = useNotificationsStore();
-  const { t } = useTranslation();
-  const { activeSubject } = useActiveSubjectStore();
-  const { currentGroup } = useAuthStore();
 
-  const instrument = useFetchInstrument(params.id!);
+  const query = useFormQuery(params.id!);
 
-  const [result, setResult] = useState<FormInstrumentData>();
-  const [timeCollected, setTimeCollected] = useState<number>(0);
-
-  if (!instrument) {
+  if (!query.data) {
     return <Spinner />;
   }
 
-  const handleSubmit = async (data: FormInstrumentData) => {
-    const now = Date.now();
-    await axios.post('/v1/instruments/records/forms', {
-      data: data,
-      groupName: currentGroup?.name,
-      instrumentName: instrument.name,
-      instrumentVersion: instrument.version,
-      kind: 'form',
-      subjectInfo: activeSubject,
-      time: Date.now()
-    });
-    setTimeCollected(now);
-    setResult(data);
-    notifications.addNotification({ message: t('instruments.formPage.uploadSuccessful'), type: 'success' });
-  };
-
   return (
     <div>
-      <PageHeader title={instrument.details.title} />
-      <Stepper
-        steps={[
-          {
-            element: <FormOverview details={instrument.details} />,
-            icon: <HiOutlineDocumentCheck />,
-            label: t('instruments.formPage.overview.label')
-          },
-          {
-            element: <FormIdentification />,
-            icon: <HiOutlineIdentification />,
-            label: t('instruments.formPage.identification.label')
-          },
-          {
-            element: <FormQuestions instrument={instrument} onSubmit={(data) => void handleSubmit(data)} />,
-            icon: <HiOutlineQuestionMarkCircle />,
-            label: t('instruments.formPage.questions.label')
-          },
-          {
-            element: <FormSummary instrument={instrument} result={result} timeCollected={timeCollected} />,
-            icon: <HiOutlinePrinter />,
-            label: t('instruments.formPage.summary.label')
-          }
-        ]}
-      />
+      <PageHeader className="print:hidden" title={query.data.details.title} />
+      <div className="mx-auto max-w-3xl">
+        <FormStepper
+          activeVisit={activeVisit!}
+          form={query.data}
+          onSubmit={(data) => {
+            // eslint-disable-next-line no-alert
+            alert(JSON.stringify(data));
+          }}
+        />
+      </div>
     </div>
   );
 };
-
-export default FormPage;

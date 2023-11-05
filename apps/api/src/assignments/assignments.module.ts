@@ -5,6 +5,7 @@ import { InstrumentsModule } from '@/instruments/instruments.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
 import { AssignmentsController } from './assignments.controller';
+import { AssignmentsRepository } from './assignments.repository';
 import { AssignmentsService } from './assignments.service';
 import { AssignmentEntity, AssignmentSchema } from './entities/assignment.entity';
 
@@ -20,6 +21,6 @@ import { AssignmentEntity, AssignmentSchema } from './entities/assignment.entity
     ]),
     SubjectsModule
   ],
-  providers: [AssignmentsService]
+  providers: [AssignmentsRepository, AssignmentsService]
 })
 export class AssignmentsModule {}

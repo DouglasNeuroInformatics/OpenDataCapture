@@ -1,0 +1,32 @@
+{
+  "message": {
+    "en": "Message",
+    "fr": "Message"
+  },
+  "pageTitle": {
+    "en": "Contact Us",
+    "fr": "Nous contacter"
+  },
+  "reason": {
+    "en": "Reason",
+    "fr": "Raison"
+  },
+  "reasons": {
+    "bug": {
+      "en": "Bug Report",
+      "fr": "Rapport de bug"
+    },
+    "feedback": {
+      "en": "Feedback",
+      "fr": "Retour d'information"
+    },
+    "other": {
+      "en": "Other",
+      "fr": "Autre"
+    },
+    "request": {
+      "en": "Request",
+      "fr": "Demande"
+    }
+  }
+}

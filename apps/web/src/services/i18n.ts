@@ -10,11 +10,12 @@ void i18n
   .use(initReactI18next)
   .init({
     debug: false,
-    defaultNS: 'translation',
+    defaultNS: 'common',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
     },
+    ns: ['auth', 'common', 'contact', 'instruments', 'layout', 'overview', 'setup', 'subjects', 'user', 'visits'],
     returnObjects: true,
     supportedLngs: ['en', 'fr']
   });

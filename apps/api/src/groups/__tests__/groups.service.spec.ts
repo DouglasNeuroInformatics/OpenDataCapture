@@ -1,29 +1,32 @@
 // import { ConflictException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it } from 'bun:test';
 
-import { getModelToken } from '@nestjs/mongoose';
+import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
-import { GroupEntity } from '../entities/group.entity';
+import { GroupsRepository } from '../groups.repository';
 import { GroupsService } from '../groups.service';
 
 describe('GroupsService', () => {
   let groupsService: GroupsService;
+  let groupsRepository: MockedInstance<GroupsRepository>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         GroupsService,
         {
-          provide: getModelToken(GroupEntity.modelName),
-          useValue: {}
+          provide: GroupsRepository,
+          useValue: createMock(GroupsRepository)
         }
       ]
     }).compile();
+    groupsRepository = moduleRef.get(GroupsRepository);
     groupsService = moduleRef.get(GroupsService);
   });
 
   it('should be defined', () => {
+    expect(groupsRepository).toBeDefined();
     expect(groupsService).toBeDefined();
   });
 

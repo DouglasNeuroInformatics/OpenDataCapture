@@ -1,14 +1,16 @@
 /* eslint-disable perfectionist/sort-objects */
+
 import { Form } from '@douglasneuroinformatics/ui';
-import type { LoginCredentials } from '@open-data-capture/types';
+import type { LoginCredentials } from '@open-data-capture/common/auth';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 export type LoginFormProps = {
   onSubmit: (credentials: LoginCredentials) => void;
 };
 
 export const LoginForm = ({ onSubmit }: LoginFormProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
   return (
     <Form<LoginCredentials>
       content={{
@@ -24,27 +26,10 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
         }
       }}
       submitBtnLabel={t('login')}
-      validationSchema={{
-        additionalProperties: false,
-        errorMessage: {
-          properties: {
-            password: t('form.errors.required'),
-            username: t('form.errors.required')
-          }
-        },
-        properties: {
-          password: {
-            minLength: 1,
-            type: 'string'
-          },
-          username: {
-            minLength: 1,
-            type: 'string'
-          }
-        },
-        required: ['username', 'password'],
-        type: 'object'
-      }}
+      validationSchema={z.object({
+        username: z.string().min(1),
+        password: z.string().min(1)
+      })}
       onSubmit={onSubmit}
     />
   );

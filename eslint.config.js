@@ -61,4 +61,15 @@ const webConfig = createConfig({
   }
 });
 
-export default [...baseConfig, ...apiConfig, ...gatewayConfig, ...webConfig];
+const instrumentsConfig = createConfig({
+  base: {
+    env: 'browser',
+    filesRoot: 'packages/instruments/src'
+  },
+  jsx: true,
+  ts: {
+    project: path.resolve(__dirname, 'packages', 'instruments', 'tsconfig.json')
+  }
+});
+
+export default [...baseConfig, ...apiConfig, ...gatewayConfig, ...webConfig, ...instrumentsConfig];

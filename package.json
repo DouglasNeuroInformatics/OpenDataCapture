@@ -16,7 +16,7 @@
     "dev": "bun dev:core",
     "dev:all": "env-cmd cross-env NODE_ENV=development turbo run dev",
     "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --filter=@open-data-capture/api --filter=@open-data-capture/web",
-    "force-reinstall": "rm -f bun.lockb && bun pm cache rm && bun clean && bun install",
+    "force-reinstall": "bun pm cache rm && bun clean && bun install",
     "format": "turbo run format",
     "lint": "turbo run lint",
     "prepare": "husky install",
@@ -26,20 +26,17 @@
   "devDependencies": {
     "@douglasneuroinformatics/eslint-config": "latest",
     "@douglasneuroinformatics/form-types": "latest",
-    "@open-data-capture/types": "workspace:*",
-    "@turbo/workspaces": "^1.10.14",
-    "bun-types": "^1.0.4",
+    "@turbo/workspaces": "^1.10.16",
+    "bun-types": "^1.0.7",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
-    "eslint": "^8.50.0",
+    "eslint": "^8.52.0",
     "husky": "^8.0.3",
     "prettier": "^3.0.3",
-    "prettier-plugin-astro": "^0.12.0",
-    "prettier-plugin-tailwindcss": "^0.5.5",
-    "turbo": "^1.10.14",
+    "prettier-plugin-astro": "^0.12.1",
+    "prettier-plugin-tailwindcss": "^0.5.6",
+    "turbo": "^1.10.16",
     "typescript": "^5.2.2"
   },
-  "dependencies": {
-    "@joshunrau/eslint-config": ""
-  }
+  "packageManager": "bun@1.0.7"
 }

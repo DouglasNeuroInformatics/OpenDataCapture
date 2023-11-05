@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
-import { ClientTable, Dropdown, SearchBar } from '@douglasneuroinformatics/ui';
+import { ClientTable, Dropdown, SearchBar, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
-import type { InstrumentRecordsExport, Subject } from '@open-data-capture/types';
+import type { InstrumentRecordsExport } from '@open-data-capture/common/instrument-records';
+import type { Subject } from '@open-data-capture/common/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useDownload } from '@/hooks/useDownload';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { SubjectLookup } from './SubjectLookup';
@@ -20,13 +20,16 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
   const navigate = useNavigate();
   const { currentGroup, currentUser } = useAuthStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['subjects', 'common']);
 
   const [showLookup, setShowLookup] = useState(false);
 
   const getExportRecords = async () => {
-    const url = '/v1/instruments/records/forms/export' + (currentGroup ? `?group=${currentGroup.name}` : '');
-    const response = await axios.get<InstrumentRecordsExport>(url);
+    const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
+      params: {
+        groupId: currentGroup?.id
+      }
+    });
     return response.data;
   };
 
@@ -40,7 +43,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         });
         break;
       case 'CSV':
-        download('README.txt', () => Promise.resolve(t('viewSubjects.table.exportHelpText')));
+        download('README.txt', () => Promise.resolve(t('index.table.exportHelpText')));
         download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
           const columnNames = Object.keys(data[0]!);
@@ -61,18 +64,17 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
       <SubjectLookup show={showLookup} onClose={handleLookupClose} />
       <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
         <SearchBar
-          className="px-4 py-2.5 pl-2"
           size="md"
           onClick={() => {
             setShowLookup(true);
           }}
         />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <Dropdown options={[]} size="sm" title={t('viewSubjects.table.filters')} onSelection={() => null} />
+          <Dropdown options={[]} size="sm" title={t('index.table.filters')} onSelection={() => null} />
           <Dropdown
             options={['CSV', 'JSON']}
             size="sm"
-            title={t('viewSubjects.table.export')}
+            title={t('index.table.export')}
             onSelection={handleExportSelection}
           />
         </div>
@@ -81,20 +83,23 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         columns={[
           {
             field: (subject) => subject.identifier.slice(0, 6),
-            label: t('viewSubjects.table.columns.subject')
+            label: t('index.table.subject')
           },
           {
             field: (subject) => toBasicISOString(new Date(subject.dateOfBirth)),
-            label: t('viewSubjects.table.columns.dateOfBirth')
+            label: t('common:identificationData.dateOfBirth.label')
           },
           {
-            field: (subject) => (subject.sex === 'female' ? t('sex.female') : t('sex.male')),
-            label: t('viewSubjects.table.columns.sex')
+            field: (subject) =>
+              subject.sex === 'female'
+                ? t('common:identificationData.sex.female')
+                : t('common:identificationData.sex.male'),
+            label: t('common:identificationData.sex.label')
           }
         ]}
         data={data}
         onEntryClick={(subject) => {
-          navigate(subject.identifier);
+          navigate(`${subject.identifier}/assignments`);
         }}
       />
     </>

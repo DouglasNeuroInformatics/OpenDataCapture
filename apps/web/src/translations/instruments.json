@@ -1,0 +1,160 @@
+{
+  "available": {
+    "nullActiveVisitError": {
+      "en": "Please begin a visit to continue",
+      "fr": "Veuillez commencer une visite pour continuer"
+    },
+    "title": {
+      "en": "Available Instruments",
+      "fr": "Instruments disponibles"
+    }
+  },
+  "create": {
+    "basicMetadata": {
+      "en": "Basic Metadata",
+      "fr": "Métadonnées de base"
+    },
+    "content": {
+      "field": {
+        "en": "Field",
+        "fr": "Champ"
+      },
+      "fields": {
+        "en": "Fields",
+        "fr": "Champs"
+      },
+      "flat": {
+        "en": "Flat",
+        "fr": "Uniforme"
+      },
+      "grouped": {
+        "en": "Grouped",
+        "fr": "Groupée"
+      },
+      "structure": {
+        "en": "Structure",
+        "fr": "Structure"
+      }
+    },
+    "errors": {
+      "duplicateField": {
+        "en": "Invalid duplicate field name",
+        "fr": "Nom de champ en double invalide"
+      },
+      "validationFailed": {
+        "en": "Input validation failed. Please refer to the browser console for additional details.",
+        "fr": "La validation de l'entrée a échoué. Veuillez vous référer à la console du navigateur pour plus de détails."
+      }
+    },
+    "steps": {
+      "content": {
+        "en": "Content",
+        "fr": "Contenu"
+      },
+      "info": {
+        "en": "Info",
+        "fr": "Info"
+      },
+      "review": {
+        "en": "Review",
+        "fr": "Révision"
+      }
+    },
+    "title": {
+      "en": "Create Instrument",
+      "fr": "Créer un instrument"
+    }
+  },
+  "form": {
+    "steps": {
+      "overview": {
+        "en": "Overview",
+        "fr": "Aperçu"
+      },
+      "questions": {
+        "en": "Questions",
+        "fr": "Questions"
+      },
+      "summary": {
+        "en": "Summary",
+        "fr": "Résumé"
+      }
+    }
+  },
+  "manage": {
+    "title": {
+      "en": "Manage Instruments",
+      "fr": "Gérer les instruments"
+    }
+  },
+  "overview": {
+    "estimatedDuration": {
+      "en": "{{minutes}} minutes",
+      "fr": "{{minutes}} minutes"
+    }
+  },
+  "props": {
+    "description": {
+      "en": "Description",
+      "fr": "Description"
+    },
+    "details": {
+      "en": "Details",
+      "fr": "Détails"
+    },
+    "estimatedDuration": {
+      "en": "Estimated Duration",
+      "fr": "Durée estimée"
+    },
+    "instructions": {
+      "en": "Instructions",
+      "fr": "Instructions"
+    },
+    "name": {
+      "en": "Instrument Name",
+      "fr": "Nom de l'instrument"
+    },
+    "tag": {
+      "en": "Tag",
+      "fr": "Tag"
+    },
+    "tags": {
+      "en": "Tags",
+      "fr": "Tags"
+    },
+    "title": {
+      "en": "Title",
+      "fr": "Titre"
+    },
+    "version": {
+      "en": "Version",
+      "fr": "Version"
+    }
+  },
+  "summary": {
+    "subtitle": {
+      "en": "Completed on {{ dateCompleted }}",
+      "fr": "Remplie le {{ dateCompleted }}"
+    },
+    "title": {
+      "en": "Summary of Results for the {{title}}",
+      "fr": "{{title}} : résumé des résultats"
+    }
+  },
+  "view": {
+    "filters": {
+      "language": {
+        "en": "Language",
+        "fr": "Langue"
+      },
+      "tags": {
+        "en": "Tags",
+        "fr": "Tags"
+      }
+    },
+    "title": {
+      "en": "Available Instruments",
+      "fr": "Tous les instruments"
+    }
+  }
+}

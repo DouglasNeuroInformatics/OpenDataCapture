@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { AdjustmentsHorizontalIcon, ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
-import { HiAdjustmentsHorizontal, HiChartBar, HiEye, HiPlus, HiUserPlus } from 'react-icons/hi2';
 
 import { NavigationLink } from './NavigationLink';
 
@@ -10,7 +10,7 @@ export type NavigationProps = {
 };
 
 export const Navigation = (props: NavigationProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('layout');
 
   return (
     <nav className="flex-grow">
@@ -18,15 +18,15 @@ export const Navigation = (props: NavigationProps) => {
         access={null}
         cyTestId="overview"
         href="/overview"
-        icon={<HiChartBar />}
+        icon={<ChartBarIcon height={16} width={16} />}
         label={t('navLinks.overview')}
         {...props}
       />
       <NavigationLink
         access={{ action: 'create', subject: 'Subject' }}
         cyTestId="add-visit"
-        href="/subjects/add-visit"
-        icon={<HiUserPlus />}
+        href="/visits/add-visit"
+        icon={<UserPlusIcon height={16} width={16} />}
         label={t('navLinks.addVisit')}
         {...props}
       />
@@ -42,32 +42,24 @@ export const Navigation = (props: NavigationProps) => {
           }
         ]}
         cyTestId="view-subjects"
-        href="/subjects/view-subjects"
-        icon={<HiEye />}
+        href="/subjects"
+        icon={<EyeIcon height={16} width={16} />}
         label={t(`navLinks.viewSubjects`)}
-        {...props}
-      />
-      <NavigationLink
-        access={{ action: 'create', subject: 'Instrument' }}
-        cyTestId="create-instrument"
-        href="/instruments/create"
-        icon={<HiPlus />}
-        label={t('navLinks.createInstrument')}
         {...props}
       />
       <NavigationLink
         access={{ action: 'delete', subject: 'Instrument' }}
         cyTestId="manage-instrument"
-        href="instruments/manage"
-        icon={<HiAdjustmentsHorizontal />}
+        href="/instruments/manage-instruments"
+        icon={<AdjustmentsHorizontalIcon height={16} width={16} />}
         label={t('navLinks.manageInstruments')}
         {...props}
       />
       <NavigationLink
         access={{ action: 'create', subject: 'InstrumentRecord' }}
         cyTestId="view-instrument"
-        href="/instruments/available"
-        icon={<HiEye />}
+        href="/instruments/available-instruments"
+        icon={<EyeIcon height={16} width={16} />}
         label={t('navLinks.availableInstruments')}
         {...props}
       />

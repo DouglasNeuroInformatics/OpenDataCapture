@@ -5,6 +5,7 @@ import { GroupsModule } from '@/groups/groups.module';
 
 import { SubjectEntity, SubjectSchema } from './entities/subject.entity';
 import { SubjectsController } from './subjects.controller';
+import { SubjectsRepository } from './subjects.repository';
 import { SubjectsService } from './subjects.service';
 
 @Module({
@@ -19,6 +20,6 @@ import { SubjectsService } from './subjects.service';
       }
     ])
   ],
-  providers: [SubjectsService]
+  providers: [SubjectsRepository, SubjectsService]
 })
 export class SubjectsModule {}

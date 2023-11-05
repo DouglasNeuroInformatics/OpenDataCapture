@@ -1,18 +1,26 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { type Assignment, type AssignmentStatus } from '@open-data-capture/types';
-import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { type Assignment, type AssignmentStatus } from '@open-data-capture/common/assignment';
+import { Schema as MongooseSchema } from 'mongoose';
 
-import type { FormInstrumentEntity } from '@/instruments/entities/form-instrument.entity';
 import { InstrumentEntity } from '@/instruments/entities/instrument.entity';
-import { type SubjectDocument, SubjectEntity } from '@/subjects/entities/subject.entity';
+import { SubjectEntity } from '@/subjects/entities/subject.entity';
 
-@Schema({ strict: 'throw', timestamps: true })
+@EntitySchema()
 export class AssignmentEntity implements Assignment {
   static readonly modelName = 'Assignment';
 
+  @ApiProperty()
+  @Prop({ required: true, type: Object })
+  assignedAt: Date;
+
+  @ApiProperty()
+  @Prop({ required: true, type: Object })
+  expiresAt: Date;
+
   @Prop({ ref: InstrumentEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
-  instrument: FormInstrumentEntity;
+  instrument: InstrumentEntity;
 
   @ApiProperty()
   @Prop({ enum: ['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING'] satisfies AssignmentStatus[], type: String })
@@ -20,17 +28,11 @@ export class AssignmentEntity implements Assignment {
 
   @ApiProperty()
   @Prop({ ref: SubjectEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
-  subject: SubjectDocument;
+  subject: SubjectEntity;
 
   @ApiProperty()
   @Prop({ required: true })
-  timeAssigned: number;
-
-  @ApiProperty()
-  @Prop({ required: true })
-  timeExpires: number;
+  url: string;
 }
-
-export type AssignmentDocument = HydratedDocument<AssignmentEntity>;
 
 export const AssignmentSchema = SchemaFactory.createForClass(AssignmentEntity);

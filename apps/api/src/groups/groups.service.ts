@@ -1,66 +1,69 @@
-import type { AccessibleModel } from '@casl/mongoose';
+import { accessibleBy } from '@casl/mongoose';
+import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import type { AppAbility, Group } from '@open-data-capture/types';
-import { Model } from 'mongoose';
+import type { Group } from '@open-data-capture/common/group';
+
+import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { type GroupDocument, GroupEntity } from './entities/group.entity';
+import { GroupsRepository } from './groups.repository';
 
 @Injectable()
-export class GroupsService {
-  constructor(
-    @InjectModel(GroupEntity.modelName)
-    private readonly groupModel: Model<GroupDocument, AccessibleModel<GroupDocument>>
-  ) {}
+export class GroupsService implements EntityService<Group> {
+  constructor(private readonly groupsRepository: GroupsRepository) {}
 
-  async create(createGroupDto: CreateGroupDto): Promise<Group> {
-    if (await this.groupModel.exists({ name: createGroupDto.name })) {
-      throw new ConflictException(`Group with name '${createGroupDto.name}' already exists!`);
+  async create(group: CreateGroupDto) {
+    if (await this.groupsRepository.exists({ name: group.name })) {
+      throw new ConflictException(`Group with name '${group.name}' already exists!`);
     }
-    return this.groupModel.create(createGroupDto);
+    return this.groupsRepository.create(group);
   }
 
-  async findAll(ability: AppAbility): Promise<Group[]> {
-    return this.groupModel.find().accessibleBy(ability);
-  }
-
-  async findById(id: string, ability: AppAbility): Promise<Group> {
-    const group = await this.groupModel.findById(id);
+  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
+    const group = await this.groupsRepository.findById(id);
     if (!group) {
-      throw new NotFoundException(`Failed to find group with id: ${id}`);
+      throw new NotFoundException(`Failed to find group with ID: ${id}`);
+    } else if (ability && !ability.can('delete', group)) {
+      throw new ForbiddenException(`Insufficient rights to delete group with ID: ${id}`);
     }
-    if (!ability.can('read', group)) {
-      throw new ForbiddenException();
+    return (await this.groupsRepository.deleteById(id))!;
+  }
+
+  async findAll({ ability }: EntityOperationOptions = {}) {
+    if (!ability) {
+      return this.groupsRepository.find();
+    }
+    return this.groupsRepository.find(accessibleBy(ability, 'read').Group);
+  }
+
+  async findById(id: string, { ability }: EntityOperationOptions = {}) {
+    const group = await this.groupsRepository.findById(id);
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with ID: ${id}`);
+    } else if (ability && !ability.can('delete', group)) {
+      throw new ForbiddenException(`Insufficient rights to read group with ID: ${id}`);
     }
     return group;
   }
 
-  async findByName(name: string, ability: AppAbility): Promise<Group> {
-    const group = await this.groupModel.findOne({ name }).exec();
+  async findByName(name: string, { ability }: EntityOperationOptions = {}) {
+    const group = await this.groupsRepository.findOne({ name });
     if (!group) {
       throw new NotFoundException(`Failed to find group with name: ${name}`);
-    }
-    if (!ability.can('read', group)) {
-      throw new ForbiddenException();
+    } else if (ability && !ability.can('read', group)) {
+      throw new ForbiddenException(`Insufficient rights to read group with name: ${name}`);
     }
     return group;
   }
 
-  async remove(name: string): Promise<Group> {
-    const result = await this.groupModel.findOneAndDelete({ name });
-    if (!result) {
-      throw new NotFoundException(`Failed to find group with name: ${name}`);
+  async updateById(id: string, update: UpdateGroupDto, { ability }: EntityOperationOptions = {}) {
+    const group = await this.groupsRepository.findById(id);
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with ID: ${id}`);
+    } else if (ability && !ability.can('update', group)) {
+      throw new ForbiddenException(`Insufficient rights to update group with ID: ${id}`);
     }
-    return result;
-  }
-
-  async update(name: string, updateGroupDto: UpdateGroupDto): Promise<Group> {
-    const result = await this.groupModel.findOneAndUpdate({ name }, updateGroupDto);
-    if (!result) {
-      throw new NotFoundException(`Failed to find group with name: ${name}`);
-    }
-    return result;
+    return (await this.groupsRepository.updateById(id, update))!;
   }
 }

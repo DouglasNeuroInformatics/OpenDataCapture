@@ -1,16 +1,19 @@
-import type { Sex, SubjectIdentificationData } from '@open-data-capture/types';
-import { IsDateString, IsIn, IsString } from 'class-validator';
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
+import { ApiProperty } from '@nestjs/swagger';
+import { subjectIdentificationDataSchema } from '@open-data-capture/common/subject';
+import type { Sex, SubjectIdentificationData } from '@open-data-capture/common/subject';
 
+@ValidationSchema(subjectIdentificationDataSchema)
 export class SubjectIdentificationDataDto implements SubjectIdentificationData {
-  @IsDateString()
-  dateOfBirth: string;
+  @ApiProperty()
+  dateOfBirth: Date;
 
-  @IsString()
+  @ApiProperty()
   firstName: string;
 
-  @IsString()
+  @ApiProperty()
   lastName: string;
 
-  @IsIn(['male', 'female'] satisfies Sex[])
+  @ApiProperty()
   sex: Sex;
 }

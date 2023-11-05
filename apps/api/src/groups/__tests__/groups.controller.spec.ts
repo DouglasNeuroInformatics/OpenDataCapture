@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it } from 'bun:test';
 
 import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
-// import { Types } from 'mongoose';
 
 import { GroupsController } from '../groups.controller';
 import { GroupsService } from '../groups.service';

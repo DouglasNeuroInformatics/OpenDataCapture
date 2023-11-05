@@ -23,9 +23,6 @@ const preview: Preview = {
     }
   },
   parameters: {
-    backgrounds: {
-      default: 'light'
-    },
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
       matchers: {

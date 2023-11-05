@@ -1,10 +1,10 @@
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { PartialType } from '@nestjs/swagger';
-import { type Group } from '@open-data-capture/types';
-import { IsOptional } from 'class-validator';
+import { createGroupDataSchema } from '@open-data-capture/common/group';
 
 import { CreateGroupDto } from './create-group.dto';
 
-export class UpdateGroupDto extends PartialType(CreateGroupDto) implements Partial<Group> {
-  @IsOptional()
+@ValidationSchema(createGroupDataSchema.partial())
+export class UpdateGroupDto extends PartialType(CreateGroupDto) {
   name?: string;
 }

@@ -1,52 +1,56 @@
+import { CurrentUser, type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { type AppAbility } from '@open-data-capture/types';
+import type { AppAbility } from '@open-data-capture/common/core';
+import type { Group } from '@open-data-capture/common/group';
 
-import { CurrentUser } from '@/core/decorators/current-user.decorator';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { GroupEntity } from './entities/group.entity';
 import { GroupsService } from './groups.service';
 
 @ApiTags('Groups')
 @Controller('groups')
-export class GroupsController {
+export class GroupsController implements EntityController<Group> {
   constructor(private readonly groupsService: GroupsService) {}
 
-  @ApiOperation({ description: 'Adds a new group to the database', summary: 'Create Group' })
+  @ApiOperation({ summary: 'Create Group' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Group' })
-  create(@Body() createGroupDto: CreateGroupDto): Promise<GroupEntity> {
+  create(@Body() createGroupDto: CreateGroupDto) {
     return this.groupsService.create(createGroupDto);
   }
 
-  @ApiOperation({ description: 'Returns all groups in the database', summary: 'Get All Groups' })
+  @ApiOperation({ summary: 'Delete Group' })
+  @Delete(':id')
+  @RouteAccess({ action: 'delete', subject: 'Group' })
+  deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.groupsService.deleteById(id, { ability });
+  }
+
+  @ApiOperation({ summary: 'Get All Groups' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findAll(@CurrentUser('ability') ability: AppAbility): Promise<GroupEntity[]> {
-    return this.groupsService.findAll(ability);
+  findAll(@CurrentUser('ability') ability: AppAbility) {
+    return this.groupsService.findAll({ ability });
   }
 
-  @ApiOperation({ description: 'Returns the group with the provided name', summary: 'Find Group' })
-  @Get(':name')
+  @ApiOperation({ summary: 'Get Group' })
+  @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findByName(@Param('name') name: string, @CurrentUser('ability') ability: AppAbility): Promise<GroupEntity> {
-    return this.groupsService.findByName(name, ability);
+  findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.groupsService.findById(id, { ability });
   }
 
-  @ApiOperation({ description: 'Returns the deleted user', summary: 'Delete Group' })
-  @Delete(':name')
-  @RouteAccess({ action: 'delete', subject: 'Group' })
-  remove(@Param('name') name: string): Promise<GroupEntity> {
-    return this.groupsService.remove(name);
-  }
-
-  @ApiOperation({ description: 'Returns the updated group', summary: 'Update Group' })
-  @Patch(':name')
+  @ApiOperation({ summary: 'Update Group' })
+  @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Group' })
-  update(@Param('name') name: string, @Body() updateGroupDto: UpdateGroupDto): Promise<GroupEntity> {
-    return this.groupsService.update(name, updateGroupDto);
+  updateById(
+    @Param('id', ParseIdPipe) id: string,
+    @Body() update: UpdateGroupDto,
+    @CurrentUser('ability') ability: AppAbility
+  ) {
+    return this.groupsService.updateById(id, update, { ability });
   }
 }

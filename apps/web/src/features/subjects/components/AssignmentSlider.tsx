@@ -1,44 +1,54 @@
-import { Button, Slider, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import type { Assignment } from '@open-data-capture/types';
-import axios from 'axios';
+import { Button, Slider } from '@douglasneuroinformatics/ui';
+import type { AssignmentSummary } from '@open-data-capture/common/assignment';
+import type { Language } from '@open-data-capture/common/core';
 import { useTranslation } from 'react-i18next';
 
+import { resolveFormSummary } from '@/utils/translate-instrument';
+
 export type AssignmentSliderProps = {
-  assignment: Assignment | null;
+  assignment: AssignmentSummary | null;
   isOpen: boolean;
+  onCancel: (assignment: AssignmentSummary) => void;
   setIsOpen: (isOpen: boolean) => void;
 };
 
 /** Component for modifying an existing assignment */
-export const AssignmentSlider = ({ assignment, isOpen, setIsOpen }: AssignmentSliderProps) => {
-  const { t } = useTranslation(['common', 'subjects']);
-  const notifications = useNotificationsStore();
-
-  const cancelAssignment = async () => {
-    // @ts-expect-error - until db is refactored
-    await axios.patch(`/v1/assignments/${assignment._id}`, { status: 'CANCELED' });
-    notifications.addNotification({ type: 'success' });
-    setIsOpen(false);
-  };
+export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: AssignmentSliderProps) => {
+  const { i18n, t } = useTranslation(['common', 'subjects']);
+  const instrument = assignment ? resolveFormSummary(assignment.instrument, i18n.resolvedLanguage as Language) : null;
 
   return (
-    <Slider isOpen={isOpen} setIsOpen={() => setIsOpen(false)} title={assignment?.instrument.details.title}>
-      <p>{assignment?.instrument.details.description}</p>
-      <div className="mt-3 flex gap-2">
-        <Button
-          className="w-full text-sm"
-          disabled={assignment?.status === 'CANCELED'}
-          label={t('cancel')}
-          variant="danger"
-          onClick={() => void cancelAssignment()}
-        />
-        <Button
-          disabled
-          className="w-full whitespace-nowrap text-sm"
-          label={t('subjects:assignmentSlider.resendNotification')}
-          variant="secondary"
-        />
-      </div>
+    <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={instrument?.details.title}>
+      {instrument && (
+        <div className="flex h-full flex-col">
+          <div className="flex gap-1 text-sm">
+            <a
+              className="overflow-hidden text-ellipsis whitespace-nowrap text-sm"
+              href={assignment!.url}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <span className="font-medium">URL: </span>
+              {assignment!.url}
+            </a>
+          </div>
+          <div className="mt-auto flex gap-2">
+            <Button
+              className="w-full text-sm"
+              disabled={assignment?.status === 'CANCELED'}
+              label={t('cancel')}
+              variant="danger"
+              onClick={() => onCancel(assignment!)}
+            />
+            <Button
+              disabled
+              className="w-full whitespace-nowrap text-sm"
+              label={t('subjects:assignments.resendNotification')}
+              variant="secondary"
+            />
+          </div>
+        </div>
+      )}
     </Slider>
   );
 };

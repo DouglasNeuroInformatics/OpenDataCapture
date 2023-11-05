@@ -1,10 +1,10 @@
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { type Group } from '@open-data-capture/types';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { createGroupDataSchema } from '@open-data-capture/common/group';
+import type { CreateGroupData } from '@open-data-capture/common/group';
 
-export class CreateGroupDto implements Group {
+@ValidationSchema(createGroupDataSchema)
+export class CreateGroupDto implements CreateGroupData {
   @ApiProperty({ example: 'Depression Clinic' })
-  @IsString()
-  @IsNotEmpty()
   name: string;
 }

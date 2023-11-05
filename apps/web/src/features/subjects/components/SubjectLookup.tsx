@@ -1,10 +1,10 @@
-import { Modal } from '@douglasneuroinformatics/ui';
-import type { Subject } from '@open-data-capture/types';
+import { Modal, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import type { Subject, SubjectIdentificationData } from '@open-data-capture/common/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { IdentificationForm, type IdentificationFormData } from '@/components';
+import { IdentificationForm } from '@/components/IdentificationForm';
 
 type SubjectLookupProps = {
   onClose: () => void;
@@ -12,24 +12,26 @@ type SubjectLookupProps = {
 };
 
 export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['subjects', 'common']);
+  const notifications = useNotificationsStore();
   const navigate = useNavigate();
 
-  const lookupSubject = (formData: IdentificationFormData) => {
-    axios
-      .post<Subject>('/v1/subjects/lookup', formData)
-      .then(({ data: { identifier } }) => {
-        navigate(identifier);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const lookupSubject = async (data: SubjectIdentificationData) => {
+    const response = await axios.post<Subject>('/v1/subjects/lookup', data, {
+      validateStatus: (status) => status === 200 || status === 404
+    });
+    if (response.status === 404) {
+      notifications.addNotification({ message: t('common:notFound'), type: 'warning' });
+      return;
+    }
+    notifications.addNotification({ type: 'success' });
+    navigate(`${response.data.identifier}/assignments`);
   };
 
   return (
-    <Modal open={show} title={t('viewSubjects.lookup.title')} onClose={onClose}>
+    <Modal open={show} title={t('index.lookup.title')} onClose={onClose}>
       <div>
-        <IdentificationForm fillActiveSubject onSubmit={lookupSubject} />
+        <IdentificationForm fillActiveSubject onSubmit={(data) => void lookupSubject(data)} />
       </div>
     </Modal>
   );

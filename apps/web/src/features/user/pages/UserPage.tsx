@@ -1,4 +1,4 @@
-import { HiUserCircle } from 'react-icons/hi2';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -16,11 +16,9 @@ export const UserPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <HiUserCircle className="h-20 w-20" />
+      <UserCircleIcon className="h-20 w-20" />
       <h1 className="mt-2 text-3xl font-bold">{fullName}</h1>
       <h3>{currentUser?.username}</h3>
     </div>
   );
 };
-
-export default UserPage;

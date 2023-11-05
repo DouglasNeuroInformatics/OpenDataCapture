@@ -1,98 +1,66 @@
 /* eslint-disable perfectionist/sort-objects */
+
 import { Form } from '@douglasneuroinformatics/ui';
-import type { Sex } from '@open-data-capture/types';
+import type { SubjectIdentificationData } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
-import { useActiveSubjectStore } from '@/stores/active-subject-store';
-
-type IdentificationFormData = {
-  dateOfBirth: string;
-  firstName: string;
-  lastName: string;
-  sex: Sex;
-};
+import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 export type IdentificationFormProps = {
-  /** Whether to prefill the form with the active subject, if one exists  */
+  /** Whether to prefill the form with the subject from the active visit, if one exists  */
   fillActiveSubject?: boolean;
 
   /** Callback function invoked when validation is successful */
-  onSubmit: (data: IdentificationFormData) => void;
+  onSubmit: (data: SubjectIdentificationData) => void;
 
   /** Optional override for the default submit button label */
   submitBtnLabel?: string;
 };
 
 export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel }: IdentificationFormProps) => {
-  const { activeSubject } = useActiveSubjectStore();
-  const { t } = useTranslation();
+  const { activeVisit } = useActiveVisitStore();
+  const { t } = useTranslation(['common']);
 
   return (
-    <Form<IdentificationFormData>
+    <Form<SubjectIdentificationData>
       content={{
         firstName: {
-          description: t('identificationForm.firstName.description'),
+          description: t('common:identificationData.firstName.description'),
           kind: 'text',
-          label: t('identificationForm.firstName.label'),
+          label: t('common:identificationData.firstName.label'),
           variant: 'short'
         },
         lastName: {
-          description: t('identificationForm.lastName.description'),
+          description: t('common:identificationData.lastName.description'),
           kind: 'text',
-          label: t('identificationForm.lastName.label'),
+          label: t('common:identificationData.lastName.label'),
           variant: 'short'
         },
         dateOfBirth: {
           kind: 'date',
-          label: t('identificationForm.dateOfBirth.label')
+          label: t('common:identificationData.dateOfBirth.label')
         },
         sex: {
-          description: t('identificationForm.sex.description'),
+          description: t('common:identificationData.sex.description'),
           kind: 'options',
-          label: t('identificationForm.sex.label'),
+          label: t('common:identificationData.sex.label'),
           options: {
-            female: t('sex.female'),
-            male: t('sex.male')
+            female: t('common:identificationData.sex.female'),
+            male: t('common:identificationData.sex.male')
           }
         }
       }}
-      initialValues={fillActiveSubject ? activeSubject : undefined}
+      initialValues={fillActiveSubject ? activeVisit?.subject ?? null : null}
       resetBtn={fillActiveSubject}
-      submitBtnLabel={submitBtnLabel ?? t('identificationForm.submit')}
-      validationSchema={{
-        additionalProperties: false,
-        errorMessage: {
-          properties: {
-            dateOfBirth: t('form.errors.required'),
-            firstName: t('form.errors.required'),
-            lastName: t('form.errors.required'),
-            sex: t('form.errors.required')
-          }
-        },
-        properties: {
-          dateOfBirth: {
-            format: 'date',
-            type: 'string'
-          },
-          firstName: {
-            minLength: 1,
-            type: 'string'
-          },
-          lastName: {
-            minLength: 1,
-            type: 'string'
-          },
-          sex: {
-            enum: ['male', 'female'],
-            type: 'string'
-          }
-        },
-        required: ['firstName', 'lastName', 'sex', 'dateOfBirth'],
-        type: 'object'
-      }}
+      submitBtnLabel={submitBtnLabel ?? t('submit')}
+      validationSchema={z.object({
+        firstName: z.string(),
+        lastName: z.string(),
+        dateOfBirth: z.date(),
+        sex: z.enum(['male', 'female'])
+      })}
       onSubmit={onSubmit}
     />
   );
 };
-
-export type { IdentificationFormData };
