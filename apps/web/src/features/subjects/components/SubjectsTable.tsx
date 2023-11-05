@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { ClientTable, Dropdown, SearchBar, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
-import type { InstrumentRecordsExport } from '@open-data-capture/common/instrument';
+import type { InstrumentRecordsExport } from '@open-data-capture/common/instrument-records';
 import type { Subject } from '@open-data-capture/common/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -25,8 +25,11 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const [showLookup, setShowLookup] = useState(false);
 
   const getExportRecords = async () => {
-    const url = '/v1/instruments/records/forms/export' + (currentGroup ? `?group=${currentGroup.name}` : '');
-    const response = await axios.get<InstrumentRecordsExport>(url);
+    const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
+      params: {
+        groupId: currentGroup?.id
+      }
+    });
     return response.data;
   };
 
