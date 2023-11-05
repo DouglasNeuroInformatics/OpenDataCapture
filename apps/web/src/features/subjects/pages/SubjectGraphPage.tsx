@@ -10,6 +10,7 @@ import {
 } from '@douglasneuroinformatics/ui';
 import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrumentSummary } from '@open-data-capture/common/instrument';
+import { pickBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -22,7 +23,7 @@ import { VisualizationHeader } from '../components/VisualizationHeader';
 
 type GraphData = {
   [key: string]: unknown;
-  date: Date;
+  time: number;
 }[];
 
 const COLOR_PALETTE = [
@@ -66,6 +67,7 @@ export const SubjectGraphPage = () => {
     params: {
       groupId: currentGroup?.id,
       instrumentId: selectedForm?.id,
+      minDate: minDate ?? undefined,
       subjectIdentifier: params.subjectIdentifier!
     }
   });
@@ -75,14 +77,23 @@ export const SubjectGraphPage = () => {
       const data: GraphData = [];
       for (const record of recordsQuery.data) {
         data.push({
-          date: record.date,
-          ...record.computedMeasures,
-          ...record.data
+          ...pickBy(record.computedMeasures, (_, key) => {
+            return selectedMeasures.find((item) => item.key === key);
+          }),
+          time: record.date.getTime()
         });
       }
+      data.sort((a, b) => {
+        if (a.time > b.time) {
+          return 1;
+        } else if (b.time > a.time) {
+          return -1;
+        }
+        return 0;
+      });
       setGraphData(data);
     }
-  }, [recordsQuery.data]);
+  }, [recordsQuery.data, selectedForm, selectedMeasures]);
 
   if (!formsQuery.data) {
     return null;
@@ -90,7 +101,9 @@ export const SubjectGraphPage = () => {
 
   const formOptions: Record<string, string> = {};
   for (const form of formsQuery.data) {
-    formOptions[form.id!] = form.details.title;
+    if (form.measures && Object.keys(form.measures).length > 0) {
+      formOptions[form.id!] = form.details.title;
+    }
   }
 
   const lines: LineGraphLine[] = [];
@@ -101,14 +114,14 @@ export const SubjectGraphPage = () => {
       stroke: COLOR_PALETTE[i],
       val: measure.key
     });
-    lines.push({
-      legendType: 'none',
-      name: `${measure.label} (${t('common:groupTrend')})`,
-      stroke: COLOR_PALETTE[i],
-      strokeDasharray: '5 5',
-      strokeWidth: 0.5,
-      val: measure.key + 'Group'
-    });
+    // lines.push({
+    //   legendType: 'none',
+    //   name: `${measure.label} (${t('common:groupTrend')})`,
+    //   stroke: COLOR_PALETTE[i],
+    //   strokeDasharray: '5 5',
+    //   strokeWidth: 0.5,
+    //   val: measure.key + 'Group'
+    // });
   }
 
   const handleSelectForm = (id: string) => {
@@ -152,7 +165,7 @@ export const SubjectGraphPage = () => {
           data={graphData}
           lines={lines}
           xAxis={{
-            key: 'date',
+            key: 'time',
             label: t('visualization.xLabel')
           }}
         />
