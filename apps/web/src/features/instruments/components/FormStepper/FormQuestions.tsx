@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 export type FormQuestionsProps = {
   form: FormInstrument<FormDataType, Language>;
-  onSubmit: (data: FormDataType) => void;
+  onSubmit: (data: FormDataType) => Promise<void>;
 };
 
 export const FormQuestions = ({ form, onSubmit }: FormQuestionsProps) => {
@@ -16,8 +16,9 @@ export const FormQuestions = ({ form, onSubmit }: FormQuestionsProps) => {
   const { t } = useTranslation('instruments');
 
   const handleSubmit = (data: FormDataType) => {
-    onSubmit(data);
-    updateIndex('increment');
+    void onSubmit(data).then(() => {
+      updateIndex('increment');
+    });
   };
 
   return (

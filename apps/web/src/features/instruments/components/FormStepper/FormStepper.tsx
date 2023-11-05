@@ -1,12 +1,15 @@
 import { useState } from 'react';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { Stepper } from '@douglasneuroinformatics/ui';
+import { Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { DocumentCheckIcon, PrinterIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Visit } from '@open-data-capture/common/visit';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+
+import { useAuthStore } from '@/stores/auth-store';
 
 import { FormOverview } from './FormOverview';
 import { FormQuestions } from './FormQuestions';
@@ -19,8 +22,22 @@ export type FormStepperProps = {
 };
 
 export const FormStepper = ({ activeVisit, form }: FormStepperProps) => {
+  const { currentGroup } = useAuthStore();
+  const notifications = useNotificationsStore();
   const [data, setData] = useState<FormDataType>();
   const { t } = useTranslation(['common', 'instruments']);
+
+  const handleSubmit = async (data: FormDataType) => {
+    await axios.post('/v1/instrument-records', {
+      data,
+      date: new Date(),
+      groupId: currentGroup?.id,
+      instrumentId: form.id,
+      subjectIdentifier: activeVisit.subject.identifier
+    });
+    notifications.addNotification({ type: 'success' });
+    setData(data);
+  };
 
   return (
     <Stepper
@@ -31,7 +48,7 @@ export const FormStepper = ({ activeVisit, form }: FormStepperProps) => {
           label: t('instruments:form.steps.overview')
         },
         {
-          element: <FormQuestions form={form} onSubmit={setData} />,
+          element: <FormQuestions form={form} onSubmit={handleSubmit} />,
           icon: <QuestionMarkCircleIcon />,
           label: t('instruments:form.steps.questions')
         },

@@ -6,7 +6,7 @@ import { createInstrumentRecordDataSchema } from '@open-data-capture/common/inst
 export class CreateInstrumentRecordDto {
   data: unknown;
   date: Date;
-  groupId: string;
+  groupId?: string;
   instrumentId: string;
   subjectIdentifier: string;
 }

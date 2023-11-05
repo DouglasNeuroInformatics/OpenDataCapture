@@ -29,25 +29,25 @@ const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, Instrum
       max: 10,
       min: 1,
       variant: 'slider'
-    },
-    reasonForSadness: {
-      deps: ['overallHappiness'],
-      kind: 'dynamic',
-      render: (data) => {
-        if (!data?.overallHappiness || data.overallHappiness >= 5) {
-          return null;
-        }
-        return {
-          label: {
-            en: 'Reason for Sadness',
-            fr: 'Raison de la tristesse'
-          },
-          isRequired: false,
-          kind: 'text',
-          variant: 'long'
-        };
-      }
     }
+    // reasonForSadness: {
+    //   deps: ['overallHappiness'],
+    //   kind: 'dynamic',
+    //   render: (data) => {
+    //     if (!data?.overallHappiness || data.overallHappiness >= 5) {
+    //       return null;
+    //     }
+    //     return {
+    //       label: {
+    //         en: 'Reason for Sadness',
+    //         fr: 'Raison de la tristesse'
+    //       },
+    //       isRequired: false,
+    //       kind: 'text',
+    //       variant: 'long'
+    //     };
+    //   }
+    // }
   },
   details: {
     description: {

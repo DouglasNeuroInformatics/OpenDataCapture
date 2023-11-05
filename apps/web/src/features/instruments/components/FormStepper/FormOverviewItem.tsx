@@ -10,7 +10,7 @@ export const FormOverviewItem = ({ heading, text }: FormOverviewItemProps) => {
       {Array.isArray(text) ? (
         <ul>
           {text.map((s, i) => (
-            <li className="my-3 text-sm" key={i}>
+            <li className="my-3" key={i}>
               {s}
             </li>
           ))}

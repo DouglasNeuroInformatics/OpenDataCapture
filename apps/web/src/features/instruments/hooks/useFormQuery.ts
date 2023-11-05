@@ -19,7 +19,9 @@ export function useFormQuery(id: string) {
         })
         .then((response) => {
           const instrument = evaluateInstrument<FormInstrument>(response.data.bundle);
-          return resolveFormInstrument(instrument, i18n.resolvedLanguage as Language);
+          return Object.assign(resolveFormInstrument(instrument, i18n.resolvedLanguage as Language), {
+            id
+          });
         });
     },
     queryKey: ['form', id, i18n.resolvedLanguage],
