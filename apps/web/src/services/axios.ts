@@ -30,6 +30,7 @@ axios.interceptors.response.use(
     const notifications = useNotificationsStore.getState();
     if (!isAxiosError(error)) {
       notifications.addNotification({ message: i18next.t('unknownError'), type: 'error' });
+      console.error(error);
       return Promise.reject(error);
     }
     notifications.addNotification({

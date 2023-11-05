@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-classes */
 
 import { CurrentUser, EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Assignment } from '@open-data-capture/common/assignment';
 import type { AppAbility } from '@open-data-capture/common/core';
@@ -33,15 +33,15 @@ export class AssignmentsController implements EntityController<Assignment> {
   @ApiOperation({ summary: 'Get All Assignments' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Assignment' })
-  findAll(@CurrentUser('ability') ability?: AppAbility) {
-    return this.assignmentsService.findAll({ ability });
+  find(@CurrentUser('ability') ability?: AppAbility, @Query('subjectIdentifier') subjectIdentifier?: string) {
+    return this.assignmentsService.find({ subjectIdentifier }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Summary of Assignments' })
   @Get('summary')
   @RouteAccess({ action: 'read', subject: 'Assignment' })
-  getSummary(@CurrentUser('ability') ability?: AppAbility) {
-    return this.assignmentsService.getSummary({ ability });
+  getSummary(@CurrentUser('ability') ability?: AppAbility, @Query('subjectIdentifier') subjectIdentifier?: string) {
+    return this.assignmentsService.getSummary({ subjectIdentifier }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Assignment' })

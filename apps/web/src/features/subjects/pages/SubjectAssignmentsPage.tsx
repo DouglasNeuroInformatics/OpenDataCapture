@@ -41,10 +41,14 @@ export const SubjectAssignmentsPage = () => {
 
   const assignmentsQuery = useQuery({
     queryFn: async () => {
-      const response = await axios.get('/v1/assignments/summary');
+      const response = await axios.get('/v1/assignments/summary', {
+        params: {
+          subjectIdentifier: params.subjectIdentifier
+        }
+      });
       return assignmentSummarySchema.array().parse(response.data);
     },
-    queryKey: ['assignments']
+    queryKey: ['assignments', params.subjectIdentifier]
   });
   const assignmentsMutation = useMutation({
     mutationFn: async (data: AssignmentMutationOptions) => {

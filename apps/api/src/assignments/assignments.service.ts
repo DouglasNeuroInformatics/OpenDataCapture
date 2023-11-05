@@ -41,11 +41,11 @@ export class AssignmentsService implements EntityService<Assignment> {
     return (await this.assignmentsRepository.deleteById(id))!;
   }
 
-  async findAll({ ability }: EntityOperationOptions = {}) {
-    if (!ability) {
-      return this.assignmentsRepository.find();
-    }
-    return this.assignmentsRepository.find(accessibleBy(ability, 'read').Assignment);
+  async find({ subjectIdentifier }: { subjectIdentifier?: string } = {}, { ability }: EntityOperationOptions = {}) {
+    const subject = subjectIdentifier ? await this.subjectsService.findById(subjectIdentifier) : undefined;
+    return this.assignmentsRepository.find({
+      $and: [{ subject }, ability ? accessibleBy(ability, 'read').Assignment : {}]
+    });
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -58,13 +58,22 @@ export class AssignmentsService implements EntityService<Assignment> {
     return assignment;
   }
 
-  async getSummary({ ability }: EntityOperationOptions = {}) {
-    return this.assignmentsRepository.find(ability ? accessibleBy(ability, 'read').Assignment : {}, {
-      populate: {
-        path: 'instrument',
-        select: '-content -measures -validationSchema'
+  async getSummary(
+    { subjectIdentifier }: { subjectIdentifier?: string } = {},
+    { ability }: EntityOperationOptions = {}
+  ) {
+    const subject = subjectIdentifier ? await this.subjectsService.findById(subjectIdentifier) : undefined;
+    return this.assignmentsRepository.find(
+      {
+        $and: [{ subject }, ability ? accessibleBy(ability, 'read').Assignment : {}]
+      },
+      {
+        populate: {
+          path: 'instrument',
+          select: '-content -measures -validationSchema'
+        }
       }
-    });
+    );
   }
 
   async updateById(id: string, update: UpdateAssignmentDto, { ability }: EntityOperationOptions = {}) {
