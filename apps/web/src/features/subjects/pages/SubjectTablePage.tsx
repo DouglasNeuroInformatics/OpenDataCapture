@@ -30,6 +30,7 @@ export const SubjectTablePage = () => {
     params: {
       groupId: currentGroup?.id,
       instrumentId: selectedForm?.id,
+      minDate: minDate ?? undefined,
       subjectIdentifier: params.subjectIdentifier!
     }
   });

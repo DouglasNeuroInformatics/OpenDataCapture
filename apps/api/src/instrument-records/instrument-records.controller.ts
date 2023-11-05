@@ -1,9 +1,10 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AppAbility } from '@open-data-capture/common/core';
+import { z } from 'zod';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -27,11 +28,19 @@ export class InstrumentRecordsController {
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   find(
     @CurrentUser('ability') ability: AppAbility,
+    @Query(
+      'minDate',
+      new ParseSchemaPipe({
+        isOptional: true,
+        schema: z.coerce.date()
+      })
+    )
+    minDate?: Date,
     @Query('groupId') groupId?: string,
     @Query('instrumentId') instrumentId?: string,
     @Query('subjectIdentifier') subjectIdentifier?: string
   ) {
-    return this.instrumentRecordsService.find({ groupId, instrumentId, subjectIdentifier }, { ability });
+    return this.instrumentRecordsService.find({ groupId, instrumentId, minDate, subjectIdentifier }, { ability });
   }
 
   @ApiOperation({ summary: 'Export Records' })

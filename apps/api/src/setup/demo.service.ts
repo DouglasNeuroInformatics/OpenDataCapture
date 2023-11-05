@@ -52,7 +52,7 @@ export class DemoService {
       const group = await this.groupsService.findByName(randomValue(demoGroups).name);
       const subject = await this.createSubject();
       for (const form of forms) {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 10; i++) {
           const data = this.createFormRecordData(
             form,
             form.name === 'EnhancedDemographicsQuestionnaire'
@@ -65,7 +65,7 @@ export class DemoService {
           );
           await this.instrumentRecordsService.create({
             data,
-            date: faker.date.past({ years: 1 }),
+            date: faker.date.past({ years: 2 }),
             groupId: group.id as string,
             instrumentId: form.id!,
             subjectIdentifier: subject.identifier

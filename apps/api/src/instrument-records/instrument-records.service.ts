@@ -31,7 +31,7 @@ export class InstrumentRecordsService {
   }
 
   async create(
-    { data, groupId, instrumentId, subjectIdentifier }: CreateInstrumentRecordData,
+    { data, date, groupId, instrumentId, subjectIdentifier }: CreateInstrumentRecordData,
     options?: EntityOperationOptions
   ) {
     const group = groupId ? await this.groupsService.findById(groupId, options) : undefined;
@@ -40,7 +40,7 @@ export class InstrumentRecordsService {
 
     return this.instrumentRecordsRepository.create({
       data,
-      date: new Date(),
+      date,
       group,
       instrument,
       subject
@@ -92,8 +92,9 @@ export class InstrumentRecordsService {
     {
       groupId,
       instrumentId,
+      minDate,
       subjectIdentifier
-    }: { groupId?: string; instrumentId?: string; subjectIdentifier?: string },
+    }: { groupId?: string; instrumentId?: string; minDate?: Date; subjectIdentifier?: string },
     { ability }: EntityOperationOptions = {}
   ) {
     const group = groupId ? await this.groupsService.findById(groupId) : undefined;
@@ -102,7 +103,15 @@ export class InstrumentRecordsService {
 
     const records = await this.instrumentRecordsRepository.find(
       {
-        $and: [ability ? accessibleBy(ability).InstrumentRecord : {}, { group, instrument, subject }]
+        $and: [
+          ability ? accessibleBy(ability).InstrumentRecord : {},
+          {
+            date: minDate ? { $gte: minDate } : undefined,
+            group,
+            instrument,
+            subject
+          }
+        ]
       },
       {
         populate: {
