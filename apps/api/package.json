@@ -15,7 +15,7 @@
     "@casl/ability": "^6.5.0",
     "@casl/mongoose": "^7.2.1",
     "@douglasneuroinformatics/ajv": "latest",
-    "@douglasneuroinformatics/nestjs": "link:@douglasneuroinformatics/nestjs",
+    "@douglasneuroinformatics/nestjs": "latest",
     "@douglasneuroinformatics/stats": "latest",
     "@douglasneuroinformatics/utils": "latest",
     "@faker-js/faker": "^8.2.0",
