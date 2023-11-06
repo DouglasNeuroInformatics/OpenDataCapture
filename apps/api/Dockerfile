@@ -1,7 +1,15 @@
-FROM oven/bun:latest as runtime
+FROM oven/bun:1.0.7 as runtime
 
 # COMPILE SOURCE CODE
 FROM runtime AS builder
+RUN apt update
+RUN apt install -y ca-certificates curl gnupg
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+RUN apt update
+RUN apt install nodejs -y
+
 WORKDIR /root
 COPY . .
 RUN bun install --ignore-scripts
@@ -15,3 +23,4 @@ RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 USER app
 CMD [ "bun", "./dist/main.js" ]
+
