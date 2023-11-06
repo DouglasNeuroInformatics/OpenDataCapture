@@ -8,7 +8,7 @@ import './styles.css';
 const root = document.getElementById('root')!;
 
 if (process.env.NODE_ENV === 'development') {
-  import('../msw/mocks/browser.jsx');
+  import('../msw/mocks/browser.js');
   //worker.start({ onUnhandledRequest: "bypass" })
 }
 

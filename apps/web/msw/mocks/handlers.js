@@ -1,4 +1,4 @@
-import { rest, http, HttpResponse } from 'msw';
+import {  http, HttpResponse } from 'msw';
 
 // src/mocks/handlers.js
 
@@ -10,9 +10,19 @@ export const handlers = [
     const password = data.get('password')
 
     if (username === 'testUsername123' && password === 'testPassword123') {
-      return new HttpResponse('Hello ' + username);
+      return new HttpResponse.json(
+        {
+          success: true,
+          message: "Login successful"
+        }
+      );
     } else {
-      return new HttpResponse('error');
+      return  new HttpResponse.json(
+        {
+          success: false,
+          message: "Login failed"
+        }
+      );
     }
   }),
 
