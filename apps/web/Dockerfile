@@ -1,4 +1,4 @@
-FROM oven/bun:canary AS builder
+FROM oven/bun:latest AS builder
 WORKDIR /root
 COPY . .
 RUN bun install --ignore-scripts

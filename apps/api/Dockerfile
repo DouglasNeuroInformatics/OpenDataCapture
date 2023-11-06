@@ -1,4 +1,4 @@
-FROM oven/bun:canary as runtime
+FROM oven/bun:latest as runtime
 
 # COMPILE SOURCE CODE
 FROM runtime AS builder
