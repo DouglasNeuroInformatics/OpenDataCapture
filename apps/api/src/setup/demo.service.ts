@@ -16,15 +16,15 @@ import mongoose from 'mongoose';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
-import { resolveInstrumentSource } from '@/instruments/instruments.utils';
+import { importInstrumentSource } from '@/instruments/macros/import-instrument-source.macro' with { type: 'macro' }
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
-const BPRS_SOURCE = await resolveInstrumentSource('forms/brief-psychiatric-rating-scale');
-const EDQ_SOURCE = await resolveInstrumentSource('forms/enhanced-demographics-questionnaire');
-const HQ_SOURCE = await resolveInstrumentSource('forms/happiness-questionnaire');
-const MMSE_SOURCE = await resolveInstrumentSource('forms/mini-mental-state-examination');
-const MOCA_SOURCE = await resolveInstrumentSource('forms/montreal-cognitive-assessment');
+const BPRS_SOURCE = importInstrumentSource('forms/brief-psychiatric-rating-scale');
+const EDQ_SOURCE = importInstrumentSource('forms/enhanced-demographics-questionnaire');
+const HQ_SOURCE = importInstrumentSource('forms/happiness-questionnaire');
+const MMSE_SOURCE = importInstrumentSource('forms/mini-mental-state-examination');
+const MOCA_SOURCE = importInstrumentSource('forms/montreal-cognitive-assessment');
 
 faker.seed(123);
 
