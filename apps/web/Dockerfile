@@ -9,6 +9,7 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesourc
 RUN apt update
 RUN apt install nodejs -y
 
+ARG VITE_API_BASE_URL
 WORKDIR /root
 COPY . .
 RUN bun install --ignore-scripts
