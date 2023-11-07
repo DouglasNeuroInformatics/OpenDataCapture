@@ -28,9 +28,3 @@ export function generateBundle(source: string) {
   output = transpiler.transformSync(output);
   return output;
 }
-
-export async function resolveInstrumentSource(path: string) {
-  const filepath = Bun.resolveSync(`@open-data-capture/instruments/${path}`, import.meta.dir);
-  const file = Bun.file(filepath);
-  return file.text();
-}
