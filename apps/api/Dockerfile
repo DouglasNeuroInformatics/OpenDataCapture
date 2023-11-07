@@ -1,4 +1,4 @@
-FROM oven/bun:1.0.7 as runtime
+FROM oven/bun:1.0.10 as runtime
 
 # COMPILE SOURCE CODE
 FROM runtime AS builder
@@ -14,7 +14,9 @@ WORKDIR /root
 COPY . .
 RUN bun install --ignore-scripts
 RUN bunx turbo run build --filter=@open-data-capture/api
+RUN bunx pkg ./node_modules/@import-meta-env/cli/bin/import-meta-env.js --target node18-alpine --output import-meta-env-alpine
 
+# RUN SERVER
 FROM runtime as runner
 WORKDIR /app
 COPY --from=builder /root/apps/api/dist/ /app/dist/
@@ -23,4 +25,3 @@ RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 USER app
 CMD [ "bun", "./dist/main.js" ]
-
