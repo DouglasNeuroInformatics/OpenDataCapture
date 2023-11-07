@@ -7,7 +7,7 @@ import './styles.css';
 
 const root = document.getElementById('root')!;
 
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   import('../msw/mocks/browser.js');
   //worker.start({ onUnhandledRequest: "bypass" })
 }
