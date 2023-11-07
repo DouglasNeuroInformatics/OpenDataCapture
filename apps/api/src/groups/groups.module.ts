@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { GroupEntity, GroupSchema } from './entities/group.entity';
 import { GroupsController } from './groups.controller';
+import { GroupsRepository } from './groups.repository';
 import { GroupsService } from './groups.service';
 
 @Module({
@@ -16,6 +17,6 @@ import { GroupsService } from './groups.service';
       }
     ])
   ],
-  providers: [GroupsService]
+  providers: [GroupsRepository, GroupsService]
 })
 export class GroupsModule {}

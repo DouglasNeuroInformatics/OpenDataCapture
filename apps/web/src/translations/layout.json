@@ -1,0 +1,68 @@
+{
+  "branding": {
+    "title": {
+      "en": "Open Data Capture",
+      "fr": "Open Data Capture"
+    }
+  },
+  "footer": {
+    "contact": {
+      "en": "Contact Us",
+      "fr": "Contactez-nous"
+    },
+    "documentation": {
+      "en": "Documentation",
+      "fr": "Documentation"
+    },
+    "license": {
+      "en": "License",
+      "fr": "Licence"
+    },
+    "sourceCode": {
+      "en": "Source Code",
+      "fr": "Code source"
+    }
+  },
+  "navLinks": {
+    "addVisit": {
+      "en": "Add Visit",
+      "fr": "Ajouter une visite"
+    },
+    "availableInstruments": {
+      "en": "View Instruments",
+      "fr": "Afficher tous les instruments"
+    },
+    "createInstrument": {
+      "en": "Add Instrument",
+      "fr": "Ajouter un instrument"
+    },
+    "manageInstruments": {
+      "en": "Manage Instruments",
+      "fr": "Gérer les instruments"
+    },
+    "overview": {
+      "en": "Overview",
+      "fr": "Vue d'ensemble"
+    },
+    "viewSubjects": {
+      "en": "View Subjects",
+      "fr": "Afficher tous les clients"
+    }
+  },
+  "organization": {
+    "name": {
+      "en": "Douglas Neuroinformatics Platform",
+      "fr": "Douglas Neuroinformatics Platform"
+    }
+  },
+  "userDropup": {
+    "logout": {
+      "en": "Logout",
+      "fr": "Se déconnecter"
+    },
+    "preferences": {
+      "en": "Preferences",
+      "fr": "Préférences"
+    }
+  }
+}

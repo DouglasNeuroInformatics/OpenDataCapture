@@ -1,12 +1,14 @@
 import { SetMetadata } from '@nestjs/common';
-import type { AppAction, AppSubject } from '@open-data-capture/types';
+import type { AppAction, AppSubject } from '@open-data-capture/common/core';
 
 type PublicRouteAccess = 'public';
 
-export type ProtectedRouteAccess = {
+export type ProtectedRoutePermissionSet = {
   action: AppAction;
   subject: AppSubject;
 };
+
+export type ProtectedRouteAccess = ProtectedRoutePermissionSet | ProtectedRoutePermissionSet[];
 
 export type RouteAccessType = ProtectedRouteAccess | PublicRouteAccess;
 

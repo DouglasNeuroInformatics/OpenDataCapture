@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import type { AppAction, AppSubject } from '@open-data-capture/types';
+import type { AppAction, AppSubject } from '@open-data-capture/common/core';
 import clsx from 'clsx';
 import { NavLink } from 'react-router-dom';
 
@@ -46,7 +46,7 @@ export const NavigationLink = ({ access, cyTestId, href, icon, label, onClick }:
     <NavLink
       className={({ isActive }) =>
         clsx(
-          'flex items-center p-2 hover:bg-slate-200 dark:hover:bg-slate-700 md:text-base md:hover:bg-slate-800',
+          'flex items-center p-2 hover:bg-slate-200 dark:hover:bg-slate-700 md:hover:bg-slate-800',
           isActive
             ? 'bg-slate-200 dark:bg-slate-700 md:bg-slate-800 md:text-slate-200'
             : 'md:bg-slate-900 md:text-slate-300'

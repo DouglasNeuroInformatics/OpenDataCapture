@@ -2,18 +2,19 @@ import React, { useRef, useState } from 'react';
 
 import { ArrowToggle, useOnClickOutside } from '@douglasneuroinformatics/ui';
 import { Transition } from '@headlessui/react';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
-import { HiUserCircle } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
-import { LanguageToggle } from '@/components';
 import { useAuthStore } from '@/stores/auth-store';
+
+import { LanguageToggle } from './LanguageToggle';
 
 export const UserDropup = () => {
   const auth = useAuthStore();
   const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation('layout');
 
   const closeDropup = () => {
     setIsOpen(false);
@@ -58,7 +59,7 @@ export const UserDropup = () => {
         className="p-2"
         content={
           <div className="flex items-center">
-            <HiUserCircle className="mr-2 h-8 w-8" />
+            <UserCircleIcon className="mr-2 h-8 w-8" />
             <span>{auth.currentUser?.username}</span>
           </div>
         }

@@ -1,12 +1,13 @@
-import type { Assignment, AssignmentStatus } from '@open-data-capture/types';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
+import { ApiProperty } from '@nestjs/swagger';
+import { updateAssignmentDataSchema } from '@open-data-capture/common/assignment';
+import type { AssignmentStatus, UpdateAssignmentData } from '@open-data-capture/common/assignment';
 
-export class UpdateAssignmentDto implements Pick<Assignment, 'status' | 'timeExpires'> {
-  @IsString()
-  @IsOptional()
-  status: AssignmentStatus;
+@ValidationSchema(updateAssignmentDataSchema)
+export class UpdateAssignmentDto implements UpdateAssignmentData {
+  @ApiProperty()
+  expiresAt?: Date;
 
-  @IsNumber()
-  @IsOptional()
-  timeExpires: number;
+  @ApiProperty()
+  status?: AssignmentStatus;
 }

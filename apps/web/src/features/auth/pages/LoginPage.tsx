@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import type { AuthPayload, LoginCredentials } from '@open-data-capture/types';
+import type { AuthPayload, LoginCredentials } from '@open-data-capture/common/auth';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ export const LoginPage = () => {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
 
   const login = async (credentials: LoginCredentials) => {
     const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
@@ -61,5 +61,3 @@ export const LoginPage = () => {
     </div>
   );
 };
-
-export default LoginPage;

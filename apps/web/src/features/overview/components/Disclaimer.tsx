@@ -12,7 +12,7 @@ export type DisclaimerProps = {
 export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProps) => {
   const { currentUser, logout } = useAuthStore();
   const { isAccepted, setIsAccepted, username } = useDisclaimerStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation('overview');
 
   const handleClose = () => {
     setIsAccepted(true, currentUser!.username);

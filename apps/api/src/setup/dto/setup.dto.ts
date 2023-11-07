@@ -1,20 +1,13 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
-import type { SetupOptions } from '@open-data-capture/types';
-import { Type } from 'class-transformer';
-import { IsBoolean, IsNotEmptyObject, ValidateNested } from 'class-validator';
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
+import { ApiProperty } from '@nestjs/swagger';
+import { setupOptionsSchema } from '@open-data-capture/common/setup';
+import type { CreateAdminData, SetupOptions } from '@open-data-capture/common/setup';
 
-import { CreateUserDto } from '@/users/dto/create-user.dto';
-
-export class CreateAdminDto extends OmitType(CreateUserDto, ['basePermissionLevel', 'groupNames'] as const) {}
-
+@ValidationSchema(setupOptionsSchema)
 export class SetupDto implements SetupOptions {
   @ApiProperty()
-  @IsNotEmptyObject()
-  @ValidateNested()
-  @Type(() => CreateAdminDto)
-  admin: CreateAdminDto;
+  admin: CreateAdminData;
 
   @ApiProperty()
-  @IsBoolean()
   initDemo: boolean;
 }

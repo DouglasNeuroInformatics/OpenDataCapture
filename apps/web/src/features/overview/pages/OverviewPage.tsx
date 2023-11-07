@@ -1,9 +1,10 @@
-import type { FormInstrumentRecordsSummary, FormInstrumentSummary, Subject, User } from '@open-data-capture/types';
+import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
+import type { Summary } from '@open-data-capture/common/summary';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { HiClipboardDocument, HiDocumentText, HiUser, HiUsers } from 'react-icons/hi2';
 
-import { PageHeader, Spinner } from '@/components';
-import { useFetch } from '@/hooks/useFetch';
+import { PageHeader } from '@/components/PageHeader';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { Disclaimer } from '../components/Disclaimer';
@@ -12,38 +13,26 @@ import { StatisticCard } from '../components/StatisticCard';
 
 export const OverviewPage = () => {
   const { currentGroup, currentUser } = useAuthStore();
-  const { t } = useTranslation();
-  const pageTitle = currentUser?.firstName
-    ? `${t('overview.welcome')}, ${currentUser.firstName}`
-    : t('overview.welcome');
+  const { t } = useTranslation('overview');
 
-  const groupQuery = currentGroup ? `?group=${currentGroup.name}` : '';
+  const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
-  const forms = useFetch<FormInstrumentSummary[]>('/v1/instruments/forms/available', [], {
-    access: { action: 'read', subject: 'User' }
+  const query = useQuery({
+    enabled: currentUser?.ability.can('read', 'Summary'),
+    queryFn: () => {
+      return axios
+        .get<Summary>('/v1/summary', {
+          params: {
+            groupId: currentGroup?.id
+          }
+        })
+        .then((response) => response.data);
+    },
+    queryKey: ['summary', currentGroup?.id]
   });
 
-  const records = useFetch<FormInstrumentRecordsSummary>(
-    '/v1/instruments/records/forms/summary' + groupQuery,
-    [currentGroup],
-    {
-      access: { action: 'read', subject: 'User' }
-    }
-  );
-
-  const subjects = useFetch<Subject[]>('/v1/subjects' + groupQuery, [currentGroup], {
-    access: { action: 'read', subject: 'User' }
-  });
-  const users = useFetch<User[]>('/v1/users' + groupQuery, [currentGroup], {
-    access: { action: 'read', subject: 'User' }
-  });
-
-  const isAllDataDefined = forms.data && records.data && subjects.data && users.data;
-  const isAnyLoading = forms.isLoading || records.isLoading || subjects.isLoading || users.isLoading;
-
-  // If it is the first time loading data
-  if (!isAllDataDefined && isAnyLoading) {
-    return <Spinner />;
+  if (!query.data) {
+    return null;
   }
 
   return (
@@ -52,32 +41,34 @@ export const OverviewPage = () => {
       <PageHeader title={pageTitle} />
       <section>
         <div className="mb-5">
-          <h3 className="text-center text-xl font-medium lg:text-left">{t('overview.summary')}</h3>
+          <h3 className="text-center text-xl font-medium lg:text-left">{t('summary')}</h3>
           <GroupSwitcher />
         </div>
         <div className="body-font">
           <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            {forms.data && records.data && subjects.data && users.data && (
-              <>
-                <StatisticCard icon={<HiUsers />} label={t('overview.totalUsers')} value={users.data.length} />
-                <StatisticCard icon={<HiUser />} label={t('overview.totalSubjects')} value={subjects.data.length} />
-                <StatisticCard
-                  icon={<HiClipboardDocument />}
-                  label={t('overview.totalInstruments')}
-                  value={forms.data.length}
-                />
-                <StatisticCard
-                  icon={<HiDocumentText />}
-                  label={t('overview.totalRecords')}
-                  value={records.data.count}
-                />
-              </>
-            )}
+            <StatisticCard
+              icon={<UsersIcon className="h-12 w-12" />}
+              label={t('totalUsers')}
+              value={query.data.counts.users}
+            />
+            <StatisticCard
+              icon={<UserIcon className="h-12 w-12" />}
+              label={t('totalSubjects')}
+              value={query.data.counts.subjects}
+            />
+            <StatisticCard
+              icon={<ClipboardDocumentIcon className="h-12 w-12" />}
+              label={t('totalInstruments')}
+              value={query.data.counts.instruments}
+            />
+            <StatisticCard
+              icon={<DocumentTextIcon className="h-12 w-12" />}
+              label={t('totalRecords')}
+              value={query.data.counts.records}
+            />
           </div>
         </div>
       </section>
     </div>
   );
 };
-
-export default OverviewPage;

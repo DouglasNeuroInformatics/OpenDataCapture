@@ -1,30 +1,32 @@
-import type { FormInstrument } from '@open-data-capture/types';
-import type { PropertiesSchema } from 'ajv/dist/types/json-schema';
+/* eslint-disable perfectionist/sort-objects */
 
-const fields = [
-  'somaticConcern',
-  'anxiety',
-  'emotionalWithdrawal',
-  'conceptualDisorganization',
-  'guiltFeelings',
-  'tension',
-  'mannerismsAndPosturing',
-  'grandiosity',
-  'depressiveMood',
-  'hostility',
-  'suspiciousness',
-  'hallucinatoryBehavior',
-  'motorRetardation',
-  'uncooperativeness',
-  'unusualThoughtContent',
-  'bluntedAffect',
-  'excitement',
-  'disorientation'
-] as const;
+type BriefPsychiatricRatingScaleData = {
+  anxiety: number;
+  bluntedAffect: number;
+  conceptualDisorganization: number;
+  depressiveMood: number;
+  disorientation: number;
+  emotionalWithdrawal: number;
+  excitement: number;
+  grandiosity: number;
+  guiltFeelings: number;
+  hallucinatoryBehavior: number;
+  hostility: number;
+  mannerismsAndPosturing: number;
+  motorRetardation: number;
+  somaticConcern: number;
+  suspiciousness: number;
+  tension: number;
+  uncooperativeness: number;
+  unusualThoughtContent: number;
+};
 
-export type BriefPsychiatricRatingScaleData = { [K in (typeof fields)[number]]: number };
-
-export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleData> = {
+const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleData, 'en'> = {
+  kind: 'form',
+  name: 'BriefPsychiatricRatingScale',
+  language: 'en',
+  tags: ['Schizophrenia', 'Psychosis'],
+  version: 1,
   content: {
     anxiety: {
       description:
@@ -214,53 +216,41 @@ export const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingS
     instructions: `
       Please enter the score for the term which best describes the patient's condition. 0 = not assessed, 1 = not
       present, 2 = very mild, 3 = mild, 4 = moderate, 5 = moderately severe, 6 = severe, 7 = extremely severe.`,
-    language: 'en',
     title: 'Brief Psychiatric Rating Scale'
   },
-  kind: 'form',
   measures: {
     totalScore: {
-      formula: {
-        fields: [
-          'anxiety',
-          'bluntedAffect',
-          'conceptualDisorganization',
-          'depressiveMood',
-          'disorientation',
-          'emotionalWithdrawal',
-          'excitement',
-          'grandiosity',
-          'guiltFeelings',
-          'hallucinatoryBehavior',
-          'hostility',
-          'mannerismsAndPosturing',
-          'motorRetardation',
-          'somaticConcern',
-          'suspiciousness',
-          'tension',
-          'uncooperativeness',
-          'unusualThoughtContent'
-        ],
-        kind: 'sum'
-      },
-      label: 'Total Score'
+      label: 'Total Score',
+      value: (data) => {
+        let sum = 0;
+        data;
+        Object.values(data).forEach((value) => {
+          sum += value;
+        });
+        return sum;
+      }
     }
   },
-  name: 'BriefPsychiatricRatingScale',
-  tags: ['Schizophrenia', 'Psychosis'],
-  validationSchema: {
-    properties: Object.fromEntries(
-      fields.map((fieldName) => [
-        fieldName,
-        {
-          maximum: 7,
-          minimum: 0,
-          type: 'integer'
-        }
-      ])
-    ) as PropertiesSchema<BriefPsychiatricRatingScaleData>,
-    required: fields,
-    type: 'object'
-  },
-  version: 1
+  validationSchema: z.object({
+    somaticConcern: z.number().int().min(0).max(7),
+    anxiety: z.number().int().min(0).max(7),
+    emotionalWithdrawal: z.number().int().min(0).max(7),
+    conceptualDisorganization: z.number().int().min(0).max(7),
+    guiltFeelings: z.number().int().min(0).max(7),
+    tension: z.number().int().min(0).max(7),
+    mannerismsAndPosturing: z.number().int().min(0).max(7),
+    grandiosity: z.number().int().min(0).max(7),
+    depressiveMood: z.number().int().min(0).max(7),
+    hostility: z.number().int().min(0).max(7),
+    suspiciousness: z.number().int().min(0).max(7),
+    hallucinatoryBehavior: z.number().int().min(0).max(7),
+    motorRetardation: z.number().int().min(0).max(7),
+    uncooperativeness: z.number().int().min(0).max(7),
+    unusualThoughtContent: z.number().int().min(0).max(7),
+    bluntedAffect: z.number().int().min(0).max(7),
+    excitement: z.number().int().min(0).max(7),
+    disorientation: z.number().int().min(0).max(7)
+  })
 };
+
+export default briefPsychiatricRatingScale;

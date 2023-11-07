@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from 'bun:test';
 
-import type { LoginRequestDto } from '../dto/login-request.dto';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
@@ -12,6 +11,8 @@ import { AbilityFactory } from '@/ability/ability.factory';
 import { UsersService } from '@/users/users.service';
 
 import { AuthService } from '../auth.service';
+
+import type { LoginRequestDto } from '../dto/login-request.dto';
 
 describe('AuthService', () => {
   let authService: AuthService;

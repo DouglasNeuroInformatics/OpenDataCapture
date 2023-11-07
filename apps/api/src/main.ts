@@ -1,8 +1,9 @@
 import path from 'node:path';
 
+import { DocumentInterceptor, ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'express';
 
@@ -10,7 +11,8 @@ import { AppModule } from './app.module';
 import { setupDocs } from './docs';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+  // Explicit type is needed due to issue with linked dependency
+  const app: NestExpressApplication = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'debug', 'log', 'verbose']
   });
 
@@ -20,6 +22,9 @@ async function bootstrap() {
     type: VersioningType.URI
   });
   app.use(json({ limit: '50MB' }));
+  app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
+  app.useGlobalInterceptors(new DocumentInterceptor());
+  app.useGlobalPipes(new ValidationPipe());
 
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
   setupDocs(app);

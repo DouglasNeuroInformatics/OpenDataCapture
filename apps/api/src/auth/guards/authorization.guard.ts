@@ -23,10 +23,12 @@ export class AuthorizationGuard implements CanActivate {
 
     if (routeAccess === 'public') {
       return true;
-    } else if (!routeAccess) {
+    } else if (!(routeAccess && request.user?.ability)) {
       return false;
     }
 
-    return request.user?.ability.can(routeAccess.action, routeAccess.subject) ?? false;
+    return Array.isArray(routeAccess)
+      ? routeAccess.every(({ action, subject }) => request.user!.ability.can(action, subject))
+      : request.user.ability.can(routeAccess.action, routeAccess.subject);
   }
 }

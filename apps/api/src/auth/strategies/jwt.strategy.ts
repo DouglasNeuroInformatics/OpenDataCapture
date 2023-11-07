@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import type { JwtPayload } from '@open-data-capture/types';
+import type { JwtPayload } from '@open-data-capture/common/auth';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 

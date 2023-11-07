@@ -1,15 +1,15 @@
+import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { type CreateAssignmentData } from '@open-data-capture/types';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { type CreateAssignmentData, createAssignmentDataSchema } from '@open-data-capture/common/assignment';
 
+@ValidationSchema(createAssignmentDataSchema)
 export class CreateAssignmentDto implements CreateAssignmentData {
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  instrumentIdentifier: string;
+  expiresAt: Date;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
+  instrumentId: string;
+
+  @ApiProperty()
   subjectIdentifier: string;
 }

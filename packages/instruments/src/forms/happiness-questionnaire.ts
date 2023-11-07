@@ -1,10 +1,19 @@
-import { createTranslatedForms } from '../utils/create-translated-forms';
+/* eslint-disable perfectionist/sort-objects */
 
-export type HappinessQuestionnaireData = {
+type HappinessQuestionnaireData = {
   overallHappiness: number;
+  reasonForSadness?: string;
 };
 
-export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnaireData>({
+const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, InstrumentLanguage> = {
+  kind: 'form',
+  name: 'HappinessQuestionnaire',
+  language: ['en', 'fr'],
+  tags: {
+    en: ['Well-Being'],
+    fr: ['Bien-être']
+  },
+  version: 1,
   content: {
     overallHappiness: {
       description: {
@@ -21,6 +30,24 @@ export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnai
       min: 1,
       variant: 'slider'
     }
+    // reasonForSadness: {
+    //   deps: ['overallHappiness'],
+    //   kind: 'dynamic',
+    //   render: (data) => {
+    //     if (!data?.overallHappiness || data.overallHappiness >= 5) {
+    //       return null;
+    //     }
+    //     return {
+    //       label: {
+    //         en: 'Reason for Sadness',
+    //         fr: 'Raison de la tristesse'
+    //       },
+    //       isRequired: false,
+    //       kind: 'text',
+    //       variant: 'long'
+    //     };
+    //   }
+    // }
   },
   details: {
     description: {
@@ -37,30 +64,10 @@ export const happinessQuestionnaire = createTranslatedForms<HappinessQuestionnai
       fr: 'Questionnaire sur le bonheur'
     }
   },
-  measures: {
-    overallHappiness: {
-      formula: {
-        field: 'overallHappiness',
-        kind: 'const'
-      },
-      label: {
-        en: 'Overall Happiness',
-        fr: 'Bonheur général'
-      }
-    }
-  },
-  name: 'HappinessQuestionnaire',
-  tags: ['Well-Being'],
-  validationSchema: {
-    properties: {
-      overallHappiness: {
-        maximum: 10,
-        minimum: 1,
-        type: 'integer'
-      }
-    },
-    required: ['overallHappiness'],
-    type: 'object'
-  },
-  version: 1
-});
+  validationSchema: z.object({
+    overallHappiness: z.number().int().gte(1).lte(10),
+    reasonForSadness: z.string().optional()
+  })
+};
+
+export default happinessQuestionnaire;
