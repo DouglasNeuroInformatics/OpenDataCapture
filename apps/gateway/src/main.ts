@@ -1,12 +1,15 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import tailwindcssPlugin from 'bun-plugin-tailwindcss';
 
 import { AppModule } from './app.module';
+import { Layout } from './components/Layout';
+import { RenderInterceptor } from './interceptors/render.interceptor';
 
 const PROJECT_ROOT = path.resolve(import.meta.dir, '..');
 const BUILD_DIR = path.resolve(PROJECT_ROOT, 'dist');
@@ -39,6 +42,12 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors();
+  app.useGlobalInterceptors(
+    new RenderInterceptor({
+      root: Layout
+    })
+  );
+  app.useGlobalPipes(new ValidationPipe());
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'dist'));
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
 
