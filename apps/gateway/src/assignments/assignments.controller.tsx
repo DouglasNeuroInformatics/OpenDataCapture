@@ -1,5 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 
+import { Render } from '@/decorators/render.decorator';
+
 import { Page } from '../decorators/page.decorator';
 import IndexPage from '../pages';
 
@@ -7,7 +9,8 @@ import IndexPage from '../pages';
 export class AssignmentsController {
   @Get()
   @Page()
+  @Render(IndexPage)
   render() {
-    return <IndexPage />;
+    return {};
   }
 }

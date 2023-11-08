@@ -1,11 +1,14 @@
+import React from 'react';
 import { renderToReadableStream } from 'react-dom/server';
 
 import { arrayBuffer } from 'stream/consumers';
 
 import { Injectable, StreamableFile } from '@nestjs/common';
 import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Reflector } from '@nestjs/core';
 import { map } from 'rxjs/operators';
+
+import { COMPONENT_KEY } from '@/decorators/render.decorator';
 
 export type RootComponentType = React.FC<{ children: React.ReactNode }>;
 
@@ -15,21 +18,26 @@ export type RenderInterceptorOptions<T extends RootComponentType> = {
 
 @Injectable()
 export class RenderInterceptor<T extends RootComponentType> implements NestInterceptor {
+  private readonly reflector = new Reflector();
+
   constructor(private readonly options: RenderInterceptorOptions<T>) {}
 
-  intercept(_: ExecutionContext, next: CallHandler<JSX.Element>): Observable<Promise<StreamableFile>> {
+  intercept<TProps extends object>(context: ExecutionContext, next: CallHandler<TProps>) {
+    const component = this.reflector.get<React.FC<TProps> | undefined>(COMPONENT_KEY, context.getHandler());
+    if (!component) {
+      return next.handle();
+    }
     return next.handle().pipe(
-      map(async (element) => {
-        return await this.render(element);
+      map(async (props) => {
+        const app = React.createElement(this.options.root, {
+          children: React.createElement(component, props)
+        });
+        const stream = await renderToReadableStream(app, {
+          bootstrapModules: ['/hydrate.js']
+        });
+        const buffer = Buffer.from(await arrayBuffer(stream));
+        return new StreamableFile(buffer);
       })
     );
-  }
-
-  private async render(element: JSX.Element): Promise<StreamableFile> {
-    const stream = await renderToReadableStream(this.options.root({ children: element }), {
-      bootstrapModules: ['/hydrate.js']
-    });
-    const buffer = Buffer.from(await arrayBuffer(stream));
-    return new StreamableFile(buffer);
   }
 }
