@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import type { Assignment } from '@open-data-capture/common/assignment';
+import type { AssignmentBundle } from '@open-data-capture/common/assignment';
 
 @Injectable()
 export class AssignmentsService {
-  private assignments: Assignment[] = [];
+  private assignments: AssignmentBundle[] = [];
 
-  addAssignments(assignments: Assignment[]) {
-    for (const assignment of assignments) {
-      this.assignments.push(assignment);
-    }
+  create(assignment: AssignmentBundle) {
+    this.assignments.push(assignment);
   }
 
-  findAssignments() {
+  find() {
     return this.assignments;
   }
 }

@@ -4,20 +4,20 @@ import { Render } from '@/decorators/render.decorator';
 
 import IndexPage from '../pages';
 import { AssignmentsService } from './assignments.service';
-import { AddGatewayAssignmentsDto } from './dto/add-gateway-assignments.dto';
+import { CreateAssignmentBundleDto } from './dto/create-assignment-bundle.dto';
 
 @Controller()
 export class AssignmentsController {
   constructor(private readonly assignmentsService: AssignmentsService) {}
 
   @Post()
-  addAssignments(@Body() { assignments }: AddGatewayAssignmentsDto) {
-    this.assignmentsService.addAssignments(assignments);
+  create(@Body() assignment: CreateAssignmentBundleDto) {
+    this.assignmentsService.create(assignment);
   }
 
   @Get()
-  findAssignments() {
-    return this.assignmentsService.findAssignments();
+  find() {
+    return this.assignmentsService.find();
   }
 
   @Get('page')
