@@ -23,7 +23,7 @@ export class SummaryService {
     return {
       counts: {
         instruments: await this.instrumentsService.count(),
-        records: await this.instrumentRecordsService.count({}, { ability }),
+        records: await this.instrumentRecordsService.count({ group }, { ability }),
         subjects: await this.subjectsService.count({ groups: group }, { ability }),
         users: await this.usersService.count({ groups: group }, { ability })
       }

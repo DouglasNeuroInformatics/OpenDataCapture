@@ -43,6 +43,11 @@ export class InstrumentRecordsService {
     const instrument = await this.instrumentsService.findById(instrumentId);
     const subject = await this.subjectsService.findById(subjectIdentifier);
 
+    if (group && !subject.groups.includes(group)) {
+      subject.groups.push(group);
+      await subject.save();
+    }
+
     return this.instrumentRecordsRepository.create({
       data,
       date,
