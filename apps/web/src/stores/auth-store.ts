@@ -18,6 +18,7 @@ export type AuthStore = {
   logout: () => void;
   setAccessToken: (accessToken: string) => void;
   setCurrentGroup: (group: Group) => void;
+  testSetAccessToken: (accessToken: string) => void;
 };
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -30,6 +31,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
   setAccessToken: (accessToken) => {
     const { groups, permissions, ...rest } = jwtDecode<JwtPayload>(accessToken);
+    console.log('successful login');
+    console.log(jwtDecode<JwtPayload>(accessToken));
+    console.log(permissions);
     const ability = createMongoAbility<AppAbility>(permissions);
     set({
       accessToken,
@@ -39,5 +43,34 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
   setCurrentGroup: (group) => {
     set({ currentGroup: group });
+  },
+
+  testSetAccessToken: (accessToken) => {
+    const { groups, permissions, ...rest } = jwtDecode<JwtPayload>(
+      'ew0KICAiYWxnIjogIkhTMjU2IiwNCiAgInR5cCI6ICJKV1QiDQp9.ew0KICAgICAgImdyb3VwcyI6IFtdLA0KICAgICAgInBlcm1pc3Npb25zIjogWw0KICAgICAgICAgIHsNCiAgICAgICAgICAgICAgImFjdGlvbiI6ICJtYW5hZ2UiLA0KICAgICAgICAgICAgICAic3ViamVjdCI6ICJhbGwiDQogICAgICAgICAgfQ0KICAgICAgXSwNCiAgICAgICJ1c2VybmFtZSI6ICJkYXZpZCIsDQogICAgICAiaWF0IjogMTY5OTQ4MTU4MywNCiAgICAgICJleHAiOiAxNjk5NTY3OTgzDQogIH0NCg=='
+    );
+    /* convert this from base64
+    {
+      "groups": [],
+      "permissions": [
+          {
+              "action": "manage",
+              "subject": "all"
+          }
+      ],
+      "username": "david",
+      "iat": 1699481583,
+      "exp": 1699567983
+  }
+    */
+    console.log('successful login');
+    console.log(jwtDecode<JwtPayload>(accessToken));
+    console.log(permissions);
+    const ability = createMongoAbility<AppAbility>(permissions);
+    set({
+      accessToken,
+      currentGroup: groups[0],
+      currentUser: { ability, groups, ...rest }
+    });
   }
 }));
