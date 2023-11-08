@@ -16,6 +16,11 @@ export class AssignmentsController {
   }
 
   @Get()
+  findAssignments() {
+    return this.assignmentsService.findAssignments();
+  }
+
+  @Get('page')
   @Render(IndexPage)
   render() {
     return { title: 'My Page' };

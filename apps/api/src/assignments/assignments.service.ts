@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 import { accessibleBy } from '@casl/mongoose';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, type OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Assignment } from '@open-data-capture/common/assignment';
 
@@ -14,8 +14,10 @@ import { AssignmentsRepository } from './assignments.repository';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 
+const REFRESH_INTERVAL = 5000;
+
 @Injectable()
-export class AssignmentsService implements EntityService<Assignment> {
+export class AssignmentsService implements EntityService<Assignment>, OnApplicationBootstrap {
   private readonly gatewayBaseUrl: string;
 
   constructor(
@@ -85,6 +87,10 @@ export class AssignmentsService implements EntityService<Assignment> {
     );
   }
 
+  onApplicationBootstrap() {
+    setTimeout(() => void this.fetchGatewayAssignments(), REFRESH_INTERVAL);
+  }
+
   async updateById(id: string, update: UpdateAssignmentDto, { ability }: EntityOperationOptions = {}) {
     const assignment = await this.assignmentsRepository.findById(id);
     if (!assignment) {
@@ -93,5 +99,16 @@ export class AssignmentsService implements EntityService<Assignment> {
       throw new ForbiddenException(`Insufficient rights to update assignment with ID: ${id}`);
     }
     return (await this.assignmentsRepository.updateById(id, update))!;
+  }
+
+  private async fetchGatewayAssignments() {
+    const response = await fetch(this.gatewayBaseUrl, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'GET'
+    });
+    const data = await response.json();
+    console.log(data);
   }
 }

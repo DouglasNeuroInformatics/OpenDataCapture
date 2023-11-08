@@ -10,4 +10,8 @@ export class AssignmentsService {
       this.assignments.push(assignment);
     }
   }
+
+  findAssignments() {
+    return this.assignments;
+  }
 }
