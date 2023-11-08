@@ -28,7 +28,7 @@ export class AbilityFactory {
         ability.can('create', 'Visit');
         break;
       case 'STANDARD':
-        ability.can('read', 'Group', { _id: { $in: user.groups } });
+        ability.can('read', 'Group', { _id: { $in: user.groups.map((group) => group.id) } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
         ability.can('create', 'Subject');
