@@ -19,6 +19,7 @@ import { InstrumentsService } from '@/instruments/instruments.service';
 import { importInstrumentSource } from '@/instruments/macros/import-instrument-source.macro' with { type: 'macro' }
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
+import { VisitsService } from '@/visits/visits.service';
 
 const BPRS_SOURCE = importInstrumentSource('forms/brief-psychiatric-rating-scale');
 const EDQ_SOURCE = importInstrumentSource('forms/enhanced-demographics-questionnaire');
@@ -38,7 +39,8 @@ export class DemoService {
     private readonly instrumentRecordsService: InstrumentRecordsService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly visitsService: VisitsService
   ) {}
 
   async init(): Promise<void> {
@@ -51,6 +53,11 @@ export class DemoService {
     for (let i = 0; i < 100; i++) {
       const group = await this.groupsService.findByName(randomValue(demoGroups).name);
       const subject = await this.createSubject();
+      await this.visitsService.create({
+        date: new Date(),
+        groupId: group._id.toString(),
+        subjectIdData: subject as Required<typeof subject>
+      })
       for (const form of forms) {
         for (let i = 0; i < 10; i++) {
           const data = this.createFormRecordData(
