@@ -17,8 +17,7 @@ export type RenderInterceptorOptions<T extends RootComponentType> = {
 export class RenderInterceptor<T extends RootComponentType> implements NestInterceptor {
   constructor(private readonly options: RenderInterceptorOptions<T>) {}
 
-  intercept(context: ExecutionContext, next: CallHandler<JSX.Element>): Observable<Promise<StreamableFile>> {
-    console.log(context);
+  intercept(_: ExecutionContext, next: CallHandler<JSX.Element>): Observable<Promise<StreamableFile>> {
     return next.handle().pipe(
       map(async (element) => {
         return await this.render(element);
