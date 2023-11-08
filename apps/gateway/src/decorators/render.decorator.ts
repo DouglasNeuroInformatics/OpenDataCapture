@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { Header } from '@nestjs/common';
+
+const setHeader = Header('Content-Type', 'text/html');
+
 export const COMPONENT_KEY = 'COMPONENT';
 
 export const Render = <
@@ -9,7 +13,8 @@ export const Render = <
 >(
   component: React.FC<P>
 ) => {
-  return (target: T, propertyKey: K) => {
+  return (target: T, propertyKey: K, descriptor: PropertyDescriptor) => {
+    setHeader(target, propertyKey, descriptor);
     Reflect.defineMetadata(COMPONENT_KEY, component, target[propertyKey] as object);
   };
 };
