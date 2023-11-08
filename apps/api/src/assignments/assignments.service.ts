@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 import { accessibleBy } from '@casl/mongoose';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
-import { ForbiddenException, Injectable, NotFoundException, type OnApplicationBootstrap } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Assignment } from '@open-data-capture/common/assignment';
 
@@ -13,16 +13,16 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { AssignmentsRepository } from './assignments.repository';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
-
-const REFRESH_INTERVAL = 5000;
+import { GatewayService } from './gateway.service';
 
 @Injectable()
-export class AssignmentsService implements EntityService<Assignment>, OnApplicationBootstrap {
+export class AssignmentsService implements EntityService<Assignment> {
   private readonly gatewayBaseUrl: string;
 
   constructor(
     configService: ConfigService,
     private readonly assignmentsRepository: AssignmentsRepository,
+    private readonly gatewayService: GatewayService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService
   ) {
@@ -32,7 +32,7 @@ export class AssignmentsService implements EntityService<Assignment>, OnApplicat
   async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto) {
     const instrument = await this.instrumentsService.findById(instrumentId);
     const subject = await this.subjectsService.findById(subjectIdentifier);
-    return this.assignmentsRepository.create({
+    const assignment = await this.assignmentsRepository.create({
       assignedAt: new Date(),
       expiresAt,
       instrument,
@@ -40,6 +40,9 @@ export class AssignmentsService implements EntityService<Assignment>, OnApplicat
       subject,
       url: new URL(crypto.randomUUID(), this.gatewayBaseUrl).toString()
     });
+    console.log(assignment);
+    await this.gatewayService.add([assignment]);
+    return assignment;
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -86,11 +89,6 @@ export class AssignmentsService implements EntityService<Assignment>, OnApplicat
       }
     );
   }
-
-  onApplicationBootstrap() {
-    setTimeout(() => void this.fetchGatewayAssignments(), REFRESH_INTERVAL);
-  }
-
   async updateById(id: string, update: UpdateAssignmentDto, { ability }: EntityOperationOptions = {}) {
     const assignment = await this.assignmentsRepository.findById(id);
     if (!assignment) {
@@ -99,16 +97,5 @@ export class AssignmentsService implements EntityService<Assignment>, OnApplicat
       throw new ForbiddenException(`Insufficient rights to update assignment with ID: ${id}`);
     }
     return (await this.assignmentsRepository.updateById(id, update))!;
-  }
-
-  private async fetchGatewayAssignments() {
-    const response = await fetch(this.gatewayBaseUrl, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'GET'
-    });
-    const data = await response.json();
-    console.log(data);
   }
 }

@@ -8,6 +8,7 @@ import { AssignmentsController } from './assignments.controller';
 import { AssignmentsRepository } from './assignments.repository';
 import { AssignmentsService } from './assignments.service';
 import { AssignmentEntity, AssignmentSchema } from './entities/assignment.entity';
+import { GatewayService } from './gateway.service';
 
 @Module({
   controllers: [AssignmentsController],
@@ -21,6 +22,6 @@ import { AssignmentEntity, AssignmentSchema } from './entities/assignment.entity
     ]),
     SubjectsModule
   ],
-  providers: [AssignmentsRepository, AssignmentsService]
+  providers: [AssignmentsRepository, AssignmentsService, GatewayService]
 })
 export class AssignmentsModule {}
