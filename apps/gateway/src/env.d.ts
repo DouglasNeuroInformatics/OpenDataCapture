@@ -2,5 +2,6 @@
 /// <reference lib="dom.iterable" />
 
 export declare global {
-  const PATH_TO_PAGE: string;
+  const __PATH_TO_PAGE__: string;
+  const __INITIAL_PROPS__: Record<string, unknown>;
 }

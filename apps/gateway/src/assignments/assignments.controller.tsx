@@ -9,6 +9,6 @@ export class AssignmentsController {
   @Get()
   @Render(IndexPage)
   render() {
-    return {}; // { title: 'My Page' };
+    return { title: 'My Page' };
   }
 }

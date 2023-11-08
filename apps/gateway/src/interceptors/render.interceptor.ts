@@ -34,7 +34,10 @@ export class RenderInterceptor<T extends RootComponentType> implements NestInter
         });
         const stream = await renderToReadableStream(app, {
           bootstrapModules: ['/hydrate.js'],
-          bootstrapScriptContent: 'const PATH_TO_PAGE = "/pages/index.js"'
+          bootstrapScriptContent: `
+            const __PATH_TO_PAGE__ = "/pages/index.js"
+            const __INITIAL_PROPS__ = ${JSON.stringify(props)}
+          `
         });
         const buffer = Buffer.from(await arrayBuffer(stream));
         return new StreamableFile(buffer);
