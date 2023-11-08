@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
-import { AppController } from './app.controller';
+import { AssignmentsModule } from './assignments/assignments.module';
 import { Layout } from './components/Layout';
 import { RenderInterceptor } from './interceptors/render.interceptor';
 
 @Module({
-  controllers: [AppController],
   imports: [
+    AssignmentsModule,
     ConfigModule.forRoot({
       isGlobal: true
     })

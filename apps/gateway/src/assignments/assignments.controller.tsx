@@ -1,10 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 
-import { Page } from './decorators/page.decorator';
-import IndexPage from './pages';
+import { Page } from '../decorators/page.decorator';
+import IndexPage from '../pages';
 
 @Controller()
-export class AppController {
+export class AssignmentsController {
   @Get()
   @Page()
   render() {
