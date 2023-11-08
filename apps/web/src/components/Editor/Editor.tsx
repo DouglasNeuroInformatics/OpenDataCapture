@@ -93,7 +93,7 @@ export const Editor = ({ className, files }: EditorProps) => {
             <QuestionMarkCircleIcon height={14} width={14} />
           </button>
         </div>
-        <div className="flex min-h-[576px]">
+        <div className="flex h-full min-h-[576px]">
           <EditorSidebar
             files={files}
             isOpen={isSidebarOpen}
@@ -102,7 +102,7 @@ export const Editor = ({ className, files }: EditorProps) => {
           />
           {selectedFile ? (
             <MonacoEditor
-              className="min-h-[576px]"
+              className="h-full min-h-[576px]"
               defaultLanguage="typescript"
               defaultValue={selectedFile.content}
               options={{
