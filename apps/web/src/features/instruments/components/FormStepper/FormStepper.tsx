@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Stepper, useNotificationsStore } from '@douglasneuroinformatics/ui';
@@ -8,6 +8,7 @@ import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Visit } from '@open-data-capture/common/visit';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -23,9 +24,16 @@ export type FormStepperProps = {
 
 export const FormStepper = ({ activeVisit, form }: FormStepperProps) => {
   const { currentGroup } = useAuthStore();
+  const navigate = useNavigate();
   const notifications = useNotificationsStore();
   const [data, setData] = useState<FormDataType>();
   const { t } = useTranslation(['common', 'instruments']);
+
+  useEffect(() => {
+    if (!activeVisit) {
+      navigate('/instruments/available-instruments');
+    }
+  }, [activeVisit]);
 
   const handleSubmit = async (data: FormDataType) => {
     await axios.post('/v1/instrument-records', {
