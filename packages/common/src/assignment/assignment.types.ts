@@ -1,4 +1,4 @@
-import type { BaseInstrument, FormInstrumentSummary } from '../instrument/instrument.types';
+import type { BaseInstrument, FormInstrument, FormInstrumentSummary } from '../instrument/instrument.types';
 
 export type AssignmentStatus = 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDING';
 
@@ -22,3 +22,7 @@ export type CreateAssignmentData = {
 };
 
 export type UpdateAssignmentData = Partial<Pick<Assignment, 'expiresAt' | 'status'>>;
+
+export type AddGatewayAssignmentsData = {
+  assignments: Assignment<FormInstrument>[];
+};

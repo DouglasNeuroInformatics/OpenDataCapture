@@ -38,3 +38,7 @@ export const updateAssignmentDataSchema = z
     status: assignmentStatusSchema
   })
   .partial() satisfies Zod.ZodType<Types.UpdateAssignmentData>;
+
+export const addGatewayAssignmentsDataSchema = z.object({
+  assignments: assignmentSchema.array()
+}) satisfies Zod.ZodType<Types.AddGatewayAssignmentsData>;
