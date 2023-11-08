@@ -16,7 +16,7 @@ export class AbilityFactory {
         break;
       case 'GROUP_MANAGER':
         ability.can('manage', 'Assignment');
-        ability.can('read', 'Group', { _id: { $in: user.groups } });
+        ability.can('read', 'Group', { _id: { $in: user.groups.map((group) => group.id) } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
         ability.can('read', 'InstrumentRecord', { group: { $in: user.groups } });
