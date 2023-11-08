@@ -40,8 +40,7 @@ export class AssignmentsService implements EntityService<Assignment> {
       subject,
       url: new URL(crypto.randomUUID(), this.gatewayBaseUrl).toString()
     });
-    console.log(assignment);
-    await this.gatewayService.add([assignment]);
+    await this.gatewayService.create(assignment);
     return assignment;
   }
 
