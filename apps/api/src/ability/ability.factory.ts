@@ -24,6 +24,8 @@ export class AbilityFactory {
         ability.can('read', 'Subject', { groups: { $in: user.groups } });
         ability.can('read', 'Summary');
         ability.can('read', 'User', { groups: { $in: user.groups } });
+        ability.can('read', 'Visit');
+        ability.can('create', 'Visit');
         break;
       case 'STANDARD':
         ability.can('read', 'Group', { _id: { $in: user.groups } });
@@ -31,6 +33,8 @@ export class AbilityFactory {
         ability.can('create', 'InstrumentRecord');
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groups: { $in: user.groups } });
+        ability.can('read', 'Visit');
+        ability.can('create', 'Visit');
     }
     return ability.build();
   }
