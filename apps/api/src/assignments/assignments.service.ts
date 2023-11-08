@@ -16,12 +16,16 @@ import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 
 @Injectable()
 export class AssignmentsService implements EntityService<Assignment> {
+  private readonly gatewayBaseUrl: string;
+
   constructor(
+    configService: ConfigService,
     private readonly assignmentsRepository: AssignmentsRepository,
-    private readonly configService: ConfigService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService
-  ) {}
+  ) {
+    this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_URL');
+  }
 
   async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto) {
     const instrument = await this.instrumentsService.findById(instrumentId);
@@ -32,7 +36,7 @@ export class AssignmentsService implements EntityService<Assignment> {
       instrument,
       status: 'OUTSTANDING',
       subject,
-      url: new URL(crypto.randomUUID(), this.configService.getOrThrow('GATEWAY_URL')).toString()
+      url: new URL(crypto.randomUUID(), this.gatewayBaseUrl).toString()
     });
   }
 
