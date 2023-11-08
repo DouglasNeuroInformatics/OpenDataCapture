@@ -1,9 +1,11 @@
+import React from 'react';
+
 import { Spinner } from '@douglasneuroinformatics/ui';
 import { instrumentSourceContainerSchema } from '@open-data-capture/common/instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-import { Editor } from '@/components/Editor';
+const Editor = React.lazy(() => import('@/components/Editor').then((module) => ({ default: module.Editor })));
 
 export const ManageInstrumentsPage = () => {
   const query = useQuery({

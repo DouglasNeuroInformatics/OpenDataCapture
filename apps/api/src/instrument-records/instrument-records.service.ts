@@ -126,8 +126,6 @@ export class InstrumentRecordsService {
       }
     );
 
-    console.log(records.length);
-
     return records.map((doc) => {
       const obj = doc.toObject({
         depopulate: true,

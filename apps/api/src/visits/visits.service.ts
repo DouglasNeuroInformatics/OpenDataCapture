@@ -20,6 +20,10 @@ export class VisitsService implements Pick<EntityService<Visit>, 'create'> {
   async create({ date, groupId, subjectIdData }: CreateVisitData) {
     const group = groupId ? await this.groupsService.findById(groupId) : undefined;
     const subject = await this.resolveSubject(subjectIdData);
+    if (group && !subject.groups.includes(group)) {
+      subject.groups.push(group);
+      await subject.save();
+    }
     return this.visitsRepository.create({ date, group, subject });
   }
 

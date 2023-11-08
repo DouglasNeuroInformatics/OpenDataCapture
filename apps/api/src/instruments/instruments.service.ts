@@ -88,7 +88,7 @@ export class InstrumentsService {
     const instrument = await this.instrumentsRepository.findById(id);
     if (!instrument) {
       throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
-    } else if (ability && !ability.can('delete', instrument)) {
+    } else if (ability && !ability.can('read', instrument)) {
       throw new ForbiddenException(`Insufficient rights to read instrument with ID: ${id}`);
     }
     return instrument;

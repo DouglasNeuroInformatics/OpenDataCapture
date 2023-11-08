@@ -36,7 +36,7 @@
     "prettier-plugin-astro": "^0.12.1",
     "prettier-plugin-tailwindcss": "^0.5.6",
     "turbo": "^1.10.16",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.1-rc"
   },
   "packageManager": "bun@1.0.7"
 }

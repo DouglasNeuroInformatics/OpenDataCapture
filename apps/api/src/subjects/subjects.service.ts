@@ -68,7 +68,7 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
     const subject = await this.subjectsRepository.findOne({ identifier });
     if (!subject) {
       throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
-    } else if (ability && !ability.can('delete', subject)) {
+    } else if (ability && !ability.can('read', subject)) {
       throw new ForbiddenException(`Insufficient rights to read subject with identifier: ${identifier}`);
     }
     return subject;

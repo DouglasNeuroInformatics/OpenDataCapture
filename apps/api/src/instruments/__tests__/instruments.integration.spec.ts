@@ -12,13 +12,13 @@ import request from 'supertest';
 import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsRepository } from '../instruments.repository';
 import { InstrumentsService } from '../instruments.service';
-import { resolveInstrumentSource } from '../instruments.utils';
+import { importInstrumentSource } from '../macros/import-instrument-source.macro' with { type: 'macro'}
 
-const BPRS_SOURCE = await resolveInstrumentSource('forms/brief-psychiatric-rating-scale');
-const EDQ_SOURCE = await resolveInstrumentSource('forms/enhanced-demographics-questionnaire');
-const HQ_SOURCE = await resolveInstrumentSource('forms/happiness-questionnaire');
-const MMSE_SOURCE = await resolveInstrumentSource('forms/mini-mental-state-examination');
-const MOCA_SOURCE = await resolveInstrumentSource('forms/montreal-cognitive-assessment');
+const BPRS_SOURCE = importInstrumentSource('forms/brief-psychiatric-rating-scale');
+const EDQ_SOURCE = importInstrumentSource('forms/enhanced-demographics-questionnaire');
+const HQ_SOURCE = importInstrumentSource('forms/happiness-questionnaire');
+const MMSE_SOURCE = importInstrumentSource('forms/mini-mental-state-examination');
+const MOCA_SOURCE = importInstrumentSource('forms/montreal-cognitive-assessment');
 
 describe('/instruments', () => {
   let app: NestExpressApplication;
