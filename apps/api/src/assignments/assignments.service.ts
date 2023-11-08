@@ -57,7 +57,7 @@ export class AssignmentsService implements EntityService<Assignment> {
     const assignment = await this.assignmentsRepository.findById(id);
     if (!assignment) {
       throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
-    } else if (ability && !ability.can('delete', assignment)) {
+    } else if (ability && !ability.can('read', assignment)) {
       throw new ForbiddenException(`Insufficient rights to read assignment with ID: ${id}`);
     }
     return assignment;

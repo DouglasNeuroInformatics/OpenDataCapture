@@ -41,7 +41,7 @@ export class GroupsService implements EntityService<Group> {
     const group = await this.groupsRepository.findById(id);
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
-    } else if (ability && !ability.can('delete', group)) {
+    } else if (ability && !ability.can('read', group)) {
       throw new ForbiddenException(`Insufficient rights to read group with ID: ${id}`);
     }
     return group;
