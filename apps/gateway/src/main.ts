@@ -26,7 +26,6 @@ async function buildStaticContent() {
   await fs.mkdir(BUILD_DIR);
 
   const pages = await resolvePages();
-  console.log(pages);
 
   await Bun.build({
     entrypoints: [path.resolve(import.meta.dir, 'hydrate.tsx'), ...pages],
