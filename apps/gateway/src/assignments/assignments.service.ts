@@ -5,7 +5,9 @@ import type { Assignment } from '@open-data-capture/common/assignment';
 export class AssignmentsService {
   private assignments: Assignment[] = [];
 
-  addAssignment(assignment: Assignment) {
-    this.assignments.push(assignment);
+  addAssignments(assignments: Assignment[]) {
+    for (const assignment of assignments) {
+      this.assignments.push(assignment);
+    }
   }
 }
