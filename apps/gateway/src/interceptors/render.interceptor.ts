@@ -33,7 +33,8 @@ export class RenderInterceptor<T extends RootComponentType> implements NestInter
           children: React.createElement(component, props)
         });
         const stream = await renderToReadableStream(app, {
-          bootstrapModules: ['/hydrate.js']
+          bootstrapModules: ['/hydrate.js'],
+          bootstrapScriptContent: 'const PATH_TO_PAGE = "/pages/index.js"'
         });
         const buffer = Buffer.from(await arrayBuffer(stream));
         return new StreamableFile(buffer);

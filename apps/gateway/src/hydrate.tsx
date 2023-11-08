@@ -1,13 +1,14 @@
 import { hydrateRoot } from 'react-dom/client';
 
 import { Layout } from './components/Layout';
-import IndexPage from './pages';
+
+const Page = await import(PATH_TO_PAGE).then((module: { default: React.ComponentType }) => module.default);
 
 import './styles.css';
 
 hydrateRoot(
   document,
   <Layout>
-    <IndexPage />
+    <Page />
   </Layout>
 );

@@ -11,12 +11,22 @@ import { AppModule } from './app.module';
 const PROJECT_ROOT = path.resolve(import.meta.dir, '..');
 const BUILD_DIR = path.resolve(PROJECT_ROOT, 'dist');
 
+async function resolvePages() {
+  const files = await fs.readdir(path.resolve(import.meta.dir, 'pages')).then((files) => {
+    return files.map((filename) => path.resolve(import.meta.dir, 'pages', filename));
+  });
+  return files;
+}
+
 async function buildStaticContent() {
   await fs.rm(BUILD_DIR, { force: true, recursive: true });
   await fs.mkdir(BUILD_DIR);
 
+  const pages = await resolvePages();
+  console.log(pages);
+
   await Bun.build({
-    entrypoints: [path.resolve(import.meta.dir, 'hydrate.tsx')],
+    entrypoints: [path.resolve(import.meta.dir, 'hydrate.tsx'), ...pages],
     minify: true,
     outdir: BUILD_DIR,
     plugins: [tailwindcssPlugin()],
