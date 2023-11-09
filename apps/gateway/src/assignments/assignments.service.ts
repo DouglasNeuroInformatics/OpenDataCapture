@@ -27,7 +27,7 @@ export class AssignmentsService {
       instrumentId,
       status: 'OUTSTANDING',
       subjectIdentifier,
-      url: `${baseUrl}/${id}`
+      url: `${baseUrl}/assignments/${id}`
     });
     return this.assignmentBundlesRepository.save(entity);
   }

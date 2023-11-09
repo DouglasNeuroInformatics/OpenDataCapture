@@ -21,7 +21,7 @@ export class AssignmentsController {
     return this.assignmentsService.find({ subjectIdentifier });
   }
 
-  @Get('page')
+  @Get(':id')
   @Render(IndexPage)
   render() {
     return { title: 'My Page' };
