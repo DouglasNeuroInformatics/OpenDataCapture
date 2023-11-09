@@ -1,9 +1,9 @@
 import path from 'path';
 
-import { LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
+import { LoggerMiddleware, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -49,6 +49,10 @@ import { AssignmentsModule } from './assignments/assignments.module';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe
     }
   ]
 })

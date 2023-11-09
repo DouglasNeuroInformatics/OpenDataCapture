@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ExceptionsFilter } from '@douglasneuroinformatics/nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
@@ -47,7 +47,6 @@ async function bootstrap() {
     })
   );
   app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
-  app.useGlobalPipes(new ValidationPipe());
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'dist'));
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
 

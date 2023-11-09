@@ -36,6 +36,12 @@ describe('/assignments', () => {
       expect(response.status).toBe(HttpStatus.OK);
     });
   });
+  describe('POST /assignments', () => {
+    it('should reject a request with an empty body', async () => {
+      const response = await request(server).post('/assignments').send();
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+  });
 });
 
 afterAll(async () => {
