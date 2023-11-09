@@ -6,10 +6,7 @@ import { assignmentBundleSchema } from '@open-data-capture/common/assignment';
 export class CreateAssignmentBundleDto {
   assignedAt: Date;
   expiresAt: Date;
-  id?: string | undefined;
-  instrument: {
-    bundle: string;
-  };
+  instrumentBundle: string;
   status: 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDING';
   url: string;
 }

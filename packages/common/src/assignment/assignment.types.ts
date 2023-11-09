@@ -5,7 +5,7 @@ export type AssignmentStatus = 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDIN
 export type Assignment<TInstrument extends BaseInstrument = BaseInstrument> = {
   assignedAt: Date;
   expiresAt: Date;
-  id?: string;
+  id?: number;
   instrument: TInstrument;
   status: AssignmentStatus;
   url: string;

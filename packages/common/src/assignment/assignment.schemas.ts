@@ -15,7 +15,7 @@ export const assignmentStatusSchema = z.enum([
 export const assignmentSchema = z.object({
   assignedAt: z.coerce.date(),
   expiresAt: z.coerce.date(),
-  id: z.string().optional(),
+  id: z.coerce.number().optional(),
   instrument: formInstrumentSchema,
   status: assignmentStatusSchema,
   url: z.string().url()
@@ -39,10 +39,8 @@ export const updateAssignmentDataSchema = z
   })
   .partial() satisfies Zod.ZodType<Types.UpdateAssignmentData>;
 
-export const assignmentBundleSchema = assignmentSchema.extend({
-  instrument: z.object({
-    bundle: z.string()
-  })
+export const assignmentBundleSchema = assignmentSchema.omit({ instrument: true }).extend({
+  instrumentBundle: z.string()
 });
 
 export type AssignmentBundle = z.infer<typeof assignmentBundleSchema>;

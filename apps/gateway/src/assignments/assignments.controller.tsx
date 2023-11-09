@@ -11,12 +11,12 @@ export class AssignmentsController {
   constructor(private readonly assignmentsService: AssignmentsService) {}
 
   @Post()
-  create(@Body() assignment: CreateAssignmentBundleDto) {
-    this.assignmentsService.create(assignment);
+  async create(@Body() assignment: CreateAssignmentBundleDto) {
+    return this.assignmentsService.create(assignment);
   }
 
   @Get()
-  find() {
+  async find() {
     return this.assignmentsService.find();
   }
 
