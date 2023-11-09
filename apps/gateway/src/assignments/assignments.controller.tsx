@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import type { AssignmentBundle } from '@open-data-capture/common/assignment';
 
 import { Render } from '@/decorators/render.decorator';
@@ -17,8 +17,8 @@ export class AssignmentsController {
   }
 
   @Get()
-  async find() {
-    return this.assignmentsService.find();
+  async find(@Query('subjectIdentifier') subjectIdentifier?: string) {
+    return this.assignmentsService.find({ subjectIdentifier });
   }
 
   @Get('page')

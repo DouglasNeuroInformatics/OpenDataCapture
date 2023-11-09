@@ -22,7 +22,11 @@ export class AssignmentsService {
     return this.assignmentBundlesRepository.save(entity);
   }
 
-  async find() {
-    return this.assignmentBundlesRepository.find();
+  async find({ subjectIdentifier }: { subjectIdentifier?: string } = {}) {
+    return this.assignmentBundlesRepository.find({
+      where: {
+        subjectIdentifier
+      }
+    });
   }
 }
