@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import type { AssignmentBundle } from '@open-data-capture/common/assignment';
+import type { CreateAssignmentBundleData } from '@open-data-capture/common/assignment';
 import type { Repository } from 'typeorm';
 
 import { AssignmentBundleEntity } from './entities/assignment-bundle.entity';
@@ -12,8 +12,13 @@ export class AssignmentsService {
     private readonly assignmentBundlesRepository: Repository<AssignmentBundleEntity>
   ) {}
 
-  async create(assignment: AssignmentBundle) {
-    const entity = this.assignmentBundlesRepository.create(assignment);
+  async create(data: CreateAssignmentBundleData) {
+    const entity = this.assignmentBundlesRepository.create({
+      ...data,
+      assignedAt: new Date(),
+      status: 'OUTSTANDING',
+      url: 'https://google.com'
+    });
     return this.assignmentBundlesRepository.save(entity);
   }
 

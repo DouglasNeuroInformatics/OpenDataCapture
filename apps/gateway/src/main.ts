@@ -1,9 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import tailwindcssPlugin from 'bun-plugin-tailwindcss';
 
@@ -46,6 +46,7 @@ async function bootstrap() {
       root: Layout
     })
   );
+  app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
   app.useGlobalPipes(new ValidationPipe());
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'dist'));
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
