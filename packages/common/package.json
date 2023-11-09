@@ -4,6 +4,9 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
+    ".": {
+      "types": "./src/index.d.ts"
+    },
     "./assignment": "./src/assignment/assignment.index.ts",
     "./auth": "./src/auth/auth.index.ts",
     "./core": "./src/core/core.index.ts",
@@ -16,7 +19,7 @@
     "./user": "./src/user/user.index.ts",
     "./visit": "./src/visit/visit.index.ts"
   },
-  "main": "./src/index.ts",
+  "types": "./src/index.d.ts",
   "scripts": {
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"

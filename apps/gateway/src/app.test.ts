@@ -3,12 +3,15 @@ import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { HttpStatus } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
+// import { InstrumentTransformer } from '@open-data-capture/common/instrument';
 import request from 'supertest';
 
 import { AppModule } from '@/app.module';
 
 let app: NestExpressApplication;
 let server: unknown;
+
+// const instrumentTransformer = new InstrumentTransformer();
 
 beforeAll(async () => {
   const moduleRef = await Test.createTestingModule({

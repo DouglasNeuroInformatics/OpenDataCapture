@@ -11,12 +11,12 @@ import type {
 } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { demoGroups, demoUsers } from '@open-data-capture/demo';
+import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' }
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
-import { importInstrumentSource } from '@/instruments/macros/import-instrument-source.macro' with { type: 'macro' }
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 import { VisitsService } from '@/visits/visits.service';
