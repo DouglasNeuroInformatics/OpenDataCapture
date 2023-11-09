@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import type { AssignmentBundle } from '@open-data-capture/common/assignment';
 
 import { Render } from '@/decorators/render.decorator';
@@ -23,7 +23,8 @@ export class AssignmentsController {
 
   @Get(':id')
   @Render(IndexPage)
-  render() {
-    return { title: 'My Page' };
+  async render(@Param('id') id: string) {
+    const assignment = await this.assignmentsService.findById(id);
+    return { bundle: assignment!.instrumentBundle, title: 'My Page' };
   }
 }

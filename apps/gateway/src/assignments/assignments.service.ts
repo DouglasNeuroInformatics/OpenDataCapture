@@ -39,4 +39,8 @@ export class AssignmentsService {
       }
     });
   }
+
+  async findById(id: string) {
+    return this.assignmentBundlesRepository.findOne({ where: { id } });
+  }
 }

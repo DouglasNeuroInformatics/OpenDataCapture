@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false,
+    "jsx": "react-jsx"
+  },
+  "include": [".storybook/**/*", "src/**/*"]
+}
