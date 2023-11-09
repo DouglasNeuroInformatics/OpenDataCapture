@@ -2,16 +2,14 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  type Assignment,
-  type CreateAssignmentBundleData,
-  assignmentBundleSchema
-} from '@open-data-capture/common/assignment';
+import type { Assignment, AssignmentBundle, CreateAssignmentBundleData } from '@open-data-capture/common/assignment';
+import { assignmentBundleSchema } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
 // import { SubjectsService } from '@/subjects/subjects.service';
 
+import { subject } from '@casl/ability';
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
@@ -28,14 +26,16 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_URL');
   }
 
-  async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto) {
+  async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto): Promise<AssignmentBundle> {
     const instrument = await this.instrumentsService.findById(instrumentId);
-    return this.httpService.post(`${this.gatewayBaseUrl}/assignments`, {
+    const dto: CreateAssignmentBundleData = {
       expiresAt,
       instrumentBundle: instrument.bundle,
       instrumentId: instrument.id as string,
       subjectIdentifier
-    } satisfies CreateAssignmentBundleData);
+    };
+    const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/assignments`, dto);
+    return assignmentBundleSchema.parseAsync(response.data);
   }
 
   async find({ subjectIdentifier }: { subjectIdentifier?: string } = {}, { ability }: EntityOperationOptions = {}) {
@@ -45,10 +45,15 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
       }
     });
     const assignmentBundles = await assignmentBundleSchema.array().parseAsync(response.data);
-    return assignmentBundles.map(async (bundle) => {
+    const assignments: Assignment[] = [];
+    for (const bundle of assignmentBundles) {
       const instrument = await this.instrumentsService.findById(bundle.instrumentId);
-      const assignment = { ...bundle, instrument };
-      return !ability || ability.can('read', assignment);
-    });
+      const assignment = subject('Assignment', { ...bundle, instrument });
+      if (ability && !ability.can('read', assignment)) {
+        continue;
+      }
+      assignments.push(assignment);
+    }
+    return assignments;
   }
 }
