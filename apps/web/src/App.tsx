@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { NotificationHub } from '@douglasneuroinformatics/ui';
+import { ErrorFallback } from '@open-data-capture/react-core/components';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { Router } from '@/Router';
 import { ActiveVisit } from '@/components/ActiveVisit';
-import { ErrorFallback } from '@/components/ErrorFallback';
 import { SuspenseFallback } from '@/components/SuspenseFallback';
 import { SetupProvider } from '@/features/setup';
 import { queryClient } from '@/services/react-query';

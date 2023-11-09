@@ -9,6 +9,10 @@
     "lint": "tsc && eslint --fix src",
     "storybook": "storybook dev -p 6006"
   },
+  "exports": {
+    "./components": "./src/components/index.ts",
+    "./tailwind.config": "./tailwind.config.js"
+  },
   "dependencies": {
     "@douglasneuroinformatics/form-types": "latest",
     "@douglasneuroinformatics/ui": "latest",
