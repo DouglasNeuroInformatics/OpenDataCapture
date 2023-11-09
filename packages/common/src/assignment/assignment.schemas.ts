@@ -15,7 +15,7 @@ export const assignmentStatusSchema = z.enum([
 export const assignmentSchema = z.object({
   assignedAt: z.coerce.date(),
   expiresAt: z.coerce.date(),
-  id: z.coerce.number().optional(),
+  id: z.coerce.string().optional(),
   instrument: formInstrumentSchema,
   status: assignmentStatusSchema,
   url: z.string().url()

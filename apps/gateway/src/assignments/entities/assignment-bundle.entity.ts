@@ -1,5 +1,5 @@
 import type { AssignmentBundle } from '@open-data-capture/common/assignment';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class AssignmentBundleEntity implements AssignmentBundle {
@@ -9,8 +9,8 @@ export class AssignmentBundleEntity implements AssignmentBundle {
   @Column()
   expiresAt: Date;
 
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  id: string;
 
   @Column()
   instrumentBundle: string;
@@ -23,7 +23,7 @@ export class AssignmentBundleEntity implements AssignmentBundle {
 
   @Column()
   subjectIdentifier: string;
-  
+
   @Column()
   url: string;
 }

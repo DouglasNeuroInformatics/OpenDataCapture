@@ -1,4 +1,7 @@
+import crypto from 'crypto';
+
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { CreateAssignmentBundleData } from '@open-data-capture/common/assignment';
 import type { Repository } from 'typeorm';
@@ -9,15 +12,22 @@ import { AssignmentBundleEntity } from './entities/assignment-bundle.entity';
 export class AssignmentsService {
   constructor(
     @InjectRepository(AssignmentBundleEntity)
-    private readonly assignmentBundlesRepository: Repository<AssignmentBundleEntity>
+    private readonly assignmentBundlesRepository: Repository<AssignmentBundleEntity>,
+    private readonly configService: ConfigService
   ) {}
 
-  async create(data: CreateAssignmentBundleData) {
+  async create({ expiresAt, instrumentBundle, instrumentId, subjectIdentifier }: CreateAssignmentBundleData) {
+    const baseUrl: string = this.configService.getOrThrow('GATEWAY_URL');
+    const id = crypto.randomUUID();
     const entity = this.assignmentBundlesRepository.create({
-      ...data,
       assignedAt: new Date(),
+      expiresAt,
+      id,
+      instrumentBundle,
+      instrumentId,
       status: 'OUTSTANDING',
-      url: 'https://google.com'
+      subjectIdentifier,
+      url: `${baseUrl}/${id}`
     });
     return this.assignmentBundlesRepository.save(entity);
   }
