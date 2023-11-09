@@ -108,7 +108,7 @@ export const SubjectAssignmentsPage = () => {
         isOpen={isEditSliderOpen}
         setIsOpen={setIsEditSliderOpen}
         onCancel={({ id }) => {
-          assignmentsMutation.mutate({ id: id!, kind: 'update', payload: { status: 'CANCELED' } });
+          assignmentsMutation.mutate({ id: id!.toString(), kind: 'update', payload: { status: 'CANCELED' } });
           setIsEditSliderOpen(false);
         }}
       />

@@ -40,7 +40,7 @@ export class AssignmentsController implements Pick<EntityController<Assignment>,
   @Get('summary')
   @RouteAccess({ action: 'read', subject: 'Assignment' })
   findSummaries(@CurrentUser('ability') ability?: AppAbility, @Query('subjectIdentifier') subjectIdentifier?: string) {
-    return this.assignmentsService.findSummaries({ subjectIdentifier }, { ability });
+    return this.assignmentsService.find({ subjectIdentifier }, { ability });
   }
 
   // @ApiOperation({ summary: 'Get Assignment' })
