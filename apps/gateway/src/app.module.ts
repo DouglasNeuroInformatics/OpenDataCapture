@@ -7,11 +7,9 @@ import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AppController } from './app.controller';
 import { AssignmentsModule } from './assignments/assignments.module';
 
 @Module({
-  controllers: [AppController],
   imports: [
     AssignmentsModule,
     ConfigModule.forRoot({
