@@ -30,7 +30,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
 
   async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto) {
     const instrument = await this.instrumentsService.findById(instrumentId);
-    return this.httpService.post(this.gatewayBaseUrl, {
+    return this.httpService.post(`${this.gatewayBaseUrl}/assignments`, {
       expiresAt,
       instrumentBundle: instrument.bundle,
       instrumentId: instrument.id as string,
@@ -39,7 +39,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
   }
 
   async find({ subjectIdentifier }: { subjectIdentifier?: string } = {}, { ability }: EntityOperationOptions = {}) {
-    const response = await this.httpService.axiosRef.get(this.gatewayBaseUrl, {
+    const response = await this.httpService.axiosRef.get(`${this.gatewayBaseUrl}/assignments`, {
       params: {
         subjectIdentifier
       }
