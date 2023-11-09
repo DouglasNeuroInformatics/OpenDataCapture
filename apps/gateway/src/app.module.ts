@@ -2,7 +2,7 @@ import path from 'path';
 
 import { LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
 import { type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -32,11 +32,17 @@ import { AssignmentsModule } from './assignments/assignments.module';
         ttl: 60000
       }
     ]),
-    TypeOrmModule.forRoot({
-      autoLoadEntities: true,
-      database: path.resolve(import.meta.dir, '..', 'data', 'db.sqlite'),
-      synchronize: true,
-      type: 'sqlite'
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const env = configService.getOrThrow<string>('NODE_ENV');
+        return {
+          autoLoadEntities: true,
+          database: env === 'test' ? ':memory:' : path.resolve(import.meta.dir, '..', 'data', 'db.sqlite'),
+          synchronize: true,
+          type: 'sqlite'
+        };
+      }
     })
   ],
   providers: [
