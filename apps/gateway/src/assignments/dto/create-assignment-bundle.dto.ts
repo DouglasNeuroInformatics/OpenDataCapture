@@ -7,6 +7,8 @@ export class CreateAssignmentBundleDto {
   assignedAt: Date;
   expiresAt: Date;
   instrumentBundle: string;
+  instrumentId: string;
   status: 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDING';
+  subjectIdentifier: string;
   url: string;
 }

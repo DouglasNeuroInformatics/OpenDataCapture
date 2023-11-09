@@ -40,7 +40,18 @@ export const updateAssignmentDataSchema = z
   .partial() satisfies Zod.ZodType<Types.UpdateAssignmentData>;
 
 export const assignmentBundleSchema = assignmentSchema.omit({ instrument: true }).extend({
-  instrumentBundle: z.string()
+  instrumentBundle: z.string(),
+  instrumentId: z.string(),
+  subjectIdentifier: z.string()
 });
 
 export type AssignmentBundle = z.infer<typeof assignmentBundleSchema>;
+
+export const createAssignmentBundleDataSchema = assignmentBundleSchema.omit({
+  assignedAt: true,
+  id: true,
+  status: true,
+  url: true
+});
+
+export type CreateAssignmentBundleData = z.infer<typeof createAssignmentBundleDataSchema>;

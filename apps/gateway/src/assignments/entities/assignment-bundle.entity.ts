@@ -16,8 +16,14 @@ export class AssignmentBundleEntity implements AssignmentBundle {
   instrumentBundle: string;
 
   @Column()
+  instrumentId: string;
+
+  @Column()
   status: 'CANCELED' | 'COMPLETE' | 'EXPIRED' | 'OUTSTANDING';
 
+  @Column()
+  subjectIdentifier: string;
+  
   @Column()
   url: string;
 }
