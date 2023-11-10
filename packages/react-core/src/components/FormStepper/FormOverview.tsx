@@ -15,7 +15,7 @@ type FormOverviewProps = {
 
 export const FormOverview = ({ form }: FormOverviewProps) => {
   const { updateIndex } = useContext(StepperContext);
-  const { t } = useTranslation();
+  const { t } = useTranslation('core');
 
   return (
     <div className="mb-2">

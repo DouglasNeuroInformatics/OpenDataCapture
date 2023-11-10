@@ -9,7 +9,7 @@ export const COMPONENT_KEY = 'COMPONENT';
 export const Render = <
   T extends object,
   K extends Extract<keyof T, string>,
-  P extends T[K] extends (...args: any[]) => infer R ? R : never
+  P extends T[K] extends (...args: any[]) => infer R ? (R extends Promise<infer U> ? U : R) : never
 >(
   component: React.FC<P>
 ) => {

@@ -11,6 +11,8 @@
   },
   "exports": {
     "./components": "./src/components/index.ts",
+    "./services/i18n": "./src/services/i18n.ts",
+    "./translations/*": "./src/translations/*",
     "./tailwind.config": "./tailwind.config.js"
   },
   "dependencies": {

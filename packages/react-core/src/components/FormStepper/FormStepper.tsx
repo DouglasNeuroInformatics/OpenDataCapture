@@ -8,19 +8,20 @@ import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 
+import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { FormOverview } from './FormOverview';
 import { FormQuestions } from './FormQuestions';
 import { FormSummary } from './FormSummary';
 
-export type FormStepperProps = {
+type FormStepperProps = {
   form: FormInstrument<FormDataType, Language>;
   onSubmit: (data: FormDataType) => Promise<void>;
   subject?: Subject;
 };
 
-export const FormStepper = ({ form, onSubmit, subject }: FormStepperProps) => {
+const FormStepperComponent = ({ form, onSubmit, subject }: FormStepperProps) => {
   const [data, setData] = useState<FormDataType>();
-  const { t } = useTranslation();
+  const { t } = useTranslation('core');
 
   const handleSubmit = async (data: FormDataType) => {
     await onSubmit(data);
@@ -49,3 +50,7 @@ export const FormStepper = ({ form, onSubmit, subject }: FormStepperProps) => {
     />
   );
 };
+
+const FormStepper = withI18nProvider(FormStepperComponent);
+
+export { FormStepper, type FormStepperProps };

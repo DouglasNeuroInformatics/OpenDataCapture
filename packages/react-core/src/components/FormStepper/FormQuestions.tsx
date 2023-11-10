@@ -13,7 +13,7 @@ export type FormQuestionsProps = {
 
 export const FormQuestions = ({ form, onSubmit }: FormQuestionsProps) => {
   const { updateIndex } = useContext(StepperContext);
-  const { t } = useTranslation();
+  const { t } = useTranslation('core');
 
   const handleSubmit = (data: FormDataType) => {
     void onSubmit(data).then(() => {
