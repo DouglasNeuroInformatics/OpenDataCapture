@@ -11,7 +11,7 @@ const IndexPage = ({ bundle }: IndexPageProps) => {
   const form = translateFormInstrument(instrument, 'en');
 
   return (
-    <div>
+    <div className="mx-auto mt-8 max-w-3xl">
       <FormStepper
         form={form}
         onSubmit={(data) => {
