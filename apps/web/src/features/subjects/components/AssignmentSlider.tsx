@@ -1,9 +1,8 @@
 import { Button, Slider } from '@douglasneuroinformatics/ui';
 import type { AssignmentSummary } from '@open-data-capture/common/assignment';
 import type { Language } from '@open-data-capture/common/core';
+import { translateFormSummary } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useTranslation } from 'react-i18next';
-
-import { resolveFormSummary } from '@/utils/translate-instrument';
 
 export type AssignmentSliderProps = {
   assignment: AssignmentSummary | null;
@@ -15,7 +14,7 @@ export type AssignmentSliderProps = {
 /** Component for modifying an existing assignment */
 export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: AssignmentSliderProps) => {
   const { i18n, t } = useTranslation(['common', 'subjects']);
-  const instrument = assignment ? resolveFormSummary(assignment.instrument, i18n.resolvedLanguage as Language) : null;
+  const instrument = assignment ? translateFormSummary(assignment.instrument, i18n.resolvedLanguage as Language) : null;
 
   return (
     <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={instrument?.details.title}>

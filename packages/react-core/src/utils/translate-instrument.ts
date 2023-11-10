@@ -131,7 +131,7 @@ function translateFormFields(
   return translatedFields;
 }
 
-function translateFormSummary<TData extends Base.FormDataType>(
+function strictTranslateFormSummary<TData extends Base.FormDataType>(
   summary: Types.FormInstrumentSummary<TData>,
   language: Language
 ): Types.FormInstrumentSummary<TData, Language> | null {
@@ -153,7 +153,7 @@ function translateFormSummary<TData extends Base.FormDataType>(
   return null;
 }
 
-function translateFormInstrument<TData extends Base.FormDataType>(
+function strictTranslateFormInstrument<TData extends Base.FormDataType>(
   form: Types.FormInstrument<TData>,
   language: Language
 ): Types.FormInstrument<TData, Language> | null {
@@ -182,18 +182,18 @@ function translateFormInstrument<TData extends Base.FormDataType>(
   return null;
 }
 
-export function resolveFormInstrument<TData extends Base.FormDataType>(
+export function translateFormInstrument<TData extends Base.FormDataType>(
   form: Types.FormInstrument<TData>,
   preferredLanguage: Language
 ) {
   const altLanguage = preferredLanguage === 'en' ? 'fr' : 'en';
-  return (translateFormInstrument(form, preferredLanguage) ?? translateFormInstrument(form, altLanguage))!;
+  return (strictTranslateFormInstrument(form, preferredLanguage) ?? strictTranslateFormInstrument(form, altLanguage))!;
 }
 
-export function resolveFormSummary<TData extends Base.FormDataType>(
+export function translateFormSummary<TData extends Base.FormDataType>(
   summary: Types.FormInstrumentSummary<TData>,
   preferredLanguage: Language
 ): Types.FormInstrumentSummary<TData, Language> {
   const altLanguage = preferredLanguage === 'en' ? 'fr' : 'en';
-  return (translateFormSummary(summary, preferredLanguage) ?? translateFormSummary(summary, altLanguage))!;
+  return (strictTranslateFormSummary(summary, preferredLanguage) ?? strictTranslateFormSummary(summary, altLanguage))!;
 }
