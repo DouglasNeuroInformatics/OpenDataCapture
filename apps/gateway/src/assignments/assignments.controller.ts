@@ -25,6 +25,6 @@ export class AssignmentsController {
   @Render(IndexPage)
   async render(@Param('id') id: string) {
     const assignment = await this.assignmentsService.findById(id);
-    return { bundle: assignment!.instrumentBundle, title: 'My Page' };
+    return { bundle: assignment!.instrumentBundle };
   }
 }

@@ -23,7 +23,7 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
 
   const handleDownload = () => {
     const filename = `${form.name}_v${form.version}_${new Date(timeCollected).toISOString()}.txt`;
-    download(filename, () => Promise.resolve(formatFormDataAsString(data)));
+    void download(filename, () => formatFormDataAsString(data));
   };
 
   const fields = getFormFields(form.content);

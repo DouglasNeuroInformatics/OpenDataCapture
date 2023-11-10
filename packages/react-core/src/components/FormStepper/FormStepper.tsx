@@ -7,6 +7,7 @@ import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
+import type { Promisable } from 'type-fest';
 
 import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { FormOverview } from './FormOverview';
@@ -15,7 +16,7 @@ import { FormSummary } from './FormSummary';
 
 type FormStepperProps = {
   form: FormInstrument<FormDataType, Language>;
-  onSubmit: (data: FormDataType) => Promise<void>;
+  onSubmit: (data: FormDataType) => Promisable<void>;
   subject?: Subject;
 };
 

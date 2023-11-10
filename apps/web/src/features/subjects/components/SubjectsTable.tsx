@@ -37,14 +37,14 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'JSON':
-        download(`${baseFilename}.json`, async () => {
+        void download(`${baseFilename}.json`, async () => {
           const data = await getExportRecords();
           return JSON.stringify(data, null, 2);
         });
         break;
       case 'CSV':
-        download('README.txt', () => Promise.resolve(t('index.table.exportHelpText')));
-        download(`${baseFilename}.csv`, async () => {
+        void download('README.txt', () => Promise.resolve(t('index.table.exportHelpText')));
+        void download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
           const columnNames = Object.keys(data[0]!);
           const rows = data.map((record) => Object.values(record).join(',')).join('\n');

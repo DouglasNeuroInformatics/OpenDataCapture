@@ -1,23 +1,24 @@
-import { useState } from 'react';
-
-import { evaluateInstrument } from '@open-data-capture/common/instrument';
+import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { FormStepper } from '@open-data-capture/react-core/components';
+import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 
 type IndexPageProps = {
   bundle: string;
-  title?: string;
 };
 
-const IndexPage = ({ bundle, title }: IndexPageProps) => {
-  const [count, setCount] = useState(0);
-  const instrument = evaluateInstrument(bundle);
+const IndexPage = ({ bundle }: IndexPageProps) => {
+  const instrument = evaluateInstrument<FormInstrument>(bundle);
+  const form = translateFormInstrument(instrument, 'en');
 
   return (
     <div>
-      <h1>{title}</h1>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment Count</button>
-      {bundle}
-      {JSON.stringify(instrument)}
+      <FormStepper
+        form={form}
+        onSubmit={(data) => {
+          // eslint-disable-next-line no-alert
+          alert(JSON.stringify(data));
+        }}
+      />
     </div>
   );
 };
