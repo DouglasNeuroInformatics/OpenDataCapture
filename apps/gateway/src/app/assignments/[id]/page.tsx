@@ -1,6 +1,6 @@
 import type { Assignment } from '@prisma/client';
 
-import { FormAssignment } from '@/app/components/FormAssignment';
+import { FormAssignment } from '@/components/FormAssignment';
 
 type AssignmentPageProps = {
   params: {
