@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "db:push": "prisma db push",
     "dev": "bun --bun next dev -p 3500",
     "format": "prettier --write src",
     "postinstall": "next telemetry disable",

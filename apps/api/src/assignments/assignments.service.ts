@@ -34,12 +34,12 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
       instrumentId: instrument.id as string,
       subjectIdentifier
     };
-    const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/assignments`, dto);
+    const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, dto);
     return assignmentBundleSchema.parseAsync(response.data);
   }
 
   async find({ subjectIdentifier }: { subjectIdentifier?: string } = {}, { ability }: EntityOperationOptions = {}) {
-    const response = await this.httpService.axiosRef.get(`${this.gatewayBaseUrl}/assignments`, {
+    const response = await this.httpService.axiosRef.get(`${this.gatewayBaseUrl}/api/assignments`, {
       params: {
         subjectIdentifier
       }

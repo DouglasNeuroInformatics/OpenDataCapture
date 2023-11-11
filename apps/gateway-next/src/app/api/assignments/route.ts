@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   }
 
   const id = crypto.randomUUID();
-  await prisma.assignment.create({
+  const assignment = await prisma.assignment.create({
     data: {
       assignedAt: new Date(),
       id,
@@ -26,5 +26,5 @@ export async function POST(request: Request) {
       ...result.data
     }
   });
-  return Response.json({ success: true }, { status: 201 });
+  return Response.json(assignment, { status: 201 });
 }
