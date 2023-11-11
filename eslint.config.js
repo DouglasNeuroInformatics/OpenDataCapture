@@ -29,12 +29,12 @@ const apiConfig = createConfig({
 
 const gatewayConfig = createConfig({
   base: {
-    env: 'node',
-    fileRoots: ['apps/gateway/src']
+    env: 'browser',
+    fileRoots: ['apps/gateway-next/src']
   },
   jsx: true,
   ts: {
-    project: path.resolve(__dirname, 'apps', 'gateway', 'tsconfig.json')
+    project: path.resolve(__dirname, 'apps', 'gateway-next', 'tsconfig.json')
   }
 });
 

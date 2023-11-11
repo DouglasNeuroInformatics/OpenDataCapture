@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Assignment {
-  id                Int      @id
+  id                String      @id
   assignedAt        DateTime
   expiresAt         DateTime
   instrumentBundle  String
