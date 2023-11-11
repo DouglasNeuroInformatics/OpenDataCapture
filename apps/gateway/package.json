@@ -9,7 +9,7 @@
     "db:push": "prisma db push",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --bun next dev -p 3500",
     "format": "prettier --write src",
-    "postinstall": "next telemetry disable",
+    "postinstall": "next telemetry disable && bun db:push",
     "lint": "tsc && eslint --fix src",
     "start": "next start"
   },
