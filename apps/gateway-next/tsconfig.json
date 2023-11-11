@@ -4,6 +4,7 @@
     "incremental": true,
     "jsx": "preserve",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "outDir": "build",
     "paths": {
       "@/*": ["./src/*"]
     },
