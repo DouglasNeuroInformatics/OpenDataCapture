@@ -4,8 +4,15 @@ import { createAssignmentBundleDataSchema } from '@open-data-capture/common/assi
 
 import prisma from '@/lib/prisma';
 
-export async function GET() {
-  const data = await prisma.assignment.findMany();
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const subjectIdentifier = url.searchParams.get('subjectIdentifier');
+  console.log(subjectIdentifier);
+  const data = await prisma.assignment.findMany({
+    where: {
+      subjectIdentifier: subjectIdentifier ?? undefined
+    }
+  });
   return Response.json(data);
 }
 
