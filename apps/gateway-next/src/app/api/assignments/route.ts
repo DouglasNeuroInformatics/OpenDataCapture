@@ -10,7 +10,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const data = await request.json();
+  const data: unknown = await request.json();
   const result = await createAssignmentBundleDataSchema.safeParseAsync(data);
   if (!result.success) {
     return Response.json({ issues: result.error.issues, message: 'Bad Request' }, { status: 400 });
