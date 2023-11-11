@@ -5,18 +5,22 @@ import { assignmentStatusSchema } from '@open-data-capture/common/assignment';
 import { formDataTypeSchema } from '@open-data-capture/common/instrument';
 import { z } from 'zod';
 
+import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
+
 // Temporary schema for the data returned by the proof of concept
 const itemSchema = z.object({
   assignedAt: z.coerce.date(),
   expiresAt: z.coerce.date(),
   id: z.coerce.string(),
   instrumentId: z.string(),
-  record: z.object({
-    assignmentId: z.string(),
-    completedAt: z.coerce.date(),
-    data: formDataTypeSchema,
-    id: z.coerce.string()
-  }),
+  record: z
+    .object({
+      assignmentId: z.string(),
+      completedAt: z.coerce.date(),
+      data: formDataTypeSchema,
+      id: z.coerce.string()
+    })
+    .nullish(),
   status: assignmentStatusSchema,
   subjectIdentifier: z.string()
 });
@@ -27,7 +31,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
   constructor(
     configService: ConfigService,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
+    private readonly instrumentRecordsService: InstrumentRecordsService
   ) {
     this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
   }
@@ -43,6 +48,22 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       console.error(result.error.issues);
       return;
     }
-    result.data;
+    for (const assignment of result.data) {
+      if (assignment.status !== 'COMPLETE' || !assignment.record?.data) {
+        continue;
+      }
+      const isExisting = await this.instrumentRecordsService.exists({ assignmentId: assignment.id });
+      if (isExisting) {
+        continue;
+      }
+      const record = await this.instrumentRecordsService.create({
+        assignmentId: assignment.id,
+        data: assignment.record.data,
+        date: assignment.record.completedAt,
+        instrumentId: assignment.instrumentId,
+        subjectIdentifier: assignment.subjectIdentifier
+      });
+      console.log(`Created record with ID: ${record.id}`);
+    }
   }
 }

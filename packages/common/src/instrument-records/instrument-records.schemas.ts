@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const createInstrumentRecordDataSchema = z.object({
+  assignmentId: z.string().optional(),
   data: z.unknown(),
   date: z.coerce.date(),
   groupId: z.string().optional(),
