@@ -35,7 +35,7 @@ export const updateAssignmentDataSchema = z
   .object({
     expiresAt: z.coerce.date(),
     record: z.object({
-      data: z.coerce.string()
+      data: z.any().transform((arg) => JSON.stringify(arg))
     }),
     status: assignmentStatusSchema
   })

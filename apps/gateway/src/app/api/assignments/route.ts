@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import crypto from 'crypto';
 
 import { createAssignmentBundleDataSchema } from '@open-data-capture/common/assignment';
@@ -8,10 +14,20 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const subjectIdentifier = url.searchParams.get('subjectIdentifier');
   const data = await prisma.assignment.findMany({
+    include: {
+      record: true
+    },
     where: {
       subjectIdentifier: subjectIdentifier ?? undefined
     }
   });
+  data.map((assignment: any) => {
+    if (assignment.record?.data) {
+      assignment.record.data = JSON.parse(assignment.record.data);
+    }
+    return assignment;
+  });
+
   return Response.json(data);
 }
 
