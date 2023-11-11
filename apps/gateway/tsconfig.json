@@ -1,15 +1,22 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": "src",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "jsx": "react-jsx",
+    "allowJs": true,
+    "incremental": true,
+    "jsx": "preserve",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "outDir": "build",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["./src/*"]
     },
-    "strictPropertyInitialization": false,
-    "types": ["bun-types"]
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "resolveJsonModule": true,
+    "target": "ES6"
   },
-  "include": ["src"]
+  "exclude": ["node_modules"],
+  "extends": "../../tsconfig.base.json",
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
 }
