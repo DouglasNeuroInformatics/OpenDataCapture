@@ -1,7 +1,10 @@
 /* eslint-disable perfectionist/sort-classes */
 
 import { CurrentUser, EntityController } from '@douglasneuroinformatics/nestjs/core';
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Redirect } from '@nestjs/common/decorators';
+import { HttpStatus } from '@nestjs/common/enums';
+import type { HttpRedirectResponse } from '@nestjs/common/interfaces';
+import { ConfigService } from '@nestjs/config';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Assignment } from '@open-data-capture/common/assignment';
 import type { AppAbility } from '@open-data-capture/common/core';
@@ -13,7 +16,14 @@ import { CreateAssignmentDto } from './dto/create-assignment.dto';
 
 @Controller('assignments')
 export class AssignmentsController implements Pick<EntityController<Assignment>, 'create'> {
-  constructor(private readonly assignmentsService: AssignmentsService) {}
+  private readonly gatewayBaseUrl: string;
+
+  constructor(
+    private readonly assignmentsService: AssignmentsService,
+    configService: ConfigService
+  ) {
+    this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
+  }
 
   @ApiOperation({ summary: 'Create Assignment' })
   @Post()
@@ -50,14 +60,11 @@ export class AssignmentsController implements Pick<EntityController<Assignment>,
   //   return this.assignmentsService.findById(id, { ability });
   // }
 
-  // @ApiOperation({ summary: 'Cancel' })
-  // @Patch(':id')
-  // @RouteAccess({ action: 'update', subject: 'Assignment' })
-  // updateById(
-  //   @Param('id', ParseIdPipe) id: string,
-  //   @Body() updateAssignmentDto: UpdateAssignmentDto,
-  //   @CurrentUser('ability') ability?: AppAbility
-  // ) {
-  //   return this.assignmentsService.updateById(id, updateAssignmentDto, { ability });
-  // }
+  @ApiOperation({ summary: 'Update Assignment' })
+  @Patch(':id')
+  @RouteAccess({ action: 'update', subject: 'Assignment' })
+  @Redirect()
+  updateById(@Param('id') id: string): HttpRedirectResponse {
+    return { statusCode: HttpStatus.PERMANENT_REDIRECT, url: `${this.gatewayBaseUrl}/api/assignments/${id}` };
+  }
 }

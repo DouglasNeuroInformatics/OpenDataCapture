@@ -33,7 +33,6 @@ export const createAssignmentDataSchema = z.object({
 
 export const updateAssignmentDataSchema = z
   .object({
-    assignedAt: z.coerce.date(),
     expiresAt: z.coerce.date(),
     status: assignmentStatusSchema
   })
