@@ -28,6 +28,8 @@ const AssignmentPage = async ({ params }: AssignmentPageProps) => {
     notFound();
   } else if (assignment.record?.completedAt) {
     redirect('/assignments/completed');
+  } else if (assignment.status === 'CANCELED') {
+    redirect('/assignments/canceled');
   }
 
   return (
