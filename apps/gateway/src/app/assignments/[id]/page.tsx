@@ -20,7 +20,7 @@ const AssignmentPage = async ({ params }: AssignmentPageProps) => {
   const assignment = await getAssignment(params.id);
 
   return (
-    <div className="mx-auto max-w-3xl pt-8">
+    <div>
       <FormAssignment instrumentBundle={assignment.instrumentBundle} />
     </div>
   );

@@ -18,5 +18,10 @@ export const FormAssignment = ({ instrumentBundle }: FormAssignmentProps) => {
     alert(JSON.stringify(data));
   };
 
-  return <FormStepper form={form} onSubmit={handleSubmit} />;
+  return (
+    <div>
+      <h3 className="my-8 text-center text-xl font-bold">{form.details.title}</h3>
+      <FormStepper form={form} onSubmit={handleSubmit} />
+    </div>
+  );
 };
