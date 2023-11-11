@@ -34,9 +34,14 @@ export const createAssignmentDataSchema = z.object({
 export const updateAssignmentDataSchema = z
   .object({
     expiresAt: z.coerce.date(),
+    record: z.object({
+      data: z.coerce.string()
+    }),
     status: assignmentStatusSchema
   })
-  .partial() satisfies Zod.ZodType<Types.UpdateAssignmentData>;
+  .partial();
+
+export type UpdateAssignmentData = z.infer<typeof updateAssignmentDataSchema>;
 
 export const assignmentBundleSchema = assignmentSchema.omit({ instrument: true }).extend({
   instrumentBundle: z.string(),

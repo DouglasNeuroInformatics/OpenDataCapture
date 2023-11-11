@@ -1,6 +1,7 @@
 'use client';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { FormStepper } from '@open-data-capture/react-core/components';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
@@ -11,6 +12,8 @@ export type FormAssignmentProps = {
 };
 
 export const FormAssignment = ({ id, instrumentBundle }: FormAssignmentProps) => {
+  const notifications = useNotificationsStore();
+
   const instrument = evaluateInstrument<FormInstrument>(instrumentBundle);
   const form = translateFormInstrument(instrument, 'en');
 
@@ -26,7 +29,7 @@ export const FormAssignment = ({ id, instrumentBundle }: FormAssignmentProps) =>
       },
       method: 'PATCH'
     });
-    console.log(response.status);
+    notifications.addNotification({ type: response.ok ? 'success' : 'error' });
   };
 
   return (
