@@ -17,7 +17,7 @@ export class AssignmentsService {
   ) {}
 
   async create({ expiresAt, instrumentBundle, instrumentId, subjectIdentifier }: CreateAssignmentBundleData) {
-    const baseUrl: string = this.configService.getOrThrow('GATEWAY_URL');
+    const baseUrl: string = this.configService.getOrThrow('GATEWAY_BASE_URL');
     const id = crypto.randomUUID();
     const entity = this.assignmentBundlesRepository.create({
       assignedAt: new Date(),

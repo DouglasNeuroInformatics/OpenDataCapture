@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       assignedAt: new Date(),
       id,
       status: 'OUTSTANDING',
-      url: `${process.env.GATEWAY_URL}/assignments/${id}`,
+      url: `${process.env.GATEWAY_BASE_URL}/assignments/${id}`,
       ...result.data
     }
   });
