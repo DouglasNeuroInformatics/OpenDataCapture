@@ -5,6 +5,7 @@ import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { FormStepper } from '@open-data-capture/react-core/components';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
+import { useTranslation } from 'react-i18next';
 
 export type FormAssignmentProps = {
   id: string;
@@ -12,10 +13,11 @@ export type FormAssignmentProps = {
 };
 
 export const FormAssignment = ({ id, instrumentBundle }: FormAssignmentProps) => {
+  const { i18n } = useTranslation();
   const notifications = useNotificationsStore();
 
   const instrument = evaluateInstrument<FormInstrument>(instrumentBundle);
-  const form = translateFormInstrument(instrument, 'en');
+  const form = translateFormInstrument(instrument, i18n.resolvedLanguage === 'fr' ? 'fr' : 'en');
 
   const handleSubmit = async (data: FormDataType) => {
     const response = await fetch(`/api/assignments/${id}`, {
