@@ -16,6 +16,7 @@
     "@douglasneuroinformatics/ui": "latest",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
+    "@prisma/client": "3.10.0",
     "next": "^14.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -26,6 +27,7 @@
     "@types/react-dom": "^18.2.14",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
+    "prisma": "3.10.0",
     "tailwindcss": "^3.3.5"
   },
   "trustedDependencies": [
