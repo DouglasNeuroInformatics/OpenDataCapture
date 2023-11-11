@@ -6,16 +6,27 @@ import { FormStepper } from '@open-data-capture/react-core/components';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 
 export type FormAssignmentProps = {
+  id: string;
   instrumentBundle: string;
 };
 
-export const FormAssignment = ({ instrumentBundle }: FormAssignmentProps) => {
+export const FormAssignment = ({ id, instrumentBundle }: FormAssignmentProps) => {
   const instrument = evaluateInstrument<FormInstrument>(instrumentBundle);
   const form = translateFormInstrument(instrument, 'en');
 
-  const handleSubmit = (data: FormDataType) => {
-    // eslint-disable-next-line no-alert
-    alert(JSON.stringify(data));
+  const handleSubmit = async (data: FormDataType) => {
+    const response = await fetch(`/api/assignments/${id}`, {
+      body: JSON.stringify({
+        record: {
+          data
+        }
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PATCH'
+    });
+    console.log(response.status);
   };
 
   return (
