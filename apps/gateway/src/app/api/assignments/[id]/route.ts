@@ -32,7 +32,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
             data: result.data.record.data
           }
         },
-        status: result.data.status
+        status: 'COMPLETE'
       },
       where: { id: params.id }
     });

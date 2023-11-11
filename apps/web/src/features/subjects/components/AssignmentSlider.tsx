@@ -22,19 +22,18 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
         <div className="flex h-full flex-col">
           <div className="flex gap-1 text-sm">
             <a
-              className="overflow-hidden text-ellipsis whitespace-nowrap text-sm"
+              className="overflow-hidden text-ellipsis whitespace-nowrap text-sm hover:underline"
               href={assignment!.url}
               rel="noreferrer"
               target="_blank"
             >
-              <span className="font-medium">URL: </span>
-              {assignment!.url}
+              {t('subjects:assignments.link')}
             </a>
           </div>
           <div className="mt-auto flex gap-2">
             <Button
               className="w-full text-sm"
-              disabled={assignment?.status === 'CANCELED'}
+              disabled={assignment?.status !== 'OUTSTANDING'}
               label={t('cancel')}
               variant="danger"
               onClick={() => onCancel(assignment!)}
