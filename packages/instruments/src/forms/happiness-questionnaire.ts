@@ -64,6 +64,15 @@ const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, Instrum
       fr: 'Questionnaire sur le bonheur'
     }
   },
+  measures: {
+    overallHappiness: {
+      label: {
+        en: 'Overall Happiness',
+        fr: 'Bonheur général'
+      },
+      value: ({ overallHappiness }) => overallHappiness
+    }
+  },
   validationSchema: z.object({
     overallHappiness: z.number().int().gte(1).lte(10),
     reasonForSadness: z.string().optional()
