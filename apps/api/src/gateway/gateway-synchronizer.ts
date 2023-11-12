@@ -27,7 +27,10 @@ const itemSchema = z.object({
 
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap {
-  private readonly gatewayBaseUrl: string;
+  private readonly config: {
+    baseUrl: string;
+    refreshInterval: number;
+  };
   private readonly logger = new Logger(GatewaySynchronizer.name);
 
   constructor(
@@ -35,15 +38,18 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     private readonly httpService: HttpService,
     private readonly instrumentRecordsService: InstrumentRecordsService
   ) {
-    this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
+    this.config = {
+      baseUrl: configService.getOrThrow('GATEWAY_BASE_URL'),
+      refreshInterval: parseInt(configService.getOrThrow('GATEWAY_REFRESH_INTERVAL'))
+    };
   }
 
   onApplicationBootstrap() {
-    setInterval(() => void this.sync(), 1000);
+    setInterval(() => void this.sync(), this.config.refreshInterval);
   }
 
   private async sync() {
-    const response = await this.httpService.axiosRef.get(`${this.gatewayBaseUrl}/api/assignments`);
+    const response = await this.httpService.axiosRef.get(`${this.config.baseUrl}/api/assignments`);
     const result = await itemSchema.array().safeParseAsync(response.data);
     if (!result.success) {
       console.error(result.error.issues);
