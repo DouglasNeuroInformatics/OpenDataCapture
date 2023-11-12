@@ -3,12 +3,13 @@ import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config';
 import { assignmentStatusSchema } from '@open-data-capture/common/assignment';
 import { formDataTypeSchema } from '@open-data-capture/common/instrument';
+import { isAxiosError } from 'axios';
 import { z } from 'zod';
 
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 
 // Temporary schema for the data returned by the proof of concept
-const itemSchema = z.object({
+const remoteAssignmentSchema = z.object({
   assignedAt: z.coerce.date(),
   expiresAt: z.coerce.date(),
   id: z.coerce.string(),
@@ -24,6 +25,8 @@ const itemSchema = z.object({
   status: assignmentStatusSchema,
   subjectIdentifier: z.string()
 });
+
+type RemoteAssignment = z.infer<typeof remoteAssignmentSchema>;
 
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap {
@@ -49,13 +52,20 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   }
 
   private async sync() {
-    const response = await this.httpService.axiosRef.get(`${this.config.baseUrl}/api/assignments`);
-    const result = await itemSchema.array().safeParseAsync(response.data);
-    if (!result.success) {
-      console.error(result.error.issues);
+    let remoteAssignments: RemoteAssignment[];
+    try {
+      const response = await this.httpService.axiosRef.get(`${this.config.baseUrl}/api/assignments`);
+      remoteAssignments = await remoteAssignmentSchema.array().parseAsync(response.data);
+    } catch (err) {
+      if (isAxiosError(err)) {
+        this.logger.warn(err.code);
+      } else {
+        this.logger.error(err);
+      }
       return;
     }
-    for (const assignment of result.data) {
+
+    for (const assignment of remoteAssignments) {
       if (assignment.status !== 'COMPLETE' || !assignment.record?.data) {
         continue;
       }
