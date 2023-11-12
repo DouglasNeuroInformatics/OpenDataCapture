@@ -1,14 +1,15 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { assignmentStatusSchema } from '@open-data-capture/common/assignment';
 import { formDataTypeSchema } from '@open-data-capture/common/instrument';
+import { isAxiosError } from 'axios';
 import { z } from 'zod';
 
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 
 // Temporary schema for the data returned by the proof of concept
-const itemSchema = z.object({
+const remoteAssignmentSchema = z.object({
   assignedAt: z.coerce.date(),
   expiresAt: z.coerce.date(),
   id: z.coerce.string(),
@@ -25,30 +26,46 @@ const itemSchema = z.object({
   subjectIdentifier: z.string()
 });
 
+type RemoteAssignment = z.infer<typeof remoteAssignmentSchema>;
+
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap {
-  private readonly gatewayBaseUrl: string;
+  private readonly config: {
+    baseUrl: string;
+    refreshInterval: number;
+  };
+  private readonly logger = new Logger(GatewaySynchronizer.name);
 
   constructor(
     configService: ConfigService,
     private readonly httpService: HttpService,
     private readonly instrumentRecordsService: InstrumentRecordsService
   ) {
-    this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
+    this.config = {
+      baseUrl: configService.getOrThrow('GATEWAY_BASE_URL'),
+      refreshInterval: parseInt(configService.getOrThrow('GATEWAY_REFRESH_INTERVAL'))
+    };
   }
 
   onApplicationBootstrap() {
-    setInterval(() => void this.sync(), 1000);
+    setInterval(() => void this.sync(), this.config.refreshInterval);
   }
 
   private async sync() {
-    const response = await this.httpService.axiosRef.get(`${this.gatewayBaseUrl}/api/assignments`);
-    const result = await itemSchema.array().safeParseAsync(response.data);
-    if (!result.success) {
-      console.error(result.error.issues);
+    let remoteAssignments: RemoteAssignment[];
+    try {
+      const response = await this.httpService.axiosRef.get(`${this.config.baseUrl}/api/assignments`);
+      remoteAssignments = await remoteAssignmentSchema.array().parseAsync(response.data);
+    } catch (err) {
+      if (isAxiosError(err)) {
+        this.logger.warn(err.code);
+      } else {
+        this.logger.error(err);
+      }
       return;
     }
-    for (const assignment of result.data) {
+
+    for (const assignment of remoteAssignments) {
       if (assignment.status !== 'COMPLETE' || !assignment.record?.data) {
         continue;
       }
@@ -63,7 +80,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         instrumentId: assignment.instrumentId,
         subjectIdentifier: assignment.subjectIdentifier
       });
-      console.log(`Created record with ID: ${record.id}`);
+      this.logger.log(`Created record with ID: ${record.id}`);
     }
   }
 }

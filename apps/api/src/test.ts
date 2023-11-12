@@ -31,7 +31,6 @@ describe('App', () => {
   describe('Setup Procedure', () => {
     it('should initially not be setup', async () => {
       const response = await request(server).get('/setup');
-      // console.log(response, 'Res');
       expect(response).toBeDefined();
     });
   });

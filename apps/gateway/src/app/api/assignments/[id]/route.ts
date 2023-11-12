@@ -14,7 +14,6 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 }
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  console.log('Recieved patch!!');
   const data: unknown = await request.json();
   const result = await updateAssignmentDataSchema.safeParseAsync(data);
   if (!result.success) {
