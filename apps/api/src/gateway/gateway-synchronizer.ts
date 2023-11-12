@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { assignmentStatusSchema } from '@open-data-capture/common/assignment';
 import { formDataTypeSchema } from '@open-data-capture/common/instrument';
@@ -28,6 +28,7 @@ const itemSchema = z.object({
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap {
   private readonly gatewayBaseUrl: string;
+  private readonly logger = new Logger(GatewaySynchronizer.name);
 
   constructor(
     configService: ConfigService,
@@ -63,7 +64,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         instrumentId: assignment.instrumentId,
         subjectIdentifier: assignment.subjectIdentifier
       });
-      console.log(`Created record with ID: ${record.id}`);
+      this.logger.log(`Created record with ID: ${record.id}`);
     }
   }
 }
