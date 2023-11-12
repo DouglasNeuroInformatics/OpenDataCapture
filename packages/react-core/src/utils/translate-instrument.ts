@@ -1,7 +1,7 @@
 import type Base from '@douglasneuroinformatics/form-types';
 import type { Language } from '@open-data-capture/common/core';
 import type * as Types from '@open-data-capture/common/instrument';
-import { mapValues, merge } from 'lodash';
+import { mapValues, merge, wrap } from 'lodash';
 
 function isUnilingualFormSummary<TData extends Base.FormDataType>(
   summary: Types.FormInstrumentSummary<TData>,
@@ -116,13 +116,13 @@ function translateFormFields(
       translatedFields[fieldName] = {
         deps: field.deps,
         kind: 'dynamic',
-        render: (data: Base.NullableFormDataType | null) => {
-          const result = field.render(data);
+        render: wrap(field.render, (func, data: Base.NullableFormDataType | null) => {
+          const result = func(data);
           if (result === null) {
             return null;
           }
           return translateStaticField(result, language);
-        }
+        })
       };
     } else {
       translatedFields[fieldName] = translateStaticField(field, language);
