@@ -1,4 +1,4 @@
-FROM oven/bun:1.0.10 as runtime
+FROM oven/bun:1.0.11 as runtime
 RUN apt update
 RUN apt install -y ca-certificates curl gnupg
 RUN mkdir -p /etc/apt/keyrings

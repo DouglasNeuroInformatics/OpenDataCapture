@@ -1,5 +1,5 @@
 # COMPILE SOURCE CODE
-FROM oven/bun:1.0.10 AS builder
+FROM oven/bun:1.0.11 AS builder
 
 RUN apt update
 RUN apt install -y ca-certificates curl gnupg
