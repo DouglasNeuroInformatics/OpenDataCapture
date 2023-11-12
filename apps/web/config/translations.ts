@@ -21,6 +21,14 @@ export const translations = () => {
             const translations = JSON.parse(contents.toString()) as Record<string, unknown>;
             return JSON.stringify(transformTranslations(translations, 'en'), null, 2);
           }
+        },
+        {
+          dest: 'dist/locales/fr',
+          src: 'src/translations/*',
+          transform: (contents) => {
+            const translations = JSON.parse(contents.toString()) as Record<string, unknown>;
+            return JSON.stringify(transformTranslations(translations, 'fr'), null, 2);
+          }
         }
       ]
     }),
