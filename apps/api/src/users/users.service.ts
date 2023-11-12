@@ -100,6 +100,8 @@ export class UsersService implements EntityService<User> {
     } else if (ability && !ability.can('read', user)) {
       throw new ForbiddenException(`Insufficient rights to read user with username: ${username}`);
     }
+    // For unknown reasons, autopopulate is broken in prod
+    await user.populate('groups');
     return user;
   }
 
