@@ -5,13 +5,13 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "bunx next build",
     "db:push": "prisma db push",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --bun next dev -p 3500",
     "format": "prettier --write src",
     "postinstall": "next telemetry disable && bun db:push",
     "lint": "tsc && eslint --fix src",
-    "start": "next start"
+    "start": "bunx next start -p 80"
   },
   "dependencies": {
     "@douglasneuroinformatics/ui": "latest",
@@ -25,6 +25,7 @@
     "next": "^14.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "sharp": "^0.32.6",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "tailwindcss": "^3.3.5"
   },
   "trustedDependencies": [
-    "sqlite3"
+    "sqlite3",
+    "sharp"
   ]
 }
