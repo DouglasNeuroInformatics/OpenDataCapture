@@ -36,7 +36,7 @@ export class InstrumentRecordsService {
   }
 
   async create(
-    { data, date, groupId, instrumentId, subjectIdentifier }: CreateInstrumentRecordData,
+    { assignmentId, data, date, groupId, instrumentId, subjectIdentifier }: CreateInstrumentRecordData,
     options?: EntityOperationOptions
   ) {
     const group = groupId ? await this.groupsService.findById(groupId, options) : undefined;
@@ -44,12 +44,17 @@ export class InstrumentRecordsService {
     const subject = await this.subjectsService.findById(subjectIdentifier);
 
     return this.instrumentRecordsRepository.create({
+      assignmentId,
       data,
       date,
       group,
       instrument,
       subject
     });
+  }
+
+  async exists(filter: FilterQuery<InstrumentRecordEntity>) {
+    return this.instrumentRecordsRepository.exists(filter);
   }
 
   async exportRecords(

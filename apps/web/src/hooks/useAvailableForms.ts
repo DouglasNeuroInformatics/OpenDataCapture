@@ -1,10 +1,9 @@
 import type { Language } from '@open-data-capture/common/core';
 import { formInstrumentSummarySchema } from '@open-data-capture/common/instrument';
+import { translateFormSummary } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-
-import { resolveFormSummary } from '@/utils/translate-instrument';
 
 export const useAvailableForms = () => {
   const { i18n } = useTranslation();
@@ -22,7 +21,7 @@ export const useAvailableForms = () => {
             console.error('Failed to parse form instrument summaries', result.error.issues);
             return [];
           }
-          return result.data.map((summary) => resolveFormSummary(summary, i18n.resolvedLanguage as Language));
+          return result.data.map((summary) => translateFormSummary(summary, i18n.resolvedLanguage as Language));
         });
     },
     queryKey: ['available-forms']

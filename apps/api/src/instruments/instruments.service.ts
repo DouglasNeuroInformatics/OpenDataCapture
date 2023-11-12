@@ -8,16 +8,18 @@ import {
 } from '@nestjs/common/exceptions';
 import type { BaseInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
 import { baseInstrumentSchema, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { InstrumentTransformer } from '@open-data-capture/common/instrument';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
 
 import { MutateInstrumentDto } from './dto/mutate-instrument.dto';
 import { InstrumentsRepository } from './instruments.repository';
-import { generateBundle } from './instruments.utils';
 
 @Injectable()
 export class InstrumentsService {
+  private readonly instrumentTransformer = new InstrumentTransformer();
+
   constructor(private readonly instrumentsRepository: InstrumentsRepository) {}
 
   async count(filter: FilterQuery<BaseInstrument> = {}, { ability }: EntityOperationOptions = {}) {
@@ -118,7 +120,7 @@ export class InstrumentsService {
     let bundle: string;
     let instance: unknown;
     try {
-      bundle = generateBundle(source);
+      bundle = this.instrumentTransformer.generateBundle(source);
       instance = evaluateInstrument(bundle);
     } catch (err) {
       throw new UnprocessableEntityException('Failed to parse instrument', {

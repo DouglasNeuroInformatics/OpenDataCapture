@@ -1,13 +1,7 @@
-import config from '@douglasneuroinformatics/ui/tailwind.config';
-import defaultTheme from 'tailwindcss/defaultTheme';
+import config from '@open-data-capture/react-core/tailwind.config';
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [...config.content, 'index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  presets: [config],
-  theme: {
-    fontFamily: {
-      sans: ['Inter var', ...defaultTheme.fontFamily.sans]
-    }
-  }
+  presets: [config]
 };

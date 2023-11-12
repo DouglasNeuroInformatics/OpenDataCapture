@@ -94,7 +94,8 @@ export type FormInstrumentDateField<TLanguage extends InstrumentLanguage = Instr
   FormInstrumentFieldMixin<TLanguage, Base.DateFormField>;
 
 export type FormInstrumentNumericField<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
-  FormInstrumentFieldMixin<TLanguage, Base.NumericFormField>;
+  | FormInstrumentFieldMixin<TLanguage, Extract<Base.NumericFormField, { variant: 'default' }>>
+  | FormInstrumentFieldMixin<TLanguage, Extract<Base.NumericFormField, { variant: 'slider' }>>;
 
 export type FormInstrumentBinaryField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,

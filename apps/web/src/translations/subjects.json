@@ -45,6 +45,10 @@
     "title": {
       "en": "Title",
       "fr": "Titre"
+    },
+    "link": {
+      "en": "Link to Assignment",
+      "fr": "Lien vers la tâche"
     }
   },
   "index": {

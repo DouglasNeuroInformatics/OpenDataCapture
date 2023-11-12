@@ -6,13 +6,13 @@ import { HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
+import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' }
 import { Types } from 'mongoose';
 import request from 'supertest';
 
 import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsRepository } from '../instruments.repository';
 import { InstrumentsService } from '../instruments.service';
-import { importInstrumentSource } from '../macros/import-instrument-source.macro' with { type: 'macro'}
 
 const BPRS_SOURCE = importInstrumentSource('forms/brief-psychiatric-rating-scale');
 const EDQ_SOURCE = importInstrumentSource('forms/enhanced-demographics-questionnaire');
