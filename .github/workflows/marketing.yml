@@ -30,10 +30,9 @@ jobs:
         run: bun install --ignore-scripts
       - name: Build Site
         run: bunx turbo run build --filter=@open-data-capture/marketing
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
         with:
-          name: dist
           path: ./apps/marketing/dist/
   deploy:
     environment:
@@ -43,10 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy
     steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: dist
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
