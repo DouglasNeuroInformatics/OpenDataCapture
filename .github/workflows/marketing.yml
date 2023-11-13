@@ -27,7 +27,7 @@ jobs:
         id: pages
         uses: actions/configure-pages@v3
       - name: Install Dependencies
-        run: bun install
+        run: bun install --ignore-scripts
       - name: Build Site
         run: bunx turbo run build --filter=@open-data-capture/marketing
       - name: Upload Artifact
