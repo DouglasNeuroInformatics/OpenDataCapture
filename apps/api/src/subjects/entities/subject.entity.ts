@@ -15,7 +15,7 @@ export class SubjectEntity {
   @Prop({ required: false })
   firstName?: string;
 
-  @Prop({ default: [], required: false, type: [{ ref: GroupEntity.name, type: MongooseSchema.Types.ObjectId }] })
+  @Prop({ default: [], required: false, type: [{ ref: GroupEntity.modelName, type: MongooseSchema.Types.ObjectId }] })
   groups: GroupEntity[];
 
   @Prop({ required: true })
