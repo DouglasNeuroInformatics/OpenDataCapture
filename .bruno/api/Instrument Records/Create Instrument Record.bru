@@ -1,0 +1,19 @@
+meta {
+  name: Create Instrument Record
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BASE_URL}}/v1/instrument-records
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "date": "2023-11-13",
+    "instrumentId": "5fa9eb966fd92f6ae5353bec3b0cb208b28eb6828962749cc87c8bfc5cb93a42",
+    "subjectIdentifier": ""
+  }
+}
