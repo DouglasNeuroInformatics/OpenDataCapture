@@ -24,6 +24,6 @@ export const useAvailableForms = () => {
           return result.data.map((summary) => translateFormSummary(summary, i18n.resolvedLanguage as Language));
         });
     },
-    queryKey: ['available-forms']
+    queryKey: ['available-forms', i18n.resolvedLanguage]
   });
 };
