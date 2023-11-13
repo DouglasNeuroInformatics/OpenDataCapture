@@ -160,7 +160,8 @@ function strictTranslateFormInstrument<TData extends Base.FormDataType>(
   if (isUnilingualForm(form, language)) {
     return form;
   } else if (isMultilingualForm(form, language)) {
-    return merge(form, {
+    return {
+      ...form,
       content: Array.isArray(form.content)
         ? form.content.map((group) => ({
             description: group.description?.[language],
@@ -177,7 +178,7 @@ function strictTranslateFormInstrument<TData extends Base.FormDataType>(
       language: language,
       measures: mapValues(form.measures, (measure) => ({ label: measure.label[language], value: measure.value })),
       tags: form.tags[language]
-    }) as Types.FormInstrument<TData, Language>;
+    } as Types.FormInstrument<TData, Language>;
   }
   return null;
 }

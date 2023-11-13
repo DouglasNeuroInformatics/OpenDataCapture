@@ -1,4 +1,4 @@
-import type { FormDataType, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
+import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Card, formatFormDataAsString, getFormFields, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
@@ -102,10 +102,6 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
       <FormSummaryGroup
         items={Object.keys(fields).map((fieldName) => {
           return match(fields[fieldName]!)
-            .with({ kind: 'array' }, (field) => ({
-              label: field.label,
-              value: 'NA'
-            }))
             .with({ kind: 'dynamic' }, (field) => {
               const staticField = field.render(data);
               if (!staticField || staticField.kind === 'array') {
@@ -113,12 +109,12 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
               }
               return {
                 label: staticField.label,
-                value: (data[fieldName] ?? 'NA') as PrimitiveFieldValue
+                value: data[fieldName]
               };
             })
             .otherwise((field) => ({
               label: field.label,
-              value: data[fieldName] as PrimitiveFieldValue
+              value: data[fieldName]
             }));
         })}
         title={t('responses')}

@@ -65,11 +65,11 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
   }
 
   async findById(identifier: string, { ability }: EntityOperationOptions = {}) {
-    const subject = await this.subjectsRepository.findOne({ identifier });
+    const subject = await this.subjectsRepository.findOne({
+      $and: [ability ? accessibleBy(ability, 'read').Subject : {}, { identifier }]
+    });
     if (!subject) {
       throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
-    } else if (ability && !ability.can('read', subject)) {
-      throw new ForbiddenException(`Insufficient rights to read subject with identifier: ${identifier}`);
     }
     return subject;
   }

@@ -1,0 +1,21 @@
+meta {
+  name: Setup
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/v1/setup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "admin": {
+      "username": "admin",
+      "password": "Password123"
+    },
+    "initDemo": true
+  }
+}

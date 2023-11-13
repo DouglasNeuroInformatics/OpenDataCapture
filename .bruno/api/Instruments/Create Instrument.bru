@@ -1,0 +1,15 @@
+meta {
+  name: Create Instrument
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/v1/instruments
+  body: json
+  auth: none
+}
+
+body:json {
+  {"source":"/* eslint-disable perfectionist/sort-objects */\n\ntype HappinessQuestionnaireData = {\n  overallHappiness: number;\n};\n\nconst happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, InstrumentLanguage> = {\n  kind: 'form',\n  name: 'HappinessQuestionnaire',\n  language: ['en', 'fr'],\n  tags: {\n    en: ['Well-Being'],\n    fr: ['Bien-être']\n  },\n  version: 1,\n  content: {\n    overallHappiness: {\n      description: {\n        en: 'Overall happiness from 1 through 10 (inclusive)',\n        fr: 'Bonheur général de 1 à 10 (inclus)'\n      },\n      isRequired: true,\n      kind: 'numeric',\n      label: {\n        en: 'Overall Happiness',\n        fr: 'Bonheur général'\n      },\n      max: 10,\n      min: 1,\n      variant: 'slider'\n    }\n  },\n  details: {\n    description: {\n      en: 'The Happiness Questionnaire is a questionnaire about happiness.',\n      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'\n    },\n    estimatedDuration: 1,\n    instructions: {\n      en: 'Please answer the question based on your current feelings.',\n      fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'\n    },\n    title: {\n      en: 'Happiness Questionnaire',\n      fr: 'Questionnaire sur le bonheur'\n    }\n  },\n  validationSchema: z.object({\n    overallHappiness: z.number().int().gte(1).lte(10)\n  })\n};\n\nexport default happinessQuestionnaire;\n"}
+}
