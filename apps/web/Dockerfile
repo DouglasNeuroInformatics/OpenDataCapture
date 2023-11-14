@@ -1,26 +1,19 @@
+FROM node:lts-slim AS base
+
 # COMPILE SOURCE CODE
-FROM oven/bun:1.0.11 AS builder
-
-RUN apt update
-RUN apt install -y ca-certificates curl gnupg
-RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
-RUN apt update
-RUN apt install nodejs -y
-
+FROM base AS builder
 ARG VITE_API_BASE_URL
-WORKDIR /root
-COPY . .
+WORKDIR /src
+COPY apps/web/ ./apps/web
+COPY packages/ ./packages
+COPY package.json tsconfig.base.json turbo.json ./
+RUN npm install -g bun@1.0.11
 RUN bun install --ignore-scripts
 RUN bunx turbo run build --filter=@open-data-capture/web
-RUN bunx pkg ./node_modules/@import-meta-env/cli/bin/import-meta-env.js --target node18-alpine --output import-meta-env-alpine
 
 # RUN SERVER
-FROM caddy:2.7-alpine as runner
+FROM base as runner
 WORKDIR /app
-COPY --from=builder /root/import-meta-env-alpine .
-COPY --from=builder /root/apps/web/.env.public /root/apps/web/start.sh /app/
-COPY --from=builder /root/apps/web/Caddyfile /etc/caddy/Caddyfile
-COPY --from=builder /root/apps/web/dist/ /app/dist/
-CMD [ "sh", "start.sh"]
+RUN npm install -g @import-meta-env/cli@0.6.8 http-server@14.1.1
+COPY --from=builder /src/apps/web/.env.public /src/apps/web/dist/ ./
+CMD [ "sh", "-c", "import-meta-env -x .env.public -p index.html && http-server -s -p 80 -P http://localhost:80? --gzip ." ]
