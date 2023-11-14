@@ -15,7 +15,7 @@
     "lint": "tsc && eslint --fix src",
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
     "test": "env-cmd -f ../../.env start-server-and-test dev http://localhost:${WEB_DEV_SERVER_PORT} cy:run",
-    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx --bun vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:open'"
+    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
@@ -74,6 +74,7 @@
     "@vitejs/plugin-react-swc": "^3.4.1",
     "autoprefixer": "^10.4.16",
     "cypress": "^13.5.0",
+    "jose": "^5.1.1",
     "jsdom": "^22.1.0",
     "msw": "^2.0.6",
     "postcss": "^8.4.31",

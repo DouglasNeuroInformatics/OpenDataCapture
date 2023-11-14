@@ -38,8 +38,7 @@ axios.interceptors.response.use(
       title: error.response?.status.toString(),
       type: 'error'
     });
-    console.error(error.response);
-    return Promise.resolve();
+    return Promise.reject(error);
   }
 );
 

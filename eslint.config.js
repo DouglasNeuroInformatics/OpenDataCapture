@@ -53,7 +53,7 @@ const gatewayConfig = createConfig({
 const webConfig = createConfig({
   base: {
     env: 'browser',
-    fileRoots: ['apps/web/.storybook', 'apps/web/src']
+    fileRoots: ['apps/web/.storybook', 'apps/web/cypress', 'apps/web/src']
   },
   jsx: true,
   ts: {

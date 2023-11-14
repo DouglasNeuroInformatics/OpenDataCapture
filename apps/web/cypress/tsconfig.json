@@ -1,7 +1,6 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "allowJs": true,
     "types": ["bun-types", "cypress"]
   },
   "include": ["../../../node_modules/cypress", "./**/*.ts"]
