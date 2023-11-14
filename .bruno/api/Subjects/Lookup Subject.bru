@@ -1,0 +1,20 @@
+meta {
+  name: Lookup Subject
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/v1/subjects/lookup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "John",
+    "lastName": "Smith",
+    "dateOfBirth": "2023-11-01",
+    "sex": "male"
+  }
+}

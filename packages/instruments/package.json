@@ -4,7 +4,9 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    "./forms/*": "./src/forms/*.ts"
+    "./forms/*": "./src/forms/*.ts",
+    "./macros": "./src/macros.ts",
+    "./raw": "./src/raw.ts"
   },
   "scripts": {
     "build:types": "rollup -c",

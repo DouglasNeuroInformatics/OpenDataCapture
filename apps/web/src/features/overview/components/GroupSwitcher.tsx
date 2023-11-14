@@ -17,7 +17,7 @@ export const GroupSwitcher = () => {
     <Menu as="div" className="relative my-2 w-fit">
       <Menu.Button className="flex items-center justify-center">
         {t('currentGroup')}:&nbsp;{currentGroup.name}
-        <ChevronDownIcon className="mx-1" />
+        <ChevronDownIcon className="mx-1" height={16} width={16} />
       </Menu.Button>
       <Transition
         as="div"

@@ -20,7 +20,7 @@ const baseConfig = createConfig({
 const apiConfig = createConfig({
   base: {
     env: 'node',
-    filesRoot: 'apps/api/src'
+    fileRoots: ['apps/api/src']
   },
   ts: {
     project: path.resolve(__dirname, 'apps', 'api', 'tsconfig.json')
@@ -29,8 +29,8 @@ const apiConfig = createConfig({
 
 const gatewayConfig = createConfig({
   base: {
-    env: 'node',
-    filesRoot: 'apps/gateway/src'
+    env: 'browser',
+    fileRoots: ['apps/gateway/src']
   },
   jsx: true,
   ts: {
@@ -53,7 +53,7 @@ const gatewayConfig = createConfig({
 const webConfig = createConfig({
   base: {
     env: 'browser',
-    filesRoot: 'apps/web/src'
+    fileRoots: ['apps/web/.storybook', 'apps/web/src']
   },
   jsx: true,
   ts: {
@@ -61,10 +61,21 @@ const webConfig = createConfig({
   }
 });
 
+const reactCoreConfig = createConfig({
+  base: {
+    env: 'browser',
+    fileRoots: ['packages/react-core/.storybook']
+  },
+  jsx: true,
+  ts: {
+    project: path.resolve(__dirname, 'packages', 'react-core', 'tsconfig.json')
+  }
+});
+
 const instrumentsConfig = createConfig({
   base: {
     env: 'browser',
-    filesRoot: 'packages/instruments/src'
+    fileRoots: ['packages/instruments/src']
   },
   jsx: true,
   ts: {
@@ -72,4 +83,4 @@ const instrumentsConfig = createConfig({
   }
 });
 
-export default [...baseConfig, ...apiConfig, ...gatewayConfig, ...webConfig, ...instrumentsConfig];
+export default [...baseConfig, ...apiConfig, ...gatewayConfig, ...webConfig, ...reactCoreConfig, ...instrumentsConfig];

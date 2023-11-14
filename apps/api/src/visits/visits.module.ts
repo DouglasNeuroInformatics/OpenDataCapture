@@ -11,6 +11,7 @@ import { VisitsService } from './visits.service';
 
 @Module({
   controllers: [VisitsController],
+  exports: [VisitsService],
   imports: [
     GroupsModule,
     MongooseModule.forFeature([

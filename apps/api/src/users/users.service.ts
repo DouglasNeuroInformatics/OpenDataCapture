@@ -87,7 +87,7 @@ export class UsersService implements EntityService<User> {
     const user = await this.usersRepository.findById(id);
     if (!user) {
       throw new NotFoundException(`Failed to find user with ID: ${id}`);
-    } else if (ability && !ability.can('delete', user)) {
+    } else if (ability && !ability.can('read', user)) {
       throw new ForbiddenException(`Insufficient rights to read user with ID: ${id}`);
     }
     return user;
@@ -97,9 +97,11 @@ export class UsersService implements EntityService<User> {
     const user = await this.usersRepository.findByUsername(username);
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
-    } else if (ability && !ability.can('delete', user)) {
+    } else if (ability && !ability.can('read', user)) {
       throw new ForbiddenException(`Insufficient rights to read user with username: ${username}`);
     }
+    // For unknown reasons, autopopulate is broken in prod
+    await user.populate('groups');
     return user;
   }
 

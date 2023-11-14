@@ -11,7 +11,14 @@ import { SubjectsTable } from '../components/SubjectsTable';
 export const SubjectIndexPage = () => {
   const { currentGroup } = useAuthStore();
   const query = useQuery({
-    queryFn: () => axios.get<Subject[]>('/v1/subjects').then((response) => response.data),
+    queryFn: () =>
+      axios
+        .get<Subject[]>('/v1/subjects', {
+          params: {
+            group: currentGroup?.name
+          }
+        })
+        .then((response) => response.data),
     queryKey: ['subjects', currentGroup?.id]
   });
 

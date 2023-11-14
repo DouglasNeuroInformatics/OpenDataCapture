@@ -1,93 +1,59 @@
-import crypto from 'crypto';
-
-import { accessibleBy } from '@casl/mongoose';
-import { EntityService } from '@douglasneuroinformatics/nestjs/core';
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+// import { accessibleBy } from '@casl/mongoose';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Assignment } from '@open-data-capture/common/assignment';
+import type { Assignment, AssignmentBundle, CreateAssignmentBundleData } from '@open-data-capture/common/assignment';
+import { assignmentBundleSchema } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
-import { SubjectsService } from '@/subjects/subjects.service';
+// import { SubjectsService } from '@/subjects/subjects.service';
 
-import { AssignmentsRepository } from './assignments.repository';
+import { subject } from '@casl/ability';
+import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
+
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
-import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 
 @Injectable()
-export class AssignmentsService implements EntityService<Assignment> {
-  constructor(
-    private readonly assignmentsRepository: AssignmentsRepository,
-    private readonly configService: ConfigService,
-    private readonly instrumentsService: InstrumentsService,
-    private readonly subjectsService: SubjectsService
-  ) {}
+export class AssignmentsService implements Pick<EntityService<Assignment>, 'create'> {
+  private readonly gatewayBaseUrl: string;
 
-  async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto) {
-    const instrument = await this.instrumentsService.findById(instrumentId);
-    const subject = await this.subjectsService.findById(subjectIdentifier);
-    return this.assignmentsRepository.create({
-      assignedAt: new Date(),
-      expiresAt,
-      instrument,
-      status: 'OUTSTANDING',
-      subject,
-      url: new URL(crypto.randomUUID(), this.configService.getOrThrow('GATEWAY_URL')).toString()
-    });
+  constructor(
+    configService: ConfigService,
+    private readonly httpService: HttpService,
+    private readonly instrumentsService: InstrumentsService // private readonly subjectsService: SubjectsService
+  ) {
+    this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
   }
 
-  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
-    const assignment = await this.assignmentsRepository.findById(id);
-    if (!assignment) {
-      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
-    } else if (ability && ability.can('delete', assignment)) {
-      throw new ForbiddenException(`Insufficient rights to delete assignment with ID: ${id}`);
-    }
-    return (await this.assignmentsRepository.deleteById(id))!;
+  async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto): Promise<AssignmentBundle> {
+    const instrument = await this.instrumentsService.findById(instrumentId);
+    const dto: CreateAssignmentBundleData = {
+      expiresAt,
+      instrumentBundle: instrument.bundle,
+      instrumentId: instrument.id as string,
+      subjectIdentifier
+    };
+    const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, dto);
+    return assignmentBundleSchema.parseAsync(response.data);
   }
 
   async find({ subjectIdentifier }: { subjectIdentifier?: string } = {}, { ability }: EntityOperationOptions = {}) {
-    const subject = subjectIdentifier ? await this.subjectsService.findById(subjectIdentifier) : undefined;
-    return this.assignmentsRepository.find({
-      $and: [{ subject }, ability ? accessibleBy(ability, 'read').Assignment : {}]
-    });
-  }
-
-  async findById(id: string, { ability }: EntityOperationOptions = {}) {
-    const assignment = await this.assignmentsRepository.findById(id);
-    if (!assignment) {
-      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
-    } else if (ability && !ability.can('delete', assignment)) {
-      throw new ForbiddenException(`Insufficient rights to read assignment with ID: ${id}`);
-    }
-    return assignment;
-  }
-
-  async getSummary(
-    { subjectIdentifier }: { subjectIdentifier?: string } = {},
-    { ability }: EntityOperationOptions = {}
-  ) {
-    const subject = subjectIdentifier ? await this.subjectsService.findById(subjectIdentifier) : undefined;
-    return this.assignmentsRepository.find(
-      {
-        $and: [{ subject }, ability ? accessibleBy(ability, 'read').Assignment : {}]
-      },
-      {
-        populate: {
-          path: 'instrument',
-          select: '-content -measures -validationSchema'
-        }
+    const response = await this.httpService.axiosRef.get(`${this.gatewayBaseUrl}/api/assignments`, {
+      params: {
+        subjectIdentifier
       }
-    );
-  }
-
-  async updateById(id: string, update: UpdateAssignmentDto, { ability }: EntityOperationOptions = {}) {
-    const assignment = await this.assignmentsRepository.findById(id);
-    if (!assignment) {
-      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
-    } else if (ability && !ability.can('update', assignment)) {
-      throw new ForbiddenException(`Insufficient rights to update assignment with ID: ${id}`);
+    });
+    const assignmentBundles = await assignmentBundleSchema.array().parseAsync(response.data);
+    const assignments: Assignment[] = [];
+    for (const bundle of assignmentBundles) {
+      const instrument = await this.instrumentsService.findById(bundle.instrumentId);
+      const assignment = subject('Assignment', { ...bundle, instrument });
+      if (ability && !ability.can('read', assignment)) {
+        continue;
+      }
+      assignments.push(assignment);
     }
-    return (await this.assignmentsRepository.updateById(id, update))!;
+    return assignments;
   }
 }

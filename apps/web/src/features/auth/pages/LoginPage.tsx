@@ -46,7 +46,7 @@ export const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DemoBanner />
+      <DemoBanner onLogin={(credentials) => void login(credentials)} />
       <FormPageWrapper
         className="min-h-0 flex-grow"
         languageToggle={{

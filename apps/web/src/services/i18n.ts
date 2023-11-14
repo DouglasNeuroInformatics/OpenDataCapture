@@ -1,4 +1,5 @@
-import { i18n as i18nLib } from '@douglasneuroinformatics/ui';
+import { i18n as i18nUi } from '@douglasneuroinformatics/ui';
+import { default as i18nCore } from '@open-data-capture/react-core/services/i18n';
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import Backend from 'i18next-http-backend';
@@ -21,7 +22,8 @@ void i18n
   });
 
 i18n.on('languageChanged', (lang) => {
-  i18nLib.changeLanguage(lang).catch(console.error);
+  i18nCore.changeLanguage(lang).catch(console.error);
+  i18nUi.changeLanguage(lang).catch(console.error);
 });
 
 export default i18n;

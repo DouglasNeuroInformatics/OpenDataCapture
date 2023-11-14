@@ -15,7 +15,7 @@
     "clean": "find . -type d '(' -name '.turbo' -o -name 'dist' -o -name 'node_modules' ')' -prune -exec rm -rf {} \\;",
     "dev": "bun dev:core",
     "dev:all": "env-cmd cross-env NODE_ENV=development turbo run dev",
-    "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --filter=@open-data-capture/api --filter=@open-data-capture/web",
+    "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --filter=@open-data-capture/api --filter=@open-data-capture/gateway --filter=@open-data-capture/web",
     "force-reinstall": "bun pm cache rm && bun clean && bun install",
     "format": "turbo run format",
     "lint": "turbo run lint",
@@ -36,7 +36,7 @@
     "prettier-plugin-astro": "^0.12.1",
     "prettier-plugin-tailwindcss": "^0.5.6",
     "turbo": "^1.10.16",
-    "typescript": "^5.2.2"
+    "typescript": "5.3.1-rc"
   },
-  "packageManager": "bun@1.0.7"
+  "packageManager": "bun@1.0.11"
 }

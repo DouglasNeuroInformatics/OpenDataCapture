@@ -1,0 +1,47 @@
+{
+  "name": "@open-data-capture/react-core",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "storybook": "storybook dev -p 6006"
+  },
+  "exports": {
+    "./components": "./src/components/index.ts",
+    "./services/i18n": "./src/services/i18n.ts",
+    "./translations/*": "./src/translations/*",
+    "./utils/translate-instrument": "./src/utils/translate-instrument.ts",
+    "./tailwind.config": "./tailwind.config.js"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/form-types": "latest",
+    "@douglasneuroinformatics/ui": "latest",
+    "@douglasneuroinformatics/utils": "latest",
+    "@heroicons/react": "^2.0.18",
+    "@open-data-capture/common": "workspace:*",
+    "i18next": "^23.6.0",
+    "react-i18next": "^13.3.1",
+    "ts-pattern": "^5.0.5",
+    "type-fest": "^4.7.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.5.2",
+    "@storybook/addon-interactions": "^7.5.2",
+    "@storybook/addon-links": "^7.5.2",
+    "@storybook/addon-themes": "^7.5.2",
+    "@storybook/blocks": "^7.5.2",
+    "@storybook/react": "^7.5.2",
+    "@storybook/react-vite": "^7.5.2",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "vite": "^4.5.0"
+  },
+  "peerDependencies": {
+    "react": "18.x",
+    "react-dom": "18.x",
+    "tailwindcss": "3.x"
+  }
+}

@@ -63,10 +63,10 @@ export const SubjectTablePage = () => {
 
     switch (option) {
       case 'JSON':
-        download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(tableData, null, 2)));
+        void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(tableData, null, 2)));
         break;
       case 'CSV':
-        download(`${baseFilename}.csv`, () => {
+        void download(`${baseFilename}.csv`, () => {
           const columnNames = Object.keys(tableData[0]!);
           const rows = tableData.map((item) => Object.values(item).join(',')).join('\n');
           return Promise.resolve(columnNames + '\n' + rows);

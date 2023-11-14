@@ -1,7 +1,3 @@
-[install.cache]
-disable = true
-disableManifest = true
-
 [install.lockfile]
 save = false
 

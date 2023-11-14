@@ -8,16 +8,18 @@ import {
 } from '@nestjs/common/exceptions';
 import type { BaseInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
 import { baseInstrumentSchema, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { InstrumentTransformer } from '@open-data-capture/common/instrument';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
 
 import { MutateInstrumentDto } from './dto/mutate-instrument.dto';
 import { InstrumentsRepository } from './instruments.repository';
-import { generateBundle } from './instruments.utils';
 
 @Injectable()
 export class InstrumentsService {
+  private readonly instrumentTransformer = new InstrumentTransformer();
+
   constructor(private readonly instrumentsRepository: InstrumentsRepository) {}
 
   async count(filter: FilterQuery<BaseInstrument> = {}, { ability }: EntityOperationOptions = {}) {
@@ -88,7 +90,7 @@ export class InstrumentsService {
     const instrument = await this.instrumentsRepository.findById(id);
     if (!instrument) {
       throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
-    } else if (ability && !ability.can('delete', instrument)) {
+    } else if (ability && !ability.can('read', instrument)) {
       throw new ForbiddenException(`Insufficient rights to read instrument with ID: ${id}`);
     }
     return instrument;
@@ -118,7 +120,7 @@ export class InstrumentsService {
     let bundle: string;
     let instance: unknown;
     try {
-      bundle = generateBundle(source);
+      bundle = this.instrumentTransformer.generateBundle(source);
       instance = evaluateInstrument(bundle);
     } catch (err) {
       throw new UnprocessableEntityException('Failed to parse instrument', {

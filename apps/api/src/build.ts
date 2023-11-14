@@ -1,8 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import swcPlugin from 'bun-plugin-swc';
-
 const entryFile = path.resolve(import.meta.dir, 'main.ts');
 const buildDir = path.resolve(import.meta.dir, '..', 'dist');
 
@@ -13,10 +11,9 @@ await fs.rm(buildDir, {
 
 const result = await Bun.build({
   entrypoints: [entryFile],
-  external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer/storage'],
+  external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],
   minify: true,
   outdir: buildDir,
-  plugins: [swcPlugin()],
   target: 'bun'
 });
 

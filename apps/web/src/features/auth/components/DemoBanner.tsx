@@ -1,11 +1,16 @@
 import { useState } from 'react';
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import type { LoginCredentials } from '@open-data-capture/common/auth';
 import { useTranslation } from 'react-i18next';
 
 import { DemoModal } from './DemoModal';
 
-export const DemoBanner = () => {
+export type DemoBannerProps = {
+  onLogin: (credentials: LoginCredentials) => void;
+};
+
+export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
   const { t } = useTranslation('auth');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -36,7 +41,7 @@ export const DemoBanner = () => {
           </div>
         </div>
       </div>
-      <DemoModal isOpen={isModalOpen} onClose={closeModal} />
+      <DemoModal isOpen={isModalOpen} onClose={closeModal} onLogin={onLogin} />
     </>
   );
 };

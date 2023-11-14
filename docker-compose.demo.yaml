@@ -24,9 +24,21 @@ services:
     environment:
       - NODE_ENV=production
       - MONGO_URI=mongodb://mongo:27017
+      - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
+      - GATEWAY_REFRESH_INTERVAL
       - SECRET_KEY
     expose:
       - 80
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+    ports:
+      - '3500:80'
+    expose:
+      - 80
+    environment:
+      - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
   web:
     image: ghcr.io/douglasneuroinformatics/data-capture-web:latest
     build:

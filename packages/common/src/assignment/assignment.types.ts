@@ -20,5 +20,3 @@ export type CreateAssignmentData = {
   instrumentId: string;
   subjectIdentifier: string;
 };
-
-export type UpdateAssignmentData = Partial<Pick<Assignment, 'expiresAt' | 'status'>>;
