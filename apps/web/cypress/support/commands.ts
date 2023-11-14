@@ -14,10 +14,11 @@
 
 //This is a login script for the
 Cypress.Commands.add('login', (username, password) => {
-  cy.visit('http://127.0.0.1:3000/auth/login');
-  cy.get('input[name="username"]').type(username);
-  cy.get('input[name="password"]').type(password);
-  cy.get('button').contains('Login').click();
+  cy.visit('/auth/login');
+  const form = cy.get('form[data-cy="login-form"]');
+  form.get('input[name="username"]').type(username);
+  form.get('input[name="password"]').type(password);
+  form.get('button[aria-label="Submit Button"]').click();
 });
 
 declare global {
