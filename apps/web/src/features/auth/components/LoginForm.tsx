@@ -25,6 +25,7 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
           variant: 'password'
         }
       }}
+      data-cy="login-form"
       submitBtnLabel={t('login')}
       validationSchema={z.object({
         username: z.string().min(1),

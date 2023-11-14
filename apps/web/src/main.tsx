@@ -7,10 +7,10 @@ import './styles.css';
 
 const root = document.getElementById('root')!;
 
-// if (import.meta.env.DEV) {
-//   import('../msw/mocks/browser.js');
-//   //worker.start({ onUnhandledRequest: "bypass" })
-// }
+if (import.meta.env.MODE === 'test') {
+  const worker = await import('./test/server/browser').then((module) => module.worker);
+  await worker.start();
+}
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>

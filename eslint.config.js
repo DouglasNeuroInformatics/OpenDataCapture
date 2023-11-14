@@ -61,6 +61,17 @@ const webConfig = createConfig({
   }
 });
 
+const cypressConfig = createConfig({
+  base: {
+    env: 'browser',
+    fileRoots: ['apps/web/cypress']
+  },
+  jsx: true,
+  ts: {
+    project: path.resolve(__dirname, 'apps', 'web', 'cypress', 'tsconfig.json')
+  }
+});
+
 const reactCoreConfig = createConfig({
   base: {
     env: 'browser',
@@ -83,4 +94,12 @@ const instrumentsConfig = createConfig({
   }
 });
 
-export default [...baseConfig, ...apiConfig, ...gatewayConfig, ...webConfig, ...reactCoreConfig, ...instrumentsConfig];
+export default [
+  ...baseConfig,
+  ...apiConfig,
+  ...gatewayConfig,
+  ...webConfig,
+  ...cypressConfig,
+  ...reactCoreConfig,
+  ...instrumentsConfig
+];
