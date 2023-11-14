@@ -15,7 +15,7 @@
     "lint": "tsc && eslint --fix src",
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
     "test": "env-cmd -f ../../.env start-server-and-test dev http://localhost:${WEB_DEV_SERVER_PORT} cy:run",
-    "test:dev": "env-cmd -f ../../.env start-server-and-test 'bunx --bun vite --mode test' http://localhost:${WEB_DEV_SERVER_PORT} cy:open"
+    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx --bun vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",

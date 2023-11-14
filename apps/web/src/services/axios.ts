@@ -4,7 +4,7 @@ import i18next from 'i18next';
 
 import { useAuthStore } from '@/stores/auth-store';
 
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+axios.defaults.baseURL = import.meta.env.MODE !== 'test' ? import.meta.env.VITE_API_BASE_URL : undefined;
 
 axios.interceptors.request.use((config) => {
   const auth = useAuthStore.getState();
