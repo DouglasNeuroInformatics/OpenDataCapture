@@ -1,10 +1,11 @@
 # Prerequisites
 
-Welcome to our deployment guide! This resource is designed to be accessible for users with varying levels of technical expertise. 
+Welcome to our deployment guide! This resource is designed to be accessible for users with varying levels of technical expertise.
 
 ## Server Configuration
 
 Before continuing, please ensure the following:
+
 - You have root access on a Linux-based server
 - Ports 80 and 443 are exposed to the internet
 - You own a domain name and have appropriately configured the DNS records

@@ -39,6 +39,7 @@ npm init -y
 Create your script, for example:
 
 **index.js**
+
 ```javascript
 // @ts-check
 const process = require('node:process');

@@ -2,14 +2,13 @@
 
 Our REST API is built using [NestJS](https://nestjs.com/), a framework for building efficient and scalable server-side applications. For a quick introduction to NestJS, we recommend [this video](https://www.youtube.com/watch?v=0M8AYU_hPas).
 
-
 ## Dependency Injection
 
 In order to understand Nest, and therefore our server-side architecture, it is first necessary to understand dependency injection (DI). If you already understand DI, you can skip this section.
 
 The main advantage of DI is that is decreases the coupling between classes and their dependencies. By removing a client's knowledge of how its dependencies are implemented, programs become more reusable, testable and maintainable.
 
-In Nest, when a class is decorated with the `@Injectable()` decorator, it is eligible to be injected as a dependency. These classes are typically services or providers that encapsulate specific functionality of the application. The classes that depend on these services or providers, such as controllers or pipes, can then have them injected into their constructors. 
+In Nest, when a class is decorated with the `@Injectable()` decorator, it is eligible to be injected as a dependency. These classes are typically services or providers that encapsulate specific functionality of the application. The classes that depend on these services or providers, such as controllers or pipes, can then have them injected into their constructors.
 
 When the application is bootstrapped, Nest scans for all the classes decorated with `@Injectable()` and creates instances of them. These instances are then stored in a container, which is responsible for managing the lifecycle of the instances and providing them when they are needed by other parts of the application.
 
@@ -23,16 +22,16 @@ Services are used to encapsulate the business logic of the application, and can 
 
 ## Security
 
-The API uses JSON Web Tokens (JWTs) to identify and authorize users. When a user attempts to 
-log in to the system, their password is compared to a hashed and salted version stored in 
-our database. If the password is valid, a JWT is created with a payload that encodes various 
+The API uses JSON Web Tokens (JWTs) to identify and authorize users. When a user attempts to
+log in to the system, their password is compared to a hashed and salted version stored in
+our database. If the password is valid, a JWT is created with a payload that encodes various
 data about the user, including any relevant permissions or roles.
 
-This payload is then signed using a private key, which is a secret value known only to the 
-server. The signed payload is returned to the client in the form of a JWT. On requests to 
-protected endpoints within the API, the client must present the JWT as proof of their identity. 
-The server then verifies the integrity of the payload by checking the signature against the 
-private key. If the signature is valid, the server can trust that the payload has not been 
+This payload is then signed using a private key, which is a secret value known only to the
+server. The signed payload is returned to the client in the form of a JWT. On requests to
+protected endpoints within the API, the client must present the JWT as proof of their identity.
+The server then verifies the integrity of the payload by checking the signature against the
+private key. If the signature is valid, the server can trust that the payload has not been
 tampered with and can use the data contained within it to determine whether the now authenticated
 user is authorized to perform certain actions.
 
@@ -40,25 +39,25 @@ For security reasons, the JWT is only valid for a limited time. This time limit,
 "expiration time," is set by the server that issues the JWT and should be set to a relatively
 short time frame to reduce the risk of the token being compromised (e.g., by malware). Of course,
 the user may be using the client application for longer than 15 minutes, and it would be annoying for
-the user to interrupt the instrument they, or a subject, is completing to reauthenticate. 
+the user to interrupt the instrument they, or a subject, is completing to reauthenticate.
 
-Therefore, in order to maintain a seamless user experience, the client (i.e., the application 
+Therefore, in order to maintain a seamless user experience, the client (i.e., the application
 or device using the JWT) can request a new JWT before it expires using both the current JWT and a
 refresh token. The refresh token is a special token that is issued along with the JWT, and is stored
-in our database (as a hashed value for security purposes). When the client sends a request for a 
-new JWT using the refresh token, the server can verify the authenticity of the request and issue 
+in our database (as a hashed value for security purposes). When the client sends a request for a
+new JWT using the refresh token, the server can verify the authenticity of the request and issue
 a new JWT without requiring the user to re-enter their password.
 
-This process allows for a secure and convenient user experience, as it allows the client to 
-continuously authenticate the user without requiring them to constantly enter their password. 
-At the same time, it also helps to maintain the security of the system, as the server can 
+This process allows for a secure and convenient user experience, as it allows the client to
+continuously authenticate the user without requiring them to constantly enter their password.
+At the same time, it also helps to maintain the security of the system, as the server can
 verify the authenticity of the refresh token before issuing a new JWT.
 
 ## Modules
 
 ### App Module
 
-The app module is the root module of the application. The root module is the starting point Nest uses to build the application graph - the internal data structure Nest uses to resolve module and provider relationships and dependencies. 
+The app module is the root module of the application. The root module is the starting point Nest uses to build the application graph - the internal data structure Nest uses to resolve module and provider relationships and dependencies.
 
 #### ConfigModule
 
@@ -70,7 +69,7 @@ The app uses a custom `ExceptionFilter` class, which is implemented to handle an
 
 #### ValidationPipe
 
-The app uses the `ValidationPipe` provided by Nest to validate and transform incoming data. A pipe is a class that implements the `PipeTransform` interface, which defines a single method, `transform`. This method takes in the data to be validated and the current request object, and returns the validated data or throws an error. This data is validated and transformed according to the decorators added to the DTO classes within each module. 
+The app uses the `ValidationPipe` provided by Nest to validate and transform incoming data. A pipe is a class that implements the `PipeTransform` interface, which defines a single method, `transform`. This method takes in the data to be validated and the current request object, and returns the validated data or throws an error. This data is validated and transformed according to the decorators added to the DTO classes within each module.
 
 ### Auth Module
 
@@ -81,15 +80,15 @@ In our application the `AccessTokenGuard` class is used as a global guard. It is
 ### Instruments Module
 
 Instruments are tasks that may be completed by users, or delegated by users to other persons
-(e.g., surveys, questionnaires, symptom scales). Individuals with user-level permissions are 
-authorized to view and submit instruments that they are authorized to access. They may also 
+(e.g., surveys, questionnaires, symptom scales). Individuals with user-level permissions are
+authorized to view and submit instruments that they are authorized to access. They may also
 request all the instruments they are authorized to use. There is also functionality to add new
 instruments and store them in the database. However, at present, this functionality is reserved
 for administrators.
 
 ## Database
 
-The database is accessed using Mongoose, an Object Data Modeling (ODM) library for MongoDB. 
+The database is accessed using Mongoose, an Object Data Modeling (ODM) library for MongoDB.
 
 Database schemas are defined using strict mode, which means that any properties not defined in the schema will not be allowed to be saved in the database. This helps to ensure that the data in the database is consistent and in the expected format.
 

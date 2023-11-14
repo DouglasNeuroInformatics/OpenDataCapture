@@ -6,7 +6,7 @@ The web client is a single page application (SPA), the architecture of which is 
 
 ### React
 
-[React](https://reactjs.org/) is a JavaScript library for building user interfaces. 
+[React](https://reactjs.org/) is a JavaScript library for building user interfaces.
 
 ### JSX
 
@@ -28,7 +28,7 @@ const element = <div className="my-class">Hello World!</div>;
 
 ### Vite
 
-[Vite](https://vitejs.dev/) is a build tool that enables us to use technologies such as JSX and TypeScript that are not supported by browsers. 
+[Vite](https://vitejs.dev/) is a build tool that enables us to use technologies such as JSX and TypeScript that are not supported by browsers.
 
 The app is transpiled to ES6 (ECMAScript 6) and is designed to be compatible with all major modern browsers, including Chrome, Firefox, Safari, Edge. Legacy browsers including all versions of Internet Explorer are not supported.
 
@@ -38,11 +38,11 @@ The app is transpiled to ES6 (ECMAScript 6) and is designed to be compatible wit
 
 ### Storybook
 
-[Storybook](https://storybook.js.org/) is a development tool for creating and testing UI components in isolation. It provides a way to visualize and interact with components in different states, and to document and share those components with others. 
+[Storybook](https://storybook.js.org/) is a development tool for creating and testing UI components in isolation. It provides a way to visualize and interact with components in different states, and to document and share those components with others.
 
 ### i18next
 
-[i18next](https://www.i18next.com/) is an internationalization (i18n) library for JavaScript. It allows us to add localization support to the platform. i18next uses a simple, JSON-based file format to store translations, and supports features such as namespaces, fallback languages, and pluralization. In our application, we use it to support both English and French. These translations are stored in the `public` directory. 
+[i18next](https://www.i18next.com/) is an internationalization (i18n) library for JavaScript. It allows us to add localization support to the platform. i18next uses a simple, JSON-based file format to store translations, and supports features such as namespaces, fallback languages, and pluralization. In our application, we use it to support both English and French. These translations are stored in the `public` directory.
 
 ## Directory Structure
 

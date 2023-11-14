@@ -3,6 +3,7 @@
 ## Main Components
 
 Open Data Capture comprises three main components:
+
 1. A Single Page Application (SPA)
 2. A Representational State Transfer (REST) API
 3. A MongoDB database
@@ -12,7 +13,8 @@ Any of these components could be replaced with an alternatives providing equival
 ## Repository Structure
 
 Our repository is a monorepo with three workspaces:
-1. Client: A React SPA 
+
+1. Client: A React SPA
 2. Common: A library of common classes, functions, and types shared between the client and server
 3. Server: A REST API built using NestJS
 
