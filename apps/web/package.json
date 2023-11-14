@@ -6,11 +6,15 @@
   "type": "module",
   "scripts": {
     "build": "tsc && cross-env NODE_ENV=production bunx vite build",
+    "cy:install": "cypress install",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx --bun vite",
     "format": "prettier --write src",
     "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
     "lint": "tsc && eslint --fix src",
-    "storybook": "env-cmd -f ../../.env storybook dev -p 6006"
+    "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
+    "test": "env-cmd -f ../../.env start-server-and-test dev http://localhost:${WEB_DEV_SERVER_PORT} cy:run"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
@@ -75,6 +79,7 @@
     "prop-types": "^15.8.1",
     "rollup-plugin-copy": "^3.5.0",
     "sort-json": "^2.0.1",
+    "start-server-and-test": "^2.0.2",
     "storybook": "^7.5.3",
     "storybook-react-i18next": "^2.0.9",
     "tailwindcss": "^3.3.5",
