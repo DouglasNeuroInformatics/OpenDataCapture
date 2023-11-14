@@ -11,8 +11,8 @@ export type InstrumentLanguage = Language | Language[];
 export type InstrumentUIOption<L extends InstrumentLanguage, V> = L extends Language
   ? V
   : L extends (infer K extends Language)[]
-  ? Record<K, V>
-  : never;
+    ? Record<K, V>
+    : never;
 
 /** The details of the instrument to be displayed to the user */
 export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
@@ -127,10 +127,10 @@ export type FormInstrumentPrimitiveField<
       | FormInstrumentOptionsField<TLanguage, TValue>
       | FormInstrumentTextField<TLanguage>
   : TValue extends number
-  ? FormInstrumentNumericField<TLanguage>
-  : TValue extends boolean
-  ? FormInstrumentBinaryField<TLanguage>
-  : never;
+    ? FormInstrumentNumericField<TLanguage>
+    : TValue extends boolean
+      ? FormInstrumentBinaryField<TLanguage>
+      : never;
 
 export type FormInstrumentDynamicFieldsetField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
@@ -169,8 +169,8 @@ export type FormInstrumentStaticField<
 > = [TValue] extends [Base.PrimitiveFieldValue]
   ? FormInstrumentPrimitiveField<TLanguage, TValue>
   : [TValue] extends [Base.ArrayFieldValue]
-  ? FormInstrumentArrayField<TLanguage, TValue>
-  : FormInstrumentArrayField<TLanguage> | FormInstrumentPrimitiveField<TLanguage>;
+    ? FormInstrumentArrayField<TLanguage, TValue>
+    : FormInstrumentArrayField<TLanguage> | FormInstrumentPrimitiveField<TLanguage>;
 
 export type FormInstrumentStaticFields<
   TData extends Base.FormDataType = Base.FormDataType,

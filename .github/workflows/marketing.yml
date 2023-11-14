@@ -1,7 +1,7 @@
 name: Deploy Marketing Site
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
     paths:
       - 'marketing/**'
   workflow_dispatch:
@@ -10,7 +10,7 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 jobs:
   build:
