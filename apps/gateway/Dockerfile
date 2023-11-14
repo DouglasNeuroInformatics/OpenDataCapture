@@ -1,21 +1,24 @@
-FROM oven/bun:1.0.11 as runtime
-RUN apt update
-RUN apt install -y ca-certificates curl gnupg
-RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
-RUN apt update
-RUN apt install nodejs -y
+FROM node:lts-slim as base
+# RUN apt-get update && apt-get install -y openssl libssl-dev
+RUN npm install -g bun@1.0.11
 
 # COMPILE SOURCE CODE
-FROM runtime as builder
-WORKDIR /root
-COPY . .
+FROM base as builder
+WORKDIR /src
+COPY apps/gateway/ ./apps/gateway
+COPY packages/ ./packages
+COPY package.json tsconfig.base.json turbo.json ./
 RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/gateway
 
-WORKDIR /root/apps/gateway
-CMD [ "bun", "start" ]
+# # RUN SERVER
+FROM base as runner
+WORKDIR /app
+COPY --from=builder /src/apps/gateway/public ./public
+COPY --from=builder /src/apps/gateway/.next/standalone ./
+COPY --from=builder /src/.next/gateway/static ./.next/static
+
+CMD [ "/bin/bash"]
 
 # RUN SERVER
 # FROM runtime as runner
