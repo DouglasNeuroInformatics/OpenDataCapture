@@ -8,7 +8,7 @@ COPY apps/web/ ./apps/web
 COPY packages/ ./packages
 COPY package.json tsconfig.base.json turbo.json ./
 RUN npm install -g bun@1.0.11
-RUN bun install --ignore-scripts
+RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/web
 
 # RUN SERVER
