@@ -27,9 +27,13 @@ export const translations = {
       en: 'There is no content here at the moment',
       fr: "Il n'y a pas de contenu ici pour le moment"
     },
-    viewAltLang: {
-      en: 'You can also view our content in French',
-      fr: 'Vous pouvez également consulter notre contenu en anglais'
+    viewAltLangPrefix: {
+      en: 'You can also view our',
+      fr: 'Vous pouvez également consulter notre'
+    },
+    viewAltLangSuffix: {
+      en: 'content in French',
+      fr: 'contenu en anglais'
     }
   },
   docs: {
