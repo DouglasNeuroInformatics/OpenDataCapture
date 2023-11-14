@@ -10,7 +10,6 @@
     "format": "prettier --write src",
     "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
     "lint": "tsc && eslint --fix src",
-    "postinstall": "cypress install",
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006"
   },
   "dependencies": {
