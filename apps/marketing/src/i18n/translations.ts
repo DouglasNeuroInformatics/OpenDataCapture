@@ -30,6 +30,9 @@ export const translations = {
       fr: 'Vous pouvez également consulter notre contenu en anglais'
     }
   },
+  docs: {
+    title: 'Docs'
+  },
   footer: {
     aboutUs: {
       en: 'About Us',

@@ -6,5 +6,6 @@
       "@/*": ["*"]
     },
     "verbatimModuleSyntax": true
-  }
+  },
+  "include": ["src/**/*"]
 }
