@@ -1,10 +1,9 @@
 describe('login', () => {
   it('passes', () => {
     cy.visit('/auth/login');
-    expect(true).to.equal(true);
-    // cy.wait(1000);
-    // cy.get('input[name="username"]').type('david');
-    // cy.get('input[name="password"]').type('Password123');
-    // cy.get('button').contains('Login').click();
+    const form = cy.get('form[data-cy="login-form"]');
+    form.get('input[name="username"]').type('David');
+    form.get('input[name="password"]').type('Password123');
+    form.get('button[aria-label="Submit Button"]').click();
   });
 });
