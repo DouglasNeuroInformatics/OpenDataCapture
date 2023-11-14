@@ -7,6 +7,11 @@ import './styles.css';
 
 const root = document.getElementById('root')!;
 
+// if (import.meta.env.DEV) {
+//   import('../msw/mocks/browser.js');
+//   //worker.start({ onUnhandledRequest: "bypass" })
+// }
+
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <App />

@@ -24,9 +24,11 @@ describe('look at questionaire', () => {
     cy.get('input[name=firstName]').type(name);
     cy.get('input[name=lastName]').type('testPatient');
     cy.get('input[class=field-input]').type('2023-09-21');
+
+    cy.get('nav').click();
     cy.get('button[class="field-input capitalize"]').click({ force: true });
-    cy.get('body').click();
-    cy.get('button[type="submit"]').click();
+    cy.get('li[id*="headlessui-listbox-option-:"]').first().click();
+    cy.get('button[type="submit"]').click({ force: true });
 
     cy.wait(1000);
 
