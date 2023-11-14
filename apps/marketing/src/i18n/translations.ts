@@ -9,10 +9,6 @@ export const translations = {
       en: 'Our Blog',
       fr: 'Notre blogue'
     },
-    noContent: {
-      en: 'There is no content here at the moment',
-      fr: "Il n'y a pas de contenu ici pour le moment"
-    },
     subheading: {
       en: 'All the latest news on Open Data Capture and the open-source electronic data capture community',
       fr: 'Toutes les dernières nouvelles sur Open Data Capture et la communauté de la saisie électronique de données open-source'
@@ -24,6 +20,12 @@ export const translations = {
     video: {
       en: 'Video',
       fr: 'Vidéo'
+    }
+  },
+  common: {
+    noContent: {
+      en: 'There is no content here at the moment',
+      fr: "Il n'y a pas de contenu ici pour le moment"
     },
     viewAltLang: {
       en: 'You can also view our content in French',
