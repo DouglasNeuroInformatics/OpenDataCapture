@@ -2,6 +2,7 @@ import type { NavItem } from './types';
 
 export type NavigationProps = {
   items: NavItem[];
+  orientation: 'horizontal' | 'vertical';
 };
 
 export const Navigation = ({ items }: NavigationProps) => {

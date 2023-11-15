@@ -24,7 +24,6 @@
     "@open-data-capture/common": "workspace:*",
     "i18next": "^23.7.6",
     "react-i18next": "^13.4.1",
-    "tailwind-merge": "^2.0.0",
     "ts-pattern": "^5.0.5",
     "type-fest": "^4.7.1"
   },

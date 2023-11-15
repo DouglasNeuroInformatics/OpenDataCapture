@@ -1,8 +1,8 @@
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@douglasneuroinformatics/ui';
 
 export const Logo = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
   <svg
-    className={twMerge('fill-sky-900 dark:fill-slate-300', className)}
+    className={cn('fill-sky-900 dark:fill-slate-300', className)}
     viewBox="0 0 320 259"
     xmlns="http://www.w3.org/2000/svg"
     {...props}

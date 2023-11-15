@@ -29,7 +29,7 @@ export const Navbar = ({ i18n, items }: NavbarProps) => {
             <>
               {items && (
                 <>
-                  <Navigation items={items} />
+                  <Navigation items={items} orientation="horizontal" />
                   <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700 md:block" />
                 </>
               )}
@@ -50,7 +50,7 @@ export const Navbar = ({ i18n, items }: NavbarProps) => {
           )}
         </div>
       </div>
-      {!isDesktop && <MobileSlider i18n={i18n} isOpen={isOpen} setIsOpen={setIsOpen} />}
+      {!isDesktop && items && <MobileSlider i18n={i18n} isOpen={isOpen} items={items} setIsOpen={setIsOpen} />}
     </>
   );
 };
