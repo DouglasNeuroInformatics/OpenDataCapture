@@ -1,6 +1,6 @@
 ---
-import Header from '@/components/core/Header.astro';
-import Footer from '@/components/core/Footer.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
 import { useTranslations } from '@/i18n';
 
 type Props = {
@@ -45,8 +45,8 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
     }
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <script defer data-domain="opendatacapture.org" src="http://analytics.douglasneuroinformatics.ca/js/script.js"
-    ></script>
+    <script defer data-domain="opendatacapture.org" src="http://analytics.douglasneuroinformatics.ca/js/script.js">
+    </script>
   </head>
   <body class="flex h-screen flex-col scroll-smooth bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <Header />
