@@ -1,12 +1,11 @@
+import { range } from '@douglasneuroinformatics/utils';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Navbar } from './Navbar';
 
 type Story = StoryObj<typeof Navbar>;
 
-export default { component: Navbar } satisfies Meta<typeof Navbar>;
-
-export const Default: Story = {
+export default {
   args: {
     i18n: {
       changeLanguage: (lang) => {
@@ -15,7 +14,14 @@ export const Default: Story = {
       resolvedLanguage: 'en'
     }
   },
+  component: Navbar,
   parameters: {
     layout: 'fullscreen'
+  }
+} satisfies Meta<typeof Navbar>;
+
+export const Default: Story = {
+  args: {
+    items: range(1, 5).map((i) => ({ id: i, label: `Page ${i}`, onClick: () => undefined }))
   }
 };

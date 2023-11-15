@@ -9,7 +9,9 @@ export type NavbarProps = {
     resolvedLanguage?: string;
   };
   items?: {
+    id: number | string;
     label: string;
+    onClick: (id: number | string) => void;
   }[];
 };
 
@@ -22,18 +24,16 @@ export const Navbar = ({ i18n, items }: NavbarProps) => {
           <span className="font-lg ml-3 hidden whitespace-nowrap font-semibold md:block">Open Data Capture</span>
         </div>
         <nav className="flex w-full justify-end gap-3">
-          {/* <a className="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={translatePath('/')}>
-            {t('landing.title')}
-          </a>
-          <a className="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={translatePath('/docs')}>
-            {t('docs.title')}
-          </a>
-          <a className="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={translatePath('/team')}>
-            {t('team.title')}
-          </a>
-          <a className="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={translatePath('/blog')}>
-            {t('blog.title')}
-          </a> */}
+          {items?.map(({ id, label, onClick }) => (
+            <button
+              className="p-2 hover:text-slate-950 dark:text-slate-300 dark:hover:text-slate-100"
+              key={id}
+              type="button"
+              onClick={() => onClick(id)}
+            >
+              {label}
+            </button>
+          ))}
         </nav>
         {items && <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700 md:block" />}
         <div className="flex flex-grow justify-end gap-3 bg-inherit">
