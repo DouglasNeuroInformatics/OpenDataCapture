@@ -1,7 +1,9 @@
-import { BaseLanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui';
+import { useState } from 'react';
+
+import { BaseLanguageToggle, Slider, ThemeToggle, useMediaQuery } from '@douglasneuroinformatics/ui';
 import type { Promisable } from 'type-fest';
 
-import { Logo } from '../Logo';
+import { Branding } from '../Branding';
 
 export type NavbarProps = {
   i18n: {
@@ -16,31 +18,40 @@ export type NavbarProps = {
 };
 
 export const Navbar = ({ i18n, items }: NavbarProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // This is to prevent ugly styling when resizing the viewport
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
   return (
-    <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
-      <div className="container flex items-center bg-inherit py-3 font-medium">
-        <div className="flex h-10 items-center [&>svg]:h-full [&>svg]:w-auto">
-          <Logo className="h-full w-auto" />
-          <span className="font-lg ml-3 hidden whitespace-nowrap font-semibold md:block">Open Data Capture</span>
-        </div>
-        <nav className="flex w-full justify-end gap-3">
-          {items?.map(({ id, label, onClick }) => (
-            <button
-              className="p-2 hover:text-slate-950 dark:text-slate-300 dark:hover:text-slate-100"
-              key={id}
-              type="button"
-              onClick={() => onClick(id)}
-            >
-              {label}
-            </button>
-          ))}
-        </nav>
-        {items && <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700 md:block" />}
-        <div className="flex flex-grow justify-end gap-3 bg-inherit">
-          <ThemeToggle />
-          <BaseLanguageToggle i18n={i18n} options={['en', 'fr']} />
+    <>
+      <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
+        <div className="container flex items-center bg-inherit py-3 font-medium">
+          <Branding showText={isDesktop} />
+          <nav className="flex w-full justify-end gap-3">
+            {items?.map(({ id, label, onClick }) => (
+              <button
+                className="p-2 hover:text-slate-950 dark:text-slate-300 dark:hover:text-slate-100"
+                key={id}
+                type="button"
+                onClick={() => onClick(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+          {items && <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700 md:block" />}
+          <div className="flex flex-grow justify-end gap-3 bg-inherit">
+            <ThemeToggle />
+            <BaseLanguageToggle i18n={i18n} options={['en', 'fr']} />
+          </div>
         </div>
       </div>
-    </div>
+      {isDesktop && (
+        <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={<Branding />}>
+          Foo
+        </Slider>
+      )}
+    </>
   );
 };
