@@ -1,18 +1,19 @@
-import type { Preview } from '@storybook/react';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import type { Preview } from '@storybook/react';
+
+import i18n from '../src/services/i18n';
 
 import '../src/styles.css';
-import i18n from '../src/services/i18n';
 
 const preview: Preview = {
   decorators: [
     withThemeByDataAttribute({
-      themes: {
-        light: 'light',
-        dark: 'dark'
-      },
+      attributeName: 'data-mode',
       defaultTheme: 'light',
-      attributeName: 'data-mode'
+      themes: {
+        dark: 'dark',
+        light: 'light'
+      }
     })
   ],
   globals: {

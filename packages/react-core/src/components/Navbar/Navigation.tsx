@@ -14,7 +14,6 @@ export type NavigationProps = {
 };
 
 export const Navigation = ({ activeItemId, btn, items, onNavigate, orientation }: NavigationProps) => {
-  console.log(items, activeItemId);
   return (
     <nav
       className={cn('flex w-full', {
