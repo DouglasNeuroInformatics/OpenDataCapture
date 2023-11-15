@@ -12,6 +12,7 @@
     "start": "astro dev"
   },
   "dependencies": {
+    "@douglasneuroinformatics/ui": "^4.0.27",
     "lodash": "^4.17.21",
     "mdast-util-to-string": "^4.0.0",
     "reading-time": "^1.5.0"
