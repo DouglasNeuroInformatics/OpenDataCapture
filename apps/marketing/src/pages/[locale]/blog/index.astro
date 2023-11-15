@@ -4,6 +4,7 @@ import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 import { getEntry } from 'astro:content';
 import PostInfoCard from '@/components/PostInfoCard.astro';
+import NoContent from '@/components/NoContent.astro';
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
@@ -18,10 +19,7 @@ const posts = await getCollection('blog', ({ data }) => data.language === resolv
   <h2 class="pb-12 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">{t('blog.heading')}</h2>
   {
     posts.length === 0 ? (
-      <div class="mt-16 text-center">
-        <h3 class="text-lg font-medium">{t('blog.noContent')}</h3>
-        <a class="mt-1 text-sm text-slate-600 dark:text-slate-300">{t('blog.viewAltLang')}</a>
-      </div>
+      <NoContent />
     ) : (
       <div class="grid gap-4 lg:grid-cols-2">
         {posts.map(async (post) => {

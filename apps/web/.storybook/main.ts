@@ -4,7 +4,6 @@ import type { StorybookConfig } from '@storybook/react-vite';
 import { mergeConfig } from 'vite';
 
 const config: StorybookConfig = {
-  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
@@ -12,13 +11,14 @@ const config: StorybookConfig = {
     '@storybook/addon-themes',
     'storybook-react-i18next'
   ],
+  docs: {
+    autodocs: 'tag'
+  },
   framework: {
     name: '@storybook/react-vite',
     options: {}
   },
-  docs: {
-    autodocs: 'tag'
-  },
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   viteFinal(config) {
     return mergeConfig(config, {
       resolve: {

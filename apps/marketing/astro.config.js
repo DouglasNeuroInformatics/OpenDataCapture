@@ -1,8 +1,9 @@
-import { defineConfig, squooshImageService } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
+import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
-import getReadingTime from 'reading-time';
+import tailwind from '@astrojs/tailwind';
+import { defineConfig, squooshImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
+import getReadingTime from 'reading-time';
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,6 +15,7 @@ export default defineConfig({
     service: squooshImageService()
   },
   integrations: [
+    react(),
     sitemap({
       i18n: {
         defaultLocale: 'en',

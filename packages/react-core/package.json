@@ -4,17 +4,17 @@
   "private": true,
   "license": "AGPL-3.0",
   "type": "module",
-  "scripts": {
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
-    "storybook": "storybook dev -p 6006"
-  },
   "exports": {
     "./components": "./src/components/index.ts",
     "./services/i18n": "./src/services/i18n.ts",
     "./translations/*": "./src/translations/*",
     "./utils/translate-instrument": "./src/utils/translate-instrument.ts",
     "./tailwind.config": "./tailwind.config.js"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "@douglasneuroinformatics/form-types": "latest",

@@ -7,19 +7,29 @@
     "build": "astro build",
     "dev": "astro dev",
     "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
     "preview": "astro preview",
     "start": "astro dev"
   },
+  "dependencies": {
+    "@douglasneuroinformatics/ui": "^4.0.27",
+    "@open-data-capture/react-core": "workspace:*",
+    "lodash": "^4.17.21",
+    "mdast-util-to-string": "^4.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "reading-time": "^1.5.0"
+  },
   "devDependencies": {
+    "@astrojs/react": "^3.0.4",
     "@astrojs/sitemap": "^3.0.3",
     "@astrojs/tailwind": "^5.0.2",
     "@tailwindcss/typography": "^0.5.10",
+    "@types/lodash": "^4.14.201",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
     "astro": "^3.5.3",
     "sharp": "^0.32.6",
     "tailwindcss": "^3.3.5"
-  },
-  "dependencies": {
-    "mdast-util-to-string": "^4.0.0",
-    "reading-time": "^1.5.0"
   }
 }
