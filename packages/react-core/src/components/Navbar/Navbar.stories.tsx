@@ -1,4 +1,5 @@
 import { range } from '@douglasneuroinformatics/utils';
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Navbar } from './Navbar';
@@ -22,6 +23,11 @@ export default {
 
 export const Default: Story = {
   args: {
-    items: range(1, 5).map((i) => ({ id: i, label: `Page ${i}`, onClick: () => undefined }))
+    items: range(1, 5).map((i) => ({
+      icon: QuestionMarkCircleIcon,
+      id: i,
+      label: `Page ${i}`,
+      onClick: () => undefined
+    }))
   }
 };

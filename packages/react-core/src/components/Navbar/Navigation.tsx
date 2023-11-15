@@ -15,7 +15,7 @@ export const Navigation = ({ items, orientation }: NavigationProps) => {
         'justify-end': orientation === 'horizontal'
       })}
     >
-      {items.map(({ id, label, onClick }) => (
+      {items.map(({ icon: Icon, id, label, onClick }) => (
         <button
           className={cn(
             'flex items-center p-2 text-slate-900 hover:text-slate-950 dark:text-slate-300 dark:hover:text-slate-100',
@@ -28,6 +28,15 @@ export const Navigation = ({ items, orientation }: NavigationProps) => {
           type="button"
           onClick={() => onClick(id)}
         >
+          {Icon && (
+            <Icon
+              className={cn('mr-2', {
+                hidden: orientation === 'horizontal'
+              })}
+              height={16}
+              width={16}
+            />
+          )}
           {label}
         </button>
       ))}
