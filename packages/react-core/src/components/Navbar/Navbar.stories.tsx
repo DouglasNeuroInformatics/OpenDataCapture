@@ -6,4 +6,13 @@ type Story = StoryObj<typeof Navbar>;
 
 export default { component: Navbar } satisfies Meta<typeof Navbar>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: {
+    i18n: {
+      changeLanguage: (lang) => {
+        alert(`Language: ${lang}`);
+      },
+      resolvedLanguage: 'en'
+    }
+  }
+};
