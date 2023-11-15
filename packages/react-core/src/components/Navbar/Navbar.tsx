@@ -5,6 +5,7 @@ import { Bars3Icon } from '@heroicons/react/24/outline';
 import type { Promisable } from 'type-fest';
 
 import { Branding } from '../Branding';
+import { Navigation } from './Navigation';
 
 export type NavbarProps = {
   i18n: {
@@ -31,19 +32,12 @@ export const Navbar = ({ i18n, items }: NavbarProps) => {
           <Branding showText={isDesktop} />
           {isDesktop ? (
             <>
-              <nav className="flex w-full justify-end gap-3">
-                {items?.map(({ id, label, onClick }) => (
-                  <button
-                    className="p-2 hover:text-slate-950 dark:text-slate-300 dark:hover:text-slate-100"
-                    key={id}
-                    type="button"
-                    onClick={() => onClick(id)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </nav>
-              {items && <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700 md:block" />}
+              {items && (
+                <>
+                  <Navigation items={items} />
+                  <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700 md:block" />
+                </>
+              )}
               <div className="flex gap-3 bg-inherit">
                 <ThemeToggle />
                 <BaseLanguageToggle i18n={i18n} options={['en', 'fr']} />
@@ -63,7 +57,21 @@ export const Navbar = ({ i18n, items }: NavbarProps) => {
       </div>
       {!isDesktop && (
         <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={<Branding />}>
-          Foo
+          <div className="flex h-full flex-col">
+            <div className="flex-grow"></div>
+            <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+              <button
+                className="rounded-md p-2 font-medium hover:backdrop-brightness-95 dark:hover:backdrop-brightness-150"
+                type="button"
+                onClick={() => {
+                  void i18n.changeLanguage(i18n.resolvedLanguage === 'en' ? 'fr' : 'en');
+                }}
+              >
+                {i18n.resolvedLanguage === 'en' ? 'Français' : 'English'}
+              </button>
+              <ThemeToggle />
+            </div>
+          </div>
         </Slider>
       )}
     </>
