@@ -14,5 +14,8 @@ export const Default: Story = {
       },
       resolvedLanguage: 'en'
     }
+  },
+  parameters: {
+    layout: 'fullscreen'
   }
 };
