@@ -1,8 +1,20 @@
 import { cn } from '@douglasneuroinformatics/ui';
 
-export const Logo = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
+export type LogoProps = React.SVGProps<SVGSVGElement> & {
+  /** The color of the logo. If set to auto, will be dark by default and light in dark mode */
+  variant: 'auto' | 'dark' | 'light';
+};
+
+export const Logo = ({ className, variant = 'auto', ...props }: LogoProps) => (
   <svg
-    className={cn('fill-sky-900 dark:fill-slate-300', className)}
+    className={cn(
+      {
+        'fill-sky-900': variant === 'dark',
+        'fill-sky-900 dark:fill-slate-300': variant === 'auto',
+        'fill-slate-300': variant === 'light'
+      },
+      className
+    )}
     viewBox="0 0 320 259"
     xmlns="http://www.w3.org/2000/svg"
     {...props}

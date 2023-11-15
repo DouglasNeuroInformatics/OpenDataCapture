@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { AdjustmentsHorizontalIcon, ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { type NavItem, Navbar } from '@open-data-capture/react-core/components';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -15,6 +15,7 @@ export const Layout = () => {
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const { i18n, t } = useTranslation('layout');
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const items: NavItem[] = [
@@ -63,10 +64,10 @@ export const Layout = () => {
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">
       <div className="print:hidden md:hidden">
-        <Navbar i18n={i18n} items={navItems} onNavigate={navigate} />
+        <Navbar activeItemId={location.pathname} i18n={i18n} items={navItems} onNavigate={navigate} />
       </div>
       <div className="hidden print:hidden md:flex md:flex-shrink-0">
-        <Sidebar />
+        <Sidebar activeItemId={location.pathname} items={navItems} onNavigate={navigate} />
       </div>
       <div className="scrollbar-none flex flex-grow flex-col overflow-y-scroll">
         <main className="container flex flex-grow flex-col">

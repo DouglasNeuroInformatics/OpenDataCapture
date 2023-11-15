@@ -10,12 +10,13 @@ import { Navigation } from './Navigation';
 import type { NavI18Next, NavItem } from './types';
 
 export type NavbarProps = {
+  activeItemId?: string;
   i18n: NavI18Next;
   items?: NavItem[];
   onNavigate?: (id: string) => void;
 };
 
-export const Navbar = ({ i18n, items, onNavigate }: NavbarProps) => {
+export const Navbar = ({ activeItemId, i18n, items, onNavigate }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // This is to prevent ugly styling when resizing the viewport
@@ -23,15 +24,20 @@ export const Navbar = ({ i18n, items, onNavigate }: NavbarProps) => {
 
   return (
     <>
-      <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
+      <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-600 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
         <div className="container flex items-center justify-between bg-inherit py-3 font-medium">
           <Branding showText={isDesktop} />
           {isDesktop ? (
             <>
               {items && (
                 <>
-                  <Navigation items={items} orientation="horizontal" onNavigate={onNavigate} />
-                  <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700 md:block" />
+                  <Navigation
+                    activeItemId={activeItemId}
+                    items={items}
+                    orientation="horizontal"
+                    onNavigate={onNavigate}
+                  />
+                  <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-600 md:block" />
                 </>
               )}
               <div className="flex gap-3 bg-inherit">
@@ -41,7 +47,7 @@ export const Navbar = ({ i18n, items, onNavigate }: NavbarProps) => {
             </>
           ) : (
             <button
-              className="text-slate-600 dark:text-slate-300"
+              type="button"
               onClick={() => {
                 setIsOpen(true);
               }}
@@ -51,7 +57,19 @@ export const Navbar = ({ i18n, items, onNavigate }: NavbarProps) => {
           )}
         </div>
       </div>
-      {!isDesktop && items && <MobileSlider i18n={i18n} isOpen={isOpen} items={items} setIsOpen={setIsOpen} />}
+      {!isDesktop && items && (
+        <MobileSlider
+          activeItemId={activeItemId}
+          i18n={i18n}
+          isOpen={isOpen}
+          items={items}
+          setIsOpen={setIsOpen}
+          onNavigate={(id) => {
+            onNavigate?.(id);
+            setIsOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };

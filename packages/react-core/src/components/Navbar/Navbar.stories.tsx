@@ -23,6 +23,7 @@ export default {
 
 export const Default: Story = {
   args: {
+    activeItemId: '1',
     items: range(1, 5).map((i) => ({
       icon: QuestionMarkCircleIcon,
       id: i.toString(),
