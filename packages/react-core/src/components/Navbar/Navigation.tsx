@@ -4,10 +4,11 @@ import type { NavItem } from './types';
 
 export type NavigationProps = {
   items: NavItem[];
+  onNavigate?: (id: string) => void;
   orientation: 'horizontal' | 'vertical';
 };
 
-export const Navigation = ({ items, orientation }: NavigationProps) => {
+export const Navigation = ({ items, onNavigate, orientation }: NavigationProps) => {
   return (
     <nav
       className={cn('flex w-full gap-3', {
@@ -15,7 +16,7 @@ export const Navigation = ({ items, orientation }: NavigationProps) => {
         'justify-end': orientation === 'horizontal'
       })}
     >
-      {items.map(({ icon: Icon, id, label, onClick }) => (
+      {items.map(({ icon: Icon, id, label, ...props }) => (
         <button
           className={cn(
             'flex items-center p-2 text-slate-900 hover:text-slate-950 dark:text-slate-300 dark:hover:text-slate-100',
@@ -26,7 +27,8 @@ export const Navigation = ({ items, orientation }: NavigationProps) => {
           )}
           key={id}
           type="button"
-          onClick={() => onClick(id)}
+          onClick={() => onNavigate?.(id)}
+          {...props}
         >
           {Icon && (
             <Icon

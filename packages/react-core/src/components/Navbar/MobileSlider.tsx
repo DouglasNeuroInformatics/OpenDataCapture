@@ -9,15 +9,16 @@ export type MobileSliderProps = {
   i18n: NavI18Next;
   isOpen: boolean;
   items: NavItem[];
+  onNavigate?: (id: string) => void;
   setIsOpen: (isOpen: boolean) => void;
 };
 
-export const MobileSlider = ({ i18n, isOpen, items, setIsOpen }: MobileSliderProps) => {
+export const MobileSlider = ({ i18n, isOpen, items, onNavigate, setIsOpen }: MobileSliderProps) => {
   return (
     <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={<Branding />}>
       <div className="flex h-full flex-col">
         <div className="flex-grow">
-          <Navigation items={items} orientation="vertical" />
+          <Navigation items={items} orientation="vertical" onNavigate={onNavigate} />
         </div>
         <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
           <button

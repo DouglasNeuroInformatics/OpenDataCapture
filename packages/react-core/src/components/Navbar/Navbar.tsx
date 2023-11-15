@@ -12,9 +12,10 @@ import type { NavI18Next, NavItem } from './types';
 export type NavbarProps = {
   i18n: NavI18Next;
   items?: NavItem[];
+  onNavigate?: (id: string) => void;
 };
 
-export const Navbar = ({ i18n, items }: NavbarProps) => {
+export const Navbar = ({ i18n, items, onNavigate }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // This is to prevent ugly styling when resizing the viewport
@@ -29,7 +30,7 @@ export const Navbar = ({ i18n, items }: NavbarProps) => {
             <>
               {items && (
                 <>
-                  <Navigation items={items} orientation="horizontal" />
+                  <Navigation items={items} orientation="horizontal" onNavigate={onNavigate} />
                   <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700 md:block" />
                 </>
               )}

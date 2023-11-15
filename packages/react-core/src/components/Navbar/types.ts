@@ -1,10 +1,10 @@
 import type { Promisable } from 'type-fest';
 
 export type NavItem = {
+  [key: `data-${string}`]: unknown;
   icon?: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
-  id: number | string;
+  id: string;
   label: string;
-  onClick: (id: number | string) => void;
 };
 
 export type NavI18Next = {

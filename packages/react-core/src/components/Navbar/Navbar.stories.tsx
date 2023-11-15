@@ -10,7 +10,7 @@ export default {
   args: {
     i18n: {
       changeLanguage: (lang) => {
-        alert(`Language: ${lang}`);
+        alert(`Change Language: ${lang}`);
       },
       resolvedLanguage: 'en'
     }
@@ -25,9 +25,10 @@ export const Default: Story = {
   args: {
     items: range(1, 5).map((i) => ({
       icon: QuestionMarkCircleIcon,
-      id: i,
+      id: i.toString(),
       label: `Page ${i}`,
       onClick: () => undefined
-    }))
+    })),
+    onNavigate: (id) => alert(`Navigate to ID: ${id}`)
   }
 };
