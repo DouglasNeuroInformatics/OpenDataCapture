@@ -35,6 +35,7 @@
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
     "eslint": "^8.53.0",
+    "eslint-plugin-astro": "^0.29.1",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-perfectionist": "^2.1.0",
     "eslint-plugin-react": "^7.33.2",

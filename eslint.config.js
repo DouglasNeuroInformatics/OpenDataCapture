@@ -5,6 +5,7 @@ import js from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import astroParser from 'astro-eslint-parser';
+import astroPlugin from 'eslint-plugin-astro';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import perfectionist from 'eslint-plugin-perfectionist';
 import reactPlugin from 'eslint-plugin-react';
@@ -186,12 +187,23 @@ export default [
   },
   {
     files: ['**/*.astro'],
+    plugins: {
+      astro: astroPlugin
+    },
     languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      },
       parser: astroParser,
       parserOptions: {
         extraFileExtensions: ['.astro'],
-        parser: tsParser
+        parser: tsParser,
+        sourceType: 'module'
       }
+    },
+    rules: {
+      ...astroPlugin.configs.recommended.rules
     }
   },
   {
