@@ -4,7 +4,7 @@ import { HttpResponse, http } from 'msw';
 import { testSubject } from '../stubs';
 
 export const VisitHandler = [
-  http.get('', () => {
+  http.get('/visits/add-visit', () => {
     return HttpResponse.json<Visit>({
       date: new Date('2023-11-14'),
       group: undefined,
