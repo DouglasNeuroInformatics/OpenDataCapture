@@ -4,14 +4,15 @@ import typographyPlugin from '@tailwindcss/typography';
 export default {
   content: ['./src/**/*.{astro,html,js,ts}'],
   darkMode: 'class',
+  plugins: [typographyPlugin],
   theme: {
     extend: {
       container: {
         center: true,
         padding: {
           DEFAULT: '1rem',
-          sm: '2rem',
           lg: '4rem',
+          sm: '2rem',
           xl: '5rem'
         }
       },
@@ -20,6 +21,5 @@ export default {
         'opacity-transform': 'opacity, transform'
       }
     }
-  },
-  plugins: [typographyPlugin]
+  }
 };
