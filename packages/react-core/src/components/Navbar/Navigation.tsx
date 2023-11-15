@@ -1,8 +1,4 @@
-export type NavItem = {
-  id: number | string;
-  label: string;
-  onClick: (id: number | string) => void;
-};
+import type { NavItem } from './types';
 
 export type NavigationProps = {
   items: NavItem[];
