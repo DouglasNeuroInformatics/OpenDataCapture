@@ -34,11 +34,12 @@ function extractLanguageFromURL(url: URL) {
 export function useTranslations(url: URL) {
   const resolvedLanguage = extractLanguageFromURL(url);
   const altLanguage = resolvedLanguage === 'en' ? 'fr' : 'en';
+  const altURL = new URL(url.href.replace(`/${resolvedLanguage}`, `/${altLanguage}`));
   const t = (key: TranslationKey) => {
     return getTranslation(key, resolvedLanguage);
   };
   const translatePath = (path: string) => {
     return `/${resolvedLanguage}${path}`;
   };
-  return { altLanguage, resolvedLanguage, t, translatePath } as const;
+  return { altLanguage, altURL, resolvedLanguage, t, translatePath } as const;
 }
