@@ -187,9 +187,6 @@ export default [
   },
   {
     files: ['**/*.astro'],
-    plugins: {
-      astro: astroPlugin
-    },
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -201,6 +198,9 @@ export default [
         parser: tsParser,
         sourceType: 'module'
       }
+    },
+    plugins: {
+      astro: astroPlugin
     },
     rules: {
       ...astroPlugin.configs.recommended.rules
@@ -263,6 +263,17 @@ export default [
       },
       parserOptions: {
         project: path.resolve(__dirname, 'packages', 'instruments', 'tsconfig.json')
+      }
+    }
+  },
+  {
+    files: ['packages/playground/**/*.ts', 'packages/playground/**/*.tsx'],
+    languageOptions: {
+      globals: {
+        ...globals.browser
+      },
+      parserOptions: {
+        project: path.resolve(__dirname, 'packages', 'playground', 'tsconfig.json')
       }
     }
   },
