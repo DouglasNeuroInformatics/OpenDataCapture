@@ -5,6 +5,7 @@ import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import { default as MonacoEditor } from '@monaco-editor/react';
 import { twMerge } from 'tailwind-merge';
 
+import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { MobileBlocker } from '../MobileBlocker';
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorHelpModal } from './EditorHelpModal';
@@ -14,7 +15,7 @@ import './setup';
 
 import type { EditorFile, MonacoEditorType, MonacoType } from './types';
 
-export type EditorProps = {
+type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
   className?: string;
 
@@ -22,7 +23,7 @@ export type EditorProps = {
   files: EditorFile[];
 };
 
-export const Editor = ({ className, files }: EditorProps) => {
+const EditorComponent = ({ className, files }: EditorProps) => {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openFiles, setOpenFiles] = useState<EditorFile[]>([]);
@@ -126,3 +127,7 @@ export const Editor = ({ className, files }: EditorProps) => {
     </MobileBlocker>
   );
 };
+
+const Editor = withI18nProvider(EditorComponent);
+
+export { Editor, type EditorProps };
