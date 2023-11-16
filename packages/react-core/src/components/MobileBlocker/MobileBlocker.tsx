@@ -7,7 +7,7 @@ export type MobileBlockerProps = {
 };
 
 export const MobileBlocker = ({ children }: MobileBlockerProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('core');
   return (
     <div className="h-full w-full">
       <div className="mx-auto flex h-full w-full max-w-prose flex-col items-center justify-center px-2 py-8 text-center md:hidden">

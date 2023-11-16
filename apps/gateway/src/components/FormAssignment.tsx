@@ -3,7 +3,7 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
-import { FormStepper } from '@open-data-capture/react-core/components';
+import { FormStepper } from '@open-data-capture/react-core/components/FormStepper';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useTranslation } from 'react-i18next';
 

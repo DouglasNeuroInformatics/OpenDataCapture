@@ -7,7 +7,7 @@ export type EditorHelpModalProps = {
 };
 
 export const EditorHelpModal = ({ isOpen, setIsOpen }: EditorHelpModalProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('core');
   return (
     <Modal showCloseButton open={isOpen} title={t('help')} onClose={() => setIsOpen(false)}>
       <p>{t('editor.keyboardShortcuts.format', { keybinding: 'Alt + F' })}</p>

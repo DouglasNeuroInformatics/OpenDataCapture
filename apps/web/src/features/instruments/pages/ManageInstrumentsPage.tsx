@@ -5,7 +5,9 @@ import { instrumentSourceContainerSchema } from '@open-data-capture/common/instr
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const Editor = React.lazy(() => import('@/components/Editor').then((module) => ({ default: module.Editor })));
+const Editor = React.lazy(() =>
+  import('@open-data-capture/react-core/components/Editor').then((module) => ({ default: module.Editor }))
+);
 
 export const ManageInstrumentsPage = () => {
   const query = useQuery({

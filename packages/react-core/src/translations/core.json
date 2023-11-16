@@ -15,6 +15,22 @@
     "en": "Details",
     "fr": "Détails"
   },
+  "editor": {
+    "keyboardShortcuts": {
+      "format": {
+        "en": "Format Document: {{keybinding}}",
+        "fr": "Appliquer le formatage du code : {{keybinding}}"
+      }
+    },
+    "noFileSelected": {
+      "en": "No File Selected",
+      "fr": "Aucun fichier sélectionné"
+    },
+    "pleaseSelectFile": {
+      "en": "Please Select a File to Begin",
+      "fr": "Veuillez sélectionner un fichier pour commencer"
+    }
+  },
   "estimatedDuration": {
     "en": "Estimated Duration",
     "fr": "Durée estimée"
@@ -22,6 +38,10 @@
   "fullName": {
     "en": "Full Name",
     "fr": "Nom et prénom"
+  },
+  "help": {
+    "en": "Help",
+    "fr": "Aide"
   },
   "identificationData": {
     "dateOfBirth": {
@@ -93,6 +113,16 @@
     "french": {
       "en": "French",
       "fr": "Français"
+    }
+  },
+  "mobileBlocker": {
+    "subtitle": {
+      "en": "Please try again on a device with a larger screen",
+      "fr": "Veuillez réessayer sur un appareil doté d'un écran plus grand"
+    },
+    "title": {
+      "en": "Sorry, this feature is not available on mobile",
+      "fr": "Désolé, cette fonctionnalité n'est pas disponible sur mobile"
     }
   },
   "responses": {
