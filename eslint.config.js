@@ -237,6 +237,17 @@ export default [
     }
   },
   {
+    files: ['apps/playground/**/*.ts', 'apps/playground/**/*.tsx'],
+    languageOptions: {
+      globals: {
+        ...globals.browser
+      },
+      parserOptions: {
+        project: path.resolve(__dirname, 'apps', 'playground', 'tsconfig.json')
+      }
+    }
+  },
+  {
     files: ['apps/web/**/*.ts', 'apps/web/**/*.tsx'],
     languageOptions: {
       globals: {
@@ -263,17 +274,6 @@ export default [
       },
       parserOptions: {
         project: path.resolve(__dirname, 'packages', 'instruments', 'tsconfig.json')
-      }
-    }
-  },
-  {
-    files: ['packages/playground/**/*.ts', 'packages/playground/**/*.tsx'],
-    languageOptions: {
-      globals: {
-        ...globals.browser
-      },
-      parserOptions: {
-        project: path.resolve(__dirname, 'packages', 'playground', 'tsconfig.json')
       }
     }
   },
