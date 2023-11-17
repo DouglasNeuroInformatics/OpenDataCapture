@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
+import { useInterval } from '@douglasneuroinformatics/ui';
 import type { Language } from '@open-data-capture/common/core';
 import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { BrowserInstrumentTransformer } from '@open-data-capture/instrument-transformer/browser';
@@ -8,39 +9,29 @@ import happinessQuestionnaire from '@open-data-capture/instruments/forms/happine
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/react-core/components/Editor';
 import { FormStepper } from '@open-data-capture/react-core/components/FormStepper';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
-
 const instrumentTransformer = new BrowserInstrumentTransformer();
 
 export const App = () => {
-  const [form, setForm] = useState<FormInstrument<FormDataType, Language> | null>(null);
   const [source, setSource] = useState<null | string>(null);
   const ref = useRef<EditorPaneRef>(null);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const value = ref.current?.editor?.getValue();
-      if (!value) {
-        setSource(null);
-        return;
-      }
-      setSource(value);
-    }, 2000);
-    return () => clearTimeout(timeout);
-  }, []);
+  useInterval(() => {
+    setSource(ref.current?.editor?.getValue() ?? null);
+  }, 2000);
 
-  const bundle = useMemo(() => {
+  const form: FormInstrument<FormDataType, Language> | null = useMemo(() => {
     if (!source) {
       return null;
     }
-    return instrumentTransformer.generateBundleSync(source);
-  }, [source]);
-
-  useEffect(() => {
-    if (bundle) {
+    try {
+      const bundle = instrumentTransformer.generateBundleSync(source);
       const instrument = evaluateInstrument<FormInstrument>(bundle);
-      setForm(translateFormInstrument(instrument, 'en'));
+      return translateFormInstrument(instrument, 'en');
+    } catch (err) {
+      console.error(err);
+      return null;
     }
-  }, [bundle]);
+  }, [source]);
 
   return (
     <div className="grid h-screen grid-cols-2 p-6">
