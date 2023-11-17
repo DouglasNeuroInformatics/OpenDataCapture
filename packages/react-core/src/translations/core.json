@@ -7,6 +7,10 @@
     "en": "Begin",
     "fr": "Commencer"
   },
+  "changeTheme": {
+    "en": "Change Theme",
+    "fr": "Changer de thème"
+  },
   "description": {
     "en": "Description",
     "fr": "Description"
@@ -128,6 +132,10 @@
   "responses": {
     "en": "Responses",
     "fr": "Réponses"
+  },
+  "save": {
+    "en": "Save",
+    "fr": "Enregistrer"
   },
   "steps": {
     "overview": {

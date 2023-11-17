@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { ArrowToggle, Card, useTheme } from '@douglasneuroinformatics/ui';
-import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import { default as MonacoEditor } from '@monaco-editor/react';
 import { twMerge } from 'tailwind-merge';
 
 import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { MobileBlocker } from '../MobileBlocker';
 import { EditorEmptyState } from './EditorEmptyState';
-import { EditorHelpModal } from './EditorHelpModal';
+import { EditorMenu } from './EditorMenu';
 import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
 import './setup';
@@ -21,10 +20,12 @@ type EditorProps = {
 
   /** A list of files to be interpreted as models by the editor */
   files: EditorFile[];
+
+  /** A callback function to be invoked when the user signals to save a file */
+  onSave?: (file: EditorFile) => void;
 };
 
-const EditorComponent = ({ className, files }: EditorProps) => {
-  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+const EditorComponent = ({ className, files, onSave }: EditorProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openFiles, setOpenFiles] = useState<EditorFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<EditorFile | null>(null);
@@ -84,15 +85,7 @@ const EditorComponent = ({ className, files }: EditorProps) => {
               />
             ))}
           </div>
-          <button
-            className="flex items-center justify-center p-2"
-            type="button"
-            onClick={() => {
-              setIsHelpModalOpen(true);
-            }}
-          >
-            <QuestionMarkCircleIcon height={14} width={14} />
-          </button>
+          <EditorMenu onInitSave={() => selectedFile && onSave?.(selectedFile)} />
         </div>
         <div className="flex h-full min-h-[576px]">
           <EditorSidebar
@@ -123,7 +116,6 @@ const EditorComponent = ({ className, files }: EditorProps) => {
           )}
         </div>
       </Card>
-      <EditorHelpModal isOpen={isHelpModalOpen} setIsOpen={setIsHelpModalOpen} />
     </MobileBlocker>
   );
 };
