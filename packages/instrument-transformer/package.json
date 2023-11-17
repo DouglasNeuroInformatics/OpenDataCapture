@@ -1,0 +1,21 @@
+{
+  "name": "@open-data-capture/instrument-transformer",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src"
+  },
+  "dependencies": {
+    "@swc/core": "^1.3.96",
+    "@swc/wasm-web": "^1.3.97",
+    "type-fest": "^4.7.1"
+  },
+  "devDependencies": {
+    "@swc/types": "^0.1.5"
+  }
+}
