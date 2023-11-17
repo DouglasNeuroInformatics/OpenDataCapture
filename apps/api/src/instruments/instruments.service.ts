@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common/exceptions';
 import type { BaseInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
 import { baseInstrumentSchema, evaluateInstrument } from '@open-data-capture/common/instrument';
-import { InstrumentTransformer } from '@open-data-capture/common/instrument';
+import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
@@ -120,7 +120,7 @@ export class InstrumentsService {
     let bundle: string;
     let instance: unknown;
     try {
-      bundle = this.instrumentTransformer.generateBundle(source);
+      bundle = await this.instrumentTransformer.generateBundle(source);
       instance = evaluateInstrument(bundle);
     } catch (err) {
       throw new UnprocessableEntityException('Failed to parse instrument', {

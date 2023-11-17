@@ -5,7 +5,13 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    "./components": "./src/components/index.ts",
+    "./components/Branding": "./src/components/Branding/index.ts",
+    "./components/Editor": "./src/components/Editor/index.ts",
+    "./components/ErrorFallback": "./src/components/ErrorFallback/index.ts",
+    "./components/FormStepper": "./src/components/FormStepper/index.ts",
+    "./components/Logo": "./src/components/Logo/index.ts",
+    "./components/MobileBlocker": "./src/components/MobileBlocker/index.ts",
+    "./components/Navbar": "./src/components/Navbar/index.ts",
     "./services/i18n": "./src/services/i18n.ts",
     "./translations/*": "./src/translations/*",
     "./utils/translate-instrument": "./src/utils/translate-instrument.ts",
@@ -13,6 +19,7 @@
   },
   "scripts": {
     "format": "prettier --write src",
+    "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
     "lint": "tsc && eslint --fix src",
     "storybook": "storybook dev -p 6006"
   },
@@ -20,9 +27,13 @@
     "@douglasneuroinformatics/form-types": "latest",
     "@douglasneuroinformatics/ui": "latest",
     "@douglasneuroinformatics/utils": "latest",
+    "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
+    "@monaco-editor/react": "^4.6.0",
     "@open-data-capture/common": "workspace:*",
     "i18next": "^23.7.6",
+    "monaco-editor": "^0.44.0",
+    "prettier": "^3.1.0",
     "react-i18next": "^13.4.1",
     "ts-pattern": "^5.0.5",
     "type-fest": "^4.7.1"
@@ -37,6 +48,7 @@
     "@storybook/react-vite": "^7.5.3",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
+    "sort-json": "^2.0.1",
     "vite": "^4.5.0"
   },
   "peerDependencies": {

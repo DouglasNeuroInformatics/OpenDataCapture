@@ -1,46 +1,39 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { ArrowToggle, Card, useTheme } from '@douglasneuroinformatics/ui';
-import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
-import { default as MonacoEditor } from '@monaco-editor/react';
+import { ArrowToggle, Card } from '@douglasneuroinformatics/ui';
 import { twMerge } from 'tailwind-merge';
 
+import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { MobileBlocker } from '../MobileBlocker';
 import { EditorEmptyState } from './EditorEmptyState';
-import { EditorHelpModal } from './EditorHelpModal';
+import { EditorMenu } from './EditorMenu';
+import { EditorPane } from './EditorPane';
 import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
 import './setup';
 
-import type { EditorFile, MonacoEditorType, MonacoType } from './types';
+import type { EditorFile } from './types';
 
-export type EditorProps = {
+type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
   className?: string;
 
   /** A list of files to be interpreted as models by the editor */
   files: EditorFile[];
+
+  /** A callback function to be invoked when the user signals to save a file */
+  onSave?: (file: EditorFile) => void;
 };
 
-export const Editor = ({ className, files }: EditorProps) => {
-  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+const EditorComponent = ({ className, files, onSave }: EditorProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openFiles, setOpenFiles] = useState<EditorFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<EditorFile | null>(null);
-  const [theme] = useTheme();
-
-  const editorRef = useRef<MonacoEditorType | null>(null);
-  const monacoRef = useRef<MonacoType | null>(null);
 
   useEffect(() => {
     setOpenFiles([]);
     setSelectedFile(null);
   }, [files]);
-
-  const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
-  };
 
   const handleCloseFile = (closedFile: EditorFile) => {
     setOpenFiles((prevFiles) => {
@@ -83,15 +76,7 @@ export const Editor = ({ className, files }: EditorProps) => {
               />
             ))}
           </div>
-          <button
-            className="flex items-center justify-center p-2"
-            type="button"
-            onClick={() => {
-              setIsHelpModalOpen(true);
-            }}
-          >
-            <QuestionMarkCircleIcon height={14} width={14} />
-          </button>
+          <EditorMenu onInitSave={() => selectedFile && onSave?.(selectedFile)} />
         </div>
         <div className="flex h-full min-h-[576px]">
           <EditorSidebar
@@ -101,28 +86,16 @@ export const Editor = ({ className, files }: EditorProps) => {
             onSelection={handleSelectFile}
           />
           {selectedFile ? (
-            <MonacoEditor
-              className="h-full min-h-[576px]"
-              defaultLanguage="typescript"
-              defaultValue={selectedFile.content}
-              options={{
-                automaticLayout: true,
-                minimap: {
-                  enabled: false
-                },
-                scrollBeyondLastLine: false,
-                tabSize: 2
-              }}
-              path={selectedFile.path}
-              theme={`odc-${theme}`}
-              onMount={handleEditorDidMount}
-            />
+            <EditorPane defaultValue={selectedFile.content} path={selectedFile.path} />
           ) : (
             <EditorEmptyState />
           )}
         </div>
       </Card>
-      <EditorHelpModal isOpen={isHelpModalOpen} setIsOpen={setIsHelpModalOpen} />
     </MobileBlocker>
   );
 };
+
+const Editor = withI18nProvider(EditorComponent);
+
+export { Editor, type EditorProps };

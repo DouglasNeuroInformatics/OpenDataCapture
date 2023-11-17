@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Spinner, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { FormStepper } from '@open-data-capture/react-core/components';
+import { FormStepper } from '@open-data-capture/react-core/components/FormStepper';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 

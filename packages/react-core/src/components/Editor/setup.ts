@@ -6,7 +6,7 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-import types from '../../../../../packages/instruments/dist/lib.d.ts?raw';
+import types from '../../../../instruments/dist/lib.d.ts?raw';
 import { MonacoConfigurer } from './config';
 
 self.MonacoEnvironment = {

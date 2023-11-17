@@ -2,7 +2,7 @@ import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { evaluateInstrument } from '@open-data-capture/common/instrument';
 import type * as Types from '@open-data-capture/common/instrument';
-import { InstrumentTransformer } from '@open-data-capture/common/instrument';
+import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import type { HydratedDocument } from 'mongoose';
 
 const instrumentTransformer = new InstrumentTransformer();
@@ -30,7 +30,7 @@ const instrumentTransformer = new InstrumentTransformer();
         return this._source;
       },
       set(this: InstrumentDocument, source: string) {
-        const bundle = instrumentTransformer.generateBundle(source);
+        const bundle = instrumentTransformer.generateBundleSync(source);
         const instance = evaluateInstrument(bundle);
         this.set({
           ...instance,
