@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import React, { useImperativeHandle, useRef, useState } from 'react';
 
 import { cn, useTheme } from '@douglasneuroinformatics/ui';
 import MonacoEditor from '@monaco-editor/react';
@@ -7,6 +7,11 @@ import './setup';
 
 import type { EditorFile, MonacoEditorType, MonacoType } from './types';
 
+export type EditorPaneRef = {
+  editor: MonacoEditorType | null;
+  monaco: MonacoType | null;
+};
+
 export type EditorPaneProps = {
   className?: string;
   defaultValue: string;
@@ -14,15 +19,31 @@ export type EditorPaneProps = {
   path: string;
 };
 
-export const EditorPane = ({ className, defaultValue, path }: EditorPaneProps) => {
+export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(function EditorPane(
+  { className, defaultValue, path },
+  ref
+) {
   const [theme] = useTheme();
+  const [isEditorMounted, setIsEditorMounted] = useState(false);
 
   const editorRef = useRef<MonacoEditorType | null>(null);
   const monacoRef = useRef<MonacoType | null>(null);
 
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        editor: editorRef.current,
+        monaco: monacoRef.current
+      };
+    },
+    [isEditorMounted]
+  );
+
   const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
+    setIsEditorMounted(true);
   };
 
   return (
@@ -43,4 +64,4 @@ export const EditorPane = ({ className, defaultValue, path }: EditorPaneProps) =
       onMount={handleEditorDidMount}
     />
   );
-};
+});
