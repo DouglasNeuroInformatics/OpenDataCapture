@@ -18,6 +18,9 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer]
     }
   },
+  optimizeDeps: {
+    exclude: ['@swc/wasm-web']
+  },
   plugins: [react()],
   resolve: {
     alias: {
