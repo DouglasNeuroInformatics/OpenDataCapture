@@ -1,18 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { ArrowToggle, Card, useTheme } from '@douglasneuroinformatics/ui';
-import { default as MonacoEditor } from '@monaco-editor/react';
+import { ArrowToggle, Card } from '@douglasneuroinformatics/ui';
 import { twMerge } from 'tailwind-merge';
 
 import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { MobileBlocker } from '../MobileBlocker';
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorMenu } from './EditorMenu';
+import { EditorPane } from './EditorPane';
 import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
 import './setup';
 
-import type { EditorFile, MonacoEditorType, MonacoType } from './types';
+import type { EditorFile } from './types';
 
 type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
@@ -29,20 +29,11 @@ const EditorComponent = ({ className, files, onSave }: EditorProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openFiles, setOpenFiles] = useState<EditorFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<EditorFile | null>(null);
-  const [theme] = useTheme();
-
-  const editorRef = useRef<MonacoEditorType | null>(null);
-  const monacoRef = useRef<MonacoType | null>(null);
 
   useEffect(() => {
     setOpenFiles([]);
     setSelectedFile(null);
   }, [files]);
-
-  const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
-  };
 
   const handleCloseFile = (closedFile: EditorFile) => {
     setOpenFiles((prevFiles) => {
@@ -95,22 +86,7 @@ const EditorComponent = ({ className, files, onSave }: EditorProps) => {
             onSelection={handleSelectFile}
           />
           {selectedFile ? (
-            <MonacoEditor
-              className="h-full min-h-[576px]"
-              defaultLanguage="typescript"
-              defaultValue={selectedFile.content}
-              options={{
-                automaticLayout: true,
-                minimap: {
-                  enabled: false
-                },
-                scrollBeyondLastLine: false,
-                tabSize: 2
-              }}
-              path={selectedFile.path}
-              theme={`odc-${theme}`}
-              onMount={handleEditorDidMount}
-            />
+            <EditorPane defaultValue={selectedFile.content} path={selectedFile.path} />
           ) : (
             <EditorEmptyState />
           )}
