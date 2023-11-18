@@ -10,6 +10,11 @@ declare global {
     TLanguage extends InstrumentLanguage
   > = import('@open-data-capture/common').FormInstrument<TData, TLanguage>;
 
+  type StrictFormInstrument<
+    TData extends FormDataType,
+    TLanguage extends InstrumentLanguage
+  > = import('@open-data-capture/common').StrictFormInstrument<TData, TLanguage>;
+
   const z: typeof import('zod').z;
 }
 

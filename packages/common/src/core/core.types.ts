@@ -4,7 +4,7 @@ import type { Class } from 'type-fest';
 import type { Assignment } from '../assignment/assignment.types';
 import type { Group } from '../group/group.types';
 import type { Instrument } from '../instrument/instrument.types';
-import type { InstrumentRecord } from '../instrument/instrument-record.types';
+import type { InstrumentRecord } from '../instrument-records/instrument-records.types';
 import type { Subject } from '../subject/subject.types';
 import type { Summary } from '../summary/summary.types';
 import type { User } from '../user/user.types';

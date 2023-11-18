@@ -220,14 +220,31 @@ type IsValidFormData<TData extends Base.FormDataType> = IsEqual<TData, ValidForm
 export type FormInstrument<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
+> = Simplify<
+  Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
+    content: FormInstrumentContent<TData, TLanguage>;
+    details: FormInstrumentDetails<TLanguage>;
+    measures?: FormInstrumentMeasures<TData, TLanguage>;
+  }
+>;
+
+export type StrictFormInstrument<
+  TData extends Base.FormDataType = Base.FormDataType,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = IsValidFormData<TData> extends true
-  ? Simplify<
-      Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
-        content: FormInstrumentContent<TData, TLanguage>;
-        details: FormInstrumentDetails<TLanguage>;
-        measures?: FormInstrumentMeasures<TData, TLanguage>;
-      }
-    >
+  ? Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {
+      validationSchema: Zod.ZodObject<{
+        [K in keyof TData]: TData[K] extends Base.PrimitiveFieldValue
+          ? Zod.ZodType<TData[K]>
+          : TData[K] extends Base.ArrayFieldValue
+            ? Zod.ZodArray<
+                Zod.ZodObject<{
+                  [P in keyof TData[K][number]]: Zod.ZodType<TData[K][number][P]>;
+                }>
+              >
+            : never;
+      }>;
+    }
   : never;
 
 export type FormInstrumentSummary<
