@@ -4,8 +4,8 @@ type DeveloperHappinessData = {
   developerHappiness: number;
   reasonForSadness?: string;
   recentCommits: {
+    commitDescription: string;
     dateOfMerge?: Date;
-    description: string;
     id: string;
     isMerged: boolean;
   }[];
@@ -56,7 +56,7 @@ const developerHappinessQuestionnaire: FormInstrument<DeveloperHappinessData, In
             };
           }
         },
-        description: { kind: 'text', label: 'Describe the commit', variant: 'short' }
+        commitDescription: { kind: 'text', label: 'Describe the commit', variant: 'short' }
       }
     }
   },
@@ -64,7 +64,12 @@ const developerHappinessQuestionnaire: FormInstrument<DeveloperHappinessData, In
     developerHappiness: z.number().min(0).max(10),
     reasonForSadness: z.string().optional(),
     recentCommits: z.array(
-      z.object({ id: z.string(), description: z.string(), isMerged: z.boolean(), dateOfMerge: z.date().optional() })
+      z.object({
+        id: z.string(),
+        commitDescription: z.string(),
+        isMerged: z.boolean(),
+        dateOfMerge: z.date().optional()
+      })
     )
   }),
   details: {

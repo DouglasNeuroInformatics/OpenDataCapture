@@ -1,5 +1,5 @@
 import type * as Base from '@douglasneuroinformatics/form-types';
-import type { IsEqual, KeysOfUnion, Simplify } from 'type-fest';
+import type { IsEqual, KeysOfUnion, RequiredDeep, Simplify } from 'type-fest';
 
 import type {
   BaseInstrument,
@@ -215,7 +215,10 @@ type ValidFormData<TData extends Base.FormDataType> = {
       : never;
 };
 
-type IsValidFormData<TData extends Base.FormDataType> = IsEqual<TData, ValidFormData<TData>>;
+type IsValidFormData<TData extends Base.FormDataType> = IsEqual<
+  RequiredDeep<TData>,
+  ValidFormData<RequiredDeep<TData>>
+>;
 
 export type FormInstrument<
   TData extends Base.FormDataType = Base.FormDataType,
