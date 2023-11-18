@@ -96,9 +96,9 @@ export type InstrumentSummary<TData = unknown, TLanguage extends InstrumentLangu
 
 /**
  * Utility type to implement one of the core field types defined in `@douglasneuroinformatics/form-types`.
- * This is necessary due to the possibility of multilingual form instruments. Essentially, this type just 
+ * This is necessary due to the possibility of multilingual form instruments. Essentially, this type just
  * wraps UI text with the `InstrumentUIOption` utility.
- * 
+ *
  * @typeParam TLanguage - the language(s) of the instrument
  * @typeParam TBase - the base field type that this field corresponds to
  * @typeParam TField - optional extensions to the multilingual base type
@@ -161,19 +161,24 @@ export type FormInstrumentBinaryField<
       }
     >;
 
+/**
+ * Conditional type representing a static field corresponding for a `PrimitiveFieldValue`
+ *
+ * @typeParam TLanguage - the language(s) of the instrument
+ * @typeParam TValue - the value corresponding to this field in `FormDataType`
+ */
 export type FormInstrumentPrimitiveField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends Base.PrimitiveFieldValue = Base.PrimitiveFieldValue
-> = TValue extends string
-  ?
-      | FormInstrumentDateField<TLanguage>
-      | FormInstrumentOptionsField<TLanguage, TValue>
-      | FormInstrumentTextField<TLanguage>
-  : TValue extends number
-    ? FormInstrumentNumericField<TLanguage>
-    : TValue extends boolean
-      ? FormInstrumentBinaryField<TLanguage>
-      : never;
+> = TValue extends Date
+  ? FormInstrumentDateField<TLanguage>
+  : TValue extends string
+    ? FormInstrumentOptionsField<TLanguage, TValue> | FormInstrumentTextField<TLanguage>
+    : TValue extends number
+      ? FormInstrumentNumericField<TLanguage>
+      : TValue extends boolean
+        ? FormInstrumentBinaryField<TLanguage>
+        : never;
 
 export type FormInstrumentDynamicFieldsetField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
