@@ -39,6 +39,14 @@ services:
       - 80
     environment:
       - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
+  playground:
+    build:
+      context: .
+      dockerfile: ./apps/playground/Dockerfile
+    ports:
+      - '3750:80'
+    expose:
+      - 80
   web:
     image: ghcr.io/douglasneuroinformatics/data-capture-web:latest
     build:
