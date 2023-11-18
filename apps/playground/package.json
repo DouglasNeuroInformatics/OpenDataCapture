@@ -5,7 +5,7 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "tsc && env-cmd -f ../../.env bunx vite build",
+    "build": "tsc && bunx vite build",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx --bun vite",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"

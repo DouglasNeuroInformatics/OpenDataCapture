@@ -25,6 +25,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
+    "@casl/ability": "^6.5.0",
     "type-fest": "^4.7.1",
     "zod": "^3.22.4"
   },
