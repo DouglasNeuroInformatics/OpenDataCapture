@@ -1,5 +1,5 @@
 import type * as Base from '@douglasneuroinformatics/form-types';
-import type { KeysOfUnion, Simplify } from 'type-fest';
+import type { IsEqual, KeysOfUnion, Simplify } from 'type-fest';
 
 import type {
   BaseInstrument,
@@ -135,15 +135,11 @@ export type FormInstrumentStaticField<
     ? FormInstrumentArrayField<TLanguage, TValue>
     : FormInstrumentArrayField<TLanguage> | FormInstrumentPrimitiveField<TLanguage>;
 
-export type FormInstrumentReservedKey = KeysOfUnion<FormInstrumentStaticField>;
-
-export type FormInstrumentFieldKey<T extends PropertyKey> = T extends FormInstrumentReservedKey ? never : T;
-
 export type FormInstrumentStaticFields<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
-  [K in keyof TData as FormInstrumentFieldKey<K>]: FormInstrumentStaticField<TLanguage, TData[K]>;
+  [K in keyof TData]: FormInstrumentStaticField<TLanguage, TData[K]>;
 };
 
 export type FormInstrumentDynamicField<
@@ -166,7 +162,7 @@ export type FormInstrumentFields<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
-  [K in keyof TData as FormInstrumentFieldKey<K>]: FormInstrumentUnknownField<TData, K, TLanguage>;
+  [K in keyof TData]: FormInstrumentUnknownField<TData, K, TLanguage>;
 };
 
 export type FormInstrumentFieldsGroup<
@@ -175,7 +171,7 @@ export type FormInstrumentFieldsGroup<
 > = {
   description?: InstrumentUIOption<TLanguage, string>;
   fields: {
-    [K in keyof TData as FormInstrumentFieldKey<K>]?: FormInstrumentUnknownField<TData, K, TLanguage>;
+    [K in keyof TData]?: FormInstrumentUnknownField<TData, K, TLanguage>;
   };
   title: InstrumentUIOption<TLanguage, string>;
 };
@@ -204,16 +200,35 @@ export type FormInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
     instructions: InstrumentUIOption<TLanguage, string | string[]>;
   };
 
+type ReservedKey = KeysOfUnion<FormInstrumentStaticField>;
+
+/**
+ * Utility type that recursively filters all reserved keys from `TData`
+ */
+type ValidFormData<TData extends Base.FormDataType> = {
+  [K in keyof TData as K extends ReservedKey ? never : K]: TData[K] extends Base.PrimitiveFieldValue
+    ? TData[K]
+    : TData[K] extends Base.ArrayFieldValue
+      ? {
+          [P in keyof TData[K][number] as P extends ReservedKey ? never : P]: TData[K][number][P];
+        }[]
+      : never;
+};
+
+type IsValidFormData<TData extends Base.FormDataType> = IsEqual<TData, ValidFormData<TData>>;
+
 export type FormInstrument<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = Simplify<
-  Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
-    content: FormInstrumentContent<TData, TLanguage>;
-    details: FormInstrumentDetails<TLanguage>;
-    measures?: FormInstrumentMeasures<TData, TLanguage>;
-  }
->;
+> = IsValidFormData<TData> extends true
+  ? Simplify<
+      Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
+        content: FormInstrumentContent<TData, TLanguage>;
+        details: FormInstrumentDetails<TLanguage>;
+        measures?: FormInstrumentMeasures<TData, TLanguage>;
+      }
+    >
+  : never;
 
 export type FormInstrumentSummary<
   TData extends Base.FormDataType = Base.FormDataType,
