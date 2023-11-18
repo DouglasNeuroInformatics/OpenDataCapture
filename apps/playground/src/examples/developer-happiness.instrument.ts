@@ -28,18 +28,15 @@ const developerHappinessQuestionnaire: FormInstrument<DeveloperHappinessData, In
       kind: 'dynamic',
       deps: ['developerHappiness'],
       render: (data) => {
-        console.log(data);
-        if (data?.developerHappiness === undefined || data?.developerHappiness === null) return null;
-        if (data.developerHappiness < 5) {
+        if (data?.developerHappiness && data.developerHappiness < 5) {
           return {
             kind: 'text',
             label: 'Why are you unhappy?',
             description: 'Tell the truth',
             variant: 'short'
           };
-        } else {
-          return null;
         }
+        return null;
       }
     },
     recentCommits: {
@@ -56,7 +53,7 @@ const developerHappinessQuestionnaire: FormInstrument<DeveloperHappinessData, In
             return {
               kind: 'date',
               label: 'Date the commit was merged'
-            } as unknown as null;
+            };
           }
         },
         description: { kind: 'text', label: 'Describe the commit', variant: 'short' }
