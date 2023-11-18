@@ -4,17 +4,36 @@ import type { z } from 'zod';
 
 import type { Language } from '../core/core.types';
 
-export type InstrumentKind = 'form';
+/** Discriminator property for instrument objects */
+type InstrumentKind = 'form';
 
+/**
+ * The language(s) of the instrument. For a unilingual instrument,
+ * this is a literal string. Otherwise, it is an array of all
+ * languages the instrument may be completed in.
+ */
 export type InstrumentLanguage = Language | Language[];
 
-export type InstrumentUIOption<L extends InstrumentLanguage, V> = L extends Language
-  ? V
-  : L extends (infer K extends Language)[]
-    ? Record<K, V>
+/**
+ * Utility type used to for UI fields in an instrument. If `L` is an array,
+ * then resolves to `Record<K, V>`, otherwise resolves to `V` (i.e., in the
+ * case of a unilingual instrument).
+ *
+ * @typeParam TLanguage - the language(s) of the instrument
+ * @typeParam TValue - the value to be displayed in the UI
+ */
+export type InstrumentUIOption<TLanguage extends InstrumentLanguage, TValue> = TLanguage extends Language
+  ? TValue
+  : TLanguage extends (infer K extends Language)[]
+    ? Record<K, TValue>
     : never;
 
-/** The details of the instrument to be displayed to the user */
+/**
+ * An object containing the base details of any instrument to be displayed to the user. This may be
+ * augmented in specific kinds of instruments, if applicable.
+ *
+ * @typeParam TLanguage - the language(s) of the instrument
+ */
 export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
@@ -23,6 +42,13 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
   title: InstrumentUIOption<TLanguage, string>;
 };
 
+/**
+ * The basic properties common to all instruments. Specific types of instruments (e.g., form, interactive)
+ * extend this type and are discriminated according to the `kind` property.
+ *
+ * @typeParam TData - the structure of the data derived from this instrument
+ * @typeParam TLanguage - the language(s) of the instrument
+ */
 export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
   content?: unknown;
@@ -55,11 +81,28 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   version: number;
 };
 
+/**
+ * An object containing the essential data describing an instrument, but omitting the content
+ * and validation schema required to actually complete the instrument. This may be used for,
+ * among other things, displaying available instruments to the user.
+ *
+ * @typeParam TData - the structure of the data derived from this instrument
+ * @typeParam TLanguage - the language(s) of the instrument
+ */
 export type InstrumentSummary<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Omit<
   BaseInstrument<TData, TLanguage>,
   'content' | 'validationSchema'
 >;
 
+/**
+ * Utility type to implement one of the core field types defined in `@douglasneuroinformatics/form-types`.
+ * This is necessary due to the possibility of multilingual form instruments. Essentially, this type just 
+ * wraps UI text with the `InstrumentUIOption` utility.
+ * 
+ * @typeParam TLanguage - the language(s) of the instrument
+ * @typeParam TBase - the base field type that this field corresponds to
+ * @typeParam TField - optional extensions to the multilingual base type
+ */
 export type FormInstrumentFieldMixin<
   TLanguage extends InstrumentLanguage,
   TBase extends Base.BaseFormField,
@@ -281,3 +324,5 @@ export type InstrumentContext = {
 };
 
 export type InstrumentFactory<T extends BaseInstrument = BaseInstrument> = (ctx: InstrumentContext) => T;
+
+export type { InstrumentKind };
