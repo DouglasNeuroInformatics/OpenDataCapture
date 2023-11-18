@@ -20,9 +20,6 @@ type Fields = FormInstrumentFields<GenericInstrumentData, 'en'>;
 
 type T = Fields['textLong'];
 
-const x: T = {
-  kind: 'date'
-}
 export const genericInstrument: GenericInstrument = {
   kind: 'form',
   language: 'en',
@@ -39,6 +36,23 @@ export const genericInstrument: GenericInstrument = {
       kind: 'binary',
       label: 'Radio',
       variant: 'radio'
-    }
+    },
+    date: {
+      kind: 'date',
+      label: 'Date'
+    },
+    numericDefault: {
+      kind: 'numeric',
+      label: 'Numeric (Default)',
+      variant: 'default'
+    },
+    numericSlider: {
+      kind: 'numeric',
+      label: 'Numeric (Slider)',
+      variant: 'slider',
+      min: 0,
+      max: 10
+    },
+    
   }
 };
