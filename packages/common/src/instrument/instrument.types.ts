@@ -1,5 +1,5 @@
 import type * as Base from '@douglasneuroinformatics/form-types';
-import type { Simplify } from 'type-fest';
+import type { KeysOfUnion, Simplify } from 'type-fest';
 import type { z } from 'zod';
 
 import type { Language } from '../core/core.types';
@@ -172,11 +172,15 @@ export type FormInstrumentStaticField<
     ? FormInstrumentArrayField<TLanguage, TValue>
     : FormInstrumentArrayField<TLanguage> | FormInstrumentPrimitiveField<TLanguage>;
 
+export type FormInstrumentReservedKey = KeysOfUnion<FormInstrumentStaticField>;
+
+export type FormInstrumentFieldKey<T extends PropertyKey> = T extends FormInstrumentReservedKey ? never : T;
+
 export type FormInstrumentStaticFields<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
-  [K in keyof TData]: FormInstrumentStaticField<TLanguage, TData[K]>;
+  [K in keyof TData as FormInstrumentFieldKey<K>]: FormInstrumentStaticField<TLanguage, TData[K]>;
 };
 
 export type FormInstrumentDynamicField<
@@ -199,7 +203,7 @@ export type FormInstrumentFields<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
-  [K in keyof TData]: FormInstrumentUnknownField<TData, K, TLanguage>;
+  [K in keyof TData as FormInstrumentFieldKey<K>]: FormInstrumentUnknownField<TData, K, TLanguage>;
 };
 
 export type FormInstrumentFieldsGroup<
@@ -208,7 +212,7 @@ export type FormInstrumentFieldsGroup<
 > = {
   description?: InstrumentUIOption<TLanguage, string>;
   fields: {
-    [K in keyof TData]?: FormInstrumentUnknownField<TData, K, TLanguage>;
+    [K in keyof TData as FormInstrumentFieldKey<K>]?: FormInstrumentUnknownField<TData, K, TLanguage>;
   };
   title: InstrumentUIOption<TLanguage, string>;
 };
