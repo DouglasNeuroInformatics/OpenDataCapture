@@ -1,19 +1,37 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { useInterval } from '@douglasneuroinformatics/ui';
+import { Card, Spinner, useInterval } from '@douglasneuroinformatics/ui';
 import type { Language } from '@open-data-capture/common/core';
 import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { BrowserInstrumentTransformer } from '@open-data-capture/instrument-transformer/browser';
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/react-core/components/Editor';
 import { FormStepper } from '@open-data-capture/react-core/components/FormStepper';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
+import { match } from 'ts-pattern';
 
 import developerHappinessQuestionnaire from '../examples/developer-happiness.instrument?raw';
 
 const instrumentTransformer = new BrowserInstrumentTransformer();
 
+type EditorBuiltState = {
+  form: FormInstrument<FormDataType, Language>;
+  status: 'built';
+};
+
+type EditorErrorState = {
+  message: string;
+  status: 'error';
+};
+
+type EditorLoadingState = {
+  status: 'loading';
+};
+
+type EditorState = EditorBuiltState | EditorErrorState | EditorLoadingState;
+
 export const Editor = () => {
+  const [state, setState] = useState<EditorState>({ status: 'loading' });
   const [source, setSource] = useState<null | string>(null);
   const ref = useRef<EditorPaneRef>(null);
 
@@ -21,18 +39,27 @@ export const Editor = () => {
     setSource(ref.current?.editor?.getValue() ?? null);
   }, 2000);
 
-  const form: FormInstrument<FormDataType, Language> | null = useMemo(() => {
+  useEffect(() => {
     if (!source) {
-      return null;
+      return;
     }
+    setState({ status: 'loading' });
+    let form: FormInstrument<FormDataType, Language>;
     try {
       const bundle = instrumentTransformer.generateBundleSync(source);
       const instrument = evaluateInstrument<FormInstrument>(bundle);
-      return translateFormInstrument(instrument, 'en');
+      form = translateFormInstrument(instrument, 'en');
     } catch (err) {
-      console.error(err);
-      return null;
+      if (typeof err === 'string') {
+        setState({ message: err, status: 'error' });
+      } else if (err instanceof Error) {
+        setState({ message: err.message, status: 'error' });
+      } else {
+        setState({ message: 'Unknown Error', status: 'error' });
+      }
+      return;
     }
+    setState({ form, status: 'built' });
   }, [source]);
 
   return (
@@ -45,15 +72,26 @@ export const Editor = () => {
           <EditorPane defaultValue={developerHappinessQuestionnaire} path="happiness-questionnaire.ts" ref={ref} />
         </div>
         <div className="col-span-1">
-          {form && (
-            <FormStepper
-              form={form}
-              onSubmit={(data) => {
-                // eslint-disable-next-line no-alert
-                alert(JSON.stringify(data));
-              }}
-            />
-          )}
+          {match(state)
+            .with({ status: 'built' }, ({ form }) => (
+              <FormStepper
+                form={form}
+                onSubmit={(data) => {
+                  // eslint-disable-next-line no-alert
+                  alert(JSON.stringify(data));
+                }}
+              />
+            ))
+            .with({ status: 'error' }, ({ message }) => (
+              <div className="flex h-full flex-col items-center justify-center">
+                <h3 className="mb-3 text-center font-semibold">Failed to Compile</h3>
+                <Card>
+                  <code className="text-sm">{message}</code>
+                </Card>
+              </div>
+            ))
+            .with({ status: 'loading' }, () => <Spinner />)
+            .exhaustive()}
         </div>
       </main>
     </div>
