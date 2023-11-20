@@ -2,7 +2,7 @@ import type { BaseInstrument } from '@open-data-capture/common/instrument';
 import { HttpResponse, http } from 'msw';
 
 export const FormHandlers = [
-    http.get('v1/available?kind=form', () => {
+    http.get('v1/instruments/available?kind=form', () => {
         return HttpResponse.json<BaseInstrument>(
             {
                 details: {
