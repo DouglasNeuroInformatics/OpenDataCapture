@@ -6,6 +6,4 @@ describe('primitiveFieldSchema', () => {
   it('should be defined', () => {
     expect(primitiveFieldSchema).toBeDefined();
   });
-
-  it('should ');
 });
