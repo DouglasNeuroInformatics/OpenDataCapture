@@ -1,4 +1,5 @@
 import type { FormInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { FormInstrument } from '@open-data-capture/common/instrument';
 import { HttpResponse, http } from 'msw';
 
 export const FormHandlers = [
@@ -17,6 +18,7 @@ export const FormHandlers = [
       measures: {
         totalScore: {
           label: 'Total Score'
+          //   value: 1
         }
       },
       name: 'BriefPsychiatricRatingScale',
