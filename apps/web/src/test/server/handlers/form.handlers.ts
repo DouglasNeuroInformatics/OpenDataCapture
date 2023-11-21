@@ -1,9 +1,9 @@
-import type { BaseInstrument } from '@open-data-capture/common/instrument';
+import type { BaseInstrument, FormInstrument } from '@open-data-capture/common/instrument';
 import { HttpResponse, http } from 'msw';
 
 export const FormHandlers = [
     http.get('v1/instruments/available?kind=form', () => {
-        return HttpResponse.json<BaseInstrument>(
+        return HttpResponse.json<FormInstrument>(
             {
                 details: {
                     description: "\n      The Brief Psychiatric Rating Scale is a rating scale which a clinician or researcher may use to\n      measure psychiatric symptoms such as depression, anxiety, hallucinations and unusual behavior.\n      The scale is one of the oldest, most widely used scales to measure psychotic symptoms and was\n      first published in 1962.",
