@@ -63,10 +63,6 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
         }
       ]}
       initialValues={{
-        firstName: null,
-        lastName: null,
-        dateOfBirth: null,
-        sex: null,
         date: new Date()
       }}
       submitBtnLabel={t('submit')}
