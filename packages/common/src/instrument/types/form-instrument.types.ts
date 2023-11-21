@@ -242,12 +242,12 @@ export type StrictFormInstrument<
 > = IsValidFormData<TData> extends true
   ? Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {
       validationSchema: Zod.ZodObject<{
-        [K in keyof TData]: TData[K] extends NonNullable<Base.PrimitiveFieldValue>
+        [K in keyof TData]: NonNullable<TData[K]> extends Base.PrimitiveFieldValue
           ? Zod.ZodType<TData[K]>
-          : TData[K] extends NonNullable<Base.ArrayFieldValue>
+          : NonNullable<TData[K]> extends Base.ArrayFieldValue
             ? Zod.ZodArray<
                 Zod.ZodObject<{
-                  [P in keyof TData[K][number]]: Zod.ZodType<TData[K][number][P]>;
+                  [P in keyof NonNullable<TData[K]>[number]]: Zod.ZodType<NonNullable<TData[K]>[number][P]>;
                 }>
               >
             : never;

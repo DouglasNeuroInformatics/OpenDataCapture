@@ -11,7 +11,7 @@ type DeveloperHappinessData = {
   }[];
 };
 
-const developerHappinessQuestionnaire: FormInstrument<DeveloperHappinessData, InstrumentLanguage> = {
+const developerHappinessQuestionnaire: StrictFormInstrument<DeveloperHappinessData, InstrumentLanguage> = {
   kind: 'form',
   name: 'TestInstrument',
   language: 'en',
