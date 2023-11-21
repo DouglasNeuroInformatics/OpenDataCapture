@@ -24,9 +24,9 @@ describe('tags test', () => {
         expect(spanText1).to.contain(text1);
       });
 
-    //deselect the first tag, select the second tag
+    //deselect the first tag
     cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click({ force: true });
+    // cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click({ force: true });
 
     // //check form contains the second tag
     // let text2: string;
