@@ -1,2 +1,8 @@
 export * from './schemas/base-instrument.schemas';
-export * from './schemas/form-instrument.schemas';
+export {
+  arrayFieldValueSchema,
+  formDataTypeSchema,
+  formInstrumentSchema,
+  formInstrumentSummarySchema,
+  primitiveFieldValueSchema
+} from './schemas/form-instrument.schemas';
