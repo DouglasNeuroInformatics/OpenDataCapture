@@ -1,6 +1,7 @@
 import type { BaseInstrument, FormInstrument } from '@open-data-capture/common/instrument';
 import { HttpResponse, http } from 'msw';
 
+
 export const FormHandlers = [
     http.get('v1/instruments/available?kind=form', () => {
         return HttpResponse.json<FormInstrument>(
@@ -21,7 +22,8 @@ export const FormHandlers = [
                 version: 1,
                 measures: {
                     totalScore: {
-                        label: "Total Score"
+                        label: "Total Score",
+                        value: 0
                     }
                 },
                 id: "6557bcdc930d9604d6355516"
