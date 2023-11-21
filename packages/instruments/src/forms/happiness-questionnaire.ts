@@ -20,7 +20,6 @@ const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, Instrum
         en: 'Overall happiness from 1 through 10 (inclusive)',
         fr: 'Bonheur général de 1 à 10 (inclus)'
       },
-      isRequired: true,
       kind: 'numeric',
       label: {
         en: 'Overall Happiness',
