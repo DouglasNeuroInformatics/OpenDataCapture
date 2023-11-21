@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 
 import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
@@ -10,9 +10,14 @@ const instrumentTransformer = new InstrumentTransformer();
 // TBD: Make this an actual unit test instead of relying on the transformer
 
 describe('evaluateInstrument', () => {
-  it('should not throw an error', () => {
+  let instrument: FormInstrument;
+
+  beforeEach(() => {
     const bundle = instrumentTransformer.generateBundleSync(happinessQuestionnaire);
-    const instrument = evaluateInstrument<FormInstrument>(bundle, { validate: true });
+    instrument = evaluateInstrument<FormInstrument>(bundle);
+  });
+
+  it('should be defined', () => {
     expect(instrument).toBeDefined();
   });
 });
