@@ -1,5 +1,5 @@
 import type * as Base from '@douglasneuroinformatics/form-types';
-import type { IsEqual, KeysOfUnion, RequiredDeep, Simplify } from 'type-fest';
+import type { IsEqual, KeysOfUnion, Simplify } from 'type-fest';
 
 import type {
   BaseInstrument,
@@ -80,11 +80,11 @@ export type FormInstrumentBinaryField<
  * Conditional type representing a static field corresponding for a `PrimitiveFieldValue`
  *
  * @typeParam TLanguage - the language(s) of the instrument
- * @typeParam TValue - the value corresponding to this field in `FormDataType`
+ * @typeParam TValue - the value corresponding to this field in `FormDataType`, excluding undefined
  */
 export type FormInstrumentPrimitiveField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TValue extends Base.PrimitiveFieldValue = Base.PrimitiveFieldValue
+  TValue extends Base.RequiredPrimitiveFieldValue = Base.RequiredPrimitiveFieldValue
 > = TValue extends Date
   ? FormInstrumentDateField<TLanguage>
   : TValue extends string
@@ -97,18 +97,16 @@ export type FormInstrumentPrimitiveField<
 
 export type FormInstrumentDynamicFieldsetField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TFieldset extends Base.ArrayFieldValue[number] = Base.ArrayFieldValue[number],
-  TValue extends Base.PrimitiveFieldValue = Base.PrimitiveFieldValue
+  TFieldset extends Base.ArrayFieldsetValue = Base.ArrayFieldsetValue,
+  TValue extends Base.RequiredPrimitiveFieldValue = Base.RequiredPrimitiveFieldValue
 > = {
   kind: 'dynamic-fieldset';
-  render: (fieldset: {
-    [K in keyof TFieldset]?: TFieldset[K] | null | undefined;
-  }) => FormInstrumentPrimitiveField<TLanguage, TValue> | null;
+  render: (fieldset: Partial<TFieldset>) => FormInstrumentPrimitiveField<TLanguage, TValue> | null;
 };
 
 export type FormInstrumentArrayFieldset<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TFieldset extends Base.ArrayFieldValue[number] = Base.ArrayFieldValue[number]
+  TFieldset extends Base.RequiredArrayFieldsetValue = Base.RequiredArrayFieldsetValue
 > = {
   [K in keyof TFieldset]:
     | FormInstrumentDynamicFieldsetField<TLanguage, TFieldset, TFieldset[K]>
@@ -117,7 +115,7 @@ export type FormInstrumentArrayFieldset<
 
 export type FormInstrumentArrayField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TValue extends Base.ArrayFieldValue = Base.ArrayFieldValue
+  TValue extends Base.RequiredArrayFieldValue = Base.RequiredArrayFieldValue
 > = FormInstrumentFieldMixin<
   TLanguage,
   Base.ArrayFormField<TValue>,
@@ -126,43 +124,47 @@ export type FormInstrumentArrayField<
   }
 >;
 
-export type FormInstrumentStaticField<
+type FormInstrumentStaticField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
-  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue = Base.ArrayFieldValue | Base.PrimitiveFieldValue
-> = [TValue] extends [Base.PrimitiveFieldValue]
+  TValue extends Base.RequiredFormFieldValue = Base.RequiredFormFieldValue
+> = TValue extends Base.RequiredPrimitiveFieldValue
   ? FormInstrumentPrimitiveField<TLanguage, TValue>
-  : [TValue] extends [Base.ArrayFieldValue]
+  : TValue extends Base.RequiredArrayFieldValue
     ? FormInstrumentArrayField<TLanguage, TValue>
     : FormInstrumentArrayField<TLanguage> | FormInstrumentPrimitiveField<TLanguage>;
 
 export type FormInstrumentStaticFields<
   TData extends Base.FormDataType = Base.FormDataType,
-  TLanguage extends InstrumentLanguage = InstrumentLanguage
+  TLanguage extends InstrumentLanguage = InstrumentLanguage,
+  TRequiredData extends Base.RequiredFormDataType<TData> = Base.RequiredFormDataType<TData>
 > = {
-  [K in keyof TData]: FormInstrumentStaticField<TLanguage, TData[K]>;
+  [K in keyof TRequiredData]: FormInstrumentStaticField<TLanguage, TRequiredData[K]>;
 };
 
 export type FormInstrumentDynamicField<
   TData extends Base.FormDataType = Base.FormDataType,
-  TValue extends Base.ArrayFieldValue | Base.PrimitiveFieldValue = Base.ArrayFieldValue | Base.PrimitiveFieldValue,
+  TValue extends Base.RequiredFormFieldValue = Base.RequiredFormFieldValue,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
   deps: readonly Extract<keyof TData, string>[];
   kind: 'dynamic';
-  render: (data: Base.NullableFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
+  render: (data: Base.PartialFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
 };
 
 export type FormInstrumentUnknownField<
   TData extends Base.FormDataType = Base.FormDataType,
   TKey extends keyof TData = keyof TData,
-  TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = FormInstrumentDynamicField<TData, TData[TKey], TLanguage> | FormInstrumentStaticField<TLanguage, TData[TKey]>;
+  TLanguage extends InstrumentLanguage = InstrumentLanguage,
+  TRequiredData extends Base.RequiredFormDataType<TData> = Base.RequiredFormDataType<TData>
+> =
+  | FormInstrumentDynamicField<TData, TRequiredData[TKey], TLanguage>
+  | FormInstrumentStaticField<TLanguage, TRequiredData[TKey]>;
 
 export type FormInstrumentFields<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = {
-  [K in keyof TData]: FormInstrumentUnknownField<TData, K, TLanguage>;
+  [K in keyof TData]-?: FormInstrumentUnknownField<TData, K, TLanguage>;
 };
 
 export type FormInstrumentFieldsGroup<
@@ -203,21 +205,24 @@ export type FormInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
 type ReservedKey = KeysOfUnion<FormInstrumentStaticField>;
 
 /**
- * Utility type that recursively filters all reserved keys from `TData`
+ * Utility type that recursively checks for all reserved keys in `TData`
  */
-type ValidFormData<TData extends Base.FormDataType> = {
-  [K in keyof TData as K extends ReservedKey ? never : K]: TData[K] extends Base.PrimitiveFieldValue
-    ? TData[K]
-    : TData[K] extends Base.ArrayFieldValue
-      ? {
-          [P in keyof TData[K][number] as P extends ReservedKey ? never : P]: TData[K][number][P];
-        }[]
-      : never;
-};
-
-type IsValidFormData<TData extends Base.FormDataType> = IsEqual<
-  RequiredDeep<TData>,
-  ValidFormData<RequiredDeep<TData>>
+type IsValidFormData<
+  TData extends Base.FormDataType,
+  TRequiredData extends Base.RequiredFormDataType<TData> = Base.RequiredFormDataType<TData>
+> = IsEqual<
+  TRequiredData,
+  {
+    [K in keyof TRequiredData as K extends ReservedKey
+      ? never
+      : K]: TRequiredData[K] extends Base.RequiredPrimitiveFieldValue
+      ? TRequiredData[K]
+      : TRequiredData[K] extends Base.RequiredArrayFieldValue
+        ? {
+            [P in keyof TRequiredData[K][number] as P extends ReservedKey ? never : P]: TRequiredData[K][number][P];
+          }[]
+        : never;
+  }
 >;
 
 export type FormInstrument<
@@ -237,9 +242,9 @@ export type StrictFormInstrument<
 > = IsValidFormData<TData> extends true
   ? Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {
       validationSchema: Zod.ZodObject<{
-        [K in keyof TData]: TData[K] extends Base.PrimitiveFieldValue
+        [K in keyof TData]: TData[K] extends NonNullable<Base.PrimitiveFieldValue>
           ? Zod.ZodType<TData[K]>
-          : TData[K] extends Base.ArrayFieldValue
+          : TData[K] extends NonNullable<Base.ArrayFieldValue>
             ? Zod.ZodArray<
                 Zod.ZodObject<{
                   [P in keyof TData[K][number]]: Zod.ZodType<TData[K][number][P]>;
