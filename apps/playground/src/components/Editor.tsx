@@ -9,6 +9,8 @@ import { EditorPane, type EditorPaneRef } from '@open-data-capture/react-core/co
 import { FormStepper } from '@open-data-capture/react-core/components/FormStepper';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { match } from 'ts-pattern';
+import { ZodError } from 'zod';
+import { fromZodError } from 'zod-validation-error';
 
 import developerHappinessQuestionnaire from '../examples/developer-happiness.instrument?raw';
 
@@ -47,11 +49,17 @@ export const Editor = () => {
     let form: FormInstrument<FormDataType, Language>;
     try {
       const bundle = instrumentTransformer.generateBundleSync(source);
-      const instrument = evaluateInstrument<FormInstrument>(bundle);
+      const instrument = evaluateInstrument<FormInstrument>(bundle, { validate: true });
       form = translateFormInstrument(instrument, 'en');
     } catch (err) {
+      console.error(err);
       if (typeof err === 'string') {
         setState({ message: err, status: 'error' });
+      } else if (err instanceof ZodError) {
+        const validationError = fromZodError(err, {
+          prefix: 'Instrument Validation Failed'
+        });
+        setState({ message: validationError.message, status: 'error' });
       } else if (err instanceof Error) {
         setState({ message: err.message, status: 'error' });
       } else {
@@ -71,7 +79,7 @@ export const Editor = () => {
         <div className="col-span-1 h-full overflow-hidden rounded-md border border-slate-900/10 dark:border-slate-100/25">
           <EditorPane defaultValue={developerHappinessQuestionnaire} path="happiness-questionnaire.ts" ref={ref} />
         </div>
-        <div className="col-span-1">
+        <div className="col-span-1 h-full overflow-hidden">
           {match(state)
             .with({ status: 'built' }, ({ form }) => (
               <FormStepper
@@ -85,7 +93,7 @@ export const Editor = () => {
             .with({ status: 'error' }, ({ message }) => (
               <div className="flex h-full flex-col items-center justify-center">
                 <h3 className="mb-3 text-center font-semibold">Failed to Compile</h3>
-                <Card>
+                <Card className="flex-grow overflow-scroll">
                   <code className="text-sm">{message}</code>
                 </Card>
               </div>
