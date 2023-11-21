@@ -124,7 +124,7 @@ export type FormInstrumentArrayField<
   }
 >;
 
-type FormInstrumentStaticField<
+export type FormInstrumentStaticField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends Base.RequiredFormFieldValue = Base.RequiredFormFieldValue
 > = TValue extends Base.RequiredPrimitiveFieldValue

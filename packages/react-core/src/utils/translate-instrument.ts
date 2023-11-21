@@ -67,14 +67,14 @@ function translatePrimitiveField(
 function translateArrayFieldset(
   fieldset: Types.FormInstrumentArrayFieldset<Language[]>,
   language: Language
-): Base.ArrayFieldset<Base.ArrayFieldValue[number]> {
+): Base.ArrayFieldset<Base.RequiredArrayFieldsetValue> {
   const transformedFieldset: Types.FormInstrumentArrayFieldset<Language> = {};
   for (const key in fieldset) {
     const field = fieldset[key]!;
     if (field.kind === 'dynamic-fieldset') {
       transformedFieldset[key] = {
         kind: 'dynamic-fieldset',
-        render: (fieldset: Record<string, Base.PrimitiveFieldValue | null | undefined>) => {
+        render: (fieldset: Partial<Base.ArrayFieldsetValue>) => {
           const result: Types.FormInstrumentPrimitiveField<Language[]> | null = field.render(fieldset);
           if (result === null) {
             return null;
@@ -92,7 +92,7 @@ function translateArrayFieldset(
 function translateStaticField(
   field: Types.FormInstrumentStaticField<Language[]>,
   language: Language
-): Base.StaticFormField<Base.ArrayFieldValue | Base.PrimitiveFieldValue> {
+): Base.StaticFormField<Base.RequiredFormFieldValue> {
   if (field.kind === 'array') {
     return {
       ...field,
@@ -116,7 +116,7 @@ function translateFormFields(
       translatedFields[fieldName] = {
         deps: field.deps,
         kind: 'dynamic',
-        render: wrap(field.render, (func, data: Base.NullableFormDataType | null) => {
+        render: wrap(field.render, (func, data: Base.PartialFormDataType | null) => {
           const result = func(data);
           if (result === null) {
             return null;

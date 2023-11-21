@@ -12,7 +12,6 @@ export const Default: Story = {
     form: {
       content: {
         overallHappiness: {
-          isRequired: true,
           kind: 'numeric',
           label: 'Overall Happiness',
           max: 10,
