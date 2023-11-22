@@ -10,7 +10,7 @@ export type TabsProps<T extends string> = {
 
 export const Tabs = <T extends string>({ activeTab, setActiveTab, tabs }: TabsProps<T>) => {
   return (
-    <div>
+    <div className="mb-6">
       <div className="sm:hidden">
         <label className="sr-only" htmlFor="tabs">
           Select View
