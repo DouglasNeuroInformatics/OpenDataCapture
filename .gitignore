@@ -35,5 +35,5 @@ yarn-error.log*
 # turbo
 .turbo
 
-# Optional
-docker-compose.prod.yaml
+# types
+lib/

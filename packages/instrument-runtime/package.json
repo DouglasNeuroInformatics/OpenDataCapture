@@ -1,0 +1,18 @@
+{
+  "name": "@open-data-capture/instrument-runtime",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "typings": "./lib/index.d.ts",
+  "scripts": {
+    "build": "tsc && api-extractor run",
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src"
+  },
+  "dependencies": {
+    "@open-data-capture/common": "workspace:*"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.38.3"
+  }
+}

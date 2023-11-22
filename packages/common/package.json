@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts"
+      "import": "./src/index.ts",
+      "types": "./lib/index.d.ts"
     },
     "./assignment": "./src/assignment/assignment.index.ts",
     "./auth": "./src/auth/auth.index.ts",
@@ -19,8 +20,9 @@
     "./user": "./src/user/user.index.ts",
     "./visit": "./src/visit/visit.index.ts"
   },
-  "types": "./src/index.d.ts",
+  "typings": "lib/index.d.ts",
   "scripts": {
+    "build": "tsc -b tsconfig.build.json",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
