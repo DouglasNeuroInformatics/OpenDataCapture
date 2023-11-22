@@ -18,6 +18,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@open-data-capture/instrument-transformer": "workspace:*",
     "rollup": "^4.4.1",
     "rollup-plugin-dts": "^6.1.0"
   }

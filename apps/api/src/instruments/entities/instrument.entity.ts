@@ -17,12 +17,12 @@ const instrumentTransformer = new InstrumentTransformer();
   virtuals: {
     content: {
       get(this: InstrumentDocument) {
-        return evaluateInstrument(this.bundle).content;
+        return evaluateInstrument<Types.FormInstrument>(this.bundle).content;
       }
     },
     measures: {
       get(this: InstrumentDocument) {
-        return evaluateInstrument(this.bundle).measures;
+        return evaluateInstrument<Types.FormInstrument>(this.bundle).measures;
       }
     },
     source: {

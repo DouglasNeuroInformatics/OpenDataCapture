@@ -11,37 +11,44 @@ import { baseInstrumentDetailsSchema, translatedSchema } from './base-instrument
 
 import type * as Types from '../instrument.types';
 
-const fieldKindSchema: Zod.ZodType<FormFieldKind> = z.enum(['options', 'date', 'array', 'binary', 'numeric', 'text']);
+export const fieldKindSchema: Zod.ZodType<FormFieldKind> = z.enum([
+  'options',
+  'date',
+  'array',
+  'binary',
+  'numeric',
+  'text'
+]);
 
-const baseFieldSchema = z.object({
+export const baseFieldSchema = z.object({
   description: translatedSchema(z.string().min(1)).optional(),
   isRequired: z.boolean().optional(),
   kind: fieldKindSchema,
   label: translatedSchema(z.string().min(1))
 });
 
-const textFieldSchema = baseFieldSchema.extend({
+export const textFieldSchema = baseFieldSchema.extend({
   kind: z.literal('text'),
   variant: z.enum(['long', 'password', 'short'])
 }) satisfies Zod.ZodType<Types.FormInstrumentTextField>;
 
-const optionsFieldSchema = baseFieldSchema.extend({
+export const optionsFieldSchema = baseFieldSchema.extend({
   kind: z.literal('options'),
   options: translatedSchema(z.record(z.string().min(1)))
 }) satisfies Zod.ZodType<Types.FormInstrumentOptionsField>;
 
-const dateFieldSchema = baseFieldSchema.extend({
+export const dateFieldSchema = baseFieldSchema.extend({
   kind: z.literal('date')
 }) satisfies Zod.ZodType<Types.FormInstrumentDateField>;
 
-const numericFieldSchema = baseFieldSchema.extend({
+export const numericFieldSchema = baseFieldSchema.extend({
   kind: z.literal('numeric'),
   max: z.number(),
   min: z.number(),
   variant: z.enum(['default', 'slider'])
 }) satisfies Zod.ZodType<Types.FormInstrumentNumericField>;
 
-const binaryFieldSchema = baseFieldSchema.extend({
+export const binaryFieldSchema = baseFieldSchema.extend({
   kind: z.literal('binary'),
   options: translatedSchema(
     z.object({
@@ -52,7 +59,7 @@ const binaryFieldSchema = baseFieldSchema.extend({
   variant: z.enum(['checkbox', 'radio'])
 }) satisfies Zod.ZodType<Types.FormInstrumentBinaryField>;
 
-const primitiveFieldSchema = z.union([
+export const primitiveFieldSchema = z.union([
   textFieldSchema,
   optionsFieldSchema,
   dateFieldSchema,
@@ -61,27 +68,27 @@ const primitiveFieldSchema = z.union([
 ]) satisfies Zod.ZodType<Types.FormInstrumentPrimitiveField>;
 
 // This schema excludes dynamic fieldset
-const arrayFieldSchema = baseFieldSchema.extend({
+export const arrayFieldSchema = baseFieldSchema.extend({
   fieldset: z.record(primitiveFieldSchema),
   kind: z.literal('array')
 }) satisfies Zod.ZodType<Types.FormInstrumentArrayField>;
 
-const staticFieldsSchema = z.record(
+export const staticFieldsSchema = z.record(
   z.union([primitiveFieldSchema, arrayFieldSchema])
 ) satisfies Zod.ZodType<Types.FormInstrumentStaticFields>;
 
-const fieldsGroupSchema = z.object({
+export const fieldsGroupSchema = z.object({
   description: translatedSchema(z.string().min(1)).optional(),
   fields: staticFieldsSchema,
   title: translatedSchema(z.string().min(1))
 }) satisfies Zod.ZodType<Types.FormInstrumentFieldsGroup>;
 
-const contentSchema = z.union([
+export const contentSchema = z.union([
   staticFieldsSchema,
   fieldsGroupSchema.array()
 ]) satisfies Zod.ZodType<Types.FormInstrumentContent>;
 
-const formInstrumentDetailsSchema = baseInstrumentDetailsSchema.extend({
+export const formInstrumentDetailsSchema = baseInstrumentDetailsSchema.extend({
   estimatedDuration: z.number().positive(),
   instructions: translatedSchema(z.union([z.string().min(1), z.array(z.string().min(1))]))
 }) satisfies Zod.ZodType<Types.BaseInstrumentDetails>;
@@ -117,4 +124,3 @@ export const formInstrumentSummarySchema = instrumentSummarySchema.extend({
     )
     .optional()
 });
-

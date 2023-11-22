@@ -1,14 +1,37 @@
 import { z } from 'zod';
 
-import type { BaseInstrument } from './instrument.types';
+import { formInstrumentSchema } from './instrument.schemas';
+
+import type { Instrument } from './instrument.types';
 
 type InstrumentContext = {
   z: typeof z;
 };
 
-type InstrumentFactory<T extends BaseInstrument = BaseInstrument> = (ctx: InstrumentContext) => T;
+type InstrumentFactory<T extends Instrument> = (ctx: InstrumentContext) => T;
 
-export function evaluateInstrument<T extends BaseInstrument>(bundle: string) {
+function validateInstrument<T extends Instrument>(instrument: T) {
+  switch (instrument.kind) {
+    case 'form':
+      return formInstrumentSchema.parse(instrument) as T;
+    default:
+      throw new Error('Unexpected instrument type: ' + instrument.kind);
+  }
+}
+
+type EvaluateInstrumentOptions = {
+  /** Whether to validate the structure of the instrument at runtime (expensive) */
+  validate?: boolean;
+};
+
+export function evaluateInstrument<T extends Instrument>(
+  bundle: string,
+  { validate }: EvaluateInstrumentOptions = { validate: false }
+) {
   const factory = (0, eval)(`"use strict"; ${bundle}`) as InstrumentFactory<T>;
-  return factory({ z });
+  const result = factory({ z });
+  if (validate) {
+    return validateInstrument(result);
+  }
+  return result;
 }
