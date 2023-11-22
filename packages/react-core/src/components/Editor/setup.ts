@@ -36,6 +36,14 @@ void loader.init().then((monaco) => {
       {
         content: types,
         path: 'index.d.ts'
+      },
+      {
+        content: `
+          declare module 'foo' {
+            export const foo: string;
+          }
+        `,
+        path: 'typings/lib.d.ts'
       }
     ]
   });
