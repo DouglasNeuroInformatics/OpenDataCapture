@@ -1,75 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Card, Spinner, useInterval } from '@douglasneuroinformatics/ui';
-import type { Language } from '@open-data-capture/common/core';
-import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
-import { BrowserInstrumentTransformer } from '@open-data-capture/instrument-transformer/browser';
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/react-core/components/Editor';
 import { FormStepper } from '@open-data-capture/react-core/components/FormStepper';
-import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { match } from 'ts-pattern';
-import { ZodError } from 'zod';
-import { fromZodError } from 'zod-validation-error';
+
+import { useTranspiler } from '@/hooks/useTranspiler';
 
 import developerHappinessQuestionnaire from '../examples/developer-happiness.instrument?raw';
 // import { Tabs } from './Tabs';
 
-const instrumentTransformer = new BrowserInstrumentTransformer();
-
-type EditorBuiltState = {
-  form: FormInstrument<FormDataType, Language>;
-  status: 'built';
-};
-
-type EditorErrorState = {
-  message: string;
-  status: 'error';
-};
-
-type EditorLoadingState = {
-  status: 'loading';
-};
-
-type EditorState = EditorBuiltState | EditorErrorState | EditorLoadingState;
-
 export const Editor = () => {
-  const [state, setState] = useState<EditorState>({ status: 'loading' });
-  const [source, setSource] = useState<null | string>(null);
+  const { setSource, state } = useTranspiler();
   const ref = useRef<EditorPaneRef>(null);
 
   useInterval(() => {
     setSource(ref.current?.editor?.getValue() ?? null);
   }, 2000);
-
-  useEffect(() => {
-    if (!source) {
-      return;
-    }
-    setState({ status: 'loading' });
-    let form: FormInstrument<FormDataType, Language>;
-    try {
-      const bundle = instrumentTransformer.generateBundleSync(source);
-      const instrument = evaluateInstrument<FormInstrument>(bundle, { validate: true });
-      form = translateFormInstrument(instrument, 'en');
-    } catch (err) {
-      console.error(err);
-      if (typeof err === 'string') {
-        setState({ message: err, status: 'error' });
-      } else if (err instanceof ZodError) {
-        const validationError = fromZodError(err, {
-          prefix: 'Instrument Validation Failed'
-        });
-        setState({ message: validationError.message, status: 'error' });
-      } else if (err instanceof Error) {
-        setState({ message: err.message, status: 'error' });
-      } else {
-        setState({ message: 'Unknown Error', status: 'error' });
-      }
-      return;
-    }
-    setState({ form, status: 'built' });
-  }, [source]);
 
   return (
     <div className="mx-auto flex h-screen max-w-screen-2xl flex-col p-4 lg:p-8">
