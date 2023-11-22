@@ -6,3 +6,4 @@ export {
   formInstrumentSummarySchema,
   primitiveFieldValueSchema
 } from './schemas/form-instrument.schemas';
+export { type InteractiveInstrument, interactiveInstrumentSchema } from './schemas/interactive-instrument.schemas';
