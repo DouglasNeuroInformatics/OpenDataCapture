@@ -1,13 +1,14 @@
 import { cn } from '@douglasneuroinformatics/ui';
 
-export type TabsProps = {
+export type TabsProps<T extends string> = {
+  activeTab: T;
+  setActiveTab: (name: T) => void;
   tabs: {
-    current: boolean;
-    label: string;
+    name: T;
   }[];
 };
 
-export const Tabs = ({ tabs }: TabsProps) => {
+export const Tabs = <T extends string>({ activeTab, setActiveTab, tabs }: TabsProps<T>) => {
   return (
     <div>
       <div className="sm:hidden">
@@ -15,38 +16,31 @@ export const Tabs = ({ tabs }: TabsProps) => {
           Select View
         </label>
         <select
-          className="block w-full rounded-md border border-slate-300 p-2 focus:border-sky-500 focus:ring-sky-500 dark:border-sky-600"
-          defaultValue={tabs.find((tab) => tab.current)?.label}
+          className="block w-full border border-slate-300 bg-slate-50 p-2 focus:border-sky-500 focus:ring-sky-500 dark:border-sky-600"
           id="tabs"
           name="tabs"
+          value={activeTab}
+          onChange={(event) => setActiveTab(event.target.value as T)}
         >
           {tabs.map((tab) => (
-            <option key={tab.label}>{tab.label}</option>
+            <option key={tab.name}>{tab.name}</option>
           ))}
         </select>
       </div>
       <div className="hidden sm:block">
-        <nav
-          aria-label="Tabs"
-          className="relative z-0 flex divide-x divide-slate-200 rounded-lg shadow dark:divide-slate-700"
-        >
-          {tabs.map((tab, tabIdx) => (
-            <div
-              aria-current={tab.current ? 'page' : undefined}
+        <nav aria-label="Tabs" className="relative z-0 flex divide-x divide-slate-200 shadow dark:divide-slate-700">
+          {tabs.map((tab) => (
+            <button
               className={cn(
-                tab.current ? 'text-slate-900' : 'text-slate-600 hover:text-slate-700',
-                tabIdx === 0 ? 'rounded-l-lg' : '',
-                tabIdx === tabs.length - 1 ? 'rounded-r-lg' : '',
-                'group relative min-w-0 flex-1 overflow-hidden bg-white px-4 py-4 text-center text-sm font-medium hover:bg-slate-50 focus:z-10'
+                tab.name === activeTab ? 'text-slate-900' : 'text-slate-600 hover:text-slate-700',
+                'group relative min-w-0 flex-1 overflow-hidden bg-slate-50 px-4 py-4 text-center text-sm font-medium hover:bg-slate-100 focus:z-10'
               )}
-              key={tab.label}
+              key={tab.name}
+              type="button"
+              onClick={() => setActiveTab(tab.name)}
             >
-              <span>{tab.label}</span>
-              <span
-                aria-hidden="true"
-                className={cn(tab.current ? 'bg-indigo-500' : 'bg-transparent', 'absolute inset-x-0 bottom-0 h-0.5')}
-              />
-            </div>
+              <span>{tab.name}</span>
+            </button>
           ))}
         </nav>
       </div>

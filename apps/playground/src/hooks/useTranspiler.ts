@@ -20,9 +20,9 @@ type LoadingState = {
   status: 'loading';
 };
 
-type TranspilerState = BuiltState | ErrorState | LoadingState;
-
 const instrumentTransformer = new BrowserInstrumentTransformer();
+
+export type TranspilerState = BuiltState | ErrorState | LoadingState;
 
 export function useTranspiler() {
   const [state, setState] = useState<TranspilerState>({ status: 'loading' });
