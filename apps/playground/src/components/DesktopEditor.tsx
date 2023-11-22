@@ -18,12 +18,12 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef, DesktopEditorProps>
   ref
 ) {
   return (
-    <div className="grid h-full grid-cols-2 gap-8 p-2">
-      <Card className="overflow-hidden">
+    <div className="flex h-full gap-8 p-2">
+      <Card className="flex-grow overflow-hidden">
         <EditorPane className="h-full min-h-0" defaultValue={defaultValue} path={path} ref={ref} />
       </Card>
-      <Card className="flex h-full min-h-0 flex-col justify-center overflow-scroll p-4">
-        <InstrumentViewer className="h-fit" state={state} />
+      <Card className="flex h-full min-h-0 w-[640px] flex-shrink-0 flex-col justify-center overflow-scroll p-4">
+        <InstrumentViewer state={state} />
       </Card>
     </div>
   );
