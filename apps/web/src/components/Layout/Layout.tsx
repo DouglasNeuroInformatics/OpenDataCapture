@@ -69,7 +69,7 @@ export const Layout = () => {
       <div className="hidden print:hidden md:flex md:flex-shrink-0">
         <Sidebar activeItemId={location.pathname} items={navItems} onNavigate={navigate} />
       </div>
-      <div className="scrollbar-none flex flex-grow flex-col overflow-y-scroll">
+      <div className="scrollbar-none flex flex-grow flex-col overflow-y-scroll pt-16 md:pt-0">
         <main className="container flex flex-grow flex-col">
           <Outlet />
         </main>
