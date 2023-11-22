@@ -13,6 +13,7 @@ import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
 import developerHappinessQuestionnaire from '../examples/developer-happiness.instrument?raw';
+// import { Tabs } from './Tabs';
 
 const instrumentTransformer = new BrowserInstrumentTransformer();
 
@@ -71,11 +72,17 @@ export const Editor = () => {
   }, [source]);
 
   return (
-    <div className="mx-auto flex h-screen max-w-screen-2xl flex-col p-8">
+    <div className="mx-auto flex h-screen max-w-screen-2xl flex-col p-4 lg:p-8">
       <header className="mb-8">
         <h1 className="text-center text-xl font-semibold">Instrument Playground</h1>
       </header>
-      <main className="grid h-[calc(100vh-128px)] grid-cols-2 gap-16">
+      <main className="grid h-[calc(100vh-128px)] gap-16 lg:grid-cols-2">
+        {/* <Tabs
+          tabs={[
+            { current: true, label: 'Editor' },
+            { current: false, label: 'Instrument' }
+          ]}
+        /> */}
         <div className="col-span-1 h-full overflow-hidden rounded-md border border-slate-900/10 dark:border-slate-100/25">
           <EditorPane defaultValue={developerHappinessQuestionnaire} path="happiness-questionnaire.ts" ref={ref} />
         </div>
