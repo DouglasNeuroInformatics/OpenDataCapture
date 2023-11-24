@@ -4,6 +4,9 @@
   "license": "AGPL-3.0",
   "type": "module",
   "typings": "./lib/index.d.ts",
+  "exports": {
+    "./typings": "./lib/index.d.ts"
+  },
   "scripts": {
     "build": "tsc && api-extractor run",
     "format": "prettier --write src",

@@ -1,4 +1,5 @@
 import { loader } from '@monaco-editor/react';
+import runtime from '@open-data-capture/instrument-runtime/typings?raw';
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
@@ -8,6 +9,8 @@ import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
 import types from '../../../../instruments/dist/lib.d.ts?raw';
 import { MonacoConfigurer } from './config';
+
+console.log(runtime);
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
