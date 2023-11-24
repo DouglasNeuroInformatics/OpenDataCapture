@@ -45,7 +45,7 @@ Open Data Capture is an integrated suite of applications tailored for the contin
 
 ### Prerequisites
 
-In order to run the platform locally, you will need to install [Bun](https://bun.sh/) and [MongoDB](https://www.mongodb.com/). Please follow the appropriate documentation to install both for your platform before continuing (for MongoDB, we recommend running it in Docker).
+In order to run the platform locally, you will need to install [Bun](https://bun.sh/) and [MongoDB](https://www.mongodb.com/). Please follow the appropriate documentation to install both for your platform before continuing (for MongoDB, we recommend running it in Docker). Also, if you are running your database on any port other than 27017, please adjust the value for `MONGO_URI` in your `.env` file (discussed later).
 
 ### Install Dependencies
 
