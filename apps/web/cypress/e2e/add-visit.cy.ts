@@ -36,6 +36,6 @@ describe('look at questionaire', () => {
     cy.get('button[data-cy="view-instrument"]').first().click({ force: true });
     cy.url().should('include', 'instruments/available');
     cy.wait(1000);
-    cy.get('h3[data-cy="instrument-title"]').first().click();
+    cy.get('h3[data-cy="instrument-title"]').contains('Happiness Questionnaire').click();
   });
 });
