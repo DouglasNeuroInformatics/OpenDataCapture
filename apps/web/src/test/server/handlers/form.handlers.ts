@@ -1,8 +1,4 @@
-// import type { FormInstrument, InstrumentLanguage } from '@open-data-capture/common/instrument';
-// import { HappinessQuestionnaireData} from 'packages/instruments/src/forms/happiness-questionnaire.ts';
-// import type { FormInstrumentSummary } from '@open-data-capture/common/instrument';
 import { HttpResponse, http } from 'msw';
-// import { z } from 'zod';
 
 
 //create an example for with data type DataForm as its input labels
