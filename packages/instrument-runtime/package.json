@@ -8,7 +8,7 @@
     "./typings": "./lib/index.d.ts"
   },
   "scripts": {
-    "build": "tsc && api-extractor run",
+    "build:types": "tsc && api-extractor run",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
