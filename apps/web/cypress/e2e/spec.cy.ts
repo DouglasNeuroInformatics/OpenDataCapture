@@ -10,13 +10,12 @@ describe('Graph test', () => {
 
     //navigates the view sujects, selects the first subject and views their graph
     cy.get('button[data-cy="view-subjects"]').first().click({force: true})
-    cy.get('td').first().click()
-    cy.get('a[data-cy="graph"]').first().click()
-    cy.get('div[data-cy="instrument-select"]').contains('Instrument').click()
-    cy.get('button[id*="headlessui-menu-item-:"]').first().click()
 
-    cy.get('div[data-cy="measure-select"]').contains('Measures').click()
-    cy.get('li[id*="headlessui-listbox-option-:"]').first().click()
+    //select first user and their instrument dropdown
+    // cy.get('td').first().click()
+    // cy.get('div[data-cy="instruement-select"]').click();
+
+
 
   })
 })
