@@ -7,7 +7,7 @@
     "build": "astro build",
     "dev": "astro dev",
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
+    "lint": "astro sync && tsc && eslint --fix src",
     "preview": "astro preview",
     "start": "astro dev"
   },

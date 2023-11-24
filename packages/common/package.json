@@ -22,7 +22,7 @@
   },
   "typings": "lib/index.d.ts",
   "scripts": {
-    "build": "tsc -b tsconfig.build.json",
+    "build:types": "tsc -b tsconfig.build.json",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
