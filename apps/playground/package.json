@@ -15,6 +15,7 @@
     "@douglasneuroinformatics/utils": "latest",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/demo": "workspace:*",
+    "@open-data-capture/instrument-runtime": "workspace:*",
     "@open-data-capture/instrument-transformer": "workspace:*",
     "@open-data-capture/instruments": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",

@@ -32,8 +32,8 @@ const resolveTypeEntry = (packageName) => {
 /** @type {import('rollup').RollupOptions[]} */
 const config = [
   {
-    input: path.resolve(__dirname, 'src', 'index.d.ts'),
-    output: [{ file: path.resolve(__dirname, 'dist', 'index.d.ts'), format: 'es' }],
+    input: path.resolve(__dirname, 'src', 'env.d.ts'),
+    output: [{ file: path.resolve(__dirname, 'dist', 'env.d.ts'), format: 'es' }],
     plugins: [dts({ respectExternal: true })]
   },
   {

@@ -26,7 +26,12 @@ export abstract class BaseInstrumentTransformer {
         syntax: 'typescript',
         tsx: true
       },
-      target: 'es2020'
+      target: 'es2020',
+      transform: {
+        react: {
+          runtime: 'classic'
+        }
+      }
     },
     minify: true,
     module: {
@@ -57,7 +62,7 @@ export abstract class BaseInstrumentTransformer {
   private transformDefaultExport(src: string) {
     let input = src;
     input = src.replace('export default', `const ${this.defaultExportSub} =`);
-    return `(({ z }) => {
+    return `(({ React, z }) => {
       ${input}
       return __instrument__
     })`;

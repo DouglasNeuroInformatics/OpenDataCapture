@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { type FormInstrument, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { type FormInstrument } from '@open-data-capture/common/instrument';
+import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { BrowserInstrumentTransformer } from '@open-data-capture/instrument-transformer/browser';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { ZodError } from 'zod';
