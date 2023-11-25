@@ -1,5 +1,5 @@
 import { loader } from '@monaco-editor/react';
-import types from '@open-data-capture/instrument-runtime/index.d.ts?raw';
+import types from '@open-data-capture/instrument-runtime/env.d.ts?raw';
 import reactTypes from '@open-data-capture/instrument-runtime/react.d.ts?raw';
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
