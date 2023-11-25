@@ -24,7 +24,7 @@ type EvaluateInstrumentOptions = {
   validate?: boolean;
 };
 
-export function evaluateInstrument<T extends Instrument>(
+export function evaluateInstrument<T extends Instrument = Instrument>(
   bundle: string,
   { validate }: EvaluateInstrumentOptions = { validate: false }
 ) {

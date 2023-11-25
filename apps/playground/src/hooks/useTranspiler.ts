@@ -7,7 +7,7 @@ import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
 type BuiltState = {
-  form: FormInstrument<FormDataType, Language>;
+  instrument: FormInstrument<FormDataType, Language> | InteractiveInstrument;
   status: 'built';
 };
 
@@ -30,11 +30,15 @@ export function useTranspiler() {
 
   const transpile = useCallback((source: string) => {
     setState({ status: 'loading' });
-    let form: FormInstrument<FormDataType, Language>;
+    let instrument: FormInstrument<FormDataType, Language> | InteractiveInstrument;
     try {
       const bundle = instrumentTransformer.generateBundleSync(source);
-      const instrument = evaluateInstrument<FormInstrument>(bundle, { validate: false });
-      form = translateFormInstrument(instrument, 'en');
+      const unknownInstrument = evaluateInstrument(bundle, { validate: false });
+      if (unknownInstrument.kind === 'form') {
+        instrument = translateFormInstrument(unknownInstrument, 'en');
+      } else {
+        instrument = unknownInstrument;
+      }
     } catch (err) {
       console.error(err);
       if (typeof err === 'string') {
@@ -51,7 +55,7 @@ export function useTranspiler() {
       }
       return;
     }
-    setState({ form, status: 'built' });
+    setState({ instrument, status: 'built' });
   }, []);
 
   useEffect(() => {
