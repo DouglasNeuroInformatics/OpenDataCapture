@@ -32,6 +32,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/form-types": "latest"
+    "@douglasneuroinformatics/form-types": "latest",
+    "@types/react": "^18.2.38"
   }
 }
