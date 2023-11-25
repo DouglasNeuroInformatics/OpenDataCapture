@@ -1,5 +1,4 @@
 import { loader } from '@monaco-editor/react';
-import runtime from '@open-data-capture/instrument-runtime/typings?raw';
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
@@ -8,9 +7,8 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
 import types from '../../../../instruments/dist/lib.d.ts?raw';
+import reactTypes from '../../../../instruments/dist/react.d.ts?raw';
 import { MonacoConfigurer } from './config';
-
-console.log(runtime);
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -39,6 +37,10 @@ void loader.init().then((monaco) => {
       {
         content: types,
         path: 'index.d.ts'
+      },
+      {
+        content: reactTypes,
+        path: '@types/react.d.ts'
       },
       {
         content: `

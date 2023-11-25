@@ -21,7 +21,7 @@ export const examples: readonly ExampleInstrumentData[] = Object.freeze([
   },
   {
     label: 'Basic Interactive',
-    path: 'basic-interactive.ts',
+    path: 'basic-interactive.tsx',
     value: basicInteractiveInstrument
   }
 ]);
