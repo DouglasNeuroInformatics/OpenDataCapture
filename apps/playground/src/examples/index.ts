@@ -1,5 +1,6 @@
 import developerHappinessQuestionnaire from './forms/developer-happiness.instrument?raw';
 import genericForm from './forms/generic-form.instrument?raw';
+import basicInteractiveInstrument from './interactive/basic-interactive.instrument?raw';
 
 export type ExampleInstrumentData = {
   label: string;
@@ -17,5 +18,10 @@ export const examples: readonly ExampleInstrumentData[] = Object.freeze([
     label: 'Generic Form',
     path: 'generic-form.ts',
     value: genericForm
+  },
+  {
+    label: 'Basic Interactive',
+    path: 'basic-interactive.ts',
+    value: basicInteractiveInstrument
   }
 ]);
