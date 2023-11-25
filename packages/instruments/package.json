@@ -9,18 +9,16 @@
     "./raw": "./src/raw.ts"
   },
   "scripts": {
-    "build:types": "rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@open-data-capture/common": "workspace:*",
+    "@open-data-capture/instrument-runtime": "workspace:*",
     "type-fest": "^4.8.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@open-data-capture/instrument-transformer": "workspace:*",
-    "rollup": "^4.4.1",
-    "rollup-plugin-dts": "^6.1.0"
+    "@open-data-capture/instrument-transformer": "workspace:*"
   }
 }

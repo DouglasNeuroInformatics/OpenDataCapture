@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
+  "types": "./src/index.d.ts",
   "exports": {
+    ".": {
+      "types": "./src/index.d.ts"
+    },
     "./*": "./dist/*"
   },
   "scripts": {
@@ -13,5 +17,9 @@
   },
   "dependencies": {
     "@open-data-capture/common": "workspace:*"
+  },
+  "devDependencies": {
+    "rollup": "^4.4.1",
+    "rollup-plugin-dts": "^6.1.0"
   }
 }
