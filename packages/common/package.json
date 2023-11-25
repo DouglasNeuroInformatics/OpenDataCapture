@@ -17,6 +17,8 @@
     "./user": "./src/user/user.index.ts",
     "./visit": "./src/visit/visit.index.ts"
   },
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"

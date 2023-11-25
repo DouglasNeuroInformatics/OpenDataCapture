@@ -1,4 +1,6 @@
 import { loader } from '@monaco-editor/react';
+import types from '@open-data-capture/instrument-runtime/index.d.ts?raw';
+import reactTypes from '@open-data-capture/instrument-runtime/react.d.ts?raw';
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
@@ -6,8 +8,6 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-import types from '../../../../instruments/dist/lib.d.ts?raw';
-import reactTypes from '../../../../instruments/dist/react.d.ts?raw';
 import { MonacoConfigurer } from './config';
 
 self.MonacoEnvironment = {
@@ -41,14 +41,6 @@ void loader.init().then((monaco) => {
       {
         content: reactTypes,
         path: '@types/react.d.ts'
-      },
-      {
-        content: `
-          declare module 'foo' {
-            export const foo: string;
-          }
-        `,
-        path: 'typings/lib.d.ts'
       }
     ]
   });

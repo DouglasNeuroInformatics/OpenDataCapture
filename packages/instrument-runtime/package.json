@@ -3,19 +3,15 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
-  "typings": "./lib/index.d.ts",
   "exports": {
-    "./typings": "./lib/index.d.ts"
+    "./*": "./dist/*"
   },
   "scripts": {
-    "build:types": "tsc && api-extractor run",
+    "build:types": "rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@open-data-capture/common": "workspace:*"
-  },
-  "devDependencies": {
-    "@microsoft/api-extractor": "^7.38.3"
   }
 }
