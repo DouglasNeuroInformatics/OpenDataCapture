@@ -62,7 +62,7 @@ export abstract class BaseInstrumentTransformer {
   private transformDefaultExport(src: string) {
     let input = src;
     input = src.replace('export default', `const ${this.defaultExportSub} =`);
-    return `(({ React, z }) => {
+    return `(({ z }) => {
       ${input}
       return __instrument__
     })`;

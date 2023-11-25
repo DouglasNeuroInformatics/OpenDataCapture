@@ -24,7 +24,13 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
             />
           ))
           .with({ instrument: { kind: 'interactive' }, status: 'built' }, ({ instrument }) => {
-            return JSON.stringify(instrument);
+            let children: React.ReactNode;
+            try {
+              children = instrument.content.render();
+            } catch (err) {
+              children = null;
+            }
+            return children;
           })
           .with({ status: 'error' }, ({ message }) => (
             <div className="flex h-full flex-col items-center justify-center">
