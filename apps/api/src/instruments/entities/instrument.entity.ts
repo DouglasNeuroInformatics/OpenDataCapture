@@ -1,7 +1,7 @@
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import { evaluateInstrument } from '@open-data-capture/common/instrument';
 import type * as Types from '@open-data-capture/common/instrument';
+import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import type { HydratedDocument } from 'mongoose';
 

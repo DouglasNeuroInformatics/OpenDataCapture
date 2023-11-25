@@ -26,8 +26,9 @@
 
 ![license](https://img.shields.io/github/license/DouglasNeuroInformatics/OpenDataCapture)
 ![version](https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/OpenDataCapture)
-![build](https://github.com/DouglasNeuroInformatics/OpenDataCapture/actions/workflows/build.yaml/badge.svg)
-[![codecov](https://codecov.io/gh/DouglasNeuroInformatics/OpenDataCapture/branch/main/graph/badge.svg?token=XHC7BY6PJ1)](https://codecov.io/gh/DouglasNeuroInformatics/OpenDataCapture)
+
+<!-- ![build](https://github.com/DouglasNeuroInformatics/OpenDataCapture/actions/workflows/build.yaml/badge.svg) -->
+<!-- [![codecov](https://codecov.io/gh/DouglasNeuroInformatics/OpenDataCapture/branch/main/graph/badge.svg?token=XHC7BY6PJ1)](https://codecov.io/gh/DouglasNeuroInformatics/OpenDataCapture) -->
 
 </div>
 <hr />
@@ -42,11 +43,9 @@ Open Data Capture is an integrated suite of applications tailored for the contin
 
 ## Development
 
-### Install Bun
+### Prerequisites
 
-```shell
-curl -fsSL https://bun.sh/install | bash
-```
+In order to run the platform locally, you will need to install [Bun](https://bun.sh/) and [MongoDB](https://www.mongodb.com/). Please follow the appropriate documentation to install both for your platform before continuing (for MongoDB, we recommend running it in Docker). Also, if you are running your database on any port other than 27017, please adjust the value for `MONGO_URI` in your `.env` file (discussed later).
 
 ### Install Dependencies
 
