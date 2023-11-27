@@ -42,7 +42,7 @@ export const Navbar = ({ activeItemId, i18n, items, onNavigate }: NavbarProps) =
           >
             <Bars3Icon height={36} width={36} />
           </button>
-          <div className="hidden items-center md:flex">
+          <div className="hidden items-center bg-inherit md:flex">
             {items && (
               <React.Fragment>
                 <Navigation
