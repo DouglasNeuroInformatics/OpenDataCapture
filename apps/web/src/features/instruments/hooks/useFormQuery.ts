@@ -1,6 +1,6 @@
 import type { Language } from '@open-data-capture/common/core';
-import { type FormInstrument } from '@open-data-capture/common/instrument';
-import { type InstrumentBundle, evaluateInstrument } from '@open-data-capture/common/instrument';
+import type { FormInstrument, InstrumentBundle } from '@open-data-capture/common/instrument';
+import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';

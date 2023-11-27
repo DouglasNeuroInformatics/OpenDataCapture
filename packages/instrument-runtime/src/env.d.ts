@@ -15,6 +15,8 @@ declare global {
     TLanguage extends InstrumentLanguage
   > = import('@open-data-capture/common').StrictFormInstrument<TData, TLanguage>;
 
+  type InteractiveInstrument = import('@open-data-capture/common').InteractiveInstrument;
+
   const z: typeof import('zod').z;
 }
 

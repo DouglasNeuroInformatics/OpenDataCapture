@@ -1,8 +1,5 @@
+import { type Instrument, formInstrumentSchema } from '@open-data-capture/common/instrument';
 import { z } from 'zod';
-
-import { formInstrumentSchema } from './instrument.schemas';
-
-import type { Instrument } from './instrument.types';
 
 type InstrumentContext = {
   z: typeof z;
@@ -24,7 +21,7 @@ type EvaluateInstrumentOptions = {
   validate?: boolean;
 };
 
-export function evaluateInstrument<T extends Instrument>(
+export function evaluateInstrument<T extends Instrument = Instrument>(
   bundle: string,
   { validate }: EvaluateInstrumentOptions = { validate: false }
 ) {

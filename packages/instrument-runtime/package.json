@@ -1,24 +1,24 @@
 {
-  "name": "@open-data-capture/instruments",
+  "name": "@open-data-capture/instrument-runtime",
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    "./forms/*": "./src/forms/*.ts",
-    "./macros": "./src/macros.ts",
-    "./raw": "./src/raw.ts"
+    ".": "./src/index.ts",
+    "./env": "./src/env.d.ts",
+    "./*": "./dist/*"
   },
   "scripts": {
+    "build:types": "rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@open-data-capture/common": "workspace:*",
-    "@open-data-capture/instrument-runtime": "workspace:*",
-    "type-fest": "^4.8.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@open-data-capture/instrument-transformer": "workspace:*"
+    "rollup": "^4.4.1",
+    "rollup-plugin-dts": "^6.1.0"
   }
 }

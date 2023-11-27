@@ -32,6 +32,7 @@
     "@nestjs/throttler": "^5.0.1",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/demo": "workspace:*",
+    "@open-data-capture/instrument-runtime": "workspace:*",
     "@open-data-capture/instrument-transformer": "workspace:*",
     "@open-data-capture/instruments": "workspace:*",
     "axios": "^1.6.1",
