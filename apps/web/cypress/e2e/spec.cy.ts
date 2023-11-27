@@ -15,7 +15,7 @@ describe('Subject view test', () => {
     cy.get('td').first().click();
     // cy.get('div[data-cy="instruement-select"]').click();
     cy.get('a').contains('Table').click();
-    cy.get('button').contains("Instrument").click();
+    cy.get('button[type="button"]').contains("Instrument").click();
 
 
 
