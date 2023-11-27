@@ -7,7 +7,7 @@
     "build": "astro build",
     "dev": "astro dev",
     "format": "prettier --write src",
-    "lint": "astro sync && tsc && eslint --fix src",
+    "lint": "astro check && eslint --fix src",
     "preview": "astro preview",
     "start": "astro dev"
   },
@@ -21,6 +21,7 @@
     "reading-time": "^1.5.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.3.1",
     "@astrojs/react": "^3.0.4",
     "@astrojs/sitemap": "^3.0.3",
     "@astrojs/tailwind": "^5.0.2",

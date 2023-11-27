@@ -1,8 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getCollection, type CollectionEntry, getEntry } from 'astro:content';
-import { useTranslations } from '@/i18n';
-import { Image } from 'astro:assets';
 import PostInfoCard from '@/components/PostInfoCard.astro';
 
 type Props = {
@@ -22,8 +20,6 @@ export const getStaticPaths = async () => {
 
   return paths;
 };
-
-const { resolvedLanguage } = useTranslations(Astro.url);
 
 const { post } = Astro.props;
 
