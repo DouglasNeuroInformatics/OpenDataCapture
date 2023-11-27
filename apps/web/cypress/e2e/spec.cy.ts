@@ -12,7 +12,7 @@ describe('Graph test', () => {
     cy.get('button[data-cy="view-subjects"]').first().click({force: true})
 
     //select first user and their instrument dropdown
-    // cy.get('td').first().click()
+    cy.get('td').first().click()
     // cy.get('div[data-cy="instruement-select"]').click();
 
 
