@@ -39,18 +39,7 @@ export const Editor = () => {
         <header className="my-6 lg:my-8">
           <h1 className="text-center text-xl font-semibold">Instrument Playground</h1>
         </header>
-        <main className="h-full min-h-0">
-          {isDesktop ? (
-            <DesktopEditor ref={ref} />
-          ) : (
-            <MobileEditor
-              defaultValue={selectedExample.value}
-              path="happiness-questionnaire.ts"
-              ref={ref}
-              state={state}
-            />
-          )}
-        </main>
+        <main className="h-full min-h-0">{isDesktop ? <DesktopEditor ref={ref} /> : <MobileEditor ref={ref} />}</main>
       </div>
     </EditorContext.Provider>
   );
