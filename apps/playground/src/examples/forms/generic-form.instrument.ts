@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-object-types */
 /* eslint-disable perfectionist/sort-objects */
 
-export type GenericInstrumentData = {
+type GenericFormInstrumentData = {
   binaryCheck: boolean;
   binaryRadio: boolean;
   date: Date;
@@ -16,9 +16,9 @@ export type GenericInstrumentData = {
   }[];
 };
 
-type GenericInstrument = StrictFormInstrument<GenericInstrumentData, 'en'>;
+type GenericFormInstrument = StrictFormInstrument<GenericFormInstrumentData, 'en'>;
 
-export const genericInstrument: GenericInstrument = {
+const genericFormInstrument: GenericFormInstrument = {
   kind: 'form',
   language: 'en',
   name: 'GenericInstrument',
@@ -110,3 +110,5 @@ export const genericInstrument: GenericInstrument = {
     )
   })
 };
+
+export default genericFormInstrument;

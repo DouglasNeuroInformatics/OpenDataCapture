@@ -1,5 +1,6 @@
 import { Card, Spinner, cn } from '@douglasneuroinformatics/ui';
 import { FormStepper } from '@open-data-capture/react-core/components/FormStepper';
+import { InteractiveStepper } from '@open-data-capture/react-core/components/InteractiveStepper';
 import { match } from 'ts-pattern';
 
 import type { TranspilerState } from '@/hooks/useTranspiler';
@@ -14,15 +15,26 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
     <div className={cn('h-full min-h-0', className)}>
       <div className="h-full overflow-scroll p-2">
         {match(state)
-          .with({ status: 'built' }, ({ form }) => (
+          .with({ instrument: { kind: 'form' }, status: 'built' }, ({ instrument }) => (
             <FormStepper
-              form={form}
+              form={instrument}
               onSubmit={(data) => {
                 // eslint-disable-next-line no-alert
                 alert(JSON.stringify(data));
               }}
             />
           ))
+          .with({ instrument: { kind: 'interactive' }, status: 'built' }, ({ instrument }) => {
+            return (
+              <InteractiveStepper
+                instrument={instrument}
+                onSubmit={(data) => {
+                  // eslint-disable-next-line no-alert
+                  alert(JSON.stringify(data));
+                }}
+              />
+            );
+          })
           .with({ status: 'error' }, ({ message }) => (
             <div className="flex h-full flex-col items-center justify-center">
               <h3 className="mb-3 text-center font-semibold">Failed to Compile</h3>

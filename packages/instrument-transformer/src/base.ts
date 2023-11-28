@@ -26,7 +26,12 @@ export abstract class BaseInstrumentTransformer {
         syntax: 'typescript',
         tsx: true
       },
-      target: 'es2020'
+      target: 'es2020',
+      transform: {
+        react: {
+          runtime: 'classic'
+        }
+      }
     },
     minify: true,
     module: {

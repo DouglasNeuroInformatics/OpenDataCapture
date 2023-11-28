@@ -4,9 +4,7 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./src/index.d.ts"
-    },
+    ".": "./src/index.ts",
     "./assignment": "./src/assignment/assignment.index.ts",
     "./auth": "./src/auth/auth.index.ts",
     "./core": "./src/core/core.index.ts",
@@ -19,17 +17,19 @@
     "./user": "./src/user/user.index.ts",
     "./visit": "./src/visit/visit.index.ts"
   },
-  "types": "./src/index.d.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
-    "type-fest": "^4.7.1",
+    "type-fest": "^4.8.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/form-types": "latest"
+    "@douglasneuroinformatics/form-types": "latest",
+    "@types/react": "^18.2.39"
   }
 }

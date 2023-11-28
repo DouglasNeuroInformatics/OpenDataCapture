@@ -7,7 +7,8 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common/exceptions';
 import type { BaseInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
-import { baseInstrumentSchema, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { baseInstrumentSchema } from '@open-data-capture/common/instrument';
+import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import type { FilterQuery } from 'mongoose';
 
