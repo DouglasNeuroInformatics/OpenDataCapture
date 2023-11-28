@@ -15,7 +15,10 @@ declare global {
     TLanguage extends InstrumentLanguage
   > = import('@open-data-capture/common').StrictFormInstrument<TData, TLanguage>;
 
-  type InteractiveInstrument = import('@open-data-capture/common').InteractiveInstrument;
+  type InteractiveInstrument<
+    TData = unknown,
+    TLanguage extends Language = Language
+  > = import('@open-data-capture/common').InteractiveInstrument<TData, TLanguage>;
 
   const React: typeof import('react');
 

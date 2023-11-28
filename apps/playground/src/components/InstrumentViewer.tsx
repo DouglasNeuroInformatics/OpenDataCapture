@@ -4,6 +4,8 @@ import { match } from 'ts-pattern';
 
 import type { TranspilerState } from '@/hooks/useTranspiler';
 
+import { InteractiveInstrumentContainer } from './InteractiveInstrumentContainer';
+
 export type InstrumentViewerProps = {
   className?: string;
   state: TranspilerState;
@@ -24,13 +26,7 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
             />
           ))
           .with({ instrument: { kind: 'interactive' }, status: 'built' }, ({ instrument }) => {
-            let children: React.ReactNode;
-            try {
-              children = instrument.content.render();
-            } catch (err) {
-              children = null;
-            }
-            return children;
+            return <InteractiveInstrumentContainer instrument={instrument} />;
           })
           .with({ status: 'error' }, ({ message }) => (
             <div className="flex h-full flex-col items-center justify-center">

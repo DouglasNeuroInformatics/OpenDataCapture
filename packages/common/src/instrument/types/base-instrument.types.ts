@@ -38,6 +38,14 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
   title: InstrumentUIOption<TLanguage, string>;
 };
 
+export type EnhancedBaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
+  BaseInstrumentDetails<TLanguage> & {
+    /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
+    estimatedDuration: number;
+    /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
+    instructions: InstrumentUIOption<TLanguage, string | string[]>;
+  };
+
 /**
  * The basic properties common to all instruments. Specific types of instruments (e.g., form, interactive)
  * extend this type and are discriminated according to the `kind` property.

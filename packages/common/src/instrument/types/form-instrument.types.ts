@@ -3,7 +3,7 @@ import type { IsEqual, KeysOfUnion, Simplify } from 'type-fest';
 
 import type {
   BaseInstrument,
-  BaseInstrumentDetails,
+  EnhancedBaseInstrumentDetails,
   InstrumentLanguage,
   InstrumentSummary,
   InstrumentUIOption
@@ -194,13 +194,11 @@ export type FormInstrumentMeasures<
   }
 >;
 
+/**
+ * @deprecated Please use `EnhancedBaseInstrumentDetails`
+ */
 export type FormInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
-  BaseInstrumentDetails<TLanguage> & {
-    /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
-    estimatedDuration: number;
-    /** Brief instructions for how the subject should complete the instrument. If any array of string is provided, these are considered to be sequential. */
-    instructions: InstrumentUIOption<TLanguage, string | string[]>;
-  };
+  EnhancedBaseInstrumentDetails<TLanguage>;
 
 type ReservedKey = KeysOfUnion<FormInstrumentStaticField>;
 
@@ -231,7 +229,7 @@ export type FormInstrument<
 > = Simplify<
   Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
     content: FormInstrumentContent<TData, TLanguage>;
-    details: FormInstrumentDetails<TLanguage>;
+    details: EnhancedBaseInstrumentDetails<TLanguage>;
     measures?: FormInstrumentMeasures<TData, TLanguage>;
   }
 >;

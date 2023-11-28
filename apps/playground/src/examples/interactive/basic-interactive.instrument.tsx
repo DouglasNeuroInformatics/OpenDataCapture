@@ -1,10 +1,18 @@
-const basicInteractiveInstrument: InteractiveInstrument = {
+type ClickTaskData = {
+  count: number;
+};
+
+const clickTask: InteractiveInstrument<ClickTaskData, 'en'> = {
   content: {
-    render: () => {
+    render: (done) => {
       const [count, setCount] = React.useState(0);
       return (
-        <div>
-          <p>Count: {count}</p>
+        <div className="flex flex-col">
+          <div>
+            <h1 className="text-center text-lg font-semibold">Click Task</h1>
+            <p>Instructions: Please click the button as many times as possible in the allotted time</p>
+            <p>Count: {count}</p>
+          </div>
           <button
             onClick={() => {
               setCount(count + 1);
@@ -12,13 +20,19 @@ const basicInteractiveInstrument: InteractiveInstrument = {
           >
             Increase Count
           </button>
+          <button type="button" onClick={() => done({ count })}>
+            Done
+          </button>
         </div>
       );
     }
   },
   details: {
-    description: 'This is the simplest possible interactive instrument',
-    title: 'Interactive Instrument'
+    description: 'This task is completely useless. It is a proof of concept for an interactive instrument.',
+    estimatedDuration: 1,
+    instructions:
+      'When you begin this task, a 10 second countdown will begin. Please click the button as many times as you can before it expires.',
+    title: 'Click Task'
   },
   kind: 'interactive',
   language: 'en',
@@ -28,4 +42,4 @@ const basicInteractiveInstrument: InteractiveInstrument = {
   version: 1.0
 };
 
-export default basicInteractiveInstrument;
+export default clickTask;
