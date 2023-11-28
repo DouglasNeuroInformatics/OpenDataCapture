@@ -30,5 +30,15 @@ export const SubjectHandlers = [
             },
          
         ])
+    }),
+
+    //handlers for graph page
+
+    http.get("/v1/instrument-records/linear-model?instrumentId=655f861deb97aff8dc4f0c82", () => {
+        return HttpResponse.json();
+    }),
+
+    http.get("/v1/instrument-records?instrumentId=655f861deb97aff8dc4f0c82&subjectIdentifier=d7c6060b1b6df7ffc54ef306fec25470af518268c17058aedc4f28b752102a7b", () => {
+        return HttpResponse.json();
     })
 ];

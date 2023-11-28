@@ -22,7 +22,14 @@ describe('Subject view test', () => {
     cy.get('button[id*="headlessui-menu-item-:r1"]').eq(2).click();
 
     cy.get('div[data-cy="download-dropdown"]').click();
-    
+
+    cy.get('a[data-cy="subject-graph"]').click();
+
+    cy.get('div[data-cy="instrument-select"]').click();
+    cy.get('button[id*="headlessui-menu-item-:r2"]').eq(1).click();
+
+    cy.get('div[data-cy="measure-select"]').click();
+    cy.get('li[id*="headlessui-listbox-option-:r2"]').click();
     
 
 
