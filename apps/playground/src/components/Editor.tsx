@@ -11,7 +11,7 @@ import { DesktopEditor } from './DesktopEditor';
 import { MobileEditor } from './MobileEditor';
 
 export const Editor = () => {
-  const { setSource, state } = useTranspiler();
+  const { setSource, source, state } = useTranspiler();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const ref = useRef<EditorPaneRef>(null);
   const [selectedExample, setSelectedExample] = useState<ExampleInstrumentData>(defaultExample);
@@ -33,7 +33,7 @@ export const Editor = () => {
 
   return (
     <EditorContext.Provider
-      value={{ exampleOptions, onChangeSelection: handleChangeSelection, selectedExample, state }}
+      value={{ exampleOptions, onChangeSelection: handleChangeSelection, selectedExample, source, state }}
     >
       <div className="mx-auto flex h-screen max-w-screen-2xl flex-col">
         <header className="my-6 lg:my-8">

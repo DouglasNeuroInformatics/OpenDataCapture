@@ -7,6 +7,7 @@ export type EditorContextType = {
   exampleOptions: string[];
   onChangeSelection: (label: string) => void;
   selectedExample: ExampleInstrumentData;
+  source: null | string;
   state: TranspilerState;
 };
 
