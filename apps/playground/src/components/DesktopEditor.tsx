@@ -1,26 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useContext } from 'react';
 
 import { Card, Dropdown } from '@douglasneuroinformatics/ui';
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/react-core/components/Editor';
 
-import { type ExampleInstrumentData, examples } from '@/examples';
-import type { TranspilerState } from '@/hooks/useTranspiler';
+import { EditorContext } from '@/context/EditorContext';
 
 import { InstrumentViewer } from './InstrumentViewer';
 
-export type DesktopEditorProps = {
-  onChangeSelection: (label: string) => void;
-  selectedExample: ExampleInstrumentData;
-  state: TranspilerState;
-};
-
-export const DesktopEditor = React.forwardRef<EditorPaneRef, DesktopEditorProps>(function DesktopEditor(
-  { onChangeSelection, selectedExample, state },
-  ref
-) {
-  const options = useMemo(() => {
-    return examples.map((instrument) => instrument.label).sort();
-  }, [examples]);
+export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEditor(_, ref) {
+  const ctx = useContext(EditorContext);
 
   return (
     <div className="flex h-full gap-8 p-2">
@@ -30,19 +18,19 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef, DesktopEditorProps>
           <div className="flex items-center">
             <span className="whitespace-nowrap">Selected Instrument: </span>
             <Dropdown
-              options={options}
+              options={ctx.exampleOptions}
               size="sm"
-              title={selectedExample.label}
+              title={ctx.selectedExample.label}
               variant="secondary"
-              onSelection={onChangeSelection}
+              onSelection={ctx.onChangeSelection}
             />
           </div>
         </div>
         <Card className="flex-grow overflow-hidden">
           <EditorPane
             className="h-full min-h-0"
-            defaultValue={selectedExample.value}
-            path={selectedExample.path}
+            defaultValue={ctx.selectedExample.value}
+            path={ctx.selectedExample.path}
             ref={ref}
           />
         </Card>
@@ -52,7 +40,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef, DesktopEditorProps>
           <h5>Editor</h5>
         </div>
         <Card className="flex h-full w-full flex-col justify-center overflow-scroll p-4">
-          <InstrumentViewer state={state} />
+          <InstrumentViewer state={ctx.state} />
         </Card>
       </div>
     </div>
