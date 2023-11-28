@@ -11,6 +11,10 @@
     "en": "Change Theme",
     "fr": "Changer de thème"
   },
+  "data": {
+    "en": "Data",
+    "fr": "Données"
+  },
   "description": {
     "en": "Description",
     "fr": "Description"
@@ -172,6 +176,10 @@
   "tags": {
     "en": "Tags",
     "fr": "Tags"
+  },
+  "task": {
+    "en": "Task",
+    "fr": "Tâche"
   },
   "title": {
     "en": "Title",
