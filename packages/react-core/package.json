@@ -9,6 +9,7 @@
     "./components/Editor": "./src/components/Editor/index.ts",
     "./components/ErrorFallback": "./src/components/ErrorFallback/index.ts",
     "./components/FormStepper": "./src/components/FormStepper/index.ts",
+    "./components/InteractiveStepper": "./src/components/InteractiveStepper/index.ts",
     "./components/Logo": "./src/components/Logo/index.ts",
     "./components/MobileBlocker": "./src/components/MobileBlocker/index.ts",
     "./components/Navbar": "./src/components/Navbar/index.ts",

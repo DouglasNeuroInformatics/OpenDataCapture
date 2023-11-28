@@ -11,6 +11,10 @@
     "en": "Change Theme",
     "fr": "Changer de thème"
   },
+  "data": {
+    "en": "Data",
+    "fr": "Données"
+  },
   "description": {
     "en": "Description",
     "fr": "Description"
@@ -119,6 +123,10 @@
       "fr": "Français"
     }
   },
+  "minutes": {
+    "en": "{{minutes}} minute(s)",
+    "fr": "{{minutes}} minute(s)"
+  },
   "mobileBlocker": {
     "subtitle": {
       "en": "Please try again on a device with a larger screen",
@@ -172,6 +180,10 @@
   "tags": {
     "en": "Tags",
     "fr": "Tags"
+  },
+  "task": {
+    "en": "Task",
+    "fr": "Tâche"
   },
   "title": {
     "en": "Title",
