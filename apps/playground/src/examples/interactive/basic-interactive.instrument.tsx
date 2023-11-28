@@ -6,22 +6,31 @@ const clickTask: InteractiveInstrument<ClickTaskData, 'en'> = {
   content: {
     render: (done) => {
       const [count, setCount] = React.useState(0);
+      const [secondsRemaining, setSecondsRemaining] = React.useState(10);
+
+      React.useEffect(() => {
+        const id = setInterval(() => {
+          setSecondsRemaining((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(id);
+      }, []);
+
+      React.useEffect(() => {
+        if (0 > secondsRemaining) {
+          done({ count });
+        }
+      }, [secondsRemaining]);
+
       return (
         <div className="flex flex-col">
-          <div>
-            <h1 className="text-center text-lg font-semibold">Click Task</h1>
-            <p>Instructions: Please click the button as many times as possible in the allotted time</p>
-            <p>Count: {count}</p>
-          </div>
+          <span>Seconds Remaining: {secondsRemaining}</span>
+          <span>Count: {Math.max(count, 0)}</span>
           <button
             onClick={() => {
               setCount(count + 1);
             }}
           >
             Increase Count
-          </button>
-          <button type="button" onClick={() => done({ count })}>
-            Done
           </button>
         </div>
       );
