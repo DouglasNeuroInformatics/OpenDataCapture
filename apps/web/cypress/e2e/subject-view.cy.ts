@@ -17,6 +17,12 @@ describe('Subject view test', () => {
     cy.get('a[data-cy="subject-table"]').click();
     cy.get('div[data-cy="select-instrument"]').click();
     cy.get('button[id*="headlessui-menu-item-:r1"]').eq(2).click();
+
+    cy.get('div[data-cy="time-dropdown"]').click();
+    cy.get('button[id*="headlessui-menu-item-:r1"]').eq(2).click();
+
+    cy.get('div[data-cy="download-dropdown"]').click();
+    
     
 
 
