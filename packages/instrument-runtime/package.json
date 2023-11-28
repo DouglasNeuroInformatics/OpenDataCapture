@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@types/react": "^18.2.39",
-    "rollup": "^4.4.1",
+    "rollup": "^4.6.0",
     "rollup-plugin-dts": "^6.1.0"
   }
 }

@@ -27,7 +27,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex justify-between">
+      <div className="flex justify-between p-2">
         <div className="flex w-min items-center gap-2">
           <span className="whitespace-nowrap">Selected Instrument: </span>
           <Dropdown
@@ -61,7 +61,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
           <ThemeToggle />
         </div>
       </div>
-      <div className="flex h-full gap-8 p-2">
+      <div className="flex h-full min-h-0 gap-8 p-2">
         <div className="flex flex-grow flex-col">
           <Card className="flex-grow overflow-hidden">
             <EditorPane

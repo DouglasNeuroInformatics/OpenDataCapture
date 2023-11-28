@@ -35,7 +35,7 @@ export const Editor = () => {
     <EditorContext.Provider
       value={{ exampleOptions, onChangeSelection: handleChangeSelection, selectedExample, source, state }}
     >
-      <div className="mx-auto flex h-screen max-w-screen-2xl flex-col">
+      <div className="mx-auto flex h-screen max-w-screen-2xl flex-col p-2">
         <header className="my-6 lg:my-8">
           <h1 className="text-center text-xl font-semibold">Instrument Playground</h1>
         </header>
