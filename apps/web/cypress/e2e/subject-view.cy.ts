@@ -14,8 +14,10 @@ describe('Subject view test', () => {
     //select first user and their instrument dropdown
     cy.get('td').first().click();
     // cy.get('div[data-cy="instruement-select"]').click();
-    cy.get('a').contains('Table').click();
-    cy.get('button[type="button"]').contains("Instrument").click();
+    cy.get('a[data-cy="subject-table"]').click();
+    cy.get('div[data-cy="select-instrument"]').click();
+    cy.get('button[id*="headlessui-menu-item-:r1"]').eq(2).click();
+    
 
 
 
