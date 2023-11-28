@@ -16,7 +16,7 @@ export const FormOverview = ({ form }: FormOverviewProps) => {
 
   return (
     <InstrumentOverview
-      Instrument={form}
+      instrument={form}
       onBegin={() => {
         updateIndex('increment');
       }}

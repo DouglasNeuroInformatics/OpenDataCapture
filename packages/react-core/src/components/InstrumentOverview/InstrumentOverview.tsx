@@ -6,32 +6,32 @@ import { match } from 'ts-pattern';
 import { InstrumentOverviewItem } from './InstrumentOverviewItem';
 
 type InstrumentOverviewProps = {
-  Instrument: UnilingualInstrument;
+  instrument: UnilingualInstrument;
   onBegin: () => void;
 };
 
-export const InstrumentOverview = ({ Instrument, onBegin }: InstrumentOverviewProps) => {
+export const InstrumentOverview = ({ instrument, onBegin }: InstrumentOverviewProps) => {
   const { t } = useTranslation('core');
 
   return (
     <div className="mb-2">
       <h3 className="text-xl font-semibold">{t('steps.overview')}</h3>
       <div className="mb-8">
-        <InstrumentOverviewItem heading={t('description')} text={Instrument.details.description} />
+        <InstrumentOverviewItem heading={t('description')} text={instrument.details.description} />
         <InstrumentOverviewItem
           heading={t('language')}
-          text={match(Instrument.language)
+          text={match(instrument.language)
             .with('en', () => t('languages.english'))
             .with('fr', () => t('languages.french'))
-            .otherwise(() => Instrument.language)}
+            .otherwise(() => instrument.language)}
         />
         <InstrumentOverviewItem
           heading={t('estimatedDuration')}
-          text={t('estimatedDuration', {
-            minutes: Instrument.details.estimatedDuration
+          text={t('minutes', {
+            minutes: instrument.details.estimatedDuration
           })}
         />
-        <InstrumentOverviewItem heading={t('instructions')} text={Instrument.details.instructions} />
+        <InstrumentOverviewItem heading={t('instructions')} text={instrument.details.instructions} />
       </div>
       <Button className="w-full" label={t('begin')} onClick={onBegin} />
     </div>

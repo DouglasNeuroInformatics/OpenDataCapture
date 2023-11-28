@@ -1,10 +1,9 @@
 import { Card, Spinner, cn } from '@douglasneuroinformatics/ui';
 import { FormStepper } from '@open-data-capture/react-core/components/FormStepper';
+import { InteractiveStepper } from '@open-data-capture/react-core/components/InteractiveStepper';
 import { match } from 'ts-pattern';
 
 import type { TranspilerState } from '@/hooks/useTranspiler';
-
-import { InteractiveInstrumentContainer } from './InteractiveInstrumentContainer';
 
 export type InstrumentViewerProps = {
   className?: string;
@@ -26,7 +25,15 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
             />
           ))
           .with({ instrument: { kind: 'interactive' }, status: 'built' }, ({ instrument }) => {
-            return <InteractiveInstrumentContainer instrument={instrument} />;
+            return (
+              <InteractiveStepper
+                instrument={instrument}
+                onSubmit={(data) => {
+                  // eslint-disable-next-line no-alert
+                  alert(JSON.stringify(data));
+                }}
+              />
+            );
           })
           .with({ status: 'error' }, ({ message }) => (
             <div className="flex h-full flex-col items-center justify-center">

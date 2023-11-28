@@ -15,7 +15,7 @@ export const InteractiveOverview = ({ instrument }: InteractiveOverviewProps) =>
 
   return (
     <InstrumentOverview
-      Instrument={instrument}
+      instrument={instrument}
       onBegin={() => {
         updateIndex('increment');
       }}
