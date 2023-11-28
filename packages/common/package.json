@@ -25,11 +25,11 @@
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
-    "type-fest": "^4.7.1",
+    "type-fest": "^4.8.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@douglasneuroinformatics/form-types": "latest",
-    "@types/react": "^18.2.38"
+    "@types/react": "^18.2.39"
   }
 }
