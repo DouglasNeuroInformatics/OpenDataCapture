@@ -1,10 +1,6 @@
 /** @type {import("prettier").Options} */
 export default {
-  plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
-  htmlWhitespaceSensitivity: 'ignore',
-  printWidth: 120,
-  singleQuote: true,
-  trailingComma: 'none',
+  htmlWhitespaceSensitivity: 'strict',
   overrides: [
     {
       files: '*.astro',
@@ -12,5 +8,9 @@ export default {
         parser: 'astro'
       }
     }
-  ]
+  ],
+  plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
+  printWidth: 120,
+  singleQuote: true,
+  trailingComma: 'none'
 };
