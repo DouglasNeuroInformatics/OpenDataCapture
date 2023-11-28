@@ -13,6 +13,7 @@
   "dependencies": {
     "@douglasneuroinformatics/ui": "latest",
     "@douglasneuroinformatics/utils": "latest",
+    "@headlessui/react": "^1.7.17",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/demo": "workspace:*",
     "@open-data-capture/instrument-runtime": "workspace:*",
