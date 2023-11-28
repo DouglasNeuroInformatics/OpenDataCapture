@@ -1,7 +1,19 @@
 const basicInteractiveInstrument: InteractiveInstrument = {
   content: {
     render: () => {
-      return <h1>Hello World</h1>;
+      const [count, setCount] = React.useState(0);
+      return (
+        <div>
+          <p>Count: {count}</p>
+          <button
+            onClick={() => {
+              setCount(count + 1);
+            }}
+          >
+            Increase Count
+          </button>
+        </div>
+      );
     }
   },
   details: {

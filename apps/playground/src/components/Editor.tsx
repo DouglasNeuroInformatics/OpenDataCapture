@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { useInterval, useMediaQuery } from '@douglasneuroinformatics/ui';
 import { type EditorPaneRef } from '@open-data-capture/react-core/components/Editor';
 
-import { type ExampleInstrumentData, examples } from '@/examples';
+import { type ExampleInstrumentData, defaultExample, examples } from '@/examples';
 import { useTranspiler } from '@/hooks/useTranspiler';
 
 import { DesktopEditor } from './DesktopEditor';
@@ -13,7 +13,7 @@ export const Editor = () => {
   const { setSource, state } = useTranspiler();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const ref = useRef<EditorPaneRef>(null);
-  const [selectedExample, setSelectedExample] = useState<ExampleInstrumentData>(examples[0]!);
+  const [selectedExample, setSelectedExample] = useState<ExampleInstrumentData>(defaultExample);
 
   useInterval(() => {
     setSource(ref.current?.editor?.getValue() ?? null);

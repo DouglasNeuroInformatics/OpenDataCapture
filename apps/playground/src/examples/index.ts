@@ -25,3 +25,5 @@ export const examples: readonly ExampleInstrumentData[] = Object.freeze([
     value: basicInteractiveInstrument
   }
 ]);
+
+export const defaultExample = examples.find((instrument) => instrument.label === 'Basic Interactive')!;

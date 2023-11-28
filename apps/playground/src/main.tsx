@@ -8,7 +8,8 @@ import './styles.css';
 const root = document.getElementById('root')!;
 
 // React must be in global scope as indirect eval is used for instrument
-window.React = React;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+(window as any).React = React;
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>

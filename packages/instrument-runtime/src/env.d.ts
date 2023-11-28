@@ -17,6 +17,8 @@ declare global {
 
   type InteractiveInstrument = import('@open-data-capture/common').InteractiveInstrument;
 
+  const React: typeof import('react');
+
   const z: typeof import('zod').z;
 }
 
