@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { InstrumentsModule } from '@/_instruments/instruments.module';
+import { _InstrumentsModule } from '@/_instruments/instruments.module';
 import { GroupsModule } from '@/groups/groups.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
@@ -15,7 +15,7 @@ import { InstrumentRecordsService } from './instrument-records.service';
   exports: [InstrumentRecordsService],
   imports: [
     GroupsModule,
-    InstrumentsModule,
+    _InstrumentsModule,
     MongooseModule.forFeature([
       {
         name: InstrumentRecordEntity.modelName,

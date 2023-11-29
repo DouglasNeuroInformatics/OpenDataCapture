@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { InstrumentsModule } from '@/_instruments/instruments.module';
+import { _InstrumentsModule } from '@/_instruments/instruments.module';
 import { GroupsModule } from '@/groups/groups.module';
 import { InstrumentRecordsModule } from '@/instrument-records/instrument-records.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
@@ -13,7 +13,7 @@ import { SetupService } from './setup.service';
 
 @Module({
   controllers: [SetupController],
-  imports: [GroupsModule, InstrumentRecordsModule, InstrumentsModule, SubjectsModule, UsersModule, VisitsModule],
+  imports: [GroupsModule, InstrumentRecordsModule, _InstrumentsModule, SubjectsModule, UsersModule, VisitsModule],
   providers: [DemoService, SetupService]
 })
 export class SetupModule {}

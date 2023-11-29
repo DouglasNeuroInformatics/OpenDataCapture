@@ -19,4 +19,4 @@ import { InstrumentsService } from './instruments.service';
   ],
   providers: [InstrumentsRepository, InstrumentsService]
 })
-export class InstrumentsModule {}
+export class _InstrumentsModule {}
