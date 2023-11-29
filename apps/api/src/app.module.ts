@@ -9,13 +9,13 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { Connection } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
 
+import { InstrumentsModule } from './_instruments/instruments.module';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
-import { InstrumentsModule } from './instruments/instruments.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';

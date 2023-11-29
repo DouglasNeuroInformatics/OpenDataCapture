@@ -4,8 +4,8 @@ import type { BaseInstrument } from '@open-data-capture/common/instrument';
 import type { InstrumentRecord } from '@open-data-capture/common/instrument-records';
 import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
+import { InstrumentEntity } from '@/_instruments/entities/instrument.entity';
 import { GroupEntity } from '@/groups/entities/group.entity';
-import { InstrumentEntity } from '@/instruments/entities/instrument.entity';
 import { SubjectEntity } from '@/subjects/entities/subject.entity';
 
 @EntitySchema<InstrumentRecord>()

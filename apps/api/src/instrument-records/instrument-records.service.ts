@@ -11,9 +11,9 @@ import type {
 } from '@open-data-capture/common/instrument-records';
 import type { FilterQuery } from 'mongoose';
 
+import { InstrumentsService } from '@/_instruments/instruments.service';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
-import { InstrumentsService } from '@/instruments/instruments.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentRecordsRepository } from './instrument-records.repository';

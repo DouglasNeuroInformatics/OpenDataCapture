@@ -5,8 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import type { Assignment, AssignmentBundle, CreateAssignmentBundleData } from '@open-data-capture/common/assignment';
 import { assignmentBundleSchema } from '@open-data-capture/common/assignment';
 
+import { InstrumentsService } from '@/_instruments/instruments.service';
 import type { EntityOperationOptions } from '@/core/types';
-import { InstrumentsService } from '@/instruments/instruments.service';
 // import { SubjectsService } from '@/subjects/subjects.service';
 
 import { subject } from '@casl/ability';

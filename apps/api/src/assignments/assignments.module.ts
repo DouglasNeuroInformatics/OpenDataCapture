@@ -1,7 +1,7 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 
-import { InstrumentsModule } from '@/instruments/instruments.module';
+import { InstrumentsModule } from '@/_instruments/instruments.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
 import { AssignmentsController } from './assignments.controller';

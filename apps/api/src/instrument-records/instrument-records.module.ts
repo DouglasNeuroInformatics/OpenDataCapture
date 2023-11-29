@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { InstrumentsModule } from '@/_instruments/instruments.module';
 import { GroupsModule } from '@/groups/groups.module';
-import { InstrumentsModule } from '@/instruments/instruments.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
 import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity';
