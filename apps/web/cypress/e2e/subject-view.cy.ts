@@ -31,7 +31,11 @@ describe('Subject view test', () => {
     cy.get('div[data-cy="measure-select"]').click();
     cy.get('li[id*="headlessui-listbox-option-:r2"]').click();
     
+    cy.get('div[class="recharts-wrapper"]').click();
 
+    cy.get('div[data-cy="time-select"]').click();
+    cy.get('button[id*="headlessui-menu-item-:r2"]').eq(1).click();
+    
 
 
   })
