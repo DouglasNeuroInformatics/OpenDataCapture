@@ -1,3 +1,5 @@
+import type { ObjectIdLike } from '@douglasneuroinformatics/nestjs/modules';
+
 export class InstrumentRecordEntity {
   static readonly modelName = 'InstrumentRecord';
 
@@ -9,9 +11,9 @@ export class InstrumentRecordEntity {
 
   date: Date;
 
-  groupId?: string;
+  groupId?: ObjectIdLike;
 
-  instrumentId: string;
+  instrumentId: ObjectIdLike;
 
-  subjectIdentifier: string;
+  subjectIdentifier: ObjectIdLike;
 }

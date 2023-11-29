@@ -1,16 +1,16 @@
 import { accessibleBy } from '@casl/mongoose';
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { CryptoService, InjectRepository, type Repository } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Subject } from '@open-data-capture/common/subject';
-import type { FilterQuery } from 'mongoose';
+import type { Filter } from 'mongodb';
 import unidecode from 'unidecode';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 
 import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
-import { SubjectsRepository } from './subjects.repository';
+import { SubjectEntity } from './entities/subject.entity';
 
 /**
  * Please note that although the SubjectsService implements EntityService, the `id` methods
@@ -19,12 +19,12 @@ import { SubjectsRepository } from './subjects.repository';
 @Injectable()
 export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'updateById'> {
   constructor(
+    @InjectRepository(SubjectEntity) private readonly subjectsRepository: Repository<SubjectEntity>,
     private readonly cryptoService: CryptoService,
-    private readonly groupsService: GroupsService,
-    private readonly subjectsRepository: SubjectsRepository
+    private readonly groupsService: GroupsService
   ) {}
 
-  async count(filter: FilterQuery<Subject> = {}, { ability }: EntityOperationOptions = {}) {
+  async count(filter: Filter<Subject> = {}, { ability }: EntityOperationOptions = {}) {
     return this.subjectsRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read').Subject : {}] });
   }
 
@@ -34,7 +34,7 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
       throw new ConflictException('A subject with the provided demographic information already exists');
     }
     return this.subjectsRepository.create({
-      groups: [],
+      groupIds: [],
       identifier,
       ...data
     });
@@ -60,7 +60,7 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
   async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
     const group = await this.groupsService.findByName(groupName);
     return this.subjectsRepository.find({
-      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read').Subject : {}]
+      $and: [{ groupIds: group._id }, ability ? accessibleBy(ability, 'read').Subject : {}]
     });
   }
 
