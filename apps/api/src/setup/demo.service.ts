@@ -14,9 +14,9 @@ import { demoGroups, demoUsers } from '@open-data-capture/demo';
 import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' }
 import mongoose from 'mongoose';
 
-import { InstrumentsService } from '@/_instruments/instruments.service';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 import { VisitsService } from '@/visits/visits.service';

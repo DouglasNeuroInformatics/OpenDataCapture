@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import type { Summary } from '@open-data-capture/common/summary';
 
-import { InstrumentsService } from '@/_instruments/instruments.service';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 

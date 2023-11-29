@@ -30,17 +30,17 @@ export class InstrumentsController {
     return this.instrumentsService.findAvailable({ kind }, { ability });
   }
 
-  @ApiOperation({ summary: 'Get Instrument' })
-  @Get(':id')
-  @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findById(@Param('id', ParseIdPipe) id: ObjectId, @CurrentUser('ability') ability: AppAbility) {
-    return this.instrumentsService.findById(id, { ability });
-  }
-
   @ApiOperation({ summary: 'Get Instrument Sources' })
   @Get('sources')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async findSources(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
     return this.instrumentsService.findSources({ kind }, { ability });
+  }
+
+  @ApiOperation({ summary: 'Get Instrument' })
+  @Get(':id')
+  @RouteAccess({ action: 'read', subject: 'Instrument' })
+  async findById(@Param('id', ParseIdPipe) id: ObjectId, @CurrentUser('ability') ability: AppAbility) {
+    return this.instrumentsService.findById(id, { ability });
   }
 }

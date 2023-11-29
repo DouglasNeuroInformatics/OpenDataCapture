@@ -9,7 +9,6 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { Connection } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
 
-import { _InstrumentsModule } from './_instruments/instruments.module';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
@@ -49,7 +48,6 @@ import { VisitsModule } from './visits/visits.module';
     }),
     GatewayModule,
     GroupsModule,
-    _InstrumentsModule,
     InstrumentsModule,
     MongooseModule.forRootAsync({
       inject: [ConfigService],

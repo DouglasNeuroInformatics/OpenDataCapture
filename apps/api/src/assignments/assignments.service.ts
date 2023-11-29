@@ -1,16 +1,13 @@
-// import { accessibleBy } from '@casl/mongoose';
+import { subject } from '@casl/ability';
+import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Assignment, AssignmentBundle, CreateAssignmentBundleData } from '@open-data-capture/common/assignment';
 import { assignmentBundleSchema } from '@open-data-capture/common/assignment';
 
-import { InstrumentsService } from '@/_instruments/instruments.service';
 import type { EntityOperationOptions } from '@/core/types';
-// import { SubjectsService } from '@/subjects/subjects.service';
-
-import { subject } from '@casl/ability';
-import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
+import { InstrumentsService } from '@/instruments/instruments.service';
 
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 
@@ -21,7 +18,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
   constructor(
     configService: ConfigService,
     private readonly httpService: HttpService,
-    private readonly instrumentsService: InstrumentsService // private readonly subjectsService: SubjectsService
+    private readonly instrumentsService: InstrumentsService
   ) {
     this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
   }
@@ -31,7 +28,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     const dto: CreateAssignmentBundleData = {
       expiresAt,
       instrumentBundle: instrument.bundle,
-      instrumentId: instrument.id as string,
+      instrumentId: instrument._id.toString(),
       subjectIdentifier
     };
     const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, dto);
@@ -48,6 +45,10 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     const assignments: Assignment[] = [];
     for (const bundle of assignmentBundles) {
       const instrument = await this.instrumentsService.findById(bundle.instrumentId);
+      // TO BE REMOVED
+      if (instrument.kind !== 'form') {
+        throw new Error('Not implemented for non-form assignments');
+      }
       const assignment = subject('Assignment', { ...bundle, instrument });
       if (ability && !ability.can('read', assignment)) {
         continue;

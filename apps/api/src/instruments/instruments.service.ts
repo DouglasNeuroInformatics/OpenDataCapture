@@ -1,5 +1,6 @@
+import { subject } from '@casl/ability';
 import { accessibleBy } from '@casl/mongoose';
-import { InjectRepository, type Repository } from '@douglasneuroinformatics/nestjs/modules';
+import { InjectRepository, type ObjectIdLike, type Repository } from '@douglasneuroinformatics/nestjs/modules';
 import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
@@ -16,13 +17,14 @@ import type {
 } from '@open-data-capture/common/instrument';
 import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
-import type { Filter, ObjectId } from 'mongodb';
+import type { Filter } from 'mongodb';
 
 import type { EntityOperationOptions } from '@/core/types';
 
 import { InstrumentEntity } from './entities/instrument.entity';
 
 import type { CreateInstrumentDto } from './dto/create-instrument.dto';
+import type { PopulatedInstrument } from './instruments.types';
 
 @Injectable()
 export class InstrumentsService {
@@ -31,6 +33,10 @@ export class InstrumentsService {
   constructor(
     @InjectRepository(InstrumentEntity) private readonly instrumentsRepository: Repository<InstrumentEntity>
   ) {}
+
+  async count() {
+    return this.instrumentsRepository.count();
+  }
 
   async create({ source }: CreateInstrumentDto): Promise<InstrumentEntity> {
     const { bundle, instance } = await this.parseSource(source, formInstrumentSchema);
@@ -44,7 +50,6 @@ export class InstrumentsService {
     query: Filter<BaseInstrument> = {},
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentSummary[]> {
-    // TBD: Figure out a better way to do this
     return this.instrumentsRepository.find(
       {
         $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
@@ -63,15 +68,21 @@ export class InstrumentsService {
     );
   }
 
-  async findById(id: ObjectId, { ability }: EntityOperationOptions = {}) {
-    // Once Mongoose's shit is removed we can use ObjectId normally
-    const instrument = await this.instrumentsRepository.findById(id.toString());
-    if (!instrument) {
+  async findById<T extends Instrument>(
+    id: ObjectIdLike,
+    { ability }: EntityOperationOptions = {}
+  ): Promise<PopulatedInstrument<T>> {
+    const entity = await this.instrumentsRepository.findById(id, {
+      projection: { _id: true, bundle: true, source: true }
+    });
+    if (!entity) {
       throw new NotFoundException(`Failed to find instrument with ID: ${id.toString()}`);
-    } else if (ability && !ability.can('read', instrument)) {
+    }
+    const instrument: T = evaluateInstrument<T>(entity.bundle);
+    if (ability && !ability.can('read', subject('Instrument', instrument))) {
       throw new ForbiddenException(`Insufficient rights to read instrument with ID: ${id.toString()}`);
     }
-    return instrument;
+    return { _id: entity._id, bundle: '', source: '', ...instrument };
   }
 
   async findSources(

@@ -6,14 +6,15 @@ import { Injectable } from '@nestjs/common';
 import type { FormInstrument, FormInstrumentMeasures } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
+  InstrumentRecord,
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@open-data-capture/common/instrument-records';
 import type { FilterQuery } from 'mongoose';
 
-import { InstrumentsService } from '@/_instruments/instruments.service';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentRecordsRepository } from './instrument-records.repository';
@@ -40,7 +41,7 @@ export class InstrumentRecordsService {
     options?: EntityOperationOptions
   ) {
     const group = groupId ? await this.groupsService.findById(groupId, options) : undefined;
-    const instrument = await this.instrumentsService.findById(instrumentId);
+    await this.instrumentsService.findById(instrumentId);
     const subject = await this.subjectsService.findById(subjectIdentifier);
 
     return this.instrumentRecordsRepository.create({
@@ -48,7 +49,7 @@ export class InstrumentRecordsService {
       data,
       date,
       group,
-      instrument,
+      instrumentId,
       subject
     });
   }
@@ -67,24 +68,20 @@ export class InstrumentRecordsService {
       : await this.subjectsService.findAll({ ability });
     const data: InstrumentRecordsExport = [];
     for (const subject of subjects) {
-      const records = await this.instrumentRecordsRepository.find(
-        {
-          group,
-          subject
-        },
-        {
-          populate: 'instrument'
-        }
-      );
+      const records = await this.instrumentRecordsRepository.find({
+        group,
+        subject
+      });
       for (const record of records) {
-        if (record.instrument.kind !== 'form') {
+        const instrument = await this.instrumentsService.findById(record.instrumentId);
+        if (instrument.kind !== 'form') {
           continue;
         }
         const formData = record.data as FormDataType;
         for (const measure of Object.keys(formData)) {
           data.push({
-            instrumentName: record.instrument.name,
-            instrumentVersion: record.instrument.version,
+            instrumentName: instrument.name,
+            instrumentVersion: instrument.version,
             measure: measure,
             subjectAge: yearsPassed(subject.dateOfBirth),
             subjectId: subject.identifier,
@@ -108,31 +105,28 @@ export class InstrumentRecordsService {
     { ability }: EntityOperationOptions = {}
   ) {
     const group = groupId ? await this.groupsService.findById(groupId) : undefined;
-    const instrument = instrumentId ? await this.instrumentsService.findById(instrumentId) : undefined;
     const subject = subjectIdentifier ? await this.subjectsService.findById(subjectIdentifier) : undefined;
 
-    const records = await this.instrumentRecordsRepository.find(
-      {
-        $and: [
-          ability ? accessibleBy(ability).InstrumentRecord : {},
-          {
-            date: minDate ? { $gte: minDate } : undefined,
-            group,
-            instrument,
-            subject
-          }
-        ]
-      },
-      {
-        populate: {
-          path: 'instrument',
-          select: ['bundle', 'kind', 'measures']
-        }
-      }
-    );
+    // Make sure refers to actual instrument
+    if (instrumentId) {
+      await this.instrumentsService.findById(instrumentId);
+    }
 
-    return records.map((doc) => {
-      const obj = doc.toObject({
+    const docs = await this.instrumentRecordsRepository.find({
+      $and: [
+        ability ? accessibleBy(ability).InstrumentRecord : {},
+        {
+          date: minDate ? { $gte: minDate } : undefined,
+          group,
+          instrumentId,
+          subject
+        }
+      ]
+    });
+
+    const records: InstrumentRecord[] = [];
+    for (const doc of docs) {
+      const obj: Record<string, unknown> = doc.toObject({
         depopulate: true,
         transform: (_, ret) => {
           delete ret._id;
@@ -140,14 +134,17 @@ export class InstrumentRecordsService {
         },
         virtuals: true
       });
-      if (doc.instrument.kind === 'form' && doc.instrument.measures) {
+      const instrument = await this.instrumentsService.findById(doc.instrumentId);
+      obj.instrument = instrument;
+      if (instrument.kind === 'form' && instrument.measures) {
         obj.computedMeasures = this.computeMeasure(
-          doc.instrument.measures as FormInstrumentMeasures,
+          instrument.measures as FormInstrumentMeasures,
           doc.data as FormDataType
         );
       }
-      return obj;
-    });
+      records.push(obj as InstrumentRecord);
+    }
+    return records;
   }
 
   async linearModel(
@@ -155,18 +152,13 @@ export class InstrumentRecordsService {
     { ability }: EntityOperationOptions = {}
   ) {
     const group = groupId ? await this.groupsService.findById(groupId) : undefined;
-    const instrument = (await this.instrumentsService.findById(instrumentId)) as unknown as FormInstrument;
+    const instrument = await this.instrumentsService.findById<FormInstrument>(instrumentId);
     if (!instrument.measures) {
       throw new Error('Instrument must contain measures');
     }
-    const records = await this.instrumentRecordsRepository.find(
-      {
-        $and: [ability ? accessibleBy(ability).InstrumentRecord : {}, { group, instrument }]
-      },
-      {
-        populate: 'instrument'
-      }
-    );
+    const records = await this.instrumentRecordsRepository.find({
+      $and: [ability ? accessibleBy(ability).InstrumentRecord : {}, { group, instrumentId }]
+    });
 
     const data: Record<string, [number, number][]> = {};
     for (const record of records) {

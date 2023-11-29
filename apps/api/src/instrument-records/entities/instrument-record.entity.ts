@@ -1,14 +1,12 @@
 import { EntitySchema } from '@douglasneuroinformatics/nestjs/core';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import type { BaseInstrument } from '@open-data-capture/common/instrument';
 import type { InstrumentRecord } from '@open-data-capture/common/instrument-records';
 import { type HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-import { InstrumentEntity } from '@/_instruments/entities/instrument.entity';
 import { GroupEntity } from '@/groups/entities/group.entity';
 import { SubjectEntity } from '@/subjects/entities/subject.entity';
 
-@EntitySchema<InstrumentRecord>()
+@EntitySchema<Omit<InstrumentRecord, 'instrument'>>()
 export class InstrumentRecordEntity {
   static readonly modelName = 'InstrumentRecord';
 
@@ -26,8 +24,8 @@ export class InstrumentRecordEntity {
   @Prop({ ref: GroupEntity.modelName, required: false, type: MongooseSchema.Types.ObjectId })
   group?: GroupEntity;
 
-  @Prop({ ref: InstrumentEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
-  instrument: BaseInstrument;
+  @Prop({ required: true })
+  instrumentId: string;
 
   @Prop({ ref: SubjectEntity.modelName, required: true, type: MongooseSchema.Types.ObjectId })
   subject: SubjectEntity;
