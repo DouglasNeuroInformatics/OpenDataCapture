@@ -1,4 +1,4 @@
-import type { MongoAbility, RawRuleOf } from '@casl/ability';
+import type { ForcedSubject, MongoAbility, RawRuleOf } from '@casl/ability';
 import type { Class } from 'type-fest';
 
 import type { Assignment } from '../assignment/assignment.types';
@@ -28,11 +28,13 @@ export type AppEntityName =
   | 'User'
   | 'Visit';
 
+type ForcedAppSubject<T> = T extends AppEntityName ? ForcedSubject<T> : never;
+
 export type AppEntityClass<TEntity extends AppEntity> = Class<TEntity> & {
   readonly modelName: AppEntityName;
 };
 
-export type AppSubject = 'all' | AppEntity | AppEntityName;
+export type AppSubject = 'all' | AppEntity | AppEntityName | ForcedAppSubject<AppEntityName>;
 
 export type AppAbility = MongoAbility<[AppAction, AppSubject]>;
 
