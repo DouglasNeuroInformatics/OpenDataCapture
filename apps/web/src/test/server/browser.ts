@@ -2,6 +2,7 @@ import { setupWorker } from 'msw/browser';
 
 import { authHandlers } from './handlers/auth.handlers';
 import { FormHandlers } from './handlers/form.handlers';
+import { ManageInstrumentHandlers } from './handlers/instrument-manager.handlers';
 import { setupHandlers } from './handlers/setup.handlers';
 import { SubjectHandlers } from './handlers/subject.handlers';
 import { SummaryHandlers } from './handlers/summary.handlers';
@@ -13,5 +14,6 @@ export const worker = setupWorker(
   ...SummaryHandlers,
   ...VisitHandler,
   ...FormHandlers,
-  ...SubjectHandlers
+  ...SubjectHandlers,
+  ...ManageInstrumentHandlers
 );
