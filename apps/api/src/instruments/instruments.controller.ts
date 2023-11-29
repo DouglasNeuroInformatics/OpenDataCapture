@@ -5,7 +5,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { MutateInstrumentDto } from './dto/mutate-instrument.dto';
+import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { InstrumentsService } from './instruments.service';
 
 @ApiTags('Instruments')
@@ -16,7 +16,7 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'Create Instrument' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Instrument' })
-  create(@Body() data: MutateInstrumentDto) {
+  create(@Body() data: CreateInstrumentDto) {
     return this.instrumentsService.create(data);
   }
 }
