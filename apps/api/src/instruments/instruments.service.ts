@@ -3,10 +3,15 @@ import { InjectRepository, type Repository } from '@douglasneuroinformatics/nest
 import { Injectable } from '@nestjs/common';
 import { ConflictException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 import { formInstrumentSchema } from '@open-data-capture/common/instrument';
-import type { BaseInstrument, Instrument, InstrumentSummary } from '@open-data-capture/common/instrument';
+import type {
+  BaseInstrument,
+  Instrument,
+  InstrumentSource,
+  InstrumentSummary
+} from '@open-data-capture/common/instrument';
 import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
-import type { Filter } from 'mongodb';
+import type { Filter} from 'mongodb';
 
 import type { EntityOperationOptions } from '@/core/types';
 
@@ -35,31 +40,38 @@ export class InstrumentsService {
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentSummary[]> {
     // TBD: Figure out a better way to do this
-    const entities = await this.instrumentsRepository.find({
-      $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
-    });
+    return this.instrumentsRepository.find(
+      {
+        $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
+      },
+      {
+        ignoreUndefined: true,
+        projection: {
+          details: true,
+          kind: true,
+          language: true,
+          name: true,
+          tags: true,
+          version: true
+        }
+      }
+    );
+  }
 
-    // {
-    //   projection: {
-    //     bundle: true,
-    //     details: true,
-    //     kind: true,
-    //     language: true,
-    //     name: true,
-    //     tags: true,
-    //     version: true
-    //   }
-    // }
-    return summaries.map((doc) =>
-      doc.toObject({
-        transform: (_, ret) => {
-          delete ret._id;
-          delete ret.bundle;
-          delete ret.content;
-          delete ret.validationSchema;
-        },
-        virtuals: true
-      })
+  async findSources(
+    query: Filter<BaseInstrument>,
+    { ability }: EntityOperationOptions = {}
+  ): Promise<InstrumentSource[]> {
+    return this.instrumentsRepository.find(
+      {
+        $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
+      },
+      {
+        ignoreUndefined: true,
+        projection: {
+          source: true
+        }
+      }
     );
   }
 

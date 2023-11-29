@@ -29,10 +29,10 @@ export class InstrumentsController {
     return this.instrumentsService.findAvailable({ kind }, { ability });
   }
 
-  // @ApiOperation({ summary: 'Get Instrument Sources' })
-  // @Get('sources')
-  // @RouteAccess({ action: 'read', subject: 'Instrument' })
-  // async findSources(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
-  //   return this.instrumentsService.findSources({ kind }, { ability });
-  // }
+  @ApiOperation({ summary: 'Get Instrument Sources' })
+  @Get('sources')
+  @RouteAccess({ action: 'read', subject: 'Instrument' })
+  async findSources(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+    return this.instrumentsService.findSources({ kind }, { ability });
+  }
 }
