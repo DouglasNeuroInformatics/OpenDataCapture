@@ -1,7 +1,12 @@
 import { accessibleBy } from '@casl/mongoose';
 import { InjectRepository, type Repository } from '@douglasneuroinformatics/nestjs/modules';
 import { Injectable } from '@nestjs/common';
-import { ConflictException, UnprocessableEntityException } from '@nestjs/common/exceptions';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common/exceptions';
 import { formInstrumentSchema } from '@open-data-capture/common/instrument';
 import type {
   BaseInstrument,
@@ -11,7 +16,7 @@ import type {
 } from '@open-data-capture/common/instrument';
 import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
-import type { Filter} from 'mongodb';
+import type { Filter, ObjectId } from 'mongodb';
 
 import type { EntityOperationOptions } from '@/core/types';
 
@@ -56,6 +61,17 @@ export class InstrumentsService {
         }
       }
     );
+  }
+
+  async findById(id: ObjectId, { ability }: EntityOperationOptions = {}) {
+    // Once Mongoose's shit is removed we can use ObjectId normally
+    const instrument = await this.instrumentsRepository.findById(id.toString());
+    if (!instrument) {
+      throw new NotFoundException(`Failed to find instrument with ID: ${id.toString()}`);
+    } else if (ability && !ability.can('read', instrument)) {
+      throw new ForbiddenException(`Insufficient rights to read instrument with ID: ${id.toString()}`);
+    }
+    return instrument;
   }
 
   async findSources(

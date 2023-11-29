@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-classes */
 
 import { CurrentUser, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AppAbility } from '@open-data-capture/common/core';
 import type { InstrumentKind } from '@open-data-capture/common/instrument';
