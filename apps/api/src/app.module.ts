@@ -1,5 +1,5 @@
 import { LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
-import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
+import { AjvModule, CryptoModule, DatabaseModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -36,6 +36,15 @@ import { VisitsModule } from './visits/visits.module';
       useFactory: (configService: ConfigService) => ({
         secretKey: configService.getOrThrow('SECRET_KEY')
       })
+    }),
+    DatabaseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
+          uri: configService.getOrThrow<string>('MONGO_URI')
+        };
+      }
     }),
     GatewayModule,
     GroupsModule,
