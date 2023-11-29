@@ -16,26 +16,26 @@ import { InstrumentsService } from './instruments.service';
 export class InstrumentsController {
   constructor(private readonly instrumentsService: InstrumentsService) {}
 
-  @ApiOperation({ summary: 'Create Instrument' })
-  @Post()
-  @RouteAccess({ action: 'create', subject: 'Instrument' })
-  create(@Body() data: MutateInstrumentDto) {
-    return this.instrumentsService.create(data);
-  }
+  // @ApiOperation({ summary: 'Create Instrument' })
+  // @Post()
+  // @RouteAccess({ action: 'create', subject: 'Instrument' })
+  // create(@Body() data: MutateInstrumentDto) {
+  //   return this.instrumentsService.create(data);
+  // }
 
-  @ApiOperation({ summary: 'Delete Instrument' })
-  @Delete(':id')
-  @RouteAccess({ action: 'delete', subject: 'Instrument' })
-  async deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
-    return this.instrumentsService.deleteById(id, { ability });
-  }
+  // @ApiOperation({ summary: 'Delete Instrument' })
+  // @Delete(':id')
+  // @RouteAccess({ action: 'delete', subject: 'Instrument' })
+  // async deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+  //   return this.instrumentsService.deleteById(id, { ability });
+  // }
 
-  @ApiOperation({ summary: 'Find All Instruments' })
-  @Get()
-  @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
-    return this.instrumentsService.find({ kind }, { ability });
-  }
+  // @ApiOperation({ summary: 'Find All Instruments' })
+  // @Get()
+  // @RouteAccess({ action: 'read', subject: 'Instrument' })
+  // async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+  //   return this.instrumentsService.find({ kind }, { ability });
+  // }
 
   @ApiOperation({ summary: 'Summarize Available Instruments' })
   @Get('available')

@@ -5,7 +5,7 @@ import { DatabaseRepository } from '@douglasneuroinformatics/nestjs/modules';
 import { createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
-import { InstrumentSourceEntity } from '../entities/instrument-source.entity';
+import { InstrumentEntity } from '../entities/instrument.entity';
 import { InstrumentsService } from '../instruments.service';
 
 describe('InstrumentsService', () => {
@@ -16,8 +16,8 @@ describe('InstrumentsService', () => {
       providers: [
         InstrumentsService,
         {
-          provide: getRepositoryToken(InstrumentSourceEntity),
-          useValue: createMock(DatabaseRepository(InstrumentSourceEntity))
+          provide: getRepositoryToken(InstrumentEntity),
+          useValue: createMock(DatabaseRepository(InstrumentEntity))
         }
       ]
     }).compile();

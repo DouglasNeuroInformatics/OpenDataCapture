@@ -1,7 +1,9 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { Body, Controller, Post } from '@nestjs/common';
+import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { AppAbility, InstrumentKind } from '@open-data-capture/common';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -19,4 +21,18 @@ export class InstrumentsController {
   create(@Body() data: CreateInstrumentDto) {
     return this.instrumentsService.create(data);
   }
+
+  @ApiOperation({ summary: 'Summarize Available Instruments' })
+  @Get('available')
+  @RouteAccess({ action: 'read', subject: 'Instrument' })
+  async findAvailable(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+    return this.instrumentsService.findAvailable({ kind }, { ability });
+  }
+
+  // @ApiOperation({ summary: 'Get Instrument Sources' })
+  // @Get('sources')
+  // @RouteAccess({ action: 'read', subject: 'Instrument' })
+  // async findSources(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+  //   return this.instrumentsService.findSources({ kind }, { ability });
+  // }
 }

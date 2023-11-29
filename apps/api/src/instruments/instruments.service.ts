@@ -1,11 +1,16 @@
+import { accessibleBy } from '@casl/mongoose';
 import { InjectRepository, type Repository } from '@douglasneuroinformatics/nestjs/modules';
 import { Injectable } from '@nestjs/common';
 import { ConflictException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import { type Instrument, formInstrumentSchema } from '@open-data-capture/common/instrument';
+import { formInstrumentSchema } from '@open-data-capture/common/instrument';
+import type { BaseInstrument, Instrument, InstrumentSummary } from '@open-data-capture/common/instrument';
 import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
+import type { Filter } from 'mongodb';
 
-import { InstrumentSourceEntity } from './entities/instrument-source.entity';
+import type { EntityOperationOptions } from '@/core/types';
+
+import { InstrumentEntity } from './entities/instrument.entity';
 
 import type { CreateInstrumentDto } from './dto/create-instrument.dto';
 
@@ -14,15 +19,48 @@ export class InstrumentsService {
   private readonly instrumentTransformer = new InstrumentTransformer();
 
   constructor(
-    @InjectRepository(InstrumentSourceEntity) private readonly instrumentsRepository: Repository<InstrumentSourceEntity>
+    @InjectRepository(InstrumentEntity) private readonly instrumentsRepository: Repository<InstrumentEntity>
   ) {}
 
-  async create({ source }: CreateInstrumentDto): Promise<InstrumentSourceEntity> {
-    const { instance } = await this.parseSource(source, formInstrumentSchema);
+  async create({ source }: CreateInstrumentDto): Promise<InstrumentEntity> {
+    const { bundle, instance } = await this.parseSource(source, formInstrumentSchema);
     if (await this.instrumentsRepository.exists({ name: instance.name })) {
       throw new ConflictException(`Instrument with name '${instance.name}' already exists!`);
     }
-    return this.instrumentsRepository.create({ name: instance.name, source });
+    return this.instrumentsRepository.create({ bundle, source, ...instance });
+  }
+
+  async findAvailable(
+    query: Filter<BaseInstrument> = {},
+    { ability }: EntityOperationOptions = {}
+  ): Promise<InstrumentSummary[]> {
+    // TBD: Figure out a better way to do this
+    const entities = await this.instrumentsRepository.find({
+      $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
+    });
+
+    // {
+    //   projection: {
+    //     bundle: true,
+    //     details: true,
+    //     kind: true,
+    //     language: true,
+    //     name: true,
+    //     tags: true,
+    //     version: true
+    //   }
+    // }
+    return summaries.map((doc) =>
+      doc.toObject({
+        transform: (_, ret) => {
+          delete ret._id;
+          delete ret.bundle;
+          delete ret.content;
+          delete ret.validationSchema;
+        },
+        virtuals: true
+      })
+    );
   }
 
   /**
