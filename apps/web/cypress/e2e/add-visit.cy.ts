@@ -38,7 +38,7 @@ describe('look at questionaire', () => {
     cy.wait(1000);
     cy.get('h3[data-cy="instrument-title"]').contains('Happiness Questionnaire').click();
     cy.get('button').contains('Begin').click();
-    // cy.get('div[style="user-select: none; touch-action: pan-y;"]').trigger('mousedown').trigger('mousemove', {which: 1, pageX: 100, pageY: 400}).trigger('mouseup')
-
+    cy.get('div[draggable="false"]').trigger('mousedown').trigger('mousemove', {clientX:500, clientY:350}).trigger('mouseup')
+    
   });
 });
