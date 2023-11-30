@@ -22,13 +22,24 @@ Cypress.Commands.add('login', (username, password) => {
   form.get('button[aria-label="Submit Button"]').click();
 });
 
+Cypress.Commands.add('dragTo', { prevSubject: 'element' }, (subject, targetSelector) => {
+  cy.wrap(subject).trigger('dragstart');
+  cy.get(targetSelector).trigger('drop');
+  cy.get(targetSelector).trigger('dragend');
+});
+
+
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Chainable {
       login(username: string, password: string): Chainable<void>;
+      dragTo(prevSubject: string): Chainable<void>;
     }
+
+
   }
 }
 //
