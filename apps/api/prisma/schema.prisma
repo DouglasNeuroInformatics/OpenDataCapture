@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type InstrumentrecordsData {
+  abstraction                  Int?
+  ageAtImmigration             Int?
+  annualIncome                 Int?
+  anxiety                      Int?
+  attention                    Int?
+  bluntedAffect                Int?
+  canCopyDesign                Int?
+  canFollowOralInstructions    Int?
+  canFollowWrittenInstructions Int?
+  canNamePencil                Int?
+  canNameWatch                 Int?
+  canRepeatPhrase              Int?
+  canWriteSentence             Int?
+  city                         Int?
+  conceptualDisorganization    Int?
+  country                      Int?
+  date                         Int?
+  day                          Int?
+  delayedRecall                Int?
+  depressiveMood               Int?
+  disorientation               Int?
+  emotionalWithdrawal          Int?
+  employmentStatus             String?
+  ethnicOrigin                 String?
+  excitement                   Int?
+  firstLanguage                String?
+  floor                        Int?
+  gender                       String?
+  grandiosity                  Int?
+  guiltFeelings                Int?
+  hallucinatoryBehavior        Int?
+  hostility                    Int?
+  householdSize                Int?
+  institution                  Int?
+  isCanadianCitizen            Boolean?
+  language                     Int?
+  learningScore                Int?
+  lowEdu                       Boolean?
+  mannerismsAndPosturing       Int?
+  maritalStatus                String?
+  month                        Int?
+  motorRetardation             Int?
+  naming                       Int?
+  numberChildren               Int?
+  orientation                  Int?
+  overallHappiness             Int?
+  postalCode                   String?
+  province                     Int?
+  recallScore                  Int?
+  religion                     String?
+  season                       Int?
+  somaticConcern               Int?
+  speaksEnglish                Boolean?
+  speaksFrench                 Boolean?
+  spellWorldScore              Int?
+  suspiciousness               Int?
+  tension                      Int?
+  uncooperativeness            Int?
+  unusualThoughtContent        Int?
+  visuospatialExecutive        Int?
+  year                         Int?
+  yearsOfEducation             Int?
+}
+
+type InstrumentsDetails {
+  /// Multiple data types found: String: 20%, InstrumentsDetailsDescription: 80% out of 5 sampled entries
+  description       Json
+  estimatedDuration Int
+  /// Multiple data types found: String: 20%, InstrumentsDetailsInstructions: 80% out of 5 sampled entries
+  instructions      Json
+  /// Multiple data types found: String: 20%, InstrumentsDetailsTitle: 80% out of 5 sampled entries
+  title             Json
+}
+
+type InstrumentsDetailsDescription {
+  en String
+  fr String
+}
+
+type InstrumentsDetailsInstructions {
+  /// Multiple data types found: String: 75%, Array(String): 25% out of 4 sampled entries
+  en Json
+  /// Multiple data types found: String: 75%, Array(String): 25% out of 4 sampled entries
+  fr Json
+}
+
+type InstrumentsDetailsTitle {
+  en String
+  fr String
+}
+
+type InstrumentsTags {
+  en String[]
+  fr String[]
+}
+
+model groups {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  v         Int      @map("__v")
+  createdAt DateTime @db.Date
+  name      String
+  updatedAt DateTime @db.Date
+}
+
+model instrumentrecords {
+  id         String                @id @default(auto()) @map("_id") @db.ObjectId
+  v          Int                   @map("__v")
+  createdAt  DateTime              @db.Date
+  data       InstrumentrecordsData
+  date       DateTime              @db.Date
+  group      String                @db.ObjectId
+  instrument String                @db.ObjectId
+  subject    String                @db.ObjectId
+  updatedAt  DateTime              @db.Date
+}
+
+model instruments {
+  id        String             @id @default(auto()) @map("_id") @db.ObjectId
+  v         Int                @map("__v")
+  source    String             @map("_source")
+  bundle    String
+  createdAt DateTime           @db.Date
+  details   InstrumentsDetails
+  kind      String
+  /// Multiple data types found: String: 20%, Array(String): 80% out of 5 sampled entries
+  language  Json
+  name      String
+  /// Multiple data types found: InstrumentsTags: 80%, Array(String): 20% out of 5 sampled entries
+  tags      Json
+  updatedAt DateTime           @db.Date
+  /// Multiple data types found: Float: 20%, Int: 80% out of 5 sampled entries
+  version   Json
+}
+
+model subjects {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  v           Int      @map("__v")
+  createdAt   DateTime @db.Date
+  dateOfBirth DateTime @db.Date
+  firstName   String
+  groups      String[]
+  identifier  String
+  lastName    String
+  sex         String
+  updatedAt   DateTime @db.Date
+}
+
+model users {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  v                   Int      @map("__v")
+  basePermissionLevel String
+  createdAt           DateTime @db.Date
+  firstName           String?
+  groups              String[]
+  lastName            String?
+  password            String
+  updatedAt           DateTime @db.Date
+  username            String
+}
+
+model visits {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  v         Int      @map("__v")
+  createdAt DateTime @db.Date
+  date      DateTime @db.Date
+  group     String   @db.ObjectId
+  subject   String   @db.ObjectId
+  updatedAt DateTime @db.Date
+}
