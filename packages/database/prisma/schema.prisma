@@ -24,17 +24,17 @@ model GroupModel {
 /// Instrument Records
 
 model InstrumentRecordModel {
-  createdAt    DateTime     @default(now()) @db.Date
-  updatedAt    DateTime     @updatedAt @db.Date
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime        @default(now()) @db.Date
+  updatedAt    DateTime        @updatedAt @db.Date
+  id           String          @id @default(auto()) @map("_id") @db.ObjectId
   data         Json
-  date         DateTime     @db.Date
-  group        GroupModel   @relation(fields: [groupId], references: [id])
-  groupId      String       @db.ObjectId
-  subject      SubjectModel @relation(fields: [subjectId], references: [id])
-  subjectId    String       @db.ObjectId
-  instrument   InstrumentModel   @relation(fields: [instrumentId], references: [id])
-  instrumentId String       @db.ObjectId
+  date         DateTime        @db.Date
+  group        GroupModel      @relation(fields: [groupId], references: [id])
+  groupId      String          @db.ObjectId
+  subject      SubjectModel    @relation(fields: [subjectId], references: [id])
+  subjectId    String          @db.ObjectId
+  instrument   InstrumentModel @relation(fields: [instrumentId], references: [id])
+  instrumentId String          @db.ObjectId
 }
 
 // Instruments 
@@ -82,11 +82,17 @@ model SubjectModel {
   instrumentRecords InstrumentRecordModel[]
 }
 
+enum BasePermissionLevel {
+  ADMIN
+  GROUP_MANAGER
+  STANDARD
+}
+
 model UserModel {
   createdAt           DateTime   @default(now()) @db.Date
   updatedAt           DateTime   @updatedAt @db.Date
   id                  String     @id @default(auto()) @map("_id") @db.ObjectId
-  basePermissionLevel String
+  basePermissionLevel BasePermissionLevel?
   firstName           String?
   groupIds            String[]   @db.ObjectId
   groups              GroupModel @relation(fields: [groupIds], references: [id])
