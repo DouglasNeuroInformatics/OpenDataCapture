@@ -1,16 +1,16 @@
 import { AbilityBuilder } from '@casl/ability';
 import { createPrismaAbility } from '@casl/prisma';
 import { Injectable, Logger } from '@nestjs/common';
-import type { AppAbility } from '@open-data-capture/common/core';
+import type { BaseAppAbility } from '@open-data-capture/common/core';
 import type { User } from '@open-data-capture/common/user';
 
 @Injectable()
 export class AbilityFactory {
   private readonly logger = new Logger(AbilityFactory.name);
 
-  createForUser(user: User): AppAbility {
+  createForUser(user: User): BaseAppAbility {
     this.logger.verbose('Creating ability for user: ' + user.username);
-    const ability = new AbilityBuilder<AppAbility>(createPrismaAbility);
+    const ability = new AbilityBuilder<BaseAppAbility>(createPrismaAbility);
     switch (user.basePermissionLevel) {
       case 'ADMIN':
         ability.can('manage', 'all');

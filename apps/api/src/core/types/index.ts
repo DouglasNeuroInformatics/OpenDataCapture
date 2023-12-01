@@ -1,5 +1,5 @@
-import type { AppAbility } from '@open-data-capture/common/core';
+import type { BaseAppAbility } from '@open-data-capture/common/core';
 
 export type EntityOperationOptions = {
-  ability?: AppAbility;
+  ability?: BaseAppAbility;
 };

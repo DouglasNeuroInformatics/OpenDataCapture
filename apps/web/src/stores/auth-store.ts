@@ -1,6 +1,6 @@
 import { createMongoAbility } from '@casl/ability';
 import type { JwtPayload } from '@open-data-capture/common/auth';
-import type { AppAbility } from '@open-data-capture/common/core';
+import type { BaseAppAbility } from '@open-data-capture/common/core';
 import type { Group } from '@open-data-capture/common/group';
 import { jwtDecode } from 'jwt-decode';
 import { create } from 'zustand';
@@ -8,7 +8,7 @@ import { create } from 'zustand';
 import { useActiveVisitStore } from './active-visit-store';
 
 export type CurrentUser = {
-  ability: AppAbility;
+  ability: BaseAppAbility;
 } & Omit<JwtPayload, 'permissions'>;
 
 export type AuthStore = {
@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
   setAccessToken: (accessToken) => {
     const { groups, permissions, ...rest } = jwtDecode<JwtPayload>(accessToken);
-    const ability = createMongoAbility<AppAbility>(permissions);
+    const ability = createMongoAbility<BaseAppAbility>(permissions);
     set({
       accessToken,
       currentGroup: groups[0],

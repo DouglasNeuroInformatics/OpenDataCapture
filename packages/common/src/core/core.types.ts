@@ -2,7 +2,7 @@ import type { PureAbility, RawRuleOf } from '@casl/ability';
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
-export type AppSubject =
+export type AppSubjectName =
   | 'Assignment'
   | 'Group'
   | 'Instrument'
@@ -13,8 +13,8 @@ export type AppSubject =
   | 'Visit'
   | 'all';
 
-export type AppAbility = PureAbility<[AppAction, AppSubject]>;
+export type BaseAppAbility = PureAbility<[AppAction, AppSubjectName]>;
 
-export type Permissions = RawRuleOf<AppAbility>[];
+export type Permissions = RawRuleOf<BaseAppAbility>[];
 
 export type Language = 'en' | 'fr';
