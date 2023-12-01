@@ -16,6 +16,7 @@ import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';
@@ -54,6 +55,7 @@ import { VisitsModule } from './visits/visits.module';
         };
       }
     }),
+    PrismaModule,
     SubjectsModule,
     ThrottlerModule.forRoot([
       {
