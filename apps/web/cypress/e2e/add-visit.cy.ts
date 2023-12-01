@@ -38,7 +38,11 @@ describe('look at questionaire', () => {
     cy.wait(1000);
     cy.get('h3[data-cy="instrument-title"]').contains('Happiness Questionnaire').click();
     cy.get('button').contains('Begin').click();
-    //cy.get('div[draggable="false"]').dragTo();
+
+    // const dataTransfer = new DataTransfer();
+    // cy.get('div[draggable="false"]').trigger('dragstart',{
+    //   dataTransfer
+    // });
 
     
   });
