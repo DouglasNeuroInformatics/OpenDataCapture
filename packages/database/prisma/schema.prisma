@@ -9,37 +9,37 @@ datasource db {
 
 // Groups
 
-model Group {
-  createdAt         DateTime           @default(now()) @db.Date
-  updatedAt         DateTime           @updatedAt @db.Date
-  id                String             @id @default(auto()) @map("_id") @db.ObjectId
-  instrumentRecords InstrumentRecord[]
+model GroupModel {
+  createdAt         DateTime                @default(now()) @db.Date
+  updatedAt         DateTime                @updatedAt @db.Date
+  id                String                  @id @default(auto()) @map("_id") @db.ObjectId
+  instrumentRecords InstrumentRecordModel[]
   name              String
-  subjects          Subject[]          @relation(fields: [subjectIds], references: [id])
-  subjectIds        String[]           @db.ObjectId
-  userIds           String[]           @db.ObjectId
-  users             User[]
+  subjects          SubjectModel[]          @relation(fields: [subjectIds], references: [id])
+  subjectIds        String[]                @db.ObjectId
+  userIds           String[]                @db.ObjectId
+  users             UserModel[]
 }
 
 /// Instrument Records
 
-model InstrumentRecord {
-  createdAt    DateTime   @default(now()) @db.Date
-  updatedAt    DateTime   @updatedAt @db.Date
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+model InstrumentRecordModel {
+  createdAt    DateTime     @default(now()) @db.Date
+  updatedAt    DateTime     @updatedAt @db.Date
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
   data         Json
-  date         DateTime   @db.Date
-  group        Group      @relation(fields: [groupId], references: [id])
-  groupId      String     @db.ObjectId
-  subject      Subject    @relation(fields: [subjectId], references: [id])
-  subjectId    String     @db.ObjectId
-  instrument   Instrument @relation(fields: [instrumentId], references: [id])
-  instrumentId String     @db.ObjectId
+  date         DateTime     @db.Date
+  group        GroupModel   @relation(fields: [groupId], references: [id])
+  groupId      String       @db.ObjectId
+  subject      SubjectModel @relation(fields: [subjectId], references: [id])
+  subjectId    String       @db.ObjectId
+  instrument   InstrumentModel   @relation(fields: [instrumentId], references: [id])
+  instrumentId String       @db.ObjectId
 }
 
 // Instruments 
 
-type InstrumentsDetails {
+type InstrumentDetails {
   // string | Record<Language, string>
   description       Json
   estimatedDuration Int
@@ -49,13 +49,13 @@ type InstrumentsDetails {
   title             Json
 }
 
-model Instrument {
-  createdAt DateTime           @default(now()) @db.Date
-  updatedAt DateTime           @updatedAt @db.Date
-  id        String             @id @default(auto()) @map("_id") @db.ObjectId
+model InstrumentModel {
+  createdAt DateTime                @default(now()) @db.Date
+  updatedAt DateTime                @updatedAt @db.Date
+  id        String                  @id @default(auto()) @map("_id") @db.ObjectId
   source    String
   bundle    String
-  details   InstrumentsDetails
+  details   InstrumentDetails
   kind      String
   /// Language | Language[]
   language  Json
@@ -63,39 +63,39 @@ model Instrument {
   /// string[] | Record<Language, string[]>
   tags      Json
   version   Float
-  records   InstrumentRecord[]
+  records   InstrumentRecordModel[]
 }
 
 // Subjects
 
-model Subject {
-  createdAt         DateTime           @default(now()) @db.Date
-  updatedAt         DateTime           @updatedAt @db.Date
-  id                String             @id @default(auto()) @map("_id") @db.ObjectId
-  dateOfBirth       DateTime           @db.Date
+model SubjectModel {
+  createdAt         DateTime                @default(now()) @db.Date
+  updatedAt         DateTime                @updatedAt @db.Date
+  id                String                  @id @default(auto()) @map("_id") @db.ObjectId
+  dateOfBirth       DateTime                @db.Date
   firstName         String?
-  groupIds          String[]           @db.ObjectId
-  groups            Group[]            @relation(fields: [groupIds], references: [id])
+  groupIds          String[]                @db.ObjectId
+  groups            GroupModel[]            @relation(fields: [groupIds], references: [id])
   identifier        String
   lastName          String?
   sex               String
-  instrumentRecords InstrumentRecord[]
+  instrumentRecords InstrumentRecordModel[]
 }
 
-model User {
-  createdAt           DateTime @default(now()) @db.Date
-  updatedAt           DateTime @updatedAt @db.Date
-  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+model UserModel {
+  createdAt           DateTime   @default(now()) @db.Date
+  updatedAt           DateTime   @updatedAt @db.Date
+  id                  String     @id @default(auto()) @map("_id") @db.ObjectId
   basePermissionLevel String
   firstName           String?
-  groupIds            String[] @db.ObjectId
-  groups              Group    @relation(fields: [groupIds], references: [id])
+  groupIds            String[]   @db.ObjectId
+  groups              GroupModel @relation(fields: [groupIds], references: [id])
   lastName            String?
   password            String
   username            String
 }
 
-model Visit {
+model VisitModel {
   createdAt DateTime @default(now()) @db.Date
   updatedAt DateTime @updatedAt @db.Date
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
