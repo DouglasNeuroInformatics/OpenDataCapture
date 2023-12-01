@@ -31,7 +31,6 @@
   "devDependencies": {
     "@casl/prisma": "^1.4.1",
     "@douglasneuroinformatics/form-types": "latest",
-    "@open-data-capture/database": "*",
     "@types/react": "^18.2.39"
   }
 }

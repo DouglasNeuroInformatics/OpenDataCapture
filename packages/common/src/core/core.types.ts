@@ -12,8 +12,6 @@ import type { Visit } from '../visit/visit.types';
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
-export type AppEntityType<T> = T extends object ? Omit<T, 'id'> : never;
-
 export type AppEntity = AppEntityType<
   Assignment | Group | Instrument | InstrumentRecord | Subject | Summary | User | Visit
 >;
@@ -32,7 +30,9 @@ export type AppEntityClass<TEntity extends AppEntity> = Class<TEntity> & {
   readonly modelName: AppEntityName;
 };
 
-export type AppSubject = 'all' | AppEntity | AppEntityName;
+type T = string | any;
+
+export type AppSubject = 'all' | AppEntityName;
 
 export type AppAbility = MongoAbility<[AppAction, AppSubject]>;
 
