@@ -44,6 +44,8 @@ describe('look at questionaire', () => {
     //   dataTransfer
     // });
 
+    // cy.get('div').contains('NA').trigger('drop');
+
     
   });
 });
