@@ -55,7 +55,7 @@ import { VisitsModule } from './visits/visits.module';
         };
       }
     }),
-    PrismaModule,
+    PrismaModule.forRoot(),
     SubjectsModule,
     ThrottlerModule.forRoot([
       {
