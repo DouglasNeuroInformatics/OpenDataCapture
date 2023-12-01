@@ -3,7 +3,6 @@ import type { PureAbility, RawRuleOf } from '@casl/ability';
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
 export type AppSubject =
-  | 'all'
   | 'Assignment'
   | 'Group'
   | 'Instrument'
@@ -11,7 +10,8 @@ export type AppSubject =
   | 'Subject'
   | 'Summary'
   | 'User'
-  | 'Visit';
+  | 'Visit'
+  | 'all';
 
 export type AppAbility = PureAbility<[AppAction, AppSubject]>;
 
