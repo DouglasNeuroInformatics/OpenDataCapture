@@ -3,11 +3,17 @@
   "globalDependencies": [".env"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "^build:types"],
+      "dependsOn": ["^build", "^build:types", "^db:generate"],
       "outputs": ["dist/**"]
     },
     "build:types": {
       "outputs": ["dist/**"]
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
     },
     "dev": {
       "cache": false,
@@ -16,7 +22,7 @@
     },
     "format": {},
     "lint": {
-      "dependsOn": ["^build:types"]
+      "dependsOn": ["^build:types", "^db:generate"]
     },
     "test": {}
   }

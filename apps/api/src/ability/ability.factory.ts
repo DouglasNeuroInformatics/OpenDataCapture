@@ -1,4 +1,5 @@
-import { AbilityBuilder, createMongoAbility } from '@casl/ability';
+import { AbilityBuilder } from '@casl/ability';
+import { createPrismaAbility } from '@casl/prisma';
 import { Injectable, Logger } from '@nestjs/common';
 import type { AppAbility } from '@open-data-capture/common/core';
 import type { User } from '@open-data-capture/common/user';
@@ -9,7 +10,7 @@ export class AbilityFactory {
 
   createForUser(user: User): AppAbility {
     this.logger.verbose('Creating ability for user: ' + user.username);
-    const ability = new AbilityBuilder<AppAbility>(createMongoAbility);
+    const ability = new AbilityBuilder<AppAbility>(createPrismaAbility);
     switch (user.basePermissionLevel) {
       case 'ADMIN':
         ability.can('manage', 'all');

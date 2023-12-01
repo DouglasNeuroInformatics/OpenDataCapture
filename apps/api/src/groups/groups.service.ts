@@ -4,24 +4,25 @@ import { ConflictException, ForbiddenException, Injectable, NotFoundException } 
 import type { Group } from '@open-data-capture/common/group';
 
 import type { EntityOperationOptions } from '@/core/types';
+import { PrismaService } from '@/prisma/prisma.service';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { GroupsRepository } from './groups.repository';
 
 @Injectable()
 export class GroupsService implements EntityService<Group> {
-  constructor(private readonly groupsRepository: GroupsRepository) {}
+  constructor(private db: PrismaService) {}
 
   async create(group: CreateGroupDto) {
-    if (await this.groupsRepository.exists({ name: group.name })) {
+    const exists = (await this.db.group.findFirst({ where: { name: group.name } })) !== null;
+    if (exists) {
       throw new ConflictException(`Group with name '${group.name}' already exists!`);
     }
-    return this.groupsRepository.create(group);
+    return this.db.group.create({ data: group });
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
-    const group = await this.groupsRepository.findById(id);
+    const group = await this.db.group.delete({ where: { id } });
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
     } else if (ability && !ability.can('delete', group)) {
