@@ -15,8 +15,8 @@ model Group {
   id                String             @id @default(auto()) @map("_id") @db.ObjectId
   instrumentRecords InstrumentRecord[]
   name              String
-  subject           Subject            @relation(fields: [subjectId], references: [id])
-  subjectId         String             @db.ObjectId
+  subjects          Subject[]          @relation(fields: [subjectIds], references: [id])
+  subjectIds        String[]           @db.ObjectId
   userIds           String[]           @db.ObjectId
   users             User[]
 }
@@ -74,7 +74,8 @@ model Subject {
   id                String             @id @default(auto()) @map("_id") @db.ObjectId
   dateOfBirth       DateTime           @db.Date
   firstName         String?
-  groups            Group[]
+  groupIds          String[]           @db.ObjectId
+  groups            Group[]            @relation(fields: [groupIds], references: [id])
   identifier        String
   lastName          String?
   sex               String
