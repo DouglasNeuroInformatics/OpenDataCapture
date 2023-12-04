@@ -12,6 +12,7 @@
 //
 // -- This is a parent command --
 import '@4tw/cypress-drag-drop';
+//require('@4tw/cypress-drag-drop')
 
 //This is a login script for the
 Cypress.Commands.add('login', (username, password) => {

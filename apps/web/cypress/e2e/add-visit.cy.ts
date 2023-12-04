@@ -45,7 +45,8 @@ describe('look at questionaire', () => {
     // });
 
     // cy.get('div').contains('NA').trigger('drop');
-
+    //const dragPoint = cy.get('div').contains('NA')
+    cy.get('div[draggable="false"]').drag('div[class="flex items-center justify-center text-slate-600 dark:text-slate-300"]',{force:true});
     
   });
 });
