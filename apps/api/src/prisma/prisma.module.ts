@@ -1,12 +1,14 @@
 import { type DynamicModule, Module } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@open-data-capture/database';
+import { PrismaClient } from '@open-data-capture/database';
 
 import { PRISMA_CLIENT_TOKEN } from './prisma.constants';
 import { getModelReferenceName } from './prisma.utils';
 
+import type { ModelSimplifiedName } from './prisma.types';
+
 @Module({})
 export class PrismaModule {
-  static forFeature<T extends Prisma.ModelName>(modelName: T): DynamicModule {
+  static forFeature<T extends ModelSimplifiedName>(modelName: T): DynamicModule {
     return {
       exports: [modelName],
       module: PrismaModule,

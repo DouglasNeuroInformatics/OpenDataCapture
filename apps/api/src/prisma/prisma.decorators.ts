@@ -1,12 +1,14 @@
 import { Inject } from '@nestjs/common';
-import { Prisma } from '@open-data-capture/database';
 
 import { PRISMA_CLIENT_TOKEN } from './prisma.constants';
+import { getModelToken } from './prisma.utils';
+
+import type { ModelSimplifiedName } from './prisma.types';
 
 export const InjectPrismaClient = () => {
   return Inject(PRISMA_CLIENT_TOKEN);
 };
 
-export const InjectModel = <T extends Prisma.ModelName>(modelName: T): ReturnType<typeof Inject> => {
-  return Inject(modelName);
+export const InjectModel = <T extends ModelSimplifiedName>(modelName: T): ReturnType<typeof Inject> => {
+  return Inject(getModelToken(modelName));
 };
