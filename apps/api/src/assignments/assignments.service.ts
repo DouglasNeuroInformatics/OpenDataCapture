@@ -1,4 +1,5 @@
-// import { accessibleBy } from '@casl/mongoose';
+import { subject } from '@casl/ability';
+import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -7,10 +8,6 @@ import { assignmentBundleSchema } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
-// import { SubjectsService } from '@/subjects/subjects.service';
-
-import { subject } from '@casl/ability';
-import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 

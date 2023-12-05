@@ -7,9 +7,9 @@ import type { HttpRedirectResponse } from '@nestjs/common/interfaces';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Assignment } from '@open-data-capture/common/assignment';
-import type { BaseAppAbility } from '@open-data-capture/common/core';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import type { AppAbility } from '@/core/types';
 
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
@@ -42,7 +42,7 @@ export class AssignmentsController implements Pick<EntityController<Assignment>,
   @ApiOperation({ summary: 'Get All Assignments' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Assignment' })
-  find(@CurrentUser('ability') ability?: BaseAppAbility, @Query('subjectIdentifier') subjectIdentifier?: string) {
+  find(@CurrentUser('ability') ability?: AppAbility, @Query('subjectIdentifier') subjectIdentifier?: string) {
     return this.assignmentsService.find({ subjectIdentifier }, { ability });
   }
 
@@ -50,7 +50,7 @@ export class AssignmentsController implements Pick<EntityController<Assignment>,
   @Get('summary')
   @RouteAccess({ action: 'read', subject: 'Assignment' })
   findSummaries(
-    @CurrentUser('ability') ability?: BaseAppAbility,
+    @CurrentUser('ability') ability?: AppAbility,
     @Query('subjectIdentifier') subjectIdentifier?: string
   ) {
     return this.assignmentsService.find({ subjectIdentifier }, { ability });

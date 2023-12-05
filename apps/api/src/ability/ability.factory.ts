@@ -3,7 +3,7 @@ import { createPrismaAbility } from '@casl/prisma';
 import { Injectable, Logger } from '@nestjs/common';
 import type { UserModel } from '@open-data-capture/database';
 
-import type { AppAbility } from './ability.types';
+import type { AppAbility } from '@/core/types';
 
 @Injectable()
 export class AbilityFactory {
