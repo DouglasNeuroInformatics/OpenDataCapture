@@ -19,6 +19,7 @@ model GroupModel {
   subjectIds        String[]                @db.ObjectId
   userIds           String[]                @db.ObjectId
   users             UserModel[]
+  VisitModel        VisitModel[]
 }
 
 /// Instrument Records
@@ -80,6 +81,7 @@ model SubjectModel {
   lastName          String?
   sex               String
   instrumentRecords InstrumentRecordModel[]
+  VisitModel        VisitModel[]
 }
 
 enum BasePermissionLevel {
@@ -89,23 +91,25 @@ enum BasePermissionLevel {
 }
 
 model UserModel {
-  createdAt           DateTime   @default(now()) @db.Date
-  updatedAt           DateTime   @updatedAt @db.Date
-  id                  String     @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt           DateTime             @default(now()) @db.Date
+  updatedAt           DateTime             @updatedAt @db.Date
+  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
   basePermissionLevel BasePermissionLevel?
   firstName           String?
-  groupIds            String[]   @db.ObjectId
-  groups              GroupModel @relation(fields: [groupIds], references: [id])
+  groupIds            String[]             @db.ObjectId
+  groups              GroupModel           @relation(fields: [groupIds], references: [id])
   lastName            String?
   password            String
   username            String
 }
 
 model VisitModel {
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime @db.Date
-  group     String   @db.ObjectId
-  subject   String   @db.ObjectId
+  createdAt DateTime     @default(now()) @db.Date
+  updatedAt DateTime     @updatedAt @db.Date
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime     @db.Date
+  group     GroupModel?   @relation(fields: [groupId], references: [id])
+  groupId   String?       @db.ObjectId
+  subject   SubjectModel @relation(fields: [subjectId], references: [id])
+  subjectId String       @db.ObjectId
 }
