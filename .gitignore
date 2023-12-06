@@ -37,3 +37,6 @@ yarn-error.log*
 
 # bun
 bun.lockb
+
+# intermediary docs
+packages/common/docs
