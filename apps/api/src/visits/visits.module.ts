@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule, SchemaFactory } from '@nestjs/mongoose';
 
 import { GroupsModule } from '@/groups/groups.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
-import { VisitEntity } from './entities/visit.entity';
 import { VisitsController } from './visits.controller';
-import { VisitsRepository } from './visits.repository';
 import { VisitsService } from './visits.service';
 
 @Module({
@@ -14,14 +12,9 @@ import { VisitsService } from './visits.service';
   exports: [VisitsService],
   imports: [
     GroupsModule,
-    MongooseModule.forFeature([
-      {
-        name: VisitEntity.modelName,
-        schema: SchemaFactory.createForClass(VisitEntity)
-      }
-    ]),
+    PrismaModule.forFeature('Visit'),
     SubjectsModule
   ],
-  providers: [VisitsRepository, VisitsService]
+  providers: [VisitsService]
 })
 export class VisitsModule {}

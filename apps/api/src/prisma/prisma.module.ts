@@ -31,9 +31,18 @@ export class PrismaModule {
       providers: [
         {
           provide: PRISMA_CLIENT_TOKEN,
-          useValue: new PrismaClient()
+          useValue: this.createClient()
         }
       ]
     };
+  }
+  private static createClient() {
+    return new PrismaClient().$extends({
+      model: {
+        groupModel: {
+          __model__: 'Group'
+        }
+      }
+    });
   }
 }

@@ -5,6 +5,6 @@ import { type CreateVisitData, createVisitDataSchema } from '@open-data-capture/
 @ValidationSchema<CreateVisitData>(createVisitDataSchema)
 export class CreateVisitDto {
   date: Date;
-  groupId: null | string;
+  groupId?: string;
   subjectIdData: SubjectIdentificationData;
 }

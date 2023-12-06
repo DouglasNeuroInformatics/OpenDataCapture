@@ -9,7 +9,7 @@ import { GroupsService } from './groups.service';
   controllers: [GroupsController],
   exports: [GroupsService],
   imports: [
-    PrismaModule.forFeature('GroupModel')
+    PrismaModule.forFeature('Group')
   ],
   providers: [GroupsService]
 })
