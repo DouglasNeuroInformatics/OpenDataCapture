@@ -1,11 +1,10 @@
 import { CurrentUser, type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
-import type { ObjectIdLike } from '@douglasneuroinformatics/nestjs/modules';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { AppAbility } from '@open-data-capture/common/core';
 import type { Group } from '@open-data-capture/common/group';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import type { AppAbility } from '@/core/types';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -40,7 +39,7 @@ export class GroupsController implements EntityController<Group> {
   @ApiOperation({ summary: 'Get Group' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findById(@Param('id', ParseIdPipe) id: ObjectIdLike, @CurrentUser('ability') ability: AppAbility) {
+  findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.groupsService.findById(id, { ability });
   }
 

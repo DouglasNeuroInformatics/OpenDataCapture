@@ -18,7 +18,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
   constructor(
     configService: ConfigService,
     private readonly httpService: HttpService,
-    private readonly instrumentsService: InstrumentsService
+    private readonly instrumentsService: InstrumentsService // private readonly subjectsService: SubjectsService
   ) {
     this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
   }
@@ -28,7 +28,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     const dto: CreateAssignmentBundleData = {
       expiresAt,
       instrumentBundle: instrument.bundle,
-      instrumentId: instrument._id.toString(),
+      instrumentId: instrument.id as string,
       subjectIdentifier
     };
     const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, dto);
@@ -45,10 +45,6 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     const assignments: Assignment[] = [];
     for (const bundle of assignmentBundles) {
       const instrument = await this.instrumentsService.findById(bundle.instrumentId);
-      // TO BE REMOVED
-      if (instrument.kind !== 'form') {
-        throw new Error('Not implemented for non-form assignments');
-      }
       const assignment = subject('Assignment', { ...bundle, instrument });
       if (ability && !ability.can('read', assignment)) {
         continue;

@@ -3,7 +3,7 @@
 import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { AppAbility } from '@open-data-capture/common/core';
+import type { BaseAppAbility } from '@open-data-capture/common/core';
 import { z } from 'zod';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -19,7 +19,7 @@ export class InstrumentRecordsController {
   @ApiOperation({ summary: 'Create Instrument Record' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
-  create(@Body() data: CreateInstrumentRecordDto, @CurrentUser('ability') ability: AppAbility) {
+  create(@Body() data: CreateInstrumentRecordDto, @CurrentUser('ability') ability: BaseAppAbility) {
     return this.instrumentRecordsService.create(data, { ability });
   }
 
@@ -27,7 +27,7 @@ export class InstrumentRecordsController {
   @Get()
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   find(
-    @CurrentUser('ability') ability: AppAbility,
+    @CurrentUser('ability') ability: BaseAppAbility,
     @Query(
       'minDate',
       new ParseSchemaPipe({
@@ -46,7 +46,7 @@ export class InstrumentRecordsController {
   @ApiOperation({ summary: 'Export Records' })
   @Get('export')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  exportRecords(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
+  exportRecords(@CurrentUser('ability') ability: BaseAppAbility, @Query('groupId') groupId?: string) {
     return this.instrumentRecordsService.exportRecords({ groupId }, { ability });
   }
 
@@ -54,7 +54,7 @@ export class InstrumentRecordsController {
   @Get('linear-model')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   linearModel(
-    @CurrentUser('ability') ability: AppAbility,
+    @CurrentUser('ability') ability: BaseAppAbility,
     @Query('instrumentId') instrumentId: string,
     @Query('groupId') groupId?: string
   ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {

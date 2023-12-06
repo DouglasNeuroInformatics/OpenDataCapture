@@ -1,8 +1,0 @@
-{
-  "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["./src/index.ts"],
-  "hideGenerator": true,
-  "out": "docs",
-  "plugin": ["typedoc-plugin-zod"],
-  "readme": "none"
-}

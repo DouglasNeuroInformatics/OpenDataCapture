@@ -1,14 +1,16 @@
-import { DatabaseModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module } from '@nestjs/common';
 
-import { GroupEntity } from './entities/group.entity';
+import { PrismaModule } from '@/prisma/prisma.module';
+
 import { GroupsController } from './groups.controller';
 import { GroupsService } from './groups.service';
 
 @Module({
   controllers: [GroupsController],
   exports: [GroupsService],
-  imports: [DatabaseModule.forFeature([GroupEntity])],
+  imports: [
+    PrismaModule.forFeature('Group')
+  ],
   providers: [GroupsService]
 })
 export class GroupsModule {}

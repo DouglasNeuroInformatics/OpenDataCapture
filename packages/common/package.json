@@ -20,7 +20,6 @@
   "module": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "build:docs": "typedoc",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
@@ -30,6 +29,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@casl/prisma": "^1.4.1",
     "@douglasneuroinformatics/form-types": "latest",
     "@types/react": "^18.2.39"
   }

@@ -12,6 +12,6 @@ export const visitSchema = z.object({
 
 export const createVisitDataSchema = z.object({
   date: z.coerce.date(),
-  groupId: z.union([z.null(), z.string()]),
+  groupId: z.string().optional(),
   subjectIdData: subjectIdentificationDataSchema
 }) satisfies Zod.ZodType<CreateVisitData>;

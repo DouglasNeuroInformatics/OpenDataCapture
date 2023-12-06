@@ -1,11 +1,13 @@
 import { LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
-import { AjvModule, CryptoModule, DatabaseModule } from '@douglasneuroinformatics/nestjs/modules';
+import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { Connection } from 'mongoose';
+import mongooseAutoPopulate from 'mongoose-autopopulate';
 
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
@@ -14,6 +16,7 @@ import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';
@@ -35,15 +38,6 @@ import { VisitsModule } from './visits/visits.module';
         secretKey: configService.getOrThrow('SECRET_KEY')
       })
     }),
-    DatabaseModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
-          uri: configService.getOrThrow<string>('MONGO_URI')
-        };
-      }
-    }),
     GatewayModule,
     GroupsModule,
     InstrumentsModule,
@@ -51,12 +45,17 @@ import { VisitsModule } from './visits/visits.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
+          connectionFactory: (connection: Connection): Connection => {
+            connection.plugin(mongooseAutoPopulate);
+            return connection;
+          },
           dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
           ignoreUndefined: true,
           uri: configService.getOrThrow<string>('MONGO_URI')
         };
       }
     }),
+    PrismaModule.forRoot(),
     SubjectsModule,
     ThrottlerModule.forRoot([
       {

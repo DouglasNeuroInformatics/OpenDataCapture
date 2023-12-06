@@ -1,6 +1,4 @@
-import { subject } from '@casl/ability';
 import { accessibleBy } from '@casl/mongoose';
-import { InjectRepository, type ObjectIdLike, type Repository } from '@douglasneuroinformatics/nestjs/modules';
 import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
@@ -8,55 +6,65 @@ import {
   NotFoundException,
   UnprocessableEntityException
 } from '@nestjs/common/exceptions';
-import { formInstrumentSchema } from '@open-data-capture/common/instrument';
-import type {
-  BaseInstrument,
-  Instrument,
-  InstrumentSource,
-  InstrumentSummary
-} from '@open-data-capture/common/instrument';
+import type { BaseInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
+import { baseInstrumentSchema } from '@open-data-capture/common/instrument';
 import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
-import type { Filter } from 'mongodb';
+import type { FilterQuery } from 'mongoose';
 
 import type { EntityOperationOptions } from '@/core/types';
 
-import { InstrumentEntity } from './entities/instrument.entity';
-
-import type { CreateInstrumentDto } from './dto/create-instrument.dto';
-import type { PopulatedInstrument } from './instruments.types';
+import { MutateInstrumentDto } from './dto/mutate-instrument.dto';
+import { InstrumentsRepository } from './instruments.repository';
 
 @Injectable()
 export class InstrumentsService {
   private readonly instrumentTransformer = new InstrumentTransformer();
 
-  constructor(
-    @InjectRepository(InstrumentEntity) private readonly instrumentsRepository: Repository<InstrumentEntity>
-  ) {}
+  constructor(private readonly instrumentsRepository: InstrumentsRepository) {}
 
-  async count() {
-    return this.instrumentsRepository.count();
+  async count(filter: FilterQuery<BaseInstrument> = {}, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentsRepository.count({
+      $and: [filter, ability ? accessibleBy(ability, 'read').Instrument : {}]
+    });
   }
 
-  async create({ source }: CreateInstrumentDto): Promise<InstrumentEntity> {
-    const { bundle, instance } = await this.parseSource(source, formInstrumentSchema);
+  async create({ source }: MutateInstrumentDto) {
+    const { instance } = await this.parseSource(source, baseInstrumentSchema);
     if (await this.instrumentsRepository.exists({ name: instance.name })) {
       throw new ConflictException(`Instrument with name '${instance.name}' already exists!`);
     }
-    return this.instrumentsRepository.create({ bundle, source, ...instance });
+    return this.instrumentsRepository.createFromSource(source);
+  }
+
+  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
+    const instrument = await this.instrumentsRepository.findById(id);
+    if (!instrument) {
+      throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
+    } else if (ability && !ability.can('delete', instrument)) {
+      throw new ForbiddenException(`Insufficient rights to delete instrument with ID: ${id}`);
+    }
+    return (await this.instrumentsRepository.deleteById(id))!;
+  }
+
+  async find(query: FilterQuery<BaseInstrument> = {}, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentsRepository.find({
+      $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
+    });
   }
 
   async findAvailable(
-    query: Filter<BaseInstrument> = {},
+    query: FilterQuery<BaseInstrument> = {},
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentSummary[]> {
-    return this.instrumentsRepository.find(
+    // TBD: Figure out a better way to do this
+    const summaries = await this.instrumentsRepository.find(
       {
         $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
       },
       {
-        ignoreUndefined: true,
         projection: {
+          bundle: true,
           details: true,
           kind: true,
           language: true,
@@ -66,47 +74,50 @@ export class InstrumentsService {
         }
       }
     );
-  }
-
-  async findById<T extends Instrument>(
-    id: ObjectIdLike,
-    { ability }: EntityOperationOptions = {}
-  ): Promise<PopulatedInstrument<T>> {
-    const entity = await this.instrumentsRepository.findById(id, {
-      projection: { _id: true, bundle: true, source: true }
-    });
-    if (!entity) {
-      throw new NotFoundException(`Failed to find instrument with ID: ${id.toString()}`);
-    }
-    const instrument: T = evaluateInstrument<T>(entity.bundle);
-    if (ability && !ability.can('read', subject('Instrument', instrument))) {
-      throw new ForbiddenException(`Insufficient rights to read instrument with ID: ${id.toString()}`);
-    }
-    return { _id: entity._id, bundle: '', source: '', ...instrument };
-  }
-
-  async findSources(
-    query: Filter<BaseInstrument>,
-    { ability }: EntityOperationOptions = {}
-  ): Promise<InstrumentSource[]> {
-    return this.instrumentsRepository.find(
-      {
-        $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
-      },
-      {
-        ignoreUndefined: true,
-        projection: {
-          source: true
-        }
-      }
+    return summaries.map((doc) =>
+      doc.toObject({
+        transform: (_, ret) => {
+          delete ret._id;
+          delete ret.bundle;
+          delete ret.content;
+          delete ret.validationSchema;
+        },
+        virtuals: true
+      })
     );
+  }
+
+  async findById(id: string, { ability }: EntityOperationOptions = {}) {
+    const instrument = await this.instrumentsRepository.findById(id);
+    if (!instrument) {
+      throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
+    } else if (ability && !ability.can('read', instrument)) {
+      throw new ForbiddenException(`Insufficient rights to read instrument with ID: ${id}`);
+    }
+    return instrument;
+  }
+
+  async findSources(query: FilterQuery<BaseInstrument> = {}, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentsRepository.find({
+      $and: [query, ability ? accessibleBy(ability, 'read').Instrument : {}]
+    });
+  }
+
+  async updateById(id: string, { source }: MutateInstrumentDto, { ability }: EntityOperationOptions = {}) {
+    const instrument = await this.instrumentsRepository.findById(id);
+    if (!instrument) {
+      throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
+    } else if (ability && !ability.can('update', instrument)) {
+      throw new ForbiddenException(`Insufficient rights to update instrument with ID: ${id}`);
+    }
+    return (await this.instrumentsRepository.updateById(id, { source }))!;
   }
 
   /**
    * Attempt to resolve an instance of an instrument from the TypeScript source code.
    * If this fails, then throws an UnprocessableContentException
    */
-  private async parseSource<T extends Instrument>(source: string, schema: Zod.ZodType<T>) {
+  private async parseSource<T extends BaseInstrument>(source: string, schema: Zod.ZodType<T>) {
     let bundle: string;
     let instance: unknown;
     try {

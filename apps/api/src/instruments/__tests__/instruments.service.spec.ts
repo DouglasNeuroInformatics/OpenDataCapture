@@ -1,11 +1,9 @@
 import { beforeEach, describe, expect, it } from 'bun:test';
 
-import { getRepositoryToken } from '@douglasneuroinformatics/nestjs/modules';
-import { DatabaseRepository } from '@douglasneuroinformatics/nestjs/modules';
 import { createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
-import { InstrumentEntity } from '../entities/instrument.entity';
+import { InstrumentsRepository } from '../instruments.repository';
 import { InstrumentsService } from '../instruments.service';
 
 describe('InstrumentsService', () => {
@@ -16,8 +14,8 @@ describe('InstrumentsService', () => {
       providers: [
         InstrumentsService,
         {
-          provide: getRepositoryToken(InstrumentEntity),
-          useValue: createMock(DatabaseRepository(InstrumentEntity))
+          provide: InstrumentsRepository,
+          useValue: createMock<InstrumentsRepository>
         }
       ]
     }).compile();

@@ -7,7 +7,7 @@ type NavbarProps = {
 };
 
 const Navbar = ({ url }: NavbarProps) => {
-  const { resolvedLanguage, translatePath, t } = useTranslations(url);
+  const { resolvedLanguage, t, translatePath } = useTranslations(url);
   return (
     <CoreNavbar
       i18n={{
