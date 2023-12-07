@@ -3,6 +3,7 @@ import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Group } from '@open-data-capture/common/group';
 
+import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
@@ -24,7 +25,7 @@ export class GroupsService implements EntityService<Group> {
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
     return this.groupModel.delete({
-      where: { AND: [ability ? accessibleBy(ability, 'delete').GroupModel : {}], id }
+      where: { AND: [accessibleQuery(ability, 'delete', 'GroupModel')], id }
     });
   }
 
