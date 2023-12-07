@@ -14,16 +14,18 @@ export class PrismaModule {
     return new PrismaClient().$extends({
       model: {
         $allModels: {
+          get __model__() {
+            const context = Prisma.getExtensionContext(this);
+            return context.$name;
+          },
           async exists<T>(this: T, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
             // Get the current model at runtime
             const context = Prisma.getExtensionContext(this);
+            context.$name;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             const result = await (context as any).findFirst({ where });
             return result !== null;
           }
-        },
-        groupModel: {
-          __model__: 'Group'
         }
       }
     });

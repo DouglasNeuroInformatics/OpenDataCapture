@@ -25,21 +25,21 @@ export class GroupsController implements EntityController<Group> {
   @ApiOperation({ summary: 'Delete Group' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Group' })
-  deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+  deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability?: AppAbility) {
     return this.groupsService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Get All Groups' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findAll(@CurrentUser('ability') ability: AppAbility) {
+  findAll(@CurrentUser('ability') ability?: AppAbility) {
     return this.groupsService.findAll({ ability });
   }
 
   @ApiOperation({ summary: 'Get Group' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+  findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability?: AppAbility) {
     return this.groupsService.findById(id, { ability });
   }
 
@@ -49,7 +49,7 @@ export class GroupsController implements EntityController<Group> {
   updateById(
     @Param('id', ParseIdPipe) id: string,
     @Body() update: UpdateGroupDto,
-    @CurrentUser('ability') ability: AppAbility
+    @CurrentUser('ability') ability?: AppAbility
   ) {
     return this.groupsService.updateById(id, update, { ability });
   }

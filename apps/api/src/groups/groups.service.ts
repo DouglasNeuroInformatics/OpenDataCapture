@@ -15,7 +15,7 @@ export class GroupsService implements EntityService<Group> {
   constructor(@InjectModel('Group') private readonly groupModel: Model<'Group'>) {}
 
   async create(group: CreateGroupDto) {
-    const exists = (await this.groupModel.findFirst({ where: { name: group.name } })) !== null;
+    const exists = await this.groupModel.exists({ name: group.name });
     if (exists) {
       throw new ConflictException(`Group with name '${group.name}' already exists!`);
     }
