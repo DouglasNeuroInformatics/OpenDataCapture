@@ -35,14 +35,11 @@ export class GroupsService implements EntityService<Group> {
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
-    return this.groupModel.findFirst({
+    const group = await this.groupModel.findFirst({
       where: { AND: [ability ? accessibleBy(ability, '').GroupModel : {}], id }
     });
-    const group = await this.groupsRepository.findById(id);
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
-    } else if (ability && !ability.can('read', group)) {
-      throw new ForbiddenException(`Insufficient rights to read group with ID: ${id}`);
     }
     return group;
   }
