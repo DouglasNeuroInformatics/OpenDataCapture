@@ -1,13 +1,33 @@
 import { type DynamicModule, Module } from '@nestjs/common';
-import { PrismaClient } from '@open-data-capture/database';
+import { Prisma, PrismaClient } from '@open-data-capture/database';
 
 import { PRISMA_CLIENT_TOKEN } from './prisma.constants';
-import { getModelReferenceName } from './prisma.utils';
+import { getModelReferenceName, getModelToken } from './prisma.utils';
 
 import type { ModelSimplifiedName } from './prisma.types';
 
+export type AppPrismaClient = ReturnType<typeof PrismaModule.createClient>;
+
 @Module({})
 export class PrismaModule {
+  static createClient() {
+    return new PrismaClient().$extends({
+      model: {
+        $allModels: {
+          async exists<T>(this: T, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
+            // Get the current model at runtime
+            const context = Prisma.getExtensionContext(this);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            const result = await (context as any).findFirst({ where });
+            return result !== null;
+          }
+        },
+        groupModel: {
+          __model__: 'Group'
+        }
+      }
+    });
+  }
   static forFeature<T extends ModelSimplifiedName>(modelName: T): DynamicModule {
     return {
       exports: [modelName],
@@ -15,8 +35,8 @@ export class PrismaModule {
       providers: [
         {
           inject: [PRISMA_CLIENT_TOKEN],
-          provide: modelName,
-          useFactory: (client: PrismaClient) => {
+          provide: getModelToken(modelName),
+          useFactory: (client: AppPrismaClient) => {
             return client[getModelReferenceName(modelName)];
           }
         }
@@ -35,14 +55,5 @@ export class PrismaModule {
         }
       ]
     };
-  }
-  private static createClient() {
-    return new PrismaClient().$extends({
-      model: {
-        groupModel: {
-          __model__: 'Group'
-        }
-      }
-    });
   }
 }
