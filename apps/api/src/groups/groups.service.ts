@@ -1,6 +1,6 @@
 import { accessibleBy } from '@casl/prisma';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Group } from '@open-data-capture/common/group';
 
 import type { EntityOperationOptions } from '@/core/types';
@@ -36,7 +36,7 @@ export class GroupsService implements EntityService<Group> {
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
     const group = await this.groupModel.findFirst({
-      where: { AND: [ability ? accessibleBy(ability, '').GroupModel : {}], id }
+      where: { AND: [ability ? accessibleBy(ability, 'read').GroupModel : {}], id }
     });
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
@@ -45,22 +45,19 @@ export class GroupsService implements EntityService<Group> {
   }
 
   async findByName(name: string, { ability }: EntityOperationOptions = {}) {
-    const group = await this.groupsRepository.findOne({ name });
+    const group = await this.groupModel.findFirst({
+      where: { AND: [ability ? accessibleBy(ability, 'read').GroupModel : {}], name }
+    });
     if (!group) {
       throw new NotFoundException(`Failed to find group with name: ${name}`);
-    } else if (ability && !ability.can('read', group)) {
-      throw new ForbiddenException(`Insufficient rights to read group with name: ${name}`);
     }
     return group;
   }
 
-  async updateById(id: string, update: UpdateGroupDto, { ability }: EntityOperationOptions = {}) {
-    const group = await this.groupsRepository.findById(id);
-    if (!group) {
-      throw new NotFoundException(`Failed to find group with ID: ${id}`);
-    } else if (ability && !ability.can('update', group)) {
-      throw new ForbiddenException(`Insufficient rights to update group with ID: ${id}`);
-    }
-    return (await this.groupsRepository.updateById(id, update))!;
+  async updateById(id: string, data: UpdateGroupDto, { ability }: EntityOperationOptions = {}) {
+    return this.groupModel.update({
+      data,
+      where: { AND: [ability ? accessibleBy(ability, 'update').GroupModel : {}], id }
+    });
   }
 }
