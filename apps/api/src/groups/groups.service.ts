@@ -1,4 +1,3 @@
-import { accessibleBy } from '@casl/prisma';
 import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Group } from '@open-data-capture/common/group';
@@ -25,19 +24,19 @@ export class GroupsService implements EntityService<Group> {
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
     return this.groupModel.delete({
-      where: { AND: [accessibleQuery(ability, 'delete', 'GroupModel')], id }
+      where: { AND: [accessibleQuery(ability, 'delete', 'Group')], id }
     });
   }
 
   async findAll({ ability }: EntityOperationOptions = {}) {
     return this.groupModel.findMany({
-      where: ability ? accessibleBy(ability, 'read').GroupModel : undefined
+      where: accessibleQuery(ability, 'read', 'Group')
     });
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
     const group = await this.groupModel.findFirst({
-      where: { AND: [ability ? accessibleBy(ability, 'read').GroupModel : {}], id }
+      where: { AND: [accessibleQuery(ability, 'read', 'Group')], id }
     });
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
@@ -47,7 +46,7 @@ export class GroupsService implements EntityService<Group> {
 
   async findByName(name: string, { ability }: EntityOperationOptions = {}) {
     const group = await this.groupModel.findFirst({
-      where: { AND: [ability ? accessibleBy(ability, 'read').GroupModel : {}], name }
+      where: { AND: [accessibleQuery(ability, 'read', 'Group'), { name }] }
     });
     if (!group) {
       throw new NotFoundException(`Failed to find group with name: ${name}`);
@@ -58,7 +57,7 @@ export class GroupsService implements EntityService<Group> {
   async updateById(id: string, data: UpdateGroupDto, { ability }: EntityOperationOptions = {}) {
     return this.groupModel.update({
       data,
-      where: { AND: [ability ? accessibleBy(ability, 'update').GroupModel : {}], id }
+      where: { AND: [accessibleQuery(ability, 'update', 'Group')], id }
     });
   }
 }
