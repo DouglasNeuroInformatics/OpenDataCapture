@@ -1,11 +1,12 @@
 import { type Instrument, formInstrumentSchema } from '@open-data-capture/common/instrument';
+import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
 type InstrumentContext = {
   z: typeof z;
 };
 
-type InstrumentFactory<T extends Instrument> = (ctx: InstrumentContext) => T;
+type InstrumentFactory<T extends Instrument> = (ctx: InstrumentContext) => Promisable<T>;
 
 function validateInstrument<T extends Instrument>(instrument: T) {
   switch (instrument.kind) {
@@ -21,12 +22,12 @@ type EvaluateInstrumentOptions = {
   validate?: boolean;
 };
 
-export function evaluateInstrument<T extends Instrument = Instrument>(
+export async function evaluateInstrument<T extends Instrument = Instrument>(
   bundle: string,
   { validate }: EvaluateInstrumentOptions = { validate: false }
 ) {
   const factory = (0, eval)(`"use strict"; ${bundle}`) as InstrumentFactory<T>;
-  const result = factory({ z });
+  const result = await factory({ z });
   if (validate) {
     return validateInstrument(result);
   }
