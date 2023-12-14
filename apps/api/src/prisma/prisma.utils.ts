@@ -2,19 +2,23 @@ import { jest } from 'bun:test';
 
 import type { Provider } from '@nestjs/common';
 
-import type { ModelEntityName } from './prisma.types';
+import type { ModelEntityName, ModelName } from './prisma.types';
 
-export function getModelReferenceName<T extends ModelEntityName>(modelName: T) {
-  return (modelName.charAt(0).toLowerCase() + modelName.slice(1) + 'Model') as `${Uncapitalize<T>}Model`;
+export function getModelReferenceName<T extends ModelEntityName>(entityName: T) {
+  return (entityName.charAt(0).toLowerCase() + entityName.slice(1) + 'Model') as `${Uncapitalize<T>}Model`;
 }
 
-export function getModelToken<T extends ModelEntityName>(modelName: T) {
-  return modelName + 'PrismaModel';
+export function getModelName<T extends ModelEntityName>(entityName: T) {
+  return entityName + 'Model' as ModelName<T>
 }
 
-export function createMockModelProvider<T extends ModelEntityName>(modelName: T): Provider {
+export function getModelToken<T extends ModelEntityName>(entityName: T) {
+  return entityName + 'PrismaModel';
+}
+
+export function createMockModelProvider<T extends ModelEntityName>(entityName: T): Provider {
   return {
-    provide: getModelToken(modelName),
+    provide: getModelToken(entityName),
     useValue: {
       aggregate: jest.fn(),
       aggregateRaw: jest.fn(),
