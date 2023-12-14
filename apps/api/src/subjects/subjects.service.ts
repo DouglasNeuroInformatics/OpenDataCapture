@@ -1,7 +1,6 @@
-import { accessibleBy } from '@casl/mongoose';
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Subject } from '@open-data-capture/common/subject';
 import type { Prisma } from '@open-data-capture/database';
 import unidecode from 'unidecode';
@@ -28,7 +27,7 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
 
   async count(where: Prisma.SubjectModelWhereInput = {}, { ability }: EntityOperationOptions = {}) {
     return this.subjectModel.count({
-      where: { AND: [accessibleQuery(ability, 'read', 'GroupModel'), where] }
+      where: { AND: [accessibleQuery(ability, 'read', 'Subject'), where] }
     });
   }
 
@@ -47,31 +46,30 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
   }
 
   async deleteById(identifier: string, { ability }: EntityOperationOptions = {}) {
-    const subject = await this.subjectsRepository.findOne({ identifier });
-    if (!subject) {
-      throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
-    } else if (ability && !ability.can('delete', subject)) {
-      throw new ForbiddenException(`Insufficient rights to delete subject with identifier: ${identifier}`);
-    }
-    return (await this.subjectsRepository.deleteOne({ identifier }))!;
+    const subject = await this.findById(identifier);
+    return this.subjectModel.delete({
+      where: { AND: [accessibleQuery(ability, 'delete', 'Subject')], id: subject.id }
+    });
   }
 
   async findAll({ ability }: EntityOperationOptions = {}) {
     return this.subjectModel.findMany({
-      where: accessibleQuery(ability, 'read', 'GroupModel')
+      where: accessibleQuery(ability, 'read', 'Subject')
     });
   }
 
   async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
-    const group = await this.groupsService.findByName(groupName);
-    return this.subjectsRepository.find({
-      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read').Subject : {}]
+    const group = await this.groupsService.findByName(groupName, { ability });
+    return this.subjectModel.findMany({
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'Subject'), { groupIds: { has: group.id } }]
+      }
     });
   }
 
   async findById(identifier: string, { ability }: EntityOperationOptions = {}) {
-    const subject = await this.subjectsRepository.findOne({
-      $and: [ability ? accessibleBy(ability, 'read').Subject : {}, { identifier }]
+    const subject = await this.subjectModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'read', 'Subject'), { identifier }] }
     });
     if (!subject) {
       throw new NotFoundException(`Failed to find subject with identifier: ${identifier}`);
