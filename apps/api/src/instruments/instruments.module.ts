@@ -3,7 +3,6 @@ import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
 
 import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
 import { InstrumentsController } from './instruments.controller';
-import { InstrumentsRepository } from './instruments.repository';
 import { InstrumentsService } from './instruments.service';
 
 @Module({
@@ -17,6 +16,6 @@ import { InstrumentsService } from './instruments.service';
       }
     ])
   ],
-  providers: [InstrumentsRepository, InstrumentsService]
+  providers: [InstrumentsService]
 })
 export class InstrumentsModule {}

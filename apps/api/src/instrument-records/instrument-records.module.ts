@@ -7,7 +7,6 @@ import { SubjectsModule } from '@/subjects/subjects.module';
 
 import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity';
 import { InstrumentRecordsController } from './instrument-records.controller';
-import { InstrumentRecordsRepository } from './instrument-records.repository';
 import { InstrumentRecordsService } from './instrument-records.service';
 
 @Module({
@@ -24,6 +23,6 @@ import { InstrumentRecordsService } from './instrument-records.service';
     ]),
     SubjectsModule
   ],
-  providers: [InstrumentRecordsRepository, InstrumentRecordsService]
+  providers: [InstrumentRecordsService]
 })
 export class InstrumentRecordsModule {}

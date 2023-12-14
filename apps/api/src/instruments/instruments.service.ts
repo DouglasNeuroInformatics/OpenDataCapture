@@ -15,7 +15,6 @@ import type { FilterQuery } from 'mongoose';
 import type { EntityOperationOptions } from '@/core/types';
 
 import { MutateInstrumentDto } from './dto/mutate-instrument.dto';
-import { InstrumentsRepository } from './instruments.repository';
 
 @Injectable()
 export class InstrumentsService {
