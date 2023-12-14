@@ -10,15 +10,17 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
 import { GroupsService } from '@/groups/groups.service';
+import type { Model } from '@/prisma/prisma.types';
+import { createMockModelProvider, getModelToken } from '@/prisma/prisma.utils';
 
 import { SubjectsController } from '../subjects.controller';
-import { SubjectsRepository } from '../subjects.repository';
 import { SubjectsService } from '../subjects.service';
 
 describe('/subjects', () => {
   let app: NestExpressApplication;
   let server: unknown;
-  let subjectsRepository: MockedInstance<SubjectsRepository>;
+
+  let subjectModel: MockedInstance<Model<'Subject'>>;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -33,10 +35,7 @@ describe('/subjects', () => {
           provide: GroupsService,
           useValue: createMock(GroupsService)
         },
-        {
-          provide: SubjectsRepository,
-          useValue: createMock(SubjectsRepository)
-        }
+        createMockModelProvider('Subject')
       ]
     }).compile();
 
@@ -47,7 +46,7 @@ describe('/subjects', () => {
     app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
-    subjectsRepository = app.get(SubjectsRepository);
+    subjectModel = app.get(getModelToken('Subject'));
 
     await app.init();
     server = app.getHttpServer();
@@ -80,7 +79,7 @@ describe('/subjects', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request where the subject already exists', async () => {
-      subjectsRepository.exists.mockResolvedValueOnce(true);
+      subjectModel.exists.mockResolvedValueOnce(true);
       const response = await request(server).post('/subjects').send(createSubjectDto);
       expect(response.status).toBe(HttpStatus.CONFLICT);
     });
@@ -96,7 +95,7 @@ describe('/subjects', () => {
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return an array of all subjects if no group is provided', async () => {
-      subjectsRepository.find.mockResolvedValueOnce([{ name: 'foo' }]);
+      subjectModel.findMany.mockResolvedValueOnce([{ name: 'foo' }]);
       const response = await request(server).get('/subjects');
       expect(response.body).toMatchObject([{ name: 'foo' }]);
     });
@@ -104,17 +103,17 @@ describe('/subjects', () => {
 
   describe('GET /subjects/:id', () => {
     it('should return status code 200 with a valid ID', async () => {
-      subjectsRepository.findOne.mockResolvedValueOnce({ name: 'foo' });
+      subjectModel.findFirst.mockResolvedValueOnce({ name: 'foo' });
       const response = await request(server).get('/subjects/123');
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should throw a not found exception if the subject does not exist', async () => {
-      subjectsRepository.findOne.mockResolvedValueOnce(null);
+      subjectModel.findFirst.mockResolvedValueOnce(null);
       const response = await request(server).get(`/subjects/123`);
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
     it('should return the subject if it exists', async () => {
-      subjectsRepository.findOne.mockResolvedValueOnce({ name: 'foo' });
+      subjectModel.findFirst.mockResolvedValueOnce({ name: 'foo' });
       const response = await request(server).get('/subjects/123');
       expect(response.body).toMatchObject({ name: 'foo' });
     });
@@ -122,7 +121,7 @@ describe('/subjects', () => {
 
   describe('DELETE /subjects/:id', () => {
     it('should return status code 200 with a valid ID', async () => {
-      subjectsRepository.findOne.mockResolvedValue({});
+      subjectModel.findFirst.mockResolvedValue({});
       const response = await request(server).delete('/subjects/123');
       expect(response.status).toBe(HttpStatus.OK);
     });
