@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 
 import { GroupsModule } from '@/groups/groups.module';
 import { InstrumentsModule } from '@/instruments/instruments.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
-import { InstrumentRecordEntity, InstrumentRecordSchema } from './entities/instrument-record.entity';
 import { InstrumentRecordsController } from './instrument-records.controller';
 import { InstrumentRecordsService } from './instrument-records.service';
 
@@ -15,12 +14,7 @@ import { InstrumentRecordsService } from './instrument-records.service';
   imports: [
     GroupsModule,
     InstrumentsModule,
-    MongooseModule.forFeature([
-      {
-        name: InstrumentRecordEntity.modelName,
-        schema: InstrumentRecordSchema
-      }
-    ]),
+    PrismaModule.forFeature('InstrumentRecord'),
     SubjectsModule
   ],
   providers: [InstrumentRecordsService]
