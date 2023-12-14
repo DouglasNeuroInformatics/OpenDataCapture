@@ -3,17 +3,16 @@ import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Subject } from '@open-data-capture/common/subject';
-import type { FilterQuery } from 'mongoose';
+import type { Prisma } from '@open-data-capture/database';
 import unidecode from 'unidecode';
 
+import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
 
 import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
-import type { Prisma } from '@open-data-capture/database';
-import { accessibleQuery } from '@/ability/ability.utils';
 
 /**
  * Please note that although the SubjectsService implements EntityService, the `id` methods
@@ -29,7 +28,7 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
 
   async count(where: Prisma.SubjectModelWhereInput = {}, { ability }: EntityOperationOptions = {}) {
     return this.subjectModel.count({
-      where: { AND: [ability ? accessibleQuery(ability, 'read', 'GroupModel') : {}, where] }
+      where: { AND: [accessibleQuery(ability, 'read', 'GroupModel'), where] }
     });
   }
 
@@ -58,10 +57,9 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
   }
 
   async findAll({ ability }: EntityOperationOptions = {}) {
-    if (!ability) {
-      return this.subjectsRepository.find();
-    }
-    return this.subjectsRepository.find(accessibleBy(ability, 'read').Subject);
+    return this.subjectModel.findMany({
+      where: accessibleQuery(ability, 'read', 'GroupModel')
+    });
   }
 
   async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
