@@ -48,7 +48,7 @@ export class InstrumentsService {
   async find(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
     return this.instrumentModel.findMany({
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
-    });
+    })
   }
 
   async findAvailable(
