@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
 import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
-import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
+import { type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
@@ -10,8 +10,10 @@ import { importInstrumentSource } from '@open-data-capture/instruments/macros' w
 import { Types } from 'mongoose';
 import request from 'supertest';
 
+import type { Model } from '@/prisma/prisma.types';
+import { createMockModelProvider, getModelToken } from '@/prisma/prisma.utils';
+
 import { InstrumentsController } from '../instruments.controller';
-import { InstrumentsRepository } from '../instruments.repository';
 import { InstrumentsService } from '../instruments.service';
 
 const BPRS_SOURCE = importInstrumentSource('forms/brief-psychiatric-rating-scale');
@@ -24,17 +26,14 @@ describe('/instruments', () => {
   let app: NestExpressApplication;
   let server: unknown;
 
-  let instrumentsRepository: MockedInstance<InstrumentsRepository>;
+  let instrumentModel: MockedInstance<Model<'Instrument'>>;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [InstrumentsController],
       providers: [
         InstrumentsService,
-        {
-          provide: InstrumentsRepository,
-          useValue: createMock(InstrumentsRepository)
-        }
+        createMockModelProvider('Instrument')
       ]
     }).compile();
 
@@ -45,7 +44,7 @@ describe('/instruments', () => {
     app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
-    instrumentsRepository = app.get(InstrumentsRepository);
+    instrumentModel = app.get(getModelToken('Instrument'));
     await app.init();
     server = app.getHttpServer();
   });
@@ -98,7 +97,7 @@ describe('/instruments', () => {
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return all the instruments returned by the repository', async () => {
-      instrumentsRepository.find.mockResolvedValueOnce([{ id: 1, kind: 'form' }]);
+      instrumentModel.findMany.mockResolvedValueOnce([{ id: 1, kind: 'form' }]);
       const response = await request(server).get('/instruments');
       expect(response.body).toMatchObject([{ id: 1 }]);
     });
@@ -115,17 +114,17 @@ describe('/instruments', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
+      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).get(`/instruments/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should throw a not found exception if the instrument does not exist', async () => {
-      instrumentsRepository.findById.mockResolvedValueOnce(null);
+      instrumentModel.findFirst.mockResolvedValueOnce(null);
       const response = await request(server).get(`/instruments/${id}`);
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
     it('should return the instrument if it exists', async () => {
-      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
+      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).get(`/instruments/${id}`);
       expect(response.body).toMatchObject({ id });
     });
@@ -180,7 +179,7 @@ describe('/instruments', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
+      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'form' });
       const response = await request(server).delete(`/instruments/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });

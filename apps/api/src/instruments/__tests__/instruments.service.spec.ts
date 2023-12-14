@@ -1,28 +1,27 @@
 import { beforeEach, describe, expect, it } from 'bun:test';
 
-import { createMock } from '@douglasneuroinformatics/nestjs/testing';
+import { type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
-import { InstrumentsRepository } from '../instruments.repository';
+import type { Model } from '@/prisma/prisma.types';
+import { createMockModelProvider, getModelToken } from '@/prisma/prisma.utils';
+
 import { InstrumentsService } from '../instruments.service';
 
 describe('InstrumentsService', () => {
   let instrumentsService: InstrumentsService;
+  let instrumentModel: MockedInstance<Model<'Instrument'>>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [
-        InstrumentsService,
-        {
-          provide: InstrumentsRepository,
-          useValue: createMock<InstrumentsRepository>
-        }
-      ]
+      providers: [InstrumentsService, createMockModelProvider('Instrument')]
     }).compile();
     instrumentsService = moduleRef.get(InstrumentsService);
+    instrumentModel = moduleRef.get(getModelToken('Instrument'));
   });
 
   it('should be defined', () => {
     expect(instrumentsService).toBeDefined();
+    expect(instrumentModel).toBeDefined();
   });
 });
