@@ -10,3 +10,5 @@ export type ModelName<T extends ModelEntityName> = `${T}Model` & Prisma.ModelNam
 export type ModelEntityName = Replace<Prisma.ModelName, 'Model', ''>;
 
 export type Model<T extends ModelEntityName> = AppPrismaClient[`${Uncapitalize<T>}Model`];
+
+export type ModelUpdateData<T extends ModelEntityName> = Parameters<Model<T>['update']>[0]['data'];

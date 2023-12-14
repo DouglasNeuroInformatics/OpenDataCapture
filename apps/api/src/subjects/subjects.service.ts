@@ -9,7 +9,7 @@ import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
-import type { Model } from '@/prisma/prisma.types';
+import type { Model, ModelUpdateData } from '@/prisma/prisma.types';
 
 import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
 
@@ -18,7 +18,7 @@ import { SubjectIdentificationDataDto } from './dto/subject-identification-data.
  * get the subject by the custom identifier rather than the default ObjectId
  */
 @Injectable()
-export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'updateById'> {
+export class SubjectsService implements EntityService<Partial<Subject>> {
   constructor(
     @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>,
     private readonly cryptoService: CryptoService,
@@ -79,6 +79,14 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
 
   async findByLookup(data: SubjectIdentificationDataDto, options?: EntityOperationOptions) {
     return this.findById(this.generateIdentifier(data), options);
+  }
+
+  async updateById(identifier: string, data: ModelUpdateData<'Subject'>, { ability }: EntityOperationOptions = {}) {
+    const subject = await this.findById(identifier);
+    return this.subjectModel.update({
+      data,
+      where: { id: subject.id, ...accessibleQuery(ability, 'update', 'Subject') }
+    });
   }
 
   private generateIdentifier({ dateOfBirth, firstName, lastName, sex }: SubjectIdentificationDataDto): string {

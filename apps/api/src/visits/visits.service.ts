@@ -3,13 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 import type { SubjectIdentificationData } from '@open-data-capture/common/subject';
 import type { CreateVisitData, Visit } from '@open-data-capture/common/visit';
+import type { SubjectModel } from '@open-data-capture/database';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
-import type { SubjectDocument } from '@/subjects/entities/subject.entity';
 import { SubjectsService } from '@/subjects/subjects.service';
-import { VisitModel } from '@open-data-capture/database';
 
 @Injectable()
 export class VisitsService implements Pick<EntityService<Visit>, 'create'> {
@@ -18,8 +17,15 @@ export class VisitsService implements Pick<EntityService<Visit>, 'create'> {
     private readonly groupsService: GroupsService,
     private readonly subjectsService: SubjectsService
   ) {}
+
   async create({ date, groupId, subjectIdData }: CreateVisitData) {
+    const group = groupId ? await this.groupsService.findById(groupId) : undefined;
     const subject = await this.resolveSubject(subjectIdData);
+
+    if (group && !subject.groupIds.includes(group.id)) {
+      await this.subjectsService.updateById(subject.identifier, { groupIds: { push: group.id } });
+    }
+
     return this.visitModel.create({
       data: {
         date,
@@ -27,19 +33,11 @@ export class VisitsService implements Pick<EntityService<Visit>, 'create'> {
         subjectId: subject.id
       }
     });
-
-    // const group = groupId ? await this.groupsService.findById(groupId) : undefined;
-    // const subject = await this.resolveSubject(subjectIdData);
-    // if (group && !subject.groups.includes(group)) {
-    //   subject.groups.push(group);
-    //   await subject.save();
-    // }
-    // return this.visitsRepository.create({ date, group, subject });
   }
 
   /** Get the subject if they exist, otherwise create them */
   private async resolveSubject(subjectIdData: SubjectIdentificationData) {
-    let subject: SubjectDocument;
+    let subject: SubjectModel;
     try {
       subject = await this.subjectsService.findByLookup(subjectIdData);
     } catch (err) {
