@@ -35,13 +35,15 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
 
   async create(data: SubjectIdentificationDataDto) {
     const identifier = this.generateIdentifier({ ...data });
-    if (await this.subjectsRepository.exists({ identifier })) {
+    if (await this.subjectModel.exists({ identifier })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
     }
-    return this.subjectsRepository.create({
-      groups: [],
-      identifier,
-      ...data
+    return this.subjectModel.create({
+      data: {
+        groupIds: [],
+        identifier,
+        ...data
+      }
     });
   }
 
