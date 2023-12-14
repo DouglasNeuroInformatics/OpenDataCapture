@@ -28,10 +28,10 @@ model InstrumentRecordModel {
   createdAt    DateTime        @default(now()) @db.Date
   updatedAt    DateTime        @updatedAt @db.Date
   id           String          @id @default(auto()) @map("_id") @db.ObjectId
-  data         Json
+  data         Json?
   date         DateTime        @db.Date
-  group        GroupModel      @relation(fields: [groupId], references: [id])
-  groupId      String          @db.ObjectId
+  group        GroupModel?     @relation(fields: [groupId], references: [id])
+  groupId      String?         @db.ObjectId
   subject      SubjectModel    @relation(fields: [subjectId], references: [id])
   subjectId    String          @db.ObjectId
   instrument   InstrumentModel @relation(fields: [instrumentId], references: [id])
