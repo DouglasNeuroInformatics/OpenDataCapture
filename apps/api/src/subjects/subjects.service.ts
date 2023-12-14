@@ -12,6 +12,8 @@ import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
 
 import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
+import type { Prisma } from '@open-data-capture/database';
+import { accessibleQuery } from '@/ability/ability.utils';
 
 /**
  * Please note that although the SubjectsService implements EntityService, the `id` methods
@@ -22,11 +24,13 @@ export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'u
   constructor(
     @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>,
     private readonly cryptoService: CryptoService,
-    private readonly groupsService: GroupsService,
+    private readonly groupsService: GroupsService
   ) {}
 
-  async count(filter: FilterQuery<Subject> = {}, { ability }: EntityOperationOptions = {}) {
-    return this.subjectsRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read').Subject : {}] });
+  async count(where: Prisma.SubjectModelWhereInput = {}, { ability }: EntityOperationOptions = {}) {
+    return this.subjectModel.count({
+      where: { AND: [ability ? accessibleQuery(ability, 'read', 'GroupModel') : {}, where] }
+    });
   }
 
   async create(data: SubjectIdentificationDataDto) {
