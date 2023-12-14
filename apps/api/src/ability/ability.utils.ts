@@ -3,14 +3,15 @@ import type { AppAction } from '@open-data-capture/common';
 
 import type { AppAbility } from '@/core/types';
 import type { ModelEntityName } from '@/prisma/prisma.types';
+import { getModelName } from '@/prisma/prisma.utils';
 
 export function accessibleQuery<T extends ModelEntityName>(
   ability: AppAbility | undefined,
   action: AppAction,
-  modelName: T
+  entityName: T
 ) {
   if (!ability) {
     return {};
   }
-  return accessibleBy(ability, action)[modelName];
+  return accessibleBy(ability, action)[getModelName(entityName)];
 }
