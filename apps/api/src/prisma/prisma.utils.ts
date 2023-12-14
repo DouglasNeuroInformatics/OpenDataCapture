@@ -2,17 +2,17 @@ import { jest } from 'bun:test';
 
 import type { Provider } from '@nestjs/common';
 
-import type { ModelSimplifiedName } from './prisma.types';
+import type { ModelEntityName } from './prisma.types';
 
-export function getModelReferenceName<T extends ModelSimplifiedName>(modelName: T) {
+export function getModelReferenceName<T extends ModelEntityName>(modelName: T) {
   return (modelName.charAt(0).toLowerCase() + modelName.slice(1) + 'Model') as `${Uncapitalize<T>}Model`;
 }
 
-export function getModelToken<T extends ModelSimplifiedName>(modelName: T) {
+export function getModelToken<T extends ModelEntityName>(modelName: T) {
   return modelName + 'PrismaModel';
 }
 
-export function createMockModelProvider<T extends ModelSimplifiedName>(modelName: T): Provider {
+export function createMockModelProvider<T extends ModelEntityName>(modelName: T): Provider {
   return {
     provide: getModelToken(modelName),
     useValue: {

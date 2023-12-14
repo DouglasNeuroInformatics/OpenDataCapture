@@ -4,7 +4,7 @@ import { Prisma, PrismaClient } from '@open-data-capture/database';
 import { PRISMA_CLIENT_TOKEN } from './prisma.constants';
 import { getModelReferenceName, getModelToken } from './prisma.utils';
 
-import type { ModelSimplifiedName } from './prisma.types';
+import type { ModelEntityName } from './prisma.types';
 
 export type AppPrismaClient = ReturnType<typeof PrismaModule.createClient>;
 
@@ -30,7 +30,7 @@ export class PrismaModule {
       }
     });
   }
-  static forFeature<T extends ModelSimplifiedName>(modelName: T): DynamicModule {
+  static forFeature<T extends ModelEntityName>(modelName: T): DynamicModule {
     return {
       exports: [modelName],
       module: PrismaModule,
