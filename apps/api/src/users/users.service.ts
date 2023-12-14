@@ -1,117 +1,110 @@
-import { accessibleBy } from '@casl/mongoose';
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { type User } from '@open-data-capture/common/user';
-import type { FilterQuery } from 'mongoose';
 
+import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
-import type { GroupEntity } from '@/groups/entities/group.entity';
 import { GroupsService } from '@/groups/groups.service';
+import { InjectModel } from '@/prisma/prisma.decorators';
+import type { Model } from '@/prisma/prisma.types';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { UsersRepository } from './users.repository';
 
 import type { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService implements EntityService<User> {
   constructor(
+    @InjectModel('User') private readonly userModel: Model<'User'>,
     private readonly cryptoService: CryptoService,
-    private readonly groupsService: GroupsService,
-    private readonly usersRepository: UsersRepository
+    private readonly groupsService: GroupsService
   ) {}
 
-  async count(filter: FilterQuery<User> = {}, { ability }: EntityOperationOptions = {}) {
-    return this.usersRepository.count({ $and: [filter, ability ? accessibleBy(ability, 'read').User : {}] });
+  async count(
+    filter: NonNullable<Parameters<Model<'User'>['count']>[0]>['where'] = {},
+    { ability }: EntityOperationOptions = {}
+  ) {
+    return this.userModel.count({
+      where: { AND: [accessibleQuery(ability, 'read', 'User'), filter] }
+    });
   }
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
   async create({ groupNames, password, username, ...rest }: CreateUserDto, options?: EntityOperationOptions) {
-    if (await this.usersRepository.exists({ name: username })) {
+    if (await this.userModel.exists({ username })) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
-    const groups: GroupEntity[] = [];
+    const groupIds: string[] = [];
     for (const groupName of groupNames ?? []) {
       const group = await this.groupsService.findByName(groupName, options);
-      groups.push(group);
+      groupIds.push(group.id);
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(password);
 
-    return this.usersRepository.create({
-      groups: groups,
-      password: hashedPassword,
-      username: username,
-      ...rest
+    return this.userModel.create({
+      data: {
+        groupIds,
+        password: hashedPassword,
+        username: username,
+        ...rest
+      }
     });
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
-    const user = await this.usersRepository.findById(id);
-    if (!user) {
-      throw new NotFoundException(`Failed to find user with ID: ${id}`);
-    } else if (ability && !ability.can('delete', user)) {
-      throw new ForbiddenException(`Insufficient rights to delete user with ID: ${id}`);
-    }
-    return (await this.usersRepository.deleteById(id))!;
+    return this.userModel.delete({
+      where: { AND: [accessibleQuery(ability, 'delete', 'User')], id }
+    });
   }
 
   /** Delete the user with the provided username, otherwise throws */
   async deleteByUsername(username: string, { ability }: EntityOperationOptions = {}) {
-    const user = await this.usersRepository.findByUsername(username);
-    if (!user) {
-      throw new NotFoundException(`Failed to find user with username: ${username}`);
-    } else if (ability && !ability.can('delete', user)) {
-      throw new ForbiddenException(`Insufficient rights to delete user with username: ${username}`);
-    }
-    return (await this.usersRepository.deleteByUsername(username))!;
+    const user = await this.findByUsername(username);
+    return this.userModel.delete({
+      where: { AND: [accessibleQuery(ability, 'delete', 'User')], id: user.id }
+    });
   }
 
   async findAll({ ability }: EntityOperationOptions = {}) {
-    if (!ability) {
-      return this.usersRepository.find();
-    }
-    return this.usersRepository.find(accessibleBy(ability, 'read').User);
+    return this.userModel.findMany({
+      where: accessibleQuery(ability, 'read', 'User')
+    });
   }
 
   async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
     const group = await this.groupsService.findByName(groupName);
-    return this.usersRepository.find({
-      $and: [{ groups: group }, ability ? accessibleBy(ability, 'read').User : {}]
+    return this.userModel.findMany({
+      where: { AND: [accessibleQuery(ability, 'read', 'User'), { groupIds: { has: group.id } }] }
     });
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
-    const user = await this.usersRepository.findById(id);
+    const user = await this.userModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'read', 'User')], id }
+    });
     if (!user) {
       throw new NotFoundException(`Failed to find user with ID: ${id}`);
-    } else if (ability && !ability.can('read', user)) {
-      throw new ForbiddenException(`Insufficient rights to read user with ID: ${id}`);
     }
     return user;
   }
 
   async findByUsername(username: string, { ability }: EntityOperationOptions = {}) {
-    const user = await this.usersRepository.findByUsername(username);
+    const user = await this.userModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'read', 'User'), { username }] }
+    });
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
-    } else if (ability && !ability.can('read', user)) {
-      throw new ForbiddenException(`Insufficient rights to read user with username: ${username}`);
     }
-    // For unknown reasons, autopopulate is broken in prod
-    await user.populate('groups');
     return user;
   }
 
-  async updateById(id: string, update: UpdateUserDto, { ability }: EntityOperationOptions = {}) {
-    const user = await this.usersRepository.findById(id);
-    if (!user) {
-      throw new NotFoundException(`Failed to find user with ID: ${id}`);
-    } else if (ability && !ability.can('update', user)) {
-      throw new ForbiddenException(`Insufficient rights to update user with ID: ${id}`);
-    }
-    return (await this.usersRepository.updateById(id, update))!;
+  async updateById(id: string, data: UpdateUserDto, { ability }: EntityOperationOptions = {}) {
+    return this.userModel.update({
+      data,
+      where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
+    });
   }
 }
