@@ -13,7 +13,7 @@ export class CreateUserDto implements CreateUserData {
   basePermissionLevel?: BasePermissionLevel;
 
   @ApiProperty({ description: 'First Name' })
-  firstName?: string;
+  firstName: string;
 
   @ApiProperty({
     description: 'The names of the group(s) to which the user belongs',
@@ -22,7 +22,7 @@ export class CreateUserDto implements CreateUserData {
   groupNames?: string[];
 
   @ApiProperty({ description: 'Last Name' })
-  lastName?: string;
+  lastName: string;
 
   @ApiProperty({
     description: 'A minimum of 8 characters, including one number, one upper case, and one lower case letter',

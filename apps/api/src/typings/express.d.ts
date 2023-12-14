@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import type { BaseAppAbility } from '@open-data-capture/common/core';
-import type { User as AppUser } from '@open-data-capture/common/user';
+import type { UserModel } from '@open-data-capture/database';
+
+import type { AppAbility } from '@/core/types';
 
 declare global {
   namespace Express {
     // https://stackoverflow.com/questions/66312048/cant-override-express-request-user-type-but-i-can-add-new-properties-to-request
-    interface User extends AppUser {
-      ability: BaseAppAbility;
+    interface User extends UserModel {
+      ability: AppAbility;
     }
   }
 }

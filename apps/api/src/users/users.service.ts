@@ -93,6 +93,7 @@ export class UsersService implements EntityService<User> {
 
   async findByUsername(username: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.userModel.findFirst({
+      include: { groups: true },
       where: { AND: [accessibleQuery(ability, 'read', 'User'), { username }] }
     });
     if (!user) {

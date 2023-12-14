@@ -3,7 +3,7 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unauthoriz
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { AuthPayload, JwtPayload } from '@open-data-capture/common/auth';
-import type { User } from '@open-data-capture/common/user';
+import type { GroupModel, UserModel } from '@open-data-capture/database';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { UsersService } from '@/users/users.service';
@@ -43,10 +43,11 @@ export class AuthService {
   }
 
   /** Wraps UserService.getByUsername with appropriate exception handling */
-  private async getUser(username: string): Promise<User> {
-    let user: User;
+  private async getUser(username: string) {
+    let user: UserModel & { groups: GroupModel[] };
     try {
-      user = await this.usersService.findByUsername(username).then((doc) => doc.toObject({ virtuals: true }));
+      user = await this.usersService.findByUsername(username);
+      // user = await this.usersService.findByUsername(username).then((doc) => doc.toObject({ virtuals: true }));
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException('Invalid username');

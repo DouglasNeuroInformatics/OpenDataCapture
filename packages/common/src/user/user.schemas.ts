@@ -17,9 +17,9 @@ export const basePermissionLevelSchema = z.enum([
 
 export const userSchema = z.object({
   basePermissionLevel: basePermissionLevelSchema.optional(),
-  firstName: z.string().min(1).optional(),
+  firstName: z.string().min(1),
   groups: groupSchema.array(),
-  lastName: z.string().min(1).optional(),
+  lastName: z.string().min(1),
   password: passwordSchema,
   username: z.string().min(1)
 }) satisfies Zod.ZodType<User>;

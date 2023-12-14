@@ -2,11 +2,11 @@ import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@n
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import type { JwtPayload } from '@open-data-capture/common/auth';
+import type { GroupModel, UserModel } from '@open-data-capture/database';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { AbilityFactory } from '@/ability/ability.factory';
-import { UserEntity } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
@@ -34,8 +34,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   /** Returns the user associated with the JWT if they exist, otherwise throws UnauthorizedException */
-  private async getUser(username: string): Promise<UserEntity> {
-    let user: UserEntity;
+  private async getUser(username: string) {
+    let user: UserModel & { groups: GroupModel[] };
     try {
       user = await this.usersService.findByUsername(username);
     } catch (error) {
