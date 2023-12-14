@@ -40,6 +40,11 @@ model InstrumentRecordModel {
 
 // Instruments 
 
+enum InstrumentKind {
+  form
+  interactive
+}
+
 type InstrumentDetails {
   // string | Record<Language, string>
   description       Json
@@ -57,7 +62,7 @@ model InstrumentModel {
   source    String
   bundle    String
   details   InstrumentDetails
-  kind      String
+  kind      InstrumentKind
   /// Language | Language[]
   language  Json
   name      String
