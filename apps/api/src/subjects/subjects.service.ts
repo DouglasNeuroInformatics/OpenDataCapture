@@ -8,9 +8,10 @@ import unidecode from 'unidecode';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
+import { InjectModel } from '@/prisma/prisma.decorators';
+import type { Model } from '@/prisma/prisma.types';
 
 import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
-import { SubjectsRepository } from './subjects.repository';
 
 /**
  * Please note that although the SubjectsService implements EntityService, the `id` methods
@@ -19,9 +20,9 @@ import { SubjectsRepository } from './subjects.repository';
 @Injectable()
 export class SubjectsService implements Omit<EntityService<Partial<Subject>>, 'updateById'> {
   constructor(
+    @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>,
     private readonly cryptoService: CryptoService,
     private readonly groupsService: GroupsService,
-    private readonly subjectsRepository: SubjectsRepository
   ) {}
 
   async count(filter: FilterQuery<Subject> = {}, { ability }: EntityOperationOptions = {}) {
