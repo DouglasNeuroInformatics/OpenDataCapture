@@ -106,10 +106,10 @@ model UserModel {
   updatedAt           DateTime             @updatedAt @db.Date
   id                  String               @id @default(auto()) @map("_id") @db.ObjectId
   basePermissionLevel BasePermissionLevel?
-  firstName           String
+  firstName           String?
   groupIds            String[]             @db.ObjectId
   groups              GroupModel[]         @relation(fields: [groupIds], references: [id])
-  lastName            String
+  lastName            String?
   password            String
   username            String
 }

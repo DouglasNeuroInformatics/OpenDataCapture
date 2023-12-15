@@ -1,10 +1,11 @@
 import { AbilityBuilder } from '@casl/ability';
 import { createPrismaAbility } from '@casl/prisma';
 import { Injectable, Logger } from '@nestjs/common';
-import type { UserModel } from '@open-data-capture/database/core';
+import { Prisma, type UserModel } from '@open-data-capture/database/core';
 
 import type { AppAbility } from '@/core/types';
 
+Prisma
 @Injectable()
 export class AbilityFactory {
   private readonly logger = new Logger(AbilityFactory.name);
@@ -26,7 +27,6 @@ export class AbilityFactory {
         ability.can('read', 'Subject', { groupIds: { hasSome: user.groupIds } });
         ability.can('read', 'Summary');
         ability.can('read', 'User', { groupIds: { hasSome: user.groupIds } });
-        ability.can('read', 'Visit');
         ability.can('create', 'Visit');
         break;
       case 'STANDARD':
