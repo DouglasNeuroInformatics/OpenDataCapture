@@ -2,7 +2,7 @@
   "name": "@open-data-capture/database",
   "version": "0.0.0",
   "exports": {
-    "./core": "./src/core/ts",
+    "./core": "./src/core.ts",
     "./gateway": "./src/gateway.ts"
   },
   "scripts": {
