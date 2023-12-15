@@ -43,13 +43,14 @@ export class PrismaModule {
     });
   }
   static forFeature<T extends ModelEntityName>(modelName: T): DynamicModule {
+    const modelToken = getModelToken(modelName);
     return {
-      exports: [modelName],
+      exports: [modelToken],
       module: PrismaModule,
       providers: [
         {
           inject: [PRISMA_CLIENT_TOKEN],
-          provide: getModelToken(modelName),
+          provide: modelToken,
           useFactory: (client: AppPrismaClient) => {
             return client[getModelReferenceName(modelName)];
           }
