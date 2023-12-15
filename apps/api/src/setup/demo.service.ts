@@ -55,7 +55,7 @@ export class DemoService {
       const subject = await this.createSubject();
       await this.visitsService.create({
         date: new Date(),
-        groupId: group._id.toString(),
+        groupId: group.id,
         subjectIdData: subject as Required<typeof subject>
       })
       for (const form of forms) {
@@ -73,7 +73,7 @@ export class DemoService {
           await this.instrumentRecordsService.create({
             data,
             date: faker.date.past({ years: 2 }),
-            groupId: group.id as string,
+            groupId: group.id,
             instrumentId: form.id!,
             subjectIdentifier: subject.identifier
           });
@@ -129,7 +129,7 @@ export class DemoService {
     ] as unknown as FormInstrument[];
   }
 
-  private async createGroups(): Promise<void> {
+  private async createGroups() {
     for (const group of demoGroups) {
       await this.groupsService.create(group);
     }
@@ -154,7 +154,7 @@ export class DemoService {
     }
   }
 
-  private async createSubject(): Promise<Subject> {
+  private async createSubject() {
     return this.subjectsService.create({
       dateOfBirth: faker.date.birthdate(),
       firstName: faker.person.firstName(),
@@ -163,7 +163,7 @@ export class DemoService {
     });
   }
 
-  private async createUsers(): Promise<void> {
+  private async createUsers() {
     for (const user of demoUsers) {
       await this.usersService.create(user);
     }
