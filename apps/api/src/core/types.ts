@@ -7,7 +7,7 @@ import type {
   SubjectModel,
   UserModel,
   VisitModel
-} from '@open-data-capture/database';
+} from '@open-data-capture/database/core';
 
 type AppSubject = AppSubjectName | GroupModel | InstrumentRecordModel | SubjectModel | UserModel | VisitModel;
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import type { UserModel } from '@open-data-capture/database';
+import type { UserModel } from '@open-data-capture/database/core';
 
 import type { AppAbility } from '@/core/types';
 

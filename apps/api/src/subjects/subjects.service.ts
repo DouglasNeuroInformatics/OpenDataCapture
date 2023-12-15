@@ -2,7 +2,7 @@ import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Subject } from '@open-data-capture/common/subject';
-import type { Prisma } from '@open-data-capture/database';
+import type { Prisma } from '@open-data-capture/database/core';
 import unidecode from 'unidecode';
 
 import { accessibleQuery } from '@/ability/ability.utils';

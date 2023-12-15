@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import type { CreateAdminData, SetupState } from '@open-data-capture/common/setup';
-import { PrismaClient } from '@open-data-capture/database';
+import { PrismaClient } from '@open-data-capture/database/core';
 
 import { InjectPrismaClient } from '@/prisma/prisma.decorators';
 import { UsersService } from '@/users/users.service';

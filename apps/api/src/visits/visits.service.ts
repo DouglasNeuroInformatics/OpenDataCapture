@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 import type { SubjectIdentificationData } from '@open-data-capture/common/subject';
 import type { CreateVisitData, Visit } from '@open-data-capture/common/visit';
-import type { SubjectModel } from '@open-data-capture/database';
+import type { SubjectModel } from '@open-data-capture/database/core';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InjectModel } from '@/prisma/prisma.decorators';

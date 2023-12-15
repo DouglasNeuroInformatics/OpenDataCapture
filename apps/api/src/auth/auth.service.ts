@@ -3,7 +3,7 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unauthoriz
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { AuthPayload, JwtPayload } from '@open-data-capture/common/auth';
-import type { GroupModel, UserModel } from '@open-data-capture/database';
+import type { GroupModel, UserModel } from '@open-data-capture/database/core';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { UsersService } from '@/users/users.service';

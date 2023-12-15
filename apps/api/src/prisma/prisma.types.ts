@@ -1,4 +1,4 @@
-import { Prisma } from '@open-data-capture/database';
+import { Prisma } from '@open-data-capture/database/core';
 import type { Replace } from 'type-fest';
 
 import type { AppPrismaClient } from './prisma.module';

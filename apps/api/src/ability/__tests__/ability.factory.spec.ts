@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'bun:test';
 
 import { Test, TestingModule } from '@nestjs/testing';
-import type { UserModel } from '@open-data-capture/database';
+import type { UserModel } from '@open-data-capture/database/core';
 
 import { AbilityFactory } from '../ability.factory';
 

@@ -1,6 +1,6 @@
 import { type DynamicModule, Module } from '@nestjs/common';
 import type { Instrument } from '@open-data-capture/common/instrument';
-import { Prisma, PrismaClient } from '@open-data-capture/database';
+import { Prisma, PrismaClient } from '@open-data-capture/database/core';
 import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 
 import { PRISMA_CLIENT_TOKEN } from './prisma.constants';
