@@ -11,7 +11,8 @@ import { Types } from 'mongoose';
 import request from 'supertest';
 
 import type { Model } from '@/prisma/prisma.types';
-import { createMockModelProvider, getModelToken } from '@/prisma/prisma.utils';
+import { getModelToken } from '@/prisma/prisma.utils';
+import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsService } from '../instruments.service';

@@ -11,7 +11,8 @@ import request from 'supertest';
 
 import { GroupsService } from '@/groups/groups.service';
 import type { Model } from '@/prisma/prisma.types';
-import { createMockModelProvider, getModelToken } from '@/prisma/prisma.utils';
+import { getModelToken } from '@/prisma/prisma.utils';
+import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { SubjectsController } from '../subjects.controller';
 import { SubjectsService } from '../subjects.service';

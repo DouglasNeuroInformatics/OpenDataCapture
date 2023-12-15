@@ -5,7 +5,8 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
 import type { Model } from '@/prisma/prisma.types';
-import { createMockModelProvider, getModelToken } from '@/prisma/prisma.utils';
+import { getModelToken } from '@/prisma/prisma.utils';
+import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { GroupsService } from '../groups.service';
 

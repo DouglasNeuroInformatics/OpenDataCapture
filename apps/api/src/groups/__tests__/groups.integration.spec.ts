@@ -10,7 +10,8 @@ import { ObjectId } from 'mongodb';
 import request from 'supertest';
 
 import type { Model } from '@/prisma/prisma.types';
-import { createMockModelProvider, getModelToken } from '@/prisma/prisma.utils';
+import { getModelToken } from '@/prisma/prisma.utils';
+import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { GroupsController } from '../groups.controller';
 import { GroupsService } from '../groups.service';

@@ -4,7 +4,8 @@ import { type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 
 import type { Model } from '@/prisma/prisma.types';
-import { createMockModelProvider, getModelToken } from '@/prisma/prisma.utils';
+import { getModelToken } from '@/prisma/prisma.utils';
+import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { InstrumentsService } from '../instruments.service';
 
