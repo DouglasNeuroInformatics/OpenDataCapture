@@ -6,16 +6,16 @@
   "type": "module",
   "scripts": {
     "build": "bunx next build",
-    "db:push": "prisma db push",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun next dev -p 3500",
     "format": "prettier --write src",
-    "postinstall": "next telemetry disable && bun db:push",
+    "postinstall": "next telemetry disable",
     "lint": "tsc && eslint --fix src",
     "start": "bunx next start -p 80"
   },
   "dependencies": {
     "@douglasneuroinformatics/ui": "latest",
     "@open-data-capture/common": "workspace:*",
+    "@open-data-capture/database": "workspace:*",
     "@open-data-capture/instrument-runtime": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
     "@prisma/client": "^5.6.0",
@@ -36,7 +36,6 @@
     "@types/react-dom": "^18.2.17",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
-    "prisma": "^5.6.0",
     "tailwindcss": "^3.3.5"
   },
   "trustedDependencies": [
