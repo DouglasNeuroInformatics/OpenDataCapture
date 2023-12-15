@@ -74,6 +74,11 @@ model InstrumentModel {
 
 // Subjects
 
+enum Sex {
+  male
+  female
+}
+
 model SubjectModel {
   createdAt         DateTime                @default(now()) @db.Date
   updatedAt         DateTime                @updatedAt @db.Date
@@ -84,7 +89,7 @@ model SubjectModel {
   groups            GroupModel[]            @relation(fields: [groupIds], references: [id])
   identifier        String
   lastName          String?
-  sex               String
+  sex               Sex
   instrumentRecords InstrumentRecordModel[]
   VisitModel        VisitModel[]
 }
