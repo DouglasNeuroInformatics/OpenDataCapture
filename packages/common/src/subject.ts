@@ -1,22 +1,22 @@
 import type { SubjectModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
-export const sexSchema = z.enum(['male', 'female']);
+export const $Sex = z.enum(['male', 'female']);
 
-export type Sex = z.infer<typeof sexSchema>;
+export type Sex = z.infer<typeof $Sex>;
 
-export const subjectIdentificationDataSchema = z.object({
+export const $SubjectIdentificationData = z.object({
   dateOfBirth: z.coerce.date(),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  sex: sexSchema
+  sex: $Sex
 });
 
-export type SubjectIdentificationData = z.infer<typeof subjectIdentificationDataSchema>;
+export type SubjectIdentificationData = z.infer<typeof $SubjectIdentificationData>;
 
 export type Subject = SubjectModel;
 
-export const subjectSchema = subjectIdentificationDataSchema.extend({
+export const $Subject = $SubjectIdentificationData.extend({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   id: z.string().min(1),
