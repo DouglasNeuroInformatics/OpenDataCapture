@@ -1,4 +1,5 @@
 import type { PureAbility, RawRuleOf } from '@casl/ability';
+import { z } from 'zod';
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
@@ -17,4 +18,8 @@ export type BaseAppAbility = PureAbility<[AppAction, AppSubjectName]>;
 
 export type Permissions = RawRuleOf<BaseAppAbility>[];
 
-export type Language = 'en' | 'fr';
+export const $Language = z.enum(['en', 'fr']);
+
+export type Language = z.infer<typeof $Language>;
+
+export const $ValidObjectId = z.string().refine((s) => new Blob([s]).size === 24);
