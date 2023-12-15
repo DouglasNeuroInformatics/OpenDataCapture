@@ -1,5 +1,6 @@
 import type { SubjectModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
+import { $BaseModel } from './core';
 
 export const $Sex = z.enum(['male', 'female']);
 
@@ -16,12 +17,11 @@ export type SubjectIdentificationData = z.infer<typeof $SubjectIdentificationDat
 
 export type Subject = SubjectModel;
 
-export const $Subject = $SubjectIdentificationData.extend({
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  id: z.string().min(1),
-  groupIds: z.array(z.string().min(1)),
-  firstName: z.string().min(1).nullable(),
-  identifier: z.string().min(1),
-  lastName: z.string().min(1).nullable()
-}) satisfies Zod.ZodType<Subject>;
+export const $Subject = $BaseModel.merge(
+  $SubjectIdentificationData.extend({
+    groupIds: z.array(z.string().min(1)),
+    firstName: z.string().min(1).nullable(),
+    identifier: z.string().min(1),
+    lastName: z.string().min(1).nullable()
+  })
+);
