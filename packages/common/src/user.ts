@@ -25,10 +25,8 @@ export const $User = $BaseModel.extend({
   username: z.string().min(1)
 }) satisfies Zod.ZodType<User>;
 
-export type CreateUserData = Omit<User, 'groups'> & {
-  groupNames?: string[];
-};
-
-export const $CreateUserData = $User.omit({ groups: true }).extend({
+export const $CreateUserData = $User.omit({ createdAt: true, groups: true, updatedAt: true }).extend({
   groupNames: z.array(z.string().min(1)).optional()
-}) satisfies Zod.ZodType<CreateUserData>;
+});
+
+export type CreateUserData = z.infer<typeof $CreateUserData>;
