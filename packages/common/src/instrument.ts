@@ -15,3 +15,4 @@ export type UnilingualInstrument = FormInstrument<FormDataType, Language> | Inte
 export * from './instrument.base';
 export * from './instrument.form';
 export * from './instrument.interactive';
+export * from './instrument.utils';
