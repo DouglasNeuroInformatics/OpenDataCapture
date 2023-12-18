@@ -9,7 +9,7 @@
     "./*": "./dist/*"
   },
   "scripts": {
-    "build:types": "rollup -c",
+    "build": "rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
@@ -22,6 +22,7 @@
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-terser": "^0.4.4",
     "@types/react": "18.2.39",
     "rollup": "^4.6.0",
     "rollup-plugin-dts": "^6.1.0"
