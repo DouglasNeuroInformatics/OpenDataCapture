@@ -6,7 +6,8 @@
   "type": "module",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "runtimes/*"
   ],
   "scripts": {
     "build": "env-cmd cross-env NODE_ENV=production turbo run build",
