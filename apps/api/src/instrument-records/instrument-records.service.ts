@@ -2,13 +2,12 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { linearRegression } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Injectable } from '@nestjs/common';
-import type { FormInstrument, FormInstrumentMeasures } from '@open-data-capture/common/instrument';
+import type { FormInstrument, FormInstrumentMeasures, evaluateInstrument } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@open-data-capture/common/instrument-records';
-import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';

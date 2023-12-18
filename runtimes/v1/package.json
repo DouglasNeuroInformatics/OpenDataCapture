@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/instrument-runtime",
+  "name": "@open-data-capture/runtime-v1",
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
@@ -15,12 +15,12 @@
   },
   "dependencies": {
     "@open-data-capture/common": "workspace:*",
-    "react": "^18.2.0",
-    "type-fest": "^4.8.3",
-    "zod": "^3.22.4"
+    "react": "18.2.0",
+    "zod": "3.22.4"
   },
   "devDependencies": {
-    "@types/react": "^18.2.39",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/react": "18.2.39",
     "rollup": "^4.6.0",
     "rollup-plugin-dts": "^6.1.0"
   }

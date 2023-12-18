@@ -6,8 +6,7 @@ import type {
   InstrumentKind,
   InstrumentSummary
 } from '@open-data-capture/common/instrument';
-import { formInstrumentSchema } from '@open-data-capture/common/instrument';
-import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
+import { formInstrumentSchema, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -48,7 +47,7 @@ export class InstrumentsService {
   async find(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
     return this.instrumentModel.findMany({
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
-    })
+    });
   }
 
   async findAvailable(
