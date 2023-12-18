@@ -1,7 +1,5 @@
-const sayHello = () => {
-  console.log('hello world');
-};
+import * as React from 'react';
 
-export * from 'zod';
+export * as Zod from 'zod';
 
-export { sayHello };
+export { React };

@@ -3,7 +3,9 @@
 import path from 'path';
 import url from 'url';
 
-import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import { dts } from 'rollup-plugin-dts';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -15,15 +17,20 @@ const config = [
     output: [
       {
         file: path.resolve(__dirname, 'dist', 'index.js'),
-        format: 'iife',
-        generatedCode: 'es2015',
-        name: 'Runtime'
+        format: 'es',
+        generatedCode: 'es2015'
+        // name: 'Runtime'
       }
     ],
     plugins: [
-      nodeResolve({
+      commonjs(),
+      resolve({
         browser: true,
         rootDir: path.resolve(__dirname, '..', '..')
+      }),
+      replace({
+        preventAssignment: false,
+        'process.env.NODE_ENV': '"development"'
       })
     ]
   },
@@ -32,7 +39,7 @@ const config = [
     output: [
       {
         file: path.resolve(__dirname, 'dist', 'index.d.ts'),
-        format: 'es'
+        format: 'esm'
       }
     ],
     plugins: [dts({ respectExternal: true })]
