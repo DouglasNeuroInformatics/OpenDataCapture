@@ -1,11 +1,11 @@
 import type { Group } from '@open-data-capture/common/group';
 import type { User } from '@open-data-capture/common/user';
 
-export type DemoUser = Omit<User, 'groups'> & {
+export type DemoUser = Omit<User, 'createdAt' | 'groups' | 'id' | 'updatedAt'> & {
   groupNames: string[];
 };
 
-export const demoGroups: Omit<Group, 'id'>[] = [
+export const demoGroups: Omit<Group, 'createdAt' | 'id' | 'updatedAt'>[] = [
   {
     name: 'Depression Clinic'
   },
