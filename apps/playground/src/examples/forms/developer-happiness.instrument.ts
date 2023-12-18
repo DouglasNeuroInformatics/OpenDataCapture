@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
+const {  } = await import('@open-data-capture/runtime-v1');
 type DeveloperHappinessData = {
   developerHappiness: number;
   reasonForSadness?: string;
