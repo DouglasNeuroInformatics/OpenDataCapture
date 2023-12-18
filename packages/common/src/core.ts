@@ -29,3 +29,11 @@ export const $BaseModel = z.object({
   updatedAt: z.coerce.date(),
   id: $ValidObjectId
 });
+
+export const $JsonLiteral = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+
+export type JsonLiteral = z.infer<typeof $JsonLiteral>;
+
+export type Json = JsonLiteral | { [key: string]: Json } | Json[];
+
+export const $Json: z.ZodType<Json> = z.lazy(() => z.union([$JsonLiteral, z.array($Json), z.record($Json)]));
