@@ -1,5 +1,6 @@
 import type { SubjectModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
+
 import { $BaseModel } from './core';
 
 export const $Sex = z.enum(['male', 'female']);
@@ -19,8 +20,8 @@ export type Subject = SubjectModel;
 
 export const $Subject = $BaseModel.merge(
   $SubjectIdentificationData.extend({
-    groupIds: z.array(z.string().min(1)),
     firstName: z.string().min(1).nullable(),
+    groupIds: z.array(z.string().min(1)),
     identifier: z.string().min(1),
     lastName: z.string().min(1).nullable()
   })

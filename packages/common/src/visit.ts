@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import type { VisitModel } from '@open-data-capture/database/core';
+import { z } from 'zod';
 
 import { $Subject, $SubjectIdentificationData } from './subject';
 
@@ -8,11 +8,11 @@ export type Visit = VisitModel;
 export const $Visit = z.object({
   createdAt: z.coerce.date(),
   date: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  groupId: z.string(),
   id: z.string(),
   subject: $Subject,
-  groupId: z.string(),
-  subjectId: z.string()
+  subjectId: z.string(),
+  updatedAt: z.coerce.date()
 }) satisfies Zod.ZodType<VisitModel>;
 
 export const $CreateVisitData = z.object({

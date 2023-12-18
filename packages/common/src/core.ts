@@ -26,14 +26,14 @@ export const $ValidObjectId = z.string().refine((s) => new Blob([s]).size === 24
 
 export const $BaseModel = z.object({
   createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  id: $ValidObjectId
+  id: $ValidObjectId,
+  updatedAt: z.coerce.date()
 });
 
 export const $JsonLiteral = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 
 export type JsonLiteral = z.infer<typeof $JsonLiteral>;
 
-export type Json = JsonLiteral | { [key: string]: Json } | Json[];
+export type Json = { [key: string]: Json } | Json[] | JsonLiteral;
 
 export const $Json: z.ZodType<Json> = z.lazy(() => z.union([$JsonLiteral, z.array($Json), z.record($Json)]));

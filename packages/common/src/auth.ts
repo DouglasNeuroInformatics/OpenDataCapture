@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import type { Group } from './group';
+
 import type { Permissions } from './core';
+import type { Group } from './group';
 
 export type AuthPayload = {
   accessToken: string;

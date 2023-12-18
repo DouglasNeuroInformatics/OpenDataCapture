@@ -1,9 +1,9 @@
+import type { GroupModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
 import { $BaseModel } from './core';
-import type { GroupModel } from '@open-data-capture/database/core';
 
-export type Group = Omit<GroupModel, 'userIds' | 'subjectIds'>;
+export type Group = Omit<GroupModel, 'subjectIds' | 'userIds'>;
 
 export const $Group = $BaseModel.extend({
   name: z.string().min(1)
