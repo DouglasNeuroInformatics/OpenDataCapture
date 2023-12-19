@@ -1,7 +1,3 @@
-import * as React from 'react';
-
-import * as Zod from 'zod';
-
 // /**
 //  * If these are not aliased, then a bug in `rollup-plugin-dts` causes the
 //  * type to reference itself, resulting in any.
@@ -50,4 +46,6 @@ declare global {
   >;
 }
 
-export { React, Zod };
+export function use() {
+  return import('react');
+}

@@ -6,7 +6,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && rollup -c",
+    "build": "rm -rf dist && bunx --bun rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
@@ -24,6 +24,7 @@
     "@rollup/plugin-typescript": "^11.1.5",
     "@types/react": "18.2.39",
     "rollup": "^4.6.0",
-    "rollup-plugin-dts": "^6.1.0"
+    "rollup-plugin-dts": "^6.1.0",
+    "type-fest": "^4.8.3"
   }
 }
