@@ -1,6 +1,9 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const {  } = await import('@open-data-capture/runtime-v1');
+/// <reference types="@open-data-capture/runtime-v1" />
+
+const { z } = await import('@open-data-capture/runtime-v1');
+
 type DeveloperHappinessData = {
   developerHappiness: number;
   reasonForSadness?: string;

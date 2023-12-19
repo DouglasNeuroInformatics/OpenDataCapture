@@ -54,6 +54,7 @@ const config = [
             '@open-data-capture/common/*': [path.resolve(rootDir, 'packages/common/src/*')]
           }
         },
+
         respectExternal: true
       })
     ]
