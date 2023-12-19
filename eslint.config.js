@@ -128,6 +128,7 @@ export default [
           allowNumber: true
         }
       ],
+      '@typescript-eslint/triple-slash-reference': 'off',
       'no-redeclare': 'off',
       'no-undef': 'off'
     }
