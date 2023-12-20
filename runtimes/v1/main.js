@@ -65,11 +65,25 @@ function parseTypesEntry(id) {
 }
 
 /**
+ * Attempt to parse the entry points for the module. If they cannot be resolved, throws an exception.
+ * @param {string} id
+ * @returns {{ main: string, types: string }}
+ */
+function resolveModule(id) {
+  const main = resolveSync(id, import.meta.dir);
+  const types = parseTypesEntry(id) ?? parseTypesEntry(`@types/${id}`);
+  if (!types) {
+    throw new Error(`Failed to resolve types for module: ${id}`);
+  }
+  return { main, types };
+}
+
+/**
  *  Returns the relative paths for all referenced paths in the file content
  * @param {string} filepath - the absolute path to the entry type declarations
  * @returns {Record<string, string>}
  */
-function getReferenceEntries(filepath) {
+function getReferencePaths(filepath) {
   /** @type {Record<string, string>} */
   const matches = {};
   const content = fs.readFileSync(filepath, 'utf-8');
@@ -87,68 +101,6 @@ function getReferenceEntries(filepath) {
   return matches;
 }
 
-/**
- * Attempt to parse the entry points for the module. If they cannot be resolved, throws an exception.
- * @param {string} id
- */
-function resolveModule(id) {
-  const mainEntry = resolveSync(id, import.meta.dir);
-  const typesEntry = parseTypesEntry(id) ?? parseTypesEntry(`@types/${id}`);
-  if (!typesEntry) {
-    throw new Error(`Failed to resolve types for module: ${id}`);
-  }
-  return {
-    main: {
-      [id]: mainEntry
-    },
-    types: {
-      [id]: typesEntry,
-      ...getReferenceEntries(id)
-    }
-  };
-}
+const { types } = resolveModule('react');
 
-/**
- * Returns the config for the entry point to the module and the type declarations
- * @param {string} id
- * @returns {[import('rollup').RollupOptions, import('rollup').RollupOptions]}
- */
-function createModuleConfig(id) {
-  const { main, types } = resolveModule(id);
-  return [
-    {
-      input: main,
-      output: {
-        dir: OUT_DIR,
-        format: 'es',
-        generatedCode: 'es2015',
-        plugins: [terser()]
-      },
-      plugins: [
-        commonjs(),
-        resolve({
-          browser: true,
-          extensions: ['.js', '.ts'],
-          rootDir: ROOT_DIR
-        }),
-        replace({
-          preventAssignment: false,
-          'process.env.NODE_ENV': '"production"'
-        }),
-        typescript()
-      ]
-    },
-    {
-      input: types,
-      output: [
-        {
-          dir: OUT_DIR,
-          format: 'es'
-        }
-      ],
-      plugins: [dts({ respectExternal: true })]
-    }
-  ];
-}
-
-export default [...createModuleConfig('react')];
+console.log(getReferencePaths(types));
