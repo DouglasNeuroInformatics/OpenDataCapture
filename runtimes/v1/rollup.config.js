@@ -82,7 +82,7 @@ function getReferenceEntries(filepath) {
     if (!fs.existsSync(absPath)) {
       throw new Error(`Resolved path for referenced file does not exist: ${absPath}`);
     }
-    matches[relPath] = absPath;
+    matches[relPath.replace(/\.d\.ts$/, '')] = absPath;
   }
   return matches;
 }
@@ -103,7 +103,7 @@ function resolveModule(id) {
     },
     types: {
       [id]: typesEntry,
-      ...getReferenceEntries(id)
+      ...getReferenceEntries(typesEntry)
     }
   };
 }
