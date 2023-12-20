@@ -6,7 +6,8 @@
     "esModuleInterop": false,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "/runtime/v1/*": ["../../runtimes/v1/dist/*"]
     },
     "resolveJsonModule": true
   },

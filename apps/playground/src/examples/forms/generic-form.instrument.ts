@@ -1,6 +1,10 @@
 /* eslint-disable perfectionist/sort-object-types */
 /* eslint-disable perfectionist/sort-objects */
 
+/// <reference types="@open-data-capture/runtime-v1" />
+
+const { z } = await import('/runtime/v1/zod');
+
 type GenericFormInstrumentData = {
   binaryCheck: boolean;
   binaryRadio: boolean;

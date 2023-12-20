@@ -2,7 +2,7 @@
 
 /// <reference types="@open-data-capture/runtime-v1" />
 
-const { z } = await import('@open-data-capture/runtime-v1');
+const { z } = await import('/runtime/v1/zod');
 
 type DeveloperHappinessData = {
   developerHappiness: number;
