@@ -46,6 +46,4 @@ declare global {
   >;
 }
 
-export function use() {
-  return import('react');
-}
+export {};

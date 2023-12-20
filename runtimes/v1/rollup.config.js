@@ -109,12 +109,10 @@ function resolveModule(id) {
 }
 
 /**
- * Returns the config for the entry point to the module and the type declarations
- * @param {string} id
+ * @param {{ main: string | Record<string, string>, types: string | Record<string, string> }} args
  * @returns {[import('rollup').RollupOptions, import('rollup').RollupOptions]}
  */
-function createModuleConfig(id) {
-  const { main, types } = resolveModule(id);
+function createModuleConfig({ main, types }) {
   return [
     {
       input: main,
@@ -146,18 +144,35 @@ function createModuleConfig(id) {
           format: 'es'
         }
       ],
-      plugins: [dts({ respectExternal: true })]
+      plugins: [
+        dts({
+          compilerOptions: {
+            paths: {
+              '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')]
+            }
+          },
+          respectExternal: true
+        })
+      ]
     }
   ];
 }
 
 /**
- * Create a config including all of the specified libraries
- * @param {string[]} modules
- * @returns {import('rollup').RollupOptions[]}
+ * Returns the config for the entry point to the module and the type declarations
+ * @param {string} id
+ * @returns {[import('rollup').RollupOptions, import('rollup').RollupOptions]}
  */
-function createConfig(...modules) {
-  return modules.flatMap(createModuleConfig);
+function createExternalModuleConfig(id) {
+  return createModuleConfig(resolveModule(id));
 }
 
-export default createConfig('react', 'zod');
+const externalPackages = ['react', 'zod'];
+
+/** @type {import('rollup').RollupOptions[]} */
+export default externalPackages.flatMap(createExternalModuleConfig).concat(
+  createModuleConfig({
+    main: path.resolve(import.meta.dir, 'index.ts'),
+    types: path.resolve(import.meta.dir, 'index.ts')
+  })
+);
