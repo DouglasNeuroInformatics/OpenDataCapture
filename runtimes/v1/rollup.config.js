@@ -109,12 +109,14 @@ function resolveModule(id) {
 }
 
 /**
- * @param {{ main: string | Record<string, string>, types: string | Record<string, string> }} args
- * @returns {[import('rollup').RollupOptions, import('rollup').RollupOptions]}
+ * @param {{ main?: string | Record<string, string>, types?: string | Record<string, string> }} args
+ * @returns {import('rollup').RollupOptions[]}
  */
 function createModuleConfig({ main, types }) {
-  return [
-    {
+  /** @type {import('rollup').RollupOptions[]} */
+  const items = [];
+  main &&
+    items.push({
       input: main,
       output: {
         dir: OUT_DIR,
@@ -135,8 +137,9 @@ function createModuleConfig({ main, types }) {
         }),
         typescript()
       ]
-    },
-    {
+    });
+  types &&
+    items.push({
       input: types,
       output: [
         {
@@ -154,14 +157,14 @@ function createModuleConfig({ main, types }) {
           respectExternal: true
         })
       ]
-    }
-  ];
+    });
+  return items;
 }
 
 /**
  * Returns the config for the entry point to the module and the type declarations
  * @param {string} id
- * @returns {[import('rollup').RollupOptions, import('rollup').RollupOptions]}
+ * @returns {import('rollup').RollupOptions[]}
  */
 function createExternalModuleConfig(id) {
   return createModuleConfig(resolveModule(id));
@@ -172,7 +175,6 @@ const externalPackages = ['react', 'zod'];
 /** @type {import('rollup').RollupOptions[]} */
 export default externalPackages.flatMap(createExternalModuleConfig).concat(
   createModuleConfig({
-    main: path.resolve(import.meta.dir, 'index.ts'),
     types: path.resolve(import.meta.dir, 'index.ts')
   })
 );
