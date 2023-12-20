@@ -9,6 +9,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
+import { defineConfig } from 'rollup';
 import dts from 'rollup-plugin-dts';
 
 const OUT_DIR = path.resolve(import.meta.dir, 'dist');
@@ -108,74 +109,59 @@ function resolveModule(id) {
   };
 }
 
-/**
- * @param {{ main?: string | Record<string, string>, types?: string | Record<string, string> }} args
- * @returns {import('rollup').RollupOptions[]}
- */
-function createModuleConfig({ main, types }) {
-  /** @type {import('rollup').RollupOptions[]} */
-  const items = [];
-  main &&
-    items.push({
-      input: main,
-      output: {
+const modules = {
+  react: resolveModule('react'),
+  zod: resolveModule('zod')
+};
+
+export default defineConfig([
+  {
+    input: {
+      core: path.resolve(import.meta.dir, 'core.ts'),
+      ...modules.react.main,
+      ...modules.zod.main
+    },
+    output: {
+      dir: OUT_DIR,
+      format: 'es',
+      generatedCode: 'es2015',
+      plugins: [terser()]
+    },
+    plugins: [
+      commonjs(),
+      resolve({
+        browser: true,
+        extensions: ['.js', '.ts'],
+        rootDir: ROOT_DIR
+      }),
+      replace({
+        preventAssignment: false,
+        'process.env.NODE_ENV': '"production"'
+      }),
+      typescript()
+    ]
+  },
+  {
+    input: {
+      core: path.resolve(import.meta.dir, 'core.ts'),
+      ...modules.react.types,
+      ...modules.zod.types
+    },
+    output: [
+      {
         dir: OUT_DIR,
-        format: 'es',
-        generatedCode: 'es2015',
-        plugins: [terser()]
-      },
-      plugins: [
-        commonjs(),
-        resolve({
-          browser: true,
-          extensions: ['.js', '.ts'],
-          rootDir: ROOT_DIR
-        }),
-        replace({
-          preventAssignment: false,
-          'process.env.NODE_ENV': '"production"'
-        }),
-        typescript()
-      ]
-    });
-  types &&
-    items.push({
-      input: types,
-      output: [
-        {
-          dir: OUT_DIR,
-          format: 'es'
-        }
-      ],
-      plugins: [
-        dts({
-          compilerOptions: {
-            paths: {
-              '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')]
-            }
-          },
-          respectExternal: true
-        })
-      ]
-    });
-  return items;
-}
-
-/**
- * Returns the config for the entry point to the module and the type declarations
- * @param {string} id
- * @returns {import('rollup').RollupOptions[]}
- */
-function createExternalModuleConfig(id) {
-  return createModuleConfig(resolveModule(id));
-}
-
-const externalPackages = ['react', 'zod'];
-
-/** @type {import('rollup').RollupOptions[]} */
-export default externalPackages.flatMap(createExternalModuleConfig).concat(
-  createModuleConfig({
-    main: path.resolve(import.meta.dir, 'core.ts'),
-    types: path.resolve(import.meta.dir, 'core.ts')
-  })
-);
+        format: 'es'
+      }
+    ],
+    plugins: [
+      dts({
+        compilerOptions: {
+          paths: {
+            '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')]
+          }
+        },
+        respectExternal: true
+      })
+    ]
+  }
+]);
