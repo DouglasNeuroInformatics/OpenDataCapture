@@ -16,7 +16,7 @@ export type Instrument = FormInstrument | InteractiveInstrument;
 
 export const $Instrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies Zod.ZodType<Instrument>;
 
-type StrictInstrumentDef<TData, TLanguage extends InstrumentLanguage> =
+export type StrictInstrumentDef<TData, TLanguage extends InstrumentLanguage> =
   | FormInstrumentDef<TData, TLanguage>
   | InteractiveInstrumentDef<TData, TLanguage>;
 
