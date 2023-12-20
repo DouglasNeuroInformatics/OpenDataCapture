@@ -16,7 +16,7 @@ const ROOT_DIR = path.resolve(import.meta.dir, '..', '..');
 
 /**
  * Returns whether `exports` is a plain object, and therefore matches `ExportConditions`
- * @param {import('type-fest').PackageJson.Exports} [exports ]
+ * @param {import('type-fest').PackageJson.Exports} [exports]
  * @returns {exports is import('type-fest').PackageJson.ExportConditions}
  */
 function isExportConditions(exports) {
@@ -151,4 +151,13 @@ function createModuleConfig(id) {
   ];
 }
 
-export default [...createModuleConfig('react')];
+/**
+ * Create a config including all of the specified libraries
+ * @param {string[]} modules
+ * @returns {import('rollup').RollupOptions[]}
+ */
+function createConfig(...modules) {
+  return modules.flatMap(createModuleConfig);
+}
+
+export default createConfig('react', 'zod');
