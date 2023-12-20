@@ -3,8 +3,6 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "rm -rf dist && bunx --bun rollup -c",
     "format": "prettier --write src",

@@ -35,3 +35,7 @@ export const $InteractiveInstrument = $BaseInstrument.extend({
   kind: z.literal('interactive'),
   validationSchema: z.instanceof(z.ZodType<Json>)
 }) satisfies Zod.ZodType<InteractiveInstrument>;
+
+export type InteractiveInstrumentDef<TData, TLanguage extends InstrumentLanguage> = TData extends Json
+  ? InteractiveInstrument<TData, TLanguage>
+  : never;

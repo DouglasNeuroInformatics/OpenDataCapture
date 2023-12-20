@@ -175,6 +175,7 @@ const externalPackages = ['react', 'zod'];
 /** @type {import('rollup').RollupOptions[]} */
 export default externalPackages.flatMap(createExternalModuleConfig).concat(
   createModuleConfig({
-    types: path.resolve(import.meta.dir, 'index.ts')
+    main: path.resolve(import.meta.dir, 'core.ts'),
+    types: path.resolve(import.meta.dir, 'core.ts')
   })
 );

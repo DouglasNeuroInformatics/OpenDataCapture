@@ -353,23 +353,22 @@ export const $FormInstrument = $BaseInstrument.extend({
   validationSchema: z.instanceof(z.ZodType<Base.FormDataType>)
 }) satisfies Zod.ZodType<FormInstrument>;
 
-export type StrictFormInstrument<
-  TData extends Base.FormDataType = Base.FormDataType,
-  TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = IsValidFormData<TData> extends true
-  ? Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {
-      validationSchema: Zod.ZodObject<{
-        [K in keyof TData]: NonNullable<TData[K]> extends Base.PrimitiveFieldValue
-          ? Zod.ZodType<TData[K]>
-          : NonNullable<TData[K]> extends Base.ArrayFieldValue
-            ? Zod.ZodArray<
-                Zod.ZodObject<{
-                  [P in keyof NonNullable<TData[K]>[number]]: Zod.ZodType<NonNullable<TData[K]>[number][P]>;
-                }>
-              >
-            : never;
-      }>;
-    }
+export type FormInstrumentDef<TData, TLanguage extends InstrumentLanguage> = TData extends Base.FormDataType
+  ? IsValidFormData<TData> extends true
+    ? Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {
+        validationSchema: Zod.ZodObject<{
+          [K in keyof TData]: NonNullable<TData[K]> extends Base.PrimitiveFieldValue
+            ? Zod.ZodType<TData[K]>
+            : NonNullable<TData[K]> extends Base.ArrayFieldValue
+              ? Zod.ZodArray<
+                  Zod.ZodObject<{
+                    [P in keyof NonNullable<TData[K]>[number]]: Zod.ZodType<NonNullable<TData[K]>[number][P]>;
+                  }>
+                >
+              : never;
+        }>;
+      }
+    : never
   : never;
 
 export type FormInstrumentSummary<
