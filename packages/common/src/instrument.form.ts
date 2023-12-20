@@ -353,7 +353,7 @@ export const $FormInstrument = $BaseInstrument.extend({
   validationSchema: z.instanceof(z.ZodType<Base.FormDataType>)
 }) satisfies Zod.ZodType<FormInstrument>;
 
-export type FormInstrumentDef<TData, TLanguage extends InstrumentLanguage> = TData extends Base.FormDataType
+export type StrictFormInstrument<TData, TLanguage extends InstrumentLanguage> = TData extends Base.FormDataType
   ? IsValidFormData<TData> extends true
     ? Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {
         validationSchema: Zod.ZodObject<{

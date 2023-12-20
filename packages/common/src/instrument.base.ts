@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { $BaseModel, $Language, type Language } from './core';
 
-export const $InstrumentKind = z.enum(['form']);
+export const $InstrumentKind = z.enum(['form', 'interactive']);
 
 export type InstrumentKind = z.infer<typeof $InstrumentKind>;
 
