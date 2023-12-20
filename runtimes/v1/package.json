@@ -8,7 +8,8 @@
   "scripts": {
     "build": "rm -rf dist && bunx --bun rollup -c",
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "postinstall": "bun run build"
   },
   "dependencies": {
     "@douglasneuroinformatics/form-types": "^5.0.2",
