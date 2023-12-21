@@ -1,7 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-/// <reference types="@open-data-capture/runtime-v1" />
-
+const { InstrumentFactory } = await import('/runtime/v1/core');
 const { z } = await import('/runtime/v1/zod');
 
 type DeveloperHappinessData = {
@@ -15,12 +14,23 @@ type DeveloperHappinessData = {
   }[];
 };
 
-const developerHappinessQuestionnaire: StrictFormInstrument<DeveloperHappinessData, InstrumentLanguage> = {
+const instrumentFactory = new InstrumentFactory({
+  kind: 'form',
+  language: 'en'
+});
+
+export default instrumentFactory.createInstrument<DeveloperHappinessData>({
   kind: 'form',
   name: 'TestInstrument',
   language: 'en',
   tags: ['Well-Being'],
   version: 1.1,
+  details: {
+    title: 'Developer happiness questionnaire',
+    description: 'This is where we check if people are unhappy with TypeScript',
+    estimatedDuration: 5,
+    instructions: 'You know how to use the web'
+  },
   content: {
     developerHappiness: {
       kind: 'numeric',
@@ -75,13 +85,5 @@ const developerHappinessQuestionnaire: StrictFormInstrument<DeveloperHappinessDa
         dateOfMerge: z.date().optional()
       })
     )
-  }),
-  details: {
-    title: 'Developer happiness questionnaire',
-    description: 'This is where we check if people are unhappy with TypeScript',
-    estimatedDuration: 5,
-    instructions: 'You know how to use the web'
-  }
-};
-
-export default developerHappinessQuestionnaire;
+  })
+});

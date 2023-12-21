@@ -36,7 +36,7 @@ type InstrumentDef<
 export class InstrumentFactory<TKind extends InstrumentKind, TLanguage extends InstrumentLanguage> {
   constructor(private options: { kind: TKind; language: TLanguage }) {}
 
-  defineInstrument<TData extends DiscriminatedInstrumentData<TKind>>(def: InstrumentDef<TKind, TData, TLanguage>) {
+  createInstrument<TData extends DiscriminatedInstrumentData<TKind>>(def: InstrumentDef<TKind, TData, TLanguage>) {
     return { ...this.options, ...def };
   }
 }
