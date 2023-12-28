@@ -10,6 +10,15 @@
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "rollup": "^4.6.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "type-fest": "^4.8.3"
+  },
   "devDependencies": {}
 }
