@@ -7,6 +7,8 @@ import type {
   StrictFormInstrument
 } from '@open-data-capture/common/instrument';
 
+import 'zod';
+
 type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['form']
   ? FormDataType
   : [TKind] extends ['interactive']
