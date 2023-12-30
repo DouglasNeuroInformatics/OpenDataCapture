@@ -6,8 +6,8 @@
   "scripts": {
     "build": "rm -rf dist && bunx --bun rollup --config rollup.config.ts --configPlugin typescript",
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
-    "postinstall": "bun run build"
+    "postinstall": "bun run build",
+    "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@douglasneuroinformatics/form-types": "^5.0.2",
@@ -17,6 +17,7 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.39.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
