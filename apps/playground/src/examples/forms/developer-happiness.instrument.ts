@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
 const { InstrumentFactory } = await import('/runtime/v1/core');
-const { z } = await import('/runtime/v1/zod');
+// const { z } = await import('/runtime/v1/zod');
 
 type DeveloperHappinessData = {
   developerHappiness: number;

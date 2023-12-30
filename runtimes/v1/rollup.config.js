@@ -53,11 +53,6 @@ export default defineConfig([
     ],
     plugins: [
       dts({
-        compilerOptions: {
-          paths: {
-            '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')]
-          }
-        },
         respectExternal: true
       })
     ]
