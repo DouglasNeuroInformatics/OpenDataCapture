@@ -13,7 +13,7 @@ export const $Visit = z.object({
   subject: $Subject,
   subjectId: z.string(),
   updatedAt: z.coerce.date()
-}) satisfies Zod.ZodType<VisitModel>;
+}) satisfies z.ZodType<VisitModel>;
 
 export const $CreateVisitData = z.object({
   date: z.coerce.date(),

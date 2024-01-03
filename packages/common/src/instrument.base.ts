@@ -29,14 +29,14 @@ export type InstrumentUIOption<TLanguage extends InstrumentLanguage, TValue> = T
     ? Record<K, TValue>
     : never;
 
-export const $InstrumentUIOption = <T extends Zod.ZodTypeAny>(schema: T) =>
+export const $InstrumentUIOption = <T extends z.ZodTypeAny>(schema: T) =>
   z.union([
     schema,
     z.object({
       en: schema,
       fr: schema
     })
-  ]) satisfies Zod.ZodType<InstrumentUIOption<InstrumentLanguage, unknown>>;
+  ]) satisfies z.ZodType<InstrumentUIOption<InstrumentLanguage, unknown>>;
 
 /**
  * An object containing the base details of any instrument to be displayed to the user. This may be
@@ -55,7 +55,7 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
 export const $BaseInstrumentDetails = z.object({
   description: $InstrumentUIOption(z.string().min(1)),
   title: $InstrumentUIOption(z.string().min(1))
-}) satisfies Zod.ZodType<BaseInstrumentDetails>;
+}) satisfies z.ZodType<BaseInstrumentDetails>;
 
 /** An object with additional details relevant to multiple categories of instrument  */
 export type EnhancedBaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
@@ -69,7 +69,7 @@ export type EnhancedBaseInstrumentDetails<TLanguage extends InstrumentLanguage =
 export const $EnhancedBaseInstrumentDetails = $BaseInstrumentDetails.extend({
   estimatedDuration: z.number().int().positive(),
   instructions: $InstrumentUIOption(z.array(z.string().min(1)))
-}) satisfies Zod.ZodType<EnhancedBaseInstrumentDetails>;
+}) satisfies z.ZodType<EnhancedBaseInstrumentDetails>;
 
 /**
  * The basic properties common to all instruments. Specific types of instruments (e.g., form, interactive)
@@ -104,7 +104,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   tags: InstrumentUIOption<TLanguage, string[]>;
 
   /** The zod validation schema for the instrument data */
-  validationSchema: Zod.ZodType<TData>;
+  validationSchema: z.ZodType<TData>;
 
   /** The version of the instrument */
   version: number;
@@ -120,7 +120,7 @@ export const $BaseInstrument = $BaseModel.extend({
   tags: $InstrumentUIOption(z.array(z.string().min(1))),
   validationSchema: z.instanceof(z.ZodType),
   version: z.number()
-}) satisfies Zod.ZodType<BaseInstrument>;
+}) satisfies z.ZodType<BaseInstrument>;
 
 /**
  * An object containing the essential data describing an instrument, but omitting the content
@@ -138,7 +138,7 @@ export type BaseInstrumentSummary<TData = unknown, TLanguage extends InstrumentL
 export const $BaseInstrumentSummary = $BaseInstrument.omit({
   content: true,
   validationSchema: true
-}) satisfies Zod.ZodType<BaseInstrumentSummary>;
+}) satisfies z.ZodType<BaseInstrumentSummary>;
 
 export type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 

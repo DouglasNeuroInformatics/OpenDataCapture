@@ -17,7 +17,7 @@ export type InteractiveInstrument<TData extends Json = Json, TLanguage extends L
   }
 >;
 
-export const $InteractiveInstrument = z.any() as Zod.ZodType<InteractiveInstrument>;
+export const $InteractiveInstrument = z.any() as z.ZodType<InteractiveInstrument>;
 
 // export const $InteractiveInstrument = $BaseInstrument.extend({
 //   content: z.object({
@@ -26,4 +26,4 @@ export const $InteractiveInstrument = z.any() as Zod.ZodType<InteractiveInstrume
 //   details: $EnhancedBaseInstrumentDetails,
 //   kind: z.literal('interactive'),
 //   validationSchema: z.instanceof(z.ZodType<Json>)
-// }) satisfies Zod.ZodType<InteractiveInstrument>;
+// }) satisfies z.ZodType<InteractiveInstrument>;

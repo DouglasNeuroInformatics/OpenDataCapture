@@ -24,7 +24,7 @@ export type AssignmentSummary = Omit<Assignment, 'instrument'> & {
 
 export const $AssignmentSummary = $Assignment.extend({
   instrument: $BaseInstrumentSummary
-}) satisfies Zod.ZodType<AssignmentSummary>;
+}) satisfies z.ZodType<AssignmentSummary>;
 
 export type CreateAssignmentData = {
   expiresAt: Date;
@@ -36,7 +36,7 @@ export const $CreateAssignmentData = z.object({
   expiresAt: z.coerce.date().min(new Date()),
   instrumentId: $ValidObjectId,
   subjectIdentifier: z.string()
-}) satisfies Zod.ZodType<CreateAssignmentData>;
+}) satisfies z.ZodType<CreateAssignmentData>;
 
 export const $UpdateAssignmentData = z
   .object({

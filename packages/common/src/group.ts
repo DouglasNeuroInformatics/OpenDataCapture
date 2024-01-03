@@ -7,7 +7,7 @@ export type Group = Omit<GroupModel, 'subjectIds' | 'userIds'>;
 
 export const $Group = $BaseModel.extend({
   name: z.string().min(1)
-}) satisfies Zod.ZodType<Group>;
+}) satisfies z.ZodType<Group>;
 
 export const $CreateGroupData = z.object({
   name: z.string().min(1)

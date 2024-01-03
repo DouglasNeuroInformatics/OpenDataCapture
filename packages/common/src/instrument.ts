@@ -8,7 +8,7 @@ import type { Json, Language } from './core';
 
 export type Instrument = FormInstrument | InteractiveInstrument;
 
-export const $Instrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies Zod.ZodType<Instrument>;
+export const $Instrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies z.ZodType<Instrument>;
 
 export type UnilingualInstrument = FormInstrument<FormDataType, Language> | InteractiveInstrument<Json, Language>;
 
