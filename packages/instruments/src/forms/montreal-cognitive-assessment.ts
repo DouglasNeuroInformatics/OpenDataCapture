@@ -1,6 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory, z } = await import('/runtime/v0.0.1/index.js');
+const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
+const { z } = await import('/runtime/v0.0.1/zod.js');
 
 type MontrealCognitiveAssessmentData = {
   abstraction: number;
