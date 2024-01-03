@@ -3,20 +3,11 @@ import type React from 'react';
 import type { Merge } from 'type-fest';
 import { z } from 'zod';
 
-import { $Json, type Json } from './core';
-import {
-  $BaseInstrument,
-  $EnhancedBaseInstrumentDetails,
-  type BaseInstrument,
-  type EnhancedBaseInstrumentDetails,
-  type InstrumentLanguage
-} from './instrument.base';
+import { type Json, type Language } from './core';
+import { type BaseInstrument, type EnhancedBaseInstrumentDetails } from './instrument.base';
 
-export type InteractiveInstrument<
-  TData extends Json = Json,
-  TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = Merge<
-  BaseInstrument<TData>,
+export type InteractiveInstrument<TData extends Json = Json, TLanguage extends Language = Language> = Merge<
+  BaseInstrument<TData, Language>,
   {
     content: {
       render: (done: (data: TData) => void) => React.ReactNode;
@@ -26,12 +17,13 @@ export type InteractiveInstrument<
   }
 >;
 
-export const $InteractiveInstrument = $BaseInstrument.extend({
-  content: z.object({
-    render: z.function().args(z.any()).returns(z.any())
-  }),
-  data: $Json,
-  details: $EnhancedBaseInstrumentDetails,
-  kind: z.literal('interactive'),
-  validationSchema: z.instanceof(z.ZodType<Json>)
-}) satisfies Zod.ZodType<InteractiveInstrument>;
+export const $InteractiveInstrument = z.any() as Zod.ZodType<InteractiveInstrument>;
+
+// export const $InteractiveInstrument = $BaseInstrument.extend({
+//   content: z.object({
+//     render: z.function().args(z.any()).returns(z.any())
+//   }),
+//   details: $EnhancedBaseInstrumentDetails,
+//   kind: z.literal('interactive'),
+//   validationSchema: z.instanceof(z.ZodType<Json>)
+// }) satisfies Zod.ZodType<InteractiveInstrument>;

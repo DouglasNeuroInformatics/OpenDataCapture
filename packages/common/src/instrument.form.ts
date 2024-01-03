@@ -341,6 +341,7 @@ export type FormInstrument<
   Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
     content: FormInstrumentContent<TData, TLanguage>;
     details: EnhancedBaseInstrumentDetails<TLanguage>;
+    kind: 'form';
     measures?: FormInstrumentMeasures<TData, TLanguage>;
   }
 >;
