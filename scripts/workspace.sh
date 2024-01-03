@@ -30,4 +30,5 @@ if [[ ! ${WORKSPACE_DIRS["$workspace"]} ]]; then
 fi
 
 DIR=${WORKSPACE_DIRS["$workspace"]}
-cd "$DIR" && "$@"
+cd "$DIR" 
+bun run "$@"

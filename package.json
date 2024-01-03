@@ -14,6 +14,7 @@
     "build:api": "env-cmd cross-env NODE_ENV=production turbo run build --filter=@open-data-capture/api",
     "build:web": "env-cmd cross-env NODE_ENV=production turbo run build --filter=@open-data-capture/web",
     "clean": "find . -type d '(' -name '.turbo' -o -name 'dist' -o -name 'node_modules' ')' -prune -exec rm -rf {} \\;",
+    "clean-workflows": "./scripts/clean-workflows.sh",
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",
     "dev": "bun dev:core",
