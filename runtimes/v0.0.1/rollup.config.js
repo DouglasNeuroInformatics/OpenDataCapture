@@ -15,7 +15,7 @@ const SRC_DIR = path.resolve(import.meta.dir, 'src');
 export default defineConfig([
   {
     input: {
-      index: path.resolve(SRC_DIR, 'index.ts'),
+      index: path.resolve(SRC_DIR, 'index.ts')
     },
     output: {
       dir: OUT_DIR,
@@ -39,7 +39,7 @@ export default defineConfig([
   },
   {
     input: {
-      index: path.resolve(SRC_DIR, 'index.ts'),
+      index: path.resolve(SRC_DIR, 'index.ts')
     },
     output: [
       {
@@ -49,6 +49,11 @@ export default defineConfig([
     ],
     plugins: [
       dts({
+        compilerOptions: {
+          paths: {
+            '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')]
+          }
+        },
         respectExternal: true
       })
     ]

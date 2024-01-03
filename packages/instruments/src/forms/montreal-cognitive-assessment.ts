@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+const { InstrumentFactory, z } = await import('/runtime/v0.0.1/index.js');
+
 type MontrealCognitiveAssessmentData = {
   abstraction: number;
   attention: number;
@@ -11,10 +13,13 @@ type MontrealCognitiveAssessmentData = {
   visuospatialExecutive: number;
 };
 
-const montrealCognitiveAssessment: FormInstrument<MontrealCognitiveAssessmentData, Language[]> = {
+const instrumentFactory = new InstrumentFactory({
   kind: 'form',
+  language: ['en', 'fr']
+});
+
+export default instrumentFactory.defineInstrument<MontrealCognitiveAssessmentData>({
   name: 'MontrealCognitiveAssessment',
-  language: ['en', 'fr'],
   tags: {
     en: ['Cognitive'],
     fr: ['Cognitif']
@@ -199,6 +204,4 @@ const montrealCognitiveAssessment: FormInstrument<MontrealCognitiveAssessmentDat
     orientation: z.number().int().gte(0).lte(6),
     visuospatialExecutive: z.number().int().gte(0).lte(5)
   })
-};
-
-export default montrealCognitiveAssessment;
+});

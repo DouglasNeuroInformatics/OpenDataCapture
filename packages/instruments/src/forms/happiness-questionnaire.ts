@@ -1,14 +1,19 @@
 /* eslint-disable perfectionist/sort-objects */
 
+const { InstrumentFactory, z } = await import('/runtime/v0.0.1/index.js');
+
 type HappinessQuestionnaireData = {
   overallHappiness: number;
   reasonForSadness?: string;
 };
 
-const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, InstrumentLanguage> = {
+const instrumentFactory = new InstrumentFactory({
   kind: 'form',
+  language: ['en', 'fr']
+});
+
+export default instrumentFactory.defineInstrument<HappinessQuestionnaireData>({
   name: 'HappinessQuestionnaire',
-  language: ['en', 'fr'],
   tags: {
     en: ['Well-Being'],
     fr: ['Bien-être']
@@ -76,6 +81,4 @@ const happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, Instrum
     overallHappiness: z.number().int().gte(1).lte(10),
     reasonForSadness: z.string().optional()
   })
-};
-
-export default happinessQuestionnaire;
+});

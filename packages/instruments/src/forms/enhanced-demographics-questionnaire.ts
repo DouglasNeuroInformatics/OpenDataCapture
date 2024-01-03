@@ -1,5 +1,9 @@
 /* eslint-disable perfectionist/sort-objects */
 
+const { InstrumentFactory, z } = await import('/runtime/v0.0.1/index.js');
+
+type Language = Extract<import('/runtime/v0.0.1/index').InstrumentLanguage, string>;
+
 type MultilingualOptions = Record<
   string,
   {
@@ -614,10 +618,13 @@ type EnhancedDemographicsQuestionnaireData = {
   yearsOfEducation?: number;
 };
 
-const enhancedDemographicsQuestionnaire: FormInstrument<EnhancedDemographicsQuestionnaireData, InstrumentLanguage> = {
+const instrumentFactory = new InstrumentFactory({
   kind: 'form',
+  language: ['en', 'fr']
+});
+
+export default instrumentFactory.defineInstrument<EnhancedDemographicsQuestionnaireData>({
   name: 'EnhancedDemographicsQuestionnaire',
-  language: ['en', 'fr'],
   tags: {
     en: ['Demographics'],
     fr: ['Démographie']
@@ -840,6 +847,4 @@ const enhancedDemographicsQuestionnaire: FormInstrument<EnhancedDemographicsQues
       yearsOfEducation: z.number().int().gte(0).lte(30)
     })
     .partial()
-};
-
-export default enhancedDemographicsQuestionnaire;
+});

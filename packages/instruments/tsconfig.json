@@ -1,6 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "paths": {
+      "/runtime/v0.0.1/*": ["../../runtimes/v0.0.1/dist/*"]
+    },
     "types": ["bun-types"]
   },
   "include": ["src"]

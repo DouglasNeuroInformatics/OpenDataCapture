@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+const { InstrumentFactory, z } = await import('/runtime/v0.0.1/index.js');
+
 type BriefPsychiatricRatingScaleData = {
   anxiety: number;
   bluntedAffect: number;
@@ -21,10 +23,13 @@ type BriefPsychiatricRatingScaleData = {
   unusualThoughtContent: number;
 };
 
-const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleData, 'en'> = {
+const instrumentFactory = new InstrumentFactory({
   kind: 'form',
+  language: 'en'
+});
+
+export default instrumentFactory.defineInstrument<BriefPsychiatricRatingScaleData>({
   name: 'BriefPsychiatricRatingScale',
-  language: 'en',
   tags: ['Schizophrenia', 'Psychosis'],
   version: 1,
   content: {
@@ -233,6 +238,4 @@ const briefPsychiatricRatingScale: FormInstrument<BriefPsychiatricRatingScaleDat
     excitement: z.number().int().min(0).max(7),
     disorientation: z.number().int().min(0).max(7)
   })
-};
-
-export default briefPsychiatricRatingScale;
+});

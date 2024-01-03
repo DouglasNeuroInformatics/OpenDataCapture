@@ -1,37 +1,42 @@
 import * as React from 'react';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import type { CoreModule as CM } from '@open-data-capture/common';
-import type { InstrumentModule as IM } from '@open-data-capture/common';
+import type { Json } from '@open-data-capture/common/core';
+import type {
+  InstrumentKind,
+  InstrumentLanguage,
+  InteractiveInstrument,
+  StrictFormInstrument
+} from '@open-data-capture/common/instrument';
 import { z } from 'zod';
 
-type DiscriminatedInstrumentData<TKind extends IM.InstrumentKind> = [TKind] extends ['form']
+type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['form']
   ? FormDataType
   : [TKind] extends ['interactive']
-    ? CM.Json
+    ? Json
     : never;
 
 type DiscriminatedInstrument<
-  TKind extends IM.InstrumentKind,
+  TKind extends InstrumentKind,
   TData extends DiscriminatedInstrumentData<TKind>,
-  TLanguage extends IM.InstrumentLanguage
+  TLanguage extends InstrumentLanguage
 > = [TKind] extends ['form']
   ? TData extends FormDataType
-    ? IM.StrictFormInstrument<TData, TLanguage>
+    ? StrictFormInstrument<TData, TLanguage>
     : never
   : [TKind] extends ['interactive']
-    ? TData extends CM.Json
-      ? IM.InteractiveInstrument<TData, TLanguage>
+    ? TData extends Json
+      ? InteractiveInstrument<TData, TLanguage>
       : never
     : never;
 
 type InstrumentDef<
-  TKind extends IM.InstrumentKind,
+  TKind extends InstrumentKind,
   TData extends DiscriminatedInstrumentData<TKind>,
-  TLanguage extends IM.InstrumentLanguage
+  TLanguage extends InstrumentLanguage
 > = Omit<DiscriminatedInstrument<TKind, TData, TLanguage>, 'kind' | 'language'>;
 
-export class InstrumentFactory<TKind extends IM.InstrumentKind, TLanguage extends IM.InstrumentLanguage> {
+export class InstrumentFactory<TKind extends InstrumentKind, TLanguage extends InstrumentLanguage> {
   constructor(private options: { kind: TKind; language: TLanguage }) {}
 
   defineInstrument<TData extends DiscriminatedInstrumentData<TKind>>(def: InstrumentDef<TKind, TData, TLanguage>) {
@@ -40,3 +45,5 @@ export class InstrumentFactory<TKind extends IM.InstrumentKind, TLanguage extend
 }
 
 export { React, z };
+
+export type { InstrumentKind, InstrumentLanguage, InteractiveInstrument, StrictFormInstrument };

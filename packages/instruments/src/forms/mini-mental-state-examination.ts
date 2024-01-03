@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+const { InstrumentFactory, z } = await import('/runtime/v0.0.1/index.js');
+
 type MiniMentalStateExaminationData = {
   canCopyDesign: number;
   canFollowOralInstructions: number;
@@ -23,10 +25,13 @@ type MiniMentalStateExaminationData = {
   year: number;
 };
 
-const miniMentalStateExamination: FormInstrument<MiniMentalStateExaminationData, Language[]> = {
+const instrumentFactory = new InstrumentFactory({
   kind: 'form',
+  language: ['en', 'fr']
+});
+
+export default instrumentFactory.defineInstrument<MiniMentalStateExaminationData>({
   name: 'MiniMentalStateExamination',
-  language: ['en', 'fr'],
   tags: {
     en: ['Cognitive'],
     fr: ['Cognitif']
@@ -482,6 +487,4 @@ const miniMentalStateExamination: FormInstrument<MiniMentalStateExaminationData,
     spellWorldScore: z.number().int().gte(0).lte(5),
     year: z.number().int().gte(0).lte(1)
   })
-};
-
-export default miniMentalStateExamination;
+});
