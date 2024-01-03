@@ -51,7 +51,7 @@ export const Navbar = ({ activeItemId, i18n, items, onNavigate }: NavbarProps) =
                   orientation="horizontal"
                   onNavigate={onNavigate}
                 />
-                <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-600 md:block" />
+                <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 md:block dark:bg-slate-600" />
               </React.Fragment>
             )}
             <div className="flex gap-3 bg-inherit">

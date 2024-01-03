@@ -1,14 +1,14 @@
 import { Card, useDownload } from '@douglasneuroinformatics/ui';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
-import type { Language } from '@open-data-capture/common/core';
+import type { Json, Language } from '@open-data-capture/common/core';
 import type { InteractiveInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 
 export type InteractiveSummaryProps = {
   data: unknown;
-  instrument: InteractiveInstrument<unknown, Language>;
-  subject?: Subject;
+  instrument: InteractiveInstrument<Json, Language>;
+  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'identifier' | 'lastName' | 'sex'>;
   timeCollected: number;
 };
 
@@ -36,7 +36,7 @@ export const InteractiveSummary = ({ data, instrument, timeCollected }: Interact
               })
             })}
           </p>
-          <div className="flex justify-end gap-4 text-slate-600 dark:text-slate-300 print:hidden">
+          <div className="flex justify-end gap-4 text-slate-600 print:hidden dark:text-slate-300">
             <button type="button">
               <ArrowDownTrayIcon height={20} width={20} onClick={handleDownload} />
             </button>

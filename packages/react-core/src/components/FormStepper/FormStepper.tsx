@@ -17,7 +17,7 @@ import { FormSummary } from './FormSummary';
 type FormStepperProps = {
   form: FormInstrument<FormDataType, Language>;
   onSubmit: (data: FormDataType) => Promisable<void>;
-  subject?: Subject;
+  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'identifier' | 'lastName' | 'sex'>;
 };
 
 const FormStepperComponent = ({ form, onSubmit, subject }: FormStepperProps) => {

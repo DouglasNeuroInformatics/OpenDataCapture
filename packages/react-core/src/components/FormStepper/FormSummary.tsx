@@ -13,7 +13,7 @@ import { FormSummaryGroup } from './FormSummaryGroup';
 export type FormSummaryProps = {
   data: FormDataType;
   form: FormInstrument<FormDataType, Language>;
-  subject?: Subject;
+  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'identifier' | 'lastName' | 'sex'>;
   timeCollected: number;
 };
 
@@ -43,7 +43,7 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
               })
             })}
           </p>
-          <div className="flex justify-end gap-4 text-slate-600 dark:text-slate-300 print:hidden">
+          <div className="flex justify-end gap-4 text-slate-600 print:hidden dark:text-slate-300">
             <button type="button">
               <ArrowDownTrayIcon height={20} width={20} onClick={handleDownload} />
             </button>
