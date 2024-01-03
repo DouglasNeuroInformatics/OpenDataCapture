@@ -1,6 +1,6 @@
 import { loader } from '@monaco-editor/react';
-import types from '@open-data-capture/instrument-runtime/env.d.ts?raw';
-import reactTypes from '@open-data-capture/instrument-runtime/react.d.ts?raw';
+import coreTypes from '@open-data-capture/runtime-v0.0.1/dist/core.d.ts?raw';
+import reactTypes from '@open-data-capture/runtime-v0.0.1/dist/react.d.ts?raw';
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
@@ -35,8 +35,8 @@ void loader.init().then((monaco) => {
   configurer.configure({
     libraries: [
       {
-        content: types,
-        path: 'index.d.ts'
+        content: coreTypes,
+        path: 'core.d.ts'
       },
       {
         content: reactTypes,
