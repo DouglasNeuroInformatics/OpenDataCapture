@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import type { Json, Language } from '@open-data-capture/common/core';
 import type {
@@ -8,7 +6,6 @@ import type {
   InteractiveInstrument,
   StrictFormInstrument
 } from '@open-data-capture/common/instrument';
-import { z } from 'zod';
 
 type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['form']
   ? FormDataType
@@ -45,7 +42,5 @@ export class InstrumentFactory<TKind extends InstrumentKind, TLanguage extends I
     return { ...this.options, ...def };
   }
 }
-
-export { React, z };
 
 export type { InstrumentKind, InstrumentLanguage, InteractiveInstrument, StrictFormInstrument };

@@ -10,12 +10,20 @@ import dts from 'rollup-plugin-dts';
 
 const OUT_DIR = path.resolve(import.meta.dir, 'dist');
 const ROOT_DIR = path.resolve(import.meta.dir, '..', '..');
-const SRC_DIR = path.resolve(import.meta.dir, 'src');
+
+import { resolveModule } from '@open-data-capture/runtime-bundler';
+
+const modules = {
+  react: resolveModule('react'),
+  zod: resolveModule('zod')
+};
 
 export default defineConfig([
   {
     input: {
-      index: path.resolve(SRC_DIR, 'index.ts')
+      core: path.resolve(import.meta.dir, 'src', 'core.ts'),
+      ...modules.react.main,
+      ...modules.zod.main
     },
     output: {
       dir: OUT_DIR,
@@ -39,7 +47,9 @@ export default defineConfig([
   },
   {
     input: {
-      index: path.resolve(SRC_DIR, 'index.ts')
+      core: path.resolve(import.meta.dir, 'src', 'core.ts'),
+      ...modules.react.types,
+      ...modules.zod.types
     },
     output: [
       {
