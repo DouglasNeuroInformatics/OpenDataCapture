@@ -17,6 +17,7 @@
     "type-fest": "^4.8.2"
   },
   "devDependencies": {
+    "@open-data-capture/instruments": "workspace:*",
     "@swc/types": "^0.1.5"
   }
 }

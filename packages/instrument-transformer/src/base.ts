@@ -2,6 +2,12 @@ import type { Module } from '@swc/types';
 
 import type { ModuleItemType, ParseOptions, TransformOptions, Transpiler } from './types';
 
+/**
+ * `BaseInstrumentTransformer` and all derived subclasses are responsible for transpiling the TypeScript source code
+ * (including potentially, JSX syntax) to vanilla JavaScript that can run in the browser. Since dynamic import is a
+ * requirement of the runtime in general, ES2022 is targeted. Therefore, some kind of fallback/error handling should
+ * be implemented for legacy browsers.
+ */
 export abstract class BaseInstrumentTransformer {
   /** The variable name that 'export default' is replaced by */
   private readonly defaultExportSub = '__instrument__';
@@ -16,7 +22,7 @@ export abstract class BaseInstrumentTransformer {
 
   private readonly parseOptions: ParseOptions = {
     syntax: 'typescript',
-    target: 'es2020',
+    target: 'es2022',
     tsx: true
   };
 
@@ -26,7 +32,7 @@ export abstract class BaseInstrumentTransformer {
         syntax: 'typescript',
         tsx: true
       },
-      target: 'es2020',
+      target: 'es2022',
       transform: {
         react: {
           runtime: 'classic'
@@ -62,9 +68,9 @@ export abstract class BaseInstrumentTransformer {
   private transformDefaultExport(src: string) {
     let input = src;
     input = src.replace('export default', `const ${this.defaultExportSub} =`);
-    return `(({ z }) => {
+    return `(async () => {
       ${input}
-      return __instrument__
+      return ${this.defaultExportSub}
     })`;
   }
 
