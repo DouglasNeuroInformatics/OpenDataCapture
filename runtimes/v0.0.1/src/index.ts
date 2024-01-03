@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import type { Json } from '@open-data-capture/common/core';
+import type { Json, Language } from '@open-data-capture/common/core';
 import type {
   InstrumentKind,
   InstrumentLanguage,
@@ -26,7 +26,9 @@ type DiscriminatedInstrument<
     : never
   : [TKind] extends ['interactive']
     ? TData extends Json
-      ? InteractiveInstrument<TData, TLanguage>
+      ? TLanguage extends Language
+        ? InteractiveInstrument<TData, TLanguage>
+        : never
       : never
     : never;
 

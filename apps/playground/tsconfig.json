@@ -7,9 +7,9 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"],
-      "/runtime/v1/*": ["../../runtimes/v1/dist/*"]
+      "/runtime/v0.0.1/*": ["../../runtimes/v0.0.1/dist/*"]
     },
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "vite.config.ts"]
+  "include": ["src", "vite.config.ts"]
 }
