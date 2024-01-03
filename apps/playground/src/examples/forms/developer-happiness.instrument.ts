@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v1/core');
-// const { z } = await import('/runtime/v1/zod');
+const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
+const { z } = await import('/runtime/v0.0.1/zod');
 
 type DeveloperHappinessData = {
   developerHappiness: number;
@@ -19,10 +19,8 @@ const instrumentFactory = new InstrumentFactory({
   language: 'en'
 });
 
-export default instrumentFactory.createInstrument<DeveloperHappinessData>({
-  kind: 'form',
+export default instrumentFactory.defineInstrument<DeveloperHappinessData>({
   name: 'TestInstrument',
-  language: 'en',
   tags: ['Well-Being'],
   version: 1.1,
   details: {

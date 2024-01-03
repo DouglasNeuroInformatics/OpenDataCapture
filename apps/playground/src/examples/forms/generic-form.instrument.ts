@@ -1,9 +1,8 @@
 /* eslint-disable perfectionist/sort-object-types */
 /* eslint-disable perfectionist/sort-objects */
 
-/// <reference types="@open-data-capture/runtime-v1" />
-
-const { z } = await import('/runtime/v1/zod');
+const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
+const { z } = await import('/runtime/v0.0.1/zod');
 
 type GenericFormInstrumentData = {
   binaryCheck: boolean;
@@ -20,11 +19,12 @@ type GenericFormInstrumentData = {
   }[];
 };
 
-type GenericFormInstrument = StrictFormInstrument<GenericFormInstrumentData, 'en'>;
-
-const genericFormInstrument: GenericFormInstrument = {
+const instrumentFactory = new InstrumentFactory({
   kind: 'form',
-  language: 'en',
+  language: 'en'
+});
+
+export default instrumentFactory.defineInstrument<GenericFormInstrumentData>({
   name: 'GenericInstrument',
   tags: ['Example'],
   version: 1.0,
@@ -113,6 +113,4 @@ const genericFormInstrument: GenericFormInstrument = {
       })
     )
   })
-};
-
-export default genericFormInstrument;
+});

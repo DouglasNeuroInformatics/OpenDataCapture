@@ -1,21 +1,30 @@
+const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
+const { useEffect, useState } = await import('/runtime/v0.0.1/react').then((module) => module.default);
+const { z } = await import('/runtime/v0.0.1/zod');
+
 type ClickTaskData = {
   count: number;
 };
 
-const clickTask: InteractiveInstrument<ClickTaskData, 'en'> = {
+const instrumentFactory = new InstrumentFactory({
+  kind: 'interactive',
+  language: 'en'
+});
+
+export default instrumentFactory.defineInstrument<ClickTaskData>({
   content: {
     render: (done) => {
-      const [count, setCount] = React.useState(0);
-      const [secondsRemaining, setSecondsRemaining] = React.useState(10);
+      const [count, setCount] = useState(0);
+      const [secondsRemaining, setSecondsRemaining] = useState(10);
 
-      React.useEffect(() => {
+      useEffect(() => {
         const id = setInterval(() => {
           setSecondsRemaining((prev) => prev - 1);
         }, 1000);
         return () => clearInterval(id);
       }, []);
-
-      React.useEffect(() => {
+      
+      useEffect(() => {
         if (0 > secondsRemaining) {
           done({ count });
         }
@@ -43,12 +52,8 @@ const clickTask: InteractiveInstrument<ClickTaskData, 'en'> = {
       'When you begin this task, a 10 second countdown will begin. Please click the button as many times as you can before it expires.',
     title: 'Click Task'
   },
-  kind: 'interactive',
-  language: 'en',
   name: 'InteractiveInstrument',
   tags: ['Interactive'],
   validationSchema: z.any(),
   version: 1.0
-};
-
-export default clickTask;
+});
