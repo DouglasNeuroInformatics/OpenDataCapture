@@ -7,7 +7,7 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "runtimes/*"
+    "runtime/*"
   ],
   "scripts": {
     "build": "env-cmd cross-env NODE_ENV=production turbo run build",

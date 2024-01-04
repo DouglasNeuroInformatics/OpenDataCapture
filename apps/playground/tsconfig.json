@@ -7,7 +7,7 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"],
-      "/runtime/v0.0.1/*": ["../../runtimes/v0.0.1/dist/*"]
+      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/dist/*"]
     },
     "resolveJsonModule": true
   },

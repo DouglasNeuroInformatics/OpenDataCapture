@@ -34,6 +34,7 @@
     "zod-validation-error": "^2.1.0"
   },
   "devDependencies": {
+    "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "@types/react": "^18.2.39",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react-swc": "^3.5.0",
