@@ -2,36 +2,30 @@ import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
-import copy from 'rollup-plugin-copy';
 import type { PluginOption, ViteDevServer } from 'vite';
 
-// The directory containing the `vite-plugin-runtime` package
-const pkgDir = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
-
-// The root directory of the monorepo
-const projectDir = path.resolve(pkgDir, '..', '..');
+const PACKAGE_DIR = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
+const RUNTIME_DIR = path.resolve(PACKAGE_DIR, '..', '..', 'runtime');
 
 const resolveBundle = async (version: string, filename: string) => {
-  const filepath = path.resolve(projectDir, 'runtime', version, 'dist', filename);
+  const filepath = path.resolve(RUNTIME_DIR, version, 'dist', filename);
   const isFile = await fs.exists(filepath);
   if (!isFile) {
     return null;
   }
-  return fs.readFile(filepath, 'utf8');
+  return fs.readFile(filepath, 'utf-8');
 };
 
 const runtime = () => {
   return {
-    ...copy({
-      copySync: true,
-      hook: 'buildStart',
-      targets: [
-        {
-          dest: 'dist/runtimes',
-          src: path.resolve(projectDir, 'runtime')
-        }
-      ]
-    }),
+    name: 'vite-plugin-runtime',
+    async buildStart() {
+      const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
+      for (const version of versions) {
+        const source = path.resolve(RUNTIME_DIR, version, 'dist');
+        await fs.cp(source, `dist/runtime/${version}`, { recursive: true });
+      }
+    },
     configureServer(server: ViteDevServer) {
       server.middlewares.use('/runtime', (req, res, next) => {
         const [version, filename] = req.url?.split('/').filter(Boolean) ?? [];
