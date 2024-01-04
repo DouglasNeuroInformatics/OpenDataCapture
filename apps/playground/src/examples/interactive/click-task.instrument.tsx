@@ -1,6 +1,6 @@
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { useEffect, useState } = await import('/runtime/v0.0.1/react').then((module) => module.default);
-const { z } = await import('/runtime/v0.0.1/zod');
+const { useEffect, useState } = await import('/runtime/v0.0.1/react.js').then((module) => module.default);
+const { z } = await import('/runtime/v0.0.1/zod.js');
 
 type ClickTaskData = {
   count: number;
