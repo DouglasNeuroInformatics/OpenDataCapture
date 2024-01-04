@@ -14,7 +14,7 @@ const projectDir = path.resolve(pkgDir, '..', '..');
 const resolveBundle = async (version: string, filename: string) => {
   const filepath = path.resolve(projectDir, 'runtime', version, 'dist', filename);
   const isFile = await fs.exists(filepath);
-  if (!(isFile && filename.endsWith('.js'))) {
+  if (!isFile) {
     return null;
   }
   return fs.readFile(filepath, 'utf8');
@@ -43,7 +43,8 @@ const runtime = () => {
             if (!file) {
               return next();
             }
-            res.writeHead(200, { 'Content-Type': 'application/javascript' });
+            const contentType = filename.endsWith('.js') ? 'text/javascript' : 'text/plain';
+            res.writeHead(200, { 'Content-Type': contentType });
             res.end(file);
           })
           .catch(next);
