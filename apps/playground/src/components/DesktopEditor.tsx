@@ -63,7 +63,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
       </div>
       <div className="flex h-full min-h-0 gap-8 p-2">
         <div className="flex flex-grow flex-col">
-          <Card className="flex-grow overflow-hidden">
+          <Card className="flex-grow p-0.5">
             <EditorPane
               className="h-full min-h-0"
               defaultValue={ctx.selectedExample.value}
