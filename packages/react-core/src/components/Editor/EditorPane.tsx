@@ -15,12 +15,13 @@ export type EditorPaneRef = {
 export type EditorPaneProps = {
   className?: string;
   defaultValue: string;
+  onMount?: () => void;
   onSave?: (file: EditorFile) => void;
   path: string;
 };
 
 export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(function EditorPane(
-  { className, defaultValue, path },
+  { className, defaultValue, onMount, path },
   ref
 ) {
   const [theme] = useTheme();
@@ -44,6 +45,7 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
     editorRef.current = editor;
     monacoRef.current = monaco;
     setIsEditorMounted(true);
+    onMount?.();
   };
 
   return (
