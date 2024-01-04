@@ -41,8 +41,9 @@ export class MonacoConfigurer {
       jsx: this.monaco.languages.typescript.JsxEmit.React,
       module: this.monaco.languages.typescript.ModuleKind.ESNext,
       moduleResolution: this.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      newLine: this.monaco.languages.typescript.NewLineKind.LineFeed,
       strict: true,
-      target: this.monaco.languages.typescript.ScriptTarget.ESNext
+      target: this.monaco.languages.typescript.ScriptTarget.ES2020
     });
   }
 
