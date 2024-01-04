@@ -7,6 +7,14 @@ import type { PluginOption, ViteDevServer } from 'vite';
 const PACKAGE_DIR = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
 const RUNTIME_DIR = path.resolve(PACKAGE_DIR, '..', '..', 'runtime');
 
+const resolveManifest = async (sourceDir: string) => {
+  const files = await fs.readdir(sourceDir, 'utf-8');
+  return {
+    declarations: files.filter((filename) => filename.endsWith('.d.ts')),
+    sources: files.filter((filename) => filename.endsWith('.js'))
+  };
+};
+
 const resolveBundle = async (version: string, filename: string) => {
   const filepath = path.resolve(RUNTIME_DIR, version, 'dist', filename);
   const isFile = await fs.exists(filepath);
@@ -23,7 +31,10 @@ const runtime = () => {
       const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
       for (const version of versions) {
         const source = path.resolve(RUNTIME_DIR, version, 'dist');
-        await fs.cp(source, `dist/runtime/${version}`, { recursive: true });
+        const destination = `dist/runtime/${version}`;
+        const manifest = await resolveManifest(source);
+        await fs.cp(source, destination, { recursive: true });
+        await fs.writeFile(path.resolve(destination, 'runtime.json'), JSON.stringify(manifest), 'utf-8');
       }
     },
     configureServer(server: ViteDevServer) {
