@@ -11,6 +11,11 @@ const RUNTIME_DIR = path.resolve(PACKAGE_DIR, '..', '..', 'runtime');
 
 const isDirectory = (path: string) => fs.lstat(path).then((stat) => stat.isDirectory());
 
+type RuntimeManifest = {
+  declarations: string[];
+  sources: string[];
+};
+
 const resolveVersion = async (version: string) => {
   const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
   if (!(await isDirectory(baseDir))) {
@@ -22,7 +27,7 @@ const resolveVersion = async (version: string) => {
     manifest: {
       declarations: files.filter((filename) => filename.endsWith('.d.ts')),
       sources: files.filter((filename) => filename.endsWith('.js'))
-    }
+    } satisfies RuntimeManifest
   };
 };
 
@@ -79,4 +84,4 @@ const runtime = () => {
   } as PluginOption;
 };
 
-export default runtime;
+export { runtime as default, type RuntimeManifest };

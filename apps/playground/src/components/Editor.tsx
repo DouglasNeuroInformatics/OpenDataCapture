@@ -1,10 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useInterval, useMediaQuery } from '@douglasneuroinformatics/ui';
 import { type EditorPaneRef } from '@open-data-capture/react-core/components/Editor';
 
 import { EditorContext } from '@/context/EditorContext';
 import { type ExampleInstrumentData, defaultExample, examples } from '@/examples';
+import { useRuntime } from '@/hooks/useRuntime';
 import { useTranspiler } from '@/hooks/useTranspiler';
 
 import { DesktopEditor } from './DesktopEditor';
@@ -15,6 +16,22 @@ export const Editor = () => {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const ref = useRef<EditorPaneRef>(null);
   const [selectedExample, setSelectedExample] = useState<ExampleInstrumentData>(defaultExample);
+
+  const { libs } = useRuntime('v0.0.1');
+
+  useEffect(() => {
+    const monaco = ref.current?.monaco;
+    if (!monaco) {
+      return;
+    }
+    Object.keys(libs).forEach((filename) => {
+      const uri = monaco.Uri.parse(filename);
+      if (!monaco.editor.getModel(uri)) {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(libs[filename]!, filename);
+        monaco.editor.createModel(libs[filename]!, 'typescript', monaco.Uri.parse(filename));
+      }
+    });
+  }, [libs]);
 
   useInterval(() => {
     setSource(ref.current?.editor?.getValue() ?? null);
