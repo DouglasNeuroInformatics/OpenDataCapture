@@ -1,4 +1,8 @@
+import path from 'path';
+
 import type { StorybookConfig } from '@storybook/react-vite';
+import { mergeConfig } from 'vite';
+import runtime from '@open-data-capture/vite-plugin-runtime';
 
 const config: StorybookConfig = {
   addons: [
@@ -15,7 +19,12 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {}
   },
-  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)']
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  viteFinal(config) {
+    return mergeConfig(config, {
+      plugins: [runtime()]
+    });
+  }
 };
 
 export default config;
