@@ -4,24 +4,47 @@ import url from 'url';
 
 import type { PluginOption, ViteDevServer } from 'vite';
 
+const MANIFEST_FILENAME = 'runtime.json';
+
 const PACKAGE_DIR = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
 const RUNTIME_DIR = path.resolve(PACKAGE_DIR, '..', '..', 'runtime');
 
-const resolveManifest = async (sourceDir: string) => {
-  const files = await fs.readdir(sourceDir, 'utf-8');
+const isDirectory = (path: string) => fs.lstat(path).then((stat) => stat.isDirectory());
+
+const resolveVersion = async (version: string) => {
+  const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
+  if (!(await isDirectory(baseDir))) {
+    throw new Error(`Not a directory: ${baseDir}`);
+  }
+  const files = await fs.readdir(baseDir, 'utf-8');
   return {
-    declarations: files.filter((filename) => filename.endsWith('.d.ts')),
-    sources: files.filter((filename) => filename.endsWith('.js'))
+    baseDir,
+    manifest: {
+      declarations: files.filter((filename) => filename.endsWith('.d.ts')),
+      sources: files.filter((filename) => filename.endsWith('.js'))
+    }
   };
 };
 
-const resolveBundle = async (version: string, filename: string) => {
-  const filepath = path.resolve(RUNTIME_DIR, version, 'dist', filename);
-  const isFile = await fs.exists(filepath);
-  if (!isFile) {
-    return null;
+const loadResource = async (version: string, filename: string) => {
+  const { baseDir, manifest } = await resolveVersion(version);
+  if (filename === MANIFEST_FILENAME) {
+    return {
+      content: JSON.stringify(manifest),
+      contentType: 'application/json'
+    };
+  } else if (manifest.declarations.includes(filename)) {
+    return {
+      content: await fs.readFile(path.resolve(baseDir, filename), 'utf-8'),
+      contentType: 'text/plain'
+    };
+  } else if (manifest.sources.includes(filename)) {
+    return {
+      content: await fs.readFile(path.resolve(baseDir, filename), 'utf-8'),
+      contentType: 'text/javascript'
+    };
   }
-  return fs.readFile(filepath, 'utf-8');
+  return null;
 };
 
 const runtime = () => {
@@ -30,11 +53,10 @@ const runtime = () => {
     async buildStart() {
       const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
       for (const version of versions) {
-        const source = path.resolve(RUNTIME_DIR, version, 'dist');
+        const { baseDir, manifest } = await resolveVersion(version);
         const destination = `dist/runtime/${version}`;
-        const manifest = await resolveManifest(source);
-        await fs.cp(source, destination, { recursive: true });
-        await fs.writeFile(path.resolve(destination, 'runtime.json'), JSON.stringify(manifest), 'utf-8');
+        await fs.cp(baseDir, destination, { recursive: true });
+        await fs.writeFile(path.resolve(destination, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf-8');
       }
     },
     configureServer(server: ViteDevServer) {
@@ -43,14 +65,13 @@ const runtime = () => {
         if (!(version && filename)) {
           return next();
         }
-        resolveBundle(version, filename)
-          .then((file) => {
-            if (!file) {
+        loadResource(version, filename)
+          .then((resource) => {
+            if (!resource) {
               return next();
             }
-            const contentType = filename.endsWith('.js') ? 'text/javascript' : 'text/plain';
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(file);
+            res.writeHead(200, { 'Content-Type': resource.contentType });
+            res.end(resource.content);
           })
           .catch(next);
       });
