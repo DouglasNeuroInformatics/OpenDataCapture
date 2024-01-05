@@ -13,10 +13,7 @@ const ROOT_DIR = path.resolve(import.meta.dir, '..', '..');
 
 import { resolveModule } from '@open-data-capture/runtime-bundler';
 
-type Mode = 'development' | 'production';
-
-const MODE = 'development' as Mode;
-// const MODE: Mode = 'production';
+const MODE = 'development' as 'development' | 'production';
 
 const modules = {
   react: resolveModule('react'),
@@ -33,8 +30,8 @@ export default defineConfig([
     output: {
       dir: OUT_DIR,
       format: 'es',
-      interop: 'auto',
       generatedCode: 'es2015',
+      interop: 'auto',
       plugins: MODE === 'production' ? [terser()] : undefined
     },
     plugins: [
