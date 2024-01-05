@@ -41,6 +41,7 @@
     "type-fest": "^4.8.2"
   },
   "devDependencies": {
+    "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "@storybook/addon-essentials": "^7.6.0",
     "@storybook/addon-interactions": "^7.6.0",
     "@storybook/addon-links": "^7.6.0",
