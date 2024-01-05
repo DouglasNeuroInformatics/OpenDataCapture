@@ -1,5 +1,5 @@
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { useEffect, useState } = await import('/runtime/v0.0.1/react.js').then((module) => module.default);
+const { useEffect, useState } = await import('/runtime/v0.0.1/react.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
 type ClickTaskData = {
@@ -23,7 +23,7 @@ export default instrumentFactory.defineInstrument<ClickTaskData>({
         }, 1000);
         return () => clearInterval(id);
       }, []);
-      
+
       useEffect(() => {
         if (0 > secondsRemaining) {
           done({ count });
