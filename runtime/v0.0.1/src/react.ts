@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 const {
   Children,
@@ -69,5 +69,3 @@ export {
   useTransition,
   version
 };
-
-export default React;

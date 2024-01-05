@@ -1,5 +1,3 @@
-import type React from 'react';
-
 import type { Merge } from 'type-fest';
 import { z } from 'zod';
 
@@ -10,7 +8,7 @@ export type InteractiveInstrument<TData extends Json = Json, TLanguage extends L
   BaseInstrument<TData, Language>,
   {
     content: {
-      render: (done: (data: TData) => void) => React.ReactNode;
+      render: (done: (data: TData) => void) => any;
     };
     details: EnhancedBaseInstrumentDetails<TLanguage>;
     kind: 'interactive';
