@@ -1,7 +1,10 @@
+format: 'short'
 fullName: Simon Ducharme
 suffix: MD
 position:
-  en: Psychiatrist, Montreal Neurological Institute
-  fr: Psychiatre, Institut neurologique de Montréal
+  en: Scientific Director, Centre for Precision Psychiatry, MUHC
+  fr: Directeur scientifique, Centre de psychiatrie de précision, CUSM
 image: '@/assets/headshots/simon-ducharme.jpg'
-quote: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda rerum nemo tempora cupiditate consectetur non.'
+quote:
+  en: 'The Centre for Precision Psychiatry Biobank requires reliable data capture across several clinical environments. The OpenDataCapture platform will allow us to rapidly deploy our project at the Douglas Institute in a modern and efficient fashion.'
+  fr: "La biobanque du Centre pour la psychiatrie de précision nécessite une collecte de données fiable à travers différents milieu clinique. La plateforme OpenDataCapture nous permettra de rapidement déployer notre projet à l'Institut Douglas de façon moderne et efficiente."

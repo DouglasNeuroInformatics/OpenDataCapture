@@ -28,6 +28,7 @@ export const collections = {
   testimonials: defineCollection({
     schema: ({ image }) =>
       z.object({
+        format: z.enum(['short', 'long']),
         fullName: z.string(),
         image: image().refine((arg) => arg.height === arg.width, {
           message: 'Image must be square (1:1 aspect ratio)'
@@ -36,7 +37,10 @@ export const collections = {
           en: z.string(),
           fr: z.string()
         }),
-        quote: z.string(),
+        quote: z.object({
+          en: z.string(),
+          fr: z.string()
+        }),
         suffix: z.enum(['MD', 'PhD']).optional()
       }),
     type: 'data'
