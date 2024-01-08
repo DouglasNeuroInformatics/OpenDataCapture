@@ -1,19 +1,19 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { createUserDataSchema } from '@open-data-capture/common/user';
+import { $CreateUserData } from '@open-data-capture/common/user';
 import type { BasePermissionLevel, CreateUserData } from '@open-data-capture/common/user';
 
-@ValidationSchema(createUserDataSchema)
+@ValidationSchema($CreateUserData)
 export class CreateUserDto implements CreateUserData {
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
     enum: ['ADMIN', 'GROUP_MANAGER', 'STANDARD'] satisfies BasePermissionLevel[],
     type: String
   })
-  basePermissionLevel?: BasePermissionLevel;
+  basePermissionLevel: BasePermissionLevel | null;
 
   @ApiProperty({ description: 'First Name' })
-  firstName: string;
+  firstName: null | string;
 
   @ApiProperty({
     description: 'The names of the group(s) to which the user belongs',
@@ -22,7 +22,7 @@ export class CreateUserDto implements CreateUserData {
   groupNames?: string[];
 
   @ApiProperty({ description: 'Last Name' })
-  lastName: string;
+  lastName: null | string;
 
   @ApiProperty({
     description: 'A minimum of 8 characters, including one number, one upper case, and one lower case letter',

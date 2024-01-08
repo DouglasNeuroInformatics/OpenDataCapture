@@ -26,7 +26,7 @@ export const $User = $BaseModel.extend({
   username: z.string().min(1)
 }) satisfies z.ZodType<User>;
 
-export const $CreateUserData = $User.omit({ createdAt: true, groups: true, updatedAt: true }).extend({
+export const $CreateUserData = $User.omit({ createdAt: true, groups: true, id: true, updatedAt: true }).extend({
   groupNames: z.array(z.string().min(1)).optional()
 });
 
