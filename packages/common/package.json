@@ -11,7 +11,7 @@
     "./group": "./src/group.ts",
     "./instrument": "./src/instrument.ts",
     "./instrument-records": "./src/instrument-records.ts",
-    "./setup": "./src/setup/setup.ts",
+    "./setup": "./src/setup.ts",
     "./subject": "./src/subject.ts",
     "./summary": "./src/summary.ts",
     "./user": "./src/user.ts",

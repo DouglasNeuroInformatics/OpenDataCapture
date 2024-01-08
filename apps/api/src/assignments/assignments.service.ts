@@ -4,7 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Assignment, AssignmentBundle, CreateAssignmentBundleData } from '@open-data-capture/common/assignment';
-import { assignmentBundleSchema } from '@open-data-capture/common/assignment';
+import { $AssignmentBundle } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -28,11 +28,11 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     const dto: CreateAssignmentBundleData = {
       expiresAt,
       instrumentBundle: instrument.bundle,
-      instrumentId: instrument.id as string,
+      instrumentId: instrument.id,
       subjectIdentifier
     };
     const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, dto);
-    return assignmentBundleSchema.parseAsync(response.data);
+    return $AssignmentBundle.parseAsync(response.data);
   }
 
   async find({ subjectIdentifier }: { subjectIdentifier?: string } = {}, { ability }: EntityOperationOptions = {}) {
@@ -41,7 +41,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
         subjectIdentifier
       }
     });
-    const assignmentBundles = await assignmentBundleSchema.array().parseAsync(response.data);
+    const assignmentBundles = await $AssignmentBundle.array().parseAsync(response.data);
     const assignments: Assignment[] = [];
     for (const bundle of assignmentBundles) {
       const instrument = await this.instrumentsService.findById(bundle.instrumentId);

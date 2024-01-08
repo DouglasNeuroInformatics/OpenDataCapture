@@ -1,6 +1,6 @@
 import type { PureAbility } from '@casl/ability';
 import type { PrismaQuery } from '@casl/prisma';
-import type { AppAction, AppSubjectName } from '@open-data-capture/common';
+import type { AppAction, AppSubjectName } from '@open-data-capture/common/core';
 import type {
   GroupModel,
   InstrumentRecordModel,

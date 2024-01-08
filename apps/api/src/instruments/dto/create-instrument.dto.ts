@@ -1,7 +1,9 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
-import { instrumentSourceSchema } from '@open-data-capture/common/instrument';
+import { $InstrumentSourceContainer } from '@open-data-capture/common/instrument';
 
-@ValidationSchema(instrumentSourceSchema)
+const $CreateInstrumentData = $InstrumentSourceContainer.pick({ source: true });
+
+@ValidationSchema($CreateInstrumentData)
 export class CreateInstrumentDto {
   source: string;
 }
