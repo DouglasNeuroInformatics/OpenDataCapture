@@ -1,7 +1,6 @@
 import { type DynamicModule, Module } from '@nestjs/common';
-import type { Instrument } from '@open-data-capture/common/instrument';
+import { type Instrument, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { Prisma, PrismaClient } from '@open-data-capture/database/core';
-import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
 
 import { PRISMA_CLIENT_TOKEN } from './prisma.constants';
 import { getModelReferenceName, getModelToken } from './prisma.utils';
@@ -21,11 +20,10 @@ export class PrismaModule {
             return context.$name;
           },
           async exists<T>(this: T, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
-            // Get the current model at runtime
-            const context = Prisma.getExtensionContext(this);
-            context.$name;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            const result = await (context as any).findFirst({ where });
+            const context = Prisma.getExtensionContext(this) as unknown as {
+              findFirst: (...args: any[]) => Promise<unknown>;
+            };
+            const result = await context.findFirst({ where });
             return result !== null;
           }
         }
