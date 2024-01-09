@@ -26,9 +26,7 @@ model AssignmentModel {
 model AssignmentRecordModel {
   id           String          @id @default(uuid())
   createdAt    DateTime        @default(now())
-  expiresAt    DateTime
   assignment   AssignmentModel @relation(fields: [assignmentId], references: [id])
   assignmentId String          @unique()
-  completedAt  DateTime
   data         String
 }
