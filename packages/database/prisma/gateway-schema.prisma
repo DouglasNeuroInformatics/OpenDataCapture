@@ -12,7 +12,7 @@ datasource db {
 }
 
 model AssignmentModel {
-  id               Int                    @id @default(autoincrement())
+  id               String                 @id @default(uuid())
   createdAt        DateTime               @default(now())
   expiresAt        DateTime
   instrumentBundle String
@@ -24,9 +24,11 @@ model AssignmentModel {
 }
 
 model AssignmentRecordModel {
-  id           Int             @id @default(autoincrement())
+  id           String          @id @default(uuid())
+  createdAt    DateTime        @default(now())
+  expiresAt    DateTime
   assignment   AssignmentModel @relation(fields: [assignmentId], references: [id])
-  assignmentId Int             @unique()
+  assignmentId String          @unique()
   completedAt  DateTime
   data         String
 }
