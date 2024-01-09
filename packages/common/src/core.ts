@@ -22,11 +22,9 @@ export const $Language = z.enum(['en', 'fr']);
 
 export type Language = z.infer<typeof $Language>;
 
-export const $ValidObjectId = z.string().refine((s) => new Blob([s]).size === 24);
-
 export const $BaseModel = z.object({
   createdAt: z.coerce.date(),
-  id: $ValidObjectId,
+  id: z.string(),
   updatedAt: z.coerce.date()
 });
 
