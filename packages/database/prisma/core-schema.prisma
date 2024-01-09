@@ -42,8 +42,8 @@ model InstrumentRecordModel {
 // Instruments 
 
 enum InstrumentKind {
-  form
-  interactive
+  FORM
+  INTERACTIVE
 }
 
 type InstrumentDetails {
@@ -76,8 +76,8 @@ model InstrumentModel {
 // Subjects
 
 enum Sex {
-  male
-  female
+  MALE
+  FEMALE
 }
 
 model SubjectModel {
