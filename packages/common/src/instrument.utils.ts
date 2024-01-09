@@ -11,9 +11,9 @@ type InstrumentFactory<T extends Instrument> = () => Promise<T>;
 
 function validateInstrument(instrument: BaseInstrument) {
   switch (instrument.kind) {
-    case 'form':
+    case 'FORM':
       return $FormInstrument.parse(instrument) as FormInstrument;
-    case 'interactive':
+    case 'INTERACTIVE':
       return $InteractiveInstrument.parse(instrument) as InteractiveInstrument;
     default:
       throw new Error(`Unexpected instrument type: ${(instrument as Record<string, any>).kind}`);

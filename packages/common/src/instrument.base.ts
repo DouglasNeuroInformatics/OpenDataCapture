@@ -1,10 +1,10 @@
+import type { InstrumentModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
 import { $BaseModel, $Language, type Language } from './core';
 
-export const $InstrumentKind = z.enum(['form', 'interactive']);
-
-export type InstrumentKind = z.infer<typeof $InstrumentKind>;
+export type InstrumentKind = InstrumentModel['kind'];
+export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE']) satisfies z.ZodType<InstrumentKind>;
 
 export const $InstrumentLanguage = z.union([$Language, $Language.array()]);
 

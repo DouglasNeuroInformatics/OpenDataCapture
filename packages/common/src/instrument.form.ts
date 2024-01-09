@@ -341,7 +341,7 @@ export type FormInstrument<
   Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
     content: FormInstrumentContent<TData, TLanguage>;
     details: EnhancedBaseInstrumentDetails<TLanguage>;
-    kind: 'form';
+    kind: 'FORM';
     measures?: FormInstrumentMeasures<TData, TLanguage>;
   }
 >;
@@ -349,7 +349,7 @@ export type FormInstrument<
 export const $FormInstrument = $BaseInstrument.extend({
   content: $FormInstrumentContent,
   details: $EnhancedBaseInstrumentDetails,
-  kind: z.literal('form'),
+  kind: z.literal('FORM'),
   measures: $FormInstrumentMeasures.optional(),
   validationSchema: z.instanceof(z.ZodType<Base.FormDataType>)
 }) satisfies z.ZodType<FormInstrument>;

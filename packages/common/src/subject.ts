@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 import { $BaseModel } from './core';
 
-export type Sex = z.infer<typeof $Sex>;
-export const $Sex = z.enum(['male', 'female']);
+export type Sex = SubjectModel['sex'];
+export const $Sex = z.enum(['MALE', 'FEMALE']) satisfies z.ZodType<Sex>;
 
 export type SubjectIdentificationData = z.infer<typeof $SubjectIdentificationData>;
 export const $SubjectIdentificationData = z.object({
