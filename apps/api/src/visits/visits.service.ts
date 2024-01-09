@@ -19,11 +19,12 @@ export class VisitsService implements Pick<EntityService<Visit>, 'create'> {
   ) {}
 
   async create({ date, groupId, subjectIdData }: CreateVisitData) {
-    const group = groupId ? await this.groupsService.findById(groupId) : undefined;
     const subject = await this.resolveSubject(subjectIdData);
 
-    if (group && !subject.groupIds.includes(group.id)) {
-      await this.subjectsService.updateById(subject.identifier, { groupIds: { push: group.id } });
+    // If the subject is not yet associated with the group, check it exists then append it 
+    if (groupId && !subject.groupIds.includes(groupId)) {
+      const group = await this.groupsService.findById(groupId);
+      await this.subjectsService.updateById(subject.id, { groupIds: { push: group.id } });
     }
 
     return this.visitModel.create({
