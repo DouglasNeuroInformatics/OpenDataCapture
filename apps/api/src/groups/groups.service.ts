@@ -44,16 +44,6 @@ export class GroupsService implements EntityService<Group> {
     return group;
   }
 
-  async findByName(name: string, { ability }: EntityOperationOptions = {}) {
-    const group = await this.groupModel.findFirst({
-      where: { AND: [accessibleQuery(ability, 'read', 'Group'), { name }] }
-    });
-    if (!group) {
-      throw new NotFoundException(`Failed to find group with name: ${name}`);
-    }
-    return group;
-  }
-
   async updateById(id: string, data: UpdateGroupDto, { ability }: EntityOperationOptions = {}) {
     return this.groupModel.update({
       data,

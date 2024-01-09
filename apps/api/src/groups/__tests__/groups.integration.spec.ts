@@ -142,11 +142,6 @@ describe('/groups', () => {
     beforeAll(() => {
       id = new ObjectId().toHexString();
     });
-
-    it('should reject a request with an invalid id', async () => {
-      const response = await request(server).delete('/groups/123');
-      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    });
     it('should return status code 200 with a valid ID', async () => {
       const response = await request(server).delete(`/groups/${id}`);
       expect(response.status).toBe(HttpStatus.OK);

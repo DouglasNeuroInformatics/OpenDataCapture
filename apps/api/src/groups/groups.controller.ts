@@ -25,7 +25,7 @@ export class GroupsController implements EntityController<Group> {
   @ApiOperation({ summary: 'Delete Group' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Group' })
-  deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability?: AppAbility) {
+  deleteById(@Param('id') id: string, @CurrentUser('ability') ability?: AppAbility) {
     return this.groupsService.deleteById(id, { ability });
   }
 
