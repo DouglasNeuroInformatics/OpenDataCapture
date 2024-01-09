@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+export type Summary = z.infer<typeof $Summary>;
 export const $Summary = z.object({
   counts: z.object({
     instruments: z.number().int(),
@@ -9,4 +10,3 @@ export const $Summary = z.object({
   })
 });
 
-export type Summary = z.infer<typeof $Summary>;

@@ -13,10 +13,7 @@ export class SummaryController {
 
   @Get()
   @RouteAccess([{ action: 'read', subject: 'Instrument' }])
-  async getSummary(
-    @CurrentUser('ability') ability: AppAbility,
-    @Query('groupId') groupId?: string
-  ): Promise<Summary> {
+  async getSummary(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string): Promise<Summary> {
     return this.summaryService.getSummary(groupId, { ability });
   }
 }
