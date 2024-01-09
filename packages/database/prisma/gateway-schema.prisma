@@ -11,22 +11,22 @@ datasource db {
   url      = "file:../data/dev.db"
 }
 
-model Assignment {
-  id                String            @id
-  assignedAt        DateTime
-  expiresAt         DateTime
-  instrumentBundle  String
-  instrumentId      String
-  record            AssignmentRecord?
-  status            String
-  subjectIdentifier String
-  url               String
+model AssignmentModel {
+  id               Int                    @id @default(autoincrement())
+  createdAt        DateTime               @default(now())
+  expiresAt        DateTime
+  instrumentBundle String
+  instrumentId     String
+  record           AssignmentRecordModel?
+  status           String
+  subjectId        String
+  url              String
 }
 
-model AssignmentRecord {
-  id           Int        @id @default(autoincrement())
-  assignment   Assignment @relation(fields: [assignmentId], references: [id])
-  assignmentId String     @unique()
+model AssignmentRecordModel {
+  id           Int             @id @default(autoincrement())
+  assignment   AssignmentModel @relation(fields: [assignmentId], references: [id])
+  assignmentId Int             @unique()
   completedAt  DateTime
   data         String
 }

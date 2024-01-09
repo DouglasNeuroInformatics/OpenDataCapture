@@ -17,7 +17,7 @@ model GroupModel {
   instrumentRecords InstrumentRecordModel[]
   name              String
   subjects          SubjectModel[]          @relation(fields: [subjectIds], references: [id])
-  subjectIds        String[]                @db.ObjectId
+  subjectIds        String[]
   userIds           String[]                @db.ObjectId
   users             UserModel[]             @relation(fields: [userIds], references: [id])
   VisitModel        VisitModel[]
@@ -34,7 +34,7 @@ model InstrumentRecordModel {
   group        GroupModel?     @relation(fields: [groupId], references: [id])
   groupId      String?         @db.ObjectId
   subject      SubjectModel    @relation(fields: [subjectId], references: [id])
-  subjectId    String          @db.ObjectId
+  subjectId    String
   instrument   InstrumentModel @relation(fields: [instrumentId], references: [id])
   instrumentId String          @db.ObjectId
 }
@@ -83,12 +83,11 @@ enum Sex {
 model SubjectModel {
   createdAt         DateTime                @default(now()) @db.Date
   updatedAt         DateTime                @updatedAt @db.Date
-  id                String                  @id @default(auto()) @map("_id") @db.ObjectId
+  id                String                  @id @map("_id")
   dateOfBirth       DateTime                @db.Date
   firstName         String?
   groupIds          String[]                @db.ObjectId
   groups            GroupModel[]            @relation(fields: [groupIds], references: [id])
-  identifier        String
   lastName          String?
   sex               Sex
   instrumentRecords InstrumentRecordModel[]
@@ -122,5 +121,5 @@ model VisitModel {
   group     GroupModel?  @relation(fields: [groupId], references: [id])
   groupId   String?      @db.ObjectId
   subject   SubjectModel @relation(fields: [subjectId], references: [id])
-  subjectId String       @db.ObjectId
+  subjectId String
 }
