@@ -31,15 +31,17 @@ export class UsersService implements EntityService<User> {
   }
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
-  async create({ groupNames, password, username, ...rest }: CreateUserDto, options?: EntityOperationOptions) {
+  async create({ groupIds, password, username, ...rest }: CreateUserDto, options?: EntityOperationOptions) {
     if (await this.userModel.exists({ username })) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
-    const groupIds: string[] = [];
-    for (const groupName of groupNames ?? []) {
-      const group = await this.groupsService.findByName(groupName, options);
-      groupIds.push(group.id);
+    // Check that all group exist and are accessible to the user
+    for (const id of groupIds) {
+      const group = await this.groupsService.findById(id, options);
+      if (!group) {
+        throw new NotFoundException(`Failed to resolve group with ID: ${id}`);
+      }
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(password);
@@ -68,16 +70,11 @@ export class UsersService implements EntityService<User> {
     });
   }
 
-  async findAll({ ability }: EntityOperationOptions = {}) {
+  async find({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     return this.userModel.findMany({
-      where: accessibleQuery(ability, 'read', 'User')
-    });
-  }
-
-  async findByGroup(groupName: string, { ability }: EntityOperationOptions = {}) {
-    const group = await this.groupsService.findByName(groupName);
-    return this.userModel.findMany({
-      where: { AND: [accessibleQuery(ability, 'read', 'User'), { groupIds: { has: group.id } }] }
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'User'), { groupIds: { has: groupId } }]
+      }
     });
   }
 
