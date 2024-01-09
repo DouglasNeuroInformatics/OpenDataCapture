@@ -1,68 +1,50 @@
+import type { AssignmentModel, AssignmentRecordModel } from '@open-data-capture/database/gateway';
 import { z } from 'zod';
 
-import { $ValidObjectId } from './core';
-import { $BaseInstrumentSummary, $Instrument, type BaseInstrumentSummary } from './instrument';
+import { $BaseModel, $Json, type Json } from './core';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
 export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
 
-export const $Assignment = z.object({
-  assignedAt: z.coerce.date(),
+export const $Assignment = $BaseModel.extend({
   expiresAt: z.coerce.date(),
-  id: z.coerce.string().optional(),
-  instrument: $Instrument,
+  instrumentBundle: z.string().min(1),
+  instrumentId: z.string().min(1),
   status: $AssignmentStatus,
+  subjectId: z.string().min(1),
   url: z.string().url()
-});
+}) satisfies z.ZodType<AssignmentModel>;
 
-export type Assignment = z.infer<typeof $Assignment>;
+export type Assignment = AssignmentModel;
 
-export type AssignmentSummary = Omit<Assignment, 'instrument'> & {
-  instrument: BaseInstrumentSummary;
+export type AssignmentRecord = Omit<AssignmentRecordModel, 'data'> & {
+  data: Json;
 };
 
-export const $AssignmentSummary = $Assignment.extend({
-  instrument: $BaseInstrumentSummary
-}) satisfies z.ZodType<AssignmentSummary>;
-
-export type CreateAssignmentData = {
-  expiresAt: Date;
-  instrumentId: string;
-  subjectIdentifier: string;
-};
+export const $AssignmentRecord = $BaseModel.extend({
+  assignment: $Assignment,
+  assignmentId: z.string().min(1),
+  completedAt: z.coerce.date(),
+  data: z
+    .string()
+    .transform((arg) => JSON.parse(arg) as unknown)
+    .pipe($Json)
+}) satisfies z.ZodType<AssignmentRecord, z.ZodTypeDef, AssignmentRecordModel>;
 
 export const $CreateAssignmentData = z.object({
   expiresAt: z.coerce.date().min(new Date()),
-  instrumentId: $ValidObjectId,
-  subjectIdentifier: z.string()
-}) satisfies z.ZodType<CreateAssignmentData>;
+  instrumentId: z.string(),
+  subjectId: z.string()
+});
+
+export type CreateAssignmentData = z.infer<typeof $CreateAssignmentData>;
 
 export const $UpdateAssignmentData = z
   .object({
     expiresAt: z.coerce.date(),
-    record: z.object({
-      data: z.any().transform((arg) => JSON.stringify(arg))
-    }),
     status: $AssignmentStatus
   })
   .partial();
 
 export type UpdateAssignmentData = z.infer<typeof $UpdateAssignmentData>;
-
-export const $AssignmentBundle = $Assignment.omit({ instrument: true }).extend({
-  instrumentBundle: z.string(),
-  instrumentId: z.string(),
-  subjectIdentifier: z.string()
-});
-
-export type AssignmentBundle = z.infer<typeof $AssignmentBundle>;
-
-export const $CreateAssignmentBundleData = $AssignmentBundle.omit({
-  assignedAt: true,
-  id: true,
-  status: true,
-  url: true
-});
-
-export type CreateAssignmentBundleData = z.infer<typeof $CreateAssignmentBundleData>;
