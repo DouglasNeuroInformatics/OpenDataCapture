@@ -7,9 +7,9 @@ import { HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
+import type { SubjectIdentificationData } from '@open-data-capture/common/subject';
 import request from 'supertest';
 
-import { GroupsService } from '@/groups/groups.service';
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
 import { createMockModelProvider } from '@/testing/testing.utils';
@@ -32,10 +32,6 @@ describe('/subjects', () => {
           provide: CryptoService,
           useValue: createMock(CryptoService)
         },
-        {
-          provide: GroupsService,
-          useValue: createMock(GroupsService)
-        },
         createMockModelProvider('Subject')
       ]
     }).compile();
@@ -54,7 +50,7 @@ describe('/subjects', () => {
   });
 
   describe('POST /subjects', () => {
-    let createSubjectDto: Record<string, any>;
+    let createSubjectDto: SubjectIdentificationData;
     beforeEach(() => {
       createSubjectDto = {
         dateOfBirth: new Date(),
@@ -96,15 +92,15 @@ describe('/subjects', () => {
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return an array of all subjects if no group is provided', async () => {
-      subjectModel.findMany.mockResolvedValueOnce([{ name: 'foo' }]);
+      subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
       const response = await request(server).get('/subjects');
-      expect(response.body).toMatchObject([{ name: 'foo' }]);
+      expect(response.body).toMatchObject([{ id: '123' }]);
     });
   });
 
   describe('GET /subjects/:id', () => {
     it('should return status code 200 with a valid ID', async () => {
-      subjectModel.findFirst.mockResolvedValueOnce({ name: 'foo' });
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
       const response = await request(server).get('/subjects/123');
       expect(response.status).toBe(HttpStatus.OK);
     });
@@ -114,9 +110,9 @@ describe('/subjects', () => {
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
     it('should return the subject if it exists', async () => {
-      subjectModel.findFirst.mockResolvedValueOnce({ name: 'foo' });
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
       const response = await request(server).get('/subjects/123');
-      expect(response.body).toMatchObject({ name: 'foo' });
+      expect(response.body).toMatchObject({ id: '123' });
     });
   });
 

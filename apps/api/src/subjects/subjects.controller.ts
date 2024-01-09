@@ -1,7 +1,6 @@
-import { CurrentUser, type EntityController } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { Subject } from '@open-data-capture/common/subject';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
@@ -11,7 +10,7 @@ import { SubjectsService } from './subjects.service';
 
 @ApiTags('Subjects')
 @Controller('subjects')
-export class SubjectsController implements Omit<EntityController<Partial<Subject>>, 'updateById'> {
+export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @ApiOperation({ summary: 'Create Subject' })
@@ -31,10 +30,8 @@ export class SubjectsController implements Omit<EntityController<Partial<Subject
   @ApiOperation({ summary: 'Get All Subjects' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  findAll(@CurrentUser('ability') ability: AppAbility, @Query('group') groupName?: string) {
-    return groupName
-      ? this.subjectsService.findByGroup(groupName, { ability })
-      : this.subjectsService.findAll({ ability });
+  find(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
+    return this.subjectsService.find({ groupId }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Subject' })
