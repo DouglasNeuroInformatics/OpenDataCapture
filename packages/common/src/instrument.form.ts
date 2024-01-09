@@ -346,9 +346,9 @@ export type FormInstrument<
   }
 >;
 
-export const $FormInstrument = $BaseInstrument.extend({
+export const $FormInstrument = $BaseInstrument().extend({
   content: $FormInstrumentContent,
-  details: $EnhancedBaseInstrumentDetails,
+  details: $EnhancedBaseInstrumentDetails(),
   kind: z.literal('FORM'),
   measures: $FormInstrumentMeasures.optional(),
   validationSchema: z.instanceof(z.ZodType<Base.FormDataType>)

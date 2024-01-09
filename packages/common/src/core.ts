@@ -22,6 +22,7 @@ export const $Language = z.enum(['en', 'fr']);
 
 export type Language = z.infer<typeof $Language>;
 
+export type BaseModel = z.infer<typeof $BaseModel>;
 export const $BaseModel = z.object({
   createdAt: z.coerce.date(),
   id: z.string(),
