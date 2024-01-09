@@ -71,7 +71,7 @@ export class InstrumentRecordsService {
         where: { groupId, subjectId: subject.id }
       });
       for (const record of records) {
-        if (record.instrument.kind !== 'form') {
+        if (record.instrument.kind !== 'FORM') {
           continue;
         }
         const formData = record.data as FormDataType;
@@ -127,7 +127,7 @@ export class InstrumentRecordsService {
 
     return await Promise.all(
       records.map(async (record) => {
-        if (record.instrument.kind === 'form') {
+        if (record.instrument.kind === 'FORM') {
           const instance = await evaluateInstrument(record.instrument.bundle);
           if (instance.measures) {
             Object.defineProperty(

@@ -6,7 +6,7 @@ import { HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' }
+import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' };
 import { Types } from 'mongoose';
 import request from 'supertest';
 
@@ -32,10 +32,7 @@ describe('/instruments', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [InstrumentsController],
-      providers: [
-        InstrumentsService,
-        createMockModelProvider('Instrument')
-      ]
+      providers: [InstrumentsService, createMockModelProvider('Instrument')]
     }).compile();
 
     app = moduleRef.createNestApplication({
@@ -98,7 +95,7 @@ describe('/instruments', () => {
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return all the instruments returned by the repository', async () => {
-      instrumentModel.findMany.mockResolvedValueOnce([{ id: 1, kind: 'form' }]);
+      instrumentModel.findMany.mockResolvedValueOnce([{ id: 1, kind: 'FORM' }]);
       const response = await request(server).get('/instruments');
       expect(response.body).toMatchObject([{ id: 1 }]);
     });
@@ -115,7 +112,7 @@ describe('/instruments', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'form' });
+      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'FORM' });
       const response = await request(server).get(`/instruments/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });
@@ -125,7 +122,7 @@ describe('/instruments', () => {
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
     it('should return the instrument if it exists', async () => {
-      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'form' });
+      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'FORM' });
       const response = await request(server).get(`/instruments/${id}`);
       expect(response.body).toMatchObject({ id });
     });
@@ -142,27 +139,27 @@ describe('/instruments', () => {
   //     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   //   });
   //   it('should reject a request to set the instrument name to an empty string', async () => {
-  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
+  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'FORM' });
   //     const response = await request(server).patch(`/instruments/${id}`).send({ name: '' });
   //     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   //   });
   //   it('should reject a request to set the instrument name to a number', async () => {
-  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
+  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'FORM' });
   //     const response = await request(server).patch(`/instruments/${id}`).send({ name: 100 });
   //     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
   //   });
   //   it('should return status code 200 with a valid ID, even if nothing is modified', async () => {
-  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
+  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'FORM' });
   //     const response = await request(server).patch(`/instruments/${id}`);
   //     expect(response.status).toBe(HttpStatus.OK);
   //   });
   //   it('should return status code 200 with a valid ID and valid data', async () => {
-  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
+  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'FORM' });
   //     const response = await request(server).patch(`/instruments/${id}`).send({ name: 'foo' });
   //     expect(response.status).toBe(HttpStatus.OK);
   //   });
   //   it('should return the modified instrument', async () => {
-  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'form' });
+  //     instrumentsRepository.findById.mockResolvedValueOnce({ id, kind: 'FORM' });
   //     instrumentsRepository.updateById.mockImplementationOnce((id: string, obj: object) => ({ id, ...obj }));
   //     const response = await request(server).patch(`/instruments/${id}`).send({ name: 'foo' });
   //     expect(response.body).toMatchObject({ name: 'foo' });
@@ -180,7 +177,7 @@ describe('/instruments', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should return status code 200 with a valid ID', async () => {
-      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'form' });
+      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'FORM' });
       const response = await request(server).delete(`/instruments/${id}`);
       expect(response.status).toBe(HttpStatus.OK);
     });
