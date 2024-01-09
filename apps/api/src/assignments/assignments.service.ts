@@ -1,10 +1,9 @@
-import { subject } from '@casl/ability';
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Assignment, AssignmentBundle, CreateAssignmentBundleData } from '@open-data-capture/common/assignment';
-import { $AssignmentBundle } from '@open-data-capture/common/assignment';
+import type { Assignment, CreateAssignmentRelayData } from '@open-data-capture/common/assignment';
+import { $Assignment, $CreateAssignmentResponseBody } from '@open-data-capture/common/assignment';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -18,39 +17,32 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
   constructor(
     configService: ConfigService,
     private readonly httpService: HttpService,
-    private readonly instrumentsService: InstrumentsService // private readonly subjectsService: SubjectsService
+    private readonly instrumentsService: InstrumentsService
   ) {
     this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
   }
 
-  async create({ expiresAt, instrumentId, subjectIdentifier }: CreateAssignmentDto): Promise<AssignmentBundle> {
+  async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto) {
     const instrument = await this.instrumentsService.findById(instrumentId);
-    const dto: CreateAssignmentBundleData = {
+    const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, {
       expiresAt,
       instrumentBundle: instrument.bundle,
       instrumentId: instrument.id,
-      subjectIdentifier
-    };
-    const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, dto);
-    return $AssignmentBundle.parseAsync(response.data);
+      subjectId
+    } satisfies CreateAssignmentRelayData);
+    return $CreateAssignmentResponseBody.parseAsync(response.data);
   }
 
-  async find({ subjectIdentifier }: { subjectIdentifier?: string } = {}, { ability }: EntityOperationOptions = {}) {
+  async find({ subjectId }: { subjectId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     const response = await this.httpService.axiosRef.get(`${this.gatewayBaseUrl}/api/assignments`, {
       params: {
-        subjectIdentifier
+        subjectId
       }
     });
-    const assignmentBundles = await $AssignmentBundle.array().parseAsync(response.data);
-    const assignments: Assignment[] = [];
-    for (const bundle of assignmentBundles) {
-      const instrument = await this.instrumentsService.findById(bundle.instrumentId);
-      const assignment = subject('Assignment', { ...bundle, instrument });
-      if (ability && !ability.can('read', assignment)) {
-        continue;
-      }
-      assignments.push(assignment);
+    const assignments = await $Assignment.array().parseAsync(response.data);
+    if (!ability) {
+      return assignments;
     }
-    return assignments;
+    return assignments.filter((assignment) => ability.can('read', assignment));
   }
 }

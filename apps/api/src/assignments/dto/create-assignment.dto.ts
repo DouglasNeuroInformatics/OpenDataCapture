@@ -11,5 +11,5 @@ export class CreateAssignmentDto implements CreateAssignmentData {
   instrumentId: string;
 
   @ApiProperty()
-  subjectIdentifier: string;
+  subjectId: string;
 }
