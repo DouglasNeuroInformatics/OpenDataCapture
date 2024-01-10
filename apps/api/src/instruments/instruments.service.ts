@@ -6,7 +6,7 @@ import type {
   InstrumentKind,
   InstrumentSummary
 } from '@open-data-capture/common/instrument';
-import { formInstrumentSchema, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { evaluateInstrument, $FormInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 
 import { accessibleQuery } from '@/ability/ability.utils';

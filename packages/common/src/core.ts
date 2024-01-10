@@ -54,3 +54,5 @@ export function isZodType(arg: unknown): arg is z.ZodTypeAny {
   const prototype = arg && typeof arg === 'object' ? Reflect.getPrototypeOf(arg.constructor) : null;
   return Boolean(prototype && Reflect.get(prototype, 'name') === 'ZodType');
 }
+
+export const $ZodTypeAny = z.custom<z.ZodTypeAny>((arg) => isZodType(arg));

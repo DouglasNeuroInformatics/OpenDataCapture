@@ -2,7 +2,7 @@ import type { InstrumentModel } from '@open-data-capture/database/core';
 import _ from 'lodash';
 import { z } from 'zod';
 
-import { $BaseModel, $Language, type BaseModel, type Language } from './core';
+import { $BaseModel, $Language, $ZodTypeAny, type BaseModel, type Language } from './core';
 
 export type InstrumentKind = InstrumentModel['kind'];
 export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'UNKNOWN']) satisfies z.ZodType<InstrumentKind>;
@@ -151,7 +151,7 @@ export const $BaseInstrument = <TLanguage extends InstrumentLanguage>(language?:
     measures: z.unknown().optional(),
     name: z.string().min(1),
     tags: $InstrumentUIOption(z.array(z.string().min(1)), language),
-    validationSchema: z.instanceof(z.ZodType),
+    validationSchema: $ZodTypeAny,
     version: z.number()
   });
 };

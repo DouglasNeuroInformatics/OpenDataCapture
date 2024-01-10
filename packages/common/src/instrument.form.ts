@@ -2,6 +2,7 @@ import type * as Base from '@douglasneuroinformatics/form-types';
 import type { IsEqual, KeysOfUnion, Simplify } from 'type-fest';
 import { z } from 'zod';
 
+import { $ZodTypeAny } from './core';
 import {
   $BaseInstrument,
   $EnhancedBaseInstrumentDetails,
@@ -351,7 +352,7 @@ export const $FormInstrument = $BaseInstrument().extend({
   details: $EnhancedBaseInstrumentDetails(),
   kind: z.literal('FORM'),
   measures: $FormInstrumentMeasures.optional(),
-  validationSchema: z.instanceof(z.ZodType<Base.FormDataType>)
+  validationSchema: $ZodTypeAny
 }) satisfies z.ZodType<FormInstrument>;
 
 export type StrictFormInstrument<TData, TLanguage extends InstrumentLanguage> = TData extends Base.FormDataType

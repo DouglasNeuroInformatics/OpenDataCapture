@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@open-data-capture/common/instrument';
@@ -47,7 +47,7 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'Get Instrument' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+  async findById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.instrumentsService.findById(id, { ability });
   }
 }
