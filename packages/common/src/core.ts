@@ -38,3 +38,5 @@ export type JsonLiteral = z.infer<typeof $JsonLiteral>;
 export type Json = { [key: string]: Json } | Json[] | JsonLiteral;
 
 export const $Json: z.ZodType<Json> = z.lazy(() => z.union([$JsonLiteral, z.array($Json), z.record($Json)]));
+
+export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
