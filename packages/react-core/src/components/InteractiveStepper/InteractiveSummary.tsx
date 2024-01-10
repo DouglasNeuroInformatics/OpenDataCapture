@@ -1,13 +1,13 @@
 import { Card, useDownload } from '@douglasneuroinformatics/ui';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
-import type { BaseModelKeys, Json, Language } from '@open-data-capture/common/core';
+import type { Json, Language } from '@open-data-capture/common/core';
 import type { InteractiveInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 
 export type InteractiveSummaryProps = {
   data: unknown;
-  instrument: Omit<InteractiveInstrument<Json, Language>, BaseModelKeys>;
+  instrument: InteractiveInstrument<Json, Language>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
   timeCollected: number;
 };

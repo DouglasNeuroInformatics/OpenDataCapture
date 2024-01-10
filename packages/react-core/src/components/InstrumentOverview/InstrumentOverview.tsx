@@ -1,5 +1,4 @@
 import { Button } from '@douglasneuroinformatics/ui';
-import type { BaseModelKeys, DistributiveOmit } from '@open-data-capture/common/core';
 import type { UnilingualInstrument } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
@@ -7,7 +6,7 @@ import { match } from 'ts-pattern';
 import { InstrumentOverviewItem } from './InstrumentOverviewItem';
 
 type InstrumentOverviewProps = {
-  instrument: DistributiveOmit<UnilingualInstrument, BaseModelKeys>;
+  instrument: UnilingualInstrument
   onBegin: () => void;
 };
 

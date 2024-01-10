@@ -27,5 +27,3 @@ export const $InteractiveInstrument = $BaseInstrument('en').extend({
   details: $EnhancedBaseInstrumentDetails('en'),
   kind: z.literal('INTERACTIVE')
 });
-
-export const $InteractiveInstrumentDef = $InteractiveInstrument.omit({ createdAt: true, id: true, updatedAt: true });

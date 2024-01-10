@@ -3,7 +3,7 @@ import { useState } from 'react';
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Stepper } from '@douglasneuroinformatics/ui';
 import { DocumentCheckIcon, PrinterIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
-import type { BaseModelKeys, Language } from '@open-data-capture/common/core';
+import type { Language } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,7 @@ import { FormQuestions } from './FormQuestions';
 import { FormSummary } from './FormSummary';
 
 type FormStepperProps = {
-  form: Omit<FormInstrument<FormDataType, Language>, BaseModelKeys>;
+  form: FormInstrument<FormDataType, Language>;
   onSubmit: (data: FormDataType) => Promisable<void>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };

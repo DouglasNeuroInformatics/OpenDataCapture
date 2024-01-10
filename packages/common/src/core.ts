@@ -29,8 +29,6 @@ export const $BaseModel = z.object({
   updatedAt: z.coerce.date()
 });
 
-export type BaseModelKeys = Extract<keyof BaseModel, string>;
-
 export const $JsonLiteral = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 
 export type JsonLiteral = z.infer<typeof $JsonLiteral>;

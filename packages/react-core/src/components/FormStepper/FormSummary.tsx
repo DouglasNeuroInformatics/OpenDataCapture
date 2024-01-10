@@ -2,7 +2,7 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Card, formatFormDataAsString, getFormFields, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
-import { type BaseModelKeys, type Language, toLowerCase } from '@open-data-capture/common/core';
+import { type Language, toLowerCase } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import { FormSummaryGroup } from './FormSummaryGroup';
 
 export type FormSummaryProps = {
   data: FormDataType;
-  form: Omit<FormInstrument<FormDataType, Language>, BaseModelKeys>;
+  form: FormInstrument<FormDataType, Language>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
   timeCollected: number;
 };

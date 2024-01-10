@@ -2,7 +2,7 @@ import type { InstrumentModel } from '@open-data-capture/database/core';
 import _ from 'lodash';
 import { z } from 'zod';
 
-import { $BaseModel, $Language, $ZodTypeAny, type BaseModel, type Language } from './core';
+import { $Language, $ZodTypeAny, type Language } from './core';
 
 export type InstrumentKind = InstrumentModel['kind'];
 export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'UNKNOWN']) satisfies z.ZodType<InstrumentKind>;
@@ -110,15 +110,12 @@ export const $EnhancedBaseInstrumentDetails = <TLanguage extends InstrumentLangu
  * @typeParam TData - the structure of the data derived from this instrument
  * @typeParam TLanguage - the language(s) of the instrument
  */
-export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = BaseModel & {
+export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
   content?: unknown;
 
   /** The details of the instrument to be displayed to the user */
   details: BaseInstrumentDetails<TLanguage>;
-
-  /** The MongoDB ObjectId represented as a hex string */
-  id?: string;
 
   /** The discriminator key for the type of instrument */
   kind: InstrumentKind;
@@ -143,7 +140,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
 };
 
 export const $BaseInstrument = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
-  return $BaseModel.extend({
+  return z.object({
     content: z.unknown(),
     details: $BaseInstrumentDetails(language),
     kind: $InstrumentKind,

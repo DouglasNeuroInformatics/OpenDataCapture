@@ -355,8 +355,6 @@ export const $FormInstrument = $BaseInstrument().extend({
   validationSchema: $ZodTypeAny
 }) satisfies z.ZodType<FormInstrument>;
 
-export const $FormInstrumentDef = $FormInstrument.omit({ createdAt: true, id: true, updatedAt: true });
-
 export type StrictFormInstrument<TData, TLanguage extends InstrumentLanguage> = TData extends Base.FormDataType
   ? IsValidFormData<TData> extends true
     ? Omit<FormInstrument<TData, TLanguage>, 'validationSchema'> & {

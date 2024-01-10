@@ -1,13 +1,13 @@
 import { useContext } from 'react';
 
 import { StepperContext } from '@douglasneuroinformatics/ui';
-import type { BaseModelKeys, Json, Language } from '@open-data-capture/common/core';
+import type { Json, Language } from '@open-data-capture/common/core';
 import type { InteractiveInstrument } from '@open-data-capture/common/instrument';
 
 import { InstrumentOverview } from '../InstrumentOverview';
 
 type InteractiveOverviewProps = {
-  instrument: Omit<InteractiveInstrument<Json, Language>, BaseModelKeys>;
+  instrument: InteractiveInstrument<Json, Language>;
 };
 
 export const InteractiveOverview = ({ instrument }: InteractiveOverviewProps) => {

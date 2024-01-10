@@ -46,37 +46,29 @@ const unilingualDetails: BaseInstrumentDetails<Language> = _.pick(enhancedUnilin
 
 const englishInstrument: BaseInstrument<null, 'en'> = {
   content: null,
-  createdAt: new Date(),
   details: unilingualDetails,
-  id: '123',
   kind: 'UNKNOWN',
   language: 'en',
   name: 'Foo',
   tags: ['Foo'],
-  updatedAt: new Date(),
   validationSchema: z.any(),
   version: 1
 };
 
 const frenchInstrument: BaseInstrument<null, 'fr'> = {
   content: null,
-  createdAt: new Date(),
   details: unilingualDetails,
-  id: '123',
   kind: 'UNKNOWN',
   language: 'fr',
   name: 'Foo',
   tags: ['Foo'],
-  updatedAt: new Date(),
   validationSchema: z.any(),
   version: 1
 };
 
 const bilingualInstrument: BaseInstrument<null, Language[]> = {
   content: null,
-  createdAt: new Date(),
   details: bilingualDetails,
-  id: '123',
   kind: 'UNKNOWN',
   language: ['en', 'fr'],
   name: 'Foo',
@@ -84,7 +76,6 @@ const bilingualInstrument: BaseInstrument<null, Language[]> = {
     en: ['Foo'],
     fr: ['Foo']
   },
-  updatedAt: new Date(),
   validationSchema: z.any(),
   version: 1
 };
