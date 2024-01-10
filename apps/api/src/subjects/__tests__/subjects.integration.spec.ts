@@ -56,7 +56,7 @@ describe('/subjects', () => {
         dateOfBirth: new Date(),
         firstName: 'John',
         lastName: 'Smith',
-        sex: 'male'
+        sex: 'MALE'
       };
     });
     it('should return status code 400 for a request with an empty body', async () => {
