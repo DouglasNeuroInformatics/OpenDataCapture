@@ -28,10 +28,15 @@ for (const dir of WORKSPACE_DIRS) {
       .then((pkg) => pkg.name.replace('@open-data-capture/', ''));
     if (workspaceName === targetWorkspace) {
       isFound = true;
-      cp.execSync(`bun run ${args.join(' ')}`, {
-        cwd: workspaceDir,
-        stdio: 'inherit'
-      });
+      try {
+        const val = cp.execSync(`bun run ${args.join(' ')}`, {
+          cwd: workspaceDir,
+          stdio: 'inherit'
+        });
+        console.log(val);
+      } catch (err) {
+        console.error(`\n${err.message}`);
+      }
     }
   }
 }
