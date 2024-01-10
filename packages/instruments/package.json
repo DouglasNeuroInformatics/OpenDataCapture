@@ -16,8 +16,5 @@
     "@open-data-capture/common": "workspace:*",
     "type-fest": "^4.8.2",
     "zod": "^3.22.4"
-  },
-  "devDependencies": {
-    "@open-data-capture/instrument-transformer": "workspace:*"
   }
 }

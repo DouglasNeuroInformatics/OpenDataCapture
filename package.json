@@ -25,7 +25,7 @@
     "lint": "turbo run lint",
     "prepare": "husky install",
     "test": "env-cmd turbo run test",
-    "ws": "./scripts/workspace.sh $@"
+    "ws": "./scripts/workspace.js $@"
   },
   "devDependencies": {
     "@douglasneuroinformatics/eslint-config": "latest",

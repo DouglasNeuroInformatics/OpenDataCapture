@@ -93,7 +93,7 @@ export default [
     }
   },
   {
-    files: ['**/*.config.js', '**/*.cjs'],
+    files: ['**/*.config.js', '**/*.cjs', 'scripts/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.node
