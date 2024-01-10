@@ -157,14 +157,8 @@ export const $BaseInstrument = <TLanguage extends InstrumentLanguage>(language?:
  * An object containing the essential data describing an instrument, but omitting the content
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
- *
- * @typeParam TData - the structure of the data derived from this instrument
- * @typeParam TLanguage - the language(s) of the instrument
  */
-export type BaseInstrumentSummary<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Omit<
-  BaseInstrument<TData, TLanguage>,
-  'content' | 'validationSchema'
->;
+export type BaseInstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content' | 'validationSchema'>;
 
 export const $BaseInstrumentSummary = $BaseInstrument().omit({
   content: true,
@@ -173,6 +167,7 @@ export const $BaseInstrumentSummary = $BaseInstrument().omit({
 
 export type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 export const $CreateInstrumentData = z.object({
+  kind: $InstrumentKind.optional(),
   source: z.string().min(1)
 });
 

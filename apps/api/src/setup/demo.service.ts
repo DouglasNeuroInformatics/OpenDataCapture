@@ -3,15 +3,17 @@ import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
+import { type Json, toUpperCase } from '@open-data-capture/common/core';
+import type { Group } from '@open-data-capture/common/group';
 import type {
   FormInstrument,
   FormInstrumentFields,
   FormInstrumentStaticField,
   FormInstrumentUnknownField
 } from '@open-data-capture/common/instrument';
-import type { Subject } from '@open-data-capture/common/subject';
-import { demoGroups, demoUsers } from '@open-data-capture/demo';
-import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' }
+import type { Subject, SubjectIdentificationData } from '@open-data-capture/common/subject';
+import { DEMO_GROUPS, DEMO_USERS } from '@open-data-capture/demo';
+import { BPRS_SOURCE, EDQ_SOURCE, HQ_SOURCE, MMSE_SOURCE, MOCA_SOURCE } from '@open-data-capture/instruments';
 import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
@@ -20,12 +22,6 @@ import { InstrumentsService } from '@/instruments/instruments.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 import { VisitsService } from '@/visits/visits.service';
-
-const BPRS_SOURCE = importInstrumentSource('forms/brief-psychiatric-rating-scale');
-const EDQ_SOURCE = importInstrumentSource('forms/enhanced-demographics-questionnaire');
-const HQ_SOURCE = importInstrumentSource('forms/happiness-questionnaire');
-const MMSE_SOURCE = importInstrumentSource('forms/mini-mental-state-examination');
-const MOCA_SOURCE = importInstrumentSource('forms/montreal-cognitive-assessment');
 
 faker.seed(123);
 
@@ -47,21 +43,31 @@ export class DemoService {
     this.logger.log(`Initializing demo for database: '${this.connection.name}'`);
 
     const forms = await this.createForms();
-    await this.createGroups();
-    await this.createUsers();
+
+    const groups: Group[] = [];
+    for (const group of DEMO_GROUPS) {
+      groups.push(await this.groupsService.create(group));
+    }
+
+    for (const user of DEMO_USERS) {
+      await this.usersService.create({
+        ...user,
+        groupIds: user.groupNames.map((name) => groups.find((group) => group.name === name)!.id)
+      });
+    }
 
     for (let i = 0; i < 100; i++) {
-      const group = await this.groupsService.findByName(randomValue(demoGroups).name);
+      const group = randomValue(groups);
       const subject = await this.createSubject();
       await this.visitsService.create({
         date: new Date(),
         groupId: group.id,
-        subjectIdData: subject as Required<typeof subject>
-      })
+        subjectIdData: subject
+      });
       for (const form of forms) {
         for (let i = 0; i < 10; i++) {
           const data = this.createFormRecordData(
-            form,
+            await form.toInstance({ kind: 'FORM' }),
             form.name === 'EnhancedDemographicsQuestionnaire'
               ? {
                   customValues: {
@@ -71,11 +77,11 @@ export class DemoService {
               : undefined
           );
           await this.instrumentRecordsService.create({
-            data,
+            data: data as Json,
             date: faker.date.past({ years: 2 }),
             groupId: group.id,
             instrumentId: form.id!,
-            subjectIdentifier: subject.identifier
+            subjectId: subject.id
           });
         }
       }
@@ -121,18 +127,12 @@ export class DemoService {
 
   private async createForms() {
     return [
-      await this.instrumentsService.create({ source: BPRS_SOURCE }),
-      await this.instrumentsService.create({ source: EDQ_SOURCE }),
-      await this.instrumentsService.create({ source: HQ_SOURCE }),
-      await this.instrumentsService.create({ source: MMSE_SOURCE }),
-      await this.instrumentsService.create({ source: MOCA_SOURCE })
-    ] as unknown as FormInstrument[];
-  }
-
-  private async createGroups() {
-    for (const group of demoGroups) {
-      await this.groupsService.create(group);
-    }
+      await this.instrumentsService.create({ kind: 'FORM', source: BPRS_SOURCE }),
+      await this.instrumentsService.create({ kind: 'FORM', source: EDQ_SOURCE }),
+      await this.instrumentsService.create({ kind: 'FORM', source: HQ_SOURCE }),
+      await this.instrumentsService.create({ kind: 'FORM', source: MMSE_SOURCE }),
+      await this.instrumentsService.create({ kind: 'FORM', source: MOCA_SOURCE })
+    ];
   }
 
   private createMockStaticFieldValue(field: FormInstrumentStaticField) {
@@ -159,13 +159,7 @@ export class DemoService {
       dateOfBirth: faker.date.birthdate(),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
-      sex: faker.person.sexType()
-    });
-  }
-
-  private async createUsers() {
-    for (const user of demoUsers) {
-      await this.usersService.create(user);
-    }
+      sex: toUpperCase(faker.person.sexType())
+    }) as Promise<Subject & SubjectIdentificationData>;
   }
 }

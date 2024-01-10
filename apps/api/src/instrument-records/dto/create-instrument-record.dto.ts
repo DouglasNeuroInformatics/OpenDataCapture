@@ -8,5 +8,5 @@ export class CreateInstrumentRecordDto {
   date: Date;
   groupId?: string;
   instrumentId: string;
-  subjectIdentifier: string;
+  subjectId: string;
 }

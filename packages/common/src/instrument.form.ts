@@ -376,7 +376,7 @@ export type StrictFormInstrument<TData, TLanguage extends InstrumentLanguage> = 
 export type FormInstrumentSummary<
   TData extends Base.FormDataType = Base.FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = BaseInstrumentSummary<TData, TLanguage> & {
+> = BaseInstrumentSummary<FormInstrument<TData, TLanguage>> & {
   measures?: Record<
     string,
     {

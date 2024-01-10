@@ -1,6 +1,6 @@
 import { type DynamicModule, Module } from '@nestjs/common';
-import { type Instrument, evaluateInstrument } from '@open-data-capture/common/instrument';
-import { Prisma, PrismaClient } from '@open-data-capture/database/core';
+import { type EvaluateInstrumentOptions, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { InstrumentKind, Prisma, PrismaClient } from '@open-data-capture/database/core';
 
 import { PRISMA_CLIENT_TOKEN } from './prisma.constants';
 import { getModelReferenceName, getModelToken } from './prisma.utils';
@@ -32,7 +32,9 @@ export class PrismaModule {
         instrumentModel: {
           toInstance: {
             compute({ bundle }) {
-              return <T extends Instrument = Instrument>() => evaluateInstrument<T>(bundle);
+              return function <TKind extends InstrumentKind>(options?: EvaluateInstrumentOptions<TKind>) {
+                return evaluateInstrument(bundle, options);
+              };
             },
             needs: { bundle: true }
           }

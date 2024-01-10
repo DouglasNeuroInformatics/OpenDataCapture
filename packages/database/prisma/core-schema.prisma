@@ -37,6 +37,7 @@ model InstrumentRecordModel {
   subjectId    String
   instrument   InstrumentModel @relation(fields: [instrumentId], references: [id])
   instrumentId String          @db.ObjectId
+  assignmentId String?
 }
 
 // Instruments 

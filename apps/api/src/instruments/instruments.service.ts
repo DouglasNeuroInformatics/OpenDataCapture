@@ -1,12 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import type {
-  BaseInstrument,
-  Instrument,
-  InstrumentKind,
-  InstrumentSummary
-} from '@open-data-capture/common/instrument';
-import { evaluateInstrument, $FormInstrument } from '@open-data-capture/common/instrument';
+import type { Instrument, InstrumentKind, InstrumentSummary } from '@open-data-capture/common/instrument';
+import { evaluateInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -29,12 +24,12 @@ export class InstrumentsService {
     return this.instrumentModel.count({ where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), filter] } });
   }
 
-  async create({ source }: CreateInstrumentDto) {
-    const { instance } = await this.parseSource(source, formInstrumentSchema);
+  async create<TKind extends InstrumentKind>({ kind, source }: CreateInstrumentDto<TKind>) {
+    const { bundle, instance } = await this.parseSource(source, { kind });
     if (await this.instrumentModel.exists({ name: instance.name })) {
       throw new ConflictException(`Instrument with name '${instance.name}' already exists!`);
     }
-    const bundle = await this.instrumentTransformer.generateBundle(source);
+
     return this.instrumentModel.create({
       data: {
         bundle,
@@ -80,26 +75,20 @@ export class InstrumentsService {
    * Attempt to resolve an instance of an instrument from the TypeScript source code.
    * If this fails, then throws an UnprocessableContentException
    */
-  private async parseSource<T extends BaseInstrument>(source: string, schema: Zod.ZodType<T>) {
+  private async parseSource<TKind extends InstrumentKind>(source: string, options?: { kind?: TKind }) {
     let bundle: string;
-    let instance: Instrument;
+    let instance: Extract<Instrument, { kind: TKind }>;
     try {
       bundle = await this.instrumentTransformer.generateBundle(source);
-      instance = await evaluateInstrument(bundle);
+      instance = await evaluateInstrument(bundle, {
+        kind: options?.kind,
+        validate: true
+      });
     } catch (err) {
       throw new UnprocessableEntityException('Failed to parse instrument', {
         cause: err
       });
     }
-    const result = await schema.safeParseAsync(instance);
-    if (!result.success) {
-      throw new UnprocessableEntityException(
-        'Successfully parsed instrument, but resolved object does not conform to expected format',
-        {
-          cause: result.error
-        }
-      );
-    }
-    return { bundle, instance: result.data };
+    return { bundle, instance };
   }
 }

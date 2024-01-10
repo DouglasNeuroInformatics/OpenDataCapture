@@ -2,12 +2,14 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { linearRegression } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Injectable } from '@nestjs/common';
-import type { FormInstrument, FormInstrumentMeasures, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { evaluateInstrument } from '@open-data-capture/common/instrument';
+import type { FormInstrument, FormInstrumentMeasures } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@open-data-capture/common/instrument-records';
+import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -36,14 +38,14 @@ export class InstrumentRecordsService {
   }
 
   async create(
-    { data, date, groupId, instrumentId, subjectIdentifier }: CreateInstrumentRecordData,
+    { data, date, groupId, instrumentId, subjectId }: CreateInstrumentRecordData,
     options?: EntityOperationOptions
   ) {
     if (groupId) {
       await this.groupsService.findById(groupId, options);
     }
     await this.instrumentsService.findById(instrumentId);
-    const subject = await this.subjectsService.findById(subjectIdentifier);
+    const subject = await this.subjectsService.findById(subjectId);
 
     return this.instrumentRecordModel.create({
       data: {
@@ -56,14 +58,15 @@ export class InstrumentRecordsService {
     });
   }
 
+  async exists(where: Prisma.InstrumentRecordModelWhereInput) {
+    return this.instrumentRecordModel.exists(where);
+  }
+  
   async exportRecords(
     { groupId }: { groupId?: string } = {},
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentRecordsExport> {
-    const group = groupId ? await this.groupsService.findById(groupId, { ability }) : undefined;
-    const subjects = group
-      ? await this.subjectsService.findByGroup(group.name, { ability })
-      : await this.subjectsService.findAll({ ability });
+    const subjects = await this.subjectsService.find({ groupId }, { ability });
     const data: InstrumentRecordsExport = [];
     for (const subject of subjects) {
       const records = await this.instrumentRecordModel.findMany({
@@ -81,7 +84,7 @@ export class InstrumentRecordsService {
             instrumentVersion: record.instrument.version,
             measure: measure,
             subjectAge: yearsPassed(subject.dateOfBirth),
-            subjectId: subject.identifier,
+            subjectId: subject.id,
             subjectSex: subject.sex,
             timestamp: record.date.toISOString(),
             value: formData[measure] as unknown
@@ -97,13 +100,12 @@ export class InstrumentRecordsService {
       groupId,
       instrumentId,
       minDate,
-      subjectIdentifier
-    }: { groupId?: string; instrumentId?: string; minDate?: Date; subjectIdentifier?: string },
+      subjectId
+    }: { groupId?: string; instrumentId?: string; minDate?: Date; subjectId?: string },
     { ability }: EntityOperationOptions = {}
   ) {
     groupId && (await this.groupsService.findById(groupId));
     instrumentId && (await this.instrumentsService.findById(instrumentId));
-    const subject = subjectIdentifier ? await this.subjectsService.findById(subjectIdentifier) : undefined;
 
     const records = await this.instrumentRecordModel.findMany({
       include: {
@@ -120,7 +122,7 @@ export class InstrumentRecordsService {
           { groupId },
           { instrumentId },
           accessibleQuery(ability, 'read', 'InstrumentRecord'),
-          { subjectId: subject?.id }
+          { subjectId }
         ]
       }
     });

@@ -4,9 +4,9 @@ import { InstrumentKind } from '@open-data-capture/database/core';
 
 import { $FormInstrument, $InteractiveInstrument, type Instrument } from './instrument';
 
-type EvaluateInstrumentOptions<T extends InstrumentKind> = {
+export type EvaluateInstrumentOptions<TKind extends InstrumentKind> = {
   /** The kind of instrument being evaluated. If validate is set to true, this will be enforced at runtime. Otherwise, it will just be asserted */
-  kind?: T;
+  kind?: TKind;
   /** Whether to validate the structure of the instrument at runtime (expensive) */
   validate?: boolean;
 };

@@ -5,7 +5,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/dist/*"]
     },
     "strictPropertyInitialization": false,
     "types": ["bun-types"]

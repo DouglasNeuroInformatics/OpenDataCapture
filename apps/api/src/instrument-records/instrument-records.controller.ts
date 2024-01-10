@@ -38,9 +38,9 @@ export class InstrumentRecordsController {
     minDate?: Date,
     @Query('groupId') groupId?: string,
     @Query('instrumentId') instrumentId?: string,
-    @Query('subjectIdentifier') subjectIdentifier?: string
+    @Query('subjectId') subjectId?: string
   ) {
-    return this.instrumentRecordsService.find({ groupId, instrumentId, minDate, subjectIdentifier }, { ability });
+    return this.instrumentRecordsService.find({ groupId, instrumentId, minDate, subjectId }, { ability });
   }
 
   @ApiOperation({ summary: 'Export Records' })

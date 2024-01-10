@@ -13,7 +13,7 @@ export const $CreateInstrumentRecordData = z.object({
   date: z.coerce.date(),
   groupId: z.string().optional(),
   instrumentId: z.string(),
-  subjectIdentifier: z.string()
+  subjectId: z.string()
 });
 
 export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;

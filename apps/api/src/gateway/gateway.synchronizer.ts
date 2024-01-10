@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { $AssignmentStatus } from '@open-data-capture/common/assignment';
+import { $Json } from '@open-data-capture/common/core';
 import { isAxiosError } from 'axios';
 import { z } from 'zod';
 
@@ -17,12 +18,12 @@ const $RemoteAssignment = z.object({
     .object({
       assignmentId: z.string(),
       completedAt: z.coerce.date(),
-      data: z.any(),
+      data: $Json,
       id: z.coerce.string()
     })
     .nullish(),
   status: $AssignmentStatus,
-  subjectIdentifier: z.string()
+  subjectId: z.string()
 });
 
 type RemoteAssignment = z.infer<typeof $RemoteAssignment>;
@@ -77,7 +78,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         data: assignment.record.data,
         date: assignment.record.completedAt,
         instrumentId: assignment.instrumentId,
-        subjectIdentifier: assignment.subjectIdentifier
+        subjectId: assignment.subjectId
       });
       this.logger.log(`Created record with ID: ${record.id}`);
     }

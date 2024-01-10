@@ -6,7 +6,7 @@ import { HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' };
+import { BPRS_SOURCE, EDQ_SOURCE, HQ_SOURCE, MMSE_SOURCE, MOCA_SOURCE } from '@open-data-capture/instruments';
 import { Types } from 'mongoose';
 import request from 'supertest';
 
@@ -16,13 +16,6 @@ import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsService } from '../instruments.service';
-
-const BPRS_SOURCE = importInstrumentSource('forms/brief-psychiatric-rating-scale');
-const EDQ_SOURCE = importInstrumentSource('forms/enhanced-demographics-questionnaire');
-const HQ_SOURCE = importInstrumentSource('forms/happiness-questionnaire');
-const MMSE_SOURCE = importInstrumentSource('forms/mini-mental-state-examination');
-const MOCA_SOURCE = importInstrumentSource('forms/montreal-cognitive-assessment');
-
 describe('/instruments', () => {
   let app: NestExpressApplication;
   let server: unknown;

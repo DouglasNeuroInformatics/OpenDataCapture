@@ -17,7 +17,7 @@ export class SetupService {
   ) {}
 
   async createAdmin(admin: CreateAdminData) {
-    return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN' });
+    return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN', groupIds: [] });
   }
 
   async dropDatabase() {

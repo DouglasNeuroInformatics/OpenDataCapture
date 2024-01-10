@@ -6,6 +6,7 @@ import {
   $BaseInstrument,
   $EnhancedBaseInstrumentDetails,
   type BaseInstrument,
+  type BaseInstrumentSummary,
   type EnhancedBaseInstrumentDetails
 } from './instrument.base';
 
@@ -27,3 +28,8 @@ export const $InteractiveInstrument = $BaseInstrument('en').extend({
   details: $EnhancedBaseInstrumentDetails('en'),
   kind: z.literal('INTERACTIVE')
 });
+
+export type InteractiveInstrumentSummary<
+  TData extends Json = Json,
+  TLanguage extends Language = Language
+> = BaseInstrumentSummary<InteractiveInstrument<TData, TLanguage>>;
