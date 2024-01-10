@@ -117,12 +117,13 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   /** The details of the instrument to be displayed to the user */
   details: BaseInstrumentDetails<TLanguage>;
 
+  id?: string;
+
   /** The discriminator key for the type of instrument */
   kind: InstrumentKind;
 
   /** The language(s) in which the instrument is written */
   language: TLanguage;
-
   /** Arbitrary measures derived from the data */
   measures?: unknown;
 
@@ -143,6 +144,7 @@ export const $BaseInstrument = <TLanguage extends InstrumentLanguage>(language?:
   return z.object({
     content: z.unknown(),
     details: $BaseInstrumentDetails(language),
+    id: z.string().optional(),
     kind: $InstrumentKind,
     language: $InstrumentLanguage(language),
     measures: z.unknown().optional(),
@@ -158,12 +160,19 @@ export const $BaseInstrument = <TLanguage extends InstrumentLanguage>(language?:
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
  */
-export type BaseInstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content' | 'validationSchema'>;
+export type BaseInstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<
+  T,
+  'content' | 'validationSchema'
+> & {
+  id: string;
+};
 
-export const $BaseInstrumentSummary = $BaseInstrument().omit({
-  content: true,
-  validationSchema: true
-}) satisfies z.ZodType<BaseInstrumentSummary>;
+export const $BaseInstrumentSummary = $BaseInstrument()
+  .omit({
+    content: true,
+    validationSchema: true
+  })
+  .extend({ id: z.string() }) satisfies z.ZodType<BaseInstrumentSummary>;
 
 export type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 export const $CreateInstrumentData = z.object({

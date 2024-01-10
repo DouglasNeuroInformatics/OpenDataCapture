@@ -58,7 +58,7 @@ export const SubjectGraphPage = () => {
       groupId: currentGroup?.id,
       instrumentId: selectedForm?.id,
       minDate: minDate ?? undefined,
-      subjectIdentifier: params.subjectIdentifier!
+      subjectId: params.subjectId!
     }
   });
   const lmQuery = useQuery({
@@ -124,7 +124,7 @@ export const SubjectGraphPage = () => {
   const formOptions: Record<string, string> = {};
   for (const form of formsQuery.data) {
     if (form.measures && Object.keys(form.measures).length > 0) {
-      formOptions[form.id!] = form.details.title;
+      formOptions[form.id] = form.details.title;
     }
   }
 

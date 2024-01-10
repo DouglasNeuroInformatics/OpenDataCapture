@@ -25,7 +25,7 @@ export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
       return;
     }
     notifications.addNotification({ type: 'success' });
-    navigate(`${response.data.identifier}/assignments`);
+    navigate(`${response.data.id}/assignments`);
   };
 
   return (

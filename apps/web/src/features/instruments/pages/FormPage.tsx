@@ -33,7 +33,7 @@ export const FormPage = () => {
       date: new Date(),
       groupId: currentGroup?.id,
       instrumentId: query.data?.id,
-      subjectIdentifier: activeVisit?.subject.identifier
+      subjectId: activeVisit?.subject.id
     });
     notifications.addNotification({ type: 'success' });
   };

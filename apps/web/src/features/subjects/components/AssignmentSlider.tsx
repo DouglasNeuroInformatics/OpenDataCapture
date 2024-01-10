@@ -1,24 +1,30 @@
 import { Button, Slider } from '@douglasneuroinformatics/ui';
-import type { AssignmentSummary } from '@open-data-capture/common/assignment';
+import type { Assignment } from '@open-data-capture/common/assignment';
 import type { Language } from '@open-data-capture/common/core';
-import { translateFormSummary } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useTranslation } from 'react-i18next';
 
+import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
+
 export type AssignmentSliderProps = {
-  assignment: AssignmentSummary | null;
+  assignment: Assignment | null;
   isOpen: boolean;
-  onCancel: (assignment: AssignmentSummary) => void;
+  onCancel: (assignment: Assignment) => void;
   setIsOpen: (isOpen: boolean) => void;
 };
 
 /** Component for modifying an existing assignment */
 export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: AssignmentSliderProps) => {
   const { i18n, t } = useTranslation(['common', 'subjects']);
-  const instrument = assignment ? translateFormSummary(assignment.instrument, i18n.resolvedLanguage as Language) : null;
+  const instrument = useInstrumentBundle(assignment?.instrumentBundle);
+
+  const title =
+    typeof instrument?.details.title === 'string'
+      ? instrument?.details.title
+      : instrument?.details.title[i18n.resolvedLanguage as Language];
 
   return (
-    <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={instrument?.details.title}>
-      {instrument && (
+    <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={title}>
+      {title && (
         <div className="flex h-full flex-col">
           <div className="flex gap-1 text-sm">
             <a

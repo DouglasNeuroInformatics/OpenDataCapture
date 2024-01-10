@@ -7,8 +7,7 @@ import {
   Spinner,
   useNotificationsStore
 } from '@douglasneuroinformatics/ui';
-import type { Language } from '@open-data-capture/common/core';
-import type { FormInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
+import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -23,7 +22,7 @@ export const AvailableInstrumentsPage = () => {
   const forms = useAvailableForms();
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'instruments']);
-  const [filteredInstruments, setFilteredInstruments] = useState<InstrumentSummary<FormInstrument, Language>[]>([]);
+  const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentSummary[]>([]);
   const [tagOptions, setTagOptions] = useState<SelectOption[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<SelectOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<SelectOption[]>([]);
@@ -116,7 +115,7 @@ export const AvailableInstrumentsPage = () => {
                   instrument={instrument}
                   onClick={() => {
                     if (activeVisit) {
-                      navigate(`/instruments/forms/${instrument.id!}`);
+                      navigate(`/instruments/forms/${instrument.id}`);
                     } else {
                       notifications.addNotification({
                         message: t('instruments:available.nullActiveVisitError'),

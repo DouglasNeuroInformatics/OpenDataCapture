@@ -4,7 +4,7 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { ClientTable, Dropdown, useDownload } from '@douglasneuroinformatics/ui';
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Language } from '@open-data-capture/common/core';
-import { type InstrumentSummary } from '@open-data-capture/common/instrument';
+import { type FormInstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -21,7 +21,7 @@ export const SubjectTablePage = () => {
   const params = useParams();
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [tableData, setTableData] = useState<Record<string, unknown>[]>([]);
-  const [selectedForm, setSelectedForm] = useState<InstrumentSummary<FormDataType, Language> | null>(null);
+  const [selectedForm, setSelectedForm] = useState<FormInstrumentSummary<FormDataType, Language> | null>(null);
   const { t } = useTranslation(['subjects', 'common']);
 
   const formsQuery = useAvailableForms();
@@ -31,7 +31,7 @@ export const SubjectTablePage = () => {
       groupId: currentGroup?.id,
       instrumentId: selectedForm?.id,
       minDate: minDate ?? undefined,
-      subjectIdentifier: params.subjectIdentifier!
+      subjectId: params.subjectId!
     }
   });
 
@@ -76,7 +76,7 @@ export const SubjectTablePage = () => {
 
   const formOptions: Record<string, string> = {};
   for (const form of formsQuery.data) {
-    formOptions[form.id!] = form.details.title;
+    formOptions[form.id] = form.details.title;
   }
 
   const handleSelectForm = (id: string) => {

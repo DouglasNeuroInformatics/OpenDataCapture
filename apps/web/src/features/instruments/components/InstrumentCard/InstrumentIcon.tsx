@@ -1,7 +1,7 @@
 import { PencilSquareIcon } from '@heroicons/react/24/solid';
 import type { InstrumentKind } from '@open-data-capture/common/instrument';
 
-// import handBrain from '@/assets/hand-brain.png';
+import handBrain from '@/assets/hand-brain.png';
 import toolBrain from '@/assets/tool-brain.png';
 
 export type InstrumentIconProps = {
@@ -10,10 +10,10 @@ export type InstrumentIconProps = {
 
 export const InstrumentIcon = ({ kind }: InstrumentIconProps) => {
   switch (kind) {
-    case 'form':
+    case 'FORM':
       return <img alt="tool brain" className="h-10 w-auto rounded-full" src={toolBrain} />;
-    // case 'interactive':
-    //   return <img alt="tool brain" className="h-10 w-auto rounded-full" src={handBrain} />;
+    case 'INTERACTIVE':
+      return <img alt="tool brain" className="h-10 w-auto rounded-full" src={handBrain} />;
     default:
       return <PencilSquareIcon className="h-8 w-8" />;
   }

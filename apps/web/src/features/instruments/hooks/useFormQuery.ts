@@ -1,6 +1,5 @@
 import type { Language } from '@open-data-capture/common/core';
-import type { FormInstrument, InstrumentBundle } from '@open-data-capture/common/instrument';
-import { evaluateInstrument } from '@open-data-capture/instrument-runtime';
+import { $InstrumentBundleContainer, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -9,19 +8,17 @@ import { useTranslation } from 'react-i18next';
 export function useFormQuery(id: string) {
   const { i18n } = useTranslation();
   return useQuery({
-    queryFn: () => {
-      return axios
-        .get<InstrumentBundle>(`/v1/instruments/${id}`, {
-          params: {
-            kind: 'form'
-          }
-        })
-        .then((response) => {
-          const instrument = evaluateInstrument<FormInstrument>(response.data.bundle);
-          return Object.assign(translateFormInstrument(instrument, i18n.resolvedLanguage as Language), {
-            id
-          });
-        });
+    queryFn: async () => {
+      const response = await axios.get(`/v1/instruments/${id}`, {
+        params: {
+          kind: 'form'
+        }
+      });
+      const { bundle } = await $InstrumentBundleContainer.parseAsync(response.data);
+      const form = await evaluateInstrument(bundle, { kind: 'FORM', validate: import.meta.env.DEV });
+      return Object.assign(translateFormInstrument(form, i18n.resolvedLanguage as Language), {
+        id
+      });
     },
     queryKey: ['form', id, i18n.resolvedLanguage],
     throwOnError: true

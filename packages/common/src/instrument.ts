@@ -1,7 +1,12 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { z } from 'zod';
 
-import { $FormInstrument, type FormInstrument, type FormInstrumentSummary } from './instrument.form';
+import {
+  $FormInstrument,
+  type FormInstrument,
+  type FormInstrumentSummary,
+  type UnilingualFormInstrumentSummary
+} from './instrument.form';
 import {
   $InteractiveInstrument,
   type InteractiveInstrument,
@@ -17,6 +22,8 @@ export const $Instrument = z.union([$FormInstrument, $InteractiveInstrument]) sa
 export type InstrumentSummary = FormInstrumentSummary | InteractiveInstrumentSummary;
 
 export type UnilingualInstrument = FormInstrument<FormDataType, Language> | InteractiveInstrument<Json, Language>;
+
+export type UnilingualInstrumentSummary = InteractiveInstrumentSummary | UnilingualFormInstrumentSummary;
 
 export * from './instrument.base';
 export * from './instrument.form';

@@ -45,8 +45,8 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
               kind: 'options',
               label: t('identificationData.sex.label'),
               options: {
-                female: t('identificationData.sex.female'),
-                male: t('identificationData.sex.male')
+                FEMALE: t('identificationData.sex.female'),
+                MALE: t('identificationData.sex.male')
               }
             }
           }
@@ -70,7 +70,7 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
         firstName: z.string(),
         lastName: z.string(),
         dateOfBirth: z.date(),
-        sex: z.enum(['male', 'female']),
+        sex: z.enum(['MALE', 'FEMALE']),
         date: z.date()
       })}
       onSubmit={onSubmit}

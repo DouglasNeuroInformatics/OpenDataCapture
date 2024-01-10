@@ -16,7 +16,7 @@ type UseFormRecordsOptions = {
     groupId?: string;
     instrumentId?: string;
     minDate?: Date;
-    subjectIdentifier?: string;
+    subjectId?: string;
   };
 };
 

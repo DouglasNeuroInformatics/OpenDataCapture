@@ -82,7 +82,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
       <ClientTable<Subject>
         columns={[
           {
-            field: (subject) => subject.identifier.slice(0, 6),
+            field: (subject) => subject.id.slice(0, 6),
             label: t('index.table.subject')
           },
           {
@@ -91,7 +91,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
           },
           {
             field: (subject) =>
-              subject.sex === 'female'
+              subject.sex === 'FEMALE'
                 ? t('common:identificationData.sex.female')
                 : t('common:identificationData.sex.male'),
             label: t('common:identificationData.sex.label')
@@ -99,7 +99,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         ]}
         data={data}
         onEntryClick={(subject) => {
-          navigate(`${subject.identifier}/assignments`);
+          navigate(`${subject.id}/assignments`);
         }}
       />
     </>

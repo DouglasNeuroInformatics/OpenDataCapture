@@ -16,7 +16,7 @@ export const subjectsRoute: RouteObject = {
       element: <SubjectIndexPage />
     },
     {
-      path: ':subjectIdentifier',
+      path: ':subjectId',
       element: <SubjectLayout />,
       children: [
         {

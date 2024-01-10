@@ -22,7 +22,7 @@ function isUnilingualForm<TData extends Base.FormDataType>(
   instrument: Types.FormInstrument<TData>,
   language: Language
 ): instrument is Types.FormInstrument<TData, Language> {
-  return isUnilingualFormSummary(instrument, language);
+  return instrument.language === language;
 }
 
 /** Return whether the instrument is a multilingual form, with the provided language as an option */
@@ -30,7 +30,7 @@ function isMultilingualForm<TData extends Base.FormDataType>(
   instrument: Types.FormInstrument<TData>,
   language: Language
 ): instrument is Types.FormInstrument<TData, Language[]> {
-  return isMultilingualFormSummary(instrument, language);
+  return Array.isArray(instrument.language) && instrument.language.includes(language);
 }
 
 function translatePrimitiveField(
@@ -141,6 +141,7 @@ function tFormSummary<TData extends Base.FormDataType>(
     return merge(summary, {
       details: {
         description: summary.details.description[language],
+        instructions: summary.details.instructions[language],
         title: summary.details.title[language]
       },
       language: language,

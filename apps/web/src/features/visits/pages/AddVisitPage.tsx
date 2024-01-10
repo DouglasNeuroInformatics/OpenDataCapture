@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { type CreateVisitData, visitSchema } from '@open-data-capture/common/visit';
+import { $Visit, type CreateVisitData } from '@open-data-capture/common/visit';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -21,7 +21,7 @@ export const AddVisitPage = () => {
       groupId: currentGroup?.id ?? null,
       subjectIdData
     } satisfies CreateVisitData);
-    setActiveVisit(visitSchema.parse(response.data));
+    setActiveVisit($Visit.parse(response.data));
     notifications.addNotification({ type: 'success' });
   };
 

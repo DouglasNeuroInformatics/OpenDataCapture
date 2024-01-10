@@ -2,7 +2,7 @@ import type * as Base from '@douglasneuroinformatics/form-types';
 import type { IsEqual, KeysOfUnion, Simplify } from 'type-fest';
 import { z } from 'zod';
 
-import { $ZodTypeAny } from './core';
+import { $ZodTypeAny, type Language } from './core';
 import {
   $BaseInstrument,
   $EnhancedBaseInstrumentDetails,
@@ -384,3 +384,10 @@ export type FormInstrumentSummary<
     }
   >;
 };
+
+export const $FormInstrumentSummary = $FormInstrument.omit({ content: true, validationSchema: true }).extend({
+  id: z.string()
+});
+
+export type UnilingualFormInstrumentSummary<TData extends Base.FormDataType = Base.FormDataType> =
+  FormInstrumentSummary<TData, Language>;

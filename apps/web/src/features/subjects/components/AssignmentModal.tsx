@@ -1,14 +1,14 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form, Modal } from '@douglasneuroinformatics/ui';
-import { createAssignmentDataSchema } from '@open-data-capture/common/assignment';
+import { $CreateAssignmentData } from '@open-data-capture/common/assignment';
 import type { CreateAssignmentData } from '@open-data-capture/common/assignment';
 import { useTranslation } from 'react-i18next';
 
 export type AssignmentModalProps = {
   instrumentOptions: Record<string, string>;
   isOpen: boolean;
-  onSubmit: (data: Omit<CreateAssignmentData, 'subjectIdentifier'>) => void;
+  onSubmit: (data: Omit<CreateAssignmentData, 'subjectId'>) => void;
   setIsOpen: (isOpen: boolean) => void;
 };
 
@@ -18,7 +18,7 @@ export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen
 
   return (
     <Modal open={isOpen} title="Assignment" onClose={() => setIsOpen(false)}>
-      <Form<Omit<CreateAssignmentData, 'subjectIdentifier'>>
+      <Form<Omit<CreateAssignmentData, 'subjectId'>>
         content={{
           instrumentId: {
             kind: 'options',
@@ -30,7 +30,7 @@ export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen
             label: t('assignments.expiresAt')
           }
         }}
-        validationSchema={createAssignmentDataSchema.omit({ subjectIdentifier: true })}
+        validationSchema={$CreateAssignmentData.omit({ subjectId: true })}
         onSubmit={onSubmit}
       />
     </Modal>

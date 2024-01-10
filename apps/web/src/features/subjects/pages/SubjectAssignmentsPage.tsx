@@ -2,12 +2,8 @@ import { useMemo, useState } from 'react';
 
 import { Button, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { PlusIcon } from '@heroicons/react/24/solid';
-import { assignmentSummarySchema } from '@open-data-capture/common/assignment';
-import type {
-  AssignmentSummary,
-  CreateAssignmentData,
-  UpdateAssignmentData
-} from '@open-data-capture/common/assignment';
+import type { Assignment, CreateAssignmentData, UpdateAssignmentData } from '@open-data-capture/common/assignment';
+import { $Assignment } from '@open-data-capture/common/assignment';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +23,7 @@ type AssignmentMutationOptions =
     }
   | {
       kind: 'create';
-      payload: Omit<CreateAssignmentData, 'subjectIdentifier'>;
+      payload: Omit<CreateAssignmentData, 'subjectId'>;
     };
 
 export const SubjectAssignmentsPage = () => {
@@ -37,23 +33,23 @@ export const SubjectAssignmentsPage = () => {
   const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
   const notifications = useNotificationsStore();
 
-  const [selectedAssignment, setSelectedAssignment] = useState<AssignmentSummary | null>(null);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   const assignmentsQuery = useQuery({
     queryFn: async () => {
       const response = await axios.get('/v1/assignments/summary', {
         params: {
-          subjectIdentifier: params.subjectIdentifier
+          subjectId: params.subjectId
         }
       });
-      return assignmentSummarySchema.array().parse(response.data);
+      return $Assignment.array().parse(response.data);
     },
-    queryKey: ['assignments', params.subjectIdentifier]
+    queryKey: ['assignments', params.subjectId]
   });
   const assignmentsMutation = useMutation({
     mutationFn: async (data: AssignmentMutationOptions) => {
       if (data.kind === 'create') {
-        await axios.post('/v1/assignments', { ...data.payload, subjectIdentifier: params.subjectIdentifier! });
+        await axios.post('/v1/assignments', { ...data.payload, subjectId: params.subjectId! });
       } else if (data.kind === 'update') {
         await axios.patch(`/v1/assignments/${data.id}`, data.payload);
       }
@@ -108,7 +104,7 @@ export const SubjectAssignmentsPage = () => {
         isOpen={isEditSliderOpen}
         setIsOpen={setIsEditSliderOpen}
         onCancel={({ id }) => {
-          assignmentsMutation.mutate({ id: id!.toString(), kind: 'update', payload: { status: 'CANCELED' } });
+          assignmentsMutation.mutate({ id: id.toString(), kind: 'update', payload: { status: 'CANCELED' } });
           setIsEditSliderOpen(false);
         }}
       />
