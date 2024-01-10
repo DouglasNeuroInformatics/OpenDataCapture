@@ -2,7 +2,12 @@ import type { Merge } from 'type-fest';
 import { z } from 'zod';
 
 import { type Json, type Language } from './core';
-import { type BaseInstrument, type EnhancedBaseInstrumentDetails } from './instrument.base';
+import {
+  $BaseInstrument,
+  $EnhancedBaseInstrumentDetails,
+  type BaseInstrument,
+  type EnhancedBaseInstrumentDetails
+} from './instrument.base';
 
 export type InteractiveInstrument<TData extends Json = Json, TLanguage extends Language = Language> = Merge<
   BaseInstrument<TData, Language>,
@@ -15,13 +20,12 @@ export type InteractiveInstrument<TData extends Json = Json, TLanguage extends L
   }
 >;
 
-export const $InteractiveInstrument = z.any() as z.ZodType<InteractiveInstrument>;
+export const $InteractiveInstrument = $BaseInstrument('en').extend({
+  content: z.object({
+    render: z.function().args(z.any()).returns(z.any())
+  }),
+  details: $EnhancedBaseInstrumentDetails('en'),
+  kind: z.literal('INTERACTIVE')
+});
 
-// export const $InteractiveInstrument = $BaseInstrument.extend({
-//   content: z.object({
-//     render: z.function().args(z.any()).returns(z.any())
-//   }),
-//   details: $EnhancedBaseInstrumentDetails,
-//   kind: z.literal('interactive'),
-//   validationSchema: z.instanceof(z.ZodType<Json>)
-// }) satisfies z.ZodType<InteractiveInstrument>;
+export const $InteractiveInstrumentDef = $InteractiveInstrument.omit({ createdAt: true, id: true, updatedAt: true });
