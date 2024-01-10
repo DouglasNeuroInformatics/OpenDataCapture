@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { MinusCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
+import { toLowerCase } from '@open-data-capture/common/core';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +17,7 @@ export const ActiveVisit = () => {
 
   const bind = useDrag(
     ({ down, offset: [ox, oy] }) => {
-      api.start({ immediate: down, x: ox, y: oy });
+      void api.start({ immediate: down, x: ox, y: oy });
     },
     {
       bounds: document.body,
@@ -64,7 +65,7 @@ export const ActiveVisit = () => {
             {t('identificationData.dateOfBirth.label')}: {toBasicISOString(activeVisit.subject.dateOfBirth)}
           </span>
           <span>
-            {t('identificationData.sex.label')}: {t(`identificationData.sex.${activeVisit.subject.sex}`)}
+            {t('identificationData.sex.label')}: {t(`identificationData.sex.${toLowerCase(activeVisit.subject.sex)}`)}
           </span>
         </React.Fragment>
       )}

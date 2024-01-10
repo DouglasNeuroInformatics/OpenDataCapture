@@ -1,5 +1,5 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import type { BaseModelKeys, Json, Language } from '@open-data-capture/common/core';
+import type { Json, Language } from '@open-data-capture/common/core';
 import type {
   InstrumentKind,
   InstrumentLanguage,
@@ -33,7 +33,7 @@ type InstrumentDef<
   TKind extends InstrumentKind,
   TData extends DiscriminatedInstrumentData<TKind>,
   TLanguage extends InstrumentLanguage
-> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage>, 'kind' | 'language' | BaseModelKeys>;
+> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage>, 'kind' | 'language'>;
 
 export class InstrumentFactory<TKind extends InstrumentKind, TLanguage extends InstrumentLanguage> {
   constructor(private options: { kind: TKind; language: TLanguage }) {}

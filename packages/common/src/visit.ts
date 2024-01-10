@@ -2,9 +2,11 @@ import type { VisitModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
 import { $BaseModel } from './core';
-import { $Subject, $SubjectIdentificationData } from './subject';
+import { $Subject, $SubjectIdentificationData, type Subject } from './subject';
 
-export type Visit = VisitModel;
+export type Visit = VisitModel & {
+  subject: Subject;
+};
 export const $Visit = $BaseModel.extend({
   date: z.coerce.date(),
   groupId: z.string(),
@@ -18,4 +20,3 @@ export const $CreateVisitData = z.object({
   groupId: z.string().nullable(),
   subjectIdData: $SubjectIdentificationData
 });
-
