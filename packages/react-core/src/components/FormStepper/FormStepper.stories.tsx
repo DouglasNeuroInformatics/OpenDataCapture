@@ -36,10 +36,10 @@ export const Default: Story = {
       details: {
         description: 'The Happiness Questionnaire is a questionnaire about happiness.',
         estimatedDuration: 1,
-        instructions: 'Please answer the question based on your current feelings.',
+        instructions: ['Please answer the question based on your current feelings.'],
         title: 'Happiness Questionnaire'
       },
-      kind: 'form',
+      kind: 'FORM',
       language: 'en',
       name: 'HappinessQuestionnaire',
       tags: ['Well-Being'],
@@ -52,9 +52,9 @@ export const Default: Story = {
     subject: {
       dateOfBirth: new Date(2000, 0, 1),
       firstName: 'Jane',
-      identifier: '123',
+      id: '123',
       lastName: 'Doe',
-      sex: 'female'
+      sex: 'MALE'
     }
   },
   decorators: [

@@ -2,7 +2,7 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Card, formatFormDataAsString, getFormFields, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
-import type { Language } from '@open-data-capture/common/core';
+import { type BaseModelKeys, type Language, toLowerCase } from '@open-data-capture/common/core';
 import type { FormInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +12,8 @@ import { FormSummaryGroup } from './FormSummaryGroup';
 
 export type FormSummaryProps = {
   data: FormDataType;
-  form: FormInstrument<FormDataType, Language>;
-  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'identifier' | 'lastName' | 'sex'>;
+  form: Omit<FormInstrument<FormDataType, Language>, BaseModelKeys>;
+  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
   timeCollected: number;
 };
 
@@ -73,7 +73,7 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
             },
             {
               label: t('identificationData.sex.label'),
-              value: t(`identificationData.sex.${subject.sex}`)
+              value: t(`identificationData.sex.${toLowerCase(subject.sex)}`)
             }
           ]}
           title={t('subject')}

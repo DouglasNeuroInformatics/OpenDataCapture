@@ -39,11 +39,12 @@ export const Default: Story = {
       details: {
         description: 'This task is completely useless. It is a proof of concept for an interactive instrument.',
         estimatedDuration: 1,
-        instructions:
-          'When you begin this task, a 10 second countdown will begin. Please click the button as many times as you can before it expires.',
+        instructions: [
+          'When you begin this task, a 10 second countdown will begin. Please click the button as many times as you can before it expires.'
+        ],
         title: 'Click Task'
       },
-      kind: 'interactive',
+      kind: 'INTERACTIVE',
       language: 'en',
       name: 'InteractiveInstrument',
       tags: ['Interactive'],
@@ -53,9 +54,9 @@ export const Default: Story = {
     subject: {
       dateOfBirth: new Date(2000, 0, 1),
       firstName: 'Jane',
-      identifier: '123',
+      id: '123',
       lastName: 'Doe',
-      sex: 'female'
+      sex: 'FEMALE'
     }
   },
   decorators: [

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Stepper } from '@douglasneuroinformatics/ui';
 import { DocumentCheckIcon, PrinterIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
-import type { Json, Language } from '@open-data-capture/common/core';
+import type { BaseModelKeys, Json, Language } from '@open-data-capture/common/core';
 import type { InteractiveInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +14,9 @@ import { InteractiveRenderer } from './InteractiveRenderer';
 import { InteractiveSummary } from './InteractiveSummary';
 
 type InteractiveStepperProps = {
-  instrument: InteractiveInstrument<Json, Language>;
+  instrument: Omit<InteractiveInstrument<Json, Language>, BaseModelKeys>;
   onSubmit: (data: unknown) => Promisable<void>;
-  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'identifier' | 'lastName' | 'sex'>;
+  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
 const InteractiveStepperComponent = ({ instrument, onSubmit, subject }: InteractiveStepperProps) => {
