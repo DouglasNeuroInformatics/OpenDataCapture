@@ -10,7 +10,7 @@ type HappinessQuestionnaireData = {
 };
 
 const instrumentFactory = new InstrumentFactory({
-  kind: 'form',
+  kind: 'FORM',
   language: ['en', 'fr']
 });
 
@@ -62,8 +62,8 @@ export default instrumentFactory.defineInstrument<HappinessQuestionnaireData>({
     },
     estimatedDuration: 1,
     instructions: {
-      en: 'Please answer the question based on your current feelings.',
-      fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'
+      en: ['Please answer the question based on your current feelings.'],
+      fr: ['Veuillez répondre à la question en fonction de vos sentiments actuels.']
     },
     title: {
       en: 'Happiness Questionnaire',

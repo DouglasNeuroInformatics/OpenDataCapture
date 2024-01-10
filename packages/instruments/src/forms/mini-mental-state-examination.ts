@@ -27,7 +27,7 @@ type MiniMentalStateExaminationData = {
 };
 
 const instrumentFactory = new InstrumentFactory({
-  kind: 'form',
+  kind: 'FORM',
   language: ['en', 'fr']
 });
 

@@ -15,7 +15,7 @@ type MontrealCognitiveAssessmentData = {
 };
 
 const instrumentFactory = new InstrumentFactory({
-  kind: 'form',
+  kind: 'FORM',
   language: ['en', 'fr']
 });
 
@@ -123,8 +123,8 @@ export default instrumentFactory.defineInstrument<MontrealCognitiveAssessmentDat
     },
     estimatedDuration: 10,
     instructions: {
-      en: 'All instructions may be repeated once.',
-      fr: 'Toutes les instructions peuvent être répétées une fois.'
+      en: ['All instructions may be repeated once.'],
+      fr: ['Toutes les instructions peuvent être répétées une fois.']
     },
     title: {
       en: 'Montreal Cognitive Assessment',

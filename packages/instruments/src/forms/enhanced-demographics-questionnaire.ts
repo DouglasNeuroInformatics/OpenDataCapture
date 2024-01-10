@@ -621,7 +621,7 @@ type EnhancedDemographicsQuestionnaireData = {
 };
 
 const instrumentFactory = new InstrumentFactory({
-  kind: 'form',
+  kind: 'FORM',
   language: ['en', 'fr']
 });
 
@@ -822,8 +822,8 @@ export default instrumentFactory.defineInstrument<EnhancedDemographicsQuestionna
     },
     estimatedDuration: 5,
     instructions: {
-      en: 'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.',
-      fr: "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
+      en: ['Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.'],
+      fr: ["Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."]
     },
     title: {
       en: 'Enhanced Demographics Questionnaire',

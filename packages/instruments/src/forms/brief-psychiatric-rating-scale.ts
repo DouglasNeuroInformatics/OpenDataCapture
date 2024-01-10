@@ -25,7 +25,7 @@ type BriefPsychiatricRatingScaleData = {
 };
 
 const instrumentFactory = new InstrumentFactory({
-  kind: 'form',
+  kind: 'FORM',
   language: 'en'
 });
 
@@ -201,9 +201,7 @@ export default instrumentFactory.defineInstrument<BriefPsychiatricRatingScaleDat
       The scale is one of the oldest, most widely used scales to measure psychotic symptoms and was
       first published in 1962.`,
     estimatedDuration: 30,
-    instructions: `
-      Please enter the score for the term which best describes the patient's condition. 0 = not assessed, 1 = not
-      present, 2 = very mild, 3 = mild, 4 = moderate, 5 = moderately severe, 6 = severe, 7 = extremely severe.`,
+    instructions: ["Please enter the score for the term which best describes the patient's condition.", "0 = not assessed, 1 = not present, 2 = very mild, 3 = mild, 4 = moderate, 5 = moderately severe, 6 = severe, 7 = extremely severe."],
     title: 'Brief Psychiatric Rating Scale'
   },
   measures: {
