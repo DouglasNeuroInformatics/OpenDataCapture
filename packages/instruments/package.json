@@ -4,10 +4,7 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./forms/*": "./src/forms/*.ts",
-    "./macros": "./src/macros.ts",
-    "./raw": "./src/raw.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "format": "prettier --write src",

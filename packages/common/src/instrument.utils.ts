@@ -1,38 +1,35 @@
-import {
-  $FormInstrument,
-  $InteractiveInstrument,
-  type BaseInstrument,
-  type FormInstrument,
-  type Instrument,
-  type InteractiveInstrument
-} from './instrument';
+/* eslint-disable @typescript-eslint/no-implied-eval */
 
-type InstrumentFactory<T extends Instrument> = () => Promise<T>;
+import { InstrumentKind } from '@open-data-capture/database/core';
 
-function validateInstrument(instrument: BaseInstrument) {
-  switch (instrument.kind) {
-    case 'FORM':
-      return $FormInstrument.parse(instrument) as FormInstrument;
-    case 'INTERACTIVE':
-      return $InteractiveInstrument.parse(instrument) as InteractiveInstrument;
-    default:
-      throw new Error(`Unexpected instrument type: ${(instrument as Record<string, any>).kind}`);
-  }
-}
+import { $FormInstrument, $InteractiveInstrument, type Instrument } from './instrument';
 
-type EvaluateInstrumentOptions = {
+type EvaluateInstrumentOptions<T extends InstrumentKind> = {
+  /** The kind of instrument being evaluated. If validate is set to true, this will be enforced at runtime. Otherwise, it will just be asserted */
+  kind?: T;
   /** Whether to validate the structure of the instrument at runtime (expensive) */
   validate?: boolean;
 };
 
-export async function evaluateInstrument<T extends Instrument = Instrument>(
+export async function evaluateInstrument<TKind extends InstrumentKind>(
   bundle: string,
-  { validate }: EvaluateInstrumentOptions = { validate: false }
-): Promise<T> {
-  const factory = (0, eval)(`"use strict"; ${bundle}`) as InstrumentFactory<T>;
-  const result = await factory();
-  if (validate) {
-    return validateInstrument(result) as T;
+  { kind, validate }: EvaluateInstrumentOptions<TKind> = { validate: false }
+) {
+  let instrument: Extract<Instrument, { kind: TKind }>;
+  try {
+    const factory = new Function(`return ${bundle}`);
+    const value = (await factory()) as unknown;
+    if (!validate) {
+      instrument = value as Extract<Instrument, { kind: TKind }>;
+    } else if (kind === 'FORM') {
+      instrument = (await $FormInstrument.parseAsync(value)) as Extract<Instrument, { kind: TKind }>;
+    } else if (kind === 'INTERACTIVE') {
+      instrument = (await $InteractiveInstrument.parseAsync(value)) as Extract<Instrument, { kind: TKind }>;
+    } else {
+      throw new Error(`Unexpected kind: ${kind}`);
+    }
+  } catch (error) {
+    throw new Error(`Failed to evaluate instrument bundle`, { cause: { bundle, error } });
   }
-  return result;
+  return instrument;
 }

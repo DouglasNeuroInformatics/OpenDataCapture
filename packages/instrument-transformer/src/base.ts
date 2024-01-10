@@ -71,7 +71,7 @@ export abstract class BaseInstrumentTransformer {
     return `(async () => {
       ${input}
       return ${this.defaultExportSub}
-    })`;
+    })()`;
   }
 
   private validate(program: Module, src: string) {
