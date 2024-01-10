@@ -18,15 +18,27 @@ if (!targetWorkspace || args.length === 0) {
   process.exit(1);
 }
 
+let isFound = false;
 for (const dir of WORKSPACE_DIRS) {
   for (const workspace of await fs.readdir(path.resolve(PROJECT_ROOT, dir))) {
-    if (workspace === targetWorkspace) {
+    const workspaceDir = path.resolve(PROJECT_ROOT, dir, workspace);
+    const workspaceName = await fs
+      .readFile(path.resolve(workspaceDir, 'package.json'), 'utf-8')
+      .then(JSON.parse)
+      .then((pkg) => pkg.name.replace('@open-data-capture/', ''));
+    if (workspaceName === targetWorkspace) {
+      isFound = true;
       cp.execSync(args.join(' '), {
-        cwd: path.resolve(PROJECT_ROOT, dir, workspace),
+        cwd: workspaceDir,
         stdio: 'inherit'
       });
     }
   }
+}
+
+if (!isFound) {
+  console.error(`Failed to find workspace: ${targetWorkspace}`);
+  process.exit(1);
 }
 
 process.exit(0);
