@@ -54,7 +54,6 @@ const loadResource = async (version: string, filename: string) => {
 
 const runtime = () => {
   return {
-    name: 'vite-plugin-runtime',
     async buildStart() {
       const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
       for (const version of versions) {
@@ -80,8 +79,9 @@ const runtime = () => {
           })
           .catch(next);
       });
-    }
+    },
+    name: 'vite-plugin-runtime'
   } as PluginOption;
 };
 
-export { runtime as default, type RuntimeManifest };
+export { type RuntimeManifest, runtime as default };
