@@ -48,3 +48,9 @@ export function toLowerCase<T extends string>(s: T) {
 export function toUpperCase<T extends string>(s: T) {
   return s.toUpperCase() as Uppercase<T>;
 }
+
+/** Used to determine if object is of type `ZodType` independent of specific instances or library versions */
+export function isZodType(arg: unknown): arg is z.ZodTypeAny {
+  const prototype = arg && typeof arg === 'object' ? Reflect.getPrototypeOf(arg.constructor) : null;
+  return Boolean(prototype && Reflect.get(prototype, 'name') === 'ZodType');
+}
