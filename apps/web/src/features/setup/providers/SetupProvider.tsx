@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { Spinner } from '@douglasneuroinformatics/ui';
-import type { SetupState } from '@open-data-capture/common/setup';
+import { $SetupStatus, type SetupStatus } from '@open-data-capture/common/setup';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { P, match } from 'ts-pattern';
@@ -18,17 +18,17 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
   const notifications = useNotificationsStore();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [setupState, setSetupState] = useState<SetupState>(() => {
+  const [setupState, setSetupState] = useState<SetupStatus | null>(() => {
     const savedSetup = window.localStorage.getItem(SETUP_KEY);
     if (!savedSetup || import.meta.env.DEV) {
-      return { isSetup: null };
+      return null;
     }
-    return JSON.parse(savedSetup) as SetupState;
+    return $SetupStatus.nullable().catch(null).parse(savedSetup);
   });
 
   const fetchSetupState = async () => {
     setIsLoading(true);
-    const response = await axios.get<SetupState>('/v1/setup');
+    const response = await axios.get<SetupStatus>('/v1/setup');
     setIsLoading(false);
     setSetupState(response.data);
   };
@@ -45,29 +45,29 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (setupState.isSetup === null) {
+    if (setupState?.isSetup === null) {
       fetchSetupState().catch(console.error);
-    } else if (!setupState.isSetup) {
+    } else if (!setupState?.isSetup) {
       window.history.replaceState({}, '', '/setup');
     }
   }, []);
 
   useEffect(() => {
     window.localStorage.setItem(SETUP_KEY, JSON.stringify(setupState));
-    if (setupState.isSetup === null) {
+    if (setupState?.isSetup === null) {
       fetchSetupState().catch(console.error);
-    } else if (!setupState.isSetup) {
+    } else if (!setupState?.isSetup) {
       window.history.replaceState({}, '', '/setup');
     }
   }, [setupState]);
 
-  return match({ ...setupState, isLoading })
-    .with(P.union({ isLoading: true }, { isSetup: null }), () => (
+  return match({ isLoading, setupState })
+    .with(P.union({ isLoading: true }, { setupState: null }), () => (
       <div className="flex h-screen w-screen items-center justify-center">
         <Spinner />
       </div>
     ))
-    .with({ isSetup: false }, () => (
+    .with({ setupState: { isSetup: false } }, () => (
       <FormPageWrapper
         languageToggle={{
           dropdownDirection: 'up',
@@ -80,6 +80,6 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
         <SetupForm onSubmit={(data) => void handleSubmit(data)} />
       </FormPageWrapper>
     ))
-    .with({ isSetup: true }, () => children)
+    .with({ setupState: { isSetup: true } }, () => children)
     .exhaustive();
 };

@@ -125,3 +125,15 @@ model VisitModel {
   subject   SubjectModel @relation(fields: [subjectId], references: [id])
   subjectId String
 }
+
+// Setup
+
+enum SetupOptionKey {
+  SETUP
+}
+
+model SetupOptionModel {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  key   String @unique
+  value Json?
+}

@@ -1,12 +1,15 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { $SetupOptions } from '@open-data-capture/common/setup';
-import type { CreateAdminData, SetupOptions } from '@open-data-capture/common/setup';
+import { $InitAppOptions } from '@open-data-capture/common/setup';
+import type { CreateAdminData, InitAppOptions } from '@open-data-capture/common/setup';
 
-@ValidationSchema($SetupOptions)
-export class SetupDto implements SetupOptions {
+@ValidationSchema($InitAppOptions)
+export class SetupDto implements InitAppOptions {
   @ApiProperty()
   admin: CreateAdminData;
+
+  @ApiProperty()
+  enableGateway: boolean;
 
   @ApiProperty()
   initDemo: boolean;
