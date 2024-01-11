@@ -48,7 +48,9 @@ export class UsersService implements EntityService<User> {
 
     return this.userModel.create({
       data: {
-        groupIds,
+        groups: {
+          connect: groupIds.map((id) => ({ id }))
+        },
         password: hashedPassword,
         username: username,
         ...rest
