@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { type CreateAdminData } from '@open-data-capture/common/setup';
 
 import { PrismaService } from '@/prisma/prisma.service';
@@ -11,6 +12,7 @@ import { SetupOptions } from './setup.options';
 @Injectable()
 export class SetupService {
   constructor(
+    private readonly configService: ConfigService,
     private readonly demoService: DemoService,
     private readonly usersService: UsersService,
     private readonly prismaService: PrismaService,
@@ -28,8 +30,9 @@ export class SetupService {
   }
 
   async initApp({ admin, enableGateway, initDemo }: SetupDto) {
+    const isDev = this.configService.getOrThrow<string>('NODE_ENV') === 'development';
     const isSetup = await this.setupOptions.getOption('isSetup');
-    if (isSetup) {
+    if (isSetup && !isDev) {
       throw new ForbiddenException();
     }
     await this.prismaService.dropDatabase();
@@ -39,5 +42,6 @@ export class SetupService {
     }
     await this.setupOptions.setOption('isGatewayEnabled', enableGateway);
     await this.setupOptions.setOption('isSetup', true);
+    return { success: true };
   }
 }

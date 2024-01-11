@@ -18,7 +18,10 @@ export class SetupOptions {
   }
 
   async setOption<TKey extends keyof SetupState>(key: TKey, value: SetupState[TKey]) {
-    return this.setupOptionModel.update({ data: { value: await this.validate(key, value) }, where: { key } });
+    if (await this.setupOptionModel.exists({ key })) {
+      return this.setupOptionModel.update({ data: { value: await this.validate(key, value) }, where: { key } });
+    }
+    return this.setupOptionModel.create({ data: { key, value: await this.validate(key, value) } });
   }
 
   private async validate(key: keyof SetupState, value: unknown) {
