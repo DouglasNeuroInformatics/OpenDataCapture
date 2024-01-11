@@ -7,6 +7,7 @@ import { isAxiosError } from 'axios';
 import { z } from 'zod';
 
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
+import { SetupOptions } from '@/setup/setup.options';
 
 // Temporary schema for the data returned by the proof of concept
 const $RemoteAssignment = z.object({
@@ -39,7 +40,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   constructor(
     configService: ConfigService,
     private readonly httpService: HttpService,
-    private readonly instrumentRecordsService: InstrumentRecordsService
+    private readonly instrumentRecordsService: InstrumentRecordsService,
+    private readonly setupOptions: SetupOptions
   ) {
     this.config = {
       baseUrl: configService.getOrThrow('GATEWAY_BASE_URL'),
@@ -52,6 +54,10 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   }
 
   private async sync() {
+    const isGatewayEnabled = await this.setupOptions.getOption('isGatewayEnabled');
+    if (!isGatewayEnabled) {
+      return;
+    }
     let remoteAssignments: RemoteAssignment[];
     try {
       const response = await this.httpService.axiosRef.get(`${this.config.baseUrl}/api/assignments`);
