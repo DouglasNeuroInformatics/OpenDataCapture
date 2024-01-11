@@ -1,10 +1,9 @@
-import type { InstrumentModel } from '@open-data-capture/database/core';
 import _ from 'lodash';
 import { z } from 'zod';
 
 import { $Language, $ZodTypeAny, type Language } from './core';
 
-export type InstrumentKind = InstrumentModel['kind'];
+export type InstrumentKind = 'FORM' | 'INTERACTIVE' | 'UNKNOWN';
 export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'UNKNOWN']) satisfies z.ZodType<InstrumentKind>;
 
 /**

@@ -60,7 +60,8 @@ export default defineConfig([
       dts({
         compilerOptions: {
           paths: {
-            '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')]
+            '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')],
+            //'@open-data-capture/database/*': [path.resolve(ROOT_DIR, 'packages/database/src/*')]
           }
         },
         respectExternal: true

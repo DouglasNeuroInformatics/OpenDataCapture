@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-implied-eval */
 
-import { InstrumentKind } from '@open-data-capture/database/core';
-
 import { $FormInstrument, $Instrument, $InteractiveInstrument, type Instrument } from './instrument';
+
+import type { InstrumentKind } from './instrument.base';
 
 export type EvaluateInstrumentOptions<TKind extends InstrumentKind> = {
   /** The kind of instrument being evaluated. If validate is set to true, this will be enforced at runtime. Otherwise, it will just be asserted */
