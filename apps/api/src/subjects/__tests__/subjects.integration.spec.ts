@@ -19,7 +19,7 @@ import { SubjectsService } from '../subjects.service';
 
 describe('/subjects', () => {
   let app: NestExpressApplication;
-  let server: unknown;
+  let server: any;
 
   let subjectModel: MockedInstance<Model<'Subject'>>;
 

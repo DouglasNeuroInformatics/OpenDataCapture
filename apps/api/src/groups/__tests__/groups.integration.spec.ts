@@ -18,7 +18,7 @@ import { GroupsService } from '../groups.service';
 
 describe('/groups', () => {
   let app: NestExpressApplication;
-  let server: unknown;
+  let server: any;
 
   let groupModel: MockedInstance<Model<'Group'>>;
 

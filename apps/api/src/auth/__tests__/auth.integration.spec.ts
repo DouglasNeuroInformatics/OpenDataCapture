@@ -19,7 +19,7 @@ import { AuthService } from '../auth.service';
 
 describe('/auth', () => {
   let app: NestExpressApplication;
-  let server: unknown;
+  let server: any;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({

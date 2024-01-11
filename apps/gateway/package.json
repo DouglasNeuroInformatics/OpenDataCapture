@@ -17,25 +17,25 @@
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/database": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
-    "@prisma/client": "^5.6.0",
-    "i18next": "^23.7.7",
+    "@prisma/client": "^5.8.0",
+    "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-http-backend": "^2.4.2",
     "lodash": "^4.17.21",
-    "next": "^14.0.3",
+    "next": "^14.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-i18next": "^13.5.0",
-    "sharp": "^0.32.6",
-    "sqlite3": "^5.1.6"
+    "react-i18next": "^14.0.0",
+    "sharp": "^0.33.1",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.39",
-    "@types/react-dom": "^18.2.17",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.5"
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1"
   },
   "trustedDependencies": [
     "sqlite3",

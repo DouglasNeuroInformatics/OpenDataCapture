@@ -18,7 +18,7 @@ import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsService } from '../instruments.service';
 describe('/instruments', () => {
   let app: NestExpressApplication;
-  let server: unknown;
+  let server: any;
 
   let instrumentModel: MockedInstance<Model<'Instrument'>>;
 

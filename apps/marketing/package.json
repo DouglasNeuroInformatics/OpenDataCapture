@@ -12,7 +12,7 @@
     "start": "astro dev"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^5.1.0",
+    "@douglasneuroinformatics/ui": "^5.2.0",
     "@open-data-capture/react-core": "workspace:*",
     "lodash": "^4.17.21",
     "mdast-util-to-string": "^4.0.0",
@@ -21,16 +21,16 @@
     "reading-time": "^1.5.0"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.3.1",
-    "@astrojs/react": "^3.0.6",
-    "@astrojs/sitemap": "^3.0.3",
-    "@astrojs/tailwind": "^5.0.2",
+    "@astrojs/check": "^0.4.1",
+    "@astrojs/react": "^3.0.9",
+    "@astrojs/sitemap": "^3.0.4",
+    "@astrojs/tailwind": "^5.1.0",
     "@tailwindcss/typography": "^0.5.10",
     "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.39",
-    "@types/react-dom": "^18.2.17",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
     "astro": "^3.6.2",
-    "sharp": "^0.32.6",
-    "tailwindcss": "^3.3.5"
+    "sharp": "^0.33.1",
+    "tailwindcss": "^3.4.1"
   }
 }

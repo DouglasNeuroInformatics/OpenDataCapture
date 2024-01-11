@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
-    "type-fest": "^4.8.2",
+    "type-fest": "^4.9.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -30,6 +30,6 @@
     "@douglasneuroinformatics/form-types": "latest",
     "@open-data-capture/database": "workspace:*",
     "@open-data-capture/instruments": "workspace:*",
-    "@types/react": "^18.2.39"
+    "@types/react": "^18.2.47"
   }
 }

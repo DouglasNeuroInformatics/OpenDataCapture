@@ -4,10 +4,7 @@ import { Module } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { Connection } from 'mongoose';
-import mongooseAutoPopulate from 'mongoose-autopopulate';
 
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
@@ -41,20 +38,6 @@ import { VisitsModule } from './visits/visits.module';
     GatewayModule,
     GroupsModule,
     InstrumentsModule,
-    MongooseModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          connectionFactory: (connection: Connection): Connection => {
-            connection.plugin(mongooseAutoPopulate);
-            return connection;
-          },
-          dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
-          ignoreUndefined: true,
-          uri: configService.getOrThrow<string>('MONGO_URI')
-        };
-      }
-    }),
     PrismaModule.forRoot(),
     SubjectsModule,
     ThrottlerModule.forRoot([

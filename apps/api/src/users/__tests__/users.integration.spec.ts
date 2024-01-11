@@ -21,7 +21,7 @@ import { UsersService } from '../users.service';
 
 describe('/users', () => {
   let app: NestExpressApplication;
-  let server: unknown;
+  let server: any;
 
   let groupsService: MockedInstance<GroupsService>;
 

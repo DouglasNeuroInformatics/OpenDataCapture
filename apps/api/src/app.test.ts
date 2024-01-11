@@ -1,6 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
-//import { HttpStatus } from '@nestjs/common';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
@@ -11,7 +10,7 @@ import { AppModule } from '@/app.module';
 
 let app: NestExpressApplication;
 let connection: Connection;
-let server: unknown;
+let server: any;
 
 beforeAll(async () => {
   const moduleRef = await Test.createTestingModule({

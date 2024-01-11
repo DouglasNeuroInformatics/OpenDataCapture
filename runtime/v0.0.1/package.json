@@ -12,7 +12,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/form-types": "^5.0.2",
+    "@douglasneuroinformatics/form-types": "^5.2.0",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/runtime-bundler": "workspace:*",
     "react": "^18.2.0",
@@ -21,9 +21,9 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.5",
-    "@types/react": "^18.2.39",
-    "rollup": "^4.6.0",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/react": "^18.2.47",
+    "rollup": "^4.9.4",
     "rollup-plugin-dts": "^6.1.0"
   }
 }
