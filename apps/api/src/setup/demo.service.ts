@@ -42,7 +42,13 @@ export class DemoService {
     const dbName = await this.prismaService.getDbName();
     this.logger.log(`Initializing demo for database: '${dbName}'`);
 
-    const forms = await this.createForms();
+    const forms = await Promise.all([
+      this.instrumentsService.create({ kind: 'FORM', source: BPRS_SOURCE }),
+      this.instrumentsService.create({ kind: 'FORM', source: EDQ_SOURCE }),
+      this.instrumentsService.create({ kind: 'FORM', source: HQ_SOURCE }),
+      this.instrumentsService.create({ kind: 'FORM', source: MMSE_SOURCE }),
+      this.instrumentsService.create({ kind: 'FORM', source: MOCA_SOURCE })
+    ]);
 
     const groups: Group[] = [];
     for (const group of DEMO_GROUPS) {
@@ -123,16 +129,6 @@ export class DemoService {
       }
     }
     return data as TData;
-  }
-
-  private async createForms() {
-    return [
-      await this.instrumentsService.create({ kind: 'FORM', source: BPRS_SOURCE }),
-      await this.instrumentsService.create({ kind: 'FORM', source: EDQ_SOURCE }),
-      await this.instrumentsService.create({ kind: 'FORM', source: HQ_SOURCE }),
-      await this.instrumentsService.create({ kind: 'FORM', source: MMSE_SOURCE }),
-      await this.instrumentsService.create({ kind: 'FORM', source: MOCA_SOURCE })
-    ];
   }
 
   private createMockStaticFieldValue(field: FormInstrumentStaticField) {
