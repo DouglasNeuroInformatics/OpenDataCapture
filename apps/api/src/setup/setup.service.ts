@@ -2,10 +2,10 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { type CreateAdminData } from '@open-data-capture/common/setup';
 
+import { DemoService } from '@/demo/demo.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { UsersService } from '@/users/users.service';
 
-import { DemoService } from './demo.service';
 import { SetupDto } from './dto/setup.dto';
 import { SetupOptions } from './setup.options';
 

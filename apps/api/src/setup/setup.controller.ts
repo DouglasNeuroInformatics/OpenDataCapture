@@ -31,7 +31,7 @@ export class SetupController {
   })
   @Post()
   @RouteAccess('public')
-  initApp(@Body() setupDto: SetupDto): Promise<void> {
+  initApp(@Body() setupDto: SetupDto): Promise<{ success: boolean }> {
     return this.setupService.initApp(setupDto);
   }
 }
