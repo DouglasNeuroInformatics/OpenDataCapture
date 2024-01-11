@@ -1,6 +1,7 @@
 import { type DynamicModule, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import { EXTENDED_PRISMA_CLIENT_TOKEN, type ExtendedPrismaClient, createExtendedPrismaClient } from './prisma.client';
+import { type ExtendedPrismaClient, PRISMA_CLIENT_TOKEN, PrismaFactory } from './prisma.factory';
 import { PrismaService } from './prisma.service';
 import { getModelReferenceName, getModelToken } from './prisma.utils';
 
@@ -15,7 +16,7 @@ export class PrismaModule {
       module: PrismaModule,
       providers: [
         {
-          inject: [EXTENDED_PRISMA_CLIENT_TOKEN],
+          inject: [PRISMA_CLIENT_TOKEN],
           provide: modelToken,
           useFactory: (client: ExtendedPrismaClient) => {
             return client[getModelReferenceName(modelName)];
@@ -26,13 +27,14 @@ export class PrismaModule {
   }
   static forRoot(): DynamicModule {
     return {
-      exports: [EXTENDED_PRISMA_CLIENT_TOKEN, PrismaService],
+      exports: [PRISMA_CLIENT_TOKEN, PrismaService],
       global: true,
       module: PrismaModule,
       providers: [
         {
-          provide: EXTENDED_PRISMA_CLIENT_TOKEN,
-          useValue: createExtendedPrismaClient()
+          inject: [ConfigService],
+          provide: PRISMA_CLIENT_TOKEN,
+          useFactory: PrismaFactory.createClient
         },
         PrismaService
       ]

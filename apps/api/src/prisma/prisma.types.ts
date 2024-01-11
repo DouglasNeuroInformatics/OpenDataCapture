@@ -1,7 +1,7 @@
 import { Prisma } from '@open-data-capture/database/core';
 import type { Replace } from 'type-fest';
 
-import type { ExtendedPrismaClient } from './prisma.client';
+import type { ExtendedPrismaClient } from './prisma.factory';
 
 export type ModelReferenceName = Uncapitalize<Prisma.ModelName>;
 

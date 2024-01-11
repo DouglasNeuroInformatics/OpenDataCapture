@@ -1,12 +1,12 @@
 import { Inject, Injectable, type OnModuleInit } from '@nestjs/common';
 
-import { EXTENDED_PRISMA_CLIENT_TOKEN, type ExtendedPrismaClient } from './prisma.client';
+import { type ExtendedPrismaClient, PRISMA_CLIENT_TOKEN } from './prisma.factory';
 
 @Injectable()
 export class PrismaService implements OnModuleInit {
   public dbName = 'Unknown';
 
-  constructor(@Inject(EXTENDED_PRISMA_CLIENT_TOKEN) public readonly client: ExtendedPrismaClient) {}
+  constructor(@Inject(PRISMA_CLIENT_TOKEN) public readonly client: ExtendedPrismaClient) {}
 
   async dropDatabase() {
     return this.client.$runCommandRaw({
