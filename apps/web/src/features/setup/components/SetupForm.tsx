@@ -1,10 +1,12 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form } from '@douglasneuroinformatics/ui';
+import { $StrongPassword } from '@open-data-capture/common/user';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 type SetupData = {
+  enableGateway: boolean;
   firstName: string;
   initDemo: boolean;
   lastName: string;
@@ -15,9 +17,6 @@ type SetupData = {
 type SetupFormProps = {
   onSubmit: (data: SetupData) => void;
 };
-
-// Matches string with 8 or more characters, minimum one upper case, lowercase, and number
-const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
 const SetupForm = ({ onSubmit }: SetupFormProps) => {
   const { t } = useTranslation(['common', 'setup']);
@@ -64,15 +63,30 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
             }
           },
           title: t('setup:demo.title')
+        },
+        {
+          fields: {
+            enableGateway: {
+              kind: 'binary',
+              label: t('setup:gateway.enable'),
+              options: {
+                f: t('no'),
+                t: t('yes')
+              },
+              variant: 'radio'
+            }
+          },
+          title: t('setup:gateway.title')
         }
       ]}
       submitBtnLabel={t('submit')}
       validationSchema={z.object({
-        firstName: z.string(),
-        lastName: z.string(),
-        username: z.string(),
-        password: z.string().regex(isStrongPassword),
-        initDemo: z.boolean()
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
+        username: z.string().min(1),
+        password: $StrongPassword,
+        initDemo: z.boolean(),
+        enableGateway: z.boolean()
       })}
       onSubmit={onSubmit}
     />
