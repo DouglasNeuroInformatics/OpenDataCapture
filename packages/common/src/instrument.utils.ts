@@ -2,7 +2,7 @@
 
 import { InstrumentKind } from '@open-data-capture/database/core';
 
-import { $FormInstrument, $InteractiveInstrument, type Instrument } from './instrument';
+import { $FormInstrument, $Instrument, $InteractiveInstrument, type Instrument } from './instrument';
 
 export type EvaluateInstrumentOptions<TKind extends InstrumentKind> = {
   /** The kind of instrument being evaluated. If validate is set to true, this will be enforced at runtime. Otherwise, it will just be asserted */
@@ -25,6 +25,8 @@ export async function evaluateInstrument<TKind extends InstrumentKind>(
       instrument = (await $FormInstrument.parseAsync(value)) as Extract<Instrument, { kind: TKind }>;
     } else if (kind === 'INTERACTIVE') {
       instrument = (await $InteractiveInstrument.parseAsync(value)) as Extract<Instrument, { kind: TKind }>;
+    } else if (kind === undefined) {
+      instrument = (await $Instrument.parseAsync(value)) as Extract<Instrument, { kind: TKind }>;
     } else {
       throw new Error(`Unexpected kind: ${kind}`);
     }

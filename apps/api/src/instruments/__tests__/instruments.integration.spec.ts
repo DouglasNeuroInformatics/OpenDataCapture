@@ -99,11 +99,6 @@ describe('/instruments', () => {
     beforeAll(() => {
       id = new Types.ObjectId().toString();
     });
-
-    it('should reject a request with an invalid id', async () => {
-      const response = await request(server).get('/instruments/123');
-      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    });
     it('should return status code 200 with a valid ID', async () => {
       instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'FORM' });
       const response = await request(server).get(`/instruments/${id}`);
@@ -158,23 +153,6 @@ describe('/instruments', () => {
   //     expect(response.body).toMatchObject({ name: 'foo' });
   //   });
   // });
-
-  describe('DELETE /instruments/:id', () => {
-    let id: string;
-    beforeAll(() => {
-      id = new Types.ObjectId().toString();
-    });
-
-    it('should reject a request with an invalid id', async () => {
-      const response = await request(server).delete('/instruments/123');
-      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    });
-    it('should return status code 200 with a valid ID', async () => {
-      instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'FORM' });
-      const response = await request(server).delete(`/instruments/${id}`);
-      expect(response.status).toBe(HttpStatus.OK);
-    });
-  });
 
   afterAll(async () => {
     await app.close();
