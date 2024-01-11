@@ -31,7 +31,10 @@ export class UsersService implements EntityService<User> {
   }
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
-  async create({ groupIds, password, username, ...rest }: CreateUserDto, options?: EntityOperationOptions) {
+  async create(
+    { basePermissionLevel, firstName, groupIds, lastName, password, username }: CreateUserDto,
+    options?: EntityOperationOptions
+  ) {
     if (await this.userModel.exists({ username })) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
@@ -48,12 +51,14 @@ export class UsersService implements EntityService<User> {
 
     return this.userModel.create({
       data: {
+        basePermissionLevel,
+        firstName,
         groups: {
           connect: groupIds.map((id) => ({ id }))
         },
+        lastName,
         password: hashedPassword,
-        username: username,
-        ...rest
+        username: username
       }
     });
   }
