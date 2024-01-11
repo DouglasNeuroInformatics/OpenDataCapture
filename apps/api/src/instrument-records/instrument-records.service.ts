@@ -61,7 +61,7 @@ export class InstrumentRecordsService {
   async exists(where: Prisma.InstrumentRecordModelWhereInput) {
     return this.instrumentRecordModel.exists(where);
   }
-  
+
   async exportRecords(
     { groupId }: { groupId?: string } = {},
     { ability }: EntityOperationOptions = {}

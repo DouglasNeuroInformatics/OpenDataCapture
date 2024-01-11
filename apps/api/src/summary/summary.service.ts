@@ -17,12 +17,13 @@ export class SummaryService {
   ) {}
 
   async getSummary(groupId?: string, { ability }: EntityOperationOptions = {}): Promise<Summary> {
+    const filter = groupId ? { groupIds: { has: groupId } } : ({} as Record<string, unknown>);
     return {
       counts: {
         instruments: await this.instrumentsService.count(),
-        records: await this.instrumentRecordsService.count({ groupId }, { ability }),
-        subjects: await this.subjectsService.count({ groupIds: { has: groupId } }, { ability }),
-        users: await this.usersService.count({ groupIds: { has: groupId } }, { ability })
+        records: await this.instrumentRecordsService.count(filter, { ability }),
+        subjects: await this.subjectsService.count(filter, { ability }),
+        users: await this.usersService.count(filter, { ability })
       }
     };
   }
