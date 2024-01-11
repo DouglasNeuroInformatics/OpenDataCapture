@@ -4,7 +4,6 @@ import { type ExtendedPrismaClient, PRISMA_CLIENT_TOKEN } from './prisma.factory
 
 @Injectable()
 export class PrismaService implements OnModuleInit {
-  public dbName = 'Unknown';
 
   constructor(@Inject(PRISMA_CLIENT_TOKEN) public readonly client: ExtendedPrismaClient) {}
 
@@ -12,6 +11,10 @@ export class PrismaService implements OnModuleInit {
     return this.client.$runCommandRaw({
       dropDatabase: 1
     });
+  }
+
+  async getDbName() {
+    return await this.client.$runCommandRaw<{ db: string }>({ dbStats: 1 }).then((stats) => stats.db);
   }
 
   async listCollections() {

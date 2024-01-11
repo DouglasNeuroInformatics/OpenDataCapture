@@ -36,14 +36,12 @@ describe('App', () => {
 });
 
 afterAll(async () => {
-  const result = await prismaService.client.$runCommandRaw({ getName: 1 });
-  console.log(result);
-  // await client.$runCommandRaw({ dropDatabase: 1 });
-  // if (connection.db.databaseName === 'data-capture-testing') {
-  //   await connection.db.dropDatabase();
-  // } else {
-  //   throw new Error(`Unexpected database name: ${connection.db.databaseName}`);
-  // }
+  const dbName = await prismaService.getDbName();
+  if (dbName === 'data-capture-testing') {
+    await prismaService.dropDatabase();
+  } else {
+    throw new Error(`Unexpected database name: ${dbName}`);
+  }
   await app.close();
   app.flushLogs();
 });

@@ -39,7 +39,8 @@ export class DemoService {
   ) {}
 
   async init(): Promise<void> {
-    this.logger.log(`Initializing demo for database: '${this.prismaService.dbName}'`);
+    const dbName = await this.prismaService.getDbName();
+    this.logger.log(`Initializing demo for database: '${dbName}'`);
 
     const forms = await this.createForms();
 
