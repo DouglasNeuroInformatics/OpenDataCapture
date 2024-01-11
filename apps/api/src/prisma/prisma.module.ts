@@ -1,47 +1,13 @@
 import { type DynamicModule, Module } from '@nestjs/common';
-import { type EvaluateInstrumentOptions, evaluateInstrument } from '@open-data-capture/common/instrument';
-import { InstrumentKind, Prisma, PrismaClient } from '@open-data-capture/database/core';
 
-import { PRISMA_CLIENT_TOKEN } from './prisma.constants';
+import { EXTENDED_PRISMA_CLIENT_TOKEN, type ExtendedPrismaClient, createExtendedPrismaClient } from './prisma.client';
+import { PrismaService } from './prisma.service';
 import { getModelReferenceName, getModelToken } from './prisma.utils';
 
 import type { ModelEntityName } from './prisma.types';
 
-export type AppPrismaClient = ReturnType<typeof PrismaModule.createClient>;
-
 @Module({})
 export class PrismaModule {
-  static createClient() {
-    return new PrismaClient().$extends({
-      model: {
-        $allModels: {
-          get __model__() {
-            const context = Prisma.getExtensionContext(this);
-            return context.$name;
-          },
-          async exists<T>(this: T, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
-            const context = Prisma.getExtensionContext(this) as unknown as {
-              findFirst: (...args: any[]) => Promise<unknown>;
-            };
-            const result = await context.findFirst({ where });
-            return result !== null;
-          }
-        }
-      },
-      result: {
-        instrumentModel: {
-          toInstance: {
-            compute({ bundle }) {
-              return function <TKind extends InstrumentKind>(options?: EvaluateInstrumentOptions<TKind>) {
-                return evaluateInstrument(bundle, options);
-              };
-            },
-            needs: { bundle: true }
-          }
-        }
-      }
-    });
-  }
   static forFeature<T extends ModelEntityName>(modelName: T): DynamicModule {
     const modelToken = getModelToken(modelName);
     return {
@@ -49,9 +15,9 @@ export class PrismaModule {
       module: PrismaModule,
       providers: [
         {
-          inject: [PRISMA_CLIENT_TOKEN],
+          inject: [EXTENDED_PRISMA_CLIENT_TOKEN],
           provide: modelToken,
-          useFactory: (client: AppPrismaClient) => {
+          useFactory: (client: ExtendedPrismaClient) => {
             return client[getModelReferenceName(modelName)];
           }
         }
@@ -60,14 +26,15 @@ export class PrismaModule {
   }
   static forRoot(): DynamicModule {
     return {
-      exports: [PRISMA_CLIENT_TOKEN],
+      exports: [EXTENDED_PRISMA_CLIENT_TOKEN, PrismaService],
       global: true,
       module: PrismaModule,
       providers: [
         {
-          provide: PRISMA_CLIENT_TOKEN,
-          useValue: this.createClient()
-        }
+          provide: EXTENDED_PRISMA_CLIENT_TOKEN,
+          useValue: createExtendedPrismaClient()
+        },
+        PrismaService
       ]
     };
   }

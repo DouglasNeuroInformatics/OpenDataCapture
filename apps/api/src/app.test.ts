@@ -1,15 +1,15 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
-import { getConnectionToken } from '@nestjs/mongoose';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import type { Connection } from 'mongoose';
 import request from 'supertest';
 
 import { AppModule } from '@/app.module';
 
+import { PrismaService } from './prisma/prisma.service';
+
 let app: NestExpressApplication;
-let connection: Connection;
+let prismaService: PrismaService;
 let server: any;
 
 beforeAll(async () => {
@@ -22,7 +22,7 @@ beforeAll(async () => {
   });
 
   await app.init();
-  connection = app.get(getConnectionToken());
+  prismaService = app.get(PrismaService);
   server = app.getHttpServer();
 });
 
@@ -36,11 +36,14 @@ describe('App', () => {
 });
 
 afterAll(async () => {
-  if (connection.db.databaseName === 'data-capture-testing') {
-    await connection.db.dropDatabase();
-  } else {
-    throw new Error(`Unexpected database name: ${connection.db.databaseName}`);
-  }
+  const result = await prismaService.client.$runCommandRaw({ getName: 1 });
+  console.log(result);
+  // await client.$runCommandRaw({ dropDatabase: 1 });
+  // if (connection.db.databaseName === 'data-capture-testing') {
+  //   await connection.db.dropDatabase();
+  // } else {
+  //   throw new Error(`Unexpected database name: ${connection.db.databaseName}`);
+  // }
   await app.close();
   app.flushLogs();
 });

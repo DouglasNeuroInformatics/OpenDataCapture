@@ -2,7 +2,6 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { randomValue } from '@douglasneuroinformatics/utils';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/mongoose';
 import { type Json, toUpperCase } from '@open-data-capture/common/core';
 import type { Group } from '@open-data-capture/common/group';
 import type {
@@ -14,11 +13,11 @@ import type {
 import type { Subject, SubjectIdentificationData } from '@open-data-capture/common/subject';
 import { DEMO_GROUPS, DEMO_USERS } from '@open-data-capture/demo';
 import { BPRS_SOURCE, EDQ_SOURCE, HQ_SOURCE, MMSE_SOURCE, MOCA_SOURCE } from '@open-data-capture/instruments';
-import mongoose from 'mongoose';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 import { VisitsService } from '@/visits/visits.service';
@@ -30,17 +29,17 @@ export class DemoService {
   private readonly logger = new Logger(DemoService.name);
 
   constructor(
-    @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly groupsService: GroupsService,
     private readonly instrumentRecordsService: InstrumentRecordsService,
     private readonly instrumentsService: InstrumentsService,
+    private readonly prismaService: PrismaService,
     private readonly subjectsService: SubjectsService,
     private readonly usersService: UsersService,
     private readonly visitsService: VisitsService
   ) {}
 
   async init(): Promise<void> {
-    this.logger.log(`Initializing demo for database: '${this.connection.name}'`);
+    this.logger.log(`Initializing demo for database: '${this.prismaService.dbName}'`);
 
     const forms = await this.createForms();
 
