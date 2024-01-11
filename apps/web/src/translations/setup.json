@@ -44,5 +44,13 @@
   "pageTitle": {
     "en": "Setup",
     "fr": "Mise en service"
+  },
+  "loadingTitle": {
+    "en": "Initializing Application",
+    "fr": "Initialisation de l'application"
+  },
+  "loadingSubtitle": {
+    "en": "Please be patient, this may take a while...",
+    "fr": "Veuillez patienter, cela peut prendre un certain temps..."
   }
 }
