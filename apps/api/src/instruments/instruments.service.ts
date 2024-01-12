@@ -56,6 +56,16 @@ export class InstrumentsService {
     }) as Promise<InstrumentSummary[]>;
   }
 
+  async findBundles(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentModel.findMany({
+      select: {
+        bundle: true,
+        id: true
+      },
+      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
+    });
+  }
+
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
     const instrument = await this.instrumentModel.findFirst({
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument')], id }
