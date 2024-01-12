@@ -1,4 +1,5 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
+import type { InstrumentKind } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
 import {
@@ -14,6 +15,7 @@ import {
 } from './instrument.interactive';
 
 import type { Json, Language } from './core';
+import type { InstrumentLanguage, StrictFormInstrument } from '/runtime/v0.0.1/core';
 
 export type Instrument = FormInstrument | InteractiveInstrument;
 
@@ -24,6 +26,31 @@ export type InstrumentSummary = FormInstrumentSummary | InteractiveInstrumentSum
 export type UnilingualInstrument = FormInstrument<FormDataType, Language> | InteractiveInstrument<Json, Language>;
 
 export type UnilingualInstrumentSummary = InteractiveInstrumentSummary | UnilingualFormInstrumentSummary;
+
+export type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['FORM']
+  ? FormDataType
+  : [TKind] extends ['INTERACTIVE']
+    ? Json
+    : never;
+
+export type DiscriminatedInstrument<
+  TKind extends InstrumentKind,
+  TData extends DiscriminatedInstrumentData<TKind>,
+  TLanguage extends InstrumentLanguage,
+  TStrict extends boolean = false
+> = [TKind] extends ['FORM']
+  ? TData extends FormDataType
+    ? TStrict extends true
+      ? StrictFormInstrument<TData, TLanguage>
+      : FormInstrument<TData, TLanguage>
+    : never
+  : [TKind] extends ['INTERACTIVE']
+    ? TData extends Json
+      ? TLanguage extends Language
+        ? InteractiveInstrument<TData, TLanguage>
+        : never
+      : never
+    : never;
 
 export * from './instrument.base';
 export * from './instrument.form';

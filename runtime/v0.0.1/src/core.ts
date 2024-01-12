@@ -1,33 +1,11 @@
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import type { Json, Language } from '@open-data-capture/common/core';
 import type {
+  DiscriminatedInstrument,
+  DiscriminatedInstrumentData,
   InstrumentKind,
   InstrumentLanguage,
   InteractiveInstrument,
   StrictFormInstrument
 } from '@open-data-capture/common/instrument';
-
-type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['FORM']
-  ? FormDataType
-  : [TKind] extends ['INTERACTIVE']
-    ? Json
-    : never;
-
-type DiscriminatedInstrument<
-  TKind extends InstrumentKind,
-  TData extends DiscriminatedInstrumentData<TKind>,
-  TLanguage extends InstrumentLanguage
-> = [TKind] extends ['FORM']
-  ? TData extends FormDataType
-    ? StrictFormInstrument<TData, TLanguage>
-    : never
-  : [TKind] extends ['INTERACTIVE']
-    ? TData extends Json
-      ? TLanguage extends Language
-        ? InteractiveInstrument<TData, TLanguage>
-        : never
-      : never
-    : never;
 
 type InstrumentDef<
   TKind extends InstrumentKind,
