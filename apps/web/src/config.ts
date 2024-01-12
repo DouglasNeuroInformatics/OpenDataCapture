@@ -19,8 +19,6 @@ const $Config = z.object({
   })
 });
 
-console.log('eval config');
-
 export const config = $Config.parse({
   dev: {
     isBypassAuthEnabled: import.meta.env.VITE_DEV_BYPASS_AUTH,
