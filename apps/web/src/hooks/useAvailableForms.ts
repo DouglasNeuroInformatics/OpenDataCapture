@@ -1,5 +1,5 @@
 import type { Language } from '@open-data-capture/common/core';
-import { $FormInstrumentSummary } from '@open-data-capture/common/instrument';
+import { $FormInstrumentSummary, type InstrumentKind } from '@open-data-capture/common/instrument';
 import { translateFormSummary } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -12,7 +12,7 @@ export const useAvailableForms = () => {
     queryFn: async () => {
       const response = await axios.get('/v1/instruments/available', {
         params: {
-          kind: 'form'
+          kind: 'FORM' satisfies InstrumentKind
         }
       });
       const result = z.array($FormInstrumentSummary).safeParse(response.data);

@@ -1,5 +1,9 @@
 import type { Language } from '@open-data-capture/common/core';
-import { $InstrumentBundleContainer, evaluateInstrument } from '@open-data-capture/common/instrument';
+import {
+  $InstrumentBundleContainer,
+  type InstrumentKind,
+  evaluateInstrument
+} from '@open-data-capture/common/instrument';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -11,7 +15,7 @@ export function useFormQuery(id: string) {
     queryFn: async () => {
       const response = await axios.get(`/v1/instruments/${id}`, {
         params: {
-          kind: 'form'
+          kind: 'FORM' satisfies InstrumentKind
         }
       });
       const { bundle } = await $InstrumentBundleContainer.parseAsync(response.data);
