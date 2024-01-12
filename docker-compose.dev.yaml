@@ -2,9 +2,9 @@
 # docker compose -f docker-compose.dev.yaml up -d
 # docker compose -f docker-compose.dev.yaml exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
 version: '3'
+name: open-data-capture
 services:
   mongo:
-    container_name: mongo
     image: mongo:6.0.2
     command: --replSet rs0
     ports:
