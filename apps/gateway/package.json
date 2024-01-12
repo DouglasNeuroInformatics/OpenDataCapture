@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "bunx next build",
-    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun next dev -p 3500",
+    "dev": "eval $(bunx env-cmd -f ../../.env bun -e \"console.log(process.env.GATEWAY_ENABLED?.toLowerCase())\") && bun run dev:start || exit 0",
+    "dev:start": "env-cmd -f ../../.env cross-env NODE_ENV=development bun next dev -p 3500",
     "format": "prettier --write src",
     "postinstall": "next telemetry disable",
     "lint": "tsc && eslint --fix src",
