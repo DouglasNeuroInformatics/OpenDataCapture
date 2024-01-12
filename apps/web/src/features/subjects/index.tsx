@@ -1,6 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import type { RouteObject } from 'react-router-dom';
+import { Navigate, type RouteObject } from 'react-router-dom';
+
+import { config } from '@/config';
 
 import { SubjectLayout } from './components/SubjectLayout';
 import { SubjectAssignmentsPage } from './pages/SubjectAssignmentsPage';
@@ -21,7 +23,7 @@ export const subjectsRoute: RouteObject = {
       children: [
         {
           path: 'assignments',
-          element: <SubjectAssignmentsPage />
+          element: config.setup.isGatewayEnabled ? <SubjectAssignmentsPage /> : <Navigate to="../table" />
         },
         {
           path: 'graph',
