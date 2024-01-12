@@ -128,12 +128,9 @@ model VisitModel {
 
 // Setup
 
-enum SetupOptionKey {
-  SETUP
-}
-
-model SetupOptionModel {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  key   String @unique
-  value Json?
+model SetupStateModel {
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  isSetup   Boolean
 }
