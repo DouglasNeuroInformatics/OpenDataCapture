@@ -29,11 +29,7 @@ import { VisitsModule } from './visits/visits.module';
       conditionalModules: [
         {
           condition: 'GATEWAY_ENABLED',
-          module: AssignmentsModule
-        },
-        {
-          condition: 'GATEWAY_ENABLED',
-          modules: [GatewayModule]
+          modules: [AssignmentsModule, GatewayModule]
         }
       ]
     }),
