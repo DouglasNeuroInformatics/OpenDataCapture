@@ -25,7 +25,7 @@ export class AssignmentsController {
     private readonly assignmentsService: AssignmentsService,
     configService: ConfigService
   ) {
-    this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
+    this.gatewayBaseUrl = configService.get('GATEWAY_BASE_URL');
   }
 
   @ApiOperation({ summary: 'Create Assignment' })

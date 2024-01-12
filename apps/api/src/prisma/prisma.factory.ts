@@ -6,8 +6,8 @@ export const PRISMA_CLIENT_TOKEN = 'PRISMA_CLIENT';
 
 export class PrismaFactory {
   static createClient(this: void, configService: ConfigService) {
-    const mongoUri = configService.getOrThrow<string>('MONGO_URI');
-    const dbName = configService.getOrThrow<string>('NODE_ENV');
+    const mongoUri = configService.get('MONGO_URI');
+    const dbName = configService.get('NODE_ENV');
     return new PrismaClient({ datasourceUrl: `${mongoUri}/data-capture-${dbName}` }).$extends({
       model: {
         $allModels: {

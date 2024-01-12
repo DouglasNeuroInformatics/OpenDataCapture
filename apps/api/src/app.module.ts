@@ -34,7 +34,7 @@ import { VisitsModule } from './visits/visits.module';
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        secretKey: configService.getOrThrow('SECRET_KEY')
+        secretKey: configService.get('SECRET_KEY')
       })
     }),
     GatewayModule,

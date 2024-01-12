@@ -1,9 +1,11 @@
 declare module '@nestjs/config' {
-  import { ConfigService as BaseConfigService, ConditionalModule, ConfigModule } from '@nestjs/config/dist';
+  import { ConditionalModule, ConfigModule } from '@nestjs/config/dist';
 
   import type { EnvironmentConfig } from '@/core/config/config.schema';
 
-  declare class ConfigService extends BaseConfigService<EnvironmentConfig> {}
+  declare class ConfigService {
+    get<TKey extends Extract<keyof EnvironmentConfig, string>>(propertyPath: TKey): EnvironmentConfig[TKey];
+  }
 
   export { ConditionalModule, ConfigModule, ConfigService };
 }

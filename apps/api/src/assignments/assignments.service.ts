@@ -19,7 +19,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     private readonly httpService: HttpService,
     private readonly instrumentsService: InstrumentsService
   ) {
-    this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
+    this.gatewayBaseUrl = configService.get('GATEWAY_BASE_URL');
   }
 
   async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto) {

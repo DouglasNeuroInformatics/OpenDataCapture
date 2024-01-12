@@ -43,9 +43,9 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     private readonly instrumentRecordsService: InstrumentRecordsService
   ) {
     this.config = {
-      baseUrl: configService.getOrThrow('GATEWAY_BASE_URL'),
-      isEnabled: configService.getOrThrow('GATEWAY_ENABLED'),
-      refreshInterval: parseInt(configService.getOrThrow('GATEWAY_REFRESH_INTERVAL'))
+      baseUrl: configService.get('GATEWAY_BASE_URL'),
+      isEnabled: configService.get('GATEWAY_ENABLED'),
+      refreshInterval: configService.get('GATEWAY_REFRESH_INTERVAL')
     };
   }
 

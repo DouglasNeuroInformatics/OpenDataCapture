@@ -29,7 +29,7 @@ describe('AuthService', () => {
         {
           provide: ConfigService,
           useValue: {
-            getOrThrow: (propertyPath: string) => propertyPath
+            get: (propertyPath: string) => propertyPath
           }
         },
         {
