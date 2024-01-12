@@ -54,6 +54,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "@storybook/addon-essentials": "^7.6.7",
     "@storybook/addon-interactions": "^7.6.7",
     "@storybook/addon-links": "^7.6.7",

@@ -2,6 +2,7 @@ import path from 'path';
 import url from 'url';
 
 import importMetaEnv from '@import-meta-env/unplugin';
+import runtime from '@open-data-capture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
@@ -10,7 +11,6 @@ import viteCompression from 'vite-plugin-compression';
 
 import { analytics } from './config/analytics';
 import { translations } from './config/translations';
-
 const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig({
@@ -30,7 +30,8 @@ export default defineConfig({
     importMetaEnv.vite({
       example: path.resolve(projectDir, '.env.public')
     }),
-    translations()
+    translations(),
+    runtime()
   ],
   resolve: {
     alias: {
