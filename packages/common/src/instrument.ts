@@ -1,11 +1,11 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import type { InstrumentKind } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
 import {
   $FormInstrument,
   type FormInstrument,
   type FormInstrumentSummary,
+  type StrictFormInstrument,
   type UnilingualFormInstrumentSummary
 } from './instrument.form';
 import {
@@ -15,7 +15,7 @@ import {
 } from './instrument.interactive';
 
 import type { Json, Language } from './core';
-import type { InstrumentLanguage, StrictFormInstrument } from '/runtime/v0.0.1/core';
+import type { InstrumentKind, InstrumentLanguage } from './instrument.base';
 
 export type Instrument = FormInstrument | InteractiveInstrument;
 
@@ -51,6 +51,12 @@ export type DiscriminatedInstrument<
         : never
       : never
     : never;
+
+export type InstrumentDef<
+  TKind extends InstrumentKind,
+  TData extends DiscriminatedInstrumentData<TKind>,
+  TLanguage extends InstrumentLanguage
+> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage, { strict: true }>, 'kind' | 'language'>;
 
 export * from './instrument.base';
 export * from './instrument.form';
