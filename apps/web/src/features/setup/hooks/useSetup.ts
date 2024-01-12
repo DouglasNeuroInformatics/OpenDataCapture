@@ -14,8 +14,7 @@ export function useSetup() {
       }
       return result.data;
     },
-    queryKey: ['setup-status'],
-    throwOnError: true
+    queryKey: ['setup-status']
   });
   const mutation = useMutation({
     mutationFn: async (data: InitAppOptions) => {

@@ -19,8 +19,7 @@ export const ManageInstrumentsPage = () => {
       }
       return result.data;
     },
-    queryKey: ['instrument-sources'],
-    throwOnError: true
+    queryKey: ['instrument-sources']
   });
 
   if (!query.data) {

@@ -20,7 +20,6 @@ export function useFormQuery(id: string) {
         id
       });
     },
-    queryKey: ['form', id, i18n.resolvedLanguage],
-    throwOnError: true
+    queryKey: ['form', id, i18n.resolvedLanguage]
   });
 }
