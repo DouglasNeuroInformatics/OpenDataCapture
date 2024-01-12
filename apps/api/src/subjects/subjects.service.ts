@@ -47,9 +47,10 @@ export class SubjectsService implements EntityService<Partial<Subject>> {
   }
 
   async find({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
-    return this.subjectModel.findMany({
+    const groupInput = groupId ? { groupIds: { has: groupId } } : {};
+    return await this.subjectModel.findMany({
       where: {
-        AND: [accessibleQuery(ability, 'read', 'Subject'), { groupIds: { has: groupId } }]
+        AND: [accessibleQuery(ability, 'read', 'Subject'), groupInput]
       }
     });
   }
