@@ -11,7 +11,7 @@ type InstrumentDef<
   TKind extends InstrumentKind,
   TData extends DiscriminatedInstrumentData<TKind>,
   TLanguage extends InstrumentLanguage
-> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage>, 'kind' | 'language'>;
+> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage, { strict: true }>, 'kind' | 'language'>;
 
 export class InstrumentFactory<TKind extends InstrumentKind, TLanguage extends InstrumentLanguage> {
   constructor(private options: { kind: TKind; language: TLanguage }) {}

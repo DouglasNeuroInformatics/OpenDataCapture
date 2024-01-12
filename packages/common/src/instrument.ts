@@ -37,10 +37,10 @@ export type DiscriminatedInstrument<
   TKind extends InstrumentKind,
   TData extends DiscriminatedInstrumentData<TKind>,
   TLanguage extends InstrumentLanguage,
-  TStrict extends boolean = false
+  TOptions extends { strict: boolean } = { strict: false }
 > = [TKind] extends ['FORM']
   ? TData extends FormDataType
-    ? TStrict extends true
+    ? TOptions['strict'] extends true
       ? StrictFormInstrument<TData, TLanguage>
       : FormInstrument<TData, TLanguage>
     : never
