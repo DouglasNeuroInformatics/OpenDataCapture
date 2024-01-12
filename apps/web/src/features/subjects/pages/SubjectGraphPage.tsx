@@ -17,8 +17,8 @@ import { pickBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useAvailableForms } from '@/hooks/useAvailableForms';
 import { useFormRecords } from '@/hooks/useFormRecords';
+import { useInstruments } from '@/hooks/useInstruments';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { TimeDropdown } from '../components/TimeDropdown';
@@ -51,7 +51,7 @@ export const SubjectGraphPage = () => {
   const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
   const { t } = useTranslation(['subjects', 'common']);
 
-  const formsQuery = useAvailableForms();
+  const formsQuery = useInstruments({ params: { kind: 'FORM' } });
   const recordsQuery = useFormRecords({
     enabled: selectedForm !== null,
     params: {
@@ -124,7 +124,7 @@ export const SubjectGraphPage = () => {
   const formOptions: Record<string, string> = {};
   for (const form of formsQuery.data) {
     if (form.measures && Object.keys(form.measures).length > 0) {
-      formOptions[form.id] = form.details.title;
+      formOptions[form.id!] = form.details.title;
     }
   }
 
