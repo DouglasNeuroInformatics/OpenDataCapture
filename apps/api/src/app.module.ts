@@ -10,6 +10,7 @@ import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
+import { $EnvironmentConfig } from './core/config/config.schema';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
@@ -26,7 +27,8 @@ import { VisitsModule } from './visits/visits.module';
     AssignmentsModule,
     AuthModule,
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
+      validate: (config) => $EnvironmentConfig.parse(config)
     }),
     CryptoModule.registerAsync({
       inject: [ConfigService],
