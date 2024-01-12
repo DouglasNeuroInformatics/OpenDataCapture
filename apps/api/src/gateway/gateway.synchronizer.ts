@@ -32,7 +32,6 @@ type RemoteAssignment = z.infer<typeof $RemoteAssignment>;
 export class GatewaySynchronizer implements OnApplicationBootstrap {
   private readonly config: {
     baseUrl: string;
-    isEnabled: boolean;
     refreshInterval: number;
   };
   private readonly logger = new Logger(GatewaySynchronizer.name);
@@ -44,7 +43,6 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   ) {
     this.config = {
       baseUrl: configurationService.get('GATEWAY_BASE_URL'),
-      isEnabled: configurationService.get('GATEWAY_ENABLED'),
       refreshInterval: configurationService.get('GATEWAY_REFRESH_INTERVAL')
     };
   }
@@ -54,9 +52,6 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   }
 
   private async sync() {
-    if (!this.config.isEnabled) {
-      return;
-    }
     let remoteAssignments: RemoteAssignment[];
     try {
       const response = await this.httpService.axiosRef.get(`${this.config.baseUrl}/api/assignments`);

@@ -24,9 +24,19 @@ import { VisitsModule } from './visits/visits.module';
 @Module({
   imports: [
     AjvModule,
-    AssignmentsModule,
     AuthModule,
-    ConfigurationModule.forRoot(),
+    ConfigurationModule.forRoot({
+      conditionalModules: [
+        {
+          condition: 'GATEWAY_ENABLED',
+          module: AssignmentsModule
+        },
+        {
+          condition: 'GATEWAY_ENABLED',
+          modules: [GatewayModule]
+        }
+      ]
+    }),
     CryptoModule.registerAsync({
       inject: [ConfigurationService],
       isGlobal: true,
@@ -34,7 +44,6 @@ import { VisitsModule } from './visits/visits.module';
         secretKey: configurationService.get('SECRET_KEY')
       })
     }),
-    GatewayModule,
     GroupsModule,
     InstrumentsModule,
     PrismaModule.forRoot(),
