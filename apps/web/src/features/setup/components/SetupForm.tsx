@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 type SetupData = {
-  enableGateway: boolean;
   firstName: string;
   initDemo: boolean;
   lastName: string;
@@ -63,20 +62,6 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
             }
           },
           title: t('setup:demo.title')
-        },
-        {
-          fields: {
-            enableGateway: {
-              kind: 'binary',
-              label: t('setup:gateway.enable'),
-              options: {
-                f: t('no'),
-                t: t('yes')
-              },
-              variant: 'radio'
-            }
-          },
-          title: t('setup:gateway.title')
         }
       ]}
       submitBtnLabel={t('submit')}
@@ -86,7 +71,6 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
         username: z.string().min(1),
         password: $StrongPassword,
         initDemo: z.boolean(),
-        enableGateway: z.boolean()
       })}
       onSubmit={onSubmit}
     />

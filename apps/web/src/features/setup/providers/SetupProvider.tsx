@@ -4,25 +4,26 @@ import { FormPageWrapper } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
 import logo from '@/assets/logo.png';
+import { useSetupState } from '@/hooks/useSetupState';
 
 import { SetupForm } from '../components/SetupForm';
 import { SetupLoadingScreen } from '../components/SetupLoadingScreen';
-import { useSetup } from '../hooks/useSetup';
+import { useInitApp } from '../hooks/useInitApp';
 
 export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
   const { t } = useTranslation('setup');
-
-  const { mutation, query } = useSetup();
+  const setupStateQuery = useSetupState();
+  const initAppMutation = useInitApp();
 
   useEffect(() => {
-    if (query.data?.isSetup === false) {
+    if (setupStateQuery.data?.isSetup === false) {
       window.history.replaceState({}, '', '/setup');
     }
-  }, [query.data]);
+  }, [setupStateQuery.data]);
 
-  if (query.data?.isSetup !== false) {
+  if (setupStateQuery.data?.isSetup !== false) {
     return children;
-  } else if (mutation.isPending) {
+  } else if (initAppMutation.isPending) {
     return <SetupLoadingScreen />;
   }
 
@@ -37,15 +38,14 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
       widthMultiplier={1.5}
     >
       <SetupForm
-        onSubmit={({ enableGateway, firstName, initDemo, lastName, password, username }) => {
-          mutation.mutate({
+        onSubmit={({ firstName, initDemo, lastName, password, username }) => {
+          initAppMutation.mutate({
             admin: {
               firstName,
               lastName,
               password,
               username
             },
-            enableGateway,
             initDemo
           });
         }}

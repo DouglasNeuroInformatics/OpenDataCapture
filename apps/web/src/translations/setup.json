@@ -31,16 +31,6 @@
       "fr": "Démonstration"
     }
   },
-  "gateway": {
-    "enable": {
-      "en": "Enable Gateway",
-      "fr": "Activer la passerelle"
-    },
-    "title": {
-      "en": "Gateway",
-      "fr": "Passerelle"
-    }
-  },
   "pageTitle": {
     "en": "Setup",
     "fr": "Mise en service"
