@@ -189,5 +189,6 @@ export const $InstrumentSourceContainer = z.object({
 
 export type InstrumentBundleContainer = z.infer<typeof $InstrumentBundleContainer>;
 export const $InstrumentBundleContainer = z.object({
-  bundle: z.string()
+  bundle: z.string(),
+  id: z.string()
 });
