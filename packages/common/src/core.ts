@@ -54,3 +54,14 @@ export function isZodType(arg: unknown): arg is z.ZodTypeAny {
 }
 
 export const $ZodTypeAny = z.custom<z.ZodTypeAny>((arg) => isZodType(arg));
+
+export const $BooleanString = z.preprocess((arg) => {
+  if (typeof arg === 'string') {
+    if (arg.trim().toLowerCase() === 'true') {
+      return true;
+    } else if (arg.trim().toLowerCase() === 'false') {
+      return false;
+    }
+  }
+  return arg;
+}, z.boolean());
