@@ -4,9 +4,9 @@ import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Redirect } from '@nestjs/common/decorators';
 import { HttpStatus } from '@nestjs/common/enums';
 import type { HttpRedirectResponse } from '@nestjs/common/interfaces';
-import { ConfigService } from '@nestjs/config';
 import { ApiOperation } from '@nestjs/swagger';
 
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
 
@@ -23,9 +23,9 @@ export class AssignmentsController {
 
   constructor(
     private readonly assignmentsService: AssignmentsService,
-    configService: ConfigService
+    configurationService: ConfigurationService
   ) {
-    this.gatewayBaseUrl = configService.get('GATEWAY_BASE_URL');
+    this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
   }
 
   @ApiOperation({ summary: 'Create Assignment' })

@@ -2,12 +2,12 @@ import path from 'node:path';
 
 import { DocumentInterceptor, ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { VersioningType } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'express';
 
 import { AppModule } from './app.module';
+import { ConfigurationService } from './configuration/configuration.service';
 import { setupDocs } from './docs';
 
 async function bootstrap() {
@@ -29,10 +29,10 @@ async function bootstrap() {
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
   setupDocs(app);
 
-  const configService = app.get(ConfigService);
+  const configurationService = app.get(ConfigurationService);
 
-  const isProduction = configService.get('NODE_ENV') === 'production';
-  const port = isProduction ? 80 : configService.get('API_DEV_SERVER_PORT') ?? 5500;
+  const isProduction = configurationService.get('NODE_ENV') === 'production';
+  const port = isProduction ? 80 : configurationService.get('API_DEV_SERVER_PORT') ?? 5500;
 
   await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);

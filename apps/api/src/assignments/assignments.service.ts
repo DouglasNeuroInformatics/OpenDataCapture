@@ -1,10 +1,10 @@
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import type { Assignment, CreateAssignmentRelayData } from '@open-data-capture/common/assignment';
 import { $Assignment, $CreateAssignmentResponseBody } from '@open-data-capture/common/assignment';
 
+import { ConfigurationService } from '@/configuration/configuration.service';
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
 
@@ -15,11 +15,11 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
   private readonly gatewayBaseUrl: string;
 
   constructor(
-    configService: ConfigService,
+    configurationService: ConfigurationService,
     private readonly httpService: HttpService,
     private readonly instrumentsService: InstrumentsService
   ) {
-    this.gatewayBaseUrl = configService.get('GATEWAY_BASE_URL');
+    this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
   }
 
   async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto) {

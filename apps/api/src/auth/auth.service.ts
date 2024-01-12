@@ -1,18 +1,18 @@
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { AuthPayload, JwtPayload } from '@open-data-capture/common/auth';
 import type { GroupModel, UserModel } from '@open-data-capture/database/core';
 
 import { AbilityFactory } from '@/ability/ability.factory';
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly abilityFactory: AbilityFactory,
-    private readonly configService: ConfigService,
+    private readonly configurationService: ConfigurationService,
     private readonly cryptoService: CryptoService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService
@@ -62,7 +62,7 @@ export class AuthService {
   private async signToken(payload: object): Promise<string> {
     return this.jwtService.signAsync(payload, {
       expiresIn: '1d',
-      secret: this.configService.get('SECRET_KEY')
+      secret: this.configurationService.get('SECRET_KEY')
     });
   }
 }

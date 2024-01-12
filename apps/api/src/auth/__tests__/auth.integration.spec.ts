@@ -4,7 +4,6 @@ import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestj
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { type NestExpressApplication } from '@nestjs/platform-express';
@@ -12,6 +11,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AbilityFactory } from '@/ability/ability.factory';
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { UsersService } from '@/users/users.service';
 
 import { AuthController } from '../auth.controller';
@@ -31,7 +31,7 @@ describe('/auth', () => {
           useValue: createMock(AbilityFactory)
         },
         {
-          provide: ConfigService,
+          provide: ConfigurationService,
           useValue: {}
         },
         {

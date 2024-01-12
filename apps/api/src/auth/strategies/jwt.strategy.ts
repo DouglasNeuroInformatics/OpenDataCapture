@@ -1,5 +1,4 @@
 import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import type { JwtPayload } from '@open-data-capture/common/auth';
 import type { GroupModel, UserModel } from '@open-data-capture/database/core';
@@ -7,6 +6,7 @@ import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { AbilityFactory } from '@/ability/ability.factory';
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   private readonly logger = new Logger(JwtStrategy.name);
 
   constructor(
-    config: ConfigService,
+    config: ConfigurationService,
     private readonly abilityFactory: AbilityFactory,
     private readonly usersService: UsersService
   ) {

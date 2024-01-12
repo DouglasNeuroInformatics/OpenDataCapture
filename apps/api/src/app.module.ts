@@ -2,7 +2,6 @@ import { LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
 import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
@@ -10,7 +9,8 @@ import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
-import { $EnvironmentConfig } from './core/config/config.schema';
+import { ConfigurationModule } from './configuration/configuration.module';
+import { ConfigurationService } from './configuration/configuration.service';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
@@ -26,15 +26,12 @@ import { VisitsModule } from './visits/visits.module';
     AjvModule,
     AssignmentsModule,
     AuthModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      validate: (config) => $EnvironmentConfig.parse(config)
-    }),
+    ConfigurationModule.forRoot(),
     CryptoModule.registerAsync({
-      inject: [ConfigService],
+      inject: [ConfigurationService],
       isGlobal: true,
-      useFactory: (configService: ConfigService) => ({
-        secretKey: configService.get('SECRET_KEY')
+      useFactory: (configurationService: ConfigurationService) => ({
+        secretKey: configurationService.get('SECRET_KEY')
       })
     }),
     GatewayModule,

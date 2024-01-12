@@ -1,5 +1,6 @@
 import { type DynamicModule, Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+
+import { ConfigurationService } from '@/configuration/configuration.service';
 
 import { type ExtendedPrismaClient, PRISMA_CLIENT_TOKEN, PrismaFactory } from './prisma.factory';
 import { PrismaService } from './prisma.service';
@@ -32,7 +33,7 @@ export class PrismaModule {
       module: PrismaModule,
       providers: [
         {
-          inject: [ConfigService],
+          inject: [ConfigurationService],
           provide: PRISMA_CLIENT_TOKEN,
           useFactory: PrismaFactory.createClient
         },

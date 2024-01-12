@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { type CreateAdminData } from '@open-data-capture/common/setup';
 import type { InitAppOptions } from '@open-data-capture/common/setup';
 
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { DemoService } from '@/demo/demo.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -13,7 +13,7 @@ import { UsersService } from '@/users/users.service';
 export class SetupService {
   constructor(
     @InjectModel('SetupState') private readonly setupStateModel: Model<'SetupState'>,
-    private readonly configService: ConfigService,
+    private readonly configurationService: ConfigurationService,
     private readonly demoService: DemoService,
     private readonly usersService: UsersService,
     private readonly prismaService: PrismaService
@@ -26,13 +26,13 @@ export class SetupService {
   async getState() {
     const savedOptions = await this.getSavedOptions();
     return {
-      isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),
+      isGatewayEnabled: this.configurationService.get('GATEWAY_ENABLED'),
       isSetup: Boolean(savedOptions?.isSetup)
     };
   }
 
   async initApp({ admin, initDemo }: InitAppOptions) {
-    const isDev = this.configService.get('NODE_ENV') === 'development';
+    const isDev = this.configurationService.get('NODE_ENV') === 'development';
     const savedOptions = await this.getSavedOptions();
     if (savedOptions?.isSetup && !isDev) {
       throw new ForbiddenException();

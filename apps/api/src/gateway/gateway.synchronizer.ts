@@ -1,11 +1,11 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { $AssignmentStatus } from '@open-data-capture/common/assignment';
 import { $Json } from '@open-data-capture/common/core';
 import { isAxiosError } from 'axios';
 import { z } from 'zod';
 
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 
 // Temporary schema for the data returned by the proof of concept
@@ -38,14 +38,14 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   private readonly logger = new Logger(GatewaySynchronizer.name);
 
   constructor(
-    configService: ConfigService,
+    configurationService: ConfigurationService,
     private readonly httpService: HttpService,
     private readonly instrumentRecordsService: InstrumentRecordsService
   ) {
     this.config = {
-      baseUrl: configService.get('GATEWAY_BASE_URL'),
-      isEnabled: configService.get('GATEWAY_ENABLED'),
-      refreshInterval: configService.get('GATEWAY_REFRESH_INTERVAL')
+      baseUrl: configurationService.get('GATEWAY_BASE_URL'),
+      isEnabled: configurationService.get('GATEWAY_ENABLED'),
+      refreshInterval: configurationService.get('GATEWAY_REFRESH_INTERVAL')
     };
   }
 
