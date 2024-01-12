@@ -15,7 +15,7 @@ export class VisitsController implements Pick<EntityController<Visit>, 'create'>
   @ApiOperation({ description: 'Create Visit' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Visit' })
-  create(@Body() data: CreateVisitDto) {
+  create(@Body() data: CreateVisitDto): Promise<Visit> {
     return this.visitsService.create(data);
   }
 }

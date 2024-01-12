@@ -9,7 +9,7 @@ export type Visit = VisitModel & {
 };
 export const $Visit = $BaseModel.extend({
   date: z.coerce.date(),
-  groupId: z.string(),
+  groupId: z.string().nullable(),
   subject: $Subject,
   subjectId: z.string()
 }) satisfies z.ZodType<Visit>;
