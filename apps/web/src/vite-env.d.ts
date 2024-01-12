@@ -11,11 +11,12 @@ interface ImportMetaDevEnv {
 }
 
 interface ImportMetaEnv extends ImportMetaDevEnv {
-  readonly CONTACT_EMAIL: string;
-  readonly DOCS_URL: string;
-  readonly GITHUB_REPO_URL: string;
-  readonly LICENSE_URL: string;
-  readonly VITE_API_BASE_URL: string;
+  readonly CONTACT_EMAIL?: string;
+  readonly DOCS_URL?: string;
+  readonly GATEWAY_ENABLED?: string;
+  readonly GITHUB_REPO_URL?: string;
+  readonly LICENSE_URL?: string;
+  readonly VITE_API_BASE_URL?: string;
 }
 
 interface ImportMeta {
