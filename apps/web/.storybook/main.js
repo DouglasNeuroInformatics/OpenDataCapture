@@ -1,8 +1,12 @@
+// @ts-check
+
 import path from 'node:path';
 
 import { defineConfig } from '@open-data-capture/storybook';
 
-export default defineConfig({
+const config = defineConfig({
+  // eslint-disable-next-line no-undef
+  packageRoot: path.resolve(__dirname, '..'),
   vite: {
     resolve: {
       alias: {
@@ -12,3 +16,5 @@ export default defineConfig({
     }
   }
 });
+
+export default config;

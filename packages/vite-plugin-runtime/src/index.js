@@ -1,3 +1,5 @@
+// @ts-check
+
 import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
@@ -16,14 +18,14 @@ const RUNTIME_DIR = path.resolve(PACKAGE_DIR, '..', '..', 'runtime');
 /**
  * Return whether the path is a directory
  * @param {string} path
- * @returns {boolean}
+ * @returns {Promise<boolean>}
  */
 const isDirectory = (path) => fs.lstat(path).then((stat) => stat.isDirectory());
 
 /**
  * Returns the manifest for a given version of the runtime
  * @param {string} version
- * @returns {{ baseDir: string, manifest: RuntimeManifest }}
+ * @returns {Promise<{ baseDir: string, manifest: RuntimeManifest }>}
  */
 const resolveVersion = async (version) => {
   const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
@@ -68,16 +70,17 @@ const loadResource = async (version, filename) => {
 };
 
 /**
- *
+ * @param {Object} options
+ * @param {string} options.packageRoot
  * @returns {import('vite').PluginOption}
  */
-const runtime = () => {
+const runtime = (options) => {
   return {
     async buildStart() {
       const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
       for (const version of versions) {
         const { baseDir, manifest } = await resolveVersion(version);
-        const destination = `dist/runtime/${version}`;
+        const destination = path.resolve(options.packageRoot, `dist/runtime/${version}`);
         await fs.cp(baseDir, destination, { recursive: true });
         await fs.writeFile(path.resolve(destination, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf-8');
       }

@@ -5,7 +5,8 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { mergeConfig } from 'vite';
 
 /**
- * @param {Object} [options]
+ * @param {Object} options
+ * @param {string} options.packageRoot
  * @param {Omit<import('vite').UserConfig, "plugins">} [options.vite]
  * @returns {import('@storybook/react-vite').StorybookConfig}
  */
@@ -28,7 +29,7 @@ export function defineConfig(options) {
     stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
     viteFinal(config) {
       return mergeConfig(config, {
-        plugins: [runtime()],
+        plugins: [runtime(options)],
         ...options?.vite
       });
     }
