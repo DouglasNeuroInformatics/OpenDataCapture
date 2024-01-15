@@ -16,6 +16,7 @@
     "./services/i18n": "./src/services/i18n.ts",
     "./translations/*": "./src/translations/*",
     "./utils/translate-instrument": "./src/utils/translate-instrument.ts",
+    "./styles.css": "./src/styles.css",
     "./tailwind.config": "./tailwind.config.js"
   },
   "scripts": {

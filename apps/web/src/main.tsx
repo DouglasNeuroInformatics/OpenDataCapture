@@ -2,9 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import { App } from './App';
-import './config';
 
-import './styles.css';
+import '@open-data-capture/react-core/styles.css';
 
 const root = document.getElementById('root')!;
 
