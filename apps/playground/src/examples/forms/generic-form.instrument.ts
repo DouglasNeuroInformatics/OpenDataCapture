@@ -20,7 +20,7 @@ type GenericFormInstrumentData = {
 };
 
 const instrumentFactory = new InstrumentFactory({
-  kind: 'form',
+  kind: 'FORM',
   language: 'en'
 });
 
@@ -95,7 +95,7 @@ export default instrumentFactory.defineInstrument<GenericFormInstrumentData>({
     description: 'This example includes a variety of possible field types',
     title: 'Generic Instrument',
     estimatedDuration: 5,
-    instructions: 'Please complete all questions'
+    instructions: ['Please complete all questions']
   },
   validationSchema: z.object({
     binaryCheck: z.boolean(),

@@ -34,7 +34,7 @@ export function useTranspiler() {
     try {
       const bundle = await instrumentTransformer.generateBundle(source);
       const unknownInstrument = await evaluateInstrument(bundle, { validate: false });
-      if (unknownInstrument.kind === 'form') {
+      if (unknownInstrument.kind === 'FORM') {
         instrument = translateFormInstrument(unknownInstrument, 'en');
       } else {
         instrument = unknownInstrument;

@@ -15,7 +15,7 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
     <div className={cn('h-full min-h-0', className)}>
       <div className="h-full overflow-scroll p-2">
         {match(state)
-          .with({ instrument: { kind: 'form' }, status: 'built' }, ({ instrument }) => (
+          .with({ instrument: { kind: 'FORM' }, status: 'built' }, ({ instrument }) => (
             <FormStepper
               form={instrument}
               onSubmit={(data) => {
@@ -24,7 +24,7 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
               }}
             />
           ))
-          .with({ instrument: { kind: 'interactive' }, status: 'built' }, ({ instrument }) => {
+          .with({ instrument: { kind: 'INTERACTIVE' }, status: 'built' }, ({ instrument }) => {
             return (
               <InteractiveStepper
                 instrument={instrument}

@@ -7,7 +7,7 @@ type ClickTaskData = {
 };
 
 const instrumentFactory = new InstrumentFactory({
-  kind: 'interactive',
+  kind: 'INTERACTIVE',
   language: 'en'
 });
 
@@ -48,8 +48,9 @@ export default instrumentFactory.defineInstrument<ClickTaskData>({
   details: {
     description: 'This task is completely useless. It is a proof of concept for an interactive instrument.',
     estimatedDuration: 1,
-    instructions:
-      'When you begin this task, a 10 second countdown will begin. Please click the button as many times as you can before it expires.',
+    instructions: [
+      'When you begin this task, a 10 second countdown will begin. Please click the button as many times as you can before it expires.'
+    ],
     title: 'Click Task'
   },
   name: 'InteractiveInstrument',

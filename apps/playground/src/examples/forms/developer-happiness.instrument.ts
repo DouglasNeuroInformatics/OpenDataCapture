@@ -15,7 +15,7 @@ type DeveloperHappinessData = {
 };
 
 const instrumentFactory = new InstrumentFactory({
-  kind: 'form',
+  kind: 'FORM',
   language: 'en'
 });
 
@@ -27,7 +27,7 @@ export default instrumentFactory.defineInstrument<DeveloperHappinessData>({
     title: 'Developer happiness questionnaire',
     description: 'This is where we check if people are unhappy with TypeScript',
     estimatedDuration: 5,
-    instructions: 'You know how to use the web'
+    instructions: ['You know how to use the web']
   },
   content: {
     developerHappiness: {
