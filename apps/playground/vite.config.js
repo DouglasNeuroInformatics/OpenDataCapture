@@ -1,3 +1,5 @@
+// @ts-check
+
 import path from 'path';
 import url from 'url';
 
@@ -17,7 +19,7 @@ export default defineConfig({
   },
   css: {
     postcss: {
-      plugins: [tailwindcss as any, autoprefixer]
+      plugins: [tailwindcss, autoprefixer]
     }
   },
   optimizeDeps: {

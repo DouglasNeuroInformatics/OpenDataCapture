@@ -10,5 +10,5 @@
     },
     "resolveJsonModule": true
   },
-  "include": [".storybook/**/*", "config/**/*", "src/**/*", "vite.config.ts"]
+  "include": ["config/**/*", "src/**/*"]
 }

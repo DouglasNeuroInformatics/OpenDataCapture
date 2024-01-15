@@ -1,0 +1,25 @@
+{
+  "name": "@open-data-capture/storybook",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "eslint --fix src"
+  },
+  "dependencies": {
+    "@storybook/addon-essentials": "^7.6.7",
+    "@storybook/addon-interactions": "^7.6.7",
+    "@storybook/addon-links": "^7.6.7",
+    "@storybook/addon-themes": "^7.6.7",
+    "@storybook/blocks": "^7.6.7",
+    "@storybook/react": "^7.6.7",
+    "@storybook/react-vite": "^7.6.7",
+    "storybook": "^7.6.7",
+    "storybook-react-i18next": "^2.0.10"
+  },
+  "peerDependencies": {
+    "i18next": "23.x"
+  }
+}

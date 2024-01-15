@@ -3,11 +3,8 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
     "jsx": "react-jsx",
-    "paths": {
-      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/dist/*"]
-    },
     "resolveJsonModule": true
   },
   "extends": "../../tsconfig.base.json",
-  "include": [".storybook/**/*", "src/**/*"]
+  "include": ["src/**/*"]
 }

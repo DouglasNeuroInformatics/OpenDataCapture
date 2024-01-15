@@ -2,21 +2,30 @@ import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
-import type { PluginOption, ViteDevServer } from 'vite';
-
 const MANIFEST_FILENAME = 'runtime.json';
 
 const PACKAGE_DIR = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
 const RUNTIME_DIR = path.resolve(PACKAGE_DIR, '..', '..', 'runtime');
 
-const isDirectory = (path: string) => fs.lstat(path).then((stat) => stat.isDirectory());
+/**
+ * @typedef  {Object}    RuntimeManifest
+ * @property {string[]}  declarations
+ * @property {string[]}  sources
+ */
 
-type RuntimeManifest = {
-  declarations: string[];
-  sources: string[];
-};
+/**
+ * Return whether the path is a directory
+ * @param {string} path
+ * @returns {boolean}
+ */
+const isDirectory = (path) => fs.lstat(path).then((stat) => stat.isDirectory());
 
-const resolveVersion = async (version: string) => {
+/**
+ * Returns the manifest for a given version of the runtime
+ * @param {string} version
+ * @returns {{ baseDir: string, manifest: RuntimeManifest }}
+ */
+const resolveVersion = async (version) => {
   const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
   if (!(await isDirectory(baseDir))) {
     throw new Error(`Not a directory: ${baseDir}`);
@@ -27,11 +36,17 @@ const resolveVersion = async (version: string) => {
     manifest: {
       declarations: files.filter((filename) => filename.endsWith('.d.ts')),
       sources: files.filter((filename) => filename.endsWith('.js'))
-    } satisfies RuntimeManifest
+    }
   };
 };
 
-const loadResource = async (version: string, filename: string) => {
+/**
+ * Returns the content and MIME type for a file in a given version
+ * @param {string} version
+ * @param {string} filename
+ * @returns {Promise<{ content: string; contentType: string; } | null>}
+ */
+const loadResource = async (version, filename) => {
   const { baseDir, manifest } = await resolveVersion(version);
   if (filename === MANIFEST_FILENAME) {
     return {
@@ -52,6 +67,10 @@ const loadResource = async (version: string, filename: string) => {
   return null;
 };
 
+/**
+ *
+ * @returns {import('vite').PluginOption}
+ */
 const runtime = () => {
   return {
     async buildStart() {
@@ -63,7 +82,7 @@ const runtime = () => {
         await fs.writeFile(path.resolve(destination, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf-8');
       }
     },
-    configureServer(server: ViteDevServer) {
+    configureServer(server) {
       server.middlewares.use('/runtime', (req, res, next) => {
         const [version, filename] = req.url?.split('/').filter(Boolean) ?? [];
         if (!(version && filename)) {
@@ -81,7 +100,7 @@ const runtime = () => {
       });
     },
     name: 'vite-plugin-runtime'
-  } as PluginOption;
+  };
 };
 
-export { type RuntimeManifest, runtime as default };
+export default runtime;

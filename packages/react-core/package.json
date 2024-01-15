@@ -41,14 +41,8 @@
     "type-fest": "^4.9.0"
   },
   "devDependencies": {
+    "@open-data-capture/storybook": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
-    "@storybook/addon-essentials": "^7.6.7",
-    "@storybook/addon-interactions": "^7.6.7",
-    "@storybook/addon-links": "^7.6.7",
-    "@storybook/addon-themes": "^7.6.7",
-    "@storybook/blocks": "^7.6.7",
-    "@storybook/react": "^7.6.7",
-    "@storybook/react-vite": "^7.6.7",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
     "sort-json": "^2.0.1",

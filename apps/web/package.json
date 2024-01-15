@@ -54,14 +54,8 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@open-data-capture/storybook": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
-    "@storybook/addon-essentials": "^7.6.7",
-    "@storybook/addon-interactions": "^7.6.7",
-    "@storybook/addon-links": "^7.6.7",
-    "@storybook/addon-themes": "^7.6.7",
-    "@storybook/blocks": "^7.6.7",
-    "@storybook/react": "^7.6.7",
-    "@storybook/react-vite": "^7.6.7",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",
@@ -80,8 +74,6 @@
     "rollup-plugin-copy": "^3.5.0",
     "sort-json": "^2.0.1",
     "start-server-and-test": "^2.0.3",
-    "storybook": "^7.6.7",
-    "storybook-react-i18next": "^2.0.10",
     "tailwindcss": "^3.4.1",
     "vite": "^4.5.0",
     "vite-plugin-compression": "^0.5.1"

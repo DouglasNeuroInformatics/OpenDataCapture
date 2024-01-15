@@ -1,3 +1,5 @@
+// @ts-check
+
 import path from 'path';
 import url from 'url';
 
@@ -11,6 +13,7 @@ import viteCompression from 'vite-plugin-compression';
 
 import { analytics } from './config/analytics';
 import { translations } from './config/translations';
+
 const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig({
@@ -20,7 +23,7 @@ export default defineConfig({
   },
   css: {
     postcss: {
-      plugins: [tailwindcss as any, autoprefixer]
+      plugins: [tailwindcss, autoprefixer]
     }
   },
   plugins: [

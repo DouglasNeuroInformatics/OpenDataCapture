@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import type { RuntimeManifest } from '@open-data-capture/vite-plugin-runtime';
 import axios from 'axios';
 import _ from 'lodash';
+
+type RuntimeManifest = {
+  declarations: string[];
+  sources: string[];
+};
 
 export function useRuntime(version: string) {
   const [declarations, setDeclarations] = useState<Record<string, string>>({});
