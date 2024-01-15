@@ -27,7 +27,7 @@
     "@import-meta-env/unplugin": "^0.5.1",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/demo": "workspace:*",
-    "@open-data-capture/instruments": "workspace:*",
+    "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
     "@react-spring/web": "^9.7.3",
     "@tanstack/react-query": "^5.17.9",

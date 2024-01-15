@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/instruments",
+  "name": "@open-data-capture/instrument-library",
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",

@@ -12,7 +12,7 @@ import type {
 } from '@open-data-capture/common/instrument';
 import type { Subject, SubjectIdentificationData } from '@open-data-capture/common/subject';
 import { DEMO_GROUPS, DEMO_USERS } from '@open-data-capture/demo';
-import { BPRS_SOURCE, EDQ_SOURCE, HQ_SOURCE, MMSE_SOURCE, MOCA_SOURCE } from '@open-data-capture/instruments';
+import { BPRS_SOURCE, EDQ_SOURCE, HQ_SOURCE, MMSE_SOURCE, MOCA_SOURCE } from '@open-data-capture/instrument-library';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -86,7 +86,7 @@ export class DemoService {
             data: data as Json,
             date: faker.date.past({ years: 2 }),
             groupId: group.id,
-            instrumentId: form.id!,
+            instrumentId: form.id,
             subjectId: subject.id
           });
         }

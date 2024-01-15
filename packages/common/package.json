@@ -29,7 +29,7 @@
     "@casl/prisma": "^1.4.1",
     "@douglasneuroinformatics/form-types": "latest",
     "@open-data-capture/database": "workspace:*",
-    "@open-data-capture/instruments": "workspace:*",
+    "@open-data-capture/instrument-library": "workspace:*",
     "@types/react": "^18.2.47"
   }
 }

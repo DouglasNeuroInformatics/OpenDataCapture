@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'bun:test';
 
-import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import {
   BPRS,
   BPRS_SOURCE,
@@ -12,7 +11,8 @@ import {
   MMSE_SOURCE,
   MOCA,
   MOCA_SOURCE
-} from '@open-data-capture/instruments';
+} from '@open-data-capture/instrument-library';
+import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 
 import { evaluateInstrument } from './instrument.utils';
 

@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'bun:test';
 
-import { HQ_SOURCE } from '@open-data-capture/instruments';
+import { HQ_SOURCE } from '@open-data-capture/instrument-library';
 
 import { InstrumentTransformer } from '.';
 

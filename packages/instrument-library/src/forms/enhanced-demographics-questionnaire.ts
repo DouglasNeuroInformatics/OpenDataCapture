@@ -3,7 +3,6 @@
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-
 type Language = Extract<import('/runtime/v0.0.1/core.js').InstrumentLanguage, string>;
 
 type MultilingualOptions = Record<
@@ -822,8 +821,12 @@ export default instrumentFactory.defineInstrument<EnhancedDemographicsQuestionna
     },
     estimatedDuration: 5,
     instructions: {
-      en: ['Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.'],
-      fr: ["Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."]
+      en: [
+        'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.'
+      ],
+      fr: [
+        "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
+      ]
     },
     title: {
       en: 'Enhanced Demographics Questionnaire',

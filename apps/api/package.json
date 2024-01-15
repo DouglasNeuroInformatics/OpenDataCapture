@@ -34,7 +34,7 @@
     "@open-data-capture/database": "workspace:*",
     "@open-data-capture/demo": "workspace:*",
     "@open-data-capture/instrument-transformer": "workspace:*",
-    "@open-data-capture/instruments": "workspace:*",
+    "@open-data-capture/instrument-library": "workspace:*",
     "axios": "^1.6.5",
     "lodash": "^4.17.21",
     "passport": "^0.7.0",

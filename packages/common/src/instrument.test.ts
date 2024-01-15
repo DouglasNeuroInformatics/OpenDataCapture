@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { BPRS, EDQ, HQ, MMSE, MOCA } from '@open-data-capture/instruments';
+import { BPRS, EDQ, HQ, MMSE, MOCA } from '@open-data-capture/instrument-library';
 
 import { $Instrument } from './instrument';
 
