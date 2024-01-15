@@ -1,0 +1,41 @@
+{
+  "name": "@open-data-capture/instrument-renderer",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "storybook": "storybook dev -p 6006"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/ui": "latest",
+    "@douglasneuroinformatics/utils": "latest",
+    "@headlessui/react": "^1.7.18",
+    "@heroicons/react": "^2.1.1",
+    "@monaco-editor/react": "^4.6.0",
+    "@open-data-capture/common": "workspace:*",
+    "@open-data-capture/runtime-v0.0.1": "workspace:*",
+    "i18next": "^23.7.16",
+    "monaco-editor": "^0.45.0",
+    "prettier": "^3.1.1",
+    "react-i18next": "^14.0.0",
+    "ts-pattern": "^5.0.6",
+    "type-fest": "^4.9.0"
+  },
+  "devDependencies": {
+    "@open-data-capture/vite-plugin-runtime": "workspace:*",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.33",
+    "vite": "^4.5.0"
+  },
+  "peerDependencies": {
+    "react": "18.x",
+    "react-dom": "18.x",
+    "tailwindcss": "3.x"
+  }
+}
