@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { DocumentInterceptor, ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { VersioningType } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
@@ -23,7 +23,6 @@ async function bootstrap() {
   });
   app.use(json({ limit: '50MB' }));
   app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
-  app.useGlobalInterceptors(new DocumentInterceptor());
   app.useGlobalPipes(new ValidationPipe());
 
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
