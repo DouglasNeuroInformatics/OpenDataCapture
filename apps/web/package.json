@@ -54,7 +54,6 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "@open-data-capture/storybook": "workspace:*",
     "@open-data-capture/vite-plugin-plausible": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "@testing-library/dom": "^9.3.4",
