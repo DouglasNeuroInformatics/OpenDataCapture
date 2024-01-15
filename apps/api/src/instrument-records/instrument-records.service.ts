@@ -3,7 +3,7 @@ import { linearRegression } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Injectable } from '@nestjs/common';
 import { evaluateInstrument } from '@open-data-capture/common/instrument';
-import type { FormInstrument, FormInstrumentMeasures } from '@open-data-capture/common/instrument';
+import type { FormInstrumentMeasures } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecordsExport,
@@ -130,12 +130,11 @@ export class InstrumentRecordsService {
     return await Promise.all(
       records.map(async (record) => {
         if (record.instrument.kind === 'FORM') {
-          const instance = await evaluateInstrument(record.instrument.bundle);
+          const instance = await evaluateInstrument(record.instrument.bundle, { kind: 'FORM' });
           if (instance.measures) {
-            Object.defineProperty(
-              record,
-              'computedMeasures',
-              this.computeMeasure(instance.measures as FormInstrumentMeasures, record.data as FormDataType)
+            (record as Record<string, any>).computedMeasures = this.computeMeasures(
+              instance.measures,
+              record.data as FormDataType
             );
           }
         }
@@ -149,8 +148,12 @@ export class InstrumentRecordsService {
     { ability }: EntityOperationOptions = {}
   ) {
     groupId && (await this.groupsService.findById(groupId));
-    const instrument = (await this.instrumentsService.findById(instrumentId)) as unknown as FormInstrument;
-    if (!instrument.measures) {
+    const instrument = await this.instrumentsService
+      .findById(instrumentId)
+      .then((instrument) => instrument.toInstance());
+    if (instrument.kind !== 'FORM') {
+      throw new Error(`Linear model is not available for instruments of kind '${instrument.kind}'`);
+    } else if (!instrument.measures) {
       throw new Error('Instrument must contain measures');
     }
 
@@ -161,7 +164,7 @@ export class InstrumentRecordsService {
 
     const data: Record<string, [number, number][]> = {};
     for (const record of records) {
-      const computedMeasures = this.computeMeasure(instrument.measures, record.data as FormDataType);
+      const computedMeasures = this.computeMeasures(instrument.measures, record.data as FormDataType);
       for (const measure in computedMeasures) {
         const x = record.date.getTime();
         const y = computedMeasures[measure]!;
@@ -180,7 +183,7 @@ export class InstrumentRecordsService {
     return results;
   }
 
-  private computeMeasure(measures: FormInstrumentMeasures, data: FormDataType) {
+  private computeMeasures(measures: FormInstrumentMeasures, data: FormDataType) {
     const computedMeasures: Record<string, number> = {};
     for (const key in measures) {
       computedMeasures[key] = measures[key]!.value(data);
