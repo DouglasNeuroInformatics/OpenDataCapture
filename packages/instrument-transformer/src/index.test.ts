@@ -1,10 +1,8 @@
 import { beforeAll, describe, expect, it } from 'bun:test';
 
-import { importInstrumentSource } from '@open-data-capture/instruments/macros' with { type: 'macro' };
+import { HQ_SOURCE } from '@open-data-capture/instruments';
 
 import { InstrumentTransformer } from '.';
-
-const HQ_SOURCE = importInstrumentSource('forms/happiness-questionnaire');
 
 describe('InstrumentTransformer', () => {
   let transformer: InstrumentTransformer;
