@@ -1,7 +1,5 @@
-import { LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
-import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
+import { AjvModule, CryptoModule, LoggingModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module } from '@nestjs/common';
-import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
@@ -44,6 +42,7 @@ import { VisitsModule } from './visits/visits.module';
     InstrumentsModule,
     PrismaModule.forRoot(),
     SubjectsModule,
+    LoggingModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         limit: 25,
@@ -81,8 +80,4 @@ import { VisitsModule } from './visits/visits.module';
     }
   ]
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

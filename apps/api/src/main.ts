@@ -1,8 +1,8 @@
 import path from 'node:path';
 
-import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { VersioningType } from '@nestjs/common';
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'express';
 
@@ -11,10 +11,10 @@ import { ConfigurationService } from './configuration/configuration.service';
 import { setupDocs } from './docs';
 
 async function bootstrap() {
-  // Explicit type is needed due to issue with linked dependency
-  const app: NestExpressApplication = await NestFactory.create(AppModule, {
+  // This hacky type assertion is needed due to issue with linked dependency
+  const app = (await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'debug', 'log', 'verbose']
-  });
+  })) as any as NestExpressApplication;
 
   app.enableCors();
   app.enableVersioning({
@@ -22,7 +22,6 @@ async function bootstrap() {
     type: VersioningType.URI
   });
   app.use(json({ limit: '50MB' }));
-  app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
   app.useGlobalPipes(new ValidationPipe());
 
   app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
