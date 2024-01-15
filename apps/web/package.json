@@ -55,6 +55,7 @@
   },
   "devDependencies": {
     "@open-data-capture/storybook": "workspace:*",
+    "@open-data-capture/vite-plugin-plausible": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.2.0",
