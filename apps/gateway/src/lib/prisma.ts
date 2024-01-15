@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@open-data-capture/database/gateway';
 
 const prismaClientSingleton = () => new PrismaClient();
 
