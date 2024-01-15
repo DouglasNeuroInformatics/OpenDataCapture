@@ -1,3 +1,5 @@
+// @ts-check
+
 import path from 'path';
 import url from 'url';
 
@@ -9,12 +11,12 @@ import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 import dts from 'rollup-plugin-dts';
 
-const OUT_DIR = path.resolve(import.meta.dir, 'dist');
-const ROOT_DIR = path.resolve(import.meta.dir, '..', '..');
-
-const MODE = 'development' as 'development' | 'production';
-
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+
+const OUT_DIR = path.resolve(__dirname, 'dist');
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
+
+const MODE = /** @type {'development' | 'production'} */ ('development');
 
 export default defineConfig([
   {
@@ -46,7 +48,7 @@ export default defineConfig([
   },
   {
     input: {
-      core: path.resolve(import.meta.dir, 'src', 'core.ts'),
+      core: path.resolve(__dirname, 'src', 'core.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),
       zod: path.resolve(__dirname, 'src', 'zod.ts')
     },
@@ -60,8 +62,7 @@ export default defineConfig([
       dts({
         compilerOptions: {
           paths: {
-            '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')],
-            //'@open-data-capture/database/*': [path.resolve(ROOT_DIR, 'packages/database/src/*')]
+            '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')]
           }
         },
         respectExternal: true

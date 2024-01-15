@@ -5,7 +5,7 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { mergeConfig } from 'vite';
 
 /**
- * @param {Object} options
+ * @param {Object} [options]
  * @param {Omit<import('vite').UserConfig, "plugins">} [options.vite]
  * @returns {import('@storybook/react-vite').StorybookConfig}
  */
@@ -29,7 +29,7 @@ export function defineConfig(options) {
     viteFinal(config) {
       return mergeConfig(config, {
         plugins: [runtime()],
-        ...options.vite
+        ...options?.vite
       });
     }
   };
@@ -37,11 +37,11 @@ export function defineConfig(options) {
 
 /**
  *
- * @param {Object} options
+ * @param {Object} [options]
  * @param {import('i18next').i18n} options.i18n
  * @returns {import('@storybook/react').Preview}
  */
-export function definePreview({ i18n }) {
+export function definePreview(options) {
   return {
     decorators: [
       // @ts-ignore
@@ -69,7 +69,7 @@ export function definePreview({ i18n }) {
           date: /Date$/
         }
       },
-      i18n
+      i18n: options?.i18n
     }
   };
 }

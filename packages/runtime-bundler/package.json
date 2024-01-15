@@ -3,12 +3,10 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
+  "main": "./src/index.js",
   "scripts": {
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "eslint --fix src"
   },
   "dependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",

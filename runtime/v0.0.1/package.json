@@ -6,7 +6,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && bunx --bun rollup --config rollup.config.ts --configPlugin typescript",
+    "build": "rm -rf dist && bunx rollup -c",
     "format": "prettier --write src",
     "postinstall": "bun run build",
     "lint": "tsc && eslint --fix src"
