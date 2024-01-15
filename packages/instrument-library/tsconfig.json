@@ -1,8 +1,12 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "jsx": "react-jsx",
+    "noEmit": false,
+    "outDir": "dist",
     "types": ["bun-types"]
   },
+  "extends": "../../tsconfig.base.json",
   "include": ["src"]
 }
