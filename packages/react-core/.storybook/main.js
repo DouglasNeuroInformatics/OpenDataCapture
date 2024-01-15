@@ -1,9 +1,30 @@
 // @ts-check
 
-import path from 'path';
+import runtime from '@open-data-capture/vite-plugin-runtime';
+import { mergeConfig } from 'vite';
 
-import { defineConfig } from '@open-data-capture/storybook';
+/** @type {import('@storybook/react-vite').StorybookConfig} */
+const config = {
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
+    '@storybook/addon-themes',
+    'storybook-react-i18next'
+  ],
+  docs: {
+    autodocs: 'tag'
+  },
+  framework: {
+    name: '@storybook/react-vite',
+    options: {}
+  },
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  viteFinal(config) {
+    return mergeConfig(config, {
+      plugins: [runtime()]
+    });
+  }
+};
 
-export default defineConfig({
-  packageRoot: path.resolve(__dirname, '..')
-});
+export default config;

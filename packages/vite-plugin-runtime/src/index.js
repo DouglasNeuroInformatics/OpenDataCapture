@@ -75,6 +75,7 @@ const loadResource = async (version, filename) => {
  * @returns {import('vite').PluginOption}
  */
 const runtime = (options) => {
+  console.log('Plugin Invoked');
   return {
     async buildStart() {
       const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
@@ -87,6 +88,7 @@ const runtime = (options) => {
     },
     configureServer(server) {
       server.middlewares.use('/runtime', (req, res, next) => {
+        console.log('Req', req);
         const [version, filename] = req.url?.split('/').filter(Boolean) ?? [];
         if (!(version && filename)) {
           return next();

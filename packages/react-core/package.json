@@ -41,7 +41,6 @@
     "type-fest": "^4.9.0"
   },
   "devDependencies": {
-    "@open-data-capture/storybook": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
