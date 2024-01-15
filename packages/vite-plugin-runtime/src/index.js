@@ -70,8 +70,8 @@ const loadResource = async (version, filename) => {
 };
 
 /**
- * @param {Object} options
- * @param {string} options.packageRoot
+ * @param {Object} [options]
+ * @param {string} [options.packageRoot]
  * @returns {import('vite').PluginOption}
  */
 const runtime = (options) => {
@@ -80,7 +80,7 @@ const runtime = (options) => {
       const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
       for (const version of versions) {
         const { baseDir, manifest } = await resolveVersion(version);
-        const destination = path.resolve(options.packageRoot, `dist/runtime/${version}`);
+        const destination = path.resolve(options?.packageRoot ?? '', `dist/runtime/${version}`);
         await fs.cp(baseDir, destination, { recursive: true });
         await fs.writeFile(path.resolve(destination, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf-8');
       }
