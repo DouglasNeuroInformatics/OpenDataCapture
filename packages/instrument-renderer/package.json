@@ -22,12 +22,14 @@
     "@open-data-capture/react-core": "workspace:*",
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
     "i18next": "^23.7.16",
+    "lodash": "^4.17.21",
     "react-i18next": "^14.0.0",
     "ts-pattern": "^5.0.6",
     "type-fest": "^4.9.0"
   },
   "devDependencies": {
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
+    "@types/lodash": "^4.14.202",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
     "vite": "^4.5.0"

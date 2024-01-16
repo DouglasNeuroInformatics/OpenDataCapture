@@ -3,11 +3,11 @@ export type InstrumentRendererProps = {
   onSubmit: (data: unknown) => Promise<void>;
 };
 
-export const InstrumentRenderer = () => {
+export const InstrumentRenderer = ({ bundle }: InstrumentRendererProps) => {
   return (
     <>
       <iframe srcDoc="Hello World" title="Open Data Capture - Interactive Instrument" />
-      <p>{}</p>
+      <p>{bundle}</p>
     </>
   );
 };
