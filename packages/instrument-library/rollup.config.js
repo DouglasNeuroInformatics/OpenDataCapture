@@ -11,7 +11,7 @@ import { defineConfig } from 'rollup';
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  external: [/^\/runtime\/.*$/],
+  external: [/^\/runtime\/.*$/, '@open-data-capture/rollup-plugin-instrument/client'],
   input: path.resolve(__dirname, 'src', 'index.ts'),
   output: {
     dir: path.resolve(__dirname, 'lib'),

@@ -1,1 +1,1 @@
-export * from './InstrumentSandbox';
+export * from './InstrumentRenderer';

@@ -12,7 +12,13 @@ import type {
 } from '@open-data-capture/common/instrument';
 import type { Subject, SubjectIdentificationData } from '@open-data-capture/common/subject';
 import { DEMO_GROUPS, DEMO_USERS } from '@open-data-capture/demo';
-import { BPRS_SOURCE, EDQ_SOURCE, HQ_SOURCE, MMSE_SOURCE, MOCA_SOURCE } from '@open-data-capture/instrument-library';
+import {
+  briefPsychiatricRatingScale,
+  enhancedDemographicsQuestionnaire,
+  happinessQuestionnaire,
+  miniMentalStateExamination,
+  montrealCognitiveAssessment
+} from '@open-data-capture/instrument-library';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -43,11 +49,11 @@ export class DemoService {
     this.logger.log(`Initializing demo for database: '${dbName}'`);
 
     const forms = await Promise.all([
-      this.instrumentsService.create({ kind: 'FORM', source: BPRS_SOURCE }),
-      this.instrumentsService.create({ kind: 'FORM', source: EDQ_SOURCE }),
-      this.instrumentsService.create({ kind: 'FORM', source: HQ_SOURCE }),
-      this.instrumentsService.create({ kind: 'FORM', source: MMSE_SOURCE }),
-      this.instrumentsService.create({ kind: 'FORM', source: MOCA_SOURCE })
+      this.instrumentsService.create({ kind: 'FORM', source: briefPsychiatricRatingScale.source }),
+      this.instrumentsService.create({ kind: 'FORM', source: enhancedDemographicsQuestionnaire.source }),
+      this.instrumentsService.create({ kind: 'FORM', source: happinessQuestionnaire.source }),
+      this.instrumentsService.create({ kind: 'FORM', source: miniMentalStateExamination.source }),
+      this.instrumentsService.create({ kind: 'FORM', source: montrealCognitiveAssessment.source })
     ]);
 
     const groups: Group[] = [];

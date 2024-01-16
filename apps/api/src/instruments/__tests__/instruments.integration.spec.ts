@@ -1,12 +1,17 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
-import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import { BPRS_SOURCE, EDQ_SOURCE, HQ_SOURCE, MMSE_SOURCE, MOCA_SOURCE } from '@open-data-capture/instrument-library';
+import {
+  briefPsychiatricRatingScale,
+  enhancedDemographicsQuestionnaire,
+  happinessQuestionnaire,
+  miniMentalStateExamination,
+  montrealCognitiveAssessment
+} from '@open-data-capture/instrument-library';
 import { Types } from 'mongoose';
 import request from 'supertest';
 
@@ -16,6 +21,7 @@ import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsService } from '../instruments.service';
+
 describe('/instruments', () => {
   let app: NestExpressApplication;
   let server: any;
@@ -32,7 +38,6 @@ describe('/instruments', () => {
       logger: false
     });
 
-    app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
     instrumentModel = app.get(getModelToken('Instrument'));
@@ -46,38 +51,40 @@ describe('/instruments', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request where name is an empty string', async () => {
-      const source = HQ_SOURCE.replace("name: 'HappinessQuestionnaire'", "name: ''");
+      const source = happinessQuestionnaire.source.replace("name: 'HappinessQuestionnaire'", "name: ''");
       const response = await request(server).post('/instruments').send({ source });
       expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
     it('should reject a request with an invalid language', async () => {
-      const source = HQ_SOURCE.replace("language: ['en', 'fr']", 'language: -1');
+      const source = happinessQuestionnaire.source.replace("language: ['en', 'fr']", 'language: -1');
       const response = await request(server).post('/instruments').send({ source });
       expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
     it('should reject a request if one of the language translations is missing', async () => {
-      const source = HQ_SOURCE.replace("fr: 'Questionnaire sur le bonheur'", '');
+      const source = happinessQuestionnaire.source.replace("fr: 'Questionnaire sur le bonheur'", '');
       const response = await request(server).post('/instruments').send({ source });
       expect(response.status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
     it('should return status code 201 when attempting to create the BPRS', async () => {
-      const response = await request(server).post('/instruments').send({ source: BPRS_SOURCE });
+      const response = await request(server).post('/instruments').send({ source: briefPsychiatricRatingScale.source });
       expect(response.status).toBe(HttpStatus.CREATED);
     });
     it('should return status code 201 when attempting to create the enhanced demographics questionnaire', async () => {
-      const response = await request(server).post('/instruments').send({ source: EDQ_SOURCE });
+      const response = await request(server)
+        .post('/instruments')
+        .send({ source: enhancedDemographicsQuestionnaire.source });
       expect(response.status).toBe(HttpStatus.CREATED);
     });
     it('should return status code 201 when attempting to create the happiness questionnaire', async () => {
-      const response = await request(server).post('/instruments').send({ source: HQ_SOURCE });
+      const response = await request(server).post('/instruments').send({ source: happinessQuestionnaire.source });
       expect(response.status).toBe(HttpStatus.CREATED);
     });
     it('should return status code 201 when attempting to create the MMSE', async () => {
-      const response = await request(server).post('/instruments').send({ source: MMSE_SOURCE });
+      const response = await request(server).post('/instruments').send({ source: miniMentalStateExamination.source });
       expect(response.status).toBe(HttpStatus.CREATED);
     });
     it('should return status code 201 when attempting to create the MoCA', async () => {
-      const response = await request(server).post('/instruments').send({ source: MOCA_SOURCE });
+      const response = await request(server).post('/instruments').send({ source: montrealCognitiveAssessment.source });
       expect(response.status).toBe(HttpStatus.CREATED);
     });
   });

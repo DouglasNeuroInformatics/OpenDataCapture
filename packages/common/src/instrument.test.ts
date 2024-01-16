@@ -1,8 +1,20 @@
 import { describe, expect, it } from 'bun:test';
 
-import { BPRS, EDQ, HQ, MMSE, MOCA } from '@open-data-capture/instrument-library';
+import {
+  briefPsychiatricRatingScale,
+  enhancedDemographicsQuestionnaire,
+  happinessQuestionnaire,
+  miniMentalStateExamination,
+  montrealCognitiveAssessment
+} from '@open-data-capture/instrument-library';
 
-import { $Instrument } from './instrument';
+import { $Instrument, evaluateInstrument } from './instrument';
+
+const BPRS = await evaluateInstrument(briefPsychiatricRatingScale.bundle);
+const EDQ = await evaluateInstrument(enhancedDemographicsQuestionnaire.bundle);
+const HQ = await evaluateInstrument(happinessQuestionnaire.bundle);
+const MMSE = await evaluateInstrument(miniMentalStateExamination.bundle);
+const MOCA = await evaluateInstrument(montrealCognitiveAssessment.bundle);
 
 describe('$Instrument', () => {
   it('should parse the brief psychiatric rating scale', () => {

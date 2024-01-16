@@ -1,28 +1,27 @@
 import { describe, expect, it } from 'bun:test';
 
 import {
-  BPRS,
-  BPRS_SOURCE,
-  EDQ,
-  EDQ_SOURCE,
-  HQ,
-  HQ_SOURCE,
-  MMSE,
-  MMSE_SOURCE,
-  MOCA,
-  MOCA_SOURCE
+  briefPsychiatricRatingScale,
+  enhancedDemographicsQuestionnaire,
+  happinessQuestionnaire,
+  miniMentalStateExamination,
+  montrealCognitiveAssessment
 } from '@open-data-capture/instrument-library';
-import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 
 import { evaluateInstrument } from './instrument.utils';
 
-const transformer = new InstrumentTransformer();
+const BPRS = await evaluateInstrument(briefPsychiatricRatingScale.bundle);
+const EDQ = await evaluateInstrument(enhancedDemographicsQuestionnaire.bundle);
+const HQ = await evaluateInstrument(happinessQuestionnaire.bundle);
+const MMSE = await evaluateInstrument(miniMentalStateExamination.bundle);
+const MOCA = await evaluateInstrument(montrealCognitiveAssessment.bundle);
 
-const BPRS_BUNDLE = await transformer.generateBundle(BPRS_SOURCE);
-const EDQ_BUNDLE = await transformer.generateBundle(EDQ_SOURCE);
-const HQ_BUNDLE = await transformer.generateBundle(HQ_SOURCE);
-const MMSE_BUNDLE = await transformer.generateBundle(MMSE_SOURCE);
-const MOCA_BUNDLE = await transformer.generateBundle(MOCA_SOURCE);
+
+const BPRS_BUNDLE = briefPsychiatricRatingScale.bundle;
+const EDQ_BUNDLE = enhancedDemographicsQuestionnaire.bundle;
+const HQ_BUNDLE = happinessQuestionnaire.bundle;
+const MMSE_BUNDLE = miniMentalStateExamination.bundle;
+const MOCA_BUNDLE = montrealCognitiveAssessment.bundle;
 
 describe('evaluateInstrument', () => {
   it('should evaluate the brief psychiatric rating scale', () => {
