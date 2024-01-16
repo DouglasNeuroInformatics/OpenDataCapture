@@ -1,5 +1,7 @@
 // @ts-check
 
+import fs from 'fs/promises';
+
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 
 /** @returns {import('rollup').Plugin} */
@@ -11,12 +13,9 @@ const instrument = () => {
   return {
     async load(id) {
       if (id.endsWith(suffix)) {
-        const module = await this.load({ id: removeSuffix(id) });
-        if (!module.code) {
-          throw new Error(`Code for module '${id}' should not be null'`);
-        }
-        const bundle = await transformer.generateBundle(module.code);
-        return { code: `export default { bundle: ${JSON.stringify(bundle)}, source: ${JSON.stringify(module.code)} }` };
+        const source = await fs.readFile(removeSuffix(id), 'utf-8');
+        const bundle = await transformer.generateBundle(source);
+        return { code: `export default { bundle: ${JSON.stringify(bundle)}, source: ${JSON.stringify(source)} }` };
       }
       return null;
     },
