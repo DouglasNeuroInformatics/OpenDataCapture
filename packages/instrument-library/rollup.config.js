@@ -3,7 +3,7 @@
 import path from 'path';
 import url from 'url';
 
-import raw from '@open-data-capture/rollup-plugin-raw';
+import instrument from '@open-data-capture/rollup-plugin-instrument';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
@@ -19,10 +19,10 @@ export default defineConfig({
     generatedCode: 'es2015'
   },
   plugins: [
-    raw(),
+    instrument(),
     resolve({
       browser: true,
-      extensions: ['.js', '.ts']
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
     }),
     typescript()
   ]

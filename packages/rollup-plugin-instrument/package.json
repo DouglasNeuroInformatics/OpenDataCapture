@@ -1,0 +1,17 @@
+{
+  "name": "@open-data-capture/rollup-plugin-instrument",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "eslint --fix src"
+  },
+  "dependencies": {
+    "@open-data-capture/instrument-transformer": "workspace:*"
+  },
+  "peerDependencies": {
+    "rollup": "4.x"
+  }
+}

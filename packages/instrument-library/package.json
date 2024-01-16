@@ -15,6 +15,6 @@
     "@open-data-capture/instrument-transformer": "workspace:*"
   },
   "devDependencies": {
-    "@open-data-capture/rollup-plugin-raw": "workspace:*"
+    "@open-data-capture/rollup-plugin-instrument": "workspace:*"
   }
 }
