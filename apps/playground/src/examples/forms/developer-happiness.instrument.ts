@@ -3,23 +3,24 @@
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-type DeveloperHappinessData = {
-  developerHappiness: number;
-  reasonForSadness?: string;
-  recentCommits: {
-    commitDescription: string;
-    dateOfMerge?: Date;
-    id: string;
-    isMerged: boolean;
-  }[];
-};
-
 const instrumentFactory = new InstrumentFactory({
   kind: 'FORM',
-  language: 'en'
+  language: 'en',
+  validationSchema: z.object({
+    developerHappiness: z.number().min(0).max(10),
+    reasonForSadness: z.string().optional(),
+    recentCommits: z.array(
+      z.object({
+        id: z.string(),
+        commitDescription: z.string(),
+        isMerged: z.boolean(),
+        dateOfMerge: z.date().optional()
+      })
+    )
+  })
 });
 
-export default instrumentFactory.defineInstrument<DeveloperHappinessData>({
+export default instrumentFactory.defineInstrument({
   name: 'TestInstrument',
   tags: ['Well-Being'],
   version: 1.1,
@@ -71,17 +72,5 @@ export default instrumentFactory.defineInstrument<DeveloperHappinessData>({
         commitDescription: { kind: 'text', label: 'Describe the commit', variant: 'short' }
       }
     }
-  },
-  validationSchema: z.object({
-    developerHappiness: z.number().min(0).max(10),
-    reasonForSadness: z.string().optional(),
-    recentCommits: z.array(
-      z.object({
-        id: z.string(),
-        commitDescription: z.string(),
-        isMerged: z.boolean(),
-        dateOfMerge: z.date().optional()
-      })
-    )
-  })
+  }
 });

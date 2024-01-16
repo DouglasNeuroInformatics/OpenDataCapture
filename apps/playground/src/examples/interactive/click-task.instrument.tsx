@@ -2,16 +2,13 @@ const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { useEffect, useState } = await import('/runtime/v0.0.1/react.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-type ClickTaskData = {
-  count: number;
-};
-
 const instrumentFactory = new InstrumentFactory({
   kind: 'INTERACTIVE',
-  language: 'en'
+  language: 'en',
+  validationSchema: z.any()
 });
 
-export default instrumentFactory.defineInstrument<ClickTaskData>({
+export default instrumentFactory.defineInstrument({
   content: {
     render: (done) => {
       const [count, setCount] = useState(0);
@@ -55,6 +52,5 @@ export default instrumentFactory.defineInstrument<ClickTaskData>({
   },
   name: 'InteractiveInstrument',
   tags: ['Interactive'],
-  validationSchema: z.any(),
   version: 1.0
 });

@@ -4,27 +4,28 @@
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-type GenericFormInstrumentData = {
-  binaryCheck: boolean;
-  binaryRadio: boolean;
-  date: Date;
-  numericDefault: number;
-  numericSlider: number;
-  optionsField: 'a' | 'b' | 'c';
-  textLong: string;
-  textPassword: string;
-  textShort: string;
-  arrayField: {
-    name: string;
-  }[];
-};
-
 const instrumentFactory = new InstrumentFactory({
   kind: 'FORM',
-  language: 'en'
+  language: 'en',
+  validationSchema: z.object({
+    binaryCheck: z.boolean(),
+    binaryRadio: z.boolean(),
+    date: z.date(),
+    numericDefault: z.number(),
+    numericSlider: z.number(),
+    optionsField: z.enum(['a', 'b', 'c']),
+    textLong: z.string(),
+    textPassword: z.string(),
+    textShort: z.string(),
+    arrayField: z.array(
+      z.object({
+        name: z.string()
+      })
+    )
+  })
 });
 
-export default instrumentFactory.defineInstrument<GenericFormInstrumentData>({
+export default instrumentFactory.defineInstrument({
   name: 'GenericInstrument',
   tags: ['Example'],
   version: 1.0,
@@ -97,20 +98,4 @@ export default instrumentFactory.defineInstrument<GenericFormInstrumentData>({
     estimatedDuration: 5,
     instructions: ['Please complete all questions']
   },
-  validationSchema: z.object({
-    binaryCheck: z.boolean(),
-    binaryRadio: z.boolean(),
-    date: z.date(),
-    numericDefault: z.number(),
-    numericSlider: z.number(),
-    optionsField: z.enum(['a', 'b', 'c']),
-    textLong: z.string(),
-    textPassword: z.string(),
-    textShort: z.string(),
-    arrayField: z.array(
-      z.object({
-        name: z.string()
-      })
-    )
-  })
 });
