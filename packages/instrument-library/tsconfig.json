@@ -4,7 +4,7 @@
     "emitDeclarationOnly": true,
     "jsx": "react-jsx",
     "noEmit": false,
-    "outDir": "dist",
+    "outDir": "lib",
     "types": ["bun-types"]
   },
   "extends": "../../tsconfig.base.json",

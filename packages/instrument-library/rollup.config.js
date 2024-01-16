@@ -14,7 +14,7 @@ export default defineConfig({
   external: [/^\/runtime\/.*$/],
   input: path.resolve(__dirname, 'src', 'index.ts'),
   output: {
-    dir: path.resolve(__dirname, 'dist'),
+    dir: path.resolve(__dirname, 'lib'),
     format: 'es',
     generatedCode: 'es2015'
   },
