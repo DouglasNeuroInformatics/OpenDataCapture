@@ -2,10 +2,11 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "allowJs": true,
-    "esModuleInterop": true,
+    "checkJs": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "lib": ["ESNext"],
+    "maxNodeModuleJsDepth": 0,
     "module": "ESNext",
     "moduleDetection": "force",
     "moduleResolution": "Bundler",
