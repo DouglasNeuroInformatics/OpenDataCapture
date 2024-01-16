@@ -1,11 +1,11 @@
 /// <reference types="@open-data-capture/rollup-plugin-instrument/client" />
 
-declare module '@open-data-capture/instrument-library/forms/*' {
+declare module '@open-data-capture/instrument-library/forms/*.js' {
   const content: any;
   export default content;
 }
 
-declare module '@open-data-capture/instrument-library/interactive/*' {
+declare module '@open-data-capture/instrument-library/interactive/*.jsx' {
   const content: any;
   export default content;
 }

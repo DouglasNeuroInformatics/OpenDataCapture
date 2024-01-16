@@ -8,12 +8,12 @@
       "import": "./lib/index.js",
       "types": "./src/types.d.ts"
     },
-    "./forms/*": {
-      "import": "./src/forms/*",
+    "./forms/*.js": {
+      "import": "./src/forms/*.js",
       "types": "./src/types.d.ts"
     },
-    "./interactive/*": {
-      "import": "./src/interactive/*",
+    "./interactive/*.jsx": {
+      "import": "./src/interactive/*.jsx",
       "types": "./src/types.d.ts"
     }
   },

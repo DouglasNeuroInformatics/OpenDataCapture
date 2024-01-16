@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 
-import briefPsychiatricRatingScale from '@open-data-capture/instrument-library/forms/brief-psychiatric-rating-scale';
-import enhancedDemographicsQuestionnaire from '@open-data-capture/instrument-library/forms/enhanced-demographics-questionnaire';
-import happinessQuestionnaire from '@open-data-capture/instrument-library/forms/happiness-questionnaire';
-import miniMentalStateExamination from '@open-data-capture/instrument-library/forms/mini-mental-state-examination';
-import montrealCognitiveAssessment from '@open-data-capture/instrument-library/forms/montreal-cognitive-assessment';
+import briefPsychiatricRatingScale from '@open-data-capture/instrument-library/forms/brief-psychiatric-rating-scale.js';
+import enhancedDemographicsQuestionnaire from '@open-data-capture/instrument-library/forms/enhanced-demographics-questionnaire.js';
+import happinessQuestionnaire from '@open-data-capture/instrument-library/forms/happiness-questionnaire.js';
+import miniMentalStateExamination from '@open-data-capture/instrument-library/forms/mini-mental-state-examination.js';
+import montrealCognitiveAssessment from '@open-data-capture/instrument-library/forms/montreal-cognitive-assessment.js';
 
 import { $Instrument } from './instrument';
 
