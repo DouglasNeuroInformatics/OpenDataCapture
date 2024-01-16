@@ -1,5 +1,3 @@
-// @ts-check
-
 import fs from 'fs/promises';
 
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';

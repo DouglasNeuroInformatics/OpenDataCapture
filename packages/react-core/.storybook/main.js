@@ -1,5 +1,3 @@
-// @ts-check
-
 import runtime from '@open-data-capture/vite-plugin-runtime';
 import { mergeConfig } from 'vite';
 

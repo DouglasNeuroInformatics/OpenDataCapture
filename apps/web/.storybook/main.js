@@ -1,5 +1,3 @@
-// @ts-check
-
 import path from 'node:path';
 
 import { mergeConfig } from 'vite';

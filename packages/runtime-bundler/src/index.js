@@ -1,5 +1,3 @@
-// @ts-check
-
 import fs from 'fs';
 import module from 'module';
 import path from 'path';
