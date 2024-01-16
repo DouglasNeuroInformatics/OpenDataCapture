@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../jsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
     "emitDecoratorMetadata": true,

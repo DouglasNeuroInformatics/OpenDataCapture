@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import path from 'node:path';
 import url from 'node:url';
 
@@ -105,7 +107,7 @@ export default [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: path.resolve(__dirname, 'tsconfig.base.json'),
+        project: path.resolve(__dirname, 'jsconfig.json'),
         sourceType: 'module'
       }
     },

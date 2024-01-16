@@ -7,7 +7,7 @@ FROM base as builder
 WORKDIR /src
 COPY apps/gateway/ ./apps/gateway
 COPY packages/ ./packages
-COPY package.json tsconfig.base.json turbo.json ./
+COPY package.json jsconfig.json turbo.json ./
 RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/gateway
 

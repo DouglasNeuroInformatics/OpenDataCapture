@@ -17,6 +17,6 @@
     "target": "ES6"
   },
   "exclude": ["node_modules"],
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../jsconfig.json",
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
 }

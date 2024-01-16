@@ -5,6 +5,6 @@
     "jsx": "react-jsx",
     "resolveJsonModule": true
   },
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../jsconfig.json",
   "include": ["src/**/*"]
 }

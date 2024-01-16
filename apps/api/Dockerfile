@@ -6,7 +6,7 @@ WORKDIR /app
 FROM base AS builder
 COPY apps/api/ ./apps/api
 COPY packages/ ./packages
-COPY package.json tsconfig.base.json turbo.json ./
+COPY package.json jsconfig.json turbo.json ./
 RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/api
 

@@ -5,7 +5,7 @@ FROM base AS builder
 WORKDIR /src
 COPY apps/playground/ ./apps/playground
 COPY packages/ ./packages
-COPY package.json tsconfig.base.json turbo.json ./
+COPY package.json jsconfig.json turbo.json ./
 RUN npm install -g bun@1.0.11
 RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/playground

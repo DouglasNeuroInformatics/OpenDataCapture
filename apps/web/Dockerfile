@@ -6,7 +6,7 @@ ARG VITE_API_BASE_URL
 WORKDIR /src
 COPY apps/web/ ./apps/web
 COPY packages/ ./packages
-COPY package.json tsconfig.base.json turbo.json ./
+COPY package.json jsconfig.json turbo.json ./
 RUN npm install -g bun@1.0.11
 RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/web
