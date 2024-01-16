@@ -7,6 +7,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "build": "rm -rf dist && tsc && rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
