@@ -25,5 +25,5 @@
     "types": ["bun-types"],
     "verbatimModuleSyntax": true
   },
-  "exclude": ["**/node_modules", "**/.*/"]
+  "exclude": ["docs/*", "**/dist", "**/lib", "**/node_modules"]
 }

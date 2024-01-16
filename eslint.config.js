@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   {
-    ignores: ['**/.astro/*', '**/.next/*', '**/build/*', '**/dist/*']
+    ignores: ['**/.astro/*', '**/.next/*', '**/build/*', '**/dist/*', '**/node_modules/*']
   },
   {
     files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs', '**/*.ts', '**/*.tsx'],
