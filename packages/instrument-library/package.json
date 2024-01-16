@@ -4,10 +4,13 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
   "scripts": {
-    "build": "rm -rf dist && tsc && rollup -c",
+    "build": "rm -rf dist && tsc && bunx --bun rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
