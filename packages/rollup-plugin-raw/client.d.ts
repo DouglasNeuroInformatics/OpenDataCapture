@@ -1,4 +1,4 @@
 declare module '*?raw' {
   const content: string;
-  export default string;
+  export default content;
 }
