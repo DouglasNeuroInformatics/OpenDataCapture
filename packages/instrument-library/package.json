@@ -6,11 +6,11 @@
   "exports": {
     ".": {
       "import": "./lib/index.js",
-      "types": "./lib/index.d.ts"
+      "types": "./src/types.d.ts"
     }
   },
   "scripts": {
-    "build:lib": "rm -rf dist && tsc && bunx --bun rollup -c",
+    "build:lib": "rm -rf lib && bunx --bun rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
@@ -18,6 +18,8 @@
     "@open-data-capture/instrument-transformer": "workspace:*"
   },
   "devDependencies": {
-    "@open-data-capture/rollup-plugin-instrument": "workspace:*"
+    "@open-data-capture/rollup-plugin-instrument": "workspace:*",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "rollup": "^4.9.4"
   }
 }

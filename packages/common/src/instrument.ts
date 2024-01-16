@@ -56,7 +56,7 @@ export type InstrumentDef<
   TKind extends InstrumentKind,
   TData extends DiscriminatedInstrumentData<TKind>,
   TLanguage extends InstrumentLanguage
-> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage, { strict: true }>, 'kind' | 'language'>;
+> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage, { strict: true }>, 'kind' | 'language' | 'validationSchema'>;
 
 export * from './instrument.base';
 export * from './instrument.form';

@@ -1,5 +1,3 @@
-import '@open-data-capture/rollup-plugin-instrument/client';
-
 export { default as briefPsychiatricRatingScale } from './forms/brief-psychiatric-rating-scale?instrument';
 export { default as enhancedDemographicsQuestionnaire } from './forms/enhanced-demographics-questionnaire?instrument';
 export { default as happinessQuestionnaire } from './forms/happiness-questionnaire?instrument';

@@ -7,10 +7,16 @@ import type {
   StrictFormInstrument
 } from '@open-data-capture/common/instrument';
 
-export class InstrumentFactory<TKind extends InstrumentKind, TLanguage extends InstrumentLanguage> {
-  constructor(private options: { kind: TKind; language: TLanguage }) {}
+import { z } from './zod';
 
-  defineInstrument<TData extends DiscriminatedInstrumentData<TKind>>(def: InstrumentDef<TKind, TData, TLanguage>) {
+export class InstrumentFactory<
+  TKind extends InstrumentKind,
+  TLanguage extends InstrumentLanguage,
+  TSchema extends z.ZodType<DiscriminatedInstrumentData<TKind>>
+> {
+  constructor(private options: { kind: TKind; language: TLanguage; validationSchema: TSchema }) {}
+
+  defineInstrument(def: InstrumentDef<TKind, z.infer<TSchema>, TLanguage>) {
     return { ...this.options, ...def };
   }
 }

@@ -1,45 +1,64 @@
+// @ts-check
+
 /* eslint-disable perfectionist/sort-objects */
 
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-type Language = Extract<import('/runtime/v0.0.1/core.js').InstrumentLanguage, string>;
+/** @typedef {Extract<import('/runtime/v0.0.1/core.js').InstrumentLanguage, string>} Language */
 
-type MultilingualOptions = Record<
-  string,
-  {
-    [L in Language]: string;
-  }
->;
+/** @typedef {Record<string, { [L in Language]: string; }>} MultilingualOptions */
 
-type TranslatedOptions<T extends MultilingualOptions> = {
-  [K in keyof T]: string;
-};
+/**
+ * @typedef {{ [K in keyof T]: string; }} TranslatedOptions
+ * @template {MultilingualOptions} T
+ */
 
-type FormattedOptions<T extends MultilingualOptions> = {
-  [L in Language]: {
-    [K in keyof T]: string;
-  };
-};
+/**
+ * @typedef {{ [L in Language]: { [K in keyof T]: string; }; }} FormattedOptions
+ * @template {MultilingualOptions} T
+ */
 
-function translateOptions<T extends MultilingualOptions>(options: T, language: Language): TranslatedOptions<T> {
-  const translatedOptions: Partial<TranslatedOptions<T>> = {};
+/**
+ * Translates multilingual options to the specified language.
+ *
+ * @template {MultilingualOptions} T
+ * @param {T} options - The multilingual options to translate.
+ * @param {Language} language - The target language.
+ * @returns {TranslatedOptions<T>} The translated options.
+ */
+function translateOptions(options, language) {
+  /** @type {Partial<TranslatedOptions<T>>} */
+  const translatedOptions = {};
   for (const option in options) {
     translatedOptions[option] = options[option]?.[language];
   }
-  return translatedOptions as TranslatedOptions<T>;
+  return /** @type {TranslatedOptions<T>} */ (translatedOptions);
 }
 
-/** Transform multilingual options to options for a multilingual instrument */
-function formatTranslatedOptions<T extends MultilingualOptions>(options: T): FormattedOptions<T> {
+/**
+ * Transform multilingual options to options for a multilingual instrument.
+ *
+ * @template {MultilingualOptions} T
+ * @param {T} options - The multilingual options to format.
+ * @returns {FormattedOptions<T>} The formatted options.
+ */
+function formatTranslatedOptions(options) {
   return {
     en: translateOptions(options, 'en'),
     fr: translateOptions(options, 'fr')
   };
 }
 
-function extractKeysAsTuple<T extends Record<string, unknown>>(options: T) {
-  return Object.keys(options) as [keyof T, ...(keyof T)[]];
+/**
+ * Extracts keys from an object as a tuple.
+ *
+ * @template {Record<string, unknown>} T
+ * @param {T} options - The object to extract keys from.
+ * @returns {[keyof T, ...(keyof T)[]]} The keys as a tuple.
+ */
+function extractKeysAsTuple(options) {
+  return /** @type {[keyof T, ...(keyof T)[]]} */ (Object.keys(options));
 }
 
 const employmentStatus = {
@@ -572,14 +591,7 @@ const religion = {
   }
 };
 
-type EmploymentStatus = keyof typeof employmentStatus;
-type EthnicOrigin = keyof typeof ethnicOrigin;
-type FirstLanguage = keyof typeof firstLanguage;
-type Gender = keyof typeof gender;
-type MartialStatus = keyof typeof maritalStatus;
-type Religion = keyof typeof religion;
-
-const yesNoOptions = {
+const yesNoOptions = /** @type {const} */ ({
   en: {
     f: 'No',
     t: 'Yes'
@@ -588,43 +600,33 @@ const yesNoOptions = {
     f: 'Non',
     t: 'Oui'
   }
-} as const;
-
-type EnhancedDemographicsQuestionnaireData = {
-  ageAtImmigration?: number;
-  // Economic
-  annualIncome?: number;
-  employmentStatus?: EmploymentStatus;
-
-  ethnicOrigin?: EthnicOrigin;
-  // Language
-  firstLanguage?: FirstLanguage;
-  // Personal Characteristics
-  gender?: Gender;
-
-  householdSize?: number;
-  // Immigration
-  isCanadianCitizen?: boolean;
-  maritalStatus?: MartialStatus;
-  numberChildren?: number;
-
-  // Living Situation
-  postalCode?: string;
-  religion?: Religion;
-
-  speaksEnglish?: boolean;
-
-  speaksFrench?: boolean;
-  // Education
-  yearsOfEducation?: number;
-};
+});
 
 const instrumentFactory = new InstrumentFactory({
   kind: 'FORM',
-  language: ['en', 'fr']
+  language: ['en', 'fr'],
+  validationSchema: z
+    .object({
+      ageAtImmigration: z.number().int().gte(1).lte(100),
+      annualIncome: z.number().int().gte(0).lte(1000000),
+      employmentStatus: z.enum(extractKeysAsTuple(employmentStatus)),
+      ethnicOrigin: z.enum(extractKeysAsTuple(ethnicOrigin)),
+      firstLanguage: z.enum(extractKeysAsTuple(firstLanguage)),
+      gender: z.enum(extractKeysAsTuple(gender)),
+      householdSize: z.number().int().gte(0).lte(20),
+      isCanadianCitizen: z.boolean(),
+      maritalStatus: z.enum(extractKeysAsTuple(maritalStatus)),
+      numberChildren: z.number().int().gte(0).lte(20),
+      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
+      religion: z.enum(extractKeysAsTuple(religion)),
+      speaksEnglish: z.boolean(),
+      speaksFrench: z.boolean(),
+      yearsOfEducation: z.number().int().gte(0).lte(30)
+    })
+    .partial()
 });
 
-export default instrumentFactory.defineInstrument<EnhancedDemographicsQuestionnaireData>({
+export default instrumentFactory.defineInstrument({
   name: 'EnhancedDemographicsQuestionnaire',
   tags: {
     en: ['Demographics'],
@@ -832,24 +834,5 @@ export default instrumentFactory.defineInstrument<EnhancedDemographicsQuestionna
       en: 'Enhanced Demographics Questionnaire',
       fr: 'Questionnaire démographique détaillé'
     }
-  },
-  validationSchema: z
-    .object({
-      ageAtImmigration: z.number().int().gte(1).lte(100),
-      annualIncome: z.number().int().gte(0).lte(1000000),
-      employmentStatus: z.enum(extractKeysAsTuple(employmentStatus)),
-      ethnicOrigin: z.enum(extractKeysAsTuple(ethnicOrigin)),
-      firstLanguage: z.enum(extractKeysAsTuple(firstLanguage)),
-      gender: z.enum(extractKeysAsTuple(gender)),
-      householdSize: z.number().int().gte(0).lte(20),
-      isCanadianCitizen: z.boolean(),
-      maritalStatus: z.enum(extractKeysAsTuple(maritalStatus)),
-      numberChildren: z.number().int().gte(0).lte(20),
-      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
-      religion: z.enum(extractKeysAsTuple(religion)),
-      speaksEnglish: z.boolean(),
-      speaksFrench: z.boolean(),
-      yearsOfEducation: z.number().int().gte(0).lte(30)
-    })
-    .partial()
+  }
 });

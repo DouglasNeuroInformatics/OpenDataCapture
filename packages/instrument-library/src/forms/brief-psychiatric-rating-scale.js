@@ -1,35 +1,36 @@
+// @ts-check
+
 /* eslint-disable perfectionist/sort-objects */
 
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-type BriefPsychiatricRatingScaleData = {
-  anxiety: number;
-  bluntedAffect: number;
-  conceptualDisorganization: number;
-  depressiveMood: number;
-  disorientation: number;
-  emotionalWithdrawal: number;
-  excitement: number;
-  grandiosity: number;
-  guiltFeelings: number;
-  hallucinatoryBehavior: number;
-  hostility: number;
-  mannerismsAndPosturing: number;
-  motorRetardation: number;
-  somaticConcern: number;
-  suspiciousness: number;
-  tension: number;
-  uncooperativeness: number;
-  unusualThoughtContent: number;
-};
-
 const instrumentFactory = new InstrumentFactory({
   kind: 'FORM',
-  language: 'en'
+  language: 'en',
+  validationSchema: z.object({
+    somaticConcern: z.number().int().min(0).max(7),
+    anxiety: z.number().int().min(0).max(7),
+    emotionalWithdrawal: z.number().int().min(0).max(7),
+    conceptualDisorganization: z.number().int().min(0).max(7),
+    guiltFeelings: z.number().int().min(0).max(7),
+    tension: z.number().int().min(0).max(7),
+    mannerismsAndPosturing: z.number().int().min(0).max(7),
+    grandiosity: z.number().int().min(0).max(7),
+    depressiveMood: z.number().int().min(0).max(7),
+    hostility: z.number().int().min(0).max(7),
+    suspiciousness: z.number().int().min(0).max(7),
+    hallucinatoryBehavior: z.number().int().min(0).max(7),
+    motorRetardation: z.number().int().min(0).max(7),
+    uncooperativeness: z.number().int().min(0).max(7),
+    unusualThoughtContent: z.number().int().min(0).max(7),
+    bluntedAffect: z.number().int().min(0).max(7),
+    excitement: z.number().int().min(0).max(7),
+    disorientation: z.number().int().min(0).max(7)
+  })
 });
 
-export default instrumentFactory.defineInstrument<BriefPsychiatricRatingScaleData>({
+export default instrumentFactory.defineInstrument({
   name: 'BriefPsychiatricRatingScale',
   tags: ['Schizophrenia', 'Psychosis'],
   version: 1,
@@ -219,25 +220,5 @@ export default instrumentFactory.defineInstrument<BriefPsychiatricRatingScaleDat
         return sum;
       }
     }
-  },
-  validationSchema: z.object({
-    somaticConcern: z.number().int().min(0).max(7),
-    anxiety: z.number().int().min(0).max(7),
-    emotionalWithdrawal: z.number().int().min(0).max(7),
-    conceptualDisorganization: z.number().int().min(0).max(7),
-    guiltFeelings: z.number().int().min(0).max(7),
-    tension: z.number().int().min(0).max(7),
-    mannerismsAndPosturing: z.number().int().min(0).max(7),
-    grandiosity: z.number().int().min(0).max(7),
-    depressiveMood: z.number().int().min(0).max(7),
-    hostility: z.number().int().min(0).max(7),
-    suspiciousness: z.number().int().min(0).max(7),
-    hallucinatoryBehavior: z.number().int().min(0).max(7),
-    motorRetardation: z.number().int().min(0).max(7),
-    uncooperativeness: z.number().int().min(0).max(7),
-    unusualThoughtContent: z.number().int().min(0).max(7),
-    bluntedAffect: z.number().int().min(0).max(7),
-    excitement: z.number().int().min(0).max(7),
-    disorientation: z.number().int().min(0).max(7)
-  })
+  }
 });

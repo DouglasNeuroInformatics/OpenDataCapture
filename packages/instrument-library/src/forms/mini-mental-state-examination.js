@@ -1,37 +1,38 @@
+// @ts-check
+
 /* eslint-disable perfectionist/sort-objects */
 
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-type MiniMentalStateExaminationData = {
-  canCopyDesign: number;
-  canFollowOralInstructions: number;
-  canFollowWrittenInstructions: number;
-  canNamePencil: number;
-  canNameWatch: number;
-  canRepeatPhrase: number;
-  canWriteSentence: number;
-  city: number;
-  country: number;
-  date: number;
-  day: number;
-  floor: number;
-  institution: number;
-  learningScore: number;
-  month: number;
-  province: number;
-  recallScore: number;
-  season: number;
-  spellWorldScore: number;
-  year: number;
-};
-
 const instrumentFactory = new InstrumentFactory({
   kind: 'FORM',
-  language: ['en', 'fr']
+  language: ['en', 'fr'],
+  validationSchema: z.object({
+    canCopyDesign: z.number().int().gte(0).lte(1),
+    canFollowOralInstructions: z.number().int().gte(0).lte(3),
+    canFollowWrittenInstructions: z.number().int().gte(0).lte(1),
+    canNamePencil: z.number().int().gte(0).lte(1),
+    canNameWatch: z.number().int().gte(0).lte(1),
+    canRepeatPhrase: z.number().int().gte(0).lte(1),
+    canWriteSentence: z.number().int().gte(0).lte(1),
+    city: z.number().int().gte(0).lte(1),
+    country: z.number().int().gte(0).lte(1),
+    date: z.number().int().gte(0).lte(1),
+    day: z.number().int().gte(0).lte(1),
+    floor: z.number().int().gte(0).lte(1),
+    institution: z.number().int().gte(0).lte(1),
+    learningScore: z.number().int().gte(0).lte(3),
+    month: z.number().int().gte(0).lte(1),
+    province: z.number().int().gte(0).lte(1),
+    recallScore: z.number().int().gte(0).lte(3),
+    season: z.number().int().gte(0).lte(1),
+    spellWorldScore: z.number().int().gte(0).lte(5),
+    year: z.number().int().gte(0).lte(1)
+  })
 });
 
-export default instrumentFactory.defineInstrument<MiniMentalStateExaminationData>({
+export default instrumentFactory.defineInstrument({
   name: 'MiniMentalStateExamination',
   tags: {
     en: ['Cognitive'],
@@ -465,27 +466,5 @@ export default instrumentFactory.defineInstrument<MiniMentalStateExaminationData
         return sum;
       }
     }
-  },
-  validationSchema: z.object({
-    canCopyDesign: z.number().int().gte(0).lte(1),
-    canFollowOralInstructions: z.number().int().gte(0).lte(3),
-    canFollowWrittenInstructions: z.number().int().gte(0).lte(1),
-    canNamePencil: z.number().int().gte(0).lte(1),
-    canNameWatch: z.number().int().gte(0).lte(1),
-    canRepeatPhrase: z.number().int().gte(0).lte(1),
-    canWriteSentence: z.number().int().gte(0).lte(1),
-    city: z.number().int().gte(0).lte(1),
-    country: z.number().int().gte(0).lte(1),
-    date: z.number().int().gte(0).lte(1),
-    day: z.number().int().gte(0).lte(1),
-    floor: z.number().int().gte(0).lte(1),
-    institution: z.number().int().gte(0).lte(1),
-    learningScore: z.number().int().gte(0).lte(3),
-    month: z.number().int().gte(0).lte(1),
-    province: z.number().int().gte(0).lte(1),
-    recallScore: z.number().int().gte(0).lte(3),
-    season: z.number().int().gte(0).lte(1),
-    spellWorldScore: z.number().int().gte(0).lte(5),
-    year: z.number().int().gte(0).lte(1)
-  })
+  }
 });
