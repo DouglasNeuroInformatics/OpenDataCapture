@@ -16,6 +16,7 @@
     "@headlessui/react": "^1.7.18",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/demo": "workspace:*",
+    "@open-data-capture/instrument-interpreter": "workspace:*",
     "@open-data-capture/instrument-transformer": "workspace:*",
     "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",

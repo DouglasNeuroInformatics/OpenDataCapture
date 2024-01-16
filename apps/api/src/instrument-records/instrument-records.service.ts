@@ -2,13 +2,13 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { linearRegression } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Injectable } from '@nestjs/common';
-import { evaluateInstrument } from '@open-data-capture/common/instrument';
 import type { FormInstrumentMeasures } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@open-data-capture/common/instrument-records';
+import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -21,6 +21,8 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
 export class InstrumentRecordsService {
+  private readonly interpreter = new InstrumentInterpreter();
+
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     private readonly groupsService: GroupsService,
@@ -130,7 +132,7 @@ export class InstrumentRecordsService {
     return await Promise.all(
       records.map(async (record) => {
         if (record.instrument.kind === 'FORM') {
-          const instance = await evaluateInstrument(record.instrument.bundle, { kind: 'FORM' });
+          const instance = await this.interpreter.interpret(record.instrument.bundle, { kind: 'FORM' });
           if (instance.measures) {
             (record as Record<string, any>).computedMeasures = this.computeMeasures(
               instance.measures,

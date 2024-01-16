@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 import type { Instrument, InstrumentKind, InstrumentSummary } from '@open-data-capture/common/instrument';
-import { evaluateInstrument } from '@open-data-capture/common/instrument';
+import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import _ from 'lodash';
 
@@ -14,6 +14,7 @@ import { CreateInstrumentDto } from './dto/create-instrument.dto';
 
 @Injectable()
 export class InstrumentsService {
+  private readonly instrumentInterpreter = new InstrumentInterpreter();
   private readonly instrumentTransformer = new InstrumentTransformer();
 
   constructor(@InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>) {}
@@ -91,7 +92,7 @@ export class InstrumentsService {
     let instance: Extract<Instrument, { kind: TKind }>;
     try {
       bundle = await this.instrumentTransformer.generateBundle(source);
-      instance = await evaluateInstrument(bundle, {
+      instance = await this.instrumentInterpreter.interpret(bundle, {
         kind: options?.kind,
         validate: true
       });

@@ -1,10 +1,13 @@
 import type { Language } from '@open-data-capture/common/core';
-import { $InstrumentBundleContainer, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { $InstrumentBundleContainer } from '@open-data-capture/common/instrument';
 import type { Instrument, InstrumentKind, UnilingualInstrument } from '@open-data-capture/common/instrument';
+import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+
+const interpreter = new InstrumentInterpreter();
 
 export const useInstruments = <TKind extends InstrumentKind>({ params }: { params?: { kind?: TKind } } = {}) => {
   const { i18n } = useTranslation();
@@ -16,7 +19,7 @@ export const useInstruments = <TKind extends InstrumentKind>({ params }: { param
       const bundles = await $InstrumentBundleContainer.array().parseAsync(response.data);
       const instruments = await Promise.all(
         bundles.map(async ({ bundle, id }) => {
-          const instrument: Extract<Instrument, { kind: TKind }> = await evaluateInstrument(bundle, {
+          const instrument: Extract<Instrument, { kind: TKind }> = await interpreter.interpret(bundle, {
             id,
             kind: params?.kind,
             validate: import.meta.env.DEV

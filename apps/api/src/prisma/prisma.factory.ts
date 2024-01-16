@@ -1,5 +1,5 @@
-import { type EvaluateInstrumentOptions, evaluateInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentKind, Prisma, PrismaClient } from '@open-data-capture/database/core';
+import { InstrumentInterpreter, type InstrumentInterpreterOptions } from '@open-data-capture/instrument-interpreter';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 
@@ -29,8 +29,9 @@ export class PrismaFactory {
         instrumentModel: {
           toInstance: {
             compute({ bundle }) {
-              return function <TKind extends InstrumentKind>(options?: EvaluateInstrumentOptions<TKind>) {
-                return evaluateInstrument(bundle, options);
+              return function <TKind extends InstrumentKind>(options?: InstrumentInterpreterOptions<TKind>) {
+                const interpreter = new InstrumentInterpreter();
+                return interpreter.interpret(bundle, options);
               };
             },
             needs: { bundle: true }

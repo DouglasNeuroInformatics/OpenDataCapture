@@ -4,9 +4,12 @@ import { ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment, AssignmentStatus } from '@open-data-capture/common/assignment';
 import type { Language } from '@open-data-capture/common/core';
-import { type Instrument, evaluateInstrument } from '@open-data-capture/common/instrument';
+import { type Instrument } from '@open-data-capture/common/instrument';
+import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
+
+const interpreter = new InstrumentInterpreter();
 
 export type AssignmentTableProps = {
   assignments: Assignment[];
@@ -22,7 +25,7 @@ export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTablePr
     const instruments: Record<string, Instrument> = {};
     const uniqueAssignments = _.uniqWith(assignments, (a, b) => a.id === b.id);
     for (const assignment of uniqueAssignments) {
-      instruments[assignment.id] = await evaluateInstrument(assignment.instrumentBundle, {
+      instruments[assignment.id] = await interpreter.interpret(assignment.instrumentBundle, {
         validate: import.meta.env.DEV
       });
     }

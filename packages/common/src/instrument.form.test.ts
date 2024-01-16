@@ -1,36 +1,29 @@
+/// <reference types="@open-data-capture/instrument-library" />
+
 import { describe, expect, it } from 'bun:test';
 
-import {
-  briefPsychiatricRatingScale,
-  enhancedDemographicsQuestionnaire,
-  happinessQuestionnaire,
-  miniMentalStateExamination,
-  montrealCognitiveAssessment
-} from '@open-data-capture/instrument-library';
+import briefPsychiatricRatingScale from '@open-data-capture/instrument-library/forms/brief-psychiatric-rating-scale';
+import enhancedDemographicsQuestionnaire from '@open-data-capture/instrument-library/forms/enhanced-demographics-questionnaire';
+import happinessQuestionnaire from '@open-data-capture/instrument-library/forms/happiness-questionnaire';
+import miniMentalStateExamination from '@open-data-capture/instrument-library/forms/mini-mental-state-examination';
+import montrealCognitiveAssessment from '@open-data-capture/instrument-library/forms/montreal-cognitive-assessment';
 
 import { $FormInstrument } from './instrument.form';
-import { evaluateInstrument } from './instrument.utils';
-
-const BPRS = await evaluateInstrument(briefPsychiatricRatingScale.bundle);
-const EDQ = await evaluateInstrument(enhancedDemographicsQuestionnaire.bundle);
-const HQ = await evaluateInstrument(happinessQuestionnaire.bundle);
-const MMSE = await evaluateInstrument(miniMentalStateExamination.bundle);
-const MOCA = await evaluateInstrument(montrealCognitiveAssessment.bundle);
 
 describe('$FormInstrument', () => {
   it('should parse the brief psychiatric rating scale', () => {
-    expect($FormInstrument.parse(BPRS)).toMatchObject(BPRS);
+    expect($FormInstrument.parse(briefPsychiatricRatingScale)).toMatchObject(briefPsychiatricRatingScale);
   });
   it('should parse the enhanced demographics questionnaire', () => {
-    expect($FormInstrument.parse(EDQ)).toMatchObject(EDQ);
+    expect($FormInstrument.parse(enhancedDemographicsQuestionnaire)).toMatchObject(enhancedDemographicsQuestionnaire);
   });
   it('should parse the happiness questionnaire', () => {
-    expect($FormInstrument.parse(HQ)).toMatchObject(HQ);
+    expect($FormInstrument.parse(happinessQuestionnaire)).toMatchObject(happinessQuestionnaire);
   });
   it('should parse the mini mental state examination', () => {
-    expect($FormInstrument.parse(MMSE)).toMatchObject(MMSE);
+    expect($FormInstrument.parse(miniMentalStateExamination)).toMatchObject(miniMentalStateExamination);
   });
   it('should parse the montreal cognitive assessment', () => {
-    expect($FormInstrument.parse(MOCA)).toMatchObject(MOCA);
+    expect($FormInstrument.parse(montrealCognitiveAssessment)).toMatchObject(montrealCognitiveAssessment);
   });
 });

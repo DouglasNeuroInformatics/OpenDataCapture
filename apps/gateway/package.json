@@ -17,6 +17,7 @@
     "@douglasneuroinformatics/ui": "latest",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/database": "workspace:*",
+    "@open-data-capture/instrument-interpreter": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
     "@prisma/client": "^5.8.0",
     "i18next": "^23.7.16",
