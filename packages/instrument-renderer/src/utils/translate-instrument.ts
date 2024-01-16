@@ -70,7 +70,7 @@ function translateArrayFieldset(
 ): Base.ArrayFieldset<Base.RequiredArrayFieldsetValue> {
   const transformedFieldset: Types.FormInstrumentArrayFieldset<Language> = {};
   for (const key in fieldset) {
-    const field = fieldset[key]!;
+    const field = fieldset[key];
     if (field.kind === 'dynamic-fieldset') {
       transformedFieldset[key] = {
         kind: 'dynamic-fieldset',
@@ -111,7 +111,7 @@ function translateFormFields(
 ): Base.FormFields {
   const translatedFields: Base.FormFields = {};
   for (const fieldName in fields) {
-    const field = fields[fieldName]!;
+    const field = fields[fieldName];
     if (field.kind === 'dynamic') {
       translatedFields[fieldName] = {
         deps: field.deps,

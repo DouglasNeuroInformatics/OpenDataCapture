@@ -67,7 +67,7 @@ export const SubjectTablePage = () => {
         break;
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(tableData[0]!);
+          const columnNames = Object.keys(tableData[0]);
           const rows = tableData.map((item) => Object.values(item).join(',')).join('\n');
           return Promise.resolve(columnNames + '\n' + rows);
         });

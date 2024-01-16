@@ -114,7 +114,7 @@ export class DemoService {
     } else {
       fields = form.content.reduce((prev, current) => {
         return { ...prev, ...current.fields };
-      }, form.content[0]!.fields) as FormInstrumentFields<TData>;
+      }, form.content[0].fields) as FormInstrumentFields<TData>;
     }
 
     const data: Partial<TData> = {};

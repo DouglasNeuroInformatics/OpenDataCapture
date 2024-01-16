@@ -81,7 +81,7 @@ export const SubjectGraphPage = () => {
       for (const measure in selectedForm.measures) {
         arr.push({
           key: measure,
-          label: selectedForm.measures[measure]!.label
+          label: selectedForm.measures[measure].label
         });
       }
     }
@@ -130,7 +130,7 @@ export const SubjectGraphPage = () => {
 
   const lines: LineGraphLine[] = [];
   for (let i = 0; i < selectedMeasures.length; i++) {
-    const measure = selectedMeasures[i]!;
+    const measure = selectedMeasures[i];
     lines.push({
       name: measure.label,
       stroke: COLOR_PALETTE[i],

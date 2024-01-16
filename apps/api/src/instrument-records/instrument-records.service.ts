@@ -167,9 +167,9 @@ export class InstrumentRecordsService {
       const computedMeasures = this.computeMeasures(instrument.measures, record.data as FormDataType);
       for (const measure in computedMeasures) {
         const x = record.date.getTime();
-        const y = computedMeasures[measure]!;
+        const y = computedMeasures[measure];
         if (Array.isArray(data[measure])) {
-          data[measure]!.push([x, y]);
+          data[measure].push([x, y]);
         } else {
           data[measure] = [[x, y]];
         }
@@ -178,7 +178,7 @@ export class InstrumentRecordsService {
 
     const results: LinearRegressionResults = {};
     for (const measure in data) {
-      results[measure] = linearRegression(data[measure]!);
+      results[measure] = linearRegression(data[measure]);
     }
     return results;
   }
@@ -186,7 +186,7 @@ export class InstrumentRecordsService {
   private computeMeasures(measures: FormInstrumentMeasures, data: FormDataType) {
     const computedMeasures: Record<string, number> = {};
     for (const key in measures) {
-      computedMeasures[key] = measures[key]!.value(data);
+      computedMeasures[key] = measures[key].value(data);
     }
     return computedMeasures;
   }

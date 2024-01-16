@@ -43,7 +43,7 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
               })
             })}
           </p>
-          <div className="flex justify-end gap-4 text-slate-600 print:hidden dark:text-slate-300">
+          <div className="flex justify-end gap-4 text-slate-600 dark:text-slate-300 print:hidden">
             <button type="button">
               <ArrowDownTrayIcon height={20} width={20} onClick={handleDownload} />
             </button>
@@ -101,7 +101,7 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
       />
       <FormSummaryGroup
         items={Object.keys(fields).map((fieldName) => {
-          return match(fields[fieldName]!)
+          return match(fields[fieldName])
             .with({ kind: 'dynamic' }, (field) => {
               const staticField = field.render(data);
               if (!staticField || staticField.kind === 'array') {
