@@ -5,7 +5,6 @@
     "jsx": "react-jsx",
     "noEmit": false,
     "outDir": "lib",
-    "types": ["bun-types"]
   },
   "extends": "../../tsconfig.base.json",
   "include": ["src"]
