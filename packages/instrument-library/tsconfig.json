@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "jsx": "react-jsx",
-    "noEmit": false,
-    "outDir": "lib",
+    "jsx": "react-jsx"
   },
   "extends": "../../tsconfig.base.json",
   "include": ["src"]
