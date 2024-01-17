@@ -20,6 +20,7 @@
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/instrument-interpreter": "workspace:*",
     "@open-data-capture/instrument-library": "workspace:*",
+    "@open-data-capture/instrument-utils": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
     "i18next": "^23.7.16",
