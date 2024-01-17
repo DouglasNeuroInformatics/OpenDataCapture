@@ -33,6 +33,7 @@
     "@heroicons/react": "^2.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@open-data-capture/common": "workspace:*",
+    "@open-data-capture/i18next": "workspace:*",
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
     "i18next": "^23.7.16",
     "monaco-editor": "^0.45.0",
