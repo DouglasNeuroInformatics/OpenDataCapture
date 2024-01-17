@@ -21,9 +21,13 @@ export type AnyInstrument = FormInstrument | InteractiveInstrument;
 
 export const $AnyInstrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies z.ZodType<AnyInstrument>;
 
+export type SomeInstrument<TKind extends InstrumentKind> = Extract<AnyInstrument, { kind: TKind }>;
+
 export type AnyInstrumentSummary = FormInstrumentSummary | InteractiveInstrumentSummary;
 
 export type AnyUnilingualInstrument = FormInstrument<FormDataType, Language> | InteractiveInstrument<Json, Language>;
+
+export type SomeUnilingualInstrument<TKind extends InstrumentKind> = Extract<AnyUnilingualInstrument, { kind: TKind }>;
 
 export type AnyUnilingualInstrumentSummary = InteractiveInstrumentSummary | UnilingualFormInstrumentSummary;
 
