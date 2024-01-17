@@ -26,6 +26,13 @@ import _ from 'lodash';
 
 import { isMultilingualInstrument, isUnilingualInstrument } from './guards';
 
+/**
+ * Determine the target language for translation based on instrument and preferred language.
+ *
+ * @param instrument - The instrument to be translated.
+ * @param preferredLanguage - The user's preferred language.
+ * @returns The target language for translation.
+ */
 function getTargetLanguage(instrument: AnyInstrument, preferredLanguage: Language): Language {
   if (typeof instrument.language === 'string') {
     return instrument.language;
@@ -35,6 +42,13 @@ function getTargetLanguage(instrument: AnyInstrument, preferredLanguage: Languag
   return instrument.language[0];
 }
 
+/**
+ * Translate a primitive field of an instrument to the user's preferred language.
+ *
+ * @param field - The primitive field to be translated.
+ * @param language - The target language for translation.
+ * @returns A translated primitive form field.
+ */
 function translatePrimitiveField(
   field: FormInstrumentPrimitiveField<Language[]>,
   language: Language
@@ -66,6 +80,13 @@ function translatePrimitiveField(
   }
 }
 
+/**
+ * Translate an array fieldset of an instrument to the user's preferred language.
+ *
+ * @param fieldset - The array fieldset to be translated.
+ * @param language - The target language for translation.
+ * @returns A translated array fieldset.
+ */
 function translateArrayFieldset(
   fieldset: FormInstrumentArrayFieldset<Language[]>,
   language: Language
@@ -91,6 +112,13 @@ function translateArrayFieldset(
   return transformedFieldset;
 }
 
+/**
+ * Translate a static field of an instrument to the user's preferred language.
+ *
+ * @param field - The static field to be translated.
+ * @param language - The target language for translation.
+ * @returns A translated static form field.
+ */
 function translateStaticField(
   field: FormInstrumentStaticField<Language[]>,
   language: Language
@@ -107,6 +135,13 @@ function translateStaticField(
   }
 }
 
+/**
+ * Translate a set of form fields of an instrument to the user's preferred language.
+ *
+ * @param fields - The form fields to be translated.
+ * @param language - The target language for translation.
+ * @returns Translated form fields.
+ */
 function translateFormFields(
   fields: Partial<FormInstrumentFields<FormDataType, Language[]>>,
   language: Language
@@ -136,6 +171,13 @@ function translateFormFields(
   return translatedFields;
 }
 
+/**
+ * Translate the content of a multilingual form instrument to the user's preferred language.
+ *
+ * @param content - The content of the instrument.
+ * @param language - The target language for translation.
+ * @returns Translated content of a unilingual form instrument.
+ */
 function translateFormContent(
   content: AnyMultilingualFormInstrument['content'],
   language: Language
@@ -150,6 +192,13 @@ function translateFormContent(
   }));
 }
 
+/**
+ * Translate a multilingual form instrument to the user's preferred language.
+ *
+ * @param form - the form instrument
+ * @param language - The target language for translation.
+ * @returns A translated unilingual form instrument.
+ */
 function translateForm(form: AnyMultilingualFormInstrument, language: Language): AnyUnilingualFormInstrument {
   return {
     ...form,
@@ -166,6 +215,17 @@ function translateForm(form: AnyMultilingualFormInstrument, language: Language):
   };
 }
 
+/**
+ * Translate an instrument to the user's preferred language.
+ *
+ * If the instrument is a unilingual instrument, it will be returned as is. Otherwise, it will
+ * be translated to the user's preferred language, or, if that is not available, the first element
+ * in an array of languages.
+ *
+ * @param instrument - The instrument to be translated.
+ * @param preferredLanguage - The user's preferred language.
+ * @returns A translated unilingual instrument.
+ */
 export function translateInstrument<const TKind extends InstrumentKind>(
   instrument: SomeInstrument<TKind>,
   preferredLanguage: Language
