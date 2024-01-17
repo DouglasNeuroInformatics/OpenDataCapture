@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-implied-eval */
 
-import { $FormInstrument, $Instrument, $InteractiveInstrument } from '@open-data-capture/common/instrument';
-import type { Instrument, InstrumentKind } from '@open-data-capture/common/instrument';
+import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@open-data-capture/common/instrument';
+import type { AnyInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
 
 export type InstrumentInterpreterOptions<TKind extends InstrumentKind> = {
   /** The value to assign to the id property of the instrument */
@@ -14,18 +14,18 @@ export type InstrumentInterpreterOptions<TKind extends InstrumentKind> = {
 
 export class InstrumentInterpreter {
   async interpret<TKind extends InstrumentKind>(bundle: string, options?: InstrumentInterpreterOptions<TKind>) {
-    let instrument: Instrument;
+    let instrument: AnyInstrument;
     try {
       const factory = new Function(`return ${bundle}`);
       const value = (await factory()) as unknown;
       if (!options?.validate) {
-        instrument = value as Extract<Instrument, { kind: TKind }>;
+        instrument = value as Extract<AnyInstrument, { kind: TKind }>;
       } else if (options.kind === 'FORM') {
         instrument = await $FormInstrument.parseAsync(value);
       } else if (options.kind === 'INTERACTIVE') {
         instrument = await $InteractiveInstrument.parseAsync(value);
       } else if (options.kind === undefined) {
-        instrument = await $Instrument.parseAsync(value);
+        instrument = await $AnyInstrument.parseAsync(value);
       } else {
         throw new Error(`Unexpected kind: ${options.kind}`);
       }
@@ -33,6 +33,6 @@ export class InstrumentInterpreter {
       throw new Error(`Failed to evaluate instrument bundle`, { cause: { bundle, error } });
     }
     instrument.id = options?.id;
-    return instrument as Extract<Instrument, { kind: TKind }>;
+    return instrument as Extract<AnyInstrument, { kind: TKind }>;
   }
 }

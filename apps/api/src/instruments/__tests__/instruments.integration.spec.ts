@@ -12,7 +12,7 @@ import {
   miniMentalStateExamination,
   montrealCognitiveAssessment
 } from '@open-data-capture/instrument-library';
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import request from 'supertest';
 
 import type { Model } from '@/prisma/prisma.types';
@@ -104,7 +104,7 @@ describe('/instruments', () => {
   describe('GET /instruments/:id', () => {
     let id: string;
     beforeAll(() => {
-      id = new Types.ObjectId().toString();
+      id = new ObjectId().toHexString();
     });
     it('should return status code 200 with a valid ID', async () => {
       instrumentModel.findFirst.mockResolvedValueOnce({ id, kind: 'FORM' });

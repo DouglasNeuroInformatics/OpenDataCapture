@@ -1,10 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
-import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus, NotFoundException } from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import type { CreateUserData } from '@open-data-capture/common/user';
@@ -48,7 +47,6 @@ describe('/users', () => {
       logger: false
     });
 
-    app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
     groupsService = app.get(GroupsService);

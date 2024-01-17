@@ -1,11 +1,11 @@
 import { Card } from '@douglasneuroinformatics/ui';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { AnyUnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentIcon } from './InstrumentIcon';
 
 export type InstrumentCardProps = {
-  instrument: UnilingualInstrumentSummary
+  instrument: AnyUnilingualInstrumentSummary;
   onClick: () => void;
 };
 

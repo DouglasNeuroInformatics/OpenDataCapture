@@ -17,15 +17,15 @@ import {
 import type { Json, Language } from './core';
 import type { InstrumentKind, InstrumentLanguage } from './instrument.base';
 
-export type Instrument = FormInstrument | InteractiveInstrument;
+export type AnyInstrument = FormInstrument | InteractiveInstrument;
 
-export const $Instrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies z.ZodType<Instrument>;
+export const $AnyInstrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies z.ZodType<AnyInstrument>;
 
-export type InstrumentSummary = FormInstrumentSummary | InteractiveInstrumentSummary;
+export type AnyInstrumentSummary = FormInstrumentSummary | InteractiveInstrumentSummary;
 
-export type UnilingualInstrument = FormInstrument<FormDataType, Language> | InteractiveInstrument<Json, Language>;
+export type AnyUnilingualInstrument = FormInstrument<FormDataType, Language> | InteractiveInstrument<Json, Language>;
 
-export type UnilingualInstrumentSummary = InteractiveInstrumentSummary | UnilingualFormInstrumentSummary;
+export type AnyUnilingualInstrumentSummary = InteractiveInstrumentSummary | UnilingualFormInstrumentSummary;
 
 export type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['FORM']
   ? FormDataType

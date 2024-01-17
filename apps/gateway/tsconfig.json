@@ -16,7 +16,7 @@
     "resolveJsonModule": true,
     "target": "ES6"
   },
-  "exclude": ["node_modules"],
+  "exclude": [".next", "node_modules"],
   "extends": "../../jsconfig.json",
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
 }

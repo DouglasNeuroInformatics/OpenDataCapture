@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { type UnilingualInstrument } from '@open-data-capture/common/instrument';
+import { type AnyUnilingualInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { BrowserInstrumentTransformer } from '@open-data-capture/instrument-transformer/browser';
 import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
@@ -8,7 +8,7 @@ import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
 type BuiltState = {
-  instrument: UnilingualInstrument;
+  instrument: AnyUnilingualInstrument;
   status: 'built';
 };
 
@@ -32,7 +32,7 @@ export function useTranspiler() {
 
   const transpile = useCallback(async (source: string) => {
     setState({ status: 'loading' });
-    let instrument: UnilingualInstrument;
+    let instrument: AnyUnilingualInstrument;
     try {
       const bundle = await instrumentTransformer.generateBundle(source);
       const unknownInstrument = await instrumentInterpreter.interpret(bundle, { validate: false });

@@ -7,7 +7,7 @@ import {
   Spinner,
   useNotificationsStore
 } from '@douglasneuroinformatics/ui';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { AnyUnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +22,7 @@ export const AvailableInstrumentsPage = () => {
   const forms = useAvailableForms();
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'instruments']);
-  const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentSummary[]>([]);
+  const [filteredInstruments, setFilteredInstruments] = useState<AnyUnilingualInstrumentSummary[]>([]);
   const [tagOptions, setTagOptions] = useState<SelectOption[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<SelectOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<SelectOption[]>([]);

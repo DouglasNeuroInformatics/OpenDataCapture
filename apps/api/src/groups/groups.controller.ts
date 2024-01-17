@@ -1,4 +1,4 @@
-import { CurrentUser, type EntityController, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser, type EntityController } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Group } from '@open-data-capture/common/group';
@@ -39,18 +39,14 @@ export class GroupsController implements EntityController<Group> {
   @ApiOperation({ summary: 'Get Group' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Group' })
-  findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability?: AppAbility) {
+  findById(@Param('id') id: string, @CurrentUser('ability') ability?: AppAbility) {
     return this.groupsService.findById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Update Group' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Group' })
-  updateById(
-    @Param('id', ParseIdPipe) id: string,
-    @Body() update: UpdateGroupDto,
-    @CurrentUser('ability') ability?: AppAbility
-  ) {
+  updateById(@Param('id') id: string, @Body() update: UpdateGroupDto, @CurrentUser('ability') ability?: AppAbility) {
     return this.groupsService.updateById(id, update, { ability });
   }
 }

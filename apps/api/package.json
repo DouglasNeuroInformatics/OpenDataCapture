@@ -15,7 +15,6 @@
   "dependencies": {
     "@casl/ability": "^6.5.0",
     "@casl/prisma": "^1.4.1",
-    "@douglasneuroinformatics/ajv": "latest",
     "@douglasneuroinformatics/nestjs": "latest",
     "@douglasneuroinformatics/stats": "latest",
     "@douglasneuroinformatics/utils": "latest",

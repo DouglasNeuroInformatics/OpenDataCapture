@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import type { Instrument, InstrumentKind, InstrumentSummary } from '@open-data-capture/common/instrument';
+import type { AnyInstrument, AnyInstrumentSummary, InstrumentKind } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import _ from 'lodash';
@@ -50,11 +50,11 @@ export class InstrumentsService {
   async findAvailable(
     query: { kind?: InstrumentKind } = {},
     { ability }: EntityOperationOptions = {}
-  ): Promise<InstrumentSummary[]> {
+  ): Promise<AnyInstrumentSummary[]> {
     return this.instrumentModel.findMany({
       select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query, { kind: 'FORM' }] }
-    }) as Promise<InstrumentSummary[]>;
+    }) as Promise<AnyInstrumentSummary[]>;
   }
 
   async findBundles(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
@@ -89,7 +89,7 @@ export class InstrumentsService {
    */
   private async parseSource<TKind extends InstrumentKind>(source: string, options?: { kind?: TKind }) {
     let bundle: string;
-    let instance: Extract<Instrument, { kind: TKind }>;
+    let instance: Extract<AnyInstrument, { kind: TKind }>;
     try {
       bundle = await this.instrumentTransformer.generateBundle(source);
       instance = await this.instrumentInterpreter.interpret(bundle, {

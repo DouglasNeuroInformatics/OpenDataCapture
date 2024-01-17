@@ -4,7 +4,7 @@ import { ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment, AssignmentStatus } from '@open-data-capture/common/assignment';
 import type { Language } from '@open-data-capture/common/core';
-import { type Instrument } from '@open-data-capture/common/instrument';
+import { type AnyInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -18,11 +18,11 @@ export type AssignmentTableProps = {
 
 export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTableProps) => {
   const { i18n, t } = useTranslation('subjects');
-  const [instruments, setInstruments] = useState<Record<string, Instrument>>({});
+  const [instruments, setInstruments] = useState<Record<string, AnyInstrument>>({});
 
   // To be moved to backend
   const evaluateInstruments = async (assignments: Assignment[]) => {
-    const instruments: Record<string, Instrument> = {};
+    const instruments: Record<string, AnyInstrument> = {};
     const uniqueAssignments = _.uniqWith(assignments, (a, b) => a.id === b.id);
     for (const assignment of uniqueAssignments) {
       instruments[assignment.id] = await interpreter.interpret(assignment.instrumentBundle, {
