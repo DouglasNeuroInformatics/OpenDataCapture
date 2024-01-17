@@ -127,6 +127,7 @@ export default [
         'error',
         {
           allowBoolean: true,
+          allowNever: true,
           allowNumber: true
         }
       ],
