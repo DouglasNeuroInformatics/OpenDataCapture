@@ -391,3 +391,7 @@ export const $FormInstrumentSummary = $FormInstrument.omit({ content: true, vali
 
 export type UnilingualFormInstrumentSummary<TData extends Base.FormDataType = Base.FormDataType> =
   FormInstrumentSummary<TData, Language>;
+
+export type AnyMultilingualFormInstrument = FormInstrument<Base.FormDataType, Language[]>;
+
+export type AnyUnilingualFormInstrument = FormInstrument<Base.FormDataType, Language>;
