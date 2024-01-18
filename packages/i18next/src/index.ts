@@ -6,12 +6,14 @@ import { initReactI18next } from 'react-i18next';
 import core from './translations/core.json';
 import { createResources } from './utils';
 
+import type { ExtendedI18NextInstance } from './types';
+
 export const defaultNS = 'core';
 
 const resources = createResources({ core });
 
-export const i18next = {
-  i18n: createInstance({
+const createExtendedInstance = (): ExtendedI18NextInstance => {
+  const baseInstance = createInstance({
     defaultNS,
     fallbackLng: 'en',
     interpolation: {
@@ -20,13 +22,17 @@ export const i18next = {
     resources,
     returnObjects: true,
     supportedLngs: ['en', 'fr']
-  }),
-  async init() {
-    await this.i18n.use(LanguageDetector).use(initReactI18next).init();
-    this.i18n.on('languageChanged', (lang) => {
-      i18nUi.changeLanguage(lang).catch(console.error);
-    });
-  }
+  });
+  return Object.assign(baseInstance, {
+    async initialize(this: ExtendedI18NextInstance) {
+      await this.use(LanguageDetector).use(initReactI18next).init();
+      this.on('languageChanged', (lang) => {
+        i18nUi.changeLanguage(lang).catch(console.error);
+      });
+    }
+  });
 };
+
+export const i18n = createExtendedInstance();
 
 export type { TranslatedResource } from './types';
