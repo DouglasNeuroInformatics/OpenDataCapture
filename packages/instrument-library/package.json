@@ -6,15 +6,15 @@
   "exports": {
     ".": {
       "import": "./lib/index.js",
-      "types": "./src/types.d.ts"
+      "types": "./src/typings/index.d.ts"
     },
     "./forms/*.js": {
       "import": "./src/forms/*.js",
-      "types": "./src/types.d.ts"
+      "types": "./src/typings/forms.d.ts"
     },
     "./interactive/*.jsx": {
       "import": "./src/interactive/*.jsx",
-      "types": "./src/types.d.ts"
+      "types": "./src/typings/interactive.d.ts"
     }
   },
   "scripts": {
