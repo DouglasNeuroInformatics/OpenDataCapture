@@ -15,7 +15,7 @@ import { useResolvedInstrument } from '../hooks/useResolvedInstrument';
 import { FormContent } from './FormContent';
 import { InstrumentOverview } from './InstrumentOverview';
 import { InstrumentSummary } from './InstrumentSummary';
-import { InteractiveStepper } from './InteractiveStepper';
+import { InteractiveContent } from './InteractiveContent';
 
 export type InstrumentRendererProps = {
   bundle: string;
@@ -43,7 +43,7 @@ export const InstrumentRenderer = ({ bundle, onSubmit, subject }: InstrumentRend
       icon: <QuestionMarkCircleIcon />
     }))
     .with({ kind: 'INTERACTIVE' }, (instrument) => ({
-      element: <InteractiveStepper instrument={instrument} onSubmit={handleSubmit} />,
+      element: <InteractiveContent instrument={instrument} onSubmit={handleSubmit} />,
       icon: <ComputerDesktopIcon />
     }))
     .exhaustive();
@@ -70,11 +70,4 @@ export const InstrumentRenderer = ({ bundle, onSubmit, subject }: InstrumentRend
       ]}
     />
   );
-
-  // return (
-  //   <>
-  //     <iframe srcDoc="Hello World" title="Open Data Capture - Interactive Instrument" />
-  //     <p>{bundle}</p>
-  //   </>
-  // );
 };
