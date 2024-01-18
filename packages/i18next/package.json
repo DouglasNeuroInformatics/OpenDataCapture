@@ -5,7 +5,10 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./client": {
+      "types": "./src/typings/i18next.d.ts"
+    }
   },
   "scripts": {
     "format": "prettier --write src",
