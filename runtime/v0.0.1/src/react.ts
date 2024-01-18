@@ -69,3 +69,5 @@ export {
   useTransition,
   version
 };
+
+export default React;

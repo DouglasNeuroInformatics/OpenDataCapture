@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "jsx": "react"
   },
   "extends": "../../jsconfig.json",
   "include": ["src"]
