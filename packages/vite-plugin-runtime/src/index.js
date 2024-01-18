@@ -23,7 +23,7 @@ const isDirectory = (path) => fs.lstat(path).then((stat) => stat.isDirectory());
 /**
  * Returns the manifest for a given version of the runtime
  * @param {string} version
- * @returns {Promise<{ baseDir: string, manifest: RuntimeManifest }>}
+ * @returns {Promise<{ baseDir: string, manifest: RuntimeManifest, importPaths: string[], version: string }>}
  */
 const resolveVersion = async (version) => {
   const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
@@ -31,12 +31,15 @@ const resolveVersion = async (version) => {
     throw new Error(`Not a directory: ${baseDir}`);
   }
   const files = await fs.readdir(baseDir, 'utf-8');
+  const sources = files.filter((filename) => filename.endsWith('.js'));
   return {
     baseDir,
+    importPaths: sources.map((filename) => `/runtime/${version}/${filename}`),
     manifest: {
       declarations: files.filter((filename) => filename.endsWith('.d.ts')),
-      sources: files.filter((filename) => filename.endsWith('.js'))
-    }
+      sources
+    },
+    version
   };
 };
 
@@ -67,6 +70,11 @@ const loadResource = async (version, filename) => {
   return null;
 };
 
+async function resolvePackages() {
+  const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
+  return await Promise.all(versions.map((version) => resolveVersion(version)));
+}
+
 /**
  * @param {Object} [options]
  * @param {string} [options.packageRoot]
@@ -75,13 +83,20 @@ const loadResource = async (version, filename) => {
 const runtime = (options) => {
   return {
     async buildStart() {
-      const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
-      for (const version of versions) {
-        const { baseDir, manifest } = await resolveVersion(version);
+      const packages = await resolvePackages();
+      for (const { baseDir, manifest, version } of packages) {
         const destination = path.resolve(options?.packageRoot ?? '', `dist/runtime/${version}`);
         await fs.cp(baseDir, destination, { recursive: true });
         await fs.writeFile(path.resolve(destination, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf-8');
       }
+    },
+    async config() {
+      const packages = await resolvePackages();
+      return {
+        optimizeDeps: {
+          exclude: packages.flatMap((pkg) => pkg.importPaths)
+        }
+      };
     },
     configureServer(server) {
       server.middlewares.use('/runtime', (req, res, next) => {
