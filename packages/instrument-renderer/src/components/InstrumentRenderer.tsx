@@ -1,30 +1,75 @@
-import { Spinner } from '@douglasneuroinformatics/ui';
+import { useState } from 'react';
+
+import { Spinner, Stepper } from '@douglasneuroinformatics/ui';
+import {
+  ComputerDesktopIcon,
+  DocumentCheckIcon,
+  PrinterIcon,
+  QuestionMarkCircleIcon
+} from '@heroicons/react/24/outline';
+import type { Subject } from '@open-data-capture/common/subject';
+import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 
 import { useResolvedInstrument } from '../hooks/useResolvedInstrument';
-import { FormStepper } from './FormStepper';
+import { FormContent } from './FormContent';
+import { InstrumentOverview } from './InstrumentOverview';
+import { InstrumentSummary } from './InstrumentSummary';
 import { InteractiveStepper } from './InteractiveStepper';
 
 export type InstrumentRendererProps = {
   bundle: string;
   onSubmit: (data: unknown) => Promise<void>;
+  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
-export const InstrumentRenderer = ({ bundle }: InstrumentRendererProps) => {
+export const InstrumentRenderer = ({ bundle, onSubmit, subject }: InstrumentRendererProps) => {
+  const [data, setData] = useState<unknown>();
   const instrument = useResolvedInstrument(bundle);
+  const { t } = useTranslation();
 
-  const handleSubmit = (data: unknown) => {
-    // eslint-disable-next-line no-alert
-    alert(JSON.stringify(data));
-  };
+  async function handleSubmit<T>(data: T) {
+    await onSubmit(data);
+    setData(data);
+  }
 
-  return match(instrument)
-    .with({ kind: 'FORM' }, (form) => <FormStepper form={form} onSubmit={handleSubmit} />)
-    .with({ kind: 'INTERACTIVE' }, (instrument) => (
-      <InteractiveStepper instrument={instrument} onSubmit={handleSubmit} />
-    ))
-    .with(null, () => <Spinner />)
+  if (!instrument) {
+    return <Spinner />;
+  }
+
+  const content = match(instrument)
+    .with({ kind: 'FORM' }, (instrument) => ({
+      element: <FormContent instrument={instrument} onSubmit={handleSubmit} />,
+      icon: <QuestionMarkCircleIcon />
+    }))
+    .with({ kind: 'INTERACTIVE' }, (instrument) => ({
+      element: <InteractiveStepper instrument={instrument} onSubmit={handleSubmit} />,
+      icon: <ComputerDesktopIcon />
+    }))
     .exhaustive();
+
+  return (
+    <Stepper
+      steps={[
+        {
+          element: <InstrumentOverview instrument={instrument} />,
+          icon: <DocumentCheckIcon />,
+          label: t('steps.overview')
+        },
+        {
+          ...content,
+          label: t('steps.questions')
+        },
+        {
+          element: (
+            <InstrumentSummary data={data} instrument={instrument} subject={subject} timeCollected={Date.now()} />
+          ),
+          icon: <PrinterIcon />,
+          label: t('steps.summary')
+        }
+      ]}
+    />
+  );
 
   // return (
   //   <>

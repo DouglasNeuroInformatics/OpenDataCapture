@@ -1,38 +1,47 @@
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { Card, formatFormDataAsString, getFormFields, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
-import { type Language, toLowerCase } from '@open-data-capture/common/core';
-import type { FormInstrument } from '@open-data-capture/common/instrument';
+import { toLowerCase } from '@open-data-capture/common/core';
+import type { InstrumentKind, SomeUnilingualInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 
-import { FormSummaryGroup } from './FormSummaryGroup';
+import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
-export type FormSummaryProps = {
-  data: FormDataType;
-  form: FormInstrument<FormDataType, Language>;
+export type InstrumentSummaryProps<TKind extends InstrumentKind> = {
+  data: unknown;
+  instrument: SomeUnilingualInstrument<TKind>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
   timeCollected: number;
 };
 
-export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryProps) => {
+export const InstrumentSummary = <TKind extends InstrumentKind>({
+  data,
+  instrument,
+  subject,
+  timeCollected
+}: InstrumentSummaryProps<TKind>) => {
   const download = useDownload();
   const { i18n, t } = useTranslation('core');
 
   const handleDownload = () => {
-    const filename = `${form.name}_v${form.version}_${new Date(timeCollected).toISOString()}.txt`;
+    const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.json`;
     void download(filename, () => formatFormDataAsString(data));
   };
 
+  if (instrument.kind === 'INTERACTIVE') {
+    return JSON.stringify(data);
+  }
+
+  const form = instrument;
   const fields = getFormFields(form.content);
 
   return (
     <Card>
       <div className="border-b px-4 py-5 sm:px-6">
         <h3 className="text-lg font-medium leading-6 text-slate-900 dark:text-slate-100">
-          {t('summary.title', { title: form.details.title })}
+          {t('summary.title', { title: instrument.details.title })}
         </h3>
         <div className="mt-1 grid grid-cols-3">
           <p className="col-span-2 text-sm text-slate-600 dark:text-slate-300">
@@ -60,7 +69,7 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
         </div>
       </div>
       {subject && (
-        <FormSummaryGroup
+        <InstrumentSummaryGroup
           items={[
             {
               label: t('fullName'),
@@ -79,7 +88,7 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
           title={t('subject')}
         />
       )}
-      <FormSummaryGroup
+      <InstrumentSummaryGroup
         items={[
           {
             label: t('title'),
@@ -99,7 +108,7 @@ export const FormSummary = ({ data, form, subject, timeCollected }: FormSummaryP
         ]}
         title={t('instrument')}
       />
-      <FormSummaryGroup
+      <InstrumentSummaryGroup
         items={Object.keys(fields).map((fieldName) => {
           return match(fields[fieldName])
             .with({ kind: 'dynamic' }, (field) => {

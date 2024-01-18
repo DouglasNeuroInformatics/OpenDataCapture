@@ -1,15 +1,14 @@
-import type { ArrayFieldValue, PrimitiveFieldValue } from '@douglasneuroinformatics/form-types';
 import { P, match } from 'ts-pattern';
 
-export type FormSummaryGroupProps = {
+export type InstrumentSummaryGroupProps = {
   items: ({
     label: string;
-    value?: ArrayFieldValue | PrimitiveFieldValue;
+    value?: unknown;
   } | null)[];
   title: string;
 };
 
-export const FormSummaryGroup = ({ items, title }: FormSummaryGroupProps) => {
+export const InstrumentSummaryGroup = ({ items, title }: InstrumentSummaryGroupProps) => {
   return (
     <div className="px-4 py-5 sm:px-6">
       <h5 className="mb-2 font-medium">{title}</h5>
@@ -21,9 +20,10 @@ export const FormSummaryGroup = ({ items, title }: FormSummaryGroupProps) => {
                 <dt className="text-sm font-medium text-slate-600 dark:text-slate-300">{item.label}</dt>
                 <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0 dark:text-slate-100">
                   {match(item.value)
-                    .with(P.array(), (arr) => JSON.stringify(arr))
                     .with(P.union(P.string, P.number, P.boolean, P.instanceOf(Date)), (value) => value.toString())
-                    .otherwise(() => 'NA')}
+                    .with(P.array(), (arr) => JSON.stringify(arr))
+                    .with(P.union([P.nullish, '']), () => 'NA')
+                    .otherwise((value) => JSON.stringify(value))}
                 </dd>
               </div>
             )

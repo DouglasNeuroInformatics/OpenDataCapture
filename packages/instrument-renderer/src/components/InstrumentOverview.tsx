@@ -1,4 +1,6 @@
-import { Button } from '@douglasneuroinformatics/ui';
+import { useContext } from 'react';
+
+import { Button, StepperContext } from '@douglasneuroinformatics/ui';
 import type { AnyUnilingualInstrument } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
@@ -7,12 +9,13 @@ import { InstrumentOverviewItem } from './InstrumentOverviewItem';
 
 type InstrumentOverviewProps = {
   instrument: AnyUnilingualInstrument;
-  onBegin: () => void;
+  onNext?: () => void;
 };
 
-export const InstrumentOverview = ({ instrument, onBegin }: InstrumentOverviewProps) => {
+export const InstrumentOverview = ({ instrument }: InstrumentOverviewProps) => {
   const { t } = useTranslation('core');
-  
+  const { updateIndex } = useContext(StepperContext);
+
   return (
     <div className="mb-2">
       <h3 className="text-xl font-semibold">{t('steps.overview')}</h3>
@@ -33,7 +36,13 @@ export const InstrumentOverview = ({ instrument, onBegin }: InstrumentOverviewPr
         />
         <InstrumentOverviewItem heading={t('instructions')} text={instrument.details.instructions} />
       </div>
-      <Button className="w-full" label={t('begin')} onClick={onBegin} />
+      <Button
+        className="w-full"
+        label={t('begin')}
+        onClick={() => {
+          updateIndex('increment');
+        }}
+      />
     </div>
   );
 };
