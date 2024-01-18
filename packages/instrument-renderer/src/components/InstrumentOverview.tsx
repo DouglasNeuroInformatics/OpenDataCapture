@@ -11,7 +11,8 @@ type InstrumentOverviewProps = {
 };
 
 export const InstrumentOverview = ({ instrument, onBegin }: InstrumentOverviewProps) => {
-  const { t } = useTranslation('renderer');
+  const { t } = useTranslation('core');
+  
   return (
     <div className="mb-2">
       <h3 className="text-xl font-semibold">{t('steps.overview')}</h3>

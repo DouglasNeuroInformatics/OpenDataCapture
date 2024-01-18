@@ -8,7 +8,6 @@ import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 
-import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { InteractiveOverview } from './InteractiveOverview';
 import { InteractiveRenderer } from './InteractiveRenderer';
 import { InteractiveSummary } from './InteractiveSummary';
@@ -19,7 +18,7 @@ type InteractiveStepperProps = {
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
-const InteractiveStepperComponent = ({ instrument, onSubmit, subject }: InteractiveStepperProps) => {
+const InteractiveStepper = ({ instrument, onSubmit, subject }: InteractiveStepperProps) => {
   const [data, setData] = useState<unknown>();
   const { t } = useTranslation('core');
 
@@ -52,7 +51,5 @@ const InteractiveStepperComponent = ({ instrument, onSubmit, subject }: Interact
     />
   );
 };
-
-const InteractiveStepper = withI18nProvider(InteractiveStepperComponent);
 
 export { InteractiveStepper, type InteractiveStepperProps };
