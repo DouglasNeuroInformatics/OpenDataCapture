@@ -3,7 +3,7 @@ import type { Module } from '@swc/types';
 import type { ModuleItemType, ParseOptions, TransformOptions, Transpiler } from './types';
 
 /**
- * `BaseInstrumentTransformer` and all derived subclasses are responsible for transpiling the TypeScript source code
+ * `BaseInstrumentTransformer` and all derived subclasses are responsible for transpiling the source code
  * (including potentially, JSX syntax) to vanilla JavaScript that can run in the browser. Since dynamic import is a
  * requirement of the runtime in general, ES2022 is targeted. Therefore, some kind of fallback/error handling should
  * be implemented for legacy browsers.
@@ -21,20 +21,28 @@ export abstract class BaseInstrumentTransformer {
   ];
 
   private readonly parseOptions: ParseOptions = {
-    syntax: 'typescript',
-    target: 'es2022',
-    tsx: true
+    jsx: true,
+    syntax: 'ecmascript',
+    target: 'es2022'
   };
 
   private readonly transformOptions: TransformOptions = {
     jsc: {
       parser: {
-        syntax: 'typescript',
-        tsx: true
+        jsx: true,
+        syntax: 'ecmascript',
       },
       target: 'es2022',
       transform: {
+        optimizer: {
+          globals: {
+            vars: {
+              __React__: 'React'
+            }
+          }
+        },
         react: {
+          pragma: '__React__.createElement',
           runtime: 'classic'
         }
       }
