@@ -21,6 +21,30 @@ const RUNTIME_DIR = path.resolve(PACKAGE_DIR, '..', '..', 'runtime');
 const isDirectory = (path) => fs.lstat(path).then((stat) => stat.isDirectory());
 
 /**
+ * Recursively get a list of files relative to the base directory
+ * @param {string} baseDir
+ */
+const resolveFiles = async (baseDir) => {
+  /** @type {{ declarations: string[], sources: string[] }} */
+  const results = { declarations: [], sources: [] };
+  /** @param {string} dir */
+  await (async function resolveDir(dir) {
+    const files = await fs.readdir(dir);
+    for (const file of files) {
+      const abspath = path.join(dir, file);
+      if (await isDirectory(abspath)) {
+        await resolveDir(abspath);
+      } else if (abspath.endsWith('.js')) {
+        results.sources.push(abspath.replace(`${baseDir}/`, ''));
+      } else if (abspath.endsWith('.d.ts')) {
+        results.declarations.push(abspath.replace(`${baseDir}/`, ''));
+      }
+    }
+  })(baseDir);
+  return results;
+};
+
+/**
  * Returns the manifest for a given version of the runtime
  * @param {string} version
  * @returns {Promise<{ baseDir: string, manifest: RuntimeManifest, importPaths: string[], version: string }>}
@@ -30,13 +54,12 @@ const resolveVersion = async (version) => {
   if (!(await isDirectory(baseDir))) {
     throw new Error(`Not a directory: ${baseDir}`);
   }
-  const files = await fs.readdir(baseDir, 'utf-8');
-  const sources = files.filter((filename) => filename.endsWith('.js'));
+  const { declarations, sources } = await resolveFiles(baseDir);
   return {
     baseDir,
     importPaths: sources.map((filename) => `/runtime/${version}/${filename}`),
     manifest: {
-      declarations: files.filter((filename) => filename.endsWith('.d.ts')),
+      declarations,
       sources
     },
     version
@@ -78,12 +101,12 @@ async function resolvePackages() {
 /**
  * @param {Object} [options]
  * @param {string} [options.packageRoot]
- * @returns {import('vite').PluginOption}
+ * @returns {Promise<import('vite').PluginOption>}
  */
-const runtime = (options) => {
+const runtime = async (options) => {
+  const packages = await resolvePackages();
   return {
     async buildStart() {
-      const packages = await resolvePackages();
       for (const { baseDir, manifest, version } of packages) {
         const destination = path.resolve(options?.packageRoot ?? '', `dist/runtime/${version}`);
         await fs.cp(baseDir, destination, { recursive: true });
@@ -91,7 +114,6 @@ const runtime = (options) => {
       }
     },
     async config() {
-      const packages = await resolvePackages();
       return {
         optimizeDeps: {
           exclude: packages.flatMap((pkg) => pkg.importPaths)
@@ -100,11 +122,12 @@ const runtime = (options) => {
     },
     configureServer(server) {
       server.middlewares.use('/runtime', (req, res, next) => {
-        const [version, filename] = req.url?.split('/').filter(Boolean) ?? [];
-        if (!(version && filename)) {
+        const [version, ...paths] = req.url?.split('/').filter(Boolean) ?? [];
+        const filepath = paths.join('/');
+        if (!(version && filepath)) {
           return next();
         }
-        loadResource(version, filename)
+        loadResource(version, filepath)
           .then((resource) => {
             if (!resource) {
               return next();
