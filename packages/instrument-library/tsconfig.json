@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "jsx": "react"
+    "jsx": "react",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
   "extends": "../../jsconfig.json",
   "include": ["src"]
