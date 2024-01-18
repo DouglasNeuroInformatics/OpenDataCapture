@@ -1,5 +1,5 @@
-import { i18next } from '@open-data-capture/i18next';
+import { i18n } from '@open-data-capture/i18next';
 
-await i18next.init();
+await i18n.initialize();
 
-export default i18next;
+export default i18n;
