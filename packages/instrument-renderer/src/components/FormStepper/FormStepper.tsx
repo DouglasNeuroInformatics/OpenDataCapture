@@ -9,7 +9,6 @@ import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 
-import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { FormOverview } from './FormOverview';
 import { FormQuestions } from './FormQuestions';
 import { FormSummary } from './FormSummary';
@@ -20,7 +19,7 @@ type FormStepperProps = {
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
-const FormStepperComponent = ({ form, onSubmit, subject }: FormStepperProps) => {
+const FormStepper = ({ form, onSubmit, subject }: FormStepperProps) => {
   const [data, setData] = useState<FormDataType>();
   const { t } = useTranslation('core');
 
@@ -51,7 +50,5 @@ const FormStepperComponent = ({ form, onSubmit, subject }: FormStepperProps) => 
     />
   );
 };
-
-const FormStepper = withI18nProvider(FormStepperComponent);
 
 export { FormStepper, type FormStepperProps };

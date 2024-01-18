@@ -1,4 +1,12 @@
 {
+  "version": {
+    "en": "Version",
+    "fr": "Version"
+  },
+  "description": {
+    "en": "Description",
+    "fr": "Description"
+  },
   "anonymous": {
     "en": "Anonymous",
     "fr": "Anonyme"
@@ -14,10 +22,6 @@
   "data": {
     "en": "Data",
     "fr": "Données"
-  },
-  "description": {
-    "en": "Description",
-    "fr": "Description"
   },
   "details": {
     "en": "Details",
@@ -188,9 +192,5 @@
   "title": {
     "en": "Title",
     "fr": "Titre"
-  },
-  "version": {
-    "en": "Version",
-    "fr": "Version"
   }
 }
