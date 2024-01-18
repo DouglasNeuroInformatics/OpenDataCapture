@@ -21,6 +21,7 @@ export default defineConfig([
     input: {
       core: path.resolve(__dirname, 'src', 'core.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),
+      'react-dom/client': path.resolve(__dirname, 'src', 'react-dom', 'client.ts'),
       zod: path.resolve(__dirname, 'src', 'zod.ts')
     },
     output: {
@@ -48,6 +49,7 @@ export default defineConfig([
     input: {
       core: path.resolve(__dirname, 'src', 'core.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),
+      'react-dom/client': path.resolve(__dirname, 'src', 'react-dom', 'client.ts'),
       zod: path.resolve(__dirname, 'src', 'zod.ts')
     },
     output: [
