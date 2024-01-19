@@ -19,7 +19,7 @@ const MODE = /** @type {'development' | 'production'} */ ('development');
 export default defineConfig([
   {
     input: {
-      '_internal/instrument-interpreter': path.resolve(__dirname, 'src', '_internal', 'instrument-interpreter.ts'),
+      '_internal/bootstrap': path.resolve(__dirname, 'src', '_internal', 'bootstrap.ts'),
       core: path.resolve(__dirname, 'src', 'core.ts'),
       jspsych: path.resolve(__dirname, 'src', 'jspsych.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),
@@ -49,7 +49,6 @@ export default defineConfig([
   },
   {
     input: {
-      '_internal/instrument-interpreter': path.resolve(__dirname, 'src', '_internal', 'instrument-interpreter.ts'),
       core: path.resolve(__dirname, 'src', 'core.ts'),
       jspsych: path.resolve(__dirname, 'src', 'jspsych.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),

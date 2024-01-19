@@ -42,8 +42,8 @@ export const InstrumentRenderer = ({ bundle, onSubmit, subject }: InstrumentRend
       element: <FormContent instrument={instrument} onSubmit={handleSubmit} />,
       icon: <QuestionMarkCircleIcon />
     }))
-    .with({ kind: 'INTERACTIVE' }, (instrument) => ({
-      element: <InteractiveContent instrument={instrument} onSubmit={handleSubmit} />,
+    .with({ kind: 'INTERACTIVE' }, () => ({
+      element: <InteractiveContent bundle={bundle} onSubmit={handleSubmit} />,
       icon: <ComputerDesktopIcon />
     }))
     .exhaustive();

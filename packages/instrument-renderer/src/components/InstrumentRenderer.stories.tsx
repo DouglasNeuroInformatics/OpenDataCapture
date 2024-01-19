@@ -4,7 +4,7 @@ import { InstrumentRenderer } from './InstrumentRenderer';
 
 type Story = StoryObj<typeof InstrumentRenderer>;
 
-import { clickTask, happinessQuestionnaire } from '@open-data-capture/instrument-library';
+import { clickTask, happinessQuestionnaire, reactionTimeTask } from '@open-data-capture/instrument-library';
 
 export default { component: InstrumentRenderer } as Meta<typeof InstrumentRenderer>;
 
@@ -17,5 +17,11 @@ export const HappinessQuestionnaire: Story = {
 export const ClickTask: Story = {
   args: {
     bundle: clickTask.bundle
+  }
+};
+
+export const ReactionTimeTask: Story = {
+  args: {
+    bundle: reactionTimeTask.bundle
   }
 };
