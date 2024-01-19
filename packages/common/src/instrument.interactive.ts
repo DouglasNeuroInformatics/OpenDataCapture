@@ -17,6 +17,7 @@ export type InteractiveInstrument<TData extends Json = Json, TLanguage extends L
   BaseInstrument<TData, Language>,
   {
     content: {
+      assets?: Record<string, any>;
       render: (this: Window, ...args: any[]) => any;
     };
     details: EnhancedBaseInstrumentDetails<TLanguage>;
