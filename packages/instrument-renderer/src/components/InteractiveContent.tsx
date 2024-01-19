@@ -20,7 +20,7 @@ export const InteractiveContent = ({ instrument }: InteractiveContentProps) => {
       title="Open Data Capture - Interactive Instrument"
       onLoad={(event) => {
         const contentWindow: ContentWindow = event.currentTarget.contentWindow!;
-        instrument.content.render.call(contentWindow);
+        instrument.content.render();
       }}
     />
   );

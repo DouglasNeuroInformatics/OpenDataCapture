@@ -13,14 +13,16 @@ import {
   type EnhancedBaseInstrumentDetails
 } from './instrument.base';
 
+export type InteractiveInstrumentContent = {
+  /** contains mapped to URLs */
+  assets?: Record<string, string>;
+  render: (...args: any[]) => any;
+};
+
 export type InteractiveInstrument<TData extends Json = Json, TLanguage extends Language = Language> = Merge<
   BaseInstrument<TData, Language>,
   {
-    content: {
-      /** contains mapped to URLs */
-      assets?: Record<string, string>;
-      render: (this: Window, ...args: any[]) => any;
-    };
+    content: InteractiveInstrumentContent;
     details: EnhancedBaseInstrumentDetails<TLanguage>;
     kind: 'INTERACTIVE';
   }
