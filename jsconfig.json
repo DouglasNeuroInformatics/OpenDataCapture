@@ -16,7 +16,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "/runtime/v0.0.1/*": ["./runtime/v0.0.1/dist/*"]
+      "/runtime/v0.0.1/*": ["./runtime/v0.0.1/lib/*"]
     },
     "skipLibCheck": true,
     "strict": true,
