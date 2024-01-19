@@ -108,7 +108,7 @@ const runtime = async (options) => {
   return {
     async buildStart() {
       for (const { baseDir, manifest, version } of packages) {
-        const destination = path.resolve(options?.packageRoot ?? '', `lib/runtime/${version}`);
+        const destination = path.resolve(options?.packageRoot ?? '', `dist/runtime/${version}`);
         await fs.cp(baseDir, destination, { recursive: true });
         await fs.writeFile(path.resolve(destination, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf-8');
       }
