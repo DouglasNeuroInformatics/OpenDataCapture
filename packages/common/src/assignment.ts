@@ -1,7 +1,9 @@
 import type { AssignmentModel, AssignmentRecordModel } from '@open-data-capture/database/gateway';
 import { z } from 'zod';
 
-import { $BaseModel, $Json, type Json } from './core';
+import { $BaseModel, $Json } from './core';
+
+import type { Json } from './core';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 

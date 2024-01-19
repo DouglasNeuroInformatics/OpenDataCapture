@@ -4,13 +4,16 @@
 import type { Merge } from 'type-fest';
 import { z } from 'zod';
 
-import { type Json, type Language } from './core';
 import {
   $BaseInstrument,
   $EnhancedBaseInstrumentDetails,
-  type BaseInstrument,
-  type BaseInstrumentSummary,
-  type EnhancedBaseInstrumentDetails
+} from './instrument.base';
+
+import type { Json, Language } from './core';
+import type {
+  BaseInstrument,
+  BaseInstrumentSummary,
+  EnhancedBaseInstrumentDetails
 } from './instrument.base';
 
 export type InteractiveInstrumentContent = {

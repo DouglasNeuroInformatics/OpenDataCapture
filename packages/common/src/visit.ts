@@ -2,7 +2,9 @@ import type { VisitModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
 import { $BaseModel } from './core';
-import { $Subject, $SubjectIdentificationData, type Subject } from './subject';
+import { $Subject, $SubjectIdentificationData } from './subject';
+
+import type { Subject } from './subject';
 
 export type Visit = VisitModel & {
   subject: Subject;

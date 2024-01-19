@@ -3,21 +3,25 @@ import { z } from 'zod';
 
 import {
   $FormInstrument,
-  type AnyMultilingualFormInstrument,
-  type AnyUnilingualFormInstrument,
-  type FormInstrument,
-  type FormInstrumentSummary,
-  type StrictFormInstrument,
-  type UnilingualFormInstrumentSummary
 } from './instrument.form';
 import {
   $InteractiveInstrument,
-  type InteractiveInstrument,
-  type InteractiveInstrumentSummary
 } from './instrument.interactive';
 
 import type { Json, Language } from './core';
 import type { InstrumentKind, InstrumentLanguage } from './instrument.base';
+import type {
+AnyMultilingualFormInstrument,
+AnyUnilingualFormInstrument,
+FormInstrument,
+FormInstrumentSummary,
+StrictFormInstrument,
+UnilingualFormInstrumentSummary
+} from './instrument.form';
+import type {
+InteractiveInstrument,
+InteractiveInstrumentSummary
+} from './instrument.interactive';
 
 export const $AnyInstrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies z.ZodType<AnyInstrument>;
 
