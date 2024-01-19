@@ -1,11 +1,10 @@
 const { HtmlKeyboardResponsePlugin, ImageKeyboardResponsePlugin, PreloadPlugin, initJsPsych } = await import(
   '/runtime/v0.0.1/jspsych.js'
 );
-
-// import { initJsPsych } from 'jspsych';
-// import HtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
-// import Preload from '@jspsych/plugin-preload';
-// import ImageKeyboardResponsePlugin from '@jspsych/plugin-image-keyboard-response';
+const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
+const { default: React, useEffect } = await import('/runtime/v0.0.1/react.js');
+const { createRoot } = await import('/runtime/v0.0.1/react-dom/client.js');
+const { z } = await import('/runtime/v0.0.1/zod.js');
 
 import 'jspsych/css/jspsych.css';
 
@@ -117,4 +116,35 @@ const debrief_block = {
 timeline.push(debrief_block);
 
 // Start the experiment
-jsPsych.run(timeline);
+const ReactionTime = () => {
+  useEffect(() => {
+    jsPsych.run(timeline);
+  }, [timeline]);
+  return <React.Fragment />;
+};
+
+const instrumentFactory = new InstrumentFactory({
+  kind: 'INTERACTIVE',
+  language: 'en',
+  validationSchema: z.any()
+});
+
+export default instrumentFactory.defineInstrument({
+  content: {
+    render() {
+      const rootElement = this.document.createElement('div');
+      this.document.body.appendChild(rootElement);
+      const root = createRoot(rootElement);
+      root.render(<ReactionTime />);
+    }
+  },
+  details: {
+    description: 'This reaction time task is a non-trivial proof of concept with jspsych.',
+    estimatedDuration: 1,
+    instructions: ['The user will be displayed instructions on the screen'],
+    title: 'Reaction Time Task'
+  },
+  name: 'ReactionTimeTask',
+  tags: ['Interactive'],
+  version: 1.0
+});
