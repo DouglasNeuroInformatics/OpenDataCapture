@@ -13,17 +13,19 @@
   },
   "devDependencies": {
     "@douglasneuroinformatics/form-types": "^5.2.0",
+    "@jspsych/plugin-html-keyboard-response": "^1.1.3",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/runtime-bundler": "workspace:*",
-    "react": "^18.2.0",
-    "zod": "^3.22.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/react": "^18.2.47",
+    "jspsych": "^7.3.4",
+    "react": "^18.2.0",
     "rollup": "^4.9.4",
-    "rollup-plugin-dts": "^6.1.0"
+    "rollup-plugin-dts": "^6.1.0",
+    "zod": "^3.22.4"
   }
 }

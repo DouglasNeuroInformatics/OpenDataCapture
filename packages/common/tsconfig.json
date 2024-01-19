@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "paths": {
       "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/dist/*"]
     }
