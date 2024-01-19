@@ -50,7 +50,7 @@ const resolveFiles = async (baseDir) => {
  * @returns {Promise<{ baseDir: string, manifest: RuntimeManifest, importPaths: string[], version: string }>}
  */
 const resolveVersion = async (version) => {
-  const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
+  const baseDir = path.resolve(RUNTIME_DIR, version, 'lib');
   if (!(await isDirectory(baseDir))) {
     throw new Error(`Not a directory: ${baseDir}`);
   }
@@ -108,7 +108,7 @@ const runtime = async (options) => {
   return {
     async buildStart() {
       for (const { baseDir, manifest, version } of packages) {
-        const destination = path.resolve(options?.packageRoot ?? '', `dist/runtime/${version}`);
+        const destination = path.resolve(options?.packageRoot ?? '', `lib/runtime/${version}`);
         await fs.cp(baseDir, destination, { recursive: true });
         await fs.writeFile(path.resolve(destination, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf-8');
       }
