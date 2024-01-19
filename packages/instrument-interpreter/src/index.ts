@@ -4,7 +4,6 @@ import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@open-d
 import type { AnyInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
 
 export type InstrumentInterpreterOptions<TKind extends InstrumentKind> = {
-  factoryArgs?: [this: any, ...args: any[]];
   /** The value to assign to the id property of the instrument */
   id?: string;
   /** The kind of instrument being evaluated. If validate is set to true, this will be enforced at runtime. Otherwise, it will just be asserted */
@@ -18,7 +17,7 @@ export class InstrumentInterpreter {
     let instrument: AnyInstrument;
     try {
       const factory = new Function(`return ${bundle}`);
-      const value = (await (options?.factoryArgs ? factory.call(...options.factoryArgs) : factory())) as unknown;
+      const value = (await factory()) as unknown;
       if (!options?.validate) {
         instrument = value as Extract<AnyInstrument, { kind: TKind }>;
       } else if (options.kind === 'FORM') {
