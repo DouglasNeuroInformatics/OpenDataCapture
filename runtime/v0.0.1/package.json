@@ -16,7 +16,6 @@
     "@jspsych/plugin-image-keyboard-response": "^1.1.3",
     "@jspsych/plugin-preload": "^1.1.3",
     "@open-data-capture/common": "workspace:*",
-    "@open-data-capture/runtime-bundler": "workspace:*",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
