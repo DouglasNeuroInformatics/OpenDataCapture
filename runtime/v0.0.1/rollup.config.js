@@ -19,6 +19,7 @@ const MODE = /** @type {'development' | 'production'} */ ('development');
 export default defineConfig([
   {
     input: {
+      '_internal/instrument-interpreter': path.resolve(__dirname, 'src', '_internal', 'instrument-interpreter.ts'),
       core: path.resolve(__dirname, 'src', 'core.ts'),
       jspsych: path.resolve(__dirname, 'src', 'jspsych.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),
@@ -48,6 +49,7 @@ export default defineConfig([
   },
   {
     input: {
+      '_internal/instrument-interpreter': path.resolve(__dirname, 'src', '_internal', 'instrument-interpreter.ts'),
       core: path.resolve(__dirname, 'src', 'core.ts'),
       jspsych: path.resolve(__dirname, 'src', 'jspsych.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),
@@ -62,11 +64,6 @@ export default defineConfig([
     ],
     plugins: [
       dts({
-        compilerOptions: {
-          paths: {
-            '@open-data-capture/common/*': [path.resolve(ROOT_DIR, 'packages/common/src/*')]
-          }
-        },
         respectExternal: true
       })
     ]
