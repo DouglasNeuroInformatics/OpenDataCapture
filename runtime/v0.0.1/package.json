@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@douglasneuroinformatics/form-types": "^5.2.0",
+    "@open-data-capture/instrument-interpreter": "workspace:*",
     "@jspsych/plugin-html-keyboard-response": "^1.1.3",
     "@jspsych/plugin-image-keyboard-response": "^1.1.3",
     "@jspsych/plugin-preload": "^1.1.3",
