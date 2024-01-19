@@ -63,6 +63,11 @@ export default defineConfig([
       }
     ],
     plugins: [
+      resolve({
+        browser: true,
+        extensions: ['.js', '.ts'],
+        rootDir: ROOT_DIR
+      }),
       dts({
         respectExternal: true
       })
