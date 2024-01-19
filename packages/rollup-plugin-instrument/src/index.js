@@ -11,8 +11,10 @@ const instrument = () => {
   return {
     async load(id) {
       if (id.endsWith(suffix)) {
-        const source = await fs.readFile(removeSuffix(id), 'utf-8');
+        const filepath = removeSuffix(id);
+        const source = await fs.readFile(filepath, 'utf-8');
         const bundle = await transformer.generateBundle(source);
+        this.addWatchFile(filepath);
         return { code: `export default { bundle: ${JSON.stringify(bundle)}, source: ${JSON.stringify(source)} }` };
       }
       return null;

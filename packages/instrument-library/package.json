@@ -19,6 +19,7 @@
   },
   "scripts": {
     "build:lib": "rm -rf lib && bunx --bun rollup -c",
+    "dev": "rm -rf lib && bunx --bun rollup -c --watch",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
