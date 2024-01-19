@@ -11,7 +11,7 @@ import dts from 'rollup-plugin-dts';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-const OUT_DIR = path.resolve(__dirname, 'dist');
+const OUT_DIR = path.resolve(__dirname, 'lib');
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
 
 const MODE = /** @type {'development' | 'production'} */ ('development');

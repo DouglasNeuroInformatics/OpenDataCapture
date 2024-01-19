@@ -3,12 +3,11 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "module": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && bunx rollup -c",
+    "build:lib": "rm -rf lib && bunx rollup -c",
     "format": "prettier --write src",
-    "postinstall": "bun run build",
     "lint": "tsc && eslint --fix src"
   },
   "devDependencies": {
