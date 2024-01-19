@@ -14,6 +14,8 @@
   "devDependencies": {
     "@douglasneuroinformatics/form-types": "^5.2.0",
     "@jspsych/plugin-html-keyboard-response": "^1.1.3",
+    "@jspsych/plugin-image-keyboard-response": "^1.1.3",
+    "@jspsych/plugin-preload": "^1.1.3",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/runtime-bundler": "workspace:*",
     "@rollup/plugin-commonjs": "^25.0.7",

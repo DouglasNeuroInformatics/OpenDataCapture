@@ -20,6 +20,7 @@ export default defineConfig([
   {
     input: {
       core: path.resolve(__dirname, 'src', 'core.ts'),
+      jspsych: path.resolve(__dirname, 'src', 'jspsych.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),
       'react-dom/client': path.resolve(__dirname, 'src', 'react-dom', 'client.ts'),
       zod: path.resolve(__dirname, 'src', 'zod.ts')
@@ -48,6 +49,7 @@ export default defineConfig([
   {
     input: {
       core: path.resolve(__dirname, 'src', 'core.ts'),
+      jspsych: path.resolve(__dirname, 'src', 'jspsych.ts'),
       react: path.resolve(__dirname, 'src', 'react.ts'),
       'react-dom/client': path.resolve(__dirname, 'src', 'react-dom', 'client.ts'),
       zod: path.resolve(__dirname, 'src', 'zod.ts')

@@ -1,2 +1,5 @@
 export * from 'jspsych';
-export { default as htmlKeyboardResponse } from '@jspsych/plugin-html-keyboard-response';
+
+export { default as HtmlKeyboardResponsePlugin } from '@jspsych/plugin-html-keyboard-response';
+export { default as ImageKeyboardResponsePlugin } from '@jspsych/plugin-image-keyboard-response';
+export { default as PreloadPlugin } from '@jspsych/plugin-preload';
