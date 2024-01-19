@@ -6,7 +6,7 @@ const { default: React, useEffect } = await import('/runtime/v0.0.1/react.js');
 const { createRoot } = await import('/runtime/v0.0.1/react-dom/client.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-import 'jspsych/css/jspsych.css';
+// import 'jspsych/css/jspsych.css';
 
 // First we have to initialize jsPsych
 const jsPsych = initJsPsych({

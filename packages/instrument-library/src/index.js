@@ -5,3 +5,4 @@ export { default as miniMentalStateExamination } from './forms/mini-mental-state
 export { default as montrealCognitiveAssessment } from './forms/montreal-cognitive-assessment?instrument';
 
 export { default as clickTask } from './interactive/click-task?instrument';
+export { default as reactionTimeTask } from './interactive/reaction-time-task?instrument';
