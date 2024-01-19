@@ -7,3 +7,4 @@ export const miniMentalStateExamination: InstrumentLibraryItem;
 export const montrealCognitiveAssessment: InstrumentLibraryItem;
 
 export const clickTask: InstrumentLibraryItem;
+export const reactionTimeTask: InstrumentLibraryItem;
