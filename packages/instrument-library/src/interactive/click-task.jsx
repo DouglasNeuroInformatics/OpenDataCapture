@@ -1,5 +1,5 @@
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { default: React, useEffect, useState } = await import('/runtime/v0.0.1/react.js');
+const { default: React, useEffect, useRef, useState } = await import('/runtime/v0.0.1/react.js');
 const { createRoot } = await import('/runtime/v0.0.1/react-dom/client.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
@@ -12,22 +12,29 @@ const { z } = await import('/runtime/v0.0.1/zod.js');
 const ClickTask = ({ done }) => {
   const [count, setCount] = useState(0);
   const [secondsRemaining, setSecondsRemaining] = useState(10);
+  /** @type {React.MutableRefObject<null | NodeJS.Timeout>} */
+  const interval = useRef(null);
 
   useEffect(() => {
-    const id = setInterval(() => {
+    interval.current = setInterval(() => {
       setSecondsRemaining((prev) => prev - 1);
     }, 1000);
-    return () => clearInterval(id);
+    return () => {
+      if (interval.current) {
+        clearInterval(interval.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
-    if (0 > secondsRemaining) {
+    if (0 > secondsRemaining && interval.current) {
       done({ count });
+      clearInterval(interval.current);
     }
   }, [secondsRemaining]);
 
   return (
-    <div className="flex flex-col">
+    <div>
       <span>Seconds Remaining: {secondsRemaining}</span>
       <span>Count: {Math.max(count, 0)}</span>
       <button
@@ -49,9 +56,12 @@ const instrumentFactory = new InstrumentFactory({
 
 export default instrumentFactory.defineInstrument({
   content: {
+    assets: {
+      css: [import.meta.injectStylesheet('./click-task.css')]
+    },
     render() {
-      const rootElement = this.document.createElement('div');
-      this.document.body.appendChild(rootElement);
+      const rootElement = document.createElement('div');
+      document.body.appendChild(rootElement);
       const root = createRoot(rootElement);
       // eslint-disable-next-line no-alert
       root.render(<ClickTask done={(data) => alert(JSON.stringify(data))} />);

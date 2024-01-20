@@ -11,7 +11,7 @@ import type { BaseInstrument, BaseInstrumentSummary, EnhancedBaseInstrumentDetai
 
 export type InteractiveInstrumentContent = {
   assets?: {
-    css?: Record<string, string>;
+    css?: string[];
     img?: Record<string, string>;
   };
   render: (...args: any[]) => any;

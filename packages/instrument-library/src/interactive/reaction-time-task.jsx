@@ -15,9 +15,7 @@ const instrumentFactory = new InstrumentFactory({
 export default instrumentFactory.defineInstrument({
   content: {
     assets: {
-      css: {
-        jspsych: import.meta.injectStylesheet('jspsych/css/jspsych.css')
-      },
+      css: [import.meta.injectStylesheet('jspsych/css/jspsych.css')],
       img: {
         blue: import.meta.encodeImage('../assets/img/blue.png'),
         orange: import.meta.encodeImage('../assets/img/orange.png')
