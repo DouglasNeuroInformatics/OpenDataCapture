@@ -34,7 +34,7 @@ const ClickTask = ({ done }) => {
   }, [secondsRemaining]);
 
   return (
-    <div>
+    <div className="click-task">
       <span>Seconds Remaining: {secondsRemaining}</span>
       <span>Count: {Math.max(count, 0)}</span>
       <button

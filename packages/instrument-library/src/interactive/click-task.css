@@ -1,3 +1,4 @@
-body {
-  background-color: blue;
+.click-task {
+  display: flex;
+  flex-direction: column;
 }
