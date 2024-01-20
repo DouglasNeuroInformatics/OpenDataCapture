@@ -30,7 +30,7 @@ export class InstrumentInterpreter {
         throw new Error(`Unexpected kind: ${options.kind}`);
       }
     } catch (error) {
-      throw new Error(`Failed to evaluate instrument bundle`, { cause: { bundle, error } });
+      throw new Error(`Failed to evaluate instrument bundle`, { cause: error });
     }
     instrument.id = options?.id;
     return instrument as Extract<AnyInstrument, { kind: TKind }>;
