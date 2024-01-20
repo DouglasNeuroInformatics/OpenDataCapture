@@ -15,8 +15,13 @@ const instrumentFactory = new InstrumentFactory({
 export default instrumentFactory.defineInstrument({
   content: {
     assets: {
-      blue: import.meta.encode('../assets/img/blue.png'),
-      orange: import.meta.encode('../assets/img/orange.png')
+      css: {
+        jspsych: import.meta.injectStylesheet('jspsych/css/jspsych.css')
+      },
+      img: {
+        blue: import.meta.encodeImage('../assets/img/blue.png'),
+        orange: import.meta.encodeImage('../assets/img/orange.png')
+      }
     },
     render() {
       // First we have to initialize jsPsych
@@ -34,7 +39,7 @@ export default instrumentFactory.defineInstrument({
 
       // Preload images
       const preload = {
-        images: [this.assets?.blue, this.assets?.orange],
+        images: [this.assets?.img?.blue, this.assets?.img?.orange],
         type: PreloadPlugin
       };
       timeline.push(preload);
@@ -56,9 +61,9 @@ export default instrumentFactory.defineInstrument({
         <p>If the circle is <strong>orange</strong>, press the letter J 
         as fast as you can.</p>
         <div style='width: 700px;'>
-        <div style='float: left;'><img src='${this.assets?.blue}'></img>
+        <div style='float: left;'><img src='${this.assets?.img?.blue}'></img>
         <p class='small'><strong>Press the F key</strong></p></div>
-        <div style='float: right;'><img src='${this.assets?.orange}'></img>
+        <div style='float: right;'><img src='${this.assets?.img?.orange}'></img>
         <p class='small'><strong>Press the J key</strong></p></div>
         </div>
         <p>Press any key to begin.</p>
@@ -69,8 +74,8 @@ export default instrumentFactory.defineInstrument({
 
       // Define trial stimuli array for timeline variables
       const test_stimuli = [
-        { correct_response: 'f', stimulus: this.assets?.blue },
-        { correct_response: 'j', stimulus: this.assets?.orange }
+        { correct_response: 'f', stimulus: this.assets?.img?.blue },
+        { correct_response: 'j', stimulus: this.assets?.img?.orange }
       ];
 
       // Define fixation and test trials

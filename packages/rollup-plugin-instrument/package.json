@@ -10,7 +10,11 @@
   },
   "dependencies": {
     "@open-data-capture/instrument-transformer": "workspace:*",
+    "csso": "^5.0.5",
     "mime": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/csso": "^5.0.4"
   },
   "peerDependencies": {
     "rollup": "4.x"
