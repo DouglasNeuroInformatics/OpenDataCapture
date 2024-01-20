@@ -4,21 +4,16 @@
 import type { Merge } from 'type-fest';
 import { z } from 'zod';
 
-import {
-  $BaseInstrument,
-  $EnhancedBaseInstrumentDetails,
-} from './instrument.base';
+import { $BaseInstrument, $EnhancedBaseInstrumentDetails } from './instrument.base';
 
 import type { Json, Language } from './core';
-import type {
-  BaseInstrument,
-  BaseInstrumentSummary,
-  EnhancedBaseInstrumentDetails
-} from './instrument.base';
+import type { BaseInstrument, BaseInstrumentSummary, EnhancedBaseInstrumentDetails } from './instrument.base';
 
 export type InteractiveInstrumentContent = {
-  /** contains mapped to URLs */
-  assets?: Record<string, string>;
+  assets?: {
+    css?: Record<string, string>;
+    img?: Record<string, string>;
+  };
   render: (...args: any[]) => any;
 };
 

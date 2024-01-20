@@ -11,5 +11,6 @@ declare module '*?instrument' {
 }
 
 interface ImportMeta {
-  encode: (filepath: string) => string;
+  encodeImage: (filepath: string) => string;
+  injectStylesheet: (filepath: string) => string;
 }
