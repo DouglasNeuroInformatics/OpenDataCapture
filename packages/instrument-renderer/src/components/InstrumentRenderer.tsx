@@ -50,6 +50,7 @@ export const InstrumentRenderer = ({ bundle, onSubmit, subject }: InstrumentRend
 
   return (
     <Stepper
+      className="h-full"
       steps={[
         {
           element: <InstrumentOverview instrument={instrument} />,

@@ -13,6 +13,8 @@ export const InteractiveContent = ({ bundle }: InteractiveContentProps) => {
 
   return (
     <iframe
+      allow="fullscreen"
+      className="h-full w-full border"
       data-bundle={bundle}
       name="interactive-instrument"
       ref={ref}
