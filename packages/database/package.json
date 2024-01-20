@@ -6,8 +6,7 @@
     "./gateway": "./src/gateway.ts"
   },
   "scripts": {
-    "build:lib": "prisma generate --schema prisma/core-schema.prisma && prisma generate --schema prisma/gateway-schema.prisma",
-    "postinstall": "bun build:lib"
+    "build:lib": "prisma generate --schema prisma/core-schema.prisma && prisma generate --schema prisma/gateway-schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^5.8.0"
