@@ -51,7 +51,7 @@ async function injectStylesheets(source, parent) {
       throw new Error(`Unexpected media type '${mimeType}' for file: ${filepath}`);
     }
     const result = minify(styles);
-    return `\`${result.css}\``;
+    return `String.raw\`${result.css}\``;
   });
 }
 
