@@ -1,4 +1,5 @@
-import runtime from '@open-data-capture/vite-plugin-runtime';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
 import { mergeConfig } from 'vite';
 
 /** @type {import('@storybook/react-vite').StorybookConfig} */
@@ -20,7 +21,11 @@ const config = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   viteFinal(config) {
     return mergeConfig(config, {
-      plugins: [runtime()]
+      css: {
+        postcss: {
+          plugins: [tailwindcss, autoprefixer]
+        }
+      }
     });
   }
 };

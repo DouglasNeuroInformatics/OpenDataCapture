@@ -5,47 +5,29 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
     "./components/Branding": "./src/components/Branding/index.ts",
-    "./components/Editor": "./src/components/Editor/index.ts",
     "./components/ErrorFallback": "./src/components/ErrorFallback/index.ts",
-    "./components/FormStepper": "./src/components/FormStepper/index.ts",
-    "./components/InteractiveStepper": "./src/components/InteractiveStepper/index.ts",
     "./components/Logo": "./src/components/Logo/index.ts",
-    "./components/MobileBlocker": "./src/components/MobileBlocker/index.ts",
     "./components/Navbar": "./src/components/Navbar/index.ts",
-    "./services/i18n": "./src/services/i18n.ts",
-    "./translations/*": "./src/translations/*",
-    "./utils/translate-instrument": "./src/utils/translate-instrument.ts",
     "./styles.css": "./src/styles.css",
     "./tailwind.config": "./tailwind.config.js"
   },
   "scripts": {
     "format": "prettier --write src",
-    "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
     "lint": "tsc && eslint --fix src",
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/form-types": "latest",
     "@douglasneuroinformatics/ui": "latest",
     "@douglasneuroinformatics/utils": "latest",
-    "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
-    "@monaco-editor/react": "^4.6.0",
-    "@open-data-capture/common": "workspace:*",
     "@open-data-capture/i18next": "workspace:*",
-    "@open-data-capture/runtime-v0.0.1": "workspace:*",
-    "i18next": "^23.7.16",
-    "monaco-editor": "^0.45.0",
-    "prettier": "^3.1.1",
-    "react-i18next": "^14.0.0",
-    "ts-pattern": "^5.0.6"
+    "react-i18next": "^14.0.0"
   },
   "devDependencies": {
-    "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
-    "sort-json": "^2.0.1",
     "vite": "^4.5.0"
   },
   "peerDependencies": {
