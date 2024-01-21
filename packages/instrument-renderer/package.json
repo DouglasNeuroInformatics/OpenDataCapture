@@ -27,8 +27,7 @@
     "i18next": "^23.7.16",
     "lodash": "^4.17.21",
     "react-i18next": "^14.0.0",
-    "ts-pattern": "^5.0.6",
-    "type-fest": "^4.9.0"
+    "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
     "@open-data-capture/vite-plugin-runtime": "workspace:*",

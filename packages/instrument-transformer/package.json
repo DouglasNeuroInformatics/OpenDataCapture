@@ -15,8 +15,7 @@
   },
   "dependencies": {
     "@swc/core": "^1.3.102",
-    "@swc/wasm-web": "^1.3.102",
-    "type-fest": "^4.9.0"
+    "@swc/wasm-web": "^1.3.102"
   },
   "devDependencies": {
     "@swc/types": "^0.1.5"

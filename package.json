@@ -58,6 +58,7 @@
     "storybook": "^7.6.7",
     "storybook-react-i18next": "^2.0.10",
     "turbo": "^1.11.3",
+    "type-fest": "^4.9.0",
     "typescript": "^5.3.3"
   },
   "packageManager": "bun@1.0.14"

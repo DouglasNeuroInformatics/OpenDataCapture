@@ -50,7 +50,6 @@
     "recharts": "^2.10.4",
     "tailwind-merge": "^2.2.0",
     "ts-pattern": "^5.0.6",
-    "type-fest": "^4.9.0",
     "zod": "^3.22.4",
     "zustand": "^4.4.7"
   },
