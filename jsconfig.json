@@ -19,6 +19,7 @@
     "paths": {
       "/runtime/v0.0.1/*": ["./runtime/v0.0.1/lib/*"]
     },
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",

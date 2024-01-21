@@ -40,6 +40,15 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
     void download(filename, () => formatFormDataAsString(formData));
   };
 
+  let language: string;
+  if (instrument.language === 'en') {
+    language = t('languages.english');
+  } else if (instrument.language === 'fr') {
+    language = t('languages.french');
+  } else {
+    language = instrument.language;
+  }
+
   return (
     <Card>
       <div className="border-b px-4 py-5 sm:px-6">
@@ -99,10 +108,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
           },
           {
             label: t('language'),
-            value: match(form.language)
-              .with('en', () => t('languages.english'))
-              .with('fr', () => t('languages.french'))
-              .otherwise(() => form.language)
+            value: language
           },
           {
             label: t('version'),

@@ -1,0 +1,7 @@
+{
+  "extends": "../../jsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*"]
+}
