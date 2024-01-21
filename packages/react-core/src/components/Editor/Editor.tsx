@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { ArrowToggle, Card } from '@douglasneuroinformatics/ui';
 import { twMerge } from 'tailwind-merge';
 
-import { withI18nProvider } from '../../utils/with-i18n-provider';
 import { MobileBlocker } from '../MobileBlocker';
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorMenu } from './EditorMenu';
@@ -14,7 +13,7 @@ import './setup';
 
 import type { EditorFile } from './types';
 
-type EditorProps = {
+export type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
   className?: string;
 
@@ -25,7 +24,7 @@ type EditorProps = {
   onSave?: (file: EditorFile) => void;
 };
 
-const EditorComponent = ({ className, files, onSave }: EditorProps) => {
+export const Editor = ({ className, files, onSave }: EditorProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openFiles, setOpenFiles] = useState<EditorFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<EditorFile | null>(null);
@@ -95,7 +94,3 @@ const EditorComponent = ({ className, files, onSave }: EditorProps) => {
     </MobileBlocker>
   );
 };
-
-const Editor = withI18nProvider(EditorComponent);
-
-export { Editor, type EditorProps };
