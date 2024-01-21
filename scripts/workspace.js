@@ -8,7 +8,11 @@ import url from 'url';
 const PROJECT_ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
 const WORKSPACE_DIRS = await fs
   .readFile(path.resolve(PROJECT_ROOT, 'package.json'), 'utf-8')
-  .then(JSON.parse)
+  .then((content) => {
+    /** @type {import('type-fest').PackageJson & { workspaces: any[] }} */
+    const pkg = JSON.parse(content);
+    return pkg;
+  })
   .then((pkg) => pkg.workspaces.map((ws) => ws.split('/')[0]));
 
 const [targetWorkspace, ...args] = process.argv.slice(2, process.argv.length);
@@ -22,6 +26,10 @@ let isFound = false;
 for (const dir of WORKSPACE_DIRS) {
   for (const workspace of await fs.readdir(path.resolve(PROJECT_ROOT, dir))) {
     const workspaceDir = path.resolve(PROJECT_ROOT, dir, workspace);
+    const stats = await fs.lstat(workspaceDir);
+    if (!stats.isDirectory()) {
+      continue;
+    }
     const workspaceName = await fs
       .readFile(path.resolve(workspaceDir, 'package.json'), 'utf-8')
       .then(JSON.parse)
@@ -35,6 +43,9 @@ for (const dir of WORKSPACE_DIRS) {
         });
         console.log(val);
       } catch (err) {
+        if (!(err instanceof Error)) {
+          throw err;
+        }
         console.error(`\n${err.message}`);
       }
     }
