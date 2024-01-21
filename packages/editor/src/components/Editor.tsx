@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react';
 import { ArrowToggle, Card } from '@douglasneuroinformatics/ui';
 import { twMerge } from 'tailwind-merge';
 
+import '../setup';
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorMenu } from './EditorMenu';
 import { EditorPane } from './EditorPane';
 import { EditorSidebar } from './EditorSidebar';
 import { EditorTab } from './EditorTab';
 import { MobileBlocker } from './MobileBlocker';
-import './setup';
 
 import type { EditorFile } from '../types';
 
