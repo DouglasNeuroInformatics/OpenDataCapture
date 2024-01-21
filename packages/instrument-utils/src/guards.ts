@@ -1,5 +1,8 @@
 import type {
+  AnyInstrument,
+  FormInstrument,
   InstrumentKind,
+  InteractiveInstrument,
   SomeInstrument,
   SomeMultilingualInstrument,
   SomeUnilingualInstrument
@@ -15,4 +18,12 @@ export function isMultilingualInstrument<TKind extends InstrumentKind>(
   instrument: SomeInstrument<TKind>
 ): instrument is SomeMultilingualInstrument<TKind> {
   return Array.isArray(instrument.language);
+}
+
+export function isFormInstrument(instrument: AnyInstrument): instrument is FormInstrument {
+  return instrument.kind === 'FORM';
+}
+
+export function isInteractiveInstrument(instrument: AnyInstrument): instrument is InteractiveInstrument {
+  return instrument.kind === 'INTERACTIVE';
 }
