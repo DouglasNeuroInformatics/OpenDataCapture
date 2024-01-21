@@ -25,8 +25,7 @@
     "react-i18next": "^14.0.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.33",
+    "@open-data-capture/vite-plugin-tailwind": "workspace:*",
     "vite": "^4.5.0"
   },
   "peerDependencies": {

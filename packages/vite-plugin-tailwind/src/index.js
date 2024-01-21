@@ -2,23 +2,29 @@ import module from 'module';
 import path from 'path';
 import process from 'process';
 
+// @ts-ignore
+import _baseConfig from '@douglasneuroinformatics/ui/tailwind.config';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
-/** @ts-ignore @type {import('tailwindcss').Config & { content: string[] }} */
-const baseConfig = (await import('@douglasneuroinformatics/ui/tailwind.config')).default;
+/** @type {import('tailwindcss').Config & { content: string[] }} */
+const baseConfig = _baseConfig;
 
 /**
  * @param {Object} [options]
- * @param {string[]} options.content
- * @param {string[]} options.include
- * @param {string | URL} options.root
+ * @param {string[]} [options.content]
+ * @param {string[]} [options.include]
+ * @param {string | URL} [options.root]
  * @returns {import('vite').PluginOption}
  */
-const tailwind = ({ content, include, root } = { content: [], include: [], root: process.cwd() }) => {
+const tailwind = (options) => {
+  const content = options?.content ?? [];
+  const include = options?.include ?? [];
+  const root = options?.root ?? process.cwd();
+
   const require = module.createRequire(root);
-  
+
   /** @type {string[]} */
   const libraryContent = [];
   for (const id of include) {
