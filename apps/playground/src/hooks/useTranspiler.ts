@@ -1,14 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { type AnyUnilingualInstrument } from '@open-data-capture/common/instrument';
-import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { BrowserInstrumentTransformer } from '@open-data-capture/instrument-transformer/browser';
-import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
 type BuiltState = {
-  instrument: AnyUnilingualInstrument;
+  bundle: string;
   status: 'built';
 };
 
@@ -21,7 +18,6 @@ type LoadingState = {
   status: 'loading';
 };
 
-const instrumentInterpreter = new InstrumentInterpreter();
 const instrumentTransformer = new BrowserInstrumentTransformer();
 
 export type TranspilerState = BuiltState | ErrorState | LoadingState;
@@ -32,15 +28,9 @@ export function useTranspiler() {
 
   const transpile = useCallback(async (source: string) => {
     setState({ status: 'loading' });
-    let instrument: AnyUnilingualInstrument;
+    let bundle: string;
     try {
-      const bundle = await instrumentTransformer.generateBundle(source);
-      const unknownInstrument = await instrumentInterpreter.interpret(bundle, { validate: false });
-      if (unknownInstrument.kind === 'FORM') {
-        instrument = translateFormInstrument(unknownInstrument, 'en');
-      } else {
-        instrument = unknownInstrument;
-      }
+      bundle = await instrumentTransformer.generateBundle(source);
     } catch (err) {
       console.error(err);
       if (typeof err === 'string') {
@@ -57,7 +47,7 @@ export function useTranspiler() {
       }
       return;
     }
-    setState({ instrument, status: 'built' });
+    setState({ bundle, status: 'built' });
   }, []);
 
   useEffect(() => {

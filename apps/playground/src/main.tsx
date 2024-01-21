@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
+import { i18n } from '@open-data-capture/i18next';
+
 import { App } from './App';
 
-import './styles.css';
+import '@open-data-capture/react-core/styles.css';
+
+await i18n.initialize();
 
 const root = document.getElementById('root')!;
-
-// React must be in global scope as indirect eval is used for instrument
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-(window as any).React = React;
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>

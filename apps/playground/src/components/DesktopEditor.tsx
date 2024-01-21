@@ -8,7 +8,7 @@ import {
   useDownload,
   useNotificationsStore
 } from '@douglasneuroinformatics/ui';
-import { EditorPane, type EditorPaneRef } from '@open-data-capture/react-core/components/Editor';
+import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
 
 import { EditorContext } from '@/context/EditorContext';
 
