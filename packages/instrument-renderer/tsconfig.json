@@ -1,10 +1,7 @@
 {
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
-    "jsx": "react-jsx",
-    "resolveJsonModule": true
-  },
   "extends": "../../jsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  },
   "include": ["src/**/*"]
 }
