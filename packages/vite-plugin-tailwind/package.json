@@ -1,0 +1,20 @@
+{
+  "name": "@open-data-capture/vite-plugin-tailwind",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "eslint --fix src"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/ui": "latest",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1"
+  },
+  "peerDependencies": {
+    "vite": "4.x"
+  }
+}
