@@ -5,7 +5,7 @@ const interpreter = new InstrumentInterpreter();
 
 window.addEventListener('message', (event: MessageEvent<{ payload: string; type: string }>) => {
   const done = (data: Json) => {
-    window.parent.dispatchEvent(new CustomEvent('done', { detail: data }));
+    window.parent.document.dispatchEvent(new CustomEvent('done', { detail: data }));
   };
   const bundle = event.data.payload;
   void interpreter

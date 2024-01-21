@@ -51,12 +51,11 @@ const instrumentFactory = new InstrumentFactory({
 
 export default instrumentFactory.defineInstrument({
   content: {
-    render() {
+    render(done) {
       const rootElement = document.createElement('div');
       document.body.appendChild(rootElement);
       const root = createRoot(rootElement);
-      // eslint-disable-next-line no-alert
-      root.render(<ClickTask done={(data) => alert(JSON.stringify(data))} />);
+      root.render(<ClickTask done={(data) => done(data)} />);
     }
   },
   details: {
