@@ -1,6 +1,7 @@
 import path from 'path';
 import url from 'url';
 
+import config from '@open-data-capture/react-core/tailwind.config';
 import runtime from '@open-data-capture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
@@ -17,7 +18,13 @@ export default defineConfig({
   },
   css: {
     postcss: {
-      plugins: [tailwindcss, autoprefixer]
+      plugins: [
+        tailwindcss({
+          content: [...config.content, 'index.html', './src/**/*.{js,ts,jsx,tsx}'],
+          presets: [config]
+        }),
+        autoprefixer
+      ]
     }
   },
   optimizeDeps: {
