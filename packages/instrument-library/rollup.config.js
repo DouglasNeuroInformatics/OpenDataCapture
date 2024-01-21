@@ -18,7 +18,7 @@ export default defineConfig({
     instrument(),
     resolve({
       browser: true,
-      extensions: ['.js', '.jsx']
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
     })
   ]
 });

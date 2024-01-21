@@ -3,60 +3,50 @@
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-/** @typedef {Extract<import('/runtime/v0.0.1/core.js').InstrumentLanguage, string>} Language */
+type Language = Extract<import('/runtime/v0.0.1/core.js').InstrumentLanguage, string>;
 
-/** @typedef {Record<string, { [L in Language]: string; }>} MultilingualOptions */
+type MultilingualOptions = Record<string, { [L in Language]: string }>;
 
-/**
- * @typedef {{ [K in keyof T]: string; }} TranslatedOptions
- * @template {MultilingualOptions} T
- */
+type TranslatedOptions<T extends MultilingualOptions> = { [K in keyof T]: string };
 
-/**
- * @typedef {{ [L in Language]: { [K in keyof T]: string; }; }} FormattedOptions
- * @template {MultilingualOptions} T
- */
+type FormattedOptions<T extends MultilingualOptions> = { [L in Language]: { [K in keyof T]: string } };
 
 /**
  * Translates multilingual options to the specified language.
  *
- * @template {MultilingualOptions} T
- * @param {T} options - The multilingual options to translate.
- * @param {Language} language - The target language.
- * @returns {TranslatedOptions<T>} The translated options.
+ * @param options - the multilingual options to translate.
+ * @param language - the target language.
+ * @returns the translated options.
  */
-function translateOptions(options, language) {
-  /** @type {Partial<TranslatedOptions<T>>} */
-  const translatedOptions = {};
+function translateOptions<T extends MultilingualOptions>(options: T, language: Language) {
+  const translatedOptions: Partial<TranslatedOptions<T>> = {};
   for (const option in options) {
     translatedOptions[option] = options[option]?.[language];
   }
-  return /** @type {TranslatedOptions<T>} */ (translatedOptions);
+  return translatedOptions as TranslatedOptions<T>;
 }
 
 /**
  * Transform multilingual options to options for a multilingual instrument.
  *
- * @template {MultilingualOptions} T
- * @param {T} options - The multilingual options to format.
- * @returns {FormattedOptions<T>} The formatted options.
+ * @param options - the multilingual options to format.
+ * @returns the formatted options.
  */
-function formatTranslatedOptions(options) {
+function formatTranslatedOptions<T extends MultilingualOptions>(options: T) {
   return {
     en: translateOptions(options, 'en'),
     fr: translateOptions(options, 'fr')
-  };
+  } satisfies FormattedOptions<T>;
 }
 
 /**
  * Extracts keys from an object as a tuple.
  *
- * @template {Record<string, unknown>} T
- * @param {T} options - The object to extract keys from.
- * @returns {[keyof T, ...(keyof T)[]]} The keys as a tuple.
+ * @param options - The object to extract keys from.
+ * @returns the keys as a tuple.
  */
-function extractKeysAsTuple(options) {
-  return /** @type {[keyof T, ...(keyof T)[]]} */ (Object.keys(options));
+function extractKeysAsTuple<T extends Record<string, unknown>>(options: T) {
+  return Object.keys(options) as [keyof T, ...(keyof T)[]];
 }
 
 const employmentStatus = {
@@ -589,7 +579,7 @@ const religion = {
   }
 };
 
-const yesNoOptions = /** @type {const} */ ({
+const yesNoOptions = /** @type {const} */ {
   en: {
     f: 'No',
     t: 'Yes'
@@ -598,7 +588,7 @@ const yesNoOptions = /** @type {const} */ ({
     f: 'Non',
     t: 'Oui'
   }
-});
+};
 
 const instrumentFactory = new InstrumentFactory({
   kind: 'FORM',

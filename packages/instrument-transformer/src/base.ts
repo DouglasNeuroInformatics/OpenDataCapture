@@ -21,16 +21,16 @@ export abstract class BaseInstrumentTransformer {
   ];
 
   private readonly parseOptions: ParseOptions = {
-    jsx: true,
-    syntax: 'ecmascript',
-    target: 'es2022'
+    syntax: 'typescript',
+    target: 'es2022',
+    tsx: true
   };
 
   private readonly transformOptions: TransformOptions = {
     jsc: {
       parser: {
-        jsx: true,
-        syntax: 'ecmascript',
+        syntax: 'typescript',
+        tsx: true
       },
       target: 'es2022',
       transform: {

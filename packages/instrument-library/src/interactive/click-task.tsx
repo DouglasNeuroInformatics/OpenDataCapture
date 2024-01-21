@@ -3,17 +3,10 @@ const { default: React, useEffect, useRef, useState } = await import('/runtime/v
 const { createRoot } = await import('/runtime/v0.0.1/react-dom/client.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-/**
- * This component renders a greeting to the user.
- *
- * @param {Object} props
- * @param {(data: { count: number }) => void} props.done
- */
-const ClickTask = ({ done }) => {
+const ClickTask: React.FC<{ done: (data: { count: number }) => void }> = ({ done }) => {
   const [count, setCount] = useState(0);
   const [secondsRemaining, setSecondsRemaining] = useState(10);
-  /** @type {React.MutableRefObject<null | NodeJS.Timeout>} */
-  const interval = useRef(null);
+  const interval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     interval.current = setInterval(() => {

@@ -6,16 +6,10 @@
   "exports": {
     ".": {
       "import": "./lib/index.js",
-      "types": "./src/typings/index.d.ts"
+      "types": "./src/index.d.ts"
     },
-    "./forms/*.js": {
-      "import": "./src/forms/*.js",
-      "types": "./src/typings/forms.d.ts"
-    },
-    "./interactive/*.jsx": {
-      "import": "./src/interactive/*.jsx",
-      "types": "./src/typings/interactive.d.ts"
-    }
+    "./forms/*.ts": "./src/forms/*.ts",
+    "./interactive/*": "./src/interactive/*"
   },
   "scripts": {
     "build:lib": "rm -rf lib && bunx --bun rollup -c",

@@ -9,7 +9,7 @@ export type TransformOutput = Simplify<CoreOutput & WebOutput>;
 
 export type ModuleItemType = Module['body'][number]['type'];
 
-export type ParseOptions = Simplify<Extract<CoreParseOptions & WebParseOptions, { syntax: 'ecmascript' }>>;
+export type ParseOptions = Simplify<Extract<CoreParseOptions & WebParseOptions, { syntax: 'typescript' }>>;
 
 export type Transpiler = {
   parse(src: string, options: ParseOptions): Promise<Module>;

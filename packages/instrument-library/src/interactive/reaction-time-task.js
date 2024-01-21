@@ -4,8 +4,6 @@ const { HtmlKeyboardResponsePlugin, ImageKeyboardResponsePlugin, PreloadPlugin, 
 const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-// import 'jspsych/css/jspsych.css';
-
 const instrumentFactory = new InstrumentFactory({
   kind: 'INTERACTIVE',
   language: 'en',
