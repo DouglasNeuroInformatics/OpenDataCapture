@@ -14,7 +14,7 @@ export type InteractiveInstrumentContent = {
     css?: string[];
     img?: Record<string, string>;
   };
-  render: (...args: any[]) => any;
+  render: (done: (data: Json) => void, ...args: any[]) => any;
 };
 
 export type InteractiveInstrument<TData extends Json = Json, TLanguage extends Language = Language> = Merge<

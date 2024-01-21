@@ -1,8 +1,12 @@
+import type { Json } from '@open-data-capture/common/core';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 
 const interpreter = new InstrumentInterpreter();
 
 window.addEventListener('message', (event: MessageEvent<{ payload: string; type: string }>) => {
+  const done = (data: Json) => {
+    window.parent.dispatchEvent(new CustomEvent('done', { detail: data }));
+  };
   const bundle = event.data.payload;
   void interpreter
     .interpret(bundle, { kind: 'INTERACTIVE' })
@@ -11,7 +15,7 @@ window.addEventListener('message', (event: MessageEvent<{ payload: string; type:
         document.head.insertAdjacentHTML('beforeend', `<style>${stylesheet}</style>`);
         console.log(stylesheet);
       });
-      instrument.content.render();
+      instrument.content.render(done);
     })
     .catch(console.error);
 });
