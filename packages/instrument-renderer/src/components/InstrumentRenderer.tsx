@@ -10,6 +10,7 @@ import {
 import type { Subject } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
+import type { Promisable } from 'type-fest';
 
 import { useResolvedInstrument } from '../hooks/useResolvedInstrument';
 import { FormContent } from './FormContent';
@@ -19,7 +20,7 @@ import { InteractiveContent } from './InteractiveContent';
 
 export type InstrumentRendererProps = {
   bundle: string;
-  onSubmit: (data: unknown) => Promise<void>;
+  onSubmit: (data: unknown) => Promisable<void>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
