@@ -10,7 +10,9 @@ const ClickTask: React.FC<{ done: (data: { count: number }) => void }> = ({ done
 
   useEffect(() => {
     interval.current = setInterval(() => {
-      setSecondsRemaining((prev) => prev - 1);
+      if (secondsRemaining > 0) {
+        setSecondsRemaining((prev) => prev - 1);
+      }
     }, 1000);
     return () => {
       if (interval.current) {
@@ -20,16 +22,16 @@ const ClickTask: React.FC<{ done: (data: { count: number }) => void }> = ({ done
   }, []);
 
   useEffect(() => {
-    if (0 > secondsRemaining && interval.current) {
+    if (secondsRemaining === 0 && interval.current) {
       done({ count });
       clearInterval(interval.current);
     }
   }, [secondsRemaining]);
 
   return (
-    <div className="click-task">
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <span>Seconds Remaining: {secondsRemaining}</span>
-      <span>Count: {Math.max(count, 0)}</span>
+      <span>Count: {count}</span>
       <button
         onClick={() => {
           setCount(count + 1);
@@ -49,9 +51,6 @@ const instrumentFactory = new InstrumentFactory({
 
 export default instrumentFactory.defineInstrument({
   content: {
-    assets: {
-      css: [import.meta.injectStylesheet('./click-task.css')]
-    },
     render() {
       const rootElement = document.createElement('div');
       document.body.appendChild(rootElement);
