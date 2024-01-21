@@ -6,6 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./package.json": "./package.json",
     "./styles.css": "./src/styles.css",
     "./tailwind.config": "./tailwind.config.js"
   },

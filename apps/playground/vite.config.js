@@ -19,9 +19,11 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    runtime(),
+    await runtime(),
     tailwind({
-      content: ['index.html', './src/**/*.{js,ts,jsx,tsx}']
+      content: ['index.html', './src/**/*.{js,ts,jsx,tsx}'],
+      include: ['@open-data-capture/editor', '@open-data-capture/instrument-renderer', '@open-data-capture/react-core'],
+      root: import.meta.url
     })
   ],
   resolve: {
