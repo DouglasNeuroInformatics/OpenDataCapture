@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { AdjustmentsHorizontalIcon, ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
-import { type NavItem, Navbar } from '@open-data-capture/react-core/components/Navbar';
+import { type NavItem, Navbar } from '@open-data-capture/react-core';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
