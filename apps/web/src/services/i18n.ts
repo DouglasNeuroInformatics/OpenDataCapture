@@ -1,20 +1,11 @@
-import { i18n } from '@open-data-capture/i18next';
+import { createExtendedInstance } from '@open-data-capture/i18next';
 import Backend from 'i18next-http-backend';
 
-i18n.use(Backend);
+const i18n = createExtendedInstance({
+  ns: ['auth', 'common', 'contact', 'instruments', 'layout', 'overview', 'setup', 'subjects', 'user', 'visits']
+});
 
-await i18n.loadNamespaces([
-  'auth',
-  'common',
-  'contact',
-  'instruments',
-  'layout',
-  'overview',
-  'setup',
-  'subjects',
-  'user',
-  'visits'
-]);
+i18n.use(Backend);
 
 await i18n.initialize();
 
