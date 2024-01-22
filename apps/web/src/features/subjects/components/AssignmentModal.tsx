@@ -14,7 +14,7 @@ export type AssignmentModalProps = {
 
 /** Component for creating a new assignment */
 export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen }: AssignmentModalProps) => {
-  const { t } = useTranslation(['subjects', 'common']);
+  const { t } = useTranslation(['subjects', 'core']);
 
   return (
     <Modal open={isOpen} title="Assignment" onClose={() => setIsOpen(false)}>
@@ -22,7 +22,7 @@ export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen
         content={{
           instrumentId: {
             kind: 'options',
-            label: t('common:instrument'),
+            label: t('core:instrument'),
             options: instrumentOptions
           },
           expiresAt: {

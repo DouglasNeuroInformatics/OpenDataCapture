@@ -20,7 +20,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
   const navigate = useNavigate();
   const { currentGroup, currentUser } = useAuthStore();
-  const { t } = useTranslation(['subjects', 'common']);
+  const { t } = useTranslation(['subjects', 'core']);
 
   const [showLookup, setShowLookup] = useState(false);
 
@@ -87,14 +87,14 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
           },
           {
             field: (subject) => toBasicISOString(new Date(subject.dateOfBirth)),
-            label: t('common:identificationData.dateOfBirth.label')
+            label: t('core:identificationData.dateOfBirth.label')
           },
           {
             field: (subject) =>
               subject.sex === 'FEMALE'
-                ? t('common:identificationData.sex.female')
-                : t('common:identificationData.sex.male'),
-            label: t('common:identificationData.sex.label')
+                ? t('core:identificationData.sex.female')
+                : t('core:identificationData.sex.male'),
+            label: t('core:identificationData.sex.label')
           }
         ]}
         data={data}

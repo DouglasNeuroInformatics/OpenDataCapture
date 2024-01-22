@@ -19,34 +19,34 @@ export type IdentificationFormProps = {
 
 export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel }: IdentificationFormProps) => {
   const { activeVisit } = useActiveVisitStore();
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation('core');
 
   return (
     <Form<SubjectIdentificationData>
       content={{
         firstName: {
-          description: t('common:identificationData.firstName.description'),
+          description: t('identificationData.firstName.description'),
           kind: 'text',
-          label: t('common:identificationData.firstName.label'),
+          label: t('identificationData.firstName.label'),
           variant: 'short'
         },
         lastName: {
-          description: t('common:identificationData.lastName.description'),
+          description: t('identificationData.lastName.description'),
           kind: 'text',
-          label: t('common:identificationData.lastName.label'),
+          label: t('identificationData.lastName.label'),
           variant: 'short'
         },
         dateOfBirth: {
           kind: 'date',
-          label: t('common:identificationData.dateOfBirth.label')
+          label: t('identificationData.dateOfBirth.label')
         },
         sex: {
-          description: t('common:identificationData.sex.description'),
+          description: t('identificationData.sex.description'),
           kind: 'options',
-          label: t('common:identificationData.sex.label'),
+          label: t('identificationData.sex.label'),
           options: {
-            FEMALE: t('common:identificationData.sex.female'),
-            MALE: t('common:identificationData.sex.male')
+            FEMALE: t('identificationData.sex.female'),
+            MALE: t('identificationData.sex.male')
           }
         }
       }}

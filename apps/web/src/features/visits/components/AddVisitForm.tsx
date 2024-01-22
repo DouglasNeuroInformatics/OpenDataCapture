@@ -14,7 +14,7 @@ export type AddVisitFormProps = {
 };
 
 export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
-  const { t } = useTranslation(['common', 'visits']);
+  const { t } = useTranslation(['core', 'visits']);
 
   return (
     <Form<AddVisitFormData>

@@ -12,7 +12,7 @@ type SubjectLookupProps = {
 };
 
 export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
-  const { t } = useTranslation(['subjects', 'common']);
+  const { t } = useTranslation(['subjects', 'core']);
   const notifications = useNotificationsStore();
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
       validateStatus: (status) => status === 200 || status === 404
     });
     if (response.status === 404) {
-      notifications.addNotification({ message: t('common:notFound'), type: 'warning' });
+      notifications.addNotification({ message: t('core:notFound'), type: 'warning' });
       return;
     }
     notifications.addNotification({ type: 'success' });

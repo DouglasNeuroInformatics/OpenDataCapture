@@ -31,16 +31,16 @@
       "fr": "Démonstration"
     }
   },
-  "pageTitle": {
-    "en": "Setup",
-    "fr": "Mise en service"
+  "loadingSubtitle": {
+    "en": "Please be patient, this may take a while...",
+    "fr": "Veuillez patienter, cela peut prendre un certain temps..."
   },
   "loadingTitle": {
     "en": "Initializing Application",
     "fr": "Initialisation de l'application"
   },
-  "loadingSubtitle": {
-    "en": "Please be patient, this may take a while...",
-    "fr": "Veuillez patienter, cela peut prendre un certain temps..."
+  "pageTitle": {
+    "en": "Setup",
+    "fr": "Mise en service"
   }
 }

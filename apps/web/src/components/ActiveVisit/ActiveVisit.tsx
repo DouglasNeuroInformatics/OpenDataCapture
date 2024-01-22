@@ -12,7 +12,7 @@ import { useActiveVisitStore } from '@/stores/active-visit-store';
 export const ActiveVisit = () => {
   const { activeVisit, setActiveVisit } = useActiveVisitStore();
   const [isHidden, setIsHidden] = useState(false);
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['core', 'common']);
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
 
   const bind = useDrag(
@@ -53,7 +53,7 @@ export const ActiveVisit = () => {
       </div>
       {isHidden && (
         <React.Fragment>
-          <h3 className="mb-2 text-xl font-medium text-inherit">{t('activeVisit')}</h3>
+          <h3 className="mb-2 text-xl font-medium text-inherit">{t('common:activeVisit')}</h3>
           <hr className="mb-2" />
           <span>
             {t('identificationData.firstName.label')}: {activeVisit.subject.firstName}

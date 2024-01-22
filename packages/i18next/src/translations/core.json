@@ -7,13 +7,29 @@
     "en": "Begin",
     "fr": "Commencer"
   },
+  "bilingual": {
+    "en": "Bilingual",
+    "fr": "Bilingue"
+  },
+  "cancel": {
+    "en": "Cancel",
+    "fr": "Annuler"
+  },
   "changeTheme": {
     "en": "Change Theme",
     "fr": "Changer de thème"
   },
+  "close": {
+    "en": "Close",
+    "fr": "Fermer"
+  },
   "data": {
     "en": "Data",
     "fr": "Données"
+  },
+  "delete": {
+    "en": "Delete",
+    "fr": "Effacer"
   },
   "description": {
     "en": "Description",
@@ -22,6 +38,10 @@
   "details": {
     "en": "Details",
     "fr": "Détails"
+  },
+  "download": {
+    "en": "Download",
+    "fr": "Télécharger"
   },
   "editor": {
     "keyboardShortcuts": {
@@ -39,9 +59,19 @@
       "fr": "Veuillez sélectionner un fichier pour commencer"
     }
   },
+  "error": {
+    "en": "Error",
+    "fr": "Erreur"
+  },
   "estimatedDuration": {
     "en": "Estimated Duration",
     "fr": "Durée estimée"
+  },
+  "form": {
+    "requiredField": {
+      "en": "This field is required",
+      "fr": "Ce champ est obligatoire"
+    }
   },
   "fullName": {
     "en": "Full Name",
@@ -50,6 +80,10 @@
   "help": {
     "en": "Help",
     "fr": "Aide"
+  },
+  "httpRequestFailed": {
+    "en": "HTTP Request Failed",
+    "fr": "Échec de la requête HTTP"
   },
   "identificationData": {
     "dateOfBirth": {
@@ -137,9 +171,33 @@
       "fr": "Désolé, cette fonctionnalité n'est pas disponible sur mobile"
     }
   },
+  "name": {
+    "en": "Name",
+    "fr": "Nom"
+  },
+  "networkError": {
+    "en": "Network Error",
+    "fr": "Erreur de réseau"
+  },
+  "no": {
+    "en": "No",
+    "fr": "Non"
+  },
+  "notFound": {
+    "en": "Not Found",
+    "fr": "Pas trouvé"
+  },
+  "print": {
+    "en": "Print",
+    "fr": "Imprimer"
+  },
   "responses": {
     "en": "Responses",
     "fr": "Réponses"
+  },
+  "results": {
+    "en": "Results",
+    "fr": "Résultats"
   },
   "save": {
     "en": "Save",
@@ -163,6 +221,10 @@
     "en": "Subject",
     "fr": "Client"
   },
+  "submit": {
+    "en": "Submit",
+    "fr": "Soumettre"
+  },
   "summary": {
     "subtitle": {
       "en": "Completed on {{ dateCompleted }}",
@@ -172,6 +234,10 @@
       "en": "Summary of Results for the {{title}}",
       "fr": "{{title}} : résumé des résultats"
     }
+  },
+  "table": {
+    "en": "Table",
+    "fr": "Tableau"
   },
   "tag": {
     "en": "Tag",
@@ -189,8 +255,16 @@
     "en": "Title",
     "fr": "Titre"
   },
+  "unknownError": {
+    "en": "Unknown Error",
+    "fr": "Erreur inconnue"
+  },
   "version": {
     "en": "Version",
     "fr": "Version"
+  },
+  "yes": {
+    "en": "Yes",
+    "fr": "Oui"
   }
 }

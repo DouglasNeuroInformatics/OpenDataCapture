@@ -14,7 +14,7 @@ export type AssignmentSliderProps = {
 
 /** Component for modifying an existing assignment */
 export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: AssignmentSliderProps) => {
-  const { i18n, t } = useTranslation(['common', 'subjects']);
+  const { i18n, t } = useTranslation(['core', 'subjects']);
   const instrument = useInstrumentBundle(assignment?.instrumentBundle);
 
   const title =

@@ -18,7 +18,7 @@ type SetupFormProps = {
 };
 
 const SetupForm = ({ onSubmit }: SetupFormProps) => {
-  const { t } = useTranslation(['common', 'setup']);
+  const { t } = useTranslation(['core', 'setup']);
   return (
     <Form<SetupData>
       content={[

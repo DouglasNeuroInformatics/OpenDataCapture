@@ -16,6 +16,10 @@
       "en": "Expires",
       "fr": "Expiration"
     },
+    "link": {
+      "en": "Link to Assignment",
+      "fr": "Lien vers la tâche"
+    },
     "resendNotification": {
       "en": "Resend Notification",
       "fr": "Renvoyer la notification"
@@ -45,10 +49,6 @@
     "title": {
       "en": "Title",
       "fr": "Titre"
-    },
-    "link": {
-      "en": "Link to Assignment",
-      "fr": "Lien vers la tâche"
     }
   },
   "index": {
