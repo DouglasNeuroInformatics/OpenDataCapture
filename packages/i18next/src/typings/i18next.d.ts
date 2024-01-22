@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
+import type { Language } from '@open-data-capture/common/core';
 import 'i18next';
 
 import core from '../translations/core.json';
@@ -17,5 +18,9 @@ declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: DefaultNS;
     resources: CustomResources;
+  }
+
+  interface i18n {
+    resolvedLanguage?: Language
   }
 }
