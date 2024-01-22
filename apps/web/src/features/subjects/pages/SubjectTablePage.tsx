@@ -22,7 +22,7 @@ export const SubjectTablePage = () => {
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [tableData, setTableData] = useState<Record<string, unknown>[]>([]);
   const [selectedForm, setSelectedForm] = useState<FormInstrumentSummary<FormDataType, Language> | null>(null);
-  const { t } = useTranslation(['subjects', 'common']);
+  const { t } = useTranslation(['subjects', 'core']);
 
   const formsQuery = useAvailableForms();
   const recordsQuery = useFormRecords({
@@ -112,7 +112,7 @@ export const SubjectTablePage = () => {
             <Dropdown
               className="text-sm"
               options={['CSV', 'JSON']}
-              title={t('common:download')}
+              title={t('core:download')}
               variant="secondary"
               onSelection={handleDownload}
             />

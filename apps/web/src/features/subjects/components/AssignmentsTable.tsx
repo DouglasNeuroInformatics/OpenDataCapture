@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment, AssignmentStatus } from '@open-data-capture/common/assignment';
-import type { Language } from '@open-data-capture/common/core';
 import { type AnyInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import _ from 'lodash';
@@ -46,7 +45,7 @@ export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTablePr
             if (typeof title === 'string') {
               return title;
             }
-            return title?.[i18n.resolvedLanguage as Language] ?? title?.[altLanguage] ?? entry.instrumentId;
+            return title?.[i18n.resolvedLanguage!] ?? title?.[altLanguage] ?? entry.instrumentId;
           },
           label: t('assignments.title')
         },

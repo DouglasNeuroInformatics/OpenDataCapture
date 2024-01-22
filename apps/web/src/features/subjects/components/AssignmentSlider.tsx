@@ -1,6 +1,5 @@
 import { Button, Slider } from '@douglasneuroinformatics/ui';
 import type { Assignment } from '@open-data-capture/common/assignment';
-import type { Language } from '@open-data-capture/common/core';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
@@ -20,7 +19,7 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
   const title =
     typeof instrument?.details.title === 'string'
       ? instrument?.details.title
-      : instrument?.details.title[i18n.resolvedLanguage as Language];
+      : instrument?.details.title[i18n.resolvedLanguage!];
 
   return (
     <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={title}>

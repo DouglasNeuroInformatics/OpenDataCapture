@@ -1,8 +1,7 @@
-import type { Language } from '@open-data-capture/common/core';
 import { $InstrumentBundleContainer } from '@open-data-capture/common/instrument';
 import type { AnyInstrument, AnyUnilingualInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
-import { translateFormInstrument } from '@open-data-capture/react-core/utils/translate-instrument';
+import { translateInstrument } from '@open-data-capture/instrument-utils';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -24,13 +23,7 @@ export const useInstruments = <TKind extends InstrumentKind>({ params }: { param
             kind: params?.kind,
             validate: import.meta.env.DEV
           });
-          if (instrument.kind === 'FORM') {
-            return translateFormInstrument(
-              instrument as Extract<AnyInstrument, { kind: 'FORM' }>,
-              i18n.resolvedLanguage as Language
-            );
-          }
-          return instrument;
+          return translateInstrument(instrument, i18n.resolvedLanguage ?? 'en');
         })
       );
       return instruments as (Extract<AnyUnilingualInstrument, { kind: TKind }> & { id: string })[];
