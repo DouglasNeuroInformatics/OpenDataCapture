@@ -6,7 +6,8 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   AnyInstrumentSummary,
   InstrumentBundleContainer,
-  InstrumentKind
+  InstrumentKind,
+  InstrumentSourceContainer
 } from '@open-data-capture/common/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -30,7 +31,7 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'Find All Instruments' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+  async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind): Promise<unknown[]> {
     return this.instrumentsService.find({ kind }, { ability });
   }
 
@@ -47,7 +48,10 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'Get Instrument Sources' })
   @Get('sources')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findSources(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+  async findSources(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('kind') kind?: InstrumentKind
+  ): Promise<InstrumentSourceContainer[]> {
     return this.instrumentsService.findSources({ kind }, { ability });
   }
 

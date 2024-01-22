@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { $BaseInstrument, $EnhancedBaseInstrumentDetails } from './instrument.base';
 
 import type { Json, Language } from './core';
-import type { BaseInstrument, BaseInstrumentSummary, EnhancedBaseInstrumentDetails } from './instrument.base';
+import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument.base';
 
 export type InteractiveInstrumentContent = {
   assets?: {
@@ -34,7 +34,10 @@ export const $InteractiveInstrument = $BaseInstrument('en').extend({
   kind: z.literal('INTERACTIVE')
 });
 
-export type InteractiveInstrumentSummary<
-  TData extends Json = Json,
-  TLanguage extends Language = Language
-> = BaseInstrumentSummary<InteractiveInstrument<TData, TLanguage>>;
+export const $InteractiveInstrumentSummary = $InteractiveInstrument
+  .omit({ content: true, validationSchema: true })
+  .extend({
+    id: z.string()
+  });
+
+export type InteractiveInstrumentSummary = z.infer<typeof $InteractiveInstrumentSummary>;

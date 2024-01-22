@@ -1,27 +1,20 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { z } from 'zod';
 
-import {
-  $FormInstrument,
-} from './instrument.form';
-import {
-  $InteractiveInstrument,
-} from './instrument.interactive';
+import { $FormInstrument, $FormInstrumentSummary } from './instrument.form';
+import { $InteractiveInstrument, $InteractiveInstrumentSummary } from './instrument.interactive';
 
 import type { Json, Language } from './core';
 import type { InstrumentKind, InstrumentLanguage } from './instrument.base';
 import type {
-AnyMultilingualFormInstrument,
-AnyUnilingualFormInstrument,
-FormInstrument,
-FormInstrumentSummary,
-StrictFormInstrument,
-UnilingualFormInstrumentSummary
+  AnyMultilingualFormInstrument,
+  AnyUnilingualFormInstrument,
+  FormInstrument,
+  FormInstrumentSummary,
+  StrictFormInstrument,
+  UnilingualFormInstrumentSummary
 } from './instrument.form';
-import type {
-InteractiveInstrument,
-InteractiveInstrumentSummary
-} from './instrument.interactive';
+import type { InteractiveInstrument, InteractiveInstrumentSummary } from './instrument.interactive';
 
 export const $AnyInstrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies z.ZodType<AnyInstrument>;
 
@@ -35,11 +28,12 @@ export type AnyMultilingualInstrument = AnyMultilingualFormInstrument;
 export type SomeMultilingualInstrument<TKind extends InstrumentKind> = Extract<
   AnyMultilingualFormInstrument,
   { kind: TKind }
-  >;
+>;
 
 // SUMMARY
 
 export type AnyInstrumentSummary = FormInstrumentSummary | InteractiveInstrumentSummary;
+export const $AnyInstrumentSummary = z.union([$FormInstrumentSummary, $InteractiveInstrumentSummary]);
 export type AnyUnilingualInstrumentSummary = InteractiveInstrumentSummary | UnilingualFormInstrumentSummary;
 
 // FOR AUTOCOMPLETE

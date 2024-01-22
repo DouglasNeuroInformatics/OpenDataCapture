@@ -3,20 +3,15 @@ import type { IsEqual, KeysOfUnion, Simplify } from 'type-fest';
 import { z } from 'zod';
 
 import { $ZodTypeAny } from './core';
-import {
-  $BaseInstrument,
-  $EnhancedBaseInstrumentDetails,
-  $InstrumentUIOption,
-} from './instrument.base';
+import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $InstrumentUIOption } from './instrument.base';
 
 import type { Language } from './core';
 import type {
-
-BaseInstrument,
-BaseInstrumentSummary,
-EnhancedBaseInstrumentDetails,
-InstrumentLanguage,
-InstrumentUIOption
+  BaseInstrument,
+  BaseInstrumentSummary,
+  EnhancedBaseInstrumentDetails,
+  InstrumentLanguage,
+  InstrumentUIOption
 } from './instrument.base';
 
 export const $FormFieldKind = z.enum([
@@ -391,7 +386,12 @@ export type FormInstrumentSummary<
 };
 
 export const $FormInstrumentSummary = $FormInstrument.omit({ content: true, validationSchema: true }).extend({
-  id: z.string()
+  id: z.string(),
+  measures: z.record(
+    z.object({
+      label: $InstrumentUIOption(z.string())
+    })
+  )
 });
 
 export type UnilingualFormInstrumentSummary<TData extends Base.FormDataType = Base.FormDataType> =
