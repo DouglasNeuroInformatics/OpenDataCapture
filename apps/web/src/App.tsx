@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { NotificationHub } from '@douglasneuroinformatics/ui';
-import { ErrorFallback } from '@open-data-capture/react-core/components/ErrorFallback';
+import { ErrorFallback } from '@open-data-capture/react-core';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from 'react-error-boundary';
