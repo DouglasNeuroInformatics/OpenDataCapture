@@ -1,4 +1,5 @@
 import { i18n as i18nUi } from '@douglasneuroinformatics/ui';
+import type { Language } from '@open-data-capture/common/core';
 import { createInstance } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
@@ -23,7 +24,7 @@ const createExtendedInstance = (): ExtendedI18NextInstance => {
     returnObjects: true,
     supportedLngs: ['en', 'fr']
   });
-  return Object.assign(baseInstance, {
+  return Object.assign(baseInstance as typeof baseInstance & { resolvedLanguage: Language }, {
     async initialize(this: ExtendedI18NextInstance) {
       await this.use(LanguageDetector).use(initReactI18next).init();
       this.on('languageChanged', (lang) => {
