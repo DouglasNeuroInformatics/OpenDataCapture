@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "build": "bun ./src/build.ts",
-    "build:lib": "prisma generate",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --watch src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
