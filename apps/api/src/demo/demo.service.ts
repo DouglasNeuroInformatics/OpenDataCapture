@@ -14,6 +14,7 @@ import type { Subject, SubjectIdentificationData } from '@open-data-capture/comm
 import { DEMO_GROUPS, DEMO_USERS } from '@open-data-capture/demo';
 import {
   briefPsychiatricRatingScale,
+  clickTask,
   enhancedDemographicsQuestionnaire,
   happinessQuestionnaire,
   miniMentalStateExamination,
@@ -55,6 +56,8 @@ export class DemoService {
       this.instrumentsService.create({ kind: 'FORM', source: miniMentalStateExamination.source }),
       this.instrumentsService.create({ kind: 'FORM', source: montrealCognitiveAssessment.source })
     ]);
+
+    await this.instrumentsService.create(clickTask);
 
     const groups: Group[] = [];
     for (const group of DEMO_GROUPS) {

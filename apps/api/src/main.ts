@@ -13,7 +13,7 @@ import { setupDocs } from './docs';
 async function bootstrap() {
   // This hacky type assertion is needed due to issue with linked dependency
   const app = (await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'debug', 'log', 'verbose']
+    logger: ['error', 'warn', 'log', 'verbose']
   })) as any as NestExpressApplication;
 
   app.enableCors();
