@@ -3,7 +3,11 @@
 import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { InstrumentBundleContainer, InstrumentKind } from '@open-data-capture/common/instrument';
+import type {
+  AnyInstrumentSummary,
+  InstrumentBundleContainer,
+  InstrumentKind
+} from '@open-data-capture/common/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
@@ -19,7 +23,7 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'Create Instrument' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Instrument' })
-  create(@Body() data: CreateInstrumentDto) {
+  create(@Body() data: CreateInstrumentDto): Promise<unknown> {
     return this.instrumentsService.create(data);
   }
 
@@ -28,13 +32,6 @@ export class InstrumentsController {
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
     return this.instrumentsService.find({ kind }, { ability });
-  }
-
-  @ApiOperation({ summary: 'Summarize Available Instruments' })
-  @Get('available')
-  @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findAvailable(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
-    return this.instrumentsService.findAvailable({ kind }, { ability });
   }
 
   @ApiOperation({ summary: 'Find Bundles' })
@@ -52,6 +49,16 @@ export class InstrumentsController {
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async findSources(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
     return this.instrumentsService.findSources({ kind }, { ability });
+  }
+
+  @ApiOperation({ summary: 'Summarize Available Instruments' })
+  @Get('summaries')
+  @RouteAccess({ action: 'read', subject: 'Instrument' })
+  async findSummaries(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('kind') kind?: InstrumentKind
+  ): Promise<AnyInstrumentSummary[]> {
+    return this.instrumentsService.findSummaries({ kind }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Instrument' })

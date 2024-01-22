@@ -53,16 +53,6 @@ export class InstrumentsService {
     });
   }
 
-  async findAvailable(
-    query: { kind?: InstrumentKind } = {},
-    { ability }: EntityOperationOptions = {}
-  ): Promise<AnyInstrumentSummary[]> {
-    return this.instrumentModel.findMany({
-      select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query, { kind: 'FORM' }] }
-    }) as Promise<AnyInstrumentSummary[]>;
-  }
-
   async findBundles(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
     return this.instrumentModel.findMany({
       select: {
@@ -87,6 +77,16 @@ export class InstrumentsService {
     return this.instrumentModel.findMany({
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
     });
+  }
+
+  async findSummaries(
+    query: { kind?: InstrumentKind } = {},
+    { ability }: EntityOperationOptions = {}
+  ): Promise<AnyInstrumentSummary[]> {
+    return this.instrumentModel.findMany({
+      select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
+      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query, { kind: 'FORM' }] }
+    }) as Promise<AnyInstrumentSummary[]>;
   }
 
   /**
