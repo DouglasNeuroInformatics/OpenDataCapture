@@ -35,7 +35,12 @@ export class PrismaModule {
         {
           inject: [ConfigurationService],
           provide: PRISMA_CLIENT_TOKEN,
-          useFactory: PrismaFactory.createClient
+          useFactory: (configurationService: ConfigurationService) => {
+            const mongoUri = configurationService.get('MONGO_URI');
+            const dbName = configurationService.get('NODE_ENV');
+            const datasourceUrl = `${mongoUri}/data-capture-${dbName}`;
+            return PrismaFactory.createClient({ datasourceUrl });
+          }
         },
         PrismaService
       ]

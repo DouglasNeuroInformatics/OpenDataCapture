@@ -1,15 +1,19 @@
+import { Logger } from '@nestjs/common';
 import { InstrumentKind, Prisma, PrismaClient } from '@open-data-capture/database/core';
 import { InstrumentInterpreter, type InstrumentInterpreterOptions } from '@open-data-capture/instrument-interpreter';
-
-import { ConfigurationService } from '@/configuration/configuration.service';
 
 export const PRISMA_CLIENT_TOKEN = 'PRISMA_CLIENT';
 
 export class PrismaFactory {
-  static createClient(this: void, configurationService: ConfigurationService) {
-    const mongoUri = configurationService.get('MONGO_URI');
-    const dbName = configurationService.get('NODE_ENV');
-    return new PrismaClient({ datasourceUrl: `${mongoUri}/data-capture-${dbName}` }).$extends({
+  private static logger = new Logger(PrismaFactory.name);
+
+  static createClient(options: Prisma.PrismaClientOptions) {
+    this.logger.debug(`Attempting to create PrismaClient...`);
+    const baseClient = new PrismaClient(options);
+    this.logger.debug('Finished creating PrismaClient');
+
+    this.logger.debug('Attempting to apply client extensions...');
+    const extendedClient = baseClient.$extends({
       model: {
         $allModels: {
           get __model__() {
@@ -39,6 +43,8 @@ export class PrismaFactory {
         }
       }
     });
+    this.logger.debug('Finished applying client extensions');
+    return extendedClient;
   }
 }
 
