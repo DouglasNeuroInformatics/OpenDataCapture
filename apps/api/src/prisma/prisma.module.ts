@@ -14,7 +14,6 @@ export class PrismaModule {
 
   static forFeature<T extends ModelEntityName>(modelName: T): DynamicModule {
     const modelToken = getModelToken(modelName);
-    this.logger.debug(`Injecting model for resolved token: '${modelToken}'`);
     return {
       exports: [modelToken],
       module: PrismaModule,
@@ -23,6 +22,7 @@ export class PrismaModule {
           inject: [PRISMA_CLIENT_TOKEN],
           provide: modelToken,
           useFactory: (client: ExtendedPrismaClient) => {
+            this.logger.debug(`Injecting model for resolved token: '${modelToken}'`);
             return client[getModelReferenceName(modelName)];
           }
         }
