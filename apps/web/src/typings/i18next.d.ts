@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
+/// <reference types="@open-data-capture/i18next/client" />
 
-import type { TranslatedResource } from '@open-data-capture/react-core/services/i18n';
-import core from '@open-data-capture/react-core/translations/core.json';
+import type { TranslatedResource } from '@open-data-capture/i18next';
 
-// import all namespaces (for the default language, only)
 import auth from '../translations/auth.json';
 import common from '../translations/common.json';
 import contact from '../translations/contact.json';
@@ -16,13 +14,11 @@ import user from '../translations/user.json';
 import visits from '../translations/visits.json';
 
 declare module 'i18next' {
-  interface CustomTypeOptions {
-    defaultNS: 'common';
-    resources: {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface AppResources {
       auth: TranslatedResource<typeof auth>;
       common: TranslatedResource<typeof common>;
       contact: TranslatedResource<typeof contact>;
-      core: TranslatedResource<typeof core>;
       instruments: TranslatedResource<typeof instruments>;
       layout: TranslatedResource<typeof layout>;
       overview: TranslatedResource<typeof overview>;
@@ -30,6 +26,5 @@ declare module 'i18next' {
       subjects: TranslatedResource<typeof subjects>;
       user: TranslatedResource<typeof user>;
       visits: TranslatedResource<typeof visits>;
-    };
   }
 }

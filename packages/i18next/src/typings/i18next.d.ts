@@ -1,14 +1,21 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
 import 'i18next';
 
 import core from '../translations/core.json';
-import { type TranslatedResource } from '../types';
+
+import type { DefaultNS, TranslatedResource } from '..';
 
 declare module 'i18next' {
+  interface AppResources {}
+
+  interface CustomResources extends AppResources {
+    core: TranslatedResource<typeof core>;
+  }
+
   interface CustomTypeOptions {
-    resources: {
-      core: TranslatedResource<typeof core>;
-    };
+    defaultNS: DefaultNS;
+    resources: CustomResources;
   }
 }

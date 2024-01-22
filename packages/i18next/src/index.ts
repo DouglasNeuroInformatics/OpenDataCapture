@@ -8,7 +8,7 @@ import { createResources } from './utils';
 
 import type { ExtendedI18NextInstance } from './types';
 
-export const defaultNS = 'core';
+const defaultNS = 'core';
 
 const resources = createResources({ core });
 
@@ -34,5 +34,7 @@ const createExtendedInstance = (): ExtendedI18NextInstance => {
 };
 
 export const i18n = createExtendedInstance();
+
+export type DefaultNS = typeof defaultNS;
 
 export type { TranslatedResource } from './types';
