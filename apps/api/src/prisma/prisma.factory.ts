@@ -20,8 +20,9 @@ export class PrismaFactory {
             const context = Prisma.getExtensionContext(this);
             return context.$name;
           },
-          async exists<T>(this: T & { $name: string }, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
-            PrismaFactory.logger.debug(`Checking if instance of '${this.$name}' exists...`);
+          async exists<T extends object>(this: T, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
+            const name = Reflect.get(this, '$name') as string;
+            PrismaFactory.logger.debug(`Checking if instance of '${name}' exists...`);
             let result: boolean;
             try {
               const context = Prisma.getExtensionContext(this) as unknown as {
@@ -32,7 +33,7 @@ export class PrismaFactory {
               PrismaFactory.logger.fatal(err);
               throw new InternalServerErrorException('Prisma Error', { cause: err });
             }
-            PrismaFactory.logger.debug(`Done checking if instance of '${this.$name}' exists: result = ${result}`);
+            PrismaFactory.logger.debug(`Done checking if instance of '${name}' exists: result = ${result}`);
             return result;
           }
         }
