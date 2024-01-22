@@ -1,6 +1,6 @@
 'use client';
 
-import { Navbar } from '@open-data-capture/react-core/components/Navbar';
+import { Navbar } from '@open-data-capture/react-core';
 import { useTranslation } from 'react-i18next';
 
 export const Header = () => {

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import type { Language } from '@open-data-capture/common/core';
 import type { InstrumentKind, SomeInstrument } from '@open-data-capture/common/instrument';
 import { translateInstrument } from '@open-data-capture/instrument-utils';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +20,6 @@ export function useTranslatedInstrument<TKind extends InstrumentKind>(instrument
     if (!instrument) {
       return null;
     }
-    return translateInstrument(instrument, i18n.resolvedLanguage as Language);
+    return translateInstrument(instrument, i18n.resolvedLanguage!);
   }, [instrument, i18n.resolvedLanguage]);
 }
