@@ -1,4 +1,4 @@
-import { type DynamicModule, Module } from '@nestjs/common';
+import { type DynamicModule, Logger, Module } from '@nestjs/common';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 
@@ -10,8 +10,11 @@ import type { ModelEntityName } from './prisma.types';
 
 @Module({})
 export class PrismaModule {
+  private static logger = new Logger(PrismaModule.name);
+
   static forFeature<T extends ModelEntityName>(modelName: T): DynamicModule {
     const modelToken = getModelToken(modelName);
+    this.logger.debug(`Injecting model for resolved token: '${modelToken}'`);
     return {
       exports: [modelToken],
       module: PrismaModule,
@@ -27,6 +30,7 @@ export class PrismaModule {
     };
   }
   static forRoot(): DynamicModule {
+    this.logger.debug('Applying root configuration...');
     return {
       exports: [PRISMA_CLIENT_TOKEN, PrismaService],
       global: true,
@@ -39,6 +43,7 @@ export class PrismaModule {
             const mongoUri = configurationService.get('MONGO_URI');
             const dbName = configurationService.get('NODE_ENV');
             const datasourceUrl = `${mongoUri}/data-capture-${dbName}`;
+            this.logger.debug(`Attempting to create client with data source: '${datasourceUrl}'`);
             return PrismaFactory.createClient({ datasourceUrl });
           }
         },
