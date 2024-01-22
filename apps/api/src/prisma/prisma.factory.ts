@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { InstrumentKind, Prisma, PrismaClient } from '@open-data-capture/database/core';
 import { InstrumentInterpreter, type InstrumentInterpreterOptions } from '@open-data-capture/instrument-interpreter';
 
@@ -20,12 +20,20 @@ export class PrismaFactory {
             const context = Prisma.getExtensionContext(this);
             return context.$name;
           },
-          async exists<T>(this: T, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
-            const context = Prisma.getExtensionContext(this) as unknown as {
-              findFirst: (...args: any[]) => Promise<unknown>;
-            };
-            const result = await context.findFirst({ where });
-            return result !== null;
+          async exists<T>(this: T & { $name: string }, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
+            PrismaFactory.logger.debug(`Checking if instance of '${this.$name}' exists...`);
+            let result: boolean;
+            try {
+              const context = Prisma.getExtensionContext(this) as unknown as {
+                findFirst: (...args: any[]) => Promise<unknown>;
+              };
+              result = (await context.findFirst({ where })) !== null;
+            } catch (err) {
+              PrismaFactory.logger.fatal(err);
+              throw new InternalServerErrorException('Prisma Error', { cause: err });
+            }
+            PrismaFactory.logger.debug(`Done checking if instance of '${this.$name}' exists: result = ${result}`);
+            return result;
           }
         }
       },
