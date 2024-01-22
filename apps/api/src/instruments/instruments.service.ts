@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 import type { AnyInstrument, AnyInstrumentSummary, InstrumentKind } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
@@ -16,6 +16,7 @@ import { CreateInstrumentDto } from './dto/create-instrument.dto';
 export class InstrumentsService {
   private readonly instrumentInterpreter = new InstrumentInterpreter();
   private readonly instrumentTransformer = new InstrumentTransformer();
+  private readonly logger = new Logger(InstrumentsService.name);
 
   constructor(@InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>) {}
 
@@ -27,10 +28,15 @@ export class InstrumentsService {
   }
 
   async create<TKind extends InstrumentKind>({ kind, source }: CreateInstrumentDto<TKind>) {
+    this.logger.debug('Attempting to parse instrument source...');
     const { bundle, instance } = await this.parseSource(source, { kind });
+    this.logger.debug(`Done parsing source for instrument '${instance.name}'`);
+
+    this.logger.debug(`Checking if instrument '${instance.name}' exists...`);
     if (await this.instrumentModel.exists({ name: instance.name })) {
       throw new ConflictException(`Instrument with name '${instance.name}' already exists!`);
     }
+    this.logger.debug(`Instrument '${instance.name}' does not exist`);
 
     return this.instrumentModel.create({
       data: {
