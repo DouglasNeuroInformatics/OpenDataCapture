@@ -101,12 +101,12 @@ async function resolvePackages() {
 /**
  * @param {Object} [options]
  * @param {string} [options.packageRoot]
- * @returns {Promise<import('vite').PluginOption>}
+ * @returns {import('vite').PluginOption}
  */
-const runtime = async (options) => {
-  const packages = await resolvePackages();
+const runtime = (options) => {
   return {
     async buildStart() {
+      const packages = await resolvePackages();
       for (const { baseDir, manifest, version } of packages) {
         const destination = path.resolve(options?.packageRoot ?? '', `dist/runtime/${version}`);
         await fs.cp(baseDir, destination, { recursive: true });
@@ -114,6 +114,7 @@ const runtime = async (options) => {
       }
     },
     async config() {
+      const packages = await resolvePackages();
       return {
         optimizeDeps: {
           exclude: packages.flatMap((pkg) => pkg.importPaths)
