@@ -4,11 +4,15 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./browser": "./src/browser.ts"
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/types.d.ts"
+    },
+    "./browser": {
+      "import": "./src/browser.js",
+      "types": "./src/types.d.ts"
+    }
   },
-  "main": "./src/index.ts",
-  "browser": "./src/browser.ts",
   "scripts": {
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
