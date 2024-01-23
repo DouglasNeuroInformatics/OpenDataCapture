@@ -1,11 +1,7 @@
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { z } from 'zod';
 
-import { $Json } from './core';
-
-import type { Group } from './group';
-import type { BaseInstrument, FormInstrument, InstrumentKind } from './instrument';
-import type { Subject } from './subject';
+import { $BaseModel, $Json } from './core';
+import { $InstrumentKind, type InstrumentKind } from './instrument';
 
 export const $CreateInstrumentRecordData = z.object({
   assignmentId: z.string().optional(),
@@ -18,20 +14,20 @@ export const $CreateInstrumentRecordData = z.object({
 
 export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;
 
-export type InstrumentRecord<TData = unknown, TInstrument extends BaseInstrument<TData> = BaseInstrument<TData>> = {
-  data: TData;
-  date: Date;
-  group?: Group;
-  instrument: TInstrument;
-  subject: Subject;
-};
+const $InstrumentRecord = $BaseModel.extend({
+  assignmentId: z.string().nullish(),
+  computedMeasures: z.record(z.number()).optional(),
+  data: z.unknown(),
+  date: z.coerce.date(),
+  groupId: z.string().nullish(),
+  instrument: z.object({
+    kind: $InstrumentKind
+  }),
+  instrumentId: z.string(),
+  subjectId: z.string()
+});
 
-export type FormInstrumentRecord<TData extends FormDataType = FormDataType> = InstrumentRecord<
-  TData,
-  FormInstrument<TData>
-> & {
-  computedMeasures?: Record<string, number>;
-};
+export type InstrumentRecord = z.infer<typeof $InstrumentRecord>;
 
 export type InstrumentRecordsExport = {
   instrumentName: string;

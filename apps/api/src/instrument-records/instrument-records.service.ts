@@ -5,10 +5,12 @@ import { Injectable } from '@nestjs/common';
 import type { FormInstrumentMeasures } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
+  InstrumentRecord,
   InstrumentRecordQueryParams,
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@open-data-capture/common/instrument-records';
+import type { InstrumentRecordModel } from '@open-data-capture/database/core';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import type { Prisma } from '@prisma/client';
 
@@ -34,7 +36,7 @@ export class InstrumentRecordsService {
   async count(
     filter: NonNullable<Parameters<Model<'InstrumentRecord'>['count']>[0]>['where'] = {},
     { ability }: EntityOperationOptions = {}
-  ) {
+  ): Promise<number> {
     return this.instrumentRecordModel.count({
       where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), filter] }
     });
@@ -43,7 +45,7 @@ export class InstrumentRecordsService {
   async create(
     { data, date, groupId, instrumentId, subjectId }: CreateInstrumentRecordData,
     options?: EntityOperationOptions
-  ) {
+  ): Promise<InstrumentRecordModel> {
     if (groupId) {
       await this.groupsService.findById(groupId, options);
     }
@@ -61,7 +63,7 @@ export class InstrumentRecordsService {
     });
   }
 
-  async exists(where: Prisma.InstrumentRecordModelWhereInput) {
+  async exists(where: Prisma.InstrumentRecordModelWhereInput): Promise<boolean> {
     return this.instrumentRecordModel.exists(where);
   }
 
@@ -101,7 +103,7 @@ export class InstrumentRecordsService {
   async find(
     { groupId, instrumentId, kind, minDate, subjectId }: InstrumentRecordQueryParams,
     { ability }: EntityOperationOptions = {}
-  ) {
+  ): Promise<InstrumentRecord[]> {
     groupId && (await this.groupsService.findById(groupId));
     instrumentId && (await this.instrumentsService.findById(instrumentId));
 
