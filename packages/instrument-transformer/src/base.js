@@ -1,32 +1,38 @@
+/// @ts-check
+/// <reference types="./types.d.ts" />
+
 /**
- * `BaseInstrumentTransformer` and all derived subclasses are responsible for transpiling the source code
- * (including potentially, JSX syntax) to vanilla JavaScript that can run in the browser. Since dynamic import is a
- * requirement of the runtime in general, ES2022 is targeted. Therefore, some kind of fallback/error handling should
- * be implemented for legacy browsers.
  * @abstract
  * @class
+ * @implements {InstrumentTransformer.InstrumentTransformer}
  */
 export class BaseInstrumentTransformer {
-  /** @type {import('./index.d.ts').Transpiler} */
-  transpiler;
-
-  /** The variable name that 'export default' is replaced by */
+  /**
+   * @description The variable name that 'export default' is replaced by
+   * @type {string}
+   */
   #defaultExportSub = '__instrument__';
 
   /**
-   * Tokens that if encountered will throw an error
-   * @type {import('./index.d.ts').ModuleItemType[]}
+   * @description Tokens that if encountered will throw an error
+   * @type {InstrumentTransformer.InstrumentTransformer.ModuleItemType[]}
    */
   #illegalItemTypes = ['ImportDeclaration', 'ExportAllDeclaration', 'ExportDeclaration', 'ExportNamedDeclaration'];
 
-  /** @type {import('./index.d.ts').ParseOptions} */
+  /**
+   * @description The options to use for SWC when parsing the source code
+   * @type {InstrumentTransformer.InstrumentTransformer.ParseOptions}
+   */
   #parseOptions = {
     syntax: 'typescript',
     target: 'es2022',
     tsx: true
   };
 
-  /** @type {import('./index.d.ts').TransformOptions} */
+  /**
+   * @description The options to use for SWC when transforming the source code
+   * @type {InstrumentTransformer.InstrumentTransformer.TransformOptions}
+   */
   #transformOptions = {
     jsc: {
       parser: {
@@ -56,17 +62,14 @@ export class BaseInstrumentTransformer {
   };
 
   /**
-   *
-   * @param {import('./index.d.ts').Transpiler} transpiler
+   * Create an InstrumentTransformer
+   * @param {InstrumentTransformer.InstrumentTransformer.Transpiler} transpiler
    */
   constructor(transpiler) {
     this.transpiler = transpiler;
   }
 
-  /**
-   * @param {string} src
-   * @returns {Promise<string>}
-   */
+  /** @param {string} src */
   async generateBundle(src) {
     const program = await this.transpiler.parse(src, this.#parseOptions);
     this.#validate(program, src);
@@ -75,10 +78,7 @@ export class BaseInstrumentTransformer {
     return result.code;
   }
 
-  /**
-   * @param {string} src
-   * @returns {string}
-   */
+  /** @param {string} src */
   generateBundleSync(src) {
     const program = this.transpiler.parseSync(src, this.#parseOptions);
     this.#validate(program, src);
@@ -87,10 +87,7 @@ export class BaseInstrumentTransformer {
     return result.code;
   }
 
-  /**
-   * @param {string} src
-   * @returns {string}
-   */
+  /** @param {string} src */
   #transformDefaultExport(src) {
     let input = src;
     input = src.replace('export default', `const ${this.#defaultExportSub} =`);
@@ -101,7 +98,6 @@ export class BaseInstrumentTransformer {
   }
 
   /**
-   *
    * @param {import('@swc/types').Module} program
    * @param {string} src
    */

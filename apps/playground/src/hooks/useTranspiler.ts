@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { BrowserInstrumentTransformer } from '@open-data-capture/instrument-transformer/browser';
+import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
@@ -18,7 +18,7 @@ type LoadingState = {
   status: 'loading';
 };
 
-const instrumentTransformer = new BrowserInstrumentTransformer();
+const instrumentTransformer = new InstrumentTransformer();
 
 export type TranspilerState = BuiltState | ErrorState | LoadingState;
 
