@@ -6,8 +6,8 @@ import { type UnilingualInstrumentSummary } from '@open-data-capture/common/inst
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useAvailableForms } from '@/hooks/useAvailableForms';
 import { useFormRecords } from '@/hooks/useFormRecords';
+import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { TimeDropdown } from '../components/TimeDropdown';
@@ -19,15 +19,15 @@ export const SubjectTablePage = () => {
   const params = useParams();
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [tableData, setTableData] = useState<Record<string, unknown>[]>([]);
-  const [selectedForm, setSelectedForm] = useState<UnilingualInstrumentSummary | null>(null);
+  const [selectedInstrument, setSelectedInstrument] = useState<UnilingualInstrumentSummary | null>(null);
   const { t } = useTranslation(['subjects', 'core']);
 
-  const formsQuery = useAvailableForms();
+  const instrumentSummariesQuery = useInstrumentSummaries();
   const recordsQuery = useFormRecords({
-    enabled: selectedForm !== null,
+    enabled: selectedInstrument !== null,
     params: {
       groupId: currentGroup?.id,
-      instrumentId: selectedForm?.id,
+      instrumentId: selectedInstrument?.id,
       minDate: minDate ?? undefined,
       subjectId: params.subjectId!
     }
@@ -47,16 +47,16 @@ export const SubjectTablePage = () => {
     }
   }, [recordsQuery.data]);
 
-  if (!formsQuery.data) {
+  if (!instrumentSummariesQuery.data) {
     return null;
   }
 
   const handleDownload = (option: 'CSV' | 'JSON') => {
-    if (!selectedForm) {
+    if (!selectedInstrument) {
       return; // should never happen, since btn is disabled when none selected
     }
-    const baseFilename = `${currentUser!.username}_${selectedForm.name}_${
-      selectedForm.version
+    const baseFilename = `${currentUser!.username}_${selectedInstrument.name}_${
+      selectedInstrument.version
     }_${new Date().toISOString()}`;
 
     switch (option) {
@@ -72,13 +72,13 @@ export const SubjectTablePage = () => {
     }
   };
 
-  const formOptions: Record<string, string> = {};
-  for (const form of formsQuery.data) {
-    formOptions[form.id] = form.details.title;
+  const instrumentOptions: Record<string, string> = {};
+  for (const summary of instrumentSummariesQuery.data) {
+    instrumentOptions[summary.id] = summary.details.title;
   }
 
-  const handleSelectForm = (id: string) => {
-    setSelectedForm(formsQuery.data.find((form) => form.id === id) ?? null);
+  const handleSelectInstrument = (id: string) => {
+    setSelectedInstrument(instrumentSummariesQuery.data.find((form) => form.id === id) ?? null);
   };
 
   const fields: { field: string; label: string }[] = [];
@@ -94,15 +94,15 @@ export const SubjectTablePage = () => {
   return (
     <div>
       <div className="my-2">
-        <VisualizationHeader minDate={minDate} title={selectedForm?.details.title} />
+        <VisualizationHeader minDate={minDate} title={selectedInstrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <Dropdown
               className="text-sm"
-              options={formOptions}
+              options={instrumentOptions}
               title={t('visualization.instrument')}
               variant="secondary"
-              onSelection={handleSelectForm}
+              onSelection={handleSelectInstrument}
             />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">

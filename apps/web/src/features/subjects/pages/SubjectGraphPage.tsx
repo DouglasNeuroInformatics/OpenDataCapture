@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import {
-  Dropdown,
-  LineGraph,
-  type LineGraphLine,
-  SelectDropdown,
-  type SelectOption
-} from '@douglasneuroinformatics/ui';
-import type { Language } from '@open-data-capture/common/core';
+import { Dropdown, LineGraph, SelectDropdown } from '@douglasneuroinformatics/ui';
+import type { LineGraphLine, SelectOption } from '@douglasneuroinformatics/ui';
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import type { LinearRegressionResults } from '@open-data-capture/common/instrument-records';
 import { useQuery } from '@tanstack/react-query';
@@ -46,47 +39,47 @@ export const SubjectGraphPage = () => {
   const params = useParams();
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [graphData, setGraphData] = useState<GraphData>([]);
-  const [selectedForm, setSelectedForm] = useState<UnilingualInstrumentSummary | null>(null);
+  const [selectedInstrument, setSelectedInstrument] = useState<UnilingualInstrumentSummary | null>(null);
   const [measureOptions, setMeasureOptions] = useState<SelectOption[]>([]);
   const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
   const { t } = useTranslation(['subjects', 'common']);
 
   const formsQuery = useInstruments({ params: { kind: 'FORM' } });
   const recordsQuery = useFormRecords({
-    enabled: selectedForm !== null,
+    enabled: selectedInstrument !== null,
     params: {
       groupId: currentGroup?.id,
-      instrumentId: selectedForm?.id,
+      instrumentId: selectedInstrument?.id,
       minDate: minDate ?? undefined,
       subjectId: params.subjectId!
     }
   });
   const lmQuery = useQuery({
-    enabled: Boolean(selectedForm),
+    enabled: Boolean(selectedInstrument),
     queryFn: async () => {
       const response = await axios.get<LinearRegressionResults>('/v1/instrument-records/linear-model', {
         params: {
           groupId: currentGroup?.id,
-          instrumentId: selectedForm?.id
+          instrumentId: selectedInstrument?.id
         }
       });
       return response.data;
     },
-    queryKey: [selectedForm]
+    queryKey: [selectedInstrument]
   });
 
   useEffect(() => {
     const arr: SelectOption[] = [];
-    if (selectedForm) {
-      for (const measure in selectedForm.measures) {
+    if (selectedInstrument) {
+      for (const measure in selectedInstrument.measures) {
         arr.push({
           key: measure,
-          label: selectedForm.measures[measure].label
+          label: selectedInstrument.measures[measure].label
         });
       }
     }
     return setMeasureOptions(arr);
-  }, [selectedForm]);
+  }, [selectedInstrument]);
 
   useEffect(() => {
     if (recordsQuery.data) {
@@ -115,7 +108,7 @@ export const SubjectGraphPage = () => {
       });
       setGraphData(data);
     }
-  }, [lmQuery.data, recordsQuery.data, selectedForm, selectedMeasures]);
+  }, [lmQuery.data, recordsQuery.data, selectedInstrument, selectedMeasures]);
 
   if (!formsQuery.data) {
     return null;
@@ -147,14 +140,14 @@ export const SubjectGraphPage = () => {
   }
 
   const handleSelectForm = (id: string) => {
-    setSelectedForm(formsQuery.data.find((form) => form.id === id) ?? null);
+    setSelectedInstrument(formsQuery.data.find((form) => form.id === id) ?? null);
     setSelectedMeasures([]);
   };
 
   return (
     <div>
       <div className="my-2">
-        <VisualizationHeader minDate={minDate} title={selectedForm?.details.title} />
+        <VisualizationHeader minDate={minDate} title={selectedInstrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select">
