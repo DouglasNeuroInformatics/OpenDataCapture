@@ -20,8 +20,10 @@ import type {
   FormInstrumentStaticField,
   InstrumentKind,
   InstrumentSummary,
+  MultilingualInstrumentMeasures,
   SomeInstrument,
   SomeUnilingualInstrument,
+  UnilingualInstrumentMeasures,
   UnilingualInstrumentSummary
 } from '@open-data-capture/common/instrument';
 import _ from 'lodash';
@@ -199,6 +201,16 @@ function translateFormContent(
   }));
 }
 
+function translateMeasures(
+  measures: MultilingualInstrumentMeasures | undefined,
+  language: Language
+): UnilingualInstrumentMeasures | undefined {
+  if (!measures) {
+    return;
+  }
+  return _.mapValues(measures, (measure) => ({ label: measure.label[language], value: measure.value }));
+}
+
 /**
  * Translate a multilingual form instrument to the user's preferred language.
  *
@@ -217,7 +229,7 @@ function translateForm(form: AnyMultilingualFormInstrument, language: Language):
       title: form.details.title[language]
     },
     language: language,
-    measures: _.mapValues(form.measures, (measure) => ({ label: measure.label[language], value: measure.value })),
+    measures: translateMeasures(form.measures, language),
     tags: form.tags[language]
   };
 }
@@ -251,7 +263,7 @@ export function translateInstrumentSummary(
     id: summary.id,
     kind: summary.kind,
     language: targetLanguage,
-    measures: summary.measures,
+    measures: translateMeasures(summary.measures, targetLanguage),
     name: summary.name,
     tags: summary.tags[targetLanguage],
     version: summary.version

@@ -113,6 +113,9 @@ export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage
   }
 >;
 
+export type UnilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language>;
+export type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language[]>;
+
 export const $InstrumentMeasures = z.record(
   z.object({
     label: $InstrumentUIOption(z.string()),
@@ -125,7 +128,7 @@ export const $UnilingualInstrumentMeasures = z.record(
     label: z.string(),
     value: z.function().args(z.any()).returns(z.number())
   })
-) satisfies z.ZodType<InstrumentMeasures<any, Language>>;
+) satisfies z.ZodType<UnilingualInstrumentMeasures>;
 
 /**
  * The basic properties common to all instruments. Specific types of instruments (e.g., form, interactive)
@@ -136,7 +139,7 @@ export const $UnilingualInstrumentMeasures = z.record(
  */
 export type BaseInstrument<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
-  content?: any;
+  content?: unknown;
 
   /** The details of the instrument to be displayed to the user */
   details: BaseInstrumentDetails<TLanguage>;
