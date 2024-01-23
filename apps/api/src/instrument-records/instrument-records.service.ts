@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import type { FormInstrumentMeasures } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
+  InstrumentRecordQueryParams,
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@open-data-capture/common/instrument-records';
@@ -98,12 +99,7 @@ export class InstrumentRecordsService {
   }
 
   async find(
-    {
-      groupId,
-      instrumentId,
-      minDate,
-      subjectId
-    }: { groupId?: string; instrumentId?: string; minDate?: Date; subjectId?: string },
+    { groupId, instrumentId, kind, minDate, subjectId }: InstrumentRecordQueryParams,
     { ability }: EntityOperationOptions = {}
   ) {
     groupId && (await this.groupsService.findById(groupId));
@@ -124,7 +120,12 @@ export class InstrumentRecordsService {
           { groupId },
           { instrumentId },
           accessibleQuery(ability, 'read', 'InstrumentRecord'),
-          { subjectId }
+          { subjectId },
+          {
+            instrument: {
+              kind
+            }
+          }
         ]
       }
     });

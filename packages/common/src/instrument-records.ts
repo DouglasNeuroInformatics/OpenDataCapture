@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { $Json } from './core';
 
 import type { Group } from './group';
-import type { BaseInstrument, FormInstrument } from './instrument';
+import type { BaseInstrument, FormInstrument, InstrumentKind } from './instrument';
 import type { Subject } from './subject';
 
 export const $CreateInstrumentRecordData = z.object({
@@ -45,3 +45,11 @@ export type InstrumentRecordsExport = {
 }[];
 
 export type LinearRegressionResults = Record<string, { intercept: number; slope: number; stdErr: number }>;
+
+export type InstrumentRecordQueryParams = {
+  groupId?: string;
+  instrumentId?: string;
+  kind?: InstrumentKind;
+  minDate?: Date;
+  subjectId?: string;
+};

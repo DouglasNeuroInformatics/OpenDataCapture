@@ -3,6 +3,7 @@
 import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { InstrumentKind } from '@open-data-capture/common/instrument';
 import { z } from 'zod';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -28,6 +29,7 @@ export class InstrumentRecordsController {
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   find(
     @CurrentUser('ability') ability: AppAbility,
+    @Query('kind') kind?: InstrumentKind,
     @Query(
       'minDate',
       new ParseSchemaPipe({
@@ -40,7 +42,7 @@ export class InstrumentRecordsController {
     @Query('instrumentId') instrumentId?: string,
     @Query('subjectId') subjectId?: string
   ) {
-    return this.instrumentRecordsService.find({ groupId, instrumentId, minDate, subjectId }, { ability });
+    return this.instrumentRecordsService.find({ groupId, instrumentId, kind, minDate, subjectId }, { ability });
   }
 
   @ApiOperation({ summary: 'Export Records' })
