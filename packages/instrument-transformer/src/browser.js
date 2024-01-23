@@ -1,6 +1,6 @@
 import initSwc, { parse, parseSync, transform, transformSync } from '@swc/wasm-web';
 
-import { BaseInstrumentTransformer } from './base';
+import { BaseInstrumentTransformer } from './base.js';
 
 await initSwc();
 
