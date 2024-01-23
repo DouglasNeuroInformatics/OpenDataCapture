@@ -85,7 +85,7 @@ export class InstrumentsService {
   ): Promise<InstrumentSummary[]> {
     return this.instrumentModel.findMany({
       select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query, { kind: 'FORM' }] }
+      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
     }) as Promise<InstrumentSummary[]>;
   }
 
