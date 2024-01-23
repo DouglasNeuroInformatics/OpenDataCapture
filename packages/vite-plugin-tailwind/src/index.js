@@ -2,14 +2,10 @@ import module from 'module';
 import path from 'path';
 import process from 'process';
 
-// @ts-ignore
-import _baseConfig from '@douglasneuroinformatics/ui/tailwind.config';
+import baseConfig from '@douglasneuroinformatics/ui/tailwind.config.cjs';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme.js';
-
-/** @type {import('tailwindcss').Config & { content: string[] }} */
-const baseConfig = _baseConfig;
 
 /**
  * @param {Object} [options]
