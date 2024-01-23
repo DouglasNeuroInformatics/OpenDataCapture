@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 
 import { Spinner, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
@@ -16,8 +18,13 @@ export const InstrumentRenderPage = () => {
   const params = useParams();
   const navigate = useNavigate();
   const notifications = useNotificationsStore();
+  const location = useLocation();
+  const { t } = useTranslation();
 
   const instrumentBundleQuery = useInstrumentBundle(params.id!);
+
+  const locationState = location.state as { summary?: UnilingualInstrumentSummary | undefined } | undefined;
+  const title = locationState?.summary?.details.title;
 
   useEffect(() => {
     if (!activeVisit) {
@@ -42,7 +49,7 @@ export const InstrumentRenderPage = () => {
 
   return (
     <div className="flex flex-grow flex-col">
-      <PageHeader className="print:hidden" title={'TITLE'} />
+      <PageHeader className="print:hidden" title={title ?? t('instrument')} />
       <div className="flex-grow">
         <InstrumentRenderer
           bundle={instrumentBundleQuery.data.bundle}
