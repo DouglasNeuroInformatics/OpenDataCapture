@@ -27,8 +27,6 @@ export const SubjectTablePage = () => {
     }
   }
 
-  console.log(data)
-
   return (
     <div>
       <div className="my-2">

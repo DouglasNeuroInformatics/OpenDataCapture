@@ -18,6 +18,10 @@
     }
   },
   "errors": {
+    "noDataToExport": {
+      "en": "No Data to Export",
+      "fr": "Pas de données à exporter"
+    },
     "noInstrumentSelected": {
       "en": "No Instrument Selected",
       "fr": "Aucun instrument sélectionné"

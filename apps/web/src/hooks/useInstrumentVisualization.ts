@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
@@ -44,11 +44,15 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  const dl = useCallback((option: 'CSV' | 'JSON') => {
+  const dl = (option: 'CSV' | 'JSON') => {
     if (!instrumentSummary) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
       return;
+    } else if (data.length === 0) {
+      notifications.addNotification({ message: t('errors.noDataToExport'), type: 'error' });
+      return;
     }
+
     const baseFilename = `${currentUser!.username}_${instrumentSummary.name}_${
       instrumentSummary.version
     }_${new Date().toISOString()}`;
@@ -64,7 +68,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           return Promise.resolve(columnNames + '\n' + rows);
         });
     }
-  }, []);
+  };
 
   useEffect(() => {
     setInstrumentSummary(summariesQuery.data?.find((instrument) => instrument.id === instrumentId) ?? null);
