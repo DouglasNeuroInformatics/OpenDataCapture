@@ -151,7 +151,7 @@ export class InstrumentRecordsService {
   async linearModel(
     { groupId, instrumentId }: { groupId?: string; instrumentId: string },
     { ability }: EntityOperationOptions = {}
-  ) {
+  ): Promise<LinearRegressionResults> {
     groupId && (await this.groupsService.findById(groupId));
     const instrument = await this.instrumentsService
       .findById(instrumentId)

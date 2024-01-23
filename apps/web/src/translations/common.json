@@ -17,6 +17,12 @@
       "fr": "Utilisateur standard"
     }
   },
+  "errors": {
+    "noInstrumentSelected": {
+      "en": "No Instrument Selected",
+      "fr": "Aucun instrument sélectionné"
+    }
+  },
   "graph": {
     "en": "Graph",
     "fr": "Graphique"

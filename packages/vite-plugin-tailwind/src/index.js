@@ -6,7 +6,7 @@ import process from 'process';
 import _baseConfig from '@douglasneuroinformatics/ui/tailwind.config';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
-import defaultTheme from 'tailwindcss/defaultTheme';
+import defaultTheme from 'tailwindcss/defaultTheme.js';
 
 /** @type {import('tailwindcss').Config & { content: string[] }} */
 const baseConfig = _baseConfig;

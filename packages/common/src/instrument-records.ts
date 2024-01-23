@@ -14,7 +14,7 @@ export const $CreateInstrumentRecordData = z.object({
 
 export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;
 
-const $InstrumentRecord = $BaseModel.extend({
+export const $InstrumentRecord = $BaseModel.extend({
   assignmentId: z.string().nullish(),
   computedMeasures: z.record(z.number()).optional(),
   data: z.unknown(),
