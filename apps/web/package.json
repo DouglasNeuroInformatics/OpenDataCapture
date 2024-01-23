@@ -9,7 +9,7 @@
     "cy:install": "cypress install",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx --bun vite",
+    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx vite",
     "format": "prettier --write src",
     "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
     "lint": "tsc && eslint --fix src",
