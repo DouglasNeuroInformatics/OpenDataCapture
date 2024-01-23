@@ -110,7 +110,7 @@ export const AvailableInstrumentsPage = () => {
                   instrument={instrument}
                   onClick={() => {
                     if (activeVisit) {
-                      navigate(`/instruments/forms/${instrument.id}`);
+                      navigate(`/instruments/render/${instrument.id}`);
                     } else {
                       notifications.addNotification({
                         message: t('instruments:available.nullActiveVisitError'),

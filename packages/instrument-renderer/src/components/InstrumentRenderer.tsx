@@ -51,7 +51,7 @@ export const InstrumentRenderer = ({ bundle, onSubmit, subject }: InstrumentRend
 
   return (
     <Stepper
-      className="h-full"
+      className="mx-auto h-full max-w-3xl xl:max-w-4xl"
       steps={[
         {
           element: <InstrumentOverview instrument={instrument} />,
