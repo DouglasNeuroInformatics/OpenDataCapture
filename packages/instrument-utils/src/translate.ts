@@ -19,12 +19,19 @@ import type {
   FormInstrumentPrimitiveField,
   FormInstrumentStaticField,
   InstrumentKind,
+  InstrumentSummary,
   SomeInstrument,
-  SomeUnilingualInstrument
+  SomeUnilingualInstrument,
+  UnilingualInstrumentSummary
 } from '@open-data-capture/common/instrument';
 import _ from 'lodash';
 
-import { isMultilingualInstrument, isUnilingualInstrument } from './guards';
+import {
+  isMultilingualInstrument,
+  isMultilingualInstrumentSummary,
+  isUnilingualInstrument,
+  isUnilingualInstrumentSummary
+} from './guards';
 
 /**
  * Determine the target language for translation based on instrument and preferred language.
@@ -33,7 +40,7 @@ import { isMultilingualInstrument, isUnilingualInstrument } from './guards';
  * @param preferredLanguage - The user's preferred language.
  * @returns The target language for translation.
  */
-function getTargetLanguage(instrument: AnyInstrument, preferredLanguage: Language): Language {
+function getTargetLanguage(instrument: Pick<AnyInstrument, 'language'>, preferredLanguage: Language): Language {
   if (typeof instrument.language === 'string') {
     return instrument.language;
   } else if (instrument.language.includes(preferredLanguage)) {
@@ -212,6 +219,42 @@ function translateForm(form: AnyMultilingualFormInstrument, language: Language):
     language: language,
     measures: _.mapValues(form.measures, (measure) => ({ label: measure.label[language], value: measure.value })),
     tags: form.tags[language]
+  };
+}
+
+/**
+ * Translate an instrument summary to the user's preferred language.
+ *
+ * If the instrument is a unilingual instrument summary, it will be returned as is. Otherwise, it will
+ * be translated to the user's preferred language, or, if that is not available, the first element
+ * in an array of languages.
+ *
+ * @param summary - The instrument to be translated.
+ * @param preferredLanguage - The user's preferred language.
+ * @returns A translated unilingual instrument.
+ */
+export function translateInstrumentSummary(
+  summary: InstrumentSummary,
+  preferredLanguage: Language
+): UnilingualInstrumentSummary {
+  if (isUnilingualInstrumentSummary(summary)) {
+    return summary;
+  } else if (!isMultilingualInstrumentSummary(summary)) {
+    throw new Error(`Unexpected value for property 'language': ${JSON.stringify(summary.language)}`);
+  }
+  const targetLanguage = getTargetLanguage(summary, preferredLanguage);
+  return {
+    details: {
+      description: summary.details.description[targetLanguage],
+      title: summary.details.title[targetLanguage]
+    },
+    id: summary.id,
+    kind: summary.kind,
+    language: targetLanguage,
+    measures: summary.measures,
+    name: summary.name,
+    tags: summary.tags[targetLanguage],
+    version: summary.version
   };
 }
 

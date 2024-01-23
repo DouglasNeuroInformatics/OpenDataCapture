@@ -169,6 +169,8 @@ export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<
 
 export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<unknown, Language>>>;
 
+export type MultilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<unknown, Language[]>>>;
+
 export const $InstrumentSummary = $BaseInstrument()
   .omit({
     content: true,
