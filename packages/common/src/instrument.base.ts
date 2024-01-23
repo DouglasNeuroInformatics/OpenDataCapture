@@ -105,6 +105,28 @@ export const $EnhancedBaseInstrumentDetails = <TLanguage extends InstrumentLangu
   ) as z.ZodType<EnhancedBaseInstrumentDetails<TLanguage>>;
 };
 
+export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Record<
+  string,
+  {
+    label: InstrumentUIOption<TLanguage, string>;
+    value: (data: TData) => number;
+  }
+>;
+
+export const $InstrumentMeasures = z.record(
+  z.object({
+    label: $InstrumentUIOption(z.string()),
+    value: z.function().args(z.any()).returns(z.number())
+  })
+) satisfies z.ZodType<InstrumentMeasures>;
+
+export const $UnilingualInstrumentMeasures = z.record(
+  z.object({
+    label: z.string(),
+    value: z.function().args(z.any()).returns(z.number())
+  })
+) satisfies z.ZodType<InstrumentMeasures<any, Language>>;
+
 /**
  * The basic properties common to all instruments. Specific types of instruments (e.g., form, interactive)
  * extend this type and are discriminated according to the `kind` property.
@@ -112,9 +134,9 @@ export const $EnhancedBaseInstrumentDetails = <TLanguage extends InstrumentLangu
  * @typeParam TData - the structure of the data derived from this instrument
  * @typeParam TLanguage - the language(s) of the instrument
  */
-export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+export type BaseInstrument<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The content in the instrument to be rendered to the user */
-  content?: unknown;
+  content?: any;
 
   /** The details of the instrument to be displayed to the user */
   details: BaseInstrumentDetails<TLanguage>;
@@ -128,7 +150,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
   language: TLanguage;
 
   /** Arbitrary measures derived from the data */
-  measures?: unknown;
+  measures?: InstrumentMeasures<TData, TLanguage>;
 
   /** The name of the instrument, which must be unique for a given version */
   name: string;
@@ -145,12 +167,12 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
 
 export const $BaseInstrument = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
-    content: z.unknown(),
+    content: z.any(),
     details: $BaseInstrumentDetails(language),
     id: z.string().optional(),
     kind: $InstrumentKind,
     language: $InstrumentLanguage(language),
-    measures: z.unknown().optional(),
+    measures: $InstrumentMeasures.optional(),
     name: z.string().min(1),
     tags: $InstrumentUIOption(z.array(z.string().min(1)), language),
     validationSchema: $ZodTypeAny,
@@ -167,9 +189,9 @@ export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<
   id: string;
 };
 
-export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<unknown, Language>>>;
+export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<any, Language>>>;
 
-export type MultilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<unknown, Language[]>>>;
+export type MultilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<any, Language[]>>>;
 
 export const $InstrumentSummary = $BaseInstrument()
   .omit({

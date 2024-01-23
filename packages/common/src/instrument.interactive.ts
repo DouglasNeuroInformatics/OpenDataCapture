@@ -4,7 +4,7 @@
 import type { Merge } from 'type-fest';
 import { z } from 'zod';
 
-import { $BaseInstrument, $EnhancedBaseInstrumentDetails } from './instrument.base';
+import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $UnilingualInstrumentMeasures } from './instrument.base';
 
 import type { Json, Language } from './core';
 import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument.base';
@@ -31,5 +31,6 @@ export const $InteractiveInstrument = $BaseInstrument('en').extend({
     render: z.function().args(z.any()).returns(z.any())
   }),
   details: $EnhancedBaseInstrumentDetails('en'),
-  kind: z.literal('INTERACTIVE')
+  kind: z.literal('INTERACTIVE'),
+  measures: $UnilingualInstrumentMeasures
 });

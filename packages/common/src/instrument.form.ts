@@ -10,6 +10,7 @@ import type {
   BaseInstrument,
   EnhancedBaseInstrumentDetails,
   InstrumentLanguage,
+  InstrumentMeasures,
   InstrumentUIOption
 } from './instrument.base';
 
@@ -293,24 +294,6 @@ export const $FormInstrumentContent = z.union([
   $FormInstrumentFieldsGroup.array()
 ]) satisfies z.ZodType<FormInstrumentContent>;
 
-export type FormInstrumentMeasures<
-  TData extends Base.FormDataType = Base.FormDataType,
-  TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = Record<
-  string,
-  {
-    label: InstrumentUIOption<TLanguage, string>;
-    value: (data: TData) => number;
-  }
->;
-
-export const $FormInstrumentMeasures = z.record(
-  z.object({
-    label: $InstrumentUIOption(z.string()),
-    value: z.function().args(z.any()).returns(z.number())
-  })
-) satisfies z.ZodType<FormInstrumentMeasures>;
-
 type ReservedKey = KeysOfUnion<FormInstrumentStaticField>;
 
 /**
@@ -342,7 +325,7 @@ export type FormInstrument<
     content: FormInstrumentContent<TData, TLanguage>;
     details: EnhancedBaseInstrumentDetails<TLanguage>;
     kind: 'FORM';
-    measures?: FormInstrumentMeasures<TData, TLanguage>;
+    measures?: InstrumentMeasures<TData, TLanguage>;
   }
 >;
 
@@ -350,7 +333,6 @@ export const $FormInstrument = $BaseInstrument().extend({
   content: $FormInstrumentContent,
   details: $EnhancedBaseInstrumentDetails(),
   kind: z.literal('FORM'),
-  measures: $FormInstrumentMeasures.optional(),
   validationSchema: $ZodTypeAny
 }) satisfies z.ZodType<FormInstrument>;
 
