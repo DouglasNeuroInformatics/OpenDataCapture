@@ -12,7 +12,7 @@ import { useInstrumentSummaries } from './useInstrumentSummaries';
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
   __date__: Date;
-  time: number;
+  __time__: number;
 };
 
 export type UseInstrumentVisualizationOptions = {
@@ -27,7 +27,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const notifications = useNotificationsStore();
   const { t } = useTranslation('common');
 
-  const [data, setData] = useState<InstrumentVisualizationRecord[]>([]);
+  const [records, setRecords] = useState<InstrumentVisualizationRecord[]>([]);
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
   const [instrumentSummary, setInstrumentSummary] = useState<UnilingualInstrumentSummary | null>(null);
@@ -48,7 +48,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     if (!instrumentSummary) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
       return;
-    } else if (data.length === 0) {
+    } else if (records.length === 0) {
       notifications.addNotification({ message: t('errors.noDataToExport'), type: 'error' });
       return;
     }
@@ -59,12 +59,12 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
     switch (option) {
       case 'JSON':
-        void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(data, null, 2)));
+        void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(records, null, 2)));
         break;
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(data[0]);
-          const rows = data.map((item) => Object.values(item).join(',')).join('\n');
+          const columnNames = Object.keys(records[0]);
+          const rows = records.map((item) => Object.values(item).join(',')).join('\n');
           return Promise.resolve(columnNames + '\n' + rows);
         });
     }
@@ -81,12 +81,12 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         const props = record.data && typeof record.data === 'object' ? record.data : {};
         records.push({
           __date__: record.date,
-          time: record.date.getTime(),
+          __time__: record.date.getTime(),
           ...record.computedMeasures,
           ...props
         });
       }
-      setData(records);
+      setRecords(records);
     }
   }, [recordsQuery.data]);
 
@@ -100,5 +100,5 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     return options;
   }, [summariesQuery.data]);
 
-  return { data, dl, instrumentOptions, instrumentSummary, minDate, setInstrumentId, setMinDate };
+  return { dl, instrumentId, instrumentOptions, instrumentSummary, minDate, records, setInstrumentId, setMinDate };
 }

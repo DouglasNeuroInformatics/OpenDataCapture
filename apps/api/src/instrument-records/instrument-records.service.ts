@@ -2,7 +2,7 @@ import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { linearRegression } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
 import { Injectable } from '@nestjs/common';
-import type { FormInstrumentMeasures } from '@open-data-capture/common/instrument';
+import type { InstrumentMeasures } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -188,7 +188,7 @@ export class InstrumentRecordsService {
     return results;
   }
 
-  private computeMeasures(measures: FormInstrumentMeasures, data: FormDataType) {
+  private computeMeasures(measures: InstrumentMeasures, data: FormDataType) {
     const computedMeasures: Record<string, number> = {};
     for (const key in measures) {
       computedMeasures[key] = measures[key].value(data);

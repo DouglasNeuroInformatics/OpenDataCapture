@@ -10,7 +10,7 @@ import { VisualizationHeader } from '../components/VisualizationHeader';
 
 export const SubjectTablePage = () => {
   const params = useParams();
-  const { data, dl, instrumentOptions, instrumentSummary, minDate, setInstrumentId, setMinDate } =
+  const { dl, instrumentOptions, instrumentSummary, minDate, records, setInstrumentId, setMinDate } =
     useInstrumentVisualization({
       params: { subjectId: params.subjectId! }
     });
@@ -18,7 +18,7 @@ export const SubjectTablePage = () => {
   const { t } = useTranslation(['subjects', 'core']);
 
   const fields: { field: string; label: string }[] = [];
-  for (const subItem in data[0]) {
+  for (const subItem in records[0]) {
     if (subItem !== '__date__') {
       fields.push({
         field: subItem,
@@ -62,7 +62,7 @@ export const SubjectTablePage = () => {
           },
           ...fields
         ]}
-        data={data}
+        data={records}
         minRows={10}
       />
     </div>
