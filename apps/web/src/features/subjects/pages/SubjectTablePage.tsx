@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { ClientTable, Dropdown, useDownload } from '@douglasneuroinformatics/ui';
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';
-import type { Language } from '@open-data-capture/common/core';
-import { type FormInstrumentSummary } from '@open-data-capture/common/instrument';
+import { type UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -21,7 +19,7 @@ export const SubjectTablePage = () => {
   const params = useParams();
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [tableData, setTableData] = useState<Record<string, unknown>[]>([]);
-  const [selectedForm, setSelectedForm] = useState<FormInstrumentSummary<FormDataType, Language> | null>(null);
+  const [selectedForm, setSelectedForm] = useState<UnilingualInstrumentSummary | null>(null);
   const { t } = useTranslation(['subjects', 'core']);
 
   const formsQuery = useAvailableForms();

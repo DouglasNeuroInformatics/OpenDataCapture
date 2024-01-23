@@ -33,11 +33,3 @@ export const $InteractiveInstrument = $BaseInstrument('en').extend({
   details: $EnhancedBaseInstrumentDetails('en'),
   kind: z.literal('INTERACTIVE')
 });
-
-export const $InteractiveInstrumentSummary = $InteractiveInstrument
-  .omit({ content: true, validationSchema: true })
-  .extend({
-    id: z.string()
-  });
-
-export type InteractiveInstrumentSummary = z.infer<typeof $InteractiveInstrumentSummary>;

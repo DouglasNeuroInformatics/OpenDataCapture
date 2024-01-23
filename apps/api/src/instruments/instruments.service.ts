@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import type { AnyInstrument, AnyInstrumentSummary, InstrumentKind } from '@open-data-capture/common/instrument';
+import type { AnyInstrument, InstrumentKind, InstrumentSummary } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import _ from 'lodash';
@@ -82,11 +82,11 @@ export class InstrumentsService {
   async findSummaries(
     query: { kind?: InstrumentKind } = {},
     { ability }: EntityOperationOptions = {}
-  ): Promise<AnyInstrumentSummary[]> {
+  ): Promise<InstrumentSummary[]> {
     return this.instrumentModel.findMany({
       select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query, { kind: 'FORM' }] }
-    }) as Promise<AnyInstrumentSummary[]>;
+    }) as Promise<InstrumentSummary[]>;
   }
 
   /**

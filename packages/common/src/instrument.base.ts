@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import type { Simplify } from 'type-fest';
 import { z } from 'zod';
 
 import { $Language, $ZodTypeAny } from './core';
@@ -125,6 +126,7 @@ export type BaseInstrument<TData = unknown, TLanguage extends InstrumentLanguage
 
   /** The language(s) in which the instrument is written */
   language: TLanguage;
+
   /** Arbitrary measures derived from the data */
   measures?: unknown;
 
@@ -161,19 +163,18 @@ export const $BaseInstrument = <TLanguage extends InstrumentLanguage>(language?:
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
  */
-export type BaseInstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<
-  T,
-  'content' | 'validationSchema'
-> & {
+export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content' | 'validationSchema'> & {
   id: string;
 };
 
-export const $BaseInstrumentSummary = $BaseInstrument()
+export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<unknown, Language>>>;
+
+export const $InstrumentSummary = $BaseInstrument()
   .omit({
     content: true,
     validationSchema: true
   })
-  .extend({ id: z.string() }) satisfies z.ZodType<BaseInstrumentSummary>;
+  .extend({ id: z.string() }) satisfies z.ZodType<InstrumentSummary>;
 
 export type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 export const $CreateInstrumentData = z.object({

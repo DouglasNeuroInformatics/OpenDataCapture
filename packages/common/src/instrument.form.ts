@@ -8,7 +8,6 @@ import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $InstrumentUIOption } 
 import type { Language } from './core';
 import type {
   BaseInstrument,
-  BaseInstrumentSummary,
   EnhancedBaseInstrumentDetails,
   InstrumentLanguage,
   InstrumentUIOption
@@ -372,30 +371,6 @@ export type StrictFormInstrument<TData, TLanguage extends InstrumentLanguage> = 
       }
     : never
   : never;
-
-export type FormInstrumentSummary<
-  TData extends Base.FormDataType = Base.FormDataType,
-  TLanguage extends InstrumentLanguage = InstrumentLanguage
-> = BaseInstrumentSummary<FormInstrument<TData, TLanguage>> & {
-  measures?: Record<
-    string,
-    {
-      label: InstrumentUIOption<TLanguage, string>;
-    }
-  >;
-};
-
-export const $FormInstrumentSummary = $FormInstrument.omit({ content: true, validationSchema: true }).extend({
-  id: z.string(),
-  measures: z.record(
-    z.object({
-      label: $InstrumentUIOption(z.string())
-    })
-  )
-});
-
-export type UnilingualFormInstrumentSummary<TData extends Base.FormDataType = Base.FormDataType> =
-  FormInstrumentSummary<TData, Language>;
 
 export type AnyMultilingualFormInstrument = FormInstrument<Base.FormDataType, Language[]>;
 

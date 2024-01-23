@@ -4,10 +4,10 @@ import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
-  AnyInstrumentSummary,
   InstrumentBundleContainer,
   InstrumentKind,
-  InstrumentSourceContainer
+  InstrumentSourceContainer,
+  InstrumentSummary
 } from '@open-data-capture/common/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -61,7 +61,7 @@ export class InstrumentsController {
   async findSummaries(
     @CurrentUser('ability') ability: AppAbility,
     @Query('kind') kind?: InstrumentKind
-  ): Promise<AnyInstrumentSummary[]> {
+  ): Promise<InstrumentSummary[]> {
     return this.instrumentsService.findSummaries({ kind }, { ability });
   }
 

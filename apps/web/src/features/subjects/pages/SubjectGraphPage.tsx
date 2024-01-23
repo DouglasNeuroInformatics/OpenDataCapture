@@ -9,7 +9,7 @@ import {
   type SelectOption
 } from '@douglasneuroinformatics/ui';
 import type { Language } from '@open-data-capture/common/core';
-import type { FormInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import type { LinearRegressionResults } from '@open-data-capture/common/instrument-records';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -46,7 +46,7 @@ export const SubjectGraphPage = () => {
   const params = useParams();
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [graphData, setGraphData] = useState<GraphData>([]);
-  const [selectedForm, setSelectedForm] = useState<FormInstrumentSummary<FormDataType, Language> | null>(null);
+  const [selectedForm, setSelectedForm] = useState<UnilingualInstrumentSummary | null>(null);
   const [measureOptions, setMeasureOptions] = useState<SelectOption[]>([]);
   const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
   const { t } = useTranslation(['subjects', 'common']);
