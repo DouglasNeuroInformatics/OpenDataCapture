@@ -4,10 +4,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import fs from 'node:fs/promises';
+import path from 'path';
+import url from 'url';
 
 import express from 'express';
 import asyncHandler from 'express-async-handler';
 import type { ViteDevServer } from 'vite';
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production';
@@ -15,8 +19,12 @@ const port = process.env.PORT ?? 5173;
 const base = process.env.BASE ?? '/';
 
 // Cached production assets
-const templateHtml = isProduction ? await fs.readFile('./dist/client/index.html', 'utf-8') : '';
-const ssrManifest = isProduction ? await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8') : undefined;
+let templateHtml = '';
+let ssrManifest: string | undefined;
+if (isProduction) {
+  templateHtml = await fs.readFile(path.resolve(__dirname, './dist/client/index.html'), 'utf-8');
+  ssrManifest = await fs.readFile(path.resolve(__dirname, './dist/client/.vite/ssr-manifest.json'), 'utf-8');
+}
 
 // Create http server
 const app = express();
@@ -35,7 +43,7 @@ if (!isProduction) {
   const compression = (await import('compression')).default;
   const sirv = (await import('sirv')).default;
   app.use(compression());
-  app.use(base, sirv('./dist/client', { extensions: [] }));
+  app.use(base, sirv(path.resolve(__dirname, './dist/client'), { extensions: [] }));
 }
 
 // Serve HTML
@@ -48,13 +56,12 @@ app.use(
       let render;
       if (!isProduction) {
         // Always read fresh template in development
-        template = await fs.readFile('./index.html', 'utf-8');
+        template = await fs.readFile(path.resolve(__dirname, './index.html'), 'utf-8');
         template = await vite!.transformIndexHtml(url, template);
-        render = (await vite!.ssrLoadModule('/src/entry-server.tsx')).render
+        render = (await vite!.ssrLoadModule('/src/entry-server.tsx')).render;
       } else {
         template = templateHtml;
-        // @ts-expect-error - temporary 
-        render = (await import('./dist/server/entry-server.js')).render;
+        render = (await import(path.resolve(__dirname, './dist/server/entry-server.js'))).render;
       }
 
       const rendered = await render(url, ssrManifest);
