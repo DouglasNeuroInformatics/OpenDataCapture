@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import type { AnyInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
-import { InstrumentInterpreter, type InstrumentInterpreterOptions } from '@open-data-capture/instrument-interpreter';
+import { type InstrumentInterpreterOptions } from '@open-data-capture/instrument-interpreter';
 
-const interpreter = new InstrumentInterpreter();
+import { useInstrumentInterpreter } from './useInstrumentInterpreter';
 
 export function useEvalInstrumentBundle<TKind extends InstrumentKind>(
   bundle: null | string | undefined,
   options?: Omit<InstrumentInterpreterOptions<TKind>, 'validate'>
 ) {
+  const interpreter = useInstrumentInterpreter();
   const [instrument, setInstrument] = useState<Extract<AnyInstrument, { kind: TKind }> | null>(null);
 
   useEffect(() => {

@@ -1,14 +1,14 @@
 import { $InstrumentBundleContainer } from '@open-data-capture/common/instrument';
 import type { AnyInstrument, AnyUnilingualInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
-import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { translateInstrument } from '@open-data-capture/instrument-utils';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-const interpreter = new InstrumentInterpreter();
+import { useInstrumentInterpreter } from './useInstrumentInterpreter';
 
 export const useInstruments = <TKind extends InstrumentKind>({ params }: { params?: { kind?: TKind } } = {}) => {
+  const interpreter = useInstrumentInterpreter();
   const { i18n } = useTranslation();
   return useQuery({
     queryFn: async () => {

@@ -4,11 +4,10 @@ import { ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment, AssignmentStatus } from '@open-data-capture/common/assignment';
 import { type AnyInstrument } from '@open-data-capture/common/instrument';
-import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 
-const interpreter = new InstrumentInterpreter();
+import { useInstrumentInterpreter } from '@/hooks/useInstrumentInterpreter';
 
 export type AssignmentTableProps = {
   assignments: Assignment[];
@@ -18,6 +17,7 @@ export type AssignmentTableProps = {
 export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTableProps) => {
   const { i18n, t } = useTranslation('subjects');
   const [instruments, setInstruments] = useState<Record<string, AnyInstrument>>({});
+  const interpreter = useInstrumentInterpreter();
 
   // To be moved to backend
   const evaluateInstruments = async (assignments: Assignment[]) => {
