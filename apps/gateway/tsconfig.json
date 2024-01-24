@@ -1,22 +1,13 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "incremental": true,
-    "jsx": "preserve",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "outDir": "build",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "resolveJsonModule": true,
-    "target": "ES6"
-  },
-  "exclude": [".next", "node_modules"],
   "extends": "../../jsconfig.json",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./src/*"],
+      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/lib/*"]
+    },
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "server.ts"]
 }

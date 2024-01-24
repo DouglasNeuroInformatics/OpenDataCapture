@@ -223,7 +223,8 @@ export default [
     files: ['apps/gateway/**/*.ts', 'apps/gateway/**/*.tsx'],
     languageOptions: {
       globals: {
-        ...globals.browser
+        ...globals.browser,
+        ...globals.node
       },
       parserOptions: {
         project: path.resolve(__dirname, 'apps', 'gateway', 'tsconfig.json')
