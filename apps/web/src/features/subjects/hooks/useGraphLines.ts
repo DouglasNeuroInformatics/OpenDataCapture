@@ -42,7 +42,7 @@ export function useGraphLines({ selectedMeasures }: UseGraphLinesOptions) {
       });
     }
     setLines(lines);
-  }, [i18n.resolvedLanguage]);
+  }, [i18n.resolvedLanguage, selectedMeasures]);
 
   return lines;
 }
