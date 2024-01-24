@@ -1,7 +1,7 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { linearRegression } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotImplementedException } from '@nestjs/common';
 import type { InstrumentMeasures } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
@@ -157,9 +157,9 @@ export class InstrumentRecordsService {
       .findById(instrumentId)
       .then((instrument) => instrument.toInstance());
     if (instrument.kind !== 'FORM') {
-      throw new Error(`Linear model is not available for instruments of kind '${instrument.kind}'`);
+      throw new NotImplementedException(`Linear model is not available for instruments of kind '${instrument.kind}'`);
     } else if (!instrument.measures) {
-      throw new Error('Instrument must contain measures');
+      return {};
     }
 
     const records = await this.instrumentRecordModel.findMany({
