@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useInstrumentBundle } from './useInstrumentBundle';
 import { useInstrumentInterpreter } from './useInstrumentInterpreter';
 
-export function useInstrument<TKind extends InstrumentKind>(id: string, options?: { kind?: TKind }) {
+export function useInstrument<TKind extends InstrumentKind>(id: null | string, options?: { kind?: TKind }) {
   const instrumentBundleQuery = useInstrumentBundle(id);
   const interpreter = useInstrumentInterpreter();
   const [instrument, setInstrument] = useState<SomeUnilingualInstrument<TKind> | null>(null);

@@ -17,12 +17,12 @@ import { useMeasureOptions } from '../hooks/useMeasureOptions';
 export const SubjectGraphPage = () => {
   const { currentGroup } = useAuthStore();
   const params = useParams();
-  const { instrumentId, instrumentOptions, instrumentSummary, minDate, records, setInstrumentId, setMinDate } =
+  const { instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
     useInstrumentVisualization({
       params: { subjectId: params.subjectId! }
     });
   const { t } = useTranslation(['subjects', 'common']);
-  const measureOptions = useMeasureOptions(instrumentSummary);
+  const measureOptions = useMeasureOptions(instrument);
   const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
 
   const linearModelQuery = useLinearModel({
@@ -48,7 +48,7 @@ export const SubjectGraphPage = () => {
   return (
     <div>
       <div className="my-2">
-        <VisualizationHeader minDate={minDate} title={instrumentSummary?.details.title} />
+        <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select">

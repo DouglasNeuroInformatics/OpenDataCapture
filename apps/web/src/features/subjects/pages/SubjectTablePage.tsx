@@ -9,7 +9,7 @@ import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization'
 
 export const SubjectTablePage = () => {
   const params = useParams();
-  const { dl, instrumentOptions, instrumentSummary, minDate, records, setInstrumentId, setMinDate } =
+  const { dl, instrument, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
     useInstrumentVisualization({
       params: { subjectId: params.subjectId! }
     });
@@ -29,7 +29,7 @@ export const SubjectTablePage = () => {
   return (
     <div>
       <div className="my-2">
-        <VisualizationHeader minDate={minDate} title={instrumentSummary?.details.title} />
+        <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <Dropdown

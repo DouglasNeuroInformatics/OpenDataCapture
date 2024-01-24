@@ -188,7 +188,10 @@ export const $BaseInstrument = <TLanguage extends InstrumentLanguage>(language?:
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
  */
-export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content' | 'validationSchema'> & {
+export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<
+  T,
+  'content' | 'measures' | 'validationSchema'
+> & {
   id: string;
 };
 

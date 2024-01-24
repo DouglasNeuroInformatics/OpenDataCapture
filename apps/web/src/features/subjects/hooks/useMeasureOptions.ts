@@ -1,19 +1,19 @@
 import { useMemo } from 'react';
 
 import type { SelectOption } from '@douglasneuroinformatics/ui';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { AnyUnilingualFormInstrument } from '@open-data-capture/common/instrument';
 
-export function useMeasureOptions(instrumentSummary: UnilingualInstrumentSummary | null): SelectOption[] {
+export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null): SelectOption[] {
   return useMemo(() => {
     const arr: SelectOption[] = [];
-    if (instrumentSummary) {
-      for (const measure in instrumentSummary.measures) {
+    if (instrument) {
+      for (const measure in instrument.measures) {
         arr.push({
           key: measure,
-          label: instrumentSummary.measures[measure].label
+          label: instrument.measures[measure].label
         });
       }
     }
     return arr;
-  }, [instrumentSummary]);
+  }, [instrument]);
 }

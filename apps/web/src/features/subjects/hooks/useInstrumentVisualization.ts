@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/ui';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { AnyUnilingualFormInstrument } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
+import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
 import { useAuthStore } from '@/stores/auth-store';
@@ -29,7 +30,8 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const [records, setRecords] = useState<InstrumentVisualizationRecord[]>([]);
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
-  const [instrumentSummary, setInstrumentSummary] = useState<UnilingualInstrumentSummary | null>(null);
+
+  const instrument: AnyUnilingualFormInstrument | null = useInstrument(instrumentId, { kind: 'FORM' });
 
   const summariesQuery = useInstrumentSummaries({ params: { kind: 'FORM' } });
   const recordsQuery = useInstrumentRecords({
@@ -44,7 +46,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   });
 
   const dl = (option: 'CSV' | 'JSON') => {
-    if (!instrumentSummary) {
+    if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
       return;
     } else if (records.length === 0) {
@@ -52,8 +54,8 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       return;
     }
 
-    const baseFilename = `${currentUser!.username}_${instrumentSummary.name}_${
-      instrumentSummary.version
+    const baseFilename = `${currentUser!.username}_${instrument.name}_${
+      instrument.version
     }_${new Date().toISOString()}`;
 
     switch (option) {
@@ -68,10 +70,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         });
     }
   };
-
-  useEffect(() => {
-    setInstrumentSummary(summariesQuery.data?.find((instrument) => instrument.id === instrumentId) ?? null);
-  }, [instrumentId]);
 
   useEffect(() => {
     if (recordsQuery.data) {
@@ -99,5 +97,5 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     return options;
   }, [summariesQuery.data]);
 
-  return { dl, instrumentId, instrumentOptions, instrumentSummary, minDate, records, setInstrumentId, setMinDate };
+  return { dl, instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate };
 }

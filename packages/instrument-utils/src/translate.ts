@@ -263,7 +263,6 @@ export function translateInstrumentSummary(
     id: summary.id,
     kind: summary.kind,
     language: targetLanguage,
-    measures: translateMeasures(summary.measures, targetLanguage),
     name: summary.name,
     tags: summary.tags[targetLanguage],
     version: summary.version
