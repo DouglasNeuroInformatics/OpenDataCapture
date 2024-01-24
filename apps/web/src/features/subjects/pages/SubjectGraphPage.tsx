@@ -45,8 +45,6 @@ export const SubjectGraphPage = () => {
     setSelectedMeasures([]);
   };
 
-  console.log(graphData);
-
   return (
     <div>
       <div className="my-2">
