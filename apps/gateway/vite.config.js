@@ -6,7 +6,7 @@ import tailwind from '@open-data-capture/vite-plugin-tailwind';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 
-const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig({
   build: {
@@ -25,10 +25,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(projectDir, 'src')
+      '@': path.resolve(__dirname, 'src')
     }
-  },
-  server: {
-    port: parseInt(process.env.PLAYGROUND_DEV_SERVER_PORT ?? '3750')
   }
 });
