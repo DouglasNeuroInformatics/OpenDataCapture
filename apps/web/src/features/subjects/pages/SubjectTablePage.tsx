@@ -3,10 +3,9 @@ import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/uti
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
-
 import { TimeDropdown } from '../components/TimeDropdown';
 import { VisualizationHeader } from '../components/VisualizationHeader';
+import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization';
 
 export const SubjectTablePage = () => {
   const params = useParams();

@@ -4,12 +4,11 @@ import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/ui'
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
+import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
+import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
 import { useAuthStore } from '@/stores/auth-store';
 
-import { useInstrumentRecords } from './useInstrumentRecords';
-import { useInstrumentSummaries } from './useInstrumentSummaries';
-
-type InstrumentVisualizationRecord = {
+export type InstrumentVisualizationRecord = {
   [key: string]: unknown;
   __date__: Date;
   __time__: number;
