@@ -40,7 +40,15 @@ export type InstrumentRecordsExport = {
   value: unknown;
 }[];
 
-export type LinearRegressionResults = Record<string, { intercept: number; slope: number; stdErr: number }>;
+export const $LinearRegressionResults = z.record(
+  z.object({
+    intercept: z.number(),
+    slope: z.number(),
+    stdErr: z.number()
+  })
+);
+
+export type LinearRegressionResults = z.infer<typeof $LinearRegressionResults>;
 
 export type InstrumentRecordQueryParams = {
   groupId?: string;
