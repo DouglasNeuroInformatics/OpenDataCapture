@@ -5,6 +5,7 @@ import { type InstrumentInterpreterOptions } from '@open-data-capture/instrument
 
 import { useInstrumentInterpreter } from './useInstrumentInterpreter';
 
+/** @deprecated - should pass the id of the instrument in assignment then fetch bundle here on client */
 export function useEvalInstrumentBundle<TKind extends InstrumentKind>(
   bundle: null | string | undefined,
   options?: Omit<InstrumentInterpreterOptions<TKind>, 'validate'>
