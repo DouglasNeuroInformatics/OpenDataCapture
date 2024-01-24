@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,5 +10,9 @@
   <body>
     <div id="root"><!--app-html--></div>
     <script type="module" src="/src/entry-client.tsx"></script>
+    <!-- see https://bugzilla.mozilla.org/show_bug.cgi?id=1404468 -->
+    <script>
+      0;
+    </script>
   </body>
 </html>
