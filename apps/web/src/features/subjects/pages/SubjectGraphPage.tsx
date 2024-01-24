@@ -1,159 +1,62 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { Dropdown, LineGraph, SelectDropdown } from '@douglasneuroinformatics/ui';
-import type { LineGraphLine, SelectOption } from '@douglasneuroinformatics/ui';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
-import type { LinearRegressionResults } from '@open-data-capture/common/instrument-records';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { pickBy } from 'lodash';
+import { Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useFormRecords } from '@/hooks/useFormRecords';
-import { useInstruments } from '@/hooks/useInstruments';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { TimeDropdown } from '../components/TimeDropdown';
 import { VisualizationHeader } from '../components/VisualizationHeader';
-
-type GraphData = {
-  [key: string]: unknown;
-  time: number;
-}[];
-
-const COLOR_PALETTE = [
-  '#D81B60',
-  '#1E88E5',
-  '#FD08FA',
-  '#A06771',
-  '#353A9B',
-  '#D90323',
-  '#9C9218',
-  '#CF0583',
-  '#4075A3'
-];
+import { useGraphData } from '../hooks/useGraphData';
+import { useGraphLines } from '../hooks/useGraphLines';
+import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization';
+import { useLinearModel } from '../hooks/useLinearModel';
+import { useMeasureOptions } from '../hooks/useMeasureOptions';
 
 export const SubjectGraphPage = () => {
   const { currentGroup } = useAuthStore();
   const params = useParams();
-  const [minDate, setMinDate] = useState<Date | null>(null);
-  const [graphData, setGraphData] = useState<GraphData>([]);
-  const [selectedInstrument, setSelectedInstrument] = useState<UnilingualInstrumentSummary | null>(null);
-  const [measureOptions, setMeasureOptions] = useState<SelectOption[]>([]);
-  const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
+  const { instrumentId, instrumentOptions, instrumentSummary, minDate, records, setInstrumentId, setMinDate } =
+    useInstrumentVisualization({
+      params: { subjectId: params.subjectId! }
+    });
   const { t } = useTranslation(['subjects', 'common']);
+  const measureOptions = useMeasureOptions(instrumentSummary);
+  const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
 
-  const formsQuery = useInstruments({ params: { kind: 'FORM' } });
-  const recordsQuery = useFormRecords({
-    enabled: selectedInstrument !== null,
+  const linearModelQuery = useLinearModel({
+    enabled: Boolean(instrumentId),
     params: {
       groupId: currentGroup?.id,
-      instrumentId: selectedInstrument?.id,
-      minDate: minDate ?? undefined,
-      subjectId: params.subjectId!
+      instrumentId: instrumentId!
     }
   });
-  const lmQuery = useQuery({
-    enabled: Boolean(selectedInstrument),
-    queryFn: async () => {
-      const response = await axios.get<LinearRegressionResults>('/v1/instrument-records/linear-model', {
-        params: {
-          groupId: currentGroup?.id,
-          instrumentId: selectedInstrument?.id
-        }
-      });
-      return response.data;
-    },
-    queryKey: [selectedInstrument]
+  const graphData = useGraphData({
+    models: linearModelQuery.data,
+    records,
+    selectedMeasures
   });
 
-  useEffect(() => {
-    const arr: SelectOption[] = [];
-    if (selectedInstrument) {
-      for (const measure in selectedInstrument.measures) {
-        arr.push({
-          key: measure,
-          label: selectedInstrument.measures[measure].label
-        });
-      }
-    }
-    return setMeasureOptions(arr);
-  }, [selectedInstrument]);
-
-  useEffect(() => {
-    if (recordsQuery.data) {
-      const data: GraphData = [];
-      for (const record of recordsQuery.data) {
-        const dataPoint: Record<string, number> & { time: number } = {
-          ...pickBy(record.computedMeasures, (_, key) => selectedMeasures.find((item) => item.key === key)),
-          time: record.date.getTime()
-        };
-        for (const key in dataPoint) {
-          const model = lmQuery.data?.[key];
-          if (!model) {
-            continue;
-          }
-          dataPoint[key + 'Group'] = Number((model.intercept + model.slope * dataPoint.time).toFixed(2));
-        }
-        data.push(dataPoint);
-      }
-      data.sort((a, b) => {
-        if (a.time > b.time) {
-          return 1;
-        } else if (b.time > a.time) {
-          return -1;
-        }
-        return 0;
-      });
-      setGraphData(data);
-    }
-  }, [lmQuery.data, recordsQuery.data, selectedInstrument, selectedMeasures]);
-
-  if (!formsQuery.data) {
-    return null;
-  }
-
-  const formOptions: Record<string, string> = {};
-  for (const form of formsQuery.data) {
-    if (form.measures && Object.keys(form.measures).length > 0) {
-      formOptions[form.id] = form.details.title;
-    }
-  }
-
-  const lines: LineGraphLine[] = [];
-  for (let i = 0; i < selectedMeasures.length; i++) {
-    const measure = selectedMeasures[i];
-    lines.push({
-      name: measure.label,
-      stroke: COLOR_PALETTE[i],
-      val: measure.key
-    });
-    lines.push({
-      legendType: 'none',
-      name: `${measure.label} (${t('common:groupTrend')})`,
-      stroke: COLOR_PALETTE[i],
-      strokeDasharray: '5 5',
-      strokeWidth: 0.5,
-      val: measure.key + 'Group'
-    });
-  }
+  const lines = useGraphLines({ selectedMeasures });
 
   const handleSelectForm = (id: string) => {
-    setSelectedInstrument(formsQuery.data.find((form) => form.id === id) ?? null);
+    setInstrumentId(id);
     setSelectedMeasures([]);
   };
+
+  console.log(graphData);
 
   return (
     <div>
       <div className="my-2">
-        <VisualizationHeader minDate={minDate} title={selectedInstrument?.details.title} />
+        <VisualizationHeader minDate={minDate} title={instrumentSummary?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select">
               <Dropdown
                 className="text-sm"
-                options={formOptions}
+                options={instrumentOptions}
                 title={t('visualization.instrument')}
                 variant="secondary"
                 onSelection={handleSelectForm}
@@ -181,7 +84,7 @@ export const SubjectGraphPage = () => {
           data={graphData}
           lines={lines}
           xAxis={{
-            key: 'time',
+            key: '__time__',
             label: t('visualization.xLabel')
           }}
         />

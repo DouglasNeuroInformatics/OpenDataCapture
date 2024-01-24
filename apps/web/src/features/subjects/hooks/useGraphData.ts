@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import type { SelectOption } from '@douglasneuroinformatics/ui';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import type { LinearRegressionResults } from '@open-data-capture/common/instrument-records';
 import _ from 'lodash';
 
@@ -13,28 +12,22 @@ export type GraphRecord = {
 };
 
 export type UseGraphDataOptions = {
-  instrument: UnilingualInstrumentSummary;
-  measures: SelectOption[];
-  models: LinearRegressionResults;
+  models?: LinearRegressionResults;
   records: InstrumentVisualizationRecord[];
+  selectedMeasures: SelectOption[];
 };
 
-export function useGraphData({
-  instrument,
-  measures,
-  models,
-  records
-}: UseGraphDataOptions): GraphRecord[] {
+export function useGraphData({ models, records, selectedMeasures }: UseGraphDataOptions): GraphRecord[] {
   return useMemo(() => {
     const graphRecords: GraphRecord[] = [];
     if (records) {
       for (const record of records) {
         const graphRecord: GraphRecord = {
-          ..._.pickBy(record, (_, key) => measures.find((item) => item.key === key)),
+          ..._.pickBy(record, (_, key) => selectedMeasures.find((item) => item.key === key)),
           __time__: record.__time__
         };
         for (const key in record) {
-          const model = models[key];
+          const model = models?.[key];
           if (!model) {
             continue;
           }
@@ -52,5 +45,5 @@ export function useGraphData({
       });
     }
     return graphRecords;
-  }, [instrument, measures, models, records]);
+  }, [selectedMeasures, models, records]);
 }
