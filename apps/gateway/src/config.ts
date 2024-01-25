@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 const $Config = z
   .object({
-    base: z.string().default('/'),
+    baseUrl: z.string().url(),
     devServerPort: z.coerce.number().int().positive().optional(),
     mode: z.enum(['development', 'production']),
     root: z.string().min(1)
@@ -23,7 +23,7 @@ const $Config = z
   }));
 
 export const CONFIG = await $Config.parseAsync({
-  base: process.env.BASE,
+  baseUrl: process.env.GATEWAY_BASE_URL,
   devServerPort: process.env.GATEWAY_DEV_SERVER_PORT,
   mode: process.env.NODE_ENV,
   root: path.resolve(__dirname, '..')

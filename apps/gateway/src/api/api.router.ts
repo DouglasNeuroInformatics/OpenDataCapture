@@ -1,6 +1,10 @@
+import crypto from 'crypto';
+
 import { $CreateAssignmentRelayData } from '@open-data-capture/common/assignment';
 import { Router } from 'express';
 
+import { CONFIG } from '@/config';
+import { db } from '@/lib/db';
 import { ah } from '@/utils/async-handler';
 import { HttpException } from '@/utils/http-exception';
 
@@ -14,17 +18,25 @@ router.get('/assignments', (req, res) => {
 
 router.post(
   '/assignments',
-  ah(async (req, res, next) => {
+  ah(async (req, res) => {
     const result = await $CreateAssignmentRelayData.safeParseAsync(req.body);
     if (!result.success) {
-      return next(new HttpException(400, 'Bad Request'));
+      throw new HttpException(400, 'Bad Request');
     }
+    await db.update(({ assignments }) => {
+      const createdAt = new Date();
+      const id = crypto.randomUUID();
+      assignments.push({
+        createdAt,
+        id,
+        status: 'OUTSTANDING',
+        updatedAt: createdAt,
+        url: `${CONFIG.baseUrl}/assignments/${id}`,
+        ...result.data
+      });
+    });
     res.status(200).send(result.data);
   })
 );
-
-router.get('*', (_, res) => {
-  res.status(404).send('Not Found');
-});
 
 export { router as apiRouter };

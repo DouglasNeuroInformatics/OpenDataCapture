@@ -1,9 +1,8 @@
 import { JSONFilePreset } from 'lowdb/node';
 
 import { CONFIG } from '@/config';
+import type { Assignment } from '@open-data-capture/common/assignment';
 
-const db = await JSONFilePreset<{
-  assignments: any[];
+export const db = await JSONFilePreset<{
+  assignments: Assignment[];
 }>(CONFIG.datasource, { assignments: [] });
-
-await db.update(({ assignments }) => assignments.push('hello world'));

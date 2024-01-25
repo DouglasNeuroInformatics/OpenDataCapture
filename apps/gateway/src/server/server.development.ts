@@ -10,7 +10,6 @@ import { BaseServer } from './server.base';
 
 const _vite = await createServer({
   appType: 'custom',
-  base: CONFIG.base,
   server: { middlewareMode: true }
 });
 

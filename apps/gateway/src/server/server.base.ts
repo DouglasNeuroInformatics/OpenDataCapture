@@ -20,7 +20,7 @@ export abstract class BaseServer {
   }
 
   async appHandler(req: Request, res: Response) {
-    const url = req.originalUrl.replace(CONFIG.base, '');
+    const url = req.url;
     try {
       const render = await this.loadRender();
       const template = await this.loadTemplate(url);

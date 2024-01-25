@@ -1,9 +1,6 @@
-import type { AssignmentModel, AssignmentRecordModel } from '@open-data-capture/database/gateway';
 import { z } from 'zod';
 
 import { $BaseModel, $Json } from './core';
-
-import type { Json } from './core';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -12,7 +9,7 @@ export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
 /**
  * An self-contained object representing an assignment. This is stored on the gateway itself.
  */
-export type Assignment = AssignmentModel;
+export type Assignment = z.infer<typeof $Assignment>;
 export const $Assignment = $BaseModel.extend({
   expiresAt: z.coerce.date(),
   instrumentBundle: z.string().min(1),
@@ -20,23 +17,20 @@ export const $Assignment = $BaseModel.extend({
   status: $AssignmentStatus,
   subjectId: z.string().min(1),
   url: z.string().url()
-}) satisfies z.ZodType<AssignmentModel>;
+});
 
 /**
  * An object representing a completed assignment. This is stored on the gateway itself. Since the
  * gateway uses an SQLite database, the JSON data is stored as a string, which then needs to be
  * transformed
  */
-export type AssignmentRecord = Omit<AssignmentRecordModel, 'data'> & { data: Json };
+export type AssignmentRecord = z.infer<typeof $AssignmentRecord>;
 export const $AssignmentRecord = $BaseModel.extend({
   assignment: $Assignment,
   assignmentId: z.string().min(1),
   completedAt: z.coerce.date(),
-  data: z
-    .string()
-    .transform((arg) => JSON.parse(arg) as unknown)
-    .pipe($Json)
-}) satisfies z.ZodType<AssignmentRecord, z.ZodTypeDef, AssignmentRecordModel>;
+  data: $Json
+});
 
 /** The DTO transferred from the web client to the core API when creating an assignment */
 export type CreateAssignmentData = z.infer<typeof $CreateAssignmentData>;
