@@ -1,9 +1,11 @@
-import type { Request, Response, Router } from 'express';
+import type { Request, Response } from 'express';
 import express from 'express';
 import type { Promisable } from 'type-fest';
 
+import { apiRouter } from '@/api/api.router';
 import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
+import { errorHandler } from '@/middleware/error-handler';
 import { ah } from '@/utils/async-handler';
 
 export abstract class BaseServer {
@@ -12,18 +14,12 @@ export abstract class BaseServer {
   constructor() {
     this.app = express();
     this.app.use(express.json());
+    this.app.use('/api', apiRouter);
+    this.app.use(ah(this.appHandler.bind(this)));
+    this.app.use(errorHandler);
   }
 
-  addRoutes(routes: { path: string; router: Router }[]) {
-    routes.forEach((route) => {
-      this.app.use(route.path, route.router);
-    });
-    this.app.use(ah(this.handler.bind(this)));
-  }
-
-  protected fixStacktrace?(err: Error): void;
-
-  async handler(req: Request, res: Response) {
+  async appHandler(req: Request, res: Response) {
     const url = req.originalUrl.replace(CONFIG.base, '');
     try {
       const render = await this.loadRender();
@@ -44,6 +40,8 @@ export abstract class BaseServer {
       res.status(500).send({ message: 'Internal Server Error', statusCode: 500 });
     }
   }
+
+  protected fixStacktrace?(err: Error): void;
 
   listen(port = CONFIG.port) {
     return this.app.listen(port, () => {
