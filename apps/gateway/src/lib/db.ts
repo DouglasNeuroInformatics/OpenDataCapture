@@ -1,5 +1,9 @@
 import { JSONFilePreset } from 'lowdb/node';
 
-const db = await JSONFilePreset('db.json', { posts: [] });
+import { CONFIG } from '@/config';
 
-await db.update(({ posts }) => posts.push('hello world'));
+const db = await JSONFilePreset<{
+  assignments: any[];
+}>(CONFIG.datasource, { assignments: [] });
+
+await db.update(({ assignments }) => assignments.push('hello world'));
