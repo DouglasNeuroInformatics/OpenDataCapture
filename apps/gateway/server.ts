@@ -7,6 +7,8 @@ import type { ViteDevServer } from 'vite';
 
 import { config } from '@/config/server.config';
 import type { RenderFunction } from '@/entry-server';
+import { apiRouter } from '@/routers/api.router';
+import { appRouter } from '@/routers/app.router';
 
 const app = express();
 
@@ -34,6 +36,9 @@ if (config.mode === 'development') {
   app.use(compression());
   app.use(config.base, sirv(path.resolve(config.root, './dist/client'), { extensions: [] }));
 }
+
+app.use('/api', apiRouter);
+app.use('/app', appRouter);
 
 // Serve HTML
 app.use(
