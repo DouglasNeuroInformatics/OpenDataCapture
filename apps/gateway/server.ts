@@ -59,7 +59,10 @@ app.use(
         ).render;
       }
       const { html } = render(url, ssrManifest);
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(template.replace(`<!--ssr-outlet-->`, html));
+      const content = template
+        .replace('{{ APP_PROPS_OUTLET }}', JSON.stringify({ message: 'Hello From Server' }))
+        .replace('{{ APP_SSR_OUTLET }}', html);
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(content);
     } catch (err) {
       if (err instanceof Error) {
         vite?.ssrFixStacktrace(err);
