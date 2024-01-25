@@ -2,7 +2,11 @@ import { Router } from 'express';
 
 const router = Router();
 
-router.get('/', (_, res) => {
+router.get('/assignments', (_, res) => {
+  res.send('Hello World');
+});
+
+router.post('/assignments', (_, res) => {
   res.send('Hello World');
 });
 
