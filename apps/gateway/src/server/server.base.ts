@@ -15,7 +15,7 @@ export abstract class BaseServer {
     this.app = express();
     this.app.use(express.json());
     this.app.use('/api', apiRouter);
-    this.app.use(ah(this.appHandler.bind(this)));
+    this.app.get('/', ah(this.appHandler.bind(this)));
     this.app.use(errorHandler);
   }
 
