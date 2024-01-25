@@ -17,8 +17,8 @@ const _vite = await createServer({
 export class DevelopmentServer extends BaseServer {
   private vite = _vite;
 
-  constructor(protected app: App) {
-    super(app);
+  constructor() {
+    super();
     this.app.use(this.vite.middlewares);
   }
 

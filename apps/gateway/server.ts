@@ -1,9 +1,6 @@
 import { Server } from '@/server';
 
-const app = express();
-const server = new Server(app);
-
-import express from 'express';
+const server = new Server();
 
 import { apiRouter } from '@/api/api.router';
 

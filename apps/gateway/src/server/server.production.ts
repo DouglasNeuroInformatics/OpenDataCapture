@@ -12,10 +12,10 @@ import { BaseServer } from './server.base';
 const template = await fs.readFile(path.resolve(CONFIG.root, './dist/client/index.html'), 'utf-8');
 
 export class ProductionServer extends BaseServer {
-  constructor(protected app: App) {
-    super(app);
-    app.use(compression());
-    app.use(CONFIG.base, sirv(path.resolve(CONFIG.root, './dist/client'), { extensions: [] }));
+  constructor() {
+    super();
+    this.app.use(compression());
+    this.app.use(CONFIG.base, sirv(path.resolve(CONFIG.root, './dist/client'), { extensions: [] }));
   }
 
   protected async loadRender() {

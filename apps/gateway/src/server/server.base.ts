@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response, Router } from 'express';
+import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import type { Promisable } from 'type-fest';
 
@@ -6,7 +7,12 @@ import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
 
 export abstract class BaseServer {
-  constructor(protected app: App) {}
+  protected app: App;
+  
+  constructor() {
+    this.app = express();
+    this.app.use(express.json());
+  }
 
   addRoutes(routes: { path: string; router: Router }[]) {
     routes.forEach((route) => {
@@ -51,6 +57,6 @@ export abstract class BaseServer {
 }
 
 export type AppServer = {
-  new (app: App): InstanceType<typeof BaseServer>;
+  new (): InstanceType<typeof BaseServer>;
   prototype: InstanceType<typeof BaseServer>;
 };
