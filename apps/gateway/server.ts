@@ -17,10 +17,10 @@ const app: App = express();
 
 // Cached production assets
 let templateHtml: null | string = null;
-let ssrManifest: null | string = null;
+// let ssrManifest: null | string = null;
 if (config.mode === 'production') {
   templateHtml = await fs.readFile(path.resolve(__dirname, './dist/client/index.html'), 'utf-8');
-  ssrManifest = await fs.readFile(path.resolve(__dirname, './dist/client/.vite/ssr-manifest.json'), 'utf-8');
+  //ssrManifest = await fs.readFile(path.resolve(__dirname, './dist/client/.vite/ssr-manifest.json'), 'utf-8');
 }
 
 // Add Vite or respective production middlewares
@@ -58,9 +58,11 @@ app.use(
           (await import(path.resolve(__dirname, './dist/server/entry-server.js'))) as { render: RenderFunction }
         ).render;
       }
-      const { html } = render(url, ssrManifest);
+
+      const props = { message: 'Hello From Server' };
+      const { html } = render(props);
       const content = template
-        .replace('{{ APP_PROPS_OUTLET }}', JSON.stringify({ message: 'Hello From Server' }))
+        .replace('{{ APP_PROPS_OUTLET }}', JSON.stringify(props))
         .replace('{{ APP_SSR_OUTLET }}', html);
       res.status(200).set({ 'Content-Type': 'text/html' }).end(content);
     } catch (err) {
