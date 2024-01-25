@@ -24,11 +24,11 @@
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
     "lodash": "^4.17.21",
+    "lowdb": "^7.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^14.0.0",
     "sirv": "^2.0.4",
-    "sqlite3": "^5.1.7",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -41,8 +41,5 @@
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "vite": "^5.0.12"
-  },
-  "trustedDependencies": [
-    "sqlite3"
-  ]
+  }
 }
