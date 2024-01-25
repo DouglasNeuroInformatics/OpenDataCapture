@@ -57,6 +57,7 @@
     "prettier-plugin-tailwindcss": "^0.5.11",
     "storybook": "^7.6.7",
     "storybook-react-i18next": "^2.0.10",
+    "tsx": "^4.7.0",
     "turbo": "^1.11.3",
     "type-fest": "^4.9.0",
     "typescript": "^5.3.3"
