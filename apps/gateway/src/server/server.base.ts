@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response, Router } from 'express';
+import type { Request, Response, Router } from 'express';
 import express from 'express';
 import type { Promisable } from 'type-fest';
 
@@ -8,7 +8,7 @@ import { ah } from '@/utils/async-handler';
 
 export abstract class BaseServer {
   protected app: App;
-  
+
   constructor() {
     this.app = express();
     this.app.use(express.json());
@@ -23,7 +23,7 @@ export abstract class BaseServer {
 
   protected fixStacktrace?(err: Error): void;
 
-  async handler(req: Request, res: Response, next: NextFunction) {
+  async handler(req: Request, res: Response) {
     const url = req.originalUrl.replace(CONFIG.base, '');
     try {
       const render = await this.loadRender();
@@ -41,7 +41,7 @@ export abstract class BaseServer {
       } else {
         console.error(err);
       }
-      next(err);
+      res.status(500).send({ message: 'Internal Server Error', statusCode: 500 });
     }
   }
 
