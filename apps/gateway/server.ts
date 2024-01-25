@@ -3,7 +3,6 @@ import path from 'path';
 
 import express from 'express';
 import asyncHandler from 'express-async-handler';
-import type { ViteDevServer } from 'vite';
 
 import { config } from '@/config/server.config';
 import type { RenderFunction } from '@/entry-server';
@@ -12,24 +11,33 @@ import { appRouter } from '@/routers/app.router';
 
 const app = express();
 
-// Cached production assets
-let templateHtml: null | string = null;
-// let ssrManifest: null | string = null;
-if (config.mode === 'production') {
-  templateHtml = await fs.readFile(path.resolve(config.root, './dist/client/index.html'), 'utf-8');
-  //ssrManifest = await fs.readFile(path.resolve(__dirname, './dist/client/.vite/ssr-manifest.json'), 'utf-8');
+async function loadTemplateHtml() {
+  if (config.mode === 'production') {
+    return await fs.readFile(path.resolve(config.root, './dist/client/index.html'), 'utf-8');
+  }
+  return null;
 }
 
+async function loadViteDevServer() {
+  if (config.mode === 'development') {
+    const { createServer } = await import('vite');
+    return await createServer({
+      appType: 'custom',
+      base: config.base,
+      server: { middlewareMode: true }
+    });
+  }
+  return null;
+}
+
+// Cached production assets
+const templateHtml = await loadTemplateHtml();
+
 // Add Vite or respective production middlewares
-let vite: ViteDevServer | null = null;
+const vite = await loadViteDevServer();
+
 if (config.mode === 'development') {
-  const { createServer } = await import('vite');
-  vite = await createServer({
-    appType: 'custom',
-    base: config.base,
-    server: { middlewareMode: true }
-  });
-  app.use(vite.middlewares);
+  app.use(vite!.middlewares);
 } else {
   const { default: compression } = await import('compression');
   const { default: sirv } = await import('sirv');
