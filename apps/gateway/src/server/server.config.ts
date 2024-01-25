@@ -6,7 +6,7 @@ import { z } from 'zod';
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const config = await z
+export const SERVER_CONFIG = await z
   .object({
     base: z.string().default('/'),
     mode: z.enum(['development', 'production']),
