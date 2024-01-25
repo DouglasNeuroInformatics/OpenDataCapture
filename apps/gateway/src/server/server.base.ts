@@ -2,9 +2,8 @@ import type { NextFunction, Request, Response, Router } from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import type { Promisable } from 'type-fest';
 
+import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
-
-import { SERVER_CONFIG } from './server.config';
 
 export abstract class BaseServer {
   constructor(protected app: App) {}
@@ -19,7 +18,7 @@ export abstract class BaseServer {
   protected fixStacktrace?(err: Error): void;
 
   async handler(req: Request, res: Response, next: NextFunction) {
-    const url = req.originalUrl.replace(SERVER_CONFIG.base, '');
+    const url = req.originalUrl.replace(CONFIG.base, '');
     try {
       const render = await this.loadRender();
       const template = await this.loadTemplate(url);
@@ -40,7 +39,7 @@ export abstract class BaseServer {
     }
   }
 
-  listen(port = SERVER_CONFIG.port) {
+  listen(port = CONFIG.port) {
     return this.app.listen(port, () => {
       console.log(`Server started at http://localhost:${port}`);
     });

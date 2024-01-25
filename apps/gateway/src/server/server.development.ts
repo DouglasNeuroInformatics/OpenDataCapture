@@ -3,14 +3,14 @@ import path from 'path';
 
 import { createServer } from 'vite';
 
+import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
 
 import { BaseServer } from './server.base';
-import { SERVER_CONFIG } from './server.config';
 
 const _vite = await createServer({
   appType: 'custom',
-  base: SERVER_CONFIG.base,
+  base: CONFIG.base,
   server: { middlewareMode: true }
 });
 
@@ -33,7 +33,7 @@ export class DevelopmentServer extends BaseServer {
   }
 
   protected async loadTemplate(url: string) {
-    const html = await fs.readFile(path.resolve(SERVER_CONFIG.root, './index.html'), 'utf-8');
+    const html = await fs.readFile(path.resolve(CONFIG.root, './index.html'), 'utf-8');
     return this.vite.transformIndexHtml(url, html);
   }
 }
