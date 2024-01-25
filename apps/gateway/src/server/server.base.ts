@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response, Router } from 'express';
 import express from 'express';
-import expressAsyncHandler from 'express-async-handler';
 import type { Promisable } from 'type-fest';
 
 import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
+import { ah } from '@/utils/async-handler';
 
 export abstract class BaseServer {
   protected app: App;
@@ -18,7 +18,7 @@ export abstract class BaseServer {
     routes.forEach((route) => {
       this.app.use(route.path, route.router);
     });
-    this.app.use(expressAsyncHandler(this.handler.bind(this)));
+    this.app.use(ah(this.handler.bind(this)));
   }
 
   protected fixStacktrace?(err: Error): void;
