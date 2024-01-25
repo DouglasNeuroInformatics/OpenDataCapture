@@ -1,0 +1,20 @@
+meta {
+  name: Create Assignment
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/api/assignments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "expiresAt": "2030-01-01",
+    "instrumentId": "123",
+    "subjectId": "123",
+    "instrumentBundle": null
+  }
+}

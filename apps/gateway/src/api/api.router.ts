@@ -10,10 +10,8 @@ import { HttpException } from '@/utils/http-exception';
 
 const router = Router();
 
-router.get('/assignments', (req, res) => {
-  // const data = $CreateAssignmentRelayData.parseAsync(re);
-  console.log(req.body);
-  res.send('Hello World');
+router.get('/assignments', (_, res) => {
+  return res.status(200).json(db.data.assignments);
 });
 
 router.post(

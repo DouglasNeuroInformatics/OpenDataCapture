@@ -1,20 +1,11 @@
 meta {
   name: Get Assignments
   type: http
-  seq: 1
+  seq: 2
 }
 
-post {
+get {
   url: {{BASE_URL}}/api/assignments
-  body: json
+  body: none
   auth: none
-}
-
-body:json {
-  {
-    "expiresAt": "2030-01-01",
-    "instrumentId": "123",
-    "subjectId": "123",
-    "instrumentBundle": null
-  }
 }

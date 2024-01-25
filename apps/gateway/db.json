@@ -1,0 +1,15 @@
+{
+  "assignments": [
+    {
+      "createdAt": "2024-01-25T22:15:31.878Z",
+      "id": "1aaa41f9-3c5b-488d-92f6-1e03e823adbc",
+      "status": "OUTSTANDING",
+      "updatedAt": "2024-01-25T22:15:31.878Z",
+      "url": "http://localhost:3500/assignments/1aaa41f9-3c5b-488d-92f6-1e03e823adbc",
+      "expiresAt": "2030-01-01T00:00:00.000Z",
+      "instrumentId": "123",
+      "subjectId": "123",
+      "instrumentBundle": "123"
+    }
+  ]
+}
