@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises';
 import path from 'path';
-import url from 'url';
 
 import express from 'express';
 import asyncHandler from 'express-async-handler';
@@ -9,18 +8,13 @@ import type { ViteDevServer } from 'vite';
 import { config } from '@/config/server.config';
 import type { RenderFunction } from '@/entry-server';
 
-type App = ReturnType<typeof express>;
-
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const app: App = express();
+const app = express();
 
 // Cached production assets
 let templateHtml: null | string = null;
 // let ssrManifest: null | string = null;
 if (config.mode === 'production') {
-  templateHtml = await fs.readFile(path.resolve(__dirname, './dist/client/index.html'), 'utf-8');
+  templateHtml = await fs.readFile(path.resolve(config.root, './dist/client/index.html'), 'utf-8');
   //ssrManifest = await fs.readFile(path.resolve(__dirname, './dist/client/.vite/ssr-manifest.json'), 'utf-8');
 }
 
@@ -38,7 +32,7 @@ if (config.mode === 'development') {
   const { default: compression } = await import('compression');
   const { default: sirv } = await import('sirv');
   app.use(compression());
-  app.use(config.base, sirv(path.resolve(__dirname, './dist/client'), { extensions: [] }));
+  app.use(config.base, sirv(path.resolve(config.root, './dist/client'), { extensions: [] }));
 }
 
 // Serve HTML
@@ -50,13 +44,13 @@ app.use(
       let template: string;
       let render: RenderFunction;
       if (config.mode === 'development') {
-        template = await fs.readFile(path.resolve(__dirname, './index.html'), 'utf-8');
+        template = await fs.readFile(path.resolve(config.root, './index.html'), 'utf-8');
         template = await vite!.transformIndexHtml(url, template);
         render = ((await vite!.ssrLoadModule('/src/entry-server.tsx')) as { render: RenderFunction }).render;
       } else {
         template = templateHtml!;
         render = (
-          (await import(path.resolve(__dirname, './dist/server/entry-server.js'))) as { render: RenderFunction }
+          (await import(path.resolve(config.root, './dist/server/entry-server.js'))) as { render: RenderFunction }
         ).render;
       }
 
