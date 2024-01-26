@@ -12,7 +12,9 @@
     }
   },
   "scripts": {
-    "build:lib": "prisma generate --schema prisma/core-schema.prisma && prisma generate --schema prisma/gateway-schema.prisma"
+    "build:lib": "bun db:generate && bun db:push",
+    "db:generate": "prisma generate --schema prisma/core-schema.prisma && prisma generate --schema prisma/gateway-schema.prisma",
+    "db:push": "env-cmd -f ../../.env prisma db push --schema prisma/gateway-schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^5.8.1"
