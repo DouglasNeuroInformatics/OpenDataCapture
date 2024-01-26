@@ -23,11 +23,10 @@
     "compression": "^1.7.4",
     "express": "^4.18.2",
     "lodash": "^4.17.21",
-    "lowdb": "^7.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^14.0.0",
-    "sirv": "^2.0.4"
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
@@ -39,5 +38,8 @@
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "vite": "^5.0.12"
-  }
+  },
+  "trustedDependencies": [
+    "sqlite3"
+  ]
 }
