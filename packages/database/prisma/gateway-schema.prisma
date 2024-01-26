@@ -8,12 +8,13 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:../data/dev.db"
+  url      = ""
 }
 
 model AssignmentModel {
-  id               String                 @id @default(uuid())
+  id               String                 @id
   createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @default(now())
   expiresAt        DateTime
   instrumentBundle String
   instrumentId     String
@@ -26,6 +27,7 @@ model AssignmentModel {
 model AssignmentRecordModel {
   id           String          @id @default(uuid())
   createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @default(now())
   assignment   AssignmentModel @relation(fields: [assignmentId], references: [id])
   assignmentId String          @unique()
   data         String

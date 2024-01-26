@@ -17,7 +17,7 @@ const $Config = z
     message: 'Server port must be specified in development mode!'
   })
   .transform(({ devServerPort, ...config }) => ({
-    datasource: path.resolve(config.root, 'data/db.json'),
+    dataDir: path.resolve(config.root, 'data'),
     port: config.mode === 'development' ? devServerPort : 80,
     ...config
   }));
