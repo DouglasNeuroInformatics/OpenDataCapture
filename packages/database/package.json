@@ -2,8 +2,14 @@
   "name": "@open-data-capture/database",
   "version": "0.0.0",
   "exports": {
-    "./core": "./src/core.ts",
-    "./gateway": "./src/gateway.ts"
+    "./core": {
+      "default": "./lib/core/index.js",
+      "types": "./lib/core/index.d.ts"
+    },
+    "./gateway": {
+      "default": "./lib/gateway/index.js",
+      "types": "./lib/gateway/index.d.ts"
+    }
   },
   "scripts": {
     "build:lib": "prisma generate --schema prisma/core-schema.prisma && prisma generate --schema prisma/gateway-schema.prisma"
