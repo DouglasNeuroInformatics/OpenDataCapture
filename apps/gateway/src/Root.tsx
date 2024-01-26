@@ -1,19 +1,17 @@
-import { useState } from 'react';
+import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 
-export type RootProps = Record<string, unknown>;
+export type RootProps = {
+  bundle: string;
+};
 
-export const Root = (props: RootProps) => {
-  const [count, setCount] = useState(0);
+export const Root = ({ bundle }: RootProps) => {
+  const handleSubmit = (data: unknown) => {
+    // eslint-disable-next-line no-alert
+    alert(JSON.stringify(data, null, 2));
+  };
   return (
-    <div>
-      <h1>Hello World</h1>
-      <div>
-        <p>Count: {count}</p>
-        <button type="button" onClick={() => setCount(count + 1)}>
-          Increment Count
-        </button>
-      </div>
-      <p>Props: {JSON.stringify(props, null, 2)}</p>
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <InstrumentRenderer bundle={bundle} className="min-h-full" onSubmit={handleSubmit} />
     </div>
   );
 };

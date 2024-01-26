@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Spinner, Stepper } from '@douglasneuroinformatics/ui';
+import { Spinner, Stepper, cn } from '@douglasneuroinformatics/ui';
 import {
   ComputerDesktopIcon,
   DocumentCheckIcon,
@@ -20,11 +20,12 @@ import { InteractiveContent } from './InteractiveContent';
 
 export type InstrumentRendererProps = {
   bundle: string;
+  className?: string;
   onSubmit: (data: unknown) => Promisable<void>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
-export const InstrumentRenderer = ({ bundle, onSubmit, subject }: InstrumentRendererProps) => {
+export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: InstrumentRendererProps) => {
   const [data, setData] = useState<unknown>();
   const instrument = useResolvedInstrument(bundle);
   const { t } = useTranslation();
@@ -51,7 +52,7 @@ export const InstrumentRenderer = ({ bundle, onSubmit, subject }: InstrumentRend
 
   return (
     <Stepper
-      className="mx-auto h-full max-w-3xl xl:max-w-4xl"
+      className={cn('mx-auto h-full max-w-3xl grow xl:max-w-4xl', className)}
       steps={[
         {
           element: <InstrumentOverview instrument={instrument} />,
