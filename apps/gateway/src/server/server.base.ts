@@ -1,3 +1,5 @@
+import path from 'path';
+
 import type { Request, Response } from 'express';
 import express from 'express';
 import type { Promisable } from 'type-fest';
@@ -7,6 +9,7 @@ import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
 import { errorHandler } from '@/middleware/error-handler';
 import { ah } from '@/utils/async-handler';
+import { htmlEngine } from '@/utils/html-engine';
 
 export abstract class BaseServer {
   protected app: App;
@@ -16,7 +19,11 @@ export abstract class BaseServer {
     this.app.use(express.json());
     this.app.use('/api', apiRouter);
     this.app.get('/', ah(this.appHandler.bind(this)));
+    this.app.get('/view', (_, res) => res.render('index'));
     this.app.use(errorHandler);
+    this.app.engine('html', (...args) => void htmlEngine(...args));
+    this.app.set('views', path.resolve(CONFIG.root, 'src/views'));
+    this.app.set('view engine', 'html');
   }
 
   async appHandler(req: Request, res: Response) {
