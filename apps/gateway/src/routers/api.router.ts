@@ -81,6 +81,7 @@ router.patch(
     }
     await prisma.assignmentModel.update({
       data: {
+        completedAt: result.data.data ? new Date() : undefined,
         data: JSON.stringify(result.data.data),
         expiresAt: result.data.expiresAt,
         status: result.data.data ? ('COMPLETE' satisfies AssignmentStatus) : result.data.status

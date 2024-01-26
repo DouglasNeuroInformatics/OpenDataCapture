@@ -56,9 +56,21 @@ export class InstrumentRecordsService {
       data: {
         data,
         date,
-        groupId,
-        instrumentId,
-        subjectId: subject.id
+        group: groupId
+          ? {
+              connect: { id: groupId }
+            }
+          : undefined,
+        instrument: {
+          connect: {
+            id: instrumentId
+          }
+        },
+        subject: {
+          connect: {
+            id: subject.id
+          }
+        }
       }
     });
   }
