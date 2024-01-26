@@ -30,5 +30,6 @@ model AssignmentRecordModel {
   updatedAt    DateTime        @default(now())
   assignment   AssignmentModel @relation(fields: [assignmentId], references: [id])
   assignmentId String          @unique()
+  completedAt  DateTime?
   data         String
 }
