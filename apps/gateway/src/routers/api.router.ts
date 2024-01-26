@@ -1,6 +1,12 @@
 import crypto from 'crypto';
 
-import { $CreateAssignmentRelayData, $UpdateAssignmentData } from '@open-data-capture/common/assignment';
+import {
+  $CreateAssignmentRelayData,
+  $UpdateAssignmentData,
+  type Assignment,
+  type AssignmentStatus
+} from '@open-data-capture/common/assignment';
+import { $Json } from '@open-data-capture/common/core';
 import { Router } from 'express';
 
 import { CONFIG } from '@/config';
@@ -13,8 +19,25 @@ const router = Router();
 router.get(
   '/assignments',
   ah(async (_, res) => {
-    const assignments = await prisma.assignmentModel.findMany();
-    return res.status(200).json(assignments);
+    const assignments = await prisma.assignmentModel.findMany({
+      include: {
+        record: true
+      }
+    });
+    return res.status(200).json(
+      assignments.map((assignment) => {
+        return {
+          ...assignment,
+          record: assignment.record
+            ? {
+                ...assignment.record,
+                data: $Json.parse(assignment.record.data)
+              }
+            : null,
+          status: assignment.status as AssignmentStatus
+        } satisfies Assignment;
+      })
+    );
   })
 );
 
