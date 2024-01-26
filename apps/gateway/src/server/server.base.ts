@@ -2,11 +2,11 @@ import express from 'express';
 import type { Promisable } from 'type-fest';
 
 import type { RootProps } from '@/Root';
-import { apiRouter } from '@/api/api.router';
-import { appRouter } from '@/app/app.router';
 import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
 import { errorHandler } from '@/middleware/error-handler';
+import { apiRouter } from '@/routers/api.router';
+import { rootRouter } from '@/routers/root.router';
 import { ah } from '@/utils/async-handler';
 
 export abstract class BaseServer {
@@ -19,7 +19,9 @@ export abstract class BaseServer {
       const template = await this.loadTemplate(url);
       res.locals.loadRoot = (props: RootProps) => {
         const { html } = render(props);
-        return template.replace('{{ ROOT_PROPS_OUTLET }}', JSON.stringify(props)).replace('{{ ROOT_SSR_OUTLET }}', html);
+        return template
+          .replace('{{ ROOT_PROPS_OUTLET }}', JSON.stringify(props))
+          .replace('{{ ROOT_SSR_OUTLET }}', html);
       };
       next();
     } catch (err) {
@@ -38,7 +40,7 @@ export abstract class BaseServer {
     this.app.use(express.json());
     this.app.use(this.rootLoader);
     this.app.use('/api', apiRouter);
-    this.app.get('/', appRouter);
+    this.app.get('/', rootRouter);
     this.app.use(errorHandler);
   }
 
