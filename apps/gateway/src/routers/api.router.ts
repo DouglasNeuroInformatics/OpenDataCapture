@@ -4,7 +4,8 @@ import {
   $CreateAssignmentRelayData,
   $UpdateAssignmentData,
   type Assignment,
-  type AssignmentStatus
+  type AssignmentStatus,
+  type CreateAssignmentResponseBody
 } from '@open-data-capture/common/assignment';
 import { $Json } from '@open-data-capture/common/core';
 import { Router } from 'express';
@@ -50,7 +51,7 @@ router.post(
     }
     const createdAt = new Date();
     const id = crypto.randomUUID();
-    const assignment = await prisma.assignmentModel.create({
+    await prisma.assignmentModel.create({
       data: {
         createdAt,
         id,
@@ -59,7 +60,7 @@ router.post(
         ...result.data
       }
     });
-    res.status(200).send(assignment);
+    res.status(200).send({ success: true } satisfies CreateAssignmentResponseBody);
   })
 );
 
