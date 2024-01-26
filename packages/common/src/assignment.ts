@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { $BaseModel, $Json } from './core';
+import { $Json } from './core';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -10,9 +10,12 @@ export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
  * An self-contained object representing an assignment. This is stored on the gateway itself.
  */
 export type Assignment = z.infer<typeof $Assignment>;
-export const $Assignment = $BaseModel.extend({
+export const $Assignment = z.object({
+  completedAt: z.coerce.date().nullable(),
+  createdAt: z.coerce.date(),
   data: $Json.nullable(),
   expiresAt: z.coerce.date(),
+  id: z.string(),
   instrumentBundle: z.string().min(1),
   instrumentId: z.string().min(1),
   status: $AssignmentStatus,
@@ -48,6 +51,10 @@ export type UpdateAssignmentData = z.infer<typeof $UpdateAssignmentData>;
 export const $UpdateAssignmentData = z
   .object({
     data: $Json,
-    expiresAt: z.coerce.date()
+    expiresAt: z.coerce.date(),
+    status: $AssignmentStatus
   })
-  .partial();
+  .partial()
+  .refine((arg) => !(arg.data && arg.status !== 'COMPLETE'), {
+    message: 'Status must be complete if data is defined'
+  });

@@ -15,7 +15,7 @@ router.get(
     if (!assignment) {
       return next();
     }
-    const html = res.locals.loadRoot({ bundle: assignment.instrumentBundle });
+    const html = res.locals.loadRoot({ bundle: assignment.instrumentBundle, id });
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
   })
 );

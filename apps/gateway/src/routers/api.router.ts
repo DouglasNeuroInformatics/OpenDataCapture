@@ -26,9 +26,6 @@ router.get(
     }
 
     const assignments = await prisma.assignmentModel.findMany({
-      include: {
-        record: true
-      },
       where: {
         subjectId
       }
@@ -37,12 +34,7 @@ router.get(
       assignments.map((assignment) => {
         return {
           ...assignment,
-          record: assignment.record
-            ? {
-                ...assignment.record,
-                data: $Json.parse(assignment.record.data)
-              }
-            : null,
+          data: assignment.data ? $Json.parse(assignment.data) : null,
           status: assignment.status as AssignmentStatus
         } satisfies Assignment;
       })
@@ -87,7 +79,11 @@ router.patch(
       throw new HttpException(400, 'Bad Request');
     }
     await prisma.assignmentModel.update({
-      data: result.data,
+      data: {
+        data: JSON.stringify(result.data.data),
+        expiresAt: result.data.expiresAt,
+        status: result.data.data ? ('COMPLETE' satisfies AssignmentStatus) : result.data.status
+      },
       where: {
         id: assignment.id
       }

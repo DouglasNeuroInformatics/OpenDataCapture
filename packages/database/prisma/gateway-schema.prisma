@@ -12,9 +12,9 @@ datasource db {
 }
 
 model AssignmentModel {
-  id               String   @id
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @default(now())
+  id               String    @id
+  createdAt        DateTime  @default(now())
+  completedAt      DateTime?
   expiresAt        DateTime
   instrumentBundle String
   instrumentId     String

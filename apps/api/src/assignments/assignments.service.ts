@@ -43,6 +43,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     if (!ability) {
       return assignments;
     }
-    return assignments.filter((assignment) => ability.can('read', assignment));
+
+    return assignments;
   }
 }

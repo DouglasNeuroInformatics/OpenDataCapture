@@ -1,4 +1,6 @@
 import { NotificationHub, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import type { UpdateAssignmentData } from '@open-data-capture/common/assignment';
+import { $Json } from '@open-data-capture/common/core';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 import { Navbar } from '@open-data-capture/react-core';
 import axios from 'axios';
@@ -9,15 +11,24 @@ import './services/i18n';
 
 export type RootProps = {
   bundle: string;
+  id: string;
 };
 
-export const Root = ({ bundle }: RootProps) => {
+export const Root = ({ bundle, id }: RootProps) => {
   const { i18n } = useTranslation('core');
   const notifications = useNotificationsStore();
 
-  const handleSubmit = async () => {
-    await axios.post('/api/assignments');
-    notifications.addNotification({ message: 'Success', type: 'success' });
+  const handleSubmit = async (data: unknown) => {
+    const result = await $Json.safeParseAsync(data);
+    if (!result.success) {
+      console.error(result.error);
+      notifications.addNotification({ type: 'error' });
+      return;
+    }
+    await axios.patch(`/api/assignments/${id}`, {
+      data: result.data
+    } satisfies UpdateAssignmentData);
+    notifications.addNotification({ type: 'success' });
   };
 
   return (

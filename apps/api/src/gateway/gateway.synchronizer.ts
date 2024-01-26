@@ -44,7 +44,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     }
 
     for (const assignment of assignments) {
-      if (assignment.status !== 'COMPLETE' || !assignment.record?.data) {
+      if (assignment.status !== 'COMPLETE' || !assignment.data) {
         continue;
       }
       const isExisting = await this.instrumentRecordsService.exists({ assignmentId: assignment.id });
@@ -53,8 +53,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       }
       const record = await this.instrumentRecordsService.create({
         assignmentId: assignment.id,
-        data: assignment.record.data,
-        date: assignment.record.completedAt!,
+        data: assignment.data,
+        date: assignment.completedAt!,
         instrumentId: assignment.instrumentId,
         subjectId: assignment.subjectId
       });
