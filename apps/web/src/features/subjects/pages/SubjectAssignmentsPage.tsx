@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@douglasneuroinformatics/ui';
 import { PlusIcon } from '@heroicons/react/24/solid';
@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 import { useAssignments } from '@/hooks/useAssignments';
-import { useAvailableForms } from '@/hooks/useAvailableForms';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
+import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
 import { useUpdateAssignment } from '@/hooks/useUpdateAssignment';
 
 import { AssignmentModal } from '../components/AssignmentModal';
@@ -17,7 +17,7 @@ import { AssignmentsTable } from '../components/AssignmentsTable';
 
 export const SubjectAssignmentsPage = () => {
   const params = useParams();
-  const { i18n, t } = useTranslation('subjects');
+  const { t } = useTranslation('subjects');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
 
@@ -27,26 +27,15 @@ export const SubjectAssignmentsPage = () => {
   const createAssignmentMutation = useCreateAssignment();
   const updateAssignmentMutation = useUpdateAssignment();
 
-  const forms = useAvailableForms();
+  const instrumentSummariesQuery = useInstrumentSummaries();
 
-  const instrumentOptions: Record<string, string> = useMemo(() => {
-    if (!forms.data) {
-      return {};
-    }
-    const options: Record<string, string> = {};
-    for (const form of forms.data) {
-      if (!form.id) {
-        console.error('Form ID does not exist');
-        continue;
-      }
-      options[form.id] = form.details.title;
-    }
-    return options;
-  }, [forms.data, i18n.resolvedLanguage]);
-
-  if (!(assignmentsQuery.data && forms.data)) {
+  if (!(assignmentsQuery.data && instrumentSummariesQuery.data)) {
     return null;
   }
+
+  const instrumentOptions = Object.fromEntries(
+    instrumentSummariesQuery.data.map((instrument) => [instrument.id, instrument.details.title])
+  );
 
   return (
     <div>
