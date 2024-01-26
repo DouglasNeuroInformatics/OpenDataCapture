@@ -22,7 +22,7 @@ export const Root = ({ bundle }: RootProps) => {
       <header>
         <Navbar i18n={i18n} />;
       </header>
-      <main className="container flex max-w-3xl flex-grow flex-col pt-16">
+      <main className="container flex max-w-3xl xl:max-w-5xl flex-grow flex-col pt-16">
         <InstrumentRenderer bundle={bundle} className="min-h-full w-full" onSubmit={handleSubmit} />
       </main>
       <NotificationHub />

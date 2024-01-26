@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 export type InterpretedInstrumentState =
   | { instrument: AnyUnilingualInstrument; status: 'DONE' }
-  | { message: string; status: 'ERROR' }
+  | { status: 'ERROR' }
   | { status: 'LOADING' };
 
 /**
@@ -20,7 +20,7 @@ export function useInterpretedInstrument(bundle: string) {
   const interpreter = useMemo(() => new InstrumentInterpreter(), []);
   const [instrument, setInstrument] = useState<AnyInstrument | null>(null);
   const [state, setState] = useState<InterpretedInstrumentState>({ status: 'LOADING' });
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     interpreter
@@ -28,7 +28,7 @@ export function useInterpretedInstrument(bundle: string) {
       .then(setInstrument)
       .catch((err) => {
         console.error(err);
-        setState({ message: t('failedToLoadInstrument'), status: 'ERROR' });
+        setState({ status: 'ERROR' });
       });
   }, [bundle]);
 

@@ -81,6 +81,10 @@
     "en": "Full Name",
     "fr": "Nom et prénom"
   },
+  "genericApology": {
+    "en": "We apologize for the inconvenience. Please contact us for further assistance.",
+    "fr": "Nous nous excusons pour ce désagrément. N'hésitez pas à nous contacter pour obtenir de l'aide."
+  },
   "help": {
     "en": "Help",
     "fr": "Aide"
@@ -206,6 +210,10 @@
   "save": {
     "en": "Save",
     "fr": "Enregistrer"
+  },
+  "somethingWentWrong": {
+    "en": "Something Went Wrong",
+    "fr": "Quelque chose n'a pas fonctionné"
   },
   "steps": {
     "overview": {

@@ -39,11 +39,12 @@ export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: Ins
     return <Spinner />;
   } else if (interpreted.status === 'ERROR') {
     return (
-      <div className="flex min-h-screen  flex-col items-center justify-center gap-1 p-3 text-center">
-        <h1 className="text-muted text-sm font-semibold uppercase tracking-wide">{t('error')}</h1>
+      <div className="flex h-full flex-col items-center justify-center gap-1 p-3 text-center">
+        <h1 className="text-muted text-sm font-semibold uppercase tracking-wide">{t('somethingWentWrong')}</h1>
         <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
           {t('failedToLoadInstrument')}
         </h3>
+        <p className="text-muted mt-2 max-w-prose text-pretty text-sm sm:text-base">{t('genericApology')}</p>
       </div>
     );
   }
