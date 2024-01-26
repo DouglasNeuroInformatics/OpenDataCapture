@@ -6,6 +6,12 @@ export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUT
 
 export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
 
+export const $AssignmentRecord = $BaseModel.extend({
+  assignmentId: z.string().min(1),
+  completedAt: z.coerce.date().nullable(),
+  data: $Json
+});
+
 /**
  * An self-contained object representing an assignment. This is stored on the gateway itself.
  */
@@ -14,22 +20,10 @@ export const $Assignment = $BaseModel.extend({
   expiresAt: z.coerce.date(),
   instrumentBundle: z.string().min(1),
   instrumentId: z.string().min(1),
+  record: $AssignmentRecord.nullable(),
   status: $AssignmentStatus,
   subjectId: z.string().min(1),
   url: z.string().url()
-});
-
-/**
- * An object representing a completed assignment. This is stored on the gateway itself. Since the
- * gateway uses an SQLite database, the JSON data is stored as a string, which then needs to be
- * transformed
- */
-export type AssignmentRecord = z.infer<typeof $AssignmentRecord>;
-export const $AssignmentRecord = $BaseModel.extend({
-  assignment: $Assignment,
-  assignmentId: z.string().min(1),
-  completedAt: z.coerce.date(),
-  data: $Json
 });
 
 /** The DTO transferred from the web client to the core API when creating an assignment */
