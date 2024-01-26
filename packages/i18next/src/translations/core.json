@@ -67,6 +67,10 @@
     "en": "Estimated Duration",
     "fr": "Durée estimée"
   },
+  "failedToLoadInstrument": {
+    "en": "Failed to Load Instrument",
+    "fr": "Échec du chargement de l'instrument"
+  },
   "form": {
     "requiredField": {
       "en": "This field is required",

@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
-import { useResolvedInstrument } from '../hooks/useResolvedInstrument';
+import { useInterpretedInstrument } from '../hooks/useInterpretedInstrument';
 import { FormContent } from './FormContent';
 import { InstrumentOverview } from './InstrumentOverview';
 import { InstrumentSummary } from './InstrumentSummary';
@@ -27,7 +27,7 @@ export type InstrumentRendererProps = {
 
 export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: InstrumentRendererProps) => {
   const [data, setData] = useState<unknown>();
-  const instrument = useResolvedInstrument(bundle);
+  const interpreted = useInterpretedInstrument(bundle);
   const { t } = useTranslation();
 
   async function handleSubmit<T>(data: T) {
@@ -35,11 +35,20 @@ export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: Ins
     setData(data);
   }
 
-  if (!instrument) {
+  if (interpreted.status === 'LOADING') {
     return <Spinner />;
+  } else if (interpreted.status === 'ERROR') {
+    return (
+      <div className="flex min-h-screen  flex-col items-center justify-center gap-1 p-3 text-center">
+        <h1 className="text-muted text-sm font-semibold uppercase tracking-wide">{t('error')}</h1>
+        <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
+          {t('failedToLoadInstrument')}
+        </h3>
+      </div>
+    );
   }
 
-  const content = match(instrument)
+  const content = match(interpreted.instrument)
     .with({ kind: 'FORM' }, (instrument) => ({
       element: <FormContent instrument={instrument} onSubmit={handleSubmit} />,
       icon: <QuestionMarkCircleIcon />
@@ -55,7 +64,7 @@ export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: Ins
       className={cn('mx-auto h-full max-w-3xl grow xl:max-w-4xl', className)}
       steps={[
         {
-          element: <InstrumentOverview instrument={instrument} />,
+          element: <InstrumentOverview instrument={interpreted.instrument} />,
           icon: <DocumentCheckIcon />,
           label: t('steps.overview')
         },
@@ -65,7 +74,12 @@ export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: Ins
         },
         {
           element: (
-            <InstrumentSummary data={data} instrument={instrument} subject={subject} timeCollected={Date.now()} />
+            <InstrumentSummary
+              data={data}
+              instrument={interpreted.instrument}
+              subject={subject}
+              timeCollected={Date.now()}
+            />
           ),
           icon: <PrinterIcon />,
           label: t('steps.summary')
