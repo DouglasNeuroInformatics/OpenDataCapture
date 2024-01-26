@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 
-import { App, type AppProps } from './App';
+import { Root, type RootProps } from './Root';
 
-export type RenderFunction = (props: AppProps) => { html: string };
+export type RenderFunction = (props: RootProps) => { html: string };
 
 export const render: RenderFunction = (props) => {
   const html = ReactDOMServer.renderToString(
     <React.StrictMode>
-      <App {...props} />
+      <Root {...props} />
     </React.StrictMode>
   );
   return { html };

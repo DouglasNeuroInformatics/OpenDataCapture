@@ -1,7 +1,7 @@
 import express from 'express';
 import type { Promisable } from 'type-fest';
 
-import type { AppProps } from '@/App';
+import type { RootProps } from '@/Root';
 import { apiRouter } from '@/api/api.router';
 import { appRouter } from '@/app/app.router';
 import { CONFIG } from '@/config';
@@ -17,9 +17,9 @@ export abstract class BaseServer {
     try {
       const render = await this.loadRender();
       const template = await this.loadTemplate(url);
-      res.locals.loadRoot = (props: AppProps) => {
+      res.locals.loadRoot = (props: RootProps) => {
         const { html } = render(props);
-        return template.replace('{{ APP_PROPS_OUTLET }}', JSON.stringify(props)).replace('{{ APP_SSR_OUTLET }}', html);
+        return template.replace('{{ ROOT_PROPS_OUTLET }}', JSON.stringify(props)).replace('{{ ROOT_SSR_OUTLET }}', html);
       };
       next();
     } catch (err) {

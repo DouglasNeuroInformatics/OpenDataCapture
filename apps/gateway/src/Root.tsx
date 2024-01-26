@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-export type AppProps = Record<string, unknown>;
+export type RootProps = Record<string, unknown>;
 
-export const App = (props: AppProps) => {
+export const Root = (props: RootProps) => {
   const [count, setCount] = useState(0);
   return (
     <div>

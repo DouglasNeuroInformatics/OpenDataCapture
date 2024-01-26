@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import type { AppProps } from '@/App';
+import type { RootProps } from '@/Root';
 
 declare global {
   namespace Express {
     interface Locals {
-      loadRoot: (props: AppProps) => string;
+      loadRoot: (props: RootProps) => string;
     }
   }
 }

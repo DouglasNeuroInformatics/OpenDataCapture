@@ -4,13 +4,13 @@
 /// <reference types="@open-data-capture/i18next/client" />
 /// <reference types="@open-data-capture/instrument-renderer/client" />
 
-import type { AppProps } from './App';
+import type { RootProps } from './Root';
 import type express from 'express';
 
 declare global {
   type App = ReturnType<typeof express>;
 
   interface Window {
-    __APP_PROPS__: AppProps;
+    __ROOT_PROPS__: RootProps;
   }
 }

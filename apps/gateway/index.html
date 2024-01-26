@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Open Data Capture - Gateway</title>
     <script>
-      Object.defineProperty(window, '__APP_PROPS__', {
+      Object.defineProperty(window, '__ROOT_PROPS__', {
         writable: false,
-        value: JSON.parse('{{ APP_PROPS_OUTLET }}')
+        value: JSON.parse('{{ ROOT_PROPS_OUTLET }}')
       });
     </script>
   </head>
   <body>
-    <div id="root">{{ APP_SSR_OUTLET }}</div>
+    <div id="root">{{ ROOT_SSR_OUTLET }}</div>
     <script type="module" src="/src/entry-client.tsx"></script>
   </body>
 </html>

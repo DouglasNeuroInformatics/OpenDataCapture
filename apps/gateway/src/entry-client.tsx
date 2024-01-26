@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { App } from './App';
+import { Root } from './Root';
 
 import '@open-data-capture/react-core/styles.css';
 
-const APP_PROPS = window.__APP_PROPS__;
+const ROOT_PROPS = window.__ROOT_PROPS__;
 
 ReactDOM.hydrateRoot(
   document.getElementById('root')!,
   <React.StrictMode>
-    <App {...APP_PROPS} />
+    <Root {...ROOT_PROPS} />
   </React.StrictMode>
 );
