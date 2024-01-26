@@ -5,6 +5,7 @@ import type { RootProps } from '@/Root';
 import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
 import { errorHandler } from '@/middleware/error-handler';
+import { notFound } from '@/middleware/not-found';
 import { apiRouter } from '@/routers/api.router';
 import { rootRouter } from '@/routers/root.router';
 import { ah } from '@/utils/async-handler';
@@ -41,6 +42,7 @@ export abstract class BaseServer {
     this.app.use('/api', apiRouter);
     this.app.use('/', this.rootLoader, rootRouter);
     this.app.use(errorHandler);
+    this.app.use(this.rootLoader, notFound);
   }
 
   protected fixStacktrace?(err: Error): void;
