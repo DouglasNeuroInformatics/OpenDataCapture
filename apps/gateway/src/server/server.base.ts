@@ -38,9 +38,8 @@ export abstract class BaseServer {
   constructor() {
     this.app = express();
     this.app.use(express.json());
-    this.app.use(this.rootLoader);
     this.app.use('/api', apiRouter);
-    this.app.get('/', rootRouter);
+    this.app.use('/', this.rootLoader, rootRouter);
     this.app.use(errorHandler);
   }
 
