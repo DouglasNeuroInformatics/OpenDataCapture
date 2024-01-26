@@ -18,9 +18,9 @@ export const Root = ({ bundle }: RootProps) => {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+    <div className="flex h-screen flex-col">
       <header>
-        <Navbar i18n={i18n} />;
+        <Navbar i18n={i18n} />
       </header>
       <main className="container flex max-w-3xl xl:max-w-5xl flex-grow flex-col pt-16">
         <InstrumentRenderer bundle={bundle} className="min-h-full w-full" onSubmit={handleSubmit} />
