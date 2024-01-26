@@ -1,8 +1,10 @@
 import { NotificationHub, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 import { Navbar } from '@open-data-capture/react-core';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
+import './services/axios';
 import './services/i18n';
 
 export type RootProps = {
@@ -13,7 +15,8 @@ export const Root = ({ bundle }: RootProps) => {
   const { i18n } = useTranslation('core');
   const notifications = useNotificationsStore();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    await axios.post('/api/assignments');
     notifications.addNotification({ message: 'Success', type: 'success' });
   };
 

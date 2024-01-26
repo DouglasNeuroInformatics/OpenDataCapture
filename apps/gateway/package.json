@@ -20,6 +20,7 @@
     "@open-data-capture/i18next": "workspace:*",
     "@open-data-capture/instrument-renderer": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
+    "axios": "^1.6.7",
     "compression": "^1.7.4",
     "express": "^4.18.2",
     "lodash": "^4.17.21",
