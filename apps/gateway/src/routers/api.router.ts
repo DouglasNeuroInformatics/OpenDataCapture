@@ -76,6 +76,7 @@ router.patch(
     }
     const result = await $UpdateAssignmentData.safeParseAsync(req.body);
     if (!result.success) {
+      console.log(result.error);
       throw new HttpException(400, 'Bad Request');
     }
     await prisma.assignmentModel.update({

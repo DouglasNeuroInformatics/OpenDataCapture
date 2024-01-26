@@ -26,7 +26,8 @@ export const Root = ({ bundle, id }: RootProps) => {
       return;
     }
     await axios.patch(`/api/assignments/${id}`, {
-      data: result.data
+      data: result.data,
+      status: 'COMPLETE'
     } satisfies UpdateAssignmentData);
     notifications.addNotification({ type: 'success' });
   };
