@@ -19,10 +19,18 @@ const router = Router();
 
 router.get(
   '/assignments',
-  ah(async (_, res) => {
+  ah(async (req, res) => {
+    let subjectId: string | undefined;
+    if (typeof req.query.subjectId === 'string') {
+      subjectId = req.query.subjectId;
+    }
+
     const assignments = await prisma.assignmentModel.findMany({
       include: {
         record: true
+      },
+      where: {
+        subjectId
       }
     });
     return res.status(200).json(
