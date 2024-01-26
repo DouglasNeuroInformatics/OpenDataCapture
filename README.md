@@ -56,7 +56,7 @@ bun install
 ### Setup Config
 
 ```shell
-awk -v secret_key="$(openssl rand -hex 16)" '/^SECRET_KEY=/{print $0 secret_key;next}1' .env.template > .env
+bun generate:env
 ```
 
 ### Launch Dev Server
@@ -77,7 +77,7 @@ cd OpenDataCapture
 ### Launch Application
 
 ```
-awk -v secret_key="$(openssl rand -hex 16)" '/^SECRET_KEY=/{print $0 secret_key;next}1' .env.template > .env
+bun generate:env
 docker compose up
 ```
 
