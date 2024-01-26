@@ -1,5 +1,7 @@
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 
+import './services/i18n';
+
 export type RootProps = {
   bundle: string;
 };
