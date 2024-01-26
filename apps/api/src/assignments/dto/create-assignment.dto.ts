@@ -1,8 +1,8 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { type CreateAssignmentData, createAssignmentDataSchema } from '@open-data-capture/common/assignment';
+import { $CreateAssignmentData, type CreateAssignmentData } from '@open-data-capture/common/assignment';
 
-@ValidationSchema(createAssignmentDataSchema)
+@ValidationSchema($CreateAssignmentData)
 export class CreateAssignmentDto implements CreateAssignmentData {
   @ApiProperty()
   expiresAt: Date;
@@ -11,5 +11,5 @@ export class CreateAssignmentDto implements CreateAssignmentData {
   instrumentId: string;
 
   @ApiProperty()
-  subjectIdentifier: string;
+  subjectId: string;
 }

@@ -1,9 +1,10 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { SetupState } from '@open-data-capture/common/setup';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { SetupDto } from './dto/setup.dto';
+import { InitAppDto } from './dto/init-app.dto';
 import { SetupService } from './setup.service';
 
 @ApiTags('Setup')
@@ -17,7 +18,7 @@ export class SetupController {
   })
   @Get()
   @RouteAccess('public')
-  getState() {
+  getState(): Promise<SetupState> {
     return this.setupService.getState();
   }
 
@@ -30,7 +31,7 @@ export class SetupController {
   })
   @Post()
   @RouteAccess('public')
-  initApp(@Body() setupDto: SetupDto) {
-    return this.setupService.initApp(setupDto);
+  initApp(@Body() initAppDto: InitAppDto): Promise<{ success: boolean }> {
+    return this.setupService.initApp(initAppDto);
   }
 }

@@ -1,9 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form } from '@douglasneuroinformatics/ui';
-import type { SubjectIdentificationData } from '@open-data-capture/common/subject';
+import { $SubjectIdentificationData, type SubjectIdentificationData } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 
 import { useActiveVisitStore } from '@/stores/active-visit-store';
 
@@ -20,46 +19,41 @@ export type IdentificationFormProps = {
 
 export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel }: IdentificationFormProps) => {
   const { activeVisit } = useActiveVisitStore();
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation('core');
 
   return (
     <Form<SubjectIdentificationData>
       content={{
         firstName: {
-          description: t('common:identificationData.firstName.description'),
+          description: t('identificationData.firstName.description'),
           kind: 'text',
-          label: t('common:identificationData.firstName.label'),
+          label: t('identificationData.firstName.label'),
           variant: 'short'
         },
         lastName: {
-          description: t('common:identificationData.lastName.description'),
+          description: t('identificationData.lastName.description'),
           kind: 'text',
-          label: t('common:identificationData.lastName.label'),
+          label: t('identificationData.lastName.label'),
           variant: 'short'
         },
         dateOfBirth: {
           kind: 'date',
-          label: t('common:identificationData.dateOfBirth.label')
+          label: t('identificationData.dateOfBirth.label')
         },
         sex: {
-          description: t('common:identificationData.sex.description'),
+          description: t('identificationData.sex.description'),
           kind: 'options',
-          label: t('common:identificationData.sex.label'),
+          label: t('identificationData.sex.label'),
           options: {
-            female: t('common:identificationData.sex.female'),
-            male: t('common:identificationData.sex.male')
+            FEMALE: t('identificationData.sex.female'),
+            MALE: t('identificationData.sex.male')
           }
         }
       }}
       initialValues={fillActiveSubject ? activeVisit?.subject : undefined}
       resetBtn={fillActiveSubject}
       submitBtnLabel={submitBtnLabel ?? t('submit')}
-      validationSchema={z.object({
-        firstName: z.string(),
-        lastName: z.string(),
-        dateOfBirth: z.date(),
-        sex: z.enum(['male', 'female'])
-      })}
+      validationSchema={$SubjectIdentificationData}
       onSubmit={onSubmit}
     />
   );

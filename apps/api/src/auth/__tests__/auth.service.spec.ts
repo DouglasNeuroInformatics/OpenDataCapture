@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it } from 'bun:test';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 
 import { AbilityFactory } from '@/ability/ability.factory';
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { UsersService } from '@/users/users.service';
 
 import { AuthService } from '../auth.service';
@@ -27,9 +27,9 @@ describe('AuthService', () => {
           useValue: createMock(AbilityFactory)
         },
         {
-          provide: ConfigService,
+          provide: ConfigurationService,
           useValue: {
-            getOrThrow: (propertyPath: string) => propertyPath
+            get: (propertyPath: string) => propertyPath
           }
         },
         {

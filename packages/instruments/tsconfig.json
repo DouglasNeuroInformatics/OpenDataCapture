@@ -1,7 +1,0 @@
-{
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "types": ["bun-types", "@open-data-capture/instrument-runtime/env"]
-  },
-  "include": ["src/**/*.ts"]
-}

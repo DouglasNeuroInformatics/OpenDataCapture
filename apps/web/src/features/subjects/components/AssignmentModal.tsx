@@ -1,28 +1,28 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form, Modal } from '@douglasneuroinformatics/ui';
-import { createAssignmentDataSchema } from '@open-data-capture/common/assignment';
+import { $CreateAssignmentData } from '@open-data-capture/common/assignment';
 import type { CreateAssignmentData } from '@open-data-capture/common/assignment';
 import { useTranslation } from 'react-i18next';
 
 export type AssignmentModalProps = {
   instrumentOptions: Record<string, string>;
   isOpen: boolean;
-  onSubmit: (data: Omit<CreateAssignmentData, 'subjectIdentifier'>) => void;
+  onSubmit: (data: Omit<CreateAssignmentData, 'subjectId'>) => void;
   setIsOpen: (isOpen: boolean) => void;
 };
 
 /** Component for creating a new assignment */
 export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen }: AssignmentModalProps) => {
-  const { t } = useTranslation(['subjects', 'common']);
+  const { t } = useTranslation(['subjects', 'core']);
 
   return (
     <Modal open={isOpen} title="Assignment" onClose={() => setIsOpen(false)}>
-      <Form<Omit<CreateAssignmentData, 'subjectIdentifier'>>
+      <Form<Omit<CreateAssignmentData, 'subjectId'>>
         content={{
           instrumentId: {
             kind: 'options',
-            label: t('common:instrument'),
+            label: t('core:instrument'),
             options: instrumentOptions
           },
           expiresAt: {
@@ -30,7 +30,7 @@ export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen
             label: t('assignments.expiresAt')
           }
         }}
-        validationSchema={createAssignmentDataSchema.omit({ subjectIdentifier: true })}
+        validationSchema={$CreateAssignmentData.omit({ subjectId: true })}
         onSubmit={onSubmit}
       />
     </Modal>

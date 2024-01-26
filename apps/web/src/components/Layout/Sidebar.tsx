@@ -1,6 +1,6 @@
 import { ThemeToggle } from '@douglasneuroinformatics/ui';
-import { Branding } from '@open-data-capture/react-core/components/Branding';
-import { type NavItem, Navigation } from '@open-data-capture/react-core/components/Navbar';
+import { Branding, Navigation } from '@open-data-capture/react-core';
+import type { NavItem } from '@open-data-capture/react-core';
 
 import { UserDropup } from './UserDropup';
 

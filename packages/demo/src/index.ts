@@ -1,20 +1,23 @@
+import { deepFreeze } from '@douglasneuroinformatics/utils';
 import type { Group } from '@open-data-capture/common/group';
 import type { User } from '@open-data-capture/common/user';
 
-export type DemoUser = Omit<User, 'groups'> & {
-  groupNames: string[];
+type DemoUser = Pick<User, 'basePermissionLevel' | 'firstName' | 'lastName' | 'password' | 'username'> & {
+  groupNames: readonly string[];
 };
 
-export const demoGroups: Omit<Group, 'id'>[] = [
+type DemoGroup = Pick<Group, 'name'>;
+
+export const DEMO_GROUPS: readonly DemoGroup[] = deepFreeze([
   {
     name: 'Depression Clinic'
   },
   {
     name: 'Psychosis Clinic'
   }
-];
+]);
 
-export const demoUsers: DemoUser[] = [
+export const DEMO_USERS: readonly DemoUser[] = deepFreeze([
   {
     basePermissionLevel: 'GROUP_MANAGER',
     firstName: 'Jane',
@@ -39,4 +42,4 @@ export const demoUsers: DemoUser[] = [
     password: 'DataCapture2023',
     username: 'FrançoisBouchard'
   }
-];
+]);

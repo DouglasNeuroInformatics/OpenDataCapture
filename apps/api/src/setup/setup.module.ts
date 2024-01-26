@@ -1,19 +1,15 @@
 import { Module } from '@nestjs/common';
 
-import { GroupsModule } from '@/groups/groups.module';
-import { InstrumentRecordsModule } from '@/instrument-records/instrument-records.module';
-import { InstrumentsModule } from '@/instruments/instruments.module';
-import { SubjectsModule } from '@/subjects/subjects.module';
+import { DemoModule } from '@/demo/demo.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 import { UsersModule } from '@/users/users.module';
-import { VisitsModule } from '@/visits/visits.module';
 
-import { DemoService } from './demo.service';
 import { SetupController } from './setup.controller';
 import { SetupService } from './setup.service';
 
 @Module({
   controllers: [SetupController],
-  imports: [GroupsModule, InstrumentRecordsModule, InstrumentsModule, SubjectsModule, UsersModule, VisitsModule],
-  providers: [DemoService, SetupService]
+  imports: [DemoModule, PrismaModule.forFeature('SetupState'), UsersModule],
+  providers: [SetupService]
 })
 export class SetupModule {}

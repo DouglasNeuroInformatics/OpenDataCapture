@@ -1,14 +1,19 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser, ParseIdPipe } from '@douglasneuroinformatics/nestjs/core';
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { AppAbility } from '@open-data-capture/common/core';
-import type { InstrumentKind } from '@open-data-capture/common/instrument';
+import type {
+  InstrumentBundleContainer,
+  InstrumentKind,
+  InstrumentSourceContainer,
+  InstrumentSummary
+} from '@open-data-capture/common/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import type { AppAbility } from '@/core/types';
 
-import { MutateInstrumentDto } from './dto/mutate-instrument.dto';
+import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { InstrumentsService } from './instruments.service';
 
 @ApiTags('Instruments')
@@ -19,53 +24,51 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'Create Instrument' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Instrument' })
-  create(@Body() data: MutateInstrumentDto) {
+  create(@Body() data: CreateInstrumentDto): Promise<unknown> {
     return this.instrumentsService.create(data);
-  }
-
-  @ApiOperation({ summary: 'Delete Instrument' })
-  @Delete(':id')
-  @RouteAccess({ action: 'delete', subject: 'Instrument' })
-  async deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
-    return this.instrumentsService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Find All Instruments' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+  async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind): Promise<unknown[]> {
     return this.instrumentsService.find({ kind }, { ability });
   }
 
-  @ApiOperation({ summary: 'Summarize Available Instruments' })
-  @Get('available')
+  @ApiOperation({ summary: 'Find Bundles' })
+  @Get('bundles')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findAvailable(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
-    return this.instrumentsService.findAvailable({ kind }, { ability });
+  async findBundles(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('kind') kind?: InstrumentKind
+  ): Promise<InstrumentBundleContainer[]> {
+    return this.instrumentsService.findBundles({ kind }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Instrument Sources' })
   @Get('sources')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findSources(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+  async findSources(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('kind') kind?: InstrumentKind
+  ): Promise<InstrumentSourceContainer[]> {
     return this.instrumentsService.findSources({ kind }, { ability });
+  }
+
+  @ApiOperation({ summary: 'Summarize Available Instruments' })
+  @Get('summaries')
+  @RouteAccess({ action: 'read', subject: 'Instrument' })
+  async findSummaries(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('kind') kind?: InstrumentKind
+  ): Promise<InstrumentSummary[]> {
+    return this.instrumentsService.findSummaries({ kind }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Instrument' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+  async findById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.instrumentsService.findById(id, { ability });
-  }
-
-  @ApiOperation({ summary: 'Update Instrument' })
-  @Patch(':id')
-  @RouteAccess({ action: 'update', subject: 'Instrument' })
-  async updateById(
-    @Param('id', ParseIdPipe) id: string,
-    @Body() update: MutateInstrumentDto,
-    @CurrentUser('ability') ability: AppAbility
-  ) {
-    return this.instrumentsService.updateById(id, update, { ability });
   }
 }

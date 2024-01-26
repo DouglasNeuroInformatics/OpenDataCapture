@@ -2,9 +2,10 @@ import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios, { isAxiosError } from 'axios';
 import i18next from 'i18next';
 
+import { config } from '@/config';
 import { useAuthStore } from '@/stores/auth-store';
 
-axios.defaults.baseURL = import.meta.env.MODE !== 'test' ? import.meta.env.VITE_API_BASE_URL : undefined;
+axios.defaults.baseURL = import.meta.env.MODE !== 'test' ? config.setup.apiBaseUrl : undefined;
 
 axios.interceptors.request.use((config) => {
   const auth = useAuthStore.getState();

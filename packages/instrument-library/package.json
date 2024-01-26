@@ -1,0 +1,28 @@
+{
+  "name": "@open-data-capture/instrument-library",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./src/index.d.ts"
+    },
+    "./forms/*.ts": "./src/forms/*.ts",
+    "./interactive/*": "./src/interactive/*"
+  },
+  "scripts": {
+    "build:lib": "rm -rf lib && bunx rollup -c",
+    "dev": "rm -rf lib && bunx rollup -c --watch",
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src"
+  },
+  "dependencies": {
+    "@open-data-capture/instrument-transformer": "workspace:*"
+  },
+  "devDependencies": {
+    "@open-data-capture/rollup-plugin-instrument": "workspace:*",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "rollup": "^4.9.4"
+  }
+}

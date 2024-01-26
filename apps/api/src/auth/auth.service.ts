@@ -1,18 +1,18 @@
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { AuthPayload, JwtPayload } from '@open-data-capture/common/auth';
-import type { User } from '@open-data-capture/common/user';
+import type { GroupModel, UserModel } from '@open-data-capture/database/core';
 
 import { AbilityFactory } from '@/ability/ability.factory';
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly abilityFactory: AbilityFactory,
-    private readonly configService: ConfigService,
+    private readonly configurationService: ConfigurationService,
     private readonly cryptoService: CryptoService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService
@@ -43,10 +43,11 @@ export class AuthService {
   }
 
   /** Wraps UserService.getByUsername with appropriate exception handling */
-  private async getUser(username: string): Promise<User> {
-    let user: User;
+  private async getUser(username: string) {
+    let user: UserModel & { groups: GroupModel[] };
     try {
-      user = await this.usersService.findByUsername(username).then((doc) => doc.toObject({ virtuals: true }));
+      user = await this.usersService.findByUsername(username);
+      // user = await this.usersService.findByUsername(username).then((doc) => doc.toObject({ virtuals: true }));
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException('Invalid username');
@@ -61,7 +62,7 @@ export class AuthService {
   private async signToken(payload: object): Promise<string> {
     return this.jwtService.signAsync(payload, {
       expiresIn: '1d',
-      secret: this.configService.getOrThrow<string>('SECRET_KEY')
+      secret: this.configurationService.get('SECRET_KEY')
     });
   }
 }

@@ -4,32 +4,30 @@
   "license": "AGPL-3.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./assignment": "./src/assignment/assignment.index.ts",
-    "./auth": "./src/auth/auth.index.ts",
-    "./core": "./src/core/core.index.ts",
-    "./group": "./src/group/group.index.ts",
-    "./instrument": "./src/instrument/instrument.index.ts",
-    "./instrument-records": "./src/instrument-records/instrument-records.index.ts",
-    "./setup": "./src/setup/setup.index.ts",
-    "./subject": "./src/subject/subject.index.ts",
-    "./summary": "./src/summary/summary.index.ts",
-    "./user": "./src/user/user.index.ts",
-    "./visit": "./src/visit/visit.index.ts"
+    "./assignment": "./src/assignment.ts",
+    "./auth": "./src/auth.ts",
+    "./core": "./src/core.ts",
+    "./group": "./src/group.ts",
+    "./instrument": "./src/instrument.ts",
+    "./instrument-records": "./src/instrument-records.ts",
+    "./setup": "./src/setup.ts",
+    "./subject": "./src/subject.ts",
+    "./summary": "./src/summary.ts",
+    "./user": "./src/user.ts",
+    "./visit": "./src/visit.ts"
   },
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
   "scripts": {
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
-    "type-fest": "^4.8.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@casl/prisma": "^1.4.1",
     "@douglasneuroinformatics/form-types": "latest",
-    "@types/react": "^18.2.39"
+    "@open-data-capture/database": "workspace:*",
+    "@types/react": "^18.2.47"
   }
 }

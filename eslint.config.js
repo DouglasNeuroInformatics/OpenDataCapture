@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import path from 'node:path';
 import url from 'node:url';
 
@@ -17,7 +19,7 @@ const __dirname = path.dirname(__filename);
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   {
-    ignores: ['**/.astro/*', '**/.next/*', '**/build/*', '**/dist/*']
+    ignores: ['**/.astro/*', '**/.next/*', '**/build/*', '**/dist/*', '**/lib/*', '**/node_modules/*', '**/*.d.ts']
   },
   {
     files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs', '**/*.ts', '**/*.tsx'],
@@ -93,7 +95,7 @@ export default [
     }
   },
   {
-    files: ['**/*.config.js', '**/*.cjs'],
+    files: ['**/*.config.js', '**/*.cjs', 'scripts/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.node
@@ -105,7 +107,7 @@ export default [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: path.resolve(__dirname, 'tsconfig.base.json'),
+        project: path.resolve(__dirname, 'jsconfig.json'),
         sourceType: 'module'
       }
     },
@@ -118,15 +120,18 @@ export default [
       ...tsPlugin.configs['recommended-type-checked'].rules,
       ...tsPlugin.configs['stylistic-type-checked'].rules,
       '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/restrict-plus-operands': 'off',
       '@typescript-eslint/restrict-template-expressions': [
         'error',
         {
           allowBoolean: true,
+          allowNever: true,
           allowNumber: true
         }
       ],
+      '@typescript-eslint/triple-slash-reference': 'off',
       'no-redeclare': 'off',
       'no-undef': 'off'
     }
@@ -218,7 +223,8 @@ export default [
     files: ['apps/gateway/**/*.ts', 'apps/gateway/**/*.tsx'],
     languageOptions: {
       globals: {
-        ...globals.browser
+        ...globals.browser,
+        ...globals.node
       },
       parserOptions: {
         project: path.resolve(__dirname, 'apps', 'gateway', 'tsconfig.json')

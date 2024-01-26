@@ -1,0 +1,30 @@
+{
+  "name": "@open-data-capture/i18next",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": {
+      "types": "./src/typings/i18next.d.ts"
+    }
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
+    "lint": "tsc && eslint --fix src"
+  },
+  "dependencies": {
+    "@open-data-capture/common": "workspace:*",
+    "i18next": "^23.7.16",
+    "i18next-browser-languagedetector": "^7.2.0",
+    "lodash": "^4.17.21",
+    "react-i18next": "^14.0.0"
+  },
+  "peerDependencies": {
+    "@types/lodash": "^4.14.202",
+    "react": "18.x",
+    "react-dom": "18.x"
+  }
+}

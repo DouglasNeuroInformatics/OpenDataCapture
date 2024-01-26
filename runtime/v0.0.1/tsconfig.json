@@ -1,0 +1,10 @@
+{
+  "extends": "../../jsconfig.json",
+  "compilerOptions": {
+    "rootDir": "../..",
+    "paths": {
+      "@open-data-capture/common/*": ["./packages/common/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

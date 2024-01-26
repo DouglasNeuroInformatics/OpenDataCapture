@@ -20,7 +20,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
   const download = useDownload();
   const navigate = useNavigate();
   const { currentGroup, currentUser } = useAuthStore();
-  const { t } = useTranslation(['subjects', 'common']);
+  const { t } = useTranslation(['subjects', 'core']);
 
   const [showLookup, setShowLookup] = useState(false);
 
@@ -46,7 +46,7 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
         void download('README.txt', () => Promise.resolve(t('index.table.exportHelpText')));
         void download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
-          const columnNames = Object.keys(data[0]!);
+          const columnNames = Object.keys(data[0]);
           const rows = data.map((record) => Object.values(record).join(',')).join('\n');
           return columnNames + '\n' + rows;
         });
@@ -82,24 +82,24 @@ export const SubjectsTable = ({ data }: SubjectTableProps) => {
       <ClientTable<Subject>
         columns={[
           {
-            field: (subject) => subject.identifier.slice(0, 6),
+            field: (subject) => subject.id.slice(0, 6),
             label: t('index.table.subject')
           },
           {
             field: (subject) => toBasicISOString(new Date(subject.dateOfBirth)),
-            label: t('common:identificationData.dateOfBirth.label')
+            label: t('core:identificationData.dateOfBirth.label')
           },
           {
             field: (subject) =>
-              subject.sex === 'female'
-                ? t('common:identificationData.sex.female')
-                : t('common:identificationData.sex.male'),
-            label: t('common:identificationData.sex.label')
+              subject.sex === 'FEMALE'
+                ? t('core:identificationData.sex.female')
+                : t('core:identificationData.sex.male'),
+            label: t('core:identificationData.sex.label')
           }
         ]}
         data={data}
         onEntryClick={(subject) => {
-          navigate(`${subject.identifier}/assignments`);
+          navigate(`${subject.id}/assignments`);
         }}
       />
     </>

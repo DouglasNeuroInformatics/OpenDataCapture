@@ -1,5 +1,6 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
-import { type CreateVisitData, visitSchema } from '@open-data-capture/common/visit';
+import { $Visit, type CreateVisitData } from '@open-data-capture/common/visit';
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -15,20 +16,22 @@ export const AddVisitPage = () => {
   const notifications = useNotificationsStore();
   const { t } = useTranslation('visits');
 
-  const handleSubmit = async ({ date, ...subjectIdData }: AddVisitFormData) => {
-    const response = await axios.post('/v1/visits', {
-      date,
-      groupId: currentGroup?.id ?? null,
-      subjectIdData
-    } satisfies CreateVisitData);
-    setActiveVisit(visitSchema.parse(response.data));
-    notifications.addNotification({ type: 'success' });
-  };
+  const mutation = useMutation({
+    mutationFn: async ({ date, ...subjectIdData }: AddVisitFormData) => {
+      const response = await axios.post('/v1/visits', {
+        date,
+        groupId: currentGroup?.id ?? null,
+        subjectIdData
+      } satisfies CreateVisitData);
+      setActiveVisit($Visit.parse(response.data));
+      notifications.addNotification({ type: 'success' });
+    }
+  });
 
   return (
     <div>
       <PageHeader title={t('addVisit')} />
-      <AddVisitForm onSubmit={(data) => void handleSubmit(data)} />
+      <AddVisitForm onSubmit={(data) => mutation.mutate(data)} />
     </div>
   );
 };

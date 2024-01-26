@@ -3,21 +3,23 @@
   "globalDependencies": [".env"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "^build:types"],
+      "dependsOn": ["^build", "^build:lib"],
       "outputs": ["dist/**"]
     },
-    "build:types": {
-      "outputs": ["dist/**"]
+    "build:lib": {
+      "outputs": ["lib/**"]
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["^build:types"],
+      "dependsOn": ["^build:lib"],
       "persistent": true
     },
     "format": {},
     "lint": {
-      "dependsOn": ["^build:types"]
+      "dependsOn": ["^build:lib"]
     },
-    "test": {}
+    "test": {
+      "dependsOn": ["^build:lib"]
+    }
   }
 }

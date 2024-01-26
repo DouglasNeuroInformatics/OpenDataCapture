@@ -1,7 +1,7 @@
 import { Modal } from '@douglasneuroinformatics/ui';
 import { snakeToCamelCase } from '@douglasneuroinformatics/utils';
 import type { LoginCredentials } from '@open-data-capture/common/auth';
-import { demoUsers } from '@open-data-capture/demo';
+import { DEMO_USERS } from '@open-data-capture/demo';
 import { useTranslation } from 'react-i18next';
 
 import { LoginButton } from './LoginButton';
@@ -19,7 +19,7 @@ export const DemoModal = ({ isOpen, onClose, onLogin }: DemoModalProps) => {
       <div className="my-3">
         <p className="text-sm leading-tight">{t('demo.summary')}</p>
         <h5 className="my-3 text-lg font-semibold">{t('demo.loginCredentials')}</h5>
-        {demoUsers.map((user) => {
+        {DEMO_USERS.map((user) => {
           const role = t(`basePermissionLevel.${snakeToCamelCase(user.basePermissionLevel!)}`, { ns: 'common' });
           return (
             <div className="my-3 leading-tight" key={user.username}>

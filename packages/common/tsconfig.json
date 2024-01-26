@@ -1,4 +1,9 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/lib/*"]
+    }
+  },
+  "extends": "../../jsconfig.json",
   "include": ["src"]
 }

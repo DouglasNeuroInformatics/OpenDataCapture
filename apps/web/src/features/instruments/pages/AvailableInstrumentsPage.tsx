@@ -1,29 +1,23 @@
 import { useEffect, useState } from 'react';
 
-import {
-  SearchBar,
-  SelectDropdown,
-  type SelectOption,
-  Spinner,
-  useNotificationsStore
-} from '@douglasneuroinformatics/ui';
-import type { Language } from '@open-data-capture/common/core';
-import type { FormInstrument, InstrumentSummary } from '@open-data-capture/common/instrument';
+import { SearchBar, SelectDropdown, Spinner, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import type { SelectOption } from '@douglasneuroinformatics/ui';
+import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
-import { useAvailableForms } from '@/hooks/useAvailableForms';
+import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
 import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 import { InstrumentCard } from '../components/InstrumentCard';
 
 export const AvailableInstrumentsPage = () => {
-  const forms = useAvailableForms();
+  const summaries = useInstrumentSummaries();
   const navigate = useNavigate();
-  const { t } = useTranslation(['common', 'instruments']);
-  const [filteredInstruments, setFilteredInstruments] = useState<InstrumentSummary<FormInstrument, Language>[]>([]);
+  const { t } = useTranslation(['core', 'instruments']);
+  const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentSummary[]>([]);
   const [tagOptions, setTagOptions] = useState<SelectOption[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<SelectOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<SelectOption[]>([]);
@@ -44,19 +38,19 @@ export const AvailableInstrumentsPage = () => {
   ];
 
   useEffect(() => {
-    if (forms.data) {
+    if (summaries.data) {
       setFilteredInstruments(
-        forms.data.filter((instrument) => {
-          const matchesSearch = instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
+        summaries.data.filter((summary) => {
+          const matchesSearch = summary.details.title.toUpperCase().includes(searchTerm.toUpperCase());
           const matchesLanguages =
-            selectedLanguages.length === 0 || selectedLanguages.find(({ key }) => key === instrument.language);
+            selectedLanguages.length === 0 || selectedLanguages.find(({ key }) => key === summary.language);
           const matchesTags =
-            selectedTags.length === 0 || instrument.tags.some((tag) => selectedTags.find(({ key }) => key === tag));
+            selectedTags.length === 0 || summary.tags.some((tag) => selectedTags.find(({ key }) => key === tag));
           return matchesSearch && matchesLanguages && matchesTags;
         })
       );
     }
-  }, [forms.data, searchTerm, selectedLanguages, selectedTags]);
+  }, [summaries.data, searchTerm, selectedLanguages, selectedTags]);
 
   useEffect(() => {
     setTagOptions(
@@ -67,7 +61,7 @@ export const AvailableInstrumentsPage = () => {
     );
   }, [filteredInstruments]);
 
-  if (!forms.data) {
+  if (!summaries.data) {
     return <Spinner />;
   }
 
@@ -116,7 +110,7 @@ export const AvailableInstrumentsPage = () => {
                   instrument={instrument}
                   onClick={() => {
                     if (activeVisit) {
-                      navigate(`/instruments/forms/${instrument.id!}`);
+                      navigate(`/instruments/render/${instrument.id}`, { state: { summary: instrument } });
                     } else {
                       notifications.addNotification({
                         message: t('instruments:available.nullActiveVisitError'),

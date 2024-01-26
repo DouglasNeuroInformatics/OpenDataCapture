@@ -1,90 +1,23 @@
-import { useEffect, useState } from 'react';
-
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { ClientTable, Dropdown, useDownload } from '@douglasneuroinformatics/ui';
+import { ClientTable, Dropdown } from '@douglasneuroinformatics/ui';
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';
-import type { Language } from '@open-data-capture/common/core';
-import { type InstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useAvailableForms } from '@/hooks/useAvailableForms';
-import { useFormRecords } from '@/hooks/useFormRecords';
-import { useAuthStore } from '@/stores/auth-store';
-
 import { TimeDropdown } from '../components/TimeDropdown';
 import { VisualizationHeader } from '../components/VisualizationHeader';
+import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization';
 
 export const SubjectTablePage = () => {
-  const { currentGroup, currentUser } = useAuthStore();
-  const download = useDownload();
   const params = useParams();
-  const [minDate, setMinDate] = useState<Date | null>(null);
-  const [tableData, setTableData] = useState<Record<string, unknown>[]>([]);
-  const [selectedForm, setSelectedForm] = useState<InstrumentSummary<FormDataType, Language> | null>(null);
-  const { t } = useTranslation(['subjects', 'common']);
+  const { dl, instrument, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
+    useInstrumentVisualization({
+      params: { subjectId: params.subjectId! }
+    });
 
-  const formsQuery = useAvailableForms();
-  const recordsQuery = useFormRecords({
-    enabled: selectedForm !== null,
-    params: {
-      groupId: currentGroup?.id,
-      instrumentId: selectedForm?.id,
-      minDate: minDate ?? undefined,
-      subjectIdentifier: params.subjectIdentifier!
-    }
-  });
-
-  useEffect(() => {
-    if (recordsQuery.data) {
-      const data: Record<string, unknown>[] = [];
-      for (const record of recordsQuery.data) {
-        data.push({
-          __date__: record.date,
-          ...record.computedMeasures,
-          ...record.data
-        });
-      }
-      setTableData(data);
-    }
-  }, [recordsQuery.data]);
-
-  if (!formsQuery.data) {
-    return null;
-  }
-
-  const handleDownload = (option: 'CSV' | 'JSON') => {
-    if (!selectedForm) {
-      return; // should never happen, since btn is disabled when none selected
-    }
-    const baseFilename = `${currentUser!.username}_${selectedForm.name}_${
-      selectedForm.version
-    }_${new Date().toISOString()}`;
-
-    switch (option) {
-      case 'JSON':
-        void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(tableData, null, 2)));
-        break;
-      case 'CSV':
-        void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(tableData[0]!);
-          const rows = tableData.map((item) => Object.values(item).join(',')).join('\n');
-          return Promise.resolve(columnNames + '\n' + rows);
-        });
-    }
-  };
-
-  const formOptions: Record<string, string> = {};
-  for (const form of formsQuery.data) {
-    formOptions[form.id!] = form.details.title;
-  }
-
-  const handleSelectForm = (id: string) => {
-    setSelectedForm(formsQuery.data.find((form) => form.id === id) ?? null);
-  };
+  const { t } = useTranslation(['subjects', 'core']);
 
   const fields: { field: string; label: string }[] = [];
-  for (const subItem in tableData[0]) {
+  for (const subItem in records[0]) {
     if (subItem !== '__date__') {
       fields.push({
         field: subItem,
@@ -96,15 +29,15 @@ export const SubjectTablePage = () => {
   return (
     <div>
       <div className="my-2">
-        <VisualizationHeader minDate={minDate} title={selectedForm?.details.title} />
+        <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <Dropdown
               className="text-sm"
-              options={formOptions}
+              options={instrumentOptions}
               title={t('visualization.instrument')}
               variant="secondary"
-              onSelection={handleSelectForm}
+              onSelection={setInstrumentId}
             />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
@@ -112,9 +45,9 @@ export const SubjectTablePage = () => {
             <Dropdown
               className="text-sm"
               options={['CSV', 'JSON']}
-              title={t('common:download')}
+              title={t('core:download')}
               variant="secondary"
-              onSelection={handleDownload}
+              onSelection={dl}
             />
           </div>
         </div>
@@ -128,7 +61,7 @@ export const SubjectTablePage = () => {
           },
           ...fields
         ]}
-        data={tableData}
+        data={records}
         minRows={10}
       />
     </div>

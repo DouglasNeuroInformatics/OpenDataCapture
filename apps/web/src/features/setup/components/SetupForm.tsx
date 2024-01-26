@@ -1,6 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form } from '@douglasneuroinformatics/ui';
+import { $StrongPassword } from '@open-data-capture/common/user';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -16,11 +17,8 @@ type SetupFormProps = {
   onSubmit: (data: SetupData) => void;
 };
 
-// Matches string with 8 or more characters, minimum one upper case, lowercase, and number
-const isStrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-
 const SetupForm = ({ onSubmit }: SetupFormProps) => {
-  const { t } = useTranslation(['common', 'setup']);
+  const { t } = useTranslation(['core', 'setup']);
   return (
     <Form<SetupData>
       content={[
@@ -68,11 +66,11 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
       ]}
       submitBtnLabel={t('submit')}
       validationSchema={z.object({
-        firstName: z.string(),
-        lastName: z.string(),
-        username: z.string(),
-        password: z.string().regex(isStrongPassword),
-        initDemo: z.boolean()
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
+        username: z.string().min(1),
+        password: $StrongPassword,
+        initDemo: z.boolean(),
       })}
       onSubmit={onSubmit}
     />

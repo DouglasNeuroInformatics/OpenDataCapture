@@ -1,5 +1,5 @@
 version: '3'
-name: data-capture
+name: open-data-capture
 volumes:
   caddy_data:
   mongo_data:

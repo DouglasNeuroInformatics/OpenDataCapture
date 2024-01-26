@@ -1,17 +1,16 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
-import { ExceptionsFilter, ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { HttpAdapterHost } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AbilityFactory } from '@/ability/ability.factory';
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { UsersService } from '@/users/users.service';
 
 import { AuthController } from '../auth.controller';
@@ -19,7 +18,7 @@ import { AuthService } from '../auth.service';
 
 describe('/auth', () => {
   let app: NestExpressApplication;
-  let server: unknown;
+  let server: any;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -31,7 +30,7 @@ describe('/auth', () => {
           useValue: createMock(AbilityFactory)
         },
         {
-          provide: ConfigService,
+          provide: ConfigurationService,
           useValue: {}
         },
         {
@@ -53,7 +52,6 @@ describe('/auth', () => {
       logger: false
     });
 
-    app.useGlobalFilters(new ExceptionsFilter(app.get(HttpAdapterHost)));
     app.useGlobalPipes(new ValidationPipe());
 
     await app.init();

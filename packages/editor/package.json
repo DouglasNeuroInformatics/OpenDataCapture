@@ -1,0 +1,36 @@
+{
+  "name": "@open-data-capture/editor",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "storybook": "storybook dev -p 6006"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/ui": "latest",
+    "@headlessui/react": "^1.7.18",
+    "@heroicons/react": "^2.1.1",
+    "@monaco-editor/react": "^4.6.0",
+    "@open-data-capture/i18next": "workspace:*",
+    "@open-data-capture/react-core": "workspace:*",
+    "monaco-editor": "^0.45.0",
+    "prettier": "^3.1.1",
+    "react-i18next": "^14.0.0"
+  },
+  "devDependencies": {
+    "@open-data-capture/vite-plugin-tailwind": "workspace:*",
+    "vite": "^4.5.0"
+  },
+  "peerDependencies": {
+    "react": "18.x",
+    "react-dom": "18.x",
+    "tailwindcss": "3.x"
+  }
+}

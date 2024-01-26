@@ -1,4 +1,4 @@
-import { Navbar as CoreNavbar } from '@open-data-capture/react-core/components/Navbar';
+import { Navbar as CoreNavbar } from '@open-data-capture/react-core';
 
 import { useTranslations } from '@/i18n';
 
@@ -7,7 +7,7 @@ type NavbarProps = {
 };
 
 const Navbar = ({ url }: NavbarProps) => {
-  const { resolvedLanguage, translatePath, t } = useTranslations(url);
+  const { resolvedLanguage, t, translatePath } = useTranslations(url);
   return (
     <CoreNavbar
       i18n={{

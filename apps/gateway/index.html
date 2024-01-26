@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open Data Capture - Gateway</title>
+    <script>
+      const ROOT_PROPS = String.raw`{{ ROOT_PROPS_OUTLET }}`;
+      Object.defineProperty(window, '__ROOT_PROPS__', {
+        writable: false,
+        value: JSON.parse(ROOT_PROPS)
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root">{{ ROOT_SSR_OUTLET }}</div>
+    <script type="module" src="/src/entry-client.tsx"></script>
+  </body>
+</html>

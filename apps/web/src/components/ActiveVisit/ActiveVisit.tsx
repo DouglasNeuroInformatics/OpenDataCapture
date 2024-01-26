@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { MinusCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
+import { toLowerCase } from '@open-data-capture/common/core';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 import { useTranslation } from 'react-i18next';
@@ -11,12 +12,12 @@ import { useActiveVisitStore } from '@/stores/active-visit-store';
 export const ActiveVisit = () => {
   const { activeVisit, setActiveVisit } = useActiveVisitStore();
   const [isHidden, setIsHidden] = useState(false);
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['core', 'common']);
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
 
   const bind = useDrag(
     ({ down, offset: [ox, oy] }) => {
-      api.start({ immediate: down, x: ox, y: oy });
+      void api.start({ immediate: down, x: ox, y: oy });
     },
     {
       bounds: document.body,
@@ -52,7 +53,7 @@ export const ActiveVisit = () => {
       </div>
       {isHidden && (
         <React.Fragment>
-          <h3 className="mb-2 text-xl font-medium text-inherit">{t('activeVisit')}</h3>
+          <h3 className="mb-2 text-xl font-medium text-inherit">{t('common:activeVisit')}</h3>
           <hr className="mb-2" />
           <span>
             {t('identificationData.firstName.label')}: {activeVisit.subject.firstName}
@@ -64,7 +65,7 @@ export const ActiveVisit = () => {
             {t('identificationData.dateOfBirth.label')}: {toBasicISOString(activeVisit.subject.dateOfBirth)}
           </span>
           <span>
-            {t('identificationData.sex.label')}: {t(`identificationData.sex.${activeVisit.subject.sex}`)}
+            {t('identificationData.sex.label')}: {t(`identificationData.sex.${toLowerCase(activeVisit.subject.sex)}`)}
           </span>
         </React.Fragment>
       )}

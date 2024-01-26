@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
 import { AbilityModule } from '@/ability/ability.module';
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { UsersModule } from '@/users/users.module';
 
 import { AuthController } from './auth.controller';
@@ -14,9 +14,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   imports: [
     AbilityModule,
     JwtModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('SECRET_KEY')
+      inject: [ConfigurationService],
+      useFactory: (configurationService: ConfigurationService) => ({
+        secret: configurationService.get('SECRET_KEY')
       })
     }),
     UsersModule

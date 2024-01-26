@@ -1,11 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const CURRENT_YEAR = new Date().getFullYear();
+import { config } from '@/config';
 
-const DOCS_URL = import.meta.env.DOCS_URL;
-const GITHUB_REPO_URL = import.meta.env.GITHUB_REPO_URL;
-const LICENSE_URL = import.meta.env.LICENSE_URL;
+const CURRENT_YEAR = new Date().getFullYear();
 
 export const Footer = () => {
   const { t } = useTranslation('layout');
@@ -18,7 +16,7 @@ export const Footer = () => {
           <div className="flex w-1/2 items-center justify-center lg:w-auto">
             <a
               className="underline-offset-3 p-1 text-center text-sm hover:underline lg:mx-2 xl:text-base"
-              href={DOCS_URL}
+              href={config.meta.docsUrl}
               rel="noreferrer"
               target="_blank"
             >
@@ -28,7 +26,7 @@ export const Footer = () => {
           <div className="flex w-1/2 items-center justify-center lg:w-auto">
             <a
               className="underline-offset-3 p-1 text-center text-sm hover:underline lg:mx-2 xl:text-base"
-              href={LICENSE_URL}
+              href={config.meta.licenseUrl}
               rel="noreferrer"
               target="_blank"
             >
@@ -38,7 +36,7 @@ export const Footer = () => {
           <div className="flex w-1/2 items-center justify-center lg:w-auto">
             <a
               className="underline-offset-3 p-1 text-center text-sm hover:underline lg:mx-2 xl:text-base"
-              href={GITHUB_REPO_URL}
+              href={config.meta.githubRepoUrl}
               rel="noreferrer"
               target="_blank"
             >

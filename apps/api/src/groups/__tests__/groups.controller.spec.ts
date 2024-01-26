@@ -35,19 +35,19 @@ describe('GroupsController', () => {
     });
   });
 
-  // describe('findAll', () => {
-  //   it('should return the array returned by the groups service', () => {
-  //     groupsService.findAll.mockResolvedValueOnce([{ name: 'Test Group' }]);
-  //     expect(groupsController.findAll()).resolves.toBeArrayOfSize(1);
-  //   });
-  // });
+  describe('findAll', () => {
+    it('should return the array returned by the groups service', () => {
+      groupsService.findAll.mockResolvedValueOnce([{ name: 'Test Group' }]);
+      expect(groupsController.findAll()).resolves.toBeArrayOfSize(1);
+    });
+  });
 
-  // describe('findById', () => {
-  //   it('should return the value provided by the groups service ', () => {
-  //     groupsService.findById.mockResolvedValueOnce({ name: 'Test Group' });
-  //     expect(groupsService.findById(new Types.ObjectId())).resolves.toMatchObject({
-  //       name: 'Test Group'
-  //     });
-  //   });
-  // });
+  describe('findById', () => {
+    it('should return the value provided by the groups service ', () => {
+      groupsService.findById.mockResolvedValueOnce({ name: 'Test Group' });
+      expect(groupsService.findById('123')).resolves.toMatchObject({
+        name: 'Test Group'
+      });
+    });
+  });
 });

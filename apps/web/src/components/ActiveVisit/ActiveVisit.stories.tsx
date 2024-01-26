@@ -15,15 +15,22 @@ export default {
       const { setActiveVisit } = useActiveVisitStore();
       useEffect(() => {
         setActiveVisit({
+          createdAt: new Date(),
           date: new Date(),
+          groupId: null,
           id: '123',
           subject: {
+            createdAt: new Date(),
             dateOfBirth: new Date('2000-01-01'),
             firstName: 'John',
-            identifier: '12345',
+            groupIds: [],
+            id: '12345',
             lastName: 'Appleseed',
-            sex: 'male'
-          }
+            sex: 'MALE',
+            updatedAt: new Date()
+          },
+          subjectId: '12345',
+          updatedAt: new Date()
         });
       }, []);
       return <Story />;

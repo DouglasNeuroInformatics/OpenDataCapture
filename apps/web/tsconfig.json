@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../jsconfig.json",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
@@ -10,5 +10,5 @@
     },
     "resolveJsonModule": true
   },
-  "include": [".storybook/**/*", "config/**/*", "src/**/*", "vite.config.ts"]
+  "include": ["config/**/*", "src/**/*"]
 }

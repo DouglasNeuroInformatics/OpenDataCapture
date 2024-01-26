@@ -1,21 +1,18 @@
-import { LoggerMiddleware } from '@douglasneuroinformatics/nestjs/core';
-import { AjvModule, CryptoModule } from '@douglasneuroinformatics/nestjs/modules';
+import { CryptoModule, LoggingModule } from '@douglasneuroinformatics/nestjs/modules';
 import { Module } from '@nestjs/common';
-import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { Connection } from 'mongoose';
-import mongooseAutoPopulate from 'mongoose-autopopulate';
 
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
+import { ConfigurationModule } from './configuration/configuration.module';
+import { ConfigurationService } from './configuration/configuration.service';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';
@@ -24,37 +21,27 @@ import { VisitsModule } from './visits/visits.module';
 
 @Module({
   imports: [
-    AjvModule,
-    AssignmentsModule,
     AuthModule,
-    ConfigModule.forRoot({
-      isGlobal: true
+    ConfigurationModule.forRoot({
+      conditionalModules: [
+        {
+          condition: 'GATEWAY_ENABLED',
+          modules: [AssignmentsModule, GatewayModule]
+        }
+      ]
     }),
     CryptoModule.registerAsync({
-      inject: [ConfigService],
+      inject: [ConfigurationService],
       isGlobal: true,
-      useFactory: (configService: ConfigService) => ({
-        secretKey: configService.getOrThrow('SECRET_KEY')
+      useFactory: (configurationService: ConfigurationService) => ({
+        secretKey: configurationService.get('SECRET_KEY')
       })
     }),
-    GatewayModule,
     GroupsModule,
     InstrumentsModule,
-    MongooseModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          connectionFactory: (connection: Connection): Connection => {
-            connection.plugin(mongooseAutoPopulate);
-            return connection;
-          },
-          dbName: `data-capture-${configService.getOrThrow<string>('NODE_ENV')}`,
-          ignoreUndefined: true,
-          uri: configService.getOrThrow<string>('MONGO_URI')
-        };
-      }
-    }),
+    PrismaModule.forRoot(),
     SubjectsModule,
+    LoggingModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         limit: 25,
@@ -92,8 +79,4 @@ import { VisitsModule } from './visits/visits.module';
     }
   ]
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

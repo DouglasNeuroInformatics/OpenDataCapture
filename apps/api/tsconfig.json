@@ -1,11 +1,12 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../jsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/lib/*"]
     },
     "strictPropertyInitialization": false,
     "types": ["bun-types"]

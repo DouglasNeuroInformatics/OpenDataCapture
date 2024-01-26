@@ -1,22 +1,14 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
 
-import { InstrumentEntity, InstrumentSchema } from './entities/instrument.entity';
+import { PrismaModule } from '@/prisma/prisma.module';
+
 import { InstrumentsController } from './instruments.controller';
-import { InstrumentsRepository } from './instruments.repository';
 import { InstrumentsService } from './instruments.service';
 
 @Module({
   controllers: [InstrumentsController],
   exports: [InstrumentsService],
-  imports: [
-    MongooseModule.forFeature([
-      {
-        name: InstrumentEntity.modelName,
-        schema: InstrumentSchema
-      }
-    ])
-  ],
-  providers: [InstrumentsRepository, InstrumentsService]
+  imports: [PrismaModule.forFeature('Instrument')],
+  providers: [InstrumentsService]
 })
 export class InstrumentsModule {}

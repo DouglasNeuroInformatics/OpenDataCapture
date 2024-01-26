@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import logo from '@/assets/logo.png';
+import { config } from '@/config';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { DemoBanner } from '../components/DemoBanner';
@@ -36,10 +37,10 @@ export const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true') {
+    if (import.meta.env.DEV && config.dev.isBypassAuthEnabled) {
       void login({
-        password: import.meta.env.VITE_DEV_PASSWORD!,
-        username: import.meta.env.VITE_DEV_USERNAME!
+        password: config.dev.password!,
+        username: config.dev.username!
       });
     }
   }, []);

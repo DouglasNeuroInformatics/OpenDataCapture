@@ -1,12 +1,12 @@
 import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
-import type { CreateInstrumentRecordData } from '@open-data-capture/common/instrument-records';
-import { createInstrumentRecordDataSchema } from '@open-data-capture/common/instrument-records';
+import type { Json } from '@open-data-capture/common/core';
+import { $CreateInstrumentRecordData } from '@open-data-capture/common/instrument-records';
 
-@ValidationSchema<CreateInstrumentRecordData>(createInstrumentRecordDataSchema)
+@ValidationSchema($CreateInstrumentRecordData)
 export class CreateInstrumentRecordDto {
-  data: unknown;
+  data: Json;
   date: Date;
   groupId?: string;
   instrumentId: string;
-  subjectIdentifier: string;
+  subjectId: string;
 }

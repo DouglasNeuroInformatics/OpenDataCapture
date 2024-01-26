@@ -1,0 +1,282 @@
+{
+  "anonymous": {
+    "en": "Anonymous",
+    "fr": "Anonyme"
+  },
+  "begin": {
+    "en": "Begin",
+    "fr": "Commencer"
+  },
+  "bilingual": {
+    "en": "Bilingual",
+    "fr": "Bilingue"
+  },
+  "cancel": {
+    "en": "Cancel",
+    "fr": "Annuler"
+  },
+  "changeTheme": {
+    "en": "Change Theme",
+    "fr": "Changer de thème"
+  },
+  "close": {
+    "en": "Close",
+    "fr": "Fermer"
+  },
+  "data": {
+    "en": "Data",
+    "fr": "Données"
+  },
+  "delete": {
+    "en": "Delete",
+    "fr": "Effacer"
+  },
+  "description": {
+    "en": "Description",
+    "fr": "Description"
+  },
+  "details": {
+    "en": "Details",
+    "fr": "Détails"
+  },
+  "download": {
+    "en": "Download",
+    "fr": "Télécharger"
+  },
+  "editor": {
+    "keyboardShortcuts": {
+      "format": {
+        "en": "Format Document: {{keybinding}}",
+        "fr": "Appliquer le formatage du code : {{keybinding}}"
+      }
+    },
+    "noFileSelected": {
+      "en": "No File Selected",
+      "fr": "Aucun fichier sélectionné"
+    },
+    "pleaseSelectFile": {
+      "en": "Please Select a File to Begin",
+      "fr": "Veuillez sélectionner un fichier pour commencer"
+    }
+  },
+  "error": {
+    "en": "Error",
+    "fr": "Erreur"
+  },
+  "estimatedDuration": {
+    "en": "Estimated Duration",
+    "fr": "Durée estimée"
+  },
+  "failedToLoadInstrument": {
+    "en": "Failed to Load Instrument",
+    "fr": "Échec du chargement de l'instrument"
+  },
+  "form": {
+    "requiredField": {
+      "en": "This field is required",
+      "fr": "Ce champ est obligatoire"
+    }
+  },
+  "fullName": {
+    "en": "Full Name",
+    "fr": "Nom et prénom"
+  },
+  "genericApology": {
+    "en": "We apologize for the inconvenience. Please contact us for further assistance.",
+    "fr": "Nous nous excusons pour ce désagrément. N'hésitez pas à nous contacter pour obtenir de l'aide."
+  },
+  "help": {
+    "en": "Help",
+    "fr": "Aide"
+  },
+  "httpRequestFailed": {
+    "en": "HTTP Request Failed",
+    "fr": "Échec de la requête HTTP"
+  },
+  "identificationData": {
+    "dateOfBirth": {
+      "label": {
+        "en": "Date of Birth",
+        "fr": "Date de naissance"
+      }
+    },
+    "firstName": {
+      "description": {
+        "en": "The subject's first name, as provided by their birth certificate.",
+        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance."
+      },
+      "label": {
+        "en": "First Name",
+        "fr": "Prénom"
+      }
+    },
+    "lastName": {
+      "description": {
+        "en": "The subject's last name, as provided by their birth certificate.",
+        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance."
+      },
+      "label": {
+        "en": "Last Name",
+        "fr": "Nom de famille"
+      }
+    },
+    "sex": {
+      "description": {
+        "en": "The subject's biological sex, as assigned at birth.",
+        "fr": "Le sexe biologique du sujet, tel qu'il a été assigné à la naissance."
+      },
+      "female": {
+        "en": "Female",
+        "fr": "Féminin"
+      },
+      "label": {
+        "en": "Sex at Birth",
+        "fr": "Sexe à la naissance"
+      },
+      "male": {
+        "en": "Male",
+        "fr": "Masculin"
+      }
+    }
+  },
+  "instructions": {
+    "en": "Instructions",
+    "fr": "Instructions"
+  },
+  "instrument": {
+    "en": "Instrument",
+    "fr": "Instrument"
+  },
+  "instrumentName": {
+    "en": "Instrument Name",
+    "fr": "Nom de l'instrument"
+  },
+  "language": {
+    "en": "Language",
+    "fr": "Langue"
+  },
+  "languages": {
+    "english": {
+      "en": "English",
+      "fr": "Anglais"
+    },
+    "french": {
+      "en": "French",
+      "fr": "Français"
+    }
+  },
+  "minutes": {
+    "en": "{{minutes}} minute(s)",
+    "fr": "{{minutes}} minute(s)"
+  },
+  "mobileBlocker": {
+    "subtitle": {
+      "en": "Please try again on a device with a larger screen",
+      "fr": "Veuillez réessayer sur un appareil doté d'un écran plus grand"
+    },
+    "title": {
+      "en": "Sorry, this feature is not available on mobile",
+      "fr": "Désolé, cette fonctionnalité n'est pas disponible sur mobile"
+    }
+  },
+  "name": {
+    "en": "Name",
+    "fr": "Nom"
+  },
+  "networkError": {
+    "en": "Network Error",
+    "fr": "Erreur de réseau"
+  },
+  "no": {
+    "en": "No",
+    "fr": "Non"
+  },
+  "notFound": {
+    "en": "Not Found",
+    "fr": "Pas trouvé"
+  },
+  "print": {
+    "en": "Print",
+    "fr": "Imprimer"
+  },
+  "responses": {
+    "en": "Responses",
+    "fr": "Réponses"
+  },
+  "results": {
+    "en": "Results",
+    "fr": "Résultats"
+  },
+  "save": {
+    "en": "Save",
+    "fr": "Enregistrer"
+  },
+  "somethingWentWrong": {
+    "en": "Something Went Wrong",
+    "fr": "Quelque chose n'a pas fonctionné"
+  },
+  "steps": {
+    "overview": {
+      "en": "Overview",
+      "fr": "Aperçu"
+    },
+    "questions": {
+      "en": "Content",
+      "fr": "Contenu"
+    },
+    "summary": {
+      "en": "Summary",
+      "fr": "Résumé"
+    }
+  },
+  "subject": {
+    "en": "Subject",
+    "fr": "Client"
+  },
+  "submit": {
+    "en": "Submit",
+    "fr": "Soumettre"
+  },
+  "summary": {
+    "subtitle": {
+      "en": "Completed on {{ dateCompleted }}",
+      "fr": "Remplie le {{ dateCompleted }}"
+    },
+    "title": {
+      "en": "Summary of Results for the {{title}}",
+      "fr": "{{title}} : résumé des résultats"
+    }
+  },
+  "table": {
+    "en": "Table",
+    "fr": "Tableau"
+  },
+  "tag": {
+    "en": "Tag",
+    "fr": "Tag"
+  },
+  "tags": {
+    "en": "Tags",
+    "fr": "Tags"
+  },
+  "task": {
+    "en": "Task",
+    "fr": "Tâche"
+  },
+  "title": {
+    "en": "Title",
+    "fr": "Titre"
+  },
+  "unknownError": {
+    "en": "Unknown Error",
+    "fr": "Erreur inconnue"
+  },
+  "version": {
+    "en": "Version",
+    "fr": "Version"
+  },
+  "yes": {
+    "en": "Yes",
+    "fr": "Oui"
+  }
+}

@@ -1,14 +1,15 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../jsconfig.json",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "esModuleInterop": false,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/lib/*"]
     },
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "vite.config.ts"]
+  "include": ["src"]
 }

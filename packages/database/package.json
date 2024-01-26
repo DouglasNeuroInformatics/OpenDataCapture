@@ -1,0 +1,28 @@
+{
+  "name": "@open-data-capture/database",
+  "version": "0.0.0",
+  "exports": {
+    "./core": {
+      "default": "./lib/core/index.js",
+      "types": "./lib/core/index.d.ts"
+    },
+    "./gateway": {
+      "default": "./lib/gateway/index.js",
+      "types": "./lib/gateway/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build:lib": "bun db:generate && bun db:push",
+    "db:generate": "prisma generate --schema prisma/core-schema.prisma && prisma generate --schema prisma/gateway-schema.prisma",
+    "db:push": "env-cmd -f ../../.env prisma db push --schema prisma/gateway-schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.8.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.8.1"
+  },
+  "trustedDependencies": [
+    "prisma"
+  ]
+}

@@ -1,28 +1,31 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser, EntityController } from '@douglasneuroinformatics/nestjs/core';
-import { Body, Controller, Get, Param, Patch, Post, Query, Redirect } from '@nestjs/common/decorators';
+import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Redirect } from '@nestjs/common/decorators';
 import { HttpStatus } from '@nestjs/common/enums';
 import type { HttpRedirectResponse } from '@nestjs/common/interfaces';
-import { ConfigService } from '@nestjs/config';
 import { ApiOperation } from '@nestjs/swagger';
-import type { Assignment } from '@open-data-capture/common/assignment';
-import type { AppAbility } from '@open-data-capture/common/core';
 
+import { ConfigurationService } from '@/configuration/configuration.service';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import type { AppAbility } from '@/core/types';
 
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 
+/**
+ * In some cases, the `AssignmentsController` delegates to the `AssignmentsService`, like any other
+ * controller in the code. In others, it simply redirects the request directly to the gateway.
+ */
 @Controller('assignments')
-export class AssignmentsController implements Pick<EntityController<Assignment>, 'create'> {
+export class AssignmentsController {
   private readonly gatewayBaseUrl: string;
 
   constructor(
     private readonly assignmentsService: AssignmentsService,
-    configService: ConfigService
+    configurationService: ConfigurationService
   ) {
-    this.gatewayBaseUrl = configService.getOrThrow('GATEWAY_BASE_URL');
+    this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
   }
 
   @ApiOperation({ summary: 'Create Assignment' })
@@ -32,33 +35,20 @@ export class AssignmentsController implements Pick<EntityController<Assignment>,
     return this.assignmentsService.create(createAssignmentDto);
   }
 
-  // @ApiOperation({ summary: 'Delete Assignment' })
-  // @Delete(':id')
-  // @RouteAccess({ action: 'delete', subject: 'Assignment' })
-  // deleteById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability?: AppAbility) {
-  //   return this.assignmentsService.deleteById(id, { ability });
-  // }
+  @ApiOperation({ summary: 'Delete Assignment' })
+  @Delete(':id')
+  @Redirect()
+  @RouteAccess({ action: 'delete', subject: 'Assignment' })
+  deleteById(@Param('id') id: string): HttpRedirectResponse {
+    return { statusCode: HttpStatus.PERMANENT_REDIRECT, url: `${this.gatewayBaseUrl}/api/assignments/${id}` };
+  }
 
   @ApiOperation({ summary: 'Get All Assignments' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Assignment' })
-  find(@CurrentUser('ability') ability?: AppAbility, @Query('subjectIdentifier') subjectIdentifier?: string) {
-    return this.assignmentsService.find({ subjectIdentifier }, { ability });
+  find(@CurrentUser('ability') ability?: AppAbility, @Query('subjectId') subjectId?: string) {
+    return this.assignmentsService.find({ subjectId }, { ability });
   }
-
-  @ApiOperation({ summary: 'Get Summary of Assignments' })
-  @Get('summary')
-  @RouteAccess({ action: 'read', subject: 'Assignment' })
-  findSummaries(@CurrentUser('ability') ability?: AppAbility, @Query('subjectIdentifier') subjectIdentifier?: string) {
-    return this.assignmentsService.find({ subjectIdentifier }, { ability });
-  }
-
-  // @ApiOperation({ summary: 'Get Assignment' })
-  // @Get(':id')
-  // @RouteAccess({ action: 'read', subject: 'Assignment' })
-  // findById(@Param('id', ParseIdPipe) id: string, @CurrentUser('ability') ability?: AppAbility) {
-  //   return this.assignmentsService.findById(id, { ability });
-  // }
 
   @ApiOperation({ summary: 'Update Assignment' })
   @Patch(':id')

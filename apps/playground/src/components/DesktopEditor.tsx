@@ -8,7 +8,7 @@ import {
   useDownload,
   useNotificationsStore
 } from '@douglasneuroinformatics/ui';
-import { EditorPane, type EditorPaneRef } from '@open-data-capture/react-core/components/Editor';
+import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
 
 import { EditorContext } from '@/context/EditorContext';
 
@@ -63,7 +63,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
       </div>
       <div className="flex h-full min-h-0 gap-8 p-2">
         <div className="flex flex-grow flex-col">
-          <Card className="flex-grow overflow-hidden">
+          <Card className="flex-grow p-0.5">
             <EditorPane
               className="h-full min-h-0"
               defaultValue={ctx.selectedExample.value}
@@ -73,7 +73,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
           </Card>
         </div>
         <div className="flex h-full min-h-0 w-[640px] flex-shrink-0 flex-col">
-          <Card className="flex h-full w-full flex-col justify-center overflow-scroll p-4">
+          <Card className="z-10 flex h-full w-full flex-col justify-center overflow-scroll p-4">
             <InstrumentViewer state={ctx.state} />
           </Card>
         </div>
