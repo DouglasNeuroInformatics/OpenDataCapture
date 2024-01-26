@@ -12,24 +12,14 @@ datasource db {
 }
 
 model AssignmentModel {
-  id               String                 @id
-  createdAt        DateTime               @default(now())
-  updatedAt        DateTime               @default(now())
+  id               String   @id
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
   expiresAt        DateTime
   instrumentBundle String
   instrumentId     String
-  record           AssignmentRecordModel?
+  data             String?
   status           String
   subjectId        String
   url              String
-}
-
-model AssignmentRecordModel {
-  id           String          @id @default(uuid())
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @default(now())
-  assignment   AssignmentModel @relation(fields: [assignmentId], references: [id])
-  assignmentId String          @unique()
-  completedAt  DateTime?
-  data         String
 }

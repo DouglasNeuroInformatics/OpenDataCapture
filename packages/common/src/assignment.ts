@@ -6,21 +6,15 @@ export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUT
 
 export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
 
-export const $AssignmentRecord = $BaseModel.extend({
-  assignmentId: z.string().min(1),
-  completedAt: z.coerce.date().nullable(),
-  data: $Json
-});
-
 /**
  * An self-contained object representing an assignment. This is stored on the gateway itself.
  */
 export type Assignment = z.infer<typeof $Assignment>;
 export const $Assignment = $BaseModel.extend({
+  data: $Json.nullable(),
   expiresAt: z.coerce.date(),
   instrumentBundle: z.string().min(1),
   instrumentId: z.string().min(1),
-  record: $AssignmentRecord.nullable(),
   status: $AssignmentStatus,
   subjectId: z.string().min(1),
   url: z.string().url()
@@ -53,7 +47,7 @@ export const $CreateAssignmentResponseBody = z.object({
 export type UpdateAssignmentData = z.infer<typeof $UpdateAssignmentData>;
 export const $UpdateAssignmentData = z
   .object({
-    expiresAt: z.coerce.date(),
-    status: $AssignmentStatus
+    data: $Json,
+    expiresAt: z.coerce.date()
   })
   .partial();
