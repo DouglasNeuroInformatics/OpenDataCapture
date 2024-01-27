@@ -5,7 +5,7 @@ import {
   $UpdateAssignmentData,
   type Assignment,
   type AssignmentStatus,
-  type CreateAssignmentResponseBody
+  type MutateAssignmentResponseBody
 } from '@open-data-capture/common/assignment';
 import { $Json } from '@open-data-capture/common/core';
 import { Router } from 'express';
@@ -60,7 +60,7 @@ router.post(
         ...result.data
       }
     });
-    res.status(200).send({ success: true } satisfies CreateAssignmentResponseBody);
+    res.status(200).send({ success: true } satisfies MutateAssignmentResponseBody);
   })
 );
 
@@ -90,7 +90,7 @@ router.patch(
         id: assignment.id
       }
     });
-    res.status(200).json({ success: true });
+    res.status(200).json({ success: true } satisfies MutateAssignmentResponseBody);
   })
 );
 
@@ -107,7 +107,7 @@ router.delete(
     await prisma.assignmentModel.delete({
       where: { id }
     });
-    res.status(200).json({ success: true });
+    res.status(200).json({ success: true } satisfies MutateAssignmentResponseBody);
   })
 );
 

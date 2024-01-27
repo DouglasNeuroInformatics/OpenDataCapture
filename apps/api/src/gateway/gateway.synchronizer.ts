@@ -1,39 +1,32 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
-import { $Assignment, type Assignment } from '@open-data-capture/common/assignment';
+import { type Assignment } from '@open-data-capture/common/assignment';
 import { isAxiosError } from 'axios';
 
+import { AssignmentsService } from '@/assignments/assignments.service';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap {
-  private readonly config: {
-    baseUrl: string;
-    refreshInterval: number;
-  };
   private readonly logger = new Logger(GatewaySynchronizer.name);
+  private readonly refreshInterval: number;
 
   constructor(
     configurationService: ConfigurationService,
-    private readonly httpService: HttpService,
+    private readonly assignmentsService: AssignmentsService,
     private readonly instrumentRecordsService: InstrumentRecordsService
   ) {
-    this.config = {
-      baseUrl: configurationService.get('GATEWAY_BASE_URL'),
-      refreshInterval: configurationService.get('GATEWAY_REFRESH_INTERVAL')
-    };
+    this.refreshInterval = configurationService.get('GATEWAY_REFRESH_INTERVAL');
   }
 
   onApplicationBootstrap() {
-    setInterval(() => void this.sync(), this.config.refreshInterval);
+    setInterval(() => void this.sync(), this.refreshInterval);
   }
 
   private async sync() {
     let assignments: Assignment[];
     try {
-      const response = await this.httpService.axiosRef.get(`${this.config.baseUrl}/api/assignments`);
-      assignments = await $Assignment.array().parseAsync(response.data);
+      assignments = await this.assignmentsService.find();
     } catch (err) {
       if (isAxiosError(err)) {
         this.logger.warn(err.code);
@@ -47,6 +40,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       if (assignment.status !== 'COMPLETE' || !assignment.data) {
         continue;
       }
+
       const isExisting = await this.instrumentRecordsService.exists({ assignmentId: assignment.id });
       if (isExisting) {
         continue;
@@ -59,6 +53,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         subjectId: assignment.subjectId
       });
       this.logger.log(`Created record with ID: ${record.id}`);
+
+      await this.assignmentsService.deleteById(assignment.id);
     }
   }
 }

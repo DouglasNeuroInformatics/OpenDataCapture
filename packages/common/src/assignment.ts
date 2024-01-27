@@ -37,9 +37,8 @@ export const $CreateAssignmentRelayData = $CreateAssignmentData.extend({
   instrumentBundle: z.string().min(1)
 });
 
-/** The response body returned when creating an assignment, on any server */
-export type CreateAssignmentResponseBody = z.infer<typeof $CreateAssignmentResponseBody>;
-export const $CreateAssignmentResponseBody = z.object({
+export type MutateAssignmentResponseBody = z.infer<typeof $MutateAssignmentResponseBody>;
+export const $MutateAssignmentResponseBody = z.object({
   success: z.boolean()
 });
 
