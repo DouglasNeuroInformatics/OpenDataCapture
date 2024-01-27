@@ -9,6 +9,7 @@ import { AssignmentsService } from './assignments.service';
 
 @Module({
   controllers: [AssignmentsController],
+  exports: [AssignmentsService],
   imports: [HttpModule, InstrumentsModule, SubjectsModule],
   providers: [AssignmentsService]
 })
