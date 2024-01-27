@@ -32,5 +32,5 @@ export const $InteractiveInstrument = $BaseInstrument('en').extend({
   }),
   details: $EnhancedBaseInstrumentDetails('en'),
   kind: z.literal('INTERACTIVE'),
-  measures: $UnilingualInstrumentMeasures
+  measures: $UnilingualInstrumentMeasures.optional()
 });
