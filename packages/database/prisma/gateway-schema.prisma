@@ -11,7 +11,7 @@ datasource db {
   url      = env("GATEWAY_DATABASE_URL")
 }
 
-model AssignmentModel {
+model RemoteAssignmentModel {
   id               String    @id
   createdAt        DateTime  @default(now())
   completedAt      DateTime?

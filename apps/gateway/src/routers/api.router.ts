@@ -24,8 +24,7 @@ router.get(
     if (typeof req.query.subjectId === 'string') {
       subjectId = req.query.subjectId;
     }
-
-    const assignments = await prisma.assignmentModel.findMany({
+    const assignments = await prisma.remoteAssignmentModel.findMany({
       where: {
         subjectId
       }
@@ -51,7 +50,7 @@ router.post(
     }
     const createdAt = new Date();
     const id = crypto.randomUUID();
-    await prisma.assignmentModel.create({
+    await prisma.remoteAssignmentModel.create({
       data: {
         createdAt,
         id,
@@ -68,7 +67,7 @@ router.patch(
   '/assignments/:id',
   ah(async (req, res) => {
     const id = req.params.id;
-    const assignment = await prisma.assignmentModel.findFirst({
+    const assignment = await prisma.remoteAssignmentModel.findFirst({
       where: { id }
     });
     if (!assignment) {
@@ -79,7 +78,7 @@ router.patch(
       console.log(result.error);
       throw new HttpException(400, 'Bad Request');
     }
-    await prisma.assignmentModel.update({
+    await prisma.remoteAssignmentModel.update({
       data: {
         completedAt: result.data.data ? new Date() : undefined,
         data: JSON.stringify(result.data.data),
@@ -98,13 +97,13 @@ router.delete(
   '/assignments/:id',
   ah(async (req, res) => {
     const id = req.params.id;
-    const assignment = await prisma.assignmentModel.findFirst({
+    const assignment = await prisma.remoteAssignmentModel.findFirst({
       where: { id }
     });
     if (!assignment) {
       throw new HttpException(404, `Failed to Find Assignment with ID: ${id}`);
     }
-    await prisma.assignmentModel.delete({
+    await prisma.remoteAssignmentModel.delete({
       where: { id }
     });
     res.status(200).json({ success: true } satisfies MutateAssignmentResponseBody);
