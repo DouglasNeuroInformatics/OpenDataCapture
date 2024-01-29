@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
-import i18next from 'i18next';
+import type { Language } from '@open-data-capture/common/core';
+import { useTranslation } from 'react-i18next';
 
 const languages = {
   en: {
@@ -18,17 +19,16 @@ type LanguageToggleProps = {
 
 export const LanguageToggle = ({ onClick, ...props }: LanguageToggleProps) => {
   const notifications = useNotificationsStore();
+  const { i18n, t } = useTranslation('common');
 
-  const inactiveLanguage = Object.keys(languages).find((l) => l !== i18next.resolvedLanguage) as
-    | keyof typeof languages
-    | undefined;
+  const inactiveLanguage = Object.keys(languages).find((l) => l !== i18n.resolvedLanguage) as Language | undefined;
 
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     try {
-      await i18next.changeLanguage(inactiveLanguage);
+      await i18n.changeLanguage(inactiveLanguage);
     } catch (error) {
       console.error(error);
-      notifications.addNotification({ message: 'Failed to change languages', type: 'error' });
+      notifications.addNotification({ message: t('errors.failedToChangeLanguage'), type: 'error' });
     }
     if (onClick) {
       onClick(event);

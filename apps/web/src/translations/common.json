@@ -18,6 +18,10 @@
     }
   },
   "errors": {
+    "failedToChangeLanguage": {
+      "en": "Failed to change languages",
+      "fr": "Le changement de langue n'a pas été effectué"
+    },
     "noDataToExport": {
       "en": "No Data to Export",
       "fr": "Pas de données à exporter"
