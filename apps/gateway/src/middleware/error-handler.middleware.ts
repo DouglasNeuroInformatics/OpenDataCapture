@@ -2,7 +2,7 @@ import type { ErrorRequestHandler } from 'express';
 
 import { HttpException } from '@/utils/http-exception';
 
-export const errorHandler: ErrorRequestHandler = (err, _, res, next) => {
+export const errorHandlerMiddleware: ErrorRequestHandler = (err, _, res, next) => {
   console.error(err);
   if (res.headersSent) {
     return next(err);

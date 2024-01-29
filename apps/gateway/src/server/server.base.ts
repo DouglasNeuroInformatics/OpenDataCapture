@@ -4,7 +4,8 @@ import type { Promisable } from 'type-fest';
 import type { RootProps } from '@/Root';
 import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
-import { errorHandler } from '@/middleware/error-handler';
+import { apiKeyMiddleware } from '@/middleware/api-key.middleware';
+import { errorHandlerMiddleware } from '@/middleware/error-handler.middleware';
 import { apiRouter } from '@/routers/api.router';
 import { rootRouter } from '@/routers/root.router';
 import { ah } from '@/utils/async-handler';
@@ -38,9 +39,9 @@ export abstract class BaseServer {
   constructor() {
     this.app = express();
     this.app.use(express.json());
-    this.app.use('/api', apiRouter);
+    this.app.use('/api', apiKeyMiddleware, apiRouter);
     this.app.use('/', this.rootLoader, rootRouter);
-    this.app.use(errorHandler);
+    this.app.use(errorHandlerMiddleware);
   }
 
   protected fixStacktrace?(err: Error): void;
