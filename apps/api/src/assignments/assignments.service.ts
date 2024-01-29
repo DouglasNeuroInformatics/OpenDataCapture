@@ -1,57 +1,65 @@
-import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
-import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import type {
-  Assignment,
-  CreateAssignmentRelayData,
-  MutateAssignmentResponseBody
-} from '@open-data-capture/common/assignment';
-import { $Assignment, $MutateAssignmentResponseBody } from '@open-data-capture/common/assignment';
+import crypto from 'node:crypto';
 
+import { Injectable } from '@nestjs/common';
+import type { Assignment, UpdateAssignmentData } from '@open-data-capture/common/assignment';
+
+import { accessibleQuery } from '@/ability/ability.utils';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import type { EntityOperationOptions } from '@/core/types';
-import { InstrumentsService } from '@/instruments/instruments.service';
+import { InjectModel } from '@/prisma/prisma.decorators';
+import type { Model } from '@/prisma/prisma.types';
 
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 
 @Injectable()
-export class AssignmentsService implements Pick<EntityService<Assignment>, 'create'> {
+export class AssignmentsService {
   private readonly gatewayBaseUrl: string;
 
   constructor(
     configurationService: ConfigurationService,
-    private readonly httpService: HttpService,
-    private readonly instrumentsService: InstrumentsService
+    @InjectModel('Assignment') private readonly assignmentModel: Model<'Assignment'>
   ) {
     this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
   }
 
-  async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto): Promise<MutateAssignmentResponseBody> {
-    const instrument = await this.instrumentsService.findById(instrumentId);
-    const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, {
-      expiresAt,
-      instrumentBundle: instrument.bundle,
-      instrumentId: instrument.id,
-      subjectId
-    } satisfies CreateAssignmentRelayData);
-    return $MutateAssignmentResponseBody.parseAsync(response.data);
-  }
-
-  async deleteById(id: string): Promise<MutateAssignmentResponseBody> {
-    const response = await this.httpService.axiosRef.delete(`${this.gatewayBaseUrl}/api/assignments/${id}`);
-    return $MutateAssignmentResponseBody.parseAsync(response.data);
-  }
-
-  async find({ subjectId }: { subjectId?: string } = {}, { ability }: EntityOperationOptions = {}) {
-    const response = await this.httpService.axiosRef.get(`${this.gatewayBaseUrl}/api/assignments`, {
-      params: {
-        subjectId
+  async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto): Promise<Assignment> {
+    const id = crypto.randomUUID();
+    const assignment = await this.assignmentModel.create({
+      data: {
+        expiresAt,
+        id,
+        instrument: {
+          connect: {
+            id: instrumentId
+          }
+        },
+        status: 'OUTSTANDING',
+        subject: {
+          connect: {
+            id: subjectId
+          }
+        },
+        url: `${this.gatewayBaseUrl}/assignments/${id}`
       }
     });
-    const assignments = await $Assignment.array().parseAsync(response.data);
-    if (!ability) {
-      return assignments;
-    }
-    return assignments;
+    return assignment;
+  }
+
+  async find(
+    { subjectId }: { subjectId?: string } = {},
+    { ability }: EntityOperationOptions = {}
+  ): Promise<Assignment[]> {
+    return this.assignmentModel.findMany({
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'Assignment'), { subjectId }]
+      }
+    });
+  }
+
+  async updateById(id: string, data: UpdateAssignmentData, { ability }: EntityOperationOptions = {}) {
+    return this.assignmentModel.update({
+      data,
+      where: { AND: [accessibleQuery(ability, 'update', 'Assignment')], id }
+    });
   }
 }

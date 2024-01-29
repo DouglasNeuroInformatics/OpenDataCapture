@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { $Json } from './core';
+import { $BaseModel, $Json } from './core';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -10,13 +10,10 @@ export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
  * An self-contained object representing an assignment. This is stored on the gateway itself.
  */
 export type Assignment = z.infer<typeof $Assignment>;
-export const $Assignment = z.object({
+
+export const $Assignment = $BaseModel.extend({
   completedAt: z.coerce.date().nullable(),
-  createdAt: z.coerce.date(),
-  data: $Json.nullable(),
   expiresAt: z.coerce.date(),
-  id: z.string(),
-  instrumentBundle: z.string().min(1),
   instrumentId: z.string().min(1),
   status: $AssignmentStatus,
   subjectId: z.string().min(1),
