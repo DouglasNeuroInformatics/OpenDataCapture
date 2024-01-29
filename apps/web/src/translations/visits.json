@@ -19,6 +19,16 @@
       "fr": "Date d'évaluation"
     }
   },
+  "errors": {
+    "assessmentMustBeInPast": {
+      "en": "The assessment must be in the past",
+      "fr": "L'évaluation doit être dans le passé"
+    },
+    "mustBeAdult": {
+      "en": "The subject must be at least 18 years old",
+      "fr": "Le client doit avoir au moins 18 ans"
+    }
+  },
   "subjectIdentification": {
     "description": {
       "en": "The following items are used to compute a unique identifier that enables consistent cross-visit identification.",
