@@ -9,7 +9,7 @@ router.get(
   '/assignments/:id',
   ah(async (req, res, next) => {
     const id = req.params.id;
-    const assignment = await prisma.assignmentModel.findFirst({
+    const assignment = await prisma.remoteAssignmentModel.findFirst({
       where: { id }
     });
     if (!assignment) {

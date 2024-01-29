@@ -1,8 +1,12 @@
 import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import type { Assignment, CreateAssignmentRelayData } from '@open-data-capture/common/assignment';
-import { $Assignment, $CreateAssignmentResponseBody } from '@open-data-capture/common/assignment';
+import type {
+  Assignment,
+  CreateAssignmentRelayData,
+  MutateAssignmentResponseBody
+} from '@open-data-capture/common/assignment';
+import { $Assignment, $MutateAssignmentResponseBody } from '@open-data-capture/common/assignment';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 import type { EntityOperationOptions } from '@/core/types';
@@ -22,7 +26,7 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
   }
 
-  async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto) {
+  async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto): Promise<MutateAssignmentResponseBody> {
     const instrument = await this.instrumentsService.findById(instrumentId);
     const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, {
       expiresAt,
@@ -30,7 +34,12 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
       instrumentId: instrument.id,
       subjectId
     } satisfies CreateAssignmentRelayData);
-    return $CreateAssignmentResponseBody.parseAsync(response.data);
+    return $MutateAssignmentResponseBody.parseAsync(response.data);
+  }
+
+  async deleteById(id: string): Promise<MutateAssignmentResponseBody> {
+    const response = await this.httpService.axiosRef.delete(`${this.gatewayBaseUrl}/api/assignments/${id}`);
+    return $MutateAssignmentResponseBody.parseAsync(response.data);
   }
 
   async find({ subjectId }: { subjectId?: string } = {}, { ability }: EntityOperationOptions = {}) {
@@ -43,7 +52,6 @@ export class AssignmentsService implements Pick<EntityService<Assignment>, 'crea
     if (!ability) {
       return assignments;
     }
-
     return assignments;
   }
 }

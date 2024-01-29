@@ -5,6 +5,10 @@ import type { SubjectIdentificationData } from '@open-data-capture/common/subjec
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+const EIGHTEEN_YEARS = 568025136000;
+
+const MIN_DATE_OF_BIRTH = new Date(Date.now() - EIGHTEEN_YEARS);
+
 export type AddVisitFormData = SubjectIdentificationData & {
   date: Date;
 };
@@ -69,9 +73,9 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
       validationSchema={z.object({
         firstName: z.string(),
         lastName: z.string(),
-        dateOfBirth: z.date(),
+        dateOfBirth: z.date().max(MIN_DATE_OF_BIRTH, { message: t('visits:errors.mustBeAdult') }),
         sex: z.enum(['MALE', 'FEMALE']),
-        date: z.date()
+        date: z.date().max(new Date(), { message: t('visits:errors.assessmentMustBeInPast') })
       })}
       onSubmit={onSubmit}
     />

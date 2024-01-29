@@ -14,6 +14,7 @@ import { queryClient } from '@/services/react-query';
 
 import './services/axios';
 import './services/i18n';
+import './services/zod';
 
 export const App = () => {
   return (

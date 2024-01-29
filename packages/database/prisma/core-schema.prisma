@@ -8,6 +8,28 @@ datasource db {
   url      = env("CORE_DATABASE_URL")
 }
 
+// Assignments
+
+enum AssignmentStatus {
+  CANCELED
+  COMPLETE
+  EXPIRED
+  OUTSTANDING
+}
+
+model AssignmentModel {
+  createdAt        DateTime               @default(now()) @db.Date
+  updatedAt        DateTime               @updatedAt @db.Date
+  id               String                 @id @map("_id")
+  completedAt      DateTime?
+  expiresAt        DateTime
+  instrumentRecord InstrumentRecordModel?
+  status           AssignmentStatus
+  subject          SubjectModel           @relation(fields: [subjectId], references: [id])
+  subjectId        String
+  url              String
+}
+
 // Groups
 
 model GroupModel {
@@ -20,24 +42,25 @@ model GroupModel {
   subjectIds        String[]
   userIds           String[]                @db.ObjectId
   users             UserModel[]             @relation(fields: [userIds], references: [id])
-  VisitModel        VisitModel[]
+  visits            VisitModel[]
 }
 
 /// Instrument Records
 
 model InstrumentRecordModel {
-  createdAt    DateTime        @default(now()) @db.Date
-  updatedAt    DateTime        @updatedAt @db.Date
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime         @default(now()) @db.Date
+  updatedAt    DateTime         @updatedAt @db.Date
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
   data         Json?
-  date         DateTime        @db.Date
-  group        GroupModel?     @relation(fields: [groupId], references: [id])
-  groupId      String?         @db.ObjectId
-  subject      SubjectModel    @relation(fields: [subjectId], references: [id])
+  date         DateTime         @db.Date
+  group        GroupModel?      @relation(fields: [groupId], references: [id])
+  groupId      String?          @db.ObjectId
+  subject      SubjectModel     @relation(fields: [subjectId], references: [id])
   subjectId    String
-  instrument   InstrumentModel @relation(fields: [instrumentId], references: [id])
-  instrumentId String          @db.ObjectId
-  assignmentId String?
+  instrument   InstrumentModel  @relation(fields: [instrumentId], references: [id])
+  instrumentId String           @db.ObjectId
+  assignment   AssignmentModel? @relation(fields: [assignmentId], references: [id])
+  assignmentId String?          @unique
 }
 
 // Instruments 
@@ -93,7 +116,8 @@ model SubjectModel {
   lastName          String?
   sex               Sex
   instrumentRecords InstrumentRecordModel[]
-  VisitModel        VisitModel[]
+  visits            VisitModel[]
+  assignments       AssignmentModel[]
 }
 
 enum BasePermissionLevel {
