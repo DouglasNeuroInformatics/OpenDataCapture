@@ -23,19 +23,23 @@ export class GatewayService {
     this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
   }
 
-  async createRemoteAssignment({
-    expiresAt,
-    instrumentId,
-    subjectId
-  }: Assignment): Promise<MutateAssignmentResponseBody> {
-    const instrument = await this.instrumentsService.findById(instrumentId);
+  async createRemoteAssignment(assignment: Assignment): Promise<MutateAssignmentResponseBody> {
+    const instrument = await this.instrumentsService.findById(assignment.instrumentId);
     const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, {
-      expiresAt,
-      instrumentBundle: instrument.bundle,
-      instrumentId: instrument.id,
-      subjectId
+      ...assignment,
+      instrumentBundle: instrument.bundle
     } satisfies CreateRemoteAssignmentData);
     if (response.status !== HttpStatus.CREATED) {
+      throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
+        cause: response.statusText
+      });
+    }
+    return $MutateAssignmentResponseBody.parseAsync(response.data);
+  }
+
+  async deleteRemoteAssignment(id: string): Promise<MutateAssignmentResponseBody> {
+    const response = await this.httpService.axiosRef.delete(`${this.gatewayBaseUrl}/api/assignments/${id}`);
+    if (response.status !== HttpStatus.OK) {
       throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
         cause: response.statusText
       });

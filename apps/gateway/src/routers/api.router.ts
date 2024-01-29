@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@open-data-capture/common/assignment';
 import type {
   AssignmentStatus,
@@ -9,7 +7,6 @@ import type {
 import { $Json } from '@open-data-capture/common/core';
 import { Router } from 'express';
 
-import { CONFIG } from '@/config';
 import { prisma } from '@/lib/prisma';
 import { ah } from '@/utils/async-handler';
 import { HttpException } from '@/utils/http-exception';
@@ -47,18 +44,10 @@ router.post(
     if (!result.success) {
       throw new HttpException(400, 'Bad Request');
     }
-    const createdAt = new Date();
-    const id = crypto.randomUUID();
     await prisma.remoteAssignmentModel.create({
-      data: {
-        createdAt,
-        id,
-        status: 'OUTSTANDING',
-        url: `${CONFIG.baseUrl}/assignments/${id}`,
-        ...result.data
-      }
+      data: result.data
     });
-    res.status(200).send({ success: true } satisfies MutateAssignmentResponseBody);
+    res.status(201).send({ success: true } satisfies MutateAssignmentResponseBody);
   })
 );
 

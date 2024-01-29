@@ -1,4 +1,4 @@
-import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import type { RemoteAssignment } from '@open-data-capture/common/assignment';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
@@ -24,49 +24,45 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   }
 
   private async sync() {
-    this.logger.verbose('Synchronizing with gateway...');
+    this.logger.log('Synchronizing with gateway...');
     let remoteAssignments: RemoteAssignment[];
     try {
       remoteAssignments = await this.gatewayService.fetchRemoteAssignments();
     } catch (err) {
-      this.logger.error(err);
+      this.logger.error('Failed to Fetch Remote Assignments', err);
       return;
     }
 
     this.logger.log(remoteAssignments);
-    return Promise.resolve(undefined);
 
-    // let assignments: Assignment[];
-    // try {
-    //   assignments = await this.assignmentsService.find();
-    // } catch (err) {
-    //   if (isAxiosError(err)) {
-    //     this.logger.warn(err.code);
-    //   } else {
-    //     this.logger.error(err);
-    //   }
-    //   return;
-    // }
-
-    // for (const assignment of assignments) {
-    //   if (assignment.status !== 'COMPLETE' || !assignment.data) {
-    //     continue;
-    //   }
-
-    //   const isExisting = await this.instrumentRecordsService.exists({ assignmentId: assignment.id });
-    //   if (isExisting) {
-    //     continue;
-    //   }
-    //   const record = await this.instrumentRecordsService.create({
-    //     assignmentId: assignment.id,
-    //     data: assignment.data,
-    //     date: assignment.completedAt!,
-    //     instrumentId: assignment.instrumentId,
-    //     subjectId: assignment.subjectId
-    //   });
-    //   this.logger.log(`Created record with ID: ${record.id}`);
-
-    //   await this.assignmentsService.deleteById(assignment.id);
-    // }
+    const completedAssignments = remoteAssignments.filter((assignment) => assignment.status === 'COMPLETE');
+    for (const assignment of completedAssignments) {
+      if (!assignment.data) {
+        this.logger.error(`Data is undefined for completed assignment with id '${assignment.id}'`);
+        continue;
+      }
+      const record = await this.instrumentRecordsService.create({
+        assignmentId: assignment.id,
+        data: assignment.data,
+        date: assignment.completedAt!,
+        instrumentId: assignment.instrumentId,
+        subjectId: assignment.subjectId
+      });
+      this.logger.log(`Created record with ID: ${record.id}`);
+      try {
+        await this.gatewayService.deleteRemoteAssignment(assignment.id);
+      } catch (err) {
+        this.logger.error('Failed to Delete Remote Assignments', err);
+        try {
+          await this.instrumentRecordsService.deleteById(record.id);
+        } catch (err) {
+          throw new InternalServerErrorException(`Failed to Delete Record with ID: ${record.id}`, {
+            cause: err
+          });
+        }
+        this.logger.log(`Deleted Record with ID: ${record.id}`);
+      }
+    }
+    this.logger.log('Done synchronizing with gateway');
   }
 }
