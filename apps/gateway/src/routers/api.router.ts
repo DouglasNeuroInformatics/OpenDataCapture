@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 import {
-  $CreateAssignmentRelayData,
+  $CreateRemoteAssignmentData,
   $UpdateAssignmentData,
   type Assignment,
   type AssignmentStatus,
@@ -44,7 +44,7 @@ router.get(
 router.post(
   '/assignments',
   ah(async (req, res) => {
-    const result = await $CreateAssignmentRelayData.safeParseAsync(req.body);
+    const result = await $CreateRemoteAssignmentData.safeParseAsync(req.body);
     if (!result.success) {
       throw new HttpException(400, 'Bad Request');
     }

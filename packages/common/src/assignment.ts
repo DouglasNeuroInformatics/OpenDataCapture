@@ -32,8 +32,8 @@ export const $CreateAssignmentData = z.object({
 });
 
 /** The DTO transferred from the core API to the external gateway when creating an assignment */
-export type CreateAssignmentRelayData = z.infer<typeof $CreateAssignmentRelayData>;
-export const $CreateAssignmentRelayData = $CreateAssignmentData.extend({
+export type CreateRemoteAssignmentData = z.infer<typeof $CreateRemoteAssignmentData>;
+export const $CreateRemoteAssignmentData = $CreateAssignmentData.extend({
   instrumentBundle: z.string().min(1)
 });
 
