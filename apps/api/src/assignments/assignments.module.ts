@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 
 import { GatewayModule } from '@/gateway/gateway.module';
 import { PrismaModule } from '@/prisma/prisma.module';
@@ -9,7 +9,7 @@ import { AssignmentsService } from './assignments.service';
 @Module({
   controllers: [AssignmentsController],
   exports: [AssignmentsService],
-  imports: [GatewayModule, PrismaModule.forFeature('Assignment')],
+  imports: [forwardRef(() => GatewayModule), PrismaModule.forFeature('Assignment')],
   providers: [AssignmentsService]
 })
 export class AssignmentsModule {}
