@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 const $Config = z
   .object({
-    authToken: z.string().min(32),
+    apiKey: z.string().min(32),
     baseUrl: z.string().url(),
     devServerPort: z.coerce.number().int().positive().optional(),
     mode: z.enum(['development', 'production']),
@@ -23,7 +23,7 @@ const $Config = z
   }));
 
 export const CONFIG = await $Config.parseAsync({
-  authToken: process.env.GATEWAY_AUTH_TOKEN,
+  apiKey: process.env.GATEWAY_API_KEY,
   baseUrl: process.env.GATEWAY_BASE_URL,
   devServerPort: process.env.GATEWAY_DEV_SERVER_PORT,
   mode: process.env.NODE_ENV,

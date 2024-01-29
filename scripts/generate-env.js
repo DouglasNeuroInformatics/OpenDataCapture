@@ -32,7 +32,7 @@ let env = await fs.readFile(path.resolve(projectRoot, '.env.template'), 'utf-8')
 env = env.replace('PROJECT_ROOT=', `PROJECT_ROOT=${projectRoot}`);
 env = env.replace('SECRET_KEY=', `SECRET_KEY=${secretKey}`);
 env = env.replace('GATEWAY_DATABASE_URL=', `GATEWAY_DATABASE_URL=${gatewayDbUrl}`);
-env = env.replace('GATEWAY_AUTH_TOKEN=', 'GATEWAY_AUTH_TOKEN=' + (await generateSecureToken()));
+env = env.replace('GATEWAY_API_KEY=', 'GATEWAY_API_KEY=' + (await generateSecureToken()));
 
 const filepath = path.resolve(projectRoot, '.env');
 await fs.writeFile(filepath, env, 'utf-8').then(() => {
