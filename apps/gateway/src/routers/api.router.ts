@@ -1,11 +1,10 @@
 import crypto from 'crypto';
 
-import {
-  $CreateRemoteAssignmentData,
-  $UpdateAssignmentData,
-  type Assignment,
-  type AssignmentStatus,
-  type MutateAssignmentResponseBody
+import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@open-data-capture/common/assignment';
+import type {
+  AssignmentStatus,
+  MutateAssignmentResponseBody,
+  RemoteAssignment
 } from '@open-data-capture/common/assignment';
 import { $Json } from '@open-data-capture/common/core';
 import { Router } from 'express';
@@ -35,7 +34,7 @@ router.get(
           ...assignment,
           data: assignment.data ? $Json.parse(assignment.data) : null,
           status: assignment.status as AssignmentStatus
-        } satisfies Assignment;
+        } satisfies RemoteAssignment;
       })
     );
   })

@@ -6,6 +6,7 @@ import type { Assignment, UpdateAssignmentData } from '@open-data-capture/common
 import { accessibleQuery } from '@/ability/ability.utils';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import type { EntityOperationOptions } from '@/core/types';
+import { GatewayService } from '@/gateway/gateway.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
 
@@ -16,8 +17,9 @@ export class AssignmentsService {
   private readonly gatewayBaseUrl: string;
 
   constructor(
+    @InjectModel('Assignment') private readonly assignmentModel: Model<'Assignment'>,
     configurationService: ConfigurationService,
-    @InjectModel('Assignment') private readonly assignmentModel: Model<'Assignment'>
+    private readonly gatewayService: GatewayService
   ) {
     this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
   }
@@ -42,6 +44,12 @@ export class AssignmentsService {
         url: `${this.gatewayBaseUrl}/assignments/${id}`
       }
     });
+    try {
+      await this.gatewayService.createRemoteAssignment(assignment);
+    } catch (err) {
+      await this.assignmentModel.delete({ where: { id } });
+      throw err;
+    }
     return assignment;
   }
 

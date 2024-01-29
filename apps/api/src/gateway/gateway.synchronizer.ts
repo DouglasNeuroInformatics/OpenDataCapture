@@ -1,10 +1,10 @@
 import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
-import { type Assignment } from '@open-data-capture/common/assignment';
-import { isAxiosError } from 'axios';
+import type { RemoteAssignment } from '@open-data-capture/common/assignment';
 
-import { AssignmentsService } from '@/assignments/assignments.service';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
+
+import { GatewayService } from './gateway.service';
 
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap {
@@ -13,7 +13,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
   constructor(
     configurationService: ConfigurationService,
-    private readonly assignmentsService: AssignmentsService,
+    private readonly gatewayService: GatewayService,
     private readonly instrumentRecordsService: InstrumentRecordsService
   ) {
     this.refreshInterval = configurationService.get('GATEWAY_REFRESH_INTERVAL');
@@ -24,37 +24,49 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   }
 
   private async sync() {
-    let assignments: Assignment[];
+    this.logger.verbose('Synchronizing with gateway...');
+    let remoteAssignments: RemoteAssignment[];
     try {
-      assignments = await this.assignmentsService.find();
+      remoteAssignments = await this.gatewayService.fetchRemoteAssignments();
     } catch (err) {
-      if (isAxiosError(err)) {
-        this.logger.warn(err.code);
-      } else {
-        this.logger.error(err);
-      }
+      this.logger.error(err);
       return;
     }
 
-    for (const assignment of assignments) {
-      if (assignment.status !== 'COMPLETE' || !assignment.data) {
-        continue;
-      }
+    this.logger.log(remoteAssignments);
+    return Promise.resolve(undefined);
 
-      const isExisting = await this.instrumentRecordsService.exists({ assignmentId: assignment.id });
-      if (isExisting) {
-        continue;
-      }
-      const record = await this.instrumentRecordsService.create({
-        assignmentId: assignment.id,
-        data: assignment.data,
-        date: assignment.completedAt!,
-        instrumentId: assignment.instrumentId,
-        subjectId: assignment.subjectId
-      });
-      this.logger.log(`Created record with ID: ${record.id}`);
+    // let assignments: Assignment[];
+    // try {
+    //   assignments = await this.assignmentsService.find();
+    // } catch (err) {
+    //   if (isAxiosError(err)) {
+    //     this.logger.warn(err.code);
+    //   } else {
+    //     this.logger.error(err);
+    //   }
+    //   return;
+    // }
 
-      await this.assignmentsService.deleteById(assignment.id);
-    }
+    // for (const assignment of assignments) {
+    //   if (assignment.status !== 'COMPLETE' || !assignment.data) {
+    //     continue;
+    //   }
+
+    //   const isExisting = await this.instrumentRecordsService.exists({ assignmentId: assignment.id });
+    //   if (isExisting) {
+    //     continue;
+    //   }
+    //   const record = await this.instrumentRecordsService.create({
+    //     assignmentId: assignment.id,
+    //     data: assignment.data,
+    //     date: assignment.completedAt!,
+    //     instrumentId: assignment.instrumentId,
+    //     subjectId: assignment.subjectId
+    //   });
+    //   this.logger.log(`Created record with ID: ${record.id}`);
+
+    //   await this.assignmentsService.deleteById(assignment.id);
+    // }
   }
 }
