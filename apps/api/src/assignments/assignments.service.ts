@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 import { AsymmetricEncryptionKeyPair } from '@douglasneuroinformatics/crypto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Assignment, UpdateAssignmentData } from '@open-data-capture/common/assignment';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -65,6 +65,16 @@ export class AssignmentsService {
         AND: [accessibleQuery(ability, 'read', 'Assignment'), { subjectId }]
       }
     });
+  }
+
+  async findById(id: string, { ability }: EntityOperationOptions = {}) {
+    const assignment = await this.assignmentModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'read', 'Assignment')], id }
+    });
+    if (!assignment) {
+      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
+    }
+    return assignment;
   }
 
   async updateById(id: string, data: UpdateAssignmentData, { ability }: EntityOperationOptions = {}) {
