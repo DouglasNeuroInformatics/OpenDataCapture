@@ -41,11 +41,12 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     const record = await this.instrumentRecordsService.create({
       assignmentId: assignment.id,
-      data: await decrypter.decrypt(remoteAssignment.encryptedData),
+      data: JSON.parse(await decrypter.decrypt(remoteAssignment.encryptedData)),
       date: completedAt,
       instrumentId: assignment.instrumentId,
       subjectId: assignment.subjectId
     });
+    
     this.logger.log(`Created record with ID: ${record.id}`);
     try {
       await this.gatewayService.deleteRemoteAssignment(assignment.id);
