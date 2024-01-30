@@ -17,6 +17,11 @@ enum AssignmentStatus {
   OUTSTANDING
 }
 
+type EncryptionKeys {
+  publicKey  String
+  privateKey String
+}
+
 model AssignmentModel {
   createdAt        DateTime               @default(now()) @db.Date
   updatedAt        DateTime               @updatedAt @db.Date
@@ -30,6 +35,7 @@ model AssignmentModel {
   subject          SubjectModel           @relation(fields: [subjectId], references: [id])
   subjectId        String
   url              String
+  encryption       EncryptionKeys?
 }
 
 // Groups
