@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { $BaseModel, $Json } from './core';
+import { $BaseModel, $Json, $Uint8Array } from './core';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -36,7 +36,7 @@ export const $CreateAssignmentData = z.object({
 /** The DTO transferred from the core API to the external gateway when creating an assignment */
 export type CreateRemoteAssignmentData = z.infer<typeof $CreateRemoteAssignmentData>;
 export const $CreateRemoteAssignmentData = $RemoteAssignment.omit({ data: true }).extend({
-  publicKey: z.array(z.number().int().min(0).max(255))
+  publicKey: $Uint8Array
 });
 
 export type MutateAssignmentResponseBody = z.infer<typeof $MutateAssignmentResponseBody>;

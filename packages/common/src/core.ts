@@ -65,3 +65,12 @@ export const $BooleanString = z.preprocess((arg) => {
   }
   return arg;
 }, z.boolean());
+
+export const $Uint8Array: z.ZodType<Uint8Array, z.ZodTypeDef, Uint8Array | number[]> = z
+  .union([z.array(z.number().int().min(0).max(255)), z.instanceof(Uint8Array)])
+  .transform((arg) => {
+    if (Array.isArray(arg)) {
+      return new Uint8Array(arg);
+    }
+    return arg;
+  });
