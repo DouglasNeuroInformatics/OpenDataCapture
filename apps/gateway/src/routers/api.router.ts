@@ -1,10 +1,6 @@
 import { Encrypter } from '@douglasneuroinformatics/crypto';
 import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@open-data-capture/common/assignment';
-import type {
-  AssignmentStatus,
-  MutateAssignmentResponseBody,
-  RemoteAssignment
-} from '@open-data-capture/common/assignment';
+import type { AssignmentStatus, MutateAssignmentResponseBody } from '@open-data-capture/common/assignment';
 import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';
@@ -25,12 +21,14 @@ router.get(
         subjectId
       }
     });
+    assignments[0].encryptedData;
     return res.status(200).json(
-      assignments.map((assignment) => {
+      assignments.map(({ encryptedData, ...assignment }) => {
         return {
           ...assignment,
+          encryptedData: encryptedData ? Array.from(encryptedData) : null,
           status: assignment.status as AssignmentStatus
-        } satisfies RemoteAssignment;
+        };
       })
     );
   })
@@ -46,8 +44,9 @@ router.post(
     const { publicKey, ...assignment } = result.data;
     await prisma.remoteAssignmentModel.create({
       data: {
+        ...assignment,
+        completedAt: new Date(),
         rawPublicKey: Buffer.from(publicKey),
-        ...assignment
       }
     });
     res.status(201).send({ success: true } satisfies MutateAssignmentResponseBody);

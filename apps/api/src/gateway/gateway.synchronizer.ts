@@ -35,7 +35,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     const completedAt = assignment.completedAt;
     if (!completedAt) {
-      console.error(`Field 'completedAt' is '${typeof completedAt}' for assignment '${assignment.id}'`);
+      this.logger.error(`Field 'completedAt' is '${typeof completedAt}' for assignment '${assignment.id}'`);
       return;
     }
 
