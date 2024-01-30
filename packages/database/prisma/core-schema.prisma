@@ -17,25 +17,25 @@ enum AssignmentStatus {
   OUTSTANDING
 }
 
-type EncryptionKeys {
-  publicKey  String
-  privateKey String
+type EncryptionKeyPair {
+  publicKey  Int[]
+  privateKey Int[]
 }
 
 model AssignmentModel {
-  createdAt        DateTime               @default(now()) @db.Date
-  updatedAt        DateTime               @updatedAt @db.Date
-  id               String                 @id @map("_id")
-  completedAt      DateTime?
-  expiresAt        DateTime
-  instrument       InstrumentModel        @relation(fields: [instrumentId], references: [id])
-  instrumentId     String                 @db.ObjectId
-  instrumentRecord InstrumentRecordModel?
-  status           AssignmentStatus
-  subject          SubjectModel           @relation(fields: [subjectId], references: [id])
-  subjectId        String
-  url              String
-  encryption       EncryptionKeys?
+  createdAt         DateTime               @default(now()) @db.Date
+  updatedAt         DateTime               @updatedAt @db.Date
+  id                String                 @id @map("_id")
+  completedAt       DateTime?
+  expiresAt         DateTime
+  instrument        InstrumentModel        @relation(fields: [instrumentId], references: [id])
+  instrumentId      String                 @db.ObjectId
+  instrumentRecord  InstrumentRecordModel?
+  status            AssignmentStatus
+  subject           SubjectModel           @relation(fields: [subjectId], references: [id])
+  subjectId         String
+  url               String
+  encryptionKeyPair EncryptionKeyPair
 }
 
 // Groups
