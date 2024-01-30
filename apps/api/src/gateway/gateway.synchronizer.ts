@@ -32,10 +32,17 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     }
     const assignment = await this.assignmentsService.findById(remoteAssignment.id);
     const decrypter = await Decrypter.fromRaw(assignment.encryptionKeyPair.privateKey);
+
+    const completedAt = assignment.completedAt;
+    if (!completedAt) {
+      console.error(`Field 'completedAt' is '${typeof completedAt}' for assignment '${assignment.id}'`);
+      return;
+    }
+
     const record = await this.instrumentRecordsService.create({
       assignmentId: assignment.id,
       data: await decrypter.decrypt(remoteAssignment.encryptedData),
-      date: assignment.completedAt!,
+      date: completedAt,
       instrumentId: assignment.instrumentId,
       subjectId: assignment.subjectId
     });
