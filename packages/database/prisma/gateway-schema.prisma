@@ -18,7 +18,8 @@ model RemoteAssignmentModel {
   expiresAt        DateTime
   instrumentBundle String
   instrumentId     String
-  data             String?
+  publicKey        String
+  data             Bytes?
   status           String
   subjectId        String
   url              String
