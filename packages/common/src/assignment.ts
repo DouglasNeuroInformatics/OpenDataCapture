@@ -35,8 +35,8 @@ export const $CreateAssignmentData = z.object({
 
 /** The DTO transferred from the core API to the external gateway when creating an assignment */
 export type CreateRemoteAssignmentData = z.infer<typeof $CreateRemoteAssignmentData>;
-export const $CreateRemoteAssignmentData = $Assignment.omit({ updatedAt: true }).extend({
-  instrumentBundle: z.string().min(1)
+export const $CreateRemoteAssignmentData = $RemoteAssignment.omit({ data: true }).extend({
+  publicKey: z.array(z.number().int().min(0).max(255))
 });
 
 export type MutateAssignmentResponseBody = z.infer<typeof $MutateAssignmentResponseBody>;
