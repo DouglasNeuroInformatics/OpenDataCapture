@@ -18,8 +18,8 @@ enum AssignmentStatus {
 }
 
 type EncryptionKeyPair {
-  publicKey  Int[]
-  privateKey Int[]
+  publicKey  Bytes
+  privateKey Bytes
 }
 
 model AssignmentModel {

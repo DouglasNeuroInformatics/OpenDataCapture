@@ -1,10 +1,10 @@
+import { Encrypter } from '@douglasneuroinformatics/crypto';
 import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@open-data-capture/common/assignment';
 import type {
   AssignmentStatus,
   MutateAssignmentResponseBody,
   RemoteAssignment
 } from '@open-data-capture/common/assignment';
-import { $Json } from '@open-data-capture/common/core';
 import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';
@@ -29,7 +29,6 @@ router.get(
       assignments.map((assignment) => {
         return {
           ...assignment,
-          data: assignment.data ? $Json.parse(assignment.data) : null,
           status: assignment.status as AssignmentStatus
         } satisfies RemoteAssignment;
       })
@@ -44,8 +43,12 @@ router.post(
     if (!result.success) {
       throw new HttpException(400, 'Bad Request');
     }
+    const { publicKey, ...assignment } = result.data;
     await prisma.remoteAssignmentModel.create({
-      data: result.data
+      data: {
+        rawPublicKey: Buffer.from(publicKey),
+        ...assignment
+      }
     });
     res.status(201).send({ success: true } satisfies MutateAssignmentResponseBody);
   })
@@ -66,12 +69,17 @@ router.patch(
       console.log(result.error);
       throw new HttpException(400, 'Bad Request');
     }
+    const { data, expiresAt, status } = result.data;
+    const publicKey = await assignment.getPublicKey();
+    const encrypter = new Encrypter(publicKey);
+    const encryptedData = data ? Buffer.from(await encrypter.encrypt(JSON.stringify(data))) : null;
+
     await prisma.remoteAssignmentModel.update({
       data: {
         completedAt: result.data.data ? new Date() : undefined,
-        data: JSON.stringify(result.data.data),
-        expiresAt: result.data.expiresAt,
-        status: result.data.data ? ('COMPLETE' satisfies AssignmentStatus) : result.data.status
+        encryptedData,
+        expiresAt,
+        status: data ? ('COMPLETE' satisfies AssignmentStatus) : status
       },
       where: {
         id: assignment.id

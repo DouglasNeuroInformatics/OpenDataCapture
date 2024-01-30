@@ -30,7 +30,7 @@ export class AssignmentsService {
     const id = crypto.randomUUID();
     const assignment = await this.assignmentModel.create({
       data: {
-        encryptionKeyPair: await encryptionKeyPair.toJSON(),
+        encryptionKeyPair: await encryptionKeyPair.toBuffer(),
         expiresAt,
         id,
         instrument: {

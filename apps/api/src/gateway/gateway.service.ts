@@ -4,7 +4,7 @@ import { BadGatewayException, HttpStatus, Injectable } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@open-data-capture/common/assignment';
 import type {
   Assignment,
-  CreateRemoteAssignmentData,
+  CreateRemoteAssignmentInputData,
   MutateAssignmentResponseBody,
   RemoteAssignment
 } from '@open-data-capture/common/assignment';
@@ -33,7 +33,7 @@ export class GatewayService {
       ...assignment,
       instrumentBundle: instrument.bundle,
       publicKey: await publicKey.toJSON()
-    } satisfies CreateRemoteAssignmentData);
+    } satisfies CreateRemoteAssignmentInputData);
     if (response.status !== HttpStatus.CREATED) {
       throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
         cause: response.statusText

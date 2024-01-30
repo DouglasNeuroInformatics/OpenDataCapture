@@ -1,3 +1,4 @@
+import { Decrypter } from '@douglasneuroinformatics/crypto';
 import { Injectable, InternalServerErrorException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import type { RemoteAssignment } from '@open-data-capture/common/assignment';
 
@@ -25,13 +26,15 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     setInterval(() => void this.sync(), this.refreshInterval);
   }
 
-  private async handleAssignmentComplete(assignment: RemoteAssignment) {
-    if (!assignment.data) {
-      throw new Error(`Data is undefined for completed assignment with id '${assignment.id}'`);
+  private async handleAssignmentComplete(remoteAssignment: RemoteAssignment) {
+    if (!remoteAssignment.encryptedData) {
+      throw new Error(`Data is undefined for completed remote assignment with id '${remoteAssignment.id}'`);
     }
+    const assignment = await this.assignmentsService.findById(remoteAssignment.id);
+    const decrypter = await Decrypter.fromRaw(assignment.encryptionKeyPair.privateKey);
     const record = await this.instrumentRecordsService.create({
       assignmentId: assignment.id,
-      data: assignment.data,
+      data: await decrypter.decrypt(remoteAssignment.encryptedData),
       date: assignment.completedAt!,
       instrumentId: assignment.instrumentId,
       subjectId: assignment.subjectId
