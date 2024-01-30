@@ -48,7 +48,7 @@ export class AssignmentsService {
       }
     });
     try {
-      await this.gatewayService.createRemoteAssignment(assignment);
+      await this.gatewayService.createRemoteAssignment(assignment, encryptionKeyPair.publicKey);
     } catch (err) {
       await this.assignmentModel.delete({ where: { id } });
       throw err;

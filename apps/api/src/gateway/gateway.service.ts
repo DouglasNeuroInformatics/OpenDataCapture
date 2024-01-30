@@ -1,3 +1,4 @@
+import type { PublicEncryptionKey } from '@douglasneuroinformatics/crypto';
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, HttpStatus, Injectable } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@open-data-capture/common/assignment';
@@ -23,11 +24,15 @@ export class GatewayService {
     this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
   }
 
-  async createRemoteAssignment(assignment: Assignment): Promise<MutateAssignmentResponseBody> {
+  async createRemoteAssignment(
+    assignment: Assignment,
+    publicKey: PublicEncryptionKey
+  ): Promise<MutateAssignmentResponseBody> {
     const instrument = await this.instrumentsService.findById(assignment.instrumentId);
     const response = await this.httpService.axiosRef.post(`${this.gatewayBaseUrl}/api/assignments`, {
       ...assignment,
-      instrumentBundle: instrument.bundle
+      instrumentBundle: instrument.bundle,
+      publicKey: await publicKey.toJSON()
     } satisfies CreateRemoteAssignmentData);
     if (response.status !== HttpStatus.CREATED) {
       throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
