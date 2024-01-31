@@ -75,6 +75,12 @@ export class InstrumentRecordsService {
     });
   }
 
+  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentRecordModel.delete({
+      where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id }
+    });
+  }
+
   async exists(where: Prisma.InstrumentRecordModelWhereInput): Promise<boolean> {
     return this.instrumentRecordModel.exists(where);
   }

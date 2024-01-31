@@ -12,9 +12,10 @@ import './services/i18n';
 export type RootProps = {
   bundle: string;
   id: string;
+  token: string;
 };
 
-export const Root = ({ bundle, id }: RootProps) => {
+export const Root = ({ bundle, id, token }: RootProps) => {
   const { i18n } = useTranslation('core');
   const notifications = useNotificationsStore();
 
@@ -25,10 +26,18 @@ export const Root = ({ bundle, id }: RootProps) => {
       notifications.addNotification({ type: 'error' });
       return;
     }
-    await axios.patch(`/api/assignments/${id}`, {
-      data: result.data,
-      status: 'COMPLETE'
-    } satisfies UpdateAssignmentData);
+    await axios.patch(
+      `/api/assignments/${id}`,
+      {
+        data: result.data,
+        status: 'COMPLETE'
+      } satisfies UpdateAssignmentData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
     notifications.addNotification({ type: 'success' });
   };
 

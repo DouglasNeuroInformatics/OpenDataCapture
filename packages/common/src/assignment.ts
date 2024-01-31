@@ -1,26 +1,28 @@
 import { z } from 'zod';
 
-import { $Json } from './core';
+import { $BaseModel, $Json, $Uint8Array } from './core';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
 export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
 
 /**
- * An self-contained object representing an assignment. This is stored on the gateway itself.
+ * An self-contained object representing an assignment.
  */
 export type Assignment = z.infer<typeof $Assignment>;
-export const $Assignment = z.object({
+export const $Assignment = $BaseModel.extend({
   completedAt: z.coerce.date().nullable(),
-  createdAt: z.coerce.date(),
-  data: $Json.nullable(),
   expiresAt: z.coerce.date(),
-  id: z.string(),
-  instrumentBundle: z.string().min(1),
   instrumentId: z.string().min(1),
   status: $AssignmentStatus,
   subjectId: z.string().min(1),
   url: z.string().url()
+});
+
+export type RemoteAssignment = z.infer<typeof $RemoteAssignment>;
+export const $RemoteAssignment = $Assignment.omit({ updatedAt: true }).extend({
+  encryptedData: $Uint8Array.nullable(),
+  instrumentBundle: z.string()
 });
 
 /** The DTO transferred from the web client to the core API when creating an assignment */
@@ -32,9 +34,9 @@ export const $CreateAssignmentData = z.object({
 });
 
 /** The DTO transferred from the core API to the external gateway when creating an assignment */
-export type CreateAssignmentRelayData = z.infer<typeof $CreateAssignmentRelayData>;
-export const $CreateAssignmentRelayData = $CreateAssignmentData.extend({
-  instrumentBundle: z.string().min(1)
+export type CreateRemoteAssignmentInputData = z.input<typeof $CreateRemoteAssignmentData>;
+export const $CreateRemoteAssignmentData = $RemoteAssignment.omit({ encryptedData: true }).extend({
+  publicKey: $Uint8Array
 });
 
 export type MutateAssignmentResponseBody = z.infer<typeof $MutateAssignmentResponseBody>;

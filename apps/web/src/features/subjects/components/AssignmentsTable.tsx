@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react';
 import { ClientTable } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment, AssignmentStatus } from '@open-data-capture/common/assignment';
-import { type AnyInstrument } from '@open-data-capture/common/instrument';
-import _ from 'lodash';
+import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
-import { useInstrumentInterpreter } from '@/hooks/useInstrumentInterpreter';
+import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
 
 export type AssignmentTableProps = {
   assignments: Assignment[];
@@ -15,37 +14,23 @@ export type AssignmentTableProps = {
 };
 
 export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTableProps) => {
-  const { i18n, t } = useTranslation('subjects');
-  const [instruments, setInstruments] = useState<Record<string, AnyInstrument>>({});
-  const interpreter = useInstrumentInterpreter();
+  const { t } = useTranslation('subjects');
+  const [instrumentSummaries, setInstrumentSummaries] = useState<Record<string, UnilingualInstrumentSummary>>({});
 
-  // To be moved to backend
-  const evaluateInstruments = async (assignments: Assignment[]) => {
-    const instruments: Record<string, AnyInstrument> = {};
-    const uniqueAssignments = _.uniqWith(assignments, (a, b) => a.id === b.id);
-    for (const assignment of uniqueAssignments) {
-      instruments[assignment.id] = await interpreter.interpret(assignment.instrumentBundle, {
-        validate: import.meta.env.DEV
-      });
-    }
-    return instruments;
-  };
+  const instrumentSummariesQuery = useInstrumentSummaries();
 
   useEffect(() => {
-    evaluateInstruments(assignments).then(setInstruments).catch(console.error);
-  }, [assignments]);
+    if (instrumentSummariesQuery.data) {
+      setInstrumentSummaries(Object.fromEntries(instrumentSummariesQuery.data.map((summary) => [summary.id, summary])));
+    }
+  }, [instrumentSummariesQuery.data]);
 
   return (
     <ClientTable<Assignment>
       columns={[
         {
           field: (entry) => {
-            const altLanguage = i18n.resolvedLanguage === 'en' ? 'fr' : 'en';
-            const title = instruments[entry.instrumentId]?.details.title;
-            if (typeof title === 'string') {
-              return title;
-            }
-            return title?.[i18n.resolvedLanguage!] ?? title?.[altLanguage] ?? entry.instrumentId;
+            return instrumentSummaries[entry.instrumentId]?.details.title ?? entry.instrumentId;
           },
           label: t('assignments.title')
         },

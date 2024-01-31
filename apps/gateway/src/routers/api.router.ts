@@ -1,16 +1,8 @@
-import crypto from 'crypto';
-
-import {
-  $CreateAssignmentRelayData,
-  $UpdateAssignmentData,
-  type Assignment,
-  type AssignmentStatus,
-  type MutateAssignmentResponseBody
-} from '@open-data-capture/common/assignment';
-import { $Json } from '@open-data-capture/common/core';
+import { Encrypter } from '@douglasneuroinformatics/crypto';
+import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@open-data-capture/common/assignment';
+import type { AssignmentStatus, MutateAssignmentResponseBody } from '@open-data-capture/common/assignment';
 import { Router } from 'express';
 
-import { CONFIG } from '@/config';
 import { prisma } from '@/lib/prisma';
 import { ah } from '@/utils/async-handler';
 import { HttpException } from '@/utils/http-exception';
@@ -29,13 +21,14 @@ router.get(
         subjectId
       }
     });
+    assignments[0].encryptedData;
     return res.status(200).json(
-      assignments.map((assignment) => {
+      assignments.map(({ encryptedData, ...assignment }) => {
         return {
           ...assignment,
-          data: assignment.data ? $Json.parse(assignment.data) : null,
+          encryptedData: encryptedData ? Array.from(encryptedData) : null,
           status: assignment.status as AssignmentStatus
-        } satisfies Assignment;
+        };
       })
     );
   })
@@ -44,22 +37,19 @@ router.get(
 router.post(
   '/assignments',
   ah(async (req, res) => {
-    const result = await $CreateAssignmentRelayData.safeParseAsync(req.body);
+    const result = await $CreateRemoteAssignmentData.safeParseAsync(req.body);
     if (!result.success) {
       throw new HttpException(400, 'Bad Request');
     }
-    const createdAt = new Date();
-    const id = crypto.randomUUID();
+    const { publicKey, ...assignment } = result.data;
     await prisma.remoteAssignmentModel.create({
       data: {
-        createdAt,
-        id,
-        status: 'OUTSTANDING',
-        url: `${CONFIG.baseUrl}/assignments/${id}`,
-        ...result.data
+        ...assignment,
+        completedAt: new Date(),
+        rawPublicKey: Buffer.from(publicKey),
       }
     });
-    res.status(200).send({ success: true } satisfies MutateAssignmentResponseBody);
+    res.status(201).send({ success: true } satisfies MutateAssignmentResponseBody);
   })
 );
 
@@ -78,12 +68,17 @@ router.patch(
       console.log(result.error);
       throw new HttpException(400, 'Bad Request');
     }
+    const { data, expiresAt, status } = result.data;
+    const publicKey = await assignment.getPublicKey();
+    const encrypter = new Encrypter(publicKey);
+    const encryptedData = data ? Buffer.from(await encrypter.encrypt(JSON.stringify(data))) : null;
+
     await prisma.remoteAssignmentModel.update({
       data: {
         completedAt: result.data.data ? new Date() : undefined,
-        data: JSON.stringify(result.data.data),
-        expiresAt: result.data.expiresAt,
-        status: result.data.data ? ('COMPLETE' satisfies AssignmentStatus) : result.data.status
+        encryptedData,
+        expiresAt,
+        status: data ? ('COMPLETE' satisfies AssignmentStatus) : status
       },
       where: {
         id: assignment.id
