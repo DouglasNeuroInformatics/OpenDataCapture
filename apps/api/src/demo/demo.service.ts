@@ -57,7 +57,7 @@ export class DemoService {
       this.instrumentsService.create({ kind: 'FORM', source: montrealCognitiveAssessment.source })
     ]);
 
-    await this.instrumentsService.create(breakoutTask);
+    await this.instrumentsService.createFromBundle(breakoutTask);
 
     const groups: Group[] = [];
     for (const group of DEMO_GROUPS) {
