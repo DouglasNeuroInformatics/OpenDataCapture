@@ -15,9 +15,7 @@
       "persistent": true
     },
     "format": {},
-    "lint": {
-      "dependsOn": ["^build:lib"]
-    },
+    "lint": {},
     "test": {
       "dependsOn": ["^build:lib"]
     }

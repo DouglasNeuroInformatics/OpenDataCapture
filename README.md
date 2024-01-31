@@ -85,7 +85,7 @@ By default, the application will run on port 80. So, navigate to `localhost` in 
 
 ## Contribution
 
-We welcome contributions! If you're interested in improving the Data Bank platform or adding new features, please refer to our Contribution Guide.
+We welcome contributions! If you're interested in improving the platform or adding new features, please refer to our Contribution Guide.
 
 ## License
 

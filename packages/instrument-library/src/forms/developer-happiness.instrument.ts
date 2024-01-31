@@ -28,6 +28,7 @@ export default instrumentFactory.defineInstrument({
     title: 'Developer happiness questionnaire',
     description: 'This is where we check if people are unhappy with TypeScript',
     estimatedDuration: 5,
+    license: 'AGPL-3.0',
     instructions: ['You know how to use the web']
   },
   content: {

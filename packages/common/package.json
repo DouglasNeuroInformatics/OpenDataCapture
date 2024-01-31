@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
+    "@open-data-capture/licenses": "workspace:*",
     "zod": "^3.22.4"
   },
   "devDependencies": {

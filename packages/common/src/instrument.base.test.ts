@@ -25,24 +25,32 @@ const enhancedBilingualDetails: EnhancedBaseInstrumentDetails<Language[]> = Obje
     en: ['Foo'],
     fr: ['Foo']
   },
+  license: 'AGPL-3.0',
   title: {
     en: 'Foo',
     fr: 'Foo'
   }
 });
+
 const enhancedUnilingualDetails: EnhancedBaseInstrumentDetails<Language> = Object.freeze({
   description: 'Foo',
   estimatedDuration: 0,
   instructions: ['Foo'],
+  license: 'AGPL-3.0',
   title: 'Foo'
 });
 
 export const bilingualDetails: BaseInstrumentDetails<Language[]> = _.pick(enhancedBilingualDetails, [
   'description',
+  'license',
   'title'
 ]);
 
-const unilingualDetails: BaseInstrumentDetails<Language> = _.pick(enhancedUnilingualDetails, ['description', 'title']);
+const unilingualDetails: BaseInstrumentDetails<Language> = _.pick(enhancedUnilingualDetails, [
+  'description',
+  'license',
+  'title'
+]);
 
 const englishInstrument: BaseInstrument<null, 'en'> = {
   content: null,

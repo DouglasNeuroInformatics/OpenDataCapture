@@ -1,0 +1,7 @@
+{
+  "extends": "../../jsconfig.json",
+  "compilerOptions": {
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"]
+}

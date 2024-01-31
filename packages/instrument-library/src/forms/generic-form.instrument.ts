@@ -96,6 +96,7 @@ export default instrumentFactory.defineInstrument({
     description: 'This example includes a variety of possible field types',
     title: 'Generic Instrument',
     estimatedDuration: 5,
-    instructions: ['Please complete all questions']
-  },
+    instructions: ['Please complete all questions'],
+    license: 'AGPL-3.0'
+  }
 });

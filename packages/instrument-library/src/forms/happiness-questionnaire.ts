@@ -63,6 +63,7 @@ export default instrumentFactory.defineInstrument({
       en: ['Please answer the question based on your current feelings.'],
       fr: ['Veuillez répondre à la question en fonction de vos sentiments actuels.']
     },
+    license: 'AGPL-3.0',
     title: {
       en: 'Happiness Questionnaire',
       fr: 'Questionnaire sur le bonheur'

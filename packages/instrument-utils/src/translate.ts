@@ -226,6 +226,7 @@ function translateForm(form: AnyMultilingualFormInstrument, language: Language):
       description: form.details.description[language],
       estimatedDuration: form.details.estimatedDuration,
       instructions: form.details.instructions?.[language],
+      license: form.details.license,
       title: form.details.title[language]
     },
     language: language,
@@ -258,6 +259,7 @@ export function translateInstrumentSummary(
   return {
     details: {
       description: summary.details.description[targetLanguage],
+      license: summary.details.license,
       title: summary.details.title[targetLanguage]
     },
     id: summary.id,
