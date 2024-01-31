@@ -4,7 +4,11 @@ const { z } = await import('/runtime/v0.0.1/zod.js');
 const instrumentFactory = new InstrumentFactory({
   kind: 'INTERACTIVE',
   language: 'en',
-  validationSchema: z.any()
+  validationSchema: z.object({
+    livesRemaining: z.number().int(),
+    timeElapsed: z.number(),
+    win: z.boolean()
+  })
 });
 
 export default instrumentFactory.defineInstrument({
@@ -12,7 +16,9 @@ export default instrumentFactory.defineInstrument({
     assets: {
       css: [import.meta.injectStylesheet('./breakout-task.styles.css')]
     },
-    render() {
+    render(done) {
+      const startTime = Date.now();
+
       const canvas = document.createElement('canvas');
       canvas.height = 320;
       canvas.width = 480;
@@ -84,8 +90,11 @@ export default instrumentFactory.defineInstrument({
                 b.status = 0;
                 score++;
                 if (score === brickRowCount * brickColumnCount) {
-                  alert('YOU WIN, CONGRATS!');
-                  document.location.reload();
+                  done({
+                    livesRemaining: lives,
+                    timeElapsed: Date.now() - startTime,
+                    win: true
+                  });
                 }
               }
             }
@@ -155,8 +164,11 @@ export default instrumentFactory.defineInstrument({
           } else {
             lives--;
             if (!lives) {
-              alert('GAME OVER');
-              document.location.reload();
+              done({
+                livesRemaining: lives,
+                timeElapsed: Date.now() - startTime,
+                win: false
+              });
             } else {
               x = canvas.width / 2;
               y = canvas.height - 30;
