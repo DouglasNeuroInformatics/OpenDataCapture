@@ -36,13 +36,18 @@ export class InstrumentsService {
     if (await this.instrumentModel.exists({ name: instance.name })) {
       throw new ConflictException(`Instrument with name '${instance.name}' already exists!`);
     }
+
     this.logger.debug(`Instrument '${instance.name}' does not exist`);
 
     return this.instrumentModel.create({
       data: {
+        ..._.omit({ ...instance }, ['content', 'measures', 'validationSchema']),
         bundle,
-        source,
-        ..._.omit(instance, ['content', 'measures', 'validationSchema'])
+        details: {
+          ...instance.details,
+          authors: instance.details.authors ?? []
+        },
+        source
       }
     });
   }

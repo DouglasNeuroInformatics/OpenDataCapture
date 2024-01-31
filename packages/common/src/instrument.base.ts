@@ -74,8 +74,8 @@ export const $InstrumentUIOption = <TLanguage extends InstrumentLanguage, TSchem
  * @typeParam TLanguage - the language(s) of the instrument
  */
 export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
-  /** The legal person that holds copyright to the instrument */
-  author?: string;
+  /** The legal person(s) that created the instrument and hold copyright to the instrument */
+  authors?: string[];
 
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
@@ -95,6 +95,7 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
 
 export const $BaseInstrumentDetails = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
+    authors: z.array(z.string()).optional(),
     description: $InstrumentUIOption(z.string().min(1), language),
     license: $LicenseIdentifier,
     referenceUrl: z.string().url().optional(),
