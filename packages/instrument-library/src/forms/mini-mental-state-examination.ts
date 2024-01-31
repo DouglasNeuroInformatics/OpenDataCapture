@@ -445,6 +445,7 @@ export default instrumentFactory.defineInstrument({
         "Si la personne vous interrompt (par exemple pour demander l'objet d'une question), vous devez répondre : \"Je vous expliquerai dans quelques minutes, lorsque nous aurons terminé. Maintenant, si nous pouvions continuer, s'il vous plaît. Nous avons presque terminé\"."
       ]
     },
+    license: 'UNLICENSED',
     title: {
       en: 'Mini Mental State Examination',
       fr: "Mini-examen de l'état mental"

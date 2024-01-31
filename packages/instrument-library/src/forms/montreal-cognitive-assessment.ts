@@ -125,6 +125,7 @@ export default instrumentFactory.defineInstrument({
       en: ['All instructions may be repeated once.'],
       fr: ['Toutes les instructions peuvent être répétées une fois.']
     },
+    license: 'UNLICENSED',
     title: {
       en: 'Montreal Cognitive Assessment',
       fr: 'Montreal Cognitive Assessment'

@@ -818,6 +818,7 @@ export default instrumentFactory.defineInstrument({
         "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
       ]
     },
+    license: 'AGPL-3.0',
     title: {
       en: 'Enhanced Demographics Questionnaire',
       fr: 'Questionnaire démographique détaillé'
