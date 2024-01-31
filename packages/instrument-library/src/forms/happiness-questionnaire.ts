@@ -71,11 +71,8 @@ export default instrumentFactory.defineInstrument({
   },
   measures: {
     overallHappiness: {
-      label: {
-        en: 'Overall Happiness',
-        fr: 'Bonheur général'
-      },
-      value: ({ overallHappiness }) => overallHappiness
+      kind: 'const',
+      ref: 'overallHappiness'
     }
   }
 });
