@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';
 import { ah } from '@/utils/async-handler';
+import { generateToken } from '@/utils/auth';
 
 const router = Router();
 
@@ -15,7 +16,8 @@ router.get(
     if (!assignment) {
       return next();
     }
-    const html = res.locals.loadRoot({ bundle: assignment.instrumentBundle, id });
+    const token = await generateToken(assignment.id);
+    const html = res.locals.loadRoot({ bundle: assignment.instrumentBundle, id, token });
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
   })
 );

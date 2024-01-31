@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 export const $Configuration = z.object({
   API_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),
+  GATEWAY_API_KEY: z.string().min(32),
   GATEWAY_BASE_URL: z.string().url(),
   GATEWAY_ENABLED: $BooleanString,
   GATEWAY_REFRESH_INTERVAL: z.coerce.number().positive().int(),

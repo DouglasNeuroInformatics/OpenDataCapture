@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 
-export const notFound: RequestHandler = (_, res) => {
+export const notFoundMiddleware: RequestHandler = (_, res) => {
   res
     .status(404)
     .set({ 'Content-Type': 'text/html' })
