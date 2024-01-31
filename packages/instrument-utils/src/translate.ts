@@ -213,7 +213,7 @@ function translateMeasures(
       case 'computed':
         return { ...measure, label: measure.label[language] };
       default:
-        return measure;
+        return { ...measure, label: measure.label?.[language] };
     }
   });
 }
