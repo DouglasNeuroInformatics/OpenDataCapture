@@ -74,11 +74,20 @@ export const $InstrumentUIOption = <TLanguage extends InstrumentLanguage, TSchem
  * @typeParam TLanguage - the language(s) of the instrument
  */
 export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+  /** The legal person that holds copyright to the instrument */
+  author?: string;
+
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
 
   /** An identifier corresponding to the SPDX license list version d2709ad (released on 2024-01-30) */
   license: LicenseIdentifier;
+
+  /** An reference link where the user can learn more about the instrument */
+  referenceUrl?: string;
+
+  /** A URL where the user can find the source code for the instrument */
+  sourceUrl?: string;
 
   /** The title of the instrument in the language it is written, omitting the definite article */
   title: InstrumentUIOption<TLanguage, string>;
@@ -88,6 +97,8 @@ export const $BaseInstrumentDetails = <TLanguage extends InstrumentLanguage>(lan
   return z.object({
     description: $InstrumentUIOption(z.string().min(1), language),
     license: $LicenseIdentifier,
+    referenceUrl: z.string().url().optional(),
+    sourceUrl: z.string().url().optional(),
     title: $InstrumentUIOption(z.string().min(1), language)
   }) as z.ZodType<BaseInstrumentDetails<TLanguage>>;
 };

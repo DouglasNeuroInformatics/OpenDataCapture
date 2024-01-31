@@ -72,12 +72,15 @@ enum InstrumentKind {
 }
 
 type InstrumentDetails {
+  author            String?
   // string | Record<Language, string>
   description       Json
   estimatedDuration Int
   // string | string[] | Record<Language, string | string[]>
   instructions      Json
   license           String
+  referenceUrl      String?
+  sourceUrl         String?
   // string | Record<Language, string>
   title             Json
 }
