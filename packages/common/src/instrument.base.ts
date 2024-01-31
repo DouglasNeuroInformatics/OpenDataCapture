@@ -95,11 +95,11 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
 
 export const $BaseInstrumentDetails = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
-    authors: z.array(z.string()).optional(),
+    authors: z.array(z.string()).nullish(),
     description: $InstrumentUIOption(z.string().min(1), language),
     license: $LicenseIdentifier,
-    referenceUrl: z.string().url().optional(),
-    sourceUrl: z.string().url().optional(),
+    referenceUrl: z.string().url().nullish(),
+    sourceUrl: z.string().url().nullish(),
     title: $InstrumentUIOption(z.string().min(1), language)
   }) as z.ZodType<BaseInstrumentDetails<TLanguage>>;
 };
