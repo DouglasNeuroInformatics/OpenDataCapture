@@ -1,4 +1,5 @@
 import type { PureAbility, RawRuleOf } from '@casl/ability';
+import { type LicenseIdentifier, licenses } from '@open-data-capture/licenses';
 import { z } from 'zod';
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
@@ -65,3 +66,9 @@ export const $BooleanString = z.preprocess((arg) => {
   }
   return arg;
 }, z.boolean());
+
+export const $LicenseIdentifier = z.string().refine((arg) => licenses.has(arg as any)) as z.ZodType<
+  LicenseIdentifier,
+  z.ZodTypeDef,
+  string
+>;

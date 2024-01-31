@@ -1,8 +1,9 @@
+import type { LicenseIdentifier } from '@open-data-capture/licenses';
 import _ from 'lodash';
 import type { Simplify } from 'type-fest';
 import { z } from 'zod';
 
-import { $Language, $ZodTypeAny } from './core';
+import { $Language, $LicenseIdentifier, $ZodTypeAny } from './core';
 
 import type { Language } from './core';
 
@@ -76,6 +77,9 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
 
+  /** An identifier corresponding to the SPDX license list version d2709ad (released on 2024-01-30) */
+  license: LicenseIdentifier;
+
   /** The title of the instrument in the language it is written, omitting the definite article */
   title: InstrumentUIOption<TLanguage, string>;
 };
@@ -83,6 +87,7 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
 export const $BaseInstrumentDetails = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
     description: $InstrumentUIOption(z.string().min(1), language),
+    license: $LicenseIdentifier,
     title: $InstrumentUIOption(z.string().min(1), language)
   }) as z.ZodType<BaseInstrumentDetails<TLanguage>>;
 };
