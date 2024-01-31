@@ -51,6 +51,12 @@
       "fr": "Titre"
     }
   },
+  "errors": {
+    "expiryMustBeInFuture": {
+      "en": "The expiry date must be in the future",
+      "fr": "La date d'expiration doit être dans le futur"
+    }
+  },
   "index": {
     "lookup": {
       "title": {

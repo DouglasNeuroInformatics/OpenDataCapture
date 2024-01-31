@@ -2,7 +2,7 @@ import { Button, Slider } from '@douglasneuroinformatics/ui';
 import type { Assignment } from '@open-data-capture/common/assignment';
 import { useTranslation } from 'react-i18next';
 
-import { useEvalInstrumentBundle } from '@/hooks/useEvalInstrumentBundle';
+import { useInstrument } from '@/hooks/useInstrument';
 
 export type AssignmentSliderProps = {
   assignment: Assignment | null;
@@ -13,17 +13,12 @@ export type AssignmentSliderProps = {
 
 /** Component for modifying an existing assignment */
 export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: AssignmentSliderProps) => {
-  const { i18n, t } = useTranslation(['core', 'subjects']);
-  const instrument = useEvalInstrumentBundle(assignment?.instrumentBundle);
-
-  const title =
-    typeof instrument?.details.title === 'string'
-      ? instrument?.details.title
-      : instrument?.details.title[i18n.resolvedLanguage!];
+  const { t } = useTranslation(['core', 'subjects']);
+  const instrument = useInstrument(assignment?.instrumentId ?? null);
 
   return (
-    <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={title}>
-      {title && (
+    <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={instrument?.details.title}>
+      {instrument && (
         <div className="flex h-full flex-col">
           <div className="flex gap-1 text-sm">
             <a
