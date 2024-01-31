@@ -122,8 +122,8 @@ export const $EnhancedBaseInstrumentDetails = <TLanguage extends InstrumentLangu
   ) as z.ZodType<EnhancedBaseInstrumentDetails<TLanguage>>;
 };
 
-type InstrumentMeasureValue = z.infer<typeof $InstrumentMeasureValue>;
-const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.date()]);
+export type InstrumentMeasureValue = z.infer<typeof $InstrumentMeasureValue>;
+export const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.date()]);
 
 export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Record<
   string,
