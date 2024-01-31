@@ -5,6 +5,8 @@ import type { CreateAssignmentData } from '@open-data-capture/common/assignment'
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+const ONE_YEAR = 31556952000;
+
 export type AssignmentModalProps = {
   instrumentOptions: Record<string, string>;
   isOpen: boolean;
@@ -29,6 +31,9 @@ export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen
             kind: 'date',
             label: t('assignments.expiresAt')
           }
+        }}
+        initialValues={{
+          expiresAt: new Date(Date.now() + ONE_YEAR)
         }}
         validationSchema={z.object({
           expiresAt: z.coerce.date().min(new Date(), { message: t('errors.expiryMustBeInFuture') }),
