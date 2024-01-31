@@ -128,6 +128,11 @@ const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.
 export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Record<
   string,
   | {
+      kind: 'computed';
+      label: InstrumentUIOption<TLanguage, string>;
+      value: (data: TData) => InstrumentMeasureValue;
+    }
+  | {
       kind: 'const';
       ref: TData extends Record<string, any>
         ? ConditionalKeys<TData, InstrumentMeasureValue> extends infer K
@@ -137,11 +142,6 @@ export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage
           : never
         : never;
     }
-  | {
-      kind?: 'computed';
-      label: InstrumentUIOption<TLanguage, string>;
-      value: (data: TData) => InstrumentMeasureValue;
-    }
 >;
 
 export type UnilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language>;
@@ -150,13 +150,13 @@ export type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TDa
 const $ComputeMeasureFunction = z.function().args(z.any()).returns($InstrumentMeasureValue);
 
 const $ComputedInstrumentMeasure = z.object({
-  kind: z.literal('computed').optional(),
+  kind: z.literal('computed'),
   label: $InstrumentUIOption(z.string()),
   value: $ComputeMeasureFunction
-}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind?: 'computed' }>>;
+}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind: 'computed' }>>;
 
 const $UnilingualComputedInstrumentMeasure = z.object({
-  kind: z.literal('computed').optional(),
+  kind: z.literal('computed'),
   label: z.string(),
   value: $ComputeMeasureFunction
 }) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind?: 'computed' }>>;
