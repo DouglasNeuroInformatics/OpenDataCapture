@@ -2,6 +2,7 @@ import path from 'path';
 import url from 'url';
 
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
@@ -44,6 +45,7 @@ export default defineConfig([
         preventAssignment: false,
         'process.env.NODE_ENV': `"${MODE}"`
       }),
+      json(),
       typescript()
     ]
   },
@@ -67,6 +69,7 @@ export default defineConfig([
         extensions: ['.js', '.ts'],
         rootDir: ROOT_DIR
       }),
+      json(),
       dts({
         respectExternal: true
       })
