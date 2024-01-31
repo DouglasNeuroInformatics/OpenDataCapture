@@ -134,6 +134,7 @@ export default instrumentFactory.defineInstrument({
     description: 'This reaction time task is a non-trivial proof of concept with jspsych.',
     estimatedDuration: 1,
     instructions: ['The user will be displayed instructions on the screen'],
+    license: 'MIT',
     title: 'Reaction Time Task'
   },
   name: 'ReactionTimeTask',

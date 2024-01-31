@@ -64,6 +64,7 @@ export default instrumentFactory.defineInstrument({
     instructions: [
       'When you begin this task, a 10 second countdown will begin. Please click the button as many times as you can before it expires.'
     ],
+    license: 'AGPL-3.0',
     title: 'Click Task'
   },
   name: 'InteractiveInstrument',
