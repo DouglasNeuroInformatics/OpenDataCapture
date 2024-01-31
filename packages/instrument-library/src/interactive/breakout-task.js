@@ -9,6 +9,9 @@ const instrumentFactory = new InstrumentFactory({
 
 export default instrumentFactory.defineInstrument({
   content: {
+    assets: {
+      css: [import.meta.injectStylesheet('./breakout-task.styles.css')]
+    },
     render() {
       return;
     }
