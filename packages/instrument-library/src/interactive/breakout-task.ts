@@ -6,8 +6,7 @@ const instrumentFactory = new InstrumentFactory({
   language: 'en',
   validationSchema: z.object({
     livesRemaining: z.number().int(),
-    timeElapsed: z.number(),
-    win: z.boolean()
+    timeElapsed: z.number()
   })
 });
 
@@ -92,8 +91,7 @@ export default instrumentFactory.defineInstrument({
                 if (score === brickRowCount * brickColumnCount) {
                   done({
                     livesRemaining: lives,
-                    timeElapsed: Date.now() - startTime,
-                    win: true
+                    timeElapsed: Date.now() - startTime
                   });
                 }
               }
@@ -166,8 +164,7 @@ export default instrumentFactory.defineInstrument({
             if (!lives) {
               done({
                 livesRemaining: lives,
-                timeElapsed: Date.now() - startTime,
-                win: false
+                timeElapsed: Date.now() - startTime
               });
             } else {
               x = canvas.width / 2;
@@ -203,6 +200,26 @@ export default instrumentFactory.defineInstrument({
     referenceUrl: 'https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript',
     sourceUrl: 'https://github.com/end3r/Gamedev-Canvas-workshop/tree/gh-pages',
     title: 'Breakout Task'
+  },
+  measures: {
+    livesRemaining: {
+      kind: 'const',
+      ref: 'livesRemaining'
+    },
+    timeElapsed: {
+      kind: 'computed',
+      label: 'Time Elapsed',
+      value(data) {
+        return `${data.timeElapsed}ms`;
+      }
+    },
+    win: {
+      kind: 'computed',
+      label: 'Won Game',
+      value(data) {
+        return data.livesRemaining > 0;
+      }
+    }
   },
   name: 'Breakout Task',
   tags: ['Interactive'],
