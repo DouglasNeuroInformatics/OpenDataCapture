@@ -76,14 +76,6 @@ export abstract class BaseInstrumentTransformer {
     return result.code;
   }
 
-  generateBundleSync(src: string) {
-    const program = this.transpiler.parseSync(src, this.parseOptions);
-    this.validate(program, src);
-    const input = this.transformDefaultExport(src);
-    const result = this.transpiler.transformSync(input, this.transformOptions);
-    return result.code;
-  }
-
   private transformDefaultExport(src: string) {
     let input = src;
     input = src.replace('export default', `const ${this.defaultExportSub} =`);
