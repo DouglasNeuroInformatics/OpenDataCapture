@@ -10,11 +10,8 @@
     "lint": "eslint --fix src"
   },
   "dependencies": {
-    "@swc/core": "^1.3.102",
-    "@swc/wasm": "^1.3.102",
-    "@swc/wasm-web": "^1.3.102"
-  },
-  "devDependencies": {
-    "@swc/types": "^0.1.5"
+    "esbuild": "^0.20.0",
+    "esbuild-wasm": "^0.20.0",
+    "z": "^1.0.9"
   }
 }
