@@ -6,4 +6,10 @@ export class InstrumentTransformer extends BaseInstrumentTransformer {
   constructor() {
     super(esbuild);
   }
+
+  async init(wasmURL: string) {
+    return this.transpiler.initialize({
+      wasmURL
+    });
+  }
 }

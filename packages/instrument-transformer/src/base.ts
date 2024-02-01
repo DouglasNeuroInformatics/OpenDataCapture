@@ -1,8 +1,9 @@
-import type { BuildOptions, BuildResult, Metafile } from 'esbuild';
+import type { BuildOptions, BuildResult, InitializeOptions, Metafile } from 'esbuild';
 import type { ValueOf } from 'type-fest';
 
 export type Transpiler = {
   build(options: BuildOptions): Promise<BuildResult>;
+  initialize(options: InitializeOptions): Promise<void>;
 };
 
 export abstract class BaseInstrumentTransformer {
