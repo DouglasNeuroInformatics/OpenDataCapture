@@ -53,7 +53,6 @@
     "eslint-plugin-react": "^7.33.2",
     "globals": "^13.24.0",
     "husky": "^8.0.3",
-    "jsdoc": "^4.0.2",
     "prettier": "^3.1.1",
     "prettier-plugin-astro": "^0.12.3",
     "prettier-plugin-tailwindcss": "^0.5.11",
@@ -64,5 +63,5 @@
     "type-fest": "^4.9.0",
     "typescript": "^5.3.3"
   },
-  "packageManager": "bun@1.0.14"
+  "packageManager": "bun@1.0.18"
 }
