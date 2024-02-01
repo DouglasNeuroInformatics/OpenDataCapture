@@ -1,5 +1,3 @@
-/// <reference types="bun-types" />
-
 import { beforeEach, describe, expect, it } from 'bun:test';
 import fs from 'fs/promises';
 import module from 'module';
@@ -13,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 const require = module.createRequire(__dirname);
 
-const loadSource = (id) => fs.readFile(require.resolve(id), 'utf-8');
+const loadSource = (id: string) => fs.readFile(require.resolve(id), 'utf-8');
 
 const sources = {
   clickTask: await loadSource('@open-data-capture/instrument-library/interactive/click-task.tsx'),
@@ -21,8 +19,7 @@ const sources = {
 };
 
 describe('InstrumentTransformer', () => {
-  /** @type {InstrumentTransformer} */
-  let transformer;
+  let transformer: InstrumentTransformer;
 
   beforeEach(() => {
     transformer = new InstrumentTransformer();

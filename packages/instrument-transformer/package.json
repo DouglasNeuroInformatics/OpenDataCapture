@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
-  "main": "./src/index.js",
-  "browser": "./src/browser.js",
-  "types": "./src/types.d.ts",
+  "main": "./src/index.ts",
+  "browser": "./src/browser.ts",
   "scripts": {
     "format": "prettier --write src",
     "lint": "eslint --fix src"
