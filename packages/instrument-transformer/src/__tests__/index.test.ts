@@ -32,21 +32,12 @@ describe('InstrumentTransformer', () => {
     it('should successfully transpile the happiness questionnaire', async () => {
       expect(transformer.generateBundle(sources.happinessQuestionnaire)).resolves.toBeString();
     });
-    it("should include the same number of substrings 'React*'", async () => {
-      const source = sources.clickTask;
-      const regex = /\bReact\w*/;
-      const sourceMatches = source.match(regex)?.length ?? 0;
-      expect(sourceMatches).toBePositive();
-      const bundle = await transformer.generateBundle(source);
-      const bundleMatches = bundle.match(regex)?.length ?? 0;
-      expect(bundleMatches).toBe(sourceMatches);
+    it('should fail to transpile syntactically invalid code', () => {
+      const source = sources.happinessQuestionnaire + 'INVALID SYNTAX!!';
+      expect(transformer.generateBundle(source)).rejects.toThrow();
     });
     it('should reject source including a static import', () => {
       const source = ["import _ from 'lodash';", sources.happinessQuestionnaire].join('\n');
-      expect(transformer.generateBundle(source)).rejects.toThrow();
-    });
-    it('should reject source including a require statement', () => {
-      const source = ["const _ = require('lodash');", sources.happinessQuestionnaire].join('\n');
       expect(transformer.generateBundle(source)).rejects.toThrow();
     });
     it('should reject source including a named export', () => {

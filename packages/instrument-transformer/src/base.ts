@@ -1,107 +1,75 @@
-import type { Options as CoreOptions, Output as CoreOutput, ParseOptions as CoreParseOptions } from '@swc/core';
-import type { Module } from '@swc/types';
-import type { Options as WebOptions, Output as WebOutput, ParseOptions as WebParseOptions } from '@swc/wasm-web';
-import type { Simplify } from 'type-fest';
-
-export type TransformOptions = Simplify<CoreOptions & WebOptions>;
-
-export type TransformOutput = Simplify<CoreOutput & WebOutput>;
-
-export type ModuleItemType = Module['body'][number]['type'];
-
-export type ParseOptions = Simplify<Extract<CoreParseOptions & WebParseOptions, { syntax: 'typescript' }>>;
+import type { BuildOptions, BuildResult, Metafile } from 'esbuild';
+import type { ValueOf } from 'type-fest';
 
 export type Transpiler = {
-  parse(src: string, options: ParseOptions): Promise<Module>;
-  parseSync(src: string, options: ParseOptions): Module;
-  transform(src: string, options: TransformOptions): Promise<TransformOutput>;
-  transformSync(src: string, options: TransformOptions): TransformOutput;
+  build(options: BuildOptions): Promise<BuildResult>;
 };
 
 export abstract class BaseInstrumentTransformer {
   /** The variable name that 'export default' is replaced by */
   private defaultExportSub = '__instrument__';
 
-  /** Tokens that if encountered will throw an error */
-  private illegalItemTypes: ModuleItemType[] = [
-    'ImportDeclaration',
-    'ExportAllDeclaration',
-    'ExportDeclaration',
-    'ExportNamedDeclaration'
-  ];
-
-  /** The options to use for SWC when parsing the source code */
-  private parseOptions: ParseOptions = {
-    syntax: 'typescript',
-    target: 'es2022',
-    tsx: true
-  };
-
-  /** The options to use for SWC when transforming the source code */
-  private transformOptions: TransformOptions = {
-    jsc: {
-      parser: {
-        syntax: 'typescript',
-        tsx: true
-      },
-      target: 'es2022',
-      transform: {
-        optimizer: {
-          globals: {
-            vars: {
-              __React__: 'React'
-            }
-          }
-        },
-        react: {
-          pragma: '__React__.createElement',
-          runtime: 'classic'
-        }
-      }
-    },
-    minify: true,
-    module: {
-      strict: true,
-      type: 'es6'
-    }
-  };
-
   constructor(public transpiler: Transpiler) {}
 
-  async generateBundle(src: string) {
-    const program = await this.transpiler.parse(src, this.parseOptions);
-    this.validate(program, src);
-    const input = this.transformDefaultExport(src);
-    const result = await this.transpiler.transform(input, this.transformOptions);
-    return result.code;
+  async generateBundle(source: string) {
+    const input = this.preprocess(source);
+    const result = await this.build(input);
+    const output = result.metafile!.outputs['bundle.js']!;
+    this.validateOutput(output);
+    return this.getBuiltCode(result);
   }
 
-  private transformDefaultExport(src: string) {
-    let input = src;
-    input = src.replace('export default', `const ${this.defaultExportSub} =`);
+  private build(source: string) {
+    return this.transpiler.build({
+      metafile: true,
+      minify: true,
+      outfile: 'bundle.js',
+      platform: 'neutral',
+      stdin: {
+        contents: source,
+        loader: 'tsx'
+      },
+      target: 'es2022',
+      write: false
+    });
+  }
+
+  private getBuiltCode(result: BuildResult) {
+    const outputFiles = result.outputFiles;
+    if (!outputFiles) {
+      throw new Error('Output files is undefined');
+    } else if (outputFiles?.length !== 1) {
+      throw new Error(`Unexpected number of output files: ${outputFiles.length}`);
+    }
+    return outputFiles[0].text;
+  }
+
+  /** Return the number of times 'export default' occurs in a string */
+  private getDefaultExportCount(source: string) {
+    return source.match(/export\s+default/g)?.length ?? 0;
+  }
+
+  /** Ensure that the source has one default export and replace it with the substitution string */
+  private preprocess(source: string) {
+    const defaultExportCount = this.getDefaultExportCount(source);
+    if (defaultExportCount !== 1) {
+      throw new Error(`Expected one default export, not ${defaultExportCount}`);
+    } else if (source.includes(this.defaultExportSub)) {
+      throw new Error(`Variable name '${this.defaultExportSub}' is considered a keyword in instruments`);
+    }
+    source = source.replace('export default', `const ${this.defaultExportSub} =`);
     return `(async () => {
-      ${input}
+      ${source}
       return ${this.defaultExportSub}
     })()`;
   }
 
-  private validate(program: Module, src: string) {
-    if (src.includes(this.defaultExportSub)) {
-      throw new Error(`Variable name '${this.defaultExportSub}' is considered a keyword in instruments`);
-    }
-    let defaultExportCount = 0;
-    for (const item of program.body) {
-      if (this.illegalItemTypes.includes(item.type)) {
-        const source = src.slice(item.span.start - 1, item.span.end - 1);
-        throw new Error(`Unexpected token '${item.type}': ${source}`);
-      } else if (item.type === 'ExportDefaultDeclaration' || item.type === 'ExportDefaultExpression') {
-        defaultExportCount += 1;
+  /** Validate the metafile for the generated bundle */
+  private validateOutput(output: ValueOf<Metafile['outputs']>) {
+    output.imports.forEach(({ kind, path }) => {
+      if (kind !== 'dynamic-import') {
+        throw new Error(`Unexpected non-dynamic import token '${kind}' at '${path}'`);
       }
-    }
-    if (defaultExportCount === 0) {
-      throw new Error('Source does not contain required default export');
-    } else if (defaultExportCount > 1) {
-      throw new Error('Source contains multiple default exports');
-    }
+    });
   }
 }
