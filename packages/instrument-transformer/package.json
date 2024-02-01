@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@swc/core": "^1.3.102",
+    "@swc/wasm": "^1.3.102",
     "@swc/wasm-web": "^1.3.102"
   },
   "devDependencies": {
