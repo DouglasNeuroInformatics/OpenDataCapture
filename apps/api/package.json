@@ -9,7 +9,7 @@
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --watch src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "preview": "env-cmd -f ../../.env cross-env NODE_ENV=production node dist/main.js",
+    "preview": "env-cmd -f ../../.env cross-env NODE_ENV=production node dist/app.mjs",
     "test": "bun test"
   },
   "dependencies": {
