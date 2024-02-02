@@ -3,18 +3,18 @@
   "version": "0.0.0",
   "exports": {
     "./core": {
-      "default": "./lib/core/index.js",
-      "types": "./lib/core/index.d.ts"
+      "default": "./dist/core/index.js",
+      "types": "./dist/core/index.d.ts"
     },
     "./gateway": {
-      "default": "./lib/gateway/index.js",
-      "types": "./lib/gateway/index.d.ts"
+      "default": "./dist/gateway/index.js",
+      "types": "./dist/gateway/index.d.ts"
     }
   },
   "scripts": {
-    "build:lib": "bun db:generate && bun db:push",
+    "build": "bun db:generate",
     "db:generate": "prisma generate --schema prisma/core-schema.prisma && prisma generate --schema prisma/gateway-schema.prisma",
-    "db:push": "env-cmd -f ../../.env prisma db push --schema prisma/gateway-schema.prisma"
+    "db:push": "env-cmd -f ../../.env prisma db push --skip-generate --schema prisma/gateway-schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^5.8.1"

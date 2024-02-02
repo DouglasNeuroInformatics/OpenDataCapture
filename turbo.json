@@ -3,21 +3,24 @@
   "globalDependencies": [".env"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "^build:lib"],
+      "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
-    "build:lib": {
-      "outputs": ["lib/**"]
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["^build:lib"],
+      "dependsOn": ["^build"],
       "persistent": true
     },
     "format": {},
     "lint": {},
     "test": {
-      "dependsOn": ["^build:lib"]
+      "dependsOn": ["^build"]
     }
   }
 }

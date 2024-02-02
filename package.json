@@ -12,7 +12,6 @@
   "scripts": {
     "build": "env-cmd cross-env NODE_ENV=production turbo run build --no-daemon",
     "build:api": "env-cmd cross-env NODE_ENV=production turbo run build --no-daemon --filter=@open-data-capture/api",
-    "build:lib": "turbo run --no-daemon build:lib",
     "build:web": "env-cmd cross-env NODE_ENV=production turbo run build --no-daemon --filter=@open-data-capture/web",
     "clean": "find . -type d '(' -name '.turbo' -o -name 'dist' -o -name 'node_modules' ')' -prune -exec rm -rf {} \\;",
     "clean-workflows": "./scripts/clean-workflows.sh",

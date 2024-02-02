@@ -13,7 +13,7 @@ import globals from 'globals';
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   {
-    ignores: ['**/.astro/*', '**/build/*', '**/dist/*', '**/lib/*', '**/node_modules/*', '**/*.d.ts']
+    ignores: ['**/.astro/*', '**/build/*', '**/dist/*', '**/node_modules/*', '**/*.d.ts']
   },
   {
     files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs', '**/*.ts', '**/*.tsx'],

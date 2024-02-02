@@ -50,7 +50,7 @@ const resolveFiles = async (baseDir) => {
  * @returns {Promise<{ baseDir: string, manifest: RuntimeManifest, importPaths: string[], version: string }>}
  */
 const resolveVersion = async (version) => {
-  const baseDir = path.resolve(RUNTIME_DIR, version, 'lib');
+  const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
   if (!(await isDirectory(baseDir))) {
     throw new Error(`Not a directory: ${baseDir}`);
   }

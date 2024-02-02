@@ -17,7 +17,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "/runtime/v0.0.1/*": ["./runtime/v0.0.1/lib/*"]
+      "/runtime/v0.0.1/*": ["./runtime/v0.0.1/dist/*"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -26,5 +26,5 @@
     "types": ["bun-types"],
     "verbatimModuleSyntax": true
   },
-  "exclude": ["docs/*", "**/dist", "**/lib", "**/node_modules"]
+  "exclude": ["docs/*", "**/dist", "**/node_modules"]
 }
