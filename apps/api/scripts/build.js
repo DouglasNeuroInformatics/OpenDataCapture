@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import module from 'module';
 import path from 'path';
 import url from 'url';
 
@@ -7,15 +8,14 @@ import esbuildPluginTsc from 'esbuild-plugin-tsc';
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const require = module.createRequire(import.meta.url);
 
 const entryFile = path.resolve(__dirname, '../src/main.ts');
 const outdir = path.resolve(__dirname, '../dist');
 const tsconfig = path.resolve(__dirname, '../tsconfig.json');
 
-await fs.rm(outdir, {
-  force: true,
-  recursive: true
-});
+await fs.rm(outdir, { force: true, recursive: true });
+await fs.mkdir(outdir);
 
 const cjsShims = `
 const { __dirname, __filename, require } = await (async () => {
@@ -30,6 +30,17 @@ const { __dirname, __filename, require } = await (async () => {
   return { __dirname, __filename, require };
 })();
 `;
+
+// Copy Prisma
+const coreDatabasePath = path.dirname(require.resolve('@open-data-capture/database/core'));
+const files = await fs.readdir(coreDatabasePath);
+const engineFilename = files.find((filename) => {
+  return filename.startsWith('libquery_engine') && filename.endsWith('.dylib.node');
+});
+if (!engineFilename) {
+  throw new Error(`Failed to resolve prisma engine from path: ${coreDatabasePath}`);
+}
+await fs.copyFile(path.join(coreDatabasePath, engineFilename), path.join(outdir, engineFilename));
 
 await esbuild.build({
   banner: {
