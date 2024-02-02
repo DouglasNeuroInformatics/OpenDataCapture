@@ -40,7 +40,7 @@ await esbuild.build({
   external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],
   format: 'esm',
   keepNames: true,
-  outdir,
+  outfile: path.resolve(outdir, 'app.mjs'),
   platform: 'node',
   plugins: [
     esbuildPluginTsc({

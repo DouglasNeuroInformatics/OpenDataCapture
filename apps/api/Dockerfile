@@ -19,4 +19,4 @@ RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 RUN chown -R app:app /app
 USER app
-CMD [ "node", "./dist/main.js" ]
+CMD [ "node", "./dist/app.mjs" ]

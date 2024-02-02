@@ -25,6 +25,10 @@ services:
     environment:
       - NODE_ENV=production
       - MONGO_URI=mongodb://mongo:27017
+      - GATEWAY_API_KEY
+      - GATEWAY_BASE_URL
+      - GATEWAY_ENABLED
+      - GATEWAY_REFRESH_INTERVAL
       - SECRET_KEY
     expose:
       - 80
