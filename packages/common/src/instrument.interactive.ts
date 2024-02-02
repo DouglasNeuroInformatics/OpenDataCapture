@@ -9,18 +9,18 @@ import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $UnilingualInstrumentM
 import type { Json, Language } from './core';
 import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument.base';
 
-export type InteractiveInstrumentContent = {
+export type InteractiveInstrumentContent<TData extends Json = Json> = {
   assets?: {
     css?: string[];
     img?: Record<string, string>;
   };
-  render: (done: (data: Json) => void, ...args: any[]) => any;
+  render: (done: (data: TData) => void) => any;
 };
 
 export type InteractiveInstrument<TData extends Json = Json, TLanguage extends Language = Language> = Merge<
   BaseInstrument<TData, Language>,
   {
-    content: InteractiveInstrumentContent;
+    content: InteractiveInstrumentContent<TData>;
     details: EnhancedBaseInstrumentDetails<TLanguage>;
     kind: 'INTERACTIVE';
   }

@@ -453,6 +453,7 @@ export default instrumentFactory.defineInstrument({
   },
   measures: {
     totalScore: {
+      kind: 'computed',
       label: {
         en: 'Total Score',
         fr: 'Score total'

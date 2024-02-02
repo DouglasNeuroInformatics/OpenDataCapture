@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import type { AnyUnilingualFormInstrument } from '@open-data-capture/common/instrument';
+import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrument } from '@/hooks/useInstrument';
@@ -58,14 +59,16 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       instrument.version
     }_${new Date().toISOString()}`;
 
+    const exportRecords = records.map((record) => _.omit(record, ['__date__', '__time__']));
+
     switch (option) {
       case 'JSON':
-        void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(records, null, 2)));
+        void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(exportRecords, null, 2)));
         break;
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(records[0]);
-          const rows = records.map((item) => Object.values(item).join(',')).join('\n');
+          const columnNames = Object.keys(exportRecords[0]);
+          const rows = exportRecords.map((item) => Object.values(item).join(',')).join('\n');
           return Promise.resolve(columnNames + '\n' + rows);
         });
     }

@@ -9,3 +9,4 @@ export const montrealCognitiveAssessment: InstrumentLibraryItem;
 
 export const clickTask: InstrumentLibraryItem;
 export const reactionTimeTask: InstrumentLibraryItem;
+export const breakoutTask: InstrumentLibraryItem;

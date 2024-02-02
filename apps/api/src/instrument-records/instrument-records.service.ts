@@ -155,7 +155,7 @@ export class InstrumentRecordsService {
         if (record.instrument.kind === 'FORM') {
           const instance = await this.interpreter.interpret(record.instrument.bundle, { kind: 'FORM' });
           if (instance.measures) {
-            (record as Record<string, any>).computedMeasures = this.computeMeasures(
+            (record as Record<string, any>).computedMeasures = this.computeNumericMeasures(
               instance.measures,
               record.data as FormDataType
             );
@@ -187,7 +187,7 @@ export class InstrumentRecordsService {
 
     const data: Record<string, [number, number][]> = {};
     for (const record of records) {
-      const computedMeasures = this.computeMeasures(instrument.measures, record.data as FormDataType);
+      const computedMeasures = this.computeNumericMeasures(instrument.measures, record.data as FormDataType);
       for (const measure in computedMeasures) {
         const x = record.date.getTime();
         const y = computedMeasures[measure];
@@ -206,10 +206,23 @@ export class InstrumentRecordsService {
     return results;
   }
 
-  private computeMeasures(measures: InstrumentMeasures, data: FormDataType) {
+  /** Compute all the measures where the value, or referenced value, is a number. Non-numeric values are ignored */
+  private computeNumericMeasures(measures: InstrumentMeasures, data: FormDataType) {
     const computedMeasures: Record<string, number> = {};
     for (const key in measures) {
-      computedMeasures[key] = measures[key].value(data);
+      const measure = measures[key];
+      let value: unknown;
+      switch (measure.kind) {
+        case 'computed':
+          value = measure.value(data);
+          break;
+        case 'const':
+          value = data[measure.ref];
+          break;
+      }
+      if (typeof value === 'number') {
+        computedMeasures[key] = value;
+      }
     }
     return computedMeasures;
   }

@@ -1,18 +1,16 @@
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { Card, formatFormDataAsString, getFormFields, useDownload } from '@douglasneuroinformatics/ui';
+import { Card, useDownload } from '@douglasneuroinformatics/ui';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
 import { toLowerCase } from '@open-data-capture/common/core';
 import type { InstrumentKind, SomeUnilingualInstrument } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
-import { isInteractiveInstrument } from '@open-data-capture/instrument-utils';
+import { computeInstrumentMeasures } from '@open-data-capture/instrument-utils';
 import { useTranslation } from 'react-i18next';
-import { match } from 'ts-pattern';
 
 import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
 export type InstrumentSummaryProps<TKind extends InstrumentKind> = {
-  data: unknown;
+  data: any;
   instrument: SomeUnilingualInstrument<TKind>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
   timeCollected: number;
@@ -27,17 +25,11 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
   const download = useDownload();
   const { i18n, t } = useTranslation('core');
 
-  if (isInteractiveInstrument(instrument)) {
-    return JSON.stringify(data);
-  }
-
-  const form = instrument;
-  const fields = getFormFields(form.content);
-  const formData = data as FormDataType;
+  const computedMeasures = computeInstrumentMeasures(instrument, data);
 
   const handleDownload = () => {
     const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.json`;
-    void download(filename, () => formatFormDataAsString(formData));
+    void download(filename, () => JSON.stringify(data, null, 2));
   };
 
   let language: string;
@@ -104,7 +96,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
         items={[
           {
             label: t('title'),
-            value: form.details.title
+            value: instrument.details.title
           },
           {
             label: t('language'),
@@ -112,29 +104,13 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
           },
           {
             label: t('version'),
-            value: form.version
+            value: instrument.version
           }
         ]}
         title={t('instrument')}
       />
       <InstrumentSummaryGroup
-        items={Object.keys(fields).map((fieldName) => {
-          return match(fields[fieldName])
-            .with({ kind: 'dynamic' }, (field) => {
-              const staticField = field.render(formData);
-              if (!staticField || staticField.kind === 'array') {
-                return null;
-              }
-              return {
-                label: staticField.label,
-                value: formData[fieldName]
-              };
-            })
-            .otherwise((field) => ({
-              label: field.label,
-              value: formData[fieldName]
-            }));
-        })}
+        items={Object.values(computedMeasures)}
         title={t('responses')}
       />
     </Card>

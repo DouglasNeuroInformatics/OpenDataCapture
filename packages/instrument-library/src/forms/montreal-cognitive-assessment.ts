@@ -133,48 +133,31 @@ export default instrumentFactory.defineInstrument({
   },
   measures: {
     abstraction: {
-      label: {
-        en: 'Abstraction',
-        fr: 'Abstraction'
-      },
-      value: ({ abstraction }) => abstraction
+      kind: 'const',
+      ref: 'abstraction'
     },
     attention: {
-      label: {
-        en: 'Attention',
-        fr: 'Attention'
-      },
-      value: ({ attention }) => attention
+      kind: 'const',
+      ref: 'attention'
     },
     delayedRecall: {
-      label: {
-        en: 'Delayed Recall',
-        fr: 'Rappel'
-      },
-      value: ({ delayedRecall }) => delayedRecall
+      kind: 'const',
+      ref: 'delayedRecall'
     },
     language: {
-      label: {
-        en: 'Language',
-        fr: 'Langue'
-      },
-      value: ({ language }) => language
+      kind: 'const',
+      ref: 'language'
     },
     naming: {
-      label: {
-        en: 'Naming',
-        fr: 'Dénomination'
-      },
-      value: ({ naming }) => naming
+      kind: 'const',
+      ref: 'naming'
     },
     orientation: {
-      label: {
-        en: 'Orientation',
-        fr: 'Orientation'
-      },
-      value: ({ orientation }) => orientation
+      kind: 'const',
+      ref: 'orientation'
     },
     totalScore: {
+      kind: 'computed',
       label: {
         en: 'Total Score',
         fr: 'Score total'
@@ -188,11 +171,8 @@ export default instrumentFactory.defineInstrument({
       }
     },
     visuospatialExecutive: {
-      label: {
-        en: 'Visuospatial/Executive',
-        fr: 'Visuospatial/Exécutif'
-      },
-      value: ({ visuospatialExecutive }) => visuospatialExecutive
+      kind: 'const',
+      ref: 'visuospatialExecutive'
     }
   }
 });

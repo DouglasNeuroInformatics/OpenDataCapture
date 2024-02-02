@@ -1,6 +1,6 @@
 import type { LicenseIdentifier } from '@open-data-capture/licenses';
 import _ from 'lodash';
-import type { Simplify } from 'type-fest';
+import type { ConditionalKeys, Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 
 import { $Language, $LicenseIdentifier, $ZodTypeAny } from './core';
@@ -74,11 +74,20 @@ export const $InstrumentUIOption = <TLanguage extends InstrumentLanguage, TSchem
  * @typeParam TLanguage - the language(s) of the instrument
  */
 export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+  /** The legal person(s) that created the instrument and hold copyright to the instrument */
+  authors?: string[];
+
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
 
   /** An identifier corresponding to the SPDX license list version d2709ad (released on 2024-01-30) */
   license: LicenseIdentifier;
+
+  /** An reference link where the user can learn more about the instrument */
+  referenceUrl?: string;
+
+  /** A URL where the user can find the source code for the instrument */
+  sourceUrl?: string;
 
   /** The title of the instrument in the language it is written, omitting the definite article */
   title: InstrumentUIOption<TLanguage, string>;
@@ -86,8 +95,11 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
 
 export const $BaseInstrumentDetails = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
+    authors: z.array(z.string()).nullish(),
     description: $InstrumentUIOption(z.string().min(1), language),
     license: $LicenseIdentifier,
+    referenceUrl: z.string().url().nullish(),
+    sourceUrl: z.string().url().nullish(),
     title: $InstrumentUIOption(z.string().min(1), language)
   }) as z.ZodType<BaseInstrumentDetails<TLanguage>>;
 };
@@ -110,29 +122,64 @@ export const $EnhancedBaseInstrumentDetails = <TLanguage extends InstrumentLangu
   ) as z.ZodType<EnhancedBaseInstrumentDetails<TLanguage>>;
 };
 
+export type InstrumentMeasureValue = z.infer<typeof $InstrumentMeasureValue>;
+export const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.date()]);
+
 export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Record<
   string,
-  {
-    label: InstrumentUIOption<TLanguage, string>;
-    value: (data: TData) => number;
-  }
+  | {
+      kind: 'computed';
+      label: InstrumentUIOption<TLanguage, string>;
+      value: (data: TData) => InstrumentMeasureValue;
+    }
+  | {
+      kind: 'const';
+      label?: InstrumentUIOption<TLanguage, string>;
+      ref: TData extends Record<string, any>
+        ? ConditionalKeys<TData, InstrumentMeasureValue> extends infer K
+          ? [K] extends [never]
+            ? string
+            : K
+          : never
+        : never;
+    }
 >;
 
 export type UnilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language>;
 export type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language[]>;
 
+const $ComputeMeasureFunction = z.function().args(z.any()).returns($InstrumentMeasureValue);
+
+const $ComputedInstrumentMeasure = z.object({
+  kind: z.literal('computed'),
+  label: $InstrumentUIOption(z.string()),
+  value: $ComputeMeasureFunction
+}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind: 'computed' }>>;
+
+const $UnilingualComputedInstrumentMeasure = z.object({
+  kind: z.literal('computed'),
+  label: z.string(),
+  value: $ComputeMeasureFunction
+}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures<any, Language>>, { kind?: 'computed' }>>;
+
+const $ConstantInstrumentMeasure = z.object({
+  kind: z.literal('const'),
+  label: $InstrumentUIOption(z.string()).optional(),
+  ref: z.string()
+}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind?: 'const' }>>;
+
+const $UnilingualConstantInstrumentMeasure = z.object({
+  kind: z.literal('const'),
+  label: z.string().optional(),
+  ref: z.string()
+}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures<any, Language>>, { kind?: 'const' }>>;
+
 export const $InstrumentMeasures = z.record(
-  z.object({
-    label: $InstrumentUIOption(z.string()),
-    value: z.function().args(z.any()).returns(z.number())
-  })
+  z.union([$ComputedInstrumentMeasure, $ConstantInstrumentMeasure])
 ) satisfies z.ZodType<InstrumentMeasures>;
 
 export const $UnilingualInstrumentMeasures = z.record(
-  z.object({
-    label: z.string(),
-    value: z.function().args(z.any()).returns(z.number())
-  })
+  z.union([$UnilingualComputedInstrumentMeasure, $UnilingualConstantInstrumentMeasure])
 ) satisfies z.ZodType<UnilingualInstrumentMeasures>;
 
 /**
