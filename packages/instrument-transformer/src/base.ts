@@ -20,6 +20,10 @@ export abstract class BaseInstrumentTransformer {
     return this.getBuiltCode(result);
   }
 
+  async init(options: InitializeOptions) {
+    return this.transpiler.initialize(options);
+  }
+
   private build(source: string) {
     return this.transpiler.build({
       metafile: true,
