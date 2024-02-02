@@ -12,7 +12,7 @@
     "./interactive/*": "./src/interactive/*"
   },
   "scripts": {
-    "build:lib": "rm -rf lib && bunx rollup -c",
+    "build:lib": "rm -rf lib && cross-env NODE_OPTIONS='--import tsx/esm' bunx rollup -c",
     "dev": "rm -rf lib && bunx rollup -c --watch",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
