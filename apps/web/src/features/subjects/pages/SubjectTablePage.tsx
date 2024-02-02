@@ -18,7 +18,7 @@ export const SubjectTablePage = () => {
 
   const fields: { field: string; label: string }[] = [];
   for (const subItem in records[0]) {
-    if (subItem !== '__date__') {
+    if (!subItem.startsWith('__')) {
       fields.push({
         field: subItem,
         label: camelToSnakeCase(subItem).toUpperCase()

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import type { AnyInstrument, InstrumentKind, InstrumentSummary } from '@open-data-capture/common/instrument';
+import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import _ from 'lodash';
@@ -29,20 +29,34 @@ export class InstrumentsService {
 
   async create<TKind extends InstrumentKind>({ kind, source }: CreateInstrumentDto<TKind>) {
     this.logger.debug('Attempting to parse instrument source...');
-    const { bundle, instance } = await this.parseSource(source, { kind });
-    this.logger.debug(`Done parsing source for instrument '${instance.name}'`);
+    const bundle = await this.parseSource(source);
+    this.logger.debug('Done parsing source for instrument');
+
+    return this.createFromBundle({ bundle, source }, { kind });
+  }
+
+  async createFromBundle<TKind extends InstrumentKind>(
+    { bundle, source }: { bundle: string; source: string },
+    options?: { kind?: TKind }
+  ) {
+    const instance = await this.interpretBundle(bundle, options);
 
     this.logger.debug(`Checking if instrument '${instance.name}' exists...`);
     if (await this.instrumentModel.exists({ name: instance.name })) {
       throw new ConflictException(`Instrument with name '${instance.name}' already exists!`);
     }
+
     this.logger.debug(`Instrument '${instance.name}' does not exist`);
 
     return this.instrumentModel.create({
       data: {
+        ..._.omit({ ...instance }, ['content', 'measures', 'validationSchema']),
         bundle,
-        source,
-        ..._.omit(instance, ['content', 'measures', 'validationSchema'])
+        details: {
+          ...instance.details,
+          authors: instance.details.authors ?? []
+        },
+        source
       }
     });
   }
@@ -89,24 +103,34 @@ export class InstrumentsService {
     }) as Promise<InstrumentSummary[]>;
   }
 
-  /**
-   * Attempt to resolve an instance of an instrument from the TypeScript source code.
-   * If this fails, then throws an UnprocessableContentException
-   */
-  private async parseSource<TKind extends InstrumentKind>(source: string, options?: { kind?: TKind }) {
-    let bundle: string;
-    let instance: Extract<AnyInstrument, { kind: TKind }>;
+  private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
+    let instance: SomeInstrument<TKind>;
     try {
-      bundle = await this.instrumentTransformer.generateBundle(source);
       instance = await this.instrumentInterpreter.interpret(bundle, {
         kind: options?.kind,
         validate: true
       });
     } catch (err) {
-      throw new UnprocessableEntityException('Failed to parse instrument', {
+      throw new UnprocessableEntityException('Failed to interpret instrument bundle', {
         cause: err
       });
     }
-    return { bundle, instance };
+    return instance;
+  }
+
+  /**
+   * Attempt to resolve an instance of an instrument from the TypeScript source code.
+   * If this fails, then throws an UnprocessableContentException
+   */
+  private async parseSource(source: string) {
+    let bundle: string;
+    try {
+      bundle = await this.instrumentTransformer.generateBundle(source);
+    } catch (err) {
+      throw new UnprocessableEntityException('Failed to parse instrument source', {
+        cause: err
+      });
+    }
+    return bundle;
   }
 }

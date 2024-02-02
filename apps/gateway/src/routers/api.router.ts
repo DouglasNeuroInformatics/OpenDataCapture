@@ -21,7 +21,6 @@ router.get(
         subjectId
       }
     });
-    assignments[0].encryptedData;
     return res.status(200).json(
       assignments.map(({ encryptedData, ...assignment }) => {
         return {

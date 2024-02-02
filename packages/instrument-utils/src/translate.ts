@@ -208,7 +208,14 @@ function translateMeasures(
   if (!measures) {
     return;
   }
-  return _.mapValues(measures, (measure) => ({ label: measure.label[language], value: measure.value }));
+  return _.mapValues(measures, (measure) => {
+    switch (measure.kind) {
+      case 'computed':
+        return { ...measure, label: measure.label[language] };
+      default:
+        return { ...measure, label: measure.label?.[language] };
+    }
+  });
 }
 
 /**

@@ -209,6 +209,7 @@ export default instrumentFactory.defineInstrument({
   },
   measures: {
     totalScore: {
+      kind: 'computed',
       label: 'Total Score',
       value: (data) => {
         let sum = 0;
