@@ -1,4 +1,5 @@
 import path from 'node:path';
+import url from 'url';
 
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { VersioningType } from '@nestjs/common';
@@ -9,6 +10,9 @@ import { json } from 'express';
 import { AppModule } from './app.module';
 import { ConfigurationService } from './configuration/configuration.service';
 import { setupDocs } from './docs';
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function bootstrap() {
   // This hacky type assertion is needed due to issue with linked dependency
@@ -24,7 +28,7 @@ async function bootstrap() {
   app.use(json({ limit: '50MB' }));
   app.useGlobalPipes(new ValidationPipe());
 
-  app.useStaticAssets(path.resolve(import.meta.dir, '..', 'public'));
+  app.useStaticAssets(path.resolve(__dirname, '..', 'public'));
   setupDocs(app);
 
   const configurationService = app.get(ConfigurationService);
