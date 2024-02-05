@@ -40,7 +40,8 @@ const engineFilename = files.find((filename) => {
 if (!engineFilename) {
   throw new Error(`Failed to resolve prisma engine from path: ${coreDatabasePath}`);
 }
-await fs.copyFile(path.join(coreDatabasePath, engineFilename), path.join(outdir, engineFilename));
+await fs.mkdir(path.join(outdir, 'core'));
+await fs.copyFile(path.join(coreDatabasePath, engineFilename), path.join(outdir, 'core', engineFilename));
 
 await esbuild.build({
   banner: {
