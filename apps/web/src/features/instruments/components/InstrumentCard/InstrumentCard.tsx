@@ -30,10 +30,10 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
         >
           {instrument.details.title}
         </h3>
-        <h5 className="mb-2 text-slate-600 dark:text-slate-300" data-cy="instrument-card">
+        <h5 className="mb-2 text-slate-700 dark:text-slate-300" data-cy="instrument-card">
           {`${t('tags')}: ${instrument.tags.join(', ')}`}
         </h5>
-        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{instrument.details.description}</p>
+        <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{instrument.details.description}</p>
       </div>
     </Card>
   );

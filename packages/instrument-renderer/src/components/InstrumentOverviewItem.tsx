@@ -6,7 +6,7 @@ export type InstrumentOverviewItemProps = {
 
 export const InstrumentOverviewItem = ({ afterText, heading, text }: InstrumentOverviewItemProps) => {
   return (
-    <div className="my-5 text-slate-600 dark:text-slate-300">
+    <div className="my-5 text-slate-700 dark:text-slate-300">
       <h5 className="mb-1 text-lg font-medium text-slate-900 dark:text-slate-100">{heading}</h5>
       {Array.isArray(text) ? (
         <ul>
