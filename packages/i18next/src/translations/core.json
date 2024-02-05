@@ -3,6 +3,10 @@
     "en": "Anonymous",
     "fr": "Anonyme"
   },
+  "authors": {
+    "en": "Authors",
+    "fr": "Auteurs"
+  },
   "begin": {
     "en": "Begin",
     "fr": "Commencer"
@@ -165,6 +169,10 @@
       "fr": "Français"
     }
   },
+  "license": {
+    "en": "License",
+    "fr": "Licence"
+  },
   "minutes": {
     "en": "{{minutes}} minute(s)",
     "fr": "{{minutes}} minute(s)"
@@ -199,6 +207,10 @@
     "en": "Print",
     "fr": "Imprimer"
   },
+  "referenceLink": {
+    "en": "Reference Link",
+    "fr": "Lien vers la référence"
+  },
   "responses": {
     "en": "Responses",
     "fr": "Réponses"
@@ -214,6 +226,10 @@
   "somethingWentWrong": {
     "en": "Something Went Wrong",
     "fr": "Quelque chose n'a pas fonctionné"
+  },
+  "sourceLink": {
+    "en": "Source Link",
+    "fr": "Lien vers le code source"
   },
   "steps": {
     "overview": {
