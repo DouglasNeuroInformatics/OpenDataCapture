@@ -35,7 +35,7 @@ const { __dirname, __filename, require } = await (async () => {
 const coreDatabasePath = path.dirname(require.resolve('@open-data-capture/database/core'));
 const files = await fs.readdir(coreDatabasePath);
 const engineFilename = files.find((filename) => {
-  return filename.startsWith('libquery_engine') && filename.endsWith('.dylib.node');
+  return filename.startsWith('libquery_engine') && filename.endsWith('.node');
 });
 if (!engineFilename) {
   throw new Error(`Failed to resolve prisma engine from path: ${coreDatabasePath}`);
