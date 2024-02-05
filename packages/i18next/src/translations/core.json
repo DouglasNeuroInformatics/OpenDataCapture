@@ -203,9 +203,17 @@
     "en": "Not Found",
     "fr": "Pas trouvé"
   },
+  "openSourceLicense": {
+    "en": "This is a free and open-source license",
+    "fr": "Il s'agit d'une licence libre"
+  },
   "print": {
     "en": "Print",
     "fr": "Imprimer"
+  },
+  "proprietaryLicense": {
+    "en": "This is not a free and open source license",
+    "fr": "Il ne s'agit pas d'une licence libre"
   },
   "referenceLink": {
     "en": "Reference Link",

@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
-import { Button, StepperContext } from '@douglasneuroinformatics/ui';
+import { Button, PopoverIcon, StepperContext, cn } from '@douglasneuroinformatics/ui';
+import { ShieldCheckIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid';
 import type { AnyUnilingualInstrument } from '@open-data-capture/common/instrument';
 import { licenses } from '@open-data-capture/licenses';
 import { useTranslation } from 'react-i18next';
@@ -27,16 +28,27 @@ export const InstrumentOverview = ({ instrument }: InstrumentOverviewProps) => {
 
   const license = licenses.get(instrument.details.license);
 
-  instrument.details.referenceUrl;
-
   return (
     <div className="mb-2">
       <h3 className="text-xl font-semibold">{t('steps.overview')}</h3>
       <div className="mb-8">
         <InstrumentOverviewItem heading={t('description')} text={instrument.details.description} />
         <InstrumentOverviewItem heading={t('language')} text={language} />
-        <InstrumentOverviewItem heading={t('authors')} text={instrument.details.authors ?? 'NA'} />
-        <InstrumentOverviewItem heading={t('license')} text={license?.name ?? 'NA'} />
+        {instrument.details.authors && (
+          <InstrumentOverviewItem heading={t('authors')} text={instrument.details.authors.join(', ') ?? 'NA'} />
+        )}
+        <InstrumentOverviewItem
+          afterText={
+            <PopoverIcon
+              icon={license?.isOpenSource ? ShieldCheckIcon : ShieldExclamationIcon}
+              iconClassName={cn('h-5 w-5', license?.isOpenSource ? 'text-sky-700' : 'text-red-500')}
+              position="right"
+              text={license?.isOpenSource ? t('openSourceLicense') : t('proprietaryLicense')}
+            />
+          }
+          heading={t('license')}
+          text={license?.name ?? 'NA'}
+        />
         <InstrumentOverviewItem
           heading={t('estimatedDuration')}
           text={t('minutes', {

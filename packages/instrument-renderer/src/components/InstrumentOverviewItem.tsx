@@ -1,9 +1,10 @@
 export type InstrumentOverviewItemProps = {
+  afterText?: React.ReactNode;
   heading: string;
   text: string | string[];
 };
 
-export const InstrumentOverviewItem = ({ heading, text }: InstrumentOverviewItemProps) => {
+export const InstrumentOverviewItem = ({ afterText, heading, text }: InstrumentOverviewItemProps) => {
   return (
     <div className="my-5 text-slate-600 dark:text-slate-300">
       <h5 className="mb-1 text-lg font-medium text-slate-900 dark:text-slate-100">{heading}</h5>
@@ -16,7 +17,10 @@ export const InstrumentOverviewItem = ({ heading, text }: InstrumentOverviewItem
           ))}
         </ul>
       ) : (
-        <p>{text}</p>
+        <div className="flex items-center gap-2">
+          <p>{text}</p>
+          {afterText}
+        </div>
       )}
     </div>
   );
