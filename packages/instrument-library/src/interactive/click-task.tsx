@@ -3,10 +3,12 @@ const { default: React, useEffect, useRef, useState } = await import('/runtime/v
 const { createRoot } = await import('/runtime/v0.0.1/react-dom/client.js');
 const { z } = await import('/runtime/v0.0.1/zod.js');
 
-const ClickTask: React.FC<{ done: (data: { count: number }) => void }> = ({ done }) => {
+type ClickTaskProps = { done: (data: { count: number }) => void };
+
+const ClickTask = ({ done }: ClickTaskProps) => {
   const [count, setCount] = useState(0);
   const [secondsRemaining, setSecondsRemaining] = useState(10);
-  const interval = useRef<NodeJS.Timeout | null>(null);
+  const interval = useRef<Timer | null>(null);
 
   useEffect(() => {
     interval.current = setInterval(() => {
