@@ -21,7 +21,7 @@
     "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --no-daemon --filter=@open-data-capture/api --filter=@open-data-capture/gateway --filter=@open-data-capture/web",
     "force-reinstall": "bun pm cache rm && bun clean && bun install",
     "format": "turbo run format --no-daemon",
-    "generate:env": "./scripts/generate-env.js",
+    "generate:env": "./scripts/generate-env.sh",
     "lint": "turbo run lint --no-daemon",
     "prepare": "husky install",
     "test": "env-cmd turbo run test --no-daemon",
