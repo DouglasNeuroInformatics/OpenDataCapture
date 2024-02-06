@@ -5,6 +5,7 @@ import type { RemoteAssignment } from '@open-data-capture/common/assignment';
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
+import { SetupService } from '@/setup/setup.service';
 
 import { GatewayService } from './gateway.service';
 
@@ -17,7 +18,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     configurationService: ConfigurationService,
     private readonly assignmentsService: AssignmentsService,
     private readonly gatewayService: GatewayService,
-    private readonly instrumentRecordsService: InstrumentRecordsService
+    private readonly instrumentRecordsService: InstrumentRecordsService,
+    private readonly setupService: SetupService
   ) {
     this.refreshInterval = configurationService.get('GATEWAY_REFRESH_INTERVAL');
   }
@@ -46,7 +48,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       instrumentId: assignment.instrumentId,
       subjectId: assignment.subjectId
     });
-    
+
     this.logger.log(`Created record with ID: ${record.id}`);
     try {
       await this.gatewayService.deleteRemoteAssignment(assignment.id);
@@ -60,6 +62,12 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   }
 
   private async sync() {
+    const setupState = await this.setupService.getState();
+    if (!setupState.isSetup) {
+      this.logger.log('Will not attempt synchronizing with gateway: app is not setup');
+      return;
+    }
+
     this.logger.log('Synchronizing with gateway...');
     let remoteAssignments: RemoteAssignment[];
     try {

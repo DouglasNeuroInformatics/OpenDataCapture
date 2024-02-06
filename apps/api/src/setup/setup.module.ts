@@ -9,6 +9,7 @@ import { SetupService } from './setup.service';
 
 @Module({
   controllers: [SetupController],
+  exports: [SetupService],
   imports: [DemoModule, PrismaModule.forFeature('SetupState'), UsersModule],
   providers: [SetupService]
 })

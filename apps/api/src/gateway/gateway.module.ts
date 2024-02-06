@@ -5,6 +5,7 @@ import { AssignmentsModule } from '@/assignments/assignments.module';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsModule } from '@/instrument-records/instrument-records.module';
 import { InstrumentsModule } from '@/instruments/instruments.module';
+import { SetupModule } from '@/setup/setup.module';
 
 import { GatewayService } from './gateway.service';
 import { GatewaySynchronizer } from './gateway.synchronizer';
@@ -24,7 +25,8 @@ import { GatewaySynchronizer } from './gateway.synchronizer';
       }
     }),
     InstrumentRecordsModule,
-    InstrumentsModule
+    InstrumentsModule,
+    SetupModule
   ],
   providers: [GatewayService, GatewaySynchronizer]
 })
