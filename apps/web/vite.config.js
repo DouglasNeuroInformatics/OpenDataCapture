@@ -4,8 +4,9 @@ import url from 'url';
 import importMetaEnv from '@import-meta-env/unplugin';
 import plausible from '@open-data-capture/vite-plugin-plausible';
 import runtime from '@open-data-capture/vite-plugin-runtime';
-import tailwind from '@open-data-capture/vite-plugin-tailwind'
 import react from '@vitejs/plugin-react-swc';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
@@ -30,11 +31,8 @@ export default defineConfig({
     }),
     translations(),
     runtime(),
-    tailwind({
-      content: ['index.html', './src/**/*.{js,ts,jsx,tsx}'],
-      include: ['@open-data-capture/editor', '@open-data-capture/instrument-renderer', '@open-data-capture/react-core'],
-      root: import.meta.file
-    })
+    autoprefixer(),
+    tailwindcss()
   ],
   resolve: {
     alias: {

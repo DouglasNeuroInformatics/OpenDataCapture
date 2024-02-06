@@ -2,7 +2,7 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 
 import i18n from '../src/services/i18n';
 
-import '../src/styles.css';
+import '@open-data-capture/react-core/styles.css';
 
 /** @type {import('@storybook/react').Preview} */
 const preview = {
