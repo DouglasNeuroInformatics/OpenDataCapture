@@ -17,7 +17,8 @@ const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
 export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1000,
-    emptyOutDir: false
+    emptyOutDir: false,
+    target: 'es2022'
   },
   css: {
     postcss: {
