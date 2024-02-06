@@ -56,9 +56,9 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@open-data-capture/tailwindcss": "workspace:*",
     "@open-data-capture/vite-plugin-plausible": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
-    "@open-data-capture/vite-plugin-tailwind": "workspace:*",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",

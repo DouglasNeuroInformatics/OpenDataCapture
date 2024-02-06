@@ -2,8 +2,9 @@ import path from 'path';
 import url from 'url';
 
 import runtime from '@open-data-capture/vite-plugin-runtime';
-import tailwind from '@open-data-capture/vite-plugin-tailwind';
 import react from '@vitejs/plugin-react-swc';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -14,15 +15,12 @@ export default defineConfig({
     emptyOutDir: false,
     target: 'es2022'
   },
-  plugins: [
-    react(),
-    runtime(),
-    tailwind({
-      content: ['index.html', './src/**/*.{js,ts,jsx,tsx}'],
-      include: ['@open-data-capture/instrument-renderer', '@open-data-capture/react-core'],
-      root: import.meta.url
-    })
-  ],
+  css: {
+    postcss: {
+      plugins: [autoprefixer(), tailwindcss()]
+    }
+  },
+  plugins: [react(), runtime()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src')

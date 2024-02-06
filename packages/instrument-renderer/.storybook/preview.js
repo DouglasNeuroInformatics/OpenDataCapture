@@ -1,3 +1,5 @@
+// @ts-check
+
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 
 import i18n from '../src/services/i18n';

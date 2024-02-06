@@ -3,8 +3,6 @@ import path from 'path';
 import process from 'process';
 
 import baseConfig from '@douglasneuroinformatics/ui/tailwind.config.cjs';
-import autoprefixer from 'autoprefixer';
-import tailwindcss from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme.js';
 
 /**
@@ -12,9 +10,9 @@ import defaultTheme from 'tailwindcss/defaultTheme.js';
  * @param {string[]} [options.content]
  * @param {string[]} [options.include]
  * @param {string | URL} [options.root]
- * @returns {import('vite').PluginOption}
+ * @returns {import('tailwindcss').Config}
  */
-const tailwind = (options) => {
+export function createConfig(options) {
   const content = options?.content ?? [];
   const include = options?.include ?? [];
   const root = options?.root ?? process.cwd();
@@ -34,28 +32,12 @@ const tailwind = (options) => {
   }
 
   return {
-    config() {
-      return {
-        css: {
-          postcss: {
-            plugins: [
-              tailwindcss({
-                content: [...baseConfig.content, ...libraryContent, ...content],
-                presets: [baseConfig],
-                theme: {
-                  fontFamily: {
-                    sans: ['Inter var', ...defaultTheme.fontFamily.sans]
-                  }
-                }
-              }),
-              autoprefixer
-            ]
-          }
-        }
-      };
-    },
-    name: 'vite-plugin-tailwind'
+    content: [...baseConfig.content, ...libraryContent, ...content],
+    presets: [baseConfig],
+    theme: {
+      fontFamily: {
+        sans: ['Inter var', ...defaultTheme.fontFamily.sans]
+      }
+    }
   };
-};
-
-export default tailwind;
+}
