@@ -8,8 +8,7 @@ services:
     image: caddy:2.7-alpine
     restart: unless-stopped
     ports:
-      - '80:80'
-      - '443:443'
+      - '5500:80'
     environment:
       - SITE_ADDRESS
     volumes:
@@ -25,11 +24,31 @@ services:
     environment:
       - NODE_ENV=production
       - MONGO_URI=mongodb://mongo:27017
+      - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
       - GATEWAY_API_KEY
-      - GATEWAY_BASE_URL
       - GATEWAY_ENABLED
       - GATEWAY_REFRESH_INTERVAL
       - SECRET_KEY
+    expose:
+      - 80
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+    ports:
+      - '3500:80'
+    expose:
+      - 80
+    environment:
+      - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
+      - NODE_ENV=production
+      - GATEWAY_API_KEY
+  playground:
+    build:
+      context: .
+      dockerfile: ./apps/playground/Dockerfile
+    ports:
+      - '3750:80'
     expose:
       - 80
   web:
