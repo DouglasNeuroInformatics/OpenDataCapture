@@ -17,7 +17,7 @@ export const LoginPage = () => {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
   const navigate = useNavigate();
-  const { t } = useTranslation('auth');
+  const { i18n, t } = useTranslation('auth');
 
   const login = async (credentials: LoginCredentials) => {
     const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
@@ -52,6 +52,7 @@ export const LoginPage = () => {
         className="min-h-0 flex-grow"
         languageToggle={{
           dropdownDirection: 'up',
+          i18n,
           options: ['en', 'fr']
         }}
         logo={logo}

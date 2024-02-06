@@ -11,7 +11,7 @@ import { SetupLoadingScreen } from '../components/SetupLoadingScreen';
 import { useInitApp } from '../hooks/useInitApp';
 
 export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
-  const { t } = useTranslation('setup');
+  const { i18n, t } = useTranslation('setup');
   const setupStateQuery = useSetupState();
   const initAppMutation = useInitApp();
 
@@ -31,6 +31,7 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
     <FormPageWrapper
       languageToggle={{
         dropdownDirection: 'up',
+        i18n,
         options: ['en', 'fr']
       }}
       logo={logo}
