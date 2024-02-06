@@ -33,6 +33,8 @@ services:
       - 80
   gateway:
     build:
+      args:
+        GATEWAY_DATABASE_FILEPATH: /app/gateway.db
       context: .
       dockerfile: ./apps/gateway/Dockerfile
     ports:
@@ -67,8 +69,10 @@ services:
     expose:
       - 80
   mongo:
+    command: --replSet rs0
     image: mongo:6.0.2
     expose:
       - 27017
+      - 28017
     volumes:
       - mongo_data:/data/db
