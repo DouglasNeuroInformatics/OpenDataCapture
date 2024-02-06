@@ -19,6 +19,11 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false
   },
+  css: {
+    postcss: {
+      plugins: [autoprefixer(), tailwindcss()]
+    }
+  },
   plugins: [
     plausible({
       baseUrl: process.env.PLAUSIBLE_BASE_URL,
@@ -30,9 +35,7 @@ export default defineConfig({
       example: path.resolve(projectDir, '.env.public')
     }),
     translations(),
-    runtime(),
-    autoprefixer(),
-    tailwindcss()
+    runtime()
   ],
   resolve: {
     alias: {
