@@ -54,7 +54,8 @@ cd OpenDataCapture
 
 ```shell
 ./scripts/generate-env.sh
-docker compose up
+docker compose up -d
+docker compose exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
 ```
 
 By default, the application will run on port 5500. So, navigate to `http://localhost:5500` in your browser and you should be greeted with the setup screen.

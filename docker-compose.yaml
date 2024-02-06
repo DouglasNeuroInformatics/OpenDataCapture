@@ -69,10 +69,9 @@ services:
     expose:
       - 80
   mongo:
-    command: --replSet rs0
-    image: mongo:6.0.2
+    image: mongo:7.0
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
     expose:
       - 27017
-      - 28017
     volumes:
       - mongo_data:/data/db

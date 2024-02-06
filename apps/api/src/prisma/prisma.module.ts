@@ -42,7 +42,7 @@ export class PrismaModule {
           useFactory: (configurationService: ConfigurationService) => {
             const mongoUri = configurationService.get('MONGO_URI');
             const dbName = configurationService.get('NODE_ENV');
-            const datasourceUrl = `${mongoUri}/data-capture-${dbName}`;
+            const datasourceUrl = `${mongoUri}/data-capture-${dbName}?replicaSet=rs0&retryWrites=true&w=majority&directConnection=true`;
             this.logger.debug(`Attempting to create client with data source: '${datasourceUrl}'`);
             return PrismaFactory.createClient({ datasourceUrl });
           }
