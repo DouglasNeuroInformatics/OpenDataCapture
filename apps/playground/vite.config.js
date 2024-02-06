@@ -7,7 +7,7 @@ import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 
-const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig({
   build: {
@@ -15,13 +15,18 @@ export default defineConfig({
     emptyOutDir: false,
     target: 'es2022'
   },
+  css: {
+    postcss: {
+      plugins: [autoprefixer(), tailwindcss()]
+    }
+  },
   optimizeDeps: {
     exclude: ['@swc/wasm-web']
   },
-  plugins: [react(), runtime(), autoprefixer(), tailwindcss()],
+  plugins: [react(), runtime()],
   resolve: {
     alias: {
-      '@': path.resolve(projectDir, 'src')
+      '@': path.resolve(__dirname, 'src')
     }
   },
   server: {
