@@ -24,7 +24,9 @@
   },
   "devDependencies": {
     "@open-data-capture/tailwindcss": "workspace:*",
-    "vite": "^4.5.0"
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.33",
+    "vite": "^5.0.12"
   },
   "peerDependencies": {
     "react": "18.x",
