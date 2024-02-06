@@ -25,7 +25,7 @@
     "react-i18next": "^14.0.0"
   },
   "devDependencies": {
-    "@open-data-capture/vite-plugin-tailwind": "workspace:*",
+    "@open-data-capture/tailwindcss": "workspace:*",
     "vite": "^4.5.0"
   },
   "peerDependencies": {

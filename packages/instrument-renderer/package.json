@@ -35,8 +35,8 @@
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
+    "@open-data-capture/tailwindcss": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
-    "@open-data-capture/vite-plugin-tailwind": "workspace:*",
     "@types/lodash": "^4.14.202",
     "vite": "^4.5.0"
   },

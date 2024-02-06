@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/vite-plugin-tailwind",
+  "name": "@open-data-capture/tailwindcss",
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
@@ -13,8 +13,5 @@
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1"
-  },
-  "peerDependencies": {
-    "vite": "4.x"
   }
 }
