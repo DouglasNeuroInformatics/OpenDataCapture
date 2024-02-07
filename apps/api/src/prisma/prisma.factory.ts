@@ -44,8 +44,8 @@ export class PrismaFactory {
           toInstance: {
             compute({ bundle }) {
               return async function <TKind extends InstrumentKind>(options?: InterpretOptions<TKind>) {
-                const interpreter = new InstrumentInterpreter();
                 const transformer = new InstrumentTransformer();
+                const interpreter = new InstrumentInterpreter();
                 bundle = await transformer.transformRuntimeImports(bundle);
                 return interpreter.interpret(bundle, options);
               };

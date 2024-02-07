@@ -14,7 +14,9 @@ import { CreateInstrumentDto } from './dto/create-instrument.dto';
 
 @Injectable()
 export class InstrumentsService {
-  private readonly instrumentInterpreter = new InstrumentInterpreter();
+  private readonly instrumentInterpreter = new InstrumentInterpreter({
+    transformBundle: (bundle) => this.instrumentTransformer.transformRuntimeImports(bundle)
+  });
   private readonly instrumentTransformer = new InstrumentTransformer();
   private readonly logger = new Logger(InstrumentsService.name);
 
@@ -106,7 +108,6 @@ export class InstrumentsService {
   private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
     let instance: SomeInstrument<TKind>;
     try {
-      bundle = await this.instrumentTransformer.transformRuntimeImports(bundle);
       instance = await this.instrumentInterpreter.interpret(bundle, {
         kind: options?.kind,
         validate: true

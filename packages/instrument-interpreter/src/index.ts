@@ -2,6 +2,12 @@
 
 import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@open-data-capture/common/instrument';
 import type { AnyInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
+import type { Promisable } from 'type-fest';
+
+export type InstrumentInterpreterOptions = {
+  /** An optional function to preprocess a bundle */
+  transformBundle?: (bundle: string) => Promisable<string>;
+};
 
 export type InterpretOptions<TKind extends InstrumentKind> = {
   /** The value to assign to the id property of the instrument */
@@ -13,9 +19,16 @@ export type InterpretOptions<TKind extends InstrumentKind> = {
 };
 
 export class InstrumentInterpreter {
+  private transformBundle?: (bundle: string) => Promisable<string>;
+
+  constructor(options?: InstrumentInterpreterOptions) {
+    this.transformBundle = options?.transformBundle;
+  }
+
   async interpret<TKind extends InstrumentKind>(bundle: string, options?: InterpretOptions<TKind>) {
     let instrument: AnyInstrument;
     try {
+      bundle = await this.transformBundle?.(bundle) ?? bundle;
       const factory = new Function(`return ${bundle}`);
       const value = (await factory()) as unknown;
       if (!options?.validate) {

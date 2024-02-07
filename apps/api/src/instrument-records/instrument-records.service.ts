@@ -12,6 +12,7 @@ import type {
 } from '@open-data-capture/common/instrument-records';
 import type { InstrumentRecordModel } from '@open-data-capture/database/core';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
+import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -24,7 +25,10 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
 export class InstrumentRecordsService {
-  private readonly interpreter = new InstrumentInterpreter();
+  private readonly interpreter = new InstrumentInterpreter({
+    transformBundle: (bundle) => this.transformer.transformRuntimeImports(bundle)
+  });
+  private readonly transformer = new InstrumentTransformer();
 
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
