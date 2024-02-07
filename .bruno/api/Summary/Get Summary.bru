@@ -7,5 +7,9 @@ meta {
 get {
   url: {{BASE_URL}}/v1/summary
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{JANE_DOE_ACCESS_TOKEN}}
 }
