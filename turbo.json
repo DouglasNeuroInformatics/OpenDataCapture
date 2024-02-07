@@ -19,6 +19,9 @@
     },
     "format": {},
     "lint": {},
+    "start": {
+      "dependsOn": ["build"]
+    },
     "test": {
       "dependsOn": ["^build"]
     }
