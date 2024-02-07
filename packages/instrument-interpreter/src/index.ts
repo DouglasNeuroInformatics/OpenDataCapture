@@ -3,7 +3,7 @@
 import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@open-data-capture/common/instrument';
 import type { AnyInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
 
-export type InstrumentInterpreterOptions<TKind extends InstrumentKind> = {
+export type InterpretOptions<TKind extends InstrumentKind> = {
   /** The value to assign to the id property of the instrument */
   id?: string;
   /** The kind of instrument being evaluated. If validate is set to true, this will be enforced at runtime. Otherwise, it will just be asserted */
@@ -13,7 +13,7 @@ export type InstrumentInterpreterOptions<TKind extends InstrumentKind> = {
 };
 
 export class InstrumentInterpreter {
-  async interpret<TKind extends InstrumentKind>(bundle: string, options?: InstrumentInterpreterOptions<TKind>) {
+  async interpret<TKind extends InstrumentKind>(bundle: string, options?: InterpretOptions<TKind>) {
     let instrument: AnyInstrument;
     try {
       const factory = new Function(`return ${bundle}`);
