@@ -1,0 +1,14 @@
+{
+  "name": "@open-data-capture/esbuild-plugin-native-modules",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "eslint --fix src"
+  },
+  "peerDependencies": {
+    "esbuild": "0x"
+  }
+}
