@@ -1,9 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const MANIFEST_FILENAME = 'runtime.json';
-
-import { resolvePackages, resolveVersion } from '@open-data-capture/runtime-resolve';
+import { MANIFEST_FILENAME, resolvePackages, resolveVersion } from '@open-data-capture/runtime-resolve';
 
 /**
  * Returns the content and MIME type for a file in a given version

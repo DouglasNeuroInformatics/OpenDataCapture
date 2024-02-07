@@ -5,6 +5,7 @@ import url from 'url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
+const MANIFEST_FILENAME = 'runtime.json';
 const RUNTIME_DIR = path.resolve(__dirname, '../../../runtime');
 
 /**
@@ -70,3 +71,5 @@ export async function resolvePackages() {
   const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
   return await Promise.all(versions.map((version) => resolveVersion(version)));
 }
+
+export { MANIFEST_FILENAME, RUNTIME_DIR };
