@@ -1,6 +1,8 @@
 import type { BuildOptions, BuildResult, InitializeOptions, Metafile } from 'esbuild';
 import type { ValueOf } from 'type-fest';
 
+import { type TransformRuntimeImportsOptions, transformRuntimeImportsPlugin } from './plugin';
+
 export type Transpiler = {
   build(options: BuildOptions): Promise<BuildResult>;
   initialize(options: InitializeOptions): Promise<void>;
@@ -24,8 +26,19 @@ export abstract class BaseInstrumentTransformer {
     return this.transpiler.initialize(options);
   }
 
+  async transformRuntimeImports(bundle: string, options?: TransformRuntimeImportsOptions) {
+    const result = await this.build(bundle, {
+      bundle: true,
+      minify: false,
+      plugins: [transformRuntimeImportsPlugin(options)]
+    });
+    return this.getBuiltCode(result);
+  }
+
   private build(source: string, options: BuildOptions = {}) {
     return this.transpiler.build({
+      format: 'esm',
+      keepNames: true,
       metafile: true,
       minify: true,
       outfile: 'bundle.js',
