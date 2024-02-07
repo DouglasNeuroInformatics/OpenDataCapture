@@ -106,6 +106,7 @@ export class InstrumentsService {
   private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
     let instance: SomeInstrument<TKind>;
     try {
+      bundle = await this.instrumentTransformer.transformRuntimeImports(bundle);
       instance = await this.instrumentInterpreter.interpret(bundle, {
         kind: options?.kind,
         validate: true
