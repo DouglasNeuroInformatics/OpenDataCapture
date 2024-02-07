@@ -12,7 +12,7 @@
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development tsx src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "preview": "env-cmd -f ../../.env cross-env NODE_ENV=production node dist/main.mjs"
+    "start": "env-cmd -f ../../.env cross-env NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT node dist/main.mjs"
   },
   "dependencies": {
     "@douglasneuroinformatics/crypto": "latest",
