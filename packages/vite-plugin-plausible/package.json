@@ -9,6 +9,6 @@
     "lint": "eslint --fix src"
   },
   "peerDependencies": {
-    "vite": "4.x"
+    "vite": "5.x"
   }
 }

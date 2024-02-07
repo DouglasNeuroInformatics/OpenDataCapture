@@ -10,6 +10,6 @@
   },
   "peerDependencies": {
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
-    "vite": "4.x"
+    "vite": "5.x"
   }
 }
