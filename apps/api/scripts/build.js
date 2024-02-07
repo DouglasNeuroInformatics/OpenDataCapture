@@ -15,8 +15,11 @@ const entryFile = path.resolve(__dirname, '../src/main.ts');
 const outdir = path.resolve(__dirname, '../dist');
 const tsconfig = path.resolve(__dirname, '../tsconfig.json');
 
+const binDir = path.resolve(outdir, 'bin');
+
 await fs.rm(outdir, { force: true, recursive: true });
 await fs.mkdir(outdir);
+await fs.mkdir(binDir);
 
 const cjsShims = `
 const { __dirname, __filename, require } = await (async () => {
@@ -46,7 +49,14 @@ async function copyPrisma() {
   await fs.copyFile(path.join(coreDatabasePath, engineFilename), path.join(outdir, 'core', engineFilename));
 }
 
+// Copy Prisma
+async function copyEsbuild() {
+  const filepath = require.resolve('esbuild/bin/esbuild');
+  await fs.copyFile(filepath, path.join(binDir, 'esbuild'));
+}
+
 await copyPrisma();
+await copyEsbuild();
 
 await esbuild.build({
   banner: {
