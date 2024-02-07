@@ -49,4 +49,12 @@ describe('InstrumentTransformer', () => {
       expect(transformer.generateBundle(source)).rejects.toThrow();
     });
   });
+
+  describe('transformRuntimeImports', () => {
+    it('should transform imports', async () => {
+      const input = 'import("/runtime/v0.0.1/react.js");\n';
+      const output = 'import("./runtime/v0.0.1/react.js");\n';
+      expect(transformer.transformRuntimeImports(input)).resolves.toBe(output);
+    });
+  });
 });
