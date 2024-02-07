@@ -5,6 +5,7 @@ import module from 'module';
 import path from 'path';
 import url from 'url';
 
+import { nativeModulesPlugin } from '@open-data-capture/esbuild-plugin-native-modules';
 import esbuild from 'esbuild';
 
 const __filename = url.fileURLToPath(import.meta.url);
@@ -44,7 +45,11 @@ const engineFilename = files.find((filename) => {
 if (!engineFilename) {
   throw new Error(`Failed to resolve prisma engine from path: ${databaseLibPath}`);
 }
-await fs.mkdir(path.join(outdir, 'gateway'));
+const dbDir = path.join(outdir, 'gateway');
+const dbDirExists = (await fs.lstat(dbDir)).isDirectory;
+if (!dbDirExists) {
+  await fs.mkdir(dbDir);
+}
 await fs.copyFile(path.join(databaseLibPath, engineFilename), path.join(outdir, 'gateway', engineFilename));
 
 await esbuild.build({
@@ -58,6 +63,7 @@ await esbuild.build({
   keepNames: true,
   outfile: path.resolve(outdir, 'main.mjs'),
   platform: 'node',
+  plugins: [nativeModulesPlugin()],
   target: ['node18', 'es2022'],
   tsconfig
 });

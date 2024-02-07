@@ -1,5 +1,15 @@
-/** @type {() => import('esbuild').Plugin} */
+import module from 'module';
+
+/**
+ * Adds support to esbuild for loading native node modules
+ *
+ * This works by intercepting import paths for .node files in the "file" namespace
+ * and adding them to the 'node-file' namespace instead.
+ *
+ * @returns {import('esbuild').Plugin}
+ */
 export function nativeModulesPlugin() {
+  const require = module.createRequire(import.meta.url);
   return {
     name: 'native-modules',
     setup(build) {
