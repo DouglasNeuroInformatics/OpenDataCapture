@@ -33,16 +33,20 @@ const { __dirname, __filename, require } = await (async () => {
 `;
 
 // Copy Prisma
-const coreDatabasePath = path.dirname(require.resolve('@open-data-capture/database/core'));
-const files = await fs.readdir(coreDatabasePath);
-const engineFilename = files.find((filename) => {
-  return filename.startsWith('libquery_engine') && filename.endsWith('.node');
-});
-if (!engineFilename) {
-  throw new Error(`Failed to resolve prisma engine from path: ${coreDatabasePath}`);
+async function copyPrisma() {
+  const coreDatabasePath = path.dirname(require.resolve('@open-data-capture/database/core'));
+  const files = await fs.readdir(coreDatabasePath);
+  const engineFilename = files.find((filename) => {
+    return filename.startsWith('libquery_engine') && filename.endsWith('.node');
+  });
+  if (!engineFilename) {
+    throw new Error(`Failed to resolve prisma engine from path: ${coreDatabasePath}`);
+  }
+  await fs.mkdir(path.join(outdir, 'core'));
+  await fs.copyFile(path.join(coreDatabasePath, engineFilename), path.join(outdir, 'core', engineFilename));
 }
-await fs.mkdir(path.join(outdir, 'core'));
-await fs.copyFile(path.join(coreDatabasePath, engineFilename), path.join(outdir, 'core', engineFilename));
+
+await copyPrisma();
 
 await esbuild.build({
   banner: {
