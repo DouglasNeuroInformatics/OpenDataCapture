@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 type SetupData = {
+  dummySubjectCount?: number;
   firstName: string;
   initDemo: boolean;
   lastName: string;
@@ -59,6 +60,20 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
                 t: t('yes')
               },
               variant: 'radio'
+            },
+            dummySubjectCount: {
+              kind: 'dynamic',
+              render: (data) => {
+                if (!data?.initDemo) {
+                  return null;
+                }
+                return {
+                  kind: 'numeric',
+                  label: t('setup:demo.dummySubjectCount'),
+                  variant: 'default'
+                };
+              },
+              deps: ['initDemo']
             }
           },
           title: t('setup:demo.title')
@@ -70,7 +85,7 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
         lastName: z.string().min(1),
         username: z.string().min(1),
         password: $StrongPassword,
-        initDemo: z.boolean(),
+        initDemo: z.boolean()
       })}
       onSubmit={onSubmit}
     />

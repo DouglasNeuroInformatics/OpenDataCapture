@@ -39,7 +39,7 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
       widthMultiplier={1.5}
     >
       <SetupForm
-        onSubmit={({ firstName, initDemo, lastName, password, username }) => {
+        onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, username }) => {
           initAppMutation.mutate({
             admin: {
               firstName,
@@ -47,6 +47,7 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
               password,
               username
             },
+            dummySubjectCount,
             initDemo
           });
         }}

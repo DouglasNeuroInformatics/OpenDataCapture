@@ -9,5 +9,8 @@ export class InitAppDto implements InitAppOptions {
   admin: CreateAdminData;
 
   @ApiProperty()
+  dummySubjectCount?: number;
+
+  @ApiProperty()
   initDemo: boolean;
 }
