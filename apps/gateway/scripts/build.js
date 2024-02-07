@@ -1,5 +1,6 @@
 // @ts-check
 
+import { existsSync } from 'fs';
 import fs from 'fs/promises';
 import module from 'module';
 import path from 'path';
@@ -16,8 +17,7 @@ const entryFile = path.resolve(__dirname, '../src/main.ts');
 const outdir = path.resolve(__dirname, '../dist');
 const tsconfig = path.resolve(__dirname, '../tsconfig.json');
 
-const outdirExists = (await fs.lstat(outdir)).isDirectory;
-if (!outdirExists) {
+if (!existsSync(outdir)) {
   await fs.mkdir(outdir);
 }
 
@@ -46,8 +46,7 @@ if (!engineFilename) {
   throw new Error(`Failed to resolve prisma engine from path: ${databaseLibPath}`);
 }
 const dbDir = path.join(outdir, 'gateway');
-const dbDirExists = (await fs.lstat(dbDir)).isDirectory;
-if (!dbDirExists) {
+if (!existsSync(dbDir)) {
   await fs.mkdir(dbDir);
 }
 await fs.copyFile(path.join(databaseLibPath, engineFilename), path.join(outdir, 'gateway', engineFilename));
