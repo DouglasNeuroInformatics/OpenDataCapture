@@ -85,7 +85,8 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
         lastName: z.string().min(1),
         username: z.string().min(1),
         password: $StrongPassword,
-        initDemo: z.boolean()
+        initDemo: z.boolean(),
+        dummySubjectCount: z.number().int().nonnegative().optional()
       })}
       onSubmit={onSubmit}
     />
