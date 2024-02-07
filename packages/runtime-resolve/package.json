@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/vite-plugin-runtime",
+  "name": "@open-data-capture/runtime-resolve",
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
@@ -8,11 +8,7 @@
     "format": "prettier --write src",
     "lint": "eslint --fix src"
   },
-  "dependencies": {
-    "@open-data-capture/runtime-resolve": "workspace:*"
-  },
   "peerDependencies": {
-    "@open-data-capture/runtime-v0.0.1": "workspace:*",
-    "vite": "5.x"
+    "@open-data-capture/runtime-v0.0.1": "workspace:*"
   }
 }
