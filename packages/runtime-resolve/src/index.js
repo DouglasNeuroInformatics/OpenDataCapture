@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
@@ -17,7 +18,7 @@ const RUNTIME_DIR = path.resolve(__dirname, '../../../runtime');
  * @param {string} path
  * @returns {Promise<boolean>}
  */
-const isDirectory = (path) => fs.lstat(path).then((stat) => stat.isDirectory());
+const isDirectory = async (path) => existsSync(path) && fs.lstat(path).then((stat) => stat.isDirectory());
 
 /**
  * Recursively get a list of files relative to the base directory
