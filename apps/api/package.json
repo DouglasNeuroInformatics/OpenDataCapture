@@ -36,6 +36,7 @@
     "@open-data-capture/instrument-interpreter": "workspace:*",
     "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/instrument-transformer": "workspace:*",
+    "@open-data-capture/runtime-v0.0.1": "workspace:*",
     "axios": "^1.6.5",
     "lodash": "^4.17.21",
     "passport": "^0.7.0",
