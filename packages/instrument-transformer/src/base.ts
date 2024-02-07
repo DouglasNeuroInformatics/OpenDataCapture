@@ -24,7 +24,7 @@ export abstract class BaseInstrumentTransformer {
     return this.transpiler.initialize(options);
   }
 
-  private build(source: string) {
+  private build(source: string, options: BuildOptions = {}) {
     return this.transpiler.build({
       metafile: true,
       minify: true,
@@ -35,7 +35,8 @@ export abstract class BaseInstrumentTransformer {
         loader: 'tsx'
       },
       target: 'es2022',
-      write: false
+      write: false,
+      ...options
     });
   }
 
