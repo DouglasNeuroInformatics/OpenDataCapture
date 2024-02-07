@@ -3,6 +3,7 @@ import module from 'module';
 import path from 'path';
 import url from 'url';
 
+import { nativeModulesPlugin } from '@open-data-capture/esbuild-plugin-native-modules';
 import esbuild from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
 
@@ -57,7 +58,8 @@ await esbuild.build({
   plugins: [
     esbuildPluginTsc({
       tsconfigPath: tsconfig
-    })
+    }),
+    nativeModulesPlugin()
   ],
   target: ['node18', 'es2022'],
   tsconfig
