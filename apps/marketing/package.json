@@ -8,8 +8,7 @@
     "dev": "astro dev",
     "format": "prettier --write src",
     "lint": "astro check && eslint --fix src",
-    "preview": "astro preview",
-    "start": "astro dev"
+    "start": "astro preview"
   },
   "dependencies": {
     "@douglasneuroinformatics/ui": "^5.2.0",

@@ -43,12 +43,12 @@ export class PrismaModule {
             const mongoUri = configurationService.get('MONGO_URI');
             const dbName = configurationService.get('NODE_ENV');
             const url = new URL(`${mongoUri}/data-capture-${dbName}`);
-            if (dbName === 'production') {
-              url.searchParams.append('replicaSet', 'rs0');
-              url.searchParams.append('retryWrites', 'true');
-              url.searchParams.append('w', 'majority');
-              url.searchParams.append('directConnection', 'true');
-            }
+            // if (dbName === 'production') {
+            //   url.searchParams.append('replicaSet', 'rs0');
+            //   url.searchParams.append('retryWrites', 'true');
+            //   url.searchParams.append('w', 'majority');
+            //   url.searchParams.append('directConnection', 'true');
+            // }
             this.logger.debug(`Attempting to create client with data source: '${url.href}'`);
             return PrismaFactory.createClient({ datasourceUrl: url.href });
           }

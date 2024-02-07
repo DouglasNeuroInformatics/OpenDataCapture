@@ -20,7 +20,8 @@
     "format": {},
     "lint": {},
     "start": {
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "persistent": true
     },
     "test": {
       "dependsOn": ["^build"]

@@ -25,6 +25,7 @@
     "lint": "turbo run lint --no-daemon",
     "prepare": "husky install",
     "test": "env-cmd turbo run test --no-daemon",
+    "start": "env-cmd cross-env NODE_ENV=production turbo run start --no-daemon",
     "ws": "./scripts/workspace.js $@"
   },
   "devDependencies": {
