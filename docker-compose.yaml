@@ -22,13 +22,14 @@ services:
     depends_on:
       - mongo
     environment:
-      - NODE_ENV=production
+      - ESBUILD_BINARY_PATH=dist/bin/esbuild
+      - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
       - MONGO_REPLICA_SET=rs0
       - MONGO_RETRY_WRITES=true
       - MONGO_WRITE_CONCERN=majority
       - MONGO_DIRECT_CONNECTION=true
       - MONGO_URI=mongodb://mongo:27017
-      - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
+      - NODE_ENV=production
       - DEBUG
       - GATEWAY_API_KEY
       - GATEWAY_ENABLED
