@@ -51,11 +51,11 @@ export class DemoService {
       this.logger.log(`Initializing demo for database: '${dbName}'`);
 
       const forms = await Promise.all([
-        this.instrumentsService.create(briefPsychiatricRatingScale),
-        this.instrumentsService.create(enhancedDemographicsQuestionnaire),
-        this.instrumentsService.create(happinessQuestionnaire),
-        this.instrumentsService.create(miniMentalStateExamination),
-        this.instrumentsService.create(montrealCognitiveAssessment)
+        this.instrumentsService.createFromBundle(briefPsychiatricRatingScale),
+        this.instrumentsService.createFromBundle(enhancedDemographicsQuestionnaire),
+        this.instrumentsService.createFromBundle(happinessQuestionnaire),
+        this.instrumentsService.createFromBundle(miniMentalStateExamination),
+        this.instrumentsService.createFromBundle(montrealCognitiveAssessment)
       ]);
 
       await this.instrumentsService.createFromBundle(breakoutTask);
