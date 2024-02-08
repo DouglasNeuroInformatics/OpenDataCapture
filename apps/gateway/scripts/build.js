@@ -67,4 +67,19 @@ await esbuild.build({
   tsconfig
 });
 
+const entryServer = path.join(__dirname, '../dist/server/entry-server.js');
+
+await esbuild.build({
+  allowOverwrite: true,
+  banner: {
+    js: cjsShims
+  },
+  bundle: true,
+  entryPoints: [entryServer],
+  format: 'esm',
+  outfile: entryServer,
+  platform: 'node',
+  target: ['node18', 'es2022']
+});
+
 console.log('Done!');
