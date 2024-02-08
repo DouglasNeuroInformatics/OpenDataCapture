@@ -1,5 +1,5 @@
 import { $Summary } from '@open-data-capture/common/summary';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 type UseSummaryQueryOptions = {
@@ -9,7 +9,8 @@ type UseSummaryQueryOptions = {
 };
 
 export const useSummaryQuery = ({ params }: UseSummaryQueryOptions = { params: {} }) => {
-  return useSuspenseQuery({
+  return useQuery({
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const response = await axios.get('/v1/summary', {
         params

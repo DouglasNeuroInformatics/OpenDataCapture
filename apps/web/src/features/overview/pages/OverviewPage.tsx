@@ -14,10 +14,10 @@ export const OverviewPage = () => {
   const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
   return (
-    <div>
+    <div className="flex flex-grow flex-col">
       <Disclaimer isRequired={import.meta.env.PROD} />
       <PageHeader title={pageTitle} />
-      <section>
+      <section className="flex flex-grow flex-col">
         <div className="mb-5 space-y-5 lg:space-y-2">
           <h3 className="text-center text-xl font-medium lg:text-left">{t('summary')}</h3>
           <GroupSwitcher />

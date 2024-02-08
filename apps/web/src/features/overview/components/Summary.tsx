@@ -1,6 +1,7 @@
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 
+import { SuspenseFallback } from '@/components/SuspenseFallback';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { StatisticCard } from '../components/StatisticCard';
@@ -15,6 +16,10 @@ export const Summary = () => {
       groupId: currentGroup?.id
     }
   });
+
+  if (!summaryQuery.data) {
+    return <SuspenseFallback />;
+  }
 
   return (
     <div className="body-font">
