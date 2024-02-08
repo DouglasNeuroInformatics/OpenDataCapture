@@ -22,6 +22,10 @@
       "en": "If you're testing the platform, you have the option to populate the database with sample data.",
       "fr": "Si vous testez la plateforme, vous avez la possibilité d'alimenter la base de données avec des échantillons de données."
     },
+    "dummySubjectCount": {
+      "en": "Number of Dummy Subjects",
+      "fr": "Nombre de clients fictifs"
+    },
     "init": {
       "en": "Initialize Demo",
       "fr": "Initialiser la démonstration"

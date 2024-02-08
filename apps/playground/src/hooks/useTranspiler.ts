@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
+import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
@@ -19,6 +20,7 @@ type LoadingState = {
 };
 
 const instrumentTransformer = new InstrumentTransformer();
+await instrumentTransformer.init({ wasmURL: esbuildWasmUrl });
 
 export type TranspilerState = BuiltState | ErrorState | LoadingState;
 

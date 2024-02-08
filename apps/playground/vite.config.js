@@ -2,11 +2,12 @@ import path from 'path';
 import url from 'url';
 
 import runtime from '@open-data-capture/vite-plugin-runtime';
-import tailwind from '@open-data-capture/vite-plugin-tailwind';
 import react from '@vitejs/plugin-react-swc';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 
-const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig({
   build: {
@@ -14,21 +15,18 @@ export default defineConfig({
     emptyOutDir: false,
     target: 'es2022'
   },
+  css: {
+    postcss: {
+      plugins: [autoprefixer(), tailwindcss()]
+    }
+  },
   optimizeDeps: {
     exclude: ['@swc/wasm-web']
   },
-  plugins: [
-    react(),
-    await runtime(),
-    tailwind({
-      content: ['index.html', './src/**/*.{js,ts,jsx,tsx}'],
-      include: ['@open-data-capture/editor', '@open-data-capture/instrument-renderer', '@open-data-capture/react-core'],
-      root: import.meta.url
-    })
-  ],
+  plugins: [react(), runtime()],
   resolve: {
     alias: {
-      '@': path.resolve(projectDir, 'src')
+      '@': path.resolve(__dirname, 'src')
     }
   },
   server: {

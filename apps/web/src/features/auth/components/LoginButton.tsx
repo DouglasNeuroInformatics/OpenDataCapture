@@ -17,7 +17,7 @@ export const LoginButton = ({ onClick }: LoginButtonProps) => {
       <AnimatePresence>
         <motion.div
           animate={{ opacity: showInfo ? 1 : 0, scale: showInfo ? 1 : 0 }}
-          className="absolute -top-8 origin-bottom-left"
+          className="absolute -top-10 origin-bottom-left"
         >
           <Card className="rounded p-1">
             <span className="whitespace-nowrap text-sm">{t('demo.useCredentials')}</span>
@@ -25,11 +25,13 @@ export const LoginButton = ({ onClick }: LoginButtonProps) => {
         </motion.div>
       </AnimatePresence>
       <button
+        className="text-default flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-1 text-sm font-medium leading-5 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700"
         type="button"
         onClick={onClick}
         onMouseEnter={() => setShowInfo(true)}
         onMouseLeave={() => setShowInfo(false)}
       >
+        {t('login')}
         <LockClosedIcon height={16} width={16} />
       </button>
     </div>

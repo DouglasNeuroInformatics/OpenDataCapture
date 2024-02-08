@@ -1,6 +1,7 @@
-import path from 'path';
+// @ts-check
 
-import tailwind from '@open-data-capture/vite-plugin-tailwind';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
 import { mergeConfig } from 'vite';
 
 /** @type {import('@storybook/react-vite').StorybookConfig} */
@@ -22,13 +23,11 @@ const config = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   viteFinal(config) {
     return mergeConfig(config, {
-      plugins: [
-        tailwind({
-          content: ['./src/**/*.{js,ts,jsx,tsx}'],
-          // eslint-disable-next-line no-undef
-          root: path.resolve(__dirname, '..')
-        })
-      ]
+      css: {
+        postcss: {
+          plugins: [autoprefixer(), tailwindcss()]
+        }
+      }
     });
   }
 };

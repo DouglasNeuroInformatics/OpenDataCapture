@@ -1,5 +1,4 @@
 /// <reference types="@open-data-capture/rollup-plugin-instrument/client" />
-/// <reference types="react" />
 
 export const briefPsychiatricRatingScale: InstrumentLibraryItem;
 export const enhancedDemographicsQuestionnaire: InstrumentLibraryItem;

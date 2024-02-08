@@ -2,7 +2,7 @@
   "compilerOptions": {
     "jsx": "preserve",
     "paths": {
-      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/lib/*"]
+      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/dist/*"]
     }
   },
   "extends": "../../jsconfig.json",

@@ -45,16 +45,16 @@ export class DemoService {
     private readonly visitsService: VisitsService
   ) {}
 
-  async init(): Promise<void> {
+  async init({ dummySubjectCount }: { dummySubjectCount: number }): Promise<void> {
     const dbName = await this.prismaService.getDbName();
     this.logger.log(`Initializing demo for database: '${dbName}'`);
 
     const forms = await Promise.all([
-      this.instrumentsService.create({ kind: 'FORM', source: briefPsychiatricRatingScale.source }),
-      this.instrumentsService.create({ kind: 'FORM', source: enhancedDemographicsQuestionnaire.source }),
-      this.instrumentsService.create({ kind: 'FORM', source: happinessQuestionnaire.source }),
-      this.instrumentsService.create({ kind: 'FORM', source: miniMentalStateExamination.source }),
-      this.instrumentsService.create({ kind: 'FORM', source: montrealCognitiveAssessment.source })
+      this.instrumentsService.create(briefPsychiatricRatingScale),
+      this.instrumentsService.create(enhancedDemographicsQuestionnaire),
+      this.instrumentsService.create(happinessQuestionnaire),
+      this.instrumentsService.create(miniMentalStateExamination),
+      this.instrumentsService.create(montrealCognitiveAssessment)
     ]);
 
     await this.instrumentsService.createFromBundle(breakoutTask);
@@ -71,7 +71,7 @@ export class DemoService {
       });
     }
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < dummySubjectCount; i++) {
       const group = randomValue(groups);
       const subject = await this.createSubject();
       await this.visitsService.create({

@@ -5,7 +5,7 @@ import { Prisma, type UserModel } from '@open-data-capture/database/core';
 
 import type { AppAbility } from '@/core/types';
 
-Prisma
+Prisma;
 @Injectable()
 export class AbilityFactory {
   private readonly logger = new Logger(AbilityFactory.name);
@@ -38,6 +38,8 @@ export class AbilityFactory {
         ability.can('read', 'Visit');
         ability.can('create', 'Visit');
     }
-    return ability.build();
+    return ability.build({
+      detectSubjectType: (object: Record<string, any>) => object.__model__
+    });
   }
 }

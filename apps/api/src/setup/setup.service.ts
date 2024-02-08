@@ -31,7 +31,7 @@ export class SetupService {
     };
   }
 
-  async initApp({ admin, initDemo }: InitAppOptions) {
+  async initApp({ admin, dummySubjectCount, initDemo }: InitAppOptions) {
     const isDev = this.configurationService.get('NODE_ENV') === 'development';
     const savedOptions = await this.getSavedOptions();
     if (savedOptions?.isSetup && !isDev) {
@@ -40,7 +40,7 @@ export class SetupService {
     await this.prismaService.dropDatabase();
     await this.createAdmin(admin);
     if (initDemo) {
-      await this.demoService.init();
+      await this.demoService.init({ dummySubjectCount: dummySubjectCount ?? 0 });
     }
     await this.setupStateModel.create({ data: { isSetup: true } });
     return { success: true };

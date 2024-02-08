@@ -5,15 +5,15 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./lib/index.js",
+      "import": "./dist/index.js",
       "types": "./src/index.d.ts"
     },
     "./forms/*.ts": "./src/forms/*.ts",
     "./interactive/*": "./src/interactive/*"
   },
   "scripts": {
-    "build:lib": "rm -rf lib && bunx rollup -c",
-    "dev": "rm -rf lib && bunx rollup -c --watch",
+    "build": "rm -rf dist && cross-env NODE_OPTIONS='--import tsx/esm' bunx rollup -c",
+    "dev": "rm -rf dist && bunx rollup -c --watch",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },

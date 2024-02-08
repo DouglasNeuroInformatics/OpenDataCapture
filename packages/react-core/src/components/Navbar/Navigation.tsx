@@ -24,7 +24,7 @@ export const Navigation = ({ activeItemId, btn, items, onNavigate, orientation }
       {items.map(({ icon: Icon, id, label, ...props }) => (
         <button
           className={cn(
-            'flex items-center p-2 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100',
+            'flex items-center p-2 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100',
             {
               'justify-start': orientation === 'vertical',
               'mx-1 justify-center': orientation === 'horizontal'

@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "type": "module",
-  "module": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build:lib": "rm -rf lib && bunx rollup -c",
+    "build": "rm -rf dist && bunx rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },

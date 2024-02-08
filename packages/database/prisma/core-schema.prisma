@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/core"
+  output   = "../dist/core"
 }
 
 datasource db {

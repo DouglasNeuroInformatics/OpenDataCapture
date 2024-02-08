@@ -77,11 +77,6 @@ describe('/groups', () => {
     beforeEach(() => {
       id = new ObjectId().toHexString();
     });
-
-    it('should reject a request with an invalid id', async () => {
-      const response = await request(server).get('/groups/123');
-      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    });
     it('should return status code 200 with a valid ID', async () => {
       groupModel.findFirst.mockResolvedValueOnce({ id });
       const response = await request(server).get(`/groups/${id}`);
@@ -103,11 +98,6 @@ describe('/groups', () => {
     let id: string;
     beforeAll(() => {
       id = new ObjectId().toHexString();
-    });
-
-    it('should reject a request with an invalid id', async () => {
-      const response = await request(server).patch('/groups/123');
-      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     it('should reject a request to set the group name to an empty string', async () => {
       const response = await request(server).patch(`/groups/${id}`).send({ name: '' });

@@ -41,30 +41,6 @@ Open Data Capture is an integrated suite of applications tailored for the contin
 - User-Friendly Design: Designed with the user in mind, its intuitive interface ensures that even those without specialized knowledge can navigate and utilize the platform with ease.
 - Streamlined Deployment: With our one-liner deployment solution, leverage Docker Compose for a hassle-free, automated setup.
 
-## Development
-
-### Prerequisites
-
-In order to run the platform locally, you will need to install [Bun](https://bun.sh/) and [MongoDB](https://www.mongodb.com/). Please follow the appropriate documentation to install both for your platform before continuing (for MongoDB, we recommend running it in Docker). Also, if you are running your database on any port other than 27017, please adjust the value for `MONGO_URI` in your `.env` file (discussed later).
-
-### Install Dependencies
-
-```shell
-bun install
-```
-
-### Setup Config
-
-```shell
-bun generate:env
-```
-
-### Launch Dev Server
-
-```shell
-bun dev
-```
-
 ## Deployment
 
 ### Download Repository
@@ -76,12 +52,13 @@ cd OpenDataCapture
 
 ### Launch Application
 
-```
-bun generate:env
-docker compose up
+```shell
+./scripts/generate-env.sh
+docker compose up -d
+docker compose exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
 ```
 
-By default, the application will run on port 80. So, navigate to `localhost` in your browser and you should be greeted with the setup screen.
+By default, the application will run on port 5500. So, navigate to `http://localhost:5500` in your browser and you should be greeted with the setup screen.
 
 ## Contribution
 

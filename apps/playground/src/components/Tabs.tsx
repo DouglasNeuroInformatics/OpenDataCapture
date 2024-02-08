@@ -34,7 +34,7 @@ export const Tabs = <T extends string>({ activeTab, setActiveTab, tabs }: TabsPr
               className={cn(
                 tab.name === activeTab
                   ? 'text-slate-900 dark:text-slate-100'
-                  : 'text-slate-600 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200',
+                  : 'text-slate-700 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200',
                 'group relative min-w-0 flex-1 overflow-hidden bg-slate-50 px-4 py-4 text-center text-sm font-medium hover:bg-slate-100 focus:z-10 dark:bg-slate-800 dark:hover:bg-slate-700'
               )}
               key={tab.name}

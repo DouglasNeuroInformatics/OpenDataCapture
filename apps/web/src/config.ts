@@ -15,7 +15,7 @@ const $Config = z.object({
     licenseUrl: z.string().url()
   }),
   setup: z.object({
-    apiBaseUrl: z.string().url(),
+    apiBaseUrl: z.string().min(1),
     isGatewayEnabled: $BooleanString
   })
 });

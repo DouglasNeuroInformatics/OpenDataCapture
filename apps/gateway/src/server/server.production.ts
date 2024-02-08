@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import compression from 'compression';
+import sirv from 'sirv';
 
 import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
@@ -14,6 +15,8 @@ export class ProductionServer extends BaseServer {
   constructor() {
     super();
     this.app.use(compression());
+    this.app.use('/', sirv(path.resolve(CONFIG.root, './dist/client'), { extensions: [] }));
+    this.app.use('/runtime', sirv(path.resolve(CONFIG.root, './dist/runtime'), { extensions: [] }));
   }
 
   protected async loadRender() {

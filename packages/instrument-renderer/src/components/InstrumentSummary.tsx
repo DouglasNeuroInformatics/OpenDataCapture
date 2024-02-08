@@ -48,7 +48,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
           {t('summary.title', { title: instrument.details.title })}
         </h3>
         <div className="mt-1 grid grid-cols-3">
-          <p className="col-span-2 text-sm text-slate-600 dark:text-slate-300">
+          <p className="col-span-2 text-sm text-slate-700 dark:text-slate-300">
             {t('summary.subtitle', {
               dateCompleted: new Date().toLocaleString(i18n.resolvedLanguage, {
                 dateStyle: 'long',
@@ -56,7 +56,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
               })
             })}
           </p>
-          <div className="flex justify-end gap-4 text-slate-600 dark:text-slate-300 print:hidden">
+          <div className="flex justify-end gap-4 text-slate-700 dark:text-slate-300 print:hidden">
             <button type="button">
               <ArrowDownTrayIcon height={20} width={20} onClick={handleDownload} />
             </button>
@@ -109,10 +109,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
         ]}
         title={t('instrument')}
       />
-      <InstrumentSummaryGroup
-        items={Object.values(computedMeasures)}
-        title={t('responses')}
-      />
+      <InstrumentSummaryGroup items={Object.values(computedMeasures)} title={t('responses')} />
     </Card>
   );
 };

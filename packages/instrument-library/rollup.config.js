@@ -10,7 +10,7 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 export default defineConfig({
   input: path.resolve(__dirname, 'src', 'index.js'),
   output: {
-    file: path.resolve(__dirname, 'lib', 'index.js'),
+    file: path.resolve(__dirname, 'dist', 'index.js'),
     format: 'es',
     generatedCode: 'es2015'
   },

@@ -12,7 +12,6 @@
   "scripts": {
     "build": "env-cmd cross-env NODE_ENV=production turbo run build --no-daemon",
     "build:api": "env-cmd cross-env NODE_ENV=production turbo run build --no-daemon --filter=@open-data-capture/api",
-    "build:lib": "turbo run --no-daemon build:lib",
     "build:web": "env-cmd cross-env NODE_ENV=production turbo run build --no-daemon --filter=@open-data-capture/web",
     "clean": "find . -type d '(' -name '.turbo' -o -name 'dist' -o -name 'node_modules' ')' -prune -exec rm -rf {} \\;",
     "clean-workflows": "./scripts/clean-workflows.sh",
@@ -22,10 +21,11 @@
     "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --no-daemon --filter=@open-data-capture/api --filter=@open-data-capture/gateway --filter=@open-data-capture/web",
     "force-reinstall": "bun pm cache rm && bun clean && bun install",
     "format": "turbo run format --no-daemon",
-    "generate:env": "./scripts/generate-env.js",
+    "generate:env": "./scripts/generate-env.sh",
     "lint": "turbo run lint --no-daemon",
     "prepare": "husky install",
     "test": "env-cmd turbo run test --no-daemon",
+    "start": "env-cmd cross-env NODE_ENV=production turbo run start --no-daemon",
     "ws": "./scripts/workspace.js $@"
   },
   "devDependencies": {
@@ -63,5 +63,5 @@
     "type-fest": "^4.9.0",
     "typescript": "^5.3.3"
   },
-  "packageManager": "bun@1.0.14"
+  "packageManager": "bun@1.0.18"
 }

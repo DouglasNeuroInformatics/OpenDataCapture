@@ -30,7 +30,7 @@ export const Navbar = ({ activeItemId, i18n, items, onNavigate }: NavbarProps) =
 
   return (
     <React.Fragment>
-      <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-600 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
+      <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
         <div className="h--full w-full bg-inherit">
           <div className="container flex items-center justify-between bg-inherit py-3 font-medium">
             <Branding className="[&>span]:hidden md:[&>span]:block" />

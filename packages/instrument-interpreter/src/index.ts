@@ -2,8 +2,14 @@
 
 import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@open-data-capture/common/instrument';
 import type { AnyInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
+import type { Promisable } from 'type-fest';
 
-export type InstrumentInterpreterOptions<TKind extends InstrumentKind> = {
+export type InstrumentInterpreterOptions = {
+  /** An optional function to preprocess a bundle */
+  transformBundle?: ((bundle: string) => Promisable<string>) | null;
+};
+
+export type InterpretOptions<TKind extends InstrumentKind> = {
   /** The value to assign to the id property of the instrument */
   id?: string;
   /** The kind of instrument being evaluated. If validate is set to true, this will be enforced at runtime. Otherwise, it will just be asserted */
@@ -13,9 +19,16 @@ export type InstrumentInterpreterOptions<TKind extends InstrumentKind> = {
 };
 
 export class InstrumentInterpreter {
-  async interpret<TKind extends InstrumentKind>(bundle: string, options?: InstrumentInterpreterOptions<TKind>) {
+  private transformBundle?: ((bundle: string) => Promisable<string>) | null;
+
+  constructor(options?: InstrumentInterpreterOptions) {
+    this.transformBundle = options?.transformBundle;
+  }
+
+  async interpret<TKind extends InstrumentKind>(bundle: string, options?: InterpretOptions<TKind>) {
     let instrument: AnyInstrument;
     try {
+      bundle = (await this.transformBundle?.(bundle)) ?? bundle;
       const factory = new Function(`return ${bundle}`);
       const value = (await factory()) as unknown;
       if (!options?.validate) {

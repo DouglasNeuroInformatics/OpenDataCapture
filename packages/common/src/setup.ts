@@ -17,5 +17,6 @@ export const $CreateAdminData = $CreateUserData.omit({
 export type InitAppOptions = z.infer<typeof $InitAppOptions>;
 export const $InitAppOptions = z.object({
   admin: $CreateAdminData,
+  dummySubjectCount: z.number().int().nonnegative().optional(),
   initDemo: z.boolean()
 });
