@@ -6,7 +6,7 @@ import type { Assignment } from '@open-data-capture/common/assignment';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useAssignments } from '@/hooks/useAssignments';
+import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
 import { useUpdateAssignment } from '@/hooks/useUpdateAssignment';
@@ -23,7 +23,7 @@ export const SubjectAssignmentsPage = () => {
 
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
-  const assignmentsQuery = useAssignments({ params: { subjectId: params.subjectId } });
+  const assignmentsQuery = useAssignmentsQuery({ params: { subjectId: params.subjectId } });
   const createAssignmentMutation = useCreateAssignment();
   const updateAssignmentMutation = useUpdateAssignment();
 
