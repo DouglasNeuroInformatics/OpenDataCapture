@@ -16,6 +16,7 @@ import { InstrumentTransformer } from '@open-data-capture/instrument-transformer
 import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/ability/ability.utils';
+import { ConfigurationService } from '@/configuration/configuration.service';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -25,17 +26,21 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
 export class InstrumentRecordsService {
-  private readonly interpreter = new InstrumentInterpreter({
-    transformBundle: (bundle) => this.transformer.transformRuntimeImports(bundle)
-  });
+  private readonly interpreter: InstrumentInterpreter;
   private readonly transformer = new InstrumentTransformer();
 
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
+    configurationService: ConfigurationService,
     private readonly groupsService: GroupsService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService
-  ) {}
+  ) {
+    const isProduction = configurationService.get('NODE_ENV') === 'production';
+    this.interpreter = new InstrumentInterpreter({
+      transformBundle: isProduction ? (bundle) => this.transformer.transformRuntimeImports(bundle) : null
+    });
+  }
 
   async count(
     filter: NonNullable<Parameters<Model<'InstrumentRecord'>['count']>[0]>['where'] = {},
