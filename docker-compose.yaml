@@ -29,10 +29,12 @@ services:
       - MONGO_DIRECT_CONNECTION=true
       - MONGO_URI=mongodb://mongo:27017
       - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
+      - DEBUG
       - GATEWAY_API_KEY
       - GATEWAY_ENABLED
       - GATEWAY_REFRESH_INTERVAL
       - SECRET_KEY
+      - VERBOSE
     expose:
       - 80
   gateway:
