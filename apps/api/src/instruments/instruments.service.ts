@@ -120,11 +120,6 @@ export class InstrumentsService {
         validate: true
       });
     } catch (err) {
-      let exception: unknown = structuredClone(err);
-      while (exception instanceof Error) {
-        this.logger.debug(err);
-        exception = exception.cause;
-      }
       throw new UnprocessableEntityException('Failed to interpret instrument bundle', {
         cause: err
       });
@@ -141,11 +136,6 @@ export class InstrumentsService {
     try {
       bundle = await this.instrumentTransformer.generateBundle(source);
     } catch (err) {
-      let exception: unknown = structuredClone(err);
-      while (exception instanceof Error) {
-        this.logger.debug(err);
-        exception = exception.cause;
-      }
       throw new UnprocessableEntityException('Failed to parse instrument source', {
         cause: err
       });
