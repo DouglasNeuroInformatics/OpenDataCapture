@@ -41,7 +41,9 @@ import { VisitsModule } from './visits/visits.module';
     InstrumentsModule,
     PrismaModule.forRoot(),
     SubjectsModule,
-    LoggingModule.forRoot(),
+    LoggingModule.forRoot({
+      debug: true
+    }),
     ThrottlerModule.forRoot([
       {
         limit: 25,
