@@ -6,7 +6,7 @@ import type { Assignment, AssignmentStatus } from '@open-data-capture/common/ass
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
-import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
+import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
 
 export type AssignmentTableProps = {
   assignments: Assignment[];
@@ -17,12 +17,10 @@ export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTablePr
   const { t } = useTranslation('subjects');
   const [instrumentSummaries, setInstrumentSummaries] = useState<Record<string, UnilingualInstrumentSummary>>({});
 
-  const instrumentSummariesQuery = useInstrumentSummaries();
+  const instrumentSummariesQuery = useInstrumentSummariesQuery();
 
   useEffect(() => {
-    if (instrumentSummariesQuery.data) {
-      setInstrumentSummaries(Object.fromEntries(instrumentSummariesQuery.data.map((summary) => [summary.id, summary])));
-    }
+    setInstrumentSummaries(Object.fromEntries(instrumentSummariesQuery.data.map((summary) => [summary.id, summary])));
   }, [instrumentSummariesQuery.data]);
 
   return (

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
-import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
+import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
 import { useAuthStore } from '@/stores/auth-store';
 
 export type InstrumentVisualizationRecord = {
@@ -34,7 +34,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   const instrument: AnyUnilingualFormInstrument | null = useInstrument(instrumentId, { kind: 'FORM' });
 
-  const summariesQuery = useInstrumentSummaries({ params: { kind: 'FORM' } });
+  const instrumentSummariesQuery = useInstrumentSummariesQuery({ params: { kind: 'FORM' } });
   const recordsQuery = useInstrumentRecords({
     enabled: instrumentId !== null,
     params: {
@@ -92,13 +92,11 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   const instrumentOptions: Record<string, string> = useMemo(() => {
     const options: Record<string, string> = {};
-    if (summariesQuery.data) {
-      for (const summary of summariesQuery.data) {
-        options[summary.id] = summary.details.title;
-      }
+    for (const summary of instrumentSummariesQuery.data) {
+      options[summary.id] = summary.details.title;
     }
     return options;
-  }, [summariesQuery.data]);
+  }, [instrumentSummariesQuery.data]);
 
   return { dl, instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate };
 }

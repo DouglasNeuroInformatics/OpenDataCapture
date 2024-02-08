@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { SearchBar, SelectDropdown, Spinner, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { SearchBar, SelectDropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
 import type { SelectOption } from '@douglasneuroinformatics/ui';
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { motion } from 'framer-motion';
@@ -8,13 +8,13 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
-import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
+import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
 import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 import { InstrumentCard } from '../components/InstrumentCard';
 
 export const AvailableInstrumentsPage = () => {
-  const summaries = useInstrumentSummaries();
+  const instrumentSummariesQuery = useInstrumentSummariesQuery();
   const navigate = useNavigate();
   const { t } = useTranslation(['core', 'instruments']);
   const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentSummary[]>([]);
@@ -38,19 +38,17 @@ export const AvailableInstrumentsPage = () => {
   ];
 
   useEffect(() => {
-    if (summaries.data) {
-      setFilteredInstruments(
-        summaries.data.filter((summary) => {
-          const matchesSearch = summary.details.title.toUpperCase().includes(searchTerm.toUpperCase());
-          const matchesLanguages =
-            selectedLanguages.length === 0 || selectedLanguages.find(({ key }) => key === summary.language);
-          const matchesTags =
-            selectedTags.length === 0 || summary.tags.some((tag) => selectedTags.find(({ key }) => key === tag));
-          return matchesSearch && matchesLanguages && matchesTags;
-        })
-      );
-    }
-  }, [summaries.data, searchTerm, selectedLanguages, selectedTags]);
+    setFilteredInstruments(
+      instrumentSummariesQuery.data.filter((summary) => {
+        const matchesSearch = summary.details.title.toUpperCase().includes(searchTerm.toUpperCase());
+        const matchesLanguages =
+          selectedLanguages.length === 0 || selectedLanguages.find(({ key }) => key === summary.language);
+        const matchesTags =
+          selectedTags.length === 0 || summary.tags.some((tag) => selectedTags.find(({ key }) => key === tag));
+        return matchesSearch && matchesLanguages && matchesTags;
+      })
+    );
+  }, [instrumentSummariesQuery.data, searchTerm, selectedLanguages, selectedTags]);
 
   useEffect(() => {
     setTagOptions(
@@ -60,10 +58,6 @@ export const AvailableInstrumentsPage = () => {
       }))
     );
   }, [filteredInstruments]);
-
-  if (!summaries.data) {
-    return <Spinner />;
-  }
 
   return (
     <div>
