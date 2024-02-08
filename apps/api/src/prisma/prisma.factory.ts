@@ -17,10 +17,6 @@ export class PrismaFactory {
     const extendedClient = baseClient.$extends({
       model: {
         $allModels: {
-          get __model__() {
-            const context = Prisma.getExtensionContext(this);
-            return context.$name;
-          },
           async exists<T extends object>(this: T, where: Prisma.Args<T, 'findFirst'>['where']): Promise<boolean> {
             const name = Reflect.get(this, '$name') as string;
             PrismaFactory.logger.debug(`Checking if instance of '${name}' exists...`);
@@ -40,7 +36,26 @@ export class PrismaFactory {
         }
       },
       result: {
+        assignmentModel: {
+          __model__: {
+            compute() {
+              return 'Assignment';
+            }
+          }
+        },
+        groupModel: {
+          __model__: {
+            compute() {
+              return 'Group';
+            }
+          }
+        },
         instrumentModel: {
+          __model__: {
+            compute() {
+              return 'Instrument';
+            }
+          },
           toInstance: {
             compute({ bundle }) {
               return async function <TKind extends InstrumentKind>(options?: InterpretOptions<TKind>) {
@@ -54,6 +69,34 @@ export class PrismaFactory {
               };
             },
             needs: { bundle: true }
+          }
+        },
+        instrumentRecordModel: {
+          __model__: {
+            compute() {
+              return 'InstrumentRecord';
+            }
+          }
+        },
+        subjectModel: {
+          __model__: {
+            compute() {
+              return 'Subject';
+            }
+          }
+        },
+        userModel: {
+          __model__: {
+            compute() {
+              return 'User';
+            }
+          }
+        },
+        visitModel: {
+          __model__: {
+            compute() {
+              return 'Visit';
+            }
           }
         }
       }
