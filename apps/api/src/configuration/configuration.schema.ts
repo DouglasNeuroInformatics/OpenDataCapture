@@ -8,7 +8,11 @@ export const $Configuration = z.object({
   GATEWAY_BASE_URL: z.string().url(),
   GATEWAY_ENABLED: $BooleanString,
   GATEWAY_REFRESH_INTERVAL: z.coerce.number().positive().int(),
+  MONGO_DIRECT_CONNECTION: z.string().optional(),
+  MONGO_REPLICA_SET: z.string().optional(),
+  MONGO_RETRY_WRITES: z.string().optional(),
   MONGO_URI: z.string().url(),
+  MONGO_WRITE_CONCERN: z.string().optional(),
   NODE_ENV: z.enum(['development', 'production', 'testing']),
   SECRET_KEY: z.string().min(32)
 });

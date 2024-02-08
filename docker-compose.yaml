@@ -23,6 +23,10 @@ services:
       - mongo
     environment:
       - NODE_ENV=production
+      - MONGO_REPLICA_SET=rs0
+      - MONGO_RETRY_WRITES=true
+      - MONGO_WRITE_CONCERN=majority
+      - MONGO_DIRECT_CONNECTION=true
       - MONGO_URI=mongodb://mongo:27017
       - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
       - GATEWAY_API_KEY
