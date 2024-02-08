@@ -1,6 +1,9 @@
+import React from 'react';
+
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 
+import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';
 
@@ -14,7 +17,7 @@ export const SubjectLayout = () => {
   const basePathname = `/subjects/${subjectId}`;
 
   return (
-    <div className="h-full">
+    <React.Fragment>
       <PageHeader title={t('layout.title', { id: subjectId.slice(0, 7) })} />
       <div className="mb-5 flex">
         {config.setup.isGatewayEnabled && (
@@ -23,7 +26,9 @@ export const SubjectLayout = () => {
         <TabLink label={t('layout.tabs.table')} pathname={`${basePathname}/table`} />
         <TabLink label={t('layout.tabs.graph')} pathname={`${basePathname}/graph`} />
       </div>
-      <Outlet />
-    </div>
+      <React.Suspense fallback={<LoadingFallback />}>
+        <Outlet />
+      </React.Suspense>
+    </React.Fragment>
   );
 };
