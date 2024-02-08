@@ -15,7 +15,7 @@ services:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
   api:
-    image: ghcr.io/douglasneuroinformatics/data-capture-api:latest
+    image: ghcr.io/douglasneuroinformatics/open-data-capture-api:latest
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
@@ -39,6 +39,7 @@ services:
     expose:
       - 80
   gateway:
+    image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway:latest
     build:
       args:
         GATEWAY_DATABASE_FILEPATH: /app/gateway.db
@@ -53,6 +54,7 @@ services:
       - NODE_ENV=production
       - GATEWAY_API_KEY
   playground:
+    image: ghcr.io/douglasneuroinformatics/open-data-capture-playground:latest
     build:
       context: .
       dockerfile: ./apps/playground/Dockerfile
@@ -61,7 +63,7 @@ services:
     expose:
       - 80
   web:
-    image: ghcr.io/douglasneuroinformatics/data-capture-web:latest
+    image: ghcr.io/douglasneuroinformatics/open-data-capture-web:latest
     build:
       args:
         VITE_API_BASE_URL: /api
@@ -77,7 +79,7 @@ services:
       - 80
   mongo:
     image: mongo:7.0
-    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    command: ['--replSet', 'rs0', '--bind_ip_all', '--port', '27017']
     expose:
       - 27017
     volumes:
