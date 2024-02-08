@@ -46,60 +46,68 @@ export class DemoService {
   ) {}
 
   async init({ dummySubjectCount }: { dummySubjectCount: number }): Promise<void> {
-    const dbName = await this.prismaService.getDbName();
-    this.logger.log(`Initializing demo for database: '${dbName}'`);
+    try {
+      const dbName = await this.prismaService.getDbName();
+      this.logger.log(`Initializing demo for database: '${dbName}'`);
 
-    const forms = await Promise.all([
-      this.instrumentsService.create(briefPsychiatricRatingScale),
-      this.instrumentsService.create(enhancedDemographicsQuestionnaire),
-      this.instrumentsService.create(happinessQuestionnaire),
-      this.instrumentsService.create(miniMentalStateExamination),
-      this.instrumentsService.create(montrealCognitiveAssessment)
-    ]);
+      const forms = await Promise.all([
+        this.instrumentsService.create(briefPsychiatricRatingScale),
+        this.instrumentsService.create(enhancedDemographicsQuestionnaire),
+        this.instrumentsService.create(happinessQuestionnaire),
+        this.instrumentsService.create(miniMentalStateExamination),
+        this.instrumentsService.create(montrealCognitiveAssessment)
+      ]);
 
-    await this.instrumentsService.createFromBundle(breakoutTask);
+      await this.instrumentsService.createFromBundle(breakoutTask);
 
-    const groups: Group[] = [];
-    for (const group of DEMO_GROUPS) {
-      groups.push(await this.groupsService.create(group));
-    }
+      const groups: Group[] = [];
+      for (const group of DEMO_GROUPS) {
+        groups.push(await this.groupsService.create(group));
+      }
 
-    for (const user of DEMO_USERS) {
-      await this.usersService.create({
-        ...user,
-        groupIds: user.groupNames.map((name) => groups.find((group) => group.name === name)!.id)
-      });
-    }
+      for (const user of DEMO_USERS) {
+        await this.usersService.create({
+          ...user,
+          groupIds: user.groupNames.map((name) => groups.find((group) => group.name === name)!.id)
+        });
+      }
 
-    for (let i = 0; i < dummySubjectCount; i++) {
-      const group = randomValue(groups);
-      const subject = await this.createSubject();
-      await this.visitsService.create({
-        date: new Date(),
-        groupId: group.id,
-        subjectIdData: subject
-      });
-      for (const form of forms) {
-        for (let i = 0; i < 10; i++) {
-          const data = this.createFormRecordData(
-            await form.toInstance({ kind: 'FORM' }),
-            form.name === 'EnhancedDemographicsQuestionnaire'
-              ? {
-                  customValues: {
-                    postalCode: 'A1A-1A1'
+      for (let i = 0; i < dummySubjectCount; i++) {
+        const group = randomValue(groups);
+        const subject = await this.createSubject();
+        await this.visitsService.create({
+          date: new Date(),
+          groupId: group.id,
+          subjectIdData: subject
+        });
+        for (const form of forms) {
+          for (let i = 0; i < 10; i++) {
+            const data = this.createFormRecordData(
+              await form.toInstance({ kind: 'FORM' }),
+              form.name === 'EnhancedDemographicsQuestionnaire'
+                ? {
+                    customValues: {
+                      postalCode: 'A1A-1A1'
+                    }
                   }
-                }
-              : undefined
-          );
-          await this.instrumentRecordsService.create({
-            data: data as Json,
-            date: faker.date.past({ years: 2 }),
-            groupId: group.id,
-            instrumentId: form.id,
-            subjectId: subject.id
-          });
+                : undefined
+            );
+            await this.instrumentRecordsService.create({
+              data: data as Json,
+              date: faker.date.past({ years: 2 }),
+              groupId: group.id,
+              instrumentId: form.id,
+              subjectId: subject.id
+            });
+          }
         }
       }
+    } catch (err) {
+      if (err instanceof Error) {
+        this.logger.error(err.cause);
+        this.logger.error(err);
+      }
+      throw err;
     }
   }
 
