@@ -120,6 +120,15 @@ export class InstrumentsService {
         validate: true
       });
     } catch (err) {
+      if (err instanceof Error) {
+        this.logger.debug(err.cause);
+        if (err.cause instanceof Error) {
+          this.logger.debug(err.cause.cause);
+          if (err.cause.cause instanceof Error) {
+            this.logger.debug(err.cause.cause.cause);
+          }
+        }
+      }
       throw new UnprocessableEntityException('Failed to interpret instrument bundle', {
         cause: err
       });
