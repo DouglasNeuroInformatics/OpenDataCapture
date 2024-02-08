@@ -1,7 +1,7 @@
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 
-import { SuspenseFallback } from '@/components/SuspenseFallback';
+import { SuspenseFallback } from '@/components/SuspenseBoundary';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { StatisticCard } from '../components/StatisticCard';
