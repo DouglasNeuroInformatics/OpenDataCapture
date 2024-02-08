@@ -77,6 +77,7 @@ await esbuild.build({
     runtimePlugin({ outdir }),
     nativeModulesPlugin()
   ],
+  sourcemap: process.env.DEBUG?.trim().toLowerCase() === 'true',
   target: ['node18', 'es2022'],
   tsconfig
 });
