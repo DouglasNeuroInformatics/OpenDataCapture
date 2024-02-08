@@ -10,16 +10,15 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';
 
+import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
 import { SubjectLookup } from './SubjectLookup';
 
-export type SubjectTableProps = {
-  data: Subject[];
-};
-
-export const SubjectsTable = ({ data }: SubjectTableProps) => {
+export const SubjectsTable = () => {
+  const { currentGroup, currentUser } = useAuthStore();
+  const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
   const download = useDownload();
   const navigate = useNavigate();
-  const { currentGroup, currentUser } = useAuthStore();
+
   const { t } = useTranslation(['subjects', 'core']);
 
   const [showLookup, setShowLookup] = useState(false);
