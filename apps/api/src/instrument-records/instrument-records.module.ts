@@ -5,6 +5,7 @@ import { InstrumentsModule } from '@/instruments/instruments.module';
 import { PrismaModule } from '@/prisma/prisma.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 
+import { InstrumentMeasuresService } from './instrument-measures.service';
 import { InstrumentRecordsController } from './instrument-records.controller';
 import { InstrumentRecordsService } from './instrument-records.service';
 
@@ -17,6 +18,6 @@ import { InstrumentRecordsService } from './instrument-records.service';
     PrismaModule.forFeature('InstrumentRecord'),
     SubjectsModule
   ],
-  providers: [InstrumentRecordsService]
+  providers: [InstrumentMeasuresService, InstrumentRecordsService]
 })
 export class InstrumentRecordsModule {}

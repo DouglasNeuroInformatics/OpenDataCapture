@@ -120,6 +120,12 @@ export class InstrumentsService {
         validate: true
       });
     } catch (err) {
+      if (err instanceof Error) {
+        this.logger.debug(err.cause);
+        if (err.cause instanceof Error) {
+          this.logger.debug(err.cause.cause);
+        }
+      }
       throw new UnprocessableEntityException('Failed to interpret instrument bundle', {
         cause: err
       });
@@ -136,6 +142,12 @@ export class InstrumentsService {
     try {
       bundle = await this.instrumentTransformer.generateBundle(source);
     } catch (err) {
+      if (err instanceof Error) {
+        this.logger.debug(err.cause);
+        if (err.cause instanceof Error) {
+          this.logger.debug(err.cause.cause);
+        }
+      }
       throw new UnprocessableEntityException('Failed to parse instrument source', {
         cause: err
       });

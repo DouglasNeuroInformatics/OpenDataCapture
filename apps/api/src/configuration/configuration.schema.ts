@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const $Configuration = z.object({
   API_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),
   API_PROD_SERVER_PORT: z.coerce.number().positive().int().default(80),
+  DEBUG: $BooleanString,
   GATEWAY_API_KEY: z.string().min(32),
   GATEWAY_BASE_URL: z.string().url(),
   GATEWAY_ENABLED: $BooleanString,
@@ -14,7 +15,8 @@ export const $Configuration = z.object({
   MONGO_URI: z.string().url(),
   MONGO_WRITE_CONCERN: z.string().optional(),
   NODE_ENV: z.enum(['development', 'production', 'testing']),
-  SECRET_KEY: z.string().min(32)
+  SECRET_KEY: z.string().min(32),
+  VERBOSE: $BooleanString
 });
 
 export type Configuration = z.infer<typeof $Configuration>;

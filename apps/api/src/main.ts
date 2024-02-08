@@ -2,7 +2,7 @@ import path from 'node:path';
 import url from 'url';
 
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
-import { VersioningType } from '@nestjs/common';
+import { type LogLevel, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'express';
@@ -16,9 +16,13 @@ const __dirname = path.dirname(__filename);
 
 async function bootstrap() {
   // This hacky type assertion is needed due to issue with linked dependency
-  const app = (await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'verbose']
-  })) as any as NestExpressApplication;
+  const app = (await NestFactory.create(AppModule)) as any as NestExpressApplication;
+
+  const configurationService = app.get(ConfigurationService);
+  const logLevels: LogLevel[] = ['error', 'fatal', 'log', 'warn'];
+  configurationService.get('DEBUG') && logLevels.push('debug');
+  configurationService.get('VERBOSE') && logLevels.push('verbose');
+  app.useLogger(logLevels);
 
   app.enableCors();
   app.enableVersioning({
@@ -30,8 +34,6 @@ async function bootstrap() {
 
   app.useStaticAssets(path.resolve(__dirname, '..', 'public'));
   setupDocs(app);
-
-  const configurationService = app.get(ConfigurationService);
 
   const isProduction = configurationService.get('NODE_ENV') === 'production';
   const port = configurationService.get(isProduction ? 'API_PROD_SERVER_PORT' : 'API_DEV_SERVER_PORT');

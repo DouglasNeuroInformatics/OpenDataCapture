@@ -12,6 +12,7 @@
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx vite",
     "format": "prettier --write src",
     "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
+    "inject": "bunx import-meta-env -x .env.public -p dist/index.html",
     "lint": "tsc && eslint --fix src",
     "start": "vite preview --port $WEB_DEV_SERVER_PORT",
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006",

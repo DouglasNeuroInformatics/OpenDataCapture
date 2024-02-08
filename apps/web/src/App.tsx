@@ -8,7 +8,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import { Router } from '@/Router';
 import { ActiveVisit } from '@/components/ActiveVisit';
-import { SuspenseFallback } from '@/components/SuspenseFallback';
+import { LoadingFallback } from '@/components/LoadingFallback';
 import { SetupProvider } from '@/features/setup';
 import { queryClient } from '@/services/react-query';
 
@@ -18,7 +18,7 @@ import './services/zod';
 
 export const App = () => {
   return (
-    <React.Suspense fallback={<SuspenseFallback />}>
+    <React.Suspense fallback={<LoadingFallback />}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <QueryClientProvider client={queryClient}>
           <ActiveVisit />

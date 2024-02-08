@@ -1,8 +1,7 @@
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { linearRegression } from '@douglasneuroinformatics/stats';
 import { yearsPassed } from '@douglasneuroinformatics/utils';
-import { Injectable, NotImplementedException } from '@nestjs/common';
-import type { InstrumentMeasures } from '@open-data-capture/common/instrument';
+import { Injectable } from '@nestjs/common';
+import type { AnyInstrument, InstrumentMeasureValue } from '@open-data-capture/common/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -14,6 +13,7 @@ import type { InstrumentRecordModel } from '@open-data-capture/database/core';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import type { Prisma } from '@prisma/client';
+import _ from 'lodash';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import { ConfigurationService } from '@/configuration/configuration.service';
@@ -24,6 +24,8 @@ import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
 import { SubjectsService } from '@/subjects/subjects.service';
 
+import { InstrumentMeasuresService } from './instrument-measures.service';
+
 @Injectable()
 export class InstrumentRecordsService {
   private readonly interpreter: InstrumentInterpreter;
@@ -33,6 +35,7 @@ export class InstrumentRecordsService {
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     configurationService: ConfigurationService,
     private readonly groupsService: GroupsService,
+    private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService
   ) {
@@ -100,26 +103,37 @@ export class InstrumentRecordsService {
   ): Promise<InstrumentRecordsExport> {
     const subjects = await this.subjectsService.find({ groupId }, { ability });
     const data: InstrumentRecordsExport = [];
+    const instruments = new Map<string, AnyInstrument>();
     for (const subject of subjects) {
       const records = await this.instrumentRecordModel.findMany({
         include: { instrument: true },
         where: { groupId, subjectId: subject.id }
       });
       for (const record of records) {
-        if (record.instrument.kind !== 'FORM') {
+        let instrument: AnyInstrument;
+        if (instruments.has(record.instrumentId)) {
+          instrument = instruments.get(record.instrumentId)!;
+        } else {
+          instrument = await record.instrument.toInstance();
+          instruments.set(record.instrumentId, instrument);
+        }
+
+        if (!instrument.measures) {
           continue;
         }
-        const formData = record.data as FormDataType;
-        for (const measure of Object.keys(formData)) {
+
+        const measures = this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data);
+
+        for (const [measureKey, measureValue] of Object.entries(measures)) {
           data.push({
             instrumentName: record.instrument.name,
             instrumentVersion: record.instrument.version,
-            measure: measure,
+            measure: measureKey,
             subjectAge: yearsPassed(subject.dateOfBirth),
             subjectId: subject.id,
             subjectSex: subject.sex,
             timestamp: record.date.toISOString(),
-            value: formData[measure] as unknown
+            value: measureValue
           });
         }
       }
@@ -161,16 +175,12 @@ export class InstrumentRecordsService {
 
     return await Promise.all(
       records.map(async (record) => {
-        if (record.instrument.kind === 'FORM') {
-          const instance = await this.interpreter.interpret(record.instrument.bundle, { kind: 'FORM' });
-          if (instance.measures) {
-            (record as Record<string, any>).computedMeasures = this.computeNumericMeasures(
-              instance.measures,
-              record.data as FormDataType
-            );
-          }
+        const instance = await this.interpreter.interpret(record.instrument.bundle);
+        let computedMeasures: Record<string, InstrumentMeasureValue> | undefined;
+        if (instance.measures) {
+          computedMeasures = this.instrumentMeasuresService.computeMeasures(instance.measures, record.data);
         }
-        return record;
+        return Object.assign(record, { computedMeasures });
       })
     );
   }
@@ -183,12 +193,9 @@ export class InstrumentRecordsService {
     const instrument = await this.instrumentsService
       .findById(instrumentId)
       .then((instrument) => instrument.toInstance());
-    if (instrument.kind !== 'FORM') {
-      throw new NotImplementedException(`Linear model is not available for instruments of kind '${instrument.kind}'`);
-    } else if (!instrument.measures) {
+    if (!instrument.measures) {
       return {};
     }
-
     const records = await this.instrumentRecordModel.findMany({
       include: { instrument: true },
       where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), { groupId }, { instrumentId }] }
@@ -196,10 +203,11 @@ export class InstrumentRecordsService {
 
     const data: Record<string, [number, number][]> = {};
     for (const record of records) {
-      const computedMeasures = this.computeNumericMeasures(instrument.measures, record.data as FormDataType);
-      for (const measure in computedMeasures) {
+      const computedMeasures = this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data);
+      const numericMeasures = _.pickBy(computedMeasures, _.isNumber);
+      for (const measure in numericMeasures) {
         const x = record.date.getTime();
-        const y = computedMeasures[measure];
+        const y = numericMeasures[measure];
         if (Array.isArray(data[measure])) {
           data[measure].push([x, y]);
         } else {
@@ -213,26 +221,5 @@ export class InstrumentRecordsService {
       results[measure] = linearRegression(data[measure]);
     }
     return results;
-  }
-
-  /** Compute all the measures where the value, or referenced value, is a number. Non-numeric values are ignored */
-  private computeNumericMeasures(measures: InstrumentMeasures, data: FormDataType) {
-    const computedMeasures: Record<string, number> = {};
-    for (const key in measures) {
-      const measure = measures[key];
-      let value: unknown;
-      switch (measure.kind) {
-        case 'computed':
-          value = measure.value(data);
-          break;
-        case 'const':
-          value = data[measure.ref];
-          break;
-      }
-      if (typeof value === 'number') {
-        computedMeasures[key] = value;
-      }
-    }
-    return computedMeasures;
   }
 }

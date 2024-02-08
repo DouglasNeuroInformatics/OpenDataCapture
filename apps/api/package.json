@@ -9,7 +9,7 @@
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --watch src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "start": "env-cmd -f ../../.env cross-env API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=development ESBUILD_BINARY_PATH=dist/bin/esbuild node dist/app.mjs",
+    "start": "env-cmd -f ../../.env cross-env API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=production ESBUILD_BINARY_PATH=dist/bin/esbuild node dist/app.mjs",
     "test": "bun test"
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "passport-jwt": "4.0.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "ts-pattern": "^5.0.6",
     "unidecode": "^0.1.8",
     "zod": "^3.22.4"
   },

@@ -10,12 +10,7 @@ type UseLinearModelOptions = {
   };
 };
 
-export const useLinearModel = (
-  { enabled, params }: UseLinearModelOptions = {
-    enabled: true,
-    params: {}
-  }
-) => {
+export function useLinearModelQuery({ enabled, params }: UseLinearModelOptions) {
   return useQuery({
     enabled,
     queryFn: async () => {
@@ -24,6 +19,6 @@ export const useLinearModel = (
       });
       return $LinearRegressionResults.parseAsync(response.data);
     },
-    queryKey: ['linear-model', ...Object.values(params)]
+    queryKey: ['linear-model', params.groupId, params.instrumentId]
   });
-};
+}

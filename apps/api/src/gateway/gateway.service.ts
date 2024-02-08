@@ -1,6 +1,6 @@
 import type { PublicEncryptionKey } from '@douglasneuroinformatics/crypto';
 import { HttpService } from '@nestjs/axios';
-import { BadGatewayException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadGatewayException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@open-data-capture/common/assignment';
 import type {
   Assignment,
@@ -15,6 +15,7 @@ import { InstrumentsService } from '@/instruments/instruments.service';
 @Injectable()
 export class GatewayService {
   private readonly gatewayBaseUrl: string;
+  private readonly logger = new Logger(GatewayService.name);
 
   constructor(
     configurationService: ConfigurationService,
@@ -63,6 +64,15 @@ export class GatewayService {
         cause: response.statusText
       });
     }
-    return $RemoteAssignment.array().parseAsync(response.data);
+    const result = await $RemoteAssignment.array().safeParseAsync(response.data);
+    if (!result.success) {
+      this.logger.error({
+        data: response.data,
+        error: result.error.format(),
+        message: 'ERROR: Remote assignments received from gateway do not match expected structure'
+      });
+      return [];
+    }
+    return result.data;
   }
 }

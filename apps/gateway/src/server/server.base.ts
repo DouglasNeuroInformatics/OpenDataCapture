@@ -1,4 +1,6 @@
-import express from 'express';
+import express, { type Request, type Response } from 'express';
+import PinoHttp from 'pino-http';
+import PinoPretty from 'pino-pretty';
 import type { Promisable } from 'type-fest';
 
 import type { RootProps } from '@/Root';
@@ -39,6 +41,27 @@ export abstract class BaseServer {
   constructor() {
     this.app = express();
     this.app.use(express.json());
+    this.app.use(
+      PinoHttp(
+        {
+          customLogLevel: (_, res) => {
+            return res.statusCode >= 500 ? 'error' : 'info';
+          },
+          serializers: {
+            req: (req: Request) => {
+              return `${req.method} ${req.url}`;
+            },
+            res: (res: Response) => {
+              return res.statusCode;
+            }
+          },
+          wrapSerializers: false
+        },
+        PinoPretty({
+          colorize: true
+        })
+      )
+    );
     this.app.use('/api', apiKeyMiddleware, apiRouter);
     this.app.use('/', this.rootLoader, rootRouter);
     this.app.use(errorHandlerMiddleware);

@@ -125,8 +125,7 @@ export const $EnhancedBaseInstrumentDetails = <TLanguage extends InstrumentLangu
 export type InstrumentMeasureValue = z.infer<typeof $InstrumentMeasureValue>;
 export const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.date()]);
 
-export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Record<
-  string,
+export type InstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> =
   | {
       kind: 'computed';
       label: InstrumentUIOption<TLanguage, string>;
@@ -142,7 +141,11 @@ export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage
             : K
           : never
         : never;
-    }
+    };
+
+export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Record<
+  string,
+  InstrumentMeasure<TData, TLanguage>
 >;
 
 export type UnilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language>;

@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
 import { $BaseModel, $Json } from './core';
-import { $InstrumentKind, type InstrumentKind } from './instrument';
+import { $InstrumentKind, $InstrumentMeasureValue } from './instrument';
+
+import type { InstrumentKind, InstrumentMeasureValue } from './instrument';
 
 export const $CreateInstrumentRecordData = z.object({
   assignmentId: z.string().optional(),
@@ -16,7 +18,7 @@ export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordD
 
 export const $InstrumentRecord = $BaseModel.extend({
   assignmentId: z.string().nullish(),
-  computedMeasures: z.record(z.number()).optional(),
+  computedMeasures: z.record($InstrumentMeasureValue).optional(),
   data: z.unknown(),
   date: z.coerce.date(),
   groupId: z.string().nullish(),
@@ -37,7 +39,7 @@ export type InstrumentRecordsExport = {
   subjectId: string;
   subjectSex: string;
   timestamp: string;
-  value: unknown;
+  value: InstrumentMeasureValue;
 }[];
 
 export const $LinearRegressionResults = z.record(

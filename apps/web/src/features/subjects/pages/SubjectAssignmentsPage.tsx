@@ -6,9 +6,9 @@ import type { Assignment } from '@open-data-capture/common/assignment';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useAssignments } from '@/hooks/useAssignments';
+import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
-import { useInstrumentSummaries } from '@/hooks/useInstrumentSummaries';
+import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
 import { useUpdateAssignment } from '@/hooks/useUpdateAssignment';
 
 import { AssignmentModal } from '../components/AssignmentModal';
@@ -23,16 +23,12 @@ export const SubjectAssignmentsPage = () => {
 
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
-  const assignmentsQuery = useAssignments({ params: { subjectId: params.subjectId } });
+  const assignmentsQuery = useAssignmentsQuery({ params: { subjectId: params.subjectId } });
   const createAssignmentMutation = useCreateAssignment();
   const updateAssignmentMutation = useUpdateAssignment();
 
-  const instrumentSummariesQuery = useInstrumentSummaries();
-
-  if (!(assignmentsQuery.data && instrumentSummariesQuery.data)) {
-    return null;
-  }
-
+  const instrumentSummariesQuery = useInstrumentSummariesQuery();
+  
   const instrumentOptions = Object.fromEntries(
     instrumentSummariesQuery.data.map((instrument) => [instrument.id, instrument.details.title])
   );
