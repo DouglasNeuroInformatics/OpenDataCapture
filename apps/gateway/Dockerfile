@@ -23,4 +23,5 @@ RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 RUN chown -R app:app /app
 USER app
+RUN echo '{ "type": "module" }' > package.json
 CMD [ "node", "./dist/main.mjs" ]

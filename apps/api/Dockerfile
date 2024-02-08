@@ -13,11 +13,11 @@ RUN bunx turbo run build --filter=@open-data-capture/api
 
 # RUN SERVER
 FROM base as runner
-COPY --from=builder /app/apps/api/package.json /app/package.json
 COPY --from=builder /app/apps/api/dist/ /app/dist/
 COPY --from=builder /app/apps/api/public/ /app/public/
 RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 RUN chown -R app:app /app
 USER app
+RUN echo '{ "type": "module" }' > package.json
 CMD [ "node", "./dist/app.mjs" ]
