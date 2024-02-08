@@ -26,12 +26,16 @@ axios.interceptors.request.use((config) => {
 });
 
 axios.interceptors.response.use(
-  (response) =>
-    new Promise((resolve) =>
+  (response) => {
+    if (!import.meta.env.DEV) {
+      return response;
+    }
+    return new Promise((resolve) =>
       setTimeout(() => {
         resolve(response);
-      }, 2000)
-    ),
+      }, config.dev.networkLatency)
+    );
+  },
   (error) => {
     const notifications = useNotificationsStore.getState();
     if (!isAxiosError(error)) {
