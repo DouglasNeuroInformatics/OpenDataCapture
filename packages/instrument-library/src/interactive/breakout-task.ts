@@ -12,15 +12,15 @@ const instrumentFactory = new InstrumentFactory({
 
 export default instrumentFactory.defineInstrument({
   content: {
-    assets: {
-      css: [import.meta.injectStylesheet('./breakout-task.styles.css')]
-    },
     render(done) {
       const startTime = Date.now();
 
       const canvas = document.createElement('canvas');
       canvas.height = 320;
       canvas.width = 480;
+      canvas.style.background = '#eee;';
+      canvas.style.display = 'block';
+      canvas.style.margin = '0 auto';
       document.body.appendChild(canvas);
 
       const ctx = canvas.getContext('2d')!;
@@ -210,7 +210,7 @@ export default instrumentFactory.defineInstrument({
       kind: 'computed',
       label: 'Time Elapsed',
       value(data) {
-        return `${data.timeElapsed}ms`;
+        return data.timeElapsed +  'ms';
       }
     },
     win: {
