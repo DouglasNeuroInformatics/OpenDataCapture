@@ -58,12 +58,16 @@ export class DemoService {
         this.instrumentsService.createFromBundle(montrealCognitiveAssessment)
       ]);
 
+      this.logger.debug('Done creating forms');
+
       await this.instrumentsService.createFromBundle(breakoutTask);
+      this.logger.debug('Done creating interactive instruments');
 
       const groups: Group[] = [];
       for (const group of DEMO_GROUPS) {
         groups.push(await this.groupsService.create(group));
       }
+      this.logger.debug('Done creating groups');
 
       for (const user of DEMO_USERS) {
         await this.usersService.create({
@@ -71,8 +75,10 @@ export class DemoService {
           groupIds: user.groupNames.map((name) => groups.find((group) => group.name === name)!.id)
         });
       }
+      this.logger.debug('Done creating users');
 
       for (let i = 0; i < dummySubjectCount; i++) {
+        this.logger.debug(`Creating dummy subject ${i + 1}/${dummySubjectCount}`);
         const group = randomValue(groups);
         const subject = await this.createSubject();
         await this.visitsService.create({
@@ -81,6 +87,7 @@ export class DemoService {
           subjectIdData: subject
         });
         for (const form of forms) {
+          this.logger.debug(`Creating dummy records for form ${form.name}`);
           for (let i = 0; i < 10; i++) {
             const data = this.createFormRecordData(
               await form.toInstance({ kind: 'FORM' }),
@@ -101,6 +108,7 @@ export class DemoService {
             });
           }
         }
+        this.logger.debug(`Done creating dummy subject ${i + 1}`);
       }
     } catch (err) {
       if (err instanceof Error) {
