@@ -26,7 +26,12 @@ axios.interceptors.request.use((config) => {
 });
 
 axios.interceptors.response.use(
-  (response) => response,
+  (response) =>
+    new Promise((resolve) =>
+      setTimeout(() => {
+        resolve(response);
+      }, 2000)
+    ),
   (error) => {
     const notifications = useNotificationsStore.getState();
     if (!isAxiosError(error)) {

@@ -5,6 +5,7 @@ import { z } from 'zod';
 const $Config = z.object({
   dev: z.object({
     isBypassAuthEnabled: $BooleanString.optional(),
+    networkLatency: z.coerce.number().int().nonnegative().optional(),
     password: z.string().min(1).optional(),
     username: z.string().min(1).optional()
   }),
@@ -24,6 +25,7 @@ export const config = await $Config
   .parseAsync({
     dev: {
       isBypassAuthEnabled: import.meta.env.VITE_DEV_BYPASS_AUTH,
+      networkLatency: import.meta.env.VITE_DEV_NETWORK_LATENCY,
       password: import.meta.env.VITE_DEV_PASSWORD,
       username: import.meta.env.VITE_DEV_USERNAME
     },

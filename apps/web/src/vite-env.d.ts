@@ -19,6 +19,7 @@ interface ImportMetaEnv extends ImportMetaDevEnv {
   readonly GITHUB_REPO_URL?: string;
   readonly LICENSE_URL?: string;
   readonly VITE_API_BASE_URL?: string;
+  readonly VITE_DEV_NETWORK_LATENCY?: string;
 }
 
 interface ImportMeta {
