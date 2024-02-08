@@ -32,7 +32,7 @@ export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps
   return (
     <iframe
       allow="fullscreen"
-      className="h-full w-full border"
+      className="h-full w-full rounded-md border border-slate-300 dark:border-slate-700"
       data-bundle={bundle}
       name="interactive-instrument"
       ref={ref}
