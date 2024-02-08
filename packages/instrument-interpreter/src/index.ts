@@ -28,7 +28,7 @@ export class InstrumentInterpreter {
   async interpret<TKind extends InstrumentKind>(bundle: string, options?: InterpretOptions<TKind>) {
     let instrument: AnyInstrument;
     try {
-      bundle = await this.transformBundle?.(bundle) ?? bundle;
+      bundle = (await this.transformBundle?.(bundle)) ?? bundle;
       const factory = new Function(`return ${bundle}`);
       const value = (await factory()) as unknown;
       if (!options?.validate) {
