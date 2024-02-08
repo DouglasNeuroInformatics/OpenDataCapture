@@ -6,7 +6,7 @@ import type { Promisable } from 'type-fest';
 
 export type InstrumentInterpreterOptions = {
   /** An optional function to preprocess a bundle */
-  transformBundle?: (bundle: string) => Promisable<string>;
+  transformBundle?: ((bundle: string) => Promisable<string>) | null;
 };
 
 export type InterpretOptions<TKind extends InstrumentKind> = {
@@ -19,7 +19,7 @@ export type InterpretOptions<TKind extends InstrumentKind> = {
 };
 
 export class InstrumentInterpreter {
-  private transformBundle?: (bundle: string) => Promisable<string>;
+  private transformBundle?: ((bundle: string) => Promisable<string>) | null;
 
   constructor(options?: InstrumentInterpreterOptions) {
     this.transformBundle = options?.transformBundle;
