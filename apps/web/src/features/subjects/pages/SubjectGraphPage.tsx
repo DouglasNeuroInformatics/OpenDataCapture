@@ -11,7 +11,7 @@ import { VisualizationHeader } from '../components/VisualizationHeader';
 import { useGraphData } from '../hooks/useGraphData';
 import { useGraphLines } from '../hooks/useGraphLines';
 import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization';
-import { useLinearModel } from '../hooks/useLinearModel';
+import { useLinearModelQuery } from '../hooks/useLinearModelQuery';
 import { useMeasureOptions } from '../hooks/useMeasureOptions';
 
 export const SubjectGraphPage = () => {
@@ -25,7 +25,7 @@ export const SubjectGraphPage = () => {
   const measureOptions = useMeasureOptions(instrument);
   const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
 
-  const linearModelQuery = useLinearModel({
+  const linearModelQuery = useLinearModelQuery({
     enabled: Boolean(instrumentId),
     params: {
       groupId: currentGroup?.id,
