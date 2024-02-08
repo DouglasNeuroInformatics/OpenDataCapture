@@ -1,7 +1,7 @@
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 
-import { SuspenseFallback } from '@/components/SuspenseBoundary';
+import { LoadingFallback } from '@/components/LoadingFallback';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { StatisticCard } from '../components/StatisticCard';
@@ -18,7 +18,7 @@ export const Summary = () => {
   });
 
   if (!summaryQuery.data) {
-    return <SuspenseFallback />;
+    return <LoadingFallback />;
   }
 
   return (
