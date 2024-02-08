@@ -36,6 +36,7 @@ export abstract class BaseInstrumentTransformer {
 
   private build(source: string, options: BuildOptions = {}) {
     return this.transpiler.build({
+      external: ['*'],
       format: 'esm',
       metafile: true,
       minify: true,
