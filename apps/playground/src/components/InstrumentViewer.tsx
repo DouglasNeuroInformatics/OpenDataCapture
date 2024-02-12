@@ -19,7 +19,7 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
               bundle={bundle}
               onSubmit={(data) => {
                 // eslint-disable-next-line no-alert
-                alert(JSON.stringify(data));
+                alert(JSON.stringify({ _message: 'The Following Data Will Be Submitted', data }, null, 2));
               }}
             />
           ))
