@@ -72,6 +72,7 @@ export default instrumentFactory.defineInstrument({
   measures: {
     count: {
       kind: 'const',
+      label: 'Count',
       ref: 'count'
     }
   },
