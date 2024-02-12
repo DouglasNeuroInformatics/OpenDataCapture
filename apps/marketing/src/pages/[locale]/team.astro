@@ -32,10 +32,10 @@ export const getStaticPaths = () => {
             <div class="flex items-center justify-center">
               <Image class="rounded-lg object-cover shadow-lg" src={image} alt={fullName} />
             </div>
-            <div class="col-span-2 space-y-1 text-lg font-medium leading-relaxed">
-              <h3>{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h3>
-              <span class="text-sky-700 dark:text-sky-400">{position}</span>
-              <p class="mt-1 text-base font-normal leading-tight text-slate-700 dark:text-slate-300">{description}</p>
+            <div class="col-span-2 space-y-1  leading-relaxed">
+              <h3 class="font-semibold">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h3>
+              <span class="font-medium tracking-tight text-sky-700 dark:text-sky-400">{position}</span>
+              <p class="mt-1 text-sm font-normal leading-tight text-slate-700 dark:text-slate-300">{description}</p>
             </div>
           </div>
         </li>
