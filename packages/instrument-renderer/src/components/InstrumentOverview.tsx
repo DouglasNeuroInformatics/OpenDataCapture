@@ -57,10 +57,10 @@ export const InstrumentOverview = ({ instrument }: InstrumentOverviewProps) => {
         />
         <InstrumentOverviewItem heading={t('instructions')} text={instrument.details.instructions} />
         {instrument.details.referenceUrl && (
-          <InstrumentOverviewItem heading={t('referenceLink')} text={instrument.details.referenceUrl} />
+          <InstrumentOverviewItem heading={t('referenceLink')} kind="link" text={instrument.details.referenceUrl} />
         )}
         {instrument.details.sourceUrl && (
-          <InstrumentOverviewItem heading={t('sourceLink')} text={instrument.details.sourceUrl} />
+          <InstrumentOverviewItem heading={t('sourceLink')} kind="link" text={instrument.details.sourceUrl} />
         )}
       </div>
       <Button

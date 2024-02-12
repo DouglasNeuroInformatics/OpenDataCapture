@@ -29,6 +29,7 @@ export abstract class BaseInstrumentTransformer {
   async transformRuntimeImports(bundle: string) {
     const result = await this.build(bundle, {
       bundle: true,
+      external: ['*'],
       plugins: [transformRuntimeImportsPlugin()]
     });
     return this.getBuiltCode(result);
@@ -36,7 +37,6 @@ export abstract class BaseInstrumentTransformer {
 
   private build(source: string, options: BuildOptions = {}) {
     return this.transpiler.build({
-      external: ['*'],
       format: 'esm',
       metafile: true,
       minify: true,
