@@ -204,6 +204,7 @@ export default instrumentFactory.defineInstrument({
   measures: {
     livesRemaining: {
       kind: 'const',
+      label: 'Lives Remaining',
       ref: 'livesRemaining'
     },
     timeElapsed: {
