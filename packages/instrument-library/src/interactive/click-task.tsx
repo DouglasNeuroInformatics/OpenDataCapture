@@ -17,9 +17,7 @@ const ClickTask = ({ done }: ClickTaskProps) => {
       }
     }, 1000);
     return () => {
-      if (interval.current) {
-        clearInterval(interval.current);
-      }
+      interval.current && clearInterval(interval.current);
     };
   }, []);
 
@@ -48,7 +46,9 @@ const ClickTask = ({ done }: ClickTaskProps) => {
 const instrumentFactory = new InstrumentFactory({
   kind: 'INTERACTIVE',
   language: 'en',
-  validationSchema: z.any()
+  validationSchema: z.object({
+    count: z.number().int()
+  })
 });
 
 export default instrumentFactory.defineInstrument({
@@ -68,6 +68,12 @@ export default instrumentFactory.defineInstrument({
     ],
     license: 'AGPL-3.0',
     title: 'Click Task'
+  },
+  measures: {
+    count: {
+      kind: 'const',
+      ref: 'count'
+    }
   },
   name: 'InteractiveInstrument',
   tags: ['Interactive'],
