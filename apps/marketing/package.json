@@ -13,6 +13,7 @@
   "dependencies": {
     "@douglasneuroinformatics/ui": "^5.2.0",
     "@open-data-capture/react-core": "workspace:*",
+    "@open-data-capture/tailwindcss": "workspace:*",
     "lodash": "^4.17.21",
     "mdast-util-to-string": "^4.0.0",
     "react": "^18.2.0",
