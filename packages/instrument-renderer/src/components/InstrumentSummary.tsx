@@ -44,7 +44,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
   return (
     <Card>
       <div className="border-b px-4 py-5 sm:px-6">
-        <h3 className="text-lg font-medium leading-6 text-slate-900 dark:text-slate-100">
+        <h3 className="text-lg font-semibold leading-6 text-slate-900 dark:text-slate-100">
           {t('summary.title', { title: instrument.details.title })}
         </h3>
         <div className="mt-1 grid grid-cols-3">
@@ -109,7 +109,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
         ]}
         title={t('instrument')}
       />
-      <InstrumentSummaryGroup items={Object.values(computedMeasures)} title={t('responses')} />
+      <InstrumentSummaryGroup items={Object.values(computedMeasures)} title={t('results')} />
     </Card>
   );
 };
