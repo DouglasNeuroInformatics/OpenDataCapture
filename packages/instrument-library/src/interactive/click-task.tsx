@@ -8,7 +8,7 @@ type ClickTaskProps = { done: (data: { count: number }) => void };
 const ClickTask = ({ done }: ClickTaskProps) => {
   const [count, setCount] = useState(0);
   const [secondsRemaining, setSecondsRemaining] = useState(10);
-  const interval = useRef<Timer | null>(null);
+  const interval = useRef<null | number>(null);
 
   useEffect(() => {
     interval.current = setInterval(() => {
