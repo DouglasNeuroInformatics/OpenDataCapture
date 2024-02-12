@@ -1,0 +1,76 @@
+---
+import { useTranslations } from '@/i18n';
+import LanguageToggle from './LanguageToggle.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import Logo from './Logo.astro';
+import MenuIcon from './MenuIcon.astro';
+
+const { t, translatePath } = useTranslations(Astro.url);
+---
+
+<header
+  class="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300"
+>
+  <div class="container flex flex-wrap items-center py-3 font-medium md:flex-nowrap">
+    <button
+      aria-label="Menu Button"
+      class="flex h-10 items-center [&>svg]:h-full [&>svg]:w-auto"
+      id="nav-toggle"
+      type="button"
+    >
+      <Logo class="hidden fill-sky-900 md:block dark:fill-slate-100" />
+      <MenuIcon class="p-1 md:hidden" id="menu-icon" />
+      <span class="font-lg ml-3 hidden whitespace-nowrap font-semibold md:block">{t('platform.title')}</span>
+    </button>
+    <nav
+      class="transition-mh order-last flex w-full flex-col overflow-hidden duration-300 md:order-none md:flex-row md:justify-end md:gap-3"
+      id="nav-dropdown"
+    >
+      <a class="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={translatePath('/')}>
+        {t('landing.title')}
+      </a>
+      <a class="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={translatePath('/docs')}>
+        {t('docs.title')}
+      </a>
+      <a class="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={translatePath('/team')}>
+        {t('team.title')}
+      </a>
+      <a class="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={translatePath('/blog')}>
+        {t('blog.title')}
+      </a>
+    </nav>
+    <div class="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 md:block dark:bg-slate-700"></div>
+    <div class="flex flex-grow justify-end gap-3">
+      <ThemeToggle />
+      <LanguageToggle />
+    </div>
+  </div>
+</header>
+<script>
+  const mobileQuery = window.matchMedia('(width < 768px)');
+  let isMobile = mobileQuery.matches;
+
+  const toggle = document.getElementById('nav-toggle')!;
+  const nav = document.getElementById('nav-dropdown')!;
+
+  toggle.addEventListener('click', () => {
+    if (isMobile) {
+      nav.style.maxHeight = nav.offsetHeight ? '0px' : `${nav.scrollHeight}px`;
+    } else {
+      window.location.assign(`/${window.location.pathname.split('/').at(1)}/`);
+    }
+  });
+
+  if (isMobile) {
+    nav.style.maxHeight = '0px';
+  }
+
+  mobileQuery.addEventListener('change', ({ matches }) => {
+    isMobile = matches;
+    if (isMobile) {
+      nav.style.maxHeight = '0px';
+    } else {
+      nav.style.maxHeight = 'none';
+    }
+  });
+</script>
