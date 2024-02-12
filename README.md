@@ -13,11 +13,13 @@
     </a>
     <br />
     <br />
-    <a href="https://demo.opendatacapture.org">View Demo</a>
+    <a href="https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues" rel="noreferrer" target="_blank">Report Bug</a>
     ·
-    <a href="https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues">Report Bug</a>
+    <a href="https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues" rel="noreferrer" target="_blank">Request Feature</a>
     ·
-    <a href="https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues">Request Feature</a>
+    <a href="https://formplayground.opendatacapture.org" rel="noreferrer" target="_blank">Instrument Playground</a>
+    ·
+    <a href="https://demo.opendatacapture.org" rel="noreferrer" target="_blank">View Demo</a>
   </p>
 </div>
 
