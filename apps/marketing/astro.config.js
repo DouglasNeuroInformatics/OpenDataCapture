@@ -1,8 +1,13 @@
+import path from 'path';
+import url from 'url';
+
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import { defineConfig, squooshImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
@@ -23,7 +28,9 @@ export default defineConfig({
         }
       }
     }),
-    tailwind()
+    tailwind({
+      configFile: path.resolve(__dirname, 'tailwind.config.js')
+    })
   ],
   markdown: {
     remarkPlugins: [
