@@ -19,16 +19,21 @@ const { t } = useTranslations(Astro.url);
 <script>
   const isDarkSystem = matchMedia('(prefers-color-scheme: dark)').matches;
   const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark' || (!savedTheme && isDarkSystem)) {
-    document.documentElement.classList.add('dark');
-  }
+  const setTheme = (theme: 'dark' | 'light') => {
+    document.documentElement.setAttribute('data-mode', theme);
+    localStorage.setItem('theme', theme);
+  };
+  const initialTheme = savedTheme === 'dark' || (!savedTheme && isDarkSystem) ? 'dark' : 'light';
+  setTheme(initialTheme);
+
   document.getElementById('theme-toggle')?.addEventListener('click', () => {
-    if (document.documentElement.classList.contains('dark')) {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    const currentTheme = document.documentElement.getAttribute('data-mode');
+    if (currentTheme === 'dark') {
+      setTheme('light');
+    } else if (currentTheme === 'light') {
+      setTheme('dark');
     } else {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+      console.error(`Unexpected theme: ${currentTheme}`);
     }
   });
 </script>
