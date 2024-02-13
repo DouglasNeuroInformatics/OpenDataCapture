@@ -44,7 +44,8 @@ export const translations = {
       en: 'About Us',
       fr: 'À propos de nous'
     },
-    gitHub: 'GitHub'
+    gitHub: 'GitHub',
+    instrumentPlayground: 'Playground'
   },
   landing: {
     addVisit: {
