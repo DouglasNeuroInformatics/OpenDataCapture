@@ -1,5 +1,5 @@
 import type { Language } from '@open-data-capture/common/core';
-import _ from 'lodash';
+import { get } from 'lodash-es';
 
 import { translations } from './translations';
 
@@ -16,7 +16,7 @@ type Translations = typeof translations;
 type TranslationKey = ExtractTranslationKey<Translations>;
 
 function getTranslation(key: TranslationKey, language: Language) {
-  const value = _.get(translations, key);
+  const value = get(translations, key);
   if (typeof value === 'string') {
     return value;
   }
