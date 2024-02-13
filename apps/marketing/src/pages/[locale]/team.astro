@@ -28,7 +28,7 @@ export const getStaticPaths = () => {
     {
       team.map(({ data: { fullName, suffix, position, image, description } }) => (
         <li class="translate-y-6 opacity-0 transition-all duration-500 ease-in-out">
-          <div class="grid grid-cols-3 gap-8">
+          <div class="grid h-full grid-cols-3 gap-8">
             <div class="flex items-center justify-center">
               <Image class="rounded-lg object-cover shadow-lg" src={image} alt={fullName} />
             </div>
