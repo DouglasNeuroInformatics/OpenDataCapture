@@ -1,4 +1,11 @@
-import { breakoutTask, clickTask, happinessQuestionnaire } from '@open-data-capture/instrument-library';
+import {
+  breakoutTask,
+  clickTask,
+  emptyBilingualForm,
+  emptyUnilingualForm,
+  genericFormInstrument,
+  happinessQuestionnaire
+} from '@open-data-capture/instrument-library';
 
 export type ExampleInstrumentData = {
   label: string;
@@ -11,6 +18,21 @@ export const examples: readonly ExampleInstrumentData[] = Object.freeze([
     label: 'Happiness Questionnaire',
     path: 'happiness-questionnaire.ts',
     value: happinessQuestionnaire.source
+  },
+  {
+    label: 'Empty Unilingual Form',
+    path: 'empty-unilingual-form.ts',
+    value: emptyUnilingualForm.source
+  },
+  {
+    label: 'Empty Bilingual Form',
+    path: 'empty-bilingual-form.ts',
+    value: emptyBilingualForm.source
+  },
+  {
+    label: 'Generic Form Example',
+    path: 'generic-form-example.ts',
+    value: genericFormInstrument.source
   },
   {
     label: 'Click Task',
