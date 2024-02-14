@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
 
-import type { Merge } from 'type-fest';
+import type { Exact, Merge } from 'type-fest';
 import { z } from 'zod';
 
 import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $UnilingualInstrumentMeasures } from './instrument.base';
@@ -14,7 +14,7 @@ export type InteractiveInstrumentContent<TData extends Json = Json> = {
     css?: string[];
     img?: Record<string, string>;
   };
-  render: (done: (data: TData) => void) => any;
+  render: (done: <T extends Exact<TData, T>>(data: T) => void) => any;
 };
 
 export type InteractiveInstrument<TData extends Json = Json, TLanguage extends Language = Language> = Merge<
