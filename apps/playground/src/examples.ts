@@ -2,6 +2,7 @@ import {
   breakoutTask,
   clickTask,
   emptyBilingualForm,
+  emptyInteractiveInstrument,
   emptyUnilingualForm,
   genericFormInstrument,
   happinessQuestionnaire
@@ -33,6 +34,11 @@ export const examples: readonly ExampleInstrumentData[] = Object.freeze([
     label: 'Generic Form Example',
     path: 'generic-form-example.ts',
     value: genericFormInstrument.source
+  },
+  {
+    label: 'Empty Interactive',
+    path: 'empty-interactive.ts',
+    value: emptyInteractiveInstrument.source
   },
   {
     label: 'Click Task',

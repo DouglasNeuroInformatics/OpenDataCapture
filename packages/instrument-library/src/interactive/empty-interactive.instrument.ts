@@ -6,7 +6,9 @@ const { z } = await import('/runtime/v0.0.1/zod.js');
 const instrumentFactory = new InstrumentFactory({
   kind: 'INTERACTIVE',
   language: 'en',
-  validationSchema: z.any()
+  validationSchema: z.object({
+    message: z.string()
+  })
 });
 
 export default instrumentFactory.defineInstrument({
@@ -17,6 +19,8 @@ export default instrumentFactory.defineInstrument({
     render(done) {
       const button = document.createElement('button');
       button.textContent = 'Submit Instrument';
+      document.body.appendChild(button);
+
       button.addEventListener('click', () => {
         done({ message: 'Hello World' });
       });
