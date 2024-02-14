@@ -31,6 +31,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
         <div className="flex w-min items-center gap-2">
           <span className="whitespace-nowrap">Selected Instrument: </span>
           <Dropdown
+            className="text-sm [&_*]:text-sm"
             options={ctx.exampleOptions}
             size="sm"
             title={ctx.selectedExample.label}

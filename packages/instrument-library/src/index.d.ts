@@ -12,3 +12,4 @@ export const genericFormInstrument: InstrumentLibraryItem;
 export const clickTask: InstrumentLibraryItem;
 export const reactionTimeTask: InstrumentLibraryItem;
 export const breakoutTask: InstrumentLibraryItem;
+export const emptyInteractiveInstrument: InstrumentLibraryItem;
