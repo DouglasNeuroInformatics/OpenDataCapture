@@ -1,64 +1,62 @@
 {
-  "landing": {
-    "addVisit": {
-      "description": {
-        "en": "Using state-of-the-art cryptographic algorithms, we compute patient identifiers based on core demographic characteristics. This innovative approach ensures zero personal data retention while enabling consistent cross-visit association.",
-        "fr": "Grâce à des algorithmes cryptographiques de pointe, nous calculons les identifiants des patients en fonction de leurs caractéristiques démographiques de base. Cette approche innovante garantit qu'aucune donnée personnelle n'est conservée tout en permettant une association cohérente entre les visites."
-      },
-      "heading": {
-        "en": "Hash-Based Patient Identification",
-        "fr": "Identification des patients par hachage"
-      },
-      "subheading": {
-        "en": "Precision in Anonymity",
-        "fr": "La précision dans l'anonymat"
-      }
+  "addVisit": {
+    "description": {
+      "en": "Using state-of-the-art cryptographic algorithms, we compute patient identifiers based on core demographic characteristics. This innovative approach ensures zero personal data retention while enabling consistent cross-visit association.",
+      "fr": "Grâce à des algorithmes cryptographiques de pointe, nous calculons les identifiants des patients en fonction de leurs caractéristiques démographiques de base. Cette approche innovante garantit qu'aucune donnée personnelle n'est conservée tout en permettant une association cohérente entre les visites."
     },
-    "dataManagement": {
-      "description": {
-        "en": "When you're prepared to export, choose between CSV or TSV formats. With Open Data Capture, you're guaranteed access to the most recent version of your data. Move beyond scattered spreadsheets and embrace centralized, secure data storage.",
-        "fr": "Lorsque vous êtes prêt à exporter, choisissez entre les formats CSV ou TSV. Avec Open Data Capture, vous avez la garantie d'accéder à la version la plus récente de vos données. Laissez derrière vous les feuilles de calcul éparpillées et adoptez un stockage de données centralisé et sécurisé."
-      },
-      "heading": {
-        "en": "Effortless Data Management",
-        "fr": "Rationalisez la gestion de vos données"
-      },
-      "subheading": {
-        "en": "Excel at Data Management, Spreadsheets Not Required",
-        "fr": "Excel pour la gestion des données, feuilles de calcul non requises"
-      },
-      "viewSubjectsScreenshot": {
-        "en": "Screenshot of view subjects page",
-        "fr": "Capture d'écran de la page de présentation de tous les sujets"
-      }
+    "heading": {
+      "en": "Hash-Based Patient Identification",
+      "fr": "Identification des patients par hachage"
     },
-    "hero": {
-      "happyPerson": {
-        "en": "Happy Person",
-        "fr": "Personne heureuse"
-      },
-      "heading": {
-        "en": "Modern, Secure, and User-Friendly Electronic Data Capture",
-        "fr": "Une plateforme de saisie électronique des données moderne, sécurisée et conviviale"
-      },
-      "learnMore": {
-        "en": "Learn More",
-        "fr": "En savoir plus"
-      },
-      "subheading": {
-        "en": "Finally, an easy-to-use, reliable, and open-source solution for clinical researchers",
-        "fr": "Enfin une solution facile à utiliser, fiable et open-source pour les chercheurs cliniques"
-      },
-      "viewDemo": {
-        "en": "View Demo",
-        "fr": "Voir la démo"
-      }
+    "subheading": {
+      "en": "Precision in Anonymity",
+      "fr": "La précision dans l'anonymat"
+    }
+  },
+  "dataManagement": {
+    "description": {
+      "en": "When you're prepared to export, choose between CSV or TSV formats. With Open Data Capture, you're guaranteed access to the most recent version of your data. Move beyond scattered spreadsheets and embrace centralized, secure data storage.",
+      "fr": "Lorsque vous êtes prêt à exporter, choisissez entre les formats CSV ou TSV. Avec Open Data Capture, vous avez la garantie d'accéder à la version la plus récente de vos données. Laissez derrière vous les feuilles de calcul éparpillées et adoptez un stockage de données centralisé et sécurisé."
     },
-    "testimonials": {
-      "heading": {
-        "en": "What People Say About Us",
-        "fr": "Ce que les gens disent de nous"
-      }
+    "heading": {
+      "en": "Effortless Data Management",
+      "fr": "Rationalisez la gestion de vos données"
+    },
+    "subheading": {
+      "en": "Excel at Data Management, Spreadsheets Not Required",
+      "fr": "Excel pour la gestion des données, feuilles de calcul non requises"
+    },
+    "viewSubjectsScreenshot": {
+      "en": "Screenshot of view subjects page",
+      "fr": "Capture d'écran de la page de présentation de tous les sujets"
+    }
+  },
+  "hero": {
+    "happyPerson": {
+      "en": "Happy Person",
+      "fr": "Personne heureuse"
+    },
+    "heading": {
+      "en": "Modern, Secure, and User-Friendly Electronic Data Capture",
+      "fr": "Une plateforme de saisie électronique des données moderne, sécurisée et conviviale"
+    },
+    "learnMore": {
+      "en": "Learn More",
+      "fr": "En savoir plus"
+    },
+    "subheading": {
+      "en": "Finally, an easy-to-use, reliable, and open-source solution for clinical researchers",
+      "fr": "Enfin une solution facile à utiliser, fiable et open-source pour les chercheurs cliniques"
+    },
+    "viewDemo": {
+      "en": "View Demo",
+      "fr": "Voir la démo"
+    }
+  },
+  "testimonials": {
+    "heading": {
+      "en": "What People Say About Us",
+      "fr": "Ce que les gens disent de nous"
     }
   }
 }
