@@ -112,4 +112,11 @@ const navLinks = [
 
   close.addEventListener('click', closeSlider);
   toggle.addEventListener('click', openSlider);
+
+  matchMedia('(min-width: 768px)').addEventListener('change', (event) => {
+    const isDesktop = event.matches;
+    if (isDesktop) {
+      closeSlider();
+    }
+  });
 </script>
