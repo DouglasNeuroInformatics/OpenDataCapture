@@ -1,0 +1,23 @@
+{
+  "blog": {
+    "en": "Blog",
+    "fr": "Blogue"
+  },
+  "changeLanguage": {
+    "en": "Change Language",
+    "fr": "Changer la langue"
+  },
+  "changeTheme": {
+    "en": "Change Theme",
+    "fr": "Changer le thème"
+  },
+  "docs": "Docs",
+  "overview": {
+    "en": "Overview",
+    "fr": "Accueil"
+  },
+  "team": {
+    "en": "Team",
+    "fr": "L'équipe"
+  }
+}

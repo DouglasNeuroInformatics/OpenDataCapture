@@ -1,5 +1,7 @@
 ---
 import Head from '@/components/Head.astro';
+import Header from '@/components/Header.astro';
+
 import { useTranslations } from '@/i18n';
 
 type Props = {
@@ -20,6 +22,7 @@ const { bilingual, meta } = Astro.props;
 <html lang={resolvedLanguage}>
   <Head bilingual={bilingual} meta={meta} />
   <body class="flex min-h-screen flex-col bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+    <Header />
     <main class="container">
       <slot />
     </main>
