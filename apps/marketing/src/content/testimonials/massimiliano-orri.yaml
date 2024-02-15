@@ -1,0 +1,10 @@
+format: 'long'
+fullName: Massimiliano Orri
+suffix: PhD
+position:
+  en: Clinical Psychologist, Douglas Institute
+  fr: Psychologue clinicienne, Institut Douglas
+image: '@/assets/headshots/massimiliano-orri.jpeg'
+quote:
+  en: 'I have two roles in my work: researcher and clinician. After trying the OpenDataCapture demo, I quickly realized that this is a much-needed innovation for both aspects of my work. It would not only enable better follow up and evaluation of my patients from the perspective of measurement-based and evidence-based care, but also to accumulate essential data that are critical to better understand the trajectories of the patients from a research perspective, and ultimately to improve their clinical care. I really looking forward to the deployment of the OpenDataCapture platform!'
+  fr: "Je joue deux rôles dans mon travail : celui de chercheur et celui de clinicien. Après avoir essayé la démonstration d'OpenDataCapture, j'ai rapidement réalisé qu'il s'agissait d'une innovation dont j'avais grand besoin pour ces deux aspects de mon travail. Elle permettrait non seulement d'améliorer le suivi et l'évaluation de mes patients du point de vue des soins fondés sur des mesures et des preuves, mais aussi d'accumuler des données essentielles pour mieux comprendre les trajectoires des patients du point de vue de la recherche et, en fin de compte, d'améliorer les soins cliniques qui leur sont prodigués. J'attends avec impatience le déploiement de la plateforme OpenDataCapture !"

@@ -1,0 +1,10 @@
+format: 'short'
+fullName: Maxime Montembeault
+suffix: PhD
+position:
+  en: Neuropsychologist, Douglas Institute
+  fr: Neuropsychologue, Institut Douglas
+image: '@/assets/headshots/maxime-montembeault.png'
+quote:
+  en: 'The OpenDataCapture platform is an ideal resource for my studies in the field of neuropsychology. The DNP team is efficient, creative and responsive to my data collection needs (and beyond)!'
+  fr: La plateforme OpenDataCapture est une ressource idéale pour mes études dans le champ de la neuropsychologie. L'équipe du DNP est efficace, créative et à l'écoute de mes besoins en matière de collecte de données (et au-delà)!

@@ -4,11 +4,13 @@ import { get } from 'lodash-es';
 import common from './translations/common.json';
 import docs from './translations/docs.json';
 import meta from './translations/meta.json';
+import team from './translations/team.json';
 
 const translations = {
   common,
   docs,
-  meta
+  meta,
+  team
 };
 
 type ExtractTranslationKey<T extends Record<string, unknown>, Key = keyof T> = Key extends string
