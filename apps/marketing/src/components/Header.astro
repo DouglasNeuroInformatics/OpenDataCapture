@@ -1,9 +1,10 @@
 ---
-import { useTranslations } from '@/i18n';
 import LanguageToggle from './LanguageToggle.astro';
-import ThemeToggle from './ThemeToggle.astro';
 import Logo from './Logo.astro';
-// import MenuIcon from './MenuIcon.astro';
+import MenuIcon from './MenuIcon.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+import { useTranslations } from '@/i18n';
 
 const { t, translatePath } = useTranslations(Astro.url);
 
@@ -30,7 +31,7 @@ const navLinks = [
 <header
   class="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300"
 >
-  <div class="container flex items-center py-3 font-medium">
+  <div class="container flex items-center justify-between py-3 font-medium">
     <button
       aria-label="Menu Button"
       class="flex h-10 items-center [&>svg]:h-full [&>svg]:w-auto"
@@ -38,21 +39,26 @@ const navLinks = [
       type="button"
     >
       <Logo class="fill-sky-900 dark:fill-slate-100" />
-      <span class="font-lg ml-3 hidden whitespace-nowrap font-semibold md:block">{t('meta.title')}</span>
+      <span class="font-lg ml-3 hidden whitespace-nowrap font-semibold lg:block">{t('meta.title')}</span>
     </button>
-    <nav class="flex w-full justify-end gap-3 overflow-hidden duration-300" id="nav-dropdown">
-      {
-        navLinks.map(({ href, label }) => (
-          <a class="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={href}>
-            {label}
-          </a>
-        ))
-      }
-    </nav>
-    <div class="mx-5 h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700"></div>
-    <div class="flex flex-grow justify-end gap-3">
-      <ThemeToggle />
-      <LanguageToggle />
+    <div class="hidden shrink md:flex">
+      <nav class="flex gap-3 overflow-hidden duration-300" id="nav-dropdown">
+        {
+          navLinks.map(({ href, label }) => (
+            <a class="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={href}>
+              {label}
+            </a>
+          ))
+        }
+      </nav>
+      <div class="mx-5 h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700"></div>
+      <div class="flex flex-grow justify-end gap-3">
+        <ThemeToggle />
+        <LanguageToggle />
+      </div>
     </div>
+    <button class="flex h-10 items-center md:hidden [&>svg]:h-full [&>svg]:w-auto" id="nav-toggle">
+      <MenuIcon />
+    </button>
   </div>
 </header>
