@@ -37,7 +37,8 @@ export const translations = {
     }
   },
   docs: {
-    title: 'Documentation'
+    heading: 'Documentation',
+    title: 'Docs'
   },
   footer: {
     aboutUs: {
