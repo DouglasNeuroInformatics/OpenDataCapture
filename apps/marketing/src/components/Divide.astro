@@ -1,0 +1,9 @@
+---
+import { cn } from '@douglasneuroinformatics/ui';
+
+type Props = astroHTML.JSX.HTMLAttributes;
+
+const { class: className, ...props } = Astro.props;
+---
+
+<hr class={cn('bg-muted mt-auto h-[1px] border-none', className)} {...props} />
