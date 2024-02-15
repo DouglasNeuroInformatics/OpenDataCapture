@@ -1,0 +1,36 @@
+---
+import { cn } from '@douglasneuroinformatics/ui';
+import { match } from 'ts-pattern';
+
+type Props = {
+  className?: string;
+  variant: 'h1' | 'h2' | 'h3' | 'h4';
+};
+
+const { className, variant } = Astro.props;
+---
+
+{
+  match(variant)
+    .with('h1', () => (
+      <h1 class={cn('text-3xl font-bold tracking-tight', className)}>
+        <slot />
+      </h1>
+    ))
+    .with('h2', () => (
+      <h2 class={cn('text-2xl font-semibold tracking-tight', className)}>
+        <slot />
+      </h2>
+    ))
+    .with('h3', () => (
+      <h3 class={cn('text-xl font-semibold tracking-tight', className)}>
+        <slot />
+      </h3>
+    ))
+    .with('h4', () => (
+      <h4 class={cn('text-lg font-semibold tracking-tight', className)}>
+        <slot />
+      </h4>
+    ))
+}
+
