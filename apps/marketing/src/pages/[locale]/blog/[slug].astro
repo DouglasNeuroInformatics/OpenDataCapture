@@ -1,0 +1,44 @@
+---
+import Page from '@/layouts/Page.astro';
+import { getCollection, type CollectionEntry, getEntry } from 'astro:content';
+import PostInfoCard from '@/components/PostInfoCard.astro';
+
+type Props = {
+  post: CollectionEntry<'blog'>;
+};
+
+export const getStaticPaths = async () => {
+  const posts = await getCollection('blog');
+
+  const paths = posts.map((post) => ({
+    params: {
+      locale: post.data.language,
+      slug: post.slug
+    },
+    props: { post }
+  }));
+
+  return paths;
+};
+
+const { post } = Astro.props;
+
+const { Content, remarkPluginFrontmatter } = await post.render();
+
+const author = await getEntry(post.data.author);
+---
+
+<Page meta={{ title: post.data.title, description: post.data.description }}>
+  <article class="prose prose-slate dark:prose-invert relative mx-auto max-w-3xl">
+    <h1 class="text-2xl font-bold text-slate-900 md:text-3xl dark:text-slate-100">
+      {post.data.title}
+    </h1>
+    <PostInfoCard
+      author={author}
+      className="not-prose"
+      datePublished={post.data.datePublished}
+      readingTime={remarkPluginFrontmatter.readingTime}
+    />
+    <Content />
+  </article>
+</Page>

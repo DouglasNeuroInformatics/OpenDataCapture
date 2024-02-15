@@ -1,0 +1,70 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+
+
+import NoContent from '@/components/NoContent.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import PostInfoCard from '@/components/PostInfoCard.astro';
+import Page from '@/layouts/Page.astro';
+
+import { useTranslations } from '@/i18n';
+
+export const getStaticPaths = () => {
+  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
+};
+
+const { resolvedLanguage, t, translatePath } = useTranslations(Astro.url);
+
+const posts = await getCollection('blog', ({ data }) => data.language === resolvedLanguage);
+posts.sort((a, b) => {
+  if (a.data.datePublished > b.data.datePublished) {
+    return -1;
+  } else if (b.data.datePublished > a.data.datePublished) {
+    return 1;
+  }
+  return 0;
+});
+---
+
+<Page bilingual meta={{ title: `${t('meta.title')} - ${t('meta.title')}` }}>
+  <PageHeader title={t('blog.heading')} />
+  {
+    posts.length === 0 ? (
+      <NoContent />
+    ) : (
+      <div class="grid gap-4 lg:grid-cols-2">
+        {posts.map(async (post) => {
+          const author = await getEntry(post.data.author);
+          const { remarkPluginFrontmatter } = await post.render();
+          return (
+            <a
+              class="cursor-pointer rounded-md border border-slate-300 bg-slate-50 p-5 shadow-sm dark:border-slate-600 dark:bg-slate-800"
+              href={translatePath(`/blog/${post.slug}`)}
+            >
+              <span
+                class:list={[
+                  'inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium',
+                  post.data.type === 'article' && 'bg-indigo-100 text-indigo-800',
+                  post.data.type === 'caseStudy' && 'bg-green-100 text-green-800',
+                  post.data.type === 'video' && 'bg-pink-100 text-pink-800'
+                ]}
+              >
+                {t(`blog.${post.data.type}`)}
+              </span>
+              <div class="mt-4">
+                <p class="text-xl font-semibold">{post.data.title}</p>
+                <p class="mt-3 text-base text-slate-700 dark:text-slate-300">{post.data.description}</p>
+              </div>
+              <PostInfoCard
+                author={author}
+                className="mt-6"
+                datePublished={post.data.datePublished}
+                readingTime={remarkPluginFrontmatter.readingTime}
+              />
+            </a>
+          );
+        })}
+      </div>
+    )
+  }
+</Page>
