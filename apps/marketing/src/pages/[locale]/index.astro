@@ -1,5 +1,5 @@
 ---
-import Heading from '@/components/Heading.astro';
+import PageHeader from '@/components/PageHeader.astro';
 import Page from '@/layouts/Page.astro';
 
 export const getStaticPaths = () => {
@@ -8,5 +8,5 @@ export const getStaticPaths = () => {
 ---
 
 <Page bilingual>
-  <Heading variant="h1">Index</Heading>
+  <PageHeader title="Index" />
 </Page>

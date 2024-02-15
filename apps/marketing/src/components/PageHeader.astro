@@ -1,0 +1,15 @@
+---
+import Heading from './Heading.astro';
+
+type Props = {
+  title: string;
+};
+
+const { title } = Astro.props;
+---
+
+<div class="flex justify-center py-8">
+  <Heading variant="h1">
+    {title}
+  </Heading>
+</div>
