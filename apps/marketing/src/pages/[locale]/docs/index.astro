@@ -1,12 +1,15 @@
 ---
 import Heading from '@/components/Heading.astro';
+import { useTranslations } from '@/i18n';
 import Page from '@/layouts/Page.astro';
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
+
+const { t } = useTranslations(Astro.url);
 ---
 
-<Page bilingual>
-  <Heading variant="h1">Index</Heading>
+<Page>
+  <Heading variant="h1">{t('docs.heading')}</Heading>
 </Page>

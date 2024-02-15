@@ -2,10 +2,12 @@ import type { Language } from '@open-data-capture/common/core';
 import { get } from 'lodash-es';
 
 import common from './translations/common.json';
+import docs from './translations/docs.json';
 import meta from './translations/meta.json';
 
 const translations = {
   common,
+  docs,
   meta
 };
 
