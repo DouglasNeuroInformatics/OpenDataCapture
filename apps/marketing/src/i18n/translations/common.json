@@ -12,10 +12,12 @@
     "fr": "Changer le thème"
   },
   "docs": "Docs",
+  "gitHub": "GitHub",
   "overview": {
     "en": "Overview",
     "fr": "Accueil"
   },
+  "playground": "Playground",
   "team": {
     "en": "Team",
     "fr": "L'équipe"
