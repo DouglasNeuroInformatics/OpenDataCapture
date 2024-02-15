@@ -1,0 +1,7 @@
+---
+export const getStaticPaths = () => {
+  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
+};
+---
+
+<div>{Astro.url}</div>

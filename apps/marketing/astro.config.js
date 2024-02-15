@@ -1,7 +1,7 @@
 import path from 'path';
 import url from 'url';
 
-import react from '@astrojs/react'
+import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import { defineConfig, squooshImageService } from 'astro/config';
@@ -16,6 +16,13 @@ export default defineConfig({
     assets: '_assets'
   },
   compressHTML: true,
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'fr'],
+    routing: {
+      prefixDefaultLocale: true
+    }
+  },
   image: {
     service: squooshImageService()
   },
