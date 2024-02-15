@@ -1,7 +1,9 @@
 ---
+import Page from '@/layouts/Page.astro';
+
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
 ---
 
-<div>{Astro.url}</div>
+<Page bilingual>Hello</Page>
