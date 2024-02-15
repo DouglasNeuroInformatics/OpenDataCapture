@@ -5,6 +5,7 @@ import Page from '@/layouts/Page.astro';
 import { getEntry } from 'astro:content';
 import PostInfoCard from '@/components/PostInfoCard.astro';
 import NoContent from '@/components/NoContent.astro';
+import Heading from '@/components/Heading.astro';
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
@@ -24,7 +25,7 @@ posts.sort((a, b) => {
 ---
 
 <Page bilingual meta={{ title: `${t('platform.title')} - ${t('blog.title')}` }}>
-  <h2 class="pb-12 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">{t('blog.heading')}</h2>
+  <Heading variant="h1">{t('blog.heading')}</Heading>
   {
     posts.length === 0 ? (
       <NoContent />
