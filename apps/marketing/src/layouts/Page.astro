@@ -1,0 +1,30 @@
+---
+import Footer from '@/components/Footer.astro';
+import Head from '@/components/Head.astro';
+import Navbar from '@/components/Navbar';
+import { useTranslations } from '@/i18n';
+
+type Props = {
+  bilingual?: boolean;
+  meta?: {
+    title?: string;
+    description?: string;
+    author?: string;
+    keywords?: string[];
+  };
+};
+
+const { resolvedLanguage } = useTranslations(Astro.url);
+---
+
+<!doctype html>
+<html lang={resolvedLanguage}>
+  <Head />
+  <body class="flex h-screen flex-col scroll-smooth bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+    <Navbar client:load url={Astro.url} />
+    <main class="container pb-8 pt-24">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
