@@ -69,7 +69,11 @@ const navLinks = [
     <div class="px-2">
       <Branding />
     </div>
-    <button class="rounded-lg p-2 text-slate-700 transition-colors dark:text-slate-300">
+    <button
+      class="rounded-lg p-2 text-slate-700 transition-colors dark:text-slate-300"
+      type="button"
+      id="close-slider-button"
+    >
       <XMarkIcon />
     </button>
   </div>
@@ -86,17 +90,23 @@ const navLinks = [
 
 <script>
   const backdrop = document.getElementById('mobile-slider-backdrop')!;
+  const close = document.getElementById('close-slider-button')!;
   const slider = document.getElementById('mobile-slider')!;
   const toggle = document.getElementById('nav-toggle')!;
+
+  close.addEventListener('click', () => {
+    backdrop.style.opacity = '0%';
+    slider.classList.add('translate-x-[28rem]');
+    setTimeout(() => {
+      backdrop.style.height = '0vh';
+      backdrop.style.width = '0vw';
+    }, 300);
+  });
 
   toggle.addEventListener('click', () => {
     backdrop.style.height = '100vh';
     backdrop.style.width = '100vw';
     backdrop.style.opacity = '50%';
-
-    // backdrop.classList.add('opacity-0');
-    // backdrop.classList.add('opacity-50');
-
     slider.classList.remove('translate-x-[28rem]');
   });
 </script>
