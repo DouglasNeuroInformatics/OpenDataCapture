@@ -1,4 +1,5 @@
 ---
+import Divide from './Divide.astro';
 import Heading from './Heading.astro';
 
 type Props = {
@@ -8,8 +9,9 @@ type Props = {
 const { title } = Astro.props;
 ---
 
-<div class="flex justify-center py-8">
+<div class="flex flex-col items-center justify-center space-y-8 py-8">
   <Heading variant="h1">
     {title}
   </Heading>
+  <Divide />
 </div>
