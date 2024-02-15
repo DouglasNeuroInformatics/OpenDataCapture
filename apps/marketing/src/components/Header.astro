@@ -94,19 +94,22 @@ const navLinks = [
   const slider = document.getElementById('mobile-slider')!;
   const toggle = document.getElementById('nav-toggle')!;
 
-  close.addEventListener('click', () => {
+  const closeSlider = () => {
     backdrop.style.opacity = '0%';
     slider.classList.add('translate-x-[28rem]');
     setTimeout(() => {
       backdrop.style.height = '0vh';
       backdrop.style.width = '0vw';
     }, 300);
-  });
+  };
 
-  toggle.addEventListener('click', () => {
+  const openSlider = () => {
     backdrop.style.height = '100vh';
     backdrop.style.width = '100vw';
     backdrop.style.opacity = '50%';
     slider.classList.remove('translate-x-[28rem]');
-  });
+  };
+
+  close.addEventListener('click', closeSlider);
+  toggle.addEventListener('click', openSlider);
 </script>
