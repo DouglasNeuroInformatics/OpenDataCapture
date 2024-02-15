@@ -2,10 +2,11 @@
 import Branding from './Branding.astro';
 import LanguageToggle from './LanguageToggle.astro';
 import MenuIcon from './MenuIcon.astro';
+import NavLink from './NavLink.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import XMarkIcon from './XMarkIcon.astro';
 
 import { useTranslations } from '@/i18n';
-import XMarkIcon from './XMarkIcon.astro';
 
 const { t, translatePath } = useTranslations(Astro.url);
 
@@ -36,13 +37,7 @@ const navLinks = [
     <Branding className="[&>span]:hidden [&>span]:lg:block" />
     <div class="hidden shrink md:flex">
       <nav class="flex gap-3 overflow-hidden duration-300" id="nav-dropdown">
-        {
-          navLinks.map(({ href, label }) => (
-            <a class="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={href}>
-              {label}
-            </a>
-          ))
-        }
+        {navLinks.map((props) => <NavLink {...props} />)}
       </nav>
       <div class="mx-5 h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700"></div>
       <div class="flex flex-grow justify-end gap-3">
@@ -56,13 +51,13 @@ const navLinks = [
   </div>
 </header>
 <div
-  class="absolute z-20 bg-black transition-opacity duration-300"
+  class="fixed z-20 bg-black transition-opacity duration-300"
   id="mobile-slider-backdrop"
   style="height: 0px; width: 0px; opacity: 0%;"
 >
 </div>
 <div
-  class="absolute right-0 z-30 flex h-screen w-full max-w-[28rem] translate-x-[28rem] flex-col overflow-y-scroll bg-slate-50 py-6 shadow-xl transition-transform duration-300 dark:bg-slate-800"
+  class="fixed right-0 z-30 flex h-screen w-full max-w-[28rem] translate-x-[28rem] flex-col overflow-y-scroll bg-slate-50 py-6 shadow-xl transition-transform duration-300 dark:bg-slate-800"
   id="mobile-slider"
 >
   <div class="flex items-center justify-between px-4">
@@ -78,16 +73,10 @@ const navLinks = [
     </button>
   </div>
   <hr class="mx-4 my-4 border-slate-300 dark:border-slate-700" />
-  {
-    navLinks.map(() => (
-      <a
-        class="flex items-center justify-start p-2 text-slate-900 hover:text-slate-900 dark:text-slate-100 dark:hover:text-slate-100"
-        href=""
-      />
-    ))
-  }
+  <nav class="flex flex-col px-4">
+    {navLinks.map((props) => <NavLink {...props} />)}
+  </nav>
 </div>
-
 <script>
   const backdrop = document.getElementById('mobile-slider-backdrop')!;
   const close = document.getElementById('close-slider-button')!;
@@ -95,6 +84,7 @@ const navLinks = [
   const toggle = document.getElementById('nav-toggle')!;
 
   const closeSlider = () => {
+    document.body.style.overflow = 'auto';
     backdrop.style.opacity = '0%';
     slider.classList.add('translate-x-[28rem]');
     setTimeout(() => {
@@ -104,6 +94,7 @@ const navLinks = [
   };
 
   const openSlider = () => {
+    document.body.style.overflow = 'hidden';
     backdrop.style.height = '100vh';
     backdrop.style.width = '100vw';
     backdrop.style.opacity = '50%';

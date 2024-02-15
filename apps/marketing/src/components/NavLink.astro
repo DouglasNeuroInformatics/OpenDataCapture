@@ -1,0 +1,12 @@
+---
+type Props = {
+  href: string;
+  label: string;
+};
+
+const { href, label } = Astro.props;
+---
+
+<a class="p-2 dark:text-slate-300 dark:hover:text-slate-100" href={href}>
+  {label}
+</a>
