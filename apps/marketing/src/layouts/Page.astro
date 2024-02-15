@@ -47,6 +47,18 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
     <link rel="sitemap" href="/sitemap-index.xml" />
     <!-- prettier-ignore -->
     <script defer data-domain="opendatacapture.org" src="http://analytics.douglasneuroinformatics.ca/js/script.js"></script>
+    <script is:inline>
+      const getThemePreference = () => {
+        const savedTheme = window.localStorage.getItem('theme');
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          return savedTheme;
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+      const theme = getThemePreference();
+      document.documentElement.setAttribute('data-mode', theme);
+      window.localStorage.setItem('theme', theme);
+    </script>
   </head>
   <body class="flex h-screen flex-col scroll-smooth bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <Navbar client:load url={Astro.url} />
