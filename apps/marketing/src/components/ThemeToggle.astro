@@ -17,15 +17,10 @@ const { t } = useTranslations(Astro.url);
   <SunIcon class="absolute inset-2 h-6 w-6 opacity-0 dark:opacity-100" />
 </button>
 <script>
-  const isDarkSystem = matchMedia('(prefers-color-scheme: dark)').matches;
-  const savedTheme = localStorage.getItem('theme');
   const setTheme = (theme: 'dark' | 'light') => {
     document.documentElement.setAttribute('data-mode', theme);
     localStorage.setItem('theme', theme);
   };
-  const initialTheme = savedTheme === 'dark' || (!savedTheme && isDarkSystem) ? 'dark' : 'light';
-  setTheme(initialTheme);
-
   document.getElementById('theme-toggle')?.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-mode');
     if (currentTheme === 'dark') {
