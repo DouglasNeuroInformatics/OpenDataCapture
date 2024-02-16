@@ -1,6 +1,6 @@
 ---
 type: article
-title: 'Navigating Bureaucracy: A Non-Profit Perspective on Innovating in Healthcare'
+title: 'Navigating Bureaucracy: A Non-Profit Perspective'
 description: 'Non-profit technical organizations can play a pivotal role in the healthcare sector, proposing collaborative solutions to align regulatory frameworks with the imperatives of innovation and efficiency.'
 author: joshua-unrau
 language: en

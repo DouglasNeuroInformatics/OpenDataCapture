@@ -20,7 +20,9 @@ const { resolvedLanguage } = useTranslations(Astro.url);
     <Image alt={author.data.fullName} class="h-10 w-10 rounded-full" src={author.data.image} />
   </div>
   <div class="ml-3">
-    <p class="text-sm font-medium">{`${author.data.fullName}${author.data.suffix ? `, ${author.data.suffix}` : ''}`}</p>
+    <p class="text-sm font-semibold">
+      {`${author.data.fullName}${author.data.suffix ? `, ${author.data.suffix}` : ''}`}
+    </p>
     <div class="flex space-x-1 text-sm text-slate-700 dark:text-slate-300">
       <time datetime={datePublished.toISOString()}>
         {
