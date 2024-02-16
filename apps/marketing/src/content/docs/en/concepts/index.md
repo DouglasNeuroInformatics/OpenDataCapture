@@ -43,7 +43,3 @@ When an instrument is completed, the result is stored in a record. Since records
 
 ## Gateway
 
-
-## Free and Open Source
-
-Open Data Capture is [free and open source software](https://www.gnu.org/philosophy/free-sw.en.html) developed by the [Douglas Neuroinformatics Platform](https://douglasneuroinformatics.ca/) for internal use at the [Douglas Research Centre](https://douglas.research.mcgill.ca/). This means that the [source code](https://github.com/DouglasNeuroInformatics/OpenDataCapture) is available for anyone to modify or deploy on their own private server. However, the DNP administers an instance of Open Data Capture on our [own server](https://docs.douglasneuroinformatics.ca/en/latest/about_the_platform/index.html#hardware), behind a firewall. As of February 2024, access to the platform is available on request. Please [contact us](support@douglasneuroinformatics.ca) for more information.

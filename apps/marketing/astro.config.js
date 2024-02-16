@@ -50,8 +50,8 @@ export default defineConfig({
       },
       sidebar: [
         {
-          autogenerate: { directory: 'overview' },
-          label: 'Overview'
+          autogenerate: { directory: 'introduction' },
+          label: 'Introduction'
         },
         {
           autogenerate: { directory: 'tutorials' },
@@ -72,6 +72,10 @@ export default defineConfig({
       ],
       social: {
         github: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'
+      },
+      tableOfContents: {
+        maxHeadingLevel: 4,
+        minHeadingLevel: 2
       },
       title: 'Open Data Capture'
     }),

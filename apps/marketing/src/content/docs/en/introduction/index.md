@@ -1,0 +1,28 @@
+---
+title: Overview
+description: Welcome to the Open Data Capture Documentation
+---
+
+Welcome to the Open Data Capture documentation! 🎉📚
+
+Our documentation is structured into five distinct sections, each designed to cater to different informational needs about Open Data Capture.
+
+### Introduction
+
+The introduction provides a high-level description of the platform, including its origins, the team behind its creation, our motivations for developing this resource, and an outline of the project's scope.
+
+### Tutorials
+
+The tutorials section is designed for hands-on learning, providing step-by-step instructions to help you get started with Open Data Capture and to assist in accomplishing specific tasks or projects.
+
+### Guides
+
+The guides section is a collection of concise and topic-specific articles. These guides are ideal for users looking for quick, actionable information on particular aspects of Open Data Capture, like performing certain tasks.
+
+### Concepts
+
+In the concepts section, we delve into explanations and discussions about the underlying principles and ideas behind Open Data Capture. This section is intended for technical users who seeking a deeper understanding of the technology, architecture, and design decisions underlying the platform.
+
+### Reference
+
+The reference section serves as a comprehensive resource, providing detailed descriptions of the platform's features, functions, APIs, and configuration options. This section is a valuable tool for developers and users who need detailed technical information and specifications.

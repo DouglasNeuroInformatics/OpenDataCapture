@@ -1,6 +1,5 @@
 ---
-title: Introduction
-description: Welcome to the Open Data Capture Documentation
+title: About
 ---
 
 Open Data Capture is a web-based platform designed for continuous clinical data collection. Designed with clinician-researchers in mind, the platform enables both remote and in-person evaluations, encompassing a range of applications — from patient questionnaires completed at home to interactive memory tasks conducted in clinical settings. The platform is designed with a robust security framework, ensuring that all collected data is securely stored in a structured, standardized manner. It offers an intuitive, user-friendly interface to filter the stored data according to various criteria. Once filtered, the data can be used to generate dynamic graphs and tables, or exported for research purposes.
