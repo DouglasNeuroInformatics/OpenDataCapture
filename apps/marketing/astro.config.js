@@ -37,6 +37,16 @@ export default defineConfig({
       }
     }),
     starlight({
+      defaultLocale: 'en',
+      favicon: '/favicon.ico',
+      locales: {
+        en: {
+          label: 'English'
+        },
+        fr: {
+          label: 'Français'
+        }
+      },
       sidebar: [
         {
           items: [
