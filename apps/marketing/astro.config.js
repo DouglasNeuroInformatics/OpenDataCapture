@@ -49,8 +49,8 @@ export default defineConfig({
         }
       },
       logo: {
-        dark: path.resolve(__dirname, './src/assets/logos/logo-dark.svg'),
-        light: path.resolve(__dirname, './src/assets/logos/logo-light.svg')
+        dark: path.resolve(__dirname, './src/assets/logos/logo-light.svg'),
+        light: path.resolve(__dirname, './src/assets/logos/logo-dark.svg')
       },
       sidebar: [
         {
