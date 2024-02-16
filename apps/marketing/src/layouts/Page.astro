@@ -4,9 +4,10 @@ import Head from '@/components/Head.astro';
 import Header from '@/components/Header.astro';
 
 import { useTranslations } from '@/i18n';
-
+import { twMerge } from 'tailwind-merge';
 type Props = {
   bilingual?: boolean;
+  className?: string;
   meta?: {
     title?: string;
     description?: string;
@@ -16,7 +17,7 @@ type Props = {
 };
 
 const { resolvedLanguage } = useTranslations(Astro.url);
-const { bilingual, meta } = Astro.props;
+const { bilingual, className, meta } = Astro.props;
 ---
 
 <!doctype html>
@@ -24,7 +25,7 @@ const { bilingual, meta } = Astro.props;
   <Head bilingual={bilingual} meta={meta} />
   <body class="flex min-h-screen flex-col bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <Header />
-    <main class="container grow py-16">
+    <main class={twMerge('container grow py-16', className)}>
       <slot />
     </main>
     <Footer />
