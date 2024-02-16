@@ -1,9 +1,11 @@
-import config from '@open-data-capture/react-core/tailwind.config';
+// @ts-check
+
+import { createConfig } from '@open-data-capture/tailwindcss';
 import typographyPlugin from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: [...config.content, './src/**/*.{astro,html,js,ts}'],
+export default createConfig({
+  content: ['./src/**/*.{astro,html,js,ts}'],
   plugins: [typographyPlugin],
-  presets: [config]
-};
+  root: __dirname
+});

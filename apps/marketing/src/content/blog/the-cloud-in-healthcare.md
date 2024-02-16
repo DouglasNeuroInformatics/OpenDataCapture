@@ -39,4 +39,4 @@ In essence, the most ethical approach is one that prioritizes patient well-being
 
 ## Conclusion
 
-The healthcare sector's migration to the cloud is not merely a question of technological advancement; it's a matter of optimizing care and ensuring data security. It's time to move beyond dated misconceptions and objectively assess the best way forward, with the well-being of patients at the forefront of the conversation.
+The healthcare sector's migration to the cloud is not merely a question of technological advancement; it's a matter of optimizing care and ensuring data security. It's time to move beyond dated misconceptions and objectively assess the best way forward, with the well-being of patients at the forefront of the conversation. OpenDataCapture's architecture is ready for whatever your institution chooses, with a service design which allows for minimal exposure to the cloud if need be, while still taking advantage of the internet for reaching patients and research subjects

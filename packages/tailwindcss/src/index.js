@@ -9,6 +9,7 @@ import defaultTheme from 'tailwindcss/defaultTheme.js';
  * @param {Object} [options]
  * @param {string[]} [options.content]
  * @param {string[]} [options.include]
+ * @param {any[]} [options.plugins]
  * @param {string | URL} [options.root]
  * @returns {import('tailwindcss').Config}
  */
@@ -33,6 +34,7 @@ export function createConfig(options) {
 
   return {
     content: [...baseConfig.content, ...libraryContent, ...content],
+    plugins: options?.plugins,
     presets: [baseConfig],
     theme: {
       fontFamily: {

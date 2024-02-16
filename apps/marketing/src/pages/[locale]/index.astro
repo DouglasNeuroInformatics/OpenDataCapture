@@ -1,12 +1,15 @@
 ---
 import { Image } from 'astro:assets';
-import hero from '@/assets/hero.svg';
-import { useTranslations } from '@/i18n';
+import { getCollection } from 'astro:content';
+
+import type { Language } from '@open-data-capture/common/core';
+
+import Hero from '@/components/Hero.astro';
 import Page from '@/layouts/Page.astro';
 import Section from '@/layouts/Section.astro';
-import type { Language } from '@open-data-capture/common/core';
-import { getCollection } from 'astro:content';
 import Testimonial from '@/components/Testimonial.astro';
+
+import { useTranslations } from '@/i18n';
 
 const { resolvedLanguage, t } = useTranslations(Astro.url);
 
@@ -70,7 +73,7 @@ export const getStaticPaths = () => {
     <div
       class="hidden opacity-0 transition-opacity duration-1000 lg:flex lg:w-1/2 lg:items-center lg:justify-center xl:w-5/12"
     >
-      <Image alt={t('landing.hero.happyPerson')} class="rounded-md brightness-90" src={hero} />
+      <Hero class="rounded-md brightness-90" />
     </div>
   </Section>
   <Section class="grid gap-8 lg:grid-cols-2" id="add-visit-section">

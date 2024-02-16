@@ -1,9 +1,10 @@
 ---
 type Props = astroHTML.JSX.HTMLAttributes;
 
+import { twMerge } from 'tailwind-merge';
 const { class: className, ...props } = Astro.props;
 ---
 
-<section class:list={["min-h-[calc(100vh-4rem)]", className]} {...props}>
+<section class={twMerge(['min-h-[calc(100vh-4rem)]', className])} {...props}>
   <slot />
 </section>

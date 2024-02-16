@@ -1,7 +1,21 @@
 import type { Language } from '@open-data-capture/common/core';
-import _ from 'lodash';
+import { get } from 'lodash-es';
 
-import { translations } from './translations';
+import blog from './translations/blog.json';
+import common from './translations/common.json';
+import docs from './translations/docs.json';
+import landing from './translations/landing.json';
+import meta from './translations/meta.json';
+import team from './translations/team.json';
+
+const translations = {
+  blog,
+  common,
+  docs,
+  landing,
+  meta,
+  team
+};
 
 type ExtractTranslationKey<T extends Record<string, unknown>, Key = keyof T> = Key extends string
   ? T[Key] extends Record<string, unknown>
@@ -16,7 +30,7 @@ type Translations = typeof translations;
 type TranslationKey = ExtractTranslationKey<Translations>;
 
 function getTranslation(key: TranslationKey, language: Language) {
-  const value = _.get(translations, key);
+  const value = get(translations, key);
   if (typeof value === 'string') {
     return value;
   }
