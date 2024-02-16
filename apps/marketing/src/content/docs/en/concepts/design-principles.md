@@ -34,3 +34,7 @@ Open Data Capture is built using a REST (Representational State Transfer) API ar
 4. REST APIs are easy to document and understand, which is essential for ensuring that future developers can build new services, such as data-driven clinical care systems based on machine learning and artificial intelligence.
 
 5. REST APIs are easy to test and debug, which is crucial for building a robust, secure, and maintainable platform.
+
+### Internationalization
+
+The platform must be fully accessible in either English or French. The approach to internationalization taken should allow for the inclusion of additional locales with relative ease.
