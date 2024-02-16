@@ -37,6 +37,9 @@ export default defineConfig({
       }
     }),
     starlight({
+      customCss: [
+        path.resolve(__dirname, './src/styles/starlight-custom.css')
+      ],
       defaultLocale: 'en',
       favicon: '/favicon.ico',
       locales: {
