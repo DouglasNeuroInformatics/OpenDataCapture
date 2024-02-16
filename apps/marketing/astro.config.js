@@ -61,9 +61,9 @@ export default defineConfig({
         }
       ],
       social: {
-        github: 'https://github.com/withastro/starlight'
+        github: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'
       },
-      title: 'My Docs'
+      title: 'Open Data Capture'
     }),
     tailwind({
       configFile: path.resolve(__dirname, 'tailwind.config.js')
