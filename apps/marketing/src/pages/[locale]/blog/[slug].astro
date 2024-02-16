@@ -2,6 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getCollection, type CollectionEntry, getEntry } from 'astro:content';
 import PostInfoCard from '@/components/PostInfoCard.astro';
+import PageHeader from '@/components/PageHeader.astro';
 
 type Props = {
   post: CollectionEntry<'blog'>;
@@ -29,10 +30,8 @@ const author = await getEntry(post.data.author);
 ---
 
 <Page meta={{ title: post.data.title, description: post.data.description }}>
-  <article class="prose prose-slate dark:prose-invert relative mx-auto max-w-3xl">
-    <h1 class="text-2xl font-bold text-slate-900 md:text-3xl dark:text-slate-100">
-      {post.data.title}
-    </h1>
+  <article class="prose prose-slate dark:prose-invert relative mx-auto max-w-3xl pt-8">
+    <PageHeader className="pb-0 text-left" title={post.data.title} />
     <PostInfoCard
       author={author}
       className="not-prose"
