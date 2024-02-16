@@ -9,8 +9,6 @@ datePublished: 2024-02-13
 
 ## Introduction
 
-Open Data Capture is an easy-to-use web application designed for continuous clinical data capture. It offers users the ability to conduct both remote and in-person clinical assessments, storing the results in a secure, structured, and standardized manner. These results may be used for research purposes, or to drive powerful visualizations to better characterize service users and access internal service performance. This article provides a high-level technical overview of the major features and architecture of Open Data Capture. 
-
 ## Architecture
 
 Open Data Capture is written in TypeScript, with all source code located in a monorepo managed by [Turborepo](https://turbo.build/). In the repository, there are three primary folders of interest:

@@ -37,9 +37,7 @@ export default defineConfig({
       }
     }),
     starlight({
-      customCss: [
-        path.resolve(__dirname, './src/styles/starlight-custom.css')
-      ],
+      customCss: [path.resolve(__dirname, './src/styles/starlight-custom.css')],
       defaultLocale: 'en',
       favicon: '/favicon.ico',
       locales: {
@@ -52,10 +50,11 @@ export default defineConfig({
       },
       sidebar: [
         {
-          items: [
-            // Each item here is one entry in the navigation menu.
-            { label: 'Example Guide', link: '/guides/example/' }
-          ],
+          autogenerate: { directory: 'overview' },
+          label: 'Overview'
+        },
+        {
+          autogenerate: { directory: 'guides' },
           label: 'Guides'
         },
         {
