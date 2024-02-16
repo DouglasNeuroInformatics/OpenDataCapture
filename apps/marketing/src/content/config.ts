@@ -1,3 +1,4 @@
+import { docsSchema } from '@astrojs/starlight/schema';
 import { defineCollection, reference, z } from 'astro:content';
 
 export const collections = {
@@ -11,6 +12,7 @@ export const collections = {
       type: z.enum(['article', 'caseStudy', 'video'])
     })
   }),
+  docs: defineCollection({ schema: docsSchema() }),
   team: defineCollection({
     schema: ({ image }) =>
       z.object({

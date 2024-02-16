@@ -2,6 +2,7 @@ import path from 'path';
 import url from 'url';
 
 import sitemap from '@astrojs/sitemap';
+import starlight from '@astrojs/starlight';
 import tailwind from '@astrojs/tailwind';
 import { defineConfig, squooshImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
@@ -34,6 +35,25 @@ export default defineConfig({
           fr: 'fr'
         }
       }
+    }),
+    starlight({
+      sidebar: [
+        {
+          items: [
+            // Each item here is one entry in the navigation menu.
+            { label: 'Example Guide', link: '/guides/example/' }
+          ],
+          label: 'Guides'
+        },
+        {
+          autogenerate: { directory: 'reference' },
+          label: 'Reference'
+        }
+      ],
+      social: {
+        github: 'https://github.com/withastro/starlight'
+      },
+      title: 'My Docs'
     }),
     tailwind({
       configFile: path.resolve(__dirname, 'tailwind.config.js')
