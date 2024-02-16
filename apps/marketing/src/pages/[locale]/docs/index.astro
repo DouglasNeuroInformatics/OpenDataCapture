@@ -1,6 +1,6 @@
 ---
 import PageHeader from '@/components/PageHeader.astro';
-import DocumentationPage from '@/layouts/DocumentationPage.astro';
+import Page from '@/layouts/Page.astro';
 
 import { useTranslations } from '@/i18n';
 
@@ -11,6 +11,6 @@ export const getStaticPaths = () => {
 const { t } = useTranslations(Astro.url);
 ---
 
-<DocumentationPage>
+<Page>
   <PageHeader title={t('docs.heading')} />
-</DocumentationPage>
+</Page>
