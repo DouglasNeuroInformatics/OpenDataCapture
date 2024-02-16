@@ -50,23 +50,23 @@ export default defineConfig({
       },
       sidebar: [
         {
-          autogenerate: { directory: 'introduction' },
+          autogenerate: { directory: '1-introduction' },
           label: 'Introduction'
         },
         {
-          autogenerate: { directory: 'tutorials' },
+          autogenerate: { directory: '2-tutorials' },
           label: 'Tutorials'
         },
         {
-          autogenerate: { directory: 'guides' },
+          autogenerate: { directory: '3-guides' },
           label: 'Guides'
         },
         {
-          autogenerate: { directory: 'concepts' },
+          autogenerate: { directory: '4-concepts' },
           label: 'Concepts'
         },
         {
-          autogenerate: { directory: 'reference' },
+          autogenerate: { directory: '5-reference' },
           label: 'Reference'
         }
       ],
