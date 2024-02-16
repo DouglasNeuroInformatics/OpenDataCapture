@@ -1,0 +1,21 @@
+---
+title: Target Users
+---
+
+### Clinical Staff
+
+The platform is designed primarily for clinical personnel, including doctors, nurses, and administrative assistants. These users will likely access the platform using Google Chrome on a desktop computer. It is safe to assume that the vast majority of these users will prefer a graphical user interface and will have little/no experience with the command line.
+
+### Research Subjects
+
+The platform allows research subjects to self-enter dat on any device, including mobile phones, tablets, laptops, and desktop computers. In some cases, these users may suffer from cognitive impairments that affect their attention or memory. Therefore, any functionalities provided to this user class should be designed with accessibility in mind.
+
+### Researchers
+
+The platform may also eventually be used by researchers, including principal investigators, postdoctoral fellows, and graduate students. Most of these users will also prefer to access data through a graphical interface, although a small minority may find it useful to access the API directly. 
+
+### Non-Human Clients
+
+The platform may later be integrated with other services (e.g., a predictive modeling service that consumes data in real-time). Therefore, fine grained permissions would be ideal for security.
+
+
