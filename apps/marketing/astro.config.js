@@ -48,6 +48,10 @@ export default defineConfig({
           label: 'Français'
         }
       },
+      logo: {
+        dark: path.resolve(__dirname, './src/assets/logos/logo-dark.svg'),
+        light: path.resolve(__dirname, './src/assets/logos/logo-light.svg')
+      },
       sidebar: [
         {
           autogenerate: { directory: '1-introduction' },

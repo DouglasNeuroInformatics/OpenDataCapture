@@ -271,3 +271,17 @@
     --sl-mobile-toc-height: 0rem;
   }
 }
+
+.site-title {
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
+.site-title > img {
+  order: 1;
+  fill: var(--slate-100);
+}
+
+.site-title > span {
+  order: 2;
+}
