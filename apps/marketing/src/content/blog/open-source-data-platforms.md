@@ -4,7 +4,7 @@ title: 'Benefits of Open-Source Electronic Data Capture Platforms'
 description: 'Open-source electronic data capture platforms offer clinician-researchers numerous practical advantages over their proprietary counterparts, including cost-savings, long-term stability, and enhanced data security.'
 author: joshua-unrau
 language: en
-datePublished: 2024-02-16
+datePublished: 2024-02-15
 ---
 
 In the digital age, electronic data capture platforms have revolutionized the way researchers collect, manage, and analyze data. In the realms of clinical research and patient care, electronic data capture tools offer numerous benefits. However, not all electronic data capture platforms are created equal. Among platforms, open-source options stand out for their significant advantages, offering cost-savings, preventing vendor lock-in, and enhanced data security,
