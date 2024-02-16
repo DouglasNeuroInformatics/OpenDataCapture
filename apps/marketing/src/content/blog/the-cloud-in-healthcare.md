@@ -4,7 +4,7 @@ title: 'The Cloud in Healthcare: Challenging the Detractors'
 description: "The healthcare sector's hesitancy to adopt cloud technology, often rooted in misunderstandings, overlooks its potential for enhanced security and efficiency, which is crucial for optimizing patient care in the digital age."
 author: gabriel-devenyi
 language: en
-datePublished: 2023-02-16
+datePublished: 2023-08-30
 ---
 
 ## Introduction
