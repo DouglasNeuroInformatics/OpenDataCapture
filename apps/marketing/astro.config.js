@@ -1,3 +1,4 @@
+import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
@@ -43,6 +44,12 @@ export default defineConfig({
       customCss: [path.resolve(__dirname, './src/styles/starlight-custom.css')],
       defaultLocale: 'en',
       favicon: '/favicon.ico',
+      head: [
+        {
+          content: await fs.readFile(path.resolve(__dirname, './src/scripts/theme-observer.js'), 'utf-8'),
+          tag: 'script'
+        }
+      ],
       locales: {
         en: {
           label: 'English'
