@@ -296,3 +296,17 @@
   color: var(--sl-color-text);
   text-decoration: underline;
 }
+
+.pagination-links {
+  /* display: none; */
+  font-size: var(--sl-text-sm);
+}
+
+.pagination-links .link-title {
+  /* display: none; */
+  font-size: var(--sl-text-xl);
+}
+
+.pagination-links > a:hover {
+  border-color: var(--sl-color-gray-4);
+}
