@@ -1,7 +1,9 @@
 ---
 import Branding from './Branding.astro';
+
+const locale = Astro.url.pathname.split('/')[1];
 ---
 
-<a class="site-title" href="/">
+<a class="site-title" href={`/${locale}`}>
   <Branding />
 </a>
