@@ -15,5 +15,5 @@ const { className } = Astro.props;
 
 <div class={twMerge('flex h-10 items-center [&>svg]:h-full [&>svg]:w-auto', className)}>
   <Logo class="fill-sky-900 dark:fill-slate-100" />
-  <span class="font-lg ml-3 whitespace-nowrap font-semibold">{t('meta.title')}</span>
+  <span class="ml-3 whitespace-nowrap font-semibold">{t('meta.title')}</span>
 </div>

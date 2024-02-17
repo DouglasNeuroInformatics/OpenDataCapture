@@ -267,19 +267,19 @@
 
 @media (min-width: 72rem) {
   :root {
-    --sl-content-pad-x: 1.5rem;
+    /* --sl-content-pad-x: 1.5rem; */
     --sl-mobile-toc-height: 0rem;
   }
 }
 
 .site-title {
+  gap: 0.75rem !important;
   font-weight: 600 !important;
-  font-size: 16px !important;
+  font-size: 1rem !important;
 }
 
 .site-title > img {
   order: 1;
-  fill: var(--slate-100);
 }
 
 .site-title > span {
