@@ -236,10 +236,10 @@
 
   --sl-color-accent-low: var(--slate-100);
   --sl-color-accent: var(--sky-500);
-  --sl-color-accent-high: var(--slate-900);
+  --sl-color-accent-high: var(--slate-700);
 
   --sl-color-text: var(--slate-700);
-  --sl-color-text-accent: var(--slate-900);
+  --sl-color-text-accent: var(--slate-700);
   --sl-color-text-invert: var(--slate-100);
   --sl-color-bg: var(--slate-100);
   --sl-color-bg-nav: var(--slate-50);
