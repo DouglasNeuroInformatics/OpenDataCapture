@@ -102,7 +102,9 @@ export const getStaticPaths = () => {
   </Section>
   <Section class="flex flex-col items-center justify-center">
     <h2 class="pb-12 text-3xl font-extrabold">{t('landing.testimonials.heading')}</h2>
-    <div class="grid auto-cols-fr divide-y lg:grid-cols-2 lg:gap-x-8 lg:gap-y-16 lg:divide-none">
+    <div
+      class="grid auto-cols-fr divide-y divide-slate-300 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-16 lg:divide-none dark:divide-slate-700"
+    >
       <Testimonial
         format={testimonials.simon.format}
         image={testimonials.simon.image}
