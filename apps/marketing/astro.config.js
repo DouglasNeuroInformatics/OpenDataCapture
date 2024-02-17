@@ -37,6 +37,9 @@ export default defineConfig({
       }
     }),
     starlight({
+      components: {
+        SiteTitle: path.resolve(__dirname, './src/components/SiteTitle.astro')
+      },
       customCss: [path.resolve(__dirname, './src/styles/starlight-custom.css')],
       defaultLocale: 'en',
       favicon: '/favicon.ico',
@@ -47,10 +50,6 @@ export default defineConfig({
         fr: {
           label: 'Français'
         }
-      },
-      logo: {
-        dark: path.resolve(__dirname, './src/assets/logos/logo-light.svg'),
-        light: path.resolve(__dirname, './src/assets/logos/logo-dark.svg')
       },
       sidebar: [
         {

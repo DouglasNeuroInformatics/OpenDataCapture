@@ -200,6 +200,8 @@
   --sl-z-index-menu: 5;
   --sl-z-index-navbar: 10;
   --sl-z-index-skiplink: 20;
+
+  --logo-color: var(--slate-100);
 }
 
 :root[data-theme='light'],
@@ -258,6 +260,8 @@
     0px 3px 2px hsla(0, 0%, 0%, 0.06), 0px 1px 1px hsla(0, 0%, 0%, 0.06);
   --sl-shadow-lg: 0px 25px 7px rgba(0, 0, 0, 0.01), 0px 16px 6px hsla(0, 0%, 0%, 0.03),
     0px 9px 5px hsla(223, 13%, 10%, 0.08), 0px 4px 4px hsla(0, 0%, 0%, 0.16), 0px 4px 2px hsla(0, 0%, 0%, 0.04);
+
+  --logo-color: var(--sky-900)
 }
 
 @media (min-width: 50em) {
@@ -278,18 +282,8 @@
   }
 }
 
-.site-title {
-  gap: 0.75rem !important;
-  font-weight: 600 !important;
-  font-size: 1rem !important;
-}
-
-.site-title > img {
-  order: 1;
-}
-
-.site-title > span {
-  order: 2;
+.site-title svg {
+  fill: var(--logo-color);
 }
 
 .sl-markdown-content a {
