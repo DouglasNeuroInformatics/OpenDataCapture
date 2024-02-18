@@ -45,7 +45,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             CONTACT_EMAIL=support@douglasneuroinformatics.ca
-            DOCS_URL=https://docs.opendatacapture.org
+            DOCS_URL=https://opendatacapture.org/docs
             GITHUB_REPO_URL=https://github.com/DouglasNeuroInformatics/OpenDataCapture
             LICENSE_URL=https://www.gnu.org/licenses/agpl-3.0.en.html
             VITE_API_BASE_URL=/api

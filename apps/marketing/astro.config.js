@@ -104,6 +104,10 @@ export default defineConfig({
       }
     ]
   },
+  redirects: {
+    '/[locale]/docs': '/[locale]/introduction/home',
+    '/docs': '/en/introduction/home'
+  },
   server: {
     port: parseInt(process.env.MARKETING_DEV_SERVER_PORT ?? 4000)
   },
