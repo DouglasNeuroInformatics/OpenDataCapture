@@ -7,7 +7,7 @@
   <p align="center">
     A modern, user-friendly web application for standardized data capture in medical research
     <br />
-    <a href="https://docs.opendatacapture.org">
+    <a href="https://opendatacapture.org/docs">
       <strong>Explore the docs »
       </strong>
     </a>
