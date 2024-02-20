@@ -261,7 +261,7 @@
   --sl-shadow-lg: 0px 25px 7px rgba(0, 0, 0, 0.01), 0px 16px 6px hsla(0, 0%, 0%, 0.03),
     0px 9px 5px hsla(223, 13%, 10%, 0.08), 0px 4px 4px hsla(0, 0%, 0%, 0.16), 0px 4px 2px hsla(0, 0%, 0%, 0.04);
 
-  --logo-color: var(--sky-900)
+  --logo-color: var(--sky-900);
 }
 
 @media (min-width: 50em) {
@@ -303,4 +303,8 @@
 
 .pagination-links > a:hover {
   border-color: var(--sl-color-gray-4);
+}
+
+.tab > a {
+  padding: 0.5rem 1.5rem !important;
 }
