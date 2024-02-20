@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import type { AnyInstrument, AnyUnilingualInstrument } from '@open-data-capture/common/instrument';
-import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
+import type { AnyInstrument, AnyUnilingualInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
+import { InstrumentInterpreter, type InterpretOptions } from '@open-data-capture/instrument-interpreter';
 import { translateInstrument } from '@open-data-capture/instrument-utils';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +16,10 @@ export type InterpretedInstrumentState =
  * @param bundle - the JavaScript code to be interpreted directly in the browser
  * @returns The instrument generated from the code, translated into the current locale, if possible, otherwise the default
  */
-export function useInterpretedInstrument(bundle: string) {
+export function useInterpretedInstrument<TKind extends InstrumentKind>(
+  bundle: string,
+  options?: InterpretOptions<TKind>
+) {
   const interpreter = useMemo(() => new InstrumentInterpreter(), []);
   const [instrument, setInstrument] = useState<AnyInstrument | null>(null);
   const [state, setState] = useState<InterpretedInstrumentState>({ status: 'LOADING' });
@@ -24,7 +27,7 @@ export function useInterpretedInstrument(bundle: string) {
 
   useEffect(() => {
     interpreter
-      .interpret(bundle)
+      .interpret(bundle, options)
       .then(setInstrument)
       .catch((err) => {
         console.error(err);
