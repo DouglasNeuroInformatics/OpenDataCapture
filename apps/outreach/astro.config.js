@@ -110,7 +110,7 @@ export default defineConfig({
     '/fr/docs': '/fr/introduction/home'
   },
   server: {
-    port: parseInt(process.env.MARKETING_DEV_SERVER_PORT ?? 4000)
+    port: parseInt(process.env.OUTREACH_DEV_SERVER_PORT ?? 4000)
   },
   site: 'https://opendatacapture.org',
   vite: {

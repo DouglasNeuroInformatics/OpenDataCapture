@@ -1,9 +1,11 @@
-name: Deploy Marketing Site
+name: Deploy Outreach Site
 on:
   push:
     branches: ['main']
     paths:
-      - 'marketing/**'
+      - 'blog/**'
+      - 'docs/**'
+      - 'apps/outreach/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,11 +31,11 @@ jobs:
       - name: Install Dependencies
         run: bun install --ignore-scripts
       - name: Build Site
-        run: bunx turbo run build --filter=@open-data-capture/marketing
+        run: bunx turbo run build --filter=@open-data-capture/outreach
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./apps/marketing/dist/
+          path: ./apps/outreach/dist/
   deploy:
     environment:
       name: github-pages
