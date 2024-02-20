@@ -14,7 +14,7 @@ export const getStaticPaths = () => {
 
 const { resolvedLanguage, t, translatePath } = useTranslations(Astro.url);
 
-const posts = await getCollection('blog', ({ data }) => data.language === resolvedLanguage);
+const posts = await getCollection('blog', ({ data }) => data.language === resolvedLanguage && !data.isDraft);
 posts.sort((a, b) => {
   if (a.data.datePublished > b.data.datePublished) {
     return -1;
@@ -51,7 +51,7 @@ posts.sort((a, b) => {
                 {t(`blog.${post.data.type}`)}
               </span>
               <div class="mt-3">
-                <p class="font-semibold text-lg tracking-tight">{post.data.title}</p>
+                <p class="text-lg font-semibold tracking-tight">{post.data.title}</p>
                 <p class="mt-3 text-sm text-slate-700 dark:text-slate-300">{post.data.description}</p>
               </div>
               <PostInfoCard
