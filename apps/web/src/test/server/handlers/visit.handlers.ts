@@ -6,10 +6,13 @@ import { testSubject } from '../stubs';
 export const VisitHandler = [
   http.post('/v1/visits', () => {
     return HttpResponse.json<Visit>({
+      createdAt: new Date(),
       date: new Date('2023-11-14'),
-      group: undefined,
+      groupId: '1',
       id: '12345',
-      subject: testSubject
+      subject: testSubject,
+      subjectId: '1',
+      updatedAt: new Date()
     });
   })
 ];

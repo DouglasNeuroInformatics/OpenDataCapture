@@ -15,9 +15,12 @@ export const adminUser: User = Object.freeze({
 });
 
 export const testSubject: Subject = Object.freeze({
+  createdAt: new Date(),
   dateOfBirth: new Date(),
   firstName: 'testSubject',
-  identifier: '231314',
+  groupIds: [],
+  id: '231314',
   lastName: 'tester',
-  sex: 'male'
+  sex: 'MALE',
+  updatedAt: new Date()
 });
