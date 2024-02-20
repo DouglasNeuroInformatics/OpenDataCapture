@@ -6,8 +6,8 @@ import { translateInstrument } from '@open-data-capture/instrument-utils';
 import { useTranslation } from 'react-i18next';
 
 export type InterpretedInstrumentState =
+  | { error: unknown; status: 'ERROR' }
   | { instrument: AnyUnilingualInstrument; status: 'DONE' }
-  | { status: 'ERROR' }
   | { status: 'LOADING' };
 
 /**
@@ -29,9 +29,9 @@ export function useInterpretedInstrument<TKind extends InstrumentKind>(
     interpreter
       .interpret(bundle, options)
       .then(setInstrument)
-      .catch((err) => {
-        console.error(err);
-        setState({ status: 'ERROR' });
+      .catch((error) => {
+        console.error(error);
+        setState({ error, status: 'ERROR' });
       });
   }, [bundle]);
 
