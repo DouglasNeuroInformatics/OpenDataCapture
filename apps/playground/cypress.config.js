@@ -2,7 +2,7 @@ import { defineConfig } from 'cypress';
 
 export default defineConfig({
   e2e: {
-    baseUrl: `http://localhost:${process.env.PLAYGROUND_SERVER_PORT}`,
+    baseUrl: `http://localhost:${process.env.PLAYGROUND_DEV_SERVER_PORT}`,
     setupNodeEvents() {
       // implement node event listeners here
       return;
