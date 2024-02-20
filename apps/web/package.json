@@ -76,7 +76,6 @@
     "prop-types": "^15.8.1",
     "rollup-plugin-copy": "^3.5.0",
     "sort-json": "^2.0.1",
-    "start-server-and-test": "^2.0.3",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.12",
     "vite-plugin-compression": "^0.5.1"
