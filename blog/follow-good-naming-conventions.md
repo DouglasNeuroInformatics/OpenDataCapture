@@ -1,6 +1,6 @@
 ---
 type: article
-title: 'Follow Good Naming Conventions in Mediacal Data'
+title: 'Follow Good Naming Conventions in Medical Data'
 description: 'Explore the pivotal role of standardized naming conventions in healthcare data management and how modern digital platforms streamline adherence to these conventions, ensuring clarity, accuracy, and compliance while fostering efficiency and interoperability.'
 author: weijie-tan
 language: en
