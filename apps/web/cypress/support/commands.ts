@@ -11,7 +11,6 @@
 //
 //
 // -- This is a parent command --
-import '@4tw/cypress-drag-drop';
 //require('@4tw/cypress-drag-drop')
 
 //This is a login script for the
@@ -30,8 +29,6 @@ Cypress.Commands.add('dragTo', { prevSubject: 'element' }, (subject, targetSelec
   cy.get(targetSelector).trigger('dragend');
 });
 
-
-
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -40,8 +37,6 @@ declare global {
       login(username: string, password: string): Chainable<void>;
       dragTo(prevSubject: string): Chainable<void>;
     }
-
-
   }
 }
 //

@@ -12,7 +12,7 @@ const ClickTask = ({ done }: ClickTaskProps) => {
   const interval = useRef<any>(null);
 
   useEffect(() => {
-    interval.current = setInterval(() => {
+    interval.current = window.setInterval(() => {
       if (secondsRemaining > 0) {
         setSecondsRemaining((prev) => prev - 1);
       }
