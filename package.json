@@ -16,6 +16,7 @@
     "clean": "find . -type d '(' -name '.turbo' -o -name 'dist' -o -name 'node_modules' ')' -prune -exec rm -rf {} \\;",
     "clean-workflows": "./scripts/clean-workflows.sh",
     "compose:dev": "docker compose -f docker-compose.dev.yaml",
+    "cy:install": "cypress install",
     "dev": "bun dev:core",
     "dev:all": "env-cmd cross-env NODE_ENV=development turbo run dev --no-daemon",
     "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --no-daemon --filter=@open-data-capture/api --filter=@open-data-capture/gateway --filter=@open-data-capture/web",
@@ -24,8 +25,8 @@
     "generate:env": "./scripts/generate-env.sh",
     "lint": "turbo run lint --no-daemon",
     "prepare": "husky install",
-    "test": "env-cmd turbo run test --no-daemon",
     "start": "env-cmd cross-env NODE_ENV=production turbo run start --no-daemon",
+    "test": "env-cmd turbo run test --no-daemon",
     "ws": "./scripts/workspace.js $@"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "astro-eslint-parser": "^0.16.1",
     "bun-types": "^1.0.22",
     "cross-env": "^7.0.3",
+    "cypress": "^13.6.2",
     "env-cmd": "^10.1.0",
     "eslint": "^8.56.0",
     "eslint-plugin-astro": "^0.31.0",
@@ -56,6 +58,7 @@
     "prettier": "^3.1.1",
     "prettier-plugin-astro": "^0.12.3",
     "prettier-plugin-tailwindcss": "^0.5.11",
+    "start-server-and-test": "^2.0.3",
     "storybook": "^7.6.7",
     "storybook-react-i18next": "^2.0.10",
     "tsx": "^4.7.0",

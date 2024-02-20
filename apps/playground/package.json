@@ -6,9 +6,13 @@
   "type": "module",
   "scripts": {
     "build": "tsc && bunx vite build",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
     "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx --bun vite",
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "test": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:run'",
+    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
     "@douglasneuroinformatics/ui": "latest",
