@@ -5,6 +5,7 @@ description: 'Although Open Data Capture and REDCap share many similar features,
 author: joshua-unrau
 language: en
 datePublished: 2024-02-19
+isDraft: true
 ---
 
 Open Data Capture and REDCap are both electronic data capture (EDC) platforms that offer a web-based interface to administer forms. However, while there is significant overlap between these platforms in terms of feature set, there are several key differences. In this article, we take a key look at both options, to help you determine which is best for your organization.

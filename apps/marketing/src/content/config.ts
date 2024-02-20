@@ -7,6 +7,7 @@ export const collections = {
       author: reference('team'),
       datePublished: z.date(),
       description: z.string(),
+      isDraft: z.boolean().optional(),
       language: z.enum(['en', 'fr']),
       title: z.string(),
       type: z.enum(['article', 'caseStudy', 'video'])
