@@ -8,7 +8,8 @@ type ClickTaskProps = { done: (data: { count: number }) => void };
 const ClickTask = ({ done }: ClickTaskProps) => {
   const [count, setCount] = useState(0);
   const [secondsRemaining, setSecondsRemaining] = useState(10);
-  const interval = useRef<null | number>(null);
+  // Conflict between type of timer in Bun and DOM 
+  const interval = useRef<any>(null);
 
   useEffect(() => {
     interval.current = setInterval(() => {

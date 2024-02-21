@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build, Lint, and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Get Package Metadata
+        run: |
+          echo "BUN_VERSION=$(cat package.json | jq .packageManager | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')" >> $GITHUB_ENV
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install Dependencies
+        run: bun install

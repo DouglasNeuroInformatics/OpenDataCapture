@@ -12,7 +12,6 @@
     }
   },
   "scripts": {
-    "build": "bun db:generate",
     "db:generate": "prisma generate --schema prisma/core-schema.prisma && prisma generate --schema prisma/gateway-schema.prisma",
     "db:push": "env-cmd --silent -f ../../.env prisma db push --skip-generate --schema prisma/gateway-schema.prisma"
   },
