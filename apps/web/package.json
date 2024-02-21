@@ -31,7 +31,6 @@
     "@open-data-capture/editor": "workspace:*",
     "@open-data-capture/i18next": "workspace:*",
     "@open-data-capture/instrument-interpreter": "workspace:*",
-    "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/instrument-renderer": "workspace:*",
     "@open-data-capture/instrument-utils": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
