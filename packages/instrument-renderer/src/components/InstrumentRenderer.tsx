@@ -8,6 +8,8 @@ import {
   QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
 import type { Subject } from '@open-data-capture/common/subject';
+import type { InstrumentKind } from '@open-data-capture/database/core';
+import type { InterpretOptions } from '@open-data-capture/instrument-interpreter';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
@@ -18,16 +20,26 @@ import { InstrumentOverview } from './InstrumentOverview';
 import { InstrumentSummary } from './InstrumentSummary';
 import { InteractiveContent } from './InteractiveContent';
 
-export type InstrumentRendererProps = {
+export type InstrumentRendererProps<TKind extends InstrumentKind> = {
   bundle: string;
   className?: string;
   onSubmit: (data: unknown) => Promisable<void>;
+  options?: InterpretOptions<TKind> & {
+    /** If set to true, then include technical details in any error display */
+    verbose?: boolean;
+  };
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
-export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: InstrumentRendererProps) => {
+export const InstrumentRenderer = <TKind extends InstrumentKind>({
+  bundle,
+  className,
+  onSubmit,
+  options,
+  subject
+}: InstrumentRendererProps<TKind>) => {
   const [data, setData] = useState<unknown>();
-  const interpreted = useInterpretedInstrument(bundle);
+  const interpreted = useInterpretedInstrument(bundle, options);
   const { t } = useTranslation();
 
   async function handleSubmit<T>(data: T) {
@@ -44,7 +56,9 @@ export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: Ins
         <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
           {t('failedToLoadInstrument')}
         </h3>
-        <p className="text-muted mt-2 max-w-prose text-pretty text-sm sm:text-base">{t('genericApology')}</p>
+        <p className="text-muted mt-2 max-w-prose text-pretty text-sm sm:text-base">
+          {options?.verbose ? interpreted.error.message : t('genericApology')}
+        </p>
       </div>
     );
   }
