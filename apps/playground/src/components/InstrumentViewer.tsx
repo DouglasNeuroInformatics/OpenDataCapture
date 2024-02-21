@@ -1,3 +1,5 @@
+import React, { useImperativeHandle, useState } from 'react';
+
 import { Spinner, cn } from '@douglasneuroinformatics/ui';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 import { match } from 'ts-pattern';
@@ -6,12 +8,30 @@ import type { TranspilerState } from '@/hooks/useTranspiler';
 
 import { CompileErrorFallback } from './CompileErrorFallback';
 
+export type InstrumentViewerRef = {
+  forceRefresh: () => void;
+};
+
 export type InstrumentViewerProps = {
   className?: string;
   state: TranspilerState;
 };
 
-export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) => {
+export const InstrumentViewer = React.forwardRef<InstrumentViewerRef, InstrumentViewerProps>(function InstrumentViewer(
+  { className, state },
+  ref
+) {
+  const [rendererKey, setRendererKey] = useState(0);
+  useImperativeHandle(
+    ref,
+    () => ({
+      forceRefresh: () => {
+        setRendererKey((prevKey) => prevKey + 1);
+      }
+    }),
+    []
+  );
+
   return (
     <div className={cn('h-full min-h-0', className)}>
       <div className="h-full p-2">
@@ -20,6 +40,7 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
             <InstrumentRenderer
               bundle={bundle}
               customErrorFallback={CompileErrorFallback}
+              key={rendererKey}
               options={{ validate: true }}
               onSubmit={(data) => {
                 // eslint-disable-next-line no-alert
@@ -33,4 +54,4 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
       </div>
     </div>
   );
-};
+});

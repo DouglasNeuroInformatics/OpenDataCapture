@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 
 import {
   Card,
@@ -8,11 +8,12 @@ import {
   useDownload,
   useNotificationsStore
 } from '@douglasneuroinformatics/ui';
+import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
 
 import { EditorContext } from '@/context/EditorContext';
 
-import { InstrumentViewer } from './InstrumentViewer';
+import { InstrumentViewer, type InstrumentViewerRef } from './InstrumentViewer';
 
 const sourceBanner = `/**
  * Please note that if you open this instrument in your IDE without the appropriate global type declarations,
@@ -24,6 +25,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
   const ctx = useContext(EditorContext);
   const download = useDownload();
   const notifications = useNotificationsStore();
+  const viewerRef = useRef<InstrumentViewerRef>(null);
 
   return (
     <div className="flex h-full flex-col">
@@ -60,6 +62,16 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
             }}
           />
           <ThemeToggle />
+          {/* Once an Icon component is implemented in UI lib, use that instead */}
+          <button
+            className="rounded-md p-2 transition-transform hover:backdrop-brightness-95 dark:hover:backdrop-brightness-150"
+            type="button"
+            onClick={() => {
+              viewerRef.current?.forceRefresh();
+            }}
+          >
+            <ArrowPathIcon height={24} width={24} />
+          </button>
         </div>
       </div>
       <div className="flex h-full min-h-0 gap-8 p-2">
@@ -75,7 +87,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
         </div>
         <div className="flex h-full min-h-0 w-[640px] flex-shrink-0 flex-col">
           <Card className="z-10 flex h-full w-full flex-col justify-center p-4">
-            <InstrumentViewer state={ctx.state} />
+            <InstrumentViewer ref={viewerRef} state={ctx.state} />
           </Card>
         </div>
       </div>
