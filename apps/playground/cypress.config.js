@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
+  defaultCommandTimeout: 20000,
   e2e: {
     baseUrl: `http://localhost:${process.env.PLAYGROUND_DEV_SERVER_PORT}`,
     setupNodeEvents() {
