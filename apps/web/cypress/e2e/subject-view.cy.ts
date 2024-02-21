@@ -12,7 +12,7 @@ describe('Subject view test', () => {
 
     //select first user and their instrument dropdown
     cy.get('td').first().click();
-    // cy.get('div[data-cy="instruement-select"]').click();
+
     cy.get('a[data-cy="subject-table"]').click();
     cy.get('div[data-cy="select-instrument"]').click();
     cy.get('button[id*="headlessui-menu-item-:r1"]').eq(0).click();
@@ -24,15 +24,18 @@ describe('Subject view test', () => {
 
     cy.get('a[data-cy="subject-graph"]').click();
 
+    //choosing first questionnaire as instrument
     cy.get('div[data-cy="instrument-select"]').click();
-    cy.get('button[id*="headlessui-menu-item-:r2"]').eq(1).click();
+    cy.get('button[id*="headlessui-menu-item-:r2"]').eq(0).click();
 
+    //choose overall happiness
     cy.get('div[data-cy="measure-select"]').click();
     cy.get('li[id*="headlessui-listbox-option-:r2"]').click();
 
     cy.get('div[class="recharts-wrapper"]').click();
 
+    //choose month as timeline
     cy.get('div[data-cy="time-select"]').click();
-    cy.get('button[id*="headlessui-menu-item-:r2"]').eq(1).click();
+    cy.get('button[id*="headlessui-menu-item-:r2"]').eq(0).click();
   });
 });
