@@ -1,8 +1,10 @@
-import { Card, Spinner, cn } from '@douglasneuroinformatics/ui';
+import { Spinner, cn } from '@douglasneuroinformatics/ui';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 import { match } from 'ts-pattern';
 
 import type { TranspilerState } from '@/hooks/useTranspiler';
+
+import { CompileErrorFallback } from './CompileErrorFallback';
 
 export type InstrumentViewerProps = {
   className?: string;
@@ -17,21 +19,15 @@ export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) =>
           .with({ status: 'built' }, ({ bundle }) => (
             <InstrumentRenderer
               bundle={bundle}
-              options={{ validate: true, verbose: true }}
+              customErrorFallback={CompileErrorFallback}
+              options={{ validate: true }}
               onSubmit={(data) => {
                 // eslint-disable-next-line no-alert
                 alert(JSON.stringify({ _message: 'The Following Data Will Be Submitted', data }, null, 2));
               }}
             />
           ))
-          .with({ status: 'error' }, ({ message }) => (
-            <div className="flex h-full flex-col items-center justify-center">
-              <h3 className="mb-3 text-center font-semibold">Failed to Compile</h3>
-              <Card className="overflow-scroll">
-                <code className="text-sm">{message}</code>
-              </Card>
-            </div>
-          ))
+          .with({ status: 'error' }, CompileErrorFallback)
           .with({ status: 'loading' }, () => <Spinner />)
           .exhaustive()}
       </div>

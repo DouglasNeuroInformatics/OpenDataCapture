@@ -23,17 +23,16 @@ import { InteractiveContent } from './InteractiveContent';
 export type InstrumentRendererProps<TKind extends InstrumentKind> = {
   bundle: string;
   className?: string;
+  customErrorFallback?: React.FC<{ error: Error }>;
   onSubmit: (data: unknown) => Promisable<void>;
-  options?: InterpretOptions<TKind> & {
-    /** If set to true, then include technical details in any error display */
-    verbose?: boolean;
-  };
+  options?: InterpretOptions<TKind>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
 export const InstrumentRenderer = <TKind extends InstrumentKind>({
   bundle,
   className,
+  customErrorFallback,
   onSubmit,
   options,
   subject
@@ -51,15 +50,15 @@ export const InstrumentRenderer = <TKind extends InstrumentKind>({
     return <Spinner />;
   } else if (interpreted.status === 'ERROR') {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-1 p-3 text-center">
-        <h1 className="text-muted text-sm font-semibold uppercase tracking-wide">{t('somethingWentWrong')}</h1>
-        <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
-          {t('failedToLoadInstrument')}
-        </h3>
-        <p className="text-muted mt-2 max-w-prose text-pretty text-sm sm:text-base">
-          {options?.verbose ? interpreted.error.message : t('genericApology')}
-        </p>
-      </div>
+      customErrorFallback?.({ error: interpreted.error }) ?? (
+        <div className="flex h-full flex-col items-center justify-center gap-1 p-3 text-center">
+          <h1 className="text-muted text-sm font-semibold uppercase tracking-wide">{t('somethingWentWrong')}</h1>
+          <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
+            {t('failedToLoadInstrument')}
+          </h3>
+          <p className="text-muted mt-2 max-w-prose text-pretty text-sm sm:text-base">{t('genericApology')}</p>
+        </div>
+      )
     );
   }
 
