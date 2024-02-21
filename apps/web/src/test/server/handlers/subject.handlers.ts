@@ -1,6 +1,7 @@
 import { HttpResponse, http } from 'msw';
 
 export const SubjectHandlers = [
+  //list of possible subject, Get request when the user enters the view subjects page
   http.get('/v1/subjects', () => {
     return HttpResponse.json([
       {
@@ -167,75 +168,16 @@ export const SubjectHandlers = [
         lastName: 'Larson',
         sex: 'FEMALE',
         updatedAt: '2024-02-20T21:20:36.262Z'
-      },
-      {
-        __model__: 'Subject',
-        createdAt: '2024-02-21T15:50:49.193Z',
-        dateOfBirth: '1989-02-14T05:00:00.000Z',
-        firstName: 'oiejsosofo',
-        groupIds: [],
-        id: '5c7a60f82e71ab28a46aff22ad60d8379a1f003ee5764ba4f6743063ceecfa99',
-        lastName: 'joafjoeajfo',
-        sex: 'MALE',
-        updatedAt: '2024-02-21T15:50:49.193Z'
-      },
-      {
-        __model__: 'Subject',
-        createdAt: '2024-02-21T15:54:31.079Z',
-        dateOfBirth: '1965-02-09T05:00:00.000Z',
-        firstName: 'fdfokasof',
-        groupIds: [],
-        id: '4c7d6593b0f1d10abd8db0a3d6341d68b2baeb50083412a0245348e7deae3a4d',
-        lastName: 'fafwfef',
-        sex: 'MALE',
-        updatedAt: '2024-02-21T15:54:31.079Z'
-      },
-      {
-        __model__: 'Subject',
-        createdAt: '2024-02-21T16:55:07.890Z',
-        dateOfBirth: '1995-02-20T05:00:00.000Z',
-        firstName: 'dsfesf',
-        groupIds: [],
-        id: 'faefe4ea448f46d276d7db7210bfe9f4a13a24f12e08e178e557c813b1250d81',
-        lastName: 'efseff',
-        sex: 'MALE',
-        updatedAt: '2024-02-21T16:55:07.890Z'
-      },
-      {
-        __model__: 'Subject',
-        createdAt: '2024-02-21T16:58:43.448Z',
-        dateOfBirth: '1973-02-21T05:00:00.000Z',
-        firstName: 'fsfefe',
-        groupIds: [],
-        id: '4f8e20eb3b6805dc52fcae2a378e73343ecb623493e21e9c6be7317cecf63d1a',
-        lastName: 'fesfsefe',
-        sex: 'MALE',
-        updatedAt: '2024-02-21T16:58:43.448Z'
-      },
-      {
-        __model__: 'Subject',
-        createdAt: '2024-02-21T17:00:19.734Z',
-        dateOfBirth: '1970-02-16T05:00:00.000Z',
-        firstName: 'esfefefe',
-        groupIds: [],
-        id: 'cc5186f6976c54e4579903e5c5ae67ed0c2e610617861b887ca28b780efa7285',
-        lastName: 'efsefesfes',
-        sex: 'FEMALE',
-        updatedAt: '2024-02-21T17:00:19.734Z'
       }
     ]);
   }),
-  http.get(
-    '/v1/assignments/summary?subjectIdentifier=d7c6060b1b6df7ffc54ef306fec25470af518268c17058aedc4f28b752102a7b',
-    () => {
-      return HttpResponse.json([]);
-    }
-  ),
 
+  //api to get assigmnents of the subject
   http.get('/v1/assignments?subjectId=a869b577da44ffa8cca3bba7c7a9d90b77acc934d37c79d1c8be8afa89293d71', () => {
     return HttpResponse.json([]);
   }),
 
+  //get response for the happiness questionnaire of the selected subject
   http.get(
     '/v1/instrument-records?instrumentId=65d5179227e183f93166d4b2&kind=FORM&subjectId=a869b577da44ffa8cca3bba7c7a9d90b77acc934d37c79d1c8be8afa89293d71',
     () => {
@@ -424,118 +366,11 @@ export const SubjectHandlers = [
     }
   ),
 
-  http.get(
-    '/v1/instrument-records?instrumentId=6557bcdc930d9604d635551c&subjectIdentifier=d7c6060b1b6df7ffc54ef306fec25470af518268c17058aedc4f28b752102a7b',
-    () => {
-      return HttpResponse.json([
-        {
-          computedMeasures: {
-            overallHappiness: 3
-          },
-          createdAt: '2023-11-17T19:19:57.595Z',
-          data: {
-            overallHappiness: 3
-          },
-          date: '2022-09-28T10:23:13.696Z',
-          group: '6557bcdc930d9604d6355528',
-          id: '6557bcdd930d9604d63555a8',
-          instrument: '6557bcdc930d9604d635551c',
-          subject: '6557bcdd930d9604d6355539',
-          updatedAt: '2023-11-17T19:19:57.595Z'
-        },
-        {
-          computedMeasures: { overallHappiness: 5 },
-          createdAt: '2023-11-23T17:04:32.650Z',
-          data: { overallHappiness: 5 },
-          date: '2022-05-31T03:39:02.806Z',
-          group: '655f861eeb97aff8dc4f0c8e',
-          id: '655f8620eb97aff8dc4f0d1d',
-          instrument: '655f861deb97aff8dc4f0c82',
-          subject: '655f861eeb97aff8dc4f0c9f',
-          updatedAt: '2023-11-23T17:04:32.650Z'
-        },
-        {
-          computedMeasures: { overallHappiness: 6 },
-          createdAt: '2023-11-23T17:04:32.723Z',
-          data: { overallHappiness: 6 },
-          date: '2023-10-19T05:58:14.760Z',
-          group: '655f861eeb97aff8dc4f0c8e',
-          id: '655f8620eb97aff8dc4f0d22',
-          instrument: '655f861deb97aff8dc4f0c82',
-          subject: '655f861eeb97aff8dc4f0c9f',
-          updatedAt: '2023-11-23T17:04:32.723Z'
-        },
-        {
-          computedMeasures: { overallHappiness: 5 },
-          createdAt: '2023-11-23T17:04:32.807Z',
-          data: { overallHappiness: 5 },
-          date: '2022-06-24T08:41:50.419Z',
-          group: '655f861eeb97aff8dc4f0c8e',
-          id: '655f8620eb97aff8dc4f0d27',
-          instrument: '655f861deb97aff8dc4f0c82',
-          subject: '655f861eeb97aff8dc4f0c9f',
-          updatedAt: '2023-11-23T17:04:32.807Z'
-        },
-        {
-          computedMeasures: { overallHappiness: 3 },
-          createdAt: '2023-11-23T17:04:32.878Z',
-          data: { overallHappiness: 3 },
-          date: '2022-03-21T01:31:56.355Z',
-          group: '655f861eeb97aff8dc4f0c8e',
-          id: '655f8620eb97aff8dc4f0d2c',
-          instrument: '655f861deb97aff8dc4f0c82',
-          subject: '655f861eeb97aff8dc4f0c9f',
-          updatedAt: '2023-11-23T17:04:32.878Z'
-        },
-        {
-          computedMeasures: { overallHappiness: 4 },
-          createdAt: '2023-11-23T17:04:32.950Z',
-          data: { overallHappiness: 4 },
-          date: '2023-07-25T13:50:37.977Z',
-          group: '655f861eeb97aff8dc4f0c8e',
-          id: '655f8620eb97aff8dc4f0d31',
-          instrument: '655f861deb97aff8dc4f0c82',
-          subject: '655f861eeb97aff8dc4f0c9f',
-          updatedAt: '2023-11-23T17:04:32.950Z'
-        },
-        {
-          computedMeasures: { overallHappiness: 9 },
-          createdAt: '2023-11-23T17:04:33.022Z',
-          data: { overallHappiness: 9 },
-          date: '2022-05-02T13:59:30.850Z',
-          group: '655f861eeb97aff8dc4f0c8e',
-          id: '655f8621eb97aff8dc4f0d36',
-          instrument: '655f861deb97aff8dc4f0c82',
-          subject: '655f861eeb97aff8dc4f0c9f',
-          updatedAt: '2023-11-23T17:04:33.022Z'
-        },
-        {
-          computedMeasures: { overallHappiness: 9 },
-          createdAt: '2023-11-23T17:04:33.094Z',
-          data: { overallHappiness: 9 },
-          date: '2023-04-28T12:57:14.825Z',
-          group: '655f861eeb97aff8dc4f0c8e',
-          id: '655f8621eb97aff8dc4f0d3b',
-          instrument: '655f861deb97aff8dc4f0c82',
-          subject: '655f861eeb97aff8dc4f0c9f',
-          updatedAt: '2023-11-23T17:04:33.094Z'
-        }
-      ]);
-    }
-  ),
-
   //handlers for graph page
 
   http.get('/v1/instrument-records/linear-model?instrumentId=655f861deb97aff8dc4f0c82', () => {
     return HttpResponse.json({
       overallHappiness: { intercept: 9.00818540326624, slope: -2.2446620053625115e-12, stdErr: 1.3275462348873016e-11 }
     });
-  }),
-
-  http.get(
-    '/v1/instrument-records?instrumentId=655f861deb97aff8dc4f0c82&subjectIdentifier=d7c6060b1b6df7ffc54ef306fec25470af518268c17058aedc4f28b752102a7b',
-    () => {
-      return HttpResponse.json();
-    }
-  )
+  })
 ];
