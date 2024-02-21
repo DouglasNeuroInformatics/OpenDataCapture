@@ -17,6 +17,8 @@
     "clean-workflows": "./scripts/clean-workflows.sh",
     "compose:dev": "docker compose -f docker-compose.dev.yaml",
     "cy:install": "cypress install",
+    "db:generate": "turbo run db:generate --no-daemon",
+    "db:push": "turbo run db:push --no-daemon",
     "dev": "bun dev:core",
     "dev:all": "env-cmd cross-env NODE_ENV=development turbo run dev --no-daemon",
     "dev:core": "env-cmd cross-env NODE_ENV=development bunx turbo run dev --no-daemon --filter=@open-data-capture/api --filter=@open-data-capture/gateway --filter=@open-data-capture/web",
