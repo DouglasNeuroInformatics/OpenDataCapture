@@ -21,5 +21,13 @@ jobs:
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: ${{ env.BUN_VERSION }}
+      - name: Setup Environment
+        run: bun generate:env
       - name: Install Dependencies
         run: bun install
+      - name: Lint
+        run: bun run lint
+      - name: Build
+        run: bun run build
+      - name: Test
+        run: bun run Test
