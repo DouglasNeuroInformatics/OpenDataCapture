@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
-import { type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
+import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
@@ -15,6 +15,7 @@ import {
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
 
+import { ConfigurationService } from '@/configuration/configuration.service';
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
 import { createMockModelProvider } from '@/testing/testing.utils';
@@ -31,7 +32,14 @@ describe('/instruments', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [InstrumentsController],
-      providers: [InstrumentsService, createMockModelProvider('Instrument')]
+      providers: [
+        InstrumentsService,
+        createMockModelProvider('Instrument'),
+        {
+          provide: ConfigurationService,
+          useValue: createMock(ConfigurationService)
+        }
+      ]
     }).compile();
 
     app = moduleRef.createNestApplication({
