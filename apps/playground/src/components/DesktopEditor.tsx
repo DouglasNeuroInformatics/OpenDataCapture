@@ -4,12 +4,14 @@ import {
   Card,
   DownloadButton,
   Dropdown,
+  LanguageToggle,
   ThemeToggle,
   useDownload,
   useNotificationsStore
 } from '@douglasneuroinformatics/ui';
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
+import { useTranslation } from 'react-i18next';
 
 import { EditorContext } from '@/context/EditorContext';
 
@@ -26,6 +28,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
   const download = useDownload();
   const notifications = useNotificationsStore();
   const viewerRef = useRef<InstrumentViewerRef>(null);
+  const { i18n } = useTranslation();
 
   return (
     <div className="flex h-full flex-col">
@@ -72,6 +75,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
           >
             <ArrowPathIcon height={24} width={24} />
           </button>
+          <LanguageToggle className="bg-slate-100" i18n={i18n} options={['en', 'fr']} />
         </div>
       </div>
       <div className="flex h-full min-h-0 gap-8 p-2">

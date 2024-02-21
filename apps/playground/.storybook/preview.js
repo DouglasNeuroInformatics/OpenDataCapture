@@ -1,5 +1,7 @@
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 
+import i18n from '../src/services/i18n';
+
 import '@open-data-capture/react-core/styles.css';
 
 /** @type {import('@storybook/react').Preview} */
@@ -29,7 +31,8 @@ const preview = {
         color: /(background|color)$/i,
         date: /Date$/
       }
-    }
+    },
+    i18n
   }
 };
 

@@ -8,6 +8,8 @@ import { SuspenseFallback } from './components/SuspenseFallback';
 
 const Editor = React.lazy(() => import('./components/Editor').then((module) => ({ default: module.Editor })));
 
+import './services/i18n';
+
 export const App = () => {
   return (
     <React.Suspense fallback={<SuspenseFallback />}>
