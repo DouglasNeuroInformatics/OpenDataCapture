@@ -4,7 +4,7 @@ import { ToggledContent } from './ToggledContent';
 
 export const StackTrace: React.FC<{ stack: string }> = ({ stack }) => {
   return (
-    <ToggledContent label="Stack Trace">
+    <ToggledContent label="Stack">
       {parse(stack).map((frame, i) => (
         <div className="text-sm text-slate-700 dark:text-slate-300" key={i}>
           <p className="ml-1">
