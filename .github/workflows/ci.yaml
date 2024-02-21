@@ -9,6 +9,11 @@ jobs:
   build:
     name: Build, Lint, and Test
     runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
