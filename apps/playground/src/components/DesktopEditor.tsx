@@ -74,7 +74,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
           </Card>
         </div>
         <div className="flex h-full min-h-0 w-[640px] flex-shrink-0 flex-col">
-          <Card className="z-10 flex h-full w-full flex-col justify-center overflow-scroll p-4">
+          <Card className="z-10 flex h-full w-full flex-col justify-center p-4">
             <InstrumentViewer state={ctx.state} />
           </Card>
         </div>

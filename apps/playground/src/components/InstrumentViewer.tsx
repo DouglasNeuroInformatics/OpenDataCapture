@@ -14,7 +14,7 @@ export type InstrumentViewerProps = {
 export const InstrumentViewer = ({ className, state }: InstrumentViewerProps) => {
   return (
     <div className={cn('h-full min-h-0', className)}>
-      <div className="h-full overflow-scroll p-2">
+      <div className="h-full p-2">
         {match(state)
           .with({ status: 'built' }, ({ bundle }) => (
             <InstrumentRenderer
