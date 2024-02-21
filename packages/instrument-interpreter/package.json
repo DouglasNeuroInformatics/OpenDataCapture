@@ -12,5 +12,8 @@
   },
   "dependencies": {
     "@open-data-capture/common": "workspace:*"
+  },
+  "devDependencies": {
+    "@open-data-capture/instrument-library": "workspace:*"
   }
 }
