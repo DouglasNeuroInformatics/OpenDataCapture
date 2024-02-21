@@ -1,7 +1,21 @@
 import { Card, cn } from '@douglasneuroinformatics/ui';
+import { z } from 'zod';
+import { fromZodError } from 'zod-validation-error';
 
 import { StackTrace } from './StackTrace';
 import { ToggledContent } from './ToggledContent';
+
+const ErrorMessage: React.FC<{ error: Error }> = ({ error }) => {
+  return (
+    <span className="font-semibold text-red-500">
+      {error instanceof z.ZodError
+        ? fromZodError(error, {
+            prefix: 'Validation Error'
+          }).message
+        : `Error: ${error.message}`}
+    </span>
+  );
+};
 
 export const CompileErrorFallback: React.FC<{ className?: string; error: Error }> = ({ className, error }) => {
   return (
@@ -9,11 +23,11 @@ export const CompileErrorFallback: React.FC<{ className?: string; error: Error }
       <div className="h-full overflow-scroll">
         <div className="space-y-1 py-3">
           <h3 className="text-lg font-bold">Failed to Compile</h3>
-          <span className="font-semibold text-red-500">Error: {error.message}</span>
+          <ErrorMessage error={error} />
         </div>
-        {error.cause instanceof Error && (
+        {error.cause instanceof Error && error.message !== error.cause.message && (
           <ToggledContent label="Cause">
-            <span className="font-semibold text-red-500">Error: {error.cause.message}</span>
+            <ErrorMessage error={error.cause} />
           </ToggledContent>
         )}
         {error.stack && <StackTrace stack={error.stack} />}
