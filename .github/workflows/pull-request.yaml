@@ -1,0 +1,57 @@
+name: Pull Request
+on:
+  pull_request:
+    types: [opened, synchronize]
+jobs:
+  build:
+    name: Build, Lint, and Test
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Bun
+        run: npm install -g bun@$(cat package.json | jq .packageManager | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+      - name: Cache Bun
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+      - name: Cache Cypress Binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-cypress-${{ hashFiles('**/bun.lockb') }}
+      - name: Setup Environment
+        run: bun generate:env
+      - name: Install Dependencies
+        run: |
+          bun install
+          bun cy:install
+      - name: Verify Cypress
+        env:
+          CI: 1
+        run: |
+          bunx cypress verify
+          bunx cypress info
+          bunx cypress version
+          bunx cypress version --component package
+          bunx cypress version --component binary
+          bunx cypress version --component electron
+          bunx cypress version --component node
+      - name: Lint
+        run: bun run lint
+      - name: Build
+        run: bun run build
+      - name: Test
+        run: bun run test
