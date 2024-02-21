@@ -33,7 +33,7 @@ export const InstrumentViewer = React.forwardRef<InstrumentViewerRef, Instrument
   );
 
   return (
-    <div className={cn('h-full min-h-0', className)}>
+    <div className={cn('h-full min-h-0 overflow-scroll', className)}>
       <div className="h-full p-2">
         {match(state)
           .with({ status: 'built' }, ({ bundle }) => (
@@ -44,7 +44,7 @@ export const InstrumentViewer = React.forwardRef<InstrumentViewerRef, Instrument
               options={{ validate: true }}
               onSubmit={(data) => {
                 // eslint-disable-next-line no-alert
-                alert(JSON.stringify({ _message: 'The Following Data Will Be Submitted', data }, null, 2));
+                alert(JSON.stringify({ _message: 'The following data will be submitted', data }, null, 2));
               }}
             />
           ))
