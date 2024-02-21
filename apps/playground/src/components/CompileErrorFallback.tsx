@@ -1,10 +1,15 @@
-import { Card } from '@douglasneuroinformatics/ui';
+import { Card, cn } from '@douglasneuroinformatics/ui';
 
-export const CompileErrorFallback: React.FC<{ error: Error }> = ({ error }) => (
-  <div className="flex h-full flex-col items-center justify-center">
-    <h3 className="mb-3 text-center font-semibold">Failed to Compile</h3>
-    <Card className="overflow-scroll">
-      <code className="text-sm">{error.message}</code>
+import { StackTrace } from './StackTrace';
+
+export const CompileErrorFallback: React.FC<{ className?: string; error: Error }> = ({ className, error }) => {
+  return (
+    <Card className={cn('flex h-min flex-col p-3 tracking-tight', className)}>
+      <div className="space-y-1 py-3">
+        <h3 className="text-lg font-bold">Failed to Compile</h3>
+        <span className="font-semibold text-red-500">Error: {error.message}</span>
+      </div>
+      {error.stack && <StackTrace stack={error.stack} />}
     </Card>
-  </div>
-);
+  );
+};
