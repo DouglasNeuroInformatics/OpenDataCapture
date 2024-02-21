@@ -36,3 +36,5 @@ jobs:
         run: bun run build
       - name: Test
         run: bun run test
+        env:
+          TERM: xterm
