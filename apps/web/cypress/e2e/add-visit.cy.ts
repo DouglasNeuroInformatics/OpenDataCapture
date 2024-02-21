@@ -23,11 +23,17 @@ describe('look at questionaire', () => {
     cy.get('button[data-cy="add-visit"]').first().click({ force: true });
     cy.get('input[name=firstName]').type(name);
     cy.get('input[name=lastName]').type('testPatient');
+
+    //activate a fill in DOB date reader
     cy.get('input[class=field-input]').first().type('test');
-    cy.get('button').contains('14').click();
+    cy.get('svg[data-testid="arrow-up-icon"]').eq(1).click();
+    cy.get('button').contains('1999').click();
+    cy.wait(500);
+    cy.get('button').contains('11').click();
 
     cy.get('button[class="field-input capitalize"]').click({ force: true });
     cy.get('li[id*="headlessui-listbox-option-:"]').first().click();
+
     cy.get('button[type="submit"]').click({ force: true });
 
     // cy.wait(1000);
@@ -38,18 +44,5 @@ describe('look at questionaire', () => {
     cy.wait(1000);
     cy.get('h3[data-cy="instrument-title"]').contains('Happiness Questionnaire').click();
     cy.get('button').contains('Begin').click();
-
-    // const dataTransfer = new DataTransfer();
-    // cy.get('div[draggable="false"]').trigger('dragstart',{
-    //   dataTransfer
-    // });
-
-    // cy.get('div').contains('NA').trigger('drop');
-    //const dragPoint = cy.get('div').contains('NA')
-    // cy.get('div[draggable="false"]').drag('div[class="flex items-center justify-center text-slate-600 dark:text-slate-300"]',{force:true});
-    // cy.get('div[draggable="false"]')
-    //   .trigger('mousedown', { which: 1, pageX: 0, pageY: 0 })
-    //   .trigger('mousemove', { which: 1, pageX: 250, pageY: 0, force: true })
-    //   .trigger('mouseup', { which: 1, force: true });
   });
 });
