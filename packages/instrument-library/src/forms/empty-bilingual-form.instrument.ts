@@ -10,7 +10,7 @@ const instrumentFactory = new InstrumentFactory({
 });
 
 export default instrumentFactory.defineInstrument({
-  name: '',
+  name: ' ',
   tags: {
     en: [],
     fr: []
@@ -19,8 +19,8 @@ export default instrumentFactory.defineInstrument({
   content: {},
   details: {
     description: {
-      en: '',
-      fr: ''
+      en: ' ',
+      fr: ' '
     },
     estimatedDuration: 1,
     instructions: {
@@ -29,8 +29,8 @@ export default instrumentFactory.defineInstrument({
     },
     license: 'UNLICENSED',
     title: {
-      en: '',
-      fr: ''
+      en: ' ',
+      fr: ' '
     }
   }
 });

@@ -86,16 +86,34 @@ export const $FormInstrumentDateField = $FormInstrumentBaseField.extend({
   kind: z.literal('date')
 }) satisfies z.ZodType<FormInstrumentDateField>;
 
-export type FormInstrumentNumericField<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
-  | FormInstrumentFieldMixin<TLanguage, Extract<Base.NumericFormField, { variant: 'default' }>>
-  | FormInstrumentFieldMixin<TLanguage, Extract<Base.NumericFormField, { variant: 'slider' }>>;
+type FormInstrumentNumericDefaultField<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
+  FormInstrumentFieldMixin<TLanguage, Extract<Base.NumericFormField, { variant: 'default' }>>;
 
-export const $FormInstrumentNumericField = $FormInstrumentBaseField.extend({
+const $FormInstrumentNumericDefaultField = $FormInstrumentBaseField.extend({
+  kind: z.literal('numeric'),
+  max: z.number().optional(),
+  min: z.number().optional(),
+  variant: z.literal('default')
+}) satisfies z.ZodType<FormInstrumentNumericDefaultField>;
+
+type FormInstrumentNumericSliderField<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
+  FormInstrumentFieldMixin<TLanguage, Extract<Base.NumericFormField, { variant: 'slider' }>>;
+
+const $FormInstrumentNumericSliderField = $FormInstrumentBaseField.extend({
   kind: z.literal('numeric'),
   max: z.number(),
   min: z.number(),
-  variant: z.enum(['default', 'slider'])
-}) satisfies z.ZodType<FormInstrumentNumericField>;
+  variant: z.literal('slider')
+}) satisfies z.ZodType<FormInstrumentNumericSliderField>;
+
+export type FormInstrumentNumericField<TLanguage extends InstrumentLanguage = InstrumentLanguage> =
+  | FormInstrumentNumericDefaultField<TLanguage>
+  | FormInstrumentNumericSliderField<TLanguage>;
+
+export const $FormInstrumentNumericField = z.union([
+  $FormInstrumentNumericDefaultField,
+  $FormInstrumentNumericSliderField
+]);
 
 export type FormInstrumentBinaryField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,

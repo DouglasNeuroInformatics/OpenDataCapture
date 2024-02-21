@@ -8,6 +8,8 @@ import {
   QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
 import type { Subject } from '@open-data-capture/common/subject';
+import type { InstrumentKind } from '@open-data-capture/database/core';
+import type { InterpretOptions } from '@open-data-capture/instrument-interpreter';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
@@ -18,16 +20,25 @@ import { InstrumentOverview } from './InstrumentOverview';
 import { InstrumentSummary } from './InstrumentSummary';
 import { InteractiveContent } from './InteractiveContent';
 
-export type InstrumentRendererProps = {
+export type InstrumentRendererProps<TKind extends InstrumentKind> = {
   bundle: string;
   className?: string;
+  customErrorFallback?: React.FC<{ error: Error }>;
   onSubmit: (data: unknown) => Promisable<void>;
+  options?: InterpretOptions<TKind>;
   subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 };
 
-export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: InstrumentRendererProps) => {
+export const InstrumentRenderer = <TKind extends InstrumentKind>({
+  bundle,
+  className,
+  customErrorFallback,
+  onSubmit,
+  options,
+  subject
+}: InstrumentRendererProps<TKind>) => {
   const [data, setData] = useState<unknown>();
-  const interpreted = useInterpretedInstrument(bundle);
+  const interpreted = useInterpretedInstrument(bundle, options);
   const { t } = useTranslation();
 
   async function handleSubmit<T>(data: T) {
@@ -39,13 +50,15 @@ export const InstrumentRenderer = ({ bundle, className, onSubmit, subject }: Ins
     return <Spinner />;
   } else if (interpreted.status === 'ERROR') {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-1 p-3 text-center">
-        <h1 className="text-muted text-sm font-semibold uppercase tracking-wide">{t('somethingWentWrong')}</h1>
-        <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
-          {t('failedToLoadInstrument')}
-        </h3>
-        <p className="text-muted mt-2 max-w-prose text-pretty text-sm sm:text-base">{t('genericApology')}</p>
-      </div>
+      customErrorFallback?.({ error: interpreted.error }) ?? (
+        <div className="flex h-full flex-col items-center justify-center gap-1 p-3 text-center">
+          <h1 className="text-muted text-sm font-semibold uppercase tracking-wide">{t('somethingWentWrong')}</h1>
+          <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
+            {t('failedToLoadInstrument')}
+          </h3>
+          <p className="text-muted mt-2 max-w-prose text-pretty text-sm sm:text-base">{t('genericApology')}</p>
+        </div>
+      )
     );
   }
 

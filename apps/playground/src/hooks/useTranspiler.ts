@@ -11,7 +11,7 @@ type BuiltState = {
 };
 
 type ErrorState = {
-  message: string;
+  error: Error;
   status: 'error';
 };
 
@@ -36,16 +36,16 @@ export function useTranspiler() {
     } catch (err) {
       console.error(err);
       if (typeof err === 'string') {
-        setState({ message: err, status: 'error' });
+        setState({ error: new Error(err, { cause: err }), status: 'error' });
       } else if (err instanceof ZodError) {
         const validationError = fromZodError(err, {
           prefix: 'Instrument Validation Failed'
         });
-        setState({ message: validationError.message, status: 'error' });
+        setState({ error: new Error(validationError.message, { cause: err }), status: 'error' });
       } else if (err instanceof Error) {
-        setState({ message: err.message, status: 'error' });
+        setState({ error: new Error(err.message, { cause: err }), status: 'error' });
       } else {
-        setState({ message: 'Unknown Error', status: 'error' });
+        setState({ error: new Error('Unknown Error', { cause: err }), status: 'error' });
       }
       return;
     }
