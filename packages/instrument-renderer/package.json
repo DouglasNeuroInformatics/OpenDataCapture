@@ -24,7 +24,6 @@
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/i18next": "workspace:*",
     "@open-data-capture/instrument-interpreter": "workspace:*",
-    "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/instrument-utils": "workspace:*",
     "@open-data-capture/licenses": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
@@ -35,6 +34,7 @@
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
+    "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/tailwindcss": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "@types/lodash": "^4.14.202",
