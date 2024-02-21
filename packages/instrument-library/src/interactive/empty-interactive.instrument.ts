@@ -12,7 +12,7 @@ const instrumentFactory = new InstrumentFactory({
 });
 
 export default instrumentFactory.defineInstrument({
-  name: '',
+  name: ' ',
   tags: [],
   version: 1.0,
   content: {
@@ -27,10 +27,10 @@ export default instrumentFactory.defineInstrument({
     }
   },
   details: {
-    description: '',
+    description: ' ',
     estimatedDuration: 1,
     instructions: [],
     license: 'UNLICENSED',
-    title: ''
+    title: ' '
   }
 });
