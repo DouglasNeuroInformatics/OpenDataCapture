@@ -7,7 +7,7 @@ export const $EnvironmentConfig = z.object({
   GATEWAY_ENABLED: $BooleanString,
   GATEWAY_REFRESH_INTERVAL: z.coerce.number().positive().int(),
   MONGO_URI: z.string().url(),
-  NODE_ENV: z.enum(['development', 'production', 'testing']),
+  NODE_ENV: z.enum(['development', 'production', 'test']),
   SECRET_KEY: z.string().min(32)
 });
 

@@ -36,7 +36,7 @@ describe('App', () => {
 
 afterAll(async () => {
   const dbName = await prismaService.getDbName();
-  if (dbName === 'data-capture-testing') {
+  if (dbName === 'data-capture-test') {
     await prismaService.dropDatabase();
   } else {
     throw new Error(`Unexpected database name: ${dbName}`);
