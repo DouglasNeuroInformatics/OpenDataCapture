@@ -12,6 +12,6 @@
   "dependencies": {
     "esbuild": "^0.20.0",
     "esbuild-wasm": "^0.20.0",
-    "z": "^1.0.9"
+    "zod": "^3.22.4"
   }
 }
