@@ -1,6 +1,9 @@
-# COMPILE SOURCE CODE
-FROM oven/bun:1.0.28 AS builder
+FROM node:lts-iron as base
+RUN npm install -g bun@1.0.28
 WORKDIR /app
+
+# COMPILE SOURCE CODE
+FROM base AS builder
 COPY apps/api/ ./apps/api
 COPY packages/ ./packages
 COPY runtime/ ./runtime
@@ -9,8 +12,7 @@ RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/api
 
 # RUN SERVER
-FROM node:lts-iron as runner
-WORKDIR /app
+FROM base as runner
 COPY --from=builder /app/apps/api/dist/ /app/dist/
 COPY --from=builder /app/apps/api/public/ /app/public/
 RUN addgroup --system --gid 1001 app
