@@ -12,8 +12,8 @@
     "@douglasneuroinformatics/ui": "latest"
   },
   "peerDependencies": {
-    "autoprefixer": "10x",
-    "postcss": "8x",
-    "tailwindcss": "^3x"
+    "autoprefixer": "10.x",
+    "postcss": "8.x",
+    "tailwindcss": "^3.x"
   }
 }
