@@ -9,6 +9,6 @@
     "lint": "eslint --fix src"
   },
   "peerDependencies": {
-    "esbuild": "0x"
+    "esbuild": "0.x"
   }
 }
