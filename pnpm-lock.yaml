@@ -43,6 +43,9 @@ importers:
       '@types/github-script':
         specifier: github:actions/github-script
         version: github.com/actions/github-script/60a0d83039c74a4aee543508d2ffcb1c3799cdea
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/node':
         specifier: ^20.11.19
         version: 20.11.19
@@ -85,6 +88,9 @@ importers:
       husky:
         specifier: ^8.0.3
         version: 8.0.3
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
       prettier:
         specifier: ^3.1.1
         version: 3.2.5
@@ -7249,6 +7255,11 @@ packages:
       { integrity: sha512-pk2B1NWalF9toCRu6gjBzR69syFjP4Od8WRAX+0mmf9lAjCRicLOWc+ZrxZHx/0XRjotgkF9t6iaMJ+aXcOdZQ== }
     dependencies:
       '@types/istanbul-lib-report': 3.0.3
+    dev: true
+
+  /@types/js-yaml@4.0.9:
+    resolution:
+      { integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg== }
     dev: true
 
   /@types/json-schema@7.0.15:

@@ -5,15 +5,13 @@ import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
+import yaml from 'js-yaml';
+
 const PROJECT_ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
 const WORKSPACE_DIRS = await fs
-  .readFile(path.resolve(PROJECT_ROOT, 'package.json'), 'utf-8')
-  .then((content) => {
-    /** @type {import('type-fest').PackageJson & { workspaces: any[] }} */
-    const pkg = JSON.parse(content);
-    return pkg;
-  })
-  .then((pkg) => pkg.workspaces.map((ws) => ws.split('/')[0]));
+  .readFile(path.resolve(PROJECT_ROOT, 'pnpm-workspace.yaml'), 'utf-8')
+  .then((content) => /** @type {{ packages: string[] }} */ /** @type {{ packages: string[] }} */ (yaml.load(content)))
+  .then(({ packages }) => packages.map((ws) => ws.split('/')[0]));
 
 const [targetWorkspace, ...args] = process.argv.slice(2, process.argv.length);
 
@@ -37,7 +35,7 @@ for (const dir of WORKSPACE_DIRS) {
     if (workspaceName === targetWorkspace) {
       isFound = true;
       try {
-        const val = cp.execSync(`bun run ${args.join(' ')}`, {
+        const val = cp.execSync(`pnpm run ${args.join(' ')}`, {
           cwd: workspaceDir,
           stdio: 'inherit'
         });
