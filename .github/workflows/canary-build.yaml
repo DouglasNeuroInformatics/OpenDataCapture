@@ -40,8 +40,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ matrix.image }}
+          # tags: |
+          #   type=raw,value=latest,enable={{is_default_branch}}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
       - name: Build and Push Docker Images
         uses: docker/build-push-action@v5
         with:
