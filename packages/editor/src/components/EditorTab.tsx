@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 
+import { cn } from '@douglasneuroinformatics/ui';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { twMerge } from 'tailwind-merge';
 
 import type { EditorFile } from '../types';
 
@@ -16,7 +16,7 @@ export const EditorTab = ({ file, isActive, onClose, onSelection }: EditorTabPro
   const xRef = useRef<HTMLDivElement>(null);
   return (
     <button
-      className={twMerge(
+      className={cn(
         'flex w-full max-w-[18rem] items-center justify-between gap-12 border-l border-slate-900/10 px-4 py-1.5 last:border-r dark:border-slate-100/25',
         isActive && 'bg-slate-100 shadow-sm dark:bg-slate-700'
       )}

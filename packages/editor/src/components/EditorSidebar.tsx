@@ -1,6 +1,6 @@
+import { cn } from '@douglasneuroinformatics/ui';
 import { DocumentIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { twMerge } from 'tailwind-merge';
 
 import type { EditorFile } from '../types';
 
@@ -21,7 +21,7 @@ export const EditorSidebar = ({ files, isOpen, onSelection, selectedFile }: Edit
       <div className="h-full w-full border-r border-slate-900/10 dark:border-slate-100/25">
         {files.map((file) => (
           <button
-            className={twMerge(
+            className={cn(
               'flex w-full items-center gap-2 p-2 text-sm',
               selectedFile?.path === file.path && 'bg-slate-100 dark:bg-slate-700'
             )}

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ArrowToggle, Card } from '@douglasneuroinformatics/ui';
-import { twMerge } from 'tailwind-merge';
+import { ArrowToggle, Card, cn } from '@douglasneuroinformatics/ui';
 
 import '../setup';
 import { EditorEmptyState } from './EditorEmptyState';
@@ -53,7 +52,7 @@ export const Editor = ({ className, files, onSave }: EditorProps) => {
 
   return (
     <MobileBlocker>
-      <Card className={twMerge('h-full w-full overflow-hidden', className)}>
+      <Card className={cn('h-full w-full overflow-hidden', className)}>
         <div className="flex justify-between border-b border-slate-900/10 dark:border-slate-100/25">
           <div className="flex w-full text-sm">
             <ArrowToggle
