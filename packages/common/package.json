@@ -18,7 +18,8 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest run"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",

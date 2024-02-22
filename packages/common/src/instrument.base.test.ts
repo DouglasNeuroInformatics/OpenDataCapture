@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'bun:test';
-
 import _ from 'lodash';
+import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
 import {

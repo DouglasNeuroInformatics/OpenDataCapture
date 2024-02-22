@@ -1,8 +1,7 @@
 /// <reference types="@open-data-capture/instrument-library" />
 
-import { describe, expect, it } from 'bun:test';
-
 import clickTask from '@open-data-capture/instrument-library/interactive/click-task.tsx';
+import { describe, expect, it } from 'vitest';
 
 import { $InteractiveInstrument } from './instrument.interactive.js';
 

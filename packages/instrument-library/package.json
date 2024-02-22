@@ -8,7 +8,7 @@
       "import": "./dist/index.js",
       "types": "./src/index.d.ts"
     },
-    "./forms/*.ts": "./src/forms/*.ts",
+    "./forms/*": "./src/forms/*",
     "./interactive/*": "./src/interactive/*"
   },
   "scripts": {
