@@ -1,4 +1,3 @@
-import type { Language } from '@open-data-capture/common/core';
 import { get } from 'lodash-es';
 
 import blog from './translations/blog.json';
@@ -16,6 +15,8 @@ const translations = {
   meta,
   team
 };
+
+type Language = 'en' | 'fr';
 
 type ExtractTranslationKey<T extends Record<string, unknown>, Key = keyof T> = Key extends string
   ? T[Key] extends Record<string, unknown>
@@ -57,3 +58,5 @@ export function useTranslations(url: URL) {
   };
   return { altLanguage, altURL, resolvedLanguage, t, translatePath } as const;
 }
+
+export type { Language };

@@ -2,14 +2,12 @@
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 
-import type { Language } from '@open-data-capture/common/core';
-
 import Hero from '@/components/Hero.astro';
 import Page from '@/layouts/Page.astro';
 import Section from '@/layouts/Section.astro';
 import Testimonial from '@/components/Testimonial.astro';
 
-import { useTranslations } from '@/i18n';
+import { useTranslations, type Language } from '@/i18n';
 
 const { resolvedLanguage, t } = useTranslations(Astro.url);
 
