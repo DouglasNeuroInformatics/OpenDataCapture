@@ -12,8 +12,8 @@
     "./interactive/*": "./src/interactive/*"
   },
   "scripts": {
-    "build": "rm -rf dist && cross-env NODE_OPTIONS='--import tsx/esm' bunx rollup -c",
-    "dev": "rm -rf dist && bunx rollup -c --watch",
+    "build": "rm -rf dist && cross-env NODE_OPTIONS='--import tsx/esm' pnpm exec rollup -c",
+    "dev": "rm -rf dist && cross-env NODE_OPTIONS='--import tsx/esm' pnpm exec rollup -c --watch",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },

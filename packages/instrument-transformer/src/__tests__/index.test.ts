@@ -4,7 +4,7 @@ import module from 'module';
 import path from 'path';
 import url from 'url';
 
-import { InstrumentTransformer } from '../index.js.js';
+import { InstrumentTransformer } from '../index.js';
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
