@@ -1,4 +1,4 @@
-name: Main
+name: Build
 on:
   push:
     branches: ['main']
@@ -14,12 +14,12 @@ jobs:
         include:
           - dockerfile: ./apps/api/Dockerfile
             image: ghcr.io/douglasneuroinformatics/open-data-capture-api
-          # - dockerfile: ./apps/gateway/Dockerfile
-          #   image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway
-          # - dockerfile: ./apps/playground/Dockerfile
-          #   image: ghcr.io/douglasneuroinformatics/open-data-capture-playground
-          # - dockerfile: ./apps/web/Dockerfile
-          #   image: ghcr.io/douglasneuroinformatics/open-data-capture-web
+          - dockerfile: ./apps/gateway/Dockerfile
+            image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway
+          - dockerfile: ./apps/playground/Dockerfile
+            image: ghcr.io/douglasneuroinformatics/open-data-capture-playground
+          - dockerfile: ./apps/web/Dockerfile
+            image: ghcr.io/douglasneuroinformatics/open-data-capture-web
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -40,10 +40,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ matrix.image }}
-          # tags: |
-          #   type=raw,value=latest,enable={{is_default_branch}}
           tags: |
-            type=raw,value=latest
+            type=raw,value=latest,enable={{is_default_branch}}
       - name: Build and Push Docker Images
         uses: docker/build-push-action@v5
         with:

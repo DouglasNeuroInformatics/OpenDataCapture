@@ -1,5 +1,5 @@
 FROM node:lts-iron as base
-RUN npm install -g bun@1.0.18
+RUN npm install -g bun@1.0.28
 WORKDIR /app
 
 # COMPILE SOURCE CODE
