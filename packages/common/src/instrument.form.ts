@@ -2,17 +2,17 @@ import type * as Base from '@douglasneuroinformatics/form-types';
 import type { IsEqual, KeysOfUnion, Simplify } from 'type-fest';
 import { z } from 'zod';
 
-import { $ZodTypeAny } from './core';
-import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $InstrumentUIOption } from './instrument.base';
+import { $ZodTypeAny } from './core.js';
+import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $InstrumentUIOption } from './instrument.base.js';
 
-import type { Language } from './core';
+import type { Language } from './core.js';
 import type {
   BaseInstrument,
   EnhancedBaseInstrumentDetails,
   InstrumentLanguage,
   InstrumentMeasures,
   InstrumentUIOption
-} from './instrument.base';
+} from './instrument.base.js';
 
 export const $FormFieldKind = z.enum([
   'options',

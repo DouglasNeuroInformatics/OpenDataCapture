@@ -11,9 +11,9 @@ import {
   type BaseInstrument,
   type BaseInstrumentDetails,
   type EnhancedBaseInstrumentDetails
-} from './instrument.base';
+} from './instrument.base.js';
 
-import type { Language } from './core';
+import type { Language } from './core.js';
 
 const enhancedBilingualDetails: EnhancedBaseInstrumentDetails<Language[]> = Object.freeze({
   description: {

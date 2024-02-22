@@ -4,7 +4,7 @@ import { describe, expect, it } from 'bun:test';
 
 import clickTask from '@open-data-capture/instrument-library/interactive/click-task.tsx';
 
-import { $InteractiveInstrument } from './instrument.interactive';
+import { $InteractiveInstrument } from './instrument.interactive.js';
 
 /**
  * For interactive instruments, cannot use `.toMatchObject`, since the render function returned by

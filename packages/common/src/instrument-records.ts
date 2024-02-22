@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { $BaseModel, $Json } from './core';
-import { $InstrumentKind, $InstrumentMeasureValue } from './instrument';
+import { $BaseModel, $Json } from './core.js';
+import { $InstrumentKind, $InstrumentMeasureValue } from './instrument.js';
 
-import type { InstrumentKind, InstrumentMeasureValue } from './instrument';
+import type { InstrumentKind, InstrumentMeasureValue } from './instrument.js';
 
 export const $CreateInstrumentRecordData = z.object({
   assignmentId: z.string().optional(),

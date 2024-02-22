@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { $CreateUserData } from './user';
+import { $CreateUserData } from './user.js';
 
 export type SetupState = z.infer<typeof $SetupState>;
 export const $SetupState = z.object({

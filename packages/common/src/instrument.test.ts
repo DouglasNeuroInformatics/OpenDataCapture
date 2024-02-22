@@ -6,7 +6,7 @@ import happinessQuestionnaire from '@open-data-capture/instrument-library/forms/
 import miniMentalStateExamination from '@open-data-capture/instrument-library/forms/mini-mental-state-examination.ts';
 import montrealCognitiveAssessment from '@open-data-capture/instrument-library/forms/montreal-cognitive-assessment.ts';
 
-import { $AnyInstrument } from './instrument';
+import { $AnyInstrument } from './instrument.js';
 
 describe('$AnyInstrument', () => {
   it('should parse the brief psychiatric rating scale', () => {

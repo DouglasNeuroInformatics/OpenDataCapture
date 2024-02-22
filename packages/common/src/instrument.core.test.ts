@@ -9,7 +9,7 @@ import miniMentalStateExamination from '@open-data-capture/instrument-library/fo
 import montrealCognitiveAssessment from '@open-data-capture/instrument-library/forms/montreal-cognitive-assessment.ts';
 import clickTask from '@open-data-capture/instrument-library/interactive/click-task.tsx';
 
-import { $AnyInstrument } from './instrument.core';
+import { $AnyInstrument } from './instrument.core.js';
 
 describe('$AnyInstrument', () => {
   describe('form instruments', () => {
