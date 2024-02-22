@@ -39,6 +39,7 @@
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
     "axios": "^1.6.5",
     "lodash": "^4.17.21",
+    "mongodb": "^6.3.0",
     "passport": "^0.7.0",
     "passport-jwt": "4.0.1",
     "reflect-metadata": "^0.1.13",

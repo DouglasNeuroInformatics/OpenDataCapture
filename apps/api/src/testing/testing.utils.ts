@@ -1,6 +1,5 @@
-import { jest } from 'bun:test';
-
 import type { Provider } from '@nestjs/common';
+import { vi } from 'vitest';
 
 import type { ModelEntityName } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
@@ -9,25 +8,25 @@ export function createMockModelProvider<T extends ModelEntityName>(entityName: T
   return {
     provide: getModelToken(entityName),
     useValue: {
-      aggregate: jest.fn(),
-      aggregateRaw: jest.fn(),
-      count: jest.fn(),
-      create: jest.fn(),
-      createMany: jest.fn(),
-      delete: jest.fn(),
-      deleteMany: jest.fn(),
-      exists: jest.fn(),
-      fields: jest.fn(),
-      findFirst: jest.fn(),
-      findFirstOrThrow: jest.fn(),
-      findMany: jest.fn(),
-      findRaw: jest.fn(),
-      findUnique: jest.fn(),
-      findUniqueOrThrow: jest.fn(),
-      groupBy: jest.fn(),
-      update: jest.fn(),
-      updateMany: jest.fn(),
-      upsert: jest.fn()
+      aggregate: vi.fn(),
+      aggregateRaw: vi.fn(),
+      count: vi.fn(),
+      create: vi.fn(),
+      createMany: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
+      exists: vi.fn(),
+      fields: vi.fn(),
+      findFirst: vi.fn(),
+      findFirstOrThrow: vi.fn(),
+      findMany: vi.fn(),
+      findRaw: vi.fn(),
+      findUnique: vi.fn(),
+      findUniqueOrThrow: vi.fn(),
+      groupBy: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      upsert: vi.fn()
     }
   };
 }

@@ -1,7 +1,6 @@
-import { beforeEach, describe, expect, it } from 'bun:test';
-
 import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 import type { Model } from '@/prisma/prisma.types';

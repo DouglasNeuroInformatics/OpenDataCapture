@@ -1,5 +1,3 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
-
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
@@ -7,6 +5,7 @@ import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';

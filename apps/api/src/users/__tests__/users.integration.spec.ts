@@ -1,5 +1,3 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
@@ -9,6 +7,7 @@ import { Test } from '@nestjs/testing';
 import type { CreateUserData } from '@open-data-capture/common/user';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { GroupsService } from '@/groups/groups.service';
 import type { Model } from '@/prisma/prisma.types';

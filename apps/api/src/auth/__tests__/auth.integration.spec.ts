@@ -1,5 +1,3 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { createMock } from '@douglasneuroinformatics/nestjs/testing';
@@ -8,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { ConfigurationService } from '@/configuration/configuration.service';

@@ -220,6 +220,9 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      mongodb:
+        specifier: ^6.3.0
+        version: 6.3.0
       passport:
         specifier: ^0.7.0
         version: 0.7.0

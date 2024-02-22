@@ -1,8 +1,7 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '@/app.module';
 
