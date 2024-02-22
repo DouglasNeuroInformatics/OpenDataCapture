@@ -1,3 +1,0 @@
-[test]
-coverageSkipTestFiles = true
-preload = ["./scripts/setup-tests.js"]
