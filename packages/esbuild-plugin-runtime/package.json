@@ -9,7 +9,7 @@
     "lint": "eslint --fix src"
   },
   "peerDependencies": {
-    "esbuild": "0x"
+    "esbuild": "0.x"
   },
   "dependencies": {
     "@open-data-capture/runtime-resolve": "workspace:*"
