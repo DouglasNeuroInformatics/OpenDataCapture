@@ -6,7 +6,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && bunx rollup -c",
+    "build": "rm -rf dist && pnpm exec rollup -c",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
@@ -28,7 +28,9 @@
     "react-dom": "^18.2.0",
     "rollup": "^4.9.4",
     "rollup-plugin-dts": "^6.1.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@open-data-capture/common": "workspace:*",
+    "@open-data-capture/instrument-interpreter": "workspace:*"
   },
   "peerDependencies": {
     "@open-data-capture/common": "workspace:*",
