@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, it } from 'bun:test';
 import fs from 'fs/promises';
 import module from 'module';
 import path from 'path';
 import url from 'url';
+
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { InstrumentTransformer } from '../index.js';
 
@@ -27,10 +28,10 @@ describe('InstrumentTransformer', () => {
 
   describe('generateBundle', () => {
     it('should successfully transpile the click task', async () => {
-      expect(transformer.generateBundle(sources.clickTask)).resolves.toBeString();
+      expect(transformer.generateBundle(sources.clickTask)).resolves.toBeTypeOf('string');
     });
     it('should successfully transpile the happiness questionnaire', async () => {
-      expect(transformer.generateBundle(sources.happinessQuestionnaire)).resolves.toBeString();
+      expect(transformer.generateBundle(sources.happinessQuestionnaire)).resolves.toBeTypeOf('string');
     });
     it('should fail to transpile syntactically invalid code', () => {
       const source = sources.happinessQuestionnaire + 'INVALID SYNTAX!!';

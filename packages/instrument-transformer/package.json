@@ -7,7 +7,8 @@
   "browser": "./src/browser.ts",
   "scripts": {
     "format": "prettier --write src",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix src",
+    "test": "vitest run"
   },
   "dependencies": {
     "esbuild": "^0.20.0",
