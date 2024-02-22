@@ -9,7 +9,7 @@ FROM base AS builder
 COPY apps/gateway/ ./apps/gateway
 COPY packages/ ./packages
 COPY runtime/ ./runtime
-COPY package.json jsconfig.json turbo.json bun.lockb ./
+COPY package.json jsconfig.json turbo.json ./
 RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/gateway
 RUN bunx turbo run db:push --filter=@open-data-capture/database

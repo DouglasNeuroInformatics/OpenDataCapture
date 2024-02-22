@@ -7,7 +7,7 @@ FROM base AS builder
 COPY apps/playground/ ./apps/playground
 COPY packages/ ./packages
 COPY runtime/ ./runtime
-COPY package.json jsconfig.json turbo.json bun.lockb ./
+COPY package.json jsconfig.json turbo.json ./
 RUN bun install
 RUN bunx turbo run build --filter=@open-data-capture/playground
 
