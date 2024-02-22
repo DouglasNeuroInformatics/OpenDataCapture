@@ -1060,6 +1060,12 @@ importers:
       '@open-data-capture/tailwindcss':
         specifier: workspace:*
         version: link:../tailwindcss
+      '@types/react':
+        specifier: ^18.2.57
+        version: 18.2.57
+      '@types/react-dom':
+        specifier: ^18.2.19
+        version: 18.2.19
       autoprefixer:
         specifier: ^10.4.16
         version: 10.4.17(postcss@8.4.35)
