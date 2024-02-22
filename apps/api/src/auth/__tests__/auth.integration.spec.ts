@@ -1,6 +1,5 @@
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { type NestExpressApplication } from '@nestjs/platform-express';
@@ -10,6 +9,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { ConfigurationService } from '@/configuration/configuration.service';
+import { createMock } from '@/testing/testing.utils';
 import { UsersService } from '@/users/users.service';
 
 import { AuthController } from '../auth.controller';

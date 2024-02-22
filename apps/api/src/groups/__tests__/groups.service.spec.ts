@@ -1,10 +1,10 @@
-import { type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
+import { type MockedInstance } from '@/testing/testing.utils';
 import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { GroupsService } from '../groups.service';

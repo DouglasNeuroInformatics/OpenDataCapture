@@ -1,5 +1,4 @@
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
@@ -7,6 +6,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { ConfigurationService } from '@/configuration/configuration.service';
+import { type MockedInstance, createMock } from '@/testing/testing.utils';
 import { UsersService } from '@/users/users.service';
 
 import { AuthService } from '../auth.service';

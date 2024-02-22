@@ -10,7 +10,7 @@
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
     "start": "env-cmd -f ../../.env cross-env NODE_OPTIONS='--enable-source-maps' API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=production ESBUILD_BINARY_PATH=dist/bin/esbuild node dist/app.mjs",
-    "test": "vitest run"
+    "test": "env-cmd -f ../../.env cross-env vitest run"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",

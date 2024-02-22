@@ -1,6 +1,7 @@
-import { type MockedInstance, createMock } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
+
+import { type MockedInstance, createMock } from '@/testing/testing.utils';
 
 import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsService } from '../instruments.service';
