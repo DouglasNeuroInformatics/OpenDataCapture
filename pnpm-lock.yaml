@@ -1135,6 +1135,13 @@ importers:
         version: 5.1.4(@types/node@20.11.19)
 
   runtime/v0.0.1:
+    dependencies:
+      '@open-data-capture/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@open-data-capture/instrument-interpreter':
+        specifier: workspace:*
+        version: link:../../packages/instrument-interpreter
     devDependencies:
       '@douglasneuroinformatics/form-types':
         specifier: ^5.2.0
@@ -1148,12 +1155,6 @@ importers:
       '@jspsych/plugin-preload':
         specifier: ^1.1.3
         version: 1.1.3(jspsych@7.3.4)
-      '@open-data-capture/common':
-        specifier: workspace:*
-        version: link:../../packages/common
-      '@open-data-capture/instrument-interpreter':
-        specifier: workspace:*
-        version: link:../../packages/instrument-interpreter
       '@rollup/plugin-commonjs':
         specifier: ^25.0.7
         version: 25.0.7(rollup@4.12.0)
