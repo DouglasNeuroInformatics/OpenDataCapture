@@ -1122,12 +1122,18 @@ importers:
       '@types/react':
         specifier: ^18.2.47
         version: 18.2.57
+      '@types/react-dom':
+        specifier: ^18.2.19
+        version: 18.2.19
       jspsych:
         specifier: ^7.3.4
         version: 7.3.4
       react:
         specifier: ^18.2.0
         version: 18.2.0
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
       rollup:
         specifier: ^4.9.4
         version: 4.12.0
