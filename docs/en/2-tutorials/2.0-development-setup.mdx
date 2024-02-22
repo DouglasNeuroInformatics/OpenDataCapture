@@ -29,17 +29,17 @@ This setup is designed for Unix-like operating systems and has been tested on Ma
 <TabItem label="Ubuntu">
   Please ensure that the following packages are installed:
 
-  ```sh
-  apt-get install build-essential jq
-  ```
+```sh
+apt-get install build-essential jq
+```
 
 </TabItem>
 <TabItem label="Arch Linux">
   Please ensure that the following packages are installed:
 
-  ```sh
-  pacman -S base-devel curl git jq
-  ```
+```sh
+pacman -S base-devel curl git jq
+```
 
 </TabItem>
 
@@ -114,7 +114,50 @@ Now, you need to setup a [MongoDB](https://www.mongodb.com/docs/) instance. Ther
     </TabItem>
 
   <TabItem label="System Install (MacOS)">
-    TBD
+
+:::caution
+These instructions assume you are using a Mac with Apple Silicon. For older, Intel-based Macs, make sure to adjust the paths as needed (e.g., homebrew is likely installed in `/usr/local` rather than in `/opt/homebrew`).
+:::
+
+    First, install MongoDB using Homebrew:
+
+    ```sh
+    brew tap mongodb/brew
+    brew update
+    brew install mongodb-community@7.0
+    ```
+
+    Then, open `/opt/homebrew/etc/mongod.conf` and make the following changes:
+
+    ```yaml
+    systemLog:
+      destination: file
+      path: /opt/homebrew/var/log/mongodb/mongo.log
+      logAppend: true
+    storage:
+      dbPath: /opt/homebrew/var/mongodb
+    net:
+      bindIp: 127.0.0.1, ::1
+      ipv6: true
+    replication:
+      replSetName: rs0
+    ```
+
+    Next, run MongoDB as a MacOS service:
+
+    ```sh
+    brew services start mongodb-community@7.0
+    ```
+
+    Finally, initiate the replication set:
+
+
+    ```sh
+    mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
+    ```
+
+
+
   </TabItem>
 </Tabs>
 
