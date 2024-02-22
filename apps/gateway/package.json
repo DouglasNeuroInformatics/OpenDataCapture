@@ -29,6 +29,7 @@
     "axios": "^1.6.7",
     "compression": "^1.7.4",
     "express": "^4.18.2",
+    "i18next": "^23.10.0",
     "lodash": "^4.17.21",
     "pino-http": "^9.0.0",
     "pino-pretty": "^10.3.1",
