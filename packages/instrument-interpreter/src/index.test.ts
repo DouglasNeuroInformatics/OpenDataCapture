@@ -9,7 +9,7 @@ import {
   montrealCognitiveAssessment
 } from '@open-data-capture/instrument-library';
 
-import { InstrumentInterpreter } from './index';
+import { InstrumentInterpreter } from './index.js';
 
 describe('InstrumentInterpreter', () => {
   const interpreter = new InstrumentInterpreter();

@@ -16,6 +16,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
+    "@douglasneuroinformatics/ui": "latest",
     "@open-data-capture/common": "workspace:*",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",

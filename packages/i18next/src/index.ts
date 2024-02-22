@@ -6,9 +6,9 @@ import _ from 'lodash';
 import { initReactI18next } from 'react-i18next';
 
 import core from './translations/core.json';
-import { createResources } from './utils';
+import { createResources } from './utils.js';
 
-import type { ExtendedI18NextInstance } from './types';
+import type { ExtendedI18NextInstance } from './types.js';
 
 const defaultNS = 'core';
 
@@ -47,4 +47,4 @@ export const i18n = createExtendedInstance();
 
 export type DefaultNS = typeof defaultNS;
 
-export type { TranslatedResource } from './types';
+export type { TranslatedResource } from './types.js';

@@ -33,7 +33,7 @@ import {
   isMultilingualInstrumentSummary,
   isUnilingualInstrument,
   isUnilingualInstrumentSummary
-} from './guards';
+} from './guards.js';
 
 /**
  * Determine the target language for translation based on instrument and preferred language.

@@ -6,7 +6,7 @@ import 'i18next';
 
 import core from '../translations/core.json';
 
-import type { DefaultNS, TranslatedResource } from '..';
+import type { DefaultNS, TranslatedResource } from '...js';
 
 declare module 'i18next' {
   interface AppResources {}
@@ -21,6 +21,6 @@ declare module 'i18next' {
   }
 
   interface i18n {
-    resolvedLanguage?: Language
+    resolvedLanguage?: Language;
   }
 }

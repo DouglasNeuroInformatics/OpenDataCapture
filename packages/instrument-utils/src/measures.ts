@@ -6,8 +6,8 @@ import {
 import _ from 'lodash';
 import { match } from 'ts-pattern';
 
-import { extractFieldLabel } from './form';
-import { isFormInstrument } from './guards';
+import { extractFieldLabel } from './form.js';
+import { isFormInstrument } from './guards.js';
 
 export type ComputedMeasures = Record<string, { label: string; value: InstrumentMeasureValue }>;
 

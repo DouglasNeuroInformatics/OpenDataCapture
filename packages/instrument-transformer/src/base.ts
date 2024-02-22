@@ -1,7 +1,7 @@
 import type { BuildOptions, BuildResult, InitializeOptions, Metafile } from 'esbuild';
 import type { ValueOf } from 'type-fest';
 
-import { transformRuntimeImportsPlugin } from './plugin';
+import { transformRuntimeImportsPlugin } from './plugin.js';
 
 export type Transpiler = {
   build(options: BuildOptions): Promise<BuildResult>;
