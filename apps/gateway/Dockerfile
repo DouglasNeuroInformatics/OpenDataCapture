@@ -1,5 +1,5 @@
 FROM node:lts-iron as base
-RUN npm install -g bun@1.0.18
+RUN npm install -g bun@1.0.28
 ARG GATEWAY_DATABASE_FILEPATH
 ENV GATEWAY_DATABASE_URL=file:${GATEWAY_DATABASE_FILEPATH}
 WORKDIR /app
