@@ -55,9 +55,6 @@ importers:
       astro-eslint-parser:
         specifier: ^0.16.1
         version: 0.16.3
-      bun-types:
-        specifier: ^1.0.22
-        version: 1.0.28
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
@@ -7540,13 +7537,6 @@ packages:
       { integrity: sha512-ltIpx+kM7g/MLRZfkbL7EsCEjfzCcScLpkg37eXEtx5kmrAKBkTJwd1GIAjDSL8wTpM6Hzn5YO4pSb91BEwu1g== }
     dev: true
 
-  /@types/ws@8.5.10:
-    resolution:
-      { integrity: sha512-vmQSUcfalpIq0R9q7uTo2lXs6eGIpt9wtnLdMv9LVpIjCA/+ufZRozlVoVelIYixx1ugCBKDhn89vnsEGOCx9A== }
-    dependencies:
-      '@types/node': 20.11.19
-    dev: true
-
   /@types/yargs-parser@21.0.3:
     resolution:
       { integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ== }
@@ -8938,14 +8928,6 @@ packages:
       lodash: 4.17.21
     transitivePeerDependencies:
       - '@swc/helpers'
-    dev: true
-
-  /bun-types@1.0.28:
-    resolution:
-      { integrity: sha512-wQqbLYRM0YnsXZMFujbCr/9YxlEl51jshMXcJ2Y9wEuU7k6TKcX2KDh032k9oHfB1wH8/SleXboIsULMtFaAaA== }
-    dependencies:
-      '@types/node': 20.11.19
-      '@types/ws': 8.5.10
     dev: true
 
   /busboy@1.6.0:
