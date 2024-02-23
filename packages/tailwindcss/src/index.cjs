@@ -11,7 +11,7 @@ const defaultTheme = require('tailwindcss/defaultTheme.js');
  * @param {string} [options.root]
  * @returns {import('tailwindcss').Config}
  */
-function createConfig(options) {
+exports.createConfig = (options) => {
   const content = options?.content ?? [];
   const include = options?.include ?? [];
 
@@ -39,6 +39,4 @@ function createConfig(options) {
       }
     }
   };
-}
-
-module.exports = createConfig;
+};
