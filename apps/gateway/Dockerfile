@@ -1,21 +1,28 @@
 FROM node:lts-iron as base
-RUN npm install -g bun@1.0.28
+WORKDIR /app
+RUN corepack enable
 ARG GATEWAY_DATABASE_FILEPATH
 ENV GATEWAY_DATABASE_URL=file:${GATEWAY_DATABASE_FILEPATH}
-WORKDIR /app
 
-# COMPILE SOURCE CODE
+# PRUNE WORKSPACE
 FROM base AS builder
-COPY apps/gateway/ ./apps/gateway
-COPY packages/ ./packages
-COPY runtime/ ./runtime
-COPY package.json jsconfig.json turbo.json ./
-RUN bun install
-RUN bunx turbo run build --filter=@open-data-capture/gateway
-RUN bunx turbo run db:push --filter=@open-data-capture/database
+COPY . .
+RUN pnpm dlx turbo prune @open-data-capture/gateway --docker
+
+# INSTALL DEPENDENCIES
+FROM base AS installer
+COPY .gitignore .gitignore
+COPY --from=builder /app/out/json/ .
+RUN pnpm install --frozen-lockfile 
+
+# BUILD THE APP
+COPY --from=builder /app/out/full/ .
+COPY turbo.json turbo.json
+RUN pnpm dlx turbo build --filter=@open-data-capture/gateway
+RUN pnpm dlx turbo run db:push --filter=@open-data-capture/database
 
 # RUN SERVER
-FROM base as runner
+FROM base AS runner
 COPY --from=builder ${GATEWAY_DATABASE_FILEPATH} ${GATEWAY_DATABASE_FILEPATH}
 COPY --from=builder /app/apps/gateway/dist/ /app/dist/
 COPY --from=builder /app/apps/gateway/public/ /app/public/
