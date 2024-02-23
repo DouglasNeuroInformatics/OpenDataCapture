@@ -5,18 +5,18 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "tsc && NODE_ENV=production bunx vite build",
+    "build": "tsc && NODE_ENV=production pnpm exec vite build",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "dev": "NODE_ENV=development env-cmd -f ../../.env bunx vite",
+    "dev": "NODE_ENV=development env-cmd -f ../../.env pnpm exec vite",
     "format": "prettier --write src",
-    "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
-    "inject": "bunx import-meta-env -x .env.public -p dist/index.html",
+    "format:translations": "find src/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
+    "inject": "pnpm exec import-meta-env -x .env.public -p dist/index.html",
     "lint": "tsc && eslint --fix src",
     "start": "vite preview --port $WEB_DEV_SERVER_PORT",
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
-    "test": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:run'",
-    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:open'"
+    "test": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:run'",
+    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
