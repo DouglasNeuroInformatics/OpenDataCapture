@@ -20,6 +20,8 @@
     "lint": "turbo run lint --cache-dir=.turbo",
     "prepare": "husky install",
     "start": "NODE_ENV=production env-cmd turbo run start",
+    "tag:create": "git tag -a $(cat package.json | jq .version)",
+    "tag:push": "git push origin $(cat package.json | jq .version)",
     "test": "env-cmd turbo run test --cache-dir=.turbo",
     "ws": "./scripts/workspace.js $@"
   },
