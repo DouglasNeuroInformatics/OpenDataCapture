@@ -21,28 +21,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Get Package Metadata
-        run: |
-          echo "BUN_VERSION=$(cat package.json | jq .packageManager | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')" >> $GITHUB_ENV
-          echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_ENV
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Install Bun
-        run: npm install -g bun@${BUN_VERSION}
-      - name: Cache Bun
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          cache: 'pnpm'
+          node-version-file: '.nvmrc'
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
       - name: Install Dependencies
-        run: bun install
+        run: pnpm install --frozen-lockfile
       - name: Build Site
-        run: bunx turbo run build --filter=@open-data-capture/outreach
+        run: pnpm exec turbo run build --filter=@open-data-capture/outreach
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
