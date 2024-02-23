@@ -16,7 +16,6 @@ import type { Prisma } from '@prisma/client';
 import _ from 'lodash';
 
 import { accessibleQuery } from '@/ability/ability.utils';
-import { ConfigurationService } from '@/configuration/configuration.service';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -33,15 +32,13 @@ export class InstrumentRecordsService {
 
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
-    configurationService: ConfigurationService,
     private readonly groupsService: GroupsService,
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService
   ) {
-    const isProduction = configurationService.get('NODE_ENV') === 'production';
     this.interpreter = new InstrumentInterpreter({
-      transformBundle: isProduction ? (bundle) => this.transformer.transformRuntimeImports(bundle) : null
+      transformBundle: (bundle) => this.transformer.transformRuntimeImports(bundle)
     });
   }
 

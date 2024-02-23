@@ -1,7 +1,6 @@
-import { beforeEach, describe, expect, it } from 'bun:test';
-
 import { Test, TestingModule } from '@nestjs/testing';
 import type { UserModel } from '@open-data-capture/database/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '../ability.factory';
 
@@ -31,7 +30,8 @@ describe('AbilityFactory', () => {
   describe('createForUser', () => {
     it('should return an empty rule set when the user has no basePermissionLevel', () => {
       const ability = abilityFactory.createForUser(userModelStub);
-      expect(ability.rules).toBeArrayOfSize(0);
+      expect(Array.isArray(ability.rules)).toBe(true);
+      expect(ability.rules.length).toBe(0);
     });
 
     it('should return permission to manage all for an admin', () => {

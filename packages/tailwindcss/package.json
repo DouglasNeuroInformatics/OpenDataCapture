@@ -2,8 +2,8 @@
   "name": "@open-data-capture/tailwindcss",
   "version": "0.0.0",
   "license": "AGPL-3.0",
-  "type": "module",
-  "main": "./src/index.js",
+  "type": "commonjs",
+  "main": "./src/index.cjs",
   "scripts": {
     "format": "prettier --write src",
     "lint": "eslint --fix src"

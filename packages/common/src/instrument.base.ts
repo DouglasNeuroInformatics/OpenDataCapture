@@ -3,9 +3,9 @@ import _ from 'lodash';
 import type { ConditionalKeys, Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 
-import { $Language, $LicenseIdentifier, $ZodTypeAny } from './core';
+import { $Language, $LicenseIdentifier, $ZodTypeAny } from './core.js';
 
-import type { Language } from './core';
+import type { Language } from './core.js';
 
 export type InstrumentKind = 'FORM' | 'INTERACTIVE' | 'UNKNOWN';
 export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'UNKNOWN']) satisfies z.ZodType<InstrumentKind>;

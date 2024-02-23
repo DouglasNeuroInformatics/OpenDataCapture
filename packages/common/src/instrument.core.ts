@@ -1,18 +1,18 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { z } from 'zod';
 
-import { $FormInstrument } from './instrument.form';
-import { $InteractiveInstrument } from './instrument.interactive';
+import { $FormInstrument } from './instrument.form.js';
+import { $InteractiveInstrument } from './instrument.interactive.js';
 
-import type { Json, Language } from './core';
-import type { InstrumentKind, InstrumentLanguage } from './instrument.base';
+import type { Json, Language } from './core.js';
+import type { InstrumentKind, InstrumentLanguage } from './instrument.base.js';
 import type {
   AnyMultilingualFormInstrument,
   AnyUnilingualFormInstrument,
   FormInstrument,
   StrictFormInstrument
-} from './instrument.form';
-import type { InteractiveInstrument } from './instrument.interactive';
+} from './instrument.form.js';
+import type { InteractiveInstrument } from './instrument.interactive.js';
 
 export const $AnyInstrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies z.ZodType<AnyInstrument>;
 

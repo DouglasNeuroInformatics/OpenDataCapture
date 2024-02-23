@@ -14,7 +14,7 @@ export const $Configuration = z.object({
   MONGO_RETRY_WRITES: z.string().optional(),
   MONGO_URI: z.string().url(),
   MONGO_WRITE_CONCERN: z.string().optional(),
-  NODE_ENV: z.enum(['development', 'production', 'testing']),
+  NODE_ENV: z.enum(['development', 'production', 'test']),
   SECRET_KEY: z.string().min(32),
   VERBOSE: $BooleanString
 });

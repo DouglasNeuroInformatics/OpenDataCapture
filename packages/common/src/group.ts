@@ -1,7 +1,7 @@
 import type { GroupModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
-import { $BaseModel } from './core';
+import { $BaseModel } from './core.js';
 
 export type Group = GroupModel;
 export const $Group = $BaseModel.extend({

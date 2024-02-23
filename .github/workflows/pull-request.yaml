@@ -14,24 +14,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - name: Install Bun
-        run: npm install -g bun@$(cat package.json | jq .packageManager | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
-      - name: Cache Bun
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          cache: 'pnpm'
+          node-version-file: '.nvmrc'
       - name: Cache Cypress Binary
         uses: actions/cache@v4
         with:
           path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-cypress-${{ hashFiles('**/bun.lockb') }}
+          key: cypress-${{ runner.os }}-cypress-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Cache Turbo
         uses: actions/cache@v4
         with:
@@ -40,27 +32,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
       - name: Setup Environment
-        run: bun generate:env
+        run: pnpm generate:env
       - name: Install Dependencies
         run: |
-          bun install
-          bun cy:install
+          pnpm install --frozen-lockfile
+          pnpm cy:install
       - name: Verify Cypress
         env:
           CI: 1
         run: |
-          bunx cypress verify
-          bunx cypress info
-          bunx cypress version
-          bunx cypress version --component package
-          bunx cypress version --component binary
-          bunx cypress version --component electron
-          bunx cypress version --component node
+          pnpm exec cypress verify
+          pnpm exec cypress info
+          pnpm exec cypress version
+          pnpm exec cypress version --component package
+          pnpm exec cypress version --component binary
+          pnpm exec cypress version --component electron
+          pnpm exec cypress version --component node
       - name: Lint
-        run: bun run lint
+        run: pnpm run lint
       - name: Build
-        run: bun run build
+        run: pnpm run build
       - name: Test
-        run: bun run test
+        run: pnpm run test
         env:
           TERM: xterm

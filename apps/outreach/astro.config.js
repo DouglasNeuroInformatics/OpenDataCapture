@@ -90,7 +90,7 @@ export default defineConfig({
       title: 'Open Data Capture'
     }),
     tailwind({
-      configFile: path.resolve(__dirname, 'tailwind.config.js')
+      configFile: path.resolve(__dirname, 'tailwind.config.cjs')
     })
   ],
   markdown: {

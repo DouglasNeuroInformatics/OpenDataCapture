@@ -1,19 +1,29 @@
 FROM node:lts-iron as base
-RUN npm install -g bun@1.0.28
 WORKDIR /app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+RUN corepack enable
 
-# COMPILE SOURCE CODE
+# PRUNE WORKSPACE
 FROM base AS builder
-COPY apps/playground/ ./apps/playground
-COPY packages/ ./packages
-COPY runtime/ ./runtime
-COPY package.json jsconfig.json turbo.json bun.lockb ./
-RUN bun install
-RUN bunx turbo run build --filter=@open-data-capture/playground
+COPY . .
+RUN pnpm dlx turbo prune @open-data-capture/playground --docker
+
+# INSTALL DEPENDENCIES
+FROM base AS installer
+COPY .gitignore jsconfig.json ./
+COPY --from=builder /app/out/json/ .
+RUN pnpm install --frozen-lockfile 
+
+# BUILD THE APP
+COPY --from=builder /app/out/full/ .
+COPY turbo.json turbo.json
+RUN pnpm dlx turbo build --filter=@open-data-capture/playground
 
 # RUN SERVER
-FROM base as runner
-WORKDIR /app
+FROM base AS runner
+COPY --from=installer /app/apps/playground/dist/ .
+COPY --from=installer /app/apps/playground/public/ .
 RUN npm install -g http-server@14.1.1
-COPY --from=builder /app/apps/playground/dist/ ./
 CMD [ "sh", "-c", "http-server -s -p 80 -P http://localhost:80? ." ]

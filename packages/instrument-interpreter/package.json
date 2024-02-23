@@ -8,12 +8,14 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest run"
   },
   "dependencies": {
     "@open-data-capture/common": "workspace:*"
   },
   "devDependencies": {
-    "@open-data-capture/instrument-library": "workspace:*"
+    "@open-data-capture/instrument-library": "workspace:*",
+    "@open-data-capture/vite-plugin-runtime": "workspace:*"
   }
 }

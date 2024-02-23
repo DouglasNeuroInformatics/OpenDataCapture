@@ -2,6 +2,8 @@
   "extends": "../../jsconfig.json",
   "compilerOptions": {
     "baseUrl": "src",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "paths": {
       "@/*": ["*"]
     },

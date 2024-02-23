@@ -1,10 +1,9 @@
 /// <reference types="@open-data-capture/instrument-library" />
 
-import { describe, expect, it } from 'bun:test';
-
 import clickTask from '@open-data-capture/instrument-library/interactive/click-task.tsx';
+import { describe, expect, it } from 'vitest';
 
-import { $InteractiveInstrument } from './instrument.interactive';
+import { $InteractiveInstrument } from './instrument.interactive.js';
 
 /**
  * For interactive instruments, cannot use `.toMatchObject`, since the render function returned by

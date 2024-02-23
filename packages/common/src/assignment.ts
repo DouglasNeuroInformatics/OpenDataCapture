@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { $BaseModel, $Json, $Uint8Array } from './core';
+import { $BaseModel, $Json, $Uint8Array } from './core.js';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 

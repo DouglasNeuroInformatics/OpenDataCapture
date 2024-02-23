@@ -4,10 +4,10 @@
 import type { Exact, Merge } from 'type-fest';
 import { z } from 'zod';
 
-import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $UnilingualInstrumentMeasures } from './instrument.base';
+import { $BaseInstrument, $EnhancedBaseInstrumentDetails, $UnilingualInstrumentMeasures } from './instrument.base.js';
 
-import type { Json, Language } from './core';
-import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument.base';
+import type { Json, Language } from './core.js';
+import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument.base.js';
 
 export type InteractiveInstrumentContent<TData extends Json = Json> = {
   assets?: {

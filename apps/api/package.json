@@ -6,11 +6,12 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.js",
-    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bun --watch src/main.ts",
+    "build:watch": "node scripts/build.js --watch",
+    "dev": "NODE_ENV=development env-cmd -f ../../.env concurrently \"pnpm build:watch\" \"sleep 1 && nodemon dist/app.mjs\"",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "start": "env-cmd -f ../../.env cross-env NODE_OPTIONS='--enable-source-maps' API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=production ESBUILD_BINARY_PATH=dist/bin/esbuild node dist/app.mjs",
-    "test": "bun test"
+    "start": "env-cmd -f ../../.env --use-shell 'NODE_OPTIONS=\"--enable-source-maps\" API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=production ESBUILD_BINARY_PATH=dist/bin/esbuild node dist/app.mjs'",
+    "test": "env-cmd -f ../../.env vitest run"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
@@ -38,7 +39,9 @@
     "@open-data-capture/instrument-transformer": "workspace:*",
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
     "axios": "^1.6.5",
+    "express": "^4.18.2",
     "lodash": "^4.17.21",
+    "mongodb": "^6.3.0",
     "passport": "^0.7.0",
     "passport-jwt": "4.0.1",
     "reflect-metadata": "^0.1.13",
@@ -57,9 +60,10 @@
     "@types/passport-jwt": "^4.0.0",
     "@types/supertest": "^6.0.2",
     "@types/unidecode": "^0.1.3",
-    "bun-plugin-swc": "^0.0.1",
+    "concurrently": "^8.2.2",
     "esbuild": "^0.20.0",
     "esbuild-plugin-tsc": "^0.4.0",
+    "nodemon": "^3.1.0",
     "supertest": "^6.3.3"
   }
 }

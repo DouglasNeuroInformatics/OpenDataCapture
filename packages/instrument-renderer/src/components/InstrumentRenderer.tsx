@@ -7,8 +7,8 @@ import {
   PrinterIcon,
   QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
+import type { InstrumentKind } from '@open-data-capture/common/instrument';
 import type { Subject } from '@open-data-capture/common/subject';
-import type { InstrumentKind } from '@open-data-capture/database/core';
 import type { InterpretOptions } from '@open-data-capture/instrument-interpreter';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';

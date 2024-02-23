@@ -5,15 +5,15 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "tsc && bunx vite build",
+    "build": "tsc && pnpm exec vite build",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx --bun vite",
+    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development pnpm exec vite",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
-    "test": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:run'",
-    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"bunx vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:open'"
+    "test": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:run'",
+    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
     "@douglasneuroinformatics/ui": "latest",
@@ -30,6 +30,7 @@
     "@open-data-capture/react-core": "workspace:*",
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
     "axios": "^1.6.5",
+    "esbuild-wasm": "^0.20.1",
     "framer-motion": "^10.18.0",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",

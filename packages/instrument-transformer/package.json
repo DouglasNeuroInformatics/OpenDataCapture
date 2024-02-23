@@ -7,11 +7,12 @@
   "browser": "./src/browser.ts",
   "scripts": {
     "format": "prettier --write src",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix src",
+    "test": "vitest run"
   },
   "dependencies": {
     "esbuild": "^0.20.0",
     "esbuild-wasm": "^0.20.0",
-    "z": "^1.0.9"
+    "zod": "^3.22.4"
   }
 }
