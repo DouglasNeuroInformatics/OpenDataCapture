@@ -1,6 +1,6 @@
 {
   "name": "open-data-capture",
-  "version": "0.0.0",
+  "version": "1.0.0-beta.0",
   "private": true,
   "license": "AGPL-3.0",
   "type": "module",
@@ -20,6 +20,8 @@
     "lint": "turbo run lint --cache-dir=.turbo",
     "prepare": "husky install",
     "start": "NODE_ENV=production env-cmd turbo run start",
+    "tag:create": "git tag -a v$(cat package.json | jq -r .version)",
+    "tag:push": "git push origin v$(cat package.json | jq -r .version)",
     "test": "env-cmd turbo run test --cache-dir=.turbo",
     "ws": "./scripts/workspace.js $@"
   },
