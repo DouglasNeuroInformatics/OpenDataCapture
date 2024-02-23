@@ -1,30 +1,27 @@
-import module from 'module';
-import path from 'path';
-import process from 'process';
+const path = require('path');
 
-import baseConfig from '@douglasneuroinformatics/ui/tailwind.config.cjs';
-import defaultTheme from 'tailwindcss/defaultTheme.js';
+const baseConfig = require('@douglasneuroinformatics/ui/tailwind.config.cjs');
+const defaultTheme = require('tailwindcss/defaultTheme.js');
 
 /**
  * @param {Object} [options]
  * @param {string[]} [options.content]
  * @param {string[]} [options.include]
  * @param {any[]} [options.plugins]
- * @param {string | URL} [options.root]
+ * @param {string} [options.root]
  * @returns {import('tailwindcss').Config}
  */
-export function createConfig(options) {
+module.exports = function createConfig(options) {
   const content = options?.content ?? [];
   const include = options?.include ?? [];
-  const root = options?.root ?? process.cwd();
-
-  const require = module.createRequire(root);
 
   /** @type {string[]} */
   const libraryContent = [];
   for (const id of include) {
     try {
-      const baseDir = path.dirname(require.resolve(`${id}/package.json`));
+      const baseDir = path.dirname(
+        require.resolve(`${id}/package.json`, { paths: options?.root ? [options?.root] : undefined })
+      );
       libraryContent.push(path.resolve(baseDir, 'src/**/*.{js,ts,jsx,tsx}'));
     } catch (err) {
       console.error(err);
@@ -42,4 +39,4 @@ export function createConfig(options) {
       }
     }
   };
-}
+};
