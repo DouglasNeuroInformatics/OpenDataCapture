@@ -7,5 +7,5 @@ import typographyPlugin from '@tailwindcss/typography';
 export default createConfig({
   content: ['./src/**/*.{astro,html,js,ts}'],
   plugins: [typographyPlugin],
-  root: __dirname
+  root: import.meta.url
 });

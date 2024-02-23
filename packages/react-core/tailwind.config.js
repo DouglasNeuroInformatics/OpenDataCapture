@@ -4,5 +4,5 @@ import { createConfig } from '@open-data-capture/tailwindcss';
 
 export default createConfig({
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
-  root: __dirname
+  root: import.meta.url
 });
