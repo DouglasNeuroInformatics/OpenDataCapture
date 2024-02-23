@@ -202,6 +202,7 @@
   --sl-z-index-skiplink: 20;
 
   --logo-color: var(--slate-100);
+  --logo-text-color: var(--slate-300);
 }
 
 :root[data-theme='light'],
@@ -262,6 +263,7 @@
     0px 9px 5px hsla(223, 13%, 10%, 0.08), 0px 4px 4px hsla(0, 0%, 0%, 0.16), 0px 4px 2px hsla(0, 0%, 0%, 0.04);
 
   --logo-color: var(--sky-900);
+  --logo-text-color: var(--slate-700);
 }
 
 @media (min-width: 50em) {
@@ -280,10 +282,6 @@
     --sl-content-pad-x: 1.5rem;
     --sl-mobile-toc-height: 0rem;
   }
-}
-
-.site-title svg {
-  fill: var(--logo-color);
 }
 
 .sl-markdown-content a {
