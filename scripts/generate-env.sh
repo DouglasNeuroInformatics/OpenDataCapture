@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 projectRoot="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 secretKey=$(openssl rand -hex 32)
