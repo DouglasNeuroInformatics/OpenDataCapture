@@ -225,7 +225,7 @@ importers:
         version: link:../../runtime/v0.0.1
       axios:
         specifier: ^1.6.5
-        version: 1.6.7
+        version: 1.6.7(debug@4.3.4)
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -484,6 +484,9 @@ importers:
       axios:
         specifier: ^1.6.5
         version: 1.6.7(debug@4.3.4)
+      esbuild-wasm:
+        specifier: ^0.20.1
+        version: 0.20.1
       framer-motion:
         specifier: ^10.18.0
         version: 10.18.0(react-dom@18.2.0)(react@18.2.0)
@@ -2947,7 +2950,7 @@ packages:
       '@prisma/client': ^2.14.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
     dependencies:
       '@casl/ability': 6.5.0
-      '@prisma/client': 5.10.2
+      '@prisma/client': 5.10.2(prisma@5.10.2)
       '@ucast/core': 1.10.2
       '@ucast/js': 3.0.4
 
@@ -4644,7 +4647,7 @@ packages:
       rxjs: ^6.0.0 || ^7.0.0
     dependencies:
       '@nestjs/common': 10.3.3(reflect-metadata@0.1.14)(rxjs@7.8.1)
-      axios: 1.6.7
+      axios: 1.6.7(debug@4.3.4)
       rxjs: 7.8.1
     dev: false
 
@@ -5108,17 +5111,6 @@ packages:
     resolution:
       { integrity: sha512-2LuNTFBIO0m7kKIQvvPHN6UE63VjpmL9rnEEaOOaiSPbZK+zUOYIzBAWcED+3XYzhYsd/0mD57VdxAEqqV52CQ== }
 
-  /@prisma/client@5.10.2:
-    resolution:
-      { integrity: sha512-ef49hzB2yJZCvM5gFHMxSFL9KYrIP9udpT5rYo0CsHD4P9IKj473MbhU1gjKKftiwWBTIyrt9jukprzZXazyag== }
-    engines: { node: '>=16.13' }
-    requiresBuild: true
-    peerDependencies:
-      prisma: '*'
-    peerDependenciesMeta:
-      prisma:
-        optional: true
-
   /@prisma/client@5.10.2(prisma@5.10.2):
     resolution:
       { integrity: sha512-ef49hzB2yJZCvM5gFHMxSFL9KYrIP9udpT5rYo0CsHD4P9IKj473MbhU1gjKKftiwWBTIyrt9jukprzZXazyag== }
@@ -5131,7 +5123,6 @@ packages:
         optional: true
     dependencies:
       prisma: 5.10.2
-    dev: false
 
   /@prisma/debug@5.10.2:
     resolution:
@@ -9034,17 +9025,6 @@ packages:
     engines: { node: '>=4' }
     dev: true
 
-  /axios@1.6.7:
-    resolution:
-      { integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA== }
-    dependencies:
-      follow-redirects: 1.15.5
-      form-data: 4.0.0
-      proxy-from-env: 1.1.0
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /axios@1.6.7(debug@4.3.4):
     resolution:
       { integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA== }
@@ -10475,19 +10455,6 @@ packages:
     dependencies:
       ms: 2.1.3
       supports-color: 8.1.1
-    dev: true
-
-  /debug@4.3.4:
-    resolution:
-      { integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ== }
-    engines: { node: '>=6.0' }
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-    dependencies:
-      ms: 2.1.2
     dev: true
 
   /debug@4.3.4(supports-color@8.1.1):
@@ -12126,17 +12093,6 @@ packages:
       { integrity: sha512-mOYmMuvJwAo/CvnMFEq4SHftq7E5188hYMTTxJyQOXk2nh+sgslRdYMw3wTthH+FMcFaZLtmBPuMu6IwztdoUQ== }
     engines: { node: '>=0.4.0' }
     dev: true
-
-  /follow-redirects@1.15.5:
-    resolution:
-      { integrity: sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw== }
-    engines: { node: '>=4.0' }
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dev: false
 
   /follow-redirects@1.15.5(debug@4.3.4):
     resolution:
@@ -19412,7 +19368,7 @@ packages:
     dependencies:
       component-emitter: 1.3.1
       cookiejar: 2.1.4
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       fast-safe-stringify: 2.1.1
       form-data: 4.0.0
       formidable: 2.1.2
