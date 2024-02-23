@@ -60,11 +60,9 @@ export class PrismaFactory {
             compute({ bundle }) {
               return async function <TKind extends InstrumentKind>(options?: InterpretOptions<TKind>) {
                 const transformer = new InstrumentTransformer();
-                const interpreter = new InstrumentInterpreter();
-                // This is not ideal, see if a way to change later
-                if (process.env.NODE_ENV === 'production') {
-                  bundle = await transformer.transformRuntimeImports(bundle);
-                }
+                const interpreter = new InstrumentInterpreter({
+                  transformBundle: (bundle) => transformer.transformRuntimeImports(bundle)
+                });
                 return interpreter.interpret(bundle, options);
               };
             },
