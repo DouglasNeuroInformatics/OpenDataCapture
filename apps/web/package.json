@@ -5,10 +5,10 @@
   "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "build": "tsc && cross-env NODE_ENV=production bunx vite build",
+    "build": "tsc && NODE_ENV=production bunx vite build",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development bunx vite",
+    "dev": "NODE_ENV=development env-cmd -f ../../.env bunx vite",
     "format": "prettier --write src",
     "format:translations": "find src/translations -name '*.json' -exec bunx sort-json {} \\;",
     "inject": "bunx import-meta-env -x .env.public -p dist/index.html",
