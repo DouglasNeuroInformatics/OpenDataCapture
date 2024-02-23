@@ -1,5 +1,8 @@
 FROM node:lts-iron as base
 WORKDIR /app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN corepack enable
 
 # PRUNE WORKSPACE
@@ -9,7 +12,7 @@ RUN pnpm dlx turbo prune @open-data-capture/api --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
-COPY .gitignore .gitignore
+COPY .gitignore jsconfig.json ./
 COPY --from=builder /app/out/json/ .
 RUN pnpm install --frozen-lockfile 
 
@@ -20,8 +23,8 @@ RUN pnpm dlx turbo build --filter=@open-data-capture/api
 
 # RUN SERVER
 FROM base AS runner
-COPY --from=builder /app/apps/api/dist/ /app/dist/
-COPY --from=builder /app/apps/api/public/ /app/public/
+COPY --from=installer /app/apps/api/dist/ /app/dist/
+COPY --from=installer /app/apps/api/public/ /app/public/
 RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 RUN chown -R app:app /app
