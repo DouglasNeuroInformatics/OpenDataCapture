@@ -74,23 +74,21 @@ Now, in order to run the code, we need to install some additional system depende
 
 #### Node.js
 
-Although Open Data Capture primarily uses the [Bun](https://bun.sh/) JavaScript runtime, several core pieces of functionality rely on [Node.js](https://nodejs.org/en). We use [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) to manage the supported Node version. Please follow the installation instruction to install nvm on your system. Then, install the current Node version with the following command:
+We use [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) to manage the supported Node version. Please follow the installation instructions to install nvm on your system. Then, install the current Node version with the following command:
 
 ```sh
 nvm install $(cat .nvmrc)
 ```
 
+Once installed, enable the `pnpm` package manager:
+
+```sh
+corepack enable
+```
+
 :::note
 This is not the only way to manage Node versions. If you have another preferred method, feel free to use it. However, we strongly recommend against using a system installation of Node.
 :::
-
-#### Bun
-
-Now that you have installed Node, we can install Bun. To install the recommended version through npm, you can use the following command:
-
-```sh
-npm install -g bun@$(cat package.json | jq .packageManager | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
-```
 
 #### MongoDB
 
@@ -156,27 +154,23 @@ These instructions assume you are using a Mac with Apple Silicon. For older, Int
     mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
     ```
 
-
-
   </TabItem>
 </Tabs>
 
 ### Runtime Dependencies
 
-Next, install runtime dependencies using Bun:
+Next, install runtime dependencies:
 
 ```sh
-bun install
+pnpm install
 ```
-
-> Note: If you encounter an error here (e.g., segmentation fault), or the proccess appears to hang, simply try again. This is often sufficient to resolve issues with Bun.
 
 ### Setup Database
 
 Now, we need to generate the database schemas:
 
 ```sh
-bun ws database db:generate && bun ws database db:push
+pnpm ws database db:generate && pnpm ws database db:push
 ```
 
 ### Run Dev Server
@@ -184,7 +178,7 @@ bun ws database db:generate && bun ws database db:push
 Now, you should be able to start the development server, which is configured with hot module replacement.
 
 ```shell
-bun dev
+pnpm dev
 ```
 
 Navigate to [http://localhost:3000](http://localhost:3000) and you should be greeted with a setup screen. Follow the instructions to create the first admin user and seed the database.
