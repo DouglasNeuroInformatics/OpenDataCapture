@@ -59,7 +59,8 @@ async function copyEsbuild() {
 await copyPrisma();
 await copyEsbuild();
 
-await esbuild.build({
+/** @type {import('esbuild').BuildOptions} */
+const options = {
   banner: {
     js: cjsShims
   },
@@ -77,9 +78,15 @@ await esbuild.build({
     runtimePlugin({ outdir }),
     nativeModulesPlugin()
   ],
-  sourcemap: process.env.DEBUG?.trim().toLowerCase() === 'true',
   target: ['node18', 'es2022'],
   tsconfig
-});
+};
 
-console.log('Done!');
+if (process.argv.includes('--watch')) {
+  const ctx = await esbuild.context(options);
+  await ctx.watch();
+  console.log('Watching...');
+} else {
+  await esbuild.build(options);
+  console.log('Done!');
+}
