@@ -32,7 +32,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
       - name: Setup Environment
-        run: bun generate:env
+        run: pnpm generate:env
       - name: Install Dependencies
         run: |
           pnpm install --frozen-lockfile
