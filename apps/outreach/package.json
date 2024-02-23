@@ -7,7 +7,7 @@
     "build": "astro build",
     "dev": "astro dev",
     "format": "prettier --write src",
-    "format:translations": "find src/i18n/translations -name '*.json' -exec bunx sort-json {} \\;",
+    "format:translations": "find src/i18n/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "lint": "astro check && eslint --fix src",
     "start": "astro preview"
   },
