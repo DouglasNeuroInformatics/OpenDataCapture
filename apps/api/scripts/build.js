@@ -4,6 +4,7 @@ import path from 'path';
 import url from 'url';
 
 import { nativeModulesPlugin } from '@open-data-capture/esbuild-plugin-native-modules';
+import { prismaPlugin } from '@open-data-capture/esbuild-plugin-prisma';
 import { runtimePlugin } from '@open-data-capture/esbuild-plugin-runtime';
 import esbuild from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
@@ -36,21 +37,7 @@ const { __dirname, __filename, require } = await (async () => {
 })();
 `;
 
-// Copy Prisma
-async function copyPrisma() {
-  const coreDatabasePath = path.dirname(require.resolve('@open-data-capture/database/core'));
-  const files = await fs.readdir(coreDatabasePath);
-  const engineFilename = files.find((filename) => {
-    return filename.startsWith('libquery_engine') && filename.endsWith('.node');
-  });
-  if (!engineFilename) {
-    throw new Error(`Failed to resolve prisma engine from path: ${coreDatabasePath}`);
-  }
-  await fs.mkdir(path.join(outdir, 'core'));
-  await fs.copyFile(path.join(coreDatabasePath, engineFilename), path.join(outdir, 'core', engineFilename));
-}
-
-// Copy Prisma
+// Copy ESBuild
 async function copyEsbuild() {
   const filepath = require.resolve('esbuild/bin/esbuild');
   await fs.copyFile(filepath, path.join(binDir, 'esbuild'));
@@ -73,6 +60,7 @@ const options = {
       tsconfigPath: tsconfig
     }),
     runtimePlugin({ outdir }),
+    prismaPlugin({ outdir: path.join(outdir, 'core') }),
     nativeModulesPlugin()
   ],
   target: ['node18', 'es2022'],
@@ -82,13 +70,12 @@ const options = {
 if (process.argv.includes('--watch')) {
   const ctx = await esbuild.context({
     ...options,
-    external: [...options.external, 'esbuild'],
+    external: [...(options.external ?? []), 'esbuild'],
     sourcemap: true
   });
   await ctx.watch();
   console.log('Watching...');
 } else {
-  await copyPrisma();
   await copyEsbuild();
   await esbuild.build(options);
   console.log('Done!');

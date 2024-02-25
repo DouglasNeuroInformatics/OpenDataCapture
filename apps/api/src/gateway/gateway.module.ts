@@ -17,7 +17,21 @@ import { GatewaySynchronizer } from './gateway.synchronizer';
     HttpModule.registerAsync({
       inject: [ConfigurationService],
       useFactory: (configurationService: ConfigurationService) => {
+        let baseURL: string;
+        if (configurationService.get('NODE_ENV') === 'production') {
+          const internalNetworkUrl = configurationService.get('GATEWAY_INTERNAL_NETWORK_URL');
+          const siteAddress = configurationService.get('GATEWAY_SITE_ADDRESS')!;
+          if (siteAddress.hostname === 'localhost' && internalNetworkUrl) {
+            baseURL = internalNetworkUrl.origin;
+          } else {
+            baseURL = siteAddress.origin;
+          }
+        } else {
+          const gatewayPort = configurationService.get('GATEWAY_DEV_SERVER_PORT')!;
+          baseURL = `http://localhost:${gatewayPort}`;
+        }
         return {
+          baseURL,
           headers: {
             Authorization: `Bearer ${configurationService.get('GATEWAY_API_KEY')}`
           }

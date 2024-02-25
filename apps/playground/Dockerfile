@@ -1,4 +1,4 @@
-FROM node:lts-iron as base
+FROM node:lts-alpine as base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -8,10 +8,14 @@ RUN corepack enable
 # PRUNE WORKSPACE
 FROM base AS builder
 COPY . .
+RUN apk add --no-cache libc6-compat
+RUN apk update
 RUN pnpm dlx turbo prune @open-data-capture/playground --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
+RUN apk add --no-cache libc6-compat
+RUN apk update
 COPY .gitignore jsconfig.json ./
 COPY --from=builder /app/out/json/ .
 RUN pnpm install --frozen-lockfile 

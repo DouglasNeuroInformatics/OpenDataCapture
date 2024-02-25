@@ -306,3 +306,7 @@
 .tab > a {
   padding: 0.5rem 1.5rem !important;
 }
+
+.underline {
+  text-decoration: underline;
+}

@@ -260,6 +260,9 @@ importers:
       '@open-data-capture/esbuild-plugin-native-modules':
         specifier: workspace:*
         version: link:../../packages/esbuild-plugin-native-modules
+      '@open-data-capture/esbuild-plugin-prisma':
+        specifier: workspace:*
+        version: link:../../packages/esbuild-plugin-prisma
       '@open-data-capture/esbuild-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/esbuild-plugin-runtime
@@ -360,6 +363,9 @@ importers:
       '@open-data-capture/esbuild-plugin-native-modules':
         specifier: workspace:*
         version: link:../../packages/esbuild-plugin-native-modules
+      '@open-data-capture/esbuild-plugin-prisma':
+        specifier: workspace:*
+        version: link:../../packages/esbuild-plugin-prisma
       '@open-data-capture/tailwindcss':
         specifier: workspace:*
         version: link:../../packages/tailwindcss
@@ -864,6 +870,24 @@ importers:
       esbuild:
         specifier: 0.x
         version: 0.20.1
+
+  packages/esbuild-plugin-prisma:
+    dependencies:
+      '@prisma/client':
+        specifier: 5.x
+        version: 5.10.2(prisma@5.10.2)
+      '@prisma/engines':
+        specifier: 5.x
+        version: 5.10.2
+      '@prisma/get-platform':
+        specifier: ^5.10.2
+        version: 5.10.2
+      esbuild:
+        specifier: 0.x
+        version: 0.20.1
+      prisma:
+        specifier: 5.x
+        version: 5.10.2
 
   packages/esbuild-plugin-runtime:
     dependencies:

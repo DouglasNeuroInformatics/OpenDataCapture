@@ -28,8 +28,8 @@
 
 ![license](https://img.shields.io/github/license/DouglasNeuroInformatics/OpenDataCapture)
 ![version](https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/OpenDataCapture)
+![build](https://github.com/DouglasNeuroInformatics/OpenDataCapture/actions/workflows/build.yaml/badge.svg)
 
-<!-- ![build](https://github.com/DouglasNeuroInformatics/OpenDataCapture/actions/workflows/build.yaml/badge.svg) -->
 <!-- [![codecov](https://codecov.io/gh/DouglasNeuroInformatics/OpenDataCapture/branch/main/graph/badge.svg?token=XHC7BY6PJ1)](https://codecov.io/gh/DouglasNeuroInformatics/OpenDataCapture) -->
 
 </div>
@@ -37,30 +37,17 @@
 
 ## About
 
-Open Data Capture is an integrated suite of applications tailored for the continuous and longitudinal collection of both clinical and research data. This platform is anchored on a few foundational principles:
+Open Data Capture is a web-based platform designed for continuous clinical data collection. Designed with clinician-researchers in mind, the platform enables both remote and in-person evaluations, encompassing a range of applications — from patient questionnaires completed at home to interactive memory tasks conducted in clinical settings. The platform is designed with a robust security framework, ensuring that all collected data is securely stored in a structured, standardized manner. It offers an intuitive, user-friendly interface to filter the stored data according to various criteria. Once filtered, the data can be used to generate dynamic graphs and tables, or exported for research purposes.
 
-- Versatility in Instruments: Whether it's surveys, clinical questionnaires, interactive tasks, or neuroimaging data, our platform can handle it all under the umbrella of a generic instrument.
-- User-Friendly Design: Designed with the user in mind, its intuitive interface ensures that even those without specialized knowledge can navigate and utilize the platform with ease.
-- Streamlined Deployment: With our one-liner deployment solution, leverage Docker Compose for a hassle-free, automated setup.
+## Quick Start
 
-## Deployment
+Assuming that Docker and Docker Compose are already installed on your system, you can deploy an instance of Open Data Capture using the following command:
 
-### Download Repository
-
-```shell
-git clone https://github.com/DouglasNeuroInformatics/OpenDataCapture
-cd OpenDataCapture
+```sh
+./scripts/generate-env.sh && docker compose up -d
 ```
 
-### Launch Application
-
-```shell
-./scripts/generate-env.sh
-docker compose up -d
-docker compose exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
-```
-
-By default, the application will run on port 5500. So, navigate to `http://localhost:5500` in your browser and you should be greeted with the setup screen.
+By default, the application will run on port 5500. So, navigate to `http://localhost:5500` in your browser and you should be greeted with the setup screen. After getting started, we highly recommend reading our [deployment guide](http://localhost:4000/en/tutorials/deployment/) for additional information on how to configure Open Data Capture to best meet the needs of your organization.
 
 ## Contribution
 

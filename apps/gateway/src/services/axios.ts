@@ -2,8 +2,6 @@ import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import axios, { isAxiosError } from 'axios';
 import i18next from 'i18next';
 
-axios.defaults.baseURL = undefined;
-
 axios.interceptors.request.use((config) => {
   config.headers.setAccept('application/json');
   config.timeout = 10000; // abort request after 10 seconds
