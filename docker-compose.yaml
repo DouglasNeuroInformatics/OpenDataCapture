@@ -26,7 +26,6 @@ services:
       - ESBUILD_BINARY_PATH=dist/bin/esbuild
       - GATEWAY_INTERNAL_NETWORK_URL=http://gateway:80
       - GATEWAY_SITE_ADDRESS=${GATEWAY_SITE_ADDRESS:-localhost:3500}
-      - GATEWAY_BASE_URL
       - MONGO_REPLICA_SET=rs0
       - MONGO_RETRY_WRITES=true
       - MONGO_WRITE_CONCERN=majority
