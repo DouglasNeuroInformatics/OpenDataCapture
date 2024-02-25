@@ -1,4 +1,4 @@
-FROM node:lts-iron as base
+FROM node:lts-alpine as base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -8,10 +8,14 @@ RUN corepack enable
 # PRUNE WORKSPACE
 FROM base AS builder
 COPY . .
+RUN apk add --no-cache libc6-compat
+RUN apk update
 RUN pnpm dlx turbo prune @open-data-capture/api --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
+RUN apk add --no-cache libc6-compat
+RUN apk update
 COPY .gitignore jsconfig.json ./
 COPY --from=builder /app/out/json/ .
 RUN pnpm install --frozen-lockfile 
@@ -25,9 +29,6 @@ RUN pnpm dlx turbo build --filter=@open-data-capture/api
 FROM base AS runner
 COPY --from=installer /app/apps/api/dist/ /app/dist/
 COPY --from=installer /app/apps/api/public/ /app/public/
-RUN addgroup --system --gid 1001 app
-RUN adduser --system --uid 1001 app
-RUN chown -R app:app /app
-USER app
 RUN echo '{ "type": "module" }' > package.json
+USER node
 CMD [ "node", "./dist/app.mjs" ]
