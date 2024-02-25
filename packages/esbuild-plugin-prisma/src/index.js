@@ -23,7 +23,6 @@ export function prismaPlugin(options) {
         if (!engineFile) {
           throw new Error(`Failed to find prisma query engine '${engineFile}' in directory: ${enginesDir}`);
         }
-        fs.promises.stat(options.outdir);
         if (!fs.existsSync(options.outdir)) {
           await fs.promises.mkdir(options.outdir, { recursive: true });
         }
