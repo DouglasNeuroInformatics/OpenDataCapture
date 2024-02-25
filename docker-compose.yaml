@@ -51,7 +51,6 @@ services:
     expose:
       - 80
     environment:
-      - GATEWAY_BASE_URL
       - NODE_ENV=production
       - GATEWAY_API_KEY
   playground:
