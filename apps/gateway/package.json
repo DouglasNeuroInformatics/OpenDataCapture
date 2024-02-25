@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@open-data-capture/esbuild-plugin-native-modules": "workspace:*",
+    "@open-data-capture/esbuild-plugin-prisma": "workspace:*",
     "@open-data-capture/tailwindcss": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
     "@types/compression": "^1.7.5",

@@ -1,0 +1,20 @@
+{
+  "name": "@open-data-capture/esbuild-plugin-prisma",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "eslint --fix src"
+  },
+  "dependencies": {
+    "@prisma/get-platform": "^5.10.2"
+  },
+  "peerDependencies": {
+    "@prisma/client": "5.x",
+    "@prisma/engines": "5.x",
+    "esbuild": "0.x",
+    "prisma": "5.x"
+  }
+}
