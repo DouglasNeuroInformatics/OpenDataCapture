@@ -24,7 +24,7 @@ services:
       - mongo
     environment:
       - ESBUILD_BINARY_PATH=dist/bin/esbuild
-      - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
+      - GATEWAY_BASE_URL
       - MONGO_REPLICA_SET=rs0
       - MONGO_RETRY_WRITES=true
       - MONGO_WRITE_CONCERN=majority
@@ -51,7 +51,7 @@ services:
     expose:
       - 80
     environment:
-      - GATEWAY_BASE_URL=https://demogateway.opendatacapture.org
+      - GATEWAY_BASE_URL
       - NODE_ENV=production
       - GATEWAY_API_KEY
   playground:
