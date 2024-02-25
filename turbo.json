@@ -19,7 +19,8 @@
     },
     "format": {},
     "inject": {
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "outputs": ["dist/**"]
     },
     "lint": {
       "dependsOn": ["^build", "^db:generate"]
