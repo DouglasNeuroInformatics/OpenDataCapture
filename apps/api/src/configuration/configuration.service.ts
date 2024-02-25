@@ -8,6 +8,6 @@ export class ConfigurationService {
   constructor(private readonly configService: ConfigService) {}
 
   get<TKey extends Extract<keyof Configuration, string>>(key: TKey) {
-    return this.configService.get<Configuration[TKey]>(key)!;
+    return this.configService.get<Configuration[TKey]>(key) as Configuration[TKey];
   }
 }
