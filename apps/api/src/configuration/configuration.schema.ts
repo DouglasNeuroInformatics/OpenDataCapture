@@ -9,13 +9,24 @@ export const $Configuration = z
     GATEWAY_API_KEY: z.string().min(32),
     GATEWAY_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),
     GATEWAY_ENABLED: $BooleanString,
-    GATEWAY_INTERNAL_NETWORK_URL: z.string().url().optional(),
+    GATEWAY_INTERNAL_NETWORK_URL: z
+      .string()
+      .url()
+      .optional()
+      .transform((arg) => (arg ? new URL(arg) : undefined)),
     GATEWAY_REFRESH_INTERVAL: z.coerce.number().positive().int(),
-    GATEWAY_SITE_ADDRESS: z.string().url().optional(),
+    GATEWAY_SITE_ADDRESS: z
+      .string()
+      .url()
+      .optional()
+      .transform((arg) => (arg ? new URL(arg) : undefined)),
     MONGO_DIRECT_CONNECTION: z.string().optional(),
     MONGO_REPLICA_SET: z.string().optional(),
     MONGO_RETRY_WRITES: z.string().optional(),
-    MONGO_URI: z.string().url(),
+    MONGO_URI: z
+      .string()
+      .url()
+      .transform((arg) => new URL(arg)),
     MONGO_WRITE_CONCERN: z.string().optional(),
     NODE_ENV: z.enum(['development', 'production', 'test']),
     SECRET_KEY: z.string().min(32),
@@ -27,12 +38,6 @@ export const $Configuration = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'GATEWAY_SITE_ADDRESS must be defined in production'
-        });
-      }
-      if (!env.GATEWAY_INTERNAL_NETWORK_URL) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'GATEWAY_INTERNAL_NETWORK_URL must be defined in production'
         });
       }
     } else if (env.NODE_ENV === 'development') {
