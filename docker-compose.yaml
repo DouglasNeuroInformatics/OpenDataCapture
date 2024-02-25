@@ -48,7 +48,7 @@ services:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
     ports:
-      - '3500:80'
+      - ${GATEWAY_PORT}:80
     expose:
       - 80
     environment:
@@ -60,7 +60,7 @@ services:
       context: .
       dockerfile: ./apps/playground/Dockerfile
     ports:
-      - '3750:80'
+      - ${PLAYGROUND_PORT}:80
     expose:
       - 80
   web:
