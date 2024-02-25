@@ -1,6 +1,15 @@
 import { $BooleanString } from '@open-data-capture/common/core';
 import { z } from 'zod';
 
+const $OptionalURL = z.preprocess(
+  (arg) => arg || undefined,
+  z
+    .string()
+    .url()
+    .optional()
+    .transform((arg) => (arg ? new URL(arg) : undefined))
+);
+
 export const $Configuration = z
   .object({
     API_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),
@@ -9,17 +18,9 @@ export const $Configuration = z
     GATEWAY_API_KEY: z.string().min(32),
     GATEWAY_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),
     GATEWAY_ENABLED: $BooleanString,
-    GATEWAY_INTERNAL_NETWORK_URL: z
-      .string()
-      .url()
-      .optional()
-      .transform((arg) => (arg ? new URL(arg) : undefined)),
+    GATEWAY_INTERNAL_NETWORK_URL: $OptionalURL,
     GATEWAY_REFRESH_INTERVAL: z.coerce.number().positive().int(),
-    GATEWAY_SITE_ADDRESS: z
-      .string()
-      .url()
-      .optional()
-      .transform((arg) => (arg ? new URL(arg) : undefined)),
+    GATEWAY_SITE_ADDRESS: $OptionalURL,
     MONGO_DIRECT_CONNECTION: z.string().optional(),
     MONGO_REPLICA_SET: z.string().optional(),
     MONGO_RETRY_WRITES: z.string().optional(),
