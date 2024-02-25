@@ -22,7 +22,18 @@ export class GatewayService {
     private readonly httpService: HttpService,
     private readonly instrumentsService: InstrumentsService
   ) {
-    this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
+    if (configurationService.get('NODE_ENV') === 'production') {
+      const internalNetworkUrl = configurationService.get('GATEWAY_INTERNAL_NETWORK_URL');
+      const siteAddress = configurationService.get('GATEWAY_SITE_ADDRESS')!;
+      if (siteAddress.hostname === 'localhost' && internalNetworkUrl) {
+        this.gatewayBaseUrl = internalNetworkUrl.href;
+      } else {
+        this.gatewayBaseUrl = siteAddress.href;
+      }
+    } else {
+      const gatewayPort = configurationService.get('GATEWAY_DEV_SERVER_PORT')!;
+      this.gatewayBaseUrl = `http://localhost:${gatewayPort}`;
+    }
   }
 
   async createRemoteAssignment(

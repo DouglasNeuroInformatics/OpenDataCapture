@@ -15,14 +15,20 @@ import { CreateAssignmentDto } from './dto/create-assignment.dto';
 
 @Injectable()
 export class AssignmentsService {
-  private readonly gatewayBaseUrl: string;
+  private readonly assignmentBaseUrl: string;
 
   constructor(
     @InjectModel('Assignment') private readonly assignmentModel: Model<'Assignment'>,
     configurationService: ConfigurationService,
     private readonly gatewayService: GatewayService
   ) {
-    this.gatewayBaseUrl = configurationService.get('GATEWAY_BASE_URL');
+    if (configurationService.get('NODE_ENV') === 'production') {
+      const siteAddress = configurationService.get('GATEWAY_SITE_ADDRESS')!;
+      this.assignmentBaseUrl = siteAddress.href;
+    } else {
+      const gatewayPort = configurationService.get('GATEWAY_DEV_SERVER_PORT')!;
+      this.assignmentBaseUrl = `http://localhost:${gatewayPort}`;
+    }
   }
 
   async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto): Promise<Assignment> {
@@ -44,7 +50,7 @@ export class AssignmentsService {
             id: subjectId
           }
         },
-        url: `${this.gatewayBaseUrl}/assignments/${id}`
+        url: `${this.assignmentBaseUrl}/assignments/${id}`
       }
     });
     try {
