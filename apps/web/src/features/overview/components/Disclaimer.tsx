@@ -22,7 +22,7 @@ export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProp
 
   return (
     <Modal open={show} title={t('disclaimer.title')} onClose={handleClose}>
-      <p>{t('disclaimer.message')}</p>
+      <p className="text-sm">{t('disclaimer.message')}</p>
       <div className="mt-3 flex">
         <Button className="mr-2" label={t('disclaimer.accept')} size="sm" onClick={handleClose} />
         <Button

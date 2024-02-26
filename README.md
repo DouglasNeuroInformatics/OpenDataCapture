@@ -5,7 +5,7 @@
   </a>
   <h3 align="center">Open Data Capture</h3>
   <p align="center">
-    A modern, user-friendly web application for standardized data capture in medical research
+    An electronic data capture platform designed for administering remote and in-person clinical instruments, including both interactive tasks and forms 
     <br />
     <a href="https://opendatacapture.org/docs">
       <strong>Explore the docs »

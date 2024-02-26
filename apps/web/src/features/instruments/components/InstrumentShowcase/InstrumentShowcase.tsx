@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { SearchBar, SelectDropdown, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/ui';
 import type { SelectOption } from '@douglasneuroinformatics/ui';
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { motion } from 'framer-motion';
@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
-import { useActiveVisitStore } from '@/stores/active-visit-store';
 
 import { InstrumentCard } from '../InstrumentCard';
 
@@ -21,9 +20,6 @@ export const InstrumentsShowcase = () => {
   const [selectedLanguages, setSelectedLanguages] = useState<SelectOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<SelectOption[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const { activeVisit } = useActiveVisitStore();
-  const notifications = useNotificationsStore();
 
   const languageOptions = [
     {
@@ -100,14 +96,7 @@ export const InstrumentsShowcase = () => {
               <InstrumentCard
                 instrument={instrument}
                 onClick={() => {
-                  if (activeVisit) {
-                    navigate(`/instruments/render/${instrument.id}`, { state: { summary: instrument } });
-                  } else {
-                    notifications.addNotification({
-                      message: t('instruments:available.nullActiveVisitError'),
-                      type: 'info'
-                    });
-                  }
+                  navigate(`/instruments/render/${instrument.id}`, { state: { summary: instrument } });
                 }}
               />
             </motion.div>

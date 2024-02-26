@@ -1,6 +1,7 @@
+import React from 'react';
+
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { $Visit, type CreateVisitData } from '@open-data-capture/common/visit';
-import * as i18next from '@open-data-capture/i18next';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +12,6 @@ import { useAuthStore } from '@/stores/auth-store';
 
 import { AddVisitForm, type AddVisitFormData } from '../components/AddVisitForm';
 
-i18next.i18n.t('foo');
 export const AddVisitPage = () => {
   const { setActiveVisit } = useActiveVisitStore();
   const { currentGroup } = useAuthStore();
@@ -31,9 +31,9 @@ export const AddVisitPage = () => {
   });
 
   return (
-    <div>
+    <React.Fragment>
       <PageHeader title={t('addVisit')} />
       <AddVisitForm onSubmit={(data) => mutation.mutate(data)} />
-    </div>
+    </React.Fragment>
   );
 };

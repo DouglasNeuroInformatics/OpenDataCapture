@@ -5,6 +5,16 @@
       "fr": "Open Data Capture"
     }
   },
+  "endVisitModal": {
+    "message": {
+      "en": "Are you sure you want to end the current visit? If you choose to proceed, you'll be taken back to the overview page.",
+      "fr": "Êtes-vous sûr de vouloir mettre fin à la visite en cours ? Si vous décidez de continuer, vous serez ramené à la page de vue d'ensemble."
+    },
+    "title": {
+      "en": "End Visit",
+      "fr": "Terminer la visite"
+    }
+  },
   "footer": {
     "contact": {
       "en": "Contact Us",
@@ -25,28 +35,32 @@
   },
   "navLinks": {
     "addVisit": {
-      "en": "Add Visit",
-      "fr": "Ajouter une visite"
+      "en": "Begin Visit",
+      "fr": "Commencer une visite"
     },
     "availableInstruments": {
-      "en": "View Instruments",
-      "fr": "Afficher tous les instruments"
+      "en": "Administer Instrument",
+      "fr": "Administrer un instrument"
     },
     "createInstrument": {
       "en": "Add Instrument",
       "fr": "Ajouter un instrument"
     },
-    "manageInstruments": {
-      "en": "Manage Instruments",
-      "fr": "Gérer les instruments"
+    "endVisit": {
+      "en": "End Visit",
+      "fr": "Terminer la visite"
     },
     "overview": {
       "en": "Overview",
       "fr": "Vue d'ensemble"
     },
+    "viewCurrentSubject": {
+      "en": "View Current Subject",
+      "fr": "Voir le client actuel"
+    },
     "viewSubjects": {
-      "en": "View Subjects",
-      "fr": "Afficher tous les clients"
+      "en": "Data Hub",
+      "fr": "Centre de données"
     }
   },
   "organization": {

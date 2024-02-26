@@ -8,9 +8,10 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Run Script
         uses: actions/github-script@v7
         with:
           script: |
             require('./.github/scripts/issues.cjs')()
-  
