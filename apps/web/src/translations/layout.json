@@ -47,6 +47,10 @@
     "viewCurrentSubject": {
       "en": "View Current Subject",
       "fr": "Voir le client actuel"
+    },
+    "endVisit": {
+      "en": "End Visit",
+      "fr": "Terminer la visite"
     }
   },
   "organization": {

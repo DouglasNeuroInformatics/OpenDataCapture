@@ -4,6 +4,7 @@ export type NavButtonProps = {
   [key: `data-${string}`]: unknown;
   activeClassName?: string;
   className?: string;
+  disabled?: boolean;
   icon?: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
   isActive: boolean;
   label: string;

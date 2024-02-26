@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import { cn } from '@douglasneuroinformatics/ui';
-import { ChartBarIcon, ChartPieIcon, ComputerDesktopIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
+import {
+  ChartBarIcon,
+  ChartPieIcon,
+  ComputerDesktopIcon,
+  EyeIcon,
+  StopIcon,
+  UserPlusIcon
+} from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -24,7 +31,7 @@ export type NavigationProps = {
 
 export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: NavigationProps) => {
   const { currentUser } = useAuthStore();
-  const { activeVisit } = useActiveVisitStore();
+  const { activeVisit, setActiveVisit } = useActiveVisitStore();
 
   const [navItems, setNavItems] = useState<NavItem[][]>([]);
   const { i18n, t } = useTranslation('layout');
@@ -52,6 +59,7 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
     if (currentUser?.ability.can('create', 'Visit')) {
       visitItems.push({
         'data-cy': 'add-visit',
+        disabled: activeVisit !== null,
         icon: UserPlusIcon,
         id: '/visits/add-visit',
         label: t('navLinks.addVisit')
@@ -87,20 +95,36 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
     >
       {navItems.map((items, i) => (
         <div className="w-full py-2 first:pt-0 last:pb-0" key={i}>
-          {items.map(({ id, ...props }) => (
-            <NavButton
-              activeClassName={btn?.activeClassName}
-              className={btn?.className}
-              isActive={location.pathname === id}
-              key={id}
-              variant={orientation}
-              onClick={() => {
-                navigate(id);
-                onNavigate?.(id);
-              }}
-              {...props}
-            />
-          ))}
+          <>
+            {items.map(({ id, ...props }) => (
+              <NavButton
+                activeClassName={btn?.activeClassName}
+                className={btn?.className}
+                isActive={location.pathname === id}
+                key={id}
+                variant={orientation}
+                onClick={() => {
+                  navigate(id);
+                  onNavigate?.(id);
+                }}
+                {...props}
+              />
+            ))}
+            {i === navItems.length - 1 && (
+              <NavButton
+                className={btn?.className}
+                disabled={activeVisit === null}
+                icon={StopIcon}
+                isActive={false}
+                label={t('navLinks.endVisit')}
+                variant={orientation}
+                onClick={() => {
+                  setActiveVisit(null);
+                  navigate('/overview');
+                }}
+              />
+            )}
+          </>
         </div>
       ))}
     </nav>
