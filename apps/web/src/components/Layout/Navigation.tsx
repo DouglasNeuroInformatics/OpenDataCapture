@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { cn } from '@douglasneuroinformatics/ui';
+import { Button, Modal, cn } from '@douglasneuroinformatics/ui';
 import {
   ChartBarIcon,
   ChartPieIcon,
@@ -32,9 +32,10 @@ export type NavigationProps = {
 export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: NavigationProps) => {
   const { currentUser } = useAuthStore();
   const { activeVisit, setActiveVisit } = useActiveVisitStore();
+  const [isEndVisitModalOpen, setIsEndVisitModalOpen] = useState(false);
 
   const [navItems, setNavItems] = useState<NavItem[][]>([]);
-  const { i18n, t } = useTranslation('layout');
+  const { i18n, t } = useTranslation(['layout', 'core']);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -86,47 +87,72 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
   }, [activeVisit, currentUser, i18n.resolvedLanguage]);
 
   return (
-    <nav
-      className={cn('flex w-full divide-y divide-slate-300 dark:divide-slate-700', {
-        'divide-slate-700': isAlwaysDark,
-        'flex-col': orientation === 'vertical',
-        'justify-end': orientation === 'horizontal'
-      })}
-    >
-      {navItems.map((items, i) => (
-        <div className="w-full py-2 first:pt-0 last:pb-0" key={i}>
-          <>
-            {items.map(({ id, ...props }) => (
-              <NavButton
-                activeClassName={btn?.activeClassName}
-                className={btn?.className}
-                isActive={location.pathname === id}
-                key={id}
-                variant={orientation}
-                onClick={() => {
-                  navigate(id);
-                  onNavigate?.(id);
-                }}
-                {...props}
-              />
-            ))}
-            {i === navItems.length - 1 && (
-              <NavButton
-                className={btn?.className}
-                disabled={activeVisit === null}
-                icon={StopIcon}
-                isActive={false}
-                label={t('navLinks.endVisit')}
-                variant={orientation}
-                onClick={() => {
-                  setActiveVisit(null);
-                  navigate('/overview');
-                }}
-              />
-            )}
-          </>
+    <>
+      <nav
+        className={cn('flex w-full divide-y divide-slate-300 dark:divide-slate-700', {
+          'divide-slate-700': isAlwaysDark,
+          'flex-col': orientation === 'vertical',
+          'justify-end': orientation === 'horizontal'
+        })}
+      >
+        {navItems.map((items, i) => (
+          <div className="w-full py-2 first:pt-0 last:pb-0" key={i}>
+            <>
+              {items.map(({ id, ...props }) => (
+                <NavButton
+                  activeClassName={btn?.activeClassName}
+                  className={btn?.className}
+                  isActive={location.pathname === id}
+                  key={id}
+                  variant={orientation}
+                  onClick={() => {
+                    navigate(id);
+                    onNavigate?.(id);
+                  }}
+                  {...props}
+                />
+              ))}
+              {i === navItems.length - 1 && (
+                <NavButton
+                  className={btn?.className}
+                  disabled={activeVisit === null}
+                  icon={StopIcon}
+                  isActive={false}
+                  label={t('navLinks.endVisit')}
+                  variant={orientation}
+                  onClick={() => {
+                    setIsEndVisitModalOpen(true);
+                  }}
+                />
+              )}
+            </>
+          </div>
+        ))}
+      </nav>
+      <Modal open={isEndVisitModalOpen} title={t('endVisitModal.title')} onClose={() => setIsEndVisitModalOpen(false)}>
+        <p className="text-sm">{t('endVisitModal.message')}</p>
+        <div className="mt-4 flex">
+          <Button
+            className="mr-2 min-w-16"
+            label={t('core:yes')}
+            size="sm"
+            onClick={() => {
+              setActiveVisit(null);
+              setIsEndVisitModalOpen(false);
+              navigate('/overview');
+            }}
+          />
+          <Button
+            className="min-w-16"
+            label={t('core:no')}
+            size="sm"
+            variant="secondary"
+            onClick={() => {
+              setIsEndVisitModalOpen(false);
+            }}
+          />
         </div>
-      ))}
-    </nav>
+      </Modal>
+    </>
   );
 };
