@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { AdjustmentsHorizontalIcon, ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
+import { ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -33,14 +33,6 @@ export const Layout = () => {
         icon: EyeIcon,
         id: '/subjects',
         label: t(`navLinks.viewSubjects`)
-      });
-    }
-    if (currentUser?.ability.can('manage', 'Instrument')) {
-      globalItems.push({
-        'data-cy': 'manage-instrument',
-        icon: AdjustmentsHorizontalIcon,
-        id: '/instruments/manage-instruments',
-        label: t('navLinks.manageInstruments')
       });
     }
     if (currentUser?.ability.can('create', 'InstrumentRecord')) {
