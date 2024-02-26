@@ -15,7 +15,7 @@ export type SidebarProps = {
 export const Sidebar = ({ activeItemId, items, onNavigate }: SidebarProps) => {
   return (
     <div className="flex h-screen w-80 flex-col bg-slate-900 p-3 text-slate-300 shadow-lg dark:border-r dark:border-slate-700">
-      <Branding className="h-14" logoVariant="light" />
+      <Branding className="h-14 md:p-2" logoVariant="light" />
       <hr className="my-1 h-[1px] border-none bg-slate-700" />
       <Navigation
         activeItemId={activeItemId}
