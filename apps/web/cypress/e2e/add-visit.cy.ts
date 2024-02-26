@@ -33,7 +33,7 @@ describe('look at questionaire', () => {
 
     cy.get('button[class="field-input capitalize"]').click({ force: true });
     cy.get('li[id*="headlessui-listbox-option-:"]').first().click();
-
+    //submit form
     cy.get('button[type="submit"]').click({ force: true });
 
     // cy.wait(1000);
