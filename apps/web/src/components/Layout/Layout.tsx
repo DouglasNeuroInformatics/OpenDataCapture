@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
+import { ChartBarIcon, ChartPieIcon, ComputerDesktopIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -33,7 +33,7 @@ export const Layout = () => {
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
         'data-cy': 'view-subjects',
-        icon: EyeIcon,
+        icon: ChartPieIcon,
         id: '/subjects',
         label: t(`navLinks.viewSubjects`)
       });
@@ -51,7 +51,7 @@ export const Layout = () => {
       visitItems.push({
         'data-cy': 'view-instrument',
         disabled: activeVisit === null,
-        icon: EyeIcon,
+        icon: ComputerDesktopIcon,
         id: '/instruments/available-instruments',
         label: t('navLinks.availableInstruments')
       });
