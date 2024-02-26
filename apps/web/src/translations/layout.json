@@ -43,6 +43,10 @@
     "viewSubjects": {
       "en": "Data Hub",
       "fr": "Centre de données"
+    },
+    "viewCurrentSubject": {
+      "en": "View Current Subject",
+      "fr": "Voir le client actuel"
     }
   },
   "organization": {

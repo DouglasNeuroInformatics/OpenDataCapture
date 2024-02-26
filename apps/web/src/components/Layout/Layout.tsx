@@ -56,6 +56,14 @@ export const Layout = () => {
         label: t('navLinks.availableInstruments')
       });
     }
+    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
+      visitItems.push({
+        disabled: activeVisit === null,
+        icon: EyeIcon,
+        id: `/subjects/${activeVisit?.subjectId}/table`,
+        label: t('navLinks.viewCurrentSubject')
+      });
+    }
     setNavItems([globalItems, visitItems]);
   }, [activeVisit, currentUser, i18n.resolvedLanguage]);
 
