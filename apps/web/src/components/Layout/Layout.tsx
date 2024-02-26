@@ -4,6 +4,7 @@ import { ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import { useActiveVisitStore } from '@/stores/active-visit-store';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { Footer } from './Footer';
@@ -13,6 +14,8 @@ import { Sidebar } from './Sidebar';
 import type { NavItem } from './types';
 export const Layout = () => {
   const { currentUser } = useAuthStore();
+  const { activeVisit } = useActiveVisitStore();
+
   const [navItems, setNavItems] = useState<NavItem[][]>([]);
   const { i18n, t } = useTranslation('layout');
   const navigate = useNavigate();
@@ -47,13 +50,14 @@ export const Layout = () => {
     if (currentUser?.ability.can('create', 'InstrumentRecord')) {
       visitItems.push({
         'data-cy': 'view-instrument',
+        disabled: activeVisit === null,
         icon: EyeIcon,
         id: '/instruments/available-instruments',
         label: t('navLinks.availableInstruments')
       });
     }
     setNavItems([globalItems, visitItems]);
-  }, [currentUser, i18n.resolvedLanguage]);
+  }, [activeVisit, currentUser, i18n.resolvedLanguage]);
 
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">

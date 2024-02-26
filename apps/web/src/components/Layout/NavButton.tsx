@@ -23,7 +23,7 @@ export const NavButton = ({
   return (
     <button
       className={cn(
-        'flex w-full items-center p-2 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100',
+        'flex w-full items-center p-2 text-slate-700 hover:text-slate-900 disabled:opacity-75 disabled:hover:cursor-not-allowed dark:text-slate-300 dark:hover:text-slate-100',
         {
           'justify-start': variant === 'vertical',
           'mx-1 justify-center': variant === 'horizontal'
