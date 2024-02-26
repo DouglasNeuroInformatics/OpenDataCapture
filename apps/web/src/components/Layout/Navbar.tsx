@@ -6,15 +6,7 @@ import { Branding } from '@open-data-capture/react-core';
 
 import { MobileSlider } from './MobileSlider';
 
-import type { NavItem } from './types';
-
-export type NavbarProps = {
-  activeItemId?: string;
-  items?: NavItem[] | NavItem[][];
-  onNavigate?: (id: string) => void;
-};
-
-export const Navbar = ({ activeItemId, items, onNavigate }: NavbarProps) => {
+export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   // This is to prevent ugly styling when resizing the viewport
@@ -43,18 +35,13 @@ export const Navbar = ({ activeItemId, items, onNavigate }: NavbarProps) => {
           </div>
         </div>
       </div>
-      {items && (
-        <MobileSlider
-          activeItemId={activeItemId}
-          isOpen={isOpen}
-          items={items}
-          setIsOpen={setIsOpen}
-          onNavigate={(id) => {
-            onNavigate?.(id);
-            setIsOpen(false);
-          }}
-        />
-      )}
+      <MobileSlider
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        onNavigate={() => {
+          setIsOpen(false);
+        }}
+      />
     </React.Fragment>
   );
 };
