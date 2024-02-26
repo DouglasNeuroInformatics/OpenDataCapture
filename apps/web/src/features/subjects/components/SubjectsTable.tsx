@@ -81,7 +81,7 @@ export const SubjectsTable = () => {
       <ClientTable<Subject>
         columns={[
           {
-            field: (subject) => subject.id.slice(0, 6),
+            field: (subject) => subject.id.slice(0, 7),
             label: t('index.table.subject')
           },
           {
