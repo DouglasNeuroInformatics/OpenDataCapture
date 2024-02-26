@@ -9,7 +9,7 @@ export type MobileSliderProps = {
   activeItemId?: string;
   i18n: NavI18Next;
   isOpen: boolean;
-  items: NavItem[];
+  items: NavItem[] | NavItem[][];
   onNavigate?: (id: string) => void;
   setIsOpen: (isOpen: boolean) => void;
 };

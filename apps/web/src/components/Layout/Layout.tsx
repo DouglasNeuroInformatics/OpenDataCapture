@@ -12,13 +12,13 @@ import { Sidebar } from './Sidebar';
 
 export const Layout = () => {
   const { currentUser } = useAuthStore();
-  const [navItems, setNavItems] = useState<NavItem[]>([]);
+  const [navItems, setNavItems] = useState<NavItem[][]>([]);
   const { i18n, t } = useTranslation('layout');
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const items: NavItem[] = [
+    const globalItems: NavItem[] = [
       {
         'data-cy': 'overview',
         icon: ChartBarIcon,
@@ -27,7 +27,7 @@ export const Layout = () => {
       }
     ];
     if (currentUser?.ability.can('create', 'Visit')) {
-      items.push({
+      globalItems.push({
         'data-cy': 'add-visit',
         icon: UserPlusIcon,
         id: '/visits/add-visit',
@@ -35,7 +35,7 @@ export const Layout = () => {
       });
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
-      items.push({
+      globalItems.push({
         'data-cy': 'view-subjects',
         icon: EyeIcon,
         id: '/subjects',
@@ -43,7 +43,7 @@ export const Layout = () => {
       });
     }
     if (currentUser?.ability.can('manage', 'Instrument')) {
-      items.push({
+      globalItems.push({
         'data-cy': 'manage-instrument',
         icon: AdjustmentsHorizontalIcon,
         id: '/instruments/manage-instruments',
@@ -51,22 +51,22 @@ export const Layout = () => {
       });
     }
     if (currentUser?.ability.can('create', 'InstrumentRecord')) {
-      items.push({
+      globalItems.push({
         'data-cy': 'view-instrument',
         icon: EyeIcon,
         id: '/instruments/available-instruments',
         label: t('navLinks.availableInstruments')
       });
     }
-    setNavItems(items);
+    setNavItems([globalItems]);
   }, [currentUser, i18n.resolvedLanguage]);
 
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">
-      <div className="print:hidden md:hidden">
+      <div className="md:hidden print:hidden">
         <Navbar activeItemId={location.pathname} i18n={i18n} items={navItems} onNavigate={navigate} />
       </div>
-      <div className="hidden print:hidden md:flex md:flex-shrink-0">
+      <div className="hidden md:flex md:flex-shrink-0 print:hidden">
         <Sidebar activeItemId={location.pathname} items={navItems} onNavigate={navigate} />
       </div>
       <div className="scrollbar-none flex flex-grow flex-col overflow-y-scroll pt-16 md:pt-0">

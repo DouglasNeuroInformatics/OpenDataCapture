@@ -6,7 +6,7 @@ import { UserDropup } from './UserDropup';
 
 export type SidebarProps = {
   activeItemId: string;
-  items: NavItem[];
+  items: NavItem[] | NavItem[][];
   onNavigate: (id: string) => void;
 };
 

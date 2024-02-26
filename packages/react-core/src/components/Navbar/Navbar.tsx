@@ -12,7 +12,7 @@ import type { NavI18Next, NavItem } from './types';
 export type NavbarProps = {
   activeItemId?: string;
   i18n: NavI18Next;
-  items?: NavItem[];
+  items?: NavItem[] | NavItem[][];
   onNavigate?: (id: string) => void;
 };
 
