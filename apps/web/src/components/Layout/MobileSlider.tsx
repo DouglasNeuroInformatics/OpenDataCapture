@@ -20,7 +20,13 @@ export const MobileSlider = ({ activeItemId, isOpen, items, onNavigate, setIsOpe
     <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={<Branding />}>
       <div className="flex h-full flex-col">
         <div className="flex-grow">
-          <Navigation activeItemId={activeItemId} items={items} orientation="vertical" onNavigate={onNavigate} />
+          <Navigation
+            activeItemId={activeItemId}
+            isAlwaysDark={false}
+            items={items}
+            orientation="vertical"
+            onNavigate={onNavigate}
+          />
         </div>
         <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
           <button

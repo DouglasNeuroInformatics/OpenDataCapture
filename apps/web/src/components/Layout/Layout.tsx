@@ -27,14 +27,6 @@ export const Layout = () => {
         label: t('navLinks.overview')
       }
     ];
-    if (currentUser?.ability.can('create', 'Visit')) {
-      globalItems.push({
-        'data-cy': 'add-visit',
-        icon: UserPlusIcon,
-        id: '/visits/add-visit',
-        label: t('navLinks.addVisit')
-      });
-    }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
         'data-cy': 'view-subjects',
@@ -59,7 +51,16 @@ export const Layout = () => {
         label: t('navLinks.availableInstruments')
       });
     }
-    setNavItems([globalItems]);
+    const visitItems: NavItem[] = [];
+    if (currentUser?.ability.can('create', 'Visit')) {
+      visitItems.push({
+        'data-cy': 'add-visit',
+        icon: UserPlusIcon,
+        id: '/visits/add-visit',
+        label: t('navLinks.addVisit')
+      });
+    }
+    setNavItems([globalItems, visitItems]);
   }, [currentUser, i18n.resolvedLanguage]);
 
   return (

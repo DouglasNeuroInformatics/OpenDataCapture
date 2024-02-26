@@ -23,6 +23,7 @@ export const Sidebar = ({ activeItemId, items, onNavigate }: SidebarProps) => {
           activeClassName: 'text-slate-100 bg-slate-800',
           className: 'text-slate-300 hover:text-slate-100 hover:bg-slate-800'
         }}
+        isAlwaysDark={true}
         items={items}
         orientation="vertical"
         onNavigate={onNavigate}

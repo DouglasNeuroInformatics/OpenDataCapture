@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
-import { BaseLanguageToggle, ThemeToggle, useMediaQuery } from '@douglasneuroinformatics/ui';
+import { useMediaQuery } from '@douglasneuroinformatics/ui';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { Branding } from '@open-data-capture/react-core';
-import { useTranslation } from 'react-i18next';
 
 import { MobileSlider } from './MobileSlider';
-import { Navigation } from './Navigation';
 
 import type { NavItem } from './types';
 
@@ -17,7 +15,6 @@ export type NavbarProps = {
 };
 
 export const Navbar = ({ activeItemId, items, onNavigate }: NavbarProps) => {
-  const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   // This is to prevent ugly styling when resizing the viewport
@@ -34,9 +31,8 @@ export const Navbar = ({ activeItemId, items, onNavigate }: NavbarProps) => {
       <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
         <div className="h--full w-full bg-inherit">
           <div className="container flex items-center justify-between bg-inherit py-3 font-medium">
-            <Branding className="md:p-2 [&>span]:hidden md:[&>span]:block" />
+            <Branding className="[&>span]:hidden" />
             <button
-              className="md:hidden"
               type="button"
               onClick={() => {
                 setIsOpen(true);
@@ -44,23 +40,6 @@ export const Navbar = ({ activeItemId, items, onNavigate }: NavbarProps) => {
             >
               <Bars3Icon height={36} width={36} />
             </button>
-            <div className="hidden items-center bg-inherit md:flex">
-              {items && (
-                <React.Fragment>
-                  <Navigation
-                    activeItemId={activeItemId}
-                    items={items}
-                    orientation="horizontal"
-                    onNavigate={onNavigate}
-                  />
-                  <div className="mx-5 hidden h-8 w-[1px] rounded-md bg-slate-300 md:block dark:bg-slate-600" />
-                </React.Fragment>
-              )}
-              <div className="flex gap-3 bg-inherit">
-                <ThemeToggle />
-                <BaseLanguageToggle i18n={i18n} options={['en', 'fr']} />
-              </div>
-            </div>
           </div>
         </div>
       </div>
