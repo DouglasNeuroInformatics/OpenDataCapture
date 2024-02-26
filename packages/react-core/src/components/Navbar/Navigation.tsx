@@ -1,5 +1,7 @@
 import { cn } from '@douglasneuroinformatics/ui';
 
+import { NavButton } from './NavButton';
+
 import type { NavItem } from './types';
 
 export type NavigationProps = {
@@ -21,33 +23,16 @@ export const Navigation = ({ activeItemId, btn, items, onNavigate, orientation }
         'justify-end': orientation === 'horizontal'
       })}
     >
-      {items.map(({ icon: Icon, id, label, ...props }) => (
-        <button
-          className={cn(
-            'flex items-center p-2 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100',
-            {
-              'justify-start': orientation === 'vertical',
-              'mx-1 justify-center': orientation === 'horizontal'
-            },
-            btn?.className,
-            activeItemId === id && (btn?.activeClassName ?? 'text-slate-900 dark:text-slate-100')
-          )}
+      {items.map(({ id, ...props }) => (
+        <NavButton
+          activeClassName={btn?.activeClassName}
+          className={btn?.className}
+          isActive={activeItemId === id}
           key={id}
-          type="button"
+          variant={orientation}
           onClick={() => onNavigate?.(id)}
           {...props}
-        >
-          {Icon && (
-            <Icon
-              className={cn('mr-2', {
-                hidden: orientation === 'horizontal'
-              })}
-              height={16}
-              width={16}
-            />
-          )}
-          {label}
-        </button>
+        />
       ))}
     </nav>
   );
