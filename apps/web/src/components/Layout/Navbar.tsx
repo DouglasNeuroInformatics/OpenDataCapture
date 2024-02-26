@@ -2,21 +2,22 @@ import React, { useEffect, useState } from 'react';
 
 import { BaseLanguageToggle, ThemeToggle, useMediaQuery } from '@douglasneuroinformatics/ui';
 import { Bars3Icon } from '@heroicons/react/24/outline';
+import { Branding } from '@open-data-capture/react-core';
+import { useTranslation } from 'react-i18next';
 
-import { Branding } from '../Branding';
 import { MobileSlider } from './MobileSlider';
 import { Navigation } from './Navigation';
 
-import type { NavI18Next, NavItem } from './types';
+import type { NavItem } from './types';
 
 export type NavbarProps = {
   activeItemId?: string;
-  i18n: NavI18Next;
   items?: NavItem[] | NavItem[][];
   onNavigate?: (id: string) => void;
 };
 
-export const Navbar = ({ activeItemId, i18n, items, onNavigate }: NavbarProps) => {
+export const Navbar = ({ activeItemId, items, onNavigate }: NavbarProps) => {
+  const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   // This is to prevent ugly styling when resizing the viewport
@@ -66,7 +67,6 @@ export const Navbar = ({ activeItemId, i18n, items, onNavigate }: NavbarProps) =
       {items && (
         <MobileSlider
           activeItemId={activeItemId}
-          i18n={i18n}
           isOpen={isOpen}
           items={items}
           setIsOpen={setIsOpen}

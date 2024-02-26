@@ -1,8 +1,10 @@
 import { ThemeToggle } from '@douglasneuroinformatics/ui';
-import { Branding, Navigation } from '@open-data-capture/react-core';
-import type { NavItem } from '@open-data-capture/react-core';
+import { Branding } from '@open-data-capture/react-core';
 
+import { Navigation } from './Navigation';
 import { UserDropup } from './UserDropup';
+
+import type { NavItem } from './types';
 
 export type SidebarProps = {
   activeItemId: string;

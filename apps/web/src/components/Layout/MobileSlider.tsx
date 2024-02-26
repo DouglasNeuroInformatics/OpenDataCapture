@@ -1,20 +1,21 @@
 import { Slider, ThemeToggle } from '@douglasneuroinformatics/ui';
+import { Branding } from '@open-data-capture/react-core';
+import { useTranslation } from 'react-i18next';
 
-import { Branding } from '../Branding';
 import { Navigation } from './Navigation';
 
-import type { NavI18Next, NavItem } from './types';
+import type { NavItem } from './types';
 
 export type MobileSliderProps = {
   activeItemId?: string;
-  i18n: NavI18Next;
   isOpen: boolean;
   items: NavItem[] | NavItem[][];
   onNavigate?: (id: string) => void;
   setIsOpen: (isOpen: boolean) => void;
 };
 
-export const MobileSlider = ({ activeItemId, i18n, isOpen, items, onNavigate, setIsOpen }: MobileSliderProps) => {
+export const MobileSlider = ({ activeItemId, isOpen, items, onNavigate, setIsOpen }: MobileSliderProps) => {
+  const { i18n } = useTranslation();
   return (
     <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={<Branding />}>
       <div className="flex h-full flex-col">

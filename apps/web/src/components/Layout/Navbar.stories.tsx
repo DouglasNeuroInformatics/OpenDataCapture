@@ -7,14 +7,6 @@ import { Navbar } from './Navbar';
 type Story = StoryObj<typeof Navbar>;
 
 export default {
-  args: {
-    i18n: {
-      changeLanguage: (lang) => {
-        alert(`Change Language: ${lang}`);
-      },
-      resolvedLanguage: 'en'
-    }
-  },
   component: Navbar,
   parameters: {
     layout: 'fullscreen'

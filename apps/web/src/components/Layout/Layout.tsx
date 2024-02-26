@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 
 import { AdjustmentsHorizontalIcon, ChartBarIcon, EyeIcon, UserPlusIcon } from '@heroicons/react/24/solid';
-import { type NavItem, Navbar } from '@open-data-capture/react-core';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '@/stores/auth-store';
 
 import { Footer } from './Footer';
+import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 
+import type { NavItem } from './types';
 export const Layout = () => {
   const { currentUser } = useAuthStore();
   const [navItems, setNavItems] = useState<NavItem[][]>([]);
@@ -64,7 +65,7 @@ export const Layout = () => {
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">
       <div className="md:hidden print:hidden">
-        <Navbar activeItemId={location.pathname} i18n={i18n} items={navItems} onNavigate={navigate} />
+        <Navbar activeItemId={location.pathname} items={navItems} onNavigate={navigate} />
       </div>
       <div className="hidden md:flex md:flex-shrink-0 print:hidden">
         <Sidebar activeItemId={location.pathname} items={navItems} onNavigate={navigate} />
