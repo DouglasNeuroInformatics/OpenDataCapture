@@ -7,8 +7,8 @@
   },
   "endVisitModal": {
     "message": {
-      "en": "Are you sure you want to end the current visit? If you choose to proceed, you'll be taken back to the overview page.",
-      "fr": "Êtes-vous sûr de vouloir mettre fin à la visite en cours ? Si vous décidez de continuer, vous serez ramené à la page de vue d'ensemble."
+      "en": "Are you sure you want to end the current visit? If you choose to proceed, you'll be taken back to the begin visit page.",
+      "fr": "Êtes-vous sûr de vouloir mettre fin à la visite en cours ? Si vous décidez de continuer, vous serez ramené à la page de commencement d'une visite."
     },
     "title": {
       "en": "End Visit",

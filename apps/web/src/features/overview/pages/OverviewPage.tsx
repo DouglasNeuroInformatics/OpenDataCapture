@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Navigate } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useAuthStore } from '@/stores/auth-store';
@@ -13,6 +14,10 @@ export const OverviewPage = () => {
 
   const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
 
+  if (!currentUser?.ability.can('read', 'Summary')) {
+    return <Navigate to="/visits/add-visit" />;
+  }
+
   return (
     <div className="flex flex-grow flex-col">
       <Disclaimer isRequired={import.meta.env.PROD} />
@@ -22,7 +27,7 @@ export const OverviewPage = () => {
           <h3 className="text-center text-xl font-medium lg:text-left">{t('summary')}</h3>
           <GroupSwitcher />
         </div>
-        {currentUser?.ability.can('read', 'Summary') && <Summary />}
+        <Summary />
       </section>
     </div>
   );

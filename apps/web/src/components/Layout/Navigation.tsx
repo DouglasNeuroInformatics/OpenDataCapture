@@ -40,14 +40,16 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
   const location = useLocation();
 
   useEffect(() => {
-    const globalItems: NavItem[] = [
-      {
+    currentUser?.ability.can('read', 'Summary');
+    const globalItems: NavItem[] = [];
+    if (currentUser?.ability.can('read', 'Summary')) {
+      globalItems.push({
         'data-cy': 'overview',
         icon: ChartBarIcon,
         id: '/overview',
         label: t('navLinks.overview')
-      }
-    ];
+      });
+    }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
         'data-cy': 'view-subjects',
@@ -138,7 +140,7 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
             onClick={() => {
               setActiveVisit(null);
               setIsEndVisitModalOpen(false);
-              navigate('/overview');
+              navigate('/visits/add-visit');
             }}
           />
           <Button
