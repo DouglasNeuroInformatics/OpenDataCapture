@@ -98,10 +98,11 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
         {navItems.map((items, i) => (
           <div className="w-full py-2 first:pt-0 last:pb-0" key={i}>
             <>
-              {items.map(({ id, ...props }) => (
+              {items.map(({ disabled, id, ...props }) => (
                 <NavButton
                   activeClassName={btn?.activeClassName}
                   className={btn?.className}
+                  disabled={disabled && location.pathname !== id}
                   isActive={location.pathname === id}
                   key={id}
                   onClick={() => {
