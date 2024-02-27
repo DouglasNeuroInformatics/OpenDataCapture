@@ -26,6 +26,7 @@ describe('tags test', () => {
 
     //deselect the first tag
     cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
+    cy.wait(200);
     cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click({ force: true });
 
     //check form contains the second tag
@@ -44,7 +45,8 @@ describe('tags test', () => {
 
     //deselect the second tag, select the third tag
     cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click({ force: true });
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(2).click({ force: true });
+    cy.wait(200);
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click({ force: true });
 
     //check form contains the third tag
     let text3: string;
@@ -61,6 +63,7 @@ describe('tags test', () => {
       });
 
     cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
+    cy.wait(200);
     cy.get('li[id*="headlessui-listbox-option-:"]').eq(3).click({ force: true });
 
     //check form contains the 4th tag
