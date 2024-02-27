@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 
 import { ArrowToggle, useOnClickOutside } from '@douglasneuroinformatics/ui';
 import { Transition } from '@headlessui/react';
-import { UserCircleIcon } from '@heroicons/react/24/solid';
+import { AdjustmentsVerticalIcon, LockClosedIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -39,17 +39,23 @@ export const UserDropup = () => {
           leaveTo="transform opacity-0 scale-95"
           show={isOpen}
         >
-          <div className="absolute bottom-3 w-40 bg-slate-800 shadow-lg">
+          <div className="absolute bottom-3 w-44 overflow-hidden rounded-md border border-slate-700 bg-slate-800 tracking-tight shadow-lg">
             <button
-              className="w-full p-2 hover:bg-slate-700"
+              className="flex w-full items-center px-3 py-2  hover:bg-slate-700"
               onClick={() => {
                 auth.logout();
               }}
             >
+              <LockClosedIcon className="mr-2" height={16} width={16} />
               {t('userDropup.logout')}
             </button>
-            <LanguageToggle className="w-full p-2 hover:bg-slate-700" onClick={closeDropup} />
-            <Link className="block w-full p-2 text-center hover:bg-slate-700" to="/user" onClick={closeDropup}>
+            <LanguageToggle className="w-full px-3 py-2 text-left hover:bg-slate-700" onClick={closeDropup} />
+            <Link
+              className="flex w-full items-center px-3 py-2 text-left hover:bg-slate-700"
+              to="/user"
+              onClick={closeDropup}
+            >
+              <AdjustmentsVerticalIcon className="mr-2" height={16} width={16} />
               {t('userDropup.preferences')}
             </Link>
           </div>
