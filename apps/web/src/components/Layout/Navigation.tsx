@@ -104,7 +104,6 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
                   className={btn?.className}
                   isActive={location.pathname === id}
                   key={id}
-                  variant={orientation}
                   onClick={() => {
                     navigate(id);
                     onNavigate?.(id);
@@ -119,7 +118,6 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
                   icon={StopIcon}
                   isActive={false}
                   label={t('navLinks.endVisit')}
-                  variant={orientation}
                   onClick={() => {
                     setIsEndVisitModalOpen(true);
                   }}
