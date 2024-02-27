@@ -17,6 +17,18 @@
       "fr": "Utilisateur standard"
     }
   },
+  "currentSubject": {
+    "en": "Current Subject",
+    "fr": "Le client actuel"
+  },
+  "currentSubject_FEMALE": {
+    "en": "Current Subject",
+    "fr": "La cliente actuelle"
+  },
+  "currentSubject_MALE": {
+    "en": "Current Subject",
+    "fr": "Le client actuel"
+  },
   "errors": {
     "failedToChangeLanguage": {
       "en": "Failed to change languages",

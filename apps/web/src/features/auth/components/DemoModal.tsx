@@ -22,7 +22,7 @@ export const DemoModal = ({ isOpen, onClose, onLogin }: DemoModalProps) => {
           <h5 className="font-semibold">{t('demo.availableUsers')}</h5>
           <p className="text-default text-sm leading-tight">{t('demo.pleaseSelectUser')}</p>
         </div>
-        <Card className="divide-y divide-slate-200 dark:divide-slate-600">
+        <Card className="-mx-1 divide-y divide-slate-200 dark:divide-slate-600">
           {DEMO_USERS.map((user) => (
             <div className="flex items-center space-x-4 px-2 py-3" key={user.username}>
               <div className="text-default min-w-0 flex-1">

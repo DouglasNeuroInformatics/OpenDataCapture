@@ -40,14 +40,16 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
   const location = useLocation();
 
   useEffect(() => {
-    const globalItems: NavItem[] = [
-      {
+    currentUser?.ability.can('read', 'Summary');
+    const globalItems: NavItem[] = [];
+    if (currentUser?.ability.can('read', 'Summary')) {
+      globalItems.push({
         'data-cy': 'overview',
         icon: ChartBarIcon,
         id: '/overview',
         label: t('navLinks.overview')
-      }
-    ];
+      });
+    }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
         'data-cy': 'view-subjects',
@@ -98,13 +100,13 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
         {navItems.map((items, i) => (
           <div className="w-full py-2 first:pt-0 last:pb-0" key={i}>
             <>
-              {items.map(({ id, ...props }) => (
+              {items.map(({ disabled, id, ...props }) => (
                 <NavButton
                   activeClassName={btn?.activeClassName}
                   className={btn?.className}
+                  disabled={disabled && location.pathname !== id}
                   isActive={location.pathname === id}
                   key={id}
-                  variant={orientation}
                   onClick={() => {
                     navigate(id);
                     onNavigate?.(id);
@@ -119,7 +121,6 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
                   icon={StopIcon}
                   isActive={false}
                   label={t('navLinks.endVisit')}
-                  variant={orientation}
                   onClick={() => {
                     setIsEndVisitModalOpen(true);
                   }}
@@ -139,7 +140,7 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
             onClick={() => {
               setActiveVisit(null);
               setIsEndVisitModalOpen(false);
-              navigate('/overview');
+              navigate('/visits/add-visit');
             }}
           />
           <Button
