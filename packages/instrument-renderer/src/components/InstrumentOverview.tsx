@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
-import { Button, PopoverIcon, StepperContext, cn } from '@douglasneuroinformatics/ui';
+import { Button, PopoverIcon, StepperContext } from '@douglasneuroinformatics/ui/legacy';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 import { ShieldCheckIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid';
 import type { AnyUnilingualInstrument } from '@open-data-capture/common/instrument';
 import { licenses } from '@open-data-capture/licenses';

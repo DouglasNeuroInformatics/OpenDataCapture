@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
-import { Spinner, Stepper, cn } from '@douglasneuroinformatics/ui';
+import { Spinner } from '@douglasneuroinformatics/ui/components';
+import { Stepper } from '@douglasneuroinformatics/ui/legacy';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 import {
   ComputerDesktopIcon,
   DocumentCheckIcon,

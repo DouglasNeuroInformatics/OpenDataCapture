@@ -1,4 +1,5 @@
-import { Card, useDownload } from '@douglasneuroinformatics/ui';
+import { useDownload } from '@douglasneuroinformatics/ui/hooks';
+import { Card } from '@douglasneuroinformatics/ui/legacy';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
 import { toLowerCase } from '@open-data-capture/common/core';
