@@ -1,4 +1,4 @@
-import { cn } from '@douglasneuroinformatics/ui';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 
 import { Logo } from '../Logo';
 

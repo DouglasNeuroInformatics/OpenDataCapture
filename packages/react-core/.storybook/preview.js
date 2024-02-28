@@ -4,7 +4,7 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 
 import i18n from '../src/services/i18n';
 
-import '../src/styles.css';
+import '@douglasneuroinformatics/ui/styles/globals.css';
 
 /** @type {import('@storybook/react').Preview} */
 const preview = {
