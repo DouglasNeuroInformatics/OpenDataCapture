@@ -20,8 +20,14 @@ async function bootstrap() {
 
   const configurationService = app.get(ConfigurationService);
   const logLevels: LogLevel[] = ['error', 'fatal', 'log', 'warn'];
-  configurationService.get('DEBUG') && logLevels.push('debug');
-  configurationService.get('VERBOSE') && logLevels.push('verbose');
+  if (configurationService.get('DEBUG')) {
+    console.log("Enabled 'debug' logs");
+    logLevels.push('debug');
+  }
+  if (configurationService.get('VERBOSE')) {
+    console.log("Enabled 'verbose' logs");
+    logLevels.push('verbose');
+  }
   app.useLogger(logLevels);
 
   app.enableCors();
