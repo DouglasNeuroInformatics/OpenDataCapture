@@ -18,7 +18,7 @@ Cypress.Commands.add('login', (username, password) => {
   cy.visit('http://localhost:3000/auth/login');
   //change wait times based off network speed
   //a slow network will require a long wait time in order to load all the handlers and mock data
-  cy.wait(15000);
+  cy.wait(2000);
   const form = cy.get('form[data-cy="login-form"]');
   form.get('input[name="username"]').type(username);
   form.get('input[name="password"]').type(password);
