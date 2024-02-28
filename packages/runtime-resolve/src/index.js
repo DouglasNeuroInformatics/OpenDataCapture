@@ -3,7 +3,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+// @ts-ignore
+if (typeof __dirname === 'undefined') {
+  var __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+}
 
 const MANIFEST_FILENAME = 'runtime.json';
 const RUNTIME_DIR = path.resolve(__dirname, '../../../runtime');
