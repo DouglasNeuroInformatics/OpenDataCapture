@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { MockFactory } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { type NestExpressApplication } from '@nestjs/platform-express';
@@ -9,7 +10,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { ConfigurationService } from '@/configuration/configuration.service';
-import { createMock } from '@/testing/testing.utils';
 import { UsersService } from '@/users/users.service';
 
 import { AuthController } from '../auth.controller';
@@ -24,25 +24,13 @@ describe('/auth', () => {
       controllers: [AuthController],
       providers: [
         AuthService,
-        {
-          provide: AbilityFactory,
-          useValue: createMock(AbilityFactory)
-        },
+        MockFactory.createForService(AbilityFactory),
+        MockFactory.createForService(CryptoService),
+        MockFactory.createForService(JwtService),
+        MockFactory.createForService(UsersService),
         {
           provide: ConfigurationService,
           useValue: {}
-        },
-        {
-          provide: CryptoService,
-          useValue: createMock(CryptoService)
-        },
-        {
-          provide: JwtService,
-          useValue: createMock(JwtService)
-        },
-        {
-          provide: UsersService,
-          useValue: createMock(UsersService)
         }
       ]
     }).compile();

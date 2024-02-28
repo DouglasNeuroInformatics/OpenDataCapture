@@ -1,4 +1,5 @@
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
@@ -6,7 +7,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { ConfigurationService } from '@/configuration/configuration.service';
-import { type MockedInstance, createMock } from '@/testing/testing.utils';
 import { UsersService } from '@/users/users.service';
 
 import { AuthService } from '../auth.service';
@@ -21,27 +21,15 @@ describe('AuthService', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         AuthService,
-        {
-          provide: AbilityFactory,
-          useValue: createMock(AbilityFactory)
-        },
+        MockFactory.createForService(AbilityFactory),
+        MockFactory.createForService(CryptoService),
+        MockFactory.createForService(JwtService),
+        MockFactory.createForService(UsersService),
         {
           provide: ConfigurationService,
           useValue: {
             get: (propertyPath: string) => propertyPath
           }
-        },
-        {
-          provide: CryptoService,
-          useValue: createMock(CryptoService)
-        },
-        {
-          provide: JwtService,
-          useValue: createMock(JwtService)
-        },
-        {
-          provide: UsersService,
-          useValue: createMock(UsersService)
         }
       ]
     }).compile();

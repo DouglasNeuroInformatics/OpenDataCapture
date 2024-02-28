@@ -1,4 +1,5 @@
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import _ from 'lodash';
@@ -6,7 +7,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
-import { MockFactory, type MockedInstance } from '@/testing/mock.factory';
 
 import { SubjectsService } from '../subjects.service';
 
@@ -19,7 +19,7 @@ describe('SubjectsService', () => {
       providers: [
         MockFactory.createForService(CryptoService),
         SubjectsService,
-        MockFactory.createForModelToken('Subject')
+        MockFactory.createForModelToken(getModelToken('Subject'))
       ]
     }).compile();
     subjectModel = moduleRef.get(getModelToken('Subject'));

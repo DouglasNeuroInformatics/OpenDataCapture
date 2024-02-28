@@ -9,6 +9,7 @@ import { Test } from '@nestjs/testing';
 //   miniMentalStateExamination,
 //   montrealCognitiveAssessment
 // } from '@open-data-capture/instrument-library';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -16,8 +17,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
-import { type MockedInstance, createMock } from '@/testing/testing.utils';
-import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsService } from '../instruments.service';
@@ -33,11 +32,8 @@ describe('/instruments', () => {
       controllers: [InstrumentsController],
       providers: [
         InstrumentsService,
-        createMockModelProvider('Instrument'),
-        {
-          provide: ConfigurationService,
-          useValue: createMock(ConfigurationService)
-        }
+        MockFactory.createForModelToken(getModelToken('Instrument')),
+        MockFactory.createForService(ConfigurationService)
       ]
     }).compile();
 

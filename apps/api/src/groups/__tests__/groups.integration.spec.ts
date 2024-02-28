@@ -1,4 +1,5 @@
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
@@ -8,8 +9,6 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
-import { type MockedInstance } from '@/testing/testing.utils';
-import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { GroupsController } from '../groups.controller';
 import { GroupsService } from '../groups.service';
@@ -23,7 +22,7 @@ describe('/groups', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [GroupsController],
-      providers: [GroupsService, createMockModelProvider('Group')]
+      providers: [GroupsService, MockFactory.createForModelToken(getModelToken('Group'))]
     }).compile();
 
     app = moduleRef.createNestApplication({

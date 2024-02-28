@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
@@ -11,8 +12,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { GroupsService } from '@/groups/groups.service';
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
-import { type MockedInstance, createMock } from '@/testing/testing.utils';
-import { createMockModelProvider } from '@/testing/testing.utils';
 
 import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
@@ -30,15 +29,9 @@ describe('/users', () => {
       controllers: [UsersController],
       providers: [
         UsersService,
-        {
-          provide: CryptoService,
-          useValue: createMock(CryptoService)
-        },
-        {
-          provide: GroupsService,
-          useValue: createMock(GroupsService)
-        },
-        createMockModelProvider('User')
+        MockFactory.createForModelToken(getModelToken('User')),
+        MockFactory.createForService(CryptoService),
+        MockFactory.createForService(GroupsService)
       ]
     }).compile();
 
