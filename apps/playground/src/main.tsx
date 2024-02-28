@@ -5,7 +5,7 @@ import { i18n } from '@open-data-capture/i18next';
 
 import { App } from './App';
 
-import '@open-data-capture/react-core/styles.css';
+import '@douglasneuroinformatics/ui/styles/globals.css';
 
 await i18n.initialize();
 
