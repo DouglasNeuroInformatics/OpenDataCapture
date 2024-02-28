@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 import type { Group } from '@open-data-capture/common/group';
 import type { SubjectIdentificationData } from '@open-data-capture/common/subject';
@@ -12,6 +12,8 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
 export class VisitsService {
+  private readonly logger = new Logger(VisitsService.name);
+
   constructor(
     @InjectModel('Visit') private readonly visitModel: Model<'Visit'>,
     private readonly groupsService: GroupsService,
@@ -19,6 +21,7 @@ export class VisitsService {
   ) {}
 
   async create({ date, groupId, subjectIdData }: CreateVisitData): Promise<Visit> {
+    this.logger.debug({ message: 'Attempting to create visit' });
     const subject = await this.resolveSubject(subjectIdData);
 
     // If the subject is not yet associated with the group, check it exists then append it
@@ -52,6 +55,7 @@ export class VisitsService {
 
   /** Get the subject if they exist, otherwise create them */
   private async resolveSubject(subjectIdData: SubjectIdentificationData) {
+    this.logger.debug({ message: 'Attempting to resolve subject', subjectIdData });
     let subject: SubjectModel;
     try {
       subject = await this.subjectsService.findByLookup(subjectIdData);
