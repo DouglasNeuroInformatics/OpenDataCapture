@@ -7,6 +7,7 @@ import type { Subject } from '@open-data-capture/common/subject';
 import { computeInstrumentMeasures } from '@open-data-capture/instrument-utils';
 import { useTranslation } from 'react-i18next';
 
+import { CopyButton } from './CopyButton';
 import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
 export type InstrumentSummaryProps<TKind extends InstrumentKind> = {
@@ -43,7 +44,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
 
   return (
     <Card>
-      <div className="border-b px-4 py-5 sm:px-6">
+      <div className="border-b border-slate-200 px-4 py-5 sm:px-6 dark:border-slate-700">
         <h3 className="text-lg font-semibold leading-6 text-slate-900 dark:text-slate-100">
           {t('summary.title', { title: instrument.details.title })}
         </h3>
@@ -56,11 +57,16 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
               })
             })}
           </p>
-          <div className="flex justify-end gap-4 text-slate-700 dark:text-slate-300 print:hidden">
-            <button type="button">
+          <div className="flex justify-end gap-1.5 text-slate-700 dark:text-slate-300 print:hidden">
+            <CopyButton
+              text={Object.values(computedMeasures)
+                .map(({ label, value }) => `${label}: ${value}`)
+                .join('\n')}
+            />
+            <button className="rounded-md p-2 hover:bg-slate-200 dark:hover:bg-slate-700" type="button">
               <ArrowDownTrayIcon height={20} width={20} onClick={handleDownload} />
             </button>
-            <button type="button">
+            <button className="rounded-md p-2 hover:bg-slate-200 dark:hover:bg-slate-700" type="button">
               <PrinterIcon
                 height={20}
                 width={20}
