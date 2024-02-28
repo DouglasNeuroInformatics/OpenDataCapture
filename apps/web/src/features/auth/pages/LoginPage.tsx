@@ -1,23 +1,22 @@
 import { useEffect } from 'react';
 
-import { FormPageWrapper, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import type { AuthPayload, LoginCredentials } from '@open-data-capture/common/auth';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import logo from '@/assets/logo.png';
+import { FormPageLayout } from '@/components/FormPageLayout';
 import { config } from '@/config';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { DemoBanner } from '../components/DemoBanner';
 import { LoginForm } from '../components/LoginForm';
-
 export const LoginPage = () => {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
   const navigate = useNavigate();
-  const { i18n, t } = useTranslation('auth');
+  const { t } = useTranslation('auth');
 
   const login = async (credentials: LoginCredentials) => {
     const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
@@ -48,18 +47,9 @@ export const LoginPage = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <DemoBanner onLogin={(credentials) => void login(credentials)} />
-      <FormPageWrapper
-        className="min-h-0 flex-grow"
-        languageToggle={{
-          dropdownDirection: 'up',
-          i18n,
-          options: ['en', 'fr']
-        }}
-        logo={logo}
-        title={t('login')}
-      >
+      <FormPageLayout className="min-h-0 flex-grow" title={t('login')}>
         <LoginForm onSubmit={(credentials) => void login(credentials)} />
-      </FormPageWrapper>
+      </FormPageLayout>
     </div>
   );
 };

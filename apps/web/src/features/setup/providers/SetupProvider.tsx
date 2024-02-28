@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 
-import { FormPageWrapper } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
 
-import logo from '@/assets/logo.png';
+import { FormPageLayout } from '@/components/FormPageLayout';
 import { useSetupState } from '@/hooks/useSetupState';
 
 import { SetupForm } from '../components/SetupForm';
@@ -11,7 +10,7 @@ import { SetupLoadingScreen } from '../components/SetupLoadingScreen';
 import { useInitApp } from '../hooks/useInitApp';
 
 export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
-  const { i18n, t } = useTranslation('setup');
+  const { t } = useTranslation('setup');
   const setupStateQuery = useSetupState();
   const initAppMutation = useInitApp();
 
@@ -28,16 +27,7 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <FormPageWrapper
-      languageToggle={{
-        dropdownDirection: 'up',
-        i18n,
-        options: ['en', 'fr']
-      }}
-      logo={logo}
-      title={t('pageTitle')}
-      widthMultiplier={1.5}
-    >
+    <FormPageLayout title={t('pageTitle')} widthMultiplier={1.5}>
       <SetupForm
         onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, username }) => {
           initAppMutation.mutate({
@@ -52,6 +42,6 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
           });
         }}
       />
-    </FormPageWrapper>
+    </FormPageLayout>
   );
 };

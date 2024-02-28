@@ -25,16 +25,17 @@ export class SubjectsService implements EntityService<Partial<Subject>> {
     });
   }
 
-  async create(data: SubjectIdentificationDataDto) {
-    const id = this.generateId(data);
-    if (await this.subjectModel.exists({ id: id })) {
+  async create({ dateOfBirth, firstName, lastName, sex }: SubjectIdentificationDataDto) {
+    const id = this.generateId({ dateOfBirth, firstName, lastName, sex });
+    if (await this.subjectModel.exists({ id })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
     }
     return this.subjectModel.create({
       data: {
+        dateOfBirth,
         groupIds: [],
         id,
-        ...data
+        sex
       }
     });
   }

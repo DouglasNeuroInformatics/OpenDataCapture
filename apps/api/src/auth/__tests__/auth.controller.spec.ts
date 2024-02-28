@@ -1,7 +1,6 @@
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-
-import { type MockedInstance, createMock } from '@/testing/testing.utils';
 
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
@@ -15,12 +14,7 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [
-        {
-          provide: AuthService,
-          useValue: createMock(AuthService)
-        }
-      ]
+      providers: [MockFactory.createForService(AuthService)]
     }).compile();
     authController = moduleRef.get(AuthController);
     authService = moduleRef.get(AuthService);

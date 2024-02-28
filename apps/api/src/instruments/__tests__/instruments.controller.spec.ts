@@ -1,7 +1,6 @@
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-
-import { type MockedInstance, createMock } from '@/testing/testing.utils';
 
 import { InstrumentsController } from '../instruments.controller';
 import { InstrumentsService } from '../instruments.service';
@@ -13,12 +12,7 @@ describe('InstrumentsController', () => {
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [InstrumentsController],
-      providers: [
-        {
-          provide: InstrumentsService,
-          useValue: createMock(InstrumentsService)
-        }
-      ]
+      providers: [MockFactory.createForService(InstrumentsService)]
     }).compile();
     instrumentsController = moduleRef.get(InstrumentsController);
     instrumentsService = moduleRef.get(InstrumentsService);

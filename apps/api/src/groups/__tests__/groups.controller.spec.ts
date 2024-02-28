@@ -1,7 +1,6 @@
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-
-import { type MockedInstance, createMock } from '@/testing/testing.utils';
 
 import { GroupsController } from '../groups.controller';
 import { GroupsService } from '../groups.service';
@@ -13,12 +12,7 @@ describe('GroupsController', () => {
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [GroupsController],
-      providers: [
-        {
-          provide: GroupsService,
-          useValue: createMock(GroupsService)
-        }
-      ]
+      providers: [MockFactory.createForService(GroupsService)]
     }).compile();
     groupsController = moduleRef.get(GroupsController);
     groupsService = moduleRef.get(GroupsService);
