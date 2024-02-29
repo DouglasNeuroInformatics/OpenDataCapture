@@ -43,8 +43,6 @@ services:
   gateway:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway:${RELEASE_CHANNEL}
     build:
-      args:
-        GATEWAY_DATABASE_FILEPATH: /app/gateway.db
       context: .
       dockerfile: ./apps/gateway/Dockerfile
     ports:

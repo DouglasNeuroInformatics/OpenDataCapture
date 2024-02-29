@@ -1,7 +1,6 @@
 FROM node:lts-alpine as base
 WORKDIR /app
-ARG GATEWAY_DATABASE_FILEPATH
-ENV GATEWAY_DATABASE_URL=file:${GATEWAY_DATABASE_FILEPATH}
+ENV GATEWAY_DATABASE_URL=file:/app/gateway.db
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NODE_OPTIONS="--max-old-space-size=8192"
@@ -30,7 +29,7 @@ RUN pnpm dlx turbo run db:push --filter=@open-data-capture/database
 
 # RUN SERVER
 FROM base AS runner
-COPY --from=installer ${GATEWAY_DATABASE_FILEPATH} ${GATEWAY_DATABASE_FILEPATH}
+COPY --from=installer /app/gateway.db /app/gateway.db
 COPY --from=installer /app/apps/gateway/dist/ /app/dist/
 COPY --from=installer /app/apps/gateway/public/ /app/public/
 RUN echo '{ "type": "module" }' > package.json
