@@ -14,7 +14,7 @@
     "@douglasneuroinformatics/form-types": "latest",
     "@open-data-capture/common": "workspace:*",
     "lodash": "^4.17.21",
-    "ts-pattern": "^5.0.6"
+    "ts-pattern": "^5.0.8"
   },
   "devDependencies": {
     "@open-data-capture/instrument-library": "workspace:*",

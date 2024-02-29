@@ -22,7 +22,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@casl/ability": "^6.5.0",
+    "@casl/ability": "^6.7.0",
     "@open-data-capture/licenses": "workspace:*",
     "lodash": "^4.17.21",
     "zod": "^3.22.4"
@@ -33,6 +33,6 @@
     "@open-data-capture/database": "workspace:*",
     "@open-data-capture/instrument-library": "workspace:*",
     "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.47"
+    "@types/react": "^18.2.60"
   }
 }
