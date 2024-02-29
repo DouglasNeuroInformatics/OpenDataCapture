@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
-import { Spinner, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { Spinner } from '@douglasneuroinformatics/ui/components';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 import axios from 'axios';

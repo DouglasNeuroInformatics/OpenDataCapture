@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ClientTable } from '@douglasneuroinformatics/ui';
+import { ClientTable } from '@douglasneuroinformatics/ui/legacy';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { Assignment, AssignmentStatus } from '@open-data-capture/common/assignment';
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';

@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { Form, StepperContext } from '@douglasneuroinformatics/ui';
+import { Form, StepperContext } from '@douglasneuroinformatics/ui/legacy';
 import type { AnyUnilingualFormInstrument } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';

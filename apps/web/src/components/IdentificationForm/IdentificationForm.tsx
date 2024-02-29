@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Form } from '@douglasneuroinformatics/ui';
+import { Form } from '@douglasneuroinformatics/ui/legacy';
 import { $SubjectIdentificationData, type SubjectIdentificationData } from '@open-data-capture/common/subject';
 import { useTranslation } from 'react-i18next';
 

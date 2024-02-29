@@ -1,4 +1,4 @@
-import { Form } from '@douglasneuroinformatics/ui';
+import { Form } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 

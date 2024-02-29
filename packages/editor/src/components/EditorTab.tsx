@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-import { cn } from '@douglasneuroinformatics/ui';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import type { EditorFile } from '../types';

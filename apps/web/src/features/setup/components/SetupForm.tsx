@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Form } from '@douglasneuroinformatics/ui';
+import { Form } from '@douglasneuroinformatics/ui/legacy';
 import { $StrongPassword } from '@open-data-capture/common/user';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';

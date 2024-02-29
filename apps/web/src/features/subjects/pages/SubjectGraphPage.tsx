@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui';
+import { Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useInterval, useMediaQuery } from '@douglasneuroinformatics/ui';
+import { useInterval, useMediaQuery } from '@douglasneuroinformatics/ui/hooks';
 import { type EditorPaneRef } from '@open-data-capture/editor';
 
 import { EditorContext } from '@/context/EditorContext';

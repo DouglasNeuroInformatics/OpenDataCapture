@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Card } from '@douglasneuroinformatics/ui';
+import { Card } from '@douglasneuroinformatics/ui/legacy';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,7 @@ export const LoginButton = ({ onClick }: LoginButtonProps) => {
         </motion.div>
       </AnimatePresence>
       <button
-        className="text-default flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700"
+        className="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium leading-5 text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
         type="button"
         onClick={onClick}
         onMouseEnter={() => setShowInfo(true)}

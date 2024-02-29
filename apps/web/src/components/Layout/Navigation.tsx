@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { Button, Modal, cn } from '@douglasneuroinformatics/ui';
+import { Button, Modal } from '@douglasneuroinformatics/ui/legacy';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 import {
   ChartBarIcon,
   ChartPieIcon,

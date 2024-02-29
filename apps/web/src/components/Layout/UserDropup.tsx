@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 
-import { ArrowToggle, useOnClickOutside } from '@douglasneuroinformatics/ui';
+import { useOnClickOutside } from '@douglasneuroinformatics/ui/hooks';
+import { ArrowToggle } from '@douglasneuroinformatics/ui/legacy';
 import { Transition } from '@headlessui/react';
 import { AdjustmentsVerticalIcon, LockClosedIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';

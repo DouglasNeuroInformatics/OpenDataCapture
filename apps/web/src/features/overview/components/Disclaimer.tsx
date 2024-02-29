@@ -1,4 +1,4 @@
-import { Button, Modal } from '@douglasneuroinformatics/ui';
+import { Button, Modal } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
 
 import { useAuthStore } from '@/stores/auth-store';

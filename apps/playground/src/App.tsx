@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NotificationHub } from '@douglasneuroinformatics/ui';
+import { NotificationHub } from '@douglasneuroinformatics/ui/components';
 import { ErrorFallback } from '@open-data-capture/react-core';
 import { ErrorBoundary } from 'react-error-boundary';
 

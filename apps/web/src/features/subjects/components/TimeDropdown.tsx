@@ -1,4 +1,4 @@
-import { Dropdown } from '@douglasneuroinformatics/ui';
+import { Dropdown } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
 
 export type TimeDropdownProps = {

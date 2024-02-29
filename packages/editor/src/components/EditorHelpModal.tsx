@@ -1,4 +1,4 @@
-import { Modal } from '@douglasneuroinformatics/ui';
+import { Modal } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
 
 export type EditorHelpModalProps = {

@@ -1,4 +1,4 @@
-import { Card } from '@douglasneuroinformatics/ui';
+import { Card } from '@douglasneuroinformatics/ui/legacy';
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { useTranslation } from 'react-i18next';
 

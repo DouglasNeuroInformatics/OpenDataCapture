@@ -1,4 +1,4 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
 import type { UpdateAssignmentData } from '@open-data-capture/common/assignment';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';

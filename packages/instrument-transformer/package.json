@@ -11,8 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "esbuild": "^0.20.0",
-    "esbuild-wasm": "^0.20.0",
+    "esbuild": "^0.20.1",
+    "esbuild-wasm": "^0.20.1",
     "zod": "^3.22.4"
   }
 }

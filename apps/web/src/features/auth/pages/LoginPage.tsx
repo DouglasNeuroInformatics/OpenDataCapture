@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
 import type { AuthPayload, LoginCredentials } from '@open-data-capture/common/auth';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';

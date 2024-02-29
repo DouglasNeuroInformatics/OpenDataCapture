@@ -1,4 +1,6 @@
-import { BaseLanguageToggle, NotificationHub, ThemeToggle, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { NotificationHub } from '@douglasneuroinformatics/ui/components';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
+import { BaseLanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
 import type { UpdateAssignmentData } from '@open-data-capture/common/assignment';
 import { $Json } from '@open-data-capture/common/core';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';

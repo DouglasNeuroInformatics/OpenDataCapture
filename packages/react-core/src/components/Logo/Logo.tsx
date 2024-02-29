@@ -1,4 +1,4 @@
-import { cn } from '@douglasneuroinformatics/ui';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 
 export type LogoProps = React.SVGProps<SVGSVGElement> & {
   /** The color of the logo. If set to auto, will be dark by default and light in dark mode */

@@ -1,4 +1,4 @@
-import { i18n as i18nUi } from '@douglasneuroinformatics/ui';
+import i18nUI from '@douglasneuroinformatics/ui/i18n';
 import type { Language } from '@open-data-capture/common/core';
 import { type InitOptions, createInstance } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -37,7 +37,7 @@ export const createExtendedInstance = (
     async initialize(this: ExtendedI18NextInstance) {
       await this.use(LanguageDetector).use(initReactI18next).init();
       this.on('languageChanged', (lang) => {
-        i18nUi.changeLanguage(lang).catch(console.error);
+        i18nUI.changeLanguage(lang).catch(console.error);
       });
     }
   });
@@ -48,3 +48,4 @@ export const i18n = createExtendedInstance();
 export type DefaultNS = typeof defaultNS;
 
 export type { TranslatedResource } from './types.js';
+export { transformTranslations } from './utils.js';

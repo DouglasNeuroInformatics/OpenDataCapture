@@ -1,4 +1,4 @@
-import { ThemeToggle } from '@douglasneuroinformatics/ui';
+import { ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import { toLowerCase } from '@open-data-capture/common/core';
 import { Branding } from '@open-data-capture/react-core';

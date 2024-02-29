@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useRef } from 'react';
 
-import { StepperContext } from '@douglasneuroinformatics/ui';
+import { StepperContext } from '@douglasneuroinformatics/ui/legacy';
 import { $Json, type Json } from '@open-data-capture/common/core';
 import type { Promisable } from 'type-fest';
 
