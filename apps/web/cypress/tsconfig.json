@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "types": ["bun-types", "cypress", "@4tw/cypress-drag-drop"]
+    "types": ["bun-types", "cypress"]
   },
   "include": ["../../../node_modules/cypress", "./**/*.ts"]
 }
