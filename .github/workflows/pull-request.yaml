@@ -8,6 +8,8 @@ jobs:
     outputs:
       mongodb_version: ${{ steps.define.outputs.MONGODB_VERSION }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - id: define
         run: |
           cat .env.template | grep MONGODB_VERSION >> "$GITHUB_OUTPUT"
