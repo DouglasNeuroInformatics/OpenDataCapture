@@ -11,7 +11,6 @@
 //
 //
 // -- This is a parent command --
-//require('@4tw/cypress-drag-drop')
 
 //This is a login script for the
 Cypress.Commands.add('login', (username, password) => {
@@ -36,8 +35,8 @@ declare global {
   namespace Cypress {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Chainable {
-      login(username: string, password: string): Chainable<void>;
       dragTo(prevSubject: string): Chainable<void>;
+      login(username: string, password: string): Chainable<void>;
     }
   }
 }
