@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { ArrowToggle, Card, cn } from '@douglasneuroinformatics/ui';
+import { ArrowToggle, Card } from '@douglasneuroinformatics/ui/legacy';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 
 import '../setup';
 import { EditorEmptyState } from './EditorEmptyState';
