@@ -47,7 +47,7 @@ Assuming that Docker and Docker Compose are already installed on your system, yo
 ./scripts/generate-env.sh && docker compose up -d
 ```
 
-By default, the application will run on port 5500. So, navigate to `http://localhost:5500` in your browser and you should be greeted with the setup screen. After getting started, we highly recommend reading our [deployment guide](http://localhost:4000/en/tutorials/deployment/) for additional information on how to configure Open Data Capture to best meet the needs of your organization.
+By default, the application will run on port 5500. So, navigate to `http://localhost:5500` in your browser and you should be greeted with the setup screen. After getting started, we highly recommend reading our [deployment guide](http://opendatacapture.org/en/tutorials/deployment/) for additional information on how to configure Open Data Capture to best meet the needs of your organization.
 
 ## Contribution
 
