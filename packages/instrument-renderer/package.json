@@ -17,7 +17,7 @@
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "latest",
+    "@douglasneuroinformatics/ui": "^6.0.1",
     "@douglasneuroinformatics/utils": "latest",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",

@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/crypto": "latest",
-    "@douglasneuroinformatics/ui": "latest",
+    "@douglasneuroinformatics/ui": "^6.0.1",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/database": "workspace:*",
     "@open-data-capture/i18next": "workspace:*",
