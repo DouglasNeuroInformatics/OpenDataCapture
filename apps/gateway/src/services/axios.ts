@@ -1,4 +1,4 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
 import axios, { isAxiosError } from 'axios';
 import i18next from 'i18next';
 
