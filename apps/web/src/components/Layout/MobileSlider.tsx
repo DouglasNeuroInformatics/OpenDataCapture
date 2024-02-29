@@ -1,4 +1,4 @@
-import { Slider, ThemeToggle } from '@douglasneuroinformatics/ui';
+import { Slider, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
 import { Branding } from '@open-data-capture/react-core';
 import { useTranslation } from 'react-i18next';
 

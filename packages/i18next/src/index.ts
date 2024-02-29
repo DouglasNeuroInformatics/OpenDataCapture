@@ -48,3 +48,4 @@ export const i18n = createExtendedInstance();
 export type DefaultNS = typeof defaultNS;
 
 export type { TranslatedResource } from './types.js';
+export { transformTranslations } from './utils.js';

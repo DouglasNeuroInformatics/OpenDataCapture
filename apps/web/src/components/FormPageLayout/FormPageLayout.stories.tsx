@@ -1,4 +1,4 @@
-import { Form } from '@douglasneuroinformatics/ui';
+import { Form } from '@douglasneuroinformatics/ui/legacy';
 import type { Meta, StoryObj } from '@storybook/react';
 import { z } from 'zod';
 

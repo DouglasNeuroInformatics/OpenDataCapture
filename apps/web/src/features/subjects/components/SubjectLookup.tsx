@@ -1,4 +1,5 @@
-import { Modal, useNotificationsStore } from '@douglasneuroinformatics/ui';
+import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
+import { Modal } from '@douglasneuroinformatics/ui/legacy';
 import type { Subject, SubjectIdentificationData } from '@open-data-capture/common/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';

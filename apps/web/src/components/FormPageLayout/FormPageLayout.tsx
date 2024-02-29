@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Card, LanguageToggle, ThemeToggle, cn } from '@douglasneuroinformatics/ui';
+import { Card, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 
 import logo from '@/assets/logo.png';
 

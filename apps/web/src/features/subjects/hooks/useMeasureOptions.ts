@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { type SelectOption, getFormFields } from '@douglasneuroinformatics/ui';
+import { type SelectOption, getFormFields } from '@douglasneuroinformatics/ui/legacy';
 import type { AnyUnilingualFormInstrument } from '@open-data-capture/common/instrument';
 import { match } from 'ts-pattern';
 

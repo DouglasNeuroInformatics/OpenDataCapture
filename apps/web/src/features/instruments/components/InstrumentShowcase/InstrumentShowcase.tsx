@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/ui';
-import type { SelectOption } from '@douglasneuroinformatics/ui';
+import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/ui/legacy';
+import type { SelectOption } from '@douglasneuroinformatics/ui/legacy';
 import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';

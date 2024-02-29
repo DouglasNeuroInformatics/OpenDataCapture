@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-import { ClientTable, Dropdown, SearchBar, useDownload } from '@douglasneuroinformatics/ui';
+import { useDownload } from '@douglasneuroinformatics/ui/hooks';
+import { ClientTable, Dropdown, SearchBar } from '@douglasneuroinformatics/ui/legacy';
 import { toBasicISOString } from '@douglasneuroinformatics/utils';
 import type { InstrumentRecordsExport } from '@open-data-capture/common/instrument-records';
 import type { Subject } from '@open-data-capture/common/subject';

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import type { SelectOption } from '@douglasneuroinformatics/ui';
+import type { SelectOption } from '@douglasneuroinformatics/ui/legacy';
 import type { LinearRegressionResults } from '@open-data-capture/common/instrument-records';
 import _ from 'lodash';
 

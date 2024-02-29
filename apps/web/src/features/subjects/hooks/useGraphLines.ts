@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import type { LineGraphLine, SelectOption } from '@douglasneuroinformatics/ui';
+import type { LineGraphLine, SelectOption } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
 
 const COLOR_PALETTE: readonly string[] = [

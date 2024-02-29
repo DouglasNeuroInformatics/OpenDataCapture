@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Form, Modal } from '@douglasneuroinformatics/ui';
+import { Form, Modal } from '@douglasneuroinformatics/ui/legacy';
 import type { CreateAssignmentData } from '@open-data-capture/common/assignment';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button } from '@douglasneuroinformatics/ui';
+import { Button } from '@douglasneuroinformatics/ui/legacy';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import type { Assignment } from '@open-data-capture/common/assignment';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ export const SubjectAssignmentsPage = () => {
   const updateAssignmentMutation = useUpdateAssignment();
 
   const instrumentSummariesQuery = useInstrumentSummariesQuery();
-  
+
   const instrumentOptions = Object.fromEntries(
     instrumentSummariesQuery.data.map((instrument) => [instrument.id, instrument.details.title])
   );

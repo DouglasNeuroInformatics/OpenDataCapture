@@ -1,4 +1,4 @@
-import { Card, Modal } from '@douglasneuroinformatics/ui';
+import { Card, Modal } from '@douglasneuroinformatics/ui/legacy';
 import { snakeToCamelCase } from '@douglasneuroinformatics/utils';
 import type { LoginCredentials } from '@open-data-capture/common/auth';
 import { DEMO_USERS } from '@open-data-capture/demo';

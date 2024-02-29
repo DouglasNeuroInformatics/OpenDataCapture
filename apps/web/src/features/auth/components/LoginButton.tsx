@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Card } from '@douglasneuroinformatics/ui';
+import { Card } from '@douglasneuroinformatics/ui/legacy';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';

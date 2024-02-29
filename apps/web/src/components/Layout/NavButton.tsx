@@ -1,4 +1,4 @@
-import { cn } from '@douglasneuroinformatics/ui';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 
 export type NavButtonProps = {
   [key: `data-${string}`]: unknown;
