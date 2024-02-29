@@ -33,5 +33,4 @@ COPY --from=installer /app/gateway.db /app/gateway.db
 COPY --from=installer /app/apps/gateway/dist/ /app/dist/
 COPY --from=installer /app/apps/gateway/public/ /app/public/
 RUN echo '{ "type": "module" }' > package.json
-USER node
 CMD [ "node", "./dist/main.mjs" ]
