@@ -1,4 +1,5 @@
-import { Card, cn } from '@douglasneuroinformatics/ui';
+import { Card } from '@douglasneuroinformatics/ui/legacy';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 

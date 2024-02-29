@@ -1,14 +1,7 @@
 import React, { useContext, useRef } from 'react';
 
-import {
-  Card,
-  DownloadButton,
-  Dropdown,
-  LanguageToggle,
-  ThemeToggle,
-  useDownload,
-  useNotificationsStore
-} from '@douglasneuroinformatics/ui';
+import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
+import { Card, DownloadButton, Dropdown, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
 import { useTranslation } from 'react-i18next';

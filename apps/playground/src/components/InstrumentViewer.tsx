@@ -1,6 +1,7 @@
 import React, { useImperativeHandle, useState } from 'react';
 
-import { Spinner, cn } from '@douglasneuroinformatics/ui';
+import { Spinner } from '@douglasneuroinformatics/ui/components';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 import { match } from 'ts-pattern';
 

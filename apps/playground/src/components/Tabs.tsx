@@ -1,4 +1,4 @@
-import { cn } from '@douglasneuroinformatics/ui';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 
 export type TabsProps<T extends string> = {
   activeTab: T;

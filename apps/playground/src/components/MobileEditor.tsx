@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 
-import { Dropdown } from '@douglasneuroinformatics/ui';
+import { Dropdown } from '@douglasneuroinformatics/ui/legacy';
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
 import { match } from 'ts-pattern';
 

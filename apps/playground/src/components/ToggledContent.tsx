@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { cn } from '@douglasneuroinformatics/ui';
+import { cn } from '@douglasneuroinformatics/ui/utils';
 import { ChevronUpIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
 
