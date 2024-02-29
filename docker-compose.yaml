@@ -43,8 +43,6 @@ services:
   gateway:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway:${RELEASE_CHANNEL}
     build:
-      args:
-        GATEWAY_DATABASE_FILEPATH: /app/gateway.db
       context: .
       dockerfile: ./apps/gateway/Dockerfile
     ports:
@@ -66,11 +64,10 @@ services:
   web:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-web:${RELEASE_CHANNEL}
     build:
-      args:
-        VITE_API_BASE_URL: /api
       context: .
       dockerfile: ./apps/web/Dockerfile
     environment:
+      - API_BASE_URL=/api
       - CONTACT_EMAIL
       - DOCS_URL
       - GITHUB_REPO_URL

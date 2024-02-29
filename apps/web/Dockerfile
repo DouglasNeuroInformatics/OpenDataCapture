@@ -14,7 +14,6 @@ RUN pnpm dlx turbo prune @open-data-capture/web --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
-ARG VITE_API_BASE_URL
 RUN apk add --no-cache libc6-compat
 RUN apk update
 COPY .gitignore jsconfig.json ./

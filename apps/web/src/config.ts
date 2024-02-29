@@ -36,7 +36,7 @@ export const config = await $Config
       licenseUrl: import.meta.env.LICENSE_URL
     },
     setup: {
-      apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
+      apiBaseUrl: import.meta.env.API_BASE_URL,
       isGatewayEnabled: import.meta.env.GATEWAY_ENABLED
     }
   })
