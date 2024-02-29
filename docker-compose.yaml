@@ -66,11 +66,10 @@ services:
   web:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-web:${RELEASE_CHANNEL}
     build:
-      args:
-        VITE_API_BASE_URL: /api
       context: .
       dockerfile: ./apps/web/Dockerfile
     environment:
+      - API_BASE_URL=/api
       - CONTACT_EMAIL
       - DOCS_URL
       - GITHUB_REPO_URL
