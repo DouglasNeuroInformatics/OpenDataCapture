@@ -36,13 +36,13 @@ describe('look at questionaire', () => {
     //submit form
     cy.get('button[type="submit"]').click({ force: true });
 
-    // cy.wait(1000);
+    cy.wait(1000);
 
     //navigate to view instrument page, select a form and confirm subject info is autofilled
-    cy.get('button[data-cy="view-instrument"]').first().click({ force: true });
-    cy.url().should('include', 'instruments/available');
-    cy.wait(1000);
+    cy.get('button[data-cy="view-instrument"]').click({ force: true });
+    cy.url().should('include', '/instruments/available-instruments');
+    cy.wait(100);
     cy.get('h3[data-cy="instrument-title"]').contains('Happiness Questionnaire').click();
-    cy.get('button').contains('Begin').click();
+    cy.get('button').contains('Begin').click({ force: true });
   });
 });
