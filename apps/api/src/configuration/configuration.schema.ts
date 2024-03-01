@@ -45,13 +45,13 @@ export const $Configuration = z
       if (!env.API_DEV_SERVER_PORT) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'API_DEV_SERVER_PORT must be defined in production'
+          message: 'API_DEV_SERVER_PORT must be defined in development'
         });
       }
       if (!env.GATEWAY_DEV_SERVER_PORT) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'GATEWAY_DEV_SERVER_PORT must be defined in production'
+          message: 'GATEWAY_DEV_SERVER_PORT must be defined in development'
         });
       }
     }
