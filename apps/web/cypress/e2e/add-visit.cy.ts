@@ -41,8 +41,10 @@ describe('look at questionaire', () => {
     //navigate to view instrument page, select a form and confirm subject info is autofilled
     cy.get('button[data-cy="view-instrument"]').click({ force: true });
     cy.url().should('include', '/instruments/available-instruments');
-    cy.wait(100);
+    cy.wait(1000);
     cy.get('h3[data-cy="instrument-title"]').contains('Happiness Questionnaire').click();
-    cy.get('button').contains('Begin').click({ force: true });
+    cy.get('button')
+      .contains(new RegExp('^' + 'Begin' + '$', 'g'))
+      .click({ force: true });
   });
 });
