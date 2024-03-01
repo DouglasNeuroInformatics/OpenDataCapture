@@ -11,7 +11,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/form-types": "latest",
+    "@douglasneuroinformatics/form-types": "^5.2.0",
     "@open-data-capture/common": "workspace:*",
     "lodash": "^4.17.21",
     "ts-pattern": "^5.0.8"

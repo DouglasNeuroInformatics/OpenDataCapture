@@ -19,7 +19,7 @@
     "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test --expect 404 \"pnpm dev\" \"http://localhost:${GATEWAY_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
-    "@douglasneuroinformatics/crypto": "latest",
+    "@douglasneuroinformatics/crypto": "^0.0.7",
     "@douglasneuroinformatics/ui": "^6.0.1",
     "@open-data-capture/common": "workspace:*",
     "@open-data-capture/database": "workspace:*",
@@ -28,7 +28,7 @@
     "@open-data-capture/react-core": "workspace:*",
     "axios": "^1.6.7",
     "compression": "^1.7.4",
-    "express": "^4.18.2",
+    "express": "^4.18.3",
     "i18next": "^23.10.0",
     "lodash": "^4.17.21",
     "pino-http": "^9.0.0",
@@ -47,7 +47,7 @@
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
     "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.60",
+    "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "autoprefixer": "^10.4.17",
