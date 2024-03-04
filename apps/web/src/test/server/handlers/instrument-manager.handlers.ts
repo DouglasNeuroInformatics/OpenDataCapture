@@ -18,63 +18,19 @@ export const ManageInstrumentHandlers = [
           license: 'AGPL-3.0',
           referenceUrl: null,
           sourceUrl: null,
-          title: { en: 'Happiness Questionnaire', fr: 'Questionnaire sur le bonheur' }
+          title: {
+            en: 'Happiness Questionnaire',
+            fr: 'Questionnaire sur le bonheur'
+          }
         },
-        id: '65d5179227e183f93166d4b2',
+        id: '65dd26a1933b24c8b9023ca1',
         kind: 'FORM',
         language: ['en', 'fr'],
         name: 'HappinessQuestionnaire',
-        tags: { en: ['Well-Being'], fr: ['Bien-être'] },
-        version: 1
-      },
-      {
-        details: {
-          authors: [],
-          description:
-            '\n      The Brief Psychiatric Rating Scale is a rating scale which a clinician or researcher may use to\n      measure psychiatric symptoms such as depression, anxiety, hallucinations and unusual behavior.\n      The scale is one of the oldest, most widely used scales to measure psychotic symptoms and was\n      first published in 1962.',
-          estimatedDuration: 30,
-          instructions: [
-            "Please enter the score for the term which best describes the patient's condition.",
-            '0 = not assessed, 1 = not present, 2 = very mild, 3 = mild, 4 = moderate, 5 = moderately severe, 6 = severe, 7 = extremely severe.'
-          ],
-          license: 'UNLICENSED',
-          referenceUrl: null,
-          sourceUrl: null,
-          title: 'Brief Psychiatric Rating Scale'
+        tags: {
+          en: ['Well-Being'],
+          fr: ['Bien-être']
         },
-        id: '65d5179e27e183f93166d4b7',
-        kind: 'FORM',
-        language: 'en',
-        name: 'BriefPsychiatricRatingScale',
-        tags: ['Schizophrenia', 'Psychosis'],
-        version: 1
-      },
-      {
-        details: {
-          authors: [],
-          description: {
-            en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
-            fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
-          },
-          estimatedDuration: 5,
-          instructions: {
-            en: [
-              'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.'
-            ],
-            fr: [
-              "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
-            ]
-          },
-          license: 'AGPL-3.0',
-          referenceUrl: null,
-          sourceUrl: null,
-          title: { en: 'Enhanced Demographics Questionnaire', fr: 'Questionnaire démographique détaillé' }
-        },
-        id: '65d5179e27e183f93166d4b8',
-        kind: 'FORM',
-        language: ['en', 'fr'],
-        name: 'EnhancedDemographicsQuestionnaire',
-        tags: { en: ['Demographics'], fr: ['Démographie'] },
         version: 1
       },
       {
@@ -92,14 +48,42 @@ export const ManageInstrumentHandlers = [
           license: 'UNLICENSED',
           referenceUrl: null,
           sourceUrl: null,
-          title: { en: 'Montreal Cognitive Assessment', fr: 'Montreal Cognitive Assessment' }
+          title: {
+            en: 'Montreal Cognitive Assessment',
+            fr: 'Montreal Cognitive Assessment'
+          }
         },
-        id: '65d5179e27e183f93166d4b9',
+        id: '65dd26ad933b24c8b9023ca7',
         kind: 'FORM',
         language: ['en', 'fr'],
         name: 'MontrealCognitiveAssessment',
-        tags: { en: ['Cognitive'], fr: ['Cognitif'] },
+        tags: {
+          en: ['Cognitive'],
+          fr: ['Cognitif']
+        },
         version: 8.1
+      },
+      {
+        details: {
+          authors: [],
+          description:
+            '\n      The Brief Psychiatric Rating Scale is a rating scale which a clinician or researcher may use to\n      measure psychiatric symptoms such as depression, anxiety, hallucinations and unusual behavior.\n      The scale is one of the oldest, most widely used scales to measure psychotic symptoms and was\n      first published in 1962.',
+          estimatedDuration: 30,
+          instructions: [
+            "Please enter the score for the term which best describes the patient's condition.",
+            '0 = not assessed, 1 = not present, 2 = very mild, 3 = mild, 4 = moderate, 5 = moderately severe, 6 = severe, 7 = extremely severe.'
+          ],
+          license: 'UNLICENSED',
+          referenceUrl: null,
+          sourceUrl: null,
+          title: 'Brief Psychiatric Rating Scale'
+        },
+        id: '65dd26ad933b24c8b9023ca6',
+        kind: 'FORM',
+        language: 'en',
+        name: 'BriefPsychiatricRatingScale',
+        tags: ['Schizophrenia', 'Psychosis'],
+        version: 1
       },
       {
         details: {
@@ -132,13 +116,53 @@ export const ManageInstrumentHandlers = [
           license: 'UNLICENSED',
           referenceUrl: null,
           sourceUrl: null,
-          title: { en: 'Mini Mental State Examination', fr: "Mini-examen de l'état mental" }
+          title: {
+            en: 'Mini Mental State Examination',
+            fr: "Mini-examen de l'état mental"
+          }
         },
-        id: '65d5179e27e183f93166d4ba',
+        id: '65dd26ad933b24c8b9023ca8',
         kind: 'FORM',
         language: ['en', 'fr'],
         name: 'MiniMentalStateExamination',
-        tags: { en: ['Cognitive'], fr: ['Cognitif'] },
+        tags: {
+          en: ['Cognitive'],
+          fr: ['Cognitif']
+        },
+        version: 1
+      },
+      {
+        details: {
+          authors: [],
+          description: {
+            en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
+            fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
+          },
+          estimatedDuration: 5,
+          instructions: {
+            en: [
+              'Please provide the most accurate answer for the following questions. If there are more than one correct answers, select the one that is more applicable.'
+            ],
+            fr: [
+              "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
+            ]
+          },
+          license: 'AGPL-3.0',
+          referenceUrl: null,
+          sourceUrl: null,
+          title: {
+            en: 'Enhanced Demographics Questionnaire',
+            fr: 'Questionnaire démographique détaillé'
+          }
+        },
+        id: '65dd26ad933b24c8b9023ca9',
+        kind: 'FORM',
+        language: ['en', 'fr'],
+        name: 'EnhancedDemographicsQuestionnaire',
+        tags: {
+          en: ['Demographics'],
+          fr: ['Démographie']
+        },
         version: 1
       },
       {
@@ -153,7 +177,7 @@ export const ManageInstrumentHandlers = [
           sourceUrl: 'https://github.com/end3r/Gamedev-Canvas-workshop/tree/gh-pages',
           title: 'Breakout Task'
         },
-        id: '65d5179e27e183f93166d4bb',
+        id: '65dd26ad933b24c8b9023caa',
         kind: 'INTERACTIVE',
         language: 'en',
         name: 'Breakout Task',
@@ -194,6 +218,86 @@ export const ManageInstrumentHandlers = [
       tags: { en: ['Well-Being'], fr: ['Bien-être'] },
       updatedAt: '2024-02-20T21:20:18.489Z',
       version: 1
+    });
+  }),
+
+  http.get('/v1/instruments/65dd26ad933b24c8b9023ca7', () => {
+    return HttpResponse.json({
+      details: {
+        authors: [],
+        description: {
+          en: 'The Montreal Cognitive Assessment (MoCA) was designed as a rapid screening instrument for mild cognitive dysfunction. It assesses different cognitive domains: attention and concentration, executive functions, memory, language, visuoconstructional skills, conceptual thinking, calculations, and orientation. The MoCA may be administered by anyone who understands and follows the instructions, however, only a health professional with expertise in the cognitive field may interpret the results. Time to administer the MoCA is approximately 10 minutes. The total possible score is 30 points; a score of 26 or above is considered normal.',
+          fr: "Le Montreal Cognitive Assessment (MoCA) a été conçue comme un instrument de dépistage rapide des troubles cognitifs légers. Il évalue différents domaines cognitifs : l'attention et la concentration, les fonctions exécutives, la mémoire, le langage, les capacités visuoconstructives, la pensée conceptuelle, les calculs et l'orientation. Le MoCA peut être administré par toute personne qui comprend et suit les instructions, mais seul un professionnel de la santé spécialisé dans le domaine cognitif peut interpréter les résultats. L'administration du MoCA dure environ 10 minutes. Le score total possible est de 30 points ; un score de 26 ou plus est considéré comme normal."
+        },
+        estimatedDuration: 10,
+        instructions: {
+          en: ['All instructions may be repeated once.'],
+          fr: ['Toutes les instructions peuvent être répétées une fois.']
+        },
+        license: 'UNLICENSED',
+        referenceUrl: null,
+        sourceUrl: null,
+        title: {
+          en: 'Montreal Cognitive Assessment',
+          fr: 'Montreal Cognitive Assessment'
+        }
+      },
+      createdAt: '2024-02-27T00:02:41.459Z',
+      updatedAt: '2024-02-27T00:02:41.459Z',
+      id: '65dd26ad933b24c8b9023ca7',
+      source:
+        "/* eslint-disable perfectionist/sort-objects */\n\nconst { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');\nconst { z } = await import('/runtime/v0.0.1/zod.js');\n\nconst instrumentFactory = new InstrumentFactory({\n  kind: 'FORM',\n  language: ['en', 'fr'],\n  validationSchema: z.object({\n    abstraction: z.number().int().gte(0).lte(2),\n    attention: z.number().int().gte(0).lte(6),\n    delayedRecall: z.number().int().gte(0).lte(5),\n    language: z.number().int().gte(0).lte(3),\n    lowEdu: z.boolean(),\n    naming: z.number().int().gte(0).lte(3),\n    orientation: z.number().int().gte(0).lte(6),\n    visuospatialExecutive: z.number().int().gte(0).lte(5)\n  })\n});\n\nexport default instrumentFactory.defineInstrument({\n  name: 'MontrealCognitiveAssessment',\n  tags: {\n    en: ['Cognitive'],\n    fr: ['Cognitif']\n  },\n  version: 8.1,\n  content: {\n    abstraction: {\n      kind: 'numeric',\n      label: {\n        en: 'Abstraction',\n        fr: 'Abstraction'\n      },\n      max: 2,\n      min: 0,\n      variant: 'default'\n    },\n    attention: {\n      kind: 'numeric',\n      label: {\n        en: 'Attention',\n        fr: 'Attention'\n      },\n      max: 6,\n      min: 0,\n      variant: 'default'\n    },\n    delayedRecall: {\n      kind: 'numeric',\n      label: {\n        en: 'Delayed Recall',\n        fr: 'Rappel'\n      },\n      max: 5,\n      min: 0,\n      variant: 'default'\n    },\n    language: {\n      kind: 'numeric',\n      label: {\n        en: 'Language',\n        fr: 'Langue'\n      },\n      max: 3,\n      min: 0,\n      variant: 'default'\n    },\n    lowEdu: {\n      kind: 'binary',\n      label: {\n        en: 'Less Than 12 Years of Education',\n        fr: \"Moins de 12 ans d'études\"\n      },\n      options: {\n        en: {\n          f: 'No',\n          t: 'Yes'\n        },\n        fr: {\n          f: 'No',\n          t: 'Oui'\n        }\n      },\n      variant: 'radio'\n    },\n    naming: {\n      kind: 'numeric',\n      label: {\n        en: 'Naming',\n        fr: 'Dénomination'\n      },\n      max: 3,\n      min: 0,\n      variant: 'default'\n    },\n    orientation: {\n      kind: 'numeric',\n      label: {\n        en: 'Orientation',\n        fr: 'Orientation'\n      },\n      max: 6,\n      min: 0,\n      variant: 'default'\n    },\n    visuospatialExecutive: {\n      kind: 'numeric',\n      label: {\n        en: 'Visuospatial/Executive',\n        fr: 'Visuospatial/Exécutif'\n      },\n      max: 5,\n      min: 0,\n      variant: 'default'\n    }\n  },\n  details: {\n    description: {\n      en: 'The Montreal Cognitive Assessment (MoCA) was designed as a rapid screening instrument for mild cognitive dysfunction. It assesses different cognitive domains: attention and concentration, executive functions, memory, language, visuoconstructional skills, conceptual thinking, calculations, and orientation. The MoCA may be administered by anyone who understands and follows the instructions, however, only a health professional with expertise in the cognitive field may interpret the results. Time to administer the MoCA is approximately 10 minutes. The total possible score is 30 points; a score of 26 or above is considered normal.',\n      fr: \"Le Montreal Cognitive Assessment (MoCA) a été conçue comme un instrument de dépistage rapide des troubles cognitifs légers. Il évalue différents domaines cognitifs : l'attention et la concentration, les fonctions exécutives, la mémoire, le langage, les capacités visuoconstructives, la pensée conceptuelle, les calculs et l'orientation. Le MoCA peut être administré par toute personne qui comprend et suit les instructions, mais seul un professionnel de la santé spécialisé dans le domaine cognitif peut interpréter les résultats. L'administration du MoCA dure environ 10 minutes. Le score total possible est de 30 points ; un score de 26 ou plus est considéré comme normal.\"\n    },\n    estimatedDuration: 10,\n    instructions: {\n      en: ['All instructions may be repeated once.'],\n      fr: ['Toutes les instructions peuvent être répétées une fois.']\n    },\n    license: 'UNLICENSED',\n    title: {\n      en: 'Montreal Cognitive Assessment',\n      fr: 'Montreal Cognitive Assessment'\n    }\n  },\n  measures: {\n    abstraction: {\n      kind: 'const',\n      ref: 'abstraction'\n    },\n    attention: {\n      kind: 'const',\n      ref: 'attention'\n    },\n    delayedRecall: {\n      kind: 'const',\n      ref: 'delayedRecall'\n    },\n    language: {\n      kind: 'const',\n      ref: 'language'\n    },\n    naming: {\n      kind: 'const',\n      ref: 'naming'\n    },\n    orientation: {\n      kind: 'const',\n      ref: 'orientation'\n    },\n    totalScore: {\n      kind: 'computed',\n      label: {\n        en: 'Total Score',\n        fr: 'Score total'\n      },\n      value: (data) => {\n        let sum = 0;\n        Object.values(data).forEach((value) => {\n          sum += Number(value);\n        });\n        return sum;\n      }\n    },\n    visuospatialExecutive: {\n      kind: 'const',\n      ref: 'visuospatialExecutive'\n    }\n  }\n});\n",
+      bundle:
+        '(async()=>{const{InstrumentFactory:t}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new t({kind:"FORM",language:["en","fr"],validationSchema:e.object({abstraction:e.number().int().gte(0).lte(2),attention:e.number().int().gte(0).lte(6),delayedRecall:e.number().int().gte(0).lte(5),language:e.number().int().gte(0).lte(3),lowEdu:e.boolean(),naming:e.number().int().gte(0).lte(3),orientation:e.number().int().gte(0).lte(6),visuospatialExecutive:e.number().int().gte(0).lte(5)})}).defineInstrument({name:"MontrealCognitiveAssessment",tags:{en:["Cognitive"],fr:["Cognitif"]},version:8.1,content:{abstraction:{kind:"numeric",label:{en:"Abstraction",fr:"Abstraction"},max:2,min:0,variant:"default"},attention:{kind:"numeric",label:{en:"Attention",fr:"Attention"},max:6,min:0,variant:"default"},delayedRecall:{kind:"numeric",label:{en:"Delayed Recall",fr:"Rappel"},max:5,min:0,variant:"default"},language:{kind:"numeric",label:{en:"Language",fr:"Langue"},max:3,min:0,variant:"default"},lowEdu:{kind:"binary",label:{en:"Less Than 12 Years of Education",fr:"Moins de 12 ans d\'\\xE9tudes"},options:{en:{f:"No",t:"Yes"},fr:{f:"No",t:"Oui"}},variant:"radio"},naming:{kind:"numeric",label:{en:"Naming",fr:"D\\xE9nomination"},max:3,min:0,variant:"default"},orientation:{kind:"numeric",label:{en:"Orientation",fr:"Orientation"},max:6,min:0,variant:"default"},visuospatialExecutive:{kind:"numeric",label:{en:"Visuospatial/Executive",fr:"Visuospatial/Ex\\xE9cutif"},max:5,min:0,variant:"default"}},details:{description:{en:"The Montreal Cognitive Assessment (MoCA) was designed as a rapid screening instrument for mild cognitive dysfunction. It assesses different cognitive domains: attention and concentration, executive functions, memory, language, visuoconstructional skills, conceptual thinking, calculations, and orientation. The MoCA may be administered by anyone who understands and follows the instructions, however, only a health professional with expertise in the cognitive field may interpret the results. Time to administer the MoCA is approximately 10 minutes. The total possible score is 30 points; a score of 26 or above is considered normal.",fr:"Le Montreal Cognitive Assessment (MoCA) a \\xE9t\\xE9 con\\xE7ue comme un instrument de d\\xE9pistage rapide des troubles cognitifs l\\xE9gers. Il \\xE9value diff\\xE9rents domaines cognitifs : l\'attention et la concentration, les fonctions ex\\xE9cutives, la m\\xE9moire, le langage, les capacit\\xE9s visuoconstructives, la pens\\xE9e conceptuelle, les calculs et l\'orientation. Le MoCA peut \\xEAtre administr\\xE9 par toute personne qui comprend et suit les instructions, mais seul un professionnel de la sant\\xE9 sp\\xE9cialis\\xE9 dans le domaine cognitif peut interpr\\xE9ter les r\\xE9sultats. L\'administration du MoCA dure environ 10 minutes. Le score total possible est de 30 points ; un score de 26 ou plus est consid\\xE9r\\xE9 comme normal."},estimatedDuration:10,instructions:{en:["All instructions may be repeated once."],fr:["Toutes les instructions peuvent \\xEAtre r\\xE9p\\xE9t\\xE9es une fois."]},license:"UNLICENSED",title:{en:"Montreal Cognitive Assessment",fr:"Montreal Cognitive Assessment"}},measures:{abstraction:{kind:"const",ref:"abstraction"},attention:{kind:"const",ref:"attention"},delayedRecall:{kind:"const",ref:"delayedRecall"},language:{kind:"const",ref:"language"},naming:{kind:"const",ref:"naming"},orientation:{kind:"const",ref:"orientation"},totalScore:{kind:"computed",label:{en:"Total Score",fr:"Score total"},value:i=>{let n=0;return Object.values(i).forEach(a=>{n+=Number(a)}),n}},visuospatialExecutive:{kind:"const",ref:"visuospatialExecutive"}}})})();\n',
+      kind: 'FORM',
+      language: ['en', 'fr'],
+      name: 'MontrealCognitiveAssessment',
+      tags: {
+        en: ['Cognitive'],
+        fr: ['Cognitif']
+      },
+      version: 8.1,
+      __model__: 'Instrument'
+    });
+  }),
+
+  http.get('/v1/instruments/render/65dd26ad933b24c8b9023ca7', () => {
+    return HttpResponse.json({
+      details: {
+        authors: [],
+        description: {
+          en: 'The Montreal Cognitive Assessment (MoCA) was designed as a rapid screening instrument for mild cognitive dysfunction. It assesses different cognitive domains: attention and concentration, executive functions, memory, language, visuoconstructional skills, conceptual thinking, calculations, and orientation. The MoCA may be administered by anyone who understands and follows the instructions, however, only a health professional with expertise in the cognitive field may interpret the results. Time to administer the MoCA is approximately 10 minutes. The total possible score is 30 points; a score of 26 or above is considered normal.',
+          fr: "Le Montreal Cognitive Assessment (MoCA) a été conçue comme un instrument de dépistage rapide des troubles cognitifs légers. Il évalue différents domaines cognitifs : l'attention et la concentration, les fonctions exécutives, la mémoire, le langage, les capacités visuoconstructives, la pensée conceptuelle, les calculs et l'orientation. Le MoCA peut être administré par toute personne qui comprend et suit les instructions, mais seul un professionnel de la santé spécialisé dans le domaine cognitif peut interpréter les résultats. L'administration du MoCA dure environ 10 minutes. Le score total possible est de 30 points ; un score de 26 ou plus est considéré comme normal."
+        },
+        estimatedDuration: 10,
+        instructions: {
+          en: ['All instructions may be repeated once.'],
+          fr: ['Toutes les instructions peuvent être répétées une fois.']
+        },
+        license: 'UNLICENSED',
+        referenceUrl: null,
+        sourceUrl: null,
+        title: {
+          en: 'Montreal Cognitive Assessment',
+          fr: 'Montreal Cognitive Assessment'
+        }
+      },
+      createdAt: '2024-02-27T00:02:41.459Z',
+      updatedAt: '2024-02-27T00:02:41.459Z',
+      id: '65dd26ad933b24c8b9023ca7',
+      source:
+        "/* eslint-disable perfectionist/sort-objects */\n\nconst { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');\nconst { z } = await import('/runtime/v0.0.1/zod.js');\n\nconst instrumentFactory = new InstrumentFactory({\n  kind: 'FORM',\n  language: ['en', 'fr'],\n  validationSchema: z.object({\n    abstraction: z.number().int().gte(0).lte(2),\n    attention: z.number().int().gte(0).lte(6),\n    delayedRecall: z.number().int().gte(0).lte(5),\n    language: z.number().int().gte(0).lte(3),\n    lowEdu: z.boolean(),\n    naming: z.number().int().gte(0).lte(3),\n    orientation: z.number().int().gte(0).lte(6),\n    visuospatialExecutive: z.number().int().gte(0).lte(5)\n  })\n});\n\nexport default instrumentFactory.defineInstrument({\n  name: 'MontrealCognitiveAssessment',\n  tags: {\n    en: ['Cognitive'],\n    fr: ['Cognitif']\n  },\n  version: 8.1,\n  content: {\n    abstraction: {\n      kind: 'numeric',\n      label: {\n        en: 'Abstraction',\n        fr: 'Abstraction'\n      },\n      max: 2,\n      min: 0,\n      variant: 'default'\n    },\n    attention: {\n      kind: 'numeric',\n      label: {\n        en: 'Attention',\n        fr: 'Attention'\n      },\n      max: 6,\n      min: 0,\n      variant: 'default'\n    },\n    delayedRecall: {\n      kind: 'numeric',\n      label: {\n        en: 'Delayed Recall',\n        fr: 'Rappel'\n      },\n      max: 5,\n      min: 0,\n      variant: 'default'\n    },\n    language: {\n      kind: 'numeric',\n      label: {\n        en: 'Language',\n        fr: 'Langue'\n      },\n      max: 3,\n      min: 0,\n      variant: 'default'\n    },\n    lowEdu: {\n      kind: 'binary',\n      label: {\n        en: 'Less Than 12 Years of Education',\n        fr: \"Moins de 12 ans d'études\"\n      },\n      options: {\n        en: {\n          f: 'No',\n          t: 'Yes'\n        },\n        fr: {\n          f: 'No',\n          t: 'Oui'\n        }\n      },\n      variant: 'radio'\n    },\n    naming: {\n      kind: 'numeric',\n      label: {\n        en: 'Naming',\n        fr: 'Dénomination'\n      },\n      max: 3,\n      min: 0,\n      variant: 'default'\n    },\n    orientation: {\n      kind: 'numeric',\n      label: {\n        en: 'Orientation',\n        fr: 'Orientation'\n      },\n      max: 6,\n      min: 0,\n      variant: 'default'\n    },\n    visuospatialExecutive: {\n      kind: 'numeric',\n      label: {\n        en: 'Visuospatial/Executive',\n        fr: 'Visuospatial/Exécutif'\n      },\n      max: 5,\n      min: 0,\n      variant: 'default'\n    }\n  },\n  details: {\n    description: {\n      en: 'The Montreal Cognitive Assessment (MoCA) was designed as a rapid screening instrument for mild cognitive dysfunction. It assesses different cognitive domains: attention and concentration, executive functions, memory, language, visuoconstructional skills, conceptual thinking, calculations, and orientation. The MoCA may be administered by anyone who understands and follows the instructions, however, only a health professional with expertise in the cognitive field may interpret the results. Time to administer the MoCA is approximately 10 minutes. The total possible score is 30 points; a score of 26 or above is considered normal.',\n      fr: \"Le Montreal Cognitive Assessment (MoCA) a été conçue comme un instrument de dépistage rapide des troubles cognitifs légers. Il évalue différents domaines cognitifs : l'attention et la concentration, les fonctions exécutives, la mémoire, le langage, les capacités visuoconstructives, la pensée conceptuelle, les calculs et l'orientation. Le MoCA peut être administré par toute personne qui comprend et suit les instructions, mais seul un professionnel de la santé spécialisé dans le domaine cognitif peut interpréter les résultats. L'administration du MoCA dure environ 10 minutes. Le score total possible est de 30 points ; un score de 26 ou plus est considéré comme normal.\"\n    },\n    estimatedDuration: 10,\n    instructions: {\n      en: ['All instructions may be repeated once.'],\n      fr: ['Toutes les instructions peuvent être répétées une fois.']\n    },\n    license: 'UNLICENSED',\n    title: {\n      en: 'Montreal Cognitive Assessment',\n      fr: 'Montreal Cognitive Assessment'\n    }\n  },\n  measures: {\n    abstraction: {\n      kind: 'const',\n      ref: 'abstraction'\n    },\n    attention: {\n      kind: 'const',\n      ref: 'attention'\n    },\n    delayedRecall: {\n      kind: 'const',\n      ref: 'delayedRecall'\n    },\n    language: {\n      kind: 'const',\n      ref: 'language'\n    },\n    naming: {\n      kind: 'const',\n      ref: 'naming'\n    },\n    orientation: {\n      kind: 'const',\n      ref: 'orientation'\n    },\n    totalScore: {\n      kind: 'computed',\n      label: {\n        en: 'Total Score',\n        fr: 'Score total'\n      },\n      value: (data) => {\n        let sum = 0;\n        Object.values(data).forEach((value) => {\n          sum += Number(value);\n        });\n        return sum;\n      }\n    },\n    visuospatialExecutive: {\n      kind: 'const',\n      ref: 'visuospatialExecutive'\n    }\n  }\n});\n",
+      bundle:
+        '(async()=>{const{InstrumentFactory:t}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new t({kind:"FORM",language:["en","fr"],validationSchema:e.object({abstraction:e.number().int().gte(0).lte(2),attention:e.number().int().gte(0).lte(6),delayedRecall:e.number().int().gte(0).lte(5),language:e.number().int().gte(0).lte(3),lowEdu:e.boolean(),naming:e.number().int().gte(0).lte(3),orientation:e.number().int().gte(0).lte(6),visuospatialExecutive:e.number().int().gte(0).lte(5)})}).defineInstrument({name:"MontrealCognitiveAssessment",tags:{en:["Cognitive"],fr:["Cognitif"]},version:8.1,content:{abstraction:{kind:"numeric",label:{en:"Abstraction",fr:"Abstraction"},max:2,min:0,variant:"default"},attention:{kind:"numeric",label:{en:"Attention",fr:"Attention"},max:6,min:0,variant:"default"},delayedRecall:{kind:"numeric",label:{en:"Delayed Recall",fr:"Rappel"},max:5,min:0,variant:"default"},language:{kind:"numeric",label:{en:"Language",fr:"Langue"},max:3,min:0,variant:"default"},lowEdu:{kind:"binary",label:{en:"Less Than 12 Years of Education",fr:"Moins de 12 ans d\'\\xE9tudes"},options:{en:{f:"No",t:"Yes"},fr:{f:"No",t:"Oui"}},variant:"radio"},naming:{kind:"numeric",label:{en:"Naming",fr:"D\\xE9nomination"},max:3,min:0,variant:"default"},orientation:{kind:"numeric",label:{en:"Orientation",fr:"Orientation"},max:6,min:0,variant:"default"},visuospatialExecutive:{kind:"numeric",label:{en:"Visuospatial/Executive",fr:"Visuospatial/Ex\\xE9cutif"},max:5,min:0,variant:"default"}},details:{description:{en:"The Montreal Cognitive Assessment (MoCA) was designed as a rapid screening instrument for mild cognitive dysfunction. It assesses different cognitive domains: attention and concentration, executive functions, memory, language, visuoconstructional skills, conceptual thinking, calculations, and orientation. The MoCA may be administered by anyone who understands and follows the instructions, however, only a health professional with expertise in the cognitive field may interpret the results. Time to administer the MoCA is approximately 10 minutes. The total possible score is 30 points; a score of 26 or above is considered normal.",fr:"Le Montreal Cognitive Assessment (MoCA) a \\xE9t\\xE9 con\\xE7ue comme un instrument de d\\xE9pistage rapide des troubles cognitifs l\\xE9gers. Il \\xE9value diff\\xE9rents domaines cognitifs : l\'attention et la concentration, les fonctions ex\\xE9cutives, la m\\xE9moire, le langage, les capacit\\xE9s visuoconstructives, la pens\\xE9e conceptuelle, les calculs et l\'orientation. Le MoCA peut \\xEAtre administr\\xE9 par toute personne qui comprend et suit les instructions, mais seul un professionnel de la sant\\xE9 sp\\xE9cialis\\xE9 dans le domaine cognitif peut interpr\\xE9ter les r\\xE9sultats. L\'administration du MoCA dure environ 10 minutes. Le score total possible est de 30 points ; un score de 26 ou plus est consid\\xE9r\\xE9 comme normal."},estimatedDuration:10,instructions:{en:["All instructions may be repeated once."],fr:["Toutes les instructions peuvent \\xEAtre r\\xE9p\\xE9t\\xE9es une fois."]},license:"UNLICENSED",title:{en:"Montreal Cognitive Assessment",fr:"Montreal Cognitive Assessment"}},measures:{abstraction:{kind:"const",ref:"abstraction"},attention:{kind:"const",ref:"attention"},delayedRecall:{kind:"const",ref:"delayedRecall"},language:{kind:"const",ref:"language"},naming:{kind:"const",ref:"naming"},orientation:{kind:"const",ref:"orientation"},totalScore:{kind:"computed",label:{en:"Total Score",fr:"Score total"},value:i=>{let n=0;return Object.values(i).forEach(a=>{n+=Number(a)}),n}},visuospatialExecutive:{kind:"const",ref:"visuospatialExecutive"}}})})();\n',
+      kind: 'FORM',
+      language: ['en', 'fr'],
+      name: 'MontrealCognitiveAssessment',
+      tags: {
+        en: ['Cognitive'],
+        fr: ['Cognitif']
+      },
+      version: 8.1,
+      __model__: 'Instrument'
     });
   })
 ];
