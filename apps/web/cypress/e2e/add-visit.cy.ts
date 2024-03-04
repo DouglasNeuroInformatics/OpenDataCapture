@@ -42,9 +42,26 @@ describe('look at questionaire', () => {
     cy.get('button[data-cy="view-instrument"]').click({ force: true });
     cy.url().should('include', '/instruments/available-instruments');
     cy.wait(1000);
-    cy.get('h3[data-cy="instrument-title"]').contains('Happiness Questionnaire').click();
+    cy.get('h3[data-cy="instrument-title"]').contains('Montreal Cognitive Assessment').click();
     cy.get('button')
       .contains(new RegExp('^' + 'Begin' + '$', 'g'))
       .click({ force: true });
+
+    //form begins and inputs are filled out
+    cy.get('input[name="abstraction"]').type('1');
+    cy.get('input[name="attention"]').type('1');
+    cy.get('input[name="delayedRecall"]').type('1');
+    cy.get('input[name="language"]').type('1');
+
+    //click radio button "yes"
+    cy.get('div[role="radio"]').first().click();
+
+    //fill out rest of form
+    cy.get('input[name="naming"]').type('1');
+    cy.get('input[name="orientation"]').type('1');
+    cy.get('input[name="visuospatialExecutive"]').type('1');
+
+    //submit form
+    cy.get('button[aria-label="Submit Button"]').click();
   });
 });
