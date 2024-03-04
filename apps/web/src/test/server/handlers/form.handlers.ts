@@ -218,72 +218,96 @@ export const FormHandlers = [
   //form submission handler
   http.post('/v1/instrument-records', () => {
     return HttpResponse.json({
-      createdAt: '2023-11-24T16:06:43.272Z',
-      data: { overallHappiness: 7 },
-      date: '2023-11-24T16:06:43.204Z',
-      id: '6560ca135a6ad4ffe46a3666',
-      instrument: {
-        __v: 0,
-        _id: '655f861deb97aff8dc4f0c82',
-        bundle:
-          '({z})=>{const happinessQuestionnaire={kind:"form",name:"HappinessQuestionnaire",language:["en","fr"],tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},isRequired:true,kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:(data)=>{if(!data?.overallHappiness||data.overallHappiness>=5){return null}return{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:false,kind:"text",variant:"long"}}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:"Please answer the question based on your current feelings.",fr:"Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."},title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},value:({overallHappiness})=>overallHappiness}},validationSchema:z.object({overallHappiness:z.number().int().gte(1).lte(10),reasonForSadness:z.string().optional()})};const __instrument__=happinessQuestionnaire;return __instrument__};',
-        content: {
-          overallHappiness: {
-            description: {
-              en: 'Overall happiness from 1 through 10 (inclusive)',
-              fr: 'Bonheur général de 1 à 10 (inclus)'
-            },
-            isRequired: true,
-            kind: 'numeric',
-            label: { en: 'Overall Happiness', fr: 'Bonheur général' },
-            max: 10,
-            min: 1,
-            variant: 'slider'
-          },
-          reasonForSadness: { deps: ['overallHappiness'], kind: 'dynamic' }
-        },
-        createdAt: '2023-11-23T17:04:29.826Z',
-        details: {
-          description: {
-            en: 'The Happiness Questionnaire is a questionnaire about happiness.',
-            fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
-          },
-          estimatedDuration: 1,
-          instructions: {
-            en: 'Please answer the question based on your current feelings.',
-            fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'
-          },
-          title: { en: 'Happiness Questionnaire', fr: 'Questionnaire sur le bonheur' }
-        },
-        id: '655f861deb97aff8dc4f0c82',
-        kind: 'form',
-        language: ['en', 'fr'],
-        measures: { overallHappiness: { label: { en: 'Overall Happiness', fr: 'Bonheur général' } } },
-        name: 'HappinessQuestionnaire',
-        source:
-          "/* eslint-disable perfectionist/sort-objects */\n\ntype HappinessQuestionnaireData = {\n  overallHappiness: number;\n  reasonForSadness?: string;\n};\n\nconst happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, InstrumentLanguage> = {\n  kind: 'form',\n  name: 'HappinessQuestionnaire',\n  language: ['en', 'fr'],\n  tags: {\n    en: ['Well-Being'],\n    fr: ['Bien-être']\n  },\n  version: 1,\n  content: {\n    overallHappiness: {\n      description: {\n        en: 'Overall happiness from 1 through 10 (inclusive)',\n        fr: 'Bonheur général de 1 à 10 (inclus)'\n      },\n      isRequired: true,\n      kind: 'numeric',\n      label: {\n        en: 'Overall Happiness',\n        fr: 'Bonheur général'\n      },\n      max: 10,\n      min: 1,\n      variant: 'slider'\n    },\n    reasonForSadness: {\n      deps: ['overallHappiness'],\n      kind: 'dynamic',\n      render: (data) => {\n        if (!data?.overallHappiness || data.overallHappiness >= 5) {\n          return null;\n        }\n        return {\n          label: {\n            en: 'Reason for Sadness',\n            fr: 'Raison de la tristesse'\n          },\n          isRequired: false,\n          kind: 'text',\n          variant: 'long'\n        };\n      }\n    }\n  },\n  details: {\n    description: {\n      en: 'The Happiness Questionnaire is a questionnaire about happiness.',\n      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'\n    },\n    estimatedDuration: 1,\n    instructions: {\n      en: 'Please answer the question based on your current feelings.',\n      fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'\n    },\n    title: {\n      en: 'Happiness Questionnaire',\n      fr: 'Questionnaire sur le bonheur'\n    }\n  },\n  measures: {\n    overallHappiness: {\n      label: {\n        en: 'Overall Happiness',\n        fr: 'Bonheur général'\n      },\n      value: ({ overallHappiness }) => overallHappiness\n    }\n  },\n  validationSchema: z.object({\n    overallHappiness: z.number().int().gte(1).lte(10),\n    reasonForSadness: z.string().optional()\n  })\n};\n\nexport default happinessQuestionnaire;\n",
-        tags: { en: ['Well-Being'], fr: ['Bien-être'] },
-        updatedAt: '2023-11-23T17:04:29.826Z',
-        validationSchema: {
-          _cached: null,
-          _def: { catchall: { _def: { typeName: 'ZodNever' } }, typeName: 'ZodObject', unknownKeys: 'strip' }
-        },
-        version: 1
+      createdAt: '2024-03-04T16:46:16.661Z',
+      updatedAt: '2024-03-04T16:46:16.661Z',
+      id: '65e5fad8269e4a9f2ed48fd4',
+      data: {
+        abstraction: 1,
+        attention: 1,
+        delayedRecall: 1,
+        language: 1,
+        lowEdu: true,
+        naming: 1,
+        orientation: 1,
+        visuospatialExecutive: 1
       },
-      subject: {
-        __v: 0,
-        _id: '6560c9f65a6ad4ffe46a365b',
-        createdAt: '2023-11-24T16:06:14.536Z',
-        dateOfBirth: '2023-11-21T05:00:00.000Z',
-        firstName: 'rerwer',
-        groups: [],
-        id: '6560c9f65a6ad4ffe46a365b',
-        identifier: '907b0531c7c766e9b29b8e0626c68f2a84300fa92afd476cd4f77d40973028ca',
-        lastName: '2342f2',
-        sex: 'male',
-        updatedAt: '2023-11-24T16:06:14.536Z'
-      },
-      updatedAt: '2023-11-24T16:06:43.272Z'
+      date: '2024-03-04T16:46:16.629Z',
+      groupId: null,
+      subjectId: '3069e89784e0e22b4d070e9c6117c3fe48666c44b4036762b1109c005ab4d6d4',
+      instrumentId: '65dd26ad933b24c8b9023ca7',
+      assignmentId: null,
+      __model__: 'InstrumentRecord'
     });
   })
+
+  // http.post('/v1/instrument-records', () => {
+  //   return HttpResponse.json({
+  //     createdAt: '2023-11-24T16:06:43.272Z',
+  //     data: { overallHappiness: 7 },
+  //     date: '2023-11-24T16:06:43.204Z',
+  //     id: '6560ca135a6ad4ffe46a3666',
+  //     instrument: {
+  //       __v: 0,
+  //       _id: '655f861deb97aff8dc4f0c82',
+  //       bundle:
+  //         '({z})=>{const happinessQuestionnaire={kind:"form",name:"HappinessQuestionnaire",language:["en","fr"],tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},isRequired:true,kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:(data)=>{if(!data?.overallHappiness||data.overallHappiness>=5){return null}return{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:false,kind:"text",variant:"long"}}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:"Please answer the question based on your current feelings.",fr:"Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."},title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},value:({overallHappiness})=>overallHappiness}},validationSchema:z.object({overallHappiness:z.number().int().gte(1).lte(10),reasonForSadness:z.string().optional()})};const __instrument__=happinessQuestionnaire;return __instrument__};',
+  //       content: {
+  //         overallHappiness: {
+  //           description: {
+  //             en: 'Overall happiness from 1 through 10 (inclusive)',
+  //             fr: 'Bonheur général de 1 à 10 (inclus)'
+  //           },
+  //           isRequired: true,
+  //           kind: 'numeric',
+  //           label: { en: 'Overall Happiness', fr: 'Bonheur général' },
+  //           max: 10,
+  //           min: 1,
+  //           variant: 'slider'
+  //         },
+  //         reasonForSadness: { deps: ['overallHappiness'], kind: 'dynamic' }
+  //       },
+  //       createdAt: '2023-11-23T17:04:29.826Z',
+  //       details: {
+  //         description: {
+  //           en: 'The Happiness Questionnaire is a questionnaire about happiness.',
+  //           fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
+  //         },
+  //         estimatedDuration: 1,
+  //         instructions: {
+  //           en: 'Please answer the question based on your current feelings.',
+  //           fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'
+  //         },
+  //         title: { en: 'Happiness Questionnaire', fr: 'Questionnaire sur le bonheur' }
+  //       },
+  //       id: '655f861deb97aff8dc4f0c82',
+  //       kind: 'form',
+  //       language: ['en', 'fr'],
+  //       measures: { overallHappiness: { label: { en: 'Overall Happiness', fr: 'Bonheur général' } } },
+  //       name: 'HappinessQuestionnaire',
+  //       source:
+  //         "/* eslint-disable perfectionist/sort-objects */\n\ntype HappinessQuestionnaireData = {\n  overallHappiness: number;\n  reasonForSadness?: string;\n};\n\nconst happinessQuestionnaire: FormInstrument<HappinessQuestionnaireData, InstrumentLanguage> = {\n  kind: 'form',\n  name: 'HappinessQuestionnaire',\n  language: ['en', 'fr'],\n  tags: {\n    en: ['Well-Being'],\n    fr: ['Bien-être']\n  },\n  version: 1,\n  content: {\n    overallHappiness: {\n      description: {\n        en: 'Overall happiness from 1 through 10 (inclusive)',\n        fr: 'Bonheur général de 1 à 10 (inclus)'\n      },\n      isRequired: true,\n      kind: 'numeric',\n      label: {\n        en: 'Overall Happiness',\n        fr: 'Bonheur général'\n      },\n      max: 10,\n      min: 1,\n      variant: 'slider'\n    },\n    reasonForSadness: {\n      deps: ['overallHappiness'],\n      kind: 'dynamic',\n      render: (data) => {\n        if (!data?.overallHappiness || data.overallHappiness >= 5) {\n          return null;\n        }\n        return {\n          label: {\n            en: 'Reason for Sadness',\n            fr: 'Raison de la tristesse'\n          },\n          isRequired: false,\n          kind: 'text',\n          variant: 'long'\n        };\n      }\n    }\n  },\n  details: {\n    description: {\n      en: 'The Happiness Questionnaire is a questionnaire about happiness.',\n      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'\n    },\n    estimatedDuration: 1,\n    instructions: {\n      en: 'Please answer the question based on your current feelings.',\n      fr: 'Veuillez répondre à la question en fonction de vos sentiments actuels.'\n    },\n    title: {\n      en: 'Happiness Questionnaire',\n      fr: 'Questionnaire sur le bonheur'\n    }\n  },\n  measures: {\n    overallHappiness: {\n      label: {\n        en: 'Overall Happiness',\n        fr: 'Bonheur général'\n      },\n      value: ({ overallHappiness }) => overallHappiness\n    }\n  },\n  validationSchema: z.object({\n    overallHappiness: z.number().int().gte(1).lte(10),\n    reasonForSadness: z.string().optional()\n  })\n};\n\nexport default happinessQuestionnaire;\n",
+  //       tags: { en: ['Well-Being'], fr: ['Bien-être'] },
+  //       updatedAt: '2023-11-23T17:04:29.826Z',
+  //       validationSchema: {
+  //         _cached: null,
+  //         _def: { catchall: { _def: { typeName: 'ZodNever' } }, typeName: 'ZodObject', unknownKeys: 'strip' }
+  //       },
+  //       version: 1
+  //     },
+  //     subject: {
+  //       __v: 0,
+  //       _id: '6560c9f65a6ad4ffe46a365b',
+  //       createdAt: '2023-11-24T16:06:14.536Z',
+  //       dateOfBirth: '2023-11-21T05:00:00.000Z',
+  //       firstName: 'rerwer',
+  //       groups: [],
+  //       id: '6560c9f65a6ad4ffe46a365b',
+  //       identifier: '907b0531c7c766e9b29b8e0626c68f2a84300fa92afd476cd4f77d40973028ca',
+  //       lastName: '2342f2',
+  //       sex: 'male',
+  //       updatedAt: '2023-11-24T16:06:14.536Z'
+  //     },
+  //     updatedAt: '2023-11-24T16:06:43.272Z'
+  //   });
+  // })
 ];
