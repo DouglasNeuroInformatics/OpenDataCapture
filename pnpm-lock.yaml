@@ -579,13 +579,13 @@ importers:
   apps/web:
     dependencies:
       '@casl/ability':
-        specifier: ^6.5.0
+        specifier: ^6.7.0
         version: 6.7.0
       '@douglasneuroinformatics/ui':
         specifier: ^6.1.0
         version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.64)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       '@douglasneuroinformatics/utils':
-        specifier: latest
+        specifier: ^1.2.2
         version: 1.2.2
       '@headlessui/react':
         specifier: ^1.7.18

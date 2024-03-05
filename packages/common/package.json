@@ -33,6 +33,6 @@
     "@open-data-capture/database": "workspace:*",
     "@open-data-capture/instrument-library": "workspace:*",
     "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.61"
+    "@types/react": "^18.2.63"
   }
 }
