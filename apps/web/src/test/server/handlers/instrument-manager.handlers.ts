@@ -187,12 +187,8 @@ export const ManageInstrumentHandlers = [
     ]);
   }),
 
-  http.get('/v1/instruments/65d5179227e183f93166d4b2', () => {
+  http.get('/v1/instruments/65e730e24344d866399e41e8', () => {
     return HttpResponse.json({
-      __model__: 'Instrument',
-      bundle:
-        '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
-      createdAt: '2024-02-20T21:20:18.489Z',
       details: {
         authors: [],
         description: {
@@ -207,17 +203,67 @@ export const ManageInstrumentHandlers = [
         license: 'AGPL-3.0',
         referenceUrl: null,
         sourceUrl: null,
-        title: { en: 'Happiness Questionnaire', fr: 'Questionnaire sur le bonheur' }
+        title: {
+          en: 'Happiness Questionnaire',
+          fr: 'Questionnaire sur le bonheur'
+        }
       },
-      id: '65d5179227e183f93166d4b2',
+      createdAt: '2024-03-05T14:49:06.485Z',
+      updatedAt: '2024-03-05T14:49:06.485Z',
+      id: '65e730e24344d866399e41e8',
+      source:
+        "/* eslint-disable perfectionist/sort-objects */\n\nconst { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');\nconst { z } = await import('/runtime/v0.0.1/zod.js');\n\nconst instrumentFactory = new InstrumentFactory({\n  kind: 'FORM',\n  language: ['en', 'fr'],\n  validationSchema: z.object({\n    overallHappiness: z.number().int().gte(1).lte(10),\n    reasonForSadness: z.string().optional()\n  })\n});\n\nexport default instrumentFactory.defineInstrument({\n  name: 'HappinessQuestionnaire',\n  tags: {\n    en: ['Well-Being'],\n    fr: ['Bien-être']\n  },\n  version: 1,\n  content: {\n    overallHappiness: {\n      description: {\n        en: 'Overall happiness from 1 through 10 (inclusive)',\n        fr: 'Bonheur général de 1 à 10 (inclus)'\n      },\n      kind: 'numeric',\n      label: {\n        en: 'Overall Happiness',\n        fr: 'Bonheur général'\n      },\n      max: 10,\n      min: 1,\n      variant: 'slider'\n    },\n    reasonForSadness: {\n      deps: ['overallHappiness'],\n      kind: 'dynamic',\n      render: (data) => {\n        if (!data?.overallHappiness || data.overallHappiness >= 5) {\n          return null;\n        }\n        return {\n          label: {\n            en: 'Reason for Sadness',\n            fr: 'Raison de la tristesse'\n          },\n          isRequired: false,\n          kind: 'text',\n          variant: 'long'\n        };\n      }\n    }\n  },\n  details: {\n    description: {\n      en: 'The Happiness Questionnaire is a questionnaire about happiness.',\n      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'\n    },\n    estimatedDuration: 1,\n    instructions: {\n      en: ['Please answer the question based on your current feelings.'],\n      fr: ['Veuillez répondre à la question en fonction de vos sentiments actuels.']\n    },\n    license: 'AGPL-3.0',\n    title: {\n      en: 'Happiness Questionnaire',\n      fr: 'Questionnaire sur le bonheur'\n    }\n  },\n  measures: {\n    overallHappiness: {\n      kind: 'const',\n      ref: 'overallHappiness'\n    }\n  }\n});\n",
+      bundle:
+        '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
       kind: 'FORM',
       language: ['en', 'fr'],
       name: 'HappinessQuestionnaire',
+      tags: {
+        en: ['Well-Being'],
+        fr: ['Bien-être']
+      },
+      version: 1,
+      __model__: 'Instrument'
+    });
+  }),
+
+  http.get('/v1/instruments/65dd26a1933b24c8b9023ca1', () => {
+    return HttpResponse.json({
+      details: {
+        authors: [],
+        description: {
+          en: 'The Happiness Questionnaire is a questionnaire about happiness.',
+          fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
+        },
+        estimatedDuration: 1,
+        instructions: {
+          en: ['Please answer the question based on your current feelings.'],
+          fr: ['Veuillez répondre à la question en fonction de vos sentiments actuels.']
+        },
+        license: 'AGPL-3.0',
+        referenceUrl: null,
+        sourceUrl: null,
+        title: {
+          en: 'Happiness Questionnaire',
+          fr: 'Questionnaire sur le bonheur'
+        }
+      },
+      createdAt: '2024-03-05T14:49:06.485Z',
+      updatedAt: '2024-03-05T14:49:06.485Z',
+      id: '65e730e24344d866399e41e8',
       source:
         "/* eslint-disable perfectionist/sort-objects */\n\nconst { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');\nconst { z } = await import('/runtime/v0.0.1/zod.js');\n\nconst instrumentFactory = new InstrumentFactory({\n  kind: 'FORM',\n  language: ['en', 'fr'],\n  validationSchema: z.object({\n    overallHappiness: z.number().int().gte(1).lte(10),\n    reasonForSadness: z.string().optional()\n  })\n});\n\nexport default instrumentFactory.defineInstrument({\n  name: 'HappinessQuestionnaire',\n  tags: {\n    en: ['Well-Being'],\n    fr: ['Bien-être']\n  },\n  version: 1,\n  content: {\n    overallHappiness: {\n      description: {\n        en: 'Overall happiness from 1 through 10 (inclusive)',\n        fr: 'Bonheur général de 1 à 10 (inclus)'\n      },\n      kind: 'numeric',\n      label: {\n        en: 'Overall Happiness',\n        fr: 'Bonheur général'\n      },\n      max: 10,\n      min: 1,\n      variant: 'slider'\n    },\n    reasonForSadness: {\n      deps: ['overallHappiness'],\n      kind: 'dynamic',\n      render: (data) => {\n        if (!data?.overallHappiness || data.overallHappiness >= 5) {\n          return null;\n        }\n        return {\n          label: {\n            en: 'Reason for Sadness',\n            fr: 'Raison de la tristesse'\n          },\n          isRequired: false,\n          kind: 'text',\n          variant: 'long'\n        };\n      }\n    }\n  },\n  details: {\n    description: {\n      en: 'The Happiness Questionnaire is a questionnaire about happiness.',\n      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'\n    },\n    estimatedDuration: 1,\n    instructions: {\n      en: ['Please answer the question based on your current feelings.'],\n      fr: ['Veuillez répondre à la question en fonction de vos sentiments actuels.']\n    },\n    license: 'AGPL-3.0',\n    title: {\n      en: 'Happiness Questionnaire',\n      fr: 'Questionnaire sur le bonheur'\n    }\n  },\n  measures: {\n    overallHappiness: {\n      kind: 'const',\n      ref: 'overallHappiness'\n    }\n  }\n});\n",
-      tags: { en: ['Well-Being'], fr: ['Bien-être'] },
-      updatedAt: '2024-02-20T21:20:18.489Z',
-      version: 1
+      bundle:
+        '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
+      kind: 'FORM',
+      language: ['en', 'fr'],
+      name: 'HappinessQuestionnaire',
+      tags: {
+        en: ['Well-Being'],
+        fr: ['Bien-être']
+      },
+      version: 1,
+      __model__: 'Instrument'
     });
   }),
 
