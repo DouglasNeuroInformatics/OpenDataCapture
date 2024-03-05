@@ -1,27 +1,12 @@
 import { adminUser } from '@/test/server/stubs';
 
-// //randomizer function to create random test patient name
-function makeid(length: number) {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  const charactersLength = characters.length;
-  let counter = 0;
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
-  }
-  return result;
-}
-
-const name = makeid(6);
-
 describe('tags test', () => {
   it('passes', () => {
     cy.login(adminUser.username, adminUser.password);
 
     cy.wait(2000);
     cy.get('button[data-cy="add-visit"]').first().click({ force: true });
-    cy.get('input[name=firstName]').type(name);
+    cy.get('input[name=firstName]').type('testing');
     cy.get('input[name=lastName]').type('testPatient');
 
     //activate a fill in DOB date reader
