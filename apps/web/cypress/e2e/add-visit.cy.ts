@@ -17,7 +17,7 @@ describe('look at questionaire', () => {
     cy.get('button').contains('14').click();
 
     cy.get('button[class="field-input capitalize"]').click();
-    cy.get('li[id*="headlessui-listbox-option-:"]').first().click();
+    cy.get('li').contains('Female').click();
     //submit form
     cy.get('button[type="submit"]').click();
 
