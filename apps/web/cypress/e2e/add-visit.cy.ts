@@ -5,7 +5,7 @@ describe('look at questionaire', () => {
     //navigate to add visit page, fill in subject form
     cy.login(adminUser.username, adminUser.password);
     cy.wait(2000);
-    cy.get('button[data-cy="add-visit"]').first().click({ force: true });
+    cy.get('button[data-cy="add-visit"]').first().click();
     cy.get('input[name=firstName]').type('testing');
     cy.get('input[name=lastName]').type('testPatient');
 
@@ -13,24 +13,24 @@ describe('look at questionaire', () => {
     cy.get('input[class=field-input]').first().type('test');
     cy.get('svg[data-testid="arrow-up-icon"]').eq(1).click();
     cy.get('button').contains('1999').click();
-    cy.wait(100);
-    cy.get('button').contains('11').click();
+    cy.wait(200);
+    cy.get('button').contains('14').click();
 
-    cy.get('button[class="field-input capitalize"]').click({ force: true });
+    cy.get('button[class="field-input capitalize"]').click();
     cy.get('li[id*="headlessui-listbox-option-:"]').first().click();
     //submit form
-    cy.get('button[type="submit"]').click({ force: true });
+    cy.get('button[type="submit"]').click();
 
     cy.wait(1000);
 
     //navigate to view instrument page, select a form and confirm subject info is autofilled
-    cy.get('button[data-cy="view-instrument"]').click({ force: true });
+    cy.get('button[data-cy="view-instrument"]').click();
     cy.url().should('include', '/instruments/available-instruments');
     cy.wait(1000);
     cy.get('h3[data-cy="instrument-title"]').contains('Montreal Cognitive Assessment').click();
     cy.get('button')
       .contains(new RegExp('^' + 'Begin' + '$', 'g'))
-      .click({ force: true });
+      .click();
 
     //form begins and inputs are filled out
     cy.get('input[name="abstraction"]').type('1');
