@@ -1,6 +1,6 @@
 import { HttpResponse, http } from 'msw';
 
-export const ManageInstrumentHandlers = [
+export const manageInstrumentHandlers = [
   http.get('/v1/instruments/summaries', () => {
     return HttpResponse.json([
       {

@@ -1,19 +1,19 @@
 import { setupWorker } from 'msw/browser';
 
 import { authHandlers } from './handlers/auth.handlers';
-import { FormHandlers } from './handlers/form.handlers';
-import { ManageInstrumentHandlers } from './handlers/instrument-manager.handlers';
+import { formHandlers } from './handlers/form.handlers';
+import { manageInstrumentHandlers } from './handlers/instrument-manager.handlers';
 import { setupHandlers } from './handlers/setup.handlers';
-import { SubjectHandlers } from './handlers/subject.handlers';
-import { SummaryHandlers } from './handlers/summary.handlers';
-import { VisitHandler } from './handlers/visit.handlers';
+import { subjectHandlers } from './handlers/subject.handlers';
+import { summaryHandlers } from './handlers/summary.handlers';
+import { visitHandler } from './handlers/visit.handlers';
 
 export const worker = setupWorker(
   ...authHandlers,
   ...setupHandlers,
-  ...SummaryHandlers,
-  ...VisitHandler,
-  ...FormHandlers,
-  ...SubjectHandlers,
-  ...ManageInstrumentHandlers
+  ...summaryHandlers,
+  ...visitHandler,
+  ...formHandlers,
+  ...subjectHandlers,
+  ...manageInstrumentHandlers
 );

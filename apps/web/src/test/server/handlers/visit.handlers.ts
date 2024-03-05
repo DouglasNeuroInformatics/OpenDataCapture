@@ -3,7 +3,7 @@ import { HttpResponse, http } from 'msw';
 
 import { testSubject } from '../stubs';
 
-export const VisitHandler = [
+export const visitHandler = [
   http.post('/v1/visits', () => {
     return HttpResponse.json<Visit>({
       createdAt: new Date(),

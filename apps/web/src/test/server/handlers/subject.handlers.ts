@@ -1,6 +1,6 @@
 import { HttpResponse, http } from 'msw';
 
-export const SubjectHandlers = [
+export const subjectHandlers = [
   //list of possible subject, Get request when the user enters the view subjects page
   http.get('/v1/subjects', () => {
     return HttpResponse.json([

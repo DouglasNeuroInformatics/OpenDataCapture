@@ -1,7 +1,7 @@
 import type { Summary } from '@open-data-capture/common/summary';
 import { HttpResponse, http } from 'msw';
 
-export const SummaryHandlers = [
+export const summaryHandlers = [
   http.get('v1/summary', () => {
     return HttpResponse.json<Summary>({
       counts: {

@@ -1,6 +1,6 @@
 import { HttpResponse, http } from 'msw';
 
-export const FormHandlers = [
+export const formHandlers = [
   //gather all the forms (happiness form, psychosis form, etc.)
   http.get('/v1/instruments/available?kind=form', () => {
     return HttpResponse.json([
