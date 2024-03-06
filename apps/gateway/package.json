@@ -37,7 +37,8 @@
     "react-dom": "^18.2.0",
     "react-i18next": "^14.0.5",
     "sirv": "^2.0.4",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@open-data-capture/esbuild-plugin-native-modules": "workspace:*",
