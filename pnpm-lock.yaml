@@ -306,8 +306,8 @@ importers:
         specifier: ^0.0.7
         version: 0.0.7
       '@douglasneuroinformatics/ui':
-        specifier: ^6.0.1
-        version: 6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
+        specifier: ^6.1.0
+        version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       '@open-data-capture/common':
         specifier: workspace:*
         version: link:../../packages/common
@@ -455,8 +455,8 @@ importers:
   apps/playground:
     dependencies:
       '@douglasneuroinformatics/ui':
-        specifier: ^6.0.1
-        version: 6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
+        specifier: ^6.1.0
+        version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       '@douglasneuroinformatics/utils':
         specifier: ^1.2.2
         version: 1.2.2
@@ -579,8 +579,8 @@ importers:
         specifier: ^6.7.0
         version: 6.7.0
       '@douglasneuroinformatics/ui':
-        specifier: ^6.0.1
-        version: 6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
+        specifier: ^6.1.0
+        version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       '@douglasneuroinformatics/utils':
         specifier: ^1.2.2
         version: 1.2.2
@@ -801,8 +801,8 @@ importers:
   packages/editor:
     dependencies:
       '@douglasneuroinformatics/ui':
-        specifier: ^6.0.1
-        version: 6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
+        specifier: ^6.1.0
+        version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       '@headlessui/react':
         specifier: ^1.7.18
         version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -895,8 +895,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/ui':
-        specifier: ^6.0.1
-        version: 6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
+        specifier: ^6.1.0
+        version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       '@open-data-capture/common':
         specifier: workspace:*
         version: link:../common
@@ -957,8 +957,8 @@ importers:
   packages/instrument-renderer:
     dependencies:
       '@douglasneuroinformatics/ui':
-        specifier: ^6.0.1
-        version: 6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
+        specifier: ^6.1.0
+        version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       '@douglasneuroinformatics/utils':
         specifier: ^1.2.2
         version: 1.2.2
@@ -1081,8 +1081,8 @@ importers:
   packages/react-core:
     dependencies:
       '@douglasneuroinformatics/ui':
-        specifier: ^6.0.1
-        version: 6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
+        specifier: ^6.1.0
+        version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       '@douglasneuroinformatics/utils':
         specifier: ^1.2.2
         version: 1.2.2
@@ -1152,8 +1152,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/ui':
-        specifier: ^6.0.1
-        version: 6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
+        specifier: ^6.1.0
+        version: 6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
       autoprefixer:
         specifier: 10.x
         version: 10.4.17(postcss@8.4.35)
@@ -3102,9 +3102,9 @@ packages:
       { integrity: sha512-OXWgfsdGkQv2PDtWntnVaU09ARqmxuELldp/yk90Ma/uY1yz8/9X0NdY/wOHKthP7ihk4uq3tN92jbXy1e//GA== }
     dev: false
 
-  /@douglasneuroinformatics/ui@6.0.1(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1):
+  /@douglasneuroinformatics/ui@6.1.0(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1):
     resolution:
-      { integrity: sha512-JSucvIX8Jq3WO7cFWg2+7uEPsuJmOeiwWs8zqTnZrnmsj/gFmgHtoDIcW8yy/PmdLRSqbqJCEfuEdQydgszcXw== }
+      { integrity: sha512-l7iJ9U5379MdGEXOjIZGq+qv4rJQHZ3/hYTd1AVUWg8XhShQ78etf/P+5CLXvDZsYEryGdmoQL7desUav9aDsQ== }
     peerDependencies:
       '@headlessui/tailwindcss': ^0.2.0
       '@tailwindcss/container-queries': ^0.1.1
