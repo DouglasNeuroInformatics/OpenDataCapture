@@ -99,6 +99,7 @@ export default defineConfig({
         return function (tree, { data }) {
           const textOnPage = toString(tree);
           const readingTime = getReadingTime(textOnPage);
+          // @ts-ignore
           data.astro.frontmatter.readingTime = readingTime.minutes;
         };
       }
@@ -110,7 +111,7 @@ export default defineConfig({
     '/fr/docs': '/fr/introduction/home'
   },
   server: {
-    port: parseInt(process.env.OUTREACH_DEV_SERVER_PORT ?? 4000)
+    port: parseInt(process.env.OUTREACH_DEV_SERVER_PORT ?? '4000')
   },
   site: 'https://opendatacapture.org',
   vite: {

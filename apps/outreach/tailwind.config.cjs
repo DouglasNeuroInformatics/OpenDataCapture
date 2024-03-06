@@ -1,5 +1,3 @@
-// @ts-check
-
 const { createConfig } = require('@open-data-capture/tailwindcss');
 const typographyPlugin = require('@tailwindcss/typography');
 
