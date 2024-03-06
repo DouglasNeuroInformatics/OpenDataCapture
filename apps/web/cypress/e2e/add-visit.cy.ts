@@ -4,7 +4,7 @@ describe('look at questionaire', () => {
   it('passes', () => {
     //navigate to add visit page, fill in subject form
     cy.login(adminUser.username, adminUser.password);
-    cy.wait(2000);
+
     cy.get('button[data-cy="add-visit"]').first().click();
     cy.get('input[name=firstName]').type('testing');
     cy.get('input[name=lastName]').type('testPatient');
