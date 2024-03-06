@@ -8,7 +8,7 @@
     "build": "tsc && pnpm exec vite build",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "dev": "env-cmd -f ../../.env cross-env NODE_ENV=development pnpm exec vite",
+    "dev": "NODE_ENV=development env-cmd -f ../../.env pnpm exec vite",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
