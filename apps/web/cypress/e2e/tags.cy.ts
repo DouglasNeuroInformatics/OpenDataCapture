@@ -7,10 +7,10 @@ describe('tags test', () => {
     cy.addAVisit('testing', 'testpatient');
 
     //navigate to view instruments, select the first tag available with dropdown
-    cy.wait(1000);
-    cy.get('button[data-cy="view-instrument"]').first().click({ force: true });
+
+    cy.get('button[data-cy="view-instrument"]').first().click();
     cy.get('div[data-cy="tags-btn-dropdown"]').click();
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
 
     //check that a form now contains that selected tag
     let text1: string;
@@ -28,9 +28,9 @@ describe('tags test', () => {
 
     //deselect the first tag
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click();
 
     //check form contains the second tag
     let text2: string;
@@ -47,9 +47,9 @@ describe('tags test', () => {
       });
 
     //deselect the second tag, select the third tag
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(2).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(2).click();
 
     //check form contains the third tag
     let text3: string;
@@ -65,9 +65,9 @@ describe('tags test', () => {
         expect(spanText3).to.contain(text3);
       });
 
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(3).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(3).click();
 
     //check form contains the 4th tag
     let text4: string;
@@ -84,12 +84,12 @@ describe('tags test', () => {
       });
 
     //deselect schizo and psychosis from search
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(4).click({ force: true });
+    cy.get('li[id*="headlessui-listbox-option-:"]').eq(4).click();
 
     //check form contains the 5th tag
     let text5: string;
