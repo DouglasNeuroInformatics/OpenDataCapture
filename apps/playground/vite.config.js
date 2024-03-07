@@ -21,7 +21,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['@swc/wasm-web']
+    exclude: ['@douglasneuroinformatics/ui', '@swc/wasm-web']
   },
   plugins: [react(), runtime()],
   resolve: {
