@@ -11,14 +11,14 @@ describe('Subject view test', () => {
     cy.get('button[data-cy="view-subjects"]').first().click({ force: true });
 
     //select first user and their instrument dropdown
-    cy.get('td').first().click();
+    cy.get('td[data-cy="table-data-item"]').first().click();
 
     cy.get('a[data-cy="subject-table"]').click();
     cy.get('div[data-cy="select-instrument"]').click();
-    cy.get('button[id*="headlessui-menu-item-:r1"]').eq(0).click();
+    cy.get('button[data-cy="dropdown-menu-option"]').eq(0).click();
 
     cy.get('div[data-cy="time-dropdown"]').click();
-    cy.get('button[id*="headlessui-menu-item-:r1"]').eq(2).click();
+    cy.get('button[data-cy="dropdown-menu-option"]').eq(2).click();
 
     cy.get('div[data-cy="download-dropdown"]').click();
 
@@ -30,12 +30,12 @@ describe('Subject view test', () => {
 
     //choose overall happiness
     cy.get('div[data-cy="measure-select"]').click();
-    cy.get('li[id*="headlessui-listbox-option-:r2"]').click();
+    cy.get('li[data-cy="select-dropdown-option"]').click();
 
     cy.get('div[class="recharts-wrapper"]').click();
 
     //choose month as timeline
     cy.get('div[data-cy="time-select"]').click();
-    cy.get('button[id*="headlessui-menu-item-:r2"]').eq(0).click();
+    cy.get('button[data-cy="dropdown-menu-option"]').eq(0).click();
   });
 });
