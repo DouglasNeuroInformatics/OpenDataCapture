@@ -34,10 +34,10 @@ Cypress.Commands.add('addAVisit', (firstName, lastName) => {
 
   //activate a fill in DOB date reader
   cy.get('input[class=field-input]').first().type('test');
-  cy.get('svg[data-testid="arrow-up-icon"]').eq(1).click();
-  cy.get('button').contains('1999').click();
-  cy.get('button', { timeout: 10000 }).contains(14).should('be.visible');
-  cy.get('button').contains('14').click();
+  cy.get('button[data-cy="year-select"]').click();
+  cy.get('button[data-cy="year-option"]').contains('1999').click();
+  cy.get('button[data-cy="day-option"]', { timeout: 10000 }).contains(14).should('be.visible');
+  cy.get('button[data-cy="day-option"]').contains('14').click();
 
   cy.get('button[class="field-input capitalize"]').click();
   cy.get('li').contains('Female').click();
