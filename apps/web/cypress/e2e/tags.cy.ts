@@ -10,11 +10,11 @@ describe('tags test', () => {
 
     cy.get('button[data-cy="view-instrument"]').first().click();
     cy.get('div[data-cy="tags-btn-dropdown"]').click();
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
 
     //check that a form now contains that selected tag
     let text1: string;
-    cy.get('span[class="ui-selected:font-medium"]')
+    cy.get('span[data-cy="select-dropdown-option-label"]')
       .eq(0)
       .should(($span) => {
         text1 = $span.text();
@@ -28,13 +28,13 @@ describe('tags test', () => {
 
     //deselect the first tag
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(1).click();
 
     //check form contains the second tag
     let text2: string;
-    cy.get('span[class="ui-selected:font-medium"]')
+    cy.get('span[data-cy="select-dropdown-option-label"]')
       .eq(1)
       .should(($span) => {
         text2 = $span.text();
@@ -47,13 +47,13 @@ describe('tags test', () => {
       });
 
     //deselect the second tag, select the third tag
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(2).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(2).click();
 
     //check form contains the third tag
     let text3: string;
-    cy.get('span[class="ui-selected:font-medium"]')
+    cy.get('span[data-cy="select-dropdown-option-label"]')
       .eq(0)
       .should(($span) => {
         text3 = $span.text();
@@ -65,13 +65,13 @@ describe('tags test', () => {
         expect(spanText3).to.contain(text3);
       });
 
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(3).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(3).click();
 
     //check form contains the 4th tag
     let text4: string;
-    cy.get('span[class="ui-selected:font-medium"]')
+    cy.get('span[data-cy="select-dropdown-option-label"]')
       .eq(0)
       .should(($span) => {
         text4 = $span.text();
@@ -84,16 +84,16 @@ describe('tags test', () => {
       });
 
     //deselect schizo and psychosis from search
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(1).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(1).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(0).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
     cy.wait(200);
-    cy.get('li[id*="headlessui-listbox-option-:"]').eq(4).click();
+    cy.get('li[data-cy="select-dropdown-option"]').eq(4).click();
 
     //check form contains the 5th tag
     let text5: string;
-    cy.get('span[class="ui-selected:font-medium"]')
+    cy.get('span[data-cy="select-dropdown-option-label"]')
       .eq(0)
       .should(($span) => {
         text5 = $span.text();
