@@ -13,7 +13,7 @@ describe('look at questionaire', () => {
     cy.get('input[class=field-input]').first().type('test');
     cy.get('svg[data-testid="arrow-up-icon"]').eq(1).click();
     cy.get('button').contains('1999').click();
-    cy.wait(200);
+    cy.get('button', { timeout: 10000 }).contains(14).should('be.visible');
     cy.get('button').contains('14').click();
 
     cy.get('button[class="field-input capitalize"]').click();
