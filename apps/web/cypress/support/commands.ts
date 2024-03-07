@@ -14,7 +14,7 @@
 
 //This is a login script for the
 Cypress.Commands.add('login', (username, password) => {
-  cy.visit('http://localhost:3000/auth/login');
+  cy.visit('/auth/login');
   cy.intercept('GET', '/src/assets/logo.png').as('finalElement');
 
   //logo.png the last element acquired through GET request before loading full screen thus wait for it to be completed
