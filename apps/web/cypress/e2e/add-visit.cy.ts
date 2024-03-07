@@ -45,6 +45,7 @@ describe('look at questionaire', () => {
     cy.get('input[name="visuospatialExecutive"]').type('1');
 
     //submit form
-    cy.get('button[aria-label="Submit Button"]').click();
+    // cy.get('button[aria-label="Submit Button"]').click();
+    cy.get('form[data-cy="form-content"]').children().get('button[aria-label="Submit Button"]').click();
   });
 });
