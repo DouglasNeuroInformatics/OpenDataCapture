@@ -24,6 +24,6 @@
   "devDependencies": {
     "@open-data-capture/rollup-plugin-instrument": "workspace:*",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "rollup": "^4.12.0"
+    "rollup": "^4.12.1"
   }
 }
