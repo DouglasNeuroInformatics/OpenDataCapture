@@ -26,6 +26,30 @@ Cypress.Commands.add('login', (username, password) => {
   form.get('button[aria-label="Submit Button"]').click();
 });
 
+Cypress.Commands.add('addAVisit', (firstName, lastName) => {
+  cy.get('button[data-cy="add-visit"]').first().click();
+  cy.url().should('include', '/visits/add-visit');
+  cy.get('input[name=firstName]').type(firstName);
+  cy.get('input[name=lastName]').type(lastName);
+
+  //activate a fill in DOB date reader
+  cy.get('input[class=field-input]').first().type('test');
+  cy.get('svg[data-testid="arrow-up-icon"]').eq(1).click();
+  cy.get('button').contains('1999').click();
+  cy.get('button', { timeout: 10000 }).contains(14).should('be.visible');
+  cy.get('button').contains('14').click();
+
+  cy.get('button[class="field-input capitalize"]').click();
+  cy.get('li').contains('Female').click();
+  //submit form
+  cy.get('button[type="submit"]').click();
+
+  //navigate to view instrument page, select a form and confirm subject info is autofilled
+  cy.get('button[data-cy="view-instrument"]').click();
+
+  cy.url().should('include', '/instruments/available-instruments');
+});
+
 Cypress.Commands.add('dragTo', { prevSubject: 'element' }, (subject, targetSelector) => {
   cy.wrap(subject).trigger('dragstart');
   cy.get(targetSelector).trigger('drop');
@@ -37,6 +61,7 @@ declare global {
   namespace Cypress {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Chainable {
+      addAVisit(firstName: string, lastName: string): Chainable<void>;
       dragTo(prevSubject: string): Chainable<void>;
       login(username: string, password: string): Chainable<void>;
     }
