@@ -4,22 +4,7 @@ describe('tags test', () => {
   it('passes', () => {
     cy.login(adminUser.username, adminUser.password);
 
-    cy.wait(2000);
-    cy.get('button[data-cy="add-visit"]').first().click({ force: true });
-    cy.get('input[name=firstName]').type('testing');
-    cy.get('input[name=lastName]').type('testPatient');
-
-    //activate a fill in DOB date reader
-    cy.get('input[class=field-input]').first().type('test');
-    cy.get('svg[data-testid="arrow-up-icon"]').eq(1).click();
-    cy.get('button').contains('1999').click();
-    cy.wait(500);
-    cy.get('button').contains('11').click();
-
-    cy.get('button[class="field-input capitalize"]').click({ force: true });
-    cy.get('li[id*="headlessui-listbox-option-:"]').first().click();
-    //submit form
-    cy.get('button[type="submit"]').click({ force: true });
+    cy.addAVisit('testing', 'testpatient');
 
     //navigate to view instruments, select the first tag available with dropdown
     cy.wait(1000);
