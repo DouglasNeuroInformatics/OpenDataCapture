@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 
-import { AsymmetricEncryptionKeyPair } from '@douglasneuroinformatics/crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Assignment, UpdateAssignmentData } from '@open-data-capture/common/assignment';
+import { AsymmetricEncryptionKeyPair } from '@open-data-capture/crypto';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import { ConfigurationService } from '@/configuration/configuration.service';
