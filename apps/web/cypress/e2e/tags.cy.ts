@@ -27,9 +27,8 @@ describe('tags test', () => {
       });
 
     //deselect the first tag
-    cy.wait(200);
     cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
-    cy.wait(200);
+    cy.get('li[data-cy="select-dropdown-option"]', { timeout: 10000 }).eq(1).should('be.visible');
     cy.get('li[data-cy="select-dropdown-option"]').eq(1).click();
 
     //check form contains the second tag
@@ -48,7 +47,7 @@ describe('tags test', () => {
 
     //deselect the second tag, select the third tag
     cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
-    cy.wait(200);
+    cy.get('li[data-cy="select-dropdown-option"]', { timeout: 10000 }).eq(2).should('be.visible');
     cy.get('li[data-cy="select-dropdown-option"]').eq(2).click();
 
     //check form contains the third tag
@@ -66,7 +65,7 @@ describe('tags test', () => {
       });
 
     cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
-    cy.wait(200);
+    cy.get('li[data-cy="select-dropdown-option"]', { timeout: 10000 }).eq(3).should('be.visible');
     cy.get('li[data-cy="select-dropdown-option"]').eq(3).click();
 
     //check form contains the 4th tag
@@ -86,9 +85,11 @@ describe('tags test', () => {
     //deselect schizo and psychosis from search
     cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
     cy.get('li[data-cy="select-dropdown-option"]').eq(1).click();
-    cy.wait(200);
+
+    cy.get('li[data-cy="select-dropdown-option"]', { timeout: 10000 }).eq(0).should('be.visible');
+
     cy.get('li[data-cy="select-dropdown-option"]').eq(0).click();
-    cy.wait(200);
+    cy.get('li[data-cy="select-dropdown-option"]', { timeout: 10000 }).eq(4).should('be.visible');
     cy.get('li[data-cy="select-dropdown-option"]').eq(4).click();
 
     //check form contains the 5th tag
