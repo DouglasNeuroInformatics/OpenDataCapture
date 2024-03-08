@@ -10,5 +10,5 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["src/**/*"]
+  "include": ["astro.config.js", "tailwind.config.cjs", "src/**/*"]
 }

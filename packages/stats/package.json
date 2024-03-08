@@ -1,0 +1,16 @@
+{
+  "name": "@open-data-capture/stats",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest run"
+  }
+}
