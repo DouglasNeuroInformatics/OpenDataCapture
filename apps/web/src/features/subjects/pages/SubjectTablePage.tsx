@@ -1,5 +1,5 @@
+import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable, Dropdown } from '@douglasneuroinformatics/ui/legacy';
-import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 

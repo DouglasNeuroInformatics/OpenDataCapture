@@ -1,5 +1,5 @@
+import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Card, Modal } from '@douglasneuroinformatics/ui/legacy';
-import { snakeToCamelCase } from '@douglasneuroinformatics/utils';
 import type { LoginCredentials } from '@open-data-capture/common/auth';
 import { DEMO_USERS } from '@open-data-capture/demo';
 import { useTranslation } from 'react-i18next';

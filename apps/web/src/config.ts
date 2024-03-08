@@ -1,4 +1,4 @@
-import { deepFreeze } from '@douglasneuroinformatics/utils';
+import { deepFreeze } from '@douglasneuroinformatics/libjs';
 import { $BooleanString } from '@open-data-capture/common/core';
 import { z } from 'zod';
 

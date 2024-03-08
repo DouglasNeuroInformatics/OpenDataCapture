@@ -1,4 +1,4 @@
-import { yearsPassed } from '@douglasneuroinformatics/utils';
+import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable } from '@nestjs/common';
 import type { AnyInstrument, InstrumentMeasureValue } from '@open-data-capture/common/instrument';
 import type {

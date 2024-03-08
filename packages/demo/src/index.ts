@@ -1,4 +1,4 @@
-import { deepFreeze } from '@douglasneuroinformatics/utils';
+import { deepFreeze } from '@douglasneuroinformatics/libjs';
 import type { Group } from '@open-data-capture/common/group';
 import type { User } from '@open-data-capture/common/user';
 
