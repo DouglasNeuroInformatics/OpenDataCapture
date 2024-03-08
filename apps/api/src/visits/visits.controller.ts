@@ -1,4 +1,3 @@
-import type { EntityController } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Visit } from '@open-data-capture/common/visit';
@@ -9,7 +8,7 @@ import { CreateVisitDto } from './dto/create-visit.dto';
 import { VisitsService } from './visits.service';
 
 @Controller('visits')
-export class VisitsController implements Pick<EntityController<Visit>, 'create'> {
+export class VisitsController {
   constructor(private readonly visitsService: VisitsService) {}
 
   @ApiOperation({ description: 'Create Visit' })

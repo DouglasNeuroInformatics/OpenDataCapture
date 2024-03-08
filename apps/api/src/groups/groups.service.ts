@@ -1,6 +1,4 @@
-import { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Group } from '@open-data-capture/common/group';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -11,7 +9,7 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 
 @Injectable()
-export class GroupsService implements EntityService<Group> {
+export class GroupsService {
   constructor(@InjectModel('Group') private readonly groupModel: Model<'Group'>) {}
 
   async create(group: CreateGroupDto) {

@@ -1,7 +1,6 @@
-import { CurrentUser, type EntityController } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { Group } from '@open-data-capture/common/group';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
@@ -12,7 +11,7 @@ import { GroupsService } from './groups.service';
 
 @ApiTags('Groups')
 @Controller('groups')
-export class GroupsController implements EntityController<Group> {
+export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
   @ApiOperation({ summary: 'Create Group' })

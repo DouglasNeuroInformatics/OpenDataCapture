@@ -1,7 +1,5 @@
-import type { EntityService } from '@douglasneuroinformatics/nestjs/core';
 import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { type User } from '@open-data-capture/common/user';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -14,7 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import type { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
-export class UsersService implements EntityService<User> {
+export class UsersService {
   constructor(
     @InjectModel('User') private readonly userModel: Model<'User'>,
     private readonly cryptoService: CryptoService,
