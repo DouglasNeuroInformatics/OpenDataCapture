@@ -1,4 +1,4 @@
-import { PublicKey } from '@douglasneuroinformatics/crypto';
+import { PublicKey } from '@open-data-capture/crypto';
 import { PrismaClient } from '@open-data-capture/database/gateway';
 
 export const prisma = new PrismaClient().$extends({

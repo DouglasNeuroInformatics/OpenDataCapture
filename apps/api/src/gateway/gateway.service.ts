@@ -1,4 +1,3 @@
-import type { PublicEncryptionKey } from '@douglasneuroinformatics/crypto';
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@open-data-capture/common/assignment';
@@ -8,6 +7,7 @@ import type {
   MutateAssignmentResponseBody,
   RemoteAssignment
 } from '@open-data-capture/common/assignment';
+import type { PublicEncryptionKey } from '@open-data-capture/crypto';
 
 import { InstrumentsService } from '@/instruments/instruments.service';
 

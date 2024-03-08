@@ -1,6 +1,6 @@
-import { Decrypter } from '@douglasneuroinformatics/crypto';
 import { Injectable, InternalServerErrorException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import type { RemoteAssignment } from '@open-data-capture/common/assignment';
+import { Decrypter } from '@open-data-capture/crypto';
 
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { ConfigurationService } from '@/configuration/configuration.service';
