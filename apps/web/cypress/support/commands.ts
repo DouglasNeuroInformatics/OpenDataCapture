@@ -23,7 +23,7 @@ Cypress.Commands.add('login', (username, password) => {
   const form = cy.get('form[data-cy="login-form"]');
   form.get('input[name="username"]').type(username);
   form.get('input[name="password"]').type(password);
-  form.get('button[aria-label="Submit Button"]').click();
+  form.get('button[data-cy="submit-form"]').click();
 });
 
 Cypress.Commands.add('addAVisit', (firstName, lastName) => {
@@ -33,7 +33,7 @@ Cypress.Commands.add('addAVisit', (firstName, lastName) => {
   cy.get('input[name=lastName]').type(lastName);
 
   //activate a fill in DOB date reader
-  cy.get('input[class=field-input]').first().type('test');
+  cy.get('input[data-cy="date-input"]').first().type('test');
   cy.get('button[data-cy="year-select"]').click();
   cy.get('button[data-cy="year-option"]').contains('1999').click();
   cy.get('button[data-cy="day-option"]', { timeout: 10000 }).contains(14).should('be.visible');

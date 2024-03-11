@@ -18,7 +18,7 @@ describe('look at questionaire', () => {
     cy.get('input[name="language"]').type('1');
 
     //click radio button "yes"
-    cy.get('div[role="radio"]').first().click();
+    cy.get('div[data-cy="radio-option"]').first().click();
 
     //fill out rest of form
     cy.get('input[name="naming"]').type('1');
