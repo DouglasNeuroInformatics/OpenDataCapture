@@ -14,7 +14,7 @@
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.1.0",
+    "@douglasneuroinformatics/ui": "^6.2.1",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@monaco-editor/react": "^4.6.0",
@@ -31,7 +31,7 @@
     "@types/react-dom": "^18.2.21",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
-    "vite": "^5.1.5"
+    "vite": "^5.1.6"
   },
   "peerDependencies": {
     "react": "18.x",

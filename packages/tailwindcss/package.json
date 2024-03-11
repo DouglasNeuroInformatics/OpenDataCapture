@@ -9,7 +9,7 @@
     "lint": "eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.1.0"
+    "@douglasneuroinformatics/ui": "^6.2.1"
   },
   "peerDependencies": {
     "autoprefixer": "10.x",
