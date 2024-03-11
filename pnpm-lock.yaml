@@ -254,15 +254,15 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
+      '@douglasneuroinformatics/esbuild-plugin-prisma':
+        specifier: ^0.0.1
+        version: 0.0.1(@prisma/client@5.10.2)(@prisma/engines@5.10.2)(esbuild@0.20.1)(prisma@5.10.2)
       '@nestjs/testing':
         specifier: ^10.3.3
         version: 10.3.3(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)
       '@open-data-capture/esbuild-plugin-native-modules':
         specifier: workspace:*
         version: link:../../packages/esbuild-plugin-native-modules
-      '@open-data-capture/esbuild-plugin-prisma':
-        specifier: workspace:*
-        version: link:../../packages/esbuild-plugin-prisma
       '@open-data-capture/esbuild-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/esbuild-plugin-runtime
@@ -363,12 +363,12 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
+      '@douglasneuroinformatics/esbuild-plugin-prisma':
+        specifier: ^0.0.1
+        version: 0.0.1(@prisma/client@5.10.2)(@prisma/engines@5.10.2)(esbuild@0.20.1)(prisma@5.10.2)
       '@open-data-capture/esbuild-plugin-native-modules':
         specifier: workspace:*
         version: link:../../packages/esbuild-plugin-native-modules
-      '@open-data-capture/esbuild-plugin-prisma':
-        specifier: workspace:*
-        version: link:../../packages/esbuild-plugin-prisma
       '@open-data-capture/tailwindcss':
         specifier: workspace:*
         version: link:../../packages/tailwindcss
@@ -396,6 +396,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.17
         version: 10.4.18(postcss@8.4.35)
+      esbuild:
+        specifier: ^0.20.1
+        version: 0.20.1
       postcss:
         specifier: ^8.4.35
         version: 8.4.35
@@ -869,24 +872,6 @@ importers:
       esbuild:
         specifier: 0.x
         version: 0.20.1
-
-  packages/esbuild-plugin-prisma:
-    dependencies:
-      '@prisma/client':
-        specifier: 5.x
-        version: 5.10.2(prisma@5.10.2)
-      '@prisma/engines':
-        specifier: 5.x
-        version: 5.10.2
-      '@prisma/get-platform':
-        specifier: ^5.10.2
-        version: 5.10.2
-      esbuild:
-        specifier: 0.x
-        version: 0.20.1
-      prisma:
-        specifier: 5.x
-        version: 5.10.2
 
   packages/esbuild-plugin-runtime:
     dependencies:
@@ -3057,6 +3042,22 @@ packages:
     resolution:
       { integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw== }
     engines: { node: '>=10.0.0' }
+    dev: true
+
+  /@douglasneuroinformatics/esbuild-plugin-prisma@0.0.1(@prisma/client@5.10.2)(@prisma/engines@5.10.2)(esbuild@0.20.1)(prisma@5.10.2):
+    resolution:
+      { integrity: sha512-DsLOAS4h03jFB/3muCxvD0EfTugBc4oOfYjY9CipJ5yIUsBPBVk5IkG0FEZERQr/qO9cg6djxMAkNDuH/y5wXg== }
+    peerDependencies:
+      '@prisma/client': 5.x
+      '@prisma/engines': 5.x
+      esbuild: 0.x
+      prisma: 5.x
+    dependencies:
+      '@prisma/client': 5.10.2(prisma@5.10.2)
+      '@prisma/engines': 5.10.2
+      '@prisma/get-platform': 5.10.2
+      esbuild: 0.20.1
+      prisma: 5.10.2
     dev: true
 
   /@douglasneuroinformatics/eslint-config@3.0.3(eslint@8.57.0)(typescript@5.3.3):
@@ -21996,7 +21997,6 @@ packages:
     name: github-script
     version: 7.0.1
     engines: { node: '>=20.0.0 <21.0.0' }
-    prepare: true
     requiresBuild: true
     dependencies:
       '@actions/core': 1.10.1
