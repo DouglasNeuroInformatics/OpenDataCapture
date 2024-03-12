@@ -31,7 +31,7 @@ export const SubjectTablePage = () => {
       <div className="my-2">
         <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
-          <div className="flex flex-col gap-2 lg:flex-row">
+          <div className="flex flex-col gap-2 lg:flex-row" data-cy="select-instrument">
             <Dropdown
               className="text-sm"
               options={instrumentOptions}
@@ -41,7 +41,11 @@ export const SubjectTablePage = () => {
             />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
+            <div data-cy="time-dropdown">
             <TimeDropdown setMinTime={setMinDate} />
+            </div>
+           
+            <div data-cy="download-dropdown">
             <Dropdown
               className="text-sm"
               options={['CSV', 'JSON']}
@@ -49,6 +53,8 @@ export const SubjectTablePage = () => {
               variant="secondary"
               onSelection={dl}
             />
+            </div>
+            
           </div>
         </div>
       </div>

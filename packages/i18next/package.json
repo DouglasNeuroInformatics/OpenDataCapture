@@ -16,11 +16,11 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.1.0",
+    "@douglasneuroinformatics/ui": "^6.2.2",
     "@open-data-capture/common": "workspace:*",
     "i18next-browser-languagedetector": "^7.2.0",
     "lodash": "^4.17.21",
-    "react-i18next": "^14.0.5"
+    "react-i18next": "^14.1.0"
   },
   "peerDependencies": {
     "@types/lodash": "^4.14.202",
