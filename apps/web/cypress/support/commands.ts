@@ -42,7 +42,7 @@ Cypress.Commands.add('addAVisit', (firstName, lastName) => {
   cy.get('button[class="field-input capitalize"]').click();
   cy.get('li').contains('Female').click();
   //submit form
-  cy.get('button[type="submit"]').click();
+  cy.get('button[data-cy="submit-form"]').click();
 
   //navigate to view instrument page, select a form and confirm subject info is autofilled
   cy.get('button[data-cy="view-instrument"]').click();
