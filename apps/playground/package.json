@@ -16,7 +16,7 @@
     "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.2.1",
+    "@douglasneuroinformatics/ui": "^6.2.2",
     "@douglasneuroinformatics/utils": "^1.2.2",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
@@ -49,8 +49,8 @@
   "devDependencies": {
     "@open-data-capture/tailwindcss": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
-    "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.64",
+    "@types/lodash": "^4.17.0",
+    "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.21",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "autoprefixer": "^10.4.18",

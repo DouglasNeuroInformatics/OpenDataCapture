@@ -9,7 +9,7 @@
     "lint": "eslint --fix src"
   },
   "dependencies": {
-    "@prisma/get-platform": "^5.10.2"
+    "@prisma/get-platform": "^5.11.0"
   },
   "peerDependencies": {
     "@prisma/client": "5.x",

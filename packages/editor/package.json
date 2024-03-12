@@ -14,20 +14,20 @@
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.2.1",
+    "@douglasneuroinformatics/ui": "^6.2.2",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@open-data-capture/i18next": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
-    "framer-motion": "^11.0.8",
+    "framer-motion": "^11.0.12",
     "monaco-editor": "^0.45.0",
     "prettier": "^3.2.5",
     "react-i18next": "^14.1.0"
   },
   "devDependencies": {
     "@open-data-capture/tailwindcss": "workspace:*",
-    "@types/react": "^18.2.64",
+    "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.21",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",

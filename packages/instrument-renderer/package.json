@@ -17,7 +17,7 @@
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.2.1",
+    "@douglasneuroinformatics/ui": "^6.2.2",
     "@douglasneuroinformatics/utils": "^1.2.2",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
@@ -28,7 +28,7 @@
     "@open-data-capture/licenses": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
-    "framer-motion": "^11.0.8",
+    "framer-motion": "^11.0.12",
     "i18next": "^23.10.1",
     "lodash": "^4.17.21",
     "react-i18next": "^14.1.0",
@@ -38,8 +38,8 @@
     "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/tailwindcss": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
-    "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.64",
+    "@types/lodash": "^4.17.0",
+    "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.21",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
