@@ -26,7 +26,7 @@ describe('Subject view test', () => {
 
     //choosing first questionnaire as instrument
     cy.get('div[data-cy="instrument-select"]').click();
-    cy.get('button[role="menuitem"]').eq(0).click();
+    cy.get('button[data-cy="dropdown-menu-option"]').eq(0).click();
 
     //choose overall happiness
     cy.get('div[data-cy="measure-select"]').click();
