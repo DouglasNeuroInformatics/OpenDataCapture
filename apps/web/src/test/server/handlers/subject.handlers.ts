@@ -205,224 +205,224 @@ export const subjectHandlers = [
     () => {
       return HttpResponse.json([
         {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
+          computedMeasures: {
+            overallHappiness: 3
+          },
           createdAt: '2024-03-05T14:49:18.784Z',
-          updatedAt: '2024-03-05T14:49:18.784Z',
-          id: '65e730ee4344d866399e420b',
           data: {
             overallHappiness: 3
           },
           date: '2023-01-15T05:52:34.896Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e420b',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
-          computedMeasures: {
-            overallHappiness: 3
-          },
-          __model__: 'InstrumentRecord'
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.784Z'
         },
         {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
+          computedMeasures: {
+            overallHappiness: 1
+          },
           createdAt: '2024-03-05T14:49:18.787Z',
-          updatedAt: '2024-03-05T14:49:18.787Z',
-          id: '65e730ee4344d866399e420c',
           data: {
             overallHappiness: 1
           },
           date: '2023-04-06T16:57:48.693Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e420c',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.787Z'
+        },
+        {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
           computedMeasures: {
             overallHappiness: 1
           },
-          __model__: 'InstrumentRecord'
-        },
-        {
           createdAt: '2024-03-05T14:49:18.792Z',
-          updatedAt: '2024-03-05T14:49:18.792Z',
-          id: '65e730ee4344d866399e420d',
           data: {
             overallHappiness: 1
           },
           date: '2022-09-02T13:02:47.401Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e420d',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
-          computedMeasures: {
-            overallHappiness: 1
-          },
-          __model__: 'InstrumentRecord'
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.792Z'
         },
         {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
+          computedMeasures: {
+            overallHappiness: 5
+          },
           createdAt: '2024-03-05T14:49:18.795Z',
-          updatedAt: '2024-03-05T14:49:18.795Z',
-          id: '65e730ee4344d866399e420e',
           data: {
             overallHappiness: 5
           },
           date: '2022-09-11T01:23:49.002Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e420e',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
-          computedMeasures: {
-            overallHappiness: 5
-          },
-          __model__: 'InstrumentRecord'
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.795Z'
         },
         {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
+          computedMeasures: {
+            overallHappiness: 6
+          },
           createdAt: '2024-03-05T14:49:18.799Z',
-          updatedAt: '2024-03-05T14:49:18.799Z',
-          id: '65e730ee4344d866399e420f',
           data: {
             overallHappiness: 6
           },
           date: '2024-01-30T03:43:00.887Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e420f',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
-          computedMeasures: {
-            overallHappiness: 6
-          },
-          __model__: 'InstrumentRecord'
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.799Z'
         },
         {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
+          computedMeasures: {
+            overallHappiness: 5
+          },
           createdAt: '2024-03-05T14:49:18.803Z',
-          updatedAt: '2024-03-05T14:49:18.803Z',
-          id: '65e730ee4344d866399e4210',
           data: {
             overallHappiness: 5
           },
           date: '2022-10-05T06:26:36.475Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e4210',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
-          computedMeasures: {
-            overallHappiness: 5
-          },
-          __model__: 'InstrumentRecord'
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.803Z'
         },
         {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
+          computedMeasures: {
+            overallHappiness: 3
+          },
           createdAt: '2024-03-05T14:49:18.808Z',
-          updatedAt: '2024-03-05T14:49:18.808Z',
-          id: '65e730ee4344d866399e4211',
           data: {
             overallHappiness: 3
           },
           date: '2022-07-01T23:16:42.333Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e4211',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
-          computedMeasures: {
-            overallHappiness: 3
-          },
-          __model__: 'InstrumentRecord'
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.808Z'
         },
         {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
+          computedMeasures: {
+            overallHappiness: 4
+          },
           createdAt: '2024-03-05T14:49:18.812Z',
-          updatedAt: '2024-03-05T14:49:18.812Z',
-          id: '65e730ee4344d866399e4212',
           data: {
             overallHappiness: 4
           },
           date: '2023-11-05T11:35:23.888Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e4212',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
-          computedMeasures: {
-            overallHappiness: 4
-          },
-          __model__: 'InstrumentRecord'
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.812Z'
         },
         {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
+          computedMeasures: {
+            overallHappiness: 9
+          },
           createdAt: '2024-03-05T14:49:18.816Z',
-          updatedAt: '2024-03-05T14:49:18.816Z',
-          id: '65e730ee4344d866399e4213',
           data: {
             overallHappiness: 9
           },
           date: '2022-08-13T11:44:16.693Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e4213',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.816Z'
+        },
+        {
+          __model__: 'InstrumentRecord',
+          assignmentId: null,
           computedMeasures: {
             overallHappiness: 9
           },
-          __model__: 'InstrumentRecord'
-        },
-        {
           createdAt: '2024-03-05T14:49:18.819Z',
-          updatedAt: '2024-03-05T14:49:18.819Z',
-          id: '65e730ee4344d866399e4214',
           data: {
             overallHappiness: 9
           },
           date: '2023-08-09T10:42:00.598Z',
           groupId: '65e730ee4344d866399e41f2',
-          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
-          instrumentId: '65e730e24344d866399e41e8',
-          assignmentId: null,
+          id: '65e730ee4344d866399e4214',
           instrument: {
             bundle:
               '(async()=>{const{InstrumentFactory:s}=await import("/runtime/v0.0.1/core.js"),{z:e}=await import("/runtime/v0.0.1/zod.js");return new s({kind:"FORM",language:["en","fr"],validationSchema:e.object({overallHappiness:e.number().int().gte(1).lte(10),reasonForSadness:e.string().optional()})}).defineInstrument({name:"HappinessQuestionnaire",tags:{en:["Well-Being"],fr:["Bien-\\xEAtre"]},version:1,content:{overallHappiness:{description:{en:"Overall happiness from 1 through 10 (inclusive)",fr:"Bonheur g\\xE9n\\xE9ral de 1 \\xE0 10 (inclus)"},kind:"numeric",label:{en:"Overall Happiness",fr:"Bonheur g\\xE9n\\xE9ral"},max:10,min:1,variant:"slider"},reasonForSadness:{deps:["overallHappiness"],kind:"dynamic",render:n=>!n?.overallHappiness||n.overallHappiness>=5?null:{label:{en:"Reason for Sadness",fr:"Raison de la tristesse"},isRequired:!1,kind:"text",variant:"long"}}},details:{description:{en:"The Happiness Questionnaire is a questionnaire about happiness.",fr:"Le questionnaire sur le bonheur est un questionnaire sur le bonheur."},estimatedDuration:1,instructions:{en:["Please answer the question based on your current feelings."],fr:["Veuillez r\\xE9pondre \\xE0 la question en fonction de vos sentiments actuels."]},license:"AGPL-3.0",title:{en:"Happiness Questionnaire",fr:"Questionnaire sur le bonheur"}},measures:{overallHappiness:{kind:"const",ref:"overallHappiness"}}})})();\n',
             kind: 'FORM'
           },
-          computedMeasures: {
-            overallHappiness: 9
-          },
-          __model__: 'InstrumentRecord'
+          instrumentId: '65e730e24344d866399e41e8',
+          subjectId: '19c68118c1f5e170001a1a87316621e0d28158e1adb7fc037ef491e9ad427214',
+          updatedAt: '2024-03-05T14:49:18.819Z'
         }
       ]);
     }

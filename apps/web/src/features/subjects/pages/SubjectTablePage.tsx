@@ -1,5 +1,5 @@
+import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable, Dropdown } from '@douglasneuroinformatics/ui/legacy';
-import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/utils';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -42,19 +42,18 @@ export const SubjectTablePage = () => {
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="time-dropdown">
-            <TimeDropdown setMinTime={setMinDate} />
+              <TimeDropdown setMinTime={setMinDate} />
             </div>
-           
+
             <div data-cy="download-dropdown">
-            <Dropdown
-              className="text-sm"
-              options={['CSV', 'JSON']}
-              title={t('core:download')}
-              variant="secondary"
-              onSelection={dl}
-            />
+              <Dropdown
+                className="text-sm"
+                options={['CSV', 'JSON']}
+                title={t('core:download')}
+                variant="secondary"
+                onSelection={dl}
+              />
             </div>
-            
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { randomValue } from '@douglasneuroinformatics/utils';
+import { randomValue } from '@douglasneuroinformatics/libjs';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
 import { type Json, toUpperCase } from '@open-data-capture/common/core';

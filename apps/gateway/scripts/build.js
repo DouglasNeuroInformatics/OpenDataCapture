@@ -5,8 +5,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
-import { nativeModulesPlugin } from '@open-data-capture/esbuild-plugin-native-modules';
-import { prismaPlugin } from '@open-data-capture/esbuild-plugin-prisma';
+import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-native-modules';
+import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
 import esbuild from 'esbuild';
 
 const __filename = url.fileURLToPath(import.meta.url);

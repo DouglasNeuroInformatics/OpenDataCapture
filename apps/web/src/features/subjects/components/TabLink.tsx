@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { NavLink } from 'react-router-dom';
 
-export const TabLink = ({ dataCy, label, pathname }: { dataCy?: string; label: string;  pathname: string}) => (
+export const TabLink = ({ dataCy, label, pathname }: { dataCy?: string; label: string; pathname: string }) => (
   <NavLink
     end
     className={({ isActive }) =>
@@ -10,7 +10,7 @@ export const TabLink = ({ dataCy, label, pathname }: { dataCy?: string; label: s
         isActive ? 'border-sky-500 text-slate-900 dark:text-slate-100' : 'border-slate-300'
       )
     }
-    data-cy = {dataCy}
+    data-cy={dataCy}
     to={pathname}
   >
     {label}

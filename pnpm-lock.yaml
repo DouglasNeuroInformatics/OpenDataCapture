@@ -154,12 +154,12 @@ importers:
       '@casl/prisma':
         specifier: ^1.4.1
         version: 1.4.1(@casl/ability@6.7.0)(@prisma/client@5.11.0)
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.0.1
+        version: 0.0.1(typescript@5.3.3)
       '@douglasneuroinformatics/nestjs':
         specifier: ^3.0.0
         version: 3.0.0(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)(@nestjs/testing@10.3.3)(express@4.18.3)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1)
-      '@douglasneuroinformatics/utils':
-        specifier: ^1.2.2
-        version: 1.2.2
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
@@ -254,15 +254,15 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
+      '@douglasneuroinformatics/esbuild-plugin-native-modules':
+        specifier: ^0.0.1
+        version: 0.0.1(esbuild@0.20.1)
+      '@douglasneuroinformatics/esbuild-plugin-prisma':
+        specifier: ^0.0.1
+        version: 0.0.1(@prisma/client@5.11.0)(@prisma/engines@5.11.0)(esbuild@0.20.1)(prisma@5.11.0)
       '@nestjs/testing':
         specifier: ^10.3.3
         version: 10.3.3(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)
-      '@open-data-capture/esbuild-plugin-native-modules':
-        specifier: workspace:*
-        version: link:../../packages/esbuild-plugin-native-modules
-      '@open-data-capture/esbuild-plugin-prisma':
-        specifier: workspace:*
-        version: link:../../packages/esbuild-plugin-prisma
       '@open-data-capture/esbuild-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/esbuild-plugin-runtime
@@ -292,7 +292,7 @@ importers:
         version: 0.20.1
       esbuild-plugin-tsc:
         specifier: ^0.4.0
-        version: 0.4.0(typescript@5.4.2)
+        version: 0.4.0(typescript@5.3.3)
       nodemon:
         specifier: ^3.1.0
         version: 3.1.0
@@ -363,12 +363,12 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
-      '@open-data-capture/esbuild-plugin-native-modules':
-        specifier: workspace:*
-        version: link:../../packages/esbuild-plugin-native-modules
-      '@open-data-capture/esbuild-plugin-prisma':
-        specifier: workspace:*
-        version: link:../../packages/esbuild-plugin-prisma
+      '@douglasneuroinformatics/esbuild-plugin-native-modules':
+        specifier: ^0.0.1
+        version: 0.0.1(esbuild@0.20.1)
+      '@douglasneuroinformatics/esbuild-plugin-prisma':
+        specifier: ^0.0.1
+        version: 0.0.1(@prisma/client@5.11.0)(@prisma/engines@5.11.0)(esbuild@0.20.1)(prisma@5.11.0)
       '@open-data-capture/tailwindcss':
         specifier: workspace:*
         version: link:../../packages/tailwindcss
@@ -396,6 +396,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.18
         version: 10.4.18(postcss@8.4.35)
+      esbuild:
+        specifier: ^0.20.1
+        version: 0.20.1
       postcss:
         specifier: ^8.4.35
         version: 8.4.35
@@ -426,7 +429,7 @@ importers:
     devDependencies:
       '@astrojs/check':
         specifier: ^0.5.8
-        version: 0.5.8(prettier-plugin-astro@0.12.3)(prettier@3.2.5)(typescript@5.4.2)
+        version: 0.5.8(prettier-plugin-astro@0.12.3)(prettier@3.2.5)(typescript@5.3.3)
       '@astrojs/sitemap':
         specifier: ^3.1.1
         version: 3.1.1
@@ -447,7 +450,7 @@ importers:
         version: 4.17.12
       astro:
         specifier: ^4.5.2
-        version: 4.5.2(@types/node@20.11.26)(typescript@5.4.2)
+        version: 4.5.2(@types/node@20.11.26)(typescript@5.3.3)
       sharp:
         specifier: ^0.33.2
         version: 0.33.2
@@ -457,12 +460,12 @@ importers:
 
   apps/playground:
     dependencies:
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.0.1
+        version: 0.0.1(typescript@5.3.3)
       '@douglasneuroinformatics/ui':
         specifier: ^6.2.2
         version: 6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
-      '@douglasneuroinformatics/utils':
-        specifier: ^1.2.2
-        version: 1.2.2
       '@headlessui/react':
         specifier: ^1.7.18
         version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -581,6 +584,9 @@ importers:
       '@casl/ability':
         specifier: ^6.7.0
         version: 6.7.0
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.0.1
+        version: 0.0.1(typescript@5.3.3)
       '@douglasneuroinformatics/ui':
         specifier: ^6.2.2
         version: 6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
@@ -796,9 +802,9 @@ importers:
 
   packages/demo:
     dependencies:
-      '@douglasneuroinformatics/utils':
-        specifier: ^1.2.2
-        version: 1.2.2
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.0.1
+        version: 0.0.1(typescript@5.3.3)
       '@open-data-capture/common':
         specifier: workspace:*
         version: link:../common
@@ -863,30 +869,6 @@ importers:
       vite:
         specifier: ^5.1.6
         version: 5.1.6(@types/node@20.11.26)
-
-  packages/esbuild-plugin-native-modules:
-    dependencies:
-      esbuild:
-        specifier: 0.x
-        version: 0.20.1
-
-  packages/esbuild-plugin-prisma:
-    dependencies:
-      '@prisma/client':
-        specifier: 5.x
-        version: 5.11.0(prisma@5.11.0)
-      '@prisma/engines':
-        specifier: 5.x
-        version: 5.11.0
-      '@prisma/get-platform':
-        specifier: ^5.11.0
-        version: 5.11.0
-      esbuild:
-        specifier: 0.x
-        version: 0.20.1
-      prisma:
-        specifier: 5.x
-        version: 5.11.0
 
   packages/esbuild-plugin-runtime:
     dependencies:
@@ -961,12 +943,12 @@ importers:
 
   packages/instrument-renderer:
     dependencies:
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.0.1
+        version: 0.0.1(typescript@5.3.3)
       '@douglasneuroinformatics/ui':
         specifier: ^6.2.2
         version: 6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
-      '@douglasneuroinformatics/utils':
-        specifier: ^1.2.2
-        version: 1.2.2
       '@headlessui/react':
         specifier: ^1.7.18
         version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -1085,12 +1067,12 @@ importers:
 
   packages/react-core:
     dependencies:
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.0.1
+        version: 0.0.1(typescript@5.3.3)
       '@douglasneuroinformatics/ui':
         specifier: ^6.2.2
         version: 6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
-      '@douglasneuroinformatics/utils':
-        specifier: ^1.2.2
-        version: 1.2.2
       '@heroicons/react':
         specifier: ^2.1.1
         version: 2.1.1(react@18.2.0)
@@ -1227,7 +1209,7 @@ importers:
         version: 0.4.4(rollup@4.13.0)
       '@rollup/plugin-typescript':
         specifier: ^11.1.6
-        version: 11.1.6(rollup@4.13.0)(typescript@5.4.2)
+        version: 11.1.6(rollup@4.13.0)(typescript@5.3.3)
       '@types/react':
         specifier: ^18.2.65
         version: 18.2.65
@@ -1248,7 +1230,7 @@ importers:
         version: 4.13.0
       rollup-plugin-dts:
         specifier: ^6.1.0
-        version: 6.1.0(rollup@4.13.0)(typescript@5.4.2)
+        version: 6.1.0(rollup@4.13.0)(typescript@5.3.3)
       zod:
         specifier: ^3.22.4
         version: 3.22.4
@@ -1334,18 +1316,18 @@ packages:
       is-potential-custom-element-name: 1.0.1
     dev: true
 
-  /@astrojs/check@0.5.8(prettier-plugin-astro@0.12.3)(prettier@3.2.5)(typescript@5.4.2):
+  /@astrojs/check@0.5.8(prettier-plugin-astro@0.12.3)(prettier@3.2.5)(typescript@5.3.3):
     resolution:
       { integrity: sha512-O3lPUIwhlRtya8KcUDfB0+vBPgj/qVoNvTUhYTTDx0uEsHBbssO5RSFezw6KVBxps6zIR8+YAyOoRKPBhMB7KQ== }
     hasBin: true
     peerDependencies:
       typescript: ^5.0.0
     dependencies:
-      '@astrojs/language-server': 2.8.0(prettier-plugin-astro@0.12.3)(prettier@3.2.5)(typescript@5.4.2)
+      '@astrojs/language-server': 2.8.0(prettier-plugin-astro@0.12.3)(prettier@3.2.5)(typescript@5.3.3)
       chokidar: 3.6.0
       fast-glob: 3.3.2
       kleur: 4.1.5
-      typescript: 5.4.2
+      typescript: 5.3.3
       yargs: 17.7.2
     transitivePeerDependencies:
       - prettier
@@ -1367,7 +1349,7 @@ packages:
       { integrity: sha512-tGmHvrhpzuz0JBHaJX8GywN9g4rldVNHtkoVDC3m/DdzBO70jGoVuc0uuNVglRYnsdwkbG0K02Iw3nOOR3/Y4g== }
     dev: true
 
-  /@astrojs/language-server@2.8.0(prettier-plugin-astro@0.12.3)(prettier@3.2.5)(typescript@5.4.2):
+  /@astrojs/language-server@2.8.0(prettier-plugin-astro@0.12.3)(prettier@3.2.5)(typescript@5.3.3):
     resolution:
       { integrity: sha512-WFRwvsWNCQ2I+DEJzRkF/uX0LeJN/oGabr0hnwec8alQzHbzyoqogHmE+i+cU8Mb34ouwsLXa/LlqjEqFbkSZw== }
     hasBin: true
@@ -1382,7 +1364,7 @@ packages:
     dependencies:
       '@astrojs/compiler': 2.7.0
       '@jridgewell/sourcemap-codec': 1.4.15
-      '@volar/kit': 2.1.2(typescript@5.4.2)
+      '@volar/kit': 2.1.2(typescript@5.3.3)
       '@volar/language-core': 2.1.2
       '@volar/language-server': 2.1.2
       '@volar/language-service': 2.1.2
@@ -1438,7 +1420,7 @@ packages:
       '@astrojs/markdown-remark': 4.3.0
       '@mdx-js/mdx': 3.0.1
       acorn: 8.11.3
-      astro: 4.5.2(@types/node@20.11.26)(typescript@5.4.2)
+      astro: 4.5.2(@types/node@20.11.26)(typescript@5.3.3)
       es-module-lexer: 1.4.1
       estree-util-visit: 2.0.0
       github-slugger: 2.0.0
@@ -1482,7 +1464,7 @@ packages:
       '@pagefind/default-ui': 1.0.4
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.3
-      astro: 4.5.2(@types/node@20.11.26)(typescript@5.4.2)
+      astro: 4.5.2(@types/node@20.11.26)(typescript@5.3.3)
       astro-expressive-code: 0.32.4(astro@4.5.2)
       bcp-47: 2.1.0
       hast-util-select: 6.0.2
@@ -1507,7 +1489,7 @@ packages:
       astro: ^3.0.0 || ^4.0.0
       tailwindcss: ^3.0.24
     dependencies:
-      astro: 4.5.2(@types/node@20.11.26)(typescript@5.4.2)
+      astro: 4.5.2(@types/node@20.11.26)(typescript@5.3.3)
       autoprefixer: 10.4.18(postcss@8.4.35)
       postcss: 8.4.35
       postcss-load-config: 4.0.2(postcss@8.4.35)
@@ -3063,6 +3045,31 @@ packages:
     engines: { node: '>=10.0.0' }
     dev: true
 
+  /@douglasneuroinformatics/esbuild-plugin-native-modules@0.0.1(esbuild@0.20.1):
+    resolution:
+      { integrity: sha512-xWOcxPi+secE/RN7yJKyty4GRKxixsUiVj43DoLxaGyEqy2rbAsbiK8UHfMJ21us6QwvLOQLgxpuoxzqzfVcsg== }
+    peerDependencies:
+      esbuild: 0.x
+    dependencies:
+      esbuild: 0.20.1
+    dev: true
+
+  /@douglasneuroinformatics/esbuild-plugin-prisma@0.0.1(@prisma/client@5.11.0)(@prisma/engines@5.11.0)(esbuild@0.20.1)(prisma@5.11.0):
+    resolution:
+      { integrity: sha512-DsLOAS4h03jFB/3muCxvD0EfTugBc4oOfYjY9CipJ5yIUsBPBVk5IkG0FEZERQr/qO9cg6djxMAkNDuH/y5wXg== }
+    peerDependencies:
+      '@prisma/client': 5.x
+      '@prisma/engines': 5.x
+      esbuild: 0.x
+      prisma: 5.x
+    dependencies:
+      '@prisma/client': 5.11.0(prisma@5.11.0)
+      '@prisma/engines': 5.11.0
+      '@prisma/get-platform': 5.11.0
+      esbuild: 0.20.1
+      prisma: 5.11.0
+    dev: true
+
   /@douglasneuroinformatics/eslint-config@3.0.3(eslint@8.57.0)(typescript@5.3.3):
     resolution:
       { integrity: sha512-bfx27Hb4iaASnIEYgExp84+5DhYVHPFntkY4MtuPS/skKHS9voJijpIXTeUMQeEywCua2PmnFFnXz7xpNgcpXQ== }
@@ -3089,9 +3096,20 @@ packages:
     dependencies:
       type-fest: 4.12.0
 
+  /@douglasneuroinformatics/libjs@0.0.1(typescript@5.3.3):
+    resolution:
+      { integrity: sha512-Tu9cbmkD95dsGj8vY+TO5Tnh3o2VUEG7iHNaM3nrJF2UsomYEvXI/zUoopLs/VGmjA3VUyj1ycFgsjsmS0/tTw== }
+    peerDependencies:
+      typescript: ^5.1.0
+    dependencies:
+      type-fest: 4.12.0
+      typescript: 5.3.3
+    dev: false
+
   /@douglasneuroinformatics/nestjs@3.0.0(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)(@nestjs/testing@10.3.3)(express@4.18.3)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1):
     resolution:
       { integrity: sha512-XLTNc0QK4ND+by/8vR9XL2uUHZ+eL9vy/pGf/OAk4DB0CRJkgo3C8aLqqWFJinAv/JyLHxhj3NOCju6Gf8ci0w== }
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     peerDependencies:
       '@nestjs/common': ^10.2.3
       '@nestjs/core': ^10.2.3
@@ -3122,6 +3140,7 @@ packages:
   /@douglasneuroinformatics/ui@6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1):
     resolution:
       { integrity: sha512-ZlMdUAfApeFg60GC8UAJkxg+izFI98ntNAGLRdNRV4kPKp1LKMUQml0BV7l9mNx5RYmonGrxlCTlTfZ8tW4wJw== }
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     peerDependencies:
       '@headlessui/tailwindcss': ^0.2.0
       '@tailwindcss/container-queries': ^0.1.1
@@ -6146,7 +6165,7 @@ packages:
       terser: 5.29.1
     dev: true
 
-  /@rollup/plugin-typescript@11.1.6(rollup@4.13.0)(typescript@5.4.2):
+  /@rollup/plugin-typescript@11.1.6(rollup@4.13.0)(typescript@5.3.3):
     resolution:
       { integrity: sha512-R92yOmIACgYdJ7dJ97p4K69I8gg6IEHt8M7dUBxN3W6nrO8uUxX5ixl0yU/N3aZTi8WhPuICvOHXQvF6FaykAA== }
     engines: { node: '>=14.0.0' }
@@ -6163,7 +6182,7 @@ packages:
       '@rollup/pluginutils': 5.1.0(rollup@4.13.0)
       resolve: 1.22.8
       rollup: 4.13.0
-      typescript: 5.4.2
+      typescript: 5.3.3
     dev: true
 
   /@rollup/pluginutils@5.1.0(rollup@4.13.0):
@@ -7988,7 +8007,7 @@ packages:
     resolution:
       { integrity: sha512-rO73L89PJxeYM3s3pPPjiPgVVcymqU490g0YO5n5By0k2Erzj6tay/4lr1CHAAU4JyOWd1rpQ8bCf6cZfHU96A== }
     dependencies:
-      '@types/node': 17.0.45
+      '@types/node': 20.11.26
     dev: true
 
   /@types/scheduler@0.16.8:
@@ -8443,7 +8462,7 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@volar/kit@2.1.2(typescript@5.4.2):
+  /@volar/kit@2.1.2(typescript@5.3.3):
     resolution:
       { integrity: sha512-u20R1lCWCgFYBCHC+FR/e9J+P61vUNQpyWt4keAY+zpVHEHsSXVA2xWMJV1l1Iq5Dd0jBUSqrb1zsEya455AzA== }
     peerDependencies:
@@ -8452,7 +8471,7 @@ packages:
       '@volar/language-service': 2.1.2
       '@volar/typescript': 2.1.2
       typesafe-path: 0.2.2
-      typescript: 5.4.2
+      typescript: 5.3.3
       vscode-languageserver-textdocument: 1.0.11
       vscode-uri: 3.0.8
     dev: true
@@ -8597,7 +8616,7 @@ packages:
       geckodriver: 4.3.3
       get-port: 7.0.0
       import-meta-resolve: 4.0.0
-      locate-app: 2.2.23
+      locate-app: 2.2.24
       safaridriver: 0.1.2
       split2: 4.2.0
       wait-port: 1.1.0
@@ -9120,12 +9139,12 @@ packages:
     peerDependencies:
       astro: ^3.3.0 || ^4.0.0-beta
     dependencies:
-      astro: 4.5.2(@types/node@20.11.26)(typescript@5.4.2)
+      astro: 4.5.2(@types/node@20.11.26)(typescript@5.3.3)
       hast-util-to-html: 8.0.4
       remark-expressive-code: 0.32.4
     dev: true
 
-  /astro@4.5.2(@types/node@20.11.26)(typescript@5.4.2):
+  /astro@4.5.2(@types/node@20.11.26)(typescript@5.3.3):
     resolution:
       { integrity: sha512-Nq3GojlwXJ3XD047khraCWu/6aqGFfcyq7Q0blpTBSZnCz2s4Zri04PHvUkbKF7TK2UljkFuTXKP0CE4ZuJi9Q== }
     engines: { node: '>=18.14.1', npm: '>=6.14.0' }
@@ -9186,7 +9205,7 @@ packages:
       shiki: 1.1.7
       string-width: 7.1.0
       strip-ansi: 7.1.0
-      tsconfck: 3.0.3(typescript@5.4.2)
+      tsconfck: 3.0.3(typescript@5.3.3)
       unist-util-visit: 5.0.0
       vfile: 6.0.1
       vite: 5.1.6(@types/node@20.11.26)
@@ -9326,7 +9345,6 @@ packages:
   /b4a@1.6.6:
     resolution:
       { integrity: sha512-5Tk1HLk6b6ctmjIkAcU/Ujv/1WqiDl0F0JdRCR80VsOcUlHcu7pWeWRlOqQLHfDEsVx9YH/aif5AG4ehoCtTmg== }
-    requiresBuild: true
     dev: true
 
   /babel-core@7.0.0-bridge.0(@babel/core@7.24.0):
@@ -11479,14 +11497,14 @@ packages:
       { integrity: sha512-jyfL/pwPqaFXyKnj8lP8iLk6Z0m099uXR45aSN8Av1XD4vhvQutxxPzgA2bTcAwQpa1zCXDcWOlhFgyP3GKqhQ== }
     dev: true
 
-  /esbuild-plugin-tsc@0.4.0(typescript@5.4.2):
+  /esbuild-plugin-tsc@0.4.0(typescript@5.3.3):
     resolution:
       { integrity: sha512-q9gWIovt1nkwchMLc2zhyksaiHOv3kDK4b0AUol8lkMCRhJ1zavgfb2fad6BKp7FT9rh/OHmEBXVjczLoi/0yw== }
     peerDependencies:
       typescript: ^4.0.0 || ^5.0.0
     dependencies:
       strip-comments: 2.0.1
-      typescript: 5.4.2
+      typescript: 5.3.3
     dev: true
 
   /esbuild-register@3.5.0(esbuild@0.18.20):
@@ -12232,7 +12250,6 @@ packages:
   /fast-fifo@1.3.2:
     resolution:
       { integrity: sha512-/d9sfos4yxzpwkDkuN7k2SqFKtYNmCTzgfEpz82x34IM9/zc8KGxQoXg1liNC/izpRM/MBdt44Nmx41ZWqk+FQ== }
-    requiresBuild: true
     dev: true
 
   /fast-glob@3.3.2:
@@ -14541,7 +14558,6 @@ packages:
   /jsbn@1.1.0:
     resolution:
       { integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A== }
-    requiresBuild: true
 
   /jscodeshift@0.15.2(@babel/preset-env@7.24.0):
     resolution:
@@ -14911,11 +14927,11 @@ packages:
       pkg-types: 1.0.3
     dev: true
 
-  /locate-app@2.2.23:
+  /locate-app@2.2.24:
     resolution:
-      { integrity: sha512-lzrYJYveAd5BG5utKSSDhDGQsAk6+2y8kORpM7Es+qDNDYMwWDt+Sex2yZkmkhG39An42jsc/Mi1AljOZumvdQ== }
+      { integrity: sha512-vdoBy+xJYzEw+AIZkSW1SYEuWvZOMyhIW1dMIdD+MJP6K7DHfxJcCxktDbIS0aBtPyL2MkqiEa+GoDUz47zTlg== }
     dependencies:
-      n12: 1.8.26
+      n12: 1.8.27
       type-fest: 2.13.0
       userhome: 1.0.0
     dev: true
@@ -16284,9 +16300,9 @@ packages:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  /n12@1.8.26:
+  /n12@1.8.27:
     resolution:
-      { integrity: sha512-BUTP59AmN33pLdGLkKphoxhXD8eLi3YCCuEmUXiIPGdmujKEJmyG1T3WL4N7RPr3+t4FdTeGLyejBq/WL0sCWw== }
+      { integrity: sha512-mYeuH53HBGNBjWaFAaJ9+OTzJIVu4ViyC4aleux7RdkPChUj9jTfnO070FAj3PwsY4/Wlj2vAZ1WITXXG0SAmQ== }
     dev: true
 
   /nanoid@3.3.7:
@@ -17795,7 +17811,6 @@ packages:
   /queue-tick@1.0.1:
     resolution:
       { integrity: sha512-kJt5qhMxoszgU/62PLP1CJytzd2NKetjSRnyuj31fDd3Rlcz3fzlFdFLD1SItunPwyqEOkca6GbV612BWfaBag== }
-    requiresBuild: true
     dev: true
 
   /quick-format-unescaped@4.0.4:
@@ -18695,7 +18710,7 @@ packages:
       is-plain-object: 3.0.1
     dev: true
 
-  /rollup-plugin-dts@6.1.0(rollup@4.13.0)(typescript@5.4.2):
+  /rollup-plugin-dts@6.1.0(rollup@4.13.0)(typescript@5.3.3):
     resolution:
       { integrity: sha512-ijSCPICkRMDKDLBK9torss07+8dl9UpY9z1N/zTeA1cIqdzMlpkV3MOOC7zukyvQfDyxa1s3Dl2+DeiP/G6DOw== }
     engines: { node: '>=16' }
@@ -18705,7 +18720,7 @@ packages:
     dependencies:
       magic-string: 0.30.8
       rollup: 4.13.0
-      typescript: 5.4.2
+      typescript: 5.3.3
     optionalDependencies:
       '@babel/code-frame': 7.23.5
     dev: true
@@ -19121,7 +19136,6 @@ packages:
   /simple-concat@1.0.1:
     resolution:
       { integrity: sha512-cSFtAPtRhljv69IK0hTVZQ+OfE9nePi/rtJmw5UjHeVyVroEqJXP1sFztKUy1qU+xvz3u/sfYJLa947b7nAN2Q== }
-    requiresBuild: true
 
   /simple-get@4.0.1:
     resolution:
@@ -19368,7 +19382,6 @@ packages:
   /sprintf-js@1.1.3:
     resolution:
       { integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA== }
-    requiresBuild: true
 
   /sqlite3@5.1.7:
     resolution:
@@ -19534,7 +19547,6 @@ packages:
   /streamx@2.16.1:
     resolution:
       { integrity: sha512-m9QYj6WygWyWa3H1YY69amr4nVgy61xfjys7xO7kviL5rfIEc2naf+ewFiOA+aEJD7y0JO3h2GoiUv4TDwEGzQ== }
-    requiresBuild: true
     dependencies:
       fast-fifo: 1.3.2
       queue-tick: 1.0.1
@@ -20256,7 +20268,7 @@ packages:
       { integrity: sha512-aafbuAQOTEeWmA7wtcL94w6I89EgLD7F+IlWkr596wYxeb0oveWDO5dQpv85YP0CGbxXT/qXBIeV6IYLcoZ2uA== }
     dev: false
 
-  /tsconfck@3.0.3(typescript@5.4.2):
+  /tsconfck@3.0.3(typescript@5.3.3):
     resolution:
       { integrity: sha512-4t0noZX9t6GcPTfBAbIbbIU4pfpCwh0ueq3S4O/5qXI1VwK1outmxhe9dOiEWqMz3MW2LKgDTpqWV+37IWuVbA== }
     engines: { node: ^18 || >=20 }
@@ -20267,7 +20279,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      typescript: 5.4.2
+      typescript: 5.3.3
     dev: true
 
   /tslib@1.14.1:
@@ -20519,14 +20531,6 @@ packages:
       { integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw== }
     engines: { node: '>=14.17' }
     hasBin: true
-    dev: true
-
-  /typescript@5.4.2:
-    resolution:
-      { integrity: sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ== }
-    engines: { node: '>=14.17' }
-    hasBin: true
-    dev: true
 
   /ufo@1.4.0:
     resolution:
@@ -22042,6 +22046,7 @@ packages:
     name: github-script
     version: 7.0.1
     engines: { node: '>=20.0.0 <21.0.0' }
+    prepare: true
     requiresBuild: true
     dependencies:
       '@actions/core': 1.10.1

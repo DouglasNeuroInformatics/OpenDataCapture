@@ -1,4 +1,4 @@
-import { toBasicISOString } from '@douglasneuroinformatics/utils';
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useTranslation } from 'react-i18next';
 
 export type VisualizationHeaderProps = {
