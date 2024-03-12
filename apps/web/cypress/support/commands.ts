@@ -39,8 +39,8 @@ Cypress.Commands.add('addAVisit', (firstName, lastName) => {
   cy.get('button[data-cy="day-option"]', { timeout: 10000 }).contains(14).should('be.visible');
   cy.get('button[data-cy="day-option"]').contains('14').click();
 
-  cy.get('button[class="field-input capitalize"]').click();
-  cy.get('li').contains('Female').click();
+  cy.get('button[data-cy="form-list"]').first().click();
+  cy.get('li[data-cy="form-list-option"]').contains('Female').click();
   //submit form
   cy.get('button[data-cy="submit-form"]').click();
 
