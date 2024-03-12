@@ -25,6 +25,7 @@ export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
       <h3 className="text-xl font-semibold">{t('steps.questions')}</h3>
       <Form
         content={instrument.content}
+        data-cy="form-content"
         validationSchema={instrument.validationSchema}
         onSubmit={(data) => void handleSubmit(data)}
       />

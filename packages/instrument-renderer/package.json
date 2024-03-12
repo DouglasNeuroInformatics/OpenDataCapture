@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.0.1",
-    "@douglasneuroinformatics/ui": "^6.1.0",
+    "@douglasneuroinformatics/ui": "^6.2.2",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@open-data-capture/common": "workspace:*",
@@ -28,22 +28,22 @@
     "@open-data-capture/licenses": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
-    "framer-motion": "^11.0.8",
-    "i18next": "^23.10.0",
+    "framer-motion": "^11.0.12",
+    "i18next": "^23.10.1",
     "lodash": "^4.17.21",
-    "react-i18next": "^14.0.5",
+    "react-i18next": "^14.1.0",
     "ts-pattern": "^5.0.8"
   },
   "devDependencies": {
     "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/tailwindcss": "workspace:*",
     "@open-data-capture/vite-plugin-runtime": "workspace:*",
-    "@types/lodash": "^4.14.202",
-    "@types/react": "^18.2.61",
-    "@types/react-dom": "^18.2.19",
-    "autoprefixer": "^10.4.17",
+    "@types/lodash": "^4.17.0",
+    "@types/react": "^18.2.65",
+    "@types/react-dom": "^18.2.21",
+    "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
-    "vite": "^5.1.4"
+    "vite": "^5.1.6"
   },
   "peerDependencies": {
     "react": "18.x",
