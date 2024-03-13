@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,7 @@ export const SubjectGraphPage = () => {
     useInstrumentVisualization({
       params: { subjectId: params.subjectId! }
     });
-  const { t } = useTranslation(['subjects', 'common']);
+  const { t } = useTranslation(['subjects', 'common', 'core']);
   const measureOptions = useMeasureOptions(instrument);
   const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
 
@@ -43,6 +43,38 @@ export const SubjectGraphPage = () => {
   const handleSelectForm = (id: string) => {
     setInstrumentId(id);
     setSelectedMeasures([]);
+  };
+
+  const lineGraphRef = useRef<HTMLImageElement>(null);
+
+  const captureGraph = (format: string) => {
+    const canvas = document.createElement('canvas');
+    if (!lineGraphRef.current) {
+      return;
+    } else {
+      const graphElement = lineGraphRef.current;
+
+      canvas.width = graphElement.offsetWidth;
+      canvas.height = graphElement.offsetHeight;
+
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      context.drawImage(graphElement, 0, 0);
+
+      return canvas.toDataURL(`image/${format.toLowerCase()}`); // Return data URL of PNG image
+    }
+  };
+
+  // Function to download the captured graph image
+  const downloadImage = (format: string) => {
+    const imageData = captureGraph(format);
+    if (!imageData) return;
+
+    const link = document.createElement('a');
+    link.href = imageData;
+    link.download = `graph.${format.toLowerCase()}`;
+    link.click();
   };
 
   return (
@@ -72,12 +104,23 @@ export const SubjectGraphPage = () => {
               />
             </div>
           </div>
-          <div data-cy="time-select">
-            <TimeDropdown setMinTime={setMinDate} />
+          <div className="flex flex-col gap-2 lg:flex-row">
+            <div data-cy="time-select">
+              <TimeDropdown setMinTime={setMinDate} />
+            </div>
+            <div data-cy="download-dropdown">
+              <Dropdown
+                className="text-sm"
+                options={['PNG', 'JPEG']}
+                title={t('core:download')}
+                variant="secondary"
+                onSelection={(format) => downloadImage(format)}
+              />
+            </div>
           </div>
         </div>
       </div>
-      <div>
+      <div ref={lineGraphRef}>
         <LineGraph
           data={graphData}
           lines={lines}
