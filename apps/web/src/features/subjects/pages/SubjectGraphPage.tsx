@@ -45,36 +45,52 @@ export const SubjectGraphPage = () => {
     setSelectedMeasures([]);
   };
 
-  const lineGraphRef = useRef<HTMLImageElement>(null);
+  const lineGraphRef = useRef<HTMLDivElement>(null);
 
-  const captureGraph = (format: string) => {
-    const canvas = document.createElement('canvas');
-    if (!lineGraphRef.current) {
+  const downloadDivAsImage = (format: string) => {
+    const divToCapture = lineGraphRef.current;
+
+    if (!divToCapture) {
+      console.error(`Ref not set.`);
       return;
-    } else {
-      const graphElement = lineGraphRef.current;
-
-      canvas.width = graphElement.offsetWidth;
-      canvas.height = graphElement.offsetHeight;
-
-      const context = canvas.getContext('2d');
-      if (!context) return;
-
-      context.drawImage(graphElement, 0, 0);
-
-      return canvas.toDataURL(`image/${format.toLowerCase()}`); // Return data URL of PNG image
     }
-  };
 
-  // Function to download the captured graph image
-  const downloadImage = (format: string) => {
-    const imageData = captureGraph(format);
-    if (!imageData) return;
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
 
-    const link = document.createElement('a');
-    link.href = imageData;
-    link.download = `graph.${format.toLowerCase()}`;
-    link.click();
+    if (!context) {
+      console.error('Canvas context unavailable.');
+      return;
+    }
+
+    // Set canvas dimensions to match the div
+    canvas.width = divToCapture.offsetWidth;
+    canvas.height = divToCapture.offsetHeight;
+
+    // Convert the div content to a blob
+    const svgString = new XMLSerializer().serializeToString(divToCapture);
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+
+    // Create an image element from the SVG blob
+    const image = new Image();
+    const url = URL.createObjectURL(svgBlob);
+
+    image.onload = () => {
+      context.drawImage(image, 0, 0);
+      URL.revokeObjectURL(url);
+
+      // Convert the canvas content to a data URL
+      const imageDataUrl = canvas.toDataURL(`image/${format.toLowerCase()}`);
+
+      // Create a link element to trigger the download
+      const link = document.createElement('a');
+      link.href = imageDataUrl;
+      link.download = format;
+
+      // Trigger the download
+      link.click();
+    };
+    image.src = url;
   };
 
   return (
@@ -114,7 +130,7 @@ export const SubjectGraphPage = () => {
                 options={['PNG', 'JPEG']}
                 title={t('core:download')}
                 variant="secondary"
-                onSelection={(format) => downloadImage(format)}
+                onSelection={(format) => downloadDivAsImage(format)}
               />
             </div>
           </div>
