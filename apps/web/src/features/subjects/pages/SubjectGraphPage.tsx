@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 
+import { Button } from '@douglasneuroinformatics/ui/components';
 import { Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -124,14 +125,10 @@ export const SubjectGraphPage = () => {
             <div data-cy="time-select">
               <TimeDropdown setMinTime={setMinDate} />
             </div>
-            <div data-cy="download-dropdown">
-              <Dropdown
-                className="text-sm"
-                options={['PNG', 'JPEG']}
-                title={t('core:download')}
-                variant="secondary"
-                onSelection={(format) => downloadDivAsImage(format)}
-              />
+            <div data-cy="download-button">
+              <Button variant="secondary" onClick={() => print()}>
+                Download
+              </Button>
             </div>
           </div>
         </div>
