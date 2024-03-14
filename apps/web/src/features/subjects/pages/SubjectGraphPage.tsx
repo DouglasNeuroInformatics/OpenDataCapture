@@ -49,7 +49,7 @@ export const SubjectGraphPage = () => {
     <div>
       <div className="my-2">
         <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
-        <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
+        <div className="flex flex-col gap-2 lg:flex-row lg:justify-between print:hidden">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select">
               <Dropdown
@@ -76,8 +76,13 @@ export const SubjectGraphPage = () => {
             <div data-cy="time-select">
               <TimeDropdown setMinTime={setMinDate} />
             </div>
-            <div data-cy="download-button">
-              <Button className="text-sm" label="Download" variant="secondary" onClick={() => print()} />
+            <div className="relative w-full whitespace-nowrap" data-cy="download-button">
+              <Button
+                className="relative w-full whitespace-nowrap text-sm"
+                label="Download"
+                variant="secondary"
+                onClick={() => print()}
+              />
             </div>
           </div>
         </div>
