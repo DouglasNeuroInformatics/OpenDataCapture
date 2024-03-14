@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { Button, Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui/legacy';
 import { useTranslation } from 'react-i18next';
@@ -45,54 +45,6 @@ export const SubjectGraphPage = () => {
     setSelectedMeasures([]);
   };
 
-  const lineGraphRef = useRef<HTMLDivElement>(null);
-
-  const downloadDivAsImage = (format: string) => {
-    const divToCapture = lineGraphRef.current;
-
-    if (!divToCapture) {
-      console.error(`Ref not set.`);
-      return;
-    }
-
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    if (!context) {
-      console.error('Canvas context unavailable.');
-      return;
-    }
-
-    // Set canvas dimensions to match the div
-    canvas.width = divToCapture.offsetWidth;
-    canvas.height = divToCapture.offsetHeight;
-
-    // Convert the div content to a blob
-    const svgString = new XMLSerializer().serializeToString(divToCapture);
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-
-    // Create an image element from the SVG blob
-    const image = new Image();
-    const url = URL.createObjectURL(svgBlob);
-
-    image.onload = () => {
-      context.drawImage(image, 0, 0);
-      URL.revokeObjectURL(url);
-
-      // Convert the canvas content to a data URL
-      const imageDataUrl = canvas.toDataURL(`image/${format.toLowerCase()}`);
-
-      // Create a link element to trigger the download
-      const link = document.createElement('a');
-      link.href = imageDataUrl;
-      link.download = format;
-
-      // Trigger the download
-      link.click();
-    };
-    image.src = url;
-  };
-
   return (
     <div>
       <div className="my-2">
@@ -130,7 +82,7 @@ export const SubjectGraphPage = () => {
           </div>
         </div>
       </div>
-      <div ref={lineGraphRef}>
+      <div>
         <LineGraph
           data={graphData}
           lines={lines}
