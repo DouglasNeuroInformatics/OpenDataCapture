@@ -87,7 +87,7 @@ export const SubjectGraphPage = () => {
           </div>
         </div>
       </div>
-      <div>
+      <div className="print:w-[400px]">
         <LineGraph
           data={graphData}
           lines={lines}
