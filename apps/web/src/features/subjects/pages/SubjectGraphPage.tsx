@@ -46,7 +46,9 @@ export const SubjectGraphPage = () => {
   };
 
   const handlePrint = () => {
-    window.resizeBy(window.screen.width / 2, window.screen.height / 2);
+    const newHeight = window.screen.height / 2;
+    const newWidth = window.screen.width / 2;
+    window.resizeBy(newWidth, newHeight);
     print();
   };
 
