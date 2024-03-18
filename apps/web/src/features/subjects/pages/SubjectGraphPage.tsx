@@ -45,6 +45,11 @@ export const SubjectGraphPage = () => {
     setSelectedMeasures([]);
   };
 
+  const handlePrint = () => {
+    window.resizeBy(window.screen.width / 2, window.screen.height / 2);
+    print();
+  };
+
   return (
     <div>
       <div className="my-2">
@@ -81,13 +86,13 @@ export const SubjectGraphPage = () => {
                 className="relative w-full whitespace-nowrap text-sm"
                 label="Download"
                 variant="secondary"
-                onClick={() => print()}
+                onClick={() => handlePrint()}
               />
             </div>
           </div>
         </div>
       </div>
-      <div className="print:w-[400px]">
+      <div className="print:h-[400px] print:w-[400px]">
         <LineGraph
           data={graphData}
           lines={lines}
