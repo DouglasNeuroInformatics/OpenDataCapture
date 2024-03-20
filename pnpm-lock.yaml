@@ -621,9 +621,15 @@ importers:
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
+      downloadjs:
+        specifier: ^1.4.7
+        version: 1.4.7
       framer-motion:
         specifier: ^10.18.0
         version: 10.18.0(react-dom@18.2.0)(react@18.2.0)
+      html2canvas:
+        specifier: ^1.4.1
+        version: 1.4.1
       i18next:
         specifier: ^23.10.1
         version: 23.10.1
@@ -676,6 +682,9 @@ importers:
       '@open-data-capture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-runtime
+      '@types/downloadjs':
+        specifier: ^1.4.6
+        version: 1.4.6
       '@types/lodash':
         specifier: ^4.17.0
         version: 4.17.0
@@ -7171,6 +7180,11 @@ packages:
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
     dev: true
 
+  /@types/downloadjs@1.4.6:
+    resolution:
+      { integrity: sha512-mp3w70vsaiLRT9ix92fmI9Ob2yJAPZm6tShJtofo2uHbN11G2i6a0ApIEjBl/kv3e9V7Pv7jMjk1bUwYWvMHvA== }
+    dev: true
+
   /@types/ejs@3.1.5:
     resolution: {integrity: sha512-nv+GSx77ZtXiJzwKdsASqi+YQ5Z7vwHsTP0JY2SiQgjGckkBRKZnk8nIM+7oUZ1VCtuTz0+By4qVR7fqzp/Dfg==}
     dev: true
@@ -8820,6 +8834,12 @@ packages:
     resolution: {integrity: sha512-kwDPIFCGx0NZHog36dj+tHiwP4QMzsZ3AgMViUBKI0+V5n4U0ufTCUMhnQ04diaRI8EX/QcPfql7zlhZ7j4zgg==}
     dev: true
 
+  /base64-arraybuffer@1.0.2:
+    resolution:
+      { integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ== }
+    engines: { node: '>= 0.6.0' }
+    dev: false
+
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
@@ -9788,6 +9808,13 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /css-line-break@2.1.0:
+    resolution:
+      { integrity: sha512-FHcKFCZcAha3LwfVBhCQbW2nCNbkZXn7KVUJcsT5/P8YmfsVja0FMPJr0B903j/E69HUphKiV9iQArX8SDYA4w== }
+    dependencies:
+      utrie: 1.0.2
+    dev: false
+
   /css-selector-parser@3.0.5:
     resolution: {integrity: sha512-3itoDFbKUNx1eKmVpYMFyqKX04Ww9osZ+dLgrk6GEv6KMVeXUhUnp4I5X+evw+u3ZxVU6RFXSSRxlTeMh8bA+g==}
     dev: true
@@ -10312,6 +10339,11 @@ packages:
   /dotenv@16.4.5:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
+
+  /downloadjs@1.4.7:
+    resolution:
+      { integrity: sha512-LN1gO7+u9xjU5oEScGFKvXhYf7Y/empUIIEAGBs1LzUq/rg5duiDrkuH5A2lQGd5jfMOb9X9usDa2oVXwJ0U/Q== }
+    dev: false
 
   /dset@3.1.3:
     resolution: {integrity: sha512-20TuZZHCEZ2O71q9/+8BwKwZ0QtD9D8ObhrihJPr+vLLYlSuAU3/zL4cSlgbfeoGHTjCSJBa7NGcrF9/Bx/WJQ==}
@@ -12471,6 +12503,15 @@ packages:
   /html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
     dev: true
+
+  /html2canvas@1.4.1:
+    resolution:
+      { integrity: sha512-fPU6BHNpsyIhr8yyMpTLLxAbkaK8ArIBcmZIRiBLiDhjeqvXolaEmDGmELFuX9I4xDcaKKcJl+TKZLqruBbmWA== }
+    engines: { node: '>=8.0.0' }
+    dependencies:
+      css-line-break: 2.1.0
+      text-segmentation: 1.0.3
+    dev: false
 
   /http-cache-semantics@4.1.1:
     resolution: {integrity: sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==}
@@ -19054,6 +19095,13 @@ packages:
   /utils-merge@1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
+
+  /utrie@1.0.2:
+    resolution:
+      { integrity: sha512-1MLa5ouZiOmQzUbjbu9VmjLzn1QLXBhwpUa7kdLUQK+KQ5KA9I1vk5U4YHe/X2Ch7PYnJfWuWT+VbuxbGwljhw== }
+    dependencies:
+      base64-arraybuffer: 1.0.2
+    dev: false
 
   /uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
