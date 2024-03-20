@@ -57,7 +57,7 @@ export const SubjectGraphPage = () => {
     const graphDesc = document.createElement('div');
     if (instrument) {
       graphDesc.innerText = instrument?.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
-      graphDesc.className = 'p-2';
+      graphDesc.className = 'p-2 block font-semibold text-center';
     }
 
     selectGraph.appendChild(graphDesc);
