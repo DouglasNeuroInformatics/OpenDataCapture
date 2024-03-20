@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Button, Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui/legacy';
+import downloadjs from 'downloadjs';
+import html2canvas from 'html2canvas';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -40,16 +42,31 @@ export const SubjectGraphPage = () => {
 
   const lines = useGraphLines({ selectedMeasures });
 
+  const graphRef = useRef<HTMLDivElement>(null);
+
   const handleSelectForm = (id: string) => {
     setInstrumentId(id);
     setSelectedMeasures([]);
   };
 
-  const handlePrint = () => {
-    const newHeight = window.screen.height / 2;
-    const newWidth = window.screen.width / 2;
-    window.resizeTo(newWidth, newHeight);
-    print();
+  const handleGraphDownload = async () => {
+    if (!graphRef.current) return;
+
+    const selectGraph = graphRef.current;
+
+    const graphDesc = document.createElement('div');
+    if (instrument) {
+      graphDesc.innerText = instrument?.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
+      graphDesc.className = 'p-2';
+    }
+
+    selectGraph.appendChild(graphDesc);
+
+    const canvas = await html2canvas(selectGraph);
+    const dataURL = canvas.toDataURL('image/png');
+    downloadjs(dataURL, `${params.subjectId!.slice(0, 7)}.png`, 'image/png');
+
+    selectGraph.removeChild(graphDesc);
   };
 
   return (
@@ -88,13 +105,13 @@ export const SubjectGraphPage = () => {
                 className="relative w-full whitespace-nowrap text-sm"
                 label="Download"
                 variant="secondary"
-                onClick={() => handlePrint()}
+                onClick={() => handleGraphDownload()}
               />
             </div>
           </div>
         </div>
       </div>
-      <div className="print:h-[400px] print:w-[400px]">
+      <div className="print:h-[400px] print:w-[400px]" ref={graphRef}>
         <LineGraph
           data={graphData}
           lines={lines}
