@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { ArrowToggle, Card } from '@douglasneuroinformatics/ui/legacy';
 import { cn } from '@douglasneuroinformatics/ui/utils';
 
-import '../setup';
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorMenu } from './EditorMenu';
 import { EditorPane } from './EditorPane';
@@ -12,6 +11,8 @@ import { EditorTab } from './EditorTab';
 import { MobileBlocker } from './MobileBlocker';
 
 import type { EditorFile } from '../types';
+
+import '../setup';
 
 export type EditorProps = {
   /** Additional classes to be passed to the card component wrapping the editor */
