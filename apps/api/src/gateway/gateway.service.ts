@@ -62,7 +62,7 @@ export class GatewayService {
     const result = await $RemoteAssignment.array().safeParseAsync(response.data);
     if (!result.success) {
       this.logger.error({
-        data: response.data,
+        data: response.data as unknown,
         error: result.error.format(),
         message: 'ERROR: Remote assignments received from gateway do not match expected structure'
       });

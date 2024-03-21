@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
 import type { Language } from '@open-data-capture/common/core';
-import 'i18next';
 
 import core from '../translations/core.json';
 
 import type { DefaultNS, TranslatedResource } from '../types.js';
+
+import 'i18next';
 
 declare module 'i18next' {
   interface AppResources {}

@@ -18,9 +18,9 @@ const translations = {
 
 type Language = 'en' | 'fr';
 
-type ExtractTranslationKey<T extends Record<string, unknown>, Key = keyof T> = Key extends string
-  ? T[Key] extends Record<string, unknown>
-    ? T[Key] extends Record<Language, string>
+type ExtractTranslationKey<T extends { [key: string]: unknown }, Key = keyof T> = Key extends string
+  ? T[Key] extends { [key: string]: unknown }
+    ? T[Key] extends { [K in Language]: string }
       ? Key
       : `${Key}.${ExtractTranslationKey<T[Key]>}`
     : `${Key}`
@@ -35,6 +35,7 @@ function getTranslation(key: TranslationKey, language: Language) {
   if (typeof value === 'string') {
     return value;
   }
+  value;
   return value[language];
 }
 

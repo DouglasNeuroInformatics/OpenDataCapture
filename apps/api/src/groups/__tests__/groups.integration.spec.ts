@@ -116,7 +116,7 @@ describe('/groups', () => {
       expect(response.status).toBe(HttpStatus.OK);
     });
     it('should return the modified group', async () => {
-      groupModel.update.mockImplementationOnce((obj: Record<string, any>) => obj.data);
+      groupModel.update.mockImplementationOnce((obj: { [key: string]: any }) => obj.data);
       const response = await request(server).patch(`/groups/${id}`).send({ name: 'foo' });
       expect(response.body).toMatchObject({ name: 'foo' });
     });

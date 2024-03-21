@@ -59,7 +59,7 @@ export class InstrumentRecordsController {
     @CurrentUser('ability') ability: AppAbility,
     @Query('instrumentId') instrumentId: string,
     @Query('groupId') groupId?: string
-  ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {
+  ): Promise<{ [key: string]: { intercept: number; slope: number; stdErr: number } }> {
     return this.instrumentRecordsService.linearModel({ groupId, instrumentId }, { ability });
   }
 }

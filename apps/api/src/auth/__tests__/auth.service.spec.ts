@@ -51,9 +51,9 @@ describe('AuthService', () => {
       });
     });
 
-    it('should raise an `UnauthorizedException` if the `UsersService` throws a `NotFoundException', () => {
+    it('should raise an `UnauthorizedException` if the `UsersService` throws a `NotFoundException', async () => {
       usersService.findByUsername.mockRejectedValueOnce(new NotFoundException());
-      expect(authService.login(loginRequest.username, loginRequest.password)).rejects.toBeInstanceOf(
+      await expect(authService.login(loginRequest.username, loginRequest.password)).rejects.toBeInstanceOf(
         UnauthorizedException
       );
     });

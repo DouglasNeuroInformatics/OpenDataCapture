@@ -17,7 +17,7 @@ export abstract class BaseInstrumentTransformer {
   async generateBundle(source: string) {
     const input = this.preprocess(source);
     const result = await this.build(input);
-    const output = result.metafile!.outputs['bundle.js']!;
+    const output = result.metafile!.outputs['bundle.js'];
     this.validateOutput(output);
     return this.getBuiltCode(result);
   }

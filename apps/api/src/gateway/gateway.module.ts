@@ -20,14 +20,14 @@ import { GatewaySynchronizer } from './gateway.synchronizer';
         let baseURL: string;
         if (configurationService.get('NODE_ENV') === 'production') {
           const internalNetworkUrl = configurationService.get('GATEWAY_INTERNAL_NETWORK_URL');
-          const siteAddress = configurationService.get('GATEWAY_SITE_ADDRESS')!;
+          const siteAddress = configurationService.get('GATEWAY_SITE_ADDRESS');
           if (siteAddress.hostname === 'localhost' && internalNetworkUrl) {
             baseURL = internalNetworkUrl.origin;
           } else {
             baseURL = siteAddress.origin;
           }
         } else {
-          const gatewayPort = configurationService.get('GATEWAY_DEV_SERVER_PORT')!;
+          const gatewayPort = configurationService.get('GATEWAY_DEV_SERVER_PORT');
           baseURL = `http://localhost:${gatewayPort}`;
         }
         return {

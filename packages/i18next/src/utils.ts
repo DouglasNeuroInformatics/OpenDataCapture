@@ -3,12 +3,12 @@ import _ from 'lodash';
 
 import type { TranslatedResource, TranslationsDef } from './types.js';
 
-function transformTranslations<T extends Record<string, any>>(translations: T, locale: string) {
+function transformTranslations<T extends { [key: string]: any }>(translations: T, locale: string) {
   const isPlainObject = Object.getPrototypeOf(translations) === Object.prototype;
   if (!isPlainObject) {
     throw new Error('Invalid format of translations: must be plain object');
   }
-  const result: Record<string, unknown> = {};
+  const result: { [key: string]: unknown } = {};
   for (const key in translations) {
     const value = translations[key];
     if (Object.hasOwn(value, locale)) {

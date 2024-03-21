@@ -3,6 +3,7 @@ import type { AppAction } from '@open-data-capture/common/core';
 
 import type { AppAbility } from '@/core/types';
 import type { ModelEntityName } from '@/prisma/prisma.types';
+import { getModelName } from '@/prisma/prisma.utils';
 
 export function accessibleQuery<T extends ModelEntityName>(
   ability: AppAbility | undefined,
@@ -12,6 +13,6 @@ export function accessibleQuery<T extends ModelEntityName>(
   if (!ability) {
     return {};
   }
-  // @ts-expect-error - figure this out tomorrow
-  return accessibleBy(ability, action)[entityName];
+
+  return accessibleBy(ability, action)[getModelName(entityName)];
 }

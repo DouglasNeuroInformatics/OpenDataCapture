@@ -3,7 +3,7 @@ import { ConflictException, NotFoundException, UnprocessableEntityException } fr
 import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
-import _ from 'lodash';
+import { omit } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -54,7 +54,7 @@ export class InstrumentsService {
 
     return this.instrumentModel.create({
       data: {
-        ..._.omit({ ...instance }, ['content', 'measures', 'validationSchema']),
+        ...omit({ ...instance }, ['content', 'measures', 'validationSchema']),
         bundle,
         details: {
           ...instance.details,

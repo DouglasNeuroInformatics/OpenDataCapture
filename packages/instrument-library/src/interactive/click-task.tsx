@@ -9,7 +9,7 @@ const ClickTask = ({ done }: ClickTaskProps) => {
   const [count, setCount] = useState(0);
   const [secondsRemaining, setSecondsRemaining] = useState(10);
   // Conflict between type of timer in Node and DOM
-  const interval = useRef<any>(null);
+  const interval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     interval.current = setInterval(() => {

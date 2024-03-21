@@ -13,7 +13,7 @@ import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
 import { linearRegression } from '@open-data-capture/stats';
 import type { Prisma } from '@prisma/client';
-import _ from 'lodash';
+import { isNumber, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -173,7 +173,7 @@ export class InstrumentRecordsService {
     return await Promise.all(
       records.map(async (record) => {
         const instance = await this.interpreter.interpret(record.instrument.bundle);
-        let computedMeasures: Record<string, InstrumentMeasureValue> | undefined;
+        let computedMeasures: { [key: string]: InstrumentMeasureValue } | undefined;
         if (instance.measures) {
           computedMeasures = this.instrumentMeasuresService.computeMeasures(instance.measures, record.data);
         }
@@ -198,10 +198,10 @@ export class InstrumentRecordsService {
       where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), { groupId }, { instrumentId }] }
     });
 
-    const data: Record<string, [number, number][]> = {};
+    const data: { [key: string]: [number, number][] } = {};
     for (const record of records) {
       const computedMeasures = this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data);
-      const numericMeasures = _.pickBy(computedMeasures, _.isNumber);
+      const numericMeasures = pickBy(computedMeasures, isNumber);
       for (const measure in numericMeasures) {
         const x = record.date.getTime();
         const y = numericMeasures[measure];

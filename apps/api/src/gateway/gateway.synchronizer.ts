@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import type { RemoteAssignment } from '@open-data-capture/common/assignment';
+import { $Json } from '@open-data-capture/common/core';
 import { Decrypter } from '@open-data-capture/crypto';
 
 import { AssignmentsService } from '@/assignments/assignments.service';
@@ -41,9 +42,11 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       return;
     }
 
+    const data = await $Json.parseAsync(JSON.parse(await decrypter.decrypt(remoteAssignment.encryptedData)));
+
     const record = await this.instrumentRecordsService.create({
       assignmentId: assignment.id,
-      data: JSON.parse(await decrypter.decrypt(remoteAssignment.encryptedData)),
+      data,
       date: completedAt,
       instrumentId: assignment.instrumentId,
       subjectId: assignment.subjectId
@@ -81,9 +84,9 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       if (assignment.status === 'OUTSTANDING') {
         continue;
       } else if (assignment.status === 'COMPLETE') {
-        this.handleAssignmentComplete(assignment);
+        await this.handleAssignmentComplete(assignment);
       } else {
-        this.gatewayService.deleteRemoteAssignment(assignment.id);
+        await this.gatewayService.deleteRemoteAssignment(assignment.id);
       }
       await this.assignmentsService.updateById(assignment.id, {
         status: assignment.status

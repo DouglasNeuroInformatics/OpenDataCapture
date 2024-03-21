@@ -1,6 +1,7 @@
-import { AbilityBuilder } from '@casl/ability';
+import { AbilityBuilder, detectSubjectType } from '@casl/ability';
 import { createPrismaAbility } from '@casl/prisma';
 import { Injectable, Logger } from '@nestjs/common';
+import type { AppSubjectName } from '@open-data-capture/common/core';
 import { Prisma, type UserModel } from '@open-data-capture/database/core';
 
 import type { AppAbility } from '@/core/types';
@@ -39,7 +40,12 @@ export class AbilityFactory {
         ability.can('create', 'Visit');
     }
     return ability.build({
-      detectSubjectType: (object: Record<string, any>) => object.__model__
+      detectSubjectType: (object: { [key: string]: any }) => {
+        if (object.__model__) {
+          return object.__model__ as AppSubjectName;
+        }
+        return detectSubjectType(object) as AppSubjectName;
+      }
     });
   }
 }

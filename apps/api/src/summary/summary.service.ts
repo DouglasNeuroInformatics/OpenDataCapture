@@ -17,7 +17,7 @@ export class SummaryService {
   ) {}
 
   async getSummary(groupId?: string, { ability }: EntityOperationOptions = {}): Promise<Summary> {
-    const filter = groupId ? { groupIds: { has: groupId } } : ({} as Record<string, unknown>);
+    const filter = groupId ? { groupIds: { has: groupId } } : ({} as { [key: string]: unknown });
     return {
       counts: {
         instruments: await this.instrumentsService.count(),
