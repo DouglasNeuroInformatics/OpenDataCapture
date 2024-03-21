@@ -11,7 +11,7 @@ export default config({
   },
   react: {
     enabled: true,
-    version: 'latest'
+    version: '18'
   },
   typescript: {
     enabled: true
