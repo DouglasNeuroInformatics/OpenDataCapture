@@ -1,4 +1,4 @@
-import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { $CreateUserData } from '@open-data-capture/common/user';
 import type { BasePermissionLevel } from '@open-data-capture/common/user';

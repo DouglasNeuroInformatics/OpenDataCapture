@@ -166,9 +166,9 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: ^0.0.1
         version: 0.0.1(typescript@5.3.3)
-      '@douglasneuroinformatics/nestjs':
-        specifier: ^3.0.0
-        version: 3.0.0(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)(@nestjs/testing@10.3.3)(express@4.18.3)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@douglasneuroinformatics/libnest':
+        specifier: ^0.0.2
+        version: 0.0.2(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)(@nestjs/testing@10.3.3)(express@4.18.3)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1)
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
@@ -3263,10 +3263,9 @@ packages:
       typescript: 5.3.3
     dev: false
 
-  /@douglasneuroinformatics/nestjs@3.0.0(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)(@nestjs/testing@10.3.3)(express@4.18.3)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1):
+  /@douglasneuroinformatics/libnest@0.0.2(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)(@nestjs/testing@10.3.3)(express@4.18.3)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1):
     resolution:
-      { integrity: sha512-XLTNc0QK4ND+by/8vR9XL2uUHZ+eL9vy/pGf/OAk4DB0CRJkgo3C8aLqqWFJinAv/JyLHxhj3NOCju6Gf8ci0w== }
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+      { integrity: sha512-r3OE6SkefjJWYmnTN1YXPBQ5aNm3GOn71SoZNQgRAbwsvs3KVXYVk1nCYeL1Jna7X/OaJvya+cwsL8WQsHFMJQ== }
     peerDependencies:
       '@nestjs/common': ^10.2.3
       '@nestjs/core': ^10.2.3

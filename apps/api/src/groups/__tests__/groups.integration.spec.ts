@@ -1,5 +1,5 @@
-import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
-import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
+import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { HttpStatus } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';

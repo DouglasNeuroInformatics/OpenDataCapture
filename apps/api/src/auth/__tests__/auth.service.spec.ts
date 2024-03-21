@@ -1,5 +1,5 @@
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
+import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';

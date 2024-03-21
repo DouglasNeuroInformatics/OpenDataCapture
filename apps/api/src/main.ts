@@ -1,7 +1,7 @@
 import path from 'node:path';
 import url from 'url';
 
-import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
 import { type LogLevel, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
