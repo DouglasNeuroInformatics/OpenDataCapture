@@ -46,7 +46,7 @@ export const SubjectsTable = () => {
         void download('README.txt', () => Promise.resolve(t('index.table.exportHelpText')));
         void download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
-          const columnNames = Object.keys(data[0]);
+          const columnNames = Object.keys(data[0]).join(',');
           const rows = data.map((record) => Object.values(record).join(',')).join('\n');
           return columnNames + '\n' + rows;
         });

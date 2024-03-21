@@ -1,8 +1,8 @@
 {
   "name": "@open-data-capture/instrument-utils",
+  "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
@@ -12,12 +12,13 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/form-types": "^5.2.0",
+    "@douglasneuroinformatics/libjs": "^0.1.0",
     "@open-data-capture/common": "workspace:*",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "ts-pattern": "^5.0.8"
   },
   "devDependencies": {
     "@open-data-capture/instrument-library": "workspace:*",
-    "@types/lodash": "^4.17.0"
+    "@types/lodash-es": "^4.17.0"
   }
 }

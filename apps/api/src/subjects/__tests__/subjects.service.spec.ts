@@ -1,8 +1,8 @@
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
+import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import _ from 'lodash';
+import { pick } from 'lodash-es';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Model } from '@/prisma/prisma.types';
@@ -30,7 +30,7 @@ describe('SubjectsService', () => {
     it('should call the subject model', async () => {
       const subject = { dateOfBirth: new Date(2000), firstName: 'Bob', lastName: 'Smith', sex: 'MALE' } as const;
       await subjectsService.create(subject);
-      expect(subjectModel.create.mock.lastCall?.[0]).toMatchObject({ data: _.pick(subject, 'dateOfBirth', 'sex') });
+      expect(subjectModel.create.mock.lastCall?.[0]).toMatchObject({ data: pick(subject, 'dateOfBirth', 'sex') });
     });
     it('should generate the same id when common French accents are omitted', async () => {
       subjectModel.create.mockImplementation((...args) => args);
@@ -50,9 +50,9 @@ describe('SubjectsService', () => {
       subjectModel.create.mockClear();
     });
 
-    it('should throw a ConflictException if the subject already exists', () => {
+    it('should throw a ConflictException if the subject already exists', async () => {
       subjectModel.exists.mockResolvedValueOnce(true);
-      expect(
+      await expect(
         subjectsService.create({
           dateOfBirth: new Date(2000),
           firstName: 'Bob',
@@ -64,20 +64,20 @@ describe('SubjectsService', () => {
   });
 
   describe('find', () => {
-    it('should return the array returned by the subject model', () => {
+    it('should return the array returned by the subject model', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
-      expect(subjectsService.find()).resolves.toMatchObject([{ id: '123' }]);
+      await expect(subjectsService.find()).resolves.toMatchObject([{ id: '123' }]);
     });
   });
 
   describe('findById', () => {
-    it('should throw a `NotFoundException` if there is no subject with the provided id', () => {
+    it('should throw a `NotFoundException` if there is no subject with the provided id', async () => {
       subjectModel.findFirst.mockResolvedValueOnce(null);
-      expect(subjectsService.findById('123')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(subjectsService.findById('123')).rejects.toBeInstanceOf(NotFoundException);
     });
-    it('should return the subject with the provided id if it exists', () => {
+    it('should return the subject with the provided id if it exists', async () => {
       subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
-      expect(subjectsService.findById('123')).resolves.toMatchObject({ id: '123' });
+      await expect(subjectsService.findById('123')).resolves.toMatchObject({ id: '123' });
     });
   });
 });

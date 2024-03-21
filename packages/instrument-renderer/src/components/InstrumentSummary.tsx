@@ -61,7 +61,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
           <div className="flex justify-end gap-1.5 text-slate-700 dark:text-slate-300 print:hidden">
             <CopyButton
               text={Object.values(computedMeasures)
-                .map(({ label, value }) => `${label}: ${value}`)
+                .map(({ label, value }) => `${label}: ${value.toString()}`)
                 .join('\n')}
             />
             <button className="rounded-md p-2 hover:bg-slate-200 dark:hover:bg-slate-700" type="button">

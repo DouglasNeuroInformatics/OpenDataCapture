@@ -12,7 +12,7 @@ import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument
 export type InteractiveInstrumentContent<TData extends Json = Json> = {
   assets?: {
     css?: string[];
-    img?: Record<string, string>;
+    img?: { [key: string]: string };
   };
   render: (done: <T extends Exact<TData, T>>(data: T) => void) => any;
 };

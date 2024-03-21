@@ -42,7 +42,7 @@ export class PrismaModule {
           useFactory: (configurationService: ConfigurationService) => {
             const mongoUri = configurationService.get('MONGO_URI');
             const dbName = configurationService.get('NODE_ENV');
-            const url = new URL(`${mongoUri}/data-capture-${dbName}`);
+            const url = new URL(`${mongoUri.href}/data-capture-${dbName}`);
             const params = {
               directConnection: configurationService.get('MONGO_DIRECT_CONNECTION'),
               replicaSet: configurationService.get('MONGO_REPLICA_SET'),

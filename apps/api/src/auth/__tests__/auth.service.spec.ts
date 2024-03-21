@@ -1,5 +1,5 @@
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
+import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
@@ -51,9 +51,9 @@ describe('AuthService', () => {
       });
     });
 
-    it('should raise an `UnauthorizedException` if the `UsersService` throws a `NotFoundException', () => {
+    it('should raise an `UnauthorizedException` if the `UsersService` throws a `NotFoundException', async () => {
       usersService.findByUsername.mockRejectedValueOnce(new NotFoundException());
-      expect(authService.login(loginRequest.username, loginRequest.password)).rejects.toBeInstanceOf(
+      await expect(authService.login(loginRequest.username, loginRequest.password)).rejects.toBeInstanceOf(
         UnauthorizedException
       );
     });

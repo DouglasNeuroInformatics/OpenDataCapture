@@ -1,4 +1,4 @@
-import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -32,14 +32,14 @@ describe('GroupsController', () => {
   describe('findAll', () => {
     it('should return the array returned by the groups service', async () => {
       groupsService.findAll.mockResolvedValueOnce([{ name: 'Test Group' }]);
-      expect(groupsController.findAll()).resolves.toMatchObject([{ name: 'Test Group' }]);
+      await expect(groupsController.findAll()).resolves.toMatchObject([{ name: 'Test Group' }]);
     });
   });
 
   describe('findById', () => {
-    it('should return the value provided by the groups service ', () => {
+    it('should return the value provided by the groups service ', async () => {
       groupsService.findById.mockResolvedValueOnce({ name: 'Test Group' });
-      expect(groupsService.findById('123')).resolves.toMatchObject({
+      await expect(groupsService.findById('123')).resolves.toMatchObject({
         name: 'Test Group'
       });
     });

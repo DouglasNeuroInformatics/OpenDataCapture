@@ -4,9 +4,9 @@ import { useTheme } from '@douglasneuroinformatics/ui/hooks';
 import { cn } from '@douglasneuroinformatics/ui/utils';
 import MonacoEditor from '@monaco-editor/react';
 
-import '../setup';
-
 import type { EditorFile, MonacoEditorType, MonacoType } from '../types';
+
+import '../setup';
 
 export type EditorPaneRef = {
   editor: MonacoEditorType | null;

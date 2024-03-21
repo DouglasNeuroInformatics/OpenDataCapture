@@ -1,4 +1,4 @@
-import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { $LoginCredentials, type LoginCredentials } from '@open-data-capture/common/auth';
 

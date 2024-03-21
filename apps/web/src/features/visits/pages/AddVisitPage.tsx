@@ -30,7 +30,7 @@ export const AddVisitPage = () => {
   return (
     <React.Fragment>
       <PageHeader title={t('addVisit')} />
-      <AddVisitForm onSubmit={handleSubmit} />
+      <AddVisitForm onSubmit={(data) => void handleSubmit(data)} />
     </React.Fragment>
   );
 };

@@ -41,8 +41,8 @@ export const $InstrumentLanguage = <T extends InstrumentLanguage>(language?: T) 
  */
 export type InstrumentUIOption<TLanguage extends InstrumentLanguage, TValue> = TLanguage extends Language
   ? TValue
-  : TLanguage extends (infer K extends Language)[]
-    ? Record<K, TValue>
+  : TLanguage extends (infer L extends Language)[]
+    ? { [K in L]: TValue }
     : never;
 
 export const $InstrumentUIOption = <TLanguage extends InstrumentLanguage, TSchema extends z.ZodTypeAny>(
@@ -134,7 +134,7 @@ export type InstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage 
   | {
       kind: 'const';
       label?: InstrumentUIOption<TLanguage, string>;
-      ref: TData extends Record<string, any>
+      ref: TData extends { [key: string]: any }
         ? ConditionalKeys<TData, InstrumentMeasureValue> extends infer K
           ? [K] extends [never]
             ? string
@@ -143,10 +143,9 @@ export type InstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage 
         : never;
     };
 
-export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Record<
-  string,
-  InstrumentMeasure<TData, TLanguage>
->;
+export type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+  [key: string]: InstrumentMeasure<TData, TLanguage>;
+};
 
 export type UnilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language>;
 export type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language[]>;

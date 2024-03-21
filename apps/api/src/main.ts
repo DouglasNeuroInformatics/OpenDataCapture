@@ -1,7 +1,7 @@
 import path from 'node:path';
 import url from 'url';
 
-import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
 import { type LogLevel, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
@@ -42,7 +42,7 @@ async function bootstrap() {
   setupDocs(app);
 
   const isProduction = configurationService.get('NODE_ENV') === 'production';
-  const port = configurationService.get(isProduction ? 'API_PROD_SERVER_PORT' : 'API_DEV_SERVER_PORT')!;
+  const port = configurationService.get(isProduction ? 'API_PROD_SERVER_PORT' : 'API_DEV_SERVER_PORT');
 
   await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);

@@ -28,26 +28,26 @@ describe('InstrumentTransformer', () => {
 
   describe('generateBundle', () => {
     it('should successfully transpile the click task', async () => {
-      expect(transformer.generateBundle(sources.clickTask)).resolves.toBeTypeOf('string');
+      await expect(transformer.generateBundle(sources.clickTask)).resolves.toBeTypeOf('string');
     });
     it('should successfully transpile the happiness questionnaire', async () => {
-      expect(transformer.generateBundle(sources.happinessQuestionnaire)).resolves.toBeTypeOf('string');
+      await expect(transformer.generateBundle(sources.happinessQuestionnaire)).resolves.toBeTypeOf('string');
     });
-    it('should fail to transpile syntactically invalid code', () => {
+    it('should fail to transpile syntactically invalid code', async () => {
       const source = sources.happinessQuestionnaire + 'INVALID SYNTAX!!';
-      expect(transformer.generateBundle(source)).rejects.toThrow();
+      await expect(transformer.generateBundle(source)).rejects.toThrow();
     });
-    it('should reject source including a static import', () => {
+    it('should reject source including a static import', async () => {
       const source = ["import _ from 'lodash';", sources.happinessQuestionnaire].join('\n');
-      expect(transformer.generateBundle(source)).rejects.toThrow();
+      await expect(transformer.generateBundle(source)).rejects.toThrow();
     });
-    it('should reject source including a named export', () => {
+    it('should reject source including a named export', async () => {
       const source = [sources.happinessQuestionnaire, 'export const __foo__ = 5'].join('\n');
-      expect(transformer.generateBundle(source)).rejects.toThrow();
+      await expect(transformer.generateBundle(source)).rejects.toThrow();
     });
-    it('should reject source including multiple default exports', () => {
+    it('should reject source including multiple default exports', async () => {
       const source = [sources.happinessQuestionnaire, 'export default __foo__ = 5'].join('\n');
-      expect(transformer.generateBundle(source)).rejects.toThrow();
+      await expect(transformer.generateBundle(source)).rejects.toThrow();
     });
   });
 
@@ -55,7 +55,7 @@ describe('InstrumentTransformer', () => {
     it('should transform imports', async () => {
       const input = 'import("/runtime/v0.0.1/react.js");\n';
       const output = 'import("./runtime/v0.0.1/react.js");\n';
-      expect(transformer.transformRuntimeImports(input)).resolves.toBe(output);
+      await expect(transformer.transformRuntimeImports(input)).resolves.toBe(output);
     });
   });
 });

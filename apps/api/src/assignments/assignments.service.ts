@@ -23,10 +23,10 @@ export class AssignmentsService {
     private readonly gatewayService: GatewayService
   ) {
     if (configurationService.get('NODE_ENV') === 'production') {
-      const siteAddress = configurationService.get('GATEWAY_SITE_ADDRESS')!;
+      const siteAddress = configurationService.get('GATEWAY_SITE_ADDRESS');
       this.assignmentBaseUrl = siteAddress.origin;
     } else {
-      const gatewayPort = configurationService.get('GATEWAY_DEV_SERVER_PORT')!;
+      const gatewayPort = configurationService.get('GATEWAY_DEV_SERVER_PORT');
       this.assignmentBaseUrl = `http://localhost:${gatewayPort}`;
     }
   }

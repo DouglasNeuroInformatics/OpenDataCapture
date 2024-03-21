@@ -1,6 +1,6 @@
-import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
-import { MockFactory } from '@douglasneuroinformatics/nestjs/testing';
+import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
+import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import { HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { type NestExpressApplication } from '@nestjs/platform-express';

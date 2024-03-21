@@ -13,8 +13,10 @@ export const CopyButton: React.FC<{ text: string }> = ({ text }) => {
       type="button"
       onClick={() => {
         if (state === 'READY') {
-          navigator.clipboard.writeText(text);
-          setState('SUCCESS');
+          navigator.clipboard
+            .writeText(text)
+            .then(() => setState('SUCCESS'))
+            .catch(console.error);
         }
       }}
       onMouseLeave={() => {

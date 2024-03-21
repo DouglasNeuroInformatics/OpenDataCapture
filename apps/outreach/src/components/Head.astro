@@ -40,7 +40,7 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="sitemap" href="/sitemap-index.xml" />
   <!-- prettier-ignore -->
-  <script defer data-domain="opendatacapture.org" src="http://analytics.douglasneuroinformatics.ca/js/script.js"></script>
+  <script is:inline defer data-domain="opendatacapture.org" src="http://analytics.douglasneuroinformatics.ca/js/script.js"></script>
   <script is:inline>
     const getThemePreference = () => {
       const savedTheme = window.localStorage.getItem('theme');

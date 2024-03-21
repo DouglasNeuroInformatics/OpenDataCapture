@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {

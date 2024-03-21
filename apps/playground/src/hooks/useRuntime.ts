@@ -9,7 +9,7 @@ type RuntimeManifest = {
 };
 
 export function useRuntime(version: string) {
-  const [declarations, setDeclarations] = useState<Record<string, string>>({});
+  const [declarations, setDeclarations] = useState<{ [key: string]: string }>({});
   const [manifest, setManifest] = useState<RuntimeManifest>({
     declarations: [],
     sources: []

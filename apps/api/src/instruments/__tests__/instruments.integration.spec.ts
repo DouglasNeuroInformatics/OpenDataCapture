@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
 import { HttpStatus } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
@@ -9,7 +9,7 @@ import { Test } from '@nestjs/testing';
 //   miniMentalStateExamination,
 //   montrealCognitiveAssessment
 // } from '@open-data-capture/instrument-library';
-import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/nestjs/testing';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';

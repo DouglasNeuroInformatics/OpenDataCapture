@@ -1,4 +1,4 @@
-import { ValidationSchema } from '@douglasneuroinformatics/nestjs/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { $CreateAssignmentData, type CreateAssignmentData } from '@open-data-capture/common/assignment';
 

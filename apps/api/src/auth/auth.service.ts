@@ -1,4 +1,4 @@
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { AuthPayload, JwtPayload } from '@open-data-capture/common/auth';

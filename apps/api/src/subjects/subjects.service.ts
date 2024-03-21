@@ -1,4 +1,4 @@
-import { CryptoService } from '@douglasneuroinformatics/nestjs/modules';
+import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@open-data-capture/database/core';
 import unidecode from 'unidecode';

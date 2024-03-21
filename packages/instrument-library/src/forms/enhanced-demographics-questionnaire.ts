@@ -5,7 +5,7 @@ const { z } = await import('/runtime/v0.0.1/zod.js');
 
 type Language = Extract<import('/runtime/v0.0.1/core.js').InstrumentLanguage, string>;
 
-type MultilingualOptions = Record<string, { [L in Language]: string }>;
+type MultilingualOptions = { [key: string]: { [L in Language]: string } };
 
 type TranslatedOptions<T extends MultilingualOptions> = { [K in keyof T]: string };
 
@@ -45,7 +45,7 @@ function formatTranslatedOptions<T extends MultilingualOptions>(options: T) {
  * @param options - The object to extract keys from.
  * @returns the keys as a tuple.
  */
-function extractKeysAsTuple<T extends Record<string, unknown>>(options: T) {
+function extractKeysAsTuple<T extends { [key: string]: unknown }>(options: T) {
   return Object.keys(options) as [keyof T, ...(keyof T)[]];
 }
 

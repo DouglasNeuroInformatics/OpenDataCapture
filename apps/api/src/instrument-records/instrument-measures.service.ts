@@ -24,13 +24,13 @@ export class InstrumentMeasuresService {
           const label = typeof measure.label === 'string' ? measure.label : (measure.label?.en ?? measure.label?.fr)!;
           throw new InternalServerErrorException(`Failed to compute measure '${label}': data must be object'`);
         }
-        return Reflect.get(data, measure.ref);
+        return Reflect.get(data, measure.ref) as InstrumentMeasureValue;
       })
       .exhaustive();
   }
 
   computeMeasures(measures: InstrumentMeasures, data: FormDataType | Json | Prisma.JsonValue) {
-    const computedMeasures: Record<string, InstrumentMeasureValue> = {};
+    const computedMeasures: { [key: string]: InstrumentMeasureValue } = {};
     for (const key in measures) {
       computedMeasures[key] = this.computeMeasure(measures[key], data);
     }

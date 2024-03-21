@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest/core';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@open-data-capture/common/instrument';
@@ -59,7 +59,7 @@ export class InstrumentRecordsController {
     @CurrentUser('ability') ability: AppAbility,
     @Query('instrumentId') instrumentId: string,
     @Query('groupId') groupId?: string
-  ): Promise<Record<string, { intercept: number; slope: number; stdErr: number }>> {
+  ): Promise<{ [key: string]: { intercept: number; slope: number; stdErr: number } }> {
     return this.instrumentRecordsService.linearModel({ groupId, instrumentId }, { ability });
   }
 }

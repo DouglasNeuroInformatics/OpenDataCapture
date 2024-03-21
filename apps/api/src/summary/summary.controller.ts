@@ -1,4 +1,4 @@
-import { CurrentUser } from '@douglasneuroinformatics/nestjs/core';
+import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
 import { Controller, Get, Query } from '@nestjs/common';
 import type { Summary } from '@open-data-capture/common/summary';
 

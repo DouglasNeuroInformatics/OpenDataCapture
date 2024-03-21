@@ -1,29 +1,30 @@
+import { isPlainObject } from '@douglasneuroinformatics/libjs';
 import {
   $InstrumentMeasureValue,
   type AnyUnilingualInstrument,
   type InstrumentMeasureValue
 } from '@open-data-capture/common/instrument';
-import _ from 'lodash';
 import { match } from 'ts-pattern';
 
 import { extractFieldLabel } from './form.js';
 import { isFormInstrument } from './guards.js';
 
-export type ComputedMeasures = Record<string, { label: string; value: InstrumentMeasureValue }>;
+export type ComputedMeasures = { [key: string]: { label: string; value: InstrumentMeasureValue } };
 
-export function computeInstrumentMeasures(instrument: AnyUnilingualInstrument, data: any) {
+export function computeInstrumentMeasures(instrument: AnyUnilingualInstrument, data: unknown) {
   const computedMeasures: ComputedMeasures = {};
+  if (!isPlainObject(data)) {
+    console.error(`Cannot compute measures from data: ${JSON.stringify(data)} is not an object`);
+    return computedMeasures;
+  }
   for (const key in instrument.measures) {
     const result = match(instrument.measures[key])
       .with({ kind: 'computed' }, (measure) => {
+        // @ts-expect-error - this is ignored because it is safer than the previous (any) solution
         return { label: measure.label, value: measure.value(data) };
       })
       .with({ kind: 'const' }, (measure) => {
-        if (!_.isPlainObject(data)) {
-          console.error(`Cannot extract key '${key}' from data: ${data} is not an object`);
-          return null;
-        }
-        const result = $InstrumentMeasureValue.safeParse(Reflect.get(data as object, key));
+        const result = $InstrumentMeasureValue.safeParse(data[key]);
         if (!result.success) {
           console.error('Failed to Parse Constant Measure', result.error);
           return null;
@@ -33,6 +34,7 @@ export function computeInstrumentMeasures(instrument: AnyUnilingualInstrument, d
         if (measure.label) {
           label = measure.label;
         } else if (isFormInstrument(instrument)) {
+          // @ts-expect-error - this is ignored because it is safer than the previous (any) solution
           label = extractFieldLabel(instrument, key, data);
         }
         if (!label) {
