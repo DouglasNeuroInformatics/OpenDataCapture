@@ -1013,9 +1013,9 @@ importers:
       '@open-data-capture/common':
         specifier: workspace:*
         version: link:../common
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+      '@sindresorhus/is':
+        specifier: ^6.2.0
+        version: 6.2.0
       ts-pattern:
         specifier: ^5.0.8
         version: 5.0.8
@@ -6464,6 +6464,12 @@ packages:
       { integrity: sha512-TV7t8GKYaJWsn00tFDqBw8+Uqmr8A0fRU1tvTQhyZzGv0sJCGRQL3JGMI3ucuKo3XIZdUP+Lx7/gh2t3lewy7g== }
     engines: { node: '>=14.16' }
     dev: true
+
+  /@sindresorhus/is@6.2.0:
+    resolution:
+      { integrity: sha512-yM/IGPkVnYGblhDosFBwq0ZGdnVSBkNV4onUtipGMOjZd4kB6GAu3ys91aftSbyMHh6A2GPdt+KDI5NoWP63MQ== }
+    engines: { node: '>=16' }
+    dev: false
 
   /@storybook/addon-actions@7.6.17:
     resolution:
