@@ -51,8 +51,8 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/esbuild-plugin-native-modules": "^0.0.1",
-    "@douglasneuroinformatics/esbuild-plugin-prisma": "^0.0.1",
+    "@douglasneuroinformatics/esbuild-plugin-native-modules": "^0.0.2",
+    "@douglasneuroinformatics/esbuild-plugin-prisma": "^0.0.2",
     "@nestjs/testing": "^10.3.3",
     "@open-data-capture/esbuild-plugin-runtime": "workspace:*",
     "@types/express": "^4.17.21",

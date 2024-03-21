@@ -18,7 +18,7 @@
     "format": "turbo run format",
     "generate:env": "./scripts/generate-env.sh",
     "lint": "turbo run lint --cache-dir=.turbo",
-    "prepare": "husky install",
+    "prepare": "husky",
     "start": "NODE_ENV=production env-cmd turbo run start",
     "tag:create": "git tag -a v$(cat package.json | jq -r .version)",
     "tag:push": "git push upstream v$(cat package.json | jq -r .version)",
@@ -26,6 +26,9 @@
     "ws": "./scripts/workspace.js $@"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
+    "@commitlint/types": "^19.0.3",
     "@douglasneuroinformatics/eslint-config": "^3.0.3",
     "@douglasneuroinformatics/form-types": "^5.2.0",
     "@eslint/js": "^8.57.0",
