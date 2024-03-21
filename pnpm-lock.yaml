@@ -17,8 +17,8 @@ importers:
         specifier: ^19.0.3
         version: 19.0.3
       '@douglasneuroinformatics/eslint-config':
-        specifier: ^4.2.0
-        version: 4.2.0(eslint@8.57.0)(typescript@5.3.3)
+        specifier: 4.2.1
+        version: 4.2.1(eslint@8.57.0)(typescript@5.3.3)
       '@douglasneuroinformatics/form-types':
         specifier: ^5.2.0
         version: 5.2.0
@@ -3200,9 +3200,9 @@ packages:
       prisma: 5.11.0
     dev: true
 
-  /@douglasneuroinformatics/eslint-config@4.2.0(eslint@8.57.0)(typescript@5.3.3):
+  /@douglasneuroinformatics/eslint-config@4.2.1(eslint@8.57.0)(typescript@5.3.3):
     resolution:
-      { integrity: sha512-jCPqxHb7bJLqdeX9X+Edmg4bfCpkgqMCrUP1vKraAXG5fvhezWzO7odVi7DlfA5XrvvYzYe6ELK1HlP82gBr9w== }
+      { integrity: sha512-/L/1Q39sdDbNv6dDa4a1/jfJCBA7SlZvtkJoIXSIQrRfPG6rgOnbxKIIdTU4sobTjSiD8Q7rv/Do546N+gXK5w== }
     peerDependencies:
       eslint: 8.x
       typescript: 5.x
