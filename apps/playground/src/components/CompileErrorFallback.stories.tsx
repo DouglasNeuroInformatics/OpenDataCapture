@@ -10,7 +10,7 @@ function createError() {
       (function f2() {
         throw new Error('Unexpected Error');
       })();
-    })() as never;
+    })();
   } catch (err) {
     return err as Error;
   }

@@ -67,9 +67,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         break;
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(exportRecords[0]);
+          const columnNames = Object.keys(exportRecords[0]).join(',');
           const rows = exportRecords.map((item) => Object.values(item).join(',')).join('\n');
-          return Promise.resolve(columnNames + '\n' + rows);
+          return columnNames + '\n' + rows;
         });
     }
   };
@@ -90,8 +90,8 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   }, [recordsQuery.data]);
 
-  const instrumentOptions: Record<string, string> = useMemo(() => {
-    const options: Record<string, string> = {};
+  const instrumentOptions: { [key: string]: string } = useMemo(() => {
+    const options: { [key: string]: string } = {};
     for (const summary of instrumentSummariesQuery.data) {
       options[summary.id] = summary.details.title;
     }

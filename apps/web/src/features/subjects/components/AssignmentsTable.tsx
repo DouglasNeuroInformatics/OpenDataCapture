@@ -15,7 +15,7 @@ export type AssignmentTableProps = {
 
 export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTableProps) => {
   const { t } = useTranslation('subjects');
-  const [instrumentSummaries, setInstrumentSummaries] = useState<Record<string, UnilingualInstrumentSummary>>({});
+  const [instrumentSummaries, setInstrumentSummaries] = useState<{ [key: string]: UnilingualInstrumentSummary }>({});
 
   const instrumentSummariesQuery = useInstrumentSummariesQuery();
 

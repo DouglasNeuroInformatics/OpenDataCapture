@@ -8,7 +8,7 @@ import { z } from 'zod';
 const ONE_YEAR = 31556952000;
 
 export type AssignmentModalProps = {
-  instrumentOptions: Record<string, string>;
+  instrumentOptions: { [key: string]: string };
   isOpen: boolean;
   onSubmit: (data: Omit<CreateAssignmentData, 'subjectId'>) => void;
   setIsOpen: (isOpen: boolean) => void;
