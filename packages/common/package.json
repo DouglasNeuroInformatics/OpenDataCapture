@@ -1,8 +1,8 @@
 {
   "name": "@open-data-capture/common",
+  "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
-  "type": "module",
   "exports": {
     "./assignment": "./src/assignment.ts",
     "./auth": "./src/auth.ts",

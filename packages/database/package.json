@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "exports": {
     "./core": {
-      "default": "./dist/core/index.js",
-      "types": "./dist/core/index.d.ts"
+      "types": "./dist/core/index.d.ts",
+      "default": "./dist/core/index.js"
     },
     "./gateway": {
-      "default": "./dist/gateway/index.js",
-      "types": "./dist/gateway/index.d.ts"
+      "types": "./dist/gateway/index.d.ts",
+      "default": "./dist/gateway/index.js"
     }
   },
   "scripts": {

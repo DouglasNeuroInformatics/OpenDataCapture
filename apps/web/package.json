@@ -1,9 +1,9 @@
 {
   "name": "@open-data-capture/web",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
   "license": "AGPL-3.0",
-  "type": "module",
   "scripts": {
     "build": "tsc && NODE_ENV=production NODE_OPTIONS='--import=tsx' pnpm exec vite build",
     "cy:open": "cypress open",

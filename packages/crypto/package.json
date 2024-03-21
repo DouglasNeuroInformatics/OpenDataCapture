@@ -1,9 +1,9 @@
 {
   "name": "@open-data-capture/crypto",
+  "type": "module",
   "version": "0.0.0",
   "description": "Wrappers for the Web Crypto API",
   "license": "LGPL-3.0",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },

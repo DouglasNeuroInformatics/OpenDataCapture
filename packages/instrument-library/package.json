@@ -1,12 +1,12 @@
 {
   "name": "@open-data-capture/instrument-library",
+  "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
-  "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./src/index.d.ts"
+      "types": "./src/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./forms/*": "./src/forms/*",
     "./interactive/*": "./src/interactive/*"
