@@ -6,7 +6,7 @@ export type TranslationsDef = { [key: string]: { [key: string]: unknown } };
 
 export type TranslatedResource<T = EmptyObject> = {
   [K in keyof T]: T[K] extends { [key: string]: unknown }
-    ? T[K] extends { [key: Language]: unknown }
+    ? T[K] extends { [K in Language]: unknown }
       ? ValueOf<T[K]>
       : TranslatedResource<T[K]>
     : T[K];
