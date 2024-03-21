@@ -11,7 +11,7 @@ import { isFormInstrument } from './guards.js';
 
 export type ComputedMeasures = { [key: string]: { label: string; value: InstrumentMeasureValue } };
 
-export function computeInstrumentMeasures(instrument: AnyUnilingualInstrument, data: any) {
+export function computeInstrumentMeasures(instrument: AnyUnilingualInstrument, data: unknown) {
   const computedMeasures: ComputedMeasures = {};
   for (const key in instrument.measures) {
     const result = match(instrument.measures[key])
