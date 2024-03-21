@@ -16,7 +16,7 @@ router.get(
     if (!assignment) {
       return next();
     }
-    const token = await generateToken(assignment.id);
+    const token = generateToken(assignment.id);
     const html = res.locals.loadRoot({ bundle: assignment.instrumentBundle, id, token });
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
   })
