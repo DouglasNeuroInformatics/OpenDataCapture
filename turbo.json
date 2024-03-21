@@ -3,7 +3,7 @@
   "globalDependencies": [".env", "eslint.config.js", "jsconfig.json", "prettier.config.js"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^build", "^db:generate", "^db:push"],
       "outputs": ["dist/**"]
     },
     "db:generate": {
@@ -14,7 +14,7 @@
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^build", "^db:generate", "^db:push"],
       "persistent": true
     },
     "format": {},
@@ -23,14 +23,14 @@
       "outputs": ["dist/**"]
     },
     "lint": {
-      "dependsOn": ["^build", "^db:generate"]
+      "dependsOn": ["^build", "^db:generate", "^db:push"]
     },
     "start": {
       "dependsOn": ["build", "inject"],
       "persistent": true
     },
     "test": {
-      "dependsOn": ["^build", "^db:generate"]
+      "dependsOn": ["^build", "^db:generate", "^db:push"]
     }
   }
 }
