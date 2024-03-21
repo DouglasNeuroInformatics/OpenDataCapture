@@ -11,7 +11,7 @@ import { $InteractiveInstrument } from './instrument.interactive.js';
  */
 
 describe('$InteractiveInstrument', () => {
-  it('should parse the click task', () => {
-    expect($InteractiveInstrument.safeParseAsync(clickTask)).resolves.toMatchObject({ success: true });
+  it('should parse the click task', async () => {
+    await expect($InteractiveInstrument.safeParseAsync(clickTask)).resolves.toMatchObject({ success: true });
   });
 });

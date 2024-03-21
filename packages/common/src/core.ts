@@ -76,7 +76,7 @@ export const $Uint8Array: z.ZodType<Uint8Array, z.ZodTypeDef, Uint8Array | numbe
     return arg;
   });
 
-export const $LicenseIdentifier = z.string().refine((arg) => licenses.has(arg as any)) as z.ZodType<
+export const $LicenseIdentifier = z.string().refine((arg) => licenses.has(arg as LicenseIdentifier)) as z.ZodType<
   LicenseIdentifier,
   z.ZodTypeDef,
   string

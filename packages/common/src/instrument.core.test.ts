@@ -43,8 +43,8 @@ describe('$AnyInstrument', () => {
    * Zod is not named "render", which causes it to fail the comparison, despise the same signature.
    */
   describe('interactive instruments', () => {
-    it('should parse the click task', () => {
-      expect($AnyInstrument.safeParseAsync(clickTask)).resolves.toMatchObject({ success: true });
+    it('should parse the click task', async () => {
+      await expect($AnyInstrument.safeParseAsync(clickTask)).resolves.toMatchObject({ success: true });
     });
   });
 });
