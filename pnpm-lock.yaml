@@ -1010,12 +1010,15 @@ importers:
       '@douglasneuroinformatics/form-types':
         specifier: ^5.2.0
         version: 5.2.0
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.1.0
+        version: 0.1.0(typescript@5.3.3)
       '@open-data-capture/common':
         specifier: workspace:*
         version: link:../common
-      '@sindresorhus/is':
-        specifier: ^6.2.0
-        version: 6.2.0
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       ts-pattern:
         specifier: ^5.0.8
         version: 5.0.8
@@ -1023,9 +1026,9 @@ importers:
       '@open-data-capture/instrument-library':
         specifier: workspace:*
         version: link:../instrument-library
-      '@types/lodash':
+      '@types/lodash-es':
         specifier: ^4.17.0
-        version: 4.17.0
+        version: 4.17.12
 
   packages/licenses: {}
 
@@ -6464,12 +6467,6 @@ packages:
       { integrity: sha512-TV7t8GKYaJWsn00tFDqBw8+Uqmr8A0fRU1tvTQhyZzGv0sJCGRQL3JGMI3ucuKo3XIZdUP+Lx7/gh2t3lewy7g== }
     engines: { node: '>=14.16' }
     dev: true
-
-  /@sindresorhus/is@6.2.0:
-    resolution:
-      { integrity: sha512-yM/IGPkVnYGblhDosFBwq0ZGdnVSBkNV4onUtipGMOjZd4kB6GAu3ys91aftSbyMHh6A2GPdt+KDI5NoWP63MQ== }
-    engines: { node: '>=16' }
-    dev: false
 
   /@storybook/addon-actions@7.6.17:
     resolution:

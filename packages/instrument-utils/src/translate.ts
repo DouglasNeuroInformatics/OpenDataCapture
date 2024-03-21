@@ -26,7 +26,7 @@ import type {
   UnilingualInstrumentMeasures,
   UnilingualInstrumentSummary
 } from '@open-data-capture/common/instrument';
-import _ from 'lodash';
+import { mapValues, wrap } from 'lodash-es';
 
 import {
   isMultilingualInstrument,
@@ -165,7 +165,7 @@ function translateFormFields(
       translatedFields[fieldName] = {
         deps: field.deps,
         kind: 'dynamic',
-        render: _.wrap(field.render, (func, data: PartialFormDataType | null) => {
+        render: wrap(field.render, (func, data: PartialFormDataType | null) => {
           const result = func(data);
           if (result === null) {
             return null;
@@ -208,7 +208,7 @@ function translateMeasures(
   if (!measures) {
     return;
   }
-  return _.mapValues(measures, (measure) => {
+  return mapValues(measures, (measure) => {
     switch (measure.kind) {
       case 'computed':
         return { ...measure, label: measure.label[language] };
