@@ -54,19 +54,19 @@ export const SubjectGraphPage = () => {
 
     const selectGraph = graphRef.current;
 
-    const graphDesc = document.createElement('div');
-    if (instrument) {
-      graphDesc.innerText = instrument?.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
-      graphDesc.className = 'p-2 block font-semibold text-center';
-    }
+    const canvas = await html2canvas(selectGraph, {
+      onclone: (_, element) => {
+        const graphDesc = document.createElement('div');
+        graphDesc.innerText = instrument!.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
+        graphDesc.className = 'p-2 font-semibold text-center';
+        element.prepend(graphDesc);
+      }
+    });
 
-    selectGraph.appendChild(graphDesc);
-
-    const canvas = await html2canvas(selectGraph);
     const dataURL = canvas.toDataURL('image/png');
     downloadjs(dataURL, `${params.subjectId!.slice(0, 7)}.png`, 'image/png');
 
-    selectGraph.removeChild(graphDesc);
+    // canvas.removeChild(graphDesc);
   };
 
   return (
@@ -103,6 +103,7 @@ export const SubjectGraphPage = () => {
             <div className="relative w-full whitespace-nowrap" data-cy="download-button">
               <Button
                 className="relative w-full whitespace-nowrap text-sm"
+                disabled={!instrument}
                 label="Download"
                 variant="secondary"
                 onClick={() => handleGraphDownload()}
