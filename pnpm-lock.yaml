@@ -1119,8 +1119,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(@casl/ability@6.7.0)(@prisma/client@5.11.0)
       '@douglasneuroinformatics/libui-form-types':
-        specifier: ^0.6.1
-        version: 0.6.1
+        specifier: ^0.6.2
+        version: 0.6.2
       '@open-data-capture/database':
         specifier: workspace:*
         version: link:../database
@@ -3316,9 +3316,9 @@ packages:
       zod: 3.22.4
     dev: false
 
-  /@douglasneuroinformatics/libui-form-types@0.6.1:
+  /@douglasneuroinformatics/libui-form-types@0.6.2:
     resolution:
-      { integrity: sha512-p5rEk3jPcDUBZSCRtxZEExeT7IvbCbNAe1yiwhZSDjJr1xsENK1A9I+j35EWwaJOIIKdINCegiTqEEkvn34OzQ== }
+      { integrity: sha512-RBvQKlGYxzSjxKnSnt8CWaeNQS6t3HJwcHB7zqERqLBbXilbYpD0S19W0PM/0iCcXZ02fYVCf+sBHzgaxluf9A== }
     dependencies:
       type-fest: 4.12.0
     dev: true
