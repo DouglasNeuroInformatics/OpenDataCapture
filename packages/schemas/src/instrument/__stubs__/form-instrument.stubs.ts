@@ -1,0 +1,114 @@
+import { deepFreeze } from '@douglasneuroinformatics/libjs';
+import { z } from 'zod';
+
+import type { Language } from '../../core/core.index.js';
+import type { FormInstrument } from '../instrument.form.js';
+
+type FormInstrumentStubData = {
+  favoriteNumber: number;
+  reasonFavoriteNumberIsNegative?: string;
+};
+
+export const UNILINGUAL_FORM_INSTRUMENT = deepFreeze({
+  content: {
+    favoriteNumber: {
+      kind: 'number',
+      label: 'Favorite Number',
+      variant: 'input'
+    },
+    reasonFavoriteNumberIsNegative: {
+      deps: ['favoriteNumber'],
+      kind: 'dynamic',
+      render(data) {
+        if (!data?.favoriteNumber || data.favoriteNumber >= 0) {
+          return null;
+        }
+        return {
+          kind: 'string',
+          label: 'Why is Your Favorite Number Negative?',
+          variant: 'textarea'
+        };
+      }
+    }
+  },
+  details: {
+    description: '',
+    estimatedDuration: 1,
+    instructions: [],
+    license: 'AGPL-3.0',
+    title: ''
+  },
+  kind: 'FORM',
+  language: 'en',
+  name: '',
+  tags: [],
+  validationSchema: z.object({
+    favoriteNumber: z.number(),
+    reasonFavoriteNumberIsNegative: z.string().optional()
+  }),
+  version: 1.0
+} satisfies FormInstrument<FormInstrumentStubData, Language>) as any as FormInstrument<
+  FormInstrumentStubData,
+  Language
+>;
+
+export const BILINGUAL_FORM_INSTRUMENT = deepFreeze({
+  content: {
+    favoriteNumber: {
+      kind: 'number',
+      label: {
+        en: 'Favorite Number',
+        fr: 'Numéro préféré'
+      },
+      variant: 'input'
+    },
+    reasonFavoriteNumberIsNegative: {
+      deps: ['favoriteNumber'],
+      kind: 'dynamic',
+      render(data) {
+        if (!data?.favoriteNumber || data.favoriteNumber >= 0) {
+          return null;
+        }
+        return {
+          kind: 'string',
+          label: {
+            en: 'Why is Your Favorite Number Negative?',
+            fr: 'Pourquoi votre nombre préféré est-il négatif ?'
+          },
+          variant: 'textarea'
+        };
+      }
+    }
+  },
+  details: {
+    description: {
+      en: '',
+      fr: ''
+    },
+    estimatedDuration: 1,
+    instructions: {
+      en: [],
+      fr: []
+    },
+    license: 'AGPL-3.0',
+    title: {
+      en: '',
+      fr: ''
+    }
+  },
+  kind: 'FORM',
+  language: ['en', 'fr'],
+  name: '',
+  tags: {
+    en: [],
+    fr: []
+  },
+  validationSchema: z.object({
+    favoriteNumber: z.number(),
+    reasonFavoriteNumberIsNegative: z.string().optional()
+  }),
+  version: 1.0
+} satisfies FormInstrument<FormInstrumentStubData, Language[]>) as any as FormInstrument<
+  FormInstrumentStubData,
+  Language[]
+>;
