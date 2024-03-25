@@ -1,5 +1,6 @@
 import { isUnique } from '@douglasneuroinformatics/libjs';
 import type { LicenseIdentifier } from '@open-data-capture/licenses';
+import { uniq } from 'lodash-es';
 import type { ConditionalKeys, Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 
@@ -37,16 +38,26 @@ export type InstrumentUIOption<TLanguage extends InstrumentLanguage, TValue> = T
   : TLanguage extends (infer L extends Language)[]
     ? { [K in L]: TValue }
     : never;
-export const $$InstrumentUIOption = <TSchema extends z.ZodTypeAny>(
-  $Schema: TSchema
-): z.ZodType<InstrumentUIOption<InstrumentLanguage, z.infer<TSchema>>> => {
-  return z.union([
-    $Schema,
-    z.object({
-      en: $Schema,
-      fr: $Schema
-    })
-  ]);
+export const $$InstrumentUIOption = <TSchema extends z.ZodTypeAny, TLanguage extends InstrumentLanguage>(
+  $Schema: TSchema,
+  language?: TLanguage
+): z.ZodType<InstrumentUIOption<TLanguage, z.infer<TSchema>>> => {
+  let resolvedSchema: z.ZodTypeAny = z.never();
+  if (typeof language === 'string') {
+    resolvedSchema = $Schema;
+  } else if (typeof language === 'object') {
+    const shape = Object.fromEntries(uniq(language).map((val) => [val, $Schema]));
+    resolvedSchema = z.object(shape);
+  } else if (typeof language === 'undefined') {
+    resolvedSchema = z.union([
+      $Schema,
+      z.object({
+        en: $Schema,
+        fr: $Schema
+      })
+    ]);
+  }
+  return resolvedSchema as z.ZodType<InstrumentUIOption<TLanguage, z.output<TSchema>>>;
 };
 
 /**
