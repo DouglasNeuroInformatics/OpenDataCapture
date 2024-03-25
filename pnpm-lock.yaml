@@ -487,7 +487,7 @@ importers:
       framer-motion:
         specifier: ^10.18.0
         version: 10.18.0(react-dom@18.2.0)(react@18.2.0)
-      lodash:
+      lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
       lucide-react:
@@ -527,9 +527,9 @@ importers:
       '@open-data-capture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-runtime
-      '@types/lodash':
-        specifier: ^4.17.0
-        version: 4.17.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/react':
         specifier: ^18.2.65
         version: 18.2.65

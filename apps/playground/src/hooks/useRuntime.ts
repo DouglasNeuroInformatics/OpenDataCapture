@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import axios from 'axios';
-import _ from 'lodash';
+import { difference, mapKeys } from 'lodash-es';
 
 type RuntimeManifest = {
   declarations: string[];
@@ -28,12 +28,12 @@ export function useRuntime(version: string) {
   }, []);
 
   useEffect(() => {
-    _.difference(manifest.declarations, Object.keys(declarations)).forEach((filename) => {
+    difference(manifest.declarations, Object.keys(declarations)).forEach((filename) => {
       void loadDeclaration(filename);
     });
   }, [manifest]);
 
   return {
-    libs: _.mapKeys(declarations, (_, key) => `/runtime/${version}/${key}`)
+    libs: mapKeys(declarations, (_, key) => `/runtime/${version}/${key}`)
   };
 }
