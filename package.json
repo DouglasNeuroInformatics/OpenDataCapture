@@ -37,6 +37,7 @@
     "@storybook/addon-links": "^7.6.17",
     "@storybook/addon-themes": "^7.6.17",
     "@storybook/blocks": "^7.6.17",
+    "@storybook/icons": "^1.2.9",
     "@storybook/react": "^7.6.17",
     "@storybook/react-vite": "^7.6.17",
     "@swc-node/register": "^1.9.0",
