@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { $UnilingualBaseInstrument, $UnilingualEnhancedBaseInstrumentDetails } from './instrument.base.js';
 
-import type { Json, Language } from '../core/core.index.js';
+import type { Json, Language } from '../core/core.js';
 import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument.base.js';
 
 type InteractiveInstrumentContent<TData extends Json = Json> = {

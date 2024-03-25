@@ -22,7 +22,7 @@ import type {
 import type { KeysOfUnion, Simplify } from 'type-fest';
 import { z } from 'zod';
 
-import { $ZodTypeAny, type Language } from '../core/core.index.js';
+import { $ZodTypeAny, type Language } from '../core/core.js';
 import { $$InstrumentUIOption, $BaseInstrument, $EnhancedBaseInstrumentDetails } from './instrument.base.js';
 
 import type {

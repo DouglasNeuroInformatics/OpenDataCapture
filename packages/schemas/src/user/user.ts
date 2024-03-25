@@ -1,10 +1,10 @@
 import type { UserModel } from '@open-data-capture/database/core';
 import { z } from 'zod';
 
-import { $BaseModel } from '../core/core.index.js';
-import { $Group } from '../group/group.index.js';
+import { $BaseModel } from '../core/core.js';
+import { $Group } from '../group/group.js';
 
-import type { Group } from '../group/group.index.js';
+import type { Group } from '../group/group.js';
 
 export const $StrongPassword = z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{12,}$/, {
   message:

@@ -4,7 +4,17 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "exports": {
-    "./instrument": "./src/instrument.ts"
+    "./assignment": "./src/assignment/assignment.ts",
+    "./auth": "./src/auth/auth.ts",
+    "./core": "./src/core/core.ts",
+    "./group": "./src/group/group.ts",
+    "./instrument": "./src/instrument/instrument.ts",
+    "./instrument-records": "./src/instrument-records/instrument-records.ts",
+    "./setup": "./src/setup/setup.ts",
+    "./subject": "./src/subject/subject.ts",
+    "./summary": "./src/summary/summary.ts",
+    "./user": "./src/user/user.ts",
+    "./visit": "./src/visit/visit.ts"
   },
   "scripts": {
     "format": "prettier --write src",

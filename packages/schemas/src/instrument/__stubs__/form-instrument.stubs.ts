@@ -1,7 +1,7 @@
 import { deepFreeze } from '@douglasneuroinformatics/libjs';
 import { z } from 'zod';
 
-import type { Language } from '../../core/core.index.js';
+import type { Language } from '../../core/core.js';
 import type { FormInstrument } from '../instrument.form.js';
 
 type FormInstrumentStubData = {

@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { $FormInstrument } from './instrument.form.js';
 import { $InteractiveInstrument } from './instrument.interactive.js';
 
-import type { Json, Language } from '../core/core.index.js';
+import type { Json, Language } from '../core/core.js';
 import type { InstrumentKind, InstrumentLanguage } from './instrument.base.js';
 import type {
   AnyMultilingualFormInstrument,
