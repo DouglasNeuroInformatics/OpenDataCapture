@@ -1,4 +1,4 @@
-import { $Assignment } from '@open-data-capture/common/assignment';
+import { $Assignment } from '@open-data-capture/schemas/assignment';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

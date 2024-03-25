@@ -1,4 +1,4 @@
-import { $SetupState } from '@open-data-capture/common/setup';
+import { $SetupState } from '@open-data-capture/schemas/setup';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

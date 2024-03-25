@@ -1,5 +1,5 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import type { UpdateAssignmentData } from '@open-data-capture/common/assignment';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import type { UpdateAssignmentData } from '@open-data-capture/schemas/assignment';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
