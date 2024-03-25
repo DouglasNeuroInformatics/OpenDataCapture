@@ -33,8 +33,6 @@
     "@casl/prisma": "^1.4.1",
     "@douglasneuroinformatics/libui-form-types": "^0.6.2",
     "@open-data-capture/database": "workspace:*",
-    "@open-data-capture/instrument-library": "workspace:*",
-    "@types/lodash-es": "^4.17.12",
-    "@types/react": "^18.2.65"
+    "@types/lodash-es": "^4.17.12"
   }
 }
