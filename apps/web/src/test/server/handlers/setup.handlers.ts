@@ -1,4 +1,4 @@
-import type { SetupState } from '@open-data-capture/common/setup';
+import type { SetupState } from '@open-data-capture/schemas/setup';
 import { HttpResponse, http } from 'msw';
 
 export const setupHandlers = [
