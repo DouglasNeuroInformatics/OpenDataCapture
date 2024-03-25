@@ -17,11 +17,11 @@ type InteractiveInstrumentContent<TData extends Json = Json> = {
   render: (done: <T extends Exact<TData, T>>(data: T) => void) => any;
 };
 
-export type InteractiveInstrument<TData extends Json = Json, TLanguage extends Language = Language> = Merge<
+export type InteractiveInstrument<TData extends Json = Json> = Merge<
   BaseInstrument<TData, Language>,
   {
     content: InteractiveInstrumentContent<TData>;
-    details: EnhancedBaseInstrumentDetails<TLanguage>;
+    details: EnhancedBaseInstrumentDetails<Language>;
     kind: 'INTERACTIVE';
   }
 >;
@@ -32,3 +32,5 @@ export const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $Uniling
   details: $UnilingualEnhancedBaseInstrumentDetails,
   kind: z.literal('INTERACTIVE')
 });
+
+export type InteractiveInstrumentDef<TData> = TData extends Json ? InteractiveInstrument<TData> : never;
