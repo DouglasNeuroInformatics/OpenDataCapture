@@ -31,7 +31,7 @@
     "@commitlint/config-conventional": "^19.1.0",
     "@commitlint/types": "^19.0.3",
     "@douglasneuroinformatics/eslint-config": "4.2.1",
-    "@douglasneuroinformatics/form-types": "^5.2.0",
+    "@douglasneuroinformatics/libui-form-types": "^0.6.3",
     "@storybook/addon-essentials": "^7.6.17",
     "@storybook/addon-interactions": "^7.6.17",
     "@storybook/addon-links": "^7.6.17",
