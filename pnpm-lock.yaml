@@ -1103,8 +1103,8 @@ importers:
         specifier: ^6.7.0
         version: 6.7.0
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.2.0
-        version: 0.2.0(typescript@5.3.3)
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.3.3)
       '@open-data-capture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -3276,9 +3276,9 @@ packages:
       typescript: 5.3.3
     dev: false
 
-  /@douglasneuroinformatics/libjs@0.2.0(typescript@5.3.3):
+  /@douglasneuroinformatics/libjs@0.3.0(typescript@5.3.3):
     resolution:
-      { integrity: sha512-HGEt7Q99z40qQiX2cKOGDFDRSisb3Jheu0lbJisLa8Z0iEBeGeCOUWslJiz5Zl3AWyuM4yxKVQxlLSYW+8GHoQ== }
+      { integrity: sha512-izbwuAuwCHMZVkUmjOPYFx/BdaLR/GCca4U5CbaZACm6D6Pb5t721NBGsuaMGBQt1qo6GzXzfRJ41xqxqISgzg== }
     peerDependencies:
       typescript: ^5.1.0
     dependencies:

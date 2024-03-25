@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@casl/ability": "^6.7.0",
-    "@douglasneuroinformatics/libjs": "^0.2.0",
+    "@douglasneuroinformatics/libjs": "^0.3.0",
     "@open-data-capture/licenses": "workspace:*",
     "lodash-es": "^4.17.21",
     "zod": "^3.22.4"
