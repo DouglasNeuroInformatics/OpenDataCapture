@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Card, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import { Card, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 
 import logo from '@/assets/logo.png';
 
@@ -20,7 +20,13 @@ export const FormPageLayout = ({ children, className, title, widthMultiplier = 1
       <h1 className="mb-3 text-2xl font-bold tracking-tight first-letter:capitalize">{title}</h1>
       {children}
       <div className="mt-5 flex w-full justify-between bg-inherit">
-        <LanguageToggle dropdownDirection="up" options={['en', 'fr']} />
+        <LanguageToggle
+          align="start"
+          options={{
+            en: 'English',
+            fr: 'Français'
+          }}
+        />
         <ThemeToggle />
       </div>
     </Card>

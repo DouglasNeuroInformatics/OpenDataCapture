@@ -1,4 +1,4 @@
-import { Form } from '@douglasneuroinformatics/ui/legacy';
+import { Form } from '@douglasneuroinformatics/libui/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { z } from 'zod';
 
@@ -12,44 +12,44 @@ const meta: Meta<typeof FormPageLayout> = {
       <Form
         content={{
           v1: {
-            kind: 'text',
+            kind: 'string',
             label: 'Value 1',
-            variant: 'short'
+            variant: 'input'
           },
           v2: {
-            kind: 'text',
+            kind: 'string',
             label: 'Value 2',
-            variant: 'short'
+            variant: 'input'
           },
           v3: {
-            kind: 'text',
+            kind: 'string',
             label: 'Value 3',
-            variant: 'short'
+            variant: 'input'
           },
           v4: {
-            kind: 'text',
+            kind: 'string',
             label: 'Value 4',
-            variant: 'short'
+            variant: 'input'
           },
           v5: {
-            kind: 'text',
+            kind: 'string',
             label: 'Value 5',
-            variant: 'short'
+            variant: 'input'
           },
           v6: {
-            kind: 'text',
+            kind: 'string',
             label: 'Value 6',
-            variant: 'long'
+            variant: 'textarea'
           },
           v7: {
-            kind: 'text',
+            kind: 'string',
             label: 'Value 7',
-            variant: 'long'
+            variant: 'textarea'
           },
           v8: {
-            kind: 'text',
+            kind: 'string',
             label: 'Value 8',
-            variant: 'short'
+            variant: 'input'
           }
         }}
         validationSchema={z.record(z.any())}
