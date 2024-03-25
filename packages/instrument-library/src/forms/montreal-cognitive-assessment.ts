@@ -27,92 +27,92 @@ export default instrumentFactory.defineInstrument({
   version: 8.1,
   content: {
     abstraction: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Abstraction',
         fr: 'Abstraction'
       },
       max: 2,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     attention: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Attention',
         fr: 'Attention'
       },
       max: 6,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     delayedRecall: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Delayed Recall',
         fr: 'Rappel'
       },
       max: 5,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     language: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Language',
         fr: 'Langue'
       },
       max: 3,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     lowEdu: {
-      kind: 'binary',
+      kind: 'boolean',
       label: {
         en: 'Less Than 12 Years of Education',
         fr: "Moins de 12 ans d'études"
       },
       options: {
         en: {
-          f: 'No',
-          t: 'Yes'
+          false: 'No',
+          true: 'Yes'
         },
         fr: {
-          f: 'No',
-          t: 'Oui'
+          false: 'No',
+          true: 'Oui'
         }
       },
       variant: 'radio'
     },
     naming: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Naming',
         fr: 'Dénomination'
       },
       max: 3,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     orientation: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Orientation',
         fr: 'Orientation'
       },
       max: 6,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     visuospatialExecutive: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Visuospatial/Executive',
         fr: 'Visuospatial/Exécutif'
       },
       max: 5,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     }
   },
   details: {

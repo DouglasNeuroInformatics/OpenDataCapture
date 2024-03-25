@@ -45,70 +45,70 @@ export default instrumentFactory.defineInstrument({
             en: 'Accept previous or next date',
             fr: 'Accepter la date précédente ou suivante'
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: "What is today's date?",
             fr: "Quelle est la date d'aujourd'hui ?"
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         day: {
           description: {
             en: 'Accept exact answer only',
             fr: "N'accepter que les réponses exactes"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What day of the week is this?',
             fr: 'Quel jour de la semaine sommes-nous ?'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         month: {
           description: {
             en: 'Accept either: the first day of a new month or the last day of the previous month',
             fr: "Accepter soit : le premier jour d'un nouveau mois, soit le dernier jour du mois précédent"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What month is this?',
             fr: 'Quel mois sommes-nous ?'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         season: {
           description: {
             en: 'Accept either the last week of the old season or the first week of a new season',
             fr: "accepter soit : la dernière semaine de l'ancienne saison, soit la première semaine d'une nouvelle saison"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What season is this?',
             fr: "De quelle saison s'agit-il ?"
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         year: {
           description: {
             en: 'Accept exact answer only',
             fr: "N'accepter que les réponses exactes"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What year is this?',
             fr: "De quelle année s'agit-il ?"
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -123,70 +123,70 @@ export default instrumentFactory.defineInstrument({
             en: 'Accept exact answer only',
             fr: "N'accepter que la réponse exacte"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What city/town are we in?',
             fr: 'Dans quelle ville nous trouvons-nous ?'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         country: {
           description: {
             en: 'Accept exact answer only',
             fr: "N'accepter que les réponses exactes"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What country are we in?',
             fr: 'Dans quel pays nous trouvons-nous ?'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         floor: {
           description: {
             en: 'Accept exact answer only',
             fr: "N'accepter que la réponse exacte"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What floor of the building are we on?',
             fr: 'A quel étage du bâtiment nous trouvons-nous ?'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         institution: {
           description: {
             en: 'Accept exact name of institution only',
             fr: "N'accepter que le nom exact de l'institution"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What is the name of this building?',
             fr: 'Quel est le nom de ce bâtiment ?'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         province: {
           description: {
             en: 'Accept exact answer only',
             fr: "N'accepter que les réponses exactes"
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'What province are we in?',
             fr: 'Dans quelle province nous trouvons-nous ?'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -201,14 +201,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         learningScore: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Learning Score',
             fr: "Score d'apprentissage"
           },
           max: 3,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -223,14 +223,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         spellWorldScore: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Spelling Score',
             fr: "Score d'orthographe"
           },
           max: 5,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -245,14 +245,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         recallScore: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Recall Score',
             fr: 'Score de rappel'
           },
           max: 3,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -267,14 +267,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         canNameWatch: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Name Watch Score',
             fr: 'Peut nommer une montre'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -289,14 +289,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         canNamePencil: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Name Pencil Score',
             fr: 'Peut nommer un crayon'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -311,14 +311,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         canRepeatPhrase: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Repeat Phrase Score',
             fr: 'Peut répéter une phrase'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -333,14 +333,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         canFollowWrittenInstructions: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Follow Written Instructions Score',
             fr: 'Peut suivre des instructions écrites'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -355,14 +355,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         canWriteSentence: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Write Sentence Score',
             fr: 'Peut écrire une phrase'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -377,14 +377,14 @@ export default instrumentFactory.defineInstrument({
       },
       fields: {
         canCopyDesign: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Copy Design Score',
             fr: 'Peut copier le dessin'
           },
           max: 1,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -403,14 +403,14 @@ export default instrumentFactory.defineInstrument({
             en: 'Score one point for each instruction executed correctly.',
             fr: 'Donnez un point pour chaque instruction exécutée correctement.'
           },
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Follow Oral Instructions Score',
             fr: 'Peut suivre des instructions orales'
           },
           max: 3,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {

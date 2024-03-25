@@ -33,10 +33,10 @@ export default instrumentFactory.defineInstrument({
   },
   content: {
     developerHappiness: {
-      kind: 'numeric',
+      kind: 'number',
       label: 'This is how happy a developer is',
       description: 'You hovered on the tooltip',
-      variant: 'default'
+      variant: 'input'
     },
     reasonForSadness: {
       kind: 'dynamic',
@@ -44,24 +44,24 @@ export default instrumentFactory.defineInstrument({
       render: (data) => {
         if (data?.developerHappiness && data.developerHappiness < 5) {
           return {
-            kind: 'text',
+            kind: 'string',
             label: 'Why are you unhappy?',
             description: 'Tell the truth',
-            variant: 'short'
+            variant: 'input'
           };
         }
         return null;
       }
     },
     recentCommits: {
-      kind: 'array',
+      kind: 'record-array',
       label: 'Give me a list of commits',
       description: 'NO',
       fieldset: {
-        id: { kind: 'text', label: 'Commit ID', variant: 'short' },
-        isMerged: { kind: 'binary', label: 'Is the commit merged?', variant: 'radio' },
+        id: { kind: 'string', label: 'Commit ID', variant: 'input' },
+        isMerged: { kind: 'boolean', label: 'Is the commit merged?', variant: 'radio' },
         dateOfMerge: {
-          kind: 'dynamic-fieldset',
+          kind: 'dynamic',
           render: (fieldset) => {
             if (!fieldset.isMerged) return null;
             return {
@@ -70,7 +70,7 @@ export default instrumentFactory.defineInstrument({
             };
           }
         },
-        commitDescription: { kind: 'text', label: 'Describe the commit', variant: 'short' }
+        commitDescription: { kind: 'string', label: 'Describe the commit', variant: 'input' }
       }
     }
   }

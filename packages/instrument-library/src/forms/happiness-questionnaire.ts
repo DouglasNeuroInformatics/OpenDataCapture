@@ -25,7 +25,7 @@ export default instrumentFactory.defineInstrument({
         en: 'Overall happiness from 1 through 10 (inclusive)',
         fr: 'Bonheur général de 1 à 10 (inclus)'
       },
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Overall Happiness',
         fr: 'Bonheur général'
@@ -47,8 +47,8 @@ export default instrumentFactory.defineInstrument({
             fr: 'Raison de la tristesse'
           },
           isRequired: false,
-          kind: 'text',
-          variant: 'long'
+          kind: 'string',
+          variant: 'textarea'
         };
       }
     }

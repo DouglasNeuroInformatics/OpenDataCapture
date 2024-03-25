@@ -31,12 +31,12 @@ export default instrumentFactory.defineInstrument({
   version: 1.0,
   content: {
     binaryCheck: {
-      kind: 'binary',
+      kind: 'boolean',
       label: 'Checkbox',
       variant: 'checkbox'
     },
     binaryRadio: {
-      kind: 'binary',
+      kind: 'boolean',
       label: 'Radio',
       variant: 'radio'
     },
@@ -45,49 +45,50 @@ export default instrumentFactory.defineInstrument({
       label: 'Date'
     },
     numericDefault: {
-      kind: 'numeric',
+      kind: 'number',
       label: 'Numeric (Default)',
-      variant: 'default'
+      variant: 'input'
     },
     numericSlider: {
-      kind: 'numeric',
+      kind: 'number',
       label: 'Numeric (Slider)',
       variant: 'slider',
       min: 0,
       max: 10
     },
     optionsField: {
-      kind: 'options',
+      kind: 'string',
       label: 'Options',
       options: {
         a: 'Option A',
         b: 'Option B',
         c: 'Option C'
-      }
+      },
+      variant: 'select'
     },
     textLong: {
-      kind: 'text',
+      kind: 'string',
       label: 'Long Text',
-      variant: 'long'
+      variant: 'textarea'
     },
     textShort: {
-      kind: 'text',
+      kind: 'string',
       label: 'Short Text',
-      variant: 'short'
+      variant: 'input'
     },
     textPassword: {
-      kind: 'text',
+      kind: 'string',
       label: 'Password',
       variant: 'password'
     },
     arrayField: {
-      kind: 'array',
+      kind: 'record-array',
       label: 'Array Field',
       fieldset: {
         name: {
-          kind: 'text',
+          kind: 'string',
           label: 'Name',
-          variant: 'short'
+          variant: 'input'
         }
       }
     }
