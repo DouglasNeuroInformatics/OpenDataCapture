@@ -1,4 +1,4 @@
-import { Spinner } from '@douglasneuroinformatics/ui/components';
+import { Spinner } from '@douglasneuroinformatics/libui/components';
 
 export type LoadingScreenProps = {
   subtitle: string;

@@ -23,11 +23,15 @@ const config = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   viteFinal(config) {
     return mergeConfig(config, {
+      build: {
+        target: 'es2022'
+      },
       css: {
         postcss: {
           plugins: [autoprefixer(), tailwindcss()]
         }
-      }
+      },
+      optimizeDeps: { esbuildOptions: { target: 'esnext' } }
     });
   }
 };
