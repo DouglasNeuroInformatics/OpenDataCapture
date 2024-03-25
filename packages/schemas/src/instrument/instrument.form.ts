@@ -203,7 +203,7 @@ const $FormInstrumentSetField: z.ZodType<FormInstrumentSetField> = $FormInstrume
  * @typeParam TLanguage - the language(s) of the instrument
  * @typeParam TValue - the value corresponding to this field in `FormDataType`, excluding undefined
  */
-type FormInstrumentScalarField<
+export type FormInstrumentScalarField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends RequiredFieldValue<ScalarFieldValue> = RequiredFieldValue<ScalarFieldValue>
 > = TValue extends object
@@ -227,7 +227,7 @@ const $FormInstrumentScalarField: z.ZodType<FormInstrumentScalarField> = z.union
   $FormInstrumentBooleanField
 ]);
 
-type FormInstrumentDynamicFieldsetField<
+export type FormInstrumentDynamicFieldsetField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TFieldsetValue extends FieldsetValue = FieldsetValue,
   TValue extends RequiredFieldValue<ScalarFieldValue> = RequiredFieldValue<ScalarFieldValue>
@@ -240,7 +240,7 @@ const $FormInstrumentDynamicFieldsetField: z.ZodType<FormInstrumentDynamicFields
   render: z.function().args(z.any()).returns($FormInstrumentScalarField)
 });
 
-type FormInstrumentFieldset<
+export type FormInstrumentFieldset<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TFieldset extends { [key: string]: NonNullable<ScalarFieldValue> } = { [key: string]: NonNullable<ScalarFieldValue> }
 > = {
@@ -252,7 +252,7 @@ const $FormInstrumentFieldset: z.ZodType<FormInstrumentFieldset> = z.record(
   z.union([$FormInstrumentDynamicFieldsetField, $FormInstrumentScalarField])
 );
 
-type FormInstrumentRecordArrayField<
+export type FormInstrumentRecordArrayField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends RequiredFieldValue<RecordArrayFieldValue> = RequiredFieldValue<RecordArrayFieldValue>
 > = FormInstrumentFieldMixin<
@@ -267,7 +267,7 @@ const $FormInstrumentRecordArrayField: z.ZodType<FormInstrumentRecordArrayField>
   kind: z.literal('record-array')
 });
 
-type FormInstrumentNumberRecordField<
+export type FormInstrumentNumberRecordField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends RequiredFieldValue<NumberRecordFieldValue> = RequiredFieldValue<NumberRecordFieldValue>
 > = FormInstrumentFieldMixin<
@@ -290,20 +290,21 @@ type FormInstrumentNumberRecordField<
     variant: 'likert';
   }
 >;
-const $FormInstrumentNumberRecordField: z.ZodType<FormInstrumentNumberRecordField> = $FormInstrumentBaseField.extend({
-  items: z.record(
-    z.number(),
-    z.object({
-      description: $$InstrumentUIOption(z.string()),
-      label: $$InstrumentUIOption(z.string())
-    })
-  ),
-  kind: z.literal('number-record'),
-  options: $$InstrumentUIOption(z.record(z.number(), z.string())),
-  variant: z.literal('likert')
-});
+export const $FormInstrumentNumberRecordField: z.ZodType<FormInstrumentNumberRecordField> =
+  $FormInstrumentBaseField.extend({
+    items: z.record(
+      z.number(),
+      z.object({
+        description: $$InstrumentUIOption(z.string()),
+        label: $$InstrumentUIOption(z.string())
+      })
+    ),
+    kind: z.literal('number-record'),
+    options: $$InstrumentUIOption(z.record(z.number(), z.string())),
+    variant: z.literal('likert')
+  });
 
-type FormInstrumentCompositeField<
+export type FormInstrumentCompositeField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends RequiredFieldValue<CompositeFieldValue> = RequiredFieldValue<CompositeFieldValue>
 > =
@@ -313,12 +314,12 @@ type FormInstrumentCompositeField<
       ? FormInstrumentNumberRecordField<TLanguage, TValue>
       : never;
 
-const $FormInstrumentCompositeField: z.ZodType<FormInstrumentCompositeField> = z.union([
+export const $FormInstrumentCompositeField: z.ZodType<FormInstrumentCompositeField> = z.union([
   $FormInstrumentRecordArrayField,
   $FormInstrumentNumberRecordField
 ]);
 
-type FormInstrumentStaticField<
+export type FormInstrumentStaticField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends RequiredFieldValue = RequiredFieldValue
 > =
@@ -336,7 +337,7 @@ const $FormInstrumentStaticField: z.ZodType<FormInstrumentStaticField> = z.union
   $FormInstrumentScalarField
 ]);
 
-type FormInstrumentDynamicField<
+export type FormInstrumentDynamicField<
   TData extends FormDataType = FormDataType,
   TValue extends RequiredFieldValue = RequiredFieldValue,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
@@ -345,7 +346,7 @@ type FormInstrumentDynamicField<
   kind: 'dynamic';
   render: (data: PartialFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
 };
-const $FormInstrumentDynamicField: z.ZodType<FormInstrumentDynamicField> = z.object({
+export const $FormInstrumentDynamicField: z.ZodType<FormInstrumentDynamicField> = z.object({
   deps: z.array(z.string()),
   kind: z.literal('dynamic'),
   render: z
