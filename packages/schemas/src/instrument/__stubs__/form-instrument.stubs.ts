@@ -32,16 +32,16 @@ export const UNILINGUAL_FORM_INSTRUMENT = deepFreeze({
     }
   },
   details: {
-    description: '',
+    description: 'This is a unilingual form instrument',
     estimatedDuration: 1,
-    instructions: [],
+    instructions: ['Please complete all questions'],
     license: 'AGPL-3.0',
-    title: ''
+    title: 'Unilingual Form'
   },
   kind: 'FORM',
   language: 'en',
-  name: '',
-  tags: [],
+  name: 'unilingual-form',
+  tags: ['Example'],
   validationSchema: z.object({
     favoriteNumber: z.number(),
     reasonFavoriteNumberIsNegative: z.string().optional()
@@ -82,26 +82,26 @@ export const BILINGUAL_FORM_INSTRUMENT = deepFreeze({
   },
   details: {
     description: {
-      en: '',
-      fr: ''
+      en: 'This is a unilingual form instrument',
+      fr: "Il s'agit d'un instrument unilingue"
     },
     estimatedDuration: 1,
     instructions: {
-      en: [],
-      fr: []
+      en: ['Please complete all questions'],
+      fr: ['Veuillez répondre à toutes les questions']
     },
     license: 'AGPL-3.0',
     title: {
-      en: '',
-      fr: ''
+      en: 'Unilingual Form',
+      fr: 'Formulaire unilingue'
     }
   },
   kind: 'FORM',
   language: ['en', 'fr'],
-  name: '',
+  name: 'unilingual-form',
   tags: {
-    en: [],
-    fr: []
+    en: ['Example'],
+    fr: ['Exemple']
   },
   validationSchema: z.object({
     favoriteNumber: z.number(),
