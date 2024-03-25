@@ -1,5 +1,5 @@
-import type { Json } from '@open-data-capture/common/core';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
+import type { Json } from '@open-data-capture/schemas/core';
 
 const interpreter = new InstrumentInterpreter();
 

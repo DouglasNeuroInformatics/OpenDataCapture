@@ -1,13 +1,45 @@
+import type { Json, Language } from '@open-data-capture/schemas/core';
 import type {
-  DiscriminatedInstrumentData,
-  InstrumentDef,
+  FormDataType,
+  FormInstrument,
   InstrumentKind,
   InstrumentLanguage,
   InteractiveInstrument,
   StrictFormInstrument
-} from '@open-data-capture/common/instrument';
+} from '@open-data-capture/schemas/instrument';
 
 import { z } from './zod';
+
+export type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['FORM']
+  ? FormDataType
+  : [TKind] extends ['INTERACTIVE']
+    ? Json
+    : never;
+
+export type DiscriminatedInstrument<
+  TKind extends InstrumentKind,
+  TData extends DiscriminatedInstrumentData<TKind>,
+  TLanguage extends InstrumentLanguage,
+  TOptions extends { strict: boolean } = { strict: false }
+> = [TKind] extends ['FORM']
+  ? TData extends FormDataType
+    ? TOptions['strict'] extends true
+      ? StrictFormInstrument<TData, TLanguage>
+      : FormInstrument<TData, TLanguage>
+    : never
+  : [TKind] extends ['INTERACTIVE']
+    ? TData extends Json
+      ? TLanguage extends Language
+        ? InteractiveInstrument<TData>
+        : never
+      : never
+    : never;
+
+export type InstrumentDef<
+  TKind extends InstrumentKind,
+  TData extends DiscriminatedInstrumentData<TKind>,
+  TLanguage extends InstrumentLanguage
+> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage, { strict: true }>, 'kind' | 'language' | 'validationSchema'>;
 
 export class InstrumentFactory<
   TKind extends InstrumentKind,
