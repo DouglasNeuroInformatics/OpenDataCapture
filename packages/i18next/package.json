@@ -22,7 +22,7 @@
     "react-dom": "18.x"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.2.2",
+    "@douglasneuroinformatics/libui": "^2.0.0-beta.3",
     "@open-data-capture/schemas": "workspace:*",
     "i18next-browser-languagedetector": "^7.2.0",
     "lodash": "^4.17.21",
