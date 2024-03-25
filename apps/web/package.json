@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@casl/ability": "^6.7.0",
-    "@douglasneuroinformatics/libjs": "^0.1.0",
-    "@douglasneuroinformatics/ui": "^6.2.2",
+    "@douglasneuroinformatics/libjs": "^0.3.0",
+    "@douglasneuroinformatics/libui": "^2.0.0-beta.2",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@import-meta-env/cli": "^0.6.8",
