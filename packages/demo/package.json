@@ -12,7 +12,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^0.1.0",
+    "@douglasneuroinformatics/libjs": "^0.3.0",
     "@open-data-capture/schemas": "workspace:*"
   }
 }

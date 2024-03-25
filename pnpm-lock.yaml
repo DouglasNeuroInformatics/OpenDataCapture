@@ -140,8 +140,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(@casl/ability@6.7.0)(@prisma/client@5.11.0)
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.1.0
-        version: 0.1.0(typescript@5.3.3)
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.3.3)
       '@douglasneuroinformatics/libnest':
         specifier: ^0.0.2
         version: 0.0.2(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)(@nestjs/testing@10.3.3)(express@4.18.3)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1)
@@ -446,8 +446,8 @@ importers:
   apps/playground:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.1.0
-        version: 0.1.0(typescript@5.3.3)
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.3.3)
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.0-beta.3
         version: 2.0.0-beta.3(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.3.3)
@@ -724,8 +724,8 @@ importers:
   packages/demo:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.1.0
-        version: 0.1.0(typescript@5.3.3)
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.3.3)
       '@open-data-capture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -965,8 +965,8 @@ importers:
   packages/instrument-utils:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.1.0
-        version: 0.1.0(typescript@5.3.3)
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.3.3)
       '@open-data-capture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -989,8 +989,8 @@ importers:
   packages/react-core:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.1.0
-        version: 0.1.0(typescript@5.3.3)
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.3.3)
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.0-beta.3
         version: 2.0.0-beta.3(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.3.3)
@@ -3221,16 +3221,6 @@ packages:
   /@douglasneuroinformatics/libjs@0.0.3(typescript@5.3.3):
     resolution:
       { integrity: sha512-T3Uk1TOB9u+WvLAClGcJ3bz+FJoaVDo0+rjkqFlM2+n3x1lHcpJ0xdPUgfFgh0wmlBxk4EsPZIyL98QVZX5vCQ== }
-    peerDependencies:
-      typescript: ^5.1.0
-    dependencies:
-      type-fest: 4.12.0
-      typescript: 5.3.3
-    dev: false
-
-  /@douglasneuroinformatics/libjs@0.1.0(typescript@5.3.3):
-    resolution:
-      { integrity: sha512-kbCU8Diiw7kU8Pti/1SALr8D5tbJ43g4ye4GbuQW76cW7vm5ehxTO+oN8oix1DQDrMSOZXD14USgauO0BjSN6A== }
     peerDependencies:
       typescript: ^5.1.0
     dependencies:

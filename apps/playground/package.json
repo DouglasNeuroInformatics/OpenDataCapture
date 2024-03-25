@@ -16,7 +16,7 @@
     "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^0.1.0",
+    "@douglasneuroinformatics/libjs": "^0.3.0",
     "@douglasneuroinformatics/libui": "^2.0.0-beta.3",
     "@open-data-capture/demo": "workspace:*",
     "@open-data-capture/editor": "workspace:*",
