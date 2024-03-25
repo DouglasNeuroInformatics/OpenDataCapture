@@ -3,7 +3,7 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common/decorators';
 import { ApiOperation } from '@nestjs/swagger';
-import type { Assignment } from '@open-data-capture/common/assignment';
+import type { Assignment } from '@open-data-capture/schemas/assignment';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';

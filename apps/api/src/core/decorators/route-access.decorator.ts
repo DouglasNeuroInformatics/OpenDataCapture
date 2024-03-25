@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import type { AppAction, AppSubjectName } from '@open-data-capture/common/core';
+import type { AppAction, AppSubjectName } from '@open-data-capture/schemas/core';
 
 type PublicRouteAccess = 'public';
 

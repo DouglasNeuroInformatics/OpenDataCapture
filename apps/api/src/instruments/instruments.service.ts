@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@open-data-capture/common/instrument';
 import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
 import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
+import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@open-data-capture/schemas/instrument';
 import { omit } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';

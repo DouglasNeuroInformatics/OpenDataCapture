@@ -1,6 +1,6 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
 import { PartialType } from '@nestjs/swagger';
-import { $UpdateUserData } from '@open-data-capture/common/user';
+import { $UpdateUserData } from '@open-data-capture/schemas/user';
 
 import { CreateUserDto } from './create-user.dto';
 

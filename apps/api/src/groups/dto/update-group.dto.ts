@@ -1,6 +1,6 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
 import { PartialType } from '@nestjs/swagger';
-import { $UpdateGroupData } from '@open-data-capture/common/group';
+import { $UpdateGroupData } from '@open-data-capture/schemas/group';
 
 import { CreateGroupDto } from './create-group.dto';
 

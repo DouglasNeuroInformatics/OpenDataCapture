@@ -1,5 +1,5 @@
 import { accessibleBy } from '@casl/prisma';
-import type { AppAction } from '@open-data-capture/common/core';
+import type { AppAction } from '@open-data-capture/schemas/core';
 
 import type { AppAbility } from '@/core/types';
 import type { ModelEntityName } from '@/prisma/prisma.types';

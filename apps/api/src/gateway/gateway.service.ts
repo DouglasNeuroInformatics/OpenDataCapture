@@ -1,13 +1,13 @@
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@open-data-capture/common/assignment';
+import type { PublicEncryptionKey } from '@open-data-capture/crypto';
+import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@open-data-capture/schemas/assignment';
 import type {
   Assignment,
   CreateRemoteAssignmentInputData,
   MutateAssignmentResponseBody,
   RemoteAssignment
-} from '@open-data-capture/common/assignment';
-import type { PublicEncryptionKey } from '@open-data-capture/crypto';
+} from '@open-data-capture/schemas/assignment';
 
 import { InstrumentsService } from '@/instruments/instruments.service';
 

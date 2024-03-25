@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import type { Visit } from '@open-data-capture/common/visit';
+import type { Visit } from '@open-data-capture/schemas/visit';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 

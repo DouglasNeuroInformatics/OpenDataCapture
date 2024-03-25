@@ -1,16 +1,16 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable } from '@nestjs/common';
-import type { AnyInstrument, InstrumentMeasureValue } from '@open-data-capture/common/instrument';
+import type { InstrumentRecordModel } from '@open-data-capture/database/core';
+import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
+import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
+import type { AnyInstrument, InstrumentMeasureValue } from '@open-data-capture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
   InstrumentRecordQueryParams,
   InstrumentRecordsExport,
   LinearRegressionResults
-} from '@open-data-capture/common/instrument-records';
-import type { InstrumentRecordModel } from '@open-data-capture/database/core';
-import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
-import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
+} from '@open-data-capture/schemas/instrument-records';
 import { linearRegression } from '@open-data-capture/stats';
 import type { Prisma } from '@prisma/client';
 import { isNumber, pickBy } from 'lodash-es';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { Summary } from '@open-data-capture/common/summary';
+import type { Summary } from '@open-data-capture/schemas/summary';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';

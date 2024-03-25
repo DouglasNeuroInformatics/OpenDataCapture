@@ -1,4 +1,4 @@
-import { $BooleanString } from '@open-data-capture/common/core';
+import { $BooleanString } from '@open-data-capture/schemas/core';
 import { z } from 'zod';
 
 const $OptionalURL = z.preprocess(
