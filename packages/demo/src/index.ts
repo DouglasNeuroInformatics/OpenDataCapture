@@ -1,6 +1,6 @@
 import { deepFreeze } from '@douglasneuroinformatics/libjs';
-import type { Group } from '@open-data-capture/common/group';
-import type { User } from '@open-data-capture/common/user';
+import type { Group } from '@open-data-capture/schemas/group';
+import type { User } from '@open-data-capture/schemas/user';
 
 type DemoUser = Pick<User, 'basePermissionLevel' | 'firstName' | 'lastName' | 'password' | 'username'> & {
   groupNames: readonly string[];
