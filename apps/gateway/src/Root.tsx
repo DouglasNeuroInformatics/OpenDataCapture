@@ -1,10 +1,10 @@
 import { NotificationHub } from '@douglasneuroinformatics/ui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
 import { BaseLanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
-import type { UpdateAssignmentData } from '@open-data-capture/common/assignment';
-import { $Json } from '@open-data-capture/common/core';
 import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
 import { Branding } from '@open-data-capture/react-core';
+import type { UpdateAssignmentData } from '@open-data-capture/schemas/assignment';
+import { $Json } from '@open-data-capture/schemas/core';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
