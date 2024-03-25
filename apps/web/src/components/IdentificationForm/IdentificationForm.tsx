@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Form } from '@douglasneuroinformatics/ui/legacy';
-import { $SubjectIdentificationData, type SubjectIdentificationData } from '@open-data-capture/common/subject';
+import { Form } from '@douglasneuroinformatics/libui/components';
+import { $SubjectIdentificationData, type SubjectIdentificationData } from '@open-data-capture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 
 import { useActiveVisitStore } from '@/stores/active-visit-store';
@@ -22,19 +22,19 @@ export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel
   const { t } = useTranslation('core');
 
   return (
-    <Form<SubjectIdentificationData>
+    <Form
       content={{
         firstName: {
           description: t('identificationData.firstName.description'),
-          kind: 'text',
+          kind: 'string',
           label: t('identificationData.firstName.label'),
-          variant: 'short'
+          variant: 'input'
         },
         lastName: {
           description: t('identificationData.lastName.description'),
-          kind: 'text',
+          kind: 'string',
           label: t('identificationData.lastName.label'),
-          variant: 'short'
+          variant: 'input'
         },
         dateOfBirth: {
           kind: 'date',
@@ -42,12 +42,13 @@ export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel
         },
         sex: {
           description: t('identificationData.sex.description'),
-          kind: 'options',
+          kind: 'string',
           label: t('identificationData.sex.label'),
           options: {
             FEMALE: t('identificationData.sex.female'),
             MALE: t('identificationData.sex.male')
-          }
+          },
+          variant: 'select'
         }
       }}
       initialValues={fillActiveSubject ? activeVisit?.subject : undefined}
