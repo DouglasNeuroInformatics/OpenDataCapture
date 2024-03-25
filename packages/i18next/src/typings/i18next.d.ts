@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import type { Language } from '@open-data-capture/common/core';
+import type { Language } from '@open-data-capture/schemas/core';
 
 import core from '../translations/core.json';
 

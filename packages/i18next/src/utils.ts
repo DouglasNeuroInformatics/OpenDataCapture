@@ -1,4 +1,4 @@
-import type { Language } from '@open-data-capture/common/core';
+import type { Language } from '@open-data-capture/schemas/core';
 import _ from 'lodash';
 
 import type { TranslatedResource, TranslationsDef } from './types.js';
