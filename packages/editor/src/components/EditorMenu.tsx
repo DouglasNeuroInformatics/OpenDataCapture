@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { useTheme } from '@douglasneuroinformatics/ui/hooks';
-import { Card } from '@douglasneuroinformatics/ui/legacy';
+import { Card } from '@douglasneuroinformatics/libui/components';
+import { useTheme } from '@douglasneuroinformatics/libui/hooks';
 import { Menu, Transition } from '@headlessui/react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';

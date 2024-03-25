@@ -1,7 +1,7 @@
 import React, { useImperativeHandle, useRef, useState } from 'react';
 
-import { useTheme } from '@douglasneuroinformatics/ui/hooks';
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import { useTheme } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import MonacoEditor from '@monaco-editor/react';
 
 import type { EditorFile, MonacoEditorType, MonacoType } from '../types';

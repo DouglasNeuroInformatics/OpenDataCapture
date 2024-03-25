@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { ArrowToggle, Card } from '@douglasneuroinformatics/ui/legacy';
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import { ArrowToggle, Card } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorMenu } from './EditorMenu';
@@ -61,7 +61,6 @@ export const Editor = ({ className, files, onSave }: EditorProps) => {
               className="p-2"
               position="right"
               rotation={180}
-              type="button"
               onClick={() => {
                 setIsSidebarOpen(!isSidebarOpen);
               }}

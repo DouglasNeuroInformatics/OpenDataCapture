@@ -1,4 +1,4 @@
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { DocumentIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 
