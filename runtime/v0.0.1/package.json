@@ -11,8 +11,8 @@
     "lint": "tsc && eslint --fix src"
   },
   "peerDependencies": {
-    "@open-data-capture/common": "workspace:*",
-    "@open-data-capture/instrument-interpreter": "workspace:*"
+    "@open-data-capture/instrument-interpreter": "workspace:*",
+    "@open-data-capture/schemas": "workspace:*"
   },
   "devDependencies": {
     "@jspsych/plugin-html-keyboard-response": "^1.1.3",

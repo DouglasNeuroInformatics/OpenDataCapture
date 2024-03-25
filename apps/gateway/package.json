@@ -20,12 +20,12 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/ui": "^6.2.2",
-    "@open-data-capture/common": "workspace:*",
     "@open-data-capture/crypto": "workspace:*",
     "@open-data-capture/database": "workspace:*",
     "@open-data-capture/i18next": "workspace:*",
     "@open-data-capture/instrument-renderer": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
+    "@open-data-capture/schemas": "workspace:*",
     "axios": "^1.6.7",
     "compression": "^1.7.4",
     "express": "^4.18.3",

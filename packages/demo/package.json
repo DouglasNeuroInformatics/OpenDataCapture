@@ -13,6 +13,6 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.1.0",
-    "@open-data-capture/common": "workspace:*"
+    "@open-data-capture/schemas": "workspace:*"
   }
 }

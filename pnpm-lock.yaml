@@ -175,9 +175,6 @@ importers:
       '@nestjs/throttler':
         specifier: ^5.1.2
         version: 5.1.2(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(reflect-metadata@0.1.14)
-      '@open-data-capture/common':
-        specifier: workspace:*
-        version: link:../../packages/common
       '@open-data-capture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -199,6 +196,9 @@ importers:
       '@open-data-capture/runtime-v0.0.1':
         specifier: workspace:*
         version: link:../../runtime/v0.0.1
+      '@open-data-capture/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
       '@open-data-capture/stats':
         specifier: workspace:*
         version: link:../../packages/stats
@@ -287,9 +287,6 @@ importers:
       '@douglasneuroinformatics/ui':
         specifier: ^6.2.2
         version: 6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
-      '@open-data-capture/common':
-        specifier: workspace:*
-        version: link:../../packages/common
       '@open-data-capture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -305,6 +302,9 @@ importers:
       '@open-data-capture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
+      '@open-data-capture/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
       axios:
         specifier: ^1.6.7
         version: 1.6.7(debug@4.3.4)
@@ -454,9 +454,6 @@ importers:
       '@heroicons/react':
         specifier: ^2.1.1
         version: 2.1.1(react@18.2.0)
-      '@open-data-capture/common':
-        specifier: workspace:*
-        version: link:../../packages/common
       '@open-data-capture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
@@ -481,6 +478,9 @@ importers:
       '@open-data-capture/runtime-v0.0.1':
         specifier: workspace:*
         version: link:../../runtime/v0.0.1
+      '@open-data-capture/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
       axios:
         specifier: ^1.6.7
         version: 1.6.7(debug@4.3.4)
@@ -584,9 +584,6 @@ importers:
       '@import-meta-env/unplugin':
         specifier: ^0.5.1
         version: 0.5.1(@import-meta-env/cli@0.6.8)(dotenv@16.4.5)
-      '@open-data-capture/common':
-        specifier: workspace:*
-        version: link:../../packages/common
       '@open-data-capture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
@@ -608,6 +605,9 @@ importers:
       '@open-data-capture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
+      '@open-data-capture/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
       '@tanstack/react-query':
         specifier: ^5.27.5
         version: 5.27.5(react@18.2.0)
@@ -718,37 +718,6 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(vite@5.1.6)
 
-  packages/common:
-    dependencies:
-      '@casl/ability':
-        specifier: ^6.7.0
-        version: 6.7.0
-      '@open-data-capture/licenses':
-        specifier: workspace:*
-        version: link:../licenses
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
-    devDependencies:
-      '@casl/prisma':
-        specifier: ^1.4.1
-        version: 1.4.1(@casl/ability@6.7.0)(@prisma/client@5.11.0)
-      '@open-data-capture/database':
-        specifier: workspace:*
-        version: link:../database
-      '@open-data-capture/instrument-library':
-        specifier: workspace:*
-        version: link:../instrument-library
-      '@types/lodash':
-        specifier: ^4.17.0
-        version: 4.17.0
-      '@types/react':
-        specifier: ^18.2.65
-        version: 18.2.65
-
   packages/crypto: {}
 
   packages/database:
@@ -766,9 +735,9 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: ^0.1.0
         version: 0.1.0(typescript@5.3.3)
-      '@open-data-capture/common':
+      '@open-data-capture/schemas':
         specifier: workspace:*
-        version: link:../common
+        version: link:../schemas
 
   packages/editor:
     dependencies:
@@ -845,9 +814,9 @@ importers:
       '@douglasneuroinformatics/ui':
         specifier: ^6.2.2
         version: 6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
-      '@open-data-capture/common':
+      '@open-data-capture/schemas':
         specifier: workspace:*
-        version: link:../common
+        version: link:../schemas
       '@types/lodash':
         specifier: ^4.14.202
         version: 4.17.0
@@ -872,9 +841,9 @@ importers:
 
   packages/instrument-interpreter:
     dependencies:
-      '@open-data-capture/common':
+      '@open-data-capture/schemas':
         specifier: workspace:*
-        version: link:../common
+        version: link:../schemas
     devDependencies:
       '@open-data-capture/instrument-library':
         specifier: workspace:*
@@ -916,9 +885,6 @@ importers:
       '@heroicons/react':
         specifier: ^2.1.1
         version: 2.1.1(react@18.2.0)
-      '@open-data-capture/common':
-        specifier: workspace:*
-        version: link:../common
       '@open-data-capture/i18next':
         specifier: workspace:*
         version: link:../i18next
@@ -937,6 +903,9 @@ importers:
       '@open-data-capture/runtime-v0.0.1':
         specifier: workspace:*
         version: link:../../runtime/v0.0.1
+      '@open-data-capture/schemas':
+        specifier: workspace:*
+        version: link:../schemas
       framer-motion:
         specifier: ^11.0.12
         version: 11.0.12(react-dom@18.2.0)(react@18.2.0)
@@ -1007,9 +976,9 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: ^0.1.0
         version: 0.1.0(typescript@5.3.3)
-      '@open-data-capture/common':
+      '@open-data-capture/schemas':
         specifier: workspace:*
-        version: link:../common
+        version: link:../schemas
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1171,12 +1140,12 @@ importers:
 
   runtime/v0.0.1:
     dependencies:
-      '@open-data-capture/common':
-        specifier: workspace:*
-        version: link:../../packages/common
       '@open-data-capture/instrument-interpreter':
         specifier: workspace:*
         version: link:../../packages/instrument-interpreter
+      '@open-data-capture/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
     devDependencies:
       '@jspsych/plugin-html-keyboard-response':
         specifier: ^1.1.3

@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.1.0",
-    "@open-data-capture/common": "workspace:*",
+    "@open-data-capture/schemas": "workspace:*",
     "lodash-es": "^4.17.21",
     "ts-pattern": "^5.0.8"
   },
