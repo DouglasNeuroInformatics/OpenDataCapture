@@ -1,26 +1,25 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+import { deepFreeze } from '@douglasneuroinformatics/libjs';
+import { z } from 'zod';
 
-const instrumentFactory = new InstrumentFactory({
+import type { InteractiveInstrument } from '../instrument.interactive.js';
+
+type InteractiveInstrumentStubData = {
+  message: string;
+};
+
+export const INTERACTIVE_INSTRUMENT = deepFreeze({
   kind: 'INTERACTIVE',
   language: 'en',
-  validationSchema: z.object({
-    message: z.string()
-  })
-});
-
-export default instrumentFactory.defineInstrument({
-  name: ' ',
-  tags: [],
+  name: 'interactive-instrument',
+  tags: ['Example'],
   version: 1.0,
   content: {
     render(done) {
       const button = document.createElement('button');
       button.textContent = 'Submit Instrument';
       document.body.appendChild(button);
-
       button.addEventListener('click', () => {
         done({ message: 'Hello World' });
       });
@@ -32,5 +31,8 @@ export default instrumentFactory.defineInstrument({
     instructions: [],
     license: 'UNLICENSED',
     title: ' '
-  }
-});
+  },
+  validationSchema: z.object({
+    message: z.string()
+  })
+} satisfies InteractiveInstrument<InteractiveInstrumentStubData>) as any as InteractiveInstrument<InteractiveInstrumentStubData>;
