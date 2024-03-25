@@ -8,7 +8,7 @@ import type { InstrumentKind } from './instrument.base.js';
 import type { AnyMultilingualFormInstrument, AnyUnilingualFormInstrument, FormInstrument } from './instrument.form.js';
 import type { InteractiveInstrument } from './instrument.interactive.js';
 
-export const $AnyInstrument = z.union([$FormInstrument, $InteractiveInstrument]) satisfies z.ZodType<AnyInstrument>;
+export const $AnyInstrument: z.ZodType<AnyInstrument> = z.union([$FormInstrument, $InteractiveInstrument]);
 
 export type AnyInstrument = FormInstrument | InteractiveInstrument;
 export type SomeInstrument<TKind extends InstrumentKind> = Extract<AnyInstrument, { kind: TKind }>;

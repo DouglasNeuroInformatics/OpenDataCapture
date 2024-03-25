@@ -1,6 +1,5 @@
 import { isUnique } from '@douglasneuroinformatics/libjs';
 import type { LicenseIdentifier } from '@open-data-capture/licenses';
-import { uniq } from 'lodash-es';
 import type { ConditionalKeys, Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 
@@ -46,7 +45,10 @@ export const $$InstrumentUIOption = <TSchema extends z.ZodTypeAny, TLanguage ext
   if (typeof language === 'string') {
     resolvedSchema = $Schema;
   } else if (typeof language === 'object') {
-    const shape = Object.fromEntries(uniq(language).map((val) => [val, $Schema]));
+    if (!isUnique(language)) {
+      throw new Error(`Array of languages must contain only unique values: ${language.join(', ')}`);
+    }
+    const shape = Object.fromEntries(language.map((val) => [val, $Schema]));
     resolvedSchema = z.object(shape);
   } else if (typeof language === 'undefined') {
     resolvedSchema = z.union([
