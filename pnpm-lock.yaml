@@ -877,8 +877,8 @@ importers:
   packages/instrument-renderer:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.1.0
-        version: 0.1.0(typescript@5.3.3)
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.3.3)
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.0-beta.2
         version: 2.0.0-beta.2(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.3.3)

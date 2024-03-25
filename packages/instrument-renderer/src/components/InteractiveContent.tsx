@@ -1,7 +1,7 @@
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
-import { StepperContext } from '@douglasneuroinformatics/ui/legacy';
-import { $Json, type Json } from '@open-data-capture/common/core';
+import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
+import { $Json, type Json } from '@open-data-capture/schemas/core';
 import type { Promisable } from 'type-fest';
 
 export type InteractiveContentProps = {
@@ -10,7 +10,7 @@ export type InteractiveContentProps = {
 };
 
 export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps) => {
-  const { updateIndex } = useContext(StepperContext);
+  const { updateIndex } = useLegacyStepper();
   const ref = useRef<HTMLIFrameElement>(null);
 
   const handler = useCallback(

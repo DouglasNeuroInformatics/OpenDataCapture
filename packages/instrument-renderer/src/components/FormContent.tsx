@@ -1,8 +1,7 @@
-import { useContext } from 'react';
-
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
-import { Form, StepperContext } from '@douglasneuroinformatics/ui/legacy';
-import type { AnyUnilingualFormInstrument } from '@open-data-capture/common/instrument';
+import { Form } from '@douglasneuroinformatics/libui/components';
+import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
+import type { FormDataType } from '@douglasneuroinformatics/libui-form-types';
+import type { AnyUnilingualFormInstrument } from '@open-data-capture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 
@@ -12,7 +11,7 @@ export type FormContentProps = {
 };
 
 export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
-  const { updateIndex } = useContext(StepperContext);
+  const { updateIndex } = useLegacyStepper();
   const { t } = useTranslation('core');
 
   const handleSubmit = async (data: FormDataType) => {
