@@ -64,6 +64,20 @@ export const SubjectGraphPage = () => {
     });
 
     const dataURL = canvas.toDataURL('image/png');
+    const blobCanvas = canvas.toBlob((blob) => {
+      const newImg = document.createElement('img');
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+
+      newImg.onload = () => {
+        // no longer need to read the blob so it's revoked
+        URL.revokeObjectURL(url);
+      };
+
+      newImg.src = url;
+      document.body.appendChild(newImg);
+    });
+
     downloadjs(dataURL, `${params.subjectId!.slice(0, 7)}.png`, 'image/png');
 
     // canvas.removeChild(graphDesc);
