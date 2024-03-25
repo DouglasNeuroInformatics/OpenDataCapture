@@ -24,7 +24,7 @@ export default defineConfig({
     esbuildOptions: {
       target: 'es2022'
     },
-    exclude: ['@douglasneuroinformatics/libui', '@swc/wasm-web']
+    exclude: ['@swc/wasm-web']
   },
   plugins: [react(), runtime()],
   resolve: {
