@@ -94,6 +94,11 @@ export const $BaseInstrumentDetails = z.object({
   title: $$InstrumentUIOption(z.string().min(1))
 }) satisfies z.ZodType<BaseInstrumentDetails>;
 
+export const $UnilingualBaseInstrumentDetails = $BaseInstrumentDetails.extend({
+  description: z.string().min(1),
+  title: z.string().min(1)
+}) satisfies z.ZodType<BaseInstrumentDetails<Language>>;
+
 /** An object with additional details relevant to multiple categories of instrument  */
 export type EnhancedBaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Simplify<
   BaseInstrumentDetails<TLanguage> & {
@@ -107,6 +112,12 @@ export const $EnhancedBaseInstrumentDetails = $BaseInstrumentDetails.extend({
   estimatedDuration: z.number().int().nonnegative(),
   instructions: $$InstrumentUIOption(z.array(z.string().min(1)))
 }) satisfies z.ZodType<EnhancedBaseInstrumentDetails>;
+
+export const $UnilingualEnhancedBaseInstrumentDetails = $EnhancedBaseInstrumentDetails
+  .extend($UnilingualBaseInstrumentDetails.shape)
+  .extend({
+    instructions: z.array(z.string().min(1))
+  }) satisfies z.ZodType<EnhancedBaseInstrumentDetails<Language>>;
 
 export type InstrumentMeasureValue = z.infer<typeof $InstrumentMeasureValue>;
 export const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.date()]);
@@ -218,7 +229,14 @@ export const $BaseInstrument = z.object({
   tags: $$InstrumentUIOption(z.array(z.string().min(1))),
   validationSchema: $ZodTypeAny,
   version: z.number()
-});
+}) satisfies z.ZodType<BaseInstrument>;
+
+export const $UnilingualBaseInstrument = $BaseInstrument.extend({
+  details: $UnilingualBaseInstrumentDetails,
+  language: $Language,
+  measures: $UnilingualInstrumentMeasures.optional(),
+  tags: z.array(z.string().min(1))
+}) satisfies z.ZodType<BaseInstrument<any, Language>>;
 
 /**
  * An object containing the essential data describing an instrument, but omitting the content
