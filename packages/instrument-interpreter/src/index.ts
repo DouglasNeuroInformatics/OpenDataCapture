@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-implied-eval */
 
-import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@open-data-capture/common/instrument';
-import type { AnyInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
+import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@open-data-capture/schemas/instrument';
+import type { AnyInstrument, InstrumentKind } from '@open-data-capture/schemas/instrument';
 import type { Promisable } from 'type-fest';
 
 export type InstrumentInterpreterOptions = {
