@@ -32,5 +32,3 @@ export const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $Uniling
   details: $UnilingualEnhancedBaseInstrumentDetails,
   kind: z.literal('INTERACTIVE')
 });
-
-export type InteractiveInstrumentDef<TData> = TData extends Json ? InteractiveInstrument<TData> : never;

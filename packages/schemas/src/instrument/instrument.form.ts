@@ -426,10 +426,8 @@ export const $FormInstrument: z.ZodType<FormInstrument> = $BaseInstrument.extend
 export type StrictFormInstrument<TData extends FormDataType, TLanguage extends InstrumentLanguage> =
   HasNestedKey<TData, KeysOfUnion<FormInstrumentStaticField>> extends true ? FormInstrument<TData, TLanguage> : never;
 
-export type StrictFormInstrumentDef<TData, TLanguage extends InstrumentLanguage> = TData extends FormDataType
-  ? StrictFormInstrument<TData, TLanguage>
-  : never;
-
 export type AnyMultilingualFormInstrument = FormInstrument<FormDataType, Language[]>;
 
 export type AnyUnilingualFormInstrument = FormInstrument<FormDataType, Language>;
+
+export type { FormDataType };
