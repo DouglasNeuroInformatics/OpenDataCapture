@@ -425,7 +425,7 @@ export const $FormInstrument: z.ZodType<FormInstrument> = $BaseInstrument.extend
  * Wrapper around `FormInstrument` that bans potentially confusing keys (e.g., 'kind') as field names
  */
 export type StrictFormInstrument<TData extends FormDataType, TLanguage extends InstrumentLanguage> =
-  HasNestedKey<TData, KeysOfUnion<FormInstrumentStaticField>> extends true ? FormInstrument<TData, TLanguage> : never;
+  HasNestedKey<TData, KeysOfUnion<FormInstrumentStaticField>> extends false ? FormInstrument<TData, TLanguage> : never;
 
 export type AnyMultilingualFormInstrument = FormInstrument<FormDataType, Language[]>;
 
