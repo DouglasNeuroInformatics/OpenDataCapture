@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useInterval, useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
 import { type EditorPaneRef } from '@open-data-capture/editor';
 
@@ -54,7 +55,9 @@ export const Editor = () => {
     >
       <div className="mx-auto flex h-screen flex-col p-2 xl:p-4 2xl:p-8">
         <header className="my-6 lg:my-8">
-          <h1 className="text-center text-xl font-semibold">Instrument Playground</h1>
+          <Heading className="text-center" variant="h2">
+            Instrument Playground
+          </Heading>
         </header>
         <main className="h-full min-h-0">{isDesktop ? <DesktopEditor ref={ref} /> : <MobileEditor ref={ref} />}</main>
       </div>

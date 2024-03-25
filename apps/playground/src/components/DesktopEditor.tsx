@@ -26,7 +26,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
       <div className="flex justify-between p-2">
         <div className="flex w-min items-center gap-2">
           <Select value={ctx.selectedExample.label} onValueChange={ctx.onChangeSelection}>
-            <Select.Trigger className="w-[180px]">
+            <Select.Trigger className="min-w-72 gap-2">
               <Select.Value placeholder="Select an Instrument" />
             </Select.Trigger>
             <Select.Content>
@@ -47,6 +47,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
           <Button
             size="icon"
             type="button"
+            variant="outline"
             onClick={() => {
               if (ctx.state.status !== 'built') {
                 notifications.addNotification({
@@ -71,6 +72,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
           <Button
             size="icon"
             type="button"
+            variant="outline"
             onClick={() => {
               viewerRef.current?.forceRefresh();
             }}
@@ -78,6 +80,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
             <RefreshCwIcon />
           </Button>
           <LanguageToggle
+            align="end"
             options={{
               en: 'English',
               fr: 'Français'
