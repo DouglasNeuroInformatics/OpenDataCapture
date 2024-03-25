@@ -448,15 +448,9 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: ^0.1.0
         version: 0.1.0(typescript@5.3.3)
-      '@douglasneuroinformatics/ui':
-        specifier: ^6.2.2
-        version: 6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
-      '@headlessui/react':
-        specifier: ^1.7.18
-        version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
-      '@heroicons/react':
-        specifier: ^2.1.1
-        version: 2.1.1(react@18.2.0)
+      '@douglasneuroinformatics/libui':
+        specifier: ^2.0.0-beta.3
+        version: 2.0.0-beta.3(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.3.3)
       '@open-data-capture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
@@ -493,18 +487,12 @@ importers:
       framer-motion:
         specifier: ^10.18.0
         version: 10.18.0(react-dom@18.2.0)(react@18.2.0)
-      i18next:
-        specifier: ^23.10.1
-        version: 23.10.1
-      i18next-browser-languagedetector:
-        specifier: ^7.2.0
-        version: 7.2.0
-      i18next-http-backend:
-        specifier: ^2.5.0
-        version: 2.5.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      lucide-react:
+        specifier: ^0.363.0
+        version: 0.363.0(react@18.2.0)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -16171,6 +16159,15 @@ packages:
   /lucide-react@0.359.0(react@18.2.0):
     resolution:
       { integrity: sha512-bxVL+rM/wacjpT0BKShA6r5IIKb6LCRg+ltFG9pnnIwaRX8kK3hq8v5JwMpT7RC6XeqB5cSaaV6GapPWWmtliw== }
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /lucide-react@0.363.0(react@18.2.0):
+    resolution:
+      { integrity: sha512-AlsfPCsXQyQx7wwsIgzcKOL9LwC498LIMAo+c0Es5PkHJa33xwmYAkkSoKoJWWWSYQEStqu58/jT4tL2gi32uQ== }
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:

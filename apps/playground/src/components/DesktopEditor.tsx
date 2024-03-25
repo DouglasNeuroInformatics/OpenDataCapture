@@ -1,10 +1,9 @@
 import React, { useContext, useRef } from 'react';
 
-import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import { Card, DownloadButton, Dropdown, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
-import { ArrowPathIcon } from '@heroicons/react/24/solid';
+import { Button, Card, LanguageToggle, Select, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
-import { useTranslation } from 'react-i18next';
+import { DownloadIcon, RefreshCwIcon } from 'lucide-react';
 
 import { EditorContext } from '@/context/EditorContext';
 
@@ -21,24 +20,33 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
   const download = useDownload();
   const notifications = useNotificationsStore();
   const viewerRef = useRef<InstrumentViewerRef>(null);
-  const { i18n } = useTranslation();
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex justify-between p-2">
         <div className="flex w-min items-center gap-2">
-          <span className="whitespace-nowrap">Selected Instrument: </span>
-          <Dropdown
-            className="text-sm [&_*]:text-sm"
-            options={ctx.exampleOptions}
-            size="sm"
-            title={ctx.selectedExample.label}
-            variant="secondary"
-            onSelection={ctx.onChangeSelection}
-          />
+          <Select value={ctx.selectedExample.label} onValueChange={ctx.onChangeSelection}>
+            <Select.Trigger className="w-[180px]">
+              <Select.Value placeholder="Select an Instrument" />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Group>
+                <Select.Label>Instruments</Select.Label>
+                {ctx.exampleOptions.map((option) => {
+                  return (
+                    <Select.Item key={option} value={option}>
+                      {option}
+                    </Select.Item>
+                  );
+                })}
+              </Select.Group>
+            </Select.Content>
+          </Select>
         </div>
         <div className="flex items-center gap-2">
-          <DownloadButton
+          <Button
+            size="icon"
+            type="button"
             onClick={() => {
               if (ctx.state.status !== 'built') {
                 notifications.addNotification({
@@ -56,19 +64,25 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
               const source = sourceBanner.concat(ctx.source);
               void download('instrument.tsx', () => source);
             }}
-          />
+          >
+            <DownloadIcon />
+          </Button>
           <ThemeToggle />
-          {/* Once an Icon component is implemented in UI lib, use that instead */}
-          <button
-            className="rounded-md p-2 transition-transform hover:backdrop-brightness-95 dark:hover:backdrop-brightness-150"
+          <Button
+            size="icon"
             type="button"
             onClick={() => {
               viewerRef.current?.forceRefresh();
             }}
           >
-            <ArrowPathIcon height={24} width={24} />
-          </button>
-          <LanguageToggle className="bg-slate-100" i18n={i18n} options={['en', 'fr']} />
+            <RefreshCwIcon />
+          </Button>
+          <LanguageToggle
+            options={{
+              en: 'English',
+              fr: 'Français'
+            }}
+          />
         </div>
       </div>
       <div className="flex h-full min-h-0 gap-8 p-2">
