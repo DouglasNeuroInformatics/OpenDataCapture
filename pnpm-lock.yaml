@@ -1155,6 +1155,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.21
         version: 18.2.21
+      jquery-1.12.4:
+        specifier: npm:jquery@1.12.4
+        version: /jquery@1.12.4
       jspsych:
         specifier: ^7.3.4
         version: 7.3.4
@@ -15488,6 +15491,11 @@ packages:
       { integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw== }
     engines: { node: '>=10' }
     dev: false
+
+  /jquery@1.12.4:
+    resolution:
+      { integrity: sha512-UEVp7PPK9xXYSk8xqXCJrkXnKZtlgWkd2GsAQbMRFK6S/ePU2JN5G2Zum8hIVjzR3CpdfSqdqAzId/xd4TJHeg== }
+    dev: true
 
   /js-tokens@4.0.0:
     resolution:
