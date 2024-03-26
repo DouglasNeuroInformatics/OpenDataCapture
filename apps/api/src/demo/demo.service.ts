@@ -3,7 +3,7 @@ import { toUpperCase } from '@douglasneuroinformatics/libjs';
 import type { FormDataType } from '@douglasneuroinformatics/libui-form-types';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
-import { DEMO_GROUPS, DEMO_USERS } from '@open-data-capture/demo';
+import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
 import {
   breakoutTask,
   briefPsychiatricRatingScale,
@@ -11,16 +11,16 @@ import {
   happinessQuestionnaire,
   miniMentalStateExamination,
   montrealCognitiveAssessment
-} from '@open-data-capture/instrument-library';
-import { type Json } from '@open-data-capture/schemas/core';
-import type { Group } from '@open-data-capture/schemas/group';
+} from '@opendatacapture/instrument-library';
+import { type Json } from '@opendatacapture/schemas/core';
+import type { Group } from '@opendatacapture/schemas/group';
 import type {
   FormInstrument,
   FormInstrumentFields,
   FormInstrumentStaticField,
   FormInstrumentUnknownField
-} from '@open-data-capture/schemas/instrument';
-import type { Subject, SubjectIdentificationData } from '@open-data-capture/schemas/subject';
+} from '@opendatacapture/schemas/instrument';
+import type { Subject, SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';

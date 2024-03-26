@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import { type InitAppOptions } from '@open-data-capture/common/setup';
+import { type InitAppOptions } from '@opendatacapture/common/setup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

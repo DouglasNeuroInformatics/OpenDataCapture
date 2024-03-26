@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/demo",
+  "name": "@opendatacapture/demo",
   "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
@@ -13,6 +13,6 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
-    "@open-data-capture/schemas": "workspace:*"
+    "@opendatacapture/schemas": "workspace:*"
   }
 }

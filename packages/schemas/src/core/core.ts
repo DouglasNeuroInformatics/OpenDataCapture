@@ -1,5 +1,5 @@
 import type { PureAbility, RawRuleOf } from '@casl/ability';
-import { type LicenseIdentifier, licenses } from '@open-data-capture/licenses';
+import { type LicenseIdentifier, licenses } from '@opendatacapture/licenses';
 import { z } from 'zod';
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';

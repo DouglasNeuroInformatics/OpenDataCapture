@@ -1,7 +1,7 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { InstrumentKind, Prisma, PrismaClient } from '@open-data-capture/database/core';
-import { InstrumentInterpreter, type InterpretOptions } from '@open-data-capture/instrument-interpreter';
-import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
+import { InstrumentKind, Prisma, PrismaClient } from '@opendatacapture/database/core';
+import { InstrumentInterpreter, type InterpretOptions } from '@opendatacapture/instrument-interpreter';
+import { InstrumentTransformer } from '@opendatacapture/instrument-transformer';
 
 export const PRISMA_CLIENT_TOKEN = 'PRISMA_CLIENT';
 

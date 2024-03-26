@@ -11,7 +11,7 @@ FROM base AS builder
 COPY . .
 RUN apk add --no-cache libc6-compat
 RUN apk update
-RUN pnpm dlx turbo prune @open-data-capture/gateway --docker
+RUN pnpm dlx turbo prune @opendatacapture/gateway --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
@@ -24,8 +24,8 @@ RUN pnpm install --frozen-lockfile
 # BUILD THE APP
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
-RUN pnpm dlx turbo build --filter=@open-data-capture/gateway
-RUN pnpm dlx turbo run db:push --filter=@open-data-capture/database
+RUN pnpm dlx turbo build --filter=@opendatacapture/gateway
+RUN pnpm dlx turbo run db:push --filter=@opendatacapture/database
 
 # RUN SERVER
 FROM base AS runner

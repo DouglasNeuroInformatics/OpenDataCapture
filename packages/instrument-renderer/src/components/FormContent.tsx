@@ -1,7 +1,7 @@
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
 import type { FormDataType } from '@douglasneuroinformatics/libui-form-types';
-import type { AnyUnilingualFormInstrument } from '@open-data-capture/schemas/instrument';
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 

@@ -1,5 +1,5 @@
 import { deepFreeze } from '@douglasneuroinformatics/libjs';
-import { $BooleanString } from '@open-data-capture/schemas/core';
+import { $BooleanString } from '@opendatacapture/schemas/core';
 import { z } from 'zod';
 
 const $Config = z.object({

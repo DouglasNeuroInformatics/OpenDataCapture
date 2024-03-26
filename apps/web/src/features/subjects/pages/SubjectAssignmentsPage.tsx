@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Button } from '@douglasneuroinformatics/ui/legacy';
 import { PlusIcon } from '@heroicons/react/24/solid';
-import type { Assignment } from '@open-data-capture/common/assignment';
+import type { Assignment } from '@opendatacapture/common/assignment';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 

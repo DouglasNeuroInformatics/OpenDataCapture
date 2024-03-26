@@ -5,7 +5,7 @@ import url from 'url';
 
 import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-native-modules';
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
-import { runtimePlugin } from '@open-data-capture/esbuild-plugin-runtime';
+import { runtimePlugin } from '@opendatacapture/esbuild-plugin-runtime';
 import esbuild from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
 

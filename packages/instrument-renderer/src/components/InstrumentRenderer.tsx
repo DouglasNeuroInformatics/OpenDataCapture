@@ -8,9 +8,9 @@ import {
   PrinterIcon,
   QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
-import type { InterpretOptions } from '@open-data-capture/instrument-interpreter';
-import type { InstrumentKind } from '@open-data-capture/schemas/instrument';
-import type { Subject } from '@open-data-capture/schemas/subject';
+import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
+import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';

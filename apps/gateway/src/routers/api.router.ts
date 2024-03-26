@@ -1,6 +1,6 @@
-import { Encrypter } from '@open-data-capture/crypto';
-import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@open-data-capture/schemas/assignment';
-import type { AssignmentStatus, MutateAssignmentResponseBody } from '@open-data-capture/schemas/assignment';
+import { Encrypter } from '@opendatacapture/crypto';
+import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { AssignmentStatus, MutateAssignmentResponseBody } from '@opendatacapture/schemas/assignment';
 import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';

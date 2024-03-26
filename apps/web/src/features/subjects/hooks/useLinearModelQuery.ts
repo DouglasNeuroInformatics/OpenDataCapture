@@ -1,4 +1,4 @@
-import { $LinearRegressionResults } from '@open-data-capture/common/instrument-records';
+import { $LinearRegressionResults } from '@opendatacapture/common/instrument-records';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

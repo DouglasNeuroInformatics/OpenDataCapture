@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import type { AnyUnilingualFormInstrument } from '@open-data-capture/common/instrument';
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/common/instrument';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 

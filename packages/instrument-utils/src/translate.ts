@@ -9,7 +9,7 @@ import type {
   ScalarFormField,
   StaticFormField
 } from '@douglasneuroinformatics/libui-form-types';
-import type { Language } from '@open-data-capture/schemas/core';
+import type { Language } from '@opendatacapture/schemas/core';
 import type {
   AnyInstrument,
   AnyMultilingualFormInstrument,
@@ -25,7 +25,7 @@ import type {
   SomeUnilingualInstrument,
   UnilingualInstrumentMeasures,
   UnilingualInstrumentSummary
-} from '@open-data-capture/schemas/instrument';
+} from '@opendatacapture/schemas/instrument';
 import { mapValues, wrap } from 'lodash-es';
 import { P, match } from 'ts-pattern';
 

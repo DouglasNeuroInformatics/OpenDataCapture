@@ -1,4 +1,4 @@
-import { createExtendedInstance } from '@open-data-capture/i18next';
+import { createExtendedInstance } from '@opendatacapture/i18next';
 
 const i18n = createExtendedInstance();
 

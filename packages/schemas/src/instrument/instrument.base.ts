@@ -1,5 +1,5 @@
 import { isUnique } from '@douglasneuroinformatics/libjs';
-import type { LicenseIdentifier } from '@open-data-capture/licenses';
+import type { LicenseIdentifier } from '@opendatacapture/licenses';
 import type { ConditionalKeys, Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 

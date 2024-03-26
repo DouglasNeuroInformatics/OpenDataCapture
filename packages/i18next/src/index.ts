@@ -1,5 +1,5 @@
 import i18nUI from '@douglasneuroinformatics/libui/i18n';
-import type { Language } from '@open-data-capture/schemas/core';
+import type { Language } from '@opendatacapture/schemas/core';
 import { type InitOptions, createInstance } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import _ from 'lodash';

@@ -1,4 +1,4 @@
-import { clickTask, reactionTimeTask } from '@open-data-capture/instrument-library';
+import { clickTask, reactionTimeTask } from '@opendatacapture/instrument-library';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { InteractiveContent } from './InteractiveContent';

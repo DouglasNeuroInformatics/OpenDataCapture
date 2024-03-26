@@ -6,8 +6,8 @@ import type {
   SubjectModel,
   UserModel,
   VisitModel
-} from '@open-data-capture/database/core';
-import type { AppAction, AppSubjectName } from '@open-data-capture/schemas/core';
+} from '@opendatacapture/database/core';
+import type { AppAction, AppSubjectName } from '@opendatacapture/schemas/core';
 
 type AppSubject = AppSubjectName | GroupModel | InstrumentRecordModel | SubjectModel | UserModel | VisitModel;
 

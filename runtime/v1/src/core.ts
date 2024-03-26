@@ -1,4 +1,4 @@
-import type { Json, Language } from '@open-data-capture/schemas/core';
+import type { Json, Language } from '@opendatacapture/schemas/core';
 import type {
   FormDataType,
   FormInstrument,
@@ -6,7 +6,7 @@ import type {
   InstrumentLanguage,
   InteractiveInstrument,
   StrictFormInstrument
-} from '@open-data-capture/schemas/instrument';
+} from '@opendatacapture/schemas/instrument';
 
 import { z } from './zod';
 

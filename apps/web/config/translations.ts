@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
-import { transformTranslations } from '@open-data-capture/i18next';
+import { transformTranslations } from '@opendatacapture/i18next';
 import copy from 'rollup-plugin-copy';
 import type { PluginOption, ViteDevServer } from 'vite';
 

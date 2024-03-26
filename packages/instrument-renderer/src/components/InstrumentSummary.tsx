@@ -2,9 +2,9 @@ import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
-import { computeInstrumentMeasures } from '@open-data-capture/instrument-utils';
-import type { InstrumentKind, SomeUnilingualInstrument } from '@open-data-capture/schemas/instrument';
-import type { Subject } from '@open-data-capture/schemas/subject';
+import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
+import type { InstrumentKind, SomeUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 
 import { CopyButton } from './CopyButton';

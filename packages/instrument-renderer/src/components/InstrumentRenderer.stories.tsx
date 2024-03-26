@@ -4,12 +4,7 @@ import { InstrumentRenderer } from './InstrumentRenderer';
 
 type Story = StoryObj<typeof InstrumentRenderer>;
 
-import {
-  breakoutTask,
-  clickTask,
-  happinessQuestionnaire,
-  reactionTimeTask
-} from '@open-data-capture/instrument-library';
+import { breakoutTask, clickTask, happinessQuestionnaire, reactionTimeTask } from '@opendatacapture/instrument-library';
 
 export default {
   component: InstrumentRenderer,
@@ -47,4 +42,3 @@ export const ReactionTimeTask: Story = {
     bundle: reactionTimeTask.bundle
   }
 };
-

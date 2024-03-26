@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/crypto",
+  "name": "@opendatacapture/crypto",
   "type": "module",
   "version": "0.0.0",
   "description": "Wrappers for the Web Crypto API",

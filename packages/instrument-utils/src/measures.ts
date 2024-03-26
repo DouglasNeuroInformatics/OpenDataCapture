@@ -3,7 +3,7 @@ import {
   $InstrumentMeasureValue,
   type AnyUnilingualInstrument,
   type InstrumentMeasureValue
-} from '@open-data-capture/schemas/instrument';
+} from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
 import { extractFieldLabel } from './form.js';

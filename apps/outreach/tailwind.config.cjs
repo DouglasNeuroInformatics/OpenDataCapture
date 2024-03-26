@@ -1,4 +1,4 @@
-const { createConfig } = require('@open-data-capture/tailwindcss');
+const { createConfig } = require('@opendatacapture/tailwindcss');
 const typographyPlugin = require('@tailwindcss/typography');
 
 /** @type {import('tailwindcss').Config} */

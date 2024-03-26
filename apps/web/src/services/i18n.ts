@@ -1,4 +1,4 @@
-import { createExtendedInstance } from '@open-data-capture/i18next';
+import { createExtendedInstance } from '@opendatacapture/i18next';
 import Backend from 'i18next-http-backend';
 
 const i18n = createExtendedInstance({

@@ -1,6 +1,6 @@
-import { translateInstrument } from '@open-data-capture/instrument-utils';
-import { $InstrumentBundleContainer } from '@open-data-capture/schemas/instrument';
-import type { AnyInstrument, AnyUnilingualInstrument, InstrumentKind } from '@open-data-capture/schemas/instrument';
+import { translateInstrument } from '@opendatacapture/instrument-utils';
+import { $InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
+import type { AnyInstrument, AnyUnilingualInstrument, InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';

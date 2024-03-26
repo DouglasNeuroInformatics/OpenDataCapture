@@ -6,7 +6,7 @@ import {
   emptyUnilingualForm,
   genericFormInstrument,
   happinessQuestionnaire
-} from '@open-data-capture/instrument-library';
+} from '@opendatacapture/instrument-library';
 
 export type ExampleInstrumentData = {
   label: string;

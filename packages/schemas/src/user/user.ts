@@ -1,4 +1,4 @@
-import type { UserModel } from '@open-data-capture/database/core';
+import type { UserModel } from '@opendatacapture/database/core';
 import { z } from 'zod';
 
 import { $BaseModel } from '../core/core.js';

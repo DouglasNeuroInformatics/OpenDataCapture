@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
-import type { SubjectModel } from '@open-data-capture/database/core';
-import type { Group } from '@open-data-capture/schemas/group';
-import type { SubjectIdentificationData } from '@open-data-capture/schemas/subject';
-import type { CreateVisitData, Visit } from '@open-data-capture/schemas/visit';
+import type { SubjectModel } from '@opendatacapture/database/core';
+import type { Group } from '@opendatacapture/schemas/group';
+import type { SubjectIdentificationData } from '@opendatacapture/schemas/subject';
+import type { CreateVisitData, Visit } from '@opendatacapture/schemas/visit';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InjectModel } from '@/prisma/prisma.decorators';

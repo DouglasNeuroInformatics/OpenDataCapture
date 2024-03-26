@@ -2,7 +2,7 @@ import React, { useContext, useRef } from 'react';
 
 import { Button, Card, LanguageToggle, Select, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
+import { EditorPane, type EditorPaneRef } from '@opendatacapture/editor';
 import { DownloadIcon, RefreshCwIcon } from 'lucide-react';
 
 import { EditorContext } from '@/context/EditorContext';

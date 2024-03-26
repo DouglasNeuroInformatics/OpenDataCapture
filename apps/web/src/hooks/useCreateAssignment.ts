@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { CreateAssignmentData } from '@open-data-capture/schemas/assignment';
+import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 

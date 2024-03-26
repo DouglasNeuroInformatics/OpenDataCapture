@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
+import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
 
 export const useInstrumentInterpreter = () => {
   return useMemo(() => new InstrumentInterpreter(), []);

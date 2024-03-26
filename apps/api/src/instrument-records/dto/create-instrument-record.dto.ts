@@ -1,6 +1,6 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
-import type { Json } from '@open-data-capture/schemas/core';
-import { $CreateInstrumentRecordData } from '@open-data-capture/schemas/instrument-records';
+import type { Json } from '@opendatacapture/schemas/core';
+import { $CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 
 @ValidationSchema($CreateInstrumentRecordData)
 export class CreateInstrumentRecordDto {

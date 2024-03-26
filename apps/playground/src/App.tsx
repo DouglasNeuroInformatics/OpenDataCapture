@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { NotificationHub } from '@douglasneuroinformatics/libui/components';
-import { ErrorFallback } from '@open-data-capture/react-core';
+import { ErrorFallback } from '@opendatacapture/react-core';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { SuspenseFallback } from './components/SuspenseFallback';

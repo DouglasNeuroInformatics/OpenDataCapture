@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/instrument-utils",
+  "name": "@opendatacapture/instrument-utils",
   "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
@@ -12,12 +12,12 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
-    "@open-data-capture/schemas": "workspace:*",
+    "@opendatacapture/schemas": "workspace:*",
     "lodash-es": "^4.17.21",
     "ts-pattern": "^5.0.8"
   },
   "devDependencies": {
-    "@open-data-capture/instrument-library": "workspace:*",
+    "@opendatacapture/instrument-library": "workspace:*",
     "@types/lodash-es": "^4.17.0"
   }
 }

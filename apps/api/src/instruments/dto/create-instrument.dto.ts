@@ -1,6 +1,6 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
-import type { InstrumentKind } from '@open-data-capture/database/core';
-import { $CreateInstrumentData } from '@open-data-capture/schemas/instrument';
+import type { InstrumentKind } from '@opendatacapture/database/core';
+import { $CreateInstrumentData } from '@opendatacapture/schemas/instrument';
 
 @ValidationSchema($CreateInstrumentData)
 export class CreateInstrumentDto<TKind extends InstrumentKind = InstrumentKind> {

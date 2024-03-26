@@ -1,4 +1,4 @@
-import runtime from '@open-data-capture/vite-plugin-runtime';
+import runtime from '@opendatacapture/vite-plugin-runtime';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({

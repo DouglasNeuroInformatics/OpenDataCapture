@@ -15,8 +15,8 @@ const require = module.createRequire(__dirname);
 const loadSource = (id: string) => fs.readFile(require.resolve(id), 'utf-8');
 
 const sources = {
-  clickTask: await loadSource('@open-data-capture/instrument-library/interactive/click-task.tsx'),
-  happinessQuestionnaire: await loadSource('@open-data-capture/instrument-library/forms/happiness-questionnaire.ts')
+  clickTask: await loadSource('@opendatacapture/instrument-library/interactive/click-task.tsx'),
+  happinessQuestionnaire: await loadSource('@opendatacapture/instrument-library/forms/happiness-questionnaire.ts')
 };
 
 describe('InstrumentTransformer', () => {

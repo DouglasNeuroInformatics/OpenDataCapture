@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import type { SelectOption } from '@douglasneuroinformatics/ui/legacy';
-import type { LinearRegressionResults } from '@open-data-capture/common/instrument-records';
+import type { LinearRegressionResults } from '@opendatacapture/common/instrument-records';
 import _ from 'lodash';
 
 import type { InstrumentVisualizationRecord } from './useInstrumentVisualization';

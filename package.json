@@ -1,5 +1,5 @@
 {
-  "name": "open-data-capture",
+  "name": "opendatacapture",
   "type": "module",
   "version": "1.0.0-beta.0",
   "private": true,
@@ -14,7 +14,7 @@
     "db:push": "turbo run db:push",
     "dev": "pnpm dev:core",
     "dev:all": "NODE_ENV=development env-cmd turbo run dev",
-    "dev:core": "NODE_ENV=development env-cmd pnpm exec turbo run dev --filter=@open-data-capture/api --filter=@open-data-capture/gateway --filter=@open-data-capture/web",
+    "dev:core": "NODE_ENV=development env-cmd pnpm exec turbo run dev --filter=@opendatacapture/api --filter=@opendatacapture/gateway --filter=@opendatacapture/web",
     "force-reinstall": "pnpm clean && pnpm install",
     "format": "turbo run format",
     "generate:env": "./scripts/generate-env.sh",

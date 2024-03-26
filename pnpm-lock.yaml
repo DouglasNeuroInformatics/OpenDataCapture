@@ -178,31 +178,31 @@ importers:
       '@nestjs/throttler':
         specifier: ^5.1.2
         version: 5.1.2(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(reflect-metadata@0.1.14)
-      '@open-data-capture/crypto':
+      '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
-      '@open-data-capture/database':
+      '@opendatacapture/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@open-data-capture/demo':
+      '@opendatacapture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
-      '@open-data-capture/instrument-interpreter':
+      '@opendatacapture/instrument-interpreter':
         specifier: workspace:*
         version: link:../../packages/instrument-interpreter
-      '@open-data-capture/instrument-library':
+      '@opendatacapture/instrument-library':
         specifier: workspace:*
         version: link:../../packages/instrument-library
-      '@open-data-capture/instrument-transformer':
+      '@opendatacapture/instrument-transformer':
         specifier: workspace:*
         version: link:../../packages/instrument-transformer
-      '@open-data-capture/runtime-v1':
+      '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
-      '@open-data-capture/stats':
+      '@opendatacapture/stats':
         specifier: workspace:*
         version: link:../../packages/stats
       axios:
@@ -248,7 +248,7 @@ importers:
       '@nestjs/testing':
         specifier: ^10.3.3
         version: 10.3.3(@nestjs/common@10.3.3)(@nestjs/core@10.3.3)(@nestjs/platform-express@10.3.3)
-      '@open-data-capture/esbuild-plugin-runtime':
+      '@opendatacapture/esbuild-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/esbuild-plugin-runtime
       '@types/express':
@@ -290,22 +290,22 @@ importers:
       '@douglasneuroinformatics/ui':
         specifier: ^6.2.2
         version: 6.2.2(@headlessui/tailwindcss@0.2.0)(@tailwindcss/container-queries@0.1.1)(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)
-      '@open-data-capture/crypto':
+      '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
-      '@open-data-capture/database':
+      '@opendatacapture/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@open-data-capture/i18next':
+      '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../../packages/i18next
-      '@open-data-capture/instrument-renderer':
+      '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
-      '@open-data-capture/react-core':
+      '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
       axios:
@@ -354,10 +354,10 @@ importers:
       '@douglasneuroinformatics/esbuild-plugin-prisma':
         specifier: ^0.0.2
         version: 0.0.2(@prisma/client@5.11.0)(@prisma/engines@5.11.0)(esbuild@0.20.1)(prisma@5.11.0)
-      '@open-data-capture/tailwindcss':
+      '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../../packages/tailwindcss
-      '@open-data-capture/vite-plugin-runtime':
+      '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-runtime
       '@types/compression':
@@ -424,7 +424,7 @@ importers:
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.0(astro@4.5.2)(tailwindcss@3.4.1)
-      '@open-data-capture/tailwindcss':
+      '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../../packages/tailwindcss
       '@tailwindcss/typography':
@@ -451,31 +451,31 @@ importers:
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.0-beta.3
         version: 2.0.0-beta.3(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.3.3)
-      '@open-data-capture/demo':
+      '@opendatacapture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
-      '@open-data-capture/editor':
+      '@opendatacapture/editor':
         specifier: workspace:*
         version: link:../../packages/editor
-      '@open-data-capture/i18next':
+      '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../../packages/i18next
-      '@open-data-capture/instrument-library':
+      '@opendatacapture/instrument-library':
         specifier: workspace:*
         version: link:../../packages/instrument-library
-      '@open-data-capture/instrument-renderer':
+      '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
-      '@open-data-capture/instrument-transformer':
+      '@opendatacapture/instrument-transformer':
         specifier: workspace:*
         version: link:../../packages/instrument-transformer
-      '@open-data-capture/react-core':
+      '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
-      '@open-data-capture/runtime-v1':
+      '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
       axios:
@@ -521,10 +521,10 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(zod@3.22.4)
     devDependencies:
-      '@open-data-capture/tailwindcss':
+      '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../../packages/tailwindcss
-      '@open-data-capture/vite-plugin-runtime':
+      '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-runtime
       '@types/lodash-es':
@@ -575,28 +575,28 @@ importers:
       '@import-meta-env/unplugin':
         specifier: ^0.5.1
         version: 0.5.1(@import-meta-env/cli@0.6.8)(dotenv@16.4.5)
-      '@open-data-capture/demo':
+      '@opendatacapture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
-      '@open-data-capture/editor':
+      '@opendatacapture/editor':
         specifier: workspace:*
         version: link:../../packages/editor
-      '@open-data-capture/i18next':
+      '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../../packages/i18next
-      '@open-data-capture/instrument-interpreter':
+      '@opendatacapture/instrument-interpreter':
         specifier: workspace:*
         version: link:../../packages/instrument-interpreter
-      '@open-data-capture/instrument-renderer':
+      '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
-      '@open-data-capture/instrument-utils':
+      '@opendatacapture/instrument-utils':
         specifier: workspace:*
         version: link:../../packages/instrument-utils
-      '@open-data-capture/react-core':
+      '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
       '@tanstack/react-query':
@@ -657,13 +657,13 @@ importers:
         specifier: ^4.5.2
         version: 4.5.2(@types/react@18.2.65)(react@18.2.0)
     devDependencies:
-      '@open-data-capture/tailwindcss':
+      '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../../packages/tailwindcss
-      '@open-data-capture/vite-plugin-plausible':
+      '@opendatacapture/vite-plugin-plausible':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-plausible
-      '@open-data-capture/vite-plugin-runtime':
+      '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-runtime
       '@types/lodash':
@@ -726,7 +726,7 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.3.3)
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
 
@@ -744,10 +744,10 @@ importers:
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.45.0)(react-dom@18.2.0)(react@18.2.0)
-      '@open-data-capture/i18next':
+      '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
-      '@open-data-capture/react-core':
+      '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../react-core
       framer-motion:
@@ -772,7 +772,7 @@ importers:
         specifier: 3.x
         version: 3.4.1
     devDependencies:
-      '@open-data-capture/tailwindcss':
+      '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../tailwindcss
       '@types/react':
@@ -793,7 +793,7 @@ importers:
 
   packages/esbuild-plugin-runtime:
     dependencies:
-      '@open-data-capture/runtime-resolve':
+      '@opendatacapture/runtime-resolve':
         specifier: workspace:*
         version: link:../runtime-resolve
       esbuild:
@@ -805,7 +805,7 @@ importers:
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.0-beta.3
         version: 2.0.0-beta.3(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.3.3)
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
       '@types/lodash':
@@ -832,27 +832,24 @@ importers:
 
   packages/instrument-interpreter:
     dependencies:
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
-      '@open-data-capture/instrument-library':
-        specifier: workspace:*
-        version: link:../instrument-library
-      '@open-data-capture/vite-plugin-runtime':
+      '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../vite-plugin-runtime
 
   packages/instrument-library:
     dependencies:
-      '@open-data-capture/instrument-transformer':
+      '@opendatacapture/instrument-transformer':
         specifier: workspace:*
         version: link:../instrument-transformer
-      '@open-data-capture/runtime-v1':
+      '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
     devDependencies:
-      '@open-data-capture/rollup-plugin-instrument':
+      '@opendatacapture/rollup-plugin-instrument':
         specifier: workspace:*
         version: link:../rollup-plugin-instrument
       '@rollup/plugin-node-resolve':
@@ -876,25 +873,25 @@ importers:
       '@heroicons/react':
         specifier: ^2.1.1
         version: 2.1.1(react@18.2.0)
-      '@open-data-capture/i18next':
+      '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
-      '@open-data-capture/instrument-interpreter':
+      '@opendatacapture/instrument-interpreter':
         specifier: workspace:*
         version: link:../instrument-interpreter
-      '@open-data-capture/instrument-utils':
+      '@opendatacapture/instrument-utils':
         specifier: workspace:*
         version: link:../instrument-utils
-      '@open-data-capture/licenses':
+      '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
-      '@open-data-capture/react-core':
+      '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../react-core
-      '@open-data-capture/runtime-v1':
+      '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
       framer-motion:
@@ -922,13 +919,13 @@ importers:
         specifier: ^5.0.8
         version: 5.0.8
     devDependencies:
-      '@open-data-capture/instrument-library':
+      '@opendatacapture/instrument-library':
         specifier: workspace:*
         version: link:../instrument-library
-      '@open-data-capture/tailwindcss':
+      '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../tailwindcss
-      '@open-data-capture/vite-plugin-runtime':
+      '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../vite-plugin-runtime
       '@types/lodash':
@@ -967,7 +964,7 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.3.3)
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
       lodash-es:
@@ -977,7 +974,7 @@ importers:
         specifier: ^5.0.8
         version: 5.0.8
     devDependencies:
-      '@open-data-capture/instrument-library':
+      '@opendatacapture/instrument-library':
         specifier: workspace:*
         version: link:../instrument-library
       '@types/lodash-es':
@@ -997,7 +994,7 @@ importers:
       '@heroicons/react':
         specifier: ^2.1.1
         version: 2.1.1(react@18.2.0)
-      '@open-data-capture/i18next':
+      '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
       react:
@@ -1013,7 +1010,7 @@ importers:
         specifier: 3.x
         version: 3.4.1
     devDependencies:
-      '@open-data-capture/tailwindcss':
+      '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../tailwindcss
       '@types/react':
@@ -1034,7 +1031,7 @@ importers:
 
   packages/rollup-plugin-instrument:
     dependencies:
-      '@open-data-capture/instrument-transformer':
+      '@opendatacapture/instrument-transformer':
         specifier: workspace:*
         version: link:../instrument-transformer
       csso:
@@ -1053,7 +1050,7 @@ importers:
 
   packages/runtime-resolve:
     dependencies:
-      '@open-data-capture/runtime-v1':
+      '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
 
@@ -1065,7 +1062,7 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.3.3)
-      '@open-data-capture/licenses':
+      '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
       zod:
@@ -1078,7 +1075,7 @@ importers:
       '@douglasneuroinformatics/libui-form-types':
         specifier: ^0.6.2
         version: 0.6.2
-      '@open-data-capture/database':
+      '@opendatacapture/database':
         specifier: workspace:*
         version: link:../database
 
@@ -1107,10 +1104,10 @@ importers:
 
   packages/vite-plugin-runtime:
     dependencies:
-      '@open-data-capture/runtime-resolve':
+      '@opendatacapture/runtime-resolve':
         specifier: workspace:*
         version: link:../runtime-resolve
-      '@open-data-capture/runtime-v1':
+      '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
       vite:
@@ -1128,10 +1125,10 @@ importers:
       '@jspsych/plugin-preload':
         specifier: ^1.1.3
         version: 1.1.3(jspsych@7.3.4)
-      '@open-data-capture/instrument-interpreter':
+      '@opendatacapture/instrument-interpreter':
         specifier: workspace:*
         version: link:../../packages/instrument-interpreter
-      '@open-data-capture/schemas':
+      '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
       '@rollup/plugin-commonjs':

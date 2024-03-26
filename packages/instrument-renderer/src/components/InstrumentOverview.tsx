@@ -2,8 +2,8 @@ import { Button, Popover } from '@douglasneuroinformatics/libui/components';
 import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ShieldCheckIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid';
-import { licenses } from '@open-data-capture/licenses';
-import type { AnyUnilingualInstrument } from '@open-data-capture/schemas/instrument';
+import { licenses } from '@opendatacapture/licenses';
+import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentOverviewItem } from './InstrumentOverviewItem';

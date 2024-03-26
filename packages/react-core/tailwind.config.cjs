@@ -1,6 +1,6 @@
 // @ts-check
 
-const { createConfig } = require('@open-data-capture/tailwindcss');
+const { createConfig } = require('@opendatacapture/tailwindcss');
 
 module.exports = createConfig({
   content: ['./src/**/*.{js,ts,jsx,tsx}'],

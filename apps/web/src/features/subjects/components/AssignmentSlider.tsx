@@ -1,5 +1,5 @@
 import { Button, Slider } from '@douglasneuroinformatics/ui/legacy';
-import type { Assignment } from '@open-data-capture/common/assignment';
+import type { Assignment } from '@opendatacapture/common/assignment';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrument } from '@/hooks/useInstrument';

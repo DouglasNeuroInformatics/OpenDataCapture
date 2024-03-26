@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useInterval, useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
-import { type EditorPaneRef } from '@open-data-capture/editor';
+import { type EditorPaneRef } from '@opendatacapture/editor';
 
 import { EditorContext } from '@/context/EditorContext';
 import { type ExampleInstrumentData, defaultExample, examples } from '@/examples';

@@ -2,8 +2,8 @@ import path from 'path';
 import url from 'url';
 
 import importMetaEnv from '@import-meta-env/unplugin';
-import plausible from '@open-data-capture/vite-plugin-plausible';
-import runtime from '@open-data-capture/vite-plugin-runtime';
+import plausible from '@opendatacapture/vite-plugin-plausible';
+import runtime from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';

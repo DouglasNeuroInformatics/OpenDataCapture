@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { type CreateAdminData } from '@open-data-capture/schemas/setup';
-import type { InitAppOptions } from '@open-data-capture/schemas/setup';
+import { type CreateAdminData } from '@opendatacapture/schemas/setup';
+import type { InitAppOptions } from '@opendatacapture/schemas/setup';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { DemoService } from '@/demo/demo.service';

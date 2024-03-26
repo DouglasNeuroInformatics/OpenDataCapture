@@ -3,7 +3,7 @@ import React from 'react';
 import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
 import { cn } from '@douglasneuroinformatics/ui/utils';
 import { LanguageIcon } from '@heroicons/react/24/solid';
-import type { Language } from '@open-data-capture/common/core';
+import type { Language } from '@opendatacapture/common/core';
 import { useTranslation } from 'react-i18next';
 
 const languages = {

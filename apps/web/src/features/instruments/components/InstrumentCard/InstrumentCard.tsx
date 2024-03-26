@@ -1,5 +1,5 @@
 import { Card } from '@douglasneuroinformatics/ui/legacy';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { UnilingualInstrumentSummary } from '@opendatacapture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentIcon } from './InstrumentIcon';

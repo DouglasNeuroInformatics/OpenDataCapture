@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 
 import { Select } from '@douglasneuroinformatics/libui/components';
-import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
+import { EditorPane, type EditorPaneRef } from '@opendatacapture/editor';
 import { match } from 'ts-pattern';
 
 import { EditorContext } from '@/context/EditorContext';

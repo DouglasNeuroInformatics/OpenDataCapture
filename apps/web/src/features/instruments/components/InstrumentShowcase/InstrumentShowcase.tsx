@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/ui/legacy';
 import type { SelectOption } from '@douglasneuroinformatics/ui/legacy';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { UnilingualInstrumentSummary } from '@opendatacapture/common/instrument';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

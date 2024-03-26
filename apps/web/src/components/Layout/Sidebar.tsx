@@ -1,7 +1,7 @@
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
-import { toLowerCase } from '@open-data-capture/common/core';
-import { Branding } from '@open-data-capture/react-core';
+import { toLowerCase } from '@opendatacapture/common/core';
+import { Branding } from '@opendatacapture/react-core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 

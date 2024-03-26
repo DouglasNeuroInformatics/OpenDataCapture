@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable } from '@douglasneuroinformatics/ui/legacy';
-import type { Assignment, AssignmentStatus } from '@open-data-capture/common/assignment';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import type { Assignment, AssignmentStatus } from '@opendatacapture/common/assignment';
+import type { UnilingualInstrumentSummary } from '@opendatacapture/common/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';

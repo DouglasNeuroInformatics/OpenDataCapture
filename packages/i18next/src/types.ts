@@ -1,4 +1,4 @@
-import type { Language } from '@open-data-capture/schemas/core';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { i18n } from 'i18next';
 import type { EmptyObject, ValueOf } from 'type-fest';
 

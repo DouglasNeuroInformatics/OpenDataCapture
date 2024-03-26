@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { SetupState } from '@open-data-capture/schemas/setup';
+import type { SetupState } from '@opendatacapture/schemas/setup';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 

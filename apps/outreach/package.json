@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/outreach",
+  "name": "@opendatacapture/outreach",
   "type": "module",
   "version": "0.0.0",
   "scripts": {
@@ -23,7 +23,7 @@
     "@astrojs/sitemap": "^3.1.1",
     "@astrojs/starlight": "^0.18.1",
     "@astrojs/tailwind": "^5.1.0",
-    "@open-data-capture/tailwindcss": "workspace:*",
+    "@opendatacapture/tailwindcss": "workspace:*",
     "@tailwindcss/typography": "^0.5.10",
     "@types/lodash-es": "^4.17.12",
     "astro": "^4.5.2",

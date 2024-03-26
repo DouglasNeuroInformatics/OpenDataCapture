@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form } from '@douglasneuroinformatics/ui/legacy';
-import type { LoginCredentials } from '@open-data-capture/common/auth';
+import type { LoginCredentials } from '@opendatacapture/common/auth';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 

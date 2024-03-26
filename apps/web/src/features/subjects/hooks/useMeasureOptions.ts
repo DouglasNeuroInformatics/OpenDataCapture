@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { type SelectOption, getFormFields } from '@douglasneuroinformatics/ui/legacy';
-import type { AnyUnilingualFormInstrument } from '@open-data-capture/common/instrument';
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/common/instrument';
 import { match } from 'ts-pattern';
 
 export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null): SelectOption[] {

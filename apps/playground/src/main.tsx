@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { i18n } from '@open-data-capture/i18next';
+import { i18n } from '@opendatacapture/i18next';
 
 import { App } from './App';
 

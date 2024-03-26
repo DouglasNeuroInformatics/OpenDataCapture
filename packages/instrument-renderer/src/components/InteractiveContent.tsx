@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
-import { $Json, type Json } from '@open-data-capture/schemas/core';
+import { $Json, type Json } from '@opendatacapture/schemas/core';
 import type { Promisable } from 'type-fest';
 
 export type InteractiveContentProps = {

@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/vite-plugin-plausible",
+  "name": "@opendatacapture/vite-plugin-plausible",
   "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",

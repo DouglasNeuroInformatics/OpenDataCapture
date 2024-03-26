@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/editor",
+  "name": "@opendatacapture/editor",
   "type": "module",
   "version": "0.0.0",
   "private": true,
@@ -23,15 +23,15 @@
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@monaco-editor/react": "^4.6.0",
-    "@open-data-capture/i18next": "workspace:*",
-    "@open-data-capture/react-core": "workspace:*",
+    "@opendatacapture/i18next": "workspace:*",
+    "@opendatacapture/react-core": "workspace:*",
     "framer-motion": "^11.0.12",
     "monaco-editor": "^0.45.0",
     "prettier": "^3.2.5",
     "react-i18next": "^14.1.0"
   },
   "devDependencies": {
-    "@open-data-capture/tailwindcss": "workspace:*",
+    "@opendatacapture/tailwindcss": "workspace:*",
     "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.21",
     "autoprefixer": "^10.4.18",

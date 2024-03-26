@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/vite-plugin-runtime",
+  "name": "@opendatacapture/vite-plugin-runtime",
   "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
@@ -9,10 +9,10 @@
     "lint": "eslint --fix src"
   },
   "peerDependencies": {
-    "@open-data-capture/runtime-v1": "workspace:*",
+    "@opendatacapture/runtime-v1": "workspace:*",
     "vite": "5.x"
   },
   "dependencies": {
-    "@open-data-capture/runtime-resolve": "workspace:*"
+    "@opendatacapture/runtime-resolve": "workspace:*"
   }
 }

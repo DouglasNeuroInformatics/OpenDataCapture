@@ -1,10 +1,6 @@
 import type { FormDataType, PartialFormDataType } from '@douglasneuroinformatics/libui-form-types';
-import type { Language } from '@open-data-capture/schemas/core';
-import type {
-  FormInstrument,
-  FormInstrumentContent,
-  FormInstrumentFields
-} from '@open-data-capture/schemas/instrument';
+import type { Language } from '@opendatacapture/schemas/core';
+import type { FormInstrument, FormInstrumentContent, FormInstrumentFields } from '@opendatacapture/schemas/instrument';
 
 /** Extract a flat array of form fields from the content. This function assumes there are no duplicate keys in groups  */
 export function getFormFields<TData extends FormDataType>(

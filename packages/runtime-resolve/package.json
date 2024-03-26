@@ -1,5 +1,5 @@
 {
-  "name": "@open-data-capture/runtime-resolve",
+  "name": "@opendatacapture/runtime-resolve",
   "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
@@ -9,6 +9,6 @@
     "lint": "eslint --fix src"
   },
   "peerDependencies": {
-    "@open-data-capture/runtime-v1": "workspace:*"
+    "@opendatacapture/runtime-v1": "workspace:*"
   }
 }

@@ -1,4 +1,4 @@
-import { $Summary } from '@open-data-capture/common/summary';
+import { $Summary } from '@opendatacapture/common/summary';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

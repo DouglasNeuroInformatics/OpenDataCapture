@@ -1,4 +1,4 @@
-/// <reference types="@open-data-capture/rollup-plugin-instrument/client" />
+/// <reference types="@opendatacapture/rollup-plugin-instrument/client" />
 
 export const briefPsychiatricRatingScale: InstrumentLibraryItem;
 export const enhancedDemographicsQuestionnaire: InstrumentLibraryItem;

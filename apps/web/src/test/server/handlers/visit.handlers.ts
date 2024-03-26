@@ -1,4 +1,4 @@
-import type { Visit } from '@open-data-capture/schemas/visit';
+import type { Visit } from '@opendatacapture/schemas/visit';
 import { HttpResponse, http } from 'msw';
 
 import { testSubject } from '../stubs';
