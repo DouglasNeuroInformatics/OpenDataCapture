@@ -18,7 +18,7 @@ export default defineConfig([
   {
     input: {
       '_internal/bootstrap': path.resolve(import.meta.dirname, 'src', '_internal', 'bootstrap.ts'),
-      '_legacy/jquery-1.12.4': path.resolve(import.meta.dirname, 'src', '_legacy', 'jquery-1.12.4.js'),
+      '_legacy/jquery-1.12.4': path.resolve(import.meta.dirname, 'src', '_legacy', 'jquery-1.12.4.ts'),
       core: path.resolve(import.meta.dirname, 'src', 'core.ts'),
       jspsych: path.resolve(import.meta.dirname, 'src', 'jspsych.ts'),
       react: path.resolve(import.meta.dirname, 'src', 'react.ts'),
