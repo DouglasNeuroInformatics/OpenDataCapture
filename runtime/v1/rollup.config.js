@@ -1,5 +1,4 @@
 import path from 'path';
-import url from 'url';
 
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
@@ -10,23 +9,21 @@ import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 import dts from 'rollup-plugin-dts';
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-
-const OUT_DIR = path.resolve(__dirname, 'dist');
-const ROOT_DIR = path.resolve(__dirname, '..', '..');
+const OUT_DIR = path.resolve(import.meta.dirname, 'dist');
+const ROOT_DIR = path.resolve(import.meta.dirname, '..', '..');
 
 const MODE = /** @type {'development' | 'production'} */ ('development');
 
 export default defineConfig([
   {
     input: {
-      '_internal/bootstrap': path.resolve(__dirname, 'src', '_internal', 'bootstrap.ts'),
-      '_legacy/jquery-1.12.4': path.resolve(__dirname, 'src', '_legacy', 'jquery-1.12.4.js'),
-      core: path.resolve(__dirname, 'src', 'core.ts'),
-      jspsych: path.resolve(__dirname, 'src', 'jspsych.ts'),
-      react: path.resolve(__dirname, 'src', 'react.ts'),
-      'react-dom/client': path.resolve(__dirname, 'src', 'react-dom', 'client.ts'),
-      zod: path.resolve(__dirname, 'src', 'zod.ts')
+      '_internal/bootstrap': path.resolve(import.meta.dirname, 'src', '_internal', 'bootstrap.ts'),
+      '_legacy/jquery-1.12.4': path.resolve(import.meta.dirname, 'src', '_legacy', 'jquery-1.12.4.js'),
+      core: path.resolve(import.meta.dirname, 'src', 'core.ts'),
+      jspsych: path.resolve(import.meta.dirname, 'src', 'jspsych.ts'),
+      react: path.resolve(import.meta.dirname, 'src', 'react.ts'),
+      'react-dom/client': path.resolve(import.meta.dirname, 'src', 'react-dom', 'client.ts'),
+      zod: path.resolve(import.meta.dirname, 'src', 'zod.ts')
     },
     output: {
       dir: OUT_DIR,
@@ -52,11 +49,11 @@ export default defineConfig([
   },
   {
     input: {
-      core: path.resolve(__dirname, 'src', 'core.ts'),
-      jspsych: path.resolve(__dirname, 'src', 'jspsych.ts'),
-      react: path.resolve(__dirname, 'src', 'react.ts'),
-      'react-dom/client': path.resolve(__dirname, 'src', 'react-dom', 'client.ts'),
-      zod: path.resolve(__dirname, 'src', 'zod.ts')
+      core: path.resolve(import.meta.dirname, 'src', 'core.ts'),
+      jspsych: path.resolve(import.meta.dirname, 'src', 'jspsych.ts'),
+      react: path.resolve(import.meta.dirname, 'src', 'react.ts'),
+      'react-dom/client': path.resolve(import.meta.dirname, 'src', 'react-dom', 'client.ts'),
+      zod: path.resolve(import.meta.dirname, 'src', 'zod.ts')
     },
     output: [
       {
