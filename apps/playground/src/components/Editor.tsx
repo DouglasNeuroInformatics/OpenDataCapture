@@ -18,7 +18,7 @@ export const Editor = () => {
   const ref = useRef<EditorPaneRef>(null);
   const [selectedExample, setSelectedExample] = useState<ExampleInstrumentData>(defaultExample);
 
-  const { libs } = useRuntime('v0.0.1');
+  const { libs } = useRuntime('v1');
 
   useEffect(() => {
     const monaco = ref.current?.monaco;
