@@ -2,11 +2,8 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "paths": {
-      "@open-data-capture/common/*": ["./packages/common/src/*"]
-    },
     "rootDir": "../.."
   },
   "extends": "../../jsconfig.json",
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*"]
 }

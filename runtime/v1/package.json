@@ -10,17 +10,12 @@
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
-  "peerDependencies": {
-    "@open-data-capture/instrument-interpreter": "workspace:*",
-    "@open-data-capture/schemas": "workspace:*"
-  },
-  "dependencies": {
-    "tslib": "^2.6.2"
-  },
   "devDependencies": {
     "@jspsych/plugin-html-keyboard-response": "^1.1.3",
     "@jspsych/plugin-image-keyboard-response": "^1.1.3",
     "@jspsych/plugin-preload": "^1.1.3",
+    "@open-data-capture/instrument-interpreter": "workspace:*",
+    "@open-data-capture/schemas": "workspace:*",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
