@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@open-data-capture/instrument-transformer": "workspace:*",
-    "@open-data-capture/runtime-v0.0.1": "workspace:*"
+    "@open-data-capture/runtime-v1": "workspace:*"
   },
   "devDependencies": {
     "@open-data-capture/rollup-plugin-instrument": "workspace:*",

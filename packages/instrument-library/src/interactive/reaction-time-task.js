@@ -1,8 +1,8 @@
 const { HtmlKeyboardResponsePlugin, ImageKeyboardResponsePlugin, PreloadPlugin, initJsPsych } = await import(
-  '/runtime/v0.0.1/jspsych.js'
+  '/runtime/v1/jspsych.js'
 );
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { z } = await import('/runtime/v1/zod.js');
 
 const instrumentFactory = new InstrumentFactory({
   kind: 'INTERACTIVE',

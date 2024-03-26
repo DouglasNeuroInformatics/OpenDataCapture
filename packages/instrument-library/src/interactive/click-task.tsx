@@ -1,7 +1,7 @@
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { default: React, useEffect, useRef, useState } = await import('/runtime/v0.0.1/react.js');
-const { createRoot } = await import('/runtime/v0.0.1/react-dom/client.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { default: React, useEffect, useRef, useState } = await import('/runtime/v1/react.js');
+const { createRoot } = await import('/runtime/v1/react-dom/client.js');
+const { z } = await import('/runtime/v1/zod.js');
 
 type ClickTaskProps = { done: (data: { count: number }) => void };
 

@@ -7,7 +7,7 @@
     "moduleResolution": "Bundler",
     "paths": {
       "@/*": ["./src/*"],
-      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/dist/*"]
+      "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     },
     "resolveJsonModule": true
   },

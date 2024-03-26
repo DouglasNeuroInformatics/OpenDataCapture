@@ -196,9 +196,9 @@ importers:
       '@open-data-capture/instrument-transformer':
         specifier: workspace:*
         version: link:../../packages/instrument-transformer
-      '@open-data-capture/runtime-v0.0.1':
+      '@open-data-capture/runtime-v1':
         specifier: workspace:*
-        version: link:../../runtime/v0.0.1
+        version: link:../../runtime/v1
       '@open-data-capture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -472,9 +472,9 @@ importers:
       '@open-data-capture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
-      '@open-data-capture/runtime-v0.0.1':
+      '@open-data-capture/runtime-v1':
         specifier: workspace:*
-        version: link:../../runtime/v0.0.1
+        version: link:../../runtime/v1
       '@open-data-capture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -848,9 +848,9 @@ importers:
       '@open-data-capture/instrument-transformer':
         specifier: workspace:*
         version: link:../instrument-transformer
-      '@open-data-capture/runtime-v0.0.1':
+      '@open-data-capture/runtime-v1':
         specifier: workspace:*
-        version: link:../../runtime/v0.0.1
+        version: link:../../runtime/v1
     devDependencies:
       '@open-data-capture/rollup-plugin-instrument':
         specifier: workspace:*
@@ -891,9 +891,9 @@ importers:
       '@open-data-capture/react-core':
         specifier: workspace:*
         version: link:../react-core
-      '@open-data-capture/runtime-v0.0.1':
+      '@open-data-capture/runtime-v1':
         specifier: workspace:*
-        version: link:../../runtime/v0.0.1
+        version: link:../../runtime/v1
       '@open-data-capture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -1053,9 +1053,9 @@ importers:
 
   packages/runtime-resolve:
     dependencies:
-      '@open-data-capture/runtime-v0.0.1':
+      '@open-data-capture/runtime-v1':
         specifier: workspace:*
-        version: link:../../runtime/v0.0.1
+        version: link:../../runtime/v1
 
   packages/schemas:
     dependencies:
@@ -1110,14 +1110,14 @@ importers:
       '@open-data-capture/runtime-resolve':
         specifier: workspace:*
         version: link:../runtime-resolve
-      '@open-data-capture/runtime-v0.0.1':
+      '@open-data-capture/runtime-v1':
         specifier: workspace:*
-        version: link:../../runtime/v0.0.1
+        version: link:../../runtime/v1
       vite:
         specifier: 5.x
         version: 5.1.6(@types/node@20.11.26)
 
-  runtime/v0.0.1:
+  runtime/v1:
     dependencies:
       '@open-data-capture/instrument-interpreter':
         specifier: workspace:*

@@ -1,5 +1,5 @@
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { z } = await import('/runtime/v1/zod.js');
 
 const instrumentFactory = new InstrumentFactory({
   kind: 'INTERACTIVE',
@@ -211,7 +211,7 @@ export default instrumentFactory.defineInstrument({
       kind: 'computed',
       label: 'Time Elapsed',
       value(data) {
-        return data.timeElapsed +  'ms';
+        return data.timeElapsed + 'ms';
       }
     },
     win: {

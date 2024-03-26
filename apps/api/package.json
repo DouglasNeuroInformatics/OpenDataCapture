@@ -35,7 +35,7 @@
     "@open-data-capture/instrument-interpreter": "workspace:*",
     "@open-data-capture/instrument-library": "workspace:*",
     "@open-data-capture/instrument-transformer": "workspace:*",
-    "@open-data-capture/runtime-v0.0.1": "workspace:*",
+    "@open-data-capture/runtime-v1": "workspace:*",
     "@open-data-capture/schemas": "workspace:*",
     "@open-data-capture/stats": "workspace:*",
     "axios": "^1.6.7",

@@ -36,7 +36,7 @@ export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps
       data-bundle={bundle}
       name="interactive-instrument"
       ref={ref}
-      srcDoc='<script src="/runtime/v0.0.1/_internal/bootstrap.js" type="module"></script>'
+      srcDoc='<script src="/runtime/v1/_internal/bootstrap.js" type="module"></script>'
       title="Open Data Capture - Interactive Instrument"
       onLoad={(event) => {
         const contentWindow: Window | null = event.currentTarget.contentWindow;

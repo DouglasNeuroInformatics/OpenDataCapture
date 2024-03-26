@@ -1,9 +1,9 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { z } = await import('/runtime/v1/zod.js');
 
-type Language = Extract<import('/runtime/v0.0.1/core.js').InstrumentLanguage, string>;
+type Language = Extract<import('/runtime/v1/core.js').InstrumentLanguage, string>;
 
 type MultilingualOptions = { [key: string]: { [L in Language]: string } };
 

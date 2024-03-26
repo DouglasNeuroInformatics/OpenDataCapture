@@ -9,6 +9,6 @@
     "lint": "eslint --fix src"
   },
   "peerDependencies": {
-    "@open-data-capture/runtime-v0.0.1": "workspace:*"
+    "@open-data-capture/runtime-v1": "workspace:*"
   }
 }

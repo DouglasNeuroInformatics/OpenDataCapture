@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     alias: {
-      '/runtime/v0.0.1': path.resolve(import.meta.dirname, '../../runtime/v0.0.1/dist')
+      '/runtime/v1': path.resolve(import.meta.dirname, '../../runtime/v1/dist')
     },
     coverage: {
       include: ['src/**/*'],

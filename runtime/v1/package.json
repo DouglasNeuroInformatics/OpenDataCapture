@@ -1,7 +1,7 @@
 {
-  "name": "@open-data-capture/runtime-v0.0.1",
+  "name": "@open-data-capture/runtime-v1",
   "type": "module",
-  "version": "0.0.0",
+  "version": "1.0.0-beta.0",
   "license": "AGPL-3.0",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,6 +13,9 @@
   "peerDependencies": {
     "@open-data-capture/instrument-interpreter": "workspace:*",
     "@open-data-capture/schemas": "workspace:*"
+  },
+  "dependencies": {
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
     "@jspsych/plugin-html-keyboard-response": "^1.1.3",
@@ -32,8 +35,5 @@
     "rollup": "^4.13.0",
     "rollup-plugin-dts": "^6.1.0",
     "zod": "^3.22.4"
-  },
-  "dependencies": {
-    "tslib": "^2.6.2"
   }
 }

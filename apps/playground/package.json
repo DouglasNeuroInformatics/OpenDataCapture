@@ -25,7 +25,7 @@
     "@open-data-capture/instrument-renderer": "workspace:*",
     "@open-data-capture/instrument-transformer": "workspace:*",
     "@open-data-capture/react-core": "workspace:*",
-    "@open-data-capture/runtime-v0.0.1": "workspace:*",
+    "@open-data-capture/runtime-v1": "workspace:*",
     "@open-data-capture/schemas": "workspace:*",
     "axios": "^1.6.7",
     "esbuild-wasm": "^0.20.1",

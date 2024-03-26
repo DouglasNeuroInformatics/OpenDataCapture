@@ -1,8 +1,8 @@
 /* eslint-disable perfectionist/sort-object-types */
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { z } = await import('/runtime/v1/zod.js');
 
 const instrumentFactory = new InstrumentFactory({
   kind: 'FORM',

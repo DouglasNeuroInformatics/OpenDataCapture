@@ -4,7 +4,7 @@
     "jsx": "preserve",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "paths": {
-      "/runtime/v0.0.1/*": ["../../runtime/v0.0.1/dist/*"]
+      "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     }
   },
   "include": ["src"]
