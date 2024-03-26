@@ -33,7 +33,9 @@ export default defineConfig([
       plugins: MODE === 'production' ? [terser()] : undefined
     },
     plugins: [
-      commonjs(),
+      commonjs({
+        exclude: ['**/*/jquery.js']
+      }),
       resolve({
         browser: true,
         extensions: ['.js', '.ts'],
