@@ -19,7 +19,8 @@
     "@types/lodash": "^4.14.202",
     "i18next": "23.x",
     "react": "18.x",
-    "react-dom": "18.x"
+    "react-dom": "18.x",
+    "tailwindcss": "3.x"
   },
   "dependencies": {
     "@douglasneuroinformatics/libui": "^2.0.0-beta.3",
