@@ -1,16 +1,10 @@
 const { HtmlKeyboardResponsePlugin, ImageKeyboardResponsePlugin, PreloadPlugin, initJsPsych } = await import(
   '/runtime/v1/jspsych.js'
 );
-const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
-  kind: 'INTERACTIVE',
-  language: 'en',
-  validationSchema: z.any()
-});
-
-export default instrumentFactory.defineInstrument({
+export default defineInstrument({
   content: {
     assets: {
       css: [import.meta.injectStylesheet('jspsych/css/jspsych.css')],
@@ -137,7 +131,10 @@ export default instrumentFactory.defineInstrument({
     license: 'MIT',
     title: 'Reaction Time Task'
   },
+  kind: 'INTERACTIVE',
+  language: 'en',
   name: 'ReactionTimeTask',
   tags: ['Interactive'],
+  validationSchema: z.any(),
   version: 1.0
 });

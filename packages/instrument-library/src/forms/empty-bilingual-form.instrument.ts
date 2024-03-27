@@ -1,15 +1,11 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  validationSchema: z.object({})
-});
-
-export default instrumentFactory.defineInstrument({
   name: ' ',
   tags: {
     en: [],
@@ -32,5 +28,6 @@ export default instrumentFactory.defineInstrument({
       en: ' ',
       fr: ' '
     }
-  }
+  },
+  validationSchema: z.object({})
 });

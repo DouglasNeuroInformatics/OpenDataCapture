@@ -1,26 +1,11 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: 'en',
-  validationSchema: z.object({
-    developerHappiness: z.number().min(0).max(10),
-    reasonForSadness: z.string().optional(),
-    recentCommits: z.array(
-      z.object({
-        id: z.string(),
-        commitDescription: z.string(),
-        isMerged: z.boolean(),
-        dateOfMerge: z.date().optional()
-      })
-    )
-  })
-});
-
-export default instrumentFactory.defineInstrument({
   name: 'TestInstrument',
   tags: ['Well-Being'],
   version: 1.1,
@@ -73,5 +58,17 @@ export default instrumentFactory.defineInstrument({
         commitDescription: { kind: 'string', label: 'Describe the commit', variant: 'input' }
       }
     }
-  }
+  },
+  validationSchema: z.object({
+    developerHappiness: z.number().min(0).max(10),
+    reasonForSadness: z.string().optional(),
+    recentCommits: z.array(
+      z.object({
+        id: z.string(),
+        commitDescription: z.string(),
+        isMerged: z.boolean(),
+        dateOfMerge: z.date().optional()
+      })
+    )
+  })
 });

@@ -1,31 +1,12 @@
 /* eslint-disable perfectionist/sort-object-types */
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: 'en',
-  validationSchema: z.object({
-    binaryCheck: z.boolean(),
-    binaryRadio: z.boolean(),
-    date: z.date(),
-    numericDefault: z.number(),
-    numericSlider: z.number(),
-    optionsField: z.enum(['a', 'b', 'c']),
-    textLong: z.string(),
-    textPassword: z.string(),
-    textShort: z.string(),
-    arrayField: z.array(
-      z.object({
-        name: z.string()
-      })
-    )
-  })
-});
-
-export default instrumentFactory.defineInstrument({
   name: 'GenericInstrument',
   tags: ['Example'],
   version: 1.0,
@@ -99,5 +80,21 @@ export default instrumentFactory.defineInstrument({
     estimatedDuration: 5,
     instructions: ['Please complete all questions'],
     license: 'AGPL-3.0'
-  }
+  },
+  validationSchema: z.object({
+    binaryCheck: z.boolean(),
+    binaryRadio: z.boolean(),
+    date: z.date(),
+    numericDefault: z.number(),
+    numericSlider: z.number(),
+    optionsField: z.enum(['a', 'b', 'c']),
+    textLong: z.string(),
+    textPassword: z.string(),
+    textShort: z.string(),
+    arrayField: z.array(
+      z.object({
+        name: z.string()
+      })
+    )
+  })
 });

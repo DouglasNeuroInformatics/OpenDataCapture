@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
 type Language = Extract<import('/runtime/v1/core.js').InstrumentLanguage, string>;
@@ -590,31 +590,9 @@ const yesNoOptions = /** @type {const} */ {
   }
 };
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  validationSchema: z
-    .object({
-      ageAtImmigration: z.number().int().gte(1).lte(100),
-      annualIncome: z.number().int().gte(0).lte(1000000),
-      employmentStatus: z.enum(extractKeysAsTuple(employmentStatus)),
-      ethnicOrigin: z.enum(extractKeysAsTuple(ethnicOrigin)),
-      firstLanguage: z.enum(extractKeysAsTuple(firstLanguage)),
-      gender: z.enum(extractKeysAsTuple(gender)),
-      householdSize: z.number().int().gte(0).lte(20),
-      isCanadianCitizen: z.boolean(),
-      maritalStatus: z.enum(extractKeysAsTuple(maritalStatus)),
-      numberChildren: z.number().int().gte(0).lte(20),
-      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
-      religion: z.enum(extractKeysAsTuple(religion)),
-      speaksEnglish: z.boolean(),
-      speaksFrench: z.boolean(),
-      yearsOfEducation: z.number().int().gte(0).lte(30)
-    })
-    .partial()
-});
-
-export default instrumentFactory.defineInstrument({
   name: 'EnhancedDemographicsQuestionnaire',
   tags: {
     en: ['Demographics'],
@@ -829,5 +807,24 @@ export default instrumentFactory.defineInstrument({
       en: 'Enhanced Demographics Questionnaire',
       fr: 'Questionnaire démographique détaillé'
     }
-  }
+  },
+  validationSchema: z
+    .object({
+      ageAtImmigration: z.number().int().gte(1).lte(100),
+      annualIncome: z.number().int().gte(0).lte(1000000),
+      employmentStatus: z.enum(extractKeysAsTuple(employmentStatus)),
+      ethnicOrigin: z.enum(extractKeysAsTuple(ethnicOrigin)),
+      firstLanguage: z.enum(extractKeysAsTuple(firstLanguage)),
+      gender: z.enum(extractKeysAsTuple(gender)),
+      householdSize: z.number().int().gte(0).lte(20),
+      isCanadianCitizen: z.boolean(),
+      maritalStatus: z.enum(extractKeysAsTuple(maritalStatus)),
+      numberChildren: z.number().int().gte(0).lte(20),
+      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
+      religion: z.enum(extractKeysAsTuple(religion)),
+      speaksEnglish: z.boolean(),
+      speaksFrench: z.boolean(),
+      yearsOfEducation: z.number().int().gte(0).lte(30)
+    })
+    .partial()
 });

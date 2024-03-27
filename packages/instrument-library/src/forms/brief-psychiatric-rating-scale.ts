@@ -1,34 +1,11 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: 'en',
-  validationSchema: z.object({
-    somaticConcern: z.number().int().min(0).max(7),
-    anxiety: z.number().int().min(0).max(7),
-    emotionalWithdrawal: z.number().int().min(0).max(7),
-    conceptualDisorganization: z.number().int().min(0).max(7),
-    guiltFeelings: z.number().int().min(0).max(7),
-    tension: z.number().int().min(0).max(7),
-    mannerismsAndPosturing: z.number().int().min(0).max(7),
-    grandiosity: z.number().int().min(0).max(7),
-    depressiveMood: z.number().int().min(0).max(7),
-    hostility: z.number().int().min(0).max(7),
-    suspiciousness: z.number().int().min(0).max(7),
-    hallucinatoryBehavior: z.number().int().min(0).max(7),
-    motorRetardation: z.number().int().min(0).max(7),
-    uncooperativeness: z.number().int().min(0).max(7),
-    unusualThoughtContent: z.number().int().min(0).max(7),
-    bluntedAffect: z.number().int().min(0).max(7),
-    excitement: z.number().int().min(0).max(7),
-    disorientation: z.number().int().min(0).max(7)
-  })
-});
-
-export default instrumentFactory.defineInstrument({
   name: 'BriefPsychiatricRatingScale',
   tags: ['Schizophrenia', 'Psychosis'],
   version: 1,
@@ -220,5 +197,25 @@ export default instrumentFactory.defineInstrument({
         return sum;
       }
     }
-  }
+  },
+  validationSchema: z.object({
+    somaticConcern: z.number().int().min(0).max(7),
+    anxiety: z.number().int().min(0).max(7),
+    emotionalWithdrawal: z.number().int().min(0).max(7),
+    conceptualDisorganization: z.number().int().min(0).max(7),
+    guiltFeelings: z.number().int().min(0).max(7),
+    tension: z.number().int().min(0).max(7),
+    mannerismsAndPosturing: z.number().int().min(0).max(7),
+    grandiosity: z.number().int().min(0).max(7),
+    depressiveMood: z.number().int().min(0).max(7),
+    hostility: z.number().int().min(0).max(7),
+    suspiciousness: z.number().int().min(0).max(7),
+    hallucinatoryBehavior: z.number().int().min(0).max(7),
+    motorRetardation: z.number().int().min(0).max(7),
+    uncooperativeness: z.number().int().min(0).max(7),
+    unusualThoughtContent: z.number().int().min(0).max(7),
+    bluntedAffect: z.number().int().min(0).max(7),
+    excitement: z.number().int().min(0).max(7),
+    disorientation: z.number().int().min(0).max(7)
+  })
 });

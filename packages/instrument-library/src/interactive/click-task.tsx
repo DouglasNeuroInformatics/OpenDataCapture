@@ -1,4 +1,4 @@
-const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
 const { default: React, useEffect, useRef, useState } = await import('/runtime/v1/react.js');
 const { createRoot } = await import('/runtime/v1/react-dom/client.js');
 const { z } = await import('/runtime/v1/zod.js');
@@ -44,15 +44,7 @@ const ClickTask = ({ done }: ClickTaskProps) => {
   );
 };
 
-const instrumentFactory = new InstrumentFactory({
-  kind: 'INTERACTIVE',
-  language: 'en',
-  validationSchema: z.object({
-    count: z.number().int()
-  })
-});
-
-export default instrumentFactory.defineInstrument({
+export default defineInstrument({
   content: {
     render(done) {
       const rootElement = document.createElement('div');
@@ -70,6 +62,8 @@ export default instrumentFactory.defineInstrument({
     license: 'AGPL-3.0',
     title: 'Click Task'
   },
+  kind: 'INTERACTIVE',
+  language: 'en',
   measures: {
     count: {
       kind: 'const',
@@ -79,5 +73,8 @@ export default instrumentFactory.defineInstrument({
   },
   name: 'InteractiveInstrument',
   tags: ['Interactive'],
+  validationSchema: z.object({
+    count: z.number().int()
+  }),
   version: 1.0
 });

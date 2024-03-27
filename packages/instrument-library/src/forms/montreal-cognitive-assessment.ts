@@ -1,24 +1,11 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v1/core.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  validationSchema: z.object({
-    abstraction: z.number().int().gte(0).lte(2),
-    attention: z.number().int().gte(0).lte(6),
-    delayedRecall: z.number().int().gte(0).lte(5),
-    language: z.number().int().gte(0).lte(3),
-    lowEdu: z.boolean(),
-    naming: z.number().int().gte(0).lte(3),
-    orientation: z.number().int().gte(0).lte(6),
-    visuospatialExecutive: z.number().int().gte(0).lte(5)
-  })
-});
-
-export default instrumentFactory.defineInstrument({
   name: 'MontrealCognitiveAssessment',
   tags: {
     en: ['Cognitive'],
@@ -174,5 +161,15 @@ export default instrumentFactory.defineInstrument({
       kind: 'const',
       ref: 'visuospatialExecutive'
     }
-  }
+  },
+  validationSchema: z.object({
+    abstraction: z.number().int().gte(0).lte(2),
+    attention: z.number().int().gte(0).lte(6),
+    delayedRecall: z.number().int().gte(0).lte(5),
+    language: z.number().int().gte(0).lte(3),
+    lowEdu: z.boolean(),
+    naming: z.number().int().gte(0).lte(3),
+    orientation: z.number().int().gte(0).lte(6),
+    visuospatialExecutive: z.number().int().gte(0).lte(5)
+  })
 });
