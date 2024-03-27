@@ -974,9 +974,6 @@ importers:
         specifier: ^5.0.8
         version: 5.0.8
     devDependencies:
-      '@opendatacapture/instrument-library':
-        specifier: workspace:*
-        version: link:../instrument-library
       '@types/lodash-es':
         specifier: ^4.17.0
         version: 4.17.12

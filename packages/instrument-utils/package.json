@@ -17,7 +17,6 @@
     "ts-pattern": "^5.0.8"
   },
   "devDependencies": {
-    "@opendatacapture/instrument-library": "workspace:*",
     "@types/lodash-es": "^4.17.0"
   }
 }
