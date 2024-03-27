@@ -482,8 +482,8 @@ importers:
         specifier: ^1.6.7
         version: 1.6.7(debug@4.3.4)
       esbuild-wasm:
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       framer-motion:
         specifier: ^10.18.0
         version: 10.18.0(react-dom@18.2.0)(react@18.2.0)
@@ -922,9 +922,9 @@ importers:
         specifier: ^5.0.8
         version: 5.0.8
     devDependencies:
-      '@opendatacapture/instrument-library':
+      '@opendatacapture/instrument-stubs':
         specifier: workspace:*
-        version: link:../instrument-library
+        version: link:../instrument-stubs
       '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../tailwindcss
@@ -943,6 +943,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.18
         version: 10.4.18(postcss@8.4.35)
+      esbuild-wasm:
+        specifier: ^0.20.2
+        version: 0.20.2
       postcss:
         specifier: ^8.4.35
         version: 8.4.35
@@ -971,8 +974,8 @@ importers:
         specifier: ^0.20.1
         version: 0.20.1
       esbuild-wasm:
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       zod:
         specifier: ^3.22.4
         version: 3.22.4
@@ -12337,12 +12340,11 @@ packages:
       - supports-color
     dev: true
 
-  /esbuild-wasm@0.20.1:
+  /esbuild-wasm@0.20.2:
     resolution:
-      { integrity: sha512-6v/WJubRsjxBbQdz6izgvx7LsVFvVaGmSdwrFHmEzoVgfXL89hkKPoQHsnVI2ngOkcBUQT9kmAM1hVL1k/Av4A== }
+      { integrity: sha512-7o6nmsEqlcXJXMNqnx5K+M4w4OPx7yTFXQHcJyeP3SkXb8p2T8N9E1ayK4vd/qDBepH6fuPoZwiFvZm8x5qv+w== }
     engines: { node: '>=12' }
     hasBin: true
-    dev: false
 
   /esbuild@0.18.20:
     resolution:

@@ -28,7 +28,7 @@
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "axios": "^1.6.7",
-    "esbuild-wasm": "^0.20.1",
+    "esbuild-wasm": "^0.20.2",
     "framer-motion": "^10.18.0",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.363.0",

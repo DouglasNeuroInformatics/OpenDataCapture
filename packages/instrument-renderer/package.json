@@ -40,13 +40,14 @@
     "ts-pattern": "^5.0.8"
   },
   "devDependencies": {
-    "@opendatacapture/instrument-library": "workspace:*",
+    "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/tailwindcss": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@types/lodash": "^4.17.0",
     "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.21",
     "autoprefixer": "^10.4.18",
+    "esbuild-wasm": "^0.20.2",
     "postcss": "^8.4.35",
     "vite": "^5.1.6"
   }

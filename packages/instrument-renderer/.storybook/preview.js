@@ -1,10 +1,17 @@
-// @ts-check
+/// @ts-check
+/// <reference types="vite/client" />
 
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import * as esbuild from 'esbuild-wasm';
+import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
 import i18n from '../src/services/i18n';
 
 import '@douglasneuroinformatics/libui/styles/globals.css';
+
+await esbuild.initialize({
+  wasmURL: esbuildWasmUrl
+});
 
 /** @type {import('@storybook/react').Preview} */
 const preview = {
