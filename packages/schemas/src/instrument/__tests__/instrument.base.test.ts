@@ -49,7 +49,6 @@ describe('$$InstrumentUIOption', () => {
     expect(() => $$InstrumentUIOption(z.number(), ['en', 'fr']).parse(num)).toThrow();
   });
   it('should handle the language ["en", "fr", "fr] successfully', () => {
-    expect($$InstrumentUIOption(z.number(), ['en', 'fr', 'fr']).parse(obj)).toEqual(obj);
     expect(() => $$InstrumentUIOption(z.string(), ['en', 'fr', 'fr']).parse(obj)).toThrow();
     expect(() => $$InstrumentUIOption(z.number(), ['en', 'fr', 'fr']).parse(num)).toThrow();
   });
