@@ -41,6 +41,7 @@ export type InstrumentDef<
   TLanguage extends InstrumentLanguage
 > = Omit<DiscriminatedInstrument<TKind, TData, TLanguage, { strict: true }>, 'kind' | 'language' | 'validationSchema'>;
 
+/** @deprecated use `defineInstrument` */
 export class InstrumentFactory<
   TKind extends InstrumentKind,
   TLanguage extends InstrumentLanguage,
@@ -51,6 +52,20 @@ export class InstrumentFactory<
   defineInstrument(def: InstrumentDef<TKind, z.infer<TSchema>, TLanguage>) {
     return { ...this.options, ...def };
   }
+}
+
+export function defineInstrument<
+  TKind extends InstrumentKind,
+  TLanguage extends InstrumentLanguage,
+  TSchema extends z.ZodType<DiscriminatedInstrumentData<TKind>>
+>(
+  def: { kind: TKind; language: TLanguage; validationSchema: TSchema } & InstrumentDef<
+    TKind,
+    z.infer<TSchema>,
+    TLanguage
+  >
+) {
+  return def;
 }
 
 export type { InstrumentKind, InstrumentLanguage, InteractiveInstrument, StrictFormInstrument };
