@@ -1,6 +1,6 @@
+import { INTERACTIVE_INSTRUMENT } from '@opendatacapture/instrument-stubs/interactive';
 import { describe, expect, it } from 'vitest';
 
-import { INTERACTIVE_INSTRUMENT } from '../__stubs__/interactive-instrument.stubs.js';
 import { $InteractiveInstrument } from '../instrument.interactive.js';
 
 describe('$InteractiveInstrument', () => {

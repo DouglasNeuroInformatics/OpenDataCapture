@@ -1,7 +1,7 @@
+import { BILINGUAL_FORM_INSTRUMENT, UNILINGUAL_FORM_INSTRUMENT } from '@opendatacapture/instrument-stubs/forms';
+import { INTERACTIVE_INSTRUMENT } from '@opendatacapture/instrument-stubs/interactive';
 import { describe, expect, it } from 'vitest';
 
-import { BILINGUAL_FORM_INSTRUMENT, UNILINGUAL_FORM_INSTRUMENT } from '../__stubs__/form-instrument.stubs.js';
-import { INTERACTIVE_INSTRUMENT } from '../__stubs__/interactive-instrument.stubs.js';
 import { $AnyInstrument } from '../instrument.core.js';
 
 describe('$AnyInstrument', () => {

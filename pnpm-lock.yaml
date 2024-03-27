@@ -1090,6 +1090,9 @@ importers:
       '@opendatacapture/database':
         specifier: workspace:*
         version: link:../database
+      '@opendatacapture/instrument-stubs':
+        specifier: workspace:*
+        version: link:../instrument-stubs
 
   packages/stats: {}
 

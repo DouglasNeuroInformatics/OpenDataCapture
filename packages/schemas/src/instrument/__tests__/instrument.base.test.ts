@@ -1,7 +1,7 @@
+import { BILINGUAL_FORM_INSTRUMENT, UNILINGUAL_FORM_INSTRUMENT } from '@opendatacapture/instrument-stubs/forms';
 import { describe, expect, it, test } from 'vitest';
 import { z } from 'zod';
 
-import { BILINGUAL_FORM_INSTRUMENT, UNILINGUAL_FORM_INSTRUMENT } from '../__stubs__/form-instrument.stubs.js';
 import {
   $$InstrumentUIOption,
   $BaseInstrument,
