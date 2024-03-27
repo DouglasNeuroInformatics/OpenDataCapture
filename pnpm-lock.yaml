@@ -947,6 +947,18 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6(@types/node@20.11.26)
 
+  packages/instrument-stubs:
+    dependencies:
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.3.0
+        version: 0.3.0(typescript@5.3.3)
+      '@opendatacapture/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+
   packages/instrument-transformer:
     dependencies:
       esbuild:

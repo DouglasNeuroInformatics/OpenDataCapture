@@ -1,0 +1,18 @@
+{
+  "name": "@opendatacapture/instrument-stubs",
+  "type": "module",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/libjs": "^0.3.0",
+    "@opendatacapture/schemas": "workspace:*",
+    "zod": "^3.22.4"
+  }
+}
