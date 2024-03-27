@@ -5,7 +5,8 @@
 
 /**
  * The reason for this copy-paste declaration is to avoid polluting the global namespace
- * with ancient jQuery types, which also breaks rollup-plugin-dts.
+ * with ancient jQuery types, which also breaks rollup-plugin-dts. Instead, consumers need
+ * to explicitly import 'jquery-1.12.4' to access these variables.
  */
 
 /* *****************************************************************************
