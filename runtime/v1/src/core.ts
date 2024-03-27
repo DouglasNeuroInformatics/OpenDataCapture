@@ -10,13 +10,13 @@ import type {
 
 import { z } from './zod';
 
-export type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['FORM']
+type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['FORM']
   ? FormDataType
   : [TKind] extends ['INTERACTIVE']
     ? Json
     : never;
 
-export type DiscriminatedInstrument<
+type DiscriminatedInstrument<
   TKind extends InstrumentKind,
   TData extends DiscriminatedInstrumentData<TKind>,
   TLanguage extends InstrumentLanguage,
@@ -35,7 +35,7 @@ export type DiscriminatedInstrument<
       : never
     : never;
 
-export type InstrumentDef<
+type InstrumentDef<
   TKind extends InstrumentKind,
   TData extends DiscriminatedInstrumentData<TKind>,
   TLanguage extends InstrumentLanguage
