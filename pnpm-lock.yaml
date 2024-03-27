@@ -955,6 +955,9 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.3.3)
+      '@opendatacapture/instrument-transformer':
+        specifier: workspace:*
+        version: link:../instrument-transformer
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas

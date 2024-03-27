@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
+    "@opendatacapture/instrument-transformer": "workspace:*",
     "zod": "^3.22.4"
   }
 }

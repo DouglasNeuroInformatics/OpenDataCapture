@@ -1,4 +1,4 @@
-import { BILINGUAL_FORM_INSTRUMENT, UNILINGUAL_FORM_INSTRUMENT } from '@opendatacapture/instrument-stubs/forms';
+import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { describe, expect, it, test } from 'vitest';
 import { z } from 'zod';
 
@@ -67,27 +67,27 @@ describe('$$InstrumentUIOption', () => {
 
 describe('$BaseInstrumentDetails', () => {
   it('should handle unilingual details', () => {
-    expect($BaseInstrumentDetails.safeParse(UNILINGUAL_FORM_INSTRUMENT.details).success).toBe(true);
+    expect($BaseInstrumentDetails.safeParse(unilingualFormInstrument.instance.details).success).toBe(true);
   });
   it('should handle multilingual details', () => {
-    expect($BaseInstrumentDetails.safeParse(BILINGUAL_FORM_INSTRUMENT.details).success).toBe(true);
+    expect($BaseInstrumentDetails.safeParse(bilingualFormInstrument.instance.details).success).toBe(true);
   });
 });
 
 describe('$EnhancedBaseInstrumentDetails', () => {
   it('should handle unilingual details', () => {
-    expect($EnhancedBaseInstrumentDetails.safeParse(UNILINGUAL_FORM_INSTRUMENT.details).success).toBe(true);
+    expect($EnhancedBaseInstrumentDetails.safeParse(unilingualFormInstrument.instance.details).success).toBe(true);
   });
   it('should handle multilingual details', () => {
-    expect($EnhancedBaseInstrumentDetails.safeParse(BILINGUAL_FORM_INSTRUMENT.details).success).toBe(true);
+    expect($EnhancedBaseInstrumentDetails.safeParse(bilingualFormInstrument.instance.details).success).toBe(true);
   });
 });
 
 describe('$BaseInstrument', () => {
   it('should handle a unilingual form', () => {
-    expect($BaseInstrument.safeParse(UNILINGUAL_FORM_INSTRUMENT).success).toBe(true);
+    expect($BaseInstrument.safeParse(unilingualFormInstrument.instance).success).toBe(true);
   });
   it('should handle a multilingual form', () => {
-    expect($BaseInstrument.safeParse(BILINGUAL_FORM_INSTRUMENT).success).toBe(true);
+    expect($BaseInstrument.safeParse(bilingualFormInstrument.instance).success).toBe(true);
   });
 });
