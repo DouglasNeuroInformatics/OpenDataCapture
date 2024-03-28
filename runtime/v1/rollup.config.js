@@ -38,7 +38,8 @@ export default defineConfig([
       format: 'es',
       generatedCode: 'es2015',
       interop: 'auto',
-      plugins: MODE === 'production' ? [terser()] : undefined
+      plugins: [terser()],
+      sourcemap: true
     },
     plugins: [
       commonjs({
