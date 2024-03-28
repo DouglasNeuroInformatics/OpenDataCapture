@@ -1,3 +1,5 @@
+import React from 'react';
+
 export type InstrumentOverviewItemProps = {
   afterText?: React.ReactNode;
   heading: string;

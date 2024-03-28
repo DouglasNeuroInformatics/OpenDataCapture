@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
 import { $Json, type Json } from '@opendatacapture/schemas/core';

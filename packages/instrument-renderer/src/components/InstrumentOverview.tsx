@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Button, Popover } from '@douglasneuroinformatics/libui/components';
 import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';

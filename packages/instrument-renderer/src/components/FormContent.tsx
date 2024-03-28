@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
 import type { FormDataType } from '@douglasneuroinformatics/libui-form-types';
