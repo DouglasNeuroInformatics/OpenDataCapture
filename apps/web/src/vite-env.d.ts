@@ -3,7 +3,6 @@
 /// <reference lib="dom.iterable" />
 /// <reference types="vite/client" />
 /// <reference types="@opendatacapture/i18next/client" />
-/// <reference types="@opendatacapture/instrument-renderer/client" />
 
 // All of these should be undefined in production
 interface ImportMetaDevEnv {

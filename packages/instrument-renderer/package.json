@@ -6,9 +6,6 @@
   "license": "AGPL-3.0",
   "exports": {
     ".": "./src/index.ts",
-    "./client": {
-      "types": "./src/client.d.ts"
-    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -31,7 +28,6 @@
     "@opendatacapture/instrument-utils": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
-    "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "framer-motion": "^11.0.12",
     "i18next": "^23.10.1",
