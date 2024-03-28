@@ -21,7 +21,6 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
     "@douglasneuroinformatics/libui": "^2.0.0-beta.2",
-    "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
