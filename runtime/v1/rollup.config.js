@@ -21,6 +21,10 @@ export default defineConfig([
         import.meta.dirname,
         'src/@opendatacapture/instrument-renderer.ts'
       ),
+      '@opendatacapture/instrument-transformer': path.resolve(
+        import.meta.dirname,
+        'src/@opendatacapture/instrument-transformer.ts'
+      ),
       '_internal/bootstrap': path.resolve(import.meta.dirname, 'src', '_internal', 'bootstrap.ts'),
       '_legacy/jquery-1.12.4': path.resolve(import.meta.dirname, 'src', '_legacy', 'jquery-1.12.4.js'),
       core: path.resolve(import.meta.dirname, 'src', 'core.ts'),
@@ -58,6 +62,10 @@ export default defineConfig([
       '@opendatacapture/instrument-renderer': path.resolve(
         import.meta.dirname,
         'src/@opendatacapture/instrument-renderer.ts'
+      ),
+      '@opendatacapture/instrument-transformer': path.resolve(
+        import.meta.dirname,
+        'src/@opendatacapture/instrument-transformer.ts'
       ),
       '_legacy/jquery-1.12.4': path.resolve(import.meta.dirname, 'src', '_legacy', 'jquery-1.12.4.d.ts'),
       core: path.resolve(import.meta.dirname, 'src', 'core.ts'),

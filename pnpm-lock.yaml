@@ -1146,6 +1146,9 @@ importers:
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
+      '@opendatacapture/instrument-transformer':
+        specifier: workspace:*
+        version: link:../../packages/instrument-transformer
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
