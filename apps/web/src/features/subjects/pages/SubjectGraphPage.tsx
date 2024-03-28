@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
+import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { Button, Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui/legacy';
-import downloadjs from 'downloadjs';
 import html2canvas from 'html2canvas';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -17,6 +17,7 @@ import { useLinearModelQuery } from '../hooks/useLinearModelQuery';
 import { useMeasureOptions } from '../hooks/useMeasureOptions';
 
 export const SubjectGraphPage = () => {
+  const downloadCanvas = useDownload();
   const { currentGroup } = useAuthStore();
   const params = useParams();
   const { instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
@@ -62,25 +63,14 @@ export const SubjectGraphPage = () => {
         element.prepend(graphDesc);
       }
     });
-
-    const dataURL = canvas.toDataURL('image/png');
-    const blobCanvas = canvas.toBlob((blob) => {
-      const newImg = document.createElement('img');
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-
-      newImg.onload = () => {
-        // no longer need to read the blob so it's revoked
-        URL.revokeObjectURL(url);
-      };
-
-      newImg.src = url;
-      document.body.appendChild(newImg);
+    const blobCanvas = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) return reject(new Error('blob does not exist'));
+        return resolve(blob);
+      });
     });
 
-    downloadjs(dataURL, `${params.subjectId!.slice(0, 7)}.png`, 'image/png');
-
-    // canvas.removeChild(graphDesc);
+    await downloadCanvas(`${params.subjectId!.slice(0, 7)}.png`, () => blobCanvas, { blobType: 'image/png' });
   };
 
   return (
