@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { XMarkIcon } from '@heroicons/react/24/outline';
