@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { InstrumentTransformer } from '@opendatacapture/instrument-transformer';
+import { InstrumentTransformer } from '@opendatacapture/instrument-transformer/browser';
 import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';

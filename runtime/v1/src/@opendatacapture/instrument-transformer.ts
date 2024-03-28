@@ -1,1 +1,1 @@
-export * from '@opendatacapture/instrument-transformer';
+export * from '@opendatacapture/instrument-transformer/browser';
