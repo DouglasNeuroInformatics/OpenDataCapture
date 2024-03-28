@@ -25,7 +25,10 @@ export class InstrumentInterpreter {
     this.transformBundle = options?.transformBundle;
   }
 
-  async interpret<TKind extends InstrumentKind>(bundle: string, options?: InterpretOptions<TKind>) {
+  async interpret<TKind extends InstrumentKind>(
+    bundle: string,
+    options?: InterpretOptions<TKind>
+  ): Promise<Extract<AnyInstrument, { kind: TKind }>> {
     let instrument: AnyInstrument;
     try {
       bundle = (await this.transformBundle?.(bundle)) ?? bundle;
