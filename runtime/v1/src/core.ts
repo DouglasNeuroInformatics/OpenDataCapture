@@ -49,7 +49,7 @@ export class InstrumentFactory<
 > {
   constructor(private options: { kind: TKind; language: TLanguage; validationSchema: TSchema }) {}
 
-  defineInstrument(def: InstrumentDef<TKind, z.infer<TSchema>, TLanguage>) {
+  defineInstrument(def: InstrumentDef<TKind, z.TypeOf<TSchema>, TLanguage>) {
     return { ...this.options, ...def };
   }
 }
@@ -61,7 +61,7 @@ export function defineInstrument<
 >(
   def: { kind: TKind; language: TLanguage; validationSchema: TSchema } & InstrumentDef<
     TKind,
-    z.infer<TSchema>,
+    z.TypeOf<TSchema>,
     TLanguage
   >
 ) {
