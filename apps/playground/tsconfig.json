@@ -3,7 +3,7 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
-    "jsx": "react-jsx",
+    "jsx": "react",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {

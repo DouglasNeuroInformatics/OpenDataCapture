@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useInterval, useMediaQuery } from '@douglasneuroinformatics/libui/hooks';

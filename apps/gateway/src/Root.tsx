@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { NotificationHub } from '@douglasneuroinformatics/ui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
 import { BaseLanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';

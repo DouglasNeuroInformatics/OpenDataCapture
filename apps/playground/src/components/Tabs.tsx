@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { cn } from '@douglasneuroinformatics/libui/utils';
 
 export type TabsProps<T extends string> = {

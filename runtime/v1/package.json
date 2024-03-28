@@ -31,6 +31,7 @@
     "@jspsych/plugin-image-keyboard-response": "^1.1.3",
     "@jspsych/plugin-preload": "^1.1.3",
     "@opendatacapture/instrument-interpreter": "workspace:*",
+    "@opendatacapture/instrument-renderer": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",

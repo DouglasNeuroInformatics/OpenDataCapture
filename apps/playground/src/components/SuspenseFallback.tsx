@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { LoadingScreen } from '@opendatacapture/react-core';
 
 export const SuspenseFallback = () => {
