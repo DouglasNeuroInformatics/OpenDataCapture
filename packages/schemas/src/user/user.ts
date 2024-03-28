@@ -1,10 +1,7 @@
-import type { UserModel } from '@opendatacapture/database/core';
 import { z } from 'zod';
 
 import { $BaseModel } from '../core/core.js';
 import { $Group } from '../group/group.js';
-
-import type { Group } from '../group/group.js';
 
 export const $StrongPassword = z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{12,}$/, {
   message:
@@ -15,7 +12,7 @@ export const $BasePermissionLevel = z.enum(['ADMIN', 'GROUP_MANAGER', 'STANDARD'
 
 export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
 
-export type User = UserModel & { groups: Group[] };
+export type User = z.infer<typeof $User>;
 export const $User = $BaseModel.extend({
   basePermissionLevel: $BasePermissionLevel.nullable(),
   firstName: z.string().min(1),
@@ -24,7 +21,7 @@ export const $User = $BaseModel.extend({
   lastName: z.string().min(1),
   password: z.string().min(1),
   username: z.string().min(1)
-}) satisfies z.ZodType<User>;
+});
 
 export type CreateUserData = z.infer<typeof $CreateUserData>;
 export const $CreateUserData = $User

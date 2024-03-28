@@ -891,9 +891,6 @@ importers:
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../react-core
-      '@opendatacapture/runtime-v1':
-        specifier: workspace:*
-        version: link:../../runtime/v1
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -1093,9 +1090,6 @@ importers:
       '@douglasneuroinformatics/libui-form-types':
         specifier: ^0.6.2
         version: 0.6.2
-      '@opendatacapture/database':
-        specifier: workspace:*
-        version: link:../database
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../instrument-stubs
