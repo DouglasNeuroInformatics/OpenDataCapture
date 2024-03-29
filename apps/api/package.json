@@ -39,7 +39,7 @@
     "@open-data-capture/runtime-v0.0.1": "workspace:*",
     "@open-data-capture/stats": "workspace:*",
     "axios": "^1.6.7",
-    "express": "^4.18.3",
+    "express": "^4.19.2",
     "lodash-es": "^4.17.21",
     "mongodb": "^6.5.0",
     "passport": "^0.7.0",
