@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { Button, Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui/legacy';
 import html2canvas from 'html2canvas';
@@ -61,6 +62,26 @@ export const SubjectGraphPage = () => {
         graphDesc.innerText = instrument!.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
         graphDesc.className = 'p-2 font-semibold text-center';
         element.prepend(graphDesc);
+
+        if (selectedMeasures) {
+          const graphMeasure = document.createElement('div');
+          graphMeasure.innerText = 'Form of Measurement: ' + selectedMeasures[0].label;
+          graphMeasure.className = 'p-2 font-semibold';
+          element.append(graphMeasure);
+        }
+
+        const graphTime = document.createElement('div');
+        if (minDate) {
+          graphTime.innerText = 'Data time frame: ' + toBasicISOString(minDate) + ' - ' + toBasicISOString(new Date());
+
+          graphTime.className = 'p-2 font-semibold';
+          element.append(graphTime);
+        } else {
+          graphTime.innerText = 'Data time frame: All-Time';
+
+          graphTime.className = 'p-2 font-semibold';
+          element.append(graphTime);
+        }
       }
     });
     const blobCanvas = await new Promise<Blob>((resolve, reject) => {
