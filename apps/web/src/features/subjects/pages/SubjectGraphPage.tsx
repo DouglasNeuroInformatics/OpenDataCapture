@@ -110,7 +110,7 @@ export const SubjectGraphPage = () => {
                 disabled={!instrument}
                 label="Download"
                 variant="secondary"
-                onClick={() => handleGraphDownload()}
+                onClick={() => void handleGraphDownload()}
               />
             </div>
           </div>
