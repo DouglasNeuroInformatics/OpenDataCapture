@@ -44,7 +44,7 @@ export const SubjectGraphPage = () => {
 
   const lines = useGraphLines({ selectedMeasures });
 
-  const graphRef = useRef<HTMLDivElement>(null);
+  const graphContainerRef = useRef<HTMLDivElement>(null);
 
   const handleSelectForm = (id: string) => {
     setInstrumentId(id);
@@ -52,9 +52,9 @@ export const SubjectGraphPage = () => {
   };
 
   const handleGraphDownload = async () => {
-    if (!graphRef.current) return;
+    if (!graphContainerRef.current) return;
 
-    const canvas = await html2canvas(graphRef.current, {
+    const canvas = await html2canvas(graphContainerRef.current, {
       onclone: (_, element) => {
         const graphDesc = document.createElement('p');
         graphDesc.innerText = instrument!.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
@@ -138,7 +138,7 @@ export const SubjectGraphPage = () => {
           </div>
         </div>
       </div>
-      <div ref={graphRef}>
+      <div ref={graphContainerRef}>
         <LineGraph
           data={graphData}
           lines={lines}
