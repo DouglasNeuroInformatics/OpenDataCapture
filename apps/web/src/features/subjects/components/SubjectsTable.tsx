@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { useDownload } from '@douglasneuroinformatics/ui/hooks';
-import { ClientTable, Dropdown, SearchBar } from '@douglasneuroinformatics/ui/legacy';
-import type { InstrumentRecordsExport } from '@opendatacapture/common/instrument-records';
-import type { Subject } from '@opendatacapture/common/subject';
+import { LegacyClientTable, LegacyDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
+import { useDownload } from '@douglasneuroinformatics/libui/hooks';
+import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -64,22 +64,20 @@ export const SubjectsTable = () => {
       <SubjectLookup show={showLookup} onClose={handleLookupClose} />
       <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
         <SearchBar
-          size="md"
           onClick={() => {
             setShowLookup(true);
           }}
         />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <Dropdown options={[]} size="sm" title={t('index.table.filters')} onSelection={() => null} />
-          <Dropdown
+          <LegacyDropdown options={[]} title={t('index.table.filters')} onSelection={() => null} />
+          <LegacyDropdown
             options={['CSV', 'JSON']}
-            size="sm"
             title={t('index.table.export')}
             onSelection={handleExportSelection}
           />
         </div>
       </div>
-      <ClientTable<Subject>
+      <LegacyClientTable<Subject>
         columns={[
           {
             field: (subject) => subject.id.slice(0, 7),

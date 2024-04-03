@@ -1,5 +1,5 @@
 import { PencilSquareIcon } from '@heroicons/react/24/solid';
-import type { InstrumentKind } from '@opendatacapture/common/instrument';
+import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 
 import handBrain from '@/assets/hand-brain.png';
 import toolBrain from '@/assets/tool-brain.png';

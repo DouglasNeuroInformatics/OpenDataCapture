@@ -1,6 +1,11 @@
 import { useState } from 'react';
 
-import { Dropdown, LineGraph, SelectDropdown, type SelectOption } from '@douglasneuroinformatics/ui/legacy';
+import {
+  LegacyDropdown,
+  LegacySelectDropdown,
+  type LegacySelectOption,
+  LineGraph
+} from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -23,7 +28,7 @@ export const SubjectGraphPage = () => {
     });
   const { t } = useTranslation(['subjects', 'common']);
   const measureOptions = useMeasureOptions(instrument);
-  const [selectedMeasures, setSelectedMeasures] = useState<SelectOption[]>([]);
+  const [selectedMeasures, setSelectedMeasures] = useState<LegacySelectOption[]>([]);
 
   const linearModelQuery = useLinearModelQuery({
     enabled: Boolean(instrumentId),
@@ -52,16 +57,15 @@ export const SubjectGraphPage = () => {
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select">
-              <Dropdown
+              <LegacyDropdown
                 className="text-sm"
                 options={instrumentOptions}
                 title={t('visualization.instrument')}
-                variant="secondary"
                 onSelection={handleSelectForm}
               />
             </div>
             <div data-cy="measure-select">
-              <SelectDropdown
+              <LegacySelectDropdown
                 checkPosition="right"
                 className="text-sm"
                 options={measureOptions}

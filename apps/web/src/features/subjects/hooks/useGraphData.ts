@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import type { SelectOption } from '@douglasneuroinformatics/ui/legacy';
-import type { LinearRegressionResults } from '@opendatacapture/common/instrument-records';
+import type { LegacySelectOption } from '@douglasneuroinformatics/libui/components';
+import type { LinearRegressionResults } from '@opendatacapture/schemas/instrument-records';
 import _ from 'lodash';
 
 import type { InstrumentVisualizationRecord } from './useInstrumentVisualization';
@@ -14,7 +14,7 @@ export type GraphRecord = {
 export type UseGraphDataOptions = {
   models?: LinearRegressionResults;
   records: InstrumentVisualizationRecord[];
-  selectedMeasures: SelectOption[];
+  selectedMeasures: LegacySelectOption[];
 };
 
 export function useGraphData({ models, records, selectedMeasures }: UseGraphDataOptions): GraphRecord[] {

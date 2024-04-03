@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 
-import { useOnClickOutside } from '@douglasneuroinformatics/ui/hooks';
-import { ArrowToggle } from '@douglasneuroinformatics/ui/legacy';
+import { ArrowToggle } from '@douglasneuroinformatics/libui/components';
+import { useOnClickOutside } from '@douglasneuroinformatics/libui/hooks';
 import { Transition } from '@headlessui/react';
 import { AdjustmentsVerticalIcon, LockClosedIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
@@ -64,19 +64,18 @@ export const UserDropup = () => {
       </div>
       <ArrowToggle
         className="p-2"
-        content={
-          <div className="flex items-center">
-            <UserCircleIcon className="mr-2 h-8 w-8" />
-            <span>{auth.currentUser?.username}</span>
-          </div>
-        }
-        contentPosition="left"
         position="right"
         rotation={-90}
+        size="md"
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-      />
+      >
+        <div className="flex flex-row-reverse items-center">
+          <UserCircleIcon className="mr-2 h-8 w-8" />
+          <span>{auth.currentUser?.username}</span>
+        </div>
+      </ArrowToggle>
     </div>
   );
 };

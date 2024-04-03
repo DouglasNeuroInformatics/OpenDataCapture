@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 
-import { type SelectOption, getFormFields } from '@douglasneuroinformatics/ui/legacy';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/common/instrument';
+import { type LegacySelectOption } from '@douglasneuroinformatics/libui/components';
+import { getFormFields } from '@opendatacapture/instrument-utils';
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
-export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null): SelectOption[] {
+export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null): LegacySelectOption[] {
   return useMemo(() => {
-    const arr: SelectOption[] = [];
+    const arr: LegacySelectOption[] = [];
     if (instrument) {
       const formFields = getFormFields(instrument.content);
       for (const key in instrument.measures) {

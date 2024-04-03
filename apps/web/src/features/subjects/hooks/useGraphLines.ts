@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import type { LineGraphLine, SelectOption } from '@douglasneuroinformatics/ui/legacy';
+import type { LegacySelectOption, LineGraphLine } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 const COLOR_PALETTE: readonly string[] = [
@@ -16,7 +16,7 @@ const COLOR_PALETTE: readonly string[] = [
 ];
 
 export type UseGraphLinesOptions = {
-  selectedMeasures: SelectOption[];
+  selectedMeasures: LegacySelectOption[];
 };
 
 export function useGraphLines({ selectedMeasures }: UseGraphLinesOptions) {

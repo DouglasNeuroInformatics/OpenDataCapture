@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { Button, Modal } from '@douglasneuroinformatics/ui/legacy';
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import { Button, LegacyModal } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import {
   ChartBarIcon,
   ChartPieIcon,
@@ -131,7 +131,11 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
           </div>
         ))}
       </nav>
-      <Modal open={isEndVisitModalOpen} title={t('endVisitModal.title')} onClose={() => setIsEndVisitModalOpen(false)}>
+      <LegacyModal
+        open={isEndVisitModalOpen}
+        title={t('endVisitModal.title')}
+        onClose={() => setIsEndVisitModalOpen(false)}
+      >
         <p className="text-sm">{t('endVisitModal.message')}</p>
         <div className="mt-4 flex">
           <Button
@@ -154,7 +158,7 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
             }}
           />
         </div>
-      </Modal>
+      </LegacyModal>
     </>
   );
 };

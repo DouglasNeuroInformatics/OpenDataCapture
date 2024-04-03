@@ -1,4 +1,4 @@
-import { Dropdown } from '@douglasneuroinformatics/ui/legacy';
+import { LegacyDropdown } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 export type TimeDropdownProps = {
@@ -9,7 +9,7 @@ export const TimeDropdown = ({ setMinTime }: TimeDropdownProps) => {
   const { t } = useTranslation('subjects');
 
   return (
-    <Dropdown
+    <LegacyDropdown
       className="text-sm"
       options={{
         all: t('visualization.timeframeOptions.all'),
@@ -17,7 +17,6 @@ export const TimeDropdown = ({ setMinTime }: TimeDropdownProps) => {
         pastYear: t('visualization.timeframeOptions.year')
       }}
       title={t('visualization.timeframe')}
-      variant="secondary"
       onSelection={(selection) => {
         if (selection === 'pastYear') {
           setMinTime(new Date(new Date().setFullYear(new Date().getFullYear() - 1)));

@@ -1,6 +1,6 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import { Modal } from '@douglasneuroinformatics/ui/legacy';
-import type { Subject, SubjectIdentificationData } from '@opendatacapture/common/subject';
+import { LegacyModal } from '@douglasneuroinformatics/libui/components';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import type { Subject, SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -30,10 +30,10 @@ export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
   };
 
   return (
-    <Modal open={show} title={t('index.lookup.title')} onClose={onClose}>
+    <LegacyModal open={show} title={t('index.lookup.title')} onClose={onClose}>
       <div>
         <IdentificationForm fillActiveSubject onSubmit={(data) => void lookupSubject(data)} />
       </div>
-    </Modal>
+    </LegacyModal>
   );
 };

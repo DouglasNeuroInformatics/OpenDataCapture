@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { useMediaQuery } from '@douglasneuroinformatics/ui/hooks';
+import { useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { Branding } from '@opendatacapture/react-core';
 

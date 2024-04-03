@@ -1,4 +1,4 @@
-import { Slider, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
+import { LegacySlider, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { Branding } from '@opendatacapture/react-core';
 import { useTranslation } from 'react-i18next';
 
@@ -13,7 +13,7 @@ export type MobileSliderProps = {
 export const MobileSlider = ({ isOpen, onNavigate, setIsOpen }: MobileSliderProps) => {
   const { i18n } = useTranslation();
   return (
-    <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={<Branding />}>
+    <LegacySlider isOpen={isOpen} setIsOpen={setIsOpen} title={<Branding />}>
       <div className="flex h-full flex-col">
         <div className="flex-grow">
           <Navigation isAlwaysDark={false} orientation="vertical" onNavigate={onNavigate} />
@@ -31,6 +31,6 @@ export const MobileSlider = ({ isOpen, onNavigate, setIsOpen }: MobileSliderProp
           <ThemeToggle />
         </div>
       </div>
-    </Slider>
+    </LegacySlider>
   );
 };

@@ -1,4 +1,4 @@
-import { Form } from '@douglasneuroinformatics/ui/legacy';
+import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -14,22 +14,23 @@ export type ContactFormProps = {
 export const ContactForm = ({ onSubmit }: ContactFormProps) => {
   const { t } = useTranslation('contact');
   return (
-    <Form<ContactFormData>
+    <Form
       content={{
         contactReason: {
-          kind: 'options',
+          kind: 'string',
           label: t('reason'),
           options: {
             bug: t('reasons.bug'),
             feedback: t('reasons.feedback'),
             other: t('reasons.other'),
             request: t('reasons.request')
-          }
+          },
+          variant: 'select'
         },
         message: {
-          kind: 'text',
+          kind: 'string',
           label: t('message'),
-          variant: 'long'
+          variant: 'textarea'
         }
       }}
       validationSchema={z.object({

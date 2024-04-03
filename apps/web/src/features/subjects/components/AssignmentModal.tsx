@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Form, Modal } from '@douglasneuroinformatics/ui/legacy';
-import type { CreateAssignmentData } from '@opendatacapture/common/assignment';
+import { Form, LegacyModal } from '@douglasneuroinformatics/libui/components';
+import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -19,13 +19,14 @@ export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen
   const { t } = useTranslation(['subjects', 'core']);
 
   return (
-    <Modal open={isOpen} title="Assignment" onClose={() => setIsOpen(false)}>
-      <Form<Omit<CreateAssignmentData, 'subjectId'>>
+    <LegacyModal open={isOpen} title="Assignment" onClose={() => setIsOpen(false)}>
+      <Form
         content={{
           instrumentId: {
-            kind: 'options',
+            kind: 'string',
             label: t('core:instrument'),
-            options: instrumentOptions
+            options: instrumentOptions,
+            variant: 'select'
           },
           expiresAt: {
             kind: 'date',
@@ -35,12 +36,14 @@ export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen
         initialValues={{
           expiresAt: new Date(Date.now() + ONE_YEAR)
         }}
-        validationSchema={z.object({
-          expiresAt: z.coerce.date().min(new Date(), { message: t('errors.expiryMustBeInFuture') }),
-          instrumentId: z.string()
-        })}
+        validationSchema={
+          z.object({
+            expiresAt: z.coerce.date().min(new Date(), { message: t('errors.expiryMustBeInFuture') }),
+            instrumentId: z.string()
+          }) satisfies z.ZodType<Omit<CreateAssignmentData, 'subjectId'>>
+        }
         onSubmit={onSubmit}
       />
-    </Modal>
+    </LegacyModal>
   );
 };

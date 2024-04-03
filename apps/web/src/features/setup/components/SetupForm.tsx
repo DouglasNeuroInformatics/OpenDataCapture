@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Form } from '@douglasneuroinformatics/ui/legacy';
-import { $StrongPassword } from '@opendatacapture/common/user';
+import { Form } from '@douglasneuroinformatics/libui/components';
+import { $StrongPassword } from '@opendatacapture/schemas/user';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -21,28 +21,28 @@ type SetupFormProps = {
 const SetupForm = ({ onSubmit }: SetupFormProps) => {
   const { t } = useTranslation(['core', 'setup']);
   return (
-    <Form<SetupData>
+    <Form
       content={[
         {
           description: t('setup:admin.description'),
           fields: {
             firstName: {
-              kind: 'text',
+              kind: 'string',
               label: t('identificationData.firstName.label'),
-              variant: 'short'
+              variant: 'input'
             },
             lastName: {
-              kind: 'text',
+              kind: 'string',
               label: t('identificationData.lastName.label'),
-              variant: 'short'
+              variant: 'input'
             },
             username: {
-              kind: 'text',
+              kind: 'string',
               label: t('setup:admin.username'),
-              variant: 'short'
+              variant: 'input'
             },
             password: {
-              kind: 'text',
+              kind: 'string',
               label: t('setup:admin.password'),
               variant: 'password'
             }
@@ -53,11 +53,11 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
           description: t('setup:demo.description'),
           fields: {
             initDemo: {
-              kind: 'binary',
+              kind: 'boolean',
               label: t('setup:demo.init'),
               options: {
-                f: t('no'),
-                t: t('yes')
+                false: t('no'),
+                true: t('yes')
               },
               variant: 'radio'
             },
@@ -68,9 +68,9 @@ const SetupForm = ({ onSubmit }: SetupFormProps) => {
                   return null;
                 }
                 return {
-                  kind: 'numeric',
+                  kind: 'number',
                   label: t('setup:demo.dummySubjectCount'),
-                  variant: 'default'
+                  variant: 'input'
                 };
               },
               deps: ['initDemo']

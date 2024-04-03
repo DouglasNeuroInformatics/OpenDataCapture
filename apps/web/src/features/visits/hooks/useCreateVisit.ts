@@ -1,5 +1,5 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import { $Visit, type CreateVisitData } from '@opendatacapture/common/visit';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { $Visit, type CreateVisitData } from '@opendatacapture/schemas/visit';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
