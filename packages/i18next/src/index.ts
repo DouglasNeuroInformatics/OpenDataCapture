@@ -2,7 +2,7 @@ import i18nUI from '@douglasneuroinformatics/libui/i18n';
 import type { Language } from '@opendatacapture/schemas/core';
 import { type InitOptions, createInstance } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import _ from 'lodash';
+import { merge } from 'lodash-es';
 import { initReactI18next } from 'react-i18next';
 
 import core from './translations/core.json';
@@ -18,7 +18,7 @@ export const createExtendedInstance = (
   options: Omit<InitOptions, 'defaultNS' | 'supportedLngs'> = {}
 ): ExtendedI18NextInstance => {
   const baseInstance = createInstance(
-    _.merge(
+    merge(
       {
         defaultNS,
         fallbackLng: 'en',

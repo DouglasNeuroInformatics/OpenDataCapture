@@ -320,7 +320,7 @@ importers:
       i18next:
         specifier: ^23.10.1
         version: 23.10.1
-      lodash:
+      lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
       pino-http:
@@ -366,9 +366,9 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-      '@types/lodash':
-        specifier: ^4.17.0
-        version: 4.17.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/react':
         specifier: ^18.2.65
         version: 18.2.65
@@ -623,7 +623,7 @@ importers:
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
-      lodash:
+      lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
       react:
@@ -666,9 +666,9 @@ importers:
       '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-runtime
-      '@types/lodash':
-        specifier: ^4.17.0
-        version: 4.17.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/react':
         specifier: ^18.2.65
         version: 18.2.65
@@ -808,16 +808,13 @@ importers:
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
-      '@types/lodash':
-        specifier: ^4.14.202
-        version: 4.17.0
       i18next:
         specifier: 23.x
         version: 23.10.1
       i18next-browser-languagedetector:
         specifier: ^7.2.0
         version: 7.2.0
-      lodash:
+      lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
       react:
@@ -832,6 +829,10 @@ importers:
       tailwindcss:
         specifier: 3.x
         version: 3.4.1
+    devDependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
 
   packages/instrument-interpreter:
     dependencies:
@@ -897,7 +898,7 @@ importers:
       i18next:
         specifier: ^23.10.1
         version: 23.10.1
-      lodash:
+      lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
       react:
@@ -925,9 +926,9 @@ importers:
       '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../vite-plugin-runtime
-      '@types/lodash':
-        specifier: ^4.17.0
-        version: 4.17.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/react':
         specifier: ^18.2.65
         version: 18.2.65
@@ -8494,6 +8495,7 @@ packages:
   /@types/lodash@4.17.0:
     resolution:
       { integrity: sha512-t7dhREVv6dbNj0q17X12j7yDG4bD/DHYX7o5/DbDxobP0HnGPgpRz2Ej77aL7TZT3DSw13fqUTj8J4mMnqa7WA== }
+    dev: true
 
   /@types/mdast@4.0.3:
     resolution:

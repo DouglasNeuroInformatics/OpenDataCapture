@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
-import _ from 'lodash';
+import { omit } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrument } from '@/hooks/useInstrument';
@@ -59,7 +59,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       instrument.version
     }_${new Date().toISOString()}`;
 
-    const exportRecords = records.map((record) => _.omit(record, ['__date__', '__time__']));
+    const exportRecords = records.map((record) => omit(record, ['__date__', '__time__']));
 
     switch (option) {
       case 'JSON':

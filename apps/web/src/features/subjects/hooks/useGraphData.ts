@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import type { LegacySelectOption } from '@douglasneuroinformatics/libui/components';
 import type { LinearRegressionResults } from '@opendatacapture/schemas/instrument-records';
-import _ from 'lodash';
+import { pickBy } from 'lodash-es';
 
 import type { InstrumentVisualizationRecord } from './useInstrumentVisualization';
 
@@ -23,7 +23,7 @@ export function useGraphData({ models, records, selectedMeasures }: UseGraphData
     if (records) {
       for (const record of records) {
         const graphRecord: GraphRecord = {
-          ..._.pickBy(record, (_, key) => selectedMeasures.find((item) => item.key === key)),
+          ...pickBy(record, (_, key) => selectedMeasures.find((item) => item.key === key)),
           __time__: record.__time__
         };
         for (const key in record) {

@@ -16,7 +16,6 @@
     "lint": "tsc && eslint --fix src"
   },
   "peerDependencies": {
-    "@types/lodash": "^4.14.202",
     "i18next": "23.x",
     "react": "18.x",
     "react-dom": "18.x",
@@ -26,7 +25,10 @@
     "@douglasneuroinformatics/libui": "^2.0.0-beta.10",
     "@opendatacapture/schemas": "workspace:*",
     "i18next-browser-languagedetector": "^7.2.0",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "react-i18next": "^14.1.0"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12"
   }
 }

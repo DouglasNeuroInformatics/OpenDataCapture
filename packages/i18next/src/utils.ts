@@ -1,5 +1,5 @@
 import type { Language } from '@opendatacapture/schemas/core';
-import _ from 'lodash';
+import { mapValues } from 'lodash-es';
 
 import type { TranslatedResource, TranslationsDef } from './types.js';
 
@@ -21,7 +21,7 @@ function transformTranslations<T extends { [key: string]: any }>(translations: T
 }
 
 function createResourcesForLanguage<T extends TranslationsDef>(translations: T, locale: Language) {
-  return _.mapValues(translations, (value) => transformTranslations(value, locale));
+  return mapValues(translations, (value) => transformTranslations(value, locale));
 }
 
 function createResources<T extends TranslationsDef>(translations: T) {
