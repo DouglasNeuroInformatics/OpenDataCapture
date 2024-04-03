@@ -19,7 +19,7 @@
     "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test --expect 404 \"pnpm dev\" \"http://localhost:${GATEWAY_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.2.2",
+    "@douglasneuroinformatics/libui": "^2.0.0-beta.10",
     "@opendatacapture/crypto": "workspace:*",
     "@opendatacapture/database": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
