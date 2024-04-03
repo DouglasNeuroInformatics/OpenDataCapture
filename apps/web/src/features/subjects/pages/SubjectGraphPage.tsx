@@ -65,19 +65,22 @@ export const SubjectGraphPage = () => {
 
         if (selectedMeasures) {
           const graphMeasure = document.createElement('div');
-          graphMeasure.innerText = 'Form of Measurement: ' + selectedMeasures[0].label;
+          graphMeasure.innerText = 'Form of Measurement: ';
+          for (const i of selectedMeasures) {
+            graphMeasure.innerText = graphMeasure.innerText + i.label + ' ';
+          }
           graphMeasure.className = 'p-2 font-semibold';
           element.append(graphMeasure);
         }
 
         const graphTime = document.createElement('div');
         if (minDate) {
-          graphTime.innerText = 'Data time frame: ' + toBasicISOString(minDate) + ' - ' + toBasicISOString(new Date());
+          graphTime.innerText = 'Time frame: ' + toBasicISOString(minDate) + ' - ' + toBasicISOString(new Date());
 
           graphTime.className = 'p-2 font-semibold';
           element.append(graphTime);
         } else {
-          graphTime.innerText = 'Data time frame: All-Time';
+          graphTime.innerText = 'Time frame: All-Time';
 
           graphTime.className = 'p-2 font-semibold';
           element.append(graphTime);
