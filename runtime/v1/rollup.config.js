@@ -33,11 +33,13 @@ const sourceOptions = {
   },
   plugins: [
     commonjs({
-      exclude: ['**/*/jquery.js']
+      exclude: ['**/*/jquery.js'],
+      extensions: ['.cjs', '.js', '.mjs'],
+      transformMixedEsModules: true
     }),
     resolve({
       browser: true,
-      extensions: ['.js', '.ts'],
+      extensions: ['.js', '.mjs', '.ts'],
       rootDir: ROOT_DIR
     }),
     replace({
