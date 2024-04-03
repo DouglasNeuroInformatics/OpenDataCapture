@@ -54,9 +54,7 @@ export const SubjectGraphPage = () => {
   const handleGraphDownload = async () => {
     if (!graphRef.current) return;
 
-    const selectGraph = graphRef.current;
-
-    const canvas = await html2canvas(selectGraph, {
+    const canvas = await html2canvas(graphRef.current, {
       onclone: (_, element) => {
         const graphDesc = document.createElement('p');
         graphDesc.innerText = instrument!.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
