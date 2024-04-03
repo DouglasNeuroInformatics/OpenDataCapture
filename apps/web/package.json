@@ -33,6 +33,7 @@
     "@opendatacapture/instrument-renderer": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
+    "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@tanstack/react-query": "^5.27.5",
     "@tanstack/react-query-devtools": "^5.27.6",
