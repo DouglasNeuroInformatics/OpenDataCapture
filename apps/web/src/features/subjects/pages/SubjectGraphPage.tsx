@@ -63,9 +63,9 @@ export const SubjectGraphPage = () => {
 
         if (selectedMeasures) {
           const graphMeasure = document.createElement('p');
-          graphMeasure.innerText = 'Form of Measurement: ';
+          graphMeasure.innerText = t('visualization.measures') + ': ';
           for (const selectMeasureOption of selectedMeasures) {
-            graphMeasure.innerText = graphMeasure.innerText + selectMeasureOption.label + ' ';
+            graphMeasure.innerText += selectMeasureOption.label + ' ';
           }
           graphMeasure.className = 'p-2 font-semibold';
           element.append(graphMeasure);
