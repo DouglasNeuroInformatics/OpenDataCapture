@@ -58,22 +58,22 @@ export const SubjectGraphPage = () => {
 
     const canvas = await html2canvas(selectGraph, {
       onclone: (_, element) => {
-        const graphDesc = document.createElement('div');
+        const graphDesc = document.createElement('p');
         graphDesc.innerText = instrument!.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
         graphDesc.className = 'p-2 font-semibold text-center';
         element.prepend(graphDesc);
 
         if (selectedMeasures) {
-          const graphMeasure = document.createElement('div');
+          const graphMeasure = document.createElement('p');
           graphMeasure.innerText = 'Form of Measurement: ';
-          for (const i of selectedMeasures) {
-            graphMeasure.innerText = graphMeasure.innerText + i.label + ' ';
+          for (const selectMeasureOption of selectedMeasures) {
+            graphMeasure.innerText = graphMeasure.innerText + selectMeasureOption.label + ' ';
           }
           graphMeasure.className = 'p-2 font-semibold';
           element.append(graphMeasure);
         }
 
-        const graphTime = document.createElement('div');
+        const graphTime = document.createElement('p');
         if (minDate) {
           graphTime.innerText = 'Time frame: ' + toBasicISOString(minDate) + ' - ' + toBasicISOString(new Date());
 
