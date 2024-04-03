@@ -19,7 +19,7 @@
     "tailwindcss": "3.x"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.0.0-beta.3",
+    "@douglasneuroinformatics/libui": "^2.0.0-beta.10",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@monaco-editor/react": "^4.6.0",
