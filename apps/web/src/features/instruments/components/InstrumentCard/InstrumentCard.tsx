@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Card } from '@douglasneuroinformatics/libui/components';
 import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';

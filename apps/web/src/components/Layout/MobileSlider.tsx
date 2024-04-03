@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { LegacySlider, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { Branding } from '@opendatacapture/react-core';
 import { useTranslation } from 'react-i18next';

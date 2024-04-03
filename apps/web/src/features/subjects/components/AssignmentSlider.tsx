@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Button, LegacySlider } from '@douglasneuroinformatics/libui/components';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import { useTranslation } from 'react-i18next';

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Button, LegacyModal } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 

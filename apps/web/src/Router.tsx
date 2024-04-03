@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import React from 'react';
+
 import { BrowserRouter, Navigate, type RouteObject, useRoutes } from 'react-router-dom';
 
 import { Layout } from './components/Layout';

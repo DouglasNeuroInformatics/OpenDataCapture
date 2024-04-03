@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Spinner } from '@douglasneuroinformatics/libui/components';
 
 export const LoadingFallback = () => (

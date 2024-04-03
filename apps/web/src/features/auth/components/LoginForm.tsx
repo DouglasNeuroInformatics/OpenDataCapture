@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import React from 'react';
+
 import { Form } from '@douglasneuroinformatics/libui/components';
 import type { LoginCredentials } from '@opendatacapture/schemas/auth';
 import { useTranslation } from 'react-i18next';

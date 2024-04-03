@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { LegacyModal } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { Subject, SubjectIdentificationData } from '@opendatacapture/schemas/subject';

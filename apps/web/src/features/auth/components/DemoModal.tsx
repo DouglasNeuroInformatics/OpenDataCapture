@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Card, LegacyModal } from '@douglasneuroinformatics/libui/components';
 import { DEMO_USERS } from '@opendatacapture/demo';

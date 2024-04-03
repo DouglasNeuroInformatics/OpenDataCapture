@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import React from 'react';
+
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $SubjectIdentificationData, type SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';

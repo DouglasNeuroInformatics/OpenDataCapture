@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { LegacySelectDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import type { LegacySelectOption } from '@douglasneuroinformatics/libui/components';

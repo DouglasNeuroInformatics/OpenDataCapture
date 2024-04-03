@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { LoadingScreen } from '@opendatacapture/react-core';
 import { useTranslation } from 'react-i18next';
 

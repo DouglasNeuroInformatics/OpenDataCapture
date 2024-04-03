@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import React from 'react';
+
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $StrongPassword } from '@opendatacapture/schemas/user';
 import { useTranslation } from 'react-i18next';

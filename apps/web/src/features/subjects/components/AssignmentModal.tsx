@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import React from 'react';
+
 import { Form, LegacyModal } from '@douglasneuroinformatics/libui/components';
 import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import { useTranslation } from 'react-i18next';
