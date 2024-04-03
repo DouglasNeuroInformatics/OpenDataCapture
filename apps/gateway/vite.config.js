@@ -20,6 +20,11 @@ export default defineConfig({
       plugins: [autoprefixer(), tailwindcss()]
     }
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2022'
+    }
+  },
   plugins: [react(), runtime()],
   resolve: {
     alias: {

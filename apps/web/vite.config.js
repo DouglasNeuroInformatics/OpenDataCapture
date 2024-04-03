@@ -25,6 +25,11 @@ export default defineConfig({
       plugins: [autoprefixer(), tailwindcss()]
     }
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2022'
+    }
+  },
   plugins: [
     plausible({
       baseUrl: process.env.PLAUSIBLE_BASE_URL,

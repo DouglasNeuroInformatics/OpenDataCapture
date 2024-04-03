@@ -31,7 +31,11 @@ const config = {
           plugins: [autoprefixer(), tailwindcss()]
         }
       },
-      optimizeDeps: { esbuildOptions: { target: 'esnext' } }
+      optimizeDeps: {
+        esbuildOptions: {
+          target: 'es2022'
+        }
+      }
     });
   }
 };

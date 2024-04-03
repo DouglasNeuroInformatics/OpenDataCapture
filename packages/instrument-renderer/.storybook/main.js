@@ -32,7 +32,11 @@ const config = {
           plugins: [autoprefixer(), tailwindcss()]
         }
       },
-      optimizeDeps: { esbuildOptions: { target: 'es2022' } },
+      optimizeDeps: {
+        esbuildOptions: {
+          target: 'es2022'
+        }
+      },
       plugins: [runtime()]
     });
   }
