@@ -101,7 +101,7 @@ export const SubjectGraphPage = () => {
     <div>
       <div className="my-2">
         <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
-        <div className="flex flex-col gap-2 lg:flex-row lg:justify-between print:hidden">
+        <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select">
               <Dropdown
@@ -140,7 +140,7 @@ export const SubjectGraphPage = () => {
           </div>
         </div>
       </div>
-      <div className="print:h-[400px] print:w-[400px]" ref={graphRef}>
+      <div ref={graphRef}>
         <LineGraph
           data={graphData}
           lines={lines}
