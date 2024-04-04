@@ -15,7 +15,7 @@ export const InstrumentIcon = ({ kind }: InstrumentIconProps) => {
     case 'FORM':
       return <img alt="tool brain" className="h-10 w-auto rounded-full" src={toolBrain} />;
     case 'INTERACTIVE':
-      return <img alt="tool brain" className="h-10 w-auto rounded-full" src={handBrain} />;
+      return <img alt="hand brain" className="h-10 w-auto rounded-full" src={handBrain} />;
     default:
       return <PencilSquareIcon className="h-8 w-8" />;
   }
