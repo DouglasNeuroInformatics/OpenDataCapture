@@ -878,6 +878,9 @@ importers:
       '@heroicons/react':
         specifier: ^2.1.1
         version: 2.1.1(react@18.2.0)
+      '@opendatacapture/evaluate-instrument':
+        specifier: workspace:*
+        version: link:../evaluate-instrument
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next

@@ -16,12 +16,14 @@
   "peerDependencies": {
     "react": "18.x",
     "react-dom": "18.x",
-    "tailwindcss": "3.x"
+    "tailwindcss": "3.x",
+    "vite": "5.x"
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
     "@douglasneuroinformatics/libui": "^2.0.0-beta.13",
     "@heroicons/react": "^2.1.1",
+    "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
