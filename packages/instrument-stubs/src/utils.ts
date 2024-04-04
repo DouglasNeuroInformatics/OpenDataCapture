@@ -1,4 +1,4 @@
-import { deepFreeze } from '@douglasneuroinformatics/libjs';
+import { deepFreeze, randomInt } from '@douglasneuroinformatics/libjs';
 import { InstrumentTransformer } from '@opendatacapture/instrument-transformer';
 import type { Json } from '@opendatacapture/schemas/core';
 import type {
@@ -17,7 +17,7 @@ type InstrumentStubInstance<T> =
 
 type InstrumentStub<T> = {
   bundle: string;
-  instance: InstrumentStubInstance<T>;
+  instance: InstrumentStubInstance<T> & { id: string };
   source: string;
 };
 
@@ -29,7 +29,10 @@ export async function createInstrumentStub<T>(
   const source = `export default (${factory.toString()})()`;
   return {
     bundle: await transformer.generateBundle(source),
-    instance: deepFreeze(await factory()) as InstrumentStubInstance<T>,
+    instance: deepFreeze({
+      ...(await factory()),
+      id: randomInt(100, 999).toString()
+    }) as InstrumentStubInstance<T> & { id: string },
     source
   };
 }
