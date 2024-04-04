@@ -18,8 +18,8 @@ export const FormPageLayout = ({ children, className, maxWidth = 'sm', title }: 
       className={cn(
         'm-5 flex w-full flex-col items-center rounded-2xl p-8',
         maxWidth === 'sm' && 'sm:max-w-sm',
-        maxWidth === 'md' && 'sm:max-w-md',
-        maxWidth === 'lg' && 'sm:max-w-lg'
+        maxWidth === 'md' && 'sm:max-w-lg',
+        maxWidth === 'lg' && 'sm:max-w-2xl'
       )}
     >
       <Logo className="m-3 h-auto w-16" variant="auto" />

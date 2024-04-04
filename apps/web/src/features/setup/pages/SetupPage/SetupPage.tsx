@@ -26,7 +26,7 @@ export type SetupPageProps = {
 export const SetupPage = ({ onSubmit }: SetupPageProps) => {
   const { t } = useTranslation(['core', 'setup']);
   return (
-    <FormPageLayout maxWidth="md" title={t('setup:pageTitle')}>
+    <FormPageLayout maxWidth="lg" title={t('setup:pageTitle')}>
       <Form
         content={[
           {
