@@ -37,5 +37,7 @@ describe('Subject view test', () => {
     //choose month as timeline
     cy.get('div[data-cy="time-select"]').click();
     cy.get('button[data-cy="dropdown-menu-option"]').eq(0).click();
+
+    cy.get('div[data-cy="download-button"]').click();
   });
 });

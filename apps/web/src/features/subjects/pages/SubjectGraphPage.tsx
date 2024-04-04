@@ -16,7 +16,6 @@ import { useGraphLines } from '../hooks/useGraphLines';
 import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization';
 import { useLinearModelQuery } from '../hooks/useLinearModelQuery';
 import { useMeasureOptions } from '../hooks/useMeasureOptions';
-import { subject } from '@casl/ability';
 
 export const SubjectGraphPage = () => {
   const downloadCanvas = useDownload();
