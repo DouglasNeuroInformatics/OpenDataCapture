@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
-    "@douglasneuroinformatics/libui": "^2.0.0-beta.10",
+    "@douglasneuroinformatics/libui": "^2.0.0-beta.13",
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/editor": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",

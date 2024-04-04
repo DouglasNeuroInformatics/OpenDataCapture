@@ -288,8 +288,8 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.0-beta.10
-        version: 2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
+        specifier: ^2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
       '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -452,8 +452,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.4.3)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.0-beta.10
-        version: 2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
+        specifier: ^2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
       '@opendatacapture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
@@ -564,8 +564,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.4.3)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.0-beta.10
-        version: 2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
+        specifier: ^2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
       '@headlessui/react':
         specifier: ^1.7.18
         version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -745,8 +745,8 @@ importers:
   packages/editor:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.0-beta.10
-        version: 2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
+        specifier: ^2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
       '@headlessui/react':
         specifier: ^1.7.18
         version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -815,8 +815,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.0-beta.10
-        version: 2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
+        specifier: ^2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -881,8 +881,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.4.3)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.0-beta.10
-        version: 2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
+        specifier: ^2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
       '@heroicons/react':
         specifier: ^2.1.1
         version: 2.1.1(react@18.2.0)
@@ -1014,8 +1014,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(typescript@5.4.3)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.0-beta.10
-        version: 2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
+        specifier: ^2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
       '@heroicons/react':
         specifier: ^2.1.1
         version: 2.1.1(react@18.2.0)
@@ -1109,8 +1109,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.0-beta.10
-        version: 2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
+        specifier: ^2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3)
       autoprefixer:
         specifier: 10.x
         version: 10.4.18(postcss@8.4.35)
@@ -3274,9 +3274,9 @@ packages:
     dependencies:
       type-fest: 4.15.0
 
-  /@douglasneuroinformatics/libui@2.0.0-beta.10(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3):
+  /@douglasneuroinformatics/libui@2.0.0-beta.13(@types/react-dom@18.2.21)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.1)(typescript@5.4.3):
     resolution:
-      { integrity: sha512-TEylCUotbROuoZp9c6O9WENuxiF/6KVVohJBZyYLHZzt9PRTyYrX0OIX0Lp7/RWsAGg/rjDkuvyOUKhPVozNhg== }
+      { integrity: sha512-xY9A/B5BwR816VWHg7zbsaugSqiFPNNs60WJ6D6qWcnyr/b3moS6XEAnJqTZAGmOjXFpv4Iki9qKXctLLXK41g== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -18275,6 +18275,7 @@ packages:
     resolution:
       { integrity: sha512-3cqjOqg6s0XbOjWvmasmqHch+RLxIEk2r/70rzGXuz3iIGQsQheEQyqYCBb5EECoD01Vo2SIbDqW4paLeLTASw== }
     engines: { node: '>=10' }
+    deprecated: please update to the following version as this contains a bug (https://github.com/theKashey/react-remove-scroll-bar/issues/57)
     peerDependencies:
       '@types/react': ^16.8.0 || ^17.0.0 || ^18.0.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
