@@ -20,7 +20,48 @@ const config = {
     name: '@storybook/react-vite',
     options: {}
   },
-  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: [
+    {
+      directory: '../src/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Components'
+    },
+    {
+      directory: '../src/features/contact/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Contact'
+    },
+    {
+      directory: '../src/features/instruments/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Instruments'
+    },
+    {
+      directory: '../src/features/overview/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Overview'
+    },
+    {
+      directory: '../src/features/setup/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Setup'
+    },
+    {
+      directory: '../src/features/subjects/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Subjects'
+    },
+    {
+      directory: '../src/features/user/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'User'
+    },
+    {
+      directory: '../src/features/visits/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Visits'
+    }
+  ],
   viteFinal(config) {
     return mergeConfig(config, {
       css: {
