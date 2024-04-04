@@ -1,7 +1,5 @@
-import { createExtendedInstance } from '@opendatacapture/i18next';
+import { i18n } from '@opendatacapture/i18next';
 
-const i18n = createExtendedInstance();
-
-await i18n.initialize();
+await i18n.init();
 
 export default i18n;
