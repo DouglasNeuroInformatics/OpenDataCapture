@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { NotificationHub } from '@douglasneuroinformatics/libui/components';
+import { i18n } from '@opendatacapture/i18next';
 import { ErrorFallback } from '@opendatacapture/react-core';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -8,7 +9,7 @@ import { SuspenseFallback } from './components/SuspenseFallback';
 
 const Editor = React.lazy(() => import('./components/Editor').then((module) => ({ default: module.Editor })));
 
-import './services/i18n';
+await i18n.init();
 
 export const App = () => {
   return (

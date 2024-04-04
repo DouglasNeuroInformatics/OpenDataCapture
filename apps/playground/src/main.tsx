@@ -1,13 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { i18n } from '@opendatacapture/i18next';
-
 import { App } from './App';
 
 import '@douglasneuroinformatics/libui/styles/globals.css';
-
-await i18n.initialize();
 
 const root = document.getElementById('root')!;
 
