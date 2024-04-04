@@ -1,6 +1,6 @@
-/// <reference types="@opendatacapture/i18next/client" />
+/// <reference types="@opendatacapture/i18next" />
 
-import type { TranslatedResource } from '@opendatacapture/i18next';
+import type { TranslatedResource } from '@douglasneuroinformatics/libui/i18n';
 
 import auth from '../translations/auth.json';
 import common from '../translations/common.json';

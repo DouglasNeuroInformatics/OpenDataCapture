@@ -1,12 +1,8 @@
-import { createExtendedInstance } from '@opendatacapture/i18next';
+import { i18n } from '@opendatacapture/i18next';
 import Backend from 'i18next-http-backend';
 
-const i18n = createExtendedInstance({
+await i18n.use(Backend).init({
   ns: ['auth', 'common', 'contact', 'instruments', 'layout', 'overview', 'setup', 'subjects', 'user', 'visits']
 });
-
-i18n.use(Backend);
-
-await i18n.initialize();
 
 export default i18n;
