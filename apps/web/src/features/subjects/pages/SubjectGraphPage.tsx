@@ -16,6 +16,7 @@ import { useGraphLines } from '../hooks/useGraphLines';
 import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization';
 import { useLinearModelQuery } from '../hooks/useLinearModelQuery';
 import { useMeasureOptions } from '../hooks/useMeasureOptions';
+import { subject } from '@casl/ability';
 
 export const SubjectGraphPage = () => {
   const downloadCanvas = useDownload();
@@ -57,13 +58,21 @@ export const SubjectGraphPage = () => {
     const canvas = await html2canvas(graphContainerRef.current, {
       onclone: (_, element) => {
         const graphDesc = document.createElement('p');
-        graphDesc.innerText = instrument!.details.title + ' of Subject: ' + params.subjectId!.slice(0, 7);
+
+        const formType = instrument!.details.title;
+        const subjectId = params.subjectId!.slice(0, 7);
+
+        graphDesc.innerText = t('downloadInfo.subjectText', {
+          form: formType ?? '',
+          id: subjectId ?? ''
+        });
+
         graphDesc.className = 'p-2 font-semibold text-center';
         element.prepend(graphDesc);
 
         if (selectedMeasures) {
           const graphMeasure = document.createElement('p');
-          graphMeasure.innerText = t('visualization.measures') + ': ';
+          graphMeasure.innerText = t('downloadInfo.measurement');
           for (const selectMeasureOption of selectedMeasures) {
             graphMeasure.innerText += selectMeasureOption.label + ' ';
           }
@@ -130,7 +139,7 @@ export const SubjectGraphPage = () => {
               <Button
                 className="relative w-full whitespace-nowrap text-sm"
                 disabled={!instrument}
-                label="Download"
+                label={t('downloadInfo.download')}
                 variant="secondary"
                 onClick={() => void handleGraphDownload()}
               />

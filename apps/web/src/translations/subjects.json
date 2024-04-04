@@ -158,5 +158,19 @@
       "en": "Value",
       "fr": "Valeur"
     }
+  },
+  "downloadInfo": {
+    "download": {
+      "en": "Download",
+      "fr": "télécharger"
+    },
+    "subjectText": {
+      "en": "{{form}} of Subject: {{id}}",
+      "fr": "{{form}} du Sujet : {{id}}"
+    },
+    "measurement": {
+      "en": "Measures: ",
+      "fr": "Mesures : "
+    }
   }
 }
