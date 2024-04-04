@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/schemas": "workspace:*"
   },
   "devDependencies": {

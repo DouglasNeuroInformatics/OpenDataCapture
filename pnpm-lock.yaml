@@ -812,6 +812,8 @@ importers:
         specifier: 0.x
         version: 0.20.1
 
+  packages/evaluate-instrument: {}
+
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
@@ -835,6 +837,9 @@ importers:
 
   packages/instrument-interpreter:
     dependencies:
+      '@opendatacapture/evaluate-instrument':
+        specifier: workspace:*
+        version: link:../evaluate-instrument
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas

@@ -1,0 +1,14 @@
+{
+  "name": "@opendatacapture/evaluate-instrument",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "eslint --fix src"
+  }
+}
