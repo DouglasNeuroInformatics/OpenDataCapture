@@ -2,12 +2,12 @@ import React from 'react';
 
 import { Spinner } from '@douglasneuroinformatics/libui/components';
 
-export type LoadingScreenProps = {
+export type LoadingPageProps = {
   subtitle: string;
   title: string;
 };
 
-export const LoadingScreen = ({ subtitle, title }: LoadingScreenProps) => {
+export const LoadingPage = ({ subtitle, title }: LoadingPageProps) => {
   return (
     <div className="my-auto flex h-screen w-screen flex-col items-center justify-center">
       <div className="mt-24 text-center">
