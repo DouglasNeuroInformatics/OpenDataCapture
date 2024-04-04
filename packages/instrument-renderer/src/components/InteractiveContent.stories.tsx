@@ -22,6 +22,6 @@ export default {
 
 export const Default: Story = {
   args: {
-    bundle: await interactiveInstrument.toBundle()
+    bundle: interactiveInstrument.bundle
   }
 };

@@ -15,18 +15,21 @@ type InstrumentStubInstance<T> =
       ? InteractiveInstrument<TData>
       : never;
 
-export class InstrumentStub<T> {
+type InstrumentStub<T> = {
+  bundle: string;
   instance: InstrumentStubInstance<T>;
   source: string;
+};
 
-  #transformer = new InstrumentTransformer();
+const transformer = new InstrumentTransformer();
 
-  constructor(options: { factory: () => InstrumentStubInstance<T> }) {
-    this.instance = deepFreeze(options.factory()) as InstrumentStubInstance<T>;
-    this.source = `export default (${options.factory.toString()})()`;
-  }
-
-  async toBundle() {
-    return this.#transformer.generateBundle(this.source);
-  }
+export async function createInstrumentStub<T>(
+  factory: () => Promise<InstrumentStubInstance<T>>
+): Promise<InstrumentStub<T>> {
+  const source = `export default (${factory.toString()})()`;
+  return {
+    bundle: await transformer.generateBundle(source),
+    instance: deepFreeze(await factory()) as InstrumentStubInstance<T>,
+    source
+  };
 }

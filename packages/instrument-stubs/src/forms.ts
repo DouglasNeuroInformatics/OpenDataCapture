@@ -2,17 +2,17 @@
 
 import type { Language } from '@opendatacapture/schemas/core';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
-import { z } from 'zod';
 
-import { InstrumentStub } from './utils.js';
+import { createInstrumentStub } from './utils.js';
 
 type FormInstrumentStubData = {
   favoriteNumber: number;
   reasonFavoriteNumberIsNegative?: string;
 };
 
-export const unilingualFormInstrument = new InstrumentStub<FormInstrument<FormInstrumentStubData, Language>>({
-  factory: () => {
+export const unilingualFormInstrument = await createInstrumentStub<FormInstrument<FormInstrumentStubData, Language>>(
+  async () => {
+    const { z } = await import('zod');
     return {
       content: {
         favoriteNumber: {
@@ -53,10 +53,11 @@ export const unilingualFormInstrument = new InstrumentStub<FormInstrument<FormIn
       version: 1.0
     };
   }
-});
+);
 
-export const bilingualFormInstrument = new InstrumentStub<FormInstrument<FormInstrumentStubData, Language[]>>({
-  factory: () => {
+export const bilingualFormInstrument = await createInstrumentStub<FormInstrument<FormInstrumentStubData, Language[]>>(
+  async () => {
+    const { z } = await import('zod');
     return {
       content: {
         favoriteNumber: {
@@ -115,4 +116,4 @@ export const bilingualFormInstrument = new InstrumentStub<FormInstrument<FormIns
       version: 1.0
     };
   }
-});
+);

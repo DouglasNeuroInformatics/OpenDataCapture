@@ -1,16 +1,16 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import type { InteractiveInstrument } from '@opendatacapture/schemas/instrument';
-import { z } from 'zod';
 
-import { InstrumentStub } from './utils.js';
+import { createInstrumentStub } from './utils.js';
 
 type InteractiveInstrumentStubData = {
   message: string;
 };
 
-export const interactiveInstrument = new InstrumentStub<InteractiveInstrument<InteractiveInstrumentStubData>>({
-  factory: () => {
+export const interactiveInstrument = await createInstrumentStub<InteractiveInstrument<InteractiveInstrumentStubData>>(
+  async () => {
+    const { z } = await import('zod');
     return {
       kind: 'INTERACTIVE',
       language: 'en',
@@ -39,4 +39,4 @@ export const interactiveInstrument = new InstrumentStub<InteractiveInstrument<In
       })
     };
   }
-});
+);

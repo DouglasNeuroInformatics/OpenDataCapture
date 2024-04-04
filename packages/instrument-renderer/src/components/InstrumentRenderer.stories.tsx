@@ -23,18 +23,18 @@ export default {
 
 export const UnilingualForm: Story = {
   args: {
-    bundle: await unilingualFormInstrument.toBundle()
+    bundle: unilingualFormInstrument.bundle
   }
 };
 
 export const BilingualForm: Story = {
   args: {
-    bundle: await bilingualFormInstrument.toBundle()
+    bundle: bilingualFormInstrument.bundle
   }
 };
 
 export const Interactive: Story = {
   args: {
-    bundle: await interactiveInstrument.toBundle()
+    bundle: interactiveInstrument.bundle
   }
 };
