@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
+import type { TranslatedResource } from '@douglasneuroinformatics/libui/i18n';
 import type { Language } from '@opendatacapture/schemas/core';
 
 import core from '../translations/core.json';
-
-import type { DefaultNS, TranslatedResource } from '../types.js';
 
 import 'i18next';
 
@@ -17,7 +16,7 @@ declare module 'i18next' {
   }
 
   interface CustomTypeOptions {
-    defaultNS: DefaultNS;
+    defaultNS: typeof import('../index.ts').defaultNS;
     resources: CustomResources;
   }
 

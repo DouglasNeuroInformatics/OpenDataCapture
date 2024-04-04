@@ -820,31 +820,15 @@ importers:
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
-      i18next:
-        specifier: 23.x
-        version: 23.10.1
-      i18next-browser-languagedetector:
-        specifier: ^7.2.0
-        version: 7.2.0
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
       react:
         specifier: 18.x
         version: 18.2.0
       react-dom:
         specifier: 18.x
         version: 18.2.0(react@18.2.0)
-      react-i18next:
-        specifier: ^14.1.0
-        version: 14.1.0(i18next@23.10.1)(react-dom@18.2.0)(react@18.2.0)
       tailwindcss:
         specifier: 3.x
         version: 3.4.1
-    devDependencies:
-      '@types/lodash-es':
-        specifier: ^4.17.12
-        version: 4.17.12
 
   packages/instrument-interpreter:
     dependencies:
@@ -13989,13 +13973,6 @@ packages:
     engines: { node: '>=18' }
     hasBin: true
     dev: true
-
-  /i18next-browser-languagedetector@7.2.0:
-    resolution:
-      { integrity: sha512-U00DbDtFIYD3wkWsr2aVGfXGAj2TgnELzOX9qv8bT0aJtvPV9CRO77h+vgmHFBMe7LAxdwvT/7VkCWGya6L3tA== }
-    dependencies:
-      '@babel/runtime': 7.24.0
-    dev: false
 
   /i18next-browser-languagedetector@7.2.1:
     resolution:
