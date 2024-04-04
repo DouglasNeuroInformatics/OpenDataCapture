@@ -4,7 +4,7 @@
 import type { TranslatedResource } from '@douglasneuroinformatics/libui/i18n';
 import type { Language } from '@opendatacapture/schemas/core';
 
-import core from '../translations/core.json';
+import core from './translations/core.json';
 
 import 'i18next';
 
@@ -16,7 +16,7 @@ declare module 'i18next' {
   }
 
   interface CustomTypeOptions {
-    defaultNS: typeof import('../index.ts').defaultNS;
+    defaultNS: 'core';
     resources: CustomResources;
   }
 
@@ -24,3 +24,5 @@ declare module 'i18next' {
     resolvedLanguage?: Language;
   }
 }
+
+export const i18n: typeof import('@douglasneuroinformatics/libui/i18n').i18n;

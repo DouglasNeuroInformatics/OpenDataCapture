@@ -820,6 +820,9 @@ importers:
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
+      i18next:
+        specifier: ^23.10.1
+        version: 23.10.1
       react:
         specifier: 18.x
         version: 18.2.0

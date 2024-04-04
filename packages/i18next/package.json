@@ -5,7 +5,10 @@
   "private": true,
   "license": "AGPL-3.0",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    }
   },
   "scripts": {
     "format": "prettier --write src",
@@ -19,6 +22,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libui": "^2.0.0-beta.13",
-    "@opendatacapture/schemas": "workspace:*"
+    "@opendatacapture/schemas": "workspace:*",
+    "i18next": "^23.10.1"
   }
 }
