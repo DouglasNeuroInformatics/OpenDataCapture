@@ -9,12 +9,22 @@ import { z } from 'zod';
 
 import { FormPageLayout } from '@/components/FormPageLayout';
 
-import { useCreateSetupState } from '../../hooks/useCreateSetupState';
+type SetupData = z.infer<typeof $SetupData>;
+const $SetupData = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  username: z.string().min(1),
+  password: $StrongPassword,
+  initDemo: z.boolean(),
+  dummySubjectCount: z.number().int().nonnegative().optional()
+});
 
-export const SetupPage = () => {
-  const createSetupStateMutation = useCreateSetupState();
+export type SetupPageProps = {
+  onSubmit: (data: SetupData) => void;
+};
+
+export const SetupPage = ({ onSubmit }: SetupPageProps) => {
   const { t } = useTranslation(['core', 'setup']);
-
   return (
     <FormPageLayout maxWidth="md" title={t('setup:pageTitle')}>
       <Form
@@ -76,26 +86,8 @@ export const SetupPage = () => {
           }
         ]}
         submitBtnLabel={t('submit')}
-        validationSchema={z.object({
-          firstName: z.string().min(1),
-          lastName: z.string().min(1),
-          username: z.string().min(1),
-          password: $StrongPassword,
-          initDemo: z.boolean(),
-          dummySubjectCount: z.number().int().nonnegative().optional()
-        })}
-        onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, username }) => {
-          createSetupStateMutation.mutate({
-            admin: {
-              firstName,
-              lastName,
-              password,
-              username
-            },
-            dummySubjectCount,
-            initDemo
-          });
-        }}
+        validationSchema={$SetupData}
+        onSubmit={onSubmit}
       />
     </FormPageLayout>
   );

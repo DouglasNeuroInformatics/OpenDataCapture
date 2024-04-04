@@ -21,5 +21,20 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
     return <SetupLoadingPage />;
   }
 
-  return <SetupPage />;
+  return (
+    <SetupPage
+      onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, username }) => {
+        createSetupStateMutation.mutate({
+          admin: {
+            firstName,
+            lastName,
+            password,
+            username
+          },
+          dummySubjectCount,
+          initDemo
+        });
+      }}
+    />
+  );
 };
