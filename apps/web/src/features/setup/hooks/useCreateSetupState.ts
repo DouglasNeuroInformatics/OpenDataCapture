@@ -3,7 +3,7 @@ import { type InitAppOptions } from '@opendatacapture/schemas/setup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-export function useInitApp() {
+export function useCreateSetupState() {
   const queryClient = useQueryClient();
   const { addNotification } = useNotificationsStore();
   return useMutation({

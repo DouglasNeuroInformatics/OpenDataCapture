@@ -42,9 +42,9 @@ const config = {
       titlePrefix: 'Overview'
     },
     {
-      directory: '../src/features/setup/components',
+      directory: '../src/features/setup/pages',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
-      titlePrefix: 'Setup'
+      titlePrefix: 'Setup Pages'
     },
     {
       directory: '../src/features/subjects/components',

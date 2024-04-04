@@ -48,7 +48,7 @@ export const LoginPage = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <DemoBanner onLogin={(credentials) => void login(credentials)} />
-      <FormPageLayout className="min-h-0 flex-grow" title={t('login')}>
+      <FormPageLayout className="min-h-0 flex-grow" maxWidth="sm" title={t('login')}>
         <LoginForm onSubmit={(credentials) => void login(credentials)} />
       </FormPageLayout>
     </div>
