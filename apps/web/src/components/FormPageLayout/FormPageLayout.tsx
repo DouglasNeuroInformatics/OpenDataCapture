@@ -2,24 +2,30 @@ import React from 'react';
 
 import { Card, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
-
-import logo from '@/assets/logo.png';
+import { Logo } from '@opendatacapture/react-core';
 
 export type FormPageLayoutProps = {
   children: React.ReactNode;
   className?: string;
+  maxWidth: 'lg' | 'md' | 'sm';
   title: string;
-  widthMultiplier?: number;
 };
 
 /** Standalone page used as a wrapper for forms (e.g., on login page) */
-export const FormPageLayout = ({ children, className, title, widthMultiplier = 1 }: FormPageLayoutProps) => (
+export const FormPageLayout = ({ children, className, maxWidth = 'sm', title }: FormPageLayoutProps) => (
   <div className={cn('flex min-h-screen items-center justify-center', className)}>
-    <Card className="m-5 flex flex-col items-center rounded-2xl p-8" style={{ width: `${24 * widthMultiplier}rem` }}>
-      <img alt="logo" className="m-2 h-auto w-16" src={logo} />
+    <Card
+      className={cn(
+        'm-5 flex w-full flex-col items-center rounded-2xl p-8',
+        maxWidth === 'sm' && 'sm:max-w-sm',
+        maxWidth === 'md' && 'sm:max-w-md',
+        maxWidth === 'lg' && 'sm:max-w-lg'
+      )}
+    >
+      <Logo className="m-3 h-auto w-16" variant="auto" />
       <h1 className="mb-3 text-2xl font-bold tracking-tight first-letter:capitalize">{title}</h1>
       {children}
-      <div className="mt-5 flex w-full justify-between bg-inherit">
+      <div className="flex w-full justify-between bg-inherit">
         <LanguageToggle
           align="start"
           options={{

@@ -8,7 +8,78 @@ import { FormPageLayout } from './FormPageLayout';
 
 type Story = StoryObj<typeof FormPageLayout>;
 
-const meta: Meta<typeof FormPageLayout> = {
+export default {
+  component: FormPageLayout,
+  parameters: {
+    layout: 'fullscreen'
+  }
+} satisfies Meta<typeof FormPageLayout>;
+
+export const Small: Story = {
+  args: {
+    children: (
+      <Form
+        content={{
+          v1: {
+            kind: 'string',
+            label: 'Value 1',
+            variant: 'input'
+          },
+          v2: {
+            kind: 'string',
+            label: 'Value 2',
+            variant: 'input'
+          }
+        }}
+        validationSchema={z.record(z.any())}
+        onSubmit={(data) => {
+          alert(JSON.stringify(data));
+        }}
+      />
+    ),
+    maxWidth: 'sm',
+    title: 'Example'
+  }
+};
+
+export const Medium: Story = {
+  args: {
+    children: (
+      <Form
+        content={{
+          v1: {
+            kind: 'string',
+            label: 'Value 1',
+            variant: 'input'
+          },
+          v2: {
+            kind: 'string',
+            label: 'Value 2',
+            variant: 'input'
+          },
+          v3: {
+            kind: 'string',
+            label: 'Value 3',
+            variant: 'input'
+          },
+          v4: {
+            kind: 'string',
+            label: 'Value 4',
+            variant: 'input'
+          }
+        }}
+        validationSchema={z.record(z.any())}
+        onSubmit={(data) => {
+          alert(JSON.stringify(data));
+        }}
+      />
+    ),
+    maxWidth: 'md',
+    title: 'Example'
+  }
+};
+
+export const Large: Story = {
   args: {
     children: (
       <Form
@@ -42,16 +113,6 @@ const meta: Meta<typeof FormPageLayout> = {
             kind: 'string',
             label: 'Value 6',
             variant: 'textarea'
-          },
-          v7: {
-            kind: 'string',
-            label: 'Value 7',
-            variant: 'textarea'
-          },
-          v8: {
-            kind: 'string',
-            label: 'Value 8',
-            variant: 'input'
           }
         }}
         validationSchema={z.record(z.any())}
@@ -60,14 +121,7 @@ const meta: Meta<typeof FormPageLayout> = {
         }}
       />
     ),
+    maxWidth: 'lg',
     title: 'Example'
-  },
-  component: FormPageLayout,
-  parameters: {
-    layout: 'fullscreen'
   }
 };
-
-export default meta;
-
-export const Default: Story = {};
