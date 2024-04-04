@@ -32,7 +32,7 @@ export class InstrumentInterpreter {
     let instrument: AnyInstrument;
     try {
       bundle = (await this.transformBundle?.(bundle)) ?? bundle;
-      const value = await evaluateInstrument(bundle);
+      const value: unknown = await evaluateInstrument(bundle);
       if (!options?.validate) {
         instrument = value as Extract<AnyInstrument, { kind: TKind }>;
       } else if (options.kind === 'FORM') {

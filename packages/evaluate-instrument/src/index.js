@@ -7,8 +7,8 @@
  * PLAYGROUND).**
  *
  * @param {string} bundle
- * @returns {Promise<unknown>}
+ * @returns {Promise<any>}
  */
 export async function evaluateInstrument(bundle) {
-  return await new Function(`return ${bundle}`)();
+  return new Function(`return ${bundle}`)();
 }
