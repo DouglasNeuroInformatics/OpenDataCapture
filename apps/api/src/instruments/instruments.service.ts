@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
-import { InstrumentTransformer } from '@opendatacapture/instrument-transformer';
+import { InstrumentTransformer } from '@opendatacapture/instrument-transformer/server';
 import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@opendatacapture/schemas/instrument';
 import type { Prisma } from '@prisma/client';
 import { omit } from 'lodash-es';

@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 import fs from 'fs/promises';
 import module from 'module';
 
-import { InstrumentTransformer } from '@opendatacapture/instrument-transformer';
+import { InstrumentTransformer } from '@opendatacapture/instrument-transformer/server';
 import { minify } from 'csso';
 import mime from 'mime/lite';
 

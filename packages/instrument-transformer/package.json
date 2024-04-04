@@ -5,7 +5,8 @@
   "license": "AGPL-3.0",
   "exports": {
     ".": "./src/index.ts",
-    "./browser": "./src/browser.ts"
+    "./browser": "./src/browser.ts",
+    "./server": "./src/server.ts"
   },
   "scripts": {
     "format": "prettier --write src",

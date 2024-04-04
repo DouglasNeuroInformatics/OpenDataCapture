@@ -30,8 +30,8 @@ export class ConfigurationModule {
       imports: [
         ...options.conditionalModules.flatMap(({ condition, module, modules }) =>
           module
-            ? ConditionalModule.registerWhen(module, condition!)
-            : modules.map((module) => ConditionalModule.registerWhen(module, condition!))
+            ? ConditionalModule.registerWhen(module, condition)
+            : modules.map((module) => ConditionalModule.registerWhen(module, condition))
         ),
         ConfigModule.forRoot({
           validate: (config) => $Configuration.parse(config)
