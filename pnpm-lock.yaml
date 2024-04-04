@@ -593,6 +593,9 @@ importers:
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
+      '@opendatacapture/instrument-stubs':
+        specifier: workspace:*
+        version: link:../../packages/instrument-stubs
       '@opendatacapture/instrument-utils':
         specifier: workspace:*
         version: link:../../packages/instrument-utils
