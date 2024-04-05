@@ -14,7 +14,6 @@
     "storybook": "storybook dev -p 6006"
   },
   "peerDependencies": {
-    "@opendatacapture/runtime-v1": "workspace:*",
     "react": "18.x",
     "react-dom": "18.x",
     "tailwindcss": "3.x",
@@ -30,6 +29,7 @@
     "@opendatacapture/instrument-utils": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
+    "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "framer-motion": "^11.0.12",
     "i18next": "^23.10.1",
