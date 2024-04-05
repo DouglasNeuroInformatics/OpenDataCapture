@@ -4,6 +4,15 @@ import { Logo } from './Logo';
 
 type Story = StoryObj<typeof Logo>;
 
-export default { component: Logo } satisfies Meta<typeof Logo>;
+export default {
+  component: Logo,
+  parameters: {
+    layout: 'centered'
+  }
+} satisfies Meta<typeof Logo>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: {
+    className: 'w-96'
+  }
+};
