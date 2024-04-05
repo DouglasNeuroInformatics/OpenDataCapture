@@ -1,5 +1,6 @@
+import { rmdir } from 'fs';
+
 import { defineConfig } from 'cypress';
-const { rmdir } = require('fs');
 
 export default defineConfig({
   e2e: {
