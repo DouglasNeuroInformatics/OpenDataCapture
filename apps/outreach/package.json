@@ -9,7 +9,7 @@
     "format": "prettier --write src",
     "format:translations": "find src/i18n/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "lint": "astro check && eslint --fix src",
-    "start": "astro preview"
+    "preview": "astro preview"
   },
   "dependencies": {
     "lodash-es": "^4.17.21",

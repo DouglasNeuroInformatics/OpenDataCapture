@@ -24,7 +24,7 @@
     "lint": {
       "dependsOn": ["^build", "^db:generate"]
     },
-    "start": {
+    "preview": {
       "dependsOn": ["build", "inject"],
       "persistent": true
     },
