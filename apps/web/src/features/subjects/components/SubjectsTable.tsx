@@ -64,6 +64,7 @@ export const SubjectsTable = () => {
       <SubjectLookup show={showLookup} onClose={handleLookupClose} />
       <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
         <SearchBar
+          className="flex-grow"
           onClick={() => {
             setShowLookup(true);
           }}
