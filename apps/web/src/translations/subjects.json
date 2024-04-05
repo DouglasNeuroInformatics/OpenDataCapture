@@ -166,7 +166,7 @@
     },
     "subjectText": {
       "en": "{{form}} of Subject: {{id}}",
-      "fr": "{{form}} du Sujet : {{id}}"
+      "fr": "{{form}} du client : {{id}}"
     },
     "measurement": {
       "en": "Measures: ",
