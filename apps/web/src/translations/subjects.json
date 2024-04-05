@@ -158,5 +158,27 @@
       "en": "Value",
       "fr": "Valeur"
     }
+  },
+  "downloadInfo": {
+    "download": {
+      "en": "Download",
+      "fr": "Télécharger"
+    },
+    "subjectText": {
+      "en": "{{form}} of Subject: {{id}}",
+      "fr": "{{form}} du client : {{id}}"
+    },
+    "measurement": {
+      "en": "Measures: ",
+      "fr": "Mesures : "
+    },
+    "time": {
+      "en": "Time frame: ",
+      "fr": "Période : "
+    },
+    "allTime": {
+      "en": "Time frame: All time",
+      "fr": "Période : Toujours"
+    }
   }
 }

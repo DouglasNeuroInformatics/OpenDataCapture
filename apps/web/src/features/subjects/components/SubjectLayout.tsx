@@ -19,7 +19,7 @@ export const SubjectLayout = () => {
   return (
     <React.Fragment>
       <PageHeader title={t('layout.title', { id: subjectId.slice(0, 7) })} />
-      <div className="mb-5 flex">
+      <div className="mb-5 flex print:hidden">
         {config.setup.isGatewayEnabled && (
           <TabLink
             dataCy="subject-assignment"

@@ -39,6 +39,7 @@
     "axios": "^1.6.7",
     "clsx": "^2.1.0",
     "framer-motion": "^10.18.0",
+    "html2canvas": "^1.4.1",
     "i18next": "^23.10.1",
     "i18next-http-backend": "^2.5.0",
     "jwt-decode": "^4.0.0",
