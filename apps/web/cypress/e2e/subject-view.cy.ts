@@ -1,7 +1,7 @@
 // //make sure to change these credentials based on the profiles within the database
 import { adminUser } from '@/test/server/stubs';
 
-import { deleteDownloadsFolder } from '../utils/utils';
+import { deleteDownloadsFolder } from '../utils';
 // const username = 'david';
 // const password = 'Password123';
 
