@@ -32,6 +32,8 @@ const { __dirname, __filename, require } = await (async () => {
 })();
 `;
 
+const outfile = path.resolve(outdir, 'app.mjs');
+
 /** @type {import('esbuild').BuildOptions & { external: NonNullable<unknown>, plugins: NonNullable<unknown> }} */
 const options = {
   banner: {
@@ -42,7 +44,7 @@ const options = {
   external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],
   format: 'esm',
   keepNames: true,
-  outfile: path.resolve(outdir, 'app.mjs'),
+  outfile,
   platform: 'node',
   plugins: [
     esbuildPluginTsc({
@@ -74,9 +76,39 @@ async function build() {
   console.log('Done!');
 }
 
+async function watch() {
+  return new Promise((resolve, reject) => {
+    esbuild
+      .context({
+        ...options,
+        external: [...options.external, 'esbuild'],
+        plugins: [
+          ...options.plugins,
+          {
+            name: 'rebuild',
+            setup(build) {
+              build.onEnd((result) => {
+                console.log(`Done! Build completed with ${result.errors.length} errors`);
+                resolve(result);
+              });
+            }
+          }
+        ],
+        sourcemap: true
+      })
+      .then((ctx) => {
+        ctx.watch();
+        console.log('Watching...');
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
 const isEntry = process.argv[1] === import.meta.filename;
 if (isEntry) {
   build();
 }
 
-export { build, clean, options };
+export { clean, outfile, watch };

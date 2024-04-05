@@ -6,11 +6,10 @@
   "license": "AGPL-3.0",
   "scripts": {
     "build": "node scripts/build.js",
-    "build:watch": "node scripts/build.js --watch",
-    "dev": "NODE_ENV=development env-cmd -f ../../.env concurrently \"pnpm build:watch\" \"sleep 1 && nodemon dist/app.mjs\"",
+    "dev": "NODE_ENV=development env-cmd -f ../../.env node scripts/dev.js",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "preview": "env-cmd -f ../../.env --use-shell 'NODE_OPTIONS=\"--enable-source-maps\" API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=production ESBUILD_BINARY_PATH=dist/bin/esbuild GATEWAY_SITE_ADDRESS=http://localhost:$GATEWAY_DEV_SERVER_PORT  node dist/app.mjs'",
+    "preview": "env-cmd -f ../../.env --use-shell 'NODE_OPTIONS=\"--enable-source-maps\" API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=production ESBUILD_BINARY_PATH=dist/bin/esbuild GATEWAY_SITE_ADDRESS=http://localhost:$GATEWAY_DEV_SERVER_PORT node dist/app.mjs'",
     "test": "env-cmd -f ../../.env vitest run"
   },
   "dependencies": {
@@ -57,6 +56,7 @@
     "@opendatacapture/esbuild-plugin-runtime": "workspace:*",
     "@types/express": "^4.17.21",
     "@types/lodash-es": "^4.17.12",
+    "@types/nodemon": "^1.19.6",
     "@types/passport": "^1.0.16",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
