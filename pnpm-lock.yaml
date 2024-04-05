@@ -1145,15 +1145,9 @@ importers:
       '@jspsych/plugin-preload':
         specifier: ^1.1.3
         version: 1.1.3(jspsych@7.3.4)
-      '@opendatacapture/instrument-interpreter':
+      '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
-        version: link:../../packages/instrument-interpreter
-      '@opendatacapture/instrument-renderer':
-        specifier: workspace:*
-        version: link:../../packages/instrument-renderer
-      '@opendatacapture/instrument-transformer':
-        specifier: workspace:*
-        version: link:../../packages/instrument-transformer
+        version: link:../../packages/evaluate-instrument
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas

@@ -5,10 +5,7 @@
  * **IMPORTANT: ONLY INPUT FROM TRUSTED USERS MUST BE PASSED TO THIS FUNCTION. THE ONLY EXCEPTION
  * TO THIS IS ON A COMPLETELY STATIC WEBSITE THAT NEVER INTERACTS WITH OUR SERVERS (I.E., THE INSTRUMENT
  * PLAYGROUND).**
- *
- * @param {string} bundle
- * @returns {Promise<any>}
  */
-export async function evaluateInstrument(bundle) {
-  return new Function(`return ${bundle}`)();
+export async function evaluateInstrument(bundle: string) {
+  return (await new Function(`return ${bundle}`)()) as Promise<unknown>;
 }

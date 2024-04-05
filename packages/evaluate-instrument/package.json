@@ -5,10 +5,10 @@
   "private": true,
   "license": "AGPL-3.0",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "eslint --fix src"
+    "lint": "tsc && eslint --fix src"
   }
 }
