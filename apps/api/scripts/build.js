@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import fs from 'fs/promises';
 import module from 'module';
 import path from 'path';
@@ -16,10 +18,6 @@ const tsconfig = path.resolve(import.meta.dirname, '../tsconfig.json');
 
 const binDir = path.resolve(outdir, 'bin');
 
-await fs.rm(outdir, { force: true, recursive: true });
-await fs.mkdir(outdir);
-await fs.mkdir(binDir);
-
 const cjsShims = `
 const { __dirname, __filename, require } = await (async () => {
   const module = (await import('module')).default;
@@ -33,12 +31,6 @@ const { __dirname, __filename, require } = await (async () => {
   return { __dirname, __filename, require };
 })();
 `;
-
-// Copy ESBuild
-async function copyEsbuild() {
-  const filepath = require.resolve('esbuild/bin/esbuild');
-  await fs.copyFile(filepath, path.join(binDir, 'esbuild'));
-}
 
 /** @type {import('esbuild').BuildOptions} */
 const options = {
@@ -64,16 +56,27 @@ const options = {
   tsconfig
 };
 
-if (process.argv.includes('--watch')) {
-  const ctx = await esbuild.context({
-    ...options,
-    external: [...(options.external ?? []), 'esbuild'],
-    sourcemap: true
-  });
-  await ctx.watch();
-  console.log('Watching...');
-} else {
+async function copyEsbuild() {
+  const filepath = require.resolve('esbuild/bin/esbuild');
+  await fs.copyFile(filepath, path.join(binDir, 'esbuild'));
+}
+
+async function clean() {
+  await fs.rm(outdir, { force: true, recursive: true });
+  await fs.mkdir(outdir);
+  await fs.mkdir(binDir);
+}
+
+async function build() {
+  await clean();
   await copyEsbuild();
   await esbuild.build(options);
   console.log('Done!');
 }
+
+const isEntry = process.argv[1] === import.meta.filename;
+if (isEntry) {
+  build();
+}
+
+export { build, clean, options };
