@@ -2,7 +2,7 @@ import React from 'react';
 
 import { NotificationHub } from '@douglasneuroinformatics/libui/components';
 import { i18n } from '@opendatacapture/i18next';
-import { ErrorFallback } from '@opendatacapture/react-core';
+import { ErrorPage } from '@opendatacapture/react-core';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { SuspenseFallback } from './components/SuspenseFallback';
@@ -14,7 +14,7 @@ await i18n.init();
 export const App = () => {
   return (
     <React.Suspense fallback={<SuspenseFallback />}>
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ErrorBoundary FallbackComponent={ErrorPage}>
         <NotificationHub />
         <Editor />
       </ErrorBoundary>

@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 
-export type ErrorFallbackProps = {
+export type ErrorPageProps = {
   error: {
     message: string;
   };
 };
 
-export const ErrorFallback = ({ error }: ErrorFallbackProps) => {
+export const ErrorPage = ({ error }: ErrorPageProps) => {
   useEffect(() => {
     console.error(error);
   }, [error]);
