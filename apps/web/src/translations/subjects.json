@@ -162,7 +162,7 @@
   "downloadInfo": {
     "download": {
       "en": "Download",
-      "fr": "télécharger"
+      "fr": "Télécharger"
     },
     "subjectText": {
       "en": "{{form}} of Subject: {{id}}",
@@ -171,6 +171,14 @@
     "measurement": {
       "en": "Measures: ",
       "fr": "Mesures : "
+    },
+    "time": {
+      "en": "Time frame: ",
+      "fr": "Période : "
+    },
+    "allTime": {
+      "en": "Time frame: All time",
+      "fr": "Période : Toujours"
     }
   }
 }

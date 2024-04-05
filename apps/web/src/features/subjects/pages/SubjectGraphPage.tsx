@@ -81,12 +81,13 @@ export const SubjectGraphPage = () => {
 
         const graphTime = document.createElement('p');
         if (minDate) {
-          graphTime.innerText = 'Time frame: ' + toBasicISOString(minDate) + ' - ' + toBasicISOString(new Date());
+          graphTime.innerText = t('downloadInfo.time');
+          graphTime.innerText += toBasicISOString(minDate) + ' - ' + toBasicISOString(new Date());
 
           graphTime.className = 'p-2 font-semibold';
           element.append(graphTime);
         } else {
-          graphTime.innerText = 'Time frame: All-Time';
+          graphTime.innerText = t('downloadInfo.allTime');
 
           graphTime.className = 'p-2 font-semibold';
           element.append(graphTime);
