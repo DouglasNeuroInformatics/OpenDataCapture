@@ -12,5 +12,5 @@
     },
     "strictPropertyInitialization": false
   },
-  "include": ["src/**/*"]
+  "include": ["scripts/*", "src/**/*"]
 }
