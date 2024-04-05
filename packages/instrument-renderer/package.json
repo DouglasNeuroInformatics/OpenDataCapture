@@ -14,6 +14,7 @@
     "storybook": "storybook dev -p 6006"
   },
   "peerDependencies": {
+    "@opendatacapture/runtime-v1": "workspace:*",
     "react": "18.x",
     "react-dom": "18.x",
     "tailwindcss": "3.x",

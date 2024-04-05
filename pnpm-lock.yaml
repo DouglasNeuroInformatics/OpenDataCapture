@@ -896,6 +896,9 @@ importers:
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../react-core
+      '@opendatacapture/runtime-v1':
+        specifier: workspace:*
+        version: link:../../runtime/v1
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas

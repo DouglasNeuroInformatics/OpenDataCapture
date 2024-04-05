@@ -4,6 +4,8 @@ import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
 import { $Json, type Json } from '@opendatacapture/schemas/core';
 import type { Promisable } from 'type-fest';
 
+import bootstrapScript from '../scripts/bootstrap-interactive-content?raw';
+
 export type InteractiveContentProps = {
   bundle: string;
   onSubmit: (data: Json) => Promisable<void>;
@@ -36,7 +38,7 @@ export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps
       data-bundle={bundle}
       name="interactive-instrument"
       ref={ref}
-      srcDoc='<script src="/runtime/v1/_internal/bootstrap.js" type="module"></script>'
+      srcDoc={`<script type="module">${bootstrapScript}</script>`}
       title="Open Data Capture - Interactive Instrument"
       onLoad={(event) => {
         const contentWindow: Window | null = event.currentTarget.contentWindow;
