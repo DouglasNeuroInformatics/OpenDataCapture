@@ -32,7 +32,7 @@ const { __dirname, __filename, require } = await (async () => {
 })();
 `;
 
-/** @type {import('esbuild').BuildOptions} */
+/** @type {import('esbuild').BuildOptions & { external: NonNullable<unknown>, plugins: NonNullable<unknown> }} */
 const options = {
   banner: {
     js: cjsShims
