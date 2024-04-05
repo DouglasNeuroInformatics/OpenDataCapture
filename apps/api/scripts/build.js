@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import module from 'module';
 import path from 'path';
-import url from 'url';
 
 import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-native-modules';
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
@@ -9,13 +8,11 @@ import { runtimePlugin } from '@opendatacapture/esbuild-plugin-runtime';
 import esbuild from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
 
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const require = module.createRequire(import.meta.url);
 
-const entryFile = path.resolve(__dirname, '../src/main.ts');
-const outdir = path.resolve(__dirname, '../dist');
-const tsconfig = path.resolve(__dirname, '../tsconfig.json');
+const entryFile = path.resolve(import.meta.dirname, '../src/main.ts');
+const outdir = path.resolve(import.meta.dirname, '../dist');
+const tsconfig = path.resolve(import.meta.dirname, '../tsconfig.json');
 
 const binDir = path.resolve(outdir, 'bin');
 
