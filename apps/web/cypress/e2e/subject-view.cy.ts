@@ -38,7 +38,7 @@ describe('Subject view test', () => {
     cy.get('div[data-cy="time-select"]').click();
     cy.get('button[data-cy="dropdown-menu-option"]').eq(0).click();
 
-    cy.get('div[data-cy="download-button"]').click();
+    cy.get('div[data-cy="download-button-container"]').click();
 
     //check if downloaded file exists
     cy.readFile('cypress/downloads/19c6811.png');

@@ -135,7 +135,7 @@ export const SubjectGraphPage = () => {
             <div data-cy="time-select">
               <TimeDropdown setMinTime={setMinDate} />
             </div>
-            <div className="relative w-full whitespace-nowrap" data-cy="download-button">
+            <div className="relative w-full whitespace-nowrap" data-cy="download-button-container">
               <Button
                 className="relative w-full whitespace-nowrap text-sm"
                 disabled={!instrument}
