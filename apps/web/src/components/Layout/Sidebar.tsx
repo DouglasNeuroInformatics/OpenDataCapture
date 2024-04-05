@@ -52,7 +52,7 @@ export const Sidebar = () => {
       <hr className="my-1 h-[1px] border-none bg-slate-700" />
       <div className="flex items-center">
         <UserDropup />
-        <ThemeToggle />
+        <ThemeToggle className="hover:bg-slate-800 hover:text-slate-300" variant="ghost" />
       </div>
     </div>
   );
