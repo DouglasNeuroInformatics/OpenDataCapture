@@ -22,12 +22,12 @@ export const Small: Story = {
         content={{
           v1: {
             kind: 'string',
-            label: 'Value 1',
+            label: 'Username',
             variant: 'input'
           },
           v2: {
             kind: 'string',
-            label: 'Value 2',
+            label: 'Password',
             variant: 'input'
           }
         }}
@@ -38,7 +38,7 @@ export const Small: Story = {
       />
     ),
     maxWidth: 'sm',
-    title: 'Example'
+    title: 'Login'
   }
 };
 
