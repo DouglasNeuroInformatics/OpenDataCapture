@@ -13,9 +13,7 @@ export function accessibleQuery<T extends ModelEntityName>(
   if (!ability) {
     return {};
   }
-
   // @ts-expect-error - under investigation
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return accessibleBy(ability, action)[entityName];
+  return accessibleBy(ability, action)[entityName] as ReturnType<typeof accessibleBy>[`${T}Model`];
   // what should work accessibleBy(ability, action)[getModelName(entityName)]
 }
