@@ -1,8 +1,8 @@
 {
-  "name": "@open-data-capture/instrument-interpreter",
+  "name": "@opendatacapture/instrument-interpreter",
+  "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
@@ -12,10 +12,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@open-data-capture/common": "workspace:*"
+    "@opendatacapture/evaluate-instrument": "workspace:*",
+    "@opendatacapture/schemas": "workspace:*"
   },
   "devDependencies": {
-    "@open-data-capture/instrument-library": "workspace:*",
-    "@open-data-capture/vite-plugin-runtime": "workspace:*"
+    "@opendatacapture/vite-plugin-runtime": "workspace:*"
   }
 }

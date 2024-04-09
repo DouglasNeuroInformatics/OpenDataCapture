@@ -1,9 +1,9 @@
 {
   "extends": "../../jsconfig.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
+    "jsx": "react",
     "module": "ESNext",
     "moduleResolution": "Bundler"
   },
-  "include": ["src/**/*"]
+  "include": [".storybook/*", "src/**/*"]
 }

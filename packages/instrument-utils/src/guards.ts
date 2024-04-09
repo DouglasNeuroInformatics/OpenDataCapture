@@ -9,7 +9,7 @@ import type {
   SomeMultilingualInstrument,
   SomeUnilingualInstrument,
   UnilingualInstrumentSummary
-} from '@open-data-capture/common/instrument';
+} from '@opendatacapture/schemas/instrument';
 
 export function isUnilingualInstrument<TKind extends InstrumentKind>(
   instrument: SomeInstrument<TKind>

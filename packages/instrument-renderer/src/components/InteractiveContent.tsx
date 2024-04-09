@@ -1,8 +1,10 @@
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
-import { StepperContext } from '@douglasneuroinformatics/ui/legacy';
-import { $Json, type Json } from '@open-data-capture/common/core';
+import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
+import { $Json, type Json } from '@opendatacapture/schemas/core';
 import type { Promisable } from 'type-fest';
+
+import bootstrapScript from '../scripts/bootstrap-interactive-content?raw';
 
 export type InteractiveContentProps = {
   bundle: string;
@@ -10,7 +12,7 @@ export type InteractiveContentProps = {
 };
 
 export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps) => {
-  const { updateIndex } = useContext(StepperContext);
+  const { updateIndex } = useLegacyStepper();
   const ref = useRef<HTMLIFrameElement>(null);
 
   const handler = useCallback(
@@ -36,7 +38,7 @@ export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps
       data-bundle={bundle}
       name="interactive-instrument"
       ref={ref}
-      srcDoc='<script src="/runtime/v0.0.1/_internal/bootstrap.js" type="module"></script>'
+      srcDoc={`<script type="module">${bootstrapScript}</script>`}
       title="Open Data Capture - Interactive Instrument"
       onLoad={(event) => {
         const contentWindow: Window | null = event.currentTarget.contentWindow;

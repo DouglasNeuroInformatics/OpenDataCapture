@@ -1,5 +1,7 @@
+import React from 'react';
+
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { ClientTable, Dropdown } from '@douglasneuroinformatics/ui/legacy';
+import { LegacyClientTable, LegacyDropdown } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -32,11 +34,10 @@ export const SubjectTablePage = () => {
         <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row" data-cy="select-instrument">
-            <Dropdown
+            <LegacyDropdown
               className="text-sm"
               options={instrumentOptions}
               title={t('visualization.instrument')}
-              variant="secondary"
               onSelection={setInstrumentId}
             />
           </div>
@@ -46,18 +47,17 @@ export const SubjectTablePage = () => {
             </div>
 
             <div data-cy="download-dropdown">
-              <Dropdown
+              <LegacyDropdown
                 className="text-sm"
                 options={['CSV', 'JSON']}
                 title={t('core:download')}
-                variant="secondary"
                 onSelection={dl}
               />
             </div>
           </div>
         </div>
       </div>
-      <ClientTable
+      <LegacyClientTable
         columns={[
           {
             field: '__date__',

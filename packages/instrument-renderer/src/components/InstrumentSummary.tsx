@@ -1,11 +1,12 @@
-import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { useDownload } from '@douglasneuroinformatics/ui/hooks';
-import { Card } from '@douglasneuroinformatics/ui/legacy';
+import React from 'react';
+
+import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
+import { Card } from '@douglasneuroinformatics/libui/components';
+import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
-import { toLowerCase } from '@open-data-capture/common/core';
-import type { InstrumentKind, SomeUnilingualInstrument } from '@open-data-capture/common/instrument';
-import type { Subject } from '@open-data-capture/common/subject';
-import { computeInstrumentMeasures } from '@open-data-capture/instrument-utils';
+import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
+import type { InstrumentKind, SomeUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 
 import { CopyButton } from './CopyButton';

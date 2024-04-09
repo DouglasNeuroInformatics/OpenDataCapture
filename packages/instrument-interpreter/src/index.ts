@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-implied-eval */
 
-import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@open-data-capture/common/instrument';
-import type { AnyInstrument, InstrumentKind } from '@open-data-capture/common/instrument';
+import { evaluateInstrument } from '@opendatacapture/evaluate-instrument';
+import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyInstrument, InstrumentKind } from '@opendatacapture/schemas/instrument';
 import type { Promisable } from 'type-fest';
-
 export type InstrumentInterpreterOptions = {
   /** An optional function to preprocess a bundle */
   transformBundle?: ((bundle: string) => Promisable<string>) | null;
@@ -25,12 +25,14 @@ export class InstrumentInterpreter {
     this.transformBundle = options?.transformBundle;
   }
 
-  async interpret<TKind extends InstrumentKind>(bundle: string, options?: InterpretOptions<TKind>) {
+  async interpret<TKind extends InstrumentKind>(
+    bundle: string,
+    options?: InterpretOptions<TKind>
+  ): Promise<Extract<AnyInstrument, { kind: TKind }>> {
     let instrument: AnyInstrument;
     try {
       bundle = (await this.transformBundle?.(bundle)) ?? bundle;
-      const factory = new Function(`return ${bundle}`);
-      const value = (await factory()) as unknown;
+      const value: unknown = await evaluateInstrument(bundle);
       if (!options?.validate) {
         instrument = value as Extract<AnyInstrument, { kind: TKind }>;
       } else if (options.kind === 'FORM') {

@@ -1,5 +1,5 @@
-import { PublicKey } from '@open-data-capture/crypto';
-import { PrismaClient } from '@open-data-capture/database/gateway';
+import { PublicKey } from '@opendatacapture/crypto';
+import { PrismaClient } from '@opendatacapture/database/gateway';
 
 export const prisma = new PrismaClient().$extends({
   result: {

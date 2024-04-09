@@ -1,7 +1,9 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Form } from '@douglasneuroinformatics/ui/legacy';
-import type { LoginCredentials } from '@open-data-capture/common/auth';
+import React from 'react';
+
+import { Form } from '@douglasneuroinformatics/libui/components';
+import type { LoginCredentials } from '@opendatacapture/schemas/auth';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -12,15 +14,15 @@ export type LoginFormProps = {
 export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const { t } = useTranslation('auth');
   return (
-    <Form<LoginCredentials>
+    <Form
       content={{
         username: {
-          kind: 'text',
+          kind: 'string',
           label: t('username'),
-          variant: 'short'
+          variant: 'input'
         },
         password: {
-          kind: 'text',
+          kind: 'string',
           label: t('password'),
           variant: 'password'
         }

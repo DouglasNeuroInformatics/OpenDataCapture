@@ -1,24 +1,11 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
+const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  validationSchema: z.object({
-    abstraction: z.number().int().gte(0).lte(2),
-    attention: z.number().int().gte(0).lte(6),
-    delayedRecall: z.number().int().gte(0).lte(5),
-    language: z.number().int().gte(0).lte(3),
-    lowEdu: z.boolean(),
-    naming: z.number().int().gte(0).lte(3),
-    orientation: z.number().int().gte(0).lte(6),
-    visuospatialExecutive: z.number().int().gte(0).lte(5)
-  })
-});
-
-export default instrumentFactory.defineInstrument({
   name: 'MontrealCognitiveAssessment',
   tags: {
     en: ['Cognitive'],
@@ -27,92 +14,92 @@ export default instrumentFactory.defineInstrument({
   version: 8.1,
   content: {
     abstraction: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Abstraction',
         fr: 'Abstraction'
       },
       max: 2,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     attention: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Attention',
         fr: 'Attention'
       },
       max: 6,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     delayedRecall: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Delayed Recall',
         fr: 'Rappel'
       },
       max: 5,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     language: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Language',
         fr: 'Langue'
       },
       max: 3,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     lowEdu: {
-      kind: 'binary',
+      kind: 'boolean',
       label: {
         en: 'Less Than 12 Years of Education',
         fr: "Moins de 12 ans d'études"
       },
       options: {
         en: {
-          f: 'No',
-          t: 'Yes'
+          false: 'No',
+          true: 'Yes'
         },
         fr: {
-          f: 'No',
-          t: 'Oui'
+          false: 'No',
+          true: 'Oui'
         }
       },
       variant: 'radio'
     },
     naming: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Naming',
         fr: 'Dénomination'
       },
       max: 3,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     orientation: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Orientation',
         fr: 'Orientation'
       },
       max: 6,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     },
     visuospatialExecutive: {
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Visuospatial/Executive',
         fr: 'Visuospatial/Exécutif'
       },
       max: 5,
       min: 0,
-      variant: 'default'
+      variant: 'input'
     }
   },
   details: {
@@ -174,5 +161,15 @@ export default instrumentFactory.defineInstrument({
       kind: 'const',
       ref: 'visuospatialExecutive'
     }
-  }
+  },
+  validationSchema: z.object({
+    abstraction: z.number().int().gte(0).lte(2),
+    attention: z.number().int().gte(0).lte(6),
+    delayedRecall: z.number().int().gte(0).lte(5),
+    language: z.number().int().gte(0).lte(3),
+    lowEdu: z.boolean(),
+    naming: z.number().int().gte(0).lte(3),
+    orientation: z.number().int().gte(0).lte(6),
+    visuospatialExecutive: z.number().int().gte(0).lte(5)
+  })
 });

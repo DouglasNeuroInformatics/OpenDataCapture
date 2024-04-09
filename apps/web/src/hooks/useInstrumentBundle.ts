@@ -1,4 +1,4 @@
-import { $InstrumentBundleContainer } from '@open-data-capture/common/instrument';
+import { $InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

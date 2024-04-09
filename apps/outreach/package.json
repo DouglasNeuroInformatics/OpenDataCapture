@@ -1,7 +1,7 @@
 {
-  "name": "@open-data-capture/outreach",
-  "version": "0.0.0",
+  "name": "@opendatacapture/outreach",
   "type": "module",
+  "version": "0.0.0",
   "scripts": {
     "astro": "astro",
     "build": "astro build",
@@ -9,7 +9,7 @@
     "format": "prettier --write src",
     "format:translations": "find src/i18n/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "lint": "astro check && eslint --fix src",
-    "start": "astro preview"
+    "preview": "astro preview"
   },
   "dependencies": {
     "lodash-es": "^4.17.21",
@@ -23,7 +23,7 @@
     "@astrojs/sitemap": "^3.1.1",
     "@astrojs/starlight": "^0.18.1",
     "@astrojs/tailwind": "^5.1.0",
-    "@open-data-capture/tailwindcss": "workspace:*",
+    "@opendatacapture/tailwindcss": "workspace:*",
     "@tailwindcss/typography": "^0.5.10",
     "@types/lodash-es": "^4.17.12",
     "astro": "^4.5.2",

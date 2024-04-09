@@ -1,7 +1,7 @@
 import path from 'path';
 import url from 'url';
 
-import instrument from '@open-data-capture/rollup-plugin-instrument';
+import instrument from '@opendatacapture/rollup-plugin-instrument';
 import resolve from '@rollup/plugin-node-resolve';
 import { defineConfig } from 'rollup';
 

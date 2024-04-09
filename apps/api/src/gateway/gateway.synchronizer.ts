@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
-import type { RemoteAssignment } from '@open-data-capture/common/assignment';
-import { $Json } from '@open-data-capture/common/core';
-import { Decrypter } from '@open-data-capture/crypto';
+import { Decrypter } from '@opendatacapture/crypto';
+import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
+import { $Json } from '@opendatacapture/schemas/core';
 
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { ConfigurationService } from '@/configuration/configuration.service';

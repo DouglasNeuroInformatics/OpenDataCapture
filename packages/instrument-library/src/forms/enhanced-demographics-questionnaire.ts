@@ -1,9 +1,9 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
+const { z } = await import('/runtime/v1/zod.js');
 
-type Language = Extract<import('/runtime/v0.0.1/core.js').InstrumentLanguage, string>;
+type Language = Extract<import('/runtime/v1/core.js').InstrumentLanguage, string>;
 
 type MultilingualOptions = { [key: string]: { [L in Language]: string } };
 
@@ -581,40 +581,18 @@ const religion = {
 
 const yesNoOptions = /** @type {const} */ {
   en: {
-    f: 'No',
-    t: 'Yes'
+    false: 'No',
+    true: 'Yes'
   },
   fr: {
-    f: 'Non',
-    t: 'Oui'
+    false: 'Non',
+    true: 'Oui'
   }
 };
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  validationSchema: z
-    .object({
-      ageAtImmigration: z.number().int().gte(1).lte(100),
-      annualIncome: z.number().int().gte(0).lte(1000000),
-      employmentStatus: z.enum(extractKeysAsTuple(employmentStatus)),
-      ethnicOrigin: z.enum(extractKeysAsTuple(ethnicOrigin)),
-      firstLanguage: z.enum(extractKeysAsTuple(firstLanguage)),
-      gender: z.enum(extractKeysAsTuple(gender)),
-      householdSize: z.number().int().gte(0).lte(20),
-      isCanadianCitizen: z.boolean(),
-      maritalStatus: z.enum(extractKeysAsTuple(maritalStatus)),
-      numberChildren: z.number().int().gte(0).lte(20),
-      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
-      religion: z.enum(extractKeysAsTuple(religion)),
-      speaksEnglish: z.boolean(),
-      speaksFrench: z.boolean(),
-      yearsOfEducation: z.number().int().gte(0).lte(30)
-    })
-    .partial()
-});
-
-export default instrumentFactory.defineInstrument({
   name: 'EnhancedDemographicsQuestionnaire',
   tags: {
     en: ['Demographics'],
@@ -625,28 +603,31 @@ export default instrumentFactory.defineInstrument({
     {
       fields: {
         ethnicOrigin: {
-          kind: 'options',
+          kind: 'string',
           label: {
             en: 'Ethnic Origin',
             fr: 'Origine ethnique'
           },
-          options: formatTranslatedOptions(ethnicOrigin)
+          options: formatTranslatedOptions(ethnicOrigin),
+          variant: 'select'
         },
         gender: {
-          kind: 'options',
+          kind: 'string',
           label: {
             en: 'Gender Identity',
             fr: 'Identité de genre'
           },
-          options: formatTranslatedOptions(gender)
+          options: formatTranslatedOptions(gender),
+          variant: 'select'
         },
         religion: {
-          kind: 'options',
+          kind: 'string',
           label: {
             en: 'Religion',
             fr: 'Religion'
           },
-          options: formatTranslatedOptions(religion)
+          options: formatTranslatedOptions(religion),
+          variant: 'select'
         }
       },
       title: {
@@ -657,15 +638,16 @@ export default instrumentFactory.defineInstrument({
     {
       fields: {
         firstLanguage: {
-          kind: 'options',
+          kind: 'string',
           label: {
             en: 'First Language',
             fr: 'Langue maternelle'
           },
-          options: formatTranslatedOptions(firstLanguage)
+          options: formatTranslatedOptions(firstLanguage),
+          variant: 'select'
         },
         speaksEnglish: {
-          kind: 'binary',
+          kind: 'boolean',
           label: {
             en: 'Speak and Understand English',
             fr: "Parler et comprendre l'anglais"
@@ -674,7 +656,7 @@ export default instrumentFactory.defineInstrument({
           variant: 'radio'
         },
         speaksFrench: {
-          kind: 'binary',
+          kind: 'boolean',
           label: {
             en: 'Speak and Understand French',
             fr: 'Parler et comprendre le français'
@@ -691,40 +673,41 @@ export default instrumentFactory.defineInstrument({
     {
       fields: {
         householdSize: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Household Size',
             fr: 'Taille du ménage'
           },
           max: 20,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         maritalStatus: {
-          kind: 'options',
+          kind: 'string',
           label: {
             en: 'Martial Status',
             fr: 'État matrimonial'
           },
-          options: formatTranslatedOptions(maritalStatus)
+          options: formatTranslatedOptions(maritalStatus),
+          variant: 'select'
         },
         numberChildren: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Number of Children',
             fr: "Nombre d'enfants"
           },
           max: 20,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         postalCode: {
-          kind: 'text',
+          kind: 'string',
           label: {
             en: 'Postal Code',
             fr: 'Code postal'
           },
-          variant: 'short'
+          variant: 'input'
         }
       },
       title: {
@@ -735,22 +718,23 @@ export default instrumentFactory.defineInstrument({
     {
       fields: {
         annualIncome: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Annual Income',
             fr: 'Revenu annuel'
           },
           max: 1000000,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         },
         employmentStatus: {
-          kind: 'options',
+          kind: 'string',
           label: {
             en: 'Employment Status',
             fr: "Statut de l'emploi"
           },
-          options: formatTranslatedOptions(employmentStatus)
+          options: formatTranslatedOptions(employmentStatus),
+          variant: 'select'
         }
       },
       title: {
@@ -761,14 +745,14 @@ export default instrumentFactory.defineInstrument({
     {
       fields: {
         yearsOfEducation: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Years of Education',
             fr: "Années d'études"
           },
           max: 30,
           min: 0,
-          variant: 'default'
+          variant: 'input'
         }
       },
       title: {
@@ -779,17 +763,17 @@ export default instrumentFactory.defineInstrument({
     {
       fields: {
         ageAtImmigration: {
-          kind: 'numeric',
+          kind: 'number',
           label: {
             en: 'Age at Immigration',
             fr: "Âge à l'immigration (le cas échéant)"
           },
           max: 100,
           min: 1,
-          variant: 'default'
+          variant: 'input'
         },
         isCanadianCitizen: {
-          kind: 'binary',
+          kind: 'boolean',
           label: {
             en: 'Canadian Citizen',
             fr: 'Citoyen canadien'
@@ -823,5 +807,24 @@ export default instrumentFactory.defineInstrument({
       en: 'Enhanced Demographics Questionnaire',
       fr: 'Questionnaire démographique détaillé'
     }
-  }
+  },
+  validationSchema: z
+    .object({
+      ageAtImmigration: z.number().int().gte(1).lte(100),
+      annualIncome: z.number().int().gte(0).lte(1000000),
+      employmentStatus: z.enum(extractKeysAsTuple(employmentStatus)),
+      ethnicOrigin: z.enum(extractKeysAsTuple(ethnicOrigin)),
+      firstLanguage: z.enum(extractKeysAsTuple(firstLanguage)),
+      gender: z.enum(extractKeysAsTuple(gender)),
+      householdSize: z.number().int().gte(0).lte(20),
+      isCanadianCitizen: z.boolean(),
+      maritalStatus: z.enum(extractKeysAsTuple(maritalStatus)),
+      numberChildren: z.number().int().gte(0).lte(20),
+      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
+      religion: z.enum(extractKeysAsTuple(religion)),
+      speaksEnglish: z.boolean(),
+      speaksFrench: z.boolean(),
+      yearsOfEducation: z.number().int().gte(0).lte(30)
+    })
+    .partial()
 });

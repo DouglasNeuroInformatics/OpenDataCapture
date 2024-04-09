@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-import { Button } from '@douglasneuroinformatics/ui/legacy';
+import { Button } from '@douglasneuroinformatics/libui/components';
 import { PlusIcon } from '@heroicons/react/24/solid';
-import type { Assignment } from '@open-data-capture/common/assignment';
+import type { Assignment } from '@opendatacapture/schemas/assignment';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -39,13 +39,13 @@ export const SubjectAssignmentsPage = () => {
         <h3 className="text-lg font-semibold">{t('assignments.assignedInstruments')}</h3>
         <Button
           className="w-full text-sm lg:w-auto"
-          icon={<PlusIcon />}
-          iconPosition="right"
-          label={t('assignments.addAssignment')}
           size="sm"
           variant="secondary"
           onClick={() => setIsCreateModalOpen(true)}
-        />
+        >
+          {t('assignments.addAssignment')}
+          <PlusIcon />
+        </Button>
       </div>
       <AssignmentsTable
         assignments={assignmentsQuery.data}

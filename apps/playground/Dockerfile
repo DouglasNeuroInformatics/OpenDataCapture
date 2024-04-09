@@ -10,7 +10,7 @@ FROM base AS builder
 COPY . .
 RUN apk add --no-cache libc6-compat
 RUN apk update
-RUN pnpm dlx turbo prune @open-data-capture/playground --docker
+RUN pnpm dlx turbo prune @opendatacapture/playground --docker
 
 # INSTALL DEPENDENCIES
 FROM base AS installer
@@ -23,7 +23,7 @@ RUN pnpm install --frozen-lockfile
 # BUILD THE APP
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
-RUN pnpm dlx turbo build --filter=@open-data-capture/playground
+RUN pnpm dlx turbo build --filter=@opendatacapture/playground
 
 # RUN SERVER
 FROM base AS runner

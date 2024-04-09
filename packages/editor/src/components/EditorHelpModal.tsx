@@ -1,4 +1,6 @@
-import { Modal } from '@douglasneuroinformatics/ui/legacy';
+import React from 'react';
+
+import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 export type EditorHelpModalProps = {
@@ -9,8 +11,18 @@ export type EditorHelpModalProps = {
 export const EditorHelpModal = ({ isOpen, setIsOpen }: EditorHelpModalProps) => {
   const { t } = useTranslation('core');
   return (
-    <Modal showCloseButton open={isOpen} title={t('help')} onClose={() => setIsOpen(false)}>
-      <p>{t('editor.keyboardShortcuts.format', { keybinding: 'Alt + F' })}</p>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog.Trigger asChild>
+        <Button variant="outline">Edit Profile</Button>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>{t('help')}</Dialog.Title>
+        </Dialog.Header>
+        <div>
+          <p>{t('editor.keyboardShortcuts.format', { keybinding: 'Alt + F' })}</p>
+        </div>
+      </Dialog.Content>
+    </Dialog>
   );
 };

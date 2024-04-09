@@ -1,22 +1,22 @@
 import type {
-  ArrayFieldset,
-  ArrayFieldsetValue,
+  Fieldset,
+  FieldsetValue,
   FormDataType,
   FormFields,
+  NonNullableRecord,
   PartialFormDataType,
-  PrimitiveFormField,
-  RequiredArrayFieldsetValue,
-  RequiredFormFieldValue,
+  RequiredFieldValue,
+  ScalarFormField,
   StaticFormField
-} from '@douglasneuroinformatics/form-types';
-import type { Language } from '@open-data-capture/common/core';
+} from '@douglasneuroinformatics/libui-form-types';
+import type { Language } from '@opendatacapture/schemas/core';
 import type {
   AnyInstrument,
   AnyMultilingualFormInstrument,
   AnyUnilingualFormInstrument,
-  FormInstrumentArrayFieldset,
   FormInstrumentFields,
-  FormInstrumentPrimitiveField,
+  FormInstrumentFieldset,
+  FormInstrumentScalarField,
   FormInstrumentStaticField,
   InstrumentKind,
   InstrumentSummary,
@@ -25,8 +25,9 @@ import type {
   SomeUnilingualInstrument,
   UnilingualInstrumentMeasures,
   UnilingualInstrumentSummary
-} from '@open-data-capture/common/instrument';
+} from '@opendatacapture/schemas/instrument';
 import { mapValues, wrap } from 'lodash-es';
+import { P, match } from 'ts-pattern';
 
 import {
   isMultilingualInstrument,
@@ -52,70 +53,73 @@ function getTargetLanguage(instrument: Pick<AnyInstrument, 'language'>, preferre
 }
 
 /**
- * Translate a primitive field of an instrument to the user's preferred language.
+ * Translate a scalar field of an instrument to the user's preferred language.
  *
- * @param field - The primitive field to be translated.
+ * @param field - The scalar field to be translated.
  * @param language - The target language for translation.
- * @returns A translated primitive form field.
+ * @returns A translated scalar form field.
  */
-function translatePrimitiveField(
-  field: FormInstrumentPrimitiveField<Language[]>,
-  language: Language
-): PrimitiveFormField {
+function translateScalarField(field: FormInstrumentScalarField<Language[]>, language: Language): ScalarFormField {
   const base = {
     description: field.description?.[language],
     label: field.label[language]
   };
-  switch (field.kind) {
-    case 'binary':
-      switch (field.variant) {
-        case 'checkbox':
-          return { ...field, ...base };
-        case 'radio':
-          return { ...field, ...base, options: field.options?.[language] };
-        default:
-          throw new Error(`Unexpected value for property 'variant' in field: ${field}`);
-      }
-    case 'date':
-      return { ...field, ...base };
-    case 'numeric':
-      return { ...field, ...base };
-    case 'options':
-      return { ...field, ...base, options: field.options[language] };
-    case 'text':
-      return { ...field, ...base };
-    default:
-      throw new Error(`Unexpected value for property 'kind' in field: ${field}`);
-  }
+  return match(field)
+    .with(
+      P.union(
+        { kind: 'boolean', variant: 'checkbox' },
+        { kind: 'date' },
+        { kind: 'string', variant: P.union('input', 'password', 'textarea') },
+        { kind: 'number', variant: P.union('input', 'slider') }
+      ),
+      (field) => ({ ...field, ...base })
+    )
+    .with(P.union({ kind: 'boolean', variant: 'radio' }), (field) => ({
+      ...field,
+      ...base,
+      options: field.options?.[language]
+    }))
+    .with(
+      { kind: 'number', variant: 'radio' },
+      { kind: 'set' },
+      { kind: 'string', variant: P.union('radio', 'select') },
+      (field) => ({
+        ...field,
+        ...base,
+        options: field.options[language]
+      })
+    )
+    .exhaustive();
 }
 
 /**
- * Translate an array fieldset of an instrument to the user's preferred language.
+ * Translate a record array fieldset of an instrument to the user's preferred language.
  *
- * @param fieldset - The array fieldset to be translated.
+ * @param fieldset - The record array fieldset to be translated.
  * @param language - The target language for translation.
- * @returns A translated array fieldset.
+ * @returns A translated record array fieldset.
  */
-function translateArrayFieldset(
-  fieldset: FormInstrumentArrayFieldset<Language[]>,
+function translateRecordArrayFieldset(
+  fieldset: FormInstrumentFieldset<Language[]>,
   language: Language
-): ArrayFieldset<RequiredArrayFieldsetValue> {
-  const transformedFieldset: FormInstrumentArrayFieldset<Language> = {};
+): Fieldset<NonNullableRecord<FieldsetValue>> {
+  const transformedFieldset: FormInstrumentFieldset<Language> = {};
   for (const key in fieldset) {
+    fieldset[key];
     const field = fieldset[key];
-    if (field.kind === 'dynamic-fieldset') {
+    if (field.kind === 'dynamic') {
       transformedFieldset[key] = {
-        kind: 'dynamic-fieldset',
-        render: (fieldset: Partial<ArrayFieldsetValue>) => {
-          const result: FormInstrumentPrimitiveField<Language[]> | null = field.render(fieldset);
+        kind: 'dynamic',
+        render: (fieldset: Partial<FieldsetValue>) => {
+          const result: FormInstrumentScalarField<Language[]> | null = field.render(fieldset);
           if (result === null) {
             return null;
           }
-          return translatePrimitiveField(result, language);
+          return translateScalarField(result, language);
         }
       };
     } else {
-      transformedFieldset[key] = translatePrimitiveField(field, language);
+      transformedFieldset[key] = translateScalarField(field, language);
     }
   }
   return transformedFieldset;
@@ -131,17 +135,30 @@ function translateArrayFieldset(
 function translateStaticField(
   field: FormInstrumentStaticField<Language[]>,
   language: Language
-): StaticFormField<RequiredFormFieldValue> {
-  if (field.kind === 'array') {
-    return {
+): StaticFormField<RequiredFieldValue> {
+  return match(field)
+    .with({ kind: 'record-array' }, (field) => ({
       ...field,
       description: field.description?.[language],
-      fieldset: translateArrayFieldset(field.fieldset, language),
+      fieldset: translateRecordArrayFieldset(field.fieldset, language),
       label: field.label[language]
-    };
-  } else {
-    return translatePrimitiveField(field, language);
-  }
+    }))
+    .with({ kind: 'number-record' }, (field) => {
+      return {
+        ...field,
+        description: field.description?.[language],
+        items: mapValues(field.items, (item) => ({
+          description: item.description?.[language],
+          label: item.label[language]
+        })),
+        label: field.label[language],
+        options: field.options[language]
+      };
+    })
+    .with({ kind: P.union('boolean', 'date', 'number', 'set', 'string') }, (field) =>
+      translateScalarField(field, language)
+    )
+    .exhaustive();
 }
 
 /**

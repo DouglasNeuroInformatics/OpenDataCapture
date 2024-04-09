@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-import { Spinner } from '@douglasneuroinformatics/ui/components';
-import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
-import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
+import { Spinner } from '@douglasneuroinformatics/libui/components';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';

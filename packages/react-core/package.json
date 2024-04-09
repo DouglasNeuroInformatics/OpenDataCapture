@@ -1,9 +1,9 @@
 {
-  "name": "@open-data-capture/react-core",
+  "name": "@opendatacapture/react-core",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
   "license": "AGPL-3.0",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json",
@@ -14,24 +14,24 @@
     "lint": "tsc && eslint --fix src",
     "storybook": "storybook dev -p 6006"
   },
+  "peerDependencies": {
+    "react": "18.x",
+    "react-dom": "18.x",
+    "tailwindcss": "3.x"
+  },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^0.1.0",
-    "@douglasneuroinformatics/ui": "^6.2.2",
+    "@douglasneuroinformatics/libjs": "^0.3.0",
+    "@douglasneuroinformatics/libui": "^2.0.0",
     "@heroicons/react": "^2.1.1",
-    "@open-data-capture/i18next": "workspace:*",
+    "@opendatacapture/i18next": "workspace:*",
     "react-i18next": "^14.1.0"
   },
   "devDependencies": {
-    "@open-data-capture/tailwindcss": "workspace:*",
+    "@opendatacapture/tailwindcss": "workspace:*",
     "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.21",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
     "vite": "^5.1.7"
-  },
-  "peerDependencies": {
-    "react": "18.x",
-    "react-dom": "18.x",
-    "tailwindcss": "3.x"
   }
 }

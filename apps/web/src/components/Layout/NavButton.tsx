@@ -1,4 +1,6 @@
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import React from 'react';
+
+import { cn } from '@douglasneuroinformatics/libui/utils';
 
 export type NavButtonProps = {
   [key: `data-${string}`]: unknown;

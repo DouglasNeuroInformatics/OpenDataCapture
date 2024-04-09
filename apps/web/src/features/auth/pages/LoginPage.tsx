@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import type { AuthPayload, LoginCredentials } from '@open-data-capture/common/auth';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import type { AuthPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/auth-store';
 
 import { DemoBanner } from '../components/DemoBanner';
 import { LoginForm } from '../components/LoginForm';
+
 export const LoginPage = () => {
   const auth = useAuthStore();
   const notifications = useNotificationsStore();
@@ -47,7 +48,7 @@ export const LoginPage = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <DemoBanner onLogin={(credentials) => void login(credentials)} />
-      <FormPageLayout className="min-h-0 flex-grow" title={t('login')}>
+      <FormPageLayout className="min-h-0 flex-grow" maxWidth="sm" title={t('login')}>
         <LoginForm onSubmit={(credentials) => void login(credentials)} />
       </FormPageLayout>
     </div>

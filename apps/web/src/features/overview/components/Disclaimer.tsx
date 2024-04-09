@@ -1,4 +1,6 @@
-import { Button, Modal } from '@douglasneuroinformatics/ui/legacy';
+import React from 'react';
+
+import { Button, LegacyModal } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 import { useAuthStore } from '@/stores/auth-store';
@@ -21,7 +23,7 @@ export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProp
   const show = (!isAccepted || currentUser?.username !== username) && isRequired;
 
   return (
-    <Modal open={show} title={t('disclaimer.title')} onClose={handleClose}>
+    <LegacyModal open={show} title={t('disclaimer.title')} onClose={handleClose}>
       <p className="text-sm">{t('disclaimer.message')}</p>
       <div className="mt-3 flex">
         <Button className="mr-2" label={t('disclaimer.accept')} size="sm" onClick={handleClose} />
@@ -34,6 +36,6 @@ export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProp
           }}
         />
       </div>
-    </Modal>
+    </LegacyModal>
   );
 };

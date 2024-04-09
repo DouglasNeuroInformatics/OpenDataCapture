@@ -1,5 +1,5 @@
-import type { Subject } from '@open-data-capture/common/subject';
-import type { User } from '@open-data-capture/common/user';
+import type { Subject } from '@opendatacapture/schemas/subject';
+import type { User } from '@opendatacapture/schemas/user';
 
 export const adminUser: User = Object.freeze({
   basePermissionLevel: 'ADMIN',

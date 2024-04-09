@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { P, match } from 'ts-pattern';
 
 export type InstrumentSummaryGroupProps = {

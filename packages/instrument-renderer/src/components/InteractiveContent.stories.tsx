@@ -1,4 +1,6 @@
-import { clickTask, reactionTimeTask } from '@open-data-capture/instrument-library';
+import React from 'react';
+
+import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { InteractiveContent } from './InteractiveContent';
@@ -18,14 +20,8 @@ export default {
   ]
 } as Meta<typeof InteractiveContent>;
 
-export const ClickTask: Story = {
+export const Default: Story = {
   args: {
-    bundle: clickTask.bundle
-  }
-};
-
-export const ReactionTime: Story = {
-  args: {
-    bundle: reactionTimeTask.bundle
+    bundle: interactiveInstrument.bundle
   }
 };

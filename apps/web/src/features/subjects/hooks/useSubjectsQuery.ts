@@ -1,4 +1,4 @@
-import { $Subject } from '@open-data-capture/common/subject';
+import { $Subject } from '@opendatacapture/schemas/subject';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

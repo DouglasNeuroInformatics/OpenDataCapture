@@ -1,9 +1,9 @@
+import module from 'module';
 import path from 'path';
-import url from 'url';
 
 import importMetaEnv from '@import-meta-env/unplugin';
-import plausible from '@open-data-capture/vite-plugin-plausible';
-import runtime from '@open-data-capture/vite-plugin-runtime';
+import plausible from '@opendatacapture/vite-plugin-plausible';
+import runtime from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
@@ -12,7 +12,7 @@ import viteCompression from 'vite-plugin-compression';
 
 import { translations } from './config/translations';
 
-const projectDir = path.dirname(url.fileURLToPath(import.meta.url));
+const require = module.createRequire(import.meta.url);
 
 export default defineConfig({
   build: {
@@ -25,6 +25,12 @@ export default defineConfig({
       plugins: [autoprefixer(), tailwindcss()]
     }
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2022'
+    },
+    force: true
+  },
   plugins: [
     plausible({
       baseUrl: process.env.PLAUSIBLE_BASE_URL,
@@ -33,14 +39,16 @@ export default defineConfig({
     react(),
     viteCompression(),
     importMetaEnv.vite({
-      example: path.resolve(projectDir, '.env.public')
+      example: path.resolve(import.meta.dirname, '.env.public')
     }),
     translations(),
     runtime()
   ],
   resolve: {
     alias: {
-      '@': path.resolve(projectDir, 'src')
+      '@': path.resolve(import.meta.dirname, 'src'),
+      react: path.dirname(require.resolve('react/package.json')),
+      'react-dom': path.dirname(require.resolve('react-dom/package.json'))
     }
   },
   server: {

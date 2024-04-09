@@ -1,13 +1,13 @@
 {
-  "name": "@open-data-capture/i18next",
+  "name": "@opendatacapture/i18next",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
   "license": "AGPL-3.0",
-  "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./client": {
-      "types": "./src/typings/i18next.d.ts"
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
     }
   },
   "scripts": {
@@ -15,17 +15,14 @@
     "format:translations": "find src/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "lint": "tsc && eslint --fix src"
   },
-  "dependencies": {
-    "@douglasneuroinformatics/ui": "^6.2.2",
-    "@open-data-capture/common": "workspace:*",
-    "i18next-browser-languagedetector": "^7.2.0",
-    "lodash": "^4.17.21",
-    "react-i18next": "^14.1.0"
-  },
   "peerDependencies": {
-    "@types/lodash": "^4.14.202",
-    "i18next": "23.x",
     "react": "18.x",
-    "react-dom": "18.x"
+    "react-dom": "18.x",
+    "tailwindcss": "3.x"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/libui": "^2.0.0",
+    "@opendatacapture/schemas": "workspace:*",
+    "i18next": "^23.10.1"
   }
 }

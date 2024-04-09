@@ -8,7 +8,7 @@ import type {
   InstrumentKind,
   InstrumentSourceContainer,
   InstrumentSummary
-} from '@open-data-capture/common/instrument';
+} from '@opendatacapture/schemas/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';

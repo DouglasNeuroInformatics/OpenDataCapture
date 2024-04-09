@@ -1,10 +1,11 @@
-import { useContext } from 'react';
+import React from 'react';
 
-import { Button, PopoverIcon, StepperContext } from '@douglasneuroinformatics/ui/legacy';
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import { Button, Popover } from '@douglasneuroinformatics/libui/components';
+import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ShieldCheckIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid';
-import type { AnyUnilingualInstrument } from '@open-data-capture/common/instrument';
-import { licenses } from '@open-data-capture/licenses';
+import { licenses } from '@opendatacapture/licenses';
+import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentOverviewItem } from './InstrumentOverviewItem';
@@ -16,7 +17,7 @@ type InstrumentOverviewProps = {
 
 export const InstrumentOverview = ({ instrument }: InstrumentOverviewProps) => {
   const { t } = useTranslation('core');
-  const { updateIndex } = useContext(StepperContext);
+  const { updateIndex } = useLegacyStepper();
 
   let language: string;
   if (instrument.language === 'en') {
@@ -40,12 +41,24 @@ export const InstrumentOverview = ({ instrument }: InstrumentOverviewProps) => {
         )}
         <InstrumentOverviewItem
           afterText={
-            <PopoverIcon
-              icon={license?.isOpenSource ? ShieldCheckIcon : ShieldExclamationIcon}
-              iconClassName={cn('h-5 w-5', license?.isOpenSource ? 'text-sky-700' : 'text-red-500')}
-              position="right"
-              text={license?.isOpenSource ? t('openSourceLicense') : t('proprietaryLicense')}
-            />
+            <Popover>
+              <Popover.Trigger asChild>
+                <Button
+                  className={cn(license?.isOpenSource ? 'text-sky-700' : 'text-red-500')}
+                  size="icon"
+                  variant="ghost"
+                >
+                  {license?.isOpenSource ? (
+                    <ShieldCheckIcon className="h-5 w-5" />
+                  ) : (
+                    <ShieldExclamationIcon className="h-5 w-5" />
+                  )}
+                </Button>
+              </Popover.Trigger>
+              <Popover.Content className="w-min whitespace-nowrap p-1.5 text-sm">
+                {license?.isOpenSource ? t('openSourceLicense') : t('proprietaryLicense')}
+              </Popover.Content>
+            </Popover>
           }
           heading={t('license')}
           text={license?.name ?? 'NA'}

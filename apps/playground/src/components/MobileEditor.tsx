@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 
-import { Dropdown } from '@douglasneuroinformatics/ui/legacy';
-import { EditorPane, type EditorPaneRef } from '@open-data-capture/editor';
+import { Select } from '@douglasneuroinformatics/libui/components';
+import { EditorPane, type EditorPaneRef } from '@opendatacapture/editor';
 import { match } from 'ts-pattern';
 
 import { EditorContext } from '@/context/EditorContext';
@@ -16,13 +16,23 @@ export const MobileEditor = React.forwardRef<EditorPaneRef>(function MobileEdito
   return (
     <div className="mx-auto flex h-full min-h-0 max-w-screen-lg flex-col space-y-2 p-2">
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={[{ name: 'Editor' }, { name: 'Instrument' }]} />
-      <Dropdown
-        options={ctx.exampleOptions}
-        size="sm"
-        title={ctx.selectedExample.label}
-        variant="secondary"
-        onSelection={ctx.onChangeSelection}
-      />
+      <Select value={ctx.selectedExample.label} onValueChange={ctx.onChangeSelection}>
+        <Select.Trigger className="w-[180px]">
+          <Select.Value placeholder="Select an Instrument" />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Group>
+            <Select.Label>Instruments</Select.Label>
+            {ctx.exampleOptions.map((option) => {
+              return (
+                <Select.Item key={option} value={option}>
+                  {option}
+                </Select.Item>
+              );
+            })}
+          </Select.Group>
+        </Select.Content>
+      </Select>
       <div className="flex h-full flex-col">
         {match(activeTab)
           .with('Editor', () => (

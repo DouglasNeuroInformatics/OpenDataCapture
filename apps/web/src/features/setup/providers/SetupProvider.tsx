@@ -1,18 +1,13 @@
 import React, { useEffect } from 'react';
 
-import { useTranslation } from 'react-i18next';
-
-import { FormPageLayout } from '@/components/FormPageLayout';
-import { useSetupState } from '@/hooks/useSetupState';
-
-import { SetupForm } from '../components/SetupForm';
-import { SetupLoadingScreen } from '../components/SetupLoadingScreen';
-import { useInitApp } from '../hooks/useInitApp';
+import { useCreateSetupState } from '../hooks/useCreateSetupState';
+import { useSetupState } from '../hooks/useSetupState';
+import { SetupLoadingPage } from '../pages/SetupLoadingPage';
+import { SetupPage } from '../pages/SetupPage';
 
 export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
-  const { t } = useTranslation('setup');
   const setupStateQuery = useSetupState();
-  const initAppMutation = useInitApp();
+  const createSetupStateMutation = useCreateSetupState();
 
   useEffect(() => {
     if (setupStateQuery.data?.isSetup === false) {
@@ -22,26 +17,24 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
 
   if (setupStateQuery.data?.isSetup !== false) {
     return children;
-  } else if (initAppMutation.isPending) {
-    return <SetupLoadingScreen />;
+  } else if (createSetupStateMutation.isPending) {
+    return <SetupLoadingPage />;
   }
 
   return (
-    <FormPageLayout title={t('pageTitle')} widthMultiplier={1.5}>
-      <SetupForm
-        onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, username }) => {
-          initAppMutation.mutate({
-            admin: {
-              firstName,
-              lastName,
-              password,
-              username
-            },
-            dummySubjectCount,
-            initDemo
-          });
-        }}
-      />
-    </FormPageLayout>
+    <SetupPage
+      onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, username }) => {
+        createSetupStateMutation.mutate({
+          admin: {
+            firstName,
+            lastName,
+            password,
+            username
+          },
+          dummySubjectCount,
+          initDemo
+        });
+      }}
+    />
   );
 };

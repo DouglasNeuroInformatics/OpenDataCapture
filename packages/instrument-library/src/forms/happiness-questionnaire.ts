@@ -1,18 +1,11 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
+const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
+export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  validationSchema: z.object({
-    overallHappiness: z.number().int().gte(1).lte(10),
-    reasonForSadness: z.string().optional()
-  })
-});
-
-export default instrumentFactory.defineInstrument({
   name: 'HappinessQuestionnaire',
   tags: {
     en: ['Well-Being'],
@@ -25,7 +18,7 @@ export default instrumentFactory.defineInstrument({
         en: 'Overall happiness from 1 through 10 (inclusive)',
         fr: 'Bonheur général de 1 à 10 (inclus)'
       },
-      kind: 'numeric',
+      kind: 'number',
       label: {
         en: 'Overall Happiness',
         fr: 'Bonheur général'
@@ -47,8 +40,8 @@ export default instrumentFactory.defineInstrument({
             fr: 'Raison de la tristesse'
           },
           isRequired: false,
-          kind: 'text',
-          variant: 'long'
+          kind: 'string',
+          variant: 'textarea'
         };
       }
     }
@@ -74,5 +67,9 @@ export default instrumentFactory.defineInstrument({
       kind: 'const',
       ref: 'overallHappiness'
     }
-  }
+  },
+  validationSchema: z.object({
+    overallHappiness: z.number().int().gte(1).lte(10),
+    reasonForSadness: z.string().optional()
+  })
 });

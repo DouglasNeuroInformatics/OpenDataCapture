@@ -3,7 +3,7 @@
 import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest/core';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { InstrumentKind } from '@open-data-capture/common/instrument';
+import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { z } from 'zod';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';

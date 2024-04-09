@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
-import { transformTranslations } from '@open-data-capture/i18next';
+import { transformTranslations } from '@douglasneuroinformatics/libui/i18n';
 import copy from 'rollup-plugin-copy';
 import type { PluginOption, ViteDevServer } from 'vite';
 
@@ -18,7 +18,7 @@ export const translations = () => {
           dest: 'dist/locales/en',
           src: 'src/translations/*',
           transform: (contents) => {
-            const translations = JSON.parse(contents.toString()) as Record<string, unknown>;
+            const translations = JSON.parse(contents.toString()) as { [key: string]: unknown };
             return JSON.stringify(transformTranslations(translations, 'en'), null, 2);
           }
         },
@@ -26,7 +26,7 @@ export const translations = () => {
           dest: 'dist/locales/fr',
           src: 'src/translations/*',
           transform: (contents) => {
-            const translations = JSON.parse(contents.toString()) as Record<string, unknown>;
+            const translations = JSON.parse(contents.toString()) as { [key: string]: unknown };
             return JSON.stringify(transformTranslations(translations, 'fr'), null, 2);
           }
         }
@@ -38,7 +38,7 @@ export const translations = () => {
         if (locale && namespace) {
           const translationsFile = path.resolve(projectDir, 'src', 'translations', namespace);
           fs.readFile(translationsFile, 'utf8')
-            .then((text) => JSON.parse(text) as Record<string, unknown>)
+            .then((text) => JSON.parse(text) as { [key: string]: unknown })
             .then((translations) => {
               res.writeHead(200, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify(transformTranslations(translations, locale)));

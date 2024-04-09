@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useInterval, useMediaQuery } from '@douglasneuroinformatics/ui/hooks';
-import { type EditorPaneRef } from '@open-data-capture/editor';
+import { Heading } from '@douglasneuroinformatics/libui/components';
+import { useInterval, useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
+import { type EditorPaneRef } from '@opendatacapture/editor';
 
 import { EditorContext } from '@/context/EditorContext';
 import { type ExampleInstrumentData, defaultExample, examples } from '@/examples';
@@ -17,7 +18,7 @@ export const Editor = () => {
   const ref = useRef<EditorPaneRef>(null);
   const [selectedExample, setSelectedExample] = useState<ExampleInstrumentData>(defaultExample);
 
-  const { libs } = useRuntime('v0.0.1');
+  const { libs } = useRuntime('v1');
 
   useEffect(() => {
     const monaco = ref.current?.monaco;
@@ -54,7 +55,9 @@ export const Editor = () => {
     >
       <div className="mx-auto flex h-screen flex-col p-2 xl:p-4 2xl:p-8">
         <header className="my-6 lg:my-8">
-          <h1 className="text-center text-xl font-semibold">Instrument Playground</h1>
+          <Heading className="text-center" variant="h2">
+            Instrument Playground
+          </Heading>
         </header>
         <main className="h-full min-h-0">{isDesktop ? <DesktopEditor ref={ref} /> : <MobileEditor ref={ref} />}</main>
       </div>

@@ -1,5 +1,7 @@
-import { Card } from '@douglasneuroinformatics/ui/legacy';
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import React from 'react';
+
+import { Card } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 

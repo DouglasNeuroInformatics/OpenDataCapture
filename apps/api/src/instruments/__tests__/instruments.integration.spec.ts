@@ -8,7 +8,7 @@ import { Test } from '@nestjs/testing';
 //   happinessQuestionnaire,
 //   miniMentalStateExamination,
 //   montrealCognitiveAssessment
-// } from '@open-data-capture/instrument-library';
+// } from '@opendatacapture/instrument-library';
 import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';

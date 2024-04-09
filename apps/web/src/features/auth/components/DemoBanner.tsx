@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import type { LoginCredentials } from '@open-data-capture/common/auth';
+import type { LoginCredentials } from '@opendatacapture/schemas/auth';
 import { useTranslation } from 'react-i18next';
 
 import { DemoModal } from './DemoModal';

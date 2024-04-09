@@ -1,17 +1,16 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-import { Spinner } from '@douglasneuroinformatics/ui/components';
-import { Stepper } from '@douglasneuroinformatics/ui/legacy';
-import { cn } from '@douglasneuroinformatics/ui/utils';
+import { LegacyStepper, Spinner } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import {
   ComputerDesktopIcon,
   DocumentCheckIcon,
   PrinterIcon,
   QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
-import type { InstrumentKind } from '@open-data-capture/common/instrument';
-import type { Subject } from '@open-data-capture/common/subject';
-import type { InterpretOptions } from '@open-data-capture/instrument-interpreter';
+import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
+import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
@@ -80,7 +79,7 @@ export const InstrumentRenderer = <TKind extends InstrumentKind>({
     .exhaustive();
 
   return (
-    <Stepper
+    <LegacyStepper
       className={cn('mx-auto h-full max-w-3xl grow xl:max-w-4xl', className)}
       steps={[
         {

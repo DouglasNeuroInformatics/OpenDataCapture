@@ -1,7 +1,9 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Form } from '@douglasneuroinformatics/ui/legacy';
-import type { SubjectIdentificationData } from '@open-data-capture/common/subject';
+import React from 'react';
+
+import { Form } from '@douglasneuroinformatics/libui/components';
+import type { SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -21,7 +23,7 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
   const { t } = useTranslation(['core', 'visits']);
 
   return (
-    <Form<AddVisitFormData>
+    <Form
       className="mx-auto max-w-3xl"
       content={[
         {
@@ -30,15 +32,15 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
           fields: {
             firstName: {
               description: t('visits:subjectIdentification.firstName.description'),
-              kind: 'text',
+              kind: 'string',
               label: t('visits:subjectIdentification.firstName.label'),
-              variant: 'short'
+              variant: 'input'
             },
             lastName: {
               description: t('visits:subjectIdentification.lastName.description'),
-              kind: 'text',
+              kind: 'string',
               label: t('visits:subjectIdentification.lastName.label'),
-              variant: 'short'
+              variant: 'input'
             },
             dateOfBirth: {
               kind: 'date',
@@ -46,12 +48,13 @@ export const AddVisitForm = ({ onSubmit }: AddVisitFormProps) => {
             },
             sex: {
               description: t('identificationData.sex.description'),
-              kind: 'options',
+              kind: 'string',
               label: t('identificationData.sex.label'),
               options: {
                 FEMALE: t('identificationData.sex.female'),
                 MALE: t('identificationData.sex.male')
-              }
+              },
+              variant: 'select'
             }
           }
         },

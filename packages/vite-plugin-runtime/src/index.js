@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { MANIFEST_FILENAME, resolvePackages, resolveVersion } from '@open-data-capture/runtime-resolve';
+import { MANIFEST_FILENAME, resolvePackages, resolveVersion } from '@opendatacapture/runtime-resolve';
 
 /**
  * Returns the content and MIME type for a file in a given version

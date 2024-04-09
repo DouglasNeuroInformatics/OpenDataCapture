@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import type { SelectOption } from '@douglasneuroinformatics/ui/legacy';
-import type { LinearRegressionResults } from '@open-data-capture/common/instrument-records';
-import _ from 'lodash';
+import type { LegacySelectOption } from '@douglasneuroinformatics/libui/components';
+import type { LinearRegressionResults } from '@opendatacapture/schemas/instrument-records';
+import { pickBy } from 'lodash-es';
 
 import type { InstrumentVisualizationRecord } from './useInstrumentVisualization';
 
@@ -14,7 +14,7 @@ export type GraphRecord = {
 export type UseGraphDataOptions = {
   models?: LinearRegressionResults;
   records: InstrumentVisualizationRecord[];
-  selectedMeasures: SelectOption[];
+  selectedMeasures: LegacySelectOption[];
 };
 
 export function useGraphData({ models, records, selectedMeasures }: UseGraphDataOptions): GraphRecord[] {
@@ -23,7 +23,7 @@ export function useGraphData({ models, records, selectedMeasures }: UseGraphData
     if (records) {
       for (const record of records) {
         const graphRecord: GraphRecord = {
-          ..._.pickBy(record, (_, key) => selectedMeasures.find((item) => item.key === key)),
+          ...pickBy(record, (_, key) => selectedMeasures.find((item) => item.key === key)),
           __time__: record.__time__
         };
         for (const key in record) {

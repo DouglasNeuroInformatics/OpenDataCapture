@@ -1,7 +1,7 @@
 import path from 'path';
 import url from 'url';
 
-import runtime from '@open-data-capture/vite-plugin-runtime';
+import runtime from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
@@ -18,6 +18,11 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [autoprefixer(), tailwindcss()]
+    }
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2022'
     }
   },
   plugins: [react(), runtime()],

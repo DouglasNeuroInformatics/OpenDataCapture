@@ -1,4 +1,4 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import axios, { isAxiosError } from 'axios';
 import i18next from 'i18next';
 

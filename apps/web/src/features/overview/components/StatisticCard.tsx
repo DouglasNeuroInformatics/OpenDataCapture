@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-import { Card } from '@douglasneuroinformatics/ui/legacy';
+import { Card } from '@douglasneuroinformatics/libui/components';
 import { type MotionValue, motion, useSpring, useTransform } from 'framer-motion';
 
 type StatisticCardProps = {

@@ -31,7 +31,7 @@ for (const dir of WORKSPACE_DIRS) {
     const workspaceName = await fs
       .readFile(path.resolve(workspaceDir, 'package.json'), 'utf-8')
       .then(JSON.parse)
-      .then((pkg) => pkg.name.replace('@open-data-capture/', ''));
+      .then((pkg) => pkg.name.replace('@opendatacapture/', ''));
     if (workspaceName === targetWorkspace) {
       isFound = true;
       try {

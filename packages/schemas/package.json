@@ -1,0 +1,36 @@
+{
+  "name": "@opendatacapture/schemas",
+  "type": "module",
+  "version": "0.0.0",
+  "license": "AGPL-3.0",
+  "exports": {
+    "./assignment": "./src/assignment/assignment.ts",
+    "./auth": "./src/auth/auth.ts",
+    "./core": "./src/core/core.ts",
+    "./group": "./src/group/group.ts",
+    "./instrument": "./src/instrument/instrument.ts",
+    "./instrument-records": "./src/instrument-records/instrument-records.ts",
+    "./setup": "./src/setup/setup.ts",
+    "./subject": "./src/subject/subject.ts",
+    "./summary": "./src/summary/summary.ts",
+    "./user": "./src/user/user.ts",
+    "./visit": "./src/visit/visit.ts"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@casl/ability": "^6.7.0",
+    "@douglasneuroinformatics/libjs": "^0.3.0",
+    "@opendatacapture/licenses": "workspace:*",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@casl/prisma": "^1.4.1",
+    "@douglasneuroinformatics/libui-form-types": "^0.6.2",
+    "@opendatacapture/instrument-stubs": "workspace:*"
+  }
+}

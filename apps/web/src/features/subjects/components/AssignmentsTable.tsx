@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { ClientTable } from '@douglasneuroinformatics/ui/legacy';
-import type { Assignment, AssignmentStatus } from '@open-data-capture/common/assignment';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import { LegacyClientTable } from '@douglasneuroinformatics/libui/components';
+import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
+import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
@@ -24,7 +24,7 @@ export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTablePr
   }, [instrumentSummariesQuery.data]);
 
   return (
-    <ClientTable<Assignment>
+    <LegacyClientTable<Assignment>
       columns={[
         {
           field: (entry) => {

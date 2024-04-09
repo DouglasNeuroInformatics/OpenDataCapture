@@ -1,16 +1,7 @@
-const { InstrumentFactory } = await import('/runtime/v0.0.1/core.js');
-const { z } = await import('/runtime/v0.0.1/zod.js');
+const { defineInstrument } = await import('/runtime/v1/core.js');
+const { z } = await import('/runtime/v1/zod.js');
 
-const instrumentFactory = new InstrumentFactory({
-  kind: 'INTERACTIVE',
-  language: 'en',
-  validationSchema: z.object({
-    livesRemaining: z.number().int(),
-    timeElapsed: z.number()
-  })
-});
-
-export default instrumentFactory.defineInstrument({
+export default defineInstrument({
   content: {
     render(done) {
       const startTime = Date.now();
@@ -201,6 +192,8 @@ export default instrumentFactory.defineInstrument({
     sourceUrl: 'https://github.com/end3r/Gamedev-Canvas-workshop/tree/gh-pages',
     title: 'Breakout Task'
   },
+  kind: 'INTERACTIVE',
+  language: 'en',
   measures: {
     livesRemaining: {
       kind: 'const',
@@ -211,7 +204,7 @@ export default instrumentFactory.defineInstrument({
       kind: 'computed',
       label: 'Time Elapsed',
       value(data) {
-        return data.timeElapsed +  'ms';
+        return data.timeElapsed + 'ms';
       }
     },
     win: {
@@ -224,5 +217,9 @@ export default instrumentFactory.defineInstrument({
   },
   name: 'Breakout Task',
   tags: ['Interactive'],
+  validationSchema: z.object({
+    livesRemaining: z.number().int(),
+    timeElapsed: z.number()
+  }),
   version: 1.0
 });

@@ -1,17 +1,9 @@
-import type { FormDataType } from '@douglasneuroinformatics/form-types';
 import { randomValue } from '@douglasneuroinformatics/libjs';
+import { toUpperCase } from '@douglasneuroinformatics/libjs';
+import type { FormDataType } from '@douglasneuroinformatics/libui-form-types';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
-import { type Json, toUpperCase } from '@open-data-capture/common/core';
-import type { Group } from '@open-data-capture/common/group';
-import type {
-  FormInstrument,
-  FormInstrumentFields,
-  FormInstrumentStaticField,
-  FormInstrumentUnknownField
-} from '@open-data-capture/common/instrument';
-import type { Subject, SubjectIdentificationData } from '@open-data-capture/common/subject';
-import { DEMO_GROUPS, DEMO_USERS } from '@open-data-capture/demo';
+import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
 import {
   breakoutTask,
   briefPsychiatricRatingScale,
@@ -19,7 +11,16 @@ import {
   happinessQuestionnaire,
   miniMentalStateExamination,
   montrealCognitiveAssessment
-} from '@open-data-capture/instrument-library';
+} from '@opendatacapture/instrument-library';
+import { type Json } from '@opendatacapture/schemas/core';
+import type { Group } from '@opendatacapture/schemas/group';
+import type {
+  FormInstrument,
+  FormInstrumentFields,
+  FormInstrumentStaticField,
+  FormInstrumentUnknownField
+} from '@opendatacapture/schemas/instrument';
+import type { Subject, SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -158,19 +159,26 @@ export class DemoService {
 
   private createMockStaticFieldValue(field: FormInstrumentStaticField) {
     switch (field.kind) {
-      case 'array':
+      case 'record-array':
         throw new NotImplementedException();
-      case 'binary':
+      case 'number-record':
+        throw new NotImplementedException();
+      case 'boolean':
         return faker.datatype.boolean();
       case 'date':
         return faker.date.past({ years: 1 }).toISOString();
-      case 'numeric':
-        return faker.number.int({ max: field.max, min: field.min });
-      case 'options':
+      case 'number':
+        switch (field.variant) {
+          case 'radio':
+            throw new NotImplementedException();
+          default:
+            return faker.number.int({ max: field.max ?? 0, min: field.min });
+        }
+      case 'set':
         return typeof field.options.en === 'string'
           ? randomValue(Object.keys(field.options))
           : randomValue(Object.keys(field.options.en));
-      case 'text':
+      case 'string':
         return faker.lorem.sentence();
     }
   }

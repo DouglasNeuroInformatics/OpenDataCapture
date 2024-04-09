@@ -1,8 +1,8 @@
 import React, { useImperativeHandle, useState } from 'react';
 
-import { Spinner } from '@douglasneuroinformatics/ui/components';
-import { cn } from '@douglasneuroinformatics/ui/utils';
-import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
+import { Spinner } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
+import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import { match } from 'ts-pattern';
 
 import type { TranspilerState } from '@/hooks/useTranspiler';

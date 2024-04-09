@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { SearchBar, SelectDropdown } from '@douglasneuroinformatics/ui/legacy';
-import type { SelectOption } from '@douglasneuroinformatics/ui/legacy';
-import type { UnilingualInstrumentSummary } from '@open-data-capture/common/instrument';
+import { LegacySelectDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
+import type { LegacySelectOption } from '@douglasneuroinformatics/libui/components';
+import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -16,9 +16,9 @@ export const InstrumentsShowcase = () => {
   const navigate = useNavigate();
   const { t } = useTranslation(['core', 'instruments']);
   const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentSummary[]>([]);
-  const [tagOptions, setTagOptions] = useState<SelectOption[]>([]);
-  const [selectedLanguages, setSelectedLanguages] = useState<SelectOption[]>([]);
-  const [selectedTags, setSelectedTags] = useState<SelectOption[]>([]);
+  const [tagOptions, setTagOptions] = useState<LegacySelectOption[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<LegacySelectOption[]>([]);
+  const [selectedTags, setSelectedTags] = useState<LegacySelectOption[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   const languageOptions = [
@@ -57,16 +57,10 @@ export const InstrumentsShowcase = () => {
   return (
     <div>
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
-        <SearchBar
-          size="md"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-          }}
-        />
+        <SearchBar value={searchTerm} onValueChange={setSearchTerm} />
         <div className="flex flex-grow gap-2 lg:flex-shrink">
           <div className="flex flex-grow" data-cy="tags-btn-dropdown">
-            <SelectDropdown
+            <LegacySelectDropdown
               options={tagOptions}
               selected={selectedTags}
               setSelected={setSelectedTags}
@@ -74,7 +68,7 @@ export const InstrumentsShowcase = () => {
             />
           </div>
           <div className="flex flex-grow" data-cy="language-btn-dropdown">
-            <SelectDropdown
+            <LegacySelectDropdown
               options={languageOptions}
               selected={selectedLanguages}
               setSelected={setSelectedLanguages}

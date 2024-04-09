@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@open-data-capture/common/instrument';
-import { InstrumentInterpreter } from '@open-data-capture/instrument-interpreter';
-import { InstrumentTransformer } from '@open-data-capture/instrument-transformer';
+import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
+import { InstrumentTransformer } from '@opendatacapture/instrument-transformer/server';
+import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@opendatacapture/schemas/instrument';
+import type { Prisma } from '@prisma/client';
 import { omit } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -52,13 +53,21 @@ export class InstrumentsService {
 
     this.logger.debug(`Instrument '${instance.name}' does not exist`);
 
+    /**
+     * After upgrading TypeScript from v5.3 to 5.4, the type of string | { en: string, fr: string }
+     * does not seem to be assignable to as Prisma.InputJsonValue anymore. I know this works and
+     * don't have the time to fix it at the moment (the type error gives no useful info).
+     */
     return this.instrumentModel.create({
       data: {
         ...omit({ ...instance }, ['content', 'measures', 'validationSchema']),
         bundle,
         details: {
           ...instance.details,
-          authors: instance.details.authors ?? []
+          authors: instance.details.authors ?? [],
+          description: instance.details.description as Prisma.InputJsonValue,
+          instructions: instance.details.instructions as Prisma.InputJsonValue,
+          title: instance.details.title as Prisma.InputJsonValue
         },
         source
       }

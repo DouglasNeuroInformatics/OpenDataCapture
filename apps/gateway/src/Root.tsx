@@ -1,12 +1,13 @@
-import { NotificationHub } from '@douglasneuroinformatics/ui/components';
-import { useNotificationsStore } from '@douglasneuroinformatics/ui/hooks';
-import { BaseLanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
-import type { UpdateAssignmentData } from '@open-data-capture/common/assignment';
-import { $Json } from '@open-data-capture/common/core';
-import { InstrumentRenderer } from '@open-data-capture/instrument-renderer';
-import { Branding } from '@open-data-capture/react-core';
+import React from 'react';
+
+import { NotificationHub } from '@douglasneuroinformatics/libui/components';
+import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import { Branding } from '@opendatacapture/react-core';
+import type { UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
+import { $Json } from '@opendatacapture/schemas/core';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next';
 
 import './services/axios';
 import './services/i18n';
@@ -18,7 +19,6 @@ export type RootProps = {
 };
 
 export const Root = ({ bundle, id, token }: RootProps) => {
-  const { i18n } = useTranslation('core');
   const notifications = useNotificationsStore();
 
   const handleSubmit = async (data: unknown) => {
@@ -50,7 +50,12 @@ export const Root = ({ bundle, id, token }: RootProps) => {
           <Branding className="[&>span]:hidden sm:[&>span]:block" />
           <div className="flex gap-3 bg-inherit">
             <ThemeToggle />
-            <BaseLanguageToggle i18n={i18n} options={['en', 'fr']} />
+            <LanguageToggle
+              options={{
+                en: 'English',
+                fr: 'Français'
+              }}
+            />
           </div>
         </div>
       </header>

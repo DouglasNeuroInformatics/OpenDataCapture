@@ -1,7 +1,7 @@
 import path from 'path';
 import url from 'url';
 
-import runtime from '@open-data-capture/vite-plugin-runtime';
+import runtime from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
@@ -21,7 +21,10 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['@douglasneuroinformatics/ui', '@swc/wasm-web']
+    esbuildOptions: {
+      target: 'es2022'
+    },
+    exclude: ['@swc/wasm-web']
   },
   plugins: [react(), runtime()],
   resolve: {

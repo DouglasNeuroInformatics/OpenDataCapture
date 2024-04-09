@@ -1,7 +1,8 @@
-import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
-import { toLowerCase } from '@open-data-capture/common/core';
-import { Branding } from '@open-data-capture/react-core';
+import React from 'react';
+
+import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
+import { ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Branding } from '@opendatacapture/react-core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
@@ -51,7 +52,7 @@ export const Sidebar = () => {
       <hr className="my-1 h-[1px] border-none bg-slate-700" />
       <div className="flex items-center">
         <UserDropup />
-        <ThemeToggle className="hover:backdrop-brightness-150" />
+        <ThemeToggle className="hover:bg-slate-800 hover:text-slate-300" variant="ghost" />
       </div>
     </div>
   );

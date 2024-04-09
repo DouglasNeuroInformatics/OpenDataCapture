@@ -34,7 +34,7 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       - name: Build Site
-        run: pnpm exec turbo run build --filter=@open-data-capture/outreach
+        run: pnpm exec turbo run build --filter=@opendatacapture/outreach
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

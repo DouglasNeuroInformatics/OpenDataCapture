@@ -1,15 +1,12 @@
+import React from 'react';
+
+import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
+import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { InstrumentRenderer } from './InstrumentRenderer';
 
 type Story = StoryObj<typeof InstrumentRenderer>;
-
-import {
-  breakoutTask,
-  clickTask,
-  happinessQuestionnaire,
-  reactionTimeTask
-} from '@open-data-capture/instrument-library';
 
 export default {
   component: InstrumentRenderer,
@@ -24,27 +21,20 @@ export default {
   ]
 } as Meta<typeof InstrumentRenderer>;
 
-export const HappinessQuestionnaire: Story = {
+export const UnilingualForm: Story = {
   args: {
-    bundle: happinessQuestionnaire.bundle
+    bundle: unilingualFormInstrument.bundle
   }
 };
 
-export const BreakoutTask: Story = {
+export const BilingualForm: Story = {
   args: {
-    bundle: breakoutTask.bundle
+    bundle: bilingualFormInstrument.bundle
   }
 };
 
-export const ClickTask: Story = {
+export const Interactive: Story = {
   args: {
-    bundle: clickTask.bundle
+    bundle: interactiveInstrument.bundle
   }
 };
-
-export const ReactionTimeTask: Story = {
-  args: {
-    bundle: reactionTimeTask.bundle
-  }
-};
-

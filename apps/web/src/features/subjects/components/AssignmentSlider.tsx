@@ -1,5 +1,7 @@
-import { Button, Slider } from '@douglasneuroinformatics/ui/legacy';
-import type { Assignment } from '@open-data-capture/common/assignment';
+import React from 'react';
+
+import { Button, LegacySlider } from '@douglasneuroinformatics/libui/components';
+import type { Assignment } from '@opendatacapture/schemas/assignment';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrument } from '@/hooks/useInstrument';
@@ -17,7 +19,7 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
   const instrument = useInstrument(assignment?.instrumentId ?? null);
 
   return (
-    <Slider isOpen={isOpen} setIsOpen={setIsOpen} title={instrument?.details.title}>
+    <LegacySlider isOpen={isOpen} setIsOpen={setIsOpen} title={instrument?.details.title}>
       {instrument && (
         <div className="flex h-full flex-col">
           <div className="flex gap-1 text-sm">
@@ -47,6 +49,6 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
           </div>
         </div>
       )}
-    </Slider>
+    </LegacySlider>
   );
 };

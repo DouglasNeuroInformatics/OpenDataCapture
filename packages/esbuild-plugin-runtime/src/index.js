@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { MANIFEST_FILENAME, resolvePackages } from '@open-data-capture/runtime-resolve';
+import { MANIFEST_FILENAME, resolvePackages } from '@opendatacapture/runtime-resolve';
 
 /**
  * Adds support to esbuild for copying runtime assets to the build directory

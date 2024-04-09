@@ -1,7 +1,9 @@
+import React from 'react';
+
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
-import { Card, Modal } from '@douglasneuroinformatics/ui/legacy';
-import type { LoginCredentials } from '@open-data-capture/common/auth';
-import { DEMO_USERS } from '@open-data-capture/demo';
+import { Card, LegacyModal } from '@douglasneuroinformatics/libui/components';
+import { DEMO_USERS } from '@opendatacapture/demo';
+import type { LoginCredentials } from '@opendatacapture/schemas/auth';
 import { useTranslation } from 'react-i18next';
 
 import { LoginButton } from './LoginButton';
@@ -15,7 +17,7 @@ export type DemoModalProps = {
 export const DemoModal = ({ isOpen, onClose, onLogin }: DemoModalProps) => {
   const { t } = useTranslation(['auth', 'common']);
   return (
-    <Modal showCloseButton open={isOpen} title={t('demo.info')} width="xl" onClose={onClose}>
+    <LegacyModal showCloseButton open={isOpen} title={t('demo.info')} width="xl" onClose={onClose}>
       <div className="my-1">
         <p className="text-sm leading-tight text-slate-700 dark:text-slate-300">{t('demo.summary')}</p>
         <div className="my-3">
@@ -41,6 +43,6 @@ export const DemoModal = ({ isOpen, onClose, onLogin }: DemoModalProps) => {
           ))}
         </Card>
       </div>
-    </Modal>
+    </LegacyModal>
   );
 };

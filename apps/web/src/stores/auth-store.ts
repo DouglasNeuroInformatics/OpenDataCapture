@@ -1,7 +1,7 @@
 import { PureAbility, createMongoAbility } from '@casl/ability';
-import type { JwtPayload } from '@open-data-capture/common/auth';
-import type { AppAction, AppSubjectName, BaseAppAbility } from '@open-data-capture/common/core';
-import type { Group } from '@open-data-capture/common/group';
+import type { JwtPayload } from '@opendatacapture/schemas/auth';
+import type { AppAction, AppSubjectName, BaseAppAbility } from '@opendatacapture/schemas/core';
+import type { Group } from '@opendatacapture/schemas/group';
 import { jwtDecode } from 'jwt-decode';
 import { create } from 'zustand';
 

@@ -15,8 +15,8 @@ const require = module.createRequire(__dirname);
 const loadSource = (id: string) => fs.readFile(require.resolve(id), 'utf-8');
 
 const sources = {
-  clickTask: await loadSource('@open-data-capture/instrument-library/interactive/click-task.tsx'),
-  happinessQuestionnaire: await loadSource('@open-data-capture/instrument-library/forms/happiness-questionnaire.ts')
+  clickTask: await loadSource('@opendatacapture/instrument-library/interactive/click-task.tsx'),
+  happinessQuestionnaire: await loadSource('@opendatacapture/instrument-library/forms/happiness-questionnaire.ts')
 };
 
 describe('InstrumentTransformer', () => {
@@ -53,8 +53,8 @@ describe('InstrumentTransformer', () => {
 
   describe('transformRuntimeImports', () => {
     it('should transform imports', async () => {
-      const input = 'import("/runtime/v0.0.1/react.js");\n';
-      const output = 'import("./runtime/v0.0.1/react.js");\n';
+      const input = 'import("/runtime/v1/react.js");\n';
+      const output = 'import("./runtime/v1/react.js");\n';
       await expect(transformer.transformRuntimeImports(input)).resolves.toBe(output);
     });
   });

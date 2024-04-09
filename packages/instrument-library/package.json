@@ -1,12 +1,12 @@
 {
-  "name": "@open-data-capture/instrument-library",
+  "name": "@opendatacapture/instrument-library",
+  "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
-  "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./src/index.d.ts"
+      "types": "./src/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./forms/*": "./src/forms/*",
     "./interactive/*": "./src/interactive/*"
@@ -18,11 +18,11 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
-    "@open-data-capture/instrument-transformer": "workspace:*",
-    "@open-data-capture/runtime-v0.0.1": "workspace:*"
+    "@opendatacapture/instrument-transformer": "workspace:*",
+    "@opendatacapture/runtime-v1": "workspace:*"
   },
   "devDependencies": {
-    "@open-data-capture/rollup-plugin-instrument": "workspace:*",
+    "@opendatacapture/rollup-plugin-instrument": "workspace:*",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "rollup": "^4.13.0"
   }

@@ -1,10 +1,13 @@
 {
-  "name": "@open-data-capture/instrument-transformer",
+  "name": "@opendatacapture/instrument-transformer",
+  "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
-  "type": "module",
-  "main": "./src/index.ts",
-  "browser": "./src/browser.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./browser": "./src/browser.ts",
+    "./server": "./src/server.ts"
+  },
   "scripts": {
     "format": "prettier --write src",
     "lint": "eslint --fix src",
@@ -12,7 +15,7 @@
   },
   "dependencies": {
     "esbuild": "^0.20.1",
-    "esbuild-wasm": "^0.20.1",
+    "esbuild-wasm": "^0.20.2",
     "zod": "^3.22.4"
   }
 }

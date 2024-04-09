@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "rootDir": "../.."
+  },
+  "extends": "../../jsconfig.json",
+  "include": ["src/**/*"]
+}

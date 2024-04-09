@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { NotificationHub } from '@douglasneuroinformatics/ui/components';
-import { ErrorFallback } from '@open-data-capture/react-core';
+import { NotificationHub } from '@douglasneuroinformatics/libui/components';
+import { ErrorPage } from '@opendatacapture/react-core';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -18,7 +18,7 @@ import './services/zod';
 export const App = () => {
   return (
     <React.Suspense fallback={<LoadingFallback />}>
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ErrorBoundary FallbackComponent={ErrorPage}>
         <QueryClientProvider client={queryClient}>
           <NotificationHub />
           <SetupProvider>

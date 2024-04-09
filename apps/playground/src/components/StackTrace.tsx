@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { parse } from 'stacktrace-parser';
 
 import { ToggledContent } from './ToggledContent';

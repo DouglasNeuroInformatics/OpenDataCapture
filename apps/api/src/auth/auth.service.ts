@@ -1,8 +1,8 @@
 import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import type { AuthPayload, JwtPayload } from '@open-data-capture/common/auth';
-import type { GroupModel, UserModel } from '@open-data-capture/database/core';
+import type { GroupModel, UserModel } from '@opendatacapture/database/core';
+import type { AuthPayload, JwtPayload } from '@opendatacapture/schemas/auth';
 
 import { AbilityFactory } from '@/ability/ability.factory';
 import { ConfigurationService } from '@/configuration/configuration.service';

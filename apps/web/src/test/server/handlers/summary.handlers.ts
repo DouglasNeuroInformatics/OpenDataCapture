@@ -1,4 +1,4 @@
-import type { Summary } from '@open-data-capture/common/summary';
+import type { Summary } from '@opendatacapture/schemas/summary';
 import { HttpResponse, http } from 'msw';
 
 export const summaryHandlers = [

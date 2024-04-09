@@ -1,6 +1,8 @@
+// @ts-check
+
 const path = require('path');
 
-const baseConfig = require('@douglasneuroinformatics/ui/tailwind.config.cjs');
+const baseConfig = require('@douglasneuroinformatics/libui/tailwind.config.cjs');
 const defaultTheme = require('tailwindcss/defaultTheme.js');
 
 /**

@@ -1,28 +1,49 @@
 import React from 'react';
 
-import { Card, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/ui/legacy';
-import { cn } from '@douglasneuroinformatics/ui/utils';
-
-import logo from '@/assets/logo.png';
+import { Card, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
+import { Logo } from '@opendatacapture/react-core';
 
 export type FormPageLayoutProps = {
   children: React.ReactNode;
   className?: string;
+  maxWidth: 'lg' | 'md' | 'sm';
   title: string;
-  widthMultiplier?: number;
 };
 
 /** Standalone page used as a wrapper for forms (e.g., on login page) */
-export const FormPageLayout = ({ children, className, title, widthMultiplier = 1 }: FormPageLayoutProps) => (
-  <div className={cn('flex min-h-screen items-center justify-center', className)}>
-    <Card className="m-5 flex flex-col items-center rounded-2xl p-8" style={{ width: `${24 * widthMultiplier}rem` }}>
-      <img alt="logo" className="m-2 h-auto w-16" src={logo} />
-      <h1 className="mb-3 text-2xl font-bold tracking-tight first-letter:capitalize">{title}</h1>
-      {children}
-      <div className="mt-5 flex w-full justify-between bg-inherit">
-        <LanguageToggle dropdownDirection="up" options={['en', 'fr']} />
-        <ThemeToggle />
-      </div>
-    </Card>
-  </div>
-);
+export const FormPageLayout = ({ children, className, maxWidth = 'sm', title }: FormPageLayoutProps) => {
+  return (
+    <div className={cn('flex min-h-screen items-center justify-center', className)}>
+      <Card
+        className={cn(
+          'w-full',
+          maxWidth === 'sm' && 'sm:max-w-sm',
+          maxWidth === 'md' && 'sm:max-w-lg',
+          maxWidth === 'lg' && 'sm:max-w-2xl'
+        )}
+      >
+        <Card.Header className="flex items-center justify-center">
+          <Logo className="m-2 h-auto w-16" variant="auto" />
+          <Heading variant="h2">{title}</Heading>
+        </Card.Header>
+        <Card.Content>{children}</Card.Content>
+        <Card.Footer className="text-muted-foreground flex justify-between">
+          <p className="text-sm tracking-tighter">&copy; {new Date().getFullYear()} Douglas Neuroinformatics</p>
+          <div className="flex gap-1">
+            <LanguageToggle
+              align="start"
+              options={{
+                en: 'English',
+                fr: 'Français'
+              }}
+              triggerClassName="border"
+              variant="ghost"
+            />
+            <ThemeToggle className="border" variant="ghost" />
+          </div>
+        </Card.Footer>
+      </Card>
+    </div>
+  );
+};

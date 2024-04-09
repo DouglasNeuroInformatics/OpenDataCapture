@@ -4,7 +4,7 @@ import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libne
 import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import type { CreateUserData } from '@open-data-capture/common/user';
+import type { CreateUserData } from '@opendatacapture/schemas/user';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';

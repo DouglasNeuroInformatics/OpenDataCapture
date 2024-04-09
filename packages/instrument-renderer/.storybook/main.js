@@ -1,6 +1,6 @@
 // @ts-check
 
-import runtime from '@open-data-capture/vite-plugin-runtime';
+import runtime from '@opendatacapture/vite-plugin-runtime';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { mergeConfig } from 'vite';
@@ -24,9 +24,17 @@ const config = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   viteFinal(config) {
     return mergeConfig(config, {
+      build: {
+        target: 'es2022'
+      },
       css: {
         postcss: {
           plugins: [autoprefixer(), tailwindcss()]
+        }
+      },
+      optimizeDeps: {
+        esbuildOptions: {
+          target: 'es2022'
         }
       },
       plugins: [runtime()]
