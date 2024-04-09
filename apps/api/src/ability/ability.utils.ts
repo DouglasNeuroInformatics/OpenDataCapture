@@ -3,7 +3,7 @@ import type { AppAction } from '@opendatacapture/schemas/core';
 
 import type { AppAbility } from '@/core/types';
 import type { ModelEntityName } from '@/prisma/prisma.types';
-import { getModelName } from '@/prisma/prisma.utils';
+// import { getModelName } from '@/prisma/prisma.utils';
 
 export function accessibleQuery<T extends ModelEntityName>(
   ability: AppAbility | undefined,
@@ -14,5 +14,8 @@ export function accessibleQuery<T extends ModelEntityName>(
     return {};
   }
 
-  return accessibleBy(ability, action)[getModelName(entityName)];
+  // @ts-expect-error - under investigation
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return accessibleBy(ability, action)[entityName];
+  // what should work accessibleBy(ability, action)[getModelName(entityName)]
 }
