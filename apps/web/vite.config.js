@@ -28,8 +28,7 @@ export default defineConfig({
   optimizeDeps: {
     esbuildOptions: {
       target: 'es2022'
-    },
-    exclude: ['@douglasneuroinformatics/libui']
+    }
   },
   plugins: [
     plausible({
