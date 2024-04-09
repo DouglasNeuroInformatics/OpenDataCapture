@@ -1,6 +1,6 @@
 import { adminUser } from '@/test/server/stubs';
 
-describe('look at questionaire', () => {
+describe('look at questionnaire', () => {
   it('passes', () => {
     //navigate to add visit page, fill in subject form
     cy.login(adminUser.username, adminUser.password);
