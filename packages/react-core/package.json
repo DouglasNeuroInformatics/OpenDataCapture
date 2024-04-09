@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
-    "@douglasneuroinformatics/libui": "^2.0.0-beta.13",
+    "@douglasneuroinformatics/libui": "^2.0.0",
     "@heroicons/react": "^2.1.1",
     "@opendatacapture/i18next": "workspace:*",
     "react-i18next": "^14.1.0"
@@ -32,6 +32,6 @@
     "@types/react-dom": "^18.2.21",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
-    "vite": "^5.1.6"
+    "vite": "^5.1.7"
   }
 }

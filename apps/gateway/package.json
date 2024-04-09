@@ -19,7 +19,7 @@
     "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test --expect 404 \"pnpm dev\" \"http://localhost:${GATEWAY_DEV_SERVER_PORT}\" cy:open'"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.0.0-beta.13",
+    "@douglasneuroinformatics/libui": "^2.0.0",
     "@opendatacapture/crypto": "workspace:*",
     "@opendatacapture/database": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
@@ -29,7 +29,7 @@
     "@opendatacapture/schemas": "workspace:*",
     "axios": "^1.6.7",
     "compression": "^1.7.4",
-    "express": "^4.18.3",
+    "express": "^4.19.2",
     "i18next": "^23.10.1",
     "lodash-es": "^4.17.21",
     "pino-http": "^9.0.0",
@@ -56,7 +56,7 @@
     "esbuild": "^0.20.1",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "vite": "^5.1.6"
+    "vite": "^5.1.7"
   },
   "trustedDependencies": [
     "sqlite3"

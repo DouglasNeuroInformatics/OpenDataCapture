@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
-    "@douglasneuroinformatics/libui": "^2.0.0-beta.13",
+    "@douglasneuroinformatics/libui": "^2.0.0",
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/editor": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
@@ -52,6 +52,6 @@
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "vite": "^5.1.6"
+    "vite": "^5.1.7"
   }
 }

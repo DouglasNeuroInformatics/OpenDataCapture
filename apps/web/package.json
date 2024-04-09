@@ -21,7 +21,7 @@
   "dependencies": {
     "@casl/ability": "^6.7.0",
     "@douglasneuroinformatics/libjs": "^0.3.0",
-    "@douglasneuroinformatics/libui": "^2.0.0-beta.13",
+    "@douglasneuroinformatics/libui": "^2.0.0",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@import-meta-env/cli": "^0.6.8",
@@ -41,6 +41,7 @@
     "axios": "^1.6.7",
     "clsx": "^2.1.0",
     "framer-motion": "^10.18.0",
+    "html2canvas": "^1.4.1",
     "i18next": "^23.10.1",
     "i18next-http-backend": "^2.5.0",
     "jwt-decode": "^4.0.0",
@@ -73,7 +74,7 @@
     "rollup-plugin-copy": "^3.5.0",
     "sort-json": "^2.0.1",
     "tailwindcss": "^3.4.1",
-    "vite": "^5.1.6",
+    "vite": "^5.1.7",
     "vite-plugin-compression": "^0.5.1"
   },
   "msw": {
