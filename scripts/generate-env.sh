@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+IFS=$'\n\t'
+
+[ "${BASH_VERSINFO:-0}" -ge 5 ] || echo "Error: Bash >= 5.0 is required for this script" && exit 1
+
 projectRoot="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 secretKey=$(openssl rand -hex 32)
 
