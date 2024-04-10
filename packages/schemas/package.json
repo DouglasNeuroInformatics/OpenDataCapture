@@ -23,14 +23,14 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@casl/ability": "^6.7.0",
+    "@casl/ability": "^6.7.1",
     "@douglasneuroinformatics/libjs": "^0.3.0",
     "@opendatacapture/licenses": "workspace:*",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@casl/prisma": "^1.4.1",
-    "@douglasneuroinformatics/libui-form-types": "^0.6.2",
+    "@douglasneuroinformatics/libui-form-types": "^0.6.3",
     "@opendatacapture/instrument-stubs": "workspace:*"
   }
 }

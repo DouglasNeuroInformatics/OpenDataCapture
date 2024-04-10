@@ -38,13 +38,13 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/react": "^18.2.65",
-    "@types/react-dom": "^18.2.21",
+    "@types/react": "^18.2.75",
+    "@types/react-dom": "^18.2.24",
     "jquery-1.12.4": "npm:jquery@1.12.4",
     "jspsych": "^7.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "rollup": "^4.13.0",
+    "rollup": "^4.14.1",
     "rollup-plugin-dts": "^6.1.0",
     "zod": "^3.22.4"
   }
