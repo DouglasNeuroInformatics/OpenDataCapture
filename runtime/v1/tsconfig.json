@@ -6,5 +6,5 @@
     "rootDir": "../.."
   },
   "extends": "../../jsconfig.json",
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "*.js", "*.cjs"]
 }
