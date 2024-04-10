@@ -6,7 +6,6 @@ export default mergeConfig(baseConfig, {
   test: {
     coverage: {
       include: ['src/**/*'],
-      provider: 'v8',
       thresholds: {
         branches: 100,
         functions: 100,

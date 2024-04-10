@@ -22,6 +22,7 @@
     "prepare": "husky",
     "preview": "NODE_ENV=production env-cmd turbo run start",
     "test": "vitest",
+    "test:coverage": "vitest --coverage",
     "test:e2e": "env-cmd turbo run test:e2e",
     "ws": "./scripts/workspace.js $@"
   },
