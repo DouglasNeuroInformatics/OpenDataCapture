@@ -6,7 +6,7 @@
   "packageManager": "pnpm@8.15.3",
   "license": "AGPL-3.0",
   "scripts": {
-    "build": "NODE_ENV=production env-cmd turbo run build --cache-dir=.turbo",
+    "build": "NODE_ENV=production env-cmd turbo run build",
     "clean": "find . -type d '(' -name '.turbo' -o -name 'dist' -o -name 'node_modules' ')' -prune -exec rm -rf {} \\;",
     "clean:workflows": "./scripts/clean-workflows.sh",
     "cy:install": "cypress install",
@@ -18,11 +18,11 @@
     "force-reinstall": "pnpm clean && pnpm install",
     "format": "turbo run format",
     "generate:env": "./scripts/generate-env.sh",
-    "lint": "turbo run lint --cache-dir=.turbo",
+    "lint": "turbo run lint",
     "prepare": "husky",
     "preview": "NODE_ENV=production env-cmd turbo run start",
     "test": "vitest",
-    "test:e2e": "env-cmd turbo run test:e2e --cache-dir=.turbo",
+    "test:e2e": "env-cmd turbo run test:e2e",
     "ws": "./scripts/workspace.js $@"
   },
   "devDependencies": {
