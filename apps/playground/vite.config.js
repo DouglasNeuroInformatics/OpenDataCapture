@@ -9,7 +9,7 @@ import { defineConfig } from 'vite';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
@@ -26,7 +26,12 @@ export default defineConfig({
     },
     exclude: ['@swc/wasm-web']
   },
-  plugins: [react(), runtime()],
+  plugins: [
+    react(),
+    runtime({
+      disabled: mode === 'test'
+    })
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src')
@@ -35,4 +40,4 @@ export default defineConfig({
   server: {
     port: parseInt(process.env.PLAYGROUND_DEV_SERVER_PORT ?? '3750')
   }
-});
+}));

@@ -9,7 +9,7 @@ import { defineConfig } from 'vite';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
@@ -25,10 +25,15 @@ export default defineConfig({
       target: 'es2022'
     }
   },
-  plugins: [react(), runtime()],
+  plugins: [
+    react(),
+    runtime({
+      disabled: mode === 'test'
+    })
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src')
     }
   }
-});
+}));
