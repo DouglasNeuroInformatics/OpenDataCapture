@@ -10,8 +10,7 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "eslint --fix src",
-    "test": "vitest run"
+    "lint": "eslint --fix src"
   },
   "dependencies": {
     "esbuild": "^0.20.2",

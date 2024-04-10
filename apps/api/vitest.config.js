@@ -1,9 +1,11 @@
 import path from 'path';
 
 import swc from 'unplugin-swc';
-import { defineProject } from 'vitest/config';
+import { mergeConfig } from 'vitest/config';
 
-export default defineProject({
+import baseConfig from '../../vitest.config';
+
+export default mergeConfig(baseConfig, {
   plugins: [
     swc.vite({
       jsc: {

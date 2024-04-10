@@ -1,12 +1,9 @@
-import path from 'path';
+import { mergeConfig } from 'vitest/config';
 
-import { defineConfig } from 'vitest/config';
+import baseConfig from '../../vitest.config.js';
 
-export default defineConfig({
+export default mergeConfig(baseConfig, {
   test: {
-    alias: {
-      '/runtime/v1': path.resolve(import.meta.dirname, '../../runtime/v1/dist')
-    },
     coverage: {
       include: ['src/**/*'],
       provider: 'v8',
@@ -16,7 +13,6 @@ export default defineConfig({
         lines: 100,
         statements: 100
       }
-    },
-    watch: false
+    }
   }
 });

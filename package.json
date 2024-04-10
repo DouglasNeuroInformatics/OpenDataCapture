@@ -21,9 +21,8 @@
     "lint": "turbo run lint --cache-dir=.turbo",
     "prepare": "husky",
     "preview": "NODE_ENV=production env-cmd turbo run start",
-    "tag:create": "git tag -a v$(cat package.json | jq -r .version)",
-    "tag:push": "git push upstream v$(cat package.json | jq -r .version)",
-    "test": "env-cmd turbo run test --cache-dir=.turbo",
+    "test": "vitest",
+    "test:e2e": "env-cmd turbo run test:e2e --cache-dir=.turbo",
     "ws": "./scripts/workspace.js $@"
   },
   "devDependencies": {

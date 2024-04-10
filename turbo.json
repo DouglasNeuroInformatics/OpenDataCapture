@@ -28,7 +28,7 @@
       "dependsOn": ["build", "inject"],
       "persistent": true
     },
-    "test": {
+    "test:e2e": {
       "dependsOn": ["^build", "^db:generate"]
     }
   }
