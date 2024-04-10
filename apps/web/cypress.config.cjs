@@ -1,12 +1,10 @@
-import { rmdir } from 'fs';
+const { rmdir } = require('fs');
+const { defineConfig } = require('cypress');
 
-import { defineConfig } from 'cypress';
-
-export default defineConfig({
+module.exports = defineConfig({
   e2e: {
     baseUrl: `http://localhost:${process.env.WEB_DEV_SERVER_PORT}`,
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
+    setupNodeEvents(on) {
       on('task', {
         deleteFolder(folderName) {
           return new Promise((resolve, reject) => {
