@@ -9,7 +9,7 @@ export const interactiveInstrument = await createInstrumentStub(async () => {
     kind: 'INTERACTIVE',
     language: 'en',
     name: 'interactive-instrument',
-    tags: ['Example'],
+    tags: ['Example', 'Useless'],
     version: 1.0,
     content: {
       render(done) {

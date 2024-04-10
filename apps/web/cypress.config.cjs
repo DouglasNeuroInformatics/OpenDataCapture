@@ -1,4 +1,5 @@
-const { rmdir } = require('fs');
+const { existsSync } = require('fs');
+const { mkdir, rm } = require('fs/promises');
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
@@ -6,16 +7,17 @@ module.exports = defineConfig({
     baseUrl: `http://localhost:${process.env.WEB_DEV_SERVER_PORT}`,
     setupNodeEvents(on) {
       on('task', {
-        deleteFolder(folderName) {
-          return new Promise((resolve, reject) => {
-            rmdir(folderName, { maxRetries: 10, recursive: true }, (err) => {
-              if (err) {
-                console.error(err);
-                return reject(err);
-              }
-              resolve(null);
-            });
-          });
+        async createFolder(folderName) {
+          if (!existsSync(folderName)) {
+            await mkdir(folderName);
+          }
+          return Promise.resolve(null);
+        },
+        async deleteFolder(folderName) {
+          if (existsSync(folderName)) {
+            await rm(folderName, { force: true, recursive: true });
+          }
+          return Promise.resolve(null);
         }
       });
     }

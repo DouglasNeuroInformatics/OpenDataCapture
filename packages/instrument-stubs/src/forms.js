@@ -39,10 +39,16 @@ export const unilingualFormInstrument = await createInstrumentStub(async () => {
       license: 'AGPL-3.0',
       title: 'Unilingual Form'
     },
+    measures: {
+      favoriteNumber: {
+        kind: 'const',
+        ref: 'favoriteNumber'
+      }
+    },
     kind: 'FORM',
     language: 'en',
     name: 'unilingual-form',
-    tags: ['Example'],
+    tags: ['Example', 'Preferences'],
     validationSchema: z.object({
       favoriteNumber: z.number(),
       reasonFavoriteNumberIsNegative: z.string().optional()
@@ -102,8 +108,8 @@ export const bilingualFormInstrument = await createInstrumentStub(async () => {
     language: ['en', 'fr'],
     name: 'bilingual-form',
     tags: {
-      en: ['Example'],
-      fr: ['Exemple']
+      en: ['Example', 'Preferences'],
+      fr: ['Exemple', 'Préférences']
     },
     validationSchema: z.object({
       favoriteNumber: z.number(),

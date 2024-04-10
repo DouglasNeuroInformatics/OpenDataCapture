@@ -116,7 +116,7 @@ export const SubjectGraphPage = () => {
         <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
-            <div data-cy="instrument-select">
+            <div data-cy="instrument-select-dropdown-container">
               <LegacyDropdown
                 className="text-sm"
                 options={instrumentOptions}
@@ -124,7 +124,7 @@ export const SubjectGraphPage = () => {
                 onSelection={handleSelectForm}
               />
             </div>
-            <div data-cy="measure-select">
+            <div data-cy="measure-select-dropdown-container">
               <LegacySelectDropdown
                 checkPosition="right"
                 className="text-sm"
@@ -137,7 +137,7 @@ export const SubjectGraphPage = () => {
             </div>
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <div data-cy="time-select">
+            <div data-cy="time-select-dropdown-container">
               <TimeDropdown setMinTime={setMinDate} />
             </div>
             <div className="relative w-full whitespace-nowrap" data-cy="download-button-container">
