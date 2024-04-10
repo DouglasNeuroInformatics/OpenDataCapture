@@ -6,14 +6,10 @@
   "license": "AGPL-3.0",
   "scripts": {
     "build": "tsc && pnpm exec vite build",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run",
     "dev": "NODE_ENV=development env-cmd -f ../../.env pnpm exec vite",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
-    "test": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:run'",
-    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${PLAYGROUND_DEV_SERVER_PORT}\" cy:open'"
+    "storybook": "env-cmd -f ../../.env storybook dev -p 6006"
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",

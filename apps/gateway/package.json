@@ -9,14 +9,10 @@
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:main": "esbuild --bundle --format=esm --outfile=dist/main.js  --platform=node --external:lightningcss src/main.ts",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env node dist/main.mjs",
-    "test": "env-cmd -f ../../.env --use-shell 'start-server-and-test --expect 404 \"pnpm dev\" \"http://localhost:${GATEWAY_DEV_SERVER_PORT}\" cy:run'",
-    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test --expect 404 \"pnpm dev\" \"http://localhost:${GATEWAY_DEV_SERVER_PORT}\" cy:open'"
+    "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env node dist/main.mjs"
   },
   "dependencies": {
     "@douglasneuroinformatics/libui": "^2.0.1",
