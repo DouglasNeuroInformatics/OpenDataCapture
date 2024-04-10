@@ -4,19 +4,18 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "exports": {
-    "./forms": "./src/forms.ts",
-    "./interactive": "./src/interactive.ts"
+    "./forms": "./src/forms.js",
+    "./interactive": "./src/interactive.js"
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "eslint --fix src"
   },
   "peerDependencies": {
     "@opendatacapture/schemas": "workspace:*"
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.0",
-    "@opendatacapture/instrument-transformer": "workspace:*",
     "zod": "^3.22.4"
   }
 }
