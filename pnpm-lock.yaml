@@ -987,6 +987,10 @@ importers:
       zod:
         specifier: ^3.22.4
         version: 3.22.4
+    devDependencies:
+      '@opendatacapture/instrument-stubs':
+        specifier: workspace:*
+        version: link:../instrument-stubs
 
   packages/instrument-utils:
     dependencies:
@@ -22139,7 +22143,6 @@ packages:
     name: github-script
     version: 7.0.1
     engines: { node: '>=20.0.0 <21.0.0' }
-    prepare: true
     requiresBuild: true
     dependencies:
       '@actions/core': 1.10.1
