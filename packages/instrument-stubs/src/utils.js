@@ -35,7 +35,7 @@ import { deepFreeze, randomInt } from '@douglasneuroinformatics/libjs';
  */
 export async function createInstrumentStub(factory) {
   return {
-    bundle: `export default (${factory.toString()})()`,
+    bundle: `(${factory.toString()})()`,
     instance: /** @type InstrumentStubInstance<T> & { id: string } */ (
       deepFreeze({
         ...(await factory()),

@@ -22,11 +22,11 @@ export const interactiveInstrument = await createInstrumentStub(async () => {
       }
     },
     details: {
-      description: ' ',
+      description: 'This is an interactive instrument',
       estimatedDuration: 1,
       instructions: [],
       license: 'UNLICENSED',
-      title: ' '
+      title: 'Interactive Instrument'
     },
     validationSchema: z.object({
       message: z.string()

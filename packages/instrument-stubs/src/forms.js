@@ -84,8 +84,8 @@ export const bilingualFormInstrument = await createInstrumentStub(async () => {
     },
     details: {
       description: {
-        en: 'This is a unilingual form instrument',
-        fr: "Il s'agit d'un instrument unilingue"
+        en: 'This is a bilingual form instrument',
+        fr: "Il s'agit d'un instrument bilingue"
       },
       estimatedDuration: 1,
       instructions: {
@@ -94,13 +94,13 @@ export const bilingualFormInstrument = await createInstrumentStub(async () => {
       },
       license: 'AGPL-3.0',
       title: {
-        en: 'Unilingual Form',
-        fr: 'Formulaire unilingue'
+        en: 'Bilingual Form',
+        fr: 'Formulaire bilingue'
       }
     },
     kind: 'FORM',
     language: ['en', 'fr'],
-    name: 'unilingual-form',
+    name: 'bilingual-form',
     tags: {
       en: ['Example'],
       fr: ['Exemple']
