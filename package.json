@@ -24,7 +24,7 @@
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "test:e2e": "env-cmd turbo run test:e2e",
-    "ws": "./scripts/workspace.js $@"
+    "ws": "./scripts/workspace.sh $@"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.2.1",
