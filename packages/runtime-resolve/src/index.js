@@ -1,15 +1,14 @@
-import { existsSync } from 'fs';
-import fs from 'fs/promises';
+import fs from 'fs';
 import path from 'path';
-import url from 'url';
 
-// @ts-ignore
-if (typeof __dirname === 'undefined') {
-  var __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-}
-
+/** @public */
 const MANIFEST_FILENAME = 'runtime.json';
-const RUNTIME_DIR = path.resolve(__dirname, '../../../runtime');
+
+/** @private */
+const RUNTIME_DIR = path.resolve(import.meta.dirname, '../../../runtime');
+
+/** @private */
+const RUNTIME_DIST_DIRNAME = 'dist';
 
 /**
  * @typedef  {Object}    RuntimeManifest
@@ -27,21 +26,24 @@ const RUNTIME_DIR = path.resolve(__dirname, '../../../runtime');
 
 /**
  * Return whether the path is a directory
+ * @private
  * @param {string} path
  * @returns {Promise<boolean>}
  */
-const isDirectory = async (path) => existsSync(path) && fs.lstat(path).then((stat) => stat.isDirectory());
+const isDirectory = async (path) => fs.existsSync(path) && fs.promises.lstat(path).then((stat) => stat.isDirectory());
 
 /**
  * Recursively get a list of files relative to the base directory
+ * @private
  * @param {string} baseDir
+ * @returns {Promise<RuntimeManifest>}
  */
-export async function resolveFiles(baseDir) {
+async function resolveManifest(baseDir) {
   /** @type {{ declarations: string[], sources: string[] }} */
   const results = { declarations: [], sources: [] };
   /** @param {string} dir */
   await (async function resolveDir(dir) {
-    const files = await fs.readdir(dir);
+    const files = await fs.promises.readdir(dir, 'utf-8');
     for (const file of files) {
       const abspath = path.join(dir, file);
       if (await isDirectory(abspath)) {
@@ -62,11 +64,11 @@ export async function resolveFiles(baseDir) {
  * @returns {Promise<RuntimeVersionInfo>}
  */
 export async function resolveVersion(version) {
-  const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
+  const baseDir = path.resolve(RUNTIME_DIR, version, RUNTIME_DIST_DIRNAME);
   if (!(await isDirectory(baseDir))) {
     throw new Error(`Not a directory: ${baseDir}`);
   }
-  const { declarations, sources } = await resolveFiles(baseDir);
+  const { declarations, sources } = await resolveManifest(baseDir);
   return {
     baseDir,
     importPaths: sources.map((filename) => `/runtime/${version}/${filename}`),
@@ -78,9 +80,10 @@ export async function resolveVersion(version) {
   };
 }
 
+/** @returns {Promise<RuntimeVersionInfo[]>} */
 export async function resolvePackages() {
-  const versions = await fs.readdir(RUNTIME_DIR, 'utf-8');
+  const versions = await fs.promises.readdir(RUNTIME_DIR, 'utf-8');
   return await Promise.all(versions.map((version) => resolveVersion(version)));
 }
 
-export { MANIFEST_FILENAME, RUNTIME_DIR };
+export { MANIFEST_FILENAME, RUNTIME_DIR, RUNTIME_DIST_DIRNAME };
