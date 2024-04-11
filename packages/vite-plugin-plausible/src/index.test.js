@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 
-import { plausiblePlugin } from '../plausible-plugin.js';
+import { plausible } from './index.js';
 
 test('plausiblePlugin', (t) => {
   const options = {
@@ -9,7 +9,7 @@ test('plausiblePlugin', (t) => {
   };
 
   /** @type {any} */
-  const plugin = plausiblePlugin(options);
+  const plugin = plausible(options);
 
   t.expect(plugin.apply === 'build', 'Should have apply property set to "build"');
   t.expect(plugin.name === 'vite-plugin-plausible', 'Should have name property set to "vite-plugin-plausible"');
