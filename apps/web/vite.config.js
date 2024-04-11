@@ -2,8 +2,8 @@ import module from 'module';
 import path from 'path';
 
 import importMetaEnv from '@import-meta-env/unplugin';
-import plausible from '@opendatacapture/vite-plugin-plausible';
-import runtime from '@opendatacapture/vite-plugin-runtime';
+import { plausible } from '@opendatacapture/vite-plugin-plausible';
+import { runtime } from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
@@ -32,10 +32,12 @@ export default defineConfig(({ mode }) => ({
     force: true
   },
   plugins: [
-    plausible({
-      baseUrl: process.env.PLAUSIBLE_BASE_URL,
-      dataDomain: process.env.PLAUSIBLE_DATA_DOMAIN
-    }),
+    process.env.PLAUSIBLE_BASE_URL && process.env.PLAUSIBLE_DATA_DOMAIN
+      ? plausible({
+          baseUrl: process.env.PLAUSIBLE_BASE_URL,
+          dataDomain: process.env.PLAUSIBLE_DATA_DOMAIN
+        })
+      : false,
     react(),
     viteCompression(),
     importMetaEnv.vite({

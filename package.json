@@ -68,5 +68,13 @@
     "unplugin-swc": "^1.4.5",
     "vitest": "^1.4.0",
     "webdriverio": "^8.35.1"
-  }
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
 }

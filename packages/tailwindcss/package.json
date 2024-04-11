@@ -1,6 +1,6 @@
 {
   "name": "@opendatacapture/tailwindcss",
-  "type": "commonjs",
+  "type": "module",
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "main": "./src/index.cjs",
