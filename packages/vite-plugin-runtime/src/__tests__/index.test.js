@@ -6,7 +6,7 @@ import * as runtimeResolve from '@opendatacapture/runtime-resolve';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
 
-import { runtimePlugin } from '../runtime-plugin.js';
+import { runtime } from '../index.js';
 
 /** @type {runtimeResolve.RuntimeVersionInfo} */
 const runtimeVersionInfoStub = deepFreeze(
@@ -24,7 +24,7 @@ const runtimeVersionInfoStub = deepFreeze(
   }
 );
 
-describe('runtimePlugin', () => {
+describe('runtime', () => {
   /** @type {import('vitest').MockInstance<any[], Promise<runtimeResolve.RuntimeVersionInfo[]>>} */
   let resolvePackages;
 
@@ -36,11 +36,11 @@ describe('runtimePlugin', () => {
     vi.clearAllMocks();
   });
   it('should return false if disabled', () => {
-    expect(runtimePlugin({ disabled: true })).toBe(false);
+    expect(runtime({ disabled: true })).toBe(false);
   });
   it('should return an object by default', () => {
-    expect(runtimePlugin()).not.toBeNull();
-    expect(runtimePlugin()).toBeTypeOf('object');
+    expect(runtime()).not.toBeNull();
+    expect(runtime()).toBeTypeOf('object');
   });
   describe('buildStart', async () => {
     it('should invoke fs.cp and fs.writeFile for each item returned by resolvePackages', async () => {
@@ -48,7 +48,7 @@ describe('runtimePlugin', () => {
       vi.spyOn(fs, 'writeFile').mockImplementation(vi.fn());
       resolvePackages.mockResolvedValueOnce(range(3).map(() => structuredClone(runtimeVersionInfoStub)));
       /** @type {any} */
-      const plugin = runtimePlugin();
+      const plugin = runtime();
       await plugin.buildStart();
       expect(fs.cp).toHaveBeenCalledTimes(3);
       expect(fs.writeFile).toHaveBeenCalledTimes(3);
@@ -61,7 +61,7 @@ describe('runtimePlugin', () => {
         range(3).map(() => ({ ...structuredClone(runtimeVersionInfoStub), version: 'v0' }))
       );
       /** @type {any} */
-      const plugin = runtimePlugin({
+      const plugin = runtime({
         packageRoot: '/home/dev/test'
       });
       await plugin.buildStart();
@@ -75,7 +75,7 @@ describe('runtimePlugin', () => {
         { ...structuredClone(runtimeVersionInfoStub), importPaths: ['/path3', '/path4'] }
       ]);
       /** @type {any} */
-      const plugin = runtimePlugin();
+      const plugin = runtime();
       expect(plugin.config()).resolves.toMatchObject({
         optimizeDeps: {
           exclude: ['/path1', '/path2', '/path3', '/path4']
@@ -84,7 +84,7 @@ describe('runtimePlugin', () => {
     });
   });
   describe('configureServer', async () => {
-    /** @type {{ middlewares: { use: import('vitest').Mock ) }; }} */
+    /** @type {{ middlewares: { use: import('vitest').Mock }; }} */
     let server;
 
     beforeEach(() => {
@@ -93,7 +93,7 @@ describe('runtimePlugin', () => {
 
     it('should call the server.middlewares.use method', () => {
       /** @type {any} */
-      const plugin = runtimePlugin();
+      const plugin = runtime();
       plugin.configureServer(server);
       expect(server.middlewares.use).toHaveBeenCalledOnce();
       const [route, handler] = server.middlewares.use.mock.lastCall;

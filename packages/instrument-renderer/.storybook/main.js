@@ -1,6 +1,6 @@
 // @ts-check
 
-import runtime from '@opendatacapture/vite-plugin-runtime';
+import { runtime } from '@opendatacapture/vite-plugin-runtime';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { mergeConfig } from 'vite';

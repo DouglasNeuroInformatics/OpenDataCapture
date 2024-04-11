@@ -2,7 +2,7 @@ import { test } from 'vitest';
 
 import { plausible } from './index.js';
 
-test('plausiblePlugin', (t) => {
+test('plausible', (t) => {
   const options = {
     baseUrl: 'https://example.com',
     dataDomain: 'example.com'

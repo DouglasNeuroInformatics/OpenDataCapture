@@ -3,7 +3,7 @@ import path from 'path';
 
 import importMetaEnv from '@import-meta-env/unplugin';
 import { plausible } from '@opendatacapture/vite-plugin-plausible';
-import runtime from '@opendatacapture/vite-plugin-runtime';
+import { runtime } from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
