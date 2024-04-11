@@ -1,4 +1,5 @@
 import type { PureAbility, RawRuleOf } from '@casl/ability';
+import { isObject } from '@douglasneuroinformatics/libjs';
 import { type LicenseIdentifier, licenses } from '@opendatacapture/licenses';
 import { z } from 'zod';
 
@@ -42,13 +43,19 @@ export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K
 
 /** Used to determine if object is of type `ZodType` independent of specific instances or library versions */
 export function isZodType(arg: unknown): arg is z.ZodTypeAny {
-  const prototype = arg && typeof arg === 'object' ? Reflect.getPrototypeOf(arg.constructor) : null;
+  let prototype: null | object = null;
+  if (isObject(arg) && isObject(arg.constructor)) {
+    prototype = Reflect.getPrototypeOf(arg.constructor);
+  }
   return Boolean(prototype && Reflect.get(prototype, 'name') === 'ZodType');
 }
 
 export const $ZodTypeAny = z.custom<z.ZodTypeAny>((arg) => isZodType(arg));
 
 export const $BooleanString = z.preprocess((arg) => {
+  if (typeof arg !== 'string') {
+    return arg;
+  }
   if (typeof arg === 'string') {
     if (arg.trim().toLowerCase() === 'true') {
       return true;
