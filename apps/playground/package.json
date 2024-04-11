@@ -12,7 +12,7 @@
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^0.3.0",
+    "@douglasneuroinformatics/libjs": "^0.3.1",
     "@douglasneuroinformatics/libui": "^2.0.1",
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/editor": "workspace:*",

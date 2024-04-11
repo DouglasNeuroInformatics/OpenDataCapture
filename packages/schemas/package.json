@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@casl/ability": "^6.7.1",
-    "@douglasneuroinformatics/libjs": "^0.3.0",
+    "@douglasneuroinformatics/libjs": "^0.3.1",
     "@opendatacapture/licenses": "workspace:*",
     "zod": "^3.22.4"
   },
