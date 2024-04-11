@@ -18,6 +18,14 @@ const RUNTIME_DIR = path.resolve(__dirname, '../../../runtime');
  */
 
 /**
+ * @typedef {object} RuntimeVersionInfo
+ * @property {string} baseDir
+ * @property {RuntimeManifest} manifest
+ * @property {string[]} importPaths
+ * @property {string} version
+ */
+
+/**
  * Return whether the path is a directory
  * @param {string} path
  * @returns {Promise<boolean>}
@@ -51,7 +59,7 @@ export async function resolveFiles(baseDir) {
 /**
  * Returns the manifest for a given version of the runtime
  * @param {string} version
- * @returns {Promise<{ baseDir: string, manifest: RuntimeManifest, importPaths: string[], version: string }>}
+ * @returns {Promise<RuntimeVersionInfo>}
  */
 export async function resolveVersion(version) {
   const baseDir = path.resolve(RUNTIME_DIR, version, 'dist');
