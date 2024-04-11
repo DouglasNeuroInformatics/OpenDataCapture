@@ -140,8 +140,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(@casl/ability@6.7.1)(@prisma/client@5.12.1)
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libnest':
         specifier: ^0.0.2
         version: 0.0.2(@nestjs/common@10.3.7)(@nestjs/core@10.3.7)(@nestjs/platform-express@10.3.7)(@nestjs/testing@10.3.7)(express@4.19.2)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1)
@@ -452,8 +452,8 @@ importers:
   apps/playground:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.1
         version: 2.0.1(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
@@ -564,8 +564,8 @@ importers:
         specifier: ^6.7.1
         version: 6.7.1
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.1
         version: 2.0.1(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
@@ -742,8 +742,8 @@ importers:
   packages/demo:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -849,10 +849,6 @@ importers:
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
-    devDependencies:
-      '@opendatacapture/vite-plugin-runtime':
-        specifier: workspace:*
-        version: link:../vite-plugin-runtime
 
   packages/instrument-library:
     dependencies:
@@ -876,8 +872,8 @@ importers:
   packages/instrument-renderer:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.1
         version: 2.0.1(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
@@ -967,8 +963,8 @@ importers:
   packages/instrument-stubs:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -995,8 +991,8 @@ importers:
   packages/instrument-utils:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -1016,8 +1012,8 @@ importers:
   packages/react-core:
     dependencies:
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.1
         version: 2.0.1(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
@@ -1090,8 +1086,8 @@ importers:
         specifier: ^6.7.1
         version: 6.7.1
       '@douglasneuroinformatics/libjs':
-        specifier: ^0.3.0
-        version: 0.3.0(typescript@5.4.5)
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -1143,6 +1139,10 @@ importers:
       vite:
         specifier: 5.x
         version: 5.2.8(@types/node@20.12.7)
+    devDependencies:
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
 
   runtime/v1:
     devDependencies:
@@ -3218,15 +3218,14 @@ packages:
       - vue-eslint-parser
     dev: true
 
-  /@douglasneuroinformatics/libjs@0.3.0(typescript@5.4.5):
+  /@douglasneuroinformatics/libjs@0.3.1(typescript@5.4.5):
     resolution:
-      { integrity: sha512-izbwuAuwCHMZVkUmjOPYFx/BdaLR/GCca4U5CbaZACm6D6Pb5t721NBGsuaMGBQt1qo6GzXzfRJ41xqxqISgzg== }
+      { integrity: sha512-23K0XenTIhcCRomB5OsTY3BmDmacjwbO+X41ze7O9j9mcqwC4tPUct/1GN3KGimPEFiEHO+75kgCJhpX/dQH5g== }
     peerDependencies:
       typescript: ^5.1.0
     dependencies:
       type-fest: 4.15.0
       typescript: 5.4.5
-    dev: false
 
   /@douglasneuroinformatics/libnest@0.0.2(@nestjs/common@10.3.7)(@nestjs/core@10.3.7)(@nestjs/platform-express@10.3.7)(@nestjs/testing@10.3.7)(express@4.19.2)(mongodb@6.5.0)(reflect-metadata@0.1.14)(rxjs@7.8.1):
     resolution:
@@ -3271,7 +3270,7 @@ packages:
       react: ^18.2.0
       react-dom: ^18.2.0
     dependencies:
-      '@douglasneuroinformatics/libjs': 0.3.0(typescript@5.4.5)
+      '@douglasneuroinformatics/libjs': 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui-form-types': 0.6.3
       '@headlessui/react': 1.7.18(react-dom@18.2.0)(react@18.2.0)
       '@headlessui/tailwindcss': 0.2.0(tailwindcss@3.4.3)

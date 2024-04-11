@@ -14,7 +14,7 @@
   "dependencies": {
     "@casl/ability": "^6.7.1",
     "@casl/prisma": "^1.4.1",
-    "@douglasneuroinformatics/libjs": "^0.3.0",
+    "@douglasneuroinformatics/libjs": "^0.3.1",
     "@douglasneuroinformatics/libnest": "^0.0.2",
     "@faker-js/faker": "^8.4.1",
     "@nestjs/axios": "^3.0.2",

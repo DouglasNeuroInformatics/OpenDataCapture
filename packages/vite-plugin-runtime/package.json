@@ -14,5 +14,8 @@
   },
   "dependencies": {
     "@opendatacapture/runtime-resolve": "workspace:*"
+  },
+  "devDependencies": {
+    "@douglasneuroinformatics/libjs": "^0.3.1"
   }
 }
