@@ -12,5 +12,5 @@
     },
     "strictPropertyInitialization": false
   },
-  "include": ["scripts/*", "src/**/*"]
+  "include": ["scripts/*", "src/**/*", "*.js", "*.cjs"]
 }

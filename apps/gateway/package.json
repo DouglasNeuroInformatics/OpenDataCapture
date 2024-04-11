@@ -9,14 +9,10 @@
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:main": "esbuild --bundle --format=esm --outfile=dist/main.js  --platform=node --external:lightningcss src/main.ts",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env node dist/main.mjs",
-    "test": "env-cmd -f ../../.env --use-shell 'start-server-and-test --expect 404 \"pnpm dev\" \"http://localhost:${GATEWAY_DEV_SERVER_PORT}\" cy:run'",
-    "test:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test --expect 404 \"pnpm dev\" \"http://localhost:${GATEWAY_DEV_SERVER_PORT}\" cy:open'"
+    "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env node dist/main.mjs"
   },
   "dependencies": {
     "@douglasneuroinformatics/libui": "^2.0.1",
@@ -27,10 +23,10 @@
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
-    "axios": "^1.6.7",
+    "axios": "^1.6.8",
     "compression": "^1.7.4",
     "express": "^4.19.2",
-    "i18next": "^23.10.1",
+    "i18next": "^23.11.1",
     "lodash-es": "^4.17.21",
     "pino-http": "^9.0.0",
     "pino-pretty": "^10.3.1",
@@ -49,14 +45,14 @@
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
     "@types/lodash-es": "^4.17.12",
-    "@types/react": "^18.2.65",
-    "@types/react-dom": "^18.2.21",
+    "@types/react": "^18.2.75",
+    "@types/react-dom": "^18.2.24",
     "@vitejs/plugin-react-swc": "^3.6.0",
-    "autoprefixer": "^10.4.18",
-    "esbuild": "^0.20.1",
-    "postcss": "^8.4.35",
-    "tailwindcss": "^3.4.1",
-    "vite": "^5.1.7"
+    "autoprefixer": "^10.4.19",
+    "esbuild": "^0.20.2",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.2.8"
   },
   "trustedDependencies": [
     "sqlite3"

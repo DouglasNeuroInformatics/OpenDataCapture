@@ -1,23 +1,8 @@
-import fs from 'fs/promises';
-import module from 'module';
-import path from 'path';
-import url from 'url';
-
+import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
+import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { InstrumentTransformer } from '../index.js';
-
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const require = module.createRequire(__dirname);
-
-const loadSource = (id: string) => fs.readFile(require.resolve(id), 'utf-8');
-
-const sources = {
-  clickTask: await loadSource('@opendatacapture/instrument-library/interactive/click-task.tsx'),
-  happinessQuestionnaire: await loadSource('@opendatacapture/instrument-library/forms/happiness-questionnaire.ts')
-};
+import { InstrumentTransformer } from '../browser.js';
 
 describe('InstrumentTransformer', () => {
   let transformer: InstrumentTransformer;
@@ -28,25 +13,25 @@ describe('InstrumentTransformer', () => {
 
   describe('generateBundle', () => {
     it('should successfully transpile the click task', async () => {
-      await expect(transformer.generateBundle(sources.clickTask)).resolves.toBeTypeOf('string');
+      await expect(transformer.generateBundle(interactiveInstrument.source)).resolves.toBeTypeOf('string');
     });
     it('should successfully transpile the happiness questionnaire', async () => {
-      await expect(transformer.generateBundle(sources.happinessQuestionnaire)).resolves.toBeTypeOf('string');
+      await expect(transformer.generateBundle(unilingualFormInstrument.source)).resolves.toBeTypeOf('string');
     });
     it('should fail to transpile syntactically invalid code', async () => {
-      const source = sources.happinessQuestionnaire + 'INVALID SYNTAX!!';
+      const source = unilingualFormInstrument.source + 'INVALID SYNTAX!!';
       await expect(transformer.generateBundle(source)).rejects.toThrow();
     });
     it('should reject source including a static import', async () => {
-      const source = ["import _ from 'lodash';", sources.happinessQuestionnaire].join('\n');
+      const source = ["import _ from 'lodash';", unilingualFormInstrument.source].join('\n');
       await expect(transformer.generateBundle(source)).rejects.toThrow();
     });
     it('should reject source including a named export', async () => {
-      const source = [sources.happinessQuestionnaire, 'export const __foo__ = 5'].join('\n');
+      const source = [unilingualFormInstrument.source, 'export const __foo__ = 5'].join('\n');
       await expect(transformer.generateBundle(source)).rejects.toThrow();
     });
     it('should reject source including multiple default exports', async () => {
-      const source = [sources.happinessQuestionnaire, 'export default __foo__ = 5'].join('\n');
+      const source = [unilingualFormInstrument.source, 'export default __foo__ = 5'].join('\n');
       await expect(transformer.generateBundle(source)).rejects.toThrow();
     });
   });

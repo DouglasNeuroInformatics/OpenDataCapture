@@ -3,5 +3,5 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"]
   },
-  "include": ["src"]
+  "include": ["src/**/*", "*.js", "*.cjs"]
 }

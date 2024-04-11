@@ -2,6 +2,11 @@
 # 
 # Delete all the workflows that are currently disabled
 
+set -euo pipefail
+IFS=$'\n\t'
+
+[ "${BASH_VERSINFO:-0}" -ge 5 ] || echo "Error: Bash >= 5.0 is required for this script" && exit 1
+
 org=DouglasNeuroInformatics
 repo=OpenDataCapture
 

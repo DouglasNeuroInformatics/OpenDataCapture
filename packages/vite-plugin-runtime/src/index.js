@@ -32,10 +32,14 @@ const loadResource = async (version, filename) => {
 
 /**
  * @param {Object} [options]
+ * @param {boolean} [options.disabled]
  * @param {string} [options.packageRoot]
  * @returns {import('vite').PluginOption}
  */
 const runtime = (options) => {
+  if (options?.disabled) {
+    return false;
+  }
   return {
     async buildStart() {
       const packages = await resolvePackages();

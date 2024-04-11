@@ -14,7 +14,7 @@ import { translations } from './config/translations';
 
 const require = module.createRequire(import.meta.url);
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
@@ -42,7 +42,9 @@ export default defineConfig({
       example: path.resolve(import.meta.dirname, '.env.public')
     }),
     translations(),
-    runtime()
+    runtime({
+      disabled: mode === 'test'
+    })
   ],
   resolve: {
     alias: {
@@ -63,4 +65,4 @@ export default defineConfig({
       }
     }
   }
-});
+}));

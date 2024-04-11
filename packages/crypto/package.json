@@ -9,7 +9,6 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
-    "test": "vitest run"
+    "lint": "tsc && eslint --fix src"
   }
 }

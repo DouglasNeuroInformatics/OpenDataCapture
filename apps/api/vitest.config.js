@@ -1,16 +1,15 @@
 import path from 'path';
-import url from 'url';
 
 import swc from 'unplugin-swc';
-import { defineConfig } from 'vitest/config';
+import { mergeConfig } from 'vitest/config';
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+import baseConfig from '../../vitest.config';
 
-export default defineConfig({
+export default mergeConfig(baseConfig, {
   plugins: [
     swc.vite({
       jsc: {
-        baseUrl: path.resolve(__dirname, 'src'),
+        baseUrl: path.resolve(import.meta.dirname, 'src'),
         externalHelpers: true,
         keepClassNames: true,
         parser: {
@@ -36,6 +35,6 @@ export default defineConfig({
   ],
   test: {
     globals: true,
-    root: './'
+    root: import.meta.dirname
   }
 });

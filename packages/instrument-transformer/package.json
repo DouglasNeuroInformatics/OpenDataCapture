@@ -10,12 +10,14 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "eslint --fix src",
-    "test": "vitest run"
+    "lint": "eslint --fix src"
   },
   "dependencies": {
-    "esbuild": "^0.20.1",
+    "esbuild": "^0.20.2",
     "esbuild-wasm": "^0.20.2",
     "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@opendatacapture/instrument-stubs": "workspace:*"
   }
 }

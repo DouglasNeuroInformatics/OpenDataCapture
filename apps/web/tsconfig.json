@@ -11,5 +11,5 @@
     },
     "resolveJsonModule": true
   },
-  "include": ["config/**/*", "src/**/*"]
+  "include": ["config/**/*", "src/**/*", "*.js", "*.cjs"]
 }
