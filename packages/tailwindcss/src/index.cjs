@@ -20,15 +20,10 @@ exports.createConfig = (options) => {
   /** @type {string[]} */
   const libraryContent = [];
   for (const id of include) {
-    try {
-      const baseDir = path.dirname(
-        require.resolve(`${id}/package.json`, { paths: options?.root ? [options?.root] : undefined })
-      );
-      libraryContent.push(path.resolve(baseDir, 'src/**/*.{js,ts,jsx,tsx}'));
-    } catch (err) {
-      console.error(err);
-      continue;
-    }
+    const baseDir = path.dirname(
+      require.resolve(`${id}/package.json`, { paths: options?.root ? [options?.root] : undefined })
+    );
+    libraryContent.push(path.resolve(baseDir, 'src/**/*.{js,ts,jsx,tsx}'));
   }
 
   return {
