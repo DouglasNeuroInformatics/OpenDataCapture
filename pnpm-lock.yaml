@@ -85,6 +85,9 @@ importers:
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
+      expect-type:
+        specifier: ^0.19.0
+        version: 0.19.0
       husky:
         specifier: ^9.0.11
         version: 9.0.11
@@ -1099,8 +1102,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(@casl/ability@6.7.1)(@prisma/client@5.12.1)
       '@douglasneuroinformatics/libui-form-types':
-        specifier: ^0.6.3
-        version: 0.6.3
+        specifier: ^0.6.4
+        version: 0.6.4
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../instrument-stubs
@@ -3262,6 +3265,13 @@ packages:
       { integrity: sha512-rxEhFQ1/4YHPBrwYcNtmIJKbrLBBLKdyB5Bb4bB77Y4h1P0jiGx2nj9CShbK/Tuc2cQxRym8cwsqV9sOvC16zA== }
     dependencies:
       type-fest: 4.15.0
+
+  /@douglasneuroinformatics/libui-form-types@0.6.4:
+    resolution:
+      { integrity: sha512-VGB8VvAXSWfAgiVXuqrc/aK8JP7J66xk0I3M5CTNneeDyR7Jn7fbKh0tAexGx70WMrNzXRm4wm74UFt0LF5Lbw== }
+    dependencies:
+      type-fest: 4.15.0
+    dev: true
 
   /@douglasneuroinformatics/libui@2.0.1(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
@@ -12356,6 +12366,12 @@ packages:
     resolution:
       { integrity: sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg== }
     engines: { node: '>=6' }
+
+  /expect-type@0.19.0:
+    resolution:
+      { integrity: sha512-piv9wz3IrAG4Wnk2A+n2VRCHieAyOSxrRLU872Xo6nyn39kYXKDALk4OcqnvLRnFvkz659CnWC8MWZLuuQnoqg== }
+    engines: { node: '>=12.0.0' }
+    dev: true
 
   /express@4.19.2:
     resolution:
