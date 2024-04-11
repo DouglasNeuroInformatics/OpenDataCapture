@@ -11,7 +11,8 @@ export default defineConfig({
       exclude: ['coverage/**', 'cypress/**', 'dist/**', '**/*.d.ts', '**/*{.,-}{test,spec}.?(c|m)[jt]s?(x)'],
       include: ['apps/**/*', 'packages/**/*'],
       provider: 'v8',
-      reportsDirectory: path.resolve(import.meta.dirname, 'coverage')
+      reportsDirectory: path.resolve(import.meta.dirname, 'coverage'),
+      skipFull: true
     },
     watch: false
   }
