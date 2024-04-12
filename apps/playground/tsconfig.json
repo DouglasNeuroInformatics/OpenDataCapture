@@ -3,6 +3,7 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react",
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -10,7 +11,8 @@
       "@/*": ["./src/*"],
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     },
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["vite/client"]
   },
   "include": ["src/**/*", "*.js", "*.cjs"]
 }
