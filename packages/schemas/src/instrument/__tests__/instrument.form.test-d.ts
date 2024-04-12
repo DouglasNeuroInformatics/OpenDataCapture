@@ -12,8 +12,17 @@ import type {
 
 /** FormInstrumentScalarField */
 {
-  // Default date types passed into FormInstrumentScalarField should resolve the default FormInstrument[Type]Field(s)
+  // With no parameters, it should be a union of all scalar types
   expectTypeOf<FormInstrumentScalarField['kind']>().toMatchTypeOf<'boolean' | 'date' | 'number' | 'set' | 'string'>();
+  expectTypeOf<FormInstrumentScalarField>().toMatchTypeOf<
+    | FormInstrumentBooleanField
+    | FormInstrumentDateField
+    | FormInstrumentNumberField
+    | FormInstrumentSetField
+    | FormInstrumentStringField
+  >();
+
+  // Default date types passed into FormInstrumentScalarField should resolve the default FormInstrument[Type]Field(s)
   expectTypeOf<FormInstrumentScalarField<InstrumentLanguage, Date>>().toEqualTypeOf<FormInstrumentDateField>();
   expectTypeOf<FormInstrumentScalarField<InstrumentLanguage, Set<string>>>().toEqualTypeOf<FormInstrumentSetField>();
   expectTypeOf<FormInstrumentScalarField<InstrumentLanguage, string>>().toEqualTypeOf<FormInstrumentStringField>();
