@@ -16,7 +16,7 @@ export default defineConfig({
         '**/public/**',
         '**/scripts/**',
         '**/*.d.?(c|m)ts',
-        '**/*{.,-}{test,spec}.?(c|m)[jt]s?(x)',
+        '**/*{.,-}{test,test-d,spec}.?(c|m)[jt]s?(x)',
         '**/*.config.?(c|m)[jt]s?(x)',
         '**/*.stories.?(c|m)[jt]s?(x)'
       ],
