@@ -8,6 +8,7 @@ import { expectTypeOf } from 'expect-type';
 
 import type { InstrumentLanguage } from '../instrument.base.ts';
 import type {
+  AnyFormInstrumentField,
   AnyFormInstrumentScalarField,
   AnyFormInstrumentStaticField,
   FormInstrumentBooleanField,
@@ -18,7 +19,8 @@ import type {
   FormInstrumentScalarField,
   FormInstrumentSetField,
   FormInstrumentStaticField,
-  FormInstrumentStringField
+  FormInstrumentStringField,
+  FormInstrumentUnknownField
 } from '../instrument.form.ts';
 
 /** FormInstrumentScalarField */
@@ -93,4 +95,22 @@ import type {
     keyof Extract<FormInstrumentStaticField<Language, number>, { options: object }>['options']
   >().toEqualTypeOf<number>();
   expectTypeOf<keyof FormInstrumentStaticField<Language, Set<string>>['options']>().toEqualTypeOf<string>();
+}
+
+/** FormInstrumentUnknownField */
+{
+  // With no parameters, it should be a union of all types
+  expectTypeOf<FormInstrumentUnknownField>().toEqualTypeOf<AnyFormInstrumentField>();
+  expectTypeOf<FormInstrumentUnknownField['kind']>().toEqualTypeOf<AnyFormInstrumentField['kind']>();
+  expectTypeOf<FormInstrumentUnknownField<{ _: Date }>['kind']>().toEqualTypeOf<'date' | 'dynamic'>();
+  expectTypeOf<FormInstrumentUnknownField<{ _: Set<string> }>['kind']>().toEqualTypeOf<'dynamic' | 'set'>();
+  expectTypeOf<FormInstrumentUnknownField<{ _: string }>['kind']>().toEqualTypeOf<'dynamic' | 'string'>();
+  expectTypeOf<FormInstrumentUnknownField<{ _: number }>['kind']>().toEqualTypeOf<'dynamic' | 'number'>();
+  expectTypeOf<FormInstrumentUnknownField<{ _: boolean }>['kind']>().toEqualTypeOf<'boolean' | 'dynamic'>();
+  expectTypeOf<FormInstrumentUnknownField<{ _: RecordArrayFieldValue }>['kind']>().toEqualTypeOf<
+    'dynamic' | 'record-array'
+  >();
+  expectTypeOf<FormInstrumentUnknownField<{ _: NumberRecordFieldValue }>['kind']>().toEqualTypeOf<
+    'dynamic' | 'number-record'
+  >();
 }

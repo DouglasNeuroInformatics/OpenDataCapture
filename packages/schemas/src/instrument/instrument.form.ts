@@ -371,6 +371,16 @@ export const $FormInstrumentDynamicField: z.ZodType<FormInstrumentDynamicField> 
     .returns(z.union([$FormInstrumentStaticField, z.null()]))
 });
 
+export type AnyFormInstrumentField =
+  | FormInstrumentBooleanField
+  | FormInstrumentDateField
+  | FormInstrumentDynamicField
+  | FormInstrumentNumberField
+  | FormInstrumentNumberRecordField
+  | FormInstrumentRecordArrayField
+  | FormInstrumentSetField
+  | FormInstrumentStringField;
+
 export type FormInstrumentUnknownField<
   TData extends FormDataType = FormDataType,
   TKey extends keyof TData = keyof TData,
