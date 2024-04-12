@@ -88,6 +88,9 @@ importers:
       expect-type:
         specifier: ^0.19.0
         version: 0.19.0
+      happy-dom:
+        specifier: ^14.7.1
+        version: 14.7.1
       husky:
         specifier: ^9.0.11
         version: 9.0.11
@@ -129,7 +132,7 @@ importers:
         version: 1.4.5(@swc/core@1.4.13)
       vitest:
         specifier: ^1.4.0
-        version: 1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)
+        version: 1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)(happy-dom@14.7.1)
       webdriverio:
         specifier: ^8.35.1
         version: 8.35.1(typescript@5.4.5)
@@ -7716,7 +7719,7 @@ packages:
       dom-accessibility-api: 0.6.3
       lodash: 4.17.21
       redent: 3.0.0
-      vitest: 1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)
+      vitest: 1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)(happy-dom@14.7.1)
     dev: true
 
   /@testing-library/user-event@14.5.2(@testing-library/dom@9.3.4):
@@ -8661,7 +8664,7 @@ packages:
       '@vitest/utils': 1.4.0
       magic-string: 0.30.9
       sirv: 2.0.4
-      vitest: 1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)
+      vitest: 1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)(happy-dom@14.7.1)
       webdriverio: 8.35.1(typescript@5.4.5)
     dev: true
 
@@ -8685,7 +8688,7 @@ packages:
       strip-literal: 2.1.0
       test-exclude: 6.0.0
       v8-to-istanbul: 9.2.0
-      vitest: 1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)
+      vitest: 1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)(happy-dom@14.7.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -13498,6 +13501,16 @@ packages:
       wordwrap: 1.0.0
     optionalDependencies:
       uglify-js: 3.17.4
+    dev: true
+
+  /happy-dom@14.7.1:
+    resolution:
+      { integrity: sha512-v60Q0evZ4clvMcrAh5/F8EdxDdfHdFrtffz/CNe10jKD+nFweZVxM91tW+UyY2L4AtpgIaXdZ7TQmiO1pfcwbg== }
+    engines: { node: '>=16.0.0' }
+    dependencies:
+      entities: 4.5.0
+      webidl-conversions: 7.0.0
+      whatwg-mimetype: 3.0.0
     dev: true
 
   /has-bigints@1.0.2:
@@ -21496,7 +21509,7 @@ packages:
       vite: 5.2.8(@types/node@20.12.7)
     dev: true
 
-  /vitest@1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0):
+  /vitest@1.4.0(@types/node@20.12.7)(@vitest/browser@1.4.0)(happy-dom@14.7.1):
     resolution:
       { integrity: sha512-gujzn0g7fmwf83/WzrDTnncZt2UiXP41mHuFYFrdwaLRVQ6JYQEiME2IfEjU3vcFL3VKa75XhI3lFgn+hfVsQw== }
     engines: { node: ^18.0.0 || >=20.0.0 }
@@ -21533,6 +21546,7 @@ packages:
       chai: 4.4.1
       debug: 4.3.4(supports-color@5.5.0)
       execa: 8.0.1
+      happy-dom: 14.7.1
       local-pkg: 0.5.0
       magic-string: 0.30.9
       pathe: 1.1.2
@@ -21843,7 +21857,6 @@ packages:
     resolution:
       { integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g== }
     engines: { node: '>=12' }
-    dev: false
 
   /webpack-sources@3.2.3:
     resolution:
@@ -21853,6 +21866,12 @@ packages:
   /webpack-virtual-modules@0.6.1:
     resolution:
       { integrity: sha512-poXpCylU7ExuvZK8z+On3kX+S8o/2dQ/SVYueKA0D4WEMXROXgY8Ez50/bQEUmvoSMMrWcrJqCHuhAbsiwg7Dg== }
+
+  /whatwg-mimetype@3.0.0:
+    resolution:
+      { integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q== }
+    engines: { node: '>=12' }
+    dev: true
 
   /whatwg-url@13.0.0:
     resolution:
