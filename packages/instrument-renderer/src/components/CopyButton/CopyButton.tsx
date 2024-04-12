@@ -10,10 +10,9 @@ export const CopyButton: React.FC<{ text: string }> = ({ text }) => {
 
   return (
     <Button
-      data-testid=""
       size="icon"
       type="button"
-      variant="outline"
+      variant="ghost"
       onClick={() => {
         if (state === 'READY') {
           navigator.clipboard
@@ -32,11 +31,11 @@ export const CopyButton: React.FC<{ text: string }> = ({ text }) => {
           exit={{ opacity: 0 }}
           initial={{ opacity: 0 }}
           key={state}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.1 }}
         >
           {match(state)
-            .with('READY', () => <ClipboardListIcon height={20} width={20} />)
-            .with('SUCCESS', () => <ClipboardCheckIcon height={20} width={20} />)
+            .with('READY', () => <ClipboardListIcon />)
+            .with('SUCCESS', () => <ClipboardCheckIcon />)
             .exhaustive()}
         </motion.div>
       </AnimatePresence>

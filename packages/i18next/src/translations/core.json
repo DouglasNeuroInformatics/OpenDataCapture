@@ -269,6 +269,10 @@
     "title": {
       "en": "Summary of Results for the {{title}}",
       "fr": "{{title}} : résumé des résultats"
+    },
+    "titleFallback": {
+      "en": "Summary of Results",
+      "fr": "Résumé des résultats"
     }
   },
   "table": {
