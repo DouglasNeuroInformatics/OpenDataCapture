@@ -196,6 +196,13 @@ export const $FormInstrumentSetField: z.ZodType<FormInstrumentSetField> = $FormI
   variant: z.enum(['listbox', 'select'])
 });
 
+export type AnyFormInstrumentScalarField =
+  | FormInstrumentBooleanField
+  | FormInstrumentDateField
+  | FormInstrumentNumberField
+  | FormInstrumentSetField
+  | FormInstrumentStringField;
+
 /**
  * Conditional type representing a static field corresponding for a `ScalarFieldValue`
  *
@@ -205,19 +212,19 @@ export const $FormInstrumentSetField: z.ZodType<FormInstrumentSetField> = $FormI
 export type FormInstrumentScalarField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends RequiredFieldValue<ScalarFieldValue> = RequiredFieldValue<ScalarFieldValue>
-> = TValue extends object
-  ? TValue extends Date
+> = [TValue] extends [object]
+  ? [TValue] extends [Date]
     ? FormInstrumentDateField<TLanguage>
-    : TValue extends Set<string>
+    : [TValue] extends [Set<string>]
       ? FormInstrumentSetField<TLanguage, TValue>
       : never
-  : TValue extends string
+  : [TValue] extends [string]
     ? FormInstrumentStringField<TLanguage, TValue>
-    : TValue extends number
+    : [TValue] extends [number]
       ? FormInstrumentNumberField<TLanguage, TValue>
-      : TValue extends boolean
+      : [TValue] extends [boolean]
         ? FormInstrumentBooleanField<TLanguage>
-        : never;
+        : AnyFormInstrumentScalarField;
 
 const $FormInstrumentScalarField: z.ZodType<FormInstrumentScalarField> = z.union([
   $FormInstrumentDateField,
