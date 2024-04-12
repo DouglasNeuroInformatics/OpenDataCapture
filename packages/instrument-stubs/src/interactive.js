@@ -13,8 +13,18 @@ export const interactiveInstrument = await createInstrumentStub(async () => {
     version: 1.0,
     content: {
       render(done) {
+        document.body.style.display = 'flex';
+        document.body.style.flexDirection = 'column';
+        document.body.style.placeContent = 'center';
+        document.body.style.height = '100vh';
+        document.body.style.width = '100vw';
+        document.body.style.padding = '0px';
+        document.body.style.margin = '0px';
+
         const button = document.createElement('button');
+        button.style.margin = 'auto';
         button.textContent = 'Submit Instrument';
+
         document.body.appendChild(button);
         button.addEventListener('click', () => {
           done({ message: 'Hello World' });
