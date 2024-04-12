@@ -34,6 +34,7 @@
     "framer-motion": "^11.0.27",
     "i18next": "^23.11.1",
     "lodash-es": "^4.17.21",
+    "lucide-react": "^0.367.0",
     "react-i18next": "^14.1.0",
     "ts-pattern": "^5.1.1"
   },
