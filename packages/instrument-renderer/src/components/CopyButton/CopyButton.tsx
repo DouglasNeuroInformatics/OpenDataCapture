@@ -10,6 +10,7 @@ export const CopyButton: React.FC<{ text: string }> = ({ text }) => {
 
   return (
     <Button
+      data-testid=""
       size="icon"
       type="button"
       variant="outline"
