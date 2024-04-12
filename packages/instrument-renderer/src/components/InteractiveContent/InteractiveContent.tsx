@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { $Json, type Json } from '@opendatacapture/schemas/core';
 import type { Promisable } from 'type-fest';
 
-import bootstrapScript from '../scripts/bootstrap-interactive-content?raw';
+import bootstrapScript from './bootstrap?raw';
 
 export type InteractiveContentProps = {
   bundle: string;
