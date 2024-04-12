@@ -1,14 +1,23 @@
+import type {
+  NumberRecordFieldValue,
+  RecordArrayFieldValue,
+  RequiredFieldValue
+} from '@douglasneuroinformatics/libui-form-types';
 import type { Language } from '@opendatacapture/instrument-stubs/forms';
 import { expectTypeOf } from 'expect-type';
 
 import type { InstrumentLanguage } from '../instrument.base.ts';
 import type {
   AnyFormInstrumentScalarField,
+  AnyFormInstrumentStaticField,
   FormInstrumentBooleanField,
   FormInstrumentDateField,
   FormInstrumentNumberField,
+  FormInstrumentNumberRecordField,
+  FormInstrumentRecordArrayField,
   FormInstrumentScalarField,
   FormInstrumentSetField,
+  FormInstrumentStaticField,
   FormInstrumentStringField
 } from '../instrument.form.ts';
 
@@ -47,3 +56,41 @@ import type {
 }
 
 /** FormInstrumentStaticField */
+{
+  // With no parameters, it should be a union of all static types
+  expectTypeOf<FormInstrumentStaticField>().toEqualTypeOf<AnyFormInstrumentStaticField>();
+  expectTypeOf<FormInstrumentStaticField['kind']>().toEqualTypeOf<AnyFormInstrumentStaticField['kind']>();
+
+  // Default date types passed into FormInstrumentStaticField should resolve the default FormInstrument[Type]Field(s)
+  expectTypeOf<FormInstrumentStaticField<InstrumentLanguage, Date>>().toEqualTypeOf<FormInstrumentDateField>();
+  expectTypeOf<FormInstrumentStaticField<InstrumentLanguage, Set<string>>>().toEqualTypeOf<FormInstrumentSetField>();
+  expectTypeOf<FormInstrumentStaticField<InstrumentLanguage, string>>().toEqualTypeOf<FormInstrumentStringField>();
+  expectTypeOf<FormInstrumentStaticField<InstrumentLanguage, number>>().toEqualTypeOf<FormInstrumentNumberField>();
+  expectTypeOf<FormInstrumentStaticField<InstrumentLanguage, boolean>>().toEqualTypeOf<FormInstrumentBooleanField>();
+  expectTypeOf<
+    FormInstrumentStaticField<InstrumentLanguage, RequiredFieldValue<NumberRecordFieldValue>>
+  >().toEqualTypeOf<FormInstrumentNumberRecordField>();
+  expectTypeOf<
+    FormInstrumentStaticField<InstrumentLanguage, RequiredFieldValue<RecordArrayFieldValue>>
+  >().toEqualTypeOf<FormInstrumentRecordArrayField>();
+
+  // Union literal keys should resolve correctly
+  expectTypeOf<
+    keyof Extract<FormInstrumentStaticField<Language, 'a' | 'b' | 'c'>, { options: object }>['options']
+  >().toEqualTypeOf<'a' | 'b' | 'c'>();
+  expectTypeOf<
+    keyof Extract<FormInstrumentStaticField<Language, 1 | 2 | 3>, { options: object }>['options']
+  >().toEqualTypeOf<1 | 2 | 3>();
+  expectTypeOf<keyof FormInstrumentStaticField<Language, Set<'a' | 'b' | 'c'>>['options']>().toEqualTypeOf<
+    'a' | 'b' | 'c'
+  >();
+
+  // Non-union keys should resolve correctly
+  expectTypeOf<
+    keyof Extract<FormInstrumentStaticField<Language, string>, { options: object }>['options']
+  >().toEqualTypeOf<string>();
+  expectTypeOf<
+    keyof Extract<FormInstrumentStaticField<Language, number>, { options: object }>['options']
+  >().toEqualTypeOf<number>();
+  expectTypeOf<keyof FormInstrumentStaticField<Language, Set<string>>['options']>().toEqualTypeOf<string>();
+}

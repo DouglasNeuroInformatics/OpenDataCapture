@@ -326,19 +326,28 @@ export const $FormInstrumentCompositeField: z.ZodType<FormInstrumentCompositeFie
   $FormInstrumentNumberRecordField
 ]);
 
+export type AnyFormInstrumentStaticField =
+  | FormInstrumentBooleanField
+  | FormInstrumentDateField
+  | FormInstrumentNumberField
+  | FormInstrumentNumberRecordField
+  | FormInstrumentRecordArrayField
+  | FormInstrumentSetField
+  | FormInstrumentStringField;
+
 export type FormInstrumentStaticField<
   TLanguage extends InstrumentLanguage = InstrumentLanguage,
   TValue extends RequiredFieldValue = RequiredFieldValue
-> =
-  TValue extends RequiredFieldValue<ScalarFieldValue>
-    ? FormInstrumentScalarField<TLanguage, TValue>
-    : TValue extends RequiredFieldValue<CompositeFieldValue>
-      ? TValue extends RequiredFieldValue<RecordArrayFieldValue>
-        ? FormInstrumentRecordArrayField<TLanguage, TValue>
-        : TValue extends RequiredFieldValue<NumberRecordFieldValue>
-          ? FormInstrumentNumberRecordField<TLanguage, TValue>
-          : never
-      : never;
+> = [TValue] extends [RequiredFieldValue<ScalarFieldValue>]
+  ? FormInstrumentScalarField<TLanguage, TValue>
+  : [TValue] extends [RequiredFieldValue<CompositeFieldValue>]
+    ? [TValue] extends [RequiredFieldValue<RecordArrayFieldValue>]
+      ? FormInstrumentRecordArrayField<TLanguage, TValue>
+      : [TValue] extends [RequiredFieldValue<NumberRecordFieldValue>]
+        ? FormInstrumentNumberRecordField<TLanguage, TValue>
+        : never
+    : AnyFormInstrumentStaticField;
+
 const $FormInstrumentStaticField: z.ZodType<FormInstrumentStaticField> = z.union([
   $FormInstrumentCompositeField,
   $FormInstrumentScalarField
