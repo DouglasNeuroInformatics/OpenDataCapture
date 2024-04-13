@@ -36,7 +36,8 @@
     "stacktrace-parser": "^0.1.10",
     "ts-pattern": "^5.1.1",
     "zod": "^3.22.4",
-    "zod-validation-error": "^2.1.0"
+    "zod-validation-error": "^2.1.0",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@opendatacapture/tailwindcss": "workspace:*",

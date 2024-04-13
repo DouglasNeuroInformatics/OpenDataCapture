@@ -541,6 +541,9 @@ importers:
       zod-validation-error:
         specifier: ^2.1.0
         version: 2.1.0(zod@3.22.4)
+      zustand:
+        specifier: ^4.5.2
+        version: 4.5.2(@types/react@18.2.75)(react@18.2.0)
     devDependencies:
       '@opendatacapture/tailwindcss':
         specifier: workspace:*
