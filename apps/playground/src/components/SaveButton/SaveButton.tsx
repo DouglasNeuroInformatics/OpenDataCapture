@@ -1,12 +1,15 @@
 import React from 'react';
 
 import { Button, Dialog, Input, Label } from '@douglasneuroinformatics/libui/components';
+import { SaveIcon } from 'lucide-react';
 
 export const SaveButton = () => {
   return (
     <Dialog>
       <Dialog.Trigger asChild>
-        <Button variant="secondary">Save</Button>
+        <Button className="h-9 w-9" size="icon" variant="outline">
+          <SaveIcon />
+        </Button>
       </Dialog.Trigger>
       <Dialog.Content className="sm:max-w-[475px]">
         <Dialog.Header>

@@ -68,7 +68,7 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
           >
             <DownloadIcon />
           </Button>
-          <ThemeToggle />
+
           <Button
             size="icon"
             type="button"
@@ -79,13 +79,6 @@ export const DesktopEditor = React.forwardRef<EditorPaneRef>(function DesktopEdi
           >
             <RefreshCwIcon />
           </Button>
-          <LanguageToggle
-            align="end"
-            options={{
-              en: 'English',
-              fr: 'Français'
-            }}
-          />
         </div>
       </div>
       <div className="flex h-full min-h-0 gap-8 p-2">

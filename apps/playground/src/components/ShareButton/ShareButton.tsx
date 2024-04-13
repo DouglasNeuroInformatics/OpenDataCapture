@@ -1,13 +1,15 @@
 import React from 'react';
 
 import { Button, Input, Label, Popover } from '@douglasneuroinformatics/libui/components';
-import { CopyIcon } from 'lucide-react';
+import { CopyIcon, ShareIcon } from 'lucide-react';
 
 export const ShareButton = () => {
   return (
     <Popover>
       <Popover.Trigger asChild>
-        <Button variant="secondary">Share</Button>
+        <Button className="h-9 w-9" size="icon" variant="outline">
+          <ShareIcon />
+        </Button>
       </Popover.Trigger>
       <Popover.Content align="end" className="w-[520px]">
         <div className="flex flex-col space-y-2 text-center sm:text-left">
