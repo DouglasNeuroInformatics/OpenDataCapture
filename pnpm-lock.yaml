@@ -602,9 +602,6 @@ importers:
       '@opendatacapture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
-      '@opendatacapture/editor':
-        specifier: workspace:*
-        version: link:../../packages/editor
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../../packages/i18next

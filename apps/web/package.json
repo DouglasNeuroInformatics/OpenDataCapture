@@ -27,7 +27,6 @@
     "@import-meta-env/cli": "^0.6.8",
     "@import-meta-env/unplugin": "^0.5.1",
     "@opendatacapture/demo": "workspace:*",
-    "@opendatacapture/editor": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
