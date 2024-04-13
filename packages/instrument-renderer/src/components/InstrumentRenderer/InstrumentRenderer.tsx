@@ -4,6 +4,7 @@ import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useWindowSize } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
+import { ErrorFallback } from '@opendatacapture/react-core';
 import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { FileCheckIcon, MonitorIcon, PrinterIcon } from 'lucide-react';
@@ -12,7 +13,6 @@ import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
-import { ErrorFallback } from '../ErrorFallback';
 import { FormContent } from '../FormContent';
 import { InstrumentOverview } from '../InstrumentOverview';
 import { InstrumentSummary } from '../InstrumentSummary';
@@ -125,7 +125,17 @@ export const InstrumentRenderer = <TKind extends InstrumentKind>({
       </div>
       {match(interpreted)
         .with({ status: 'LOADING' }, () => <Spinner />)
-        .with({ status: 'ERROR' }, ({ error }) => customErrorFallback?.({ error }) ?? <ErrorFallback />)
+        .with(
+          { status: 'ERROR' },
+          ({ error }) =>
+            customErrorFallback?.({ error }) ?? (
+              <ErrorFallback
+                description={t('genericApology')}
+                subtitle={t('failedToLoadInstrument')}
+                title={t('somethingWentWrong')}
+              />
+            )
+        )
         .with({ status: 'DONE' }, ({ instrument }) =>
           match({ index, instrument })
             .with({ index: 0 }, () => (
