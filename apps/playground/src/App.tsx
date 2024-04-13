@@ -7,7 +7,8 @@ import { ErrorPage, LoadingPage } from '@opendatacapture/react-core';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { MobileFallbackPage } from './components/MobileFallbackPage';
-const Editor = React.lazy(() => import('./components/Editor').then((module) => ({ default: module.Editor })));
+
+const IndexPage = React.lazy(() => import('./pages/IndexPage'));
 
 await i18n.init();
 
@@ -21,7 +22,7 @@ export const App = () => {
     >
       <ErrorBoundary FallbackComponent={ErrorPage}>
         <NotificationHub />
-        {isDesktop ? <Editor /> : <MobileFallbackPage />}
+        {isDesktop ? <IndexPage /> : <MobileFallbackPage />}
       </ErrorBoundary>
     </React.Suspense>
   );
