@@ -1,3 +1,4 @@
+import module from 'module';
 import path from 'path';
 import url from 'url';
 
@@ -6,6 +7,8 @@ import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
+
+const require = module.createRequire(import.meta.url);
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
@@ -34,7 +37,9 @@ export default defineConfig(({ mode }) => ({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src')
+      '@': path.resolve(__dirname, 'src'),
+      react: path.dirname(require.resolve('react/package.json')),
+      'react-dom': path.dirname(require.resolve('react-dom/package.json'))
     }
   },
   server: {
