@@ -1035,12 +1035,15 @@ importers:
       '@douglasneuroinformatics/libui':
         specifier: ^2.0.4
         version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
-      '@heroicons/react':
-        specifier: ^2.1.3
-        version: 2.1.3(react@18.2.0)
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
+      '@opendatacapture/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+      lucide-react:
+        specifier: ^0.368.0
+        version: 0.368.0(react@18.2.0)
       react:
         specifier: 18.x
         version: 18.2.0
@@ -15485,6 +15488,15 @@ packages:
   /lucide-react@0.367.0(react@18.2.0):
     resolution:
       { integrity: sha512-3FWiBaJiqMrx5a1sjH3CVdPqWnw/Z/PTVeeTDmOeILSs+8Ah+VhCd4FQMeHo6Z0WxHcm9piIOtilQwvceiCCKQ== }
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /lucide-react@0.368.0(react@18.2.0):
+    resolution:
+      { integrity: sha512-soryVrCjheZs8rbXKdINw9B8iPi5OajBJZMJ1HORig89ljcOcEokKKAgGbg3QWxSXel7JwHOfDFUdDHAKyUAMw== }
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
