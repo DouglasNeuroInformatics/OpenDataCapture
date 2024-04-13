@@ -6,27 +6,27 @@ const { z } = await import('/runtime/v1/zod.js');
 export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  name: ' ',
+  name: '<PLACEHOLDER>',
   tags: {
-    en: [],
-    fr: []
+    en: ['<PLACEHOLDER>'],
+    fr: ['<PLACEHOLDER>']
   },
   version: 1.0,
   content: {},
   details: {
     description: {
-      en: ' ',
-      fr: ' '
+      en: '<PLACEHOLDER>',
+      fr: '<PLACEHOLDER>'
     },
     estimatedDuration: 1,
     instructions: {
-      en: [],
-      fr: []
+      en: ['<PLACEHOLDER>'],
+      fr: ['<PLACEHOLDER>']
     },
     license: 'UNLICENSED',
     title: {
-      en: ' ',
-      fr: ' '
+      en: '<PLACEHOLDER>',
+      fr: '<PLACEHOLDER>'
     }
   },
   validationSchema: z.object({})

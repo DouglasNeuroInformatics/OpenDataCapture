@@ -6,26 +6,25 @@ const { z } = await import('/runtime/v1/zod.js');
 export default defineInstrument({
   kind: 'INTERACTIVE',
   language: 'en',
-  name: ' ',
-  tags: [],
+  name: '<PLACEHOLDER>',
+  tags: ['<PLACEHOLDER>'],
   version: 1.0,
   content: {
     render(done) {
       const button = document.createElement('button');
       button.textContent = 'Submit Instrument';
       document.body.appendChild(button);
-
       button.addEventListener('click', () => {
         done({ message: 'Hello World' });
       });
     }
   },
   details: {
-    description: ' ',
+    description: '<PLACEHOLDER>',
     estimatedDuration: 1,
-    instructions: [],
+    instructions: ['<PLACEHOLDER>'],
     license: 'UNLICENSED',
-    title: ' '
+    title: '<PLACEHOLDER>'
   },
   validationSchema: z.object({
     message: z.string()
