@@ -14,8 +14,8 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.1",
     "@douglasneuroinformatics/libui": "^2.0.4",
+    "@monaco-editor/react": "^4.6.0",
     "@opendatacapture/demo": "workspace:*",
-    "@opendatacapture/editor": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-library": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
@@ -28,6 +28,8 @@
     "framer-motion": "^11.0.27",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.367.0",
+    "monaco-editor": "^0.47.0",
+    "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.13",

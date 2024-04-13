@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { AlertDialog, Button, Dialog, DropdownMenu, Label, Switch } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { EllipsisIcon } from 'lucide-react';
+import { EllipsisVerticalIcon } from 'lucide-react';
 
 export const ActionsDropdown = () => {
   const [open, setIsOpen] = useState(false);
@@ -13,23 +13,22 @@ export const ActionsDropdown = () => {
     <React.Fragment>
       <DropdownMenu>
         <DropdownMenu.Trigger asChild>
-          <Button variant="secondary">
-            <span className="sr-only">Actions</span>
-            <EllipsisIcon className="h-4 w-4" />
+          <Button className="h-9 w-9" size="icon" variant="outline">
+            <EllipsisVerticalIcon />
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content align="end">
-          <DropdownMenu.Item onSelect={() => setIsOpen(true)}>Content filter preferences</DropdownMenu.Item>
+          <DropdownMenu.Item onSelect={() => setIsOpen(true)}>User Settings</DropdownMenu.Item>
           <DropdownMenu.Separator />
-          <DropdownMenu.Item className="text-red-600" onSelect={() => setShowDeleteDialog(true)}>
-            Delete preset
+          <DropdownMenu.Item className="text-red-600 dark:text-red-500" onSelect={() => setShowDeleteDialog(true)}>
+            Delete Instrument
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
       <Dialog open={open} onOpenChange={setIsOpen}>
         <Dialog.Content>
           <Dialog.Header>
-            <Dialog.Title>Content filter preferences</Dialog.Title>
+            <Dialog.Title>User Settings</Dialog.Title>
             <Dialog.Description>
               The content filter flags text that may violate our content policy. It&apos;s powered by our moderation
               endpoint which is free to use to moderate your OpenAI API traffic. Learn more.
@@ -59,8 +58,7 @@ export const ActionsDropdown = () => {
           <AlertDialog.Header>
             <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
             <AlertDialog.Description>
-              This action cannot be undone. This preset will no longer be accessible by you or others you&apos;ve shared
-              it with.
+              This instrument will be deleted from local storage and cannot be recovered.
             </AlertDialog.Description>
           </AlertDialog.Header>
           <AlertDialog.Footer>
