@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { useLegacyStepper } from '@douglasneuroinformatics/libui/hooks';
 import { $Json, type Json } from '@opendatacapture/schemas/core';
 import type { Promisable } from 'type-fest';
 
-import bootstrapScript from '../scripts/bootstrap-interactive-content?raw';
+import bootstrapScript from './bootstrap?raw';
 
 export type InteractiveContentProps = {
   bundle: string;
@@ -12,7 +11,6 @@ export type InteractiveContentProps = {
 };
 
 export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps) => {
-  const { updateIndex } = useLegacyStepper();
   const ref = useRef<HTMLIFrameElement>(null);
 
   const handler = useCallback(
@@ -20,7 +18,6 @@ export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps
       void (async function () {
         const data = await $Json.parseAsync(event.detail);
         await onSubmit(data);
-        updateIndex('increment');
       })();
     },
     [onSubmit]

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
-import { useInterval, useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
+import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 import { type EditorPaneRef } from '@opendatacapture/editor';
 
 import { EditorContext } from '@/context/EditorContext';
@@ -10,11 +10,9 @@ import { useRuntime } from '@/hooks/useRuntime';
 import { useTranspiler } from '@/hooks/useTranspiler';
 
 import { DesktopEditor } from './DesktopEditor';
-import { MobileEditor } from './MobileEditor';
 
 export const Editor = () => {
   const { setSource, source, state } = useTranspiler();
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const ref = useRef<EditorPaneRef>(null);
   const [selectedExample, setSelectedExample] = useState<ExampleInstrumentData>(defaultExample);
 
@@ -59,7 +57,7 @@ export const Editor = () => {
             Instrument Playground
           </Heading>
         </header>
-        <main className="h-full min-h-0">{isDesktop ? <DesktopEditor ref={ref} /> : <MobileEditor ref={ref} />}</main>
+        <DesktopEditor ref={ref} />
       </div>
     </EditorContext.Provider>
   );

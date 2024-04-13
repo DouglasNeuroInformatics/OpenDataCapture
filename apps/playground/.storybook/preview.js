@@ -1,6 +1,5 @@
+import { i18n } from '@opendatacapture/i18next';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
-
-import i18n from '../src/services/i18n';
 
 import '@douglasneuroinformatics/libui/styles/globals.css';
 

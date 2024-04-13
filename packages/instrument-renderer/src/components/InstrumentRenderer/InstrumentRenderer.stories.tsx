@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Card } from '@douglasneuroinformatics/libui/components';
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
 import type { Meta, StoryObj } from '@storybook/react';
@@ -13,12 +14,15 @@ export default {
   decorators: [
     (Story) => {
       return (
-        <div className="h-screen p-6">
+        <Card className="mx-auto w-screen max-w-3xl p-6">
           <Story />
-        </div>
+        </Card>
       );
     }
-  ]
+  ],
+  parameters: {
+    layout: 'centered'
+  }
 } as Meta<typeof InstrumentRenderer>;
 
 export const UnilingualForm: Story = {

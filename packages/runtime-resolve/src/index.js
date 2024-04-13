@@ -1,11 +1,20 @@
 import fs from 'fs';
 import path from 'path';
 
+/** @type {string} */
+let dirname;
+if (typeof module === 'undefined') {
+  dirname = import.meta.dirname;
+} else {
+  console.warn('CommonJS is considered deprecated in this project and any support for it should be removed ASAP');
+  dirname = __dirname;
+}
+
 /** @public */
 const MANIFEST_FILENAME = 'runtime.json';
 
 /** @private */
-const RUNTIME_DIR = path.resolve(import.meta.dirname, '../../../runtime');
+const RUNTIME_DIR = path.resolve(dirname, '../../../runtime');
 
 /** @private */
 const RUNTIME_DIST_DIRNAME = 'dist';

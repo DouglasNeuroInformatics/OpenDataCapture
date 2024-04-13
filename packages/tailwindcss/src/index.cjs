@@ -11,10 +11,16 @@ exports.createConfig = (options) => {
   /** @type {string[]} */
   const libraryContent = [];
   for (const id of include) {
-    const baseDir = path.dirname(
-      require.resolve(`${id}/package.json`, { paths: options?.root ? [options?.root] : undefined })
-    );
-    libraryContent.push(path.resolve(baseDir, 'src/**/*.{js,ts,jsx,tsx}'));
+    // if this try-catch is not included, for an unknown reason, the tailwind intellisense fails
+    try {
+      const baseDir = path.dirname(
+        require.resolve(`${id}/package.json`, { paths: options?.root ? [options?.root] : undefined })
+      );
+      libraryContent.push(path.resolve(baseDir, 'src/**/*.{js,ts,jsx,tsx}'));
+    } catch (err) {
+      console.error(err);
+      continue;
+    }
   }
 
   return {

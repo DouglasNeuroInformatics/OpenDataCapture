@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { P, match } from 'ts-pattern';
 
 export type InstrumentSummaryGroupProps = {
@@ -12,15 +13,15 @@ export type InstrumentSummaryGroupProps = {
 
 export const InstrumentSummaryGroup = ({ items, title }: InstrumentSummaryGroupProps) => {
   return (
-    <div className="px-4 py-5 sm:px-6">
-      <h5 className="mb-2 font-medium">{title}</h5>
+    <div className="py-2">
+      <Heading variant="h5">{title}</Heading>
       <dl>
         {items.map(
           (item, i) =>
             item && (
-              <div className="my-1 sm:grid sm:grid-cols-3 sm:gap-4" key={i}>
-                <dt className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.label}</dt>
-                <dd className="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0 dark:text-slate-100">
+              <div className="text-muted-foreground my-1 text-sm sm:grid sm:grid-cols-3 sm:gap-4" key={i}>
+                <dt className="font-medium">{item.label}</dt>
+                <dd className="mt-1 text-sm  sm:col-span-2 sm:mt-0">
                   {match(item.value)
                     .with(P.union(P.string, P.number, P.boolean, P.instanceOf(Date)), (value) => value.toString())
                     .with(P.array(), (arr) => JSON.stringify(arr))

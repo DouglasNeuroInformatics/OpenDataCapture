@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card } from '@douglasneuroinformatics/libui/components';
+import { Card, Heading } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
@@ -10,7 +10,7 @@ import { ToggledContent } from './ToggledContent';
 
 const ErrorMessage: React.FC<{ error: Error }> = ({ error }) => {
   return (
-    <span className="font-semibold text-red-500">
+    <span className="text-destructive font-medium">
       {error instanceof z.ZodError
         ? fromZodError(error, {
             prefix: 'Validation Error'
@@ -25,7 +25,7 @@ export const CompileErrorFallback: React.FC<{ className?: string; error: Error }
     <Card className={cn('flex max-h-full flex-col p-3 tracking-tight', className)}>
       <div className="h-full overflow-scroll">
         <div className="space-y-1 py-3">
-          <h3 className="text-lg font-bold">Failed to Compile</h3>
+          <Heading variant="h4">Failed to Compile</Heading>
           <ErrorMessage error={error} />
         </div>
         {error.cause instanceof Error && error.message !== error.cause.message && (

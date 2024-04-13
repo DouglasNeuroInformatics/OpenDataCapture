@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 
-import { ClipboardDocumentCheckIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import { Button } from '@douglasneuroinformatics/libui/components';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ClipboardCheckIcon, ClipboardListIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 export const CopyButton: React.FC<{ text: string }> = ({ text }) => {
   const [state, setState] = useState<'READY' | 'SUCCESS'>('READY');
 
   return (
-    <button
-      className="rounded-md p-2 hover:bg-slate-200 dark:hover:bg-slate-700"
+    <Button
+      size="icon"
       type="button"
+      variant="ghost"
       onClick={() => {
         if (state === 'READY') {
           navigator.clipboard
@@ -29,14 +31,14 @@ export const CopyButton: React.FC<{ text: string }> = ({ text }) => {
           exit={{ opacity: 0 }}
           initial={{ opacity: 0 }}
           key={state}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.1 }}
         >
           {match(state)
-            .with('READY', () => <ClipboardDocumentListIcon height={20} width={20} />)
-            .with('SUCCESS', () => <ClipboardDocumentCheckIcon height={20} width={20} />)
+            .with('READY', () => <ClipboardListIcon />)
+            .with('SUCCESS', () => <ClipboardCheckIcon />)
             .exhaustive()}
         </motion.div>
       </AnimatePresence>
-    </button>
+    </Button>
   );
 };
