@@ -2,27 +2,15 @@ import React from 'react';
 
 import { Separator } from '@douglasneuroinformatics/libui/components';
 
-import { InstrumentSelector } from '@/components/InstrumentSelector/InstrumentSelector';
-
-import { PresetActions } from '../components/PresetActions';
-import { PresetSave } from '../components/PresetSave';
-import { PresetShare } from '../components/PresetShare';
+import { Header } from '@/components/Header';
+import { MainContent } from '@/components/MainContent';
 
 const IndexPage = () => {
   return (
-    <div className="hidden h-full flex-col md:flex">
-      <div className="container flex h-16 flex-row items-center justify-between space-y-0 py-4">
-        <h2 className="text-lg font-semibold">Playground</h2>
-        <div className="flex space-x-2">
-          <InstrumentSelector />
-          <PresetSave />
-          <div className="flex">
-            <PresetShare />
-          </div>
-          <PresetActions />
-        </div>
-      </div>
+    <div className="flex h-screen w-screen flex-col overflow-hidden px-8 xl:px-12 2xl:px-16">
+      <Header />
       <Separator />
+      <MainContent />
     </div>
   );
 };

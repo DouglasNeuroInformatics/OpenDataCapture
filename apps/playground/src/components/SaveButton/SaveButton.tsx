@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button, Dialog, Input, Label } from '@douglasneuroinformatics/libui/components';
 
-export const PresetSave = () => {
+export const SaveButton = () => {
   return (
     <Dialog>
       <Dialog.Trigger asChild>

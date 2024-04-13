@@ -4,7 +4,7 @@ import { AlertDialog, Button, Dialog, DropdownMenu, Label, Switch } from '@dougl
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { EllipsisIcon } from 'lucide-react';
 
-export const PresetActions = () => {
+export const ActionsDropdown = () => {
   const [open, setIsOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { addNotification } = useNotificationsStore();

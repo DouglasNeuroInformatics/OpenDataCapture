@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, Input, Label, Popover } from '@douglasneuroinformatics/libui/components';
 import { CopyIcon } from 'lucide-react';
 
-export const PresetShare = () => {
+export const ShareButton = () => {
   return (
     <Popover>
       <Popover.Trigger asChild>
