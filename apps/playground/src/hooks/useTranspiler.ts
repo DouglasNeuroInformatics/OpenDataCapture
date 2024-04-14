@@ -1,11 +1,10 @@
 import { useCallback, useState } from 'react';
 
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
-import { InstrumentTransformer } from '@opendatacapture/instrument-transformer/browser';
-import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
+import { useInstrumentTransformer } from './useInstrumentTransformer';
 import { useSourceRef } from './useSourceRef';
 
 const DEFAULT_REBUILD_INTERVAL = 2000;
@@ -33,10 +32,8 @@ type BuildingState = {
 
 type TranspilerState = BuildingState | BuiltState | ErrorState | InitialState;
 
-const instrumentTransformer = new InstrumentTransformer();
-await instrumentTransformer.init({ wasmURL: esbuildWasmUrl });
-
 export function useTranspiler() {
+  const instrumentTransformer = useInstrumentTransformer();
   const sourceRef = useSourceRef();
   const [state, setState] = useState<TranspilerState>({ source: null, status: 'initial' });
 
