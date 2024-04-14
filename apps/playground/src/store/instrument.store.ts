@@ -1,9 +1,10 @@
 import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { create } from 'zustand';
 
+import formWithAllScalarFieldVariants from '@/examples/form/form-with-all-scalar-field-variants.instrument?raw';
 import formWithComplexDynamicField from '@/examples/form/form-with-complex-dynamic-field.instrument?raw';
+import formWithGroups from '@/examples/form/form-with-groups.instrument?raw';
 import formWithSimpleDynamicField from '@/examples/form/form-with-simple-dynamic-field.instrument?raw';
-import multilingualFormWithGroups from '@/examples/form/multilingual-form-with-groups.instrument?raw';
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
 import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
@@ -69,8 +70,15 @@ const examples: InstrumentStoreItem[] = [
     category: 'Examples',
     id: crypto.randomUUID(),
     kind: 'FORM',
-    label: 'Multilingual Form With Groups',
-    source: multilingualFormWithGroups
+    label: 'Form With Groups',
+    source: formWithGroups
+  },
+  {
+    category: 'Examples',
+    id: crypto.randomUUID(),
+    kind: 'FORM',
+    label: 'Form With All Scalar Field Variants',
+    source: formWithAllScalarFieldVariants
   }
 ];
 
