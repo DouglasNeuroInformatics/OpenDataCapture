@@ -13,7 +13,7 @@ export const Viewer = () => {
   const state = useTranspiler();
   const key = useViewerStore((store) => store.key);
   return (
-    <div className="h-full pl-12" key={key}>
+    <div className="h-full overflow-scroll pl-12" key={key}>
       {match(state)
         .with({ status: 'built' }, ({ bundle }) => (
           <InstrumentRenderer

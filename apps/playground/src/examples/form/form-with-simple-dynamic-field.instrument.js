@@ -36,9 +36,9 @@ export default defineInstrument({
     }
   },
   details: {
-    description: 'This is an example of a form with conditional rendering and validation logic',
+    description: 'This is an example of a simple form with conditional rendering and validation logic',
     estimatedDuration: 1,
-    instructions: ['Please respond to all questions shown'],
+    instructions: ['Please respond to all questions'],
     license: 'AGPL-3.0',
     title: 'Favorite Color'
   },

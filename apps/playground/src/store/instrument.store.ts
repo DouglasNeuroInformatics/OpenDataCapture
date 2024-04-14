@@ -1,7 +1,9 @@
 import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { create } from 'zustand';
 
-import formWithDynamicField from '@/examples/form/form-with-dynamic-field.instrument?raw';
+import formWithComplexDynamicField from '@/examples/form/form-with-complex-dynamic-field.instrument?raw';
+import formWithSimpleDynamicField from '@/examples/form/form-with-simple-dynamic-field.instrument?raw';
+import multilingualFormWithGroups from '@/examples/form/multilingual-form-with-groups.instrument?raw';
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
 import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
@@ -53,8 +55,22 @@ const examples: InstrumentStoreItem[] = [
     category: 'Examples',
     id: crypto.randomUUID(),
     kind: 'FORM',
-    label: 'Form With Dynamic Field',
-    source: formWithDynamicField
+    label: 'Form With Simple Dynamic Field',
+    source: formWithSimpleDynamicField
+  },
+  {
+    category: 'Examples',
+    id: crypto.randomUUID(),
+    kind: 'FORM',
+    label: 'Form With Complex Dynamic Field',
+    source: formWithComplexDynamicField
+  },
+  {
+    category: 'Examples',
+    id: crypto.randomUUID(),
+    kind: 'FORM',
+    label: 'Multilingual Form With Groups',
+    source: multilingualFormWithGroups
   }
 ];
 
