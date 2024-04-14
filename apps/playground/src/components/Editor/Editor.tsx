@@ -59,10 +59,18 @@ export const Editor = ({ className }: EditorProps) => {
       defaultValue={selectedInstrument.source}
       options={{
         automaticLayout: true,
+        codeLens: false,
+        inlineSuggest: {
+          enabled: true
+        },
         minimap: {
           enabled: false
         },
         scrollBeyondLastLine: false,
+        stickyScroll: {
+          enabled: false
+        },
+        tabCompletion: 'on',
         tabSize: 2
       }}
       path={'index.ts'}
