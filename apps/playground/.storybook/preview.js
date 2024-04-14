@@ -3,6 +3,8 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 
 import '@douglasneuroinformatics/libui/styles/globals.css';
 
+await i18n.init();
+
 /** @type {import('@storybook/react').Preview} */
 const preview = {
   decorators: [

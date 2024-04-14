@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Branding } from '@opendatacapture/react-core';
 
 import { ActionsDropdown } from '../ActionsDropdown';
 import { DownloadButton } from '../DownloadButton';
@@ -11,7 +12,7 @@ import { ShareButton } from '../ShareButton';
 export const Header = () => {
   return (
     <header className="flex h-16 items-center justify-between py-4">
-      <h2 className="text-lg font-semibold">Playground</h2>
+      <Branding />
       <div className="flex space-x-2">
         <InstrumentSelector />
         <SaveButton />

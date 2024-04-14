@@ -7,7 +7,7 @@ import { match } from 'ts-pattern';
 
 import type { TranspilerState } from '@/hooks/useTranspiler';
 
-import { CompileErrorFallback } from './CompileErrorFallback';
+import { CompileErrorFallback } from '../CompileErrorFallback';
 
 export type InstrumentViewerRef = {
   forceRefresh: () => void;

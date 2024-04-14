@@ -52,7 +52,7 @@ export const Editor = ({ className }: EditorProps) => {
 
   return (
     <MonacoEditor
-      className={cn('h-full]', className)}
+      className={cn('border', className)}
       defaultLanguage="typescript"
       defaultValue={selectedInstrument?.source ?? ''}
       options={{

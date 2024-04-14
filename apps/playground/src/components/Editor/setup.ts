@@ -41,6 +41,7 @@ loader.config({ monaco });
   monaco.editor.defineTheme('odc-light', {
     base: 'vs',
     colors: {
+      // slate-50
       'editor.background': '#F8FAFC'
     },
     inherit: true,
@@ -50,7 +51,8 @@ loader.config({ monaco });
   monaco.editor.defineTheme('odc-dark', {
     base: 'vs-dark',
     colors: {
-      'editor.background': '#1E313B'
+      // slate-800
+      'editor.background': '#1E293B'
     },
     inherit: true,
     rules: []
