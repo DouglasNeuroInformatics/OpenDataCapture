@@ -8,7 +8,7 @@ function createError() {
   try {
     return (function f1() {
       (function f2() {
-        throw new Error('Unexpected Error');
+        throw new Error('Unexpected Error', { cause: new Error('Another Error') });
       })();
     })();
   } catch (err) {
