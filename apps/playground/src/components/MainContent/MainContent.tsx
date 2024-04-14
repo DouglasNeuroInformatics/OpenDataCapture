@@ -7,7 +7,7 @@ import { Viewer } from '../Viewer';
 
 export const MainContent = () => {
   return (
-    <main className="flex flex-grow flex-col py-4">
+    <main className="flex flex-grow flex-col overflow-hidden py-4">
       <Resizable.PanelGroup direction="horizontal">
         <Resizable.Panel defaultSize={50} minSize={25}>
           <Editor className="h-full min-h-0 border-r-0" />
