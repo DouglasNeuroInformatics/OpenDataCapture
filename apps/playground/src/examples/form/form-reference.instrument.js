@@ -141,7 +141,7 @@ export default defineInstrument({
               label: 'Question 2'
             },
             q3: {
-              label: 'Question 2'
+              label: 'Question 3'
             }
           },
           options: {
@@ -168,7 +168,7 @@ export default defineInstrument({
             },
             f2: {
               kind: 'string',
-              label: 'Field 1',
+              label: 'Field 2',
               variant: 'input'
             }
           }
