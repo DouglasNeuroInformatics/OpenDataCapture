@@ -300,14 +300,13 @@ export type FormInstrumentNumberRecordField<
 export const $FormInstrumentNumberRecordField: z.ZodType<FormInstrumentNumberRecordField> =
   $FormInstrumentBaseField.extend({
     items: z.record(
-      z.number(),
       z.object({
-        description: $$InstrumentUIOption(z.string()),
+        description: $$InstrumentUIOption(z.string()).optional(),
         label: $$InstrumentUIOption(z.string())
       })
     ),
     kind: z.literal('number-record'),
-    options: $$InstrumentUIOption(z.record(z.number(), z.string())),
+    options: $$InstrumentUIOption(z.record(z.coerce.number(), z.string())),
     variant: z.literal('likert')
   });
 
