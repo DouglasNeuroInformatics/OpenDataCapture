@@ -50,7 +50,7 @@ export const InstrumentRenderPage = () => {
 
   return (
     <div className="flex flex-grow flex-col">
-      <PageHeader className="print:hidden" title={title ?? t('instrument')} />
+      <PageHeader title={title ?? t('instrument')} />
       <div className="flex-grow">
         <InstrumentRenderer
           bundle={instrumentBundleQuery.data.bundle}
