@@ -1,4 +1,5 @@
-import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
+import { $InstrumentKind } from '@opendatacapture/schemas/instrument';
+import { z } from 'zod';
 import { create } from 'zustand';
 
 import formReference from '@/examples/form/form-reference.instrument?raw';
@@ -9,20 +10,63 @@ import multilingualForm from '@/templates/form/multilingual-form.instrument?raw'
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
 import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
 
-type InstrumentCategory = 'Examples' | 'Saved' | 'Templates';
+const $InstrumentStoreItem = z.object({
+  category: z.enum(['Examples', 'Saved', 'Templates']),
+  id: z.string().uuid(),
+  kind: $InstrumentKind,
+  label: z.string(),
+  source: z.string()
+});
 
-type InstrumentStoreItem = {
-  category: InstrumentCategory;
-  id: string;
-  kind: InstrumentKind;
-  label: string;
-  source: string;
+type InstrumentStoreItem = z.infer<typeof $InstrumentStoreItem>;
+type InstrumentCategory = InstrumentStoreItem['category'];
+
+const instrumentStorage = {
+  _genKey(label: string): string {
+    return this._prefix + label;
+  },
+  _prefix: 'instrument--',
+  add(item: InstrumentStoreItem): void {
+    if (this.has(item)) {
+      console.error(`Instrument with label ${item.label} already in local storage`);
+      return;
+    }
+    localStorage.setItem(this._genKey(item.label), JSON.stringify(item));
+  },
+  get(label: string): InstrumentStoreItem | null {
+    const item = localStorage.getItem(this._genKey(label));
+    if (item === null) {
+      return null;
+    }
+    try {
+      return $InstrumentStoreItem.parse(JSON.parse(item));
+    } catch (err) {
+      console.error('Failed to parse saved instrument item', err);
+      return null;
+    }
+  },
+  getAll(): InstrumentStoreItem[] {
+    const savedItems: InstrumentStoreItem[] = [];
+    for (const key in localStorage) {
+      if (key.startsWith(this._prefix)) {
+        try {
+          savedItems.push($InstrumentStoreItem.parse(JSON.parse(localStorage.getItem(key)!)));
+        } catch (err) {
+          console.error('Failed to parse saved instrument item', err);
+        }
+      }
+    }
+    return savedItems;
+  },
+  has(item: InstrumentStoreItem): boolean {
+    return localStorage.getItem(this._genKey(item.label)) !== null;
+  }
 };
 
 type InstrumentStore = {
-  addInstrument: (item: InstrumentStoreItem) => void;
   instruments: InstrumentStoreItem[];
   removeInstrument: (id: string) => void;
+  saveInstrument: (item: InstrumentStoreItem) => void;
   selectedInstrument: InstrumentStoreItem;
   setSelectedInstrument: (id: string) => void;
 };
@@ -82,12 +126,17 @@ const examples: InstrumentStoreItem[] = [
   }
 ];
 
+const saved = instrumentStorage.getAll();
+
 export const DEFAULT_INSTRUMENT = templates[0];
 
 export const useInstrumentStore = create<InstrumentStore>((set) => ({
-  addInstrument: (item) => set(({ instruments }) => ({ instruments: [...instruments, item] })),
-  instruments: [...templates, ...examples],
+  instruments: [...templates, ...examples, ...saved],
   removeInstrument: (id) => set(({ instruments }) => ({ instruments: instruments.filter((item) => item.id !== id) })),
+  saveInstrument: (item) => {
+    instrumentStorage.add(item);
+    set(({ instruments }) => ({ instruments: [...instruments, item], selectedInstrument: item }));
+  },
   selectedInstrument: DEFAULT_INSTRUMENT,
   setSelectedInstrument: (id) => {
     set(({ instruments }) => {
