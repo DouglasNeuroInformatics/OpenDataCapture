@@ -6,8 +6,8 @@ const { z } = await import('/runtime/v1/zod.js');
 export default defineInstrument({
   kind: 'FORM',
   language: 'en',
-  name: 'FORM_WITH_ALL_SCALAR_FIELD_VARIANTS',
-  tags: ['Comprehensive'],
+  name: 'FORM_REFERENCE',
+  tags: ['Reference'],
   version: 1.0,
   content: [
     {
@@ -125,10 +125,59 @@ export default defineInstrument({
           }
         }
       }
+    },
+    {
+      title: 'Number Record',
+      description: 'Note: this is a composite field',
+      fields: {
+        numberRecord: {
+          kind: 'number-record',
+          label: 'Number Record (Likert)',
+          items: {
+            q1: {
+              label: 'Question 1'
+            },
+            q2: {
+              label: 'Question 2'
+            },
+            q3: {
+              label: 'Question 2'
+            }
+          },
+          options: {
+            1: 'Low',
+            2: 'Medium',
+            3: 'High'
+          },
+          variant: 'likert'
+        }
+      }
+    },
+    {
+      title: 'Record Array',
+      description: 'Note: this is a composite field',
+      fields: {
+        recordArray: {
+          kind: 'record-array',
+          label: 'Record Array',
+          fieldset: {
+            f1: {
+              kind: 'string',
+              label: 'Field 1',
+              variant: 'input'
+            },
+            f2: {
+              kind: 'string',
+              label: 'Field 1',
+              variant: 'input'
+            }
+          }
+        }
+      }
     }
   ],
   details: {
-    description: 'This example includes all possible scalar field variants',
+    description: 'This example includes all possible static field variants',
     title: 'Reference Instrument',
     estimatedDuration: 5,
     instructions: ['Please complete all questions'],
@@ -147,6 +196,13 @@ export default defineInstrument({
     stringSelect: z.enum(['a', 'b', 'c']),
     stringTextArea: z.string(),
     setListbox: z.set(z.enum(['a', 'b', 'c'])),
-    setSelect: z.set(z.enum(['a', 'b', 'c']))
+    setSelect: z.set(z.enum(['a', 'b', 'c'])),
+    numberRecord: z.record(z.union([z.literal(1), z.literal(2), z.literal(3)])),
+    recordArray: z.array(
+      z.object({
+        f1: z.string(),
+        f2: z.string()
+      })
+    )
   })
 });

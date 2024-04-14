@@ -1,7 +1,7 @@
 import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { create } from 'zustand';
 
-import formWithAllScalarFieldVariants from '@/examples/form/form-with-all-scalar-field-variants.instrument?raw';
+import formReference from '@/examples/form/form-reference.instrument?raw';
 import formWithComplexDynamicField from '@/examples/form/form-with-complex-dynamic-field.instrument?raw';
 import formWithGroups from '@/examples/form/form-with-groups.instrument?raw';
 import formWithSimpleDynamicField from '@/examples/form/form-with-simple-dynamic-field.instrument?raw';
@@ -56,6 +56,13 @@ const examples: InstrumentStoreItem[] = [
     category: 'Examples',
     id: crypto.randomUUID(),
     kind: 'FORM',
+    label: 'Form With Groups',
+    source: formWithGroups
+  },
+  {
+    category: 'Examples',
+    id: crypto.randomUUID(),
+    kind: 'FORM',
     label: 'Form With Simple Dynamic Field',
     source: formWithSimpleDynamicField
   },
@@ -70,15 +77,8 @@ const examples: InstrumentStoreItem[] = [
     category: 'Examples',
     id: crypto.randomUUID(),
     kind: 'FORM',
-    label: 'Form With Groups',
-    source: formWithGroups
-  },
-  {
-    category: 'Examples',
-    id: crypto.randomUUID(),
-    kind: 'FORM',
-    label: 'Form With All Scalar Field Variants',
-    source: formWithAllScalarFieldVariants
+    label: 'Form Reference',
+    source: formReference
   }
 ];
 
