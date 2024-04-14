@@ -17,7 +17,7 @@ type InstrumentStore = {
   addInstrument: (item: InstrumentStoreItem) => void;
   instruments: InstrumentStoreItem[];
   removeInstrument: (id: string) => void;
-  selectedInstrument: InstrumentStoreItem | null;
+  selectedInstrument: InstrumentStoreItem;
   setSelectedInstrument: (id: string) => void;
 };
 
@@ -45,14 +45,16 @@ const templates: InstrumentStoreItem[] = [
   }
 ];
 
+export const DEFAULT_INSTRUMENT = templates[0];
+
 export const useInstrumentStore = create<InstrumentStore>((set) => ({
   addInstrument: (item) => set(({ instruments }) => ({ instruments: [...instruments, item] })),
   instruments: [...templates],
   removeInstrument: (id) => set(({ instruments }) => ({ instruments: instruments.filter((item) => item.id !== id) })),
-  selectedInstrument: null,
+  selectedInstrument: DEFAULT_INSTRUMENT,
   setSelectedInstrument: (id) => {
     set(({ instruments }) => {
-      return { selectedInstrument: instruments.find((item) => item.id === id) ?? null };
+      return { selectedInstrument: instruments.find((item) => item.id === id) };
     });
   }
 }));

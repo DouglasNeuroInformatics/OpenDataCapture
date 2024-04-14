@@ -1,1 +1,1 @@
-export * from './PresetSelector';
+export * from './InstrumentSelector';

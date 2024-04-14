@@ -56,7 +56,7 @@ export const Editor = ({ className }: EditorProps) => {
     <MonacoEditor
       className={cn('border', className)}
       defaultLanguage="typescript"
-      defaultValue={selectedInstrument?.source ?? ''}
+      defaultValue={selectedInstrument.source}
       options={{
         automaticLayout: true,
         minimap: {

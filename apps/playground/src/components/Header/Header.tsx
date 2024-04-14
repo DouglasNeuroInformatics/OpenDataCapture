@@ -5,7 +5,7 @@ import { Branding } from '@opendatacapture/react-core';
 
 import { ActionsDropdown } from '../ActionsDropdown';
 import { DownloadButton } from '../DownloadButton';
-import { InstrumentSelector } from '../InstrumentSelector/InstrumentSelector';
+import { InstrumentSelector } from '../InstrumentSelector';
 import { SaveButton } from '../SaveButton';
 import { ShareButton } from '../ShareButton';
 

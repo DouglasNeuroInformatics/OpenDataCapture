@@ -21,7 +21,7 @@ export const InstrumentSelector = () => {
           role="combobox"
           variant="outline"
         >
-          {selectedInstrument ? selectedInstrument.label : 'Load Instrument'}
+          {selectedInstrument.label}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </Popover.Trigger>
@@ -45,7 +45,7 @@ export const InstrumentSelector = () => {
                   <CheckIcon
                     className={cn(
                       'ml-auto h-4 w-4',
-                      selectedInstrument?.id === instrument.id ? 'opacity-100' : 'opacity-0'
+                      selectedInstrument.id === instrument.id ? 'opacity-100' : 'opacity-0'
                     )}
                   />
                 </Command.Item>

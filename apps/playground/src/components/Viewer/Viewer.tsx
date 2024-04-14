@@ -10,7 +10,6 @@ import { CompileErrorFallback } from '../CompileErrorFallback';
 
 export const Viewer = () => {
   const state = useTranspiler();
-
   return (
     <div className="h-full pl-12">
       {match(state)
