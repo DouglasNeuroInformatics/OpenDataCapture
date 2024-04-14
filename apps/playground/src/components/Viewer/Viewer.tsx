@@ -5,13 +5,15 @@ import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import { P, match } from 'ts-pattern';
 
 import { useTranspiler } from '@/hooks/useTranspiler';
+import { useViewerStore } from '@/store/viewer.store';
 
-import { CompileErrorFallback } from '../CompileErrorFallback';
+import { CompileErrorFallback } from './CompileErrorFallback';
 
 export const Viewer = () => {
   const state = useTranspiler();
+  const key = useViewerStore((store) => store.key);
   return (
-    <div className="h-full pl-12">
+    <div className="h-full pl-12" key={key}>
       {match(state)
         .with({ status: 'built' }, ({ bundle }) => (
           <InstrumentRenderer

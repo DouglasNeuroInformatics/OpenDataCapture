@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Viewer } from './Viewer';
+import { Viewer as ViewerComponent } from './Viewer';
 
-type Story = StoryObj<typeof Viewer>;
+type Story = StoryObj<typeof ViewerComponent>;
 
-export default { component: Viewer } as Meta<typeof Viewer>;
+export default { component: ViewerComponent } as Meta<typeof ViewerComponent>;
 
-export const Default: Story = {};
+export const Viewer: Story = {};
