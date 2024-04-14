@@ -1,16 +1,19 @@
 import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { create } from 'zustand';
 
+import formWithDynamicField from '@/examples/form/form-with-dynamic-field.instrument?raw';
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
 import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
 
+type InstrumentCategory = 'Examples' | 'Saved' | 'Templates';
+
 type InstrumentStoreItem = {
+  category: InstrumentCategory;
   id: string;
   kind: InstrumentKind;
   label: string;
   source: string;
-  type: 'EXAMPLE' | 'SAVED' | 'TEMPLATE';
 };
 
 type InstrumentStore = {
@@ -23,25 +26,35 @@ type InstrumentStore = {
 
 const templates: InstrumentStoreItem[] = [
   {
+    category: 'Templates',
     id: crypto.randomUUID(),
     kind: 'FORM',
     label: 'Unilingual Form',
-    source: unilingualForm,
-    type: 'TEMPLATE'
+    source: unilingualForm
   },
   {
+    category: 'Templates',
     id: crypto.randomUUID(),
     kind: 'FORM',
     label: 'Multilingual Form',
-    source: multilingualForm,
-    type: 'TEMPLATE'
+    source: multilingualForm
   },
   {
+    category: 'Templates',
     id: crypto.randomUUID(),
     kind: 'INTERACTIVE',
     label: 'Interactive Instrument',
-    source: interactiveInstrument,
-    type: 'TEMPLATE'
+    source: interactiveInstrument
+  }
+];
+
+const examples: InstrumentStoreItem[] = [
+  {
+    category: 'Examples',
+    id: crypto.randomUUID(),
+    kind: 'FORM',
+    label: 'Form With Dynamic Field',
+    source: formWithDynamicField
   }
 ];
 
@@ -49,7 +62,7 @@ export const DEFAULT_INSTRUMENT = templates[0];
 
 export const useInstrumentStore = create<InstrumentStore>((set) => ({
   addInstrument: (item) => set(({ instruments }) => ({ instruments: [...instruments, item] })),
-  instruments: [...templates],
+  instruments: [...templates, ...examples],
   removeInstrument: (id) => set(({ instruments }) => ({ instruments: instruments.filter((item) => item.id !== id) })),
   selectedInstrument: DEFAULT_INSTRUMENT,
   setSelectedInstrument: (id) => {
@@ -58,3 +71,5 @@ export const useInstrumentStore = create<InstrumentStore>((set) => ({
     });
   }
 }));
+
+export type { InstrumentCategory, InstrumentStore, InstrumentStoreItem };
