@@ -17,7 +17,7 @@
     ·
     <a href="https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues" rel="noreferrer" target="_blank">Request Feature</a>
     ·
-    <a href="https://formplayground.opendatacapture.org" rel="noreferrer" target="_blank">Instrument Playground</a>
+    <a href="https://playground.opendatacapture.org" rel="noreferrer" target="_blank">Instrument Playground</a>
     ·
     <a href="https://demo.opendatacapture.org" rel="noreferrer" target="_blank">View Demo</a>
   </p>
