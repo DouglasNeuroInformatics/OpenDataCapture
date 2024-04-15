@@ -24,8 +24,10 @@
     "@douglasneuroinformatics/libui": "^2.0.5",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
+    "framer-motion": "^11.0.28",
     "lucide-react": "^0.368.0",
-    "react-i18next": "^14.1.0"
+    "react-i18next": "^14.1.0",
+    "ts-pattern": "^5.1.1"
   },
   "devDependencies": {
     "@opendatacapture/tailwindcss": "workspace:*",

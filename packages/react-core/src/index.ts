@@ -1,4 +1,5 @@
 export * from './components/Branding';
+export * from './components/CopyButton';
 export * from './components/ErrorFallback';
 export * from './components/ErrorPage';
 export * from './components/InstrumentIcon';

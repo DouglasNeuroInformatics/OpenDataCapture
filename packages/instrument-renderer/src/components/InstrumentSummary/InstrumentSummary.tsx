@@ -4,12 +4,12 @@ import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Separator } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
+import { CopyButton } from '@opendatacapture/react-core';
 import type { InstrumentKind, SomeUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { DownloadIcon, PrinterIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { CopyButton } from '../CopyButton';
 import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
 export type InstrumentSummaryProps<TKind extends InstrumentKind> = {
