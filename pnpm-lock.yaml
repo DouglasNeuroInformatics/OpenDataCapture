@@ -306,8 +306,8 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.4
-        version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.5
+        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -470,8 +470,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.4
-        version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.5
+        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0)
@@ -591,8 +591,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.4
-        version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.5
+        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@headlessui/react':
         specifier: ^1.7.18
         version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -772,8 +772,8 @@ importers:
   packages/editor:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.4
-        version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.5
+        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@headlessui/react':
         specifier: ^1.7.18
         version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -844,8 +844,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.4
-        version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.5
+        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -896,8 +896,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.4
-        version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.5
+        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -1036,8 +1036,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.4
-        version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.5
+        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
@@ -1134,8 +1134,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.4
-        version: 2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.5
+        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       autoprefixer:
         specifier: 10.x
         version: 10.4.19(postcss@8.4.38)
@@ -3294,9 +3294,9 @@ packages:
     dependencies:
       type-fest: 4.15.0
 
-  /@douglasneuroinformatics/libui@2.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5):
+  /@douglasneuroinformatics/libui@2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-meMsaCfGpeDciDqo+HDhL0bQGTXJFjkD2nwv2xaKI/uS1LlzE7YTXADO3KGh4SDKaqYjdRg3dQSZ5RLAAfi86g== }
+      { integrity: sha512-jVdT6RHShZz1U4qgj8hIYfTCuRfo4uo6mYIaLvsj0h7v/AVixBTQecLGp45MbA15Qiar1D6HTKZt1vhAnCT5lg== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -14206,6 +14206,7 @@ packages:
     resolution:
       { integrity: sha512-zHtQzGojZXTwZTHQqra+ETKd4Sn3vgi7uBmlPoXVWZqYvuKmtI0l/VZTjqGmJY9x88GGOaZ9+G9ES8hC4T4X8g== }
     engines: { node: '>= 12' }
+    requiresBuild: true
     dependencies:
       jsbn: 1.1.0
       sprintf-js: 1.1.3
@@ -14863,6 +14864,7 @@ packages:
   /jsbn@1.1.0:
     resolution:
       { integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A== }
+    requiresBuild: true
 
   /jscodeshift@0.15.2(@babel/preset-env@7.24.4):
     resolution:
@@ -19497,6 +19499,7 @@ packages:
     resolution:
       { integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg== }
     engines: { node: '>= 6.0.0', npm: '>= 3.0.0' }
+    requiresBuild: true
 
   /smob@1.5.0:
     resolution:
@@ -19666,6 +19669,7 @@ packages:
   /sprintf-js@1.1.3:
     resolution:
       { integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA== }
+    requiresBuild: true
 
   /sqlite3@5.1.7:
     resolution:
