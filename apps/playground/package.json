@@ -28,6 +28,7 @@
     "framer-motion": "^11.0.27",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.367.0",
+    "lz-string": "^1.5.0",
     "monaco-editor": "^0.47.0",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
