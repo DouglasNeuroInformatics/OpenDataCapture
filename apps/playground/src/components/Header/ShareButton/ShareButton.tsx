@@ -7,7 +7,7 @@ export const ShareButton = () => {
   return (
     <Popover>
       <Popover.Trigger asChild>
-        <Button className="h-9 w-9" size="icon" variant="outline">
+        <Button disabled className="h-9 w-9" size="icon" variant="outline">
           <ShareIcon />
         </Button>
       </Popover.Trigger>
