@@ -30,7 +30,6 @@
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
-    "framer-motion": "^11.0.27",
     "i18next": "^23.11.1",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.367.0",

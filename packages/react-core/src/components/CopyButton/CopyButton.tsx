@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 
-import { Button } from '@douglasneuroinformatics/libui/components';
+import { Button, type ButtonProps } from '@douglasneuroinformatics/libui/components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ClipboardCheckIcon, ClipboardListIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
-export const CopyButton: React.FC<{ text: string }> = ({ text }) => {
+export const CopyButton: React.FC<{ size?: ButtonProps['size']; text: string; variant?: ButtonProps['variant'] }> = ({
+  size,
+  text,
+  variant
+}) => {
   const [state, setState] = useState<'READY' | 'SUCCESS'>('READY');
 
   return (
     <Button
-      size="icon"
+      size={size ?? 'icon'}
       type="button"
-      variant="ghost"
+      variant={variant}
       onClick={() => {
         if (state === 'READY') {
           navigator.clipboard

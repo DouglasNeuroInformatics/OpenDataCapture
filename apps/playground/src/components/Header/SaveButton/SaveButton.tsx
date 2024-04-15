@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { useSourceRef } from '@/hooks/useSourceRef';
 import { type InstrumentStoreItem, useInstrumentStore } from '@/store/instrument.store';
+import { sha256 } from '@/utils/hash';
 
 export const SaveButton = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -16,13 +17,14 @@ export const SaveButton = () => {
   const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
   const sourceRef = useSourceRef();
 
-  const handleSubmit = ({ label }: { label: string }) => {
+  const handleSubmit = async ({ label }: { label: string }) => {
+    const source = sourceRef.current;
     const item: InstrumentStoreItem = {
       category: 'Saved',
-      id: crypto.randomUUID(),
+      id: await sha256(source),
       kind: 'UNKNOWN',
       label,
-      source: sourceRef.current
+      source: source
     };
     addInstrument(item);
     setSelectedInstrument(item.id);
@@ -61,7 +63,7 @@ export const SaveButton = () => {
                 'An instrument with this label already exists'
               )
           })}
-          onSubmit={handleSubmit}
+          onSubmit={(data) => void handleSubmit(data)}
         />
       </Dialog.Content>
     </Dialog>
