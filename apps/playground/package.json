@@ -18,7 +18,6 @@
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
-    "@opendatacapture/instrument-library": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
     "@opendatacapture/instrument-transformer": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",

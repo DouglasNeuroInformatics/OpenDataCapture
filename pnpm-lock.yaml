@@ -484,9 +484,6 @@ importers:
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../../packages/i18next
-      '@opendatacapture/instrument-library':
-        specifier: workspace:*
-        version: link:../../packages/instrument-library
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
