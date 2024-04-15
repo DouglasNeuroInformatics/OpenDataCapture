@@ -11,8 +11,8 @@ export const Footer = () => {
   const { t } = useTranslation('layout');
 
   return (
-    <footer className="container py-3 text-slate-700 dark:text-slate-300 print:hidden">
-      <hr className="my-4 border-slate-200 dark:border-slate-700 print:hidden" />
+    <footer className="container py-3 text-slate-700 dark:text-slate-300">
+      <hr className="my-4 border-slate-200 dark:border-slate-700" />
       <div className="flex items-center justify-center">
         <div className="mb-3 flex flex-row flex-wrap lg:flex-nowrap">
           <div className="flex w-1/2 items-center justify-center lg:w-auto">

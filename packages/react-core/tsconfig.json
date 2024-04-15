@@ -1,9 +1,11 @@
 {
   "extends": "../../jsconfig.json",
   "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react",
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "types": ["vite/client"]
   },
   "include": [".storybook/*", "src/**/*", "*.js", "*.cjs"]
 }

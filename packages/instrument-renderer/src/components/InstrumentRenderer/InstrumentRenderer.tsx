@@ -90,7 +90,7 @@ export const InstrumentRenderer = <TKind extends InstrumentKind>({
 
   return (
     <div className={cn('h-full w-full', className)}>
-      <div className="relative mb-10 flex items-center justify-between print:hidden">
+      <div className="relative mb-10 flex items-center justify-between">
         {steps.map((step, i) => {
           return (
             <React.Fragment key={i}>

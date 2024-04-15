@@ -9,10 +9,10 @@ import { Sidebar } from './Sidebar';
 export const Layout = () => {
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">
-      <div className="md:hidden print:hidden">
+      <div className="md:hidden">
         <Navbar />
       </div>
-      <div className="hidden md:flex md:flex-shrink-0 print:hidden">
+      <div className="hidden md:flex md:flex-shrink-0">
         <Sidebar />
       </div>
       <div className="scrollbar-none flex flex-grow flex-col overflow-y-scroll pt-16 md:pt-0">

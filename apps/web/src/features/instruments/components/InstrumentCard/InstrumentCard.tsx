@@ -1,10 +1,9 @@
 import React from 'react';
 
 import { Card } from '@douglasneuroinformatics/libui/components';
+import { InstrumentIcon } from '@opendatacapture/react-core';
 import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
-
-import { InstrumentIcon } from '../InstrumentIcon';
 
 export type InstrumentCardProps = {
   instrument: UnilingualInstrumentSummary;
@@ -23,7 +22,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       onKeyDown={onClick}
     >
       <div className="mb-4 inline-flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-500 sm:mb-0 sm:mr-8">
-        <InstrumentIcon kind={instrument.kind} />
+        <InstrumentIcon className="h-10 w-auto rounded-full" kind={instrument.kind} />
       </div>
       <div className="flex-grow">
         <h3

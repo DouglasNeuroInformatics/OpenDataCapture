@@ -15,7 +15,7 @@
     "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env node dist/main.mjs"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.0.2",
+    "@douglasneuroinformatics/libui": "^2.0.5",
     "@opendatacapture/crypto": "workspace:*",
     "@opendatacapture/database": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",

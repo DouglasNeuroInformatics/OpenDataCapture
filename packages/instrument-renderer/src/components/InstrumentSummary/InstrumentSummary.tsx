@@ -51,7 +51,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
   const results = Object.values(computedMeasures);
 
   return (
-    <div className="space-y-6">
+    <div className="print:bg-primary-foreground space-y-6 print:fixed print:left-0 print:top-0 print:z-50 print:h-screen print:w-screen">
       <div className="flex">
         <div className="flex-grow">
           <Heading variant="h4">
@@ -68,7 +68,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
             })}
           </p>
         </div>
-        <div className="hidden sm:flex sm:items-center sm:gap-1">
+        <div className="hidden sm:flex sm:items-center sm:gap-1 print:hidden">
           <CopyButton text={copyText} />
           <Button size="icon" type="button" variant="ghost" onClick={handleDownload}>
             <DownloadIcon />
