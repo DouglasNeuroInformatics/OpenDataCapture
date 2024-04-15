@@ -1,16 +1,11 @@
-const textDecoder = new TextDecoder();
-const textEncoder = new TextEncoder();
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 export function decodeSource(encodedSource: string) {
-  const binString = atob(decodeURIComponent(encodedSource));
-  const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0)!);
-  return textDecoder.decode(bytes);
+  return decompressFromEncodedURIComponent(encodedSource);
 }
 
 export function encodeSource(source: string): string {
-  const bytes = textEncoder.encode(source);
-  const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('');
-  return encodeURIComponent(btoa(binString));
+  return compressToEncodedURIComponent(source);
 }
 
 export function generateShareLink(source: string) {
