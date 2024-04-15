@@ -3,7 +3,6 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import formReference from '@/examples/form/form-reference.instrument?raw';
-import formWithComplexDynamicField from '@/examples/form/form-with-complex-dynamic-field.instrument?raw';
 import formWithGroups from '@/examples/form/form-with-groups.instrument?raw';
 import formWithSimpleDynamicField from '@/examples/form/form-with-simple-dynamic-field.instrument?raw';
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
@@ -67,13 +66,6 @@ const examples: InstrumentStoreItem[] = [
     kind: 'FORM',
     label: 'Form With Simple Dynamic Field',
     source: formWithSimpleDynamicField
-  },
-  {
-    category: 'Examples',
-    id: crypto.randomUUID(),
-    kind: 'FORM',
-    label: 'Form With Complex Dynamic Field',
-    source: formWithComplexDynamicField
   },
   {
     category: 'Examples',
