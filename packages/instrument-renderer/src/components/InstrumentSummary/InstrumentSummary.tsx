@@ -69,7 +69,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
           </p>
         </div>
         <div className="hidden sm:flex sm:items-center sm:gap-1 print:hidden">
-          <CopyButton text={copyText} />
+          <CopyButton text={copyText} variant="ghost" />
           <Button size="icon" type="button" variant="ghost" onClick={handleDownload}>
             <DownloadIcon />
           </Button>
