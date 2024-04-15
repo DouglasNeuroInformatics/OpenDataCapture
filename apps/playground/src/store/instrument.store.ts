@@ -8,6 +8,7 @@ import formWithSimpleDynamicField from '@/examples/form/form-with-simple-dynamic
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
 import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
+import { sha256 } from '@/utils/hash';
 
 type InstrumentCategory = 'Examples' | 'Saved' | 'Templates';
 
@@ -31,21 +32,21 @@ type InstrumentStore = {
 const templates: InstrumentStoreItem[] = [
   {
     category: 'Templates',
-    id: crypto.randomUUID(),
+    id: await sha256(unilingualForm),
     kind: 'FORM',
     label: 'Unilingual Form',
     source: unilingualForm
   },
   {
     category: 'Templates',
-    id: crypto.randomUUID(),
+    id: await sha256(multilingualForm),
     kind: 'FORM',
     label: 'Multilingual Form',
     source: multilingualForm
   },
   {
     category: 'Templates',
-    id: crypto.randomUUID(),
+    id: await sha256(interactiveInstrument),
     kind: 'INTERACTIVE',
     label: 'Interactive Instrument',
     source: interactiveInstrument
@@ -55,21 +56,21 @@ const templates: InstrumentStoreItem[] = [
 const examples: InstrumentStoreItem[] = [
   {
     category: 'Examples',
-    id: crypto.randomUUID(),
+    id: await sha256(formWithGroups),
     kind: 'FORM',
     label: 'Form With Groups',
     source: formWithGroups
   },
   {
     category: 'Examples',
-    id: crypto.randomUUID(),
+    id: await sha256(formWithSimpleDynamicField),
     kind: 'FORM',
     label: 'Form With Simple Dynamic Field',
     source: formWithSimpleDynamicField
   },
   {
     category: 'Examples',
-    id: crypto.randomUUID(),
+    id: await sha256(formReference),
     kind: 'FORM',
     label: 'Form Reference',
     source: formReference
@@ -79,7 +80,15 @@ const examples: InstrumentStoreItem[] = [
 export const useInstrumentStore = create(
   persist<InstrumentStore>(
     (set) => ({
-      addInstrument: (item) => set(({ instruments }) => ({ instruments: [...instruments, item] })),
+      addInstrument: (item) =>
+        set(({ instruments }) => {
+          const isExistingInstrument = instruments.find((instrument) => instrument.id === item.id);
+          if (isExistingInstrument) {
+            console.error(`Instrument with ID '${item.id}' already exists`);
+            return {};
+          }
+          return { instruments: [...instruments, item] };
+        }),
       defaultInstrument: templates[0],
       instruments: [...templates, ...examples],
       removeInstrument: (id) => {
