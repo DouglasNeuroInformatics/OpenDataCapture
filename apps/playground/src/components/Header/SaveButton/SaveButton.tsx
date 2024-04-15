@@ -12,7 +12,8 @@ export const SaveButton = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const instruments = useInstrumentStore((store) => store.instruments);
-  const saveInstrument = useInstrumentStore((store) => store.saveInstrument);
+  const addInstrument = useInstrumentStore((store) => store.addInstrument);
+  const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
   const sourceRef = useSourceRef();
 
   const handleSubmit = ({ label }: { label: string }) => {
@@ -23,7 +24,8 @@ export const SaveButton = () => {
       label,
       source: sourceRef.current
     };
-    saveInstrument(item);
+    addInstrument(item);
+    setSelectedInstrument(item.id);
     setIsDialogOpen(false);
     addNotification({ type: 'success' });
   };
