@@ -22,6 +22,7 @@ type InstrumentStoreItem = {
 
 type InstrumentStore = {
   addInstrument: (item: InstrumentStoreItem) => void;
+  defaultInstrument: InstrumentStoreItem;
   instruments: InstrumentStoreItem[];
   removeInstrument: (id: string) => void;
   selectedInstrument: InstrumentStoreItem;
@@ -83,19 +84,24 @@ const examples: InstrumentStoreItem[] = [
   }
 ];
 
-export const DEFAULT_INSTRUMENT = templates[0];
-
 export const useInstrumentStore = create(
   persist<InstrumentStore>(
     (set) => ({
       addInstrument: (item) => set(({ instruments }) => ({ instruments: [...instruments, item] })),
+      defaultInstrument: templates[0],
       instruments: [...templates, ...examples],
       removeInstrument: (id) => {
         set(({ instruments }) => ({ instruments: instruments.filter((item) => item.id !== id) }));
       },
-      selectedInstrument: DEFAULT_INSTRUMENT,
+      selectedInstrument: templates[0],
       setSelectedInstrument: (id) => {
-        set(({ instruments }) => ({ selectedInstrument: instruments.find((item) => item.id === id) }));
+        set(({ defaultInstrument, instruments }) => {
+          const instrument = instruments.find((item) => item.id === id);
+          if (!instrument) {
+            console.error(`Failed to find instrument with ID: ${id}`);
+          }
+          return { selectedInstrument: instrument ?? defaultInstrument };
+        });
       }
     }),
     {

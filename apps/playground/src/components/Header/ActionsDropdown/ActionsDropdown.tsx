@@ -4,10 +4,16 @@ import { AlertDialog, Button, Dialog, DropdownMenu, Label, Switch } from '@dougl
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { EllipsisVerticalIcon } from 'lucide-react';
 
+import { useInstrumentStore } from '@/store/instrument.store';
+
 export const ActionsDropdown = () => {
   const [open, setIsOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const { addNotification } = useNotificationsStore();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
+  const defaultInstrument = useInstrumentStore((store) => store.defaultInstrument);
+  const removeInstrument = useInstrumentStore((store) => store.removeInstrument);
+  const selectedInstrument = useInstrumentStore((store) => store.selectedInstrument);
+  const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
 
   return (
     <React.Fragment>
@@ -18,10 +24,20 @@ export const ActionsDropdown = () => {
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content align="end">
-          <DropdownMenu.Item onSelect={() => setIsOpen(true)}>User Settings</DropdownMenu.Item>
+          <DropdownMenu.Item asChild onSelect={() => setIsOpen(true)}>
+            <button disabled className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
+              User Settings
+            </button>
+          </DropdownMenu.Item>
           <DropdownMenu.Separator />
-          <DropdownMenu.Item className="text-red-600 dark:text-red-500" onSelect={() => setShowDeleteDialog(true)}>
-            Delete Instrument
+          <DropdownMenu.Item asChild onSelect={() => setShowDeleteDialog(true)}>
+            <button
+              className="cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
+              disabled={selectedInstrument.category !== 'Saved'}
+              type="button"
+            >
+              Delete Instrument
+            </button>
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
@@ -57,21 +73,21 @@ export const ActionsDropdown = () => {
         <AlertDialog.Content>
           <AlertDialog.Header>
             <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
-            <AlertDialog.Description>
-              This instrument will be deleted from local storage and cannot be recovered.
-            </AlertDialog.Description>
+            <AlertDialog.Description>This instrument will be deleted from local storage.</AlertDialog.Description>
           </AlertDialog.Header>
           <AlertDialog.Footer>
-            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
             <Button
               variant="danger"
               onClick={() => {
+                setSelectedInstrument(defaultInstrument.id);
+                removeInstrument(selectedInstrument.id);
                 setShowDeleteDialog(false);
                 addNotification({ message: 'This preset has been deleted', type: 'success' });
               }}
             >
               Delete
             </Button>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
           </AlertDialog.Footer>
         </AlertDialog.Content>
       </AlertDialog>
