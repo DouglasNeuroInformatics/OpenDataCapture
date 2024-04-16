@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 
-import { AlertDialog, Button, Dialog, DropdownMenu, Label, Switch } from '@douglasneuroinformatics/libui/components';
+import { AlertDialog, Button, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { EllipsisVerticalIcon } from 'lucide-react';
 
 import { useInstrumentStore } from '@/store/instrument.store';
 
+import { UserSettings } from './UserSettings';
+
 export const ActionsDropdown = () => {
-  const [open, setIsOpen] = useState(false);
+  const [showUserSettings, setShowUserSettings] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const defaultInstrument = useInstrumentStore((store) => store.defaultInstrument);
@@ -24,7 +26,7 @@ export const ActionsDropdown = () => {
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content align="end">
-          <DropdownMenu.Item asChild onSelect={() => setIsOpen(true)}>
+          <DropdownMenu.Item asChild onSelect={() => setShowUserSettings(true)}>
             <button disabled className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
               User Settings
             </button>
@@ -41,34 +43,7 @@ export const ActionsDropdown = () => {
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
-      <Dialog open={open} onOpenChange={setIsOpen}>
-        <Dialog.Content>
-          <Dialog.Header>
-            <Dialog.Title>User Settings</Dialog.Title>
-            <Dialog.Description>
-              The content filter flags text that may violate our content policy. It&apos;s powered by our moderation
-              endpoint which is free to use to moderate your OpenAI API traffic. Learn more.
-            </Dialog.Description>
-          </Dialog.Header>
-          <div className="py-6">
-            <h4 className="text-muted-foreground text-sm">Playground Warnings</h4>
-            <div className="flex items-start justify-between space-x-4 pt-3">
-              <Switch defaultChecked={true} id="show" name="show" />
-              <Label className="grid gap-1 font-normal" htmlFor="show">
-                <span className="font-semibold">Show a warning when content is flagged</span>
-                <span className="text-muted-foreground text-sm">
-                  A warning will be shown when sexual, hateful, violent or self-harm content is detected.
-                </span>
-              </Label>
-            </div>
-          </div>
-          <Dialog.Footer>
-            <Button variant="secondary" onClick={() => setIsOpen(false)}>
-              Close
-            </Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog>
+      <UserSettings isOpen={showUserSettings} setIsOpen={setShowUserSettings} />
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialog.Content>
           <AlertDialog.Header>
