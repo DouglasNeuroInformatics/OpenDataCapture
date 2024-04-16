@@ -1,21 +1,17 @@
 import React, { useState } from 'react';
 
-import { AlertDialog, Button, DropdownMenu } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { Button, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import { EllipsisVerticalIcon } from 'lucide-react';
 
 import { useInstrumentStore } from '@/store/instrument.store';
 
+import { DeleteInstrument } from './DeleteInstrument';
 import { UserSettings } from './UserSettings';
 
 export const ActionsDropdown = () => {
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const addNotification = useNotificationsStore((store) => store.addNotification);
-  const defaultInstrument = useInstrumentStore((store) => store.defaultInstrument);
-  const removeInstrument = useInstrumentStore((store) => store.removeInstrument);
   const selectedInstrument = useInstrumentStore((store) => store.selectedInstrument);
-  const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
 
   return (
     <React.Fragment>
@@ -44,28 +40,7 @@ export const ActionsDropdown = () => {
         </DropdownMenu.Content>
       </DropdownMenu>
       <UserSettings isOpen={showUserSettings} setIsOpen={setShowUserSettings} />
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialog.Content>
-          <AlertDialog.Header>
-            <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
-            <AlertDialog.Description>This instrument will be deleted from local storage.</AlertDialog.Description>
-          </AlertDialog.Header>
-          <AlertDialog.Footer>
-            <Button
-              variant="danger"
-              onClick={() => {
-                setSelectedInstrument(defaultInstrument.id);
-                removeInstrument(selectedInstrument.id);
-                setShowDeleteDialog(false);
-                addNotification({ message: 'This preset has been deleted', type: 'success' });
-              }}
-            >
-              Delete
-            </Button>
-            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-          </AlertDialog.Footer>
-        </AlertDialog.Content>
-      </AlertDialog>
+      <DeleteInstrument isOpen={showDeleteDialog} setIsOpen={setShowDeleteDialog} />
     </React.Fragment>
   );
 };
