@@ -6,7 +6,7 @@ type License = {
   reference: string;
 };
 
-type LicenseIdentifier = 'PUBLIC_DOMAIN' | 'UNLICENSED' | Extract<keyof typeof _licenses, string>;
+type LicenseIdentifier = 'PUBLIC-DOMAIN' | 'UNLICENSED' | Extract<keyof typeof _licenses, string>;
 
 const licenses = new Map(Object.entries(_licenses)) as Map<LicenseIdentifier, License>;
 
@@ -16,7 +16,7 @@ licenses.set('UNLICENSED', {
   reference: 'https://choosealicense.com'
 });
 
-licenses.set('PUBLIC_DOMAIN', {
+licenses.set('PUBLIC-DOMAIN', {
   isOpenSource: true,
   name: 'Public Domain',
   reference: 'https://choosealicense.com'
