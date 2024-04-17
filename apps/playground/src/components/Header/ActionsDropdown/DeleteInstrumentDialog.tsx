@@ -5,12 +5,12 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 
 import { useInstrumentStore } from '@/store/instrument.store';
 
-export type DeleteInstrumentProps = {
+export type DeleteInstrumentDialogProps = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
 };
 
-export const DeleteInstrument = ({ isOpen, setIsOpen }: DeleteInstrumentProps) => {
+export const DeleteInstrumentDialog = ({ isOpen, setIsOpen }: DeleteInstrumentDialogProps) => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const defaultInstrument = useInstrumentStore((store) => store.defaultInstrument);
   const removeInstrument = useInstrumentStore((store) => store.removeInstrument);

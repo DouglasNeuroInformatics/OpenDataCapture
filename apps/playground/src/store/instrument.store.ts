@@ -86,7 +86,7 @@ const examples: InstrumentStoreItem[] = [
   }
 ];
 
-const baseInstruments = [...templates, ...examples];
+const DEFAULT_INSTRUMENTS = [...templates, ...examples];
 
 export const useInstrumentStore = create(
   persist<InstrumentStore>(
@@ -101,12 +101,12 @@ export const useInstrumentStore = create(
           return { instruments: [...instruments, item] };
         }),
       defaultInstrument: templates[0],
-      instruments: baseInstruments,
+      instruments: DEFAULT_INSTRUMENTS,
       removeInstrument: (id) => {
         set(({ instruments }) => ({ instruments: instruments.filter((item) => item.id !== id) }));
       },
       resetInstruments: () => {
-        set(({ defaultInstrument }) => ({ instruments: baseInstruments, selectedInstrument: defaultInstrument }));
+        set(({ defaultInstrument }) => ({ instruments: DEFAULT_INSTRUMENTS, selectedInstrument: defaultInstrument }));
       },
       selectedInstrument: templates[0],
       setSelectedInstrument: (id) => {

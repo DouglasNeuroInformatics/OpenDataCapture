@@ -5,14 +5,14 @@ import { EllipsisVerticalIcon } from 'lucide-react';
 
 import { useInstrumentStore } from '@/store/instrument.store';
 
-import { DeleteInstrument } from './DeleteInstrument';
-import { ResetDialog } from './ResetDialog';
-import { UserSettings } from './UserSettings';
+import { DeleteInstrumentDialog } from './DeleteInstrumentDialog';
+import { RestoreDefaultsDialog } from './RestoreDefaultsDialog';
+import { UserSettingsDialog } from './UserSettingsDialog';
 
 export const ActionsDropdown = () => {
-  const [showUserSettings, setShowUserSettings] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [showUserSettingsDialog, setShowUserSettingsDialog] = useState(false);
+  const [showDeleteInstrumentDialog, setShowDeleteInstrumentDialog] = useState(false);
+  const [showRestoreDefaultsDialog, setShowRestoreDefaultsDialog] = useState(false);
 
   const selectedInstrument = useInstrumentStore((store) => store.selectedInstrument);
 
@@ -25,13 +25,13 @@ export const ActionsDropdown = () => {
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content align="end">
-          <DropdownMenu.Item asChild onSelect={() => setShowUserSettings(true)}>
-            <button disabled className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
+          <DropdownMenu.Item asChild onSelect={() => setShowUserSettingsDialog(true)}>
+            <button className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
               User Settings
             </button>
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
-          <DropdownMenu.Item asChild onSelect={() => setShowDeleteDialog(true)}>
+          <DropdownMenu.Item asChild onSelect={() => setShowDeleteInstrumentDialog(true)}>
             <button
               className="cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
               disabled={selectedInstrument.category !== 'Saved'}
@@ -41,19 +41,19 @@ export const ActionsDropdown = () => {
             </button>
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
-          <DropdownMenu.Item asChild onSelect={() => setShowResetDialog(true)}>
+          <DropdownMenu.Item asChild onSelect={() => setShowRestoreDefaultsDialog(true)}>
             <button
               className="cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
               type="button"
             >
-              Hard Reset
+              Restore Defaults
             </button>
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
-      <UserSettings isOpen={showUserSettings} setIsOpen={setShowUserSettings} />
-      <DeleteInstrument isOpen={showDeleteDialog} setIsOpen={setShowDeleteDialog} />
-      <ResetDialog isOpen={showResetDialog} setIsOpen={setShowResetDialog} />
+      <UserSettingsDialog isOpen={showUserSettingsDialog} setIsOpen={setShowUserSettingsDialog} />
+      <DeleteInstrumentDialog isOpen={showDeleteInstrumentDialog} setIsOpen={setShowDeleteInstrumentDialog} />
+      <RestoreDefaultsDialog isOpen={showRestoreDefaultsDialog} setIsOpen={setShowRestoreDefaultsDialog} />
     </React.Fragment>
   );
 };

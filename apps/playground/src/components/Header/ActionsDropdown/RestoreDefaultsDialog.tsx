@@ -3,15 +3,18 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import React from '@opendatacapture/runtime-v1/react.js';
 
 import { useInstrumentStore } from '@/store/instrument.store';
+import { useSettingsStore } from '@/store/settings.store';
 
-export type ResetDialogProps = {
+export type RestoreDefaultsDialogProps = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
 };
 
-export const ResetDialog = ({ isOpen, setIsOpen }: ResetDialogProps) => {
+export const RestoreDefaultsDialog = ({ isOpen, setIsOpen }: RestoreDefaultsDialogProps) => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const resetInstruments = useInstrumentStore((store) => store.resetInstruments);
+  const resetSettings = useSettingsStore((store) => store.resetSettings);
+
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialog.Content>
@@ -28,6 +31,7 @@ export const ResetDialog = ({ isOpen, setIsOpen }: ResetDialogProps) => {
             onClick={() => {
               localStorage.clear();
               resetInstruments();
+              resetSettings();
               addNotification({ type: 'success' });
               setIsOpen(false);
             }}

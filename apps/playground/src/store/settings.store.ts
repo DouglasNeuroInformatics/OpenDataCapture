@@ -4,20 +4,24 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import type { Settings } from '@/models/settings.model';
 
+const DEFAULT_SETTINGS: Settings = {
+  rebuildInterval: 2000
+};
+
 export type SettingsStore = Merge<
   Settings,
   {
-    setRebuildInterval: (rebuildInterval: number) => void;
+    resetSettings: () => void;
+    setSettings: (settings: Partial<Settings>) => void;
   }
 >;
 
 export const useSettingsStore = create(
   persist<SettingsStore>(
     (set) => ({
-      rebuildInterval: 2000,
-      setRebuildInterval: (rebuildInterval) => {
-        set({ rebuildInterval });
-      }
+      ...DEFAULT_SETTINGS,
+      resetSettings: () => set(DEFAULT_SETTINGS),
+      setSettings: (settings) => set(settings)
     }),
     {
       name: 'settings-storage',
