@@ -13,7 +13,7 @@ const IndexPage = React.lazy(() => import('./pages/IndexPage'));
 await i18n.init();
 
 export const App = () => {
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isDesktop = useMediaQuery('(min-width: 640px)');
   return (
     <React.Suspense
       fallback={
