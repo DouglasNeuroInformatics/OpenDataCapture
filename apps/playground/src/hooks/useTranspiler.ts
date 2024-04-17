@@ -4,8 +4,8 @@ import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
+import { useEditorValueRef } from './useEditorValueRef';
 import { useInstrumentTransformer } from './useInstrumentTransformer';
-import { useSourceRef } from './useSourceRef';
 
 const DEFAULT_REBUILD_INTERVAL = 2000;
 
@@ -34,7 +34,7 @@ type TranspilerState = BuildingState | BuiltState | ErrorState | InitialState;
 
 export function useTranspiler() {
   const instrumentTransformer = useInstrumentTransformer();
-  const sourceRef = useSourceRef();
+  const editorValueRef = useEditorValueRef();
   const [state, setState] = useState<TranspilerState>({ source: null, status: 'initial' });
 
   const transpile = useCallback(async (source: string) => {
@@ -63,7 +63,7 @@ export function useTranspiler() {
   }, []);
 
   useInterval(() => {
-    const currentSource = sourceRef.current;
+    const currentSource = editorValueRef.current;
     if (state.status === 'building' || state.source === currentSource) {
       return;
     }

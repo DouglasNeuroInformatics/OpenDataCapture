@@ -7,7 +7,6 @@ import { ErrorPage, LoadingPage } from '@opendatacapture/react-core';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { MobileFallbackPage } from './components/MobileFallbackPage';
-import { SourceRefProvider } from './context/SourceRefContext';
 
 const IndexPage = React.lazy(() => import('./pages/IndexPage'));
 
@@ -23,13 +22,7 @@ export const App = () => {
     >
       <ErrorBoundary FallbackComponent={ErrorPage}>
         <NotificationHub />
-        {isDesktop ? (
-          <SourceRefProvider>
-            <IndexPage />
-          </SourceRefProvider>
-        ) : (
-          <MobileFallbackPage />
-        )}
+        {isDesktop ? <IndexPage /> : <MobileFallbackPage />}
       </ErrorBoundary>
     </React.Suspense>
   );

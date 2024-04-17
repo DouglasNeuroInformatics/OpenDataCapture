@@ -4,18 +4,18 @@ import { Button, Heading, Input, Popover } from '@douglasneuroinformatics/libui/
 import { CopyButton } from '@opendatacapture/react-core';
 import { ShareIcon } from 'lucide-react';
 
-import { useSourceRef } from '@/hooks/useSourceRef';
+import { useEditorValueRef } from '@/hooks/useEditorValueRef';
 import { generateShareLink } from '@/utils/share';
 
 export const ShareButton = () => {
-  const sourceRef = useSourceRef();
-  const [shareLink, setShareLink] = useState(generateShareLink(sourceRef.current));
+  const editorValueRef = useEditorValueRef();
+  const [shareLink, setShareLink] = useState(generateShareLink(editorValueRef.current));
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   // The user cannot modify the editor without closing the popover
   useEffect(() => {
     if (isPopoverOpen) {
-      setShareLink(generateShareLink(sourceRef.current));
+      setShareLink(generateShareLink(editorValueRef.current));
     }
   }, [isPopoverOpen]);
 

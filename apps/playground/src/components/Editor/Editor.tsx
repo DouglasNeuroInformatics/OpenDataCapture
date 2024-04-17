@@ -5,7 +5,7 @@ import { cn } from '@douglasneuroinformatics/libui/utils';
 import MonacoEditor from '@monaco-editor/react';
 
 import { useRuntime } from '@/hooks/useRuntime';
-import { useSourceRef } from '@/hooks/useSourceRef';
+import { useEditorStore } from '@/store/editor.store';
 import { useInstrumentStore } from '@/store/instrument.store';
 
 import type { MonacoEditorType, MonacoType } from './types';
@@ -24,7 +24,8 @@ export const Editor = ({ className }: EditorProps) => {
 
   const editorRef = useRef<MonacoEditorType | null>(null);
   const monacoRef = useRef<MonacoType | null>(null);
-  const sourceRef = useSourceRef();
+
+  const setValue = useEditorStore((store) => store.setValue);
 
   useEffect(() => {
     const monaco = monacoRef.current;
@@ -76,7 +77,7 @@ export const Editor = ({ className }: EditorProps) => {
       path={'index.ts'}
       theme={`odc-${theme}`}
       onChange={(value) => {
-        sourceRef.current = value ?? '';
+        setValue(value ?? '');
       }}
       onMount={handleEditorDidMount}
     />

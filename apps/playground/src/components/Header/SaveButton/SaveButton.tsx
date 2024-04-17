@@ -5,7 +5,7 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { SaveIcon } from 'lucide-react';
 import { z } from 'zod';
 
-import { useSourceRef } from '@/hooks/useSourceRef';
+import { useEditorValueRef } from '@/hooks/useEditorValueRef';
 import { type InstrumentStoreItem, useInstrumentStore } from '@/store/instrument.store';
 import { sha256 } from '@/utils/hash';
 
@@ -15,10 +15,10 @@ export const SaveButton = () => {
   const instruments = useInstrumentStore((store) => store.instruments);
   const addInstrument = useInstrumentStore((store) => store.addInstrument);
   const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
-  const sourceRef = useSourceRef();
+  const editorValueRef = useEditorValueRef();
 
   const handleSubmit = async ({ label }: { label: string }) => {
-    const source = sourceRef.current;
+    const source = editorValueRef.current;
     const item: InstrumentStoreItem = {
       category: 'Saved',
       id: await sha256(source),
