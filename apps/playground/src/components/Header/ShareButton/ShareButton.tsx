@@ -4,18 +4,18 @@ import { Button, Heading, Input, Popover } from '@douglasneuroinformatics/libui/
 import { CopyButton } from '@opendatacapture/react-core';
 import { ShareIcon } from 'lucide-react';
 
-import { useSourceRef } from '@/hooks/useSourceRef';
+import { useEditorValueRef } from '@/hooks/useEditorValueRef';
 import { generateShareLink } from '@/utils/share';
 
 export const ShareButton = () => {
-  const sourceRef = useSourceRef();
-  const [shareLink, setShareLink] = useState(generateShareLink(sourceRef.current));
+  const editorValueRef = useEditorValueRef();
+  const [shareLink, setShareLink] = useState(generateShareLink(editorValueRef.current));
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   // The user cannot modify the editor without closing the popover
   useEffect(() => {
     if (isPopoverOpen) {
-      setShareLink(generateShareLink(sourceRef.current));
+      setShareLink(generateShareLink(editorValueRef.current));
     }
   }, [isPopoverOpen]);
 
@@ -28,7 +28,7 @@ export const ShareButton = () => {
       </Popover.Trigger>
       <Popover.Content align="end" className="w-[520px] p-4">
         <div className="flex flex-col space-y-2 text-center sm:text-left">
-          <Heading variant="h4">Share Instrument (Experimental)</Heading>
+          <Heading variant="h5">Share Instrument (Experimental)</Heading>
           <p className="text-muted-foreground text-sm">
             Anyone with this link can open a snapshot of the current code in your playground.
           </p>

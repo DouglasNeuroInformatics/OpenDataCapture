@@ -4,11 +4,11 @@ import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { DownloadIcon } from 'lucide-react';
 
-import { useSourceRef } from '@/hooks/useSourceRef';
+import { useEditorValueRef } from '@/hooks/useEditorValueRef';
 
 export const DownloadButton = () => {
   const download = useDownload();
-  const sourceRef = useSourceRef();
+  const editorValueRef = useEditorValueRef();
 
   return (
     <Button
@@ -17,7 +17,7 @@ export const DownloadButton = () => {
       type="button"
       variant="outline"
       onClick={() => {
-        void download('instrument.js', () => sourceRef.current);
+        void download('instrument.js', () => editorValueRef.current);
       }}
     >
       <DownloadIcon />
