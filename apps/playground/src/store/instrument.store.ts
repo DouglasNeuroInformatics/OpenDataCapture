@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import formReference from '@/examples/form/form-reference.instrument?raw';
 import formWithGroups from '@/examples/form/form-with-groups.instrument?raw';
 import formWithSimpleDynamicField from '@/examples/form/form-with-simple-dynamic-field.instrument?raw';
-import interactiveWithReact from '@/examples/interactive/interactive-with-react.instrument?raw';
+// import interactiveWithReact from '@/examples/interactive/interactive-with-react.instrument?raw';
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
 import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
@@ -76,14 +76,14 @@ const examples: InstrumentStoreItem[] = [
     kind: 'FORM',
     label: 'Form Reference',
     source: formReference
-  },
-  {
-    category: 'Examples',
-    id: await sha256(interactiveWithReact),
-    kind: 'INTERACTIVE',
-    label: 'Interactive With React',
-    source: interactiveWithReact
   }
+  // {
+  //   category: 'Examples',
+  //   id: await sha256(interactiveWithReact),
+  //   kind: 'INTERACTIVE',
+  //   label: 'Interactive With React',
+  //   source: interactiveWithReact
+  // }
 ];
 
 const DEFAULT_INSTRUMENTS = [...templates, ...examples];
