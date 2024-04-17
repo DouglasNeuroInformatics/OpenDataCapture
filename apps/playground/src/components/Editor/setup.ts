@@ -27,7 +27,21 @@ loader.config({ monaco });
 {
   const monaco = await loader.init();
 
-  monaco.languages.typescript.typescriptDefaults.setModeConfiguration({});
+  monaco.languages.typescript.typescriptDefaults.setModeConfiguration({
+    codeActions: true,
+    completionItems: false,
+    definitions: true,
+    diagnostics: true,
+    documentHighlights: true,
+    documentRangeFormattingEdits: true,
+    documentSymbols: true,
+    hovers: true,
+    inlayHints: true,
+    onTypeFormattingEdits: true,
+    references: true,
+    rename: true,
+    signatureHelp: true
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   monaco.languages.onLanguage('typescript', async () => {
