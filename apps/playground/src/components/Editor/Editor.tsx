@@ -42,10 +42,10 @@ export const Editor = ({ className }: EditorProps) => {
   }, [isMounted, libs]);
 
   useEffect(() => {
-    if (editorRef.current && selectedInstrument) {
-      editorRef.current.setValue(selectedInstrument.source);
+    if (isMounted && selectedInstrument) {
+      editorRef.current!.setValue(selectedInstrument.source);
     }
-  }, [selectedInstrument]);
+  }, [isMounted, selectedInstrument]);
 
   const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
     editorRef.current = editor;
