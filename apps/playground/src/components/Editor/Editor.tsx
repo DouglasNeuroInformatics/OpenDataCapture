@@ -67,10 +67,13 @@ export const Editor = ({ className }: EditorProps) => {
         minimap: {
           enabled: false
         },
+        quickSuggestions: true,
+        quickSuggestionsDelay: 10,
         scrollBeyondLastLine: false,
         stickyScroll: {
           enabled: false
         },
+        suggestOnTriggerCharacters: true,
         tabCompletion: 'on',
         tabSize: 2
       }}
