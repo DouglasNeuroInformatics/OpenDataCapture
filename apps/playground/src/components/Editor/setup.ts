@@ -1,7 +1,7 @@
 import { loader } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import TypeScriptWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import prettierPluginBabel from 'prettier/plugins/babel';
 import prettierPluginEstree from 'prettier/plugins/estree';
 import prettier from 'prettier/standalone';
@@ -9,9 +9,9 @@ import prettier from 'prettier/standalone';
 self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'typescript' || label === 'javascript') {
-      return new tsWorker();
+      return new TypeScriptWorker();
     }
-    return new editorWorker();
+    return new EditorWorker();
   }
 };
 
