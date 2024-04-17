@@ -6,11 +6,14 @@ import { EllipsisVerticalIcon } from 'lucide-react';
 import { useInstrumentStore } from '@/store/instrument.store';
 
 import { DeleteInstrument } from './DeleteInstrument';
+import { ResetDialog } from './ResetDialog';
 import { UserSettings } from './UserSettings';
 
 export const ActionsDropdown = () => {
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+
   const selectedInstrument = useInstrumentStore((store) => store.selectedInstrument);
 
   return (
@@ -37,10 +40,20 @@ export const ActionsDropdown = () => {
               Delete Instrument
             </button>
           </DropdownMenu.Item>
+          <DropdownMenu.Separator />
+          <DropdownMenu.Item asChild onSelect={() => setShowResetDialog(true)}>
+            <button
+              className="cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
+              type="button"
+            >
+              Hard Reset
+            </button>
+          </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
       <UserSettings isOpen={showUserSettings} setIsOpen={setShowUserSettings} />
       <DeleteInstrument isOpen={showDeleteDialog} setIsOpen={setShowDeleteDialog} />
+      <ResetDialog isOpen={showResetDialog} setIsOpen={setShowResetDialog} />
     </React.Fragment>
   );
 };
