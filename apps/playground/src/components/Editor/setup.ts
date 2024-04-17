@@ -2,9 +2,16 @@ import { loader } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import TypeScriptWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import { SuggestAdapter } from 'monaco-editor/esm/vs/language/typescript/tsMode';
 import prettierPluginBabel from 'prettier/plugins/babel';
 import prettierPluginEstree from 'prettier/plugins/estree';
 import prettier from 'prettier/standalone';
+
+import type { CompletionItemProvider } from './types';
+
+class TypeScriptSuggestAdapter extends SuggestAdapter implements CompletionItemProvider {
+  triggerCharacters = ['.', '"', "'"];
+}
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -19,6 +26,14 @@ loader.config({ monaco });
 
 {
   const monaco = await loader.init();
+
+  monaco.languages.typescript.typescriptDefaults.setModeConfiguration({});
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  monaco.languages.onLanguage('typescript', async () => {
+    const worker = await monaco.languages.typescript.getTypeScriptWorker();
+    monaco.languages.registerCompletionItemProvider('typescript', new TypeScriptSuggestAdapter(worker));
+  });
 
   /**
    * Setup the TypeScript compiler options as similarly as possible to
