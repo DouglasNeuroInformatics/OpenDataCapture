@@ -61,9 +61,6 @@ export const Editor = ({ className }: EditorProps) => {
       options={{
         automaticLayout: true,
         codeLens: false,
-        inlineSuggest: {
-          enabled: true
-        },
         minimap: {
           enabled: false
         },
