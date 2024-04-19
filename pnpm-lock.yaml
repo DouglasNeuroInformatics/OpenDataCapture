@@ -306,8 +306,8 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.5
-        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -470,8 +470,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.5
-        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0)
@@ -591,8 +591,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.5
-        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@headlessui/react':
         specifier: ^1.7.18
         version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -771,27 +771,57 @@ importers:
 
   packages/editor:
     dependencies:
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.5
-        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
-      '@headlessui/react':
-        specifier: ^1.7.18
-        version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
-      '@heroicons/react':
-        specifier: ^2.1.3
-        version: 2.1.3(react@18.2.0)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0)
+      '@opendatacapture/demo':
+        specifier: workspace:*
+        version: link:../demo
+      '@opendatacapture/evaluate-instrument':
+        specifier: workspace:*
+        version: link:../evaluate-instrument
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
+      '@opendatacapture/instrument-renderer':
+        specifier: workspace:*
+        version: link:../instrument-renderer
+      '@opendatacapture/instrument-transformer':
+        specifier: workspace:*
+        version: link:../instrument-transformer
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../react-core
+      '@opendatacapture/runtime-v1':
+        specifier: workspace:*
+        version: link:../../runtime/v1
+      '@opendatacapture/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+      axios:
+        specifier: ^1.6.8
+        version: 1.6.8(debug@4.3.4)
+      esbuild-wasm:
+        specifier: ^0.20.2
+        version: 0.20.2
       framer-motion:
         specifier: ^11.0.27
         version: 11.0.27(react-dom@18.2.0)(react@18.2.0)
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+      lucide-react:
+        specifier: ^0.367.0
+        version: 0.367.0(react@18.2.0)
+      lz-string:
+        specifier: ^1.5.0
+        version: 1.5.0
       monaco-editor:
         specifier: ^0.47.0
         version: 0.47.0
@@ -799,33 +829,60 @@ importers:
         specifier: ^3.2.5
         version: 3.2.5
       react:
-        specifier: 18.x
+        specifier: ^18.2.0
         version: 18.2.0
       react-dom:
-        specifier: 18.x
+        specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      react-error-boundary:
+        specifier: ^4.0.13
+        version: 4.0.13(react@18.2.0)
       react-i18next:
         specifier: ^14.1.0
         version: 14.1.0(i18next@23.11.1)(react-dom@18.2.0)(react@18.2.0)
-      tailwindcss:
-        specifier: 3.x
-        version: 3.4.3
+      stacktrace-parser:
+        specifier: ^0.1.10
+        version: 0.1.10
+      ts-pattern:
+        specifier: ^5.1.1
+        version: 5.1.1
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+      zod-validation-error:
+        specifier: ^2.1.0
+        version: 2.1.0(zod@3.22.4)
+      zustand:
+        specifier: ^4.5.2
+        version: 4.5.2(@types/react@18.2.75)(react@18.2.0)
     devDependencies:
       '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../tailwindcss
+      '@opendatacapture/vite-plugin-runtime':
+        specifier: workspace:*
+        version: link:../vite-plugin-runtime
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/react':
         specifier: ^18.2.75
         version: 18.2.75
       '@types/react-dom':
         specifier: ^18.2.24
         version: 18.2.24
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.6.0
+        version: 3.6.0(@swc/helpers@0.5.8)(vite@5.2.8)
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.38)
       postcss:
         specifier: ^8.4.38
         version: 8.4.38
+      tailwindcss:
+        specifier: ^3.4.3
+        version: 3.4.3
       vite:
         specifier: ^5.2.8
         version: 5.2.8(@types/node@20.12.7)
@@ -844,8 +901,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.5
-        version: 2.0.5(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -896,8 +953,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.5
-        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -1033,8 +1090,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.5
-        version: 2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
@@ -1137,8 +1194,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.0.5
-        version: 2.0.5(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5)
       autoprefixer:
         specifier: 10.x
         version: 10.4.19(postcss@8.4.38)
@@ -3297,75 +3354,9 @@ packages:
     dependencies:
       type-fest: 4.15.0
 
-  /@douglasneuroinformatics/libui@2.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5):
+  /@douglasneuroinformatics/libui@2.0.8(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-jVdT6RHShZz1U4qgj8hIYfTCuRfo4uo6mYIaLvsj0h7v/AVixBTQecLGp45MbA15Qiar1D6HTKZt1vhAnCT5lg== }
-    peerDependencies:
-      react: ^18.2.0
-      react-dom: ^18.2.0
-    dependencies:
-      '@douglasneuroinformatics/libjs': 0.3.1(typescript@5.4.5)
-      '@douglasneuroinformatics/libui-form-types': 0.6.5
-      '@headlessui/react': 1.7.18(react-dom@18.2.0)(react@18.2.0)
-      '@headlessui/tailwindcss': 0.2.0(tailwindcss@3.4.3)
-      '@heroicons/react': 2.1.3(react@18.2.0)
-      '@radix-ui/react-accordion': 1.1.2(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-alert-dialog': 1.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-avatar': 1.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-checkbox': 1.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-collapsible': 1.0.3(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-context-menu': 2.1.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-dialog': 1.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-dropdown-menu': 2.0.6(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-hover-card': 1.0.7(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-label': 2.0.2(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-menubar': 1.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-popover': 1.0.7(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-progress': 1.0.3(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-radio-group': 1.1.3(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-scroll-area': 1.0.5(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-select': 2.0.0(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-separator': 1.0.3(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-slider': 1.1.2(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-slot': 1.0.2(@types/react@18.2.75)(react@18.2.0)
-      '@radix-ui/react-switch': 1.0.3(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-tabs': 1.0.4(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-tooltip': 1.0.7(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      '@tailwindcss/container-queries': 0.1.1(tailwindcss@3.4.3)
-      class-variance-authority: 0.7.0
-      clsx: 2.1.0
-      cmdk: 1.0.0(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      framer-motion: 11.0.27(react-dom@18.2.0)(react@18.2.0)
-      i18next: 23.11.1
-      i18next-browser-languagedetector: 7.2.1
-      lodash-es: 4.17.21
-      lucide-react: 0.364.0(react@18.2.0)
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      react-error-boundary: 4.0.13(react@18.2.0)
-      react-i18next: 14.1.0(i18next@23.11.1)(react-dom@18.2.0)(react@18.2.0)
-      react-resizable-panels: 2.0.16(react-dom@18.2.0)(react@18.2.0)
-      recharts: 2.12.4(react-dom@18.2.0)(react@18.2.0)
-      tailwind-merge: 2.2.2
-      tailwindcss-animate: 1.0.7(tailwindcss@3.4.3)
-      ts-pattern: 5.1.1
-      type-fest: 4.15.0
-      vaul: 0.9.0(@types/react-dom@18.2.24)(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)
-      zod: 3.22.4
-      zustand: 4.5.2(@types/react@18.2.75)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@emotion/is-prop-valid'
-      - '@types/react'
-      - '@types/react-dom'
-      - immer
-      - react-native
-      - tailwindcss
-      - typescript
-    dev: false
-
-  /@douglasneuroinformatics/libui@2.0.5(@types/react@18.2.75)(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.4.3)(typescript@5.4.5):
-    resolution:
-      { integrity: sha512-jVdT6RHShZz1U4qgj8hIYfTCuRfo4uo6mYIaLvsj0h7v/AVixBTQecLGp45MbA15Qiar1D6HTKZt1vhAnCT5lg== }
+      { integrity: sha512-dsJyunT1x3OscUogbZ17ZTsfCWB0rQF9RZbcTuSd+wfSKX4wGeJShq8QePmLgaMARUd3+182fZDfD5v8mWi4ng== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
