@@ -39,7 +39,7 @@ const IndexPage = () => {
   }, [location.href]);
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden px-8 xl:px-12 2xl:px-16">
+    <div className="flex h-screen w-screen flex-col overflow-hidden px-4">
       <Header />
       <Separator />
       <MainContent />
