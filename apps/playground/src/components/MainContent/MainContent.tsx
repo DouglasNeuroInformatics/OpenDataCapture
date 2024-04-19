@@ -10,7 +10,7 @@ export const MainContent = () => {
     <main className="flex flex-grow flex-col overflow-hidden py-4">
       <Resizable.PanelGroup direction="horizontal">
         <Resizable.Panel defaultSize={50} minSize={25}>
-          <Editor className="h-full min-h-0 border-r-0" />
+          <Editor />
         </Resizable.Panel>
         <Resizable.Handle />
         <Resizable.Panel defaultSize={50} minSize={25}>

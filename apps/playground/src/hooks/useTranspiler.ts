@@ -4,25 +4,25 @@ import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
+import type { EditorFile } from '@/models/editor-file.model';
 import { useSettingsStore } from '@/store/settings.store';
+import { hashFiles } from '@/utils/hash';
+import { resolveIndexFile } from '@/utils/resolve';
 
-import { useEditorValueRef } from './useEditorValueRef';
+import { useEditorFilesRef } from './useEditorFilesRef';
 import { useInstrumentTransformer } from './useInstrumentTransformer';
 
 type InitialState = {
-  source: null;
   status: 'initial';
 };
 
 type BuiltState = {
   bundle: string;
-  source: string;
   status: 'built';
 };
 
 type ErrorState = {
   error: Error;
-  source: string;
   status: 'error';
 };
 
@@ -32,18 +32,20 @@ type BuildingState = {
 
 type TranspilerState = BuildingState | BuiltState | ErrorState | InitialState;
 
-export function useTranspiler() {
-  const instrumentTransformer = useInstrumentTransformer();
-  const editorValueRef = useEditorValueRef();
+export function useTranspiler(): TranspilerState {
+  const editorFilesRef = useEditorFilesRef();
   const rebuildInterval = useSettingsStore((store) => store.rebuildInterval);
-  const [state, setState] = useState<TranspilerState>({ source: null, status: 'initial' });
+  const [filesHash, setFilesHash] = useState<string>('');
+  const [state, setState] = useState<TranspilerState>({ status: 'initial' });
+  const instrumentTransformer = useInstrumentTransformer();
 
-  const transpile = useCallback(async (source: string) => {
+  const transpile = useCallback(async (files: EditorFile[]) => {
+    const source = resolveIndexFile(files).value;
     setState({ status: 'building' });
     let bundle: string;
     try {
       bundle = await instrumentTransformer.generateBundle(source);
-      setState({ bundle, source, status: 'built' });
+      setState({ bundle, status: 'built' });
     } catch (err) {
       console.error(err);
       let transpilerError: Error;
@@ -59,16 +61,21 @@ export function useTranspiler() {
       } else {
         transpilerError = new Error('Unknown Error', { cause: err });
       }
-      setState({ error: transpilerError, source, status: 'error' });
+      setState({ error: transpilerError, status: 'error' });
+    } finally {
+      setFilesHash(await hashFiles(files));
     }
   }, []);
 
   useInterval(() => {
-    const currentSource = editorValueRef.current;
-    if (state.status === 'building' || state.source === currentSource) {
-      return;
-    }
-    void transpile(currentSource);
+    const currentFiles = editorFilesRef.current;
+    hashFiles(currentFiles)
+      .then((currentHash) => {
+        if (currentHash !== filesHash) {
+          void transpile(currentFiles);
+        }
+      })
+      .catch(console.error);
   }, rebuildInterval);
 
   return state;
