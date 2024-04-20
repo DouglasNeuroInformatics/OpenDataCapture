@@ -15,8 +15,6 @@ class TypeScriptSuggestAdapter extends SuggestAdapter implements CompletionItemP
   triggerCharacters = ['.', '"', "'"];
 }
 
-console.log(envTypes);
-
 self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'typescript' || label === 'javascript') {
