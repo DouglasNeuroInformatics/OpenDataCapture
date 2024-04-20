@@ -35,7 +35,7 @@ export const ShareButton = () => {
       </Popover.Trigger>
       <Popover.Content align="end" className="w-[520px] p-4">
         <div className="flex flex-col space-y-2 text-center sm:text-left">
-          <Heading variant="h5">Share Instrument (Experimental)</Heading>
+          <Heading variant="h5">Share Instrument</Heading>
           <p className="text-muted-foreground text-sm">
             Anyone with this link can open a snapshot of the current code in your playground.
           </p>

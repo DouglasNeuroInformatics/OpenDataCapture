@@ -15,6 +15,7 @@ export default defineInstrument({
     },
     render(done) {
       const button = document.createElement('button');
+      button.classList.add('submit-button');
       button.textContent = 'Submit Instrument';
       document.body.appendChild(button);
       button.addEventListener('click', () => {
