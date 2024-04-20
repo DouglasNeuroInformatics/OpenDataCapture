@@ -21,20 +21,20 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.1",
-    "@douglasneuroinformatics/libui": "^2.0.8",
+    "@douglasneuroinformatics/libui": "^2.0.9",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
-    "framer-motion": "^11.0.28",
-    "lucide-react": "^0.368.0",
+    "framer-motion": "^11.1.7",
+    "lucide-react": "^0.372.0",
     "react-i18next": "^14.1.0",
     "ts-pattern": "^5.1.1"
   },
   "devDependencies": {
     "@opendatacapture/tailwindcss": "workspace:*",
-    "@types/react": "^18.2.75",
-    "@types/react-dom": "^18.2.24",
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
-    "vite": "^5.2.8"
+    "vite": "^5.2.9"
   }
 }

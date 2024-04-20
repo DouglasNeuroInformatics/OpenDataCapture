@@ -19,19 +19,12 @@ export type InterpretOptions<TKind extends InstrumentKind> = {
 };
 
 export class InstrumentInterpreter {
-  private transformBundle?: ((bundle: string) => Promisable<string>) | null;
-
-  constructor(options?: InstrumentInterpreterOptions) {
-    this.transformBundle = options?.transformBundle;
-  }
-
   async interpret<TKind extends InstrumentKind>(
     bundle: string,
     options?: InterpretOptions<TKind>
   ): Promise<Extract<AnyInstrument, { kind: TKind }>> {
     let instrument: AnyInstrument;
     try {
-      bundle = (await this.transformBundle?.(bundle)) ?? bundle;
       const value: unknown = await evaluateInstrument(bundle);
       if (!options?.validate) {
         instrument = value as Extract<AnyInstrument, { kind: TKind }>;

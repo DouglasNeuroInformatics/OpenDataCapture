@@ -3,7 +3,8 @@
     "jsx": "react",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "types": ["@opendatacapture/instrument-runtime-env"]
   },
   "extends": "../../jsconfig.json",
   "include": ["src/**/*", "*.js", "*.cjs"]

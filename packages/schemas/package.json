@@ -24,11 +24,11 @@
     "@casl/ability": "^6.7.1",
     "@douglasneuroinformatics/libjs": "^0.3.1",
     "@opendatacapture/licenses": "workspace:*",
-    "zod": "^3.22.4"
+    "zod": "^3.22.5"
   },
   "devDependencies": {
     "@casl/prisma": "^1.4.1",
-    "@douglasneuroinformatics/libui-form-types": "^0.6.5",
+    "@douglasneuroinformatics/libui-form-types": "^0.6.8",
     "@opendatacapture/instrument-stubs": "workspace:*"
   }
 }

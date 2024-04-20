@@ -10,7 +10,7 @@ import { hashFiles } from '@/utils/hash';
 import { resolveIndexFile } from '@/utils/resolve';
 
 import { useEditorFilesRef } from './useEditorFilesRef';
-import { useInstrumentTransformer } from './useInstrumentTransformer';
+import { useInstrumentBundler } from './useInstrumentBundler';
 
 type InitialState = {
   status: 'initial';
@@ -37,14 +37,14 @@ export function useTranspiler(): TranspilerState {
   const rebuildInterval = useSettingsStore((store) => store.rebuildInterval);
   const [filesHash, setFilesHash] = useState<string>('');
   const [state, setState] = useState<TranspilerState>({ status: 'initial' });
-  const instrumentTransformer = useInstrumentTransformer();
+  const instrumentBundler = useInstrumentBundler();
 
   const transpile = useCallback(async (files: EditorFile[]) => {
     const source = resolveIndexFile(files).value;
     setState({ status: 'building' });
     let bundle: string;
     try {
-      bundle = await instrumentTransformer.generateBundle(source);
+      bundle = await instrumentBundler.generateBundle(source);
       setState({ bundle, status: 'built' });
     } catch (err) {
       console.error(err);

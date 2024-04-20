@@ -4,26 +4,19 @@
   "version": "0.0.0",
   "license": "AGPL-3.0",
   "exports": {
-    ".": {
-      "types": "./src/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./forms/*": "./src/forms/*",
-    "./interactive/*": "./src/interactive/*"
+    "./forms/*": "./dist/forms/*",
+    "./interactive/*": "./dist/interactive/*"
   },
   "scripts": {
-    "build": "rm -rf dist && NODE_OPTIONS='--import tsx/esm' pnpm exec rollup -c",
-    "dev": "rm -rf dist && NODE_OPTIONS='--import tsx/esm' pnpm exec rollup -c --watch",
+    "build": "instrument-bundler --clean --declaration --outdir dist src",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
-    "@opendatacapture/instrument-transformer": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*"
   },
   "devDependencies": {
-    "@opendatacapture/rollup-plugin-instrument": "workspace:*",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "rollup": "^4.14.1"
+    "@opendatacapture/instrument-bundler": "workspace:*",
+    "@opendatacapture/instrument-runtime-env": "workspace:*"
   }
 }

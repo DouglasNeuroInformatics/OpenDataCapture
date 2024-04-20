@@ -35,7 +35,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   /** Returns the user associated with the JWT if they exist, otherwise throws UnauthorizedException */
   private async getUser(username: string) {
-    let user: UserModel & { groups: GroupModel[] };
+    let user: { groups: GroupModel[] } & UserModel;
     try {
       user = await this.usersService.findByUsername(username);
     } catch (error) {

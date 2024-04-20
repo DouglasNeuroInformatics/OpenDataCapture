@@ -2,10 +2,11 @@ import React from 'react';
 
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { motion } from 'framer-motion';
-import { FileIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useEditorStore } from '@/store/editor.store';
+
+import { EditorFileIcon } from './EditorFileIcon';
 
 export type EditorSidebarProps = {
   isOpen: boolean;
@@ -32,7 +33,9 @@ export const EditorSidebar = ({ isOpen }: EditorSidebarProps) => {
             type="button"
             onClick={() => selectFile(file)}
           >
-            <FileIcon style={{ height: '14px', width: '14px' }} />
+            <EditorFileIcon
+              variant={file.name.endsWith('.jsx') || file.name.endsWith('tsx') ? 'react' : file.language}
+            />
             <span className="truncate">{file.name}</span>
           </button>
         ))}

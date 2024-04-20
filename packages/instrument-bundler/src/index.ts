@@ -1,42 +1,35 @@
-import type { BuildOptions, BuildResult, InitializeOptions, Metafile } from 'esbuild';
+import type { BuildOptions, BuildResult, Metafile } from 'esbuild';
 import type { ValueOf } from 'type-fest';
 
-import { transformRuntimeImportsPlugin } from './plugin.js';
+let esbuild: typeof import('esbuild');
+if (typeof window === 'undefined') {
+  ({ default: esbuild } = await import('esbuild'));
+} else {
+  ({ default: esbuild } = await import('esbuild-wasm'));
+}
 
-export type Transpiler = {
-  build(options: BuildOptions): Promise<BuildResult>;
-  initialize(options: InitializeOptions): Promise<void>;
-};
-
-export abstract class BaseInstrumentTransformer {
+export class InstrumentBundler {
   /** The variable name that 'export default' is replaced by */
   private defaultExportSub = '__instrument__';
-
-  constructor(public transpiler: Transpiler) {}
 
   async generateBundle(source: string) {
     const input = this.preprocess(source);
     const result = await this.build(input);
     const output = result.metafile!.outputs['bundle.js'];
     this.validateOutput(output);
-    return this.getBuiltCode(result);
+    return this.injectRequire(this.getBuiltCode(result));
   }
 
-  async init(options: InitializeOptions) {
-    return this.transpiler.initialize(options);
-  }
-
-  async transformRuntimeImports(bundle: string) {
-    const result = await this.build(bundle, {
-      bundle: true,
-      external: ['*'],
-      plugins: [transformRuntimeImportsPlugin()]
-    });
-    return this.getBuiltCode(result);
+  async generateBundleFiles(source: string) {
+    const bundle = await this.generateBundle(source);
+    return {
+      declaration: 'declare const bundle: string;\nexport default bundle;\n',
+      source: `export default ${JSON.stringify(bundle)}`
+    };
   }
 
   private build(source: string, options: BuildOptions = {}) {
-    return this.transpiler.build({
+    return esbuild.build({
       format: 'esm',
       metafile: true,
       minify: true,
@@ -65,6 +58,17 @@ export abstract class BaseInstrumentTransformer {
   /** Return the number of times 'export default' occurs in a string */
   private getDefaultExportCount(source: string) {
     return source.match(/export\s+default/g)?.length ?? 0;
+  }
+
+  private injectRequire(source: string) {
+    const regex = /import\.meta\.require\((.*?)\)/g;
+    return source.replaceAll(regex, (substring) => {
+      const id = substring.match(/import\.meta\.require\((['"`])(.*?)\1\)/)?.at(2);
+      if (!id) {
+        throw new TypeError(`Illegal function call \`${substring}\`: expected one argument (a non-empty string)`);
+      }
+      return substring;
+    });
   }
 
   /** Ensure that the source has one default export and replace it with the substitution string */

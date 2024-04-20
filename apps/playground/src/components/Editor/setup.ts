@@ -1,4 +1,5 @@
 import { loader } from '@monaco-editor/react';
+import envTypes from '@opendatacapture/instrument-runtime-env/lib/index.d.ts?raw';
 import * as monaco from 'monaco-editor';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
@@ -13,6 +14,8 @@ import type { CompletionItemProvider } from './types';
 class TypeScriptSuggestAdapter extends SuggestAdapter implements CompletionItemProvider {
   triggerCharacters = ['.', '"', "'"];
 }
+
+console.log(envTypes);
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -115,4 +118,8 @@ loader.config({ monaco });
 
   // Other
   monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+
+  const uri = monaco.Uri.parse('globals.d.ts');
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(envTypes, 'globals.d.ts');
+  monaco.editor.createModel(envTypes, 'typescript', uri);
 }

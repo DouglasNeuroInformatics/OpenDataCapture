@@ -26,7 +26,7 @@ export const useInstruments = <TKind extends InstrumentKind>({ params }: { param
           return translateInstrument(instrument, i18n.resolvedLanguage ?? 'en');
         })
       );
-      return instruments as (Extract<AnyUnilingualInstrument, { kind: TKind }> & { id: string })[];
+      return instruments as ({ id: string } & Extract<AnyUnilingualInstrument, { kind: TKind }>)[];
     },
     queryKey: ['instruments', params]
   });

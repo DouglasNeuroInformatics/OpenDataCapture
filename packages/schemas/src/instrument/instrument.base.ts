@@ -103,12 +103,12 @@ export const $UnilingualBaseInstrumentDetails = $BaseInstrumentDetails.extend({
 
 /** An object with additional details relevant to multiple categories of instrument  */
 export type EnhancedBaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Simplify<
-  BaseInstrumentDetails<TLanguage> & {
+  {
     /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
     estimatedDuration: number;
     /** Brief sequential instructions for how the subject should complete the instrument. */
     instructions: InstrumentUIOption<TLanguage, string[]>;
-  }
+  } & BaseInstrumentDetails<TLanguage>
 >;
 export const $EnhancedBaseInstrumentDetails = $BaseInstrumentDetails.extend({
   estimatedDuration: z.number().int().nonnegative(),
@@ -245,12 +245,9 @@ export const $UnilingualBaseInstrument = $BaseInstrument.extend({
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
  */
-export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = Omit<
-  T,
-  'content' | 'measures' | 'validationSchema'
-> & {
+export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = {
   id: string;
-};
+} & Omit<T, 'content' | 'measures' | 'validationSchema'>;
 
 export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<any, Language>>>;
 
@@ -267,14 +264,6 @@ export type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 export const $CreateInstrumentData = z.object({
   kind: $InstrumentKind.optional(),
   source: z.string().min(1)
-});
-
-export type InstrumentSourceContainer = z.infer<typeof $InstrumentSourceContainer>;
-export const $InstrumentSourceContainer = z.object({
-  id: z.string(),
-  name: z.string(),
-  source: z.string(),
-  version: z.number()
 });
 
 export type InstrumentBundleContainer = z.infer<typeof $InstrumentBundleContainer>;

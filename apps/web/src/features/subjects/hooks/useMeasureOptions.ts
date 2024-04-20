@@ -19,7 +19,7 @@ export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null
             }
             const field = formFields[key];
             if (field.kind === 'dynamic') {
-              return field.render(null)?.label;
+              return field.render({})?.label;
             }
             return field.label;
           })

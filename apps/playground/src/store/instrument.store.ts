@@ -7,6 +7,8 @@ import formReference from '@/examples/form/form-reference.instrument?raw';
 import formWithGroups from '@/examples/form/form-with-groups.instrument?raw';
 import formWithSimpleDynamicField from '@/examples/form/form-with-simple-dynamic-field.instrument?raw';
 import interactiveWithReact from '@/examples/interactive/interactive-with-react.instrument?raw';
+import interactiveWithCssIndex from '@/examples/interactive-with-css/index.ts?raw';
+import interactiveWithCssStyle from '@/examples/interactive-with-css/style.css?raw';
 import type { EditorFile } from '@/models/editor-file.model';
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
@@ -137,6 +139,23 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     ],
     kind: 'INTERACTIVE',
     label: 'Interactive With React'
+  },
+  {
+    category: 'Examples',
+    files: [
+      {
+        language: 'typescript',
+        name: 'index.tsx',
+        value: interactiveWithCssIndex
+      },
+      {
+        language: 'css',
+        name: 'style.css',
+        value: interactiveWithCssStyle
+      }
+    ],
+    kind: 'INTERACTIVE',
+    label: 'Interactive With CSS'
   }
 ]);
 
