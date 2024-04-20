@@ -18,9 +18,9 @@ type EditorStore = {
 const useEditorStore = create(
   subscribeWithSelector<EditorStore>((set) => ({
     closeFile: (file) => {
-      set(({ files }) => {
-        const currentIndex = files.indexOf(file);
-        const updatedFiles = files.filter((f) => f !== file);
+      set(({ openFiles }) => {
+        const currentIndex = openFiles.indexOf(file);
+        const updatedFiles = openFiles.filter((f) => f !== file);
         return { openFiles: updatedFiles, selectedFile: updatedFiles.at(currentIndex - 1) ?? null };
       });
     },
