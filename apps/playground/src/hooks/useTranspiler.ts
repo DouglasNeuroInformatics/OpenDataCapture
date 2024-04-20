@@ -44,7 +44,7 @@ export function useTranspiler(): TranspilerState {
     setState({ status: 'building' });
     let bundle: string;
     try {
-      bundle = await instrumentBundler.generateBundle(source);
+      bundle = await instrumentBundler.generateBundle({ source });
       setState({ bundle, status: 'built' });
     } catch (err) {
       console.error(err);

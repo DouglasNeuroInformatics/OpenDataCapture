@@ -58,7 +58,7 @@ const bundler = new InstrumentBundler();
 for (const input of inputs) {
   logger.verbose(`Bundling input file: ${input}`);
   const source = await fs.promises.readFile(input, 'utf-8');
-  const outputs = await bundler.generateBundleFiles(source);
+  const outputs = await bundler.generateBundleFiles({ source });
   const outfile = input.replace(/\.(js|ts|tsx|jsx)$/i, '.js').replace(inputBase, outputBase);
   const dirname = path.dirname(outfile);
   if (!fs.existsSync(dirname)) {

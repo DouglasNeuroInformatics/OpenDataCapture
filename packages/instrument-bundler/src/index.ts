@@ -1,6 +1,8 @@
 import type { BuildOptions, BuildResult, Metafile } from 'esbuild';
 import type { ValueOf } from 'type-fest';
 
+import type { BundleOptions } from './types.js';
+
 let esbuild: typeof import('esbuild');
 if (typeof window === 'undefined') {
   ({ default: esbuild } = await import('esbuild'));
@@ -12,7 +14,7 @@ export class InstrumentBundler {
   /** The variable name that 'export default' is replaced by */
   private defaultExportSub = '__instrument__';
 
-  async generateBundle(source: string) {
+  async generateBundle({ source }: BundleOptions) {
     const input = this.preprocess(source);
     const result = await this.build(input);
     const output = result.metafile!.outputs['bundle.js'];
@@ -20,8 +22,8 @@ export class InstrumentBundler {
     return this.injectRequire(this.getBuiltCode(result));
   }
 
-  async generateBundleFiles(source: string) {
-    const bundle = await this.generateBundle(source);
+  async generateBundleFiles(options: BundleOptions) {
+    const bundle = await this.generateBundle(options);
     return {
       declaration: 'declare const bundle: string;\nexport default bundle;\n',
       source: `export default ${JSON.stringify(bundle)}`

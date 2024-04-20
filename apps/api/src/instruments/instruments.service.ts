@@ -136,7 +136,7 @@ export class InstrumentsService {
   private async parseSource(source: string) {
     let bundle: string;
     try {
-      bundle = await this.instrumentBundler.generateBundle(source);
+      bundle = await this.instrumentBundler.generateBundle({ source });
     } catch (err) {
       if (err instanceof Error) {
         this.logger.debug(err.cause);
