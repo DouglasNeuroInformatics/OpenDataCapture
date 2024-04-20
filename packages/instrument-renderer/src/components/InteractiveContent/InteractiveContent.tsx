@@ -54,7 +54,9 @@ export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps
         }
         setIsLoaded(true);
         contentWindow.document.documentElement.setAttribute('data-mode', theme);
-        contentWindow.postMessage({ payload: bundle, type: 'begin' });
+        setTimeout(() => {
+          contentWindow.postMessage({ payload: bundle, type: 'begin' });
+        }, 100);
       }}
     />
   );
