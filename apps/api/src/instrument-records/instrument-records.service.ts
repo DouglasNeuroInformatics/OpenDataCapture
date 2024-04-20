@@ -2,7 +2,6 @@ import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable } from '@nestjs/common';
 import type { InstrumentRecordModel } from '@opendatacapture/database/core';
 import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
-import { InstrumentTransformer } from '@opendatacapture/instrument-transformer/server';
 import type { AnyInstrument, InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
@@ -28,7 +27,6 @@ import { InstrumentMeasuresService } from './instrument-measures.service';
 @Injectable()
 export class InstrumentRecordsService {
   private readonly interpreter: InstrumentInterpreter;
-  private readonly transformer = new InstrumentTransformer();
 
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
@@ -37,9 +35,7 @@ export class InstrumentRecordsService {
     private readonly instrumentsService: InstrumentsService,
     private readonly subjectsService: SubjectsService
   ) {
-    this.interpreter = new InstrumentInterpreter({
-      transformBundle: (bundle) => this.transformer.transformRuntimeImports(bundle)
-    });
+    this.interpreter = new InstrumentInterpreter();
   }
 
   async count(

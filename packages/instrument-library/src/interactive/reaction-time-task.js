@@ -7,10 +7,10 @@ const { z } = await import('/runtime/v1/zod.js');
 export default defineInstrument({
   content: {
     assets: {
-      css: [import.meta.injectStylesheet('jspsych/css/jspsych.css')],
+      css: [import.meta.require('jspsych/css/jspsych.css')],
       img: {
-        blue: import.meta.encodeImage('../assets/img/blue.png'),
-        orange: import.meta.encodeImage('../assets/img/orange.png')
+        blue: import.meta.require('../assets/img/blue.png'),
+        orange: import.meta.require('../assets/img/orange.png')
       }
     },
     render() {

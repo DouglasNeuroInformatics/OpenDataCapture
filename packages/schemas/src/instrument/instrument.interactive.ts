@@ -11,8 +11,8 @@ import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument
 
 type InteractiveInstrumentContent<TData extends Json = Json> = {
   assets?: {
-    css?: string[];
-    img?: { [key: string]: string };
+    css?: any[];
+    img?: { [key: string]: any };
   };
   render: (done: <T extends Exact<TData, T>>(data: T) => void) => any;
 };

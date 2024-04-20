@@ -12,22 +12,20 @@
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^0.3.1",
-    "@douglasneuroinformatics/libui": "^2.0.8",
+    "@douglasneuroinformatics/libui": "^2.0.9",
     "@monaco-editor/react": "^4.6.0",
-    "@opendatacapture/demo": "workspace:*",
-    "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
+    "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
-    "@opendatacapture/instrument-transformer": "workspace:*",
+    "@opendatacapture/instrument-runtime-env": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "axios": "^1.6.8",
     "esbuild-wasm": "^0.20.2",
-    "framer-motion": "^11.0.27",
+    "framer-motion": "^11.1.7",
     "lodash-es": "^4.17.21",
-    "lucide-react": "^0.367.0",
+    "lucide-react": "^0.372.0",
     "lz-string": "^1.5.0",
     "monaco-editor": "^0.47.0",
     "prettier": "^3.2.5",
@@ -37,7 +35,7 @@
     "react-i18next": "^14.1.0",
     "stacktrace-parser": "^0.1.10",
     "ts-pattern": "^5.1.1",
-    "zod": "^3.22.4",
+    "zod": "^3.22.5",
     "zod-validation-error": "^2.1.0",
     "zustand": "^4.5.2"
   },
@@ -45,12 +43,12 @@
     "@opendatacapture/tailwindcss": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@types/lodash-es": "^4.17.12",
-    "@types/react": "^18.2.75",
-    "@types/react-dom": "^18.2.24",
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
-    "vite": "^5.2.8"
+    "vite": "^5.2.9"
   }
 }

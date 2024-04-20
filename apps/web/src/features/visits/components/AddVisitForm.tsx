@@ -11,9 +11,9 @@ const EIGHTEEN_YEARS = 568025136000;
 
 const MIN_DATE_OF_BIRTH = new Date(Date.now() - EIGHTEEN_YEARS);
 
-export type AddVisitFormData = SubjectIdentificationData & {
+export type AddVisitFormData = {
   date: Date;
-};
+} & SubjectIdentificationData;
 
 export type AddVisitFormProps = {
   onSubmit: (data: AddVisitFormData) => void;

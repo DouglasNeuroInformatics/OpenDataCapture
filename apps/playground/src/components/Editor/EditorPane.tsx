@@ -34,7 +34,7 @@ export const EditorPane = () => {
       const uri = monaco.Uri.parse(filename);
       if (!monaco.editor.getModel(uri)) {
         monaco.languages.typescript.typescriptDefaults.addExtraLib(libs[filename], filename);
-        monaco.editor.createModel(libs[filename], 'typescript', monaco.Uri.parse(filename));
+        monaco.editor.createModel(libs[filename], 'typescript', uri);
       }
     });
   }, [isMounted, libs]);

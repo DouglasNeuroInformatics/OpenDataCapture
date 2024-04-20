@@ -31,7 +31,7 @@ export const Small: Story = {
             variant: 'input'
           }
         }}
-        validationSchema={z.record(z.any())}
+        validationSchema={z.record(z.string())}
         onSubmit={(data) => {
           alert(JSON.stringify(data));
         }}
@@ -68,7 +68,7 @@ export const Medium: Story = {
             variant: 'input'
           }
         }}
-        validationSchema={z.record(z.any())}
+        validationSchema={z.record(z.string())}
         onSubmit={(data) => {
           alert(JSON.stringify(data));
         }}
@@ -115,7 +115,7 @@ export const Large: Story = {
             variant: 'textarea'
           }
         }}
-        validationSchema={z.record(z.any())}
+        validationSchema={z.record(z.string())}
         onSubmit={(data) => {
           alert(JSON.stringify(data));
         }}

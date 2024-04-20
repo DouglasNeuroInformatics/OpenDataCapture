@@ -1,23 +1,24 @@
 {
-  "name": "@opendatacapture/instrument-transformer",
+  "name": "@opendatacapture/instrument-bundler",
   "type": "module",
   "version": "0.0.0",
-  "license": "AGPL-3.0",
+  "license": "LGPL-3.0",
   "exports": {
-    ".": "./src/index.ts",
-    "./browser": "./src/browser.ts",
-    "./server": "./src/server.ts"
+    ".": "./src/index.ts"
   },
+  "bin": "./src/cli.ts",
   "scripts": {
     "format": "prettier --write src",
-    "lint": "eslint --fix src"
+    "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
+    "commander": "^12.0.0",
     "esbuild": "^0.20.2",
     "esbuild-wasm": "^0.20.2",
-    "zod": "^3.22.4"
+    "glob": "^10.3.12"
   },
   "devDependencies": {
+    "@opendatacapture/instrument-runtime-env": "workspace:*",
     "@opendatacapture/instrument-stubs": "workspace:*"
   }
 }

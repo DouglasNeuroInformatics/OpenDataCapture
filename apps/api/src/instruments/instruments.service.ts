@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
+import { InstrumentBundler } from '@opendatacapture/instrument-bundler';
 import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
-import { InstrumentTransformer } from '@opendatacapture/instrument-transformer/server';
 import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@opendatacapture/schemas/instrument';
 import type { Prisma } from '@prisma/client';
 import { omit } from 'lodash-es';
@@ -15,15 +15,11 @@ import { CreateInstrumentDto } from './dto/create-instrument.dto';
 
 @Injectable()
 export class InstrumentsService {
-  private readonly instrumentInterpreter: InstrumentInterpreter;
-  private readonly instrumentTransformer = new InstrumentTransformer();
+  private readonly instrumentBundler = new InstrumentBundler();
+  private readonly instrumentInterpreter = new InstrumentInterpreter();
   private readonly logger = new Logger(InstrumentsService.name);
 
-  constructor(@InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>) {
-    this.instrumentInterpreter = new InstrumentInterpreter({
-      transformBundle: (bundle) => this.instrumentTransformer.transformRuntimeImports(bundle)
-    });
-  }
+  constructor(@InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>) {}
 
   async count(
     filter: NonNullable<Parameters<Model<'Instrument'>['count']>[0]>['where'] = {},
@@ -37,13 +33,10 @@ export class InstrumentsService {
     const bundle = await this.parseSource(source);
     this.logger.debug('Done parsing source for instrument');
 
-    return this.createFromBundle({ bundle, source }, { kind });
+    return this.createFromBundle(bundle, { kind });
   }
 
-  async createFromBundle<TKind extends InstrumentKind>(
-    { bundle, source }: { bundle: string; source: string },
-    options?: { kind?: TKind }
-  ) {
+  async createFromBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
     const instance = await this.interpretBundle(bundle, options);
 
     this.logger.debug(`Checking if instrument '${instance.name}' exists...`);
@@ -68,8 +61,7 @@ export class InstrumentsService {
           description: instance.details.description as Prisma.InputJsonValue,
           instructions: instance.details.instructions as Prisma.InputJsonValue,
           title: instance.details.title as Prisma.InputJsonValue
-        },
-        source
+        }
       }
     });
   }
@@ -144,7 +136,7 @@ export class InstrumentsService {
   private async parseSource(source: string) {
     let bundle: string;
     try {
-      bundle = await this.instrumentTransformer.generateBundle(source);
+      bundle = await this.instrumentBundler.generateBundle(source);
     } catch (err) {
       if (err instanceof Error) {
         this.logger.debug(err.cause);

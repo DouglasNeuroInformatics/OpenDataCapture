@@ -4,14 +4,12 @@ import type { FormDataType } from '@douglasneuroinformatics/libui-form-types';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger, NotImplementedException } from '@nestjs/common';
 import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
-import {
-  breakoutTask,
-  briefPsychiatricRatingScale,
-  enhancedDemographicsQuestionnaire,
-  happinessQuestionnaire,
-  miniMentalStateExamination,
-  montrealCognitiveAssessment
-} from '@opendatacapture/instrument-library';
+import briefPsychiatricRatingScale from '@opendatacapture/instrument-library/forms/brief-psychiatric-rating-scale.js';
+import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/enhanced-demographics-questionnaire.js';
+import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/happiness-questionnaire.js';
+import miniMentalStateExamination from '@opendatacapture/instrument-library/forms/mini-mental-state-examination.js';
+import montrealCognitiveAssessment from '@opendatacapture/instrument-library/forms/montreal-cognitive-assessment.js';
+import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
 import { type Json } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type {
@@ -145,7 +143,7 @@ export class DemoService {
         data[fieldName] = customValue;
         continue;
       } else if (field.kind === 'dynamic') {
-        const staticField = field.render(null);
+        const staticField = field.render({});
         if (!staticField) {
           continue;
         }

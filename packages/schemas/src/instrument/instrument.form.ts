@@ -57,14 +57,15 @@ type FormInstrumentFieldMixin<
 > = Simplify<
   TBase extends any
     ? Extract<keyof TField, string> extends Extract<keyof TBase, string>
-      ? Omit<TBase, 'description' | 'label' | keyof TField> & {
+      ? {
           description?: InstrumentUIOption<TLanguage, string>;
           label: InstrumentUIOption<TLanguage, string>;
-        } & TField
-      : Omit<TBase, 'description' | 'label'> & {
+        } & Omit<TBase, 'description' | 'label' | keyof TField> &
+          TField
+      : {
           description?: InstrumentUIOption<TLanguage, string>;
           label: InstrumentUIOption<TLanguage, string>;
-        }
+        } & Omit<TBase, 'description' | 'label'>
     : never
 >;
 const $FormInstrumentBaseField = z.object({
@@ -240,7 +241,7 @@ export type FormInstrumentDynamicFieldsetField<
   TValue extends RequiredFieldValue<ScalarFieldValue> = RequiredFieldValue<ScalarFieldValue>
 > = {
   kind: 'dynamic';
-  render: (fieldset: Partial<TFieldsetValue>) => FormInstrumentScalarField<TLanguage, TValue> | null;
+  render: (this: void, fieldset: Partial<TFieldsetValue>) => FormInstrumentScalarField<TLanguage, TValue> | null;
 };
 const $FormInstrumentDynamicFieldsetField: z.ZodType<FormInstrumentDynamicFieldsetField> = z.object({
   kind: z.literal('dynamic'),
@@ -359,7 +360,7 @@ export type FormInstrumentDynamicField<
 > = {
   deps: readonly Extract<keyof TData, string>[];
   kind: 'dynamic';
-  render: (data: PartialFormDataType<TData> | null) => FormInstrumentStaticField<TLanguage, TValue> | null;
+  render: (this: void, data: PartialFormDataType<TData>) => FormInstrumentStaticField<TLanguage, TValue> | null;
 };
 export const $FormInstrumentDynamicField: z.ZodType<FormInstrumentDynamicField> = z.object({
   deps: z.array(z.string()),
@@ -411,12 +412,12 @@ export type FormInstrumentFieldsGroup<
   fields: {
     [K in keyof TData]?: FormInstrumentUnknownField<TData, K, TLanguage>;
   };
-  title: InstrumentUIOption<TLanguage, string>;
+  title?: InstrumentUIOption<TLanguage, string>;
 };
 export const $FormInstrumentFieldsGroup = z.object({
   description: $$InstrumentUIOption(z.string().min(1)).optional(),
   fields: $FormInstrumentFields,
-  title: $$InstrumentUIOption(z.string().min(1))
+  title: $$InstrumentUIOption(z.string().min(1)).optional()
 }) satisfies z.ZodType<FormInstrumentFieldsGroup>;
 
 export type FormInstrumentContent<
@@ -432,12 +433,12 @@ export type FormInstrument<
   TData extends FormDataType = FormDataType,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Simplify<
-  Omit<BaseInstrument<TData, TLanguage>, 'details'> & {
+  {
     content: FormInstrumentContent<TData, TLanguage>;
     details: EnhancedBaseInstrumentDetails<TLanguage>;
     kind: 'FORM';
     measures?: InstrumentMeasures<TData, TLanguage>;
-  }
+  } & Omit<BaseInstrument<TData, TLanguage>, 'details'>
 >;
 export const $FormInstrument: z.ZodType<FormInstrument> = $BaseInstrument.extend({
   content: $FormInstrumentContent,

@@ -182,7 +182,7 @@ function translateFormFields(
       translatedFields[fieldName] = {
         deps: field.deps,
         kind: 'dynamic',
-        render: wrap(field.render, (func, data: PartialFormDataType | null) => {
+        render: wrap(field.render, (func, data: PartialFormDataType) => {
           const result = func(data);
           if (result === null) {
             return null;
@@ -214,7 +214,7 @@ function translateFormContent(
   return content.map((group) => ({
     description: group.description?.[language],
     fields: translateFormFields(group.fields, language),
-    title: group.title[language]
+    title: group.title?.[language]
   }));
 }
 

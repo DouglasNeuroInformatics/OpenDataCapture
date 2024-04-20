@@ -98,7 +98,6 @@ model InstrumentModel {
   createdAt   DateTime                @default(now()) @db.Date
   updatedAt   DateTime                @updatedAt @db.Date
   id          String                  @id @default(auto()) @map("_id") @db.ObjectId
-  source      String
   bundle      String
   details     InstrumentDetails
   kind        InstrumentKind

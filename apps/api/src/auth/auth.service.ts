@@ -44,7 +44,7 @@ export class AuthService {
 
   /** Wraps UserService.getByUsername with appropriate exception handling */
   private async getUser(username: string) {
-    let user: UserModel & { groups: GroupModel[] };
+    let user: { groups: GroupModel[] } & UserModel;
     try {
       user = await this.usersService.findByUsername(username);
       // user = await this.usersService.findByUsername(username).then((doc) => doc.toObject({ virtuals: true }));

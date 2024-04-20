@@ -26,14 +26,14 @@ export const ActionsDropdown = () => {
         </DropdownMenu.Trigger>
         <DropdownMenu.Content align="end">
           <DropdownMenu.Item asChild onSelect={() => setShowUserSettingsDialog(true)}>
-            <button className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
+            <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
               User Settings
             </button>
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
           <DropdownMenu.Item asChild onSelect={() => setShowDeleteInstrumentDialog(true)}>
             <button
-              className="cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
+              className="w-full cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
               disabled={selectedInstrument.category !== 'Saved'}
               type="button"
             >
@@ -43,7 +43,7 @@ export const ActionsDropdown = () => {
           <DropdownMenu.Separator />
           <DropdownMenu.Item asChild onSelect={() => setShowRestoreDefaultsDialog(true)}>
             <button
-              className="cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
+              className="w-full cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
               type="button"
             >
               Restore Defaults
