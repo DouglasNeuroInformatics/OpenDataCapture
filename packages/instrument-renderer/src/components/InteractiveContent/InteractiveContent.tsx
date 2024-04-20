@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
+import { useTheme } from '@douglasneuroinformatics/libui/hooks';
 import { $Json, type Json } from '@opendatacapture/schemas/core';
 import type { Promisable } from 'type-fest';
 
@@ -11,6 +12,7 @@ export type InteractiveContentProps = {
 };
 
 export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps) => {
+  const [theme] = useTheme();
   const ref = useRef<HTMLIFrameElement>(null);
 
   const handler = useCallback(
@@ -28,6 +30,10 @@ export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps
     return () => document.removeEventListener('done', handler, false);
   }, [handler]);
 
+  useEffect(() => {
+    ref.current?.contentDocument?.documentElement.setAttribute('data-mode', theme);
+  }, [theme]);
+
   return (
     <iframe
       allow="fullscreen"
@@ -43,6 +49,7 @@ export const InteractiveContent = ({ bundle, onSubmit }: InteractiveContentProps
           console.error('content window cannot be null');
           return;
         }
+        contentWindow.document.documentElement.setAttribute('data-mode', theme);
         contentWindow.postMessage({ payload: bundle, type: 'begin' });
       }}
     />
