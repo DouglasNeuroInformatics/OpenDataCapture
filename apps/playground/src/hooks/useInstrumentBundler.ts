@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
 import { InstrumentBundler } from '@opendatacapture/instrument-bundler';
-import esbuild from 'esbuild-wasm';
 import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
 import { useEditorStore } from '@/store/editor.store';
 
-await esbuild.initialize({
+const { initialize } = await import('esbuild-wasm');
+await initialize({
   wasmURL: esbuildWasmUrl
 });
 
