@@ -4,10 +4,10 @@ import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/comp
 import { Branding } from '@opendatacapture/react-core';
 
 import { ActionsDropdown } from './ActionsDropdown';
+import { CloneButton } from './CloneButton';
 import { DownloadButton } from './DownloadButton';
 import { InstrumentSelector } from './InstrumentSelector';
 import { RefreshButton } from './RefreshButton';
-import { SaveButton } from './SaveButton';
 import { ShareButton } from './ShareButton';
 
 export const Header = () => {
@@ -16,7 +16,7 @@ export const Header = () => {
       <Branding />
       <div className="flex space-x-2">
         <InstrumentSelector />
-        <SaveButton />
+        <CloneButton />
         <ShareButton />
         <ThemeToggle className="h-9 w-9" />
         <LanguageToggle
