@@ -5,26 +5,21 @@ import { CopyButton } from '@opendatacapture/react-core';
 import { ShareIcon } from 'lucide-react';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
-import type { EditorFile } from '@/models/editor-file.model';
-import { encodeFiles } from '@/utils/encode';
-
-export function generateShareLink(files: EditorFile[]) {
-  const url = new URL(location.origin);
-  url.searchParams.append('files', encodeFiles(files));
-  return url;
-}
+import { useInstrumentStore } from '@/store/instrument.store';
+import { encodeShareURL } from '@/utils/encode';
 
 export const ShareButton = () => {
+  const label = useInstrumentStore((store) => store.selectedInstrument.label);
   const editorFilesRef = useEditorFilesRef();
-  const [shareLink, setShareLink] = useState(generateShareLink(editorFilesRef.current));
+  const [shareURL, setShareURL] = useState(encodeShareURL({ files: editorFilesRef.current, label }));
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   // The user cannot modify the editor without closing the popover
   useEffect(() => {
     if (isPopoverOpen) {
-      setShareLink(generateShareLink(editorFilesRef.current));
+      setShareURL(encodeShareURL({ files: editorFilesRef.current, label }));
     }
-  }, [isPopoverOpen]);
+  }, [isPopoverOpen, label]);
 
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -41,8 +36,8 @@ export const ShareButton = () => {
           </p>
         </div>
         <div className="flex gap-2 pt-4">
-          <Input readOnly className="h-9" id="link" value={shareLink.href} />
-          <CopyButton size="sm" text={shareLink.href} />
+          <Input readOnly className="h-9" id="link" value={shareURL.href} />
+          <CopyButton size="sm" text={shareURL.href} />
         </div>
       </Popover.Content>
     </Popover>
