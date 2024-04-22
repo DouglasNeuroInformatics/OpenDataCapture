@@ -20,7 +20,7 @@ export const EditorTab = ({ file }: EditorTabProps) => {
   return (
     <button
       className={cn(
-        'flex w-full max-w-[18rem] items-center justify-between gap-12 border-l border-slate-900/10 px-4 py-1.5 text-sm last:border-r dark:border-slate-100/25',
+        'flex w-full max-w-[16rem] items-center justify-between gap-12 border-l border-slate-900/10 px-4 py-1.5 text-sm last:border-r dark:border-slate-100/25',
         file.name === selectedFile?.name && 'bg-slate-100 shadow-sm dark:bg-slate-700'
       )}
       type="button"
