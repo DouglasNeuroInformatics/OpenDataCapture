@@ -145,7 +145,7 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     files: [
       {
         language: 'typescript',
-        name: 'index.tsx',
+        name: 'index.ts',
         value: interactiveWithCssIndex
       },
       {
