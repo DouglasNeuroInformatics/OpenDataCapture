@@ -34,7 +34,7 @@ type TranspilerState = BuildingState | BuiltState | ErrorState | InitialState;
 
 export function useTranspiler(): TranspilerState {
   const editorFilesRef = useEditorFilesRef();
-  const rebuildInterval = useSettingsStore((store) => store.rebuildInterval);
+  const refreshInterval = useSettingsStore((store) => store.refreshInterval);
   const [filesHash, setFilesHash] = useState<string>('');
   const [state, setState] = useState<TranspilerState>({ status: 'initial' });
   const instrumentBundler = useInstrumentBundler();
@@ -76,7 +76,7 @@ export function useTranspiler(): TranspilerState {
         }
       })
       .catch(console.error);
-  }, rebuildInterval);
+  }, refreshInterval);
 
   return state;
 }

@@ -24,10 +24,10 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
         <Form
           className="py-4"
           content={{
-            rebuildInterval: {
+            refreshInterval: {
               description: 'The interval, in milliseconds, between builds, assuming the source code has changed',
               kind: 'number',
-              label: 'Rebuild Interval',
+              label: 'Refresh Interval',
               variant: 'input'
             }
           }}

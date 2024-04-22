@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Settings } from '@/models/settings.model';
 
 const DEFAULT_SETTINGS: Settings = {
-  rebuildInterval: 2000
+  refreshInterval: 2000
 };
 
 export type SettingsStore = Merge<
