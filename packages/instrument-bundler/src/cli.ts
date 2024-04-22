@@ -23,6 +23,7 @@ program.argument('<target>', 'the directory to search for instruments', (path: s
 });
 program.option('--clean', 'delete the output directory before build');
 program.option('--declaration', 'emit typescript declarations');
+program.option('--ignore [patterns...]', 'glob patterns to ignore');
 program.option('--outdir <path>', 'path to output directory');
 program.option('--verbose', 'enable verbose mode');
 program.parse();
@@ -51,7 +52,9 @@ if (options.clean) {
   await fs.promises.rm(outputBase, { force: true, recursive: true });
 }
 
-const inputs = await glob(`${inputBase}/**/*.{js,jsx,ts,tsx}`);
+const inputs = await glob(`${inputBase}/**/*.{js,jsx,ts,tsx}`, {
+  ignore: options.ignore as string[]
+});
 
 const bundler = new InstrumentBundler();
 

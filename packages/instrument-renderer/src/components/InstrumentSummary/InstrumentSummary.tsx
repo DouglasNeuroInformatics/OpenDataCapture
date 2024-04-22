@@ -45,7 +45,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
   }
 
   const copyText = Object.values(computedMeasures)
-    .map(({ label, value }) => `${label}: ${value.toString()}`)
+    .map(({ label, value }) => `${label}: ${value?.toString() ?? 'NA'}`)
     .join('\n');
 
   const results = Object.values(computedMeasures);
