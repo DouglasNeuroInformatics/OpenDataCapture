@@ -9,6 +9,7 @@ import { useInstrumentStore } from './instrument.store';
 type EditorStore = {
   addFile: (file: EditorFile) => void;
   closeFile: (file: EditorFile) => void;
+  deleteFile: (file: EditorFile) => void;
   files: EditorFile[];
   openFiles: EditorFile[];
   selectFile: (file: EditorFile) => void;
@@ -26,6 +27,18 @@ const useEditorStore = create(
         const currentIndex = openFiles.indexOf(file);
         const updatedFiles = openFiles.filter((f) => f !== file);
         return { openFiles: updatedFiles, selectedFile: updatedFiles.at(currentIndex - 1) ?? null };
+      });
+    },
+    deleteFile: (file) => {
+      set(({ files, openFiles }) => {
+        const currentIndex = openFiles.indexOf(file);
+        const updatedFiles = files.filter((f) => f !== file);
+        const updatedOpenFiles = openFiles.filter((f) => f !== file);
+        return {
+          files: updatedFiles,
+          openFiles: updatedOpenFiles,
+          selectedFile: updatedOpenFiles.at(currentIndex - 1) ?? null
+        };
       });
     },
     files: [],
