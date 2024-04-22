@@ -7,6 +7,7 @@ import { resolveIndexFile } from '@/utils/resolve';
 import { useInstrumentStore } from './instrument.store';
 
 type EditorStore = {
+  addFile: (file: EditorFile) => void;
   closeFile: (file: EditorFile) => void;
   files: EditorFile[];
   openFiles: EditorFile[];
@@ -17,6 +18,9 @@ type EditorStore = {
 
 const useEditorStore = create(
   subscribeWithSelector<EditorStore>((set) => ({
+    addFile: (file) => {
+      set(({ files, openFiles }) => ({ files: [...files, file], openFiles: [...openFiles, file], selectedFile: file }));
+    },
     closeFile: (file) => {
       set(({ openFiles }) => {
         const currentIndex = openFiles.indexOf(file);

@@ -7,19 +7,29 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { useEditorStore } from '@/store/editor.store';
 
+import { EditorAddFileButton } from './EditorAddFileButton';
 import { EditorButton } from './EditorButton';
 import { EditorEmptyState } from './EditorEmptyState';
 import { EditorFileIcon } from './EditorFileIcon';
 import { EditorPane } from './EditorPane';
 import { EditorTab } from './EditorTab';
+import { fileExtRegex } from './utils';
 
 import './setup';
 
 export const Editor = () => {
+  const [isAddFileOpen, setIsAddFileOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { files, openFiles, selectFile, selectedFile } = useEditorStore(
-    useShallow(({ files, openFiles, selectFile, selectedFile }) => ({ files, openFiles, selectFile, selectedFile }))
+  const { addFile, files, openFiles, selectFile, selectedFile } = useEditorStore(
+    useShallow(({ addFile, files, openFiles, selectFile, selectedFile }) => ({
+      addFile,
+      files,
+      openFiles,
+      selectFile,
+      selectedFile
+    }))
   );
+
   return (
     <div className="flex h-full w-full flex-col border border-r-0 bg-slate-50 dark:bg-slate-800">
       <div className="flex w-full border-b">
@@ -29,6 +39,7 @@ export const Editor = () => {
           tip="Add File"
           onClick={() => {
             setIsSidebarOpen(true);
+            setIsAddFileOpen(true);
           }}
         />
         {openFiles.map((file) => (
@@ -46,18 +57,33 @@ export const Editor = () => {
               <button
                 className={cn(
                   'flex w-full items-center gap-2 p-2 text-sm',
-                  selectedFile?.name === file.name && 'bg-slate-100 dark:bg-slate-700'
+                  selectedFile?.name === file.name && !isAddFileOpen && 'bg-slate-100 dark:bg-slate-700'
                 )}
                 key={file.name}
                 type="button"
                 onClick={() => selectFile(file)}
               >
-                <EditorFileIcon
-                  variant={file.name.endsWith('.jsx') || file.name.endsWith('tsx') ? 'react' : file.language}
-                />
+                <EditorFileIcon filename={file.name} />
                 <span className="truncate">{file.name}</span>
               </button>
             ))}
+            {isAddFileOpen && (
+              <EditorAddFileButton
+                onBlur={() => setIsAddFileOpen(false)}
+                onSubmit={(filename) => {
+                  const ext = filename.match(fileExtRegex)?.[0];
+                  if (ext) {
+                    addFile({
+                      id: crypto.randomUUID(),
+                      language: 'typescript',
+                      name: filename,
+                      value: ''
+                    });
+                  }
+                  setIsAddFileOpen(false);
+                }}
+              />
+            )}
           </div>
         </motion.div>
         {openFiles.length ? <EditorPane /> : <EditorEmptyState />}
