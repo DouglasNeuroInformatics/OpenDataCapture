@@ -13,7 +13,7 @@ import type { EditorFile } from '@/models/editor-file.model';
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
 import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
-import { hashFiles, sha256 } from '@/utils/hash';
+import { sha256 } from '@/utils/hash';
 
 type InstrumentCategory = 'Examples' | 'Saved' | 'Templates';
 
@@ -46,7 +46,7 @@ const createStoreItems = async (
       return {
         ...instrument,
         files,
-        id: await hashFiles(files)
+        id: crypto.randomUUID()
       };
     })
   );

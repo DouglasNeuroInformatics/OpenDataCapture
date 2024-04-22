@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
 import { type InstrumentStoreItem, useInstrumentStore } from '@/store/instrument.store';
-import { hashFiles } from '@/utils/hash';
 
 export const CloneButton = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -17,12 +16,12 @@ export const CloneButton = () => {
   const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
   const editorFilesRef = useEditorFilesRef();
 
-  const handleSubmit = async ({ label }: { label: string }) => {
+  const handleSubmit = ({ label }: { label: string }) => {
     const files = editorFilesRef.current;
     const item: InstrumentStoreItem = {
       category: 'Saved',
       files,
-      id: await hashFiles(files),
+      id: crypto.randomUUID(),
       kind: 'UNKNOWN',
       label
     };
