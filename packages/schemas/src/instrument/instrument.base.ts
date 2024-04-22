@@ -122,7 +122,7 @@ export const $UnilingualEnhancedBaseInstrumentDetails = $EnhancedBaseInstrumentD
   }) satisfies z.ZodType<EnhancedBaseInstrumentDetails<Language>>;
 
 export type InstrumentMeasureValue = z.infer<typeof $InstrumentMeasureValue>;
-export const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.date()]);
+export const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.date(), z.undefined()]);
 
 export type InstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> =
   | {
