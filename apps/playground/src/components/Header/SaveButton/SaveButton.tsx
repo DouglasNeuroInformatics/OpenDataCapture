@@ -6,6 +6,7 @@ import { SaveIcon } from 'lucide-react';
 import { z } from 'zod';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
+import { useEditorStore } from '@/store/editor.store';
 import { type InstrumentStoreItem, useInstrumentStore } from '@/store/instrument.store';
 import { hashFiles } from '@/utils/hash';
 
@@ -16,6 +17,7 @@ export const SaveButton = () => {
   const addInstrument = useInstrumentStore((store) => store.addInstrument);
   const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
   const editorFilesRef = useEditorFilesRef();
+  const isModified = useEditorStore((store) => store.isModified);
 
   const handleSubmit = async ({ label }: { label: string }) => {
     const files = editorFilesRef.current;
@@ -35,7 +37,7 @@ export const SaveButton = () => {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <Dialog.Trigger asChild>
-        <Button className="h-9 w-9" size="icon" variant="outline">
+        <Button className="h-9 w-9" disabled={!isModified} size="icon" variant="outline">
           <SaveIcon />
         </Button>
       </Dialog.Trigger>

@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash-es';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
@@ -9,6 +10,7 @@ import { useInstrumentStore } from './instrument.store';
 type EditorStore = {
   closeFile: (file: EditorFile) => void;
   files: EditorFile[];
+  isModified: boolean;
   openFiles: EditorFile[];
   selectFile: (file: EditorFile) => void;
   selectedFile: EditorFile | null;
@@ -25,6 +27,7 @@ const useEditorStore = create(
       });
     },
     files: [],
+    isModified: false,
     openFiles: [],
     selectFile: (file) => {
       set(({ openFiles }) => {
@@ -49,6 +52,15 @@ const useEditorStore = create(
       });
     }
   }))
+);
+
+// naive solution, consider optimizing for performance if becomes an issue
+useEditorStore.subscribe(
+  (store) => store.files,
+  (files) => {
+    const isModified = !isEqual(files, useInstrumentStore.getState().selectedInstrument.files);
+    useEditorStore.setState({ isModified });
+  }
 );
 
 useInstrumentStore.subscribe(
