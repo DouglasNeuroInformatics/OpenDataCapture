@@ -33,6 +33,7 @@ type InstrumentStore = {
   resetInstruments: () => void;
   selectedInstrument: InstrumentStoreItem;
   setSelectedInstrument: (id: string) => void;
+  updateSelectedInstrument: (update: Pick<InstrumentStoreItem, 'files'>) => void;
 };
 
 const createStoreItems = async (
@@ -190,6 +191,15 @@ export const useInstrumentStore = create(
               console.error(`Failed to find instrument with ID: ${id}`);
             }
             return { selectedInstrument: instrument ?? defaultInstrument };
+          });
+        },
+        updateSelectedInstrument: (update) => {
+          set(({ instruments, selectedInstrument }) => {
+            const updatedInstruments = [...instruments];
+            const selectedIndex = updatedInstruments.findIndex((instrument) => instrument.id === selectedInstrument.id);
+            const updatedSelectedInstrument = { ...selectedInstrument, ...update };
+            updatedInstruments[selectedIndex] = updatedSelectedInstrument;
+            return { instruments: updatedInstruments, selectedInstrument: updatedSelectedInstrument };
           });
         }
       }),
