@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { ContextMenu } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
@@ -6,8 +6,10 @@ import { motion } from 'framer-motion';
 import { Columns3Icon, FilePlusIcon, TrashIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 
+import type { EditorFile } from '@/models/editor-file.model';
 import { useEditorStore } from '@/store/editor.store';
 
+import { DeleteFileDialog } from './DeleteFileDialog';
 import { EditorAddFileButton } from './EditorAddFileButton';
 import { EditorButton } from './EditorButton';
 import { EditorEmptyState } from './EditorEmptyState';
@@ -21,16 +23,17 @@ import './setup';
 export const Editor = () => {
   const [isAddFileOpen, setIsAddFileOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { addFile, deleteFile, files, openFiles, selectFile, selectedFile } = useEditorStore(
-    useShallow(({ addFile, deleteFile, files, openFiles, selectFile, selectedFile }) => ({
+  const [isDeleteFileDialogOpen, setIsDeleteFileDialogOpen] = useState(false);
+  const { addFile, files, openFiles, selectFile, selectedFile } = useEditorStore(
+    useShallow(({ addFile, files, openFiles, selectFile, selectedFile }) => ({
       addFile,
-      deleteFile,
       files,
       openFiles,
       selectFile,
       selectedFile
     }))
   );
+  const deleteFileRef = useRef<EditorFile | null>(null);
 
   return (
     <div className="flex h-full w-full flex-col border border-r-0 bg-slate-50 dark:bg-slate-800">
@@ -71,7 +74,13 @@ export const Editor = () => {
                   </button>
                 </ContextMenu.Trigger>
                 <ContextMenu.Content className="w-64">
-                  <ContextMenu.Item onSelect={() => deleteFile(file)}>
+                  <ContextMenu.Item
+                    disabled={file.name.startsWith('index')}
+                    onSelect={() => {
+                      deleteFileRef.current = file;
+                      setIsDeleteFileDialogOpen(true);
+                    }}
+                  >
                     <TrashIcon />
                     <span className="ml-2 text-sm">Delete</span>
                   </ContextMenu.Item>
@@ -99,6 +108,11 @@ export const Editor = () => {
         </motion.div>
         {openFiles.length ? <EditorPane /> : <EditorEmptyState />}
       </div>
+      <DeleteFileDialog
+        file={deleteFileRef.current}
+        isOpen={isDeleteFileDialogOpen}
+        setIsOpen={setIsDeleteFileDialogOpen}
+      />
     </div>
   );
 };
