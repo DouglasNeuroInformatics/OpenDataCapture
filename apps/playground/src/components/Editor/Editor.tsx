@@ -8,6 +8,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useEditorStore } from '@/store/editor.store';
+import { resolveIndexFile } from '@/utils/resolve';
 
 import { DeleteFileDialog } from './DeleteFileDialog';
 import { EditorAddFileButton } from './EditorAddFileButton';
@@ -34,6 +35,7 @@ export const Editor = () => {
     }))
   );
   const deleteFileRef = useRef<EditorFile | null>(null);
+  const indexFile = resolveIndexFile(files);
 
   return (
     <div className="flex h-full w-full flex-col border border-r-0 bg-slate-50 dark:bg-slate-800">
@@ -75,7 +77,7 @@ export const Editor = () => {
                 </ContextMenu.Trigger>
                 <ContextMenu.Content className="w-64">
                   <ContextMenu.Item
-                    disabled={file.name.startsWith('index')}
+                    disabled={file === indexFile}
                     onSelect={() => {
                       deleteFileRef.current = file;
                       setIsDeleteFileDialogOpen(true);
