@@ -1,8 +1,8 @@
+import { resolveIndexInput } from '@opendatacapture/instrument-bundler';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 import type { EditorFile } from '@/models/editor-file.model';
-import { resolveIndexFile } from '@/utils/resolve';
 
 import { useInstrumentStore } from './instrument.store';
 
@@ -14,7 +14,7 @@ type EditorStore = {
   openFiles: EditorFile[];
   selectFile: (file: EditorFile) => void;
   selectedFile: EditorFile | null;
-  setSelectedFileValue: (value: string) => void;
+  setSelectedFileContent: (content: string) => void;
 };
 
 const useEditorStore = create(
@@ -53,14 +53,14 @@ const useEditorStore = create(
       });
     },
     selectedFile: null,
-    setSelectedFileValue: (value) => {
+    setSelectedFileContent: (content) => {
       set(({ files, selectedFile }) => {
         if (!selectedFile) {
-          console.error('Cannot set value: selected file is undefined!');
+          console.error('Cannot set content: selected file is undefined!');
           return {};
         }
         const updatedFiles = [...files];
-        const updatedSelectedFile = { ...selectedFile, value };
+        const updatedSelectedFile = { ...selectedFile, content };
         updatedFiles[updatedFiles.indexOf(selectedFile)] = updatedSelectedFile;
         return { files: updatedFiles, selectedFile: updatedSelectedFile };
       });
@@ -71,7 +71,7 @@ const useEditorStore = create(
 useInstrumentStore.subscribe(
   (store) => store.selectedInstrument,
   (selectedInstrument) => {
-    const indexFile = resolveIndexFile(selectedInstrument.files);
+    const indexFile = resolveIndexInput(selectedInstrument.files);
     useEditorStore.setState({
       files: selectedInstrument.files,
       openFiles: indexFile ? [indexFile] : [],

@@ -2,14 +2,13 @@ import React, { useRef, useState } from 'react';
 
 import { ContextMenu } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
+import { extractInputFileExtension, resolveIndexInput } from '@opendatacapture/instrument-bundler';
 import { motion } from 'framer-motion';
 import { Columns3Icon, FilePlusIcon, TrashIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useEditorStore } from '@/store/editor.store';
-import { extractFileExtension } from '@/utils/file';
-import { resolveIndexFile } from '@/utils/resolve';
 
 import { DeleteFileDialog } from './DeleteFileDialog';
 import { EditorAddFileButton } from './EditorAddFileButton';
@@ -35,7 +34,7 @@ export const Editor = () => {
     }))
   );
   const deleteFileRef = useRef<EditorFile | null>(null);
-  const indexFile = resolveIndexFile(files);
+  const indexFile = resolveIndexInput(files);
 
   return (
     <div className="flex h-full w-full flex-col border border-r-0 bg-slate-50 dark:bg-slate-800">
@@ -94,12 +93,12 @@ export const Editor = () => {
               <EditorAddFileButton
                 onBlur={() => setIsAddFileOpen(false)}
                 onSubmit={(filename) => {
-                  const ext = extractFileExtension(filename);
+                  const ext = extractInputFileExtension(filename);
                   if (ext) {
                     addFile({
+                      content: '',
                       id: crypto.randomUUID(),
-                      name: filename,
-                      value: ''
+                      name: filename
                     });
                   }
                   setIsAddFileOpen(false);

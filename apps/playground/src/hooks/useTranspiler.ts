@@ -4,9 +4,7 @@ import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useSettingsStore } from '@/store/settings.store';
-import { type TranspilerError, parseTranspilerError } from '@/utils/error';
 import { hashFiles } from '@/utils/hash';
-import { resolveIndexFile } from '@/utils/resolve';
 
 import { useEditorFilesRef } from './useEditorFilesRef';
 import { useInstrumentBundler } from './useInstrumentBundler';
@@ -21,7 +19,7 @@ type BuiltState = {
 };
 
 type ErrorState = {
-  error: TranspilerError;
+  error: Error;
   status: 'error';
 };
 
@@ -38,17 +36,16 @@ export function useTranspiler(): TranspilerState {
   const [state, setState] = useState<TranspilerState>({ status: 'initial' });
   const instrumentBundler = useInstrumentBundler();
 
-  const transpile = useCallback(async (files: EditorFile[]) => {
-    const source = resolveIndexFile(files).value;
+  const transpile = useCallback(async (inputs: EditorFile[]) => {
     setState({ status: 'building' });
     let bundle: string;
     try {
-      bundle = await instrumentBundler.generateBundle({ source });
+      bundle = await instrumentBundler.bundle({ inputs });
       setState({ bundle, status: 'built' });
     } catch (err) {
-      setState({ error: parseTranspilerError(err), status: 'error' });
+      setState({ error: err instanceof Error ? err : new Error('Unexpected Error', { cause: err }), status: 'error' });
     } finally {
-      setFilesHash(await hashFiles(files));
+      setFilesHash(await hashFiles(inputs));
     }
   }, []);
 

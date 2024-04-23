@@ -1,26 +1,25 @@
 import React from 'react';
 
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import type { InstrumentBuildFailureError } from '@opendatacapture/instrument-bundler/error';
+import { type InstrumentBundlerBuildError, resolveIndexInput } from '@opendatacapture/instrument-bundler';
 import { range } from 'lodash-es';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
-import { resolveIndexFile } from '@/utils/resolve';
 
 export type CodeErrorBlockProps = {
-  error: InstrumentBuildFailureError;
+  error: InstrumentBundlerBuildError;
 };
 
 export const CodeErrorBlock = ({ error }: CodeErrorBlockProps) => {
   const editorFilesRef = useEditorFilesRef();
-  const indexFile = resolveIndexFile(editorFilesRef.current);
-  const location = error.errors[0].location;
+  const indexFile = resolveIndexInput(editorFilesRef.current);
+  const location = error.cause.errors[0].location;
 
   if (!location) {
     return null;
   }
 
-  const lines = indexFile.value.split('\n');
+  const lines = indexFile.content.split('\n');
   const indexOfError = lines.indexOf(location.lineText);
 
   if (indexOfError === -1) {

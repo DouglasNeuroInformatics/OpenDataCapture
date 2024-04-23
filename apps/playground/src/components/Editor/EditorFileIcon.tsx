@@ -1,9 +1,8 @@
 import React from 'react';
 
+import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
 import { FileIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
-
-import { extractFileExtension } from '@/utils/file';
 
 export type EditorFileIconProps = {
   filename: string;
@@ -12,7 +11,7 @@ export type EditorFileIconProps = {
 export const EditorFileIcon = ({ filename }: EditorFileIconProps) => {
   return (
     <div className="h-auto w-4 fill-sky-700">
-      {match(extractFileExtension(filename))
+      {match(extractInputFileExtension(filename))
         .with('.css', () => (
           <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
             <polygon

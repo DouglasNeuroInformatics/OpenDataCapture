@@ -25,6 +25,7 @@ export default defineConfig({
       reportsDirectory: path.resolve(import.meta.dirname, 'coverage'),
       skipFull: true
     },
+    include: ['**/*/test.?(c|m)[jt]s?(x)', '**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     watch: false
   }
 });

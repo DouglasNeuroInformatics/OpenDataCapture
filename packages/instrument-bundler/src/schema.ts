@@ -1,5 +1,6 @@
-import type { BuildFailure, Location, Message } from 'esbuild';
 import { z } from 'zod';
+
+import type { BuildFailure, Location, Message } from './vendor/esbuild.js';
 
 const $Location: z.ZodType<Location> = z.object({
   column: z.number(),

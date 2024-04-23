@@ -14,7 +14,7 @@ export const DownloadButton = () => {
   const downloadFiles = async () => {
     const files = editorFilesRef.current;
     for (const file of files) {
-      await download(file.name, () => file.value);
+      await download(file.name, () => file.content);
     }
   };
 

@@ -11,12 +11,12 @@ import { inferFileLanguage } from '@/utils/file';
 import type { MonacoEditorType, MonacoType } from './types';
 
 export const EditorPane = () => {
-  const { selectedFile, setSelectedFileValue } = useStoreWithEqualityFn(
+  const { selectedFile, setSelectedFileContent } = useStoreWithEqualityFn(
     useEditorStore,
-    ({ selectedFile, setSelectedFileValue }) => {
-      return { selectedFile, setSelectedFileValue };
+    ({ selectedFile, setSelectedFileContent }) => {
+      return { selectedFile, setSelectedFileContent };
     },
-    (a, b) => a.setSelectedFileValue === b.setSelectedFileValue && a.selectedFile?.id === b.selectedFile?.id
+    (a, b) => a.setSelectedFileContent === b.setSelectedFileContent && a.selectedFile?.id === b.selectedFile?.id
   );
 
   const [theme] = useTheme();
@@ -52,7 +52,7 @@ export const EditorPane = () => {
     <MonacoEditor
       className="h-full min-h-[576px]"
       defaultLanguage={defaultLanguage ?? undefined}
-      defaultValue={selectedFile?.value}
+      defaultValue={selectedFile?.content}
       key={selectedFile?.id}
       options={{
         automaticLayout: true,
@@ -74,7 +74,7 @@ export const EditorPane = () => {
       path={selectedFile?.name}
       theme={`odc-${theme}`}
       onChange={(value) => {
-        setSelectedFileValue(value ?? '');
+        setSelectedFileContent(value ?? '');
       }}
       onMount={handleEditorDidMount}
     />

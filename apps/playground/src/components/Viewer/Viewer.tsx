@@ -6,7 +6,6 @@ import { P, match } from 'ts-pattern';
 
 import { useTranspiler } from '@/hooks/useTranspiler';
 import { useViewerStore } from '@/store/viewer.store';
-import { parseTranspilerError } from '@/utils/error';
 
 import { CompileErrorFallback } from './CompileErrorFallback';
 
@@ -19,7 +18,7 @@ export const Viewer = () => {
         .with({ status: 'built' }, ({ bundle }) => (
           <InstrumentRenderer
             bundle={bundle}
-            customErrorFallback={({ error }) => <CompileErrorFallback error={parseTranspilerError(error)} />}
+            customErrorFallback={CompileErrorFallback}
             options={{ validate: true }}
             onSubmit={(data) => {
               // eslint-disable-next-line no-alert

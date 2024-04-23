@@ -9,6 +9,6 @@ export async function sha256(source: string) {
   return resultBytes.map((x) => x.toString(16).padStart(2, '0')).join('');
 }
 
-export function hashFiles(files: EditorFile[]) {
-  return sha256(files.map((file) => file.value).join());
+export async function hashFiles(files: EditorFile[]) {
+  return sha256(files.map((file) => file.content).join());
 }

@@ -797,6 +797,9 @@ importers:
 
   packages/instrument-bundler:
     dependencies:
+      '@opendatacapture/runtime-v1':
+        specifier: workspace:*
+        version: link:../../runtime/v1
       commander:
         specifier: ^12.0.0
         version: 12.0.0
