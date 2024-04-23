@@ -66,7 +66,8 @@ export const Editor = () => {
                   <button
                     className={cn(
                       'flex w-full items-center gap-2 p-2 text-sm',
-                      selectedFile?.name === file.name && !isAddFileOpen && 'bg-slate-100 dark:bg-slate-700'
+                      selectedFile?.name === file.name && !isAddFileOpen && 'bg-slate-100 dark:bg-slate-700',
+                      file === indexFile && 'font-medium'
                     )}
                     type="button"
                     onClick={() => selectFile(file)}
