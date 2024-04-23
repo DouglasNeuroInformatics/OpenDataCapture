@@ -1,10 +1,11 @@
 import React from 'react';
 
-import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { DownloadIcon } from 'lucide-react';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
+
+import { ActionButton } from '../ActionButton';
 
 export const DownloadButton = () => {
   const download = useDownload();
@@ -18,16 +19,12 @@ export const DownloadButton = () => {
   };
 
   return (
-    <Button
-      className="h-9 w-9"
-      size="icon"
-      type="button"
-      variant="outline"
+    <ActionButton
+      icon={<DownloadIcon />}
+      tooltip="Download"
       onClick={() => {
         void downloadFiles();
       }}
-    >
-      <DownloadIcon />
-    </Button>
+    />
   );
 };

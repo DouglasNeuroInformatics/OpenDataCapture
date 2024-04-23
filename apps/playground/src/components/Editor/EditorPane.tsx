@@ -54,6 +54,7 @@ export const EditorPane = () => {
       options={{
         automaticLayout: true,
         codeLens: false,
+        contextmenu: false,
         minimap: {
           enabled: false
         },

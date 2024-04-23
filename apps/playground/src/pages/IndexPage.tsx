@@ -5,37 +5,44 @@ import { Separator } from '@douglasneuroinformatics/libui/components';
 import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
 import { useInstrumentStore } from '@/store/instrument.store';
-import { decodeFiles } from '@/utils/encode';
-import { hashFiles } from '@/utils/hash';
+import { decodeShareURL } from '@/utils/encode';
 
 const IndexPage = () => {
   const addInstrument = useInstrumentStore((store) => store.addInstrument);
   const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
+  const removeInstrument = useInstrumentStore((store) => store.removeInstrument);
+  const instruments = useInstrumentStore((store) => store.instruments);
 
-  const addShareInstrument = async (encodedFiles: string) => {
-    const files = decodeFiles(encodedFiles);
-    const id = await hashFiles(files);
+  useEffect(() => {
+    let id: null | string = null;
     try {
+      const instrument = decodeShareURL(new URL(location.href));
+      if (!instrument) {
+        return;
+      }
+      id = crypto.randomUUID();
+      let suffixNumber = 1;
+      let uniqueLabel = instrument.label;
+      while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
+        uniqueLabel = `${instrument.label} (${suffixNumber})`;
+        suffixNumber++;
+      }
       addInstrument({
         category: 'Saved',
-        files,
+        files: instrument.files,
         id,
         kind: 'UNKNOWN',
-        label: id.slice(0, 8)
+        label: uniqueLabel
       });
+      setSelectedInstrument(id);
     } catch (err) {
       console.error(err);
     }
-    setSelectedInstrument(id);
-  };
-
-  useEffect(() => {
-    const searchParams = new URL(location.href).searchParams;
-    const encodedFiles = searchParams.get('files');
-    if (!encodedFiles) {
-      return;
-    }
-    addShareInstrument(encodedFiles).catch(console.error);
+    return () => {
+      if (id) {
+        removeInstrument(id);
+      }
+    };
   }, [location.href]);
 
   return (

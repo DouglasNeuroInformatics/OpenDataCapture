@@ -13,7 +13,7 @@ import type { EditorFile } from '@/models/editor-file.model';
 import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
 import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
 import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
-import { hashFiles, sha256 } from '@/utils/hash';
+import { sha256 } from '@/utils/hash';
 
 type InstrumentCategory = 'Examples' | 'Saved' | 'Templates';
 
@@ -33,6 +33,7 @@ type InstrumentStore = {
   resetInstruments: () => void;
   selectedInstrument: InstrumentStoreItem;
   setSelectedInstrument: (id: string) => void;
+  updateSelectedInstrument: (update: Pick<InstrumentStoreItem, 'files'>) => void;
 };
 
 const createStoreItems = async (
@@ -46,7 +47,7 @@ const createStoreItems = async (
       return {
         ...instrument,
         files,
-        id: await hashFiles(files)
+        id: crypto.randomUUID()
       };
     })
   );
@@ -145,7 +146,7 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     files: [
       {
         language: 'typescript',
-        name: 'index.tsx',
+        name: 'index.ts',
         value: interactiveWithCssIndex
       },
       {
@@ -190,6 +191,15 @@ export const useInstrumentStore = create(
               console.error(`Failed to find instrument with ID: ${id}`);
             }
             return { selectedInstrument: instrument ?? defaultInstrument };
+          });
+        },
+        updateSelectedInstrument: (update) => {
+          set(({ instruments, selectedInstrument }) => {
+            const updatedInstruments = [...instruments];
+            const selectedIndex = updatedInstruments.findIndex((instrument) => instrument.id === selectedInstrument.id);
+            const updatedSelectedInstrument = { ...selectedInstrument, ...update };
+            updatedInstruments[selectedIndex] = updatedSelectedInstrument;
+            return { instruments: updatedInstruments, selectedInstrument: updatedSelectedInstrument };
           });
         }
       }),
