@@ -1,7 +1,8 @@
 import type { BuildOptions, BuildResult, Metafile } from 'esbuild';
 import type { ValueOf } from 'type-fest';
 
-import { InstrumentBundlerError } from './error.js';
+import { InstrumentBuildFailureError, InstrumentBundlerError } from './error.js';
+import { $BuildFailure } from './schema.js';
 
 import type { BundleOptions, InstrumentBundlerOptions, RequireResolve } from './types.js';
 
@@ -37,21 +38,29 @@ export class InstrumentBundler {
     };
   }
 
-  private build(source: string, options: BuildOptions = {}) {
-    return esbuild.build({
-      format: 'esm',
-      metafile: true,
-      minify: true,
-      outfile: 'bundle.js',
-      platform: 'neutral',
-      stdin: {
-        contents: source,
-        loader: 'tsx'
-      },
-      target: 'es2022',
-      write: false,
-      ...options
-    });
+  private async build(source: string, options: BuildOptions = {}) {
+    let result: BuildResult;
+    try {
+      result = await esbuild.build({
+        format: 'esm',
+        metafile: true,
+        minify: true,
+        outfile: 'bundle.js',
+        platform: 'neutral',
+        stdin: {
+          contents: source,
+          loader: 'tsx'
+        },
+        target: 'es2022',
+        write: false,
+        ...options
+      });
+    } catch (err) {
+      throw new InstrumentBuildFailureError({
+        cause: await $BuildFailure.parseAsync(err)
+      });
+    }
+    return result;
   }
 
   private getBuiltCode(result: BuildResult) {

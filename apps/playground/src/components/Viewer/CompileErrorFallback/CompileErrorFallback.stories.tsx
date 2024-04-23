@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
+import { parseTranspilerError } from '@/utils/error';
+
 import { CompileErrorFallback } from './CompileErrorFallback';
 
 type Story = StoryObj<typeof CompileErrorFallback>;
@@ -12,7 +14,7 @@ function createError() {
       })();
     })();
   } catch (err) {
-    return err as Error;
+    return parseTranspilerError(err);
   }
 }
 

@@ -58,7 +58,6 @@ const templates: InstrumentStoreItem[] = await createStoreItems([
     category: 'Templates',
     files: [
       {
-        language: 'typescript',
         name: 'index.ts',
         value: unilingualForm
       }
@@ -70,7 +69,6 @@ const templates: InstrumentStoreItem[] = await createStoreItems([
     category: 'Templates',
     files: [
       {
-        language: 'typescript',
         name: 'index.ts',
         value: multilingualForm
       }
@@ -82,7 +80,6 @@ const templates: InstrumentStoreItem[] = await createStoreItems([
     category: 'Templates',
     files: [
       {
-        language: 'typescript',
         name: 'index.ts',
         value: interactiveInstrument
       }
@@ -97,7 +94,6 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
         name: 'index.ts',
         value: formWithGroups
       }
@@ -109,7 +105,6 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
         name: 'index.ts',
         value: formWithSimpleDynamicField
       }
@@ -121,7 +116,6 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
         name: 'index.ts',
         value: formReference
       }
@@ -133,7 +127,6 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
         name: 'index.tsx',
         value: interactiveWithReact
       }
@@ -145,12 +138,10 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
         name: 'index.ts',
         value: interactiveWithCssIndex
       },
       {
-        language: 'css',
         name: 'style.css',
         value: interactiveWithCssStyle
       }

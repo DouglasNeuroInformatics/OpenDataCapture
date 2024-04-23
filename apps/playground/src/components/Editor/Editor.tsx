@@ -8,6 +8,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useEditorStore } from '@/store/editor.store';
+import { extractFileExtension } from '@/utils/file';
 import { resolveIndexFile } from '@/utils/resolve';
 
 import { DeleteFileDialog } from './DeleteFileDialog';
@@ -17,7 +18,6 @@ import { EditorEmptyState } from './EditorEmptyState';
 import { EditorFileIcon } from './EditorFileIcon';
 import { EditorPane } from './EditorPane';
 import { EditorTab } from './EditorTab';
-import { fileExtRegex } from './utils';
 
 import './setup';
 
@@ -94,11 +94,10 @@ export const Editor = () => {
               <EditorAddFileButton
                 onBlur={() => setIsAddFileOpen(false)}
                 onSubmit={(filename) => {
-                  const ext = filename.match(fileExtRegex)?.[0];
+                  const ext = extractFileExtension(filename);
                   if (ext) {
                     addFile({
                       id: crypto.randomUUID(),
-                      language: 'typescript',
                       name: filename,
                       value: ''
                     });

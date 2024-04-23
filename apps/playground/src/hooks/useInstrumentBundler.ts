@@ -4,6 +4,7 @@ import { InstrumentBundler } from '@opendatacapture/instrument-bundler';
 import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
 import { useEditorStore } from '@/store/editor.store';
+import { inferFileLanguage } from '@/utils/file';
 
 const { initialize } = await import('esbuild-wasm');
 await initialize({
@@ -24,8 +25,10 @@ export function useInstrumentBundler() {
         const file = editorStore.files.find((file) => file.name === filename);
         if (!file) {
           return null;
-        } else if (file.language !== 'css') {
-          throw new Error(`Unsupported language: ${file.language}`);
+        }
+        const language = inferFileLanguage(file?.name);
+        if (language !== 'css') {
+          throw new Error(`Unsupported language: ${language}`);
         }
         return `String.raw\`${file.value}\``;
       }

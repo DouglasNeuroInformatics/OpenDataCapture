@@ -1,11 +1,10 @@
 import { useCallback, useState } from 'react';
 
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
-import { ZodError } from 'zod';
-import { fromZodError } from 'zod-validation-error';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useSettingsStore } from '@/store/settings.store';
+import { type TranspilerError, parseTranspilerError } from '@/utils/error';
 import { hashFiles } from '@/utils/hash';
 import { resolveIndexFile } from '@/utils/resolve';
 
@@ -22,7 +21,7 @@ type BuiltState = {
 };
 
 type ErrorState = {
-  error: Error;
+  error: TranspilerError;
   status: 'error';
 };
 
@@ -47,21 +46,7 @@ export function useTranspiler(): TranspilerState {
       bundle = await instrumentBundler.generateBundle({ source });
       setState({ bundle, status: 'built' });
     } catch (err) {
-      console.error(err);
-      let transpilerError: Error;
-      if (typeof err === 'string') {
-        transpilerError = new Error(err, { cause: err });
-      } else if (err instanceof ZodError) {
-        const validationError = fromZodError(err, {
-          prefix: 'Instrument Validation Failed'
-        });
-        transpilerError = new Error(validationError.message, { cause: err });
-      } else if (err instanceof Error) {
-        transpilerError = new Error(err.message, { cause: err });
-      } else {
-        transpilerError = new Error('Unknown Error', { cause: err });
-      }
-      setState({ error: transpilerError, status: 'error' });
+      setState({ error: parseTranspilerError(err), status: 'error' });
     } finally {
       setFilesHash(await hashFiles(files));
     }

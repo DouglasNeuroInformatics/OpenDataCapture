@@ -6,6 +6,7 @@ import { useStoreWithEqualityFn } from 'zustand/traditional';
 
 import { useRuntime } from '@/hooks/useRuntime';
 import { useEditorStore } from '@/store/editor.store';
+import { inferFileLanguage } from '@/utils/file';
 
 import type { MonacoEditorType, MonacoType } from './types';
 
@@ -45,10 +46,12 @@ export const EditorPane = () => {
     setIsMounted(true);
   };
 
+  const defaultLanguage = selectedFile ? inferFileLanguage(selectedFile.name) : null;
+
   return (
     <MonacoEditor
       className="h-full min-h-[576px]"
-      defaultLanguage={selectedFile?.language}
+      defaultLanguage={defaultLanguage ?? undefined}
       defaultValue={selectedFile?.value}
       key={selectedFile?.id}
       options={{
