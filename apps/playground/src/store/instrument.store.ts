@@ -3,16 +3,16 @@ import type { OmitDeep } from 'type-fest';
 import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 
-import formReference from '@/examples/form/form-reference.instrument?raw';
-import formWithGroups from '@/examples/form/form-with-groups.instrument?raw';
-import formWithSimpleDynamicField from '@/examples/form/form-with-simple-dynamic-field.instrument?raw';
-import interactiveWithReact from '@/examples/interactive/interactive-with-react.instrument?raw';
-import interactiveWithCssIndex from '@/examples/interactive-with-css/index.ts?raw';
-import interactiveWithCssStyle from '@/examples/interactive-with-css/style.css?raw';
+import formReference from '@/examples/form/reference?raw';
+import formWithGroups from '@/examples/form/with-groups?raw';
+import formWithSimpleDynamicField from '@/examples/form/with-simple-dynamic-field?raw';
+import interactiveWithCssStyle from '@/examples/interactive/with-css/style.css?raw';
+import interactiveWithCssIndex from '@/examples/interactive/with-css?raw';
+import interactiveWithReact from '@/examples/interactive/with-react?raw';
 import type { EditorFile } from '@/models/editor-file.model';
-import multilingualForm from '@/templates/form/multilingual-form.instrument?raw';
-import unilingualForm from '@/templates/form/unilingual-form.instrument?raw';
-import interactiveInstrument from '@/templates/interactive/interactive.instrument?raw';
+import multilingualForm from '@/templates/form/multilingual?raw';
+import unilingualForm from '@/templates/form/unilingual?raw';
+import interactiveInstrument from '@/templates/interactive?raw';
 import { sha256 } from '@/utils/hash';
 
 type InstrumentCategory = 'Examples' | 'Saved' | 'Templates';
@@ -42,7 +42,7 @@ const createStoreItems = async (
   return Promise.all(
     instruments.map(async (instrument) => {
       const files: EditorFile[] = await Promise.all(
-        instrument.files.map(async (file) => ({ ...file, id: await sha256(file.value) }))
+        instrument.files.map(async (file) => ({ ...file, id: await sha256(file.content) }))
       );
       return {
         ...instrument,
@@ -58,9 +58,8 @@ const templates: InstrumentStoreItem[] = await createStoreItems([
     category: 'Templates',
     files: [
       {
-        language: 'typescript',
-        name: 'index.ts',
-        value: unilingualForm
+        content: unilingualForm,
+        name: 'index.ts'
       }
     ],
     kind: 'FORM',
@@ -70,9 +69,8 @@ const templates: InstrumentStoreItem[] = await createStoreItems([
     category: 'Templates',
     files: [
       {
-        language: 'typescript',
-        name: 'index.ts',
-        value: multilingualForm
+        content: multilingualForm,
+        name: 'index.ts'
       }
     ],
     kind: 'FORM',
@@ -82,9 +80,8 @@ const templates: InstrumentStoreItem[] = await createStoreItems([
     category: 'Templates',
     files: [
       {
-        language: 'typescript',
-        name: 'index.ts',
-        value: interactiveInstrument
+        content: interactiveInstrument,
+        name: 'index.ts'
       }
     ],
     kind: 'INTERACTIVE',
@@ -97,9 +94,8 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
-        name: 'index.ts',
-        value: formWithGroups
+        content: formWithGroups,
+        name: 'index.ts'
       }
     ],
     kind: 'FORM',
@@ -109,9 +105,8 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
-        name: 'index.ts',
-        value: formWithSimpleDynamicField
+        content: formWithSimpleDynamicField,
+        name: 'index.ts'
       }
     ],
     kind: 'FORM',
@@ -121,9 +116,8 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
-        name: 'index.ts',
-        value: formReference
+        content: formReference,
+        name: 'index.ts'
       }
     ],
     kind: 'FORM',
@@ -133,9 +127,8 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
-        name: 'index.tsx',
-        value: interactiveWithReact
+        content: interactiveWithReact,
+        name: 'index.tsx'
       }
     ],
     kind: 'INTERACTIVE',
@@ -145,14 +138,12 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        language: 'typescript',
-        name: 'index.ts',
-        value: interactiveWithCssIndex
+        content: interactiveWithCssIndex,
+        name: 'index.ts'
       },
       {
-        language: 'css',
-        name: 'style.css',
-        value: interactiveWithCssStyle
+        content: interactiveWithCssStyle,
+        name: 'style.css'
       }
     ],
     kind: 'INTERACTIVE',

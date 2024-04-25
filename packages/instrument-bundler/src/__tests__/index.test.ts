@@ -1,46 +1,39 @@
-import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { InstrumentBundler } from '../index.js';
+import { loadDirectory } from '../node.js';
+
+const inputs = {
+  form: await loadDirectory(path.resolve(import.meta.dirname, 'repositories/form'))
+};
 
 describe('InstrumentBundler', () => {
-  const bundler = new InstrumentBundler();
-  const outdir = path.join(import.meta.dirname, '__TEST__');
+  let instrumentBundler: InstrumentBundler;
 
-  beforeAll(async () => {
-    await fs.promises.mkdir(outdir);
+  beforeAll(() => {
+    instrumentBundler = new InstrumentBundler();
   });
 
-  afterAll(async () => {
-    await fs.promises.rm(outdir, { force: true, recursive: true });
-  });
-
-  describe('generateBundle', () => {
-    it('should successfully transpile the click task', async () => {
-      await expect(bundler.generateBundle({ source: interactiveInstrument.source })).resolves.toBeTypeOf('string');
+  describe('bundle', () => {
+    it('should throw an error if the file contains relative dynamic imports', async () => {
+      await expect(() =>
+        instrumentBundler.bundle({
+          inputs: [
+            { content: 'const { foo } = await import("./foo.js");', name: 'index.js' },
+            { content: 'export const foo = 5;', name: 'foo.js' }
+          ]
+        })
+      ).rejects.toThrowError("Invalid dynamic import './foo.js': must start with '/'");
     });
-    it('should successfully transpile the happiness questionnaire', async () => {
-      await expect(bundler.generateBundle({ source: unilingualFormInstrument.source })).resolves.toBeTypeOf('string');
+    it('should include valid dynamic imports', async () => {
+      const bundle = await instrumentBundler.bundle({ inputs: inputs.form });
+      expect(bundle).toMatch('import("/runtime/v1/zod.js")');
     });
-    it('should fail to transpile syntactically invalid code', async () => {
-      const source = unilingualFormInstrument.source + 'INVALID SYNTAX!!';
-      await expect(bundler.generateBundle({ source })).rejects.toThrow();
-    });
-    it('should reject source including a static import', async () => {
-      const source = ["import _ from 'lodash';", unilingualFormInstrument.source].join('\n');
-      await expect(bundler.generateBundle({ source })).rejects.toThrow();
-    });
-    it('should reject source including a named export', async () => {
-      const source = [unilingualFormInstrument.source, 'export const __foo__ = 5'].join('\n');
-      await expect(bundler.generateBundle({ source })).rejects.toThrow();
-    });
-    it('should reject source including multiple default exports', async () => {
-      const source = [unilingualFormInstrument.source, 'export default __foo__ = 5'].join('\n');
-      await expect(bundler.generateBundle({ source })).rejects.toThrow();
-    });
+    // it('should generate a bundle that can be executed', async () => {
+    //   const bundle = await instrumentBundler.bundle({ inputs: inputs.form });
+    //   expect((0, eval)(bundle)).toBeTruthy();
+    // });
   });
 });

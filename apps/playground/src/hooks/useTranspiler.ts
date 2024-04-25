@@ -1,13 +1,10 @@
 import { useCallback, useState } from 'react';
 
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
-import { ZodError } from 'zod';
-import { fromZodError } from 'zod-validation-error';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useSettingsStore } from '@/store/settings.store';
 import { hashFiles } from '@/utils/hash';
-import { resolveIndexFile } from '@/utils/resolve';
 
 import { useEditorFilesRef } from './useEditorFilesRef';
 import { useInstrumentBundler } from './useInstrumentBundler';
@@ -39,31 +36,16 @@ export function useTranspiler(): TranspilerState {
   const [state, setState] = useState<TranspilerState>({ status: 'initial' });
   const instrumentBundler = useInstrumentBundler();
 
-  const transpile = useCallback(async (files: EditorFile[]) => {
-    const source = resolveIndexFile(files).value;
+  const transpile = useCallback(async (inputs: EditorFile[]) => {
     setState({ status: 'building' });
     let bundle: string;
     try {
-      bundle = await instrumentBundler.generateBundle({ source });
+      bundle = await instrumentBundler.bundle({ inputs });
       setState({ bundle, status: 'built' });
     } catch (err) {
-      console.error(err);
-      let transpilerError: Error;
-      if (typeof err === 'string') {
-        transpilerError = new Error(err, { cause: err });
-      } else if (err instanceof ZodError) {
-        const validationError = fromZodError(err, {
-          prefix: 'Instrument Validation Failed'
-        });
-        transpilerError = new Error(validationError.message, { cause: err });
-      } else if (err instanceof Error) {
-        transpilerError = new Error(err.message, { cause: err });
-      } else {
-        transpilerError = new Error('Unknown Error', { cause: err });
-      }
-      setState({ error: transpilerError, status: 'error' });
+      setState({ error: err instanceof Error ? err : new Error('Unexpected Error', { cause: err }), status: 'error' });
     } finally {
-      setFilesHash(await hashFiles(files));
+      setFilesHash(await hashFiles(inputs));
     }
   }, []);
 

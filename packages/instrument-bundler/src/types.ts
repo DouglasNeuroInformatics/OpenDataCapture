@@ -1,9 +1,10 @@
+export type BundlerInput = {
+  content: string;
+  name: string;
+};
+
 export type BundleOptions = {
-  source: string;
+  inputs: BundlerInput[];
 };
 
-export type RequireResolve = (id: string) => any;
-
-export type InstrumentBundlerOptions = {
-  resolve?: RequireResolve;
-};
+export type BundlerInputFileExtension = '.css' | '.js' | '.jsx' | '.ts' | '.tsx';

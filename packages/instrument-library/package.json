@@ -8,7 +8,7 @@
     "./interactive/*": "./dist/interactive/*"
   },
   "scripts": {
-    "build": "instrument-bundler --clean --declaration --ignore '**/*/reaction-time-task.js' --outdir dist src",
+    "build": "instrument-bundler --clean --declaration --outdir dist src",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },

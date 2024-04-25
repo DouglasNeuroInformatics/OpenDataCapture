@@ -262,8 +262,13 @@ export const $InstrumentSummary = $BaseInstrument
 
 export type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 export const $CreateInstrumentData = z.object({
-  kind: $InstrumentKind.optional(),
-  source: z.string().min(1)
+  inputs: z.array(
+    z.object({
+      content: z.string(),
+      name: z.string()
+    })
+  ),
+  kind: $InstrumentKind.optional()
 });
 
 export type InstrumentBundleContainer = z.infer<typeof $InstrumentBundleContainer>;

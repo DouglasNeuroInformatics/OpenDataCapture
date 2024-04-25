@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import { InstrumentBundler } from '@opendatacapture/instrument-bundler';
+import { type BundlerInput, InstrumentBundler } from '@opendatacapture/instrument-bundler';
 import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
 import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@opendatacapture/schemas/instrument';
 import type { Prisma } from '@prisma/client';
@@ -28,9 +28,9 @@ export class InstrumentsService {
     return this.instrumentModel.count({ where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), filter] } });
   }
 
-  async create<TKind extends InstrumentKind>({ kind, source }: CreateInstrumentDto<TKind>) {
+  async create<TKind extends InstrumentKind>({ inputs, kind }: CreateInstrumentDto<TKind>) {
     this.logger.debug('Attempting to parse instrument source...');
-    const bundle = await this.parseSource(source);
+    const bundle = await this.parseInputs(inputs);
     this.logger.debug('Done parsing source for instrument');
 
     return this.createFromBundle(bundle, { kind });
@@ -130,13 +130,13 @@ export class InstrumentsService {
   }
 
   /**
-   * Attempt to resolve an instance of an instrument from the TypeScript source code.
+   * Attempt to resolve an instance of an instrument from inputs.
    * If this fails, then throws an UnprocessableContentException
    */
-  private async parseSource(source: string) {
+  private async parseInputs(inputs: BundlerInput[]) {
     let bundle: string;
     try {
-      bundle = await this.instrumentBundler.generateBundle({ source });
+      bundle = await this.instrumentBundler.bundle({ inputs });
     } catch (err) {
       if (err instanceof Error) {
         this.logger.debug(err.cause);
