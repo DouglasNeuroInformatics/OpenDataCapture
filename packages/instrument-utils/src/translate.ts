@@ -80,7 +80,7 @@ function translateScalarField(field: FormInstrumentScalarField<Language[]>, lang
       options: field.options?.[language]
     }))
     .with(
-      { kind: 'number', variant: 'radio' },
+      { kind: 'number', variant: P.union('radio', 'select') },
       { kind: 'set' },
       { kind: 'string', variant: P.union('radio', 'select') },
       (field) => ({

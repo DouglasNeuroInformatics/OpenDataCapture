@@ -133,7 +133,7 @@ export const $FormInstrumentNumberField: z.ZodType<FormInstrumentNumberField> = 
   $FormInstrumentBaseField.extend({
     kind: z.literal('number'),
     options: $$InstrumentUIOption(z.record(z.string().min(1))),
-    variant: z.literal('radio')
+    variant: z.enum(['radio', 'select'])
   })
 ]);
 

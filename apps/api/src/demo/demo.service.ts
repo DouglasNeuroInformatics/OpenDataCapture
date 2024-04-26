@@ -169,6 +169,8 @@ export class DemoService {
         switch (field.variant) {
           case 'radio':
             throw new NotImplementedException();
+          case 'select':
+            throw new NotImplementedException();
           default:
             return faker.number.int({ max: field.max ?? 0, min: field.min });
         }
