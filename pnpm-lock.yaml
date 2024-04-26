@@ -20,8 +20,8 @@ importers:
         specifier: 4.2.1
         version: 4.2.1(eslint@8.57.0)(typescript@5.4.5)
       '@douglasneuroinformatics/libui-form-types':
-        specifier: ^0.6.8
-        version: 0.6.8
+        specifier: ^0.7.0
+        version: 0.7.0
       '@storybook/addon-essentials':
         specifier: ^8.0.8
         version: 8.0.8(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)
@@ -1050,9 +1050,6 @@ importers:
       '@casl/prisma':
         specifier: ^1.4.1
         version: 1.4.1(@casl/ability@6.7.1)(@prisma/client@5.12.1)
-      '@douglasneuroinformatics/libui-form-types':
-        specifier: ^0.7.0
-        version: 0.7.0
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../instrument-stubs
@@ -3215,13 +3212,6 @@ packages:
       type-fest: 4.15.0
       zod: 3.22.5
     dev: false
-
-  /@douglasneuroinformatics/libui-form-types@0.6.8:
-    resolution:
-      { integrity: sha512-ZlKKYYLmyUYGxkf5b9oQOV91/8p09saOHVEbBmXnBx3q0CHGGhDwv6CvO2Em/Qpi6uShRt9JMXVOY4MVGfmBcg== }
-    dependencies:
-      type-fest: 4.15.0
-    dev: true
 
   /@douglasneuroinformatics/libui-form-types@0.7.0:
     resolution:
