@@ -1,0 +1,32 @@
+---
+// prettier-ignore
+const data = new Map([
+  ['name', 'An identifier used to to associate multiple versions of the same instrument (e.g., across versions).'],
+  ['details', 'Information about the instrument to be displayed to the user. This is an object which contains a number of possible items, as documented below.'],
+  ['details.authors', 'The legal person(s) that created the instrument and hold copyright to the instrument.'],
+  ['details.description', 'A brief description of the instrument, such as the purpose and history of the instrument.'],
+  ['details.license', 'An identifier corresponding to the SPDX license list version d2709ad (released on 2024-01-30).'],
+  ['details.referenceUrl', 'A reference link where the user can learn more about the instrument.'],
+  ['details.sourceUrl', 'A URL where the user can find the source code for the instrument.'],
+  ['details.title', 'The title of the instrument in the language it is written, omitting the definite article.']
+]);
+---
+
+<table style="text-align: left; letter-spacing: -0.025em;">
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      Array.from(data.entries()).map(([key, description]) => (
+        <tr>
+          <td>{key}</td>
+          <td>{description}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

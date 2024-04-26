@@ -1,6 +1,8 @@
 const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
+import './styles.css';
+
 export default defineInstrument({
   content: {
     render(done) {
@@ -9,9 +11,6 @@ export default defineInstrument({
       const canvas = document.createElement('canvas');
       canvas.height = 320;
       canvas.width = 480;
-      canvas.style.background = '#eee;';
-      canvas.style.display = 'block';
-      canvas.style.margin = '0 auto';
       document.body.appendChild(canvas);
 
       const ctx = canvas.getContext('2d')!;

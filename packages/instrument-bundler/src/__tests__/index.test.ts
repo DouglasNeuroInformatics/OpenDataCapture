@@ -6,7 +6,8 @@ import { InstrumentBundler } from '../index.js';
 import { loadDirectory } from '../node.js';
 
 const inputs = {
-  form: await loadDirectory(path.resolve(import.meta.dirname, 'repositories/form'))
+  form: await loadDirectory(path.resolve(import.meta.dirname, 'repositories/form')),
+  interactive: await loadDirectory(path.resolve(import.meta.dirname, 'repositories/interactive'))
 };
 
 describe('InstrumentBundler', () => {
@@ -31,6 +32,23 @@ describe('InstrumentBundler', () => {
       const bundle = await instrumentBundler.bundle({ inputs: inputs.form });
       expect(bundle).toMatch('import("/runtime/v1/zod.js")');
     });
+    it('should bundle css', async () => {
+      await expect(instrumentBundler.bundle({ inputs: inputs.interactive })).resolves.toBeTypeOf('string');
+    });
+    it('should throw an error if the file contains non-side-effect css import ', async () => {
+      await expect(() =>
+        instrumentBundler.bundle({
+          inputs: [
+            {
+              content: 'import styles from "./styles.css"; var __exports = null; export default null;',
+              name: 'index.js'
+            },
+            { content: '', name: 'styles.css' }
+          ]
+        })
+      ).rejects.toThrowError("Invalid dynamic import './foo.js': must start with '/'");
+    });
+
     // it('should generate a bundle that can be executed', async () => {
     //   const bundle = await instrumentBundler.bundle({ inputs: inputs.form });
     //   expect((0, eval)(bundle)).toBeTruthy();

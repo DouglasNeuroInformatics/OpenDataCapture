@@ -6,7 +6,7 @@ import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middl
 import formReference from '@/examples/form/reference?raw';
 import formWithGroups from '@/examples/form/with-groups?raw';
 import formWithSimpleDynamicField from '@/examples/form/with-simple-dynamic-field?raw';
-import interactiveWithCssStyle from '@/examples/interactive/with-css/style.css?raw';
+import interactiveWithCssStyle from '@/examples/interactive/with-css/styles.css?raw';
 import interactiveWithCssIndex from '@/examples/interactive/with-css?raw';
 import interactiveWithReact from '@/examples/interactive/with-react?raw';
 import type { EditorFile } from '@/models/editor-file.model';
@@ -143,7 +143,7 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
       },
       {
         content: interactiveWithCssStyle,
-        name: 'style.css'
+        name: 'styles.css'
       }
     ],
     kind: 'INTERACTIVE',
@@ -197,7 +197,7 @@ export const useInstrumentStore = create(
       {
         name: 'instrument-storage',
         storage: createJSONStorage(() => localStorage),
-        version: 1
+        version: 2
       }
     )
   )

@@ -25,8 +25,8 @@ program.argument('<target>', 'the directory to search for instruments', (path: s
 });
 program.requiredOption('--outdir <path>', 'path to output directory');
 program.option('--clean', 'delete the output directory before build');
+program.option('--debug', 'disable minification');
 program.option('--declaration', 'emit typescript declarations');
-program.option('--ignore [patterns...]', 'glob patterns to ignore searching for entry points');
 program.option('--verbose', 'enable verbose mode');
 program.parse();
 
@@ -56,13 +56,12 @@ if (options.clean) {
   await fs.promises.rm(outputBase, { force: true, recursive: true });
 }
 
-const indexFiles = await glob(`${inputBase}/**/*/index.{js,jsx,ts,tsx}`, {
-  ignore: options.ignore as string[]
-});
+const indexFiles = await glob(`${inputBase}/**/*/index.{js,jsx,ts,tsx}`);
 
 const targetDirs = Array.from(new Set(indexFiles.map((filename) => path.dirname(filename))));
 
 const bundler = new InstrumentBundler();
+const debug = Boolean(options.debug);
 
 for (const targetDir of targetDirs) {
   logger.verbose(`Searching for entry in target directory: ${targetDir}`);
@@ -91,10 +90,19 @@ for (const targetDir of targetDirs) {
   }
 
   logger.verbose('Generating bundle...');
-  const bundle = await bundler.bundle({ inputs });
+  const bundle = await bundler.bundle({ debug, inputs });
 
   logger.verbose(`Writing output bundle to file: ${outputBundlePath}`);
-  await fs.promises.writeFile(outputBundlePath, `export default ${JSON.stringify(bundle)}`, 'utf-8');
+
+  if (options.debug) {
+    await fs.promises.writeFile(
+      outputBundlePath,
+      `export default \`${bundle.replace(/\\|`|\$/g, '\\$&')}\`;\n`,
+      'utf-8'
+    );
+  } else {
+    await fs.promises.writeFile(outputBundlePath, `export default ${JSON.stringify(bundle)}`, 'utf-8');
+  }
 
   if (options.declaration) {
     const declarationOutfile = outputBundlePath.replace(/\.js$/i, '.d.ts');

@@ -18,10 +18,11 @@ function done(data) {
 async function handleMessageEvent(event) {
   /** @type {InteractiveInstrument} */
   const instrument = await evaluateInstrument(event.data.payload);
-  instrument.content.assets?.css?.forEach((stylesheet) => {
-    document.head.insertAdjacentHTML('beforeend', `<style>${stylesheet}</style>`);
-    console.log(stylesheet);
-  });
+  const encodedStyle = instrument.content.__injectHead?.style;
+  if (encodedStyle) {
+    const style = atob(encodedStyle);
+    document.head.insertAdjacentHTML('beforeend', `<style>${style}</style>`);
+  }
   instrument.content.render(done);
 }
 

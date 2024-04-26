@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
+import module from 'module';
 import path from 'path';
-import url from 'url';
 
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
@@ -9,7 +9,7 @@ import { defineConfig, squooshImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const require = module.createRequire(import.meta.dirname);
 
 /** @typedef {NonNullable<import('astro').ViteUserConfig['plugins']>[number] } VitePluginOption */
 /** @typedef {Extract<VitePluginOption, { name: string}>} VitePlugin */
@@ -126,14 +126,14 @@ export default defineConfig({
     }),
     starlight({
       components: {
-        SiteTitle: path.resolve(__dirname, './src/components/SiteTitle.astro')
+        SiteTitle: path.resolve(import.meta.dirname, './src/components/SiteTitle.astro')
       },
-      customCss: [path.resolve(__dirname, './src/styles/starlight-custom.css')],
+      customCss: [path.resolve(import.meta.dirname, './src/styles/starlight-custom.css')],
       defaultLocale: 'en',
       favicon: '/favicon.ico',
       head: [
         {
-          content: await fs.readFile(path.resolve(__dirname, './src/scripts/theme-observer.js'), 'utf-8'),
+          content: await fs.readFile(path.resolve(import.meta.dirname, './src/scripts/theme-observer.js'), 'utf-8'),
           tag: 'script'
         }
       ],
@@ -177,7 +177,7 @@ export default defineConfig({
       title: 'Open Data Capture'
     }),
     tailwind({
-      configFile: path.resolve(__dirname, 'tailwind.config.cjs')
+      configFile: path.resolve(import.meta.dirname, 'tailwind.config.cjs')
     })
   ],
   markdown: {
@@ -209,6 +209,12 @@ export default defineConfig({
           docs: '../../docs'
         }
       })
-    ]
+    ],
+    // this is necessary because the MDX imports will attempt to resolve from their actual location
+    resolve: {
+      alias: {
+        '@astrojs/starlight': path.dirname(require.resolve('@astrojs/starlight'))
+      }
+    }
   }
 });
