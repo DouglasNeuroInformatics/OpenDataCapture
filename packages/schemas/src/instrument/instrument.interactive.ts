@@ -30,9 +30,10 @@ export const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $Uniling
   content: z.object({
     __injectHead: z
       .object({
-        style: z.string()
+        style: z.string().readonly()
       })
-      .optional(),
+      .optional()
+      .readonly(),
     render: z.function().args(z.any()).returns(z.any())
   }),
   details: $UnilingualEnhancedBaseInstrumentDetails,
