@@ -4,15 +4,14 @@ const { HtmlKeyboardResponsePlugin, ImageKeyboardResponsePlugin, PreloadPlugin, 
 const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
+// import blue from '../../assets/img/blue.png';
+// import orange from '../../assets/img/orange.png';
+
+const blue = '';
+const orange = '';
+
 export default defineInstrument({
   content: {
-    assets: {
-      css: [import.meta.require('jspsych/css/jspsych.css')],
-      img: {
-        blue: import.meta.require('../assets/img/blue.png'),
-        orange: import.meta.require('../assets/img/orange.png')
-      }
-    },
     render() {
       // First we have to initialize jsPsych
       const jsPsych = initJsPsych({
@@ -29,7 +28,7 @@ export default defineInstrument({
 
       // Preload images
       const preload = {
-        images: [this.assets?.img?.blue, this.assets?.img?.orange],
+        images: [blue, orange],
         type: PreloadPlugin
       };
       timeline.push(preload);
@@ -51,9 +50,9 @@ export default defineInstrument({
         <p>If the circle is <strong>orange</strong>, press the letter J 
         as fast as you can.</p>
         <div style='width: 700px;'>
-        <div style='float: left;'><img src='${this.assets?.img?.blue}'></img>
+        <div style='float: left;'><img src='${blue}'></img>
         <p class='small'><strong>Press the F key</strong></p></div>
-        <div style='float: right;'><img src='${this.assets?.img?.orange}'></img>
+        <div style='float: right;'><img src='${orange}'></img>
         <p class='small'><strong>Press the J key</strong></p></div>
         </div>
         <p>Press any key to begin.</p>
@@ -64,8 +63,8 @@ export default defineInstrument({
 
       // Define trial stimuli array for timeline variables
       const test_stimuli = [
-        { correct_response: 'f', stimulus: this.assets?.img?.blue },
-        { correct_response: 'j', stimulus: this.assets?.img?.orange }
+        { correct_response: 'f', stimulus: blue },
+        { correct_response: 'j', stimulus: orange }
       ];
 
       // Define fixation and test trials

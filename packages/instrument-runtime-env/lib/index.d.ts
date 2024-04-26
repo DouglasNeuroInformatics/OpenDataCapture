@@ -1,15 +1,21 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-type StyleExtension = 'css';
+declare module '*.png' {
+  const src: string;
+  export default src;
+}
 
-type ImageExtension = 'jpeg' | 'jpg' | 'png';
+declare module '*.jpg' {
+  const src: string;
+  export default src;
+}
 
-type RequiredFile<T extends string> = T extends `${string}.${StyleExtension}`
-  ? string
-  : T extends `${string}.${ImageExtension}`
-    ? string
-    : never;
+declare module '*.jpeg' {
+  const src: string;
+  export default src;
+}
 
-interface ImportMeta {
-  require<T extends string>(filepath: T): RequiredFile<T>;
+declare module '*.webp' {
+  const src: string;
+  export default src;
 }

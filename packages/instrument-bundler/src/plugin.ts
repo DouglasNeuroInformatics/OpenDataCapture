@@ -23,7 +23,6 @@ export const resolvePlugin = (options: { inputs: BundlerInput[] }): Plugin => {
       });
       build.onLoad({ filter: /.*/, namespace }, (args) => {
         const input = resolveInput(args.path, options.inputs);
-
         if (!input) {
           return {
             errors: [

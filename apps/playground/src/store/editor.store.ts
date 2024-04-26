@@ -17,6 +17,9 @@ type EditorStore = {
   setSelectedFileContent: (content: string) => void;
 };
 
+const { selectedInstrument: defaultSelectedInstrument } = useInstrumentStore.getState();
+const defaultIndexFile = resolveIndexInput(defaultSelectedInstrument.files);
+
 const useEditorStore = create(
   subscribeWithSelector<EditorStore>((set) => ({
     addFile: (file) => {
@@ -41,8 +44,8 @@ const useEditorStore = create(
         };
       });
     },
-    files: [],
-    openFiles: [],
+    files: defaultSelectedInstrument.files,
+    openFiles: [defaultIndexFile],
     selectFile: (file) => {
       set(({ openFiles }) => {
         const isOpen = openFiles.includes(file);
@@ -52,7 +55,7 @@ const useEditorStore = create(
         return { selectedFile: file };
       });
     },
-    selectedFile: null,
+    selectedFile: defaultIndexFile,
     setSelectedFileContent: (content) => {
       set(({ files, selectedFile }) => {
         if (!selectedFile) {
@@ -70,16 +73,16 @@ const useEditorStore = create(
 
 useInstrumentStore.subscribe(
   (store) => store.selectedInstrument,
-  (selectedInstrument) => {
+  (selectedInstrument, prevSelectedInstrument) => {
+    if (selectedInstrument.id === prevSelectedInstrument.id) {
+      return;
+    }
     const indexFile = resolveIndexInput(selectedInstrument.files);
     useEditorStore.setState({
       files: selectedInstrument.files,
       openFiles: indexFile ? [indexFile] : [],
       selectedFile: indexFile
     });
-  },
-  {
-    fireImmediately: true
   }
 );
 

@@ -417,6 +417,9 @@ importers:
 
   apps/outreach:
     dependencies:
+      '@opendatacapture/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21

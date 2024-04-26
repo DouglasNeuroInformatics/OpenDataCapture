@@ -4,7 +4,13 @@ export type BundlerInput = {
 };
 
 export type BundleOptions = {
+  debug?: boolean;
   inputs: BundlerInput[];
+};
+
+export type BuildOutput = {
+  css?: string;
+  js: string;
 };
 
 export type BundlerInputFileExtension = '.css' | '.js' | '.jsx' | '.ts' | '.tsx';

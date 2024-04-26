@@ -3,6 +3,8 @@
 const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
+import './styles.css';
+
 export default defineInstrument({
   kind: 'INTERACTIVE',
   language: 'en',
@@ -10,9 +12,6 @@ export default defineInstrument({
   tags: ['<PLACEHOLDER>'],
   version: 1.0,
   content: {
-    assets: {
-      css: [import.meta.require('./style.css')]
-    },
     render(done) {
       const button = document.createElement('button');
       button.classList.add('submit-button');
