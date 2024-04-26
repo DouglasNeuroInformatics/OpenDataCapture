@@ -21,7 +21,7 @@
     "tailwindcss": "3.x"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.0.9",
+    "@douglasneuroinformatics/libui": "^2.1.0",
     "@opendatacapture/schemas": "workspace:*",
     "i18next": "^23.11.2"
   }

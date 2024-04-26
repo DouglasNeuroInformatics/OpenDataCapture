@@ -52,6 +52,16 @@ export default defineInstrument({
           },
           variant: 'radio'
         },
+        numberSelect: {
+          kind: 'number',
+          label: 'Number (Select)',
+          options: {
+            1: 'Low',
+            2: 'Medium',
+            3: 'High'
+          },
+          variant: 'select'
+        },
         numberSlider: {
           kind: 'number',
           label: 'Number (Slider)',
@@ -189,6 +199,7 @@ export default defineInstrument({
     date: z.date(),
     numberInput: z.number(),
     numberRadio: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+    numberSelect: z.union([z.literal(1), z.literal(2), z.literal(3)]),
     numberSlider: z.number(),
     stringInput: z.string(),
     stringPassword: z.string(),
