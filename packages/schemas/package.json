@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@casl/prisma": "^1.4.1",
-    "@douglasneuroinformatics/libui-form-types": "^0.7.0",
     "@opendatacapture/instrument-stubs": "workspace:*"
   }
 }
