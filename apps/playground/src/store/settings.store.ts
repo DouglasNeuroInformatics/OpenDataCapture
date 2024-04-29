@@ -5,6 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Settings } from '@/models/settings.model';
 
 const DEFAULT_SETTINGS: Settings = {
+  enableInstrumentStorage: true,
   refreshInterval: 2000
 };
 

@@ -17,6 +17,7 @@
     "esbuild": "^0.20.2",
     "esbuild-wasm": "^0.20.2",
     "glob": "^10.3.12",
+    "ts-pattern": "^5.1.1",
     "zod": "^3.22.5"
   },
   "devDependencies": {

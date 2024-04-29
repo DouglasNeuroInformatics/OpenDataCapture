@@ -13,9 +13,9 @@ import { useEditorStore } from '@/store/editor.store';
 import { DeleteFileDialog } from './DeleteFileDialog';
 import { EditorAddFileButton } from './EditorAddFileButton';
 import { EditorButton } from './EditorButton';
-import { EditorEmptyState } from './EditorEmptyState';
 import { EditorFileIcon } from './EditorFileIcon';
 import { EditorPane } from './EditorPane';
+import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 import { EditorTab } from './EditorTab';
 
 import './setup';
@@ -107,7 +107,7 @@ export const Editor = () => {
             )}
           </div>
         </motion.div>
-        {openFiles.length ? <EditorPane /> : <EditorEmptyState />}
+        {openFiles.length ? <EditorPane /> : <EditorPanePlaceholder>No File Selected</EditorPanePlaceholder>}
       </div>
       <DeleteFileDialog
         file={deleteFileRef.current}

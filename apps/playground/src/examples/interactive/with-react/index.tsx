@@ -1,48 +1,11 @@
+import { App } from './App.tsx';
+
 const { defineInstrument } = await import('/runtime/v1/core.js');
-const { default: React, useEffect, useRef, useState } = await import('/runtime/v1/react.js');
+const { default: React } = await import('/runtime/v1/react.js');
 const { createRoot } = await import('/runtime/v1/react-dom/client.js');
 const { z } = await import('/runtime/v1/zod.js');
 
-type ClickTaskProps = { done: (data: { count: number }) => void };
-
-const ClickTask = ({ done }: ClickTaskProps) => {
-  const [count, setCount] = useState(0);
-  const [secondsRemaining, setSecondsRemaining] = useState(10);
-  // Conflict between type of timer in Node and DOM
-  const interval = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    interval.current = setInterval(() => {
-      if (secondsRemaining > 0) {
-        setSecondsRemaining((prev) => prev - 1);
-      }
-    }, 1000);
-    return () => {
-      interval.current && clearInterval(interval.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (secondsRemaining === 0 && interval.current) {
-      done({ count });
-      clearInterval(interval.current);
-    }
-  }, [secondsRemaining]);
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <span>Seconds Remaining: {secondsRemaining}</span>
-      <span>Count: {count}</span>
-      <button
-        onClick={() => {
-          setCount(count + 1);
-        }}
-      >
-        Increase Count
-      </button>
-    </div>
-  );
-};
+import './index.css';
 
 export default defineInstrument({
   content: {
@@ -50,17 +13,15 @@ export default defineInstrument({
       const rootElement = document.createElement('div');
       document.body.appendChild(rootElement);
       const root = createRoot(rootElement);
-      root.render(<ClickTask done={(data) => done(data)} />);
+      root.render(<App done={(data) => done(data)} />);
     }
   },
   details: {
     description: 'This task is completely useless. It is a proof of concept for an interactive instrument.',
     estimatedDuration: 1,
-    instructions: [
-      'When you begin this task, a 10 second countdown will begin. Please click the button as many times as you can before it expires.'
-    ],
+    instructions: ['Please submit whatever count you want!'],
     license: 'AGPL-3.0',
-    title: 'Click Task'
+    title: 'React Click Task'
   },
   kind: 'INTERACTIVE',
   language: 'en',

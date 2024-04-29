@@ -6,14 +6,22 @@ import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middl
 import formReference from '@/examples/form/reference?raw';
 import formWithGroups from '@/examples/form/with-groups?raw';
 import formWithSimpleDynamicField from '@/examples/form/with-simple-dynamic-field?raw';
+import interactiveWithCssLogoUrl from '@/examples/interactive/with-css/logo.png?url';
 import interactiveWithCssStyle from '@/examples/interactive/with-css/styles.css?raw';
 import interactiveWithCssIndex from '@/examples/interactive/with-css?raw';
-import interactiveWithReact from '@/examples/interactive/with-react?raw';
+import interactiveWithReactAppStyle from '@/examples/interactive/with-react/App.css?raw';
+import interactiveWithReactApp from '@/examples/interactive/with-react/App?raw';
+import interactiveWithReactIndexStyle from '@/examples/interactive/with-react/index.css?raw';
+import interactiveWithReactSvg from '@/examples/interactive/with-react/react.svg?raw';
+import interactiveWithReactIndex from '@/examples/interactive/with-react?raw';
 import type { EditorFile } from '@/models/editor-file.model';
 import multilingualForm from '@/templates/form/multilingual?raw';
 import unilingualForm from '@/templates/form/unilingual?raw';
 import interactiveInstrument from '@/templates/interactive?raw';
 import { sha256 } from '@/utils/hash';
+import { loadAssetAsBase64 } from '@/utils/load';
+
+import { useSettingsStore } from './settings.store';
 
 type InstrumentCategory = 'Examples' | 'Saved' | 'Templates';
 
@@ -127,8 +135,24 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
     category: 'Examples',
     files: [
       {
-        content: interactiveWithReact,
+        content: interactiveWithReactIndex,
         name: 'index.tsx'
+      },
+      {
+        content: interactiveWithReactIndexStyle,
+        name: 'index.css'
+      },
+      {
+        content: interactiveWithReactApp,
+        name: 'App.tsx'
+      },
+      {
+        content: interactiveWithReactAppStyle,
+        name: 'App.css'
+      },
+      {
+        content: interactiveWithReactSvg,
+        name: 'react.svg'
       }
     ],
     kind: 'INTERACTIVE',
@@ -144,6 +168,10 @@ const examples: InstrumentStoreItem[] = await createStoreItems([
       {
         content: interactiveWithCssStyle,
         name: 'styles.css'
+      },
+      {
+        content: await loadAssetAsBase64(interactiveWithCssLogoUrl),
+        name: 'logo.png'
       }
     ],
     kind: 'INTERACTIVE',
@@ -202,5 +230,10 @@ export const useInstrumentStore = create(
     )
   )
 );
+
+const { enableInstrumentStorage } = useSettingsStore.getState();
+if (!enableInstrumentStorage) {
+  useInstrumentStore.persist.clearStorage();
+}
 
 export type { InstrumentCategory, InstrumentStore, InstrumentStoreItem };
