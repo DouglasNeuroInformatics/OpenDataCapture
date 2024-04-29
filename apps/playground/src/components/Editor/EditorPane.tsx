@@ -6,18 +6,20 @@ import { useStoreWithEqualityFn } from 'zustand/traditional';
 
 import { useRuntime } from '@/hooks/useRuntime';
 import { useEditorStore } from '@/store/editor.store';
-import { inferFileLanguage } from '@/utils/file';
+import { inferFileType } from '@/utils/file';
+
+import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 
 import type { MonacoEditorType, MonacoType } from './types';
 
 export const EditorPane = () => {
-  const { selectedFile, setSelectedFileContent } = useStoreWithEqualityFn(
+  const selectedFile = useStoreWithEqualityFn(
     useEditorStore,
-    ({ selectedFile, setSelectedFileContent }) => {
-      return { selectedFile, setSelectedFileContent };
-    },
-    (a, b) => a.setSelectedFileContent === b.setSelectedFileContent && a.selectedFile?.id === b.selectedFile?.id
+    (store) => store.selectedFile,
+    (a, b) => a?.id === b?.id
   );
+  const files = useEditorStore((store) => store.files);
+  const setSelectedFileContent = useEditorStore((store) => store.setSelectedFileContent);
 
   const [theme] = useTheme();
   const [isMounted, setIsMounted] = useState(false);
@@ -40,24 +42,51 @@ export const EditorPane = () => {
     });
   }, [isMounted, libs]);
 
+  useEffect(() => {
+    const monaco = monacoRef.current;
+    if (!(monaco && isMounted)) {
+      return;
+    }
+    for (const file of files) {
+      const fileType = inferFileType(file.name);
+      // if (!(fileType === 'javascript' || fileType === 'typescript')) {
+      //   continue;
+      // }
+      if (fileType !== 'typescript') {
+        continue;
+      }
+      const uri = monaco.Uri.parse(file.name);
+      if (!monaco.editor.getModel(uri)) {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(file.content, file.name);
+        monaco.editor.createModel(file.content, 'typescript', uri);
+      }
+    }
+  }, [isMounted, files]);
+
   const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
     setIsMounted(true);
   };
 
-  const defaultLanguage = selectedFile ? inferFileLanguage(selectedFile.name) : null;
+  const fileType = selectedFile ? inferFileType(selectedFile.name) : null;
+  if (!fileType) {
+    return <EditorPanePlaceholder>{`Error: Invalid file type "${fileType}"`}</EditorPanePlaceholder>;
+  } else if (fileType === 'asset') {
+    return <EditorPanePlaceholder>Cannot Display Binary Asset</EditorPanePlaceholder>;
+  }
 
   return (
     <MonacoEditor
       className="h-full min-h-[576px]"
-      defaultLanguage={defaultLanguage ?? undefined}
+      defaultLanguage={fileType satisfies 'css' | 'html' | 'javascript' | 'typescript'}
       defaultValue={selectedFile?.content}
       key={selectedFile?.id}
       options={{
         automaticLayout: true,
         codeLens: false,
         contextmenu: false,
+        fixedOverflowWidgets: true,
         minimap: {
           enabled: false
         },

@@ -3,6 +3,8 @@
 const { defineInstrument } = await import('/runtime/v1/core.js');
 const { z } = await import('/runtime/v1/zod.js');
 
+import logoSrc from './logo.png';
+
 import './styles.css';
 
 export default defineInstrument({
@@ -13,6 +15,11 @@ export default defineInstrument({
   version: 1.0,
   content: {
     render(done) {
+      const logo = document.createElement('img');
+      logo.classList.add('logo');
+      logo.alt = 'Open Data Capture Logo';
+      logo.src = logoSrc;
+      document.body.appendChild(logo);
       const button = document.createElement('button');
       button.classList.add('submit-button');
       button.textContent = 'Submit Instrument';

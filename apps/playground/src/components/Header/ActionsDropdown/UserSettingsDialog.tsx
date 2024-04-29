@@ -24,6 +24,12 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
         <Form
           className="py-4"
           content={{
+            enableInstrumentStorage: {
+              description: 'Whether to enable saving instruments to local storage',
+              kind: 'boolean',
+              label: 'Enable Instrument Storage',
+              variant: 'radio'
+            },
             refreshInterval: {
               description: 'The interval, in milliseconds, between builds, assuming the source code has changed',
               kind: 'number',

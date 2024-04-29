@@ -6,6 +6,7 @@ import { SaveIcon } from 'lucide-react';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
 import { useInstrumentStore } from '@/store/instrument.store';
+import { useSettingsStore } from '@/store/settings.store';
 
 import { ActionButton } from '../ActionButton';
 
@@ -14,6 +15,7 @@ export const SaveButton = () => {
   const editorFiles = useEditorFilesRef();
   const selectedInstrument = useInstrumentStore((store) => store.selectedInstrument);
   const updateSelectedInstrument = useInstrumentStore((store) => store.updateSelectedInstrument);
+  const enableInstrumentStorage = useSettingsStore((store) => store.enableInstrumentStorage);
 
   useInterval(() => {
     if (selectedInstrument.category === 'Saved') {
@@ -23,7 +25,7 @@ export const SaveButton = () => {
 
   return (
     <ActionButton
-      disabled={disabled}
+      disabled={disabled || !enableInstrumentStorage}
       icon={<SaveIcon />}
       tooltip="Save"
       onClick={() => {

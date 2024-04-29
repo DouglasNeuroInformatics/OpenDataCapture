@@ -3,6 +3,8 @@ import envTypes from '@opendatacapture/instrument-runtime-env/lib/index.d.ts?raw
 import * as monaco from 'monaco-editor';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TypeScriptWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import { SuggestAdapter } from 'monaco-editor/esm/vs/language/typescript/tsMode';
 import prettierPluginBabel from 'prettier/plugins/babel';
@@ -19,8 +21,12 @@ self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'typescript' || label === 'javascript') {
       return new TypeScriptWorker();
-    } else if (label === 'css' || label === 'scss' || label === 'less') {
+    } else if (label === 'css') {
       return new CssWorker();
+    } else if (label === 'json') {
+      return new JsonWorker();
+    } else if (label === 'html') {
+      return new HtmlWorker();
     }
     return new EditorWorker();
   }
@@ -59,7 +65,12 @@ loader.config({ monaco });
    * (e.g., module resolution) in the monaco enum options.
    */
   monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+    allowImportingTsExtensions: true,
+    allowJs: true,
     allowSyntheticDefaultImports: false,
+    checkJs: true,
+    forceConsistentCasingInFileNames: true,
+    isolatedModules: true,
     jsx: monaco.languages.typescript.JsxEmit.React,
     module: monaco.languages.typescript.ModuleKind.ESNext,
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,

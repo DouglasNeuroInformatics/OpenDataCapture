@@ -2,6 +2,7 @@
   "extends": "../../jsconfig.json",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react",

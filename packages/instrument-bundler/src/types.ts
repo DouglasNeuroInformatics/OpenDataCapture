@@ -1,5 +1,5 @@
 export type BundlerInput = {
-  content: string;
+  content: Uint8Array | string;
   name: string;
 };
 
@@ -13,4 +13,14 @@ export type BuildOutput = {
   js: string;
 };
 
-export type BundlerInputFileExtension = '.css' | '.js' | '.jsx' | '.ts' | '.tsx';
+export type BundlerInputFileExtension =
+  | '.css'
+  | '.jpeg'
+  | '.jpg'
+  | '.js'
+  | '.jsx'
+  | '.png'
+  | '.svg'
+  | '.ts'
+  | '.tsx'
+  | '.webp';

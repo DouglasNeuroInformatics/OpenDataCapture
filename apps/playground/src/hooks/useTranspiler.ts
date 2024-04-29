@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react';
 
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
+import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useSettingsStore } from '@/store/settings.store';
+import { editorFileToInput } from '@/utils/file';
 import { hashFiles } from '@/utils/hash';
 
 import { useEditorFilesRef } from './useEditorFilesRef';
@@ -36,8 +38,9 @@ export function useTranspiler(): TranspilerState {
   const [state, setState] = useState<TranspilerState>({ status: 'initial' });
   const instrumentBundler = useInstrumentBundler();
 
-  const transpile = useCallback(async (inputs: EditorFile[]) => {
+  const transpile = useCallback(async (files: EditorFile[]) => {
     setState({ status: 'building' });
+    const inputs: BundlerInput[] = files.map(editorFileToInput);
     let bundle: string;
     try {
       bundle = await instrumentBundler.bundle({ inputs });
@@ -45,7 +48,7 @@ export function useTranspiler(): TranspilerState {
     } catch (err) {
       setState({ error: err instanceof Error ? err : new Error('Unexpected Error', { cause: err }), status: 'error' });
     } finally {
-      setFilesHash(await hashFiles(inputs));
+      setFilesHash(await hashFiles(files));
     }
   }, []);
 
