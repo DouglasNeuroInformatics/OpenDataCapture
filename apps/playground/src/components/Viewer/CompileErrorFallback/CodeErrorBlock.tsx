@@ -1,21 +1,20 @@
 import React from 'react';
 
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import { type InstrumentBundlerBuildError, resolveIndexInput } from '@opendatacapture/instrument-bundler';
+import { type InstrumentBundlerBuildError } from '@opendatacapture/instrument-bundler';
 import { range } from 'lodash-es';
 
-import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
+import { useEditorStore } from '@/store/editor.store';
 
 export type CodeErrorBlockProps = {
   error: InstrumentBundlerBuildError;
 };
 
 export const CodeErrorBlock = ({ error }: CodeErrorBlockProps) => {
-  const editorFilesRef = useEditorFilesRef();
-  const indexFile = resolveIndexInput(editorFilesRef.current);
+  const indexFile = useEditorStore((store) => store.indexFile);
   const location = error.cause.errors[0].location;
 
-  if (!location) {
+  if (!(indexFile && location)) {
     return null;
   }
 

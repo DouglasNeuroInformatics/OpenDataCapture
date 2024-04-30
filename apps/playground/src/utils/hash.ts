@@ -10,5 +10,5 @@ export async function sha256(source: string) {
 }
 
 export async function hashFiles(files: EditorFile[]) {
-  return sha256(files.map((file) => file.content).join());
+  return sha256(files.map((file) => file.content + file.name).join());
 }

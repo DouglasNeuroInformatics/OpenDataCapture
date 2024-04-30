@@ -1,4 +1,5 @@
 import { resolveIndexInput } from '@opendatacapture/instrument-bundler';
+import type { Simplify } from 'type-fest';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
@@ -6,16 +7,25 @@ import type { EditorFile } from '@/models/editor-file.model';
 
 import { useInstrumentStore } from './instrument.store';
 
-type EditorStore = {
+type EditorState = {
+  files: EditorFile[];
+  indexFile: EditorFile | null;
+  openFiles: EditorFile[];
+  selectedFile: EditorFile | null;
+};
+
+type EditorActions = {
   addFile: (file: EditorFile) => void;
   closeFile: (file: EditorFile) => void;
   deleteFile: (file: EditorFile) => void;
-  files: EditorFile[];
-  openFiles: EditorFile[];
+  renameFile: (id: string, name: string) => void;
   selectFile: (file: EditorFile) => void;
-  selectedFile: EditorFile | null;
   setSelectedFileContent: (content: string) => void;
 };
+
+type EditorStore = Simplify<EditorActions & EditorState>;
+
+const resolveIndexFile = (files: EditorFile[]) => (files.length ? resolveIndexInput(files) : null);
 
 const { selectedInstrument: defaultSelectedInstrument } = useInstrumentStore.getState();
 const defaultIndexFile = resolveIndexInput(defaultSelectedInstrument.files);
@@ -23,13 +33,24 @@ const defaultIndexFile = resolveIndexInput(defaultSelectedInstrument.files);
 const useEditorStore = create(
   subscribeWithSelector<EditorStore>((set) => ({
     addFile: (file) => {
-      set(({ files, openFiles }) => ({ files: [...files, file], openFiles: [...openFiles, file], selectedFile: file }));
+      set(({ files, openFiles }) => {
+        const updatedFiles = [...files, file];
+        return {
+          files: updatedFiles,
+          indexFile: resolveIndexFile(updatedFiles),
+          openFiles: [...openFiles, file],
+          selectedFile: file
+        };
+      });
     },
     closeFile: (file) => {
       set(({ openFiles }) => {
         const currentIndex = openFiles.indexOf(file);
-        const updatedFiles = openFiles.filter((f) => f !== file);
-        return { openFiles: updatedFiles, selectedFile: updatedFiles.at(currentIndex - 1) ?? null };
+        const updatedOpenFiles = openFiles.filter((f) => f !== file);
+        return {
+          openFiles: updatedOpenFiles,
+          selectedFile: updatedOpenFiles.at(currentIndex - 1) ?? null
+        };
       });
     },
     deleteFile: (file) => {
@@ -39,13 +60,39 @@ const useEditorStore = create(
         const updatedOpenFiles = openFiles.filter((f) => f !== file);
         return {
           files: updatedFiles,
+          indexFile: resolveIndexFile(updatedFiles),
           openFiles: updatedOpenFiles,
           selectedFile: updatedOpenFiles.at(currentIndex - 1) ?? null
         };
       });
     },
     files: defaultSelectedInstrument.files,
+    indexFile: defaultIndexFile,
     openFiles: [defaultIndexFile],
+    renameFile: (id, name) => {
+      set(({ files, indexFile, openFiles, selectedFile }) => {
+        const updatedFiles = [...files];
+        let index = updatedFiles.findIndex((file) => file.id === id);
+        if (index === -1) {
+          console.error(`Failed to rename file: could not find file with ID '${id}'`);
+          return {};
+        }
+        const updatedFile = { ...files[index], name };
+        updatedFiles[index] = updatedFile;
+
+        const updatedOpenFiles = [...openFiles];
+        index = updatedOpenFiles.findIndex((file) => file.id === id);
+        if (index > -1) {
+          updatedOpenFiles[index] = updatedFile;
+        }
+        return {
+          files: updatedFiles,
+          indexFile: updatedFile.id === indexFile?.id ? updatedFile : indexFile,
+          openFiles: updatedOpenFiles,
+          selectedFile: updatedFile.id === selectedFile?.id ? updatedFile : selectedFile
+        };
+      });
+    },
     selectFile: (file) => {
       set(({ openFiles }) => {
         const isOpen = openFiles.includes(file);
@@ -77,7 +124,7 @@ useInstrumentStore.subscribe(
     if (selectedInstrument.id === prevSelectedInstrument.id) {
       return;
     }
-    const indexFile = resolveIndexInput(selectedInstrument.files);
+    const indexFile = resolveIndexFile(selectedInstrument.files);
     useEditorStore.setState({
       files: selectedInstrument.files,
       openFiles: indexFile ? [indexFile] : [],

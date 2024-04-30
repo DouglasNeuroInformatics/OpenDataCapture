@@ -526,6 +526,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+      react-dropzone:
+        specifier: ^14.2.3
+        version: 14.2.3(react@18.3.1)
       react-error-boundary:
         specifier: ^4.0.13
         version: 4.0.13(react@18.3.1)
@@ -9440,6 +9443,12 @@ packages:
     engines: { node: '>=8.0.0' }
     dev: false
 
+  /attr-accept@2.2.2:
+    resolution:
+      { integrity: sha512-7prDjvt9HmqiZ0cl5CRjtS84sEyhsHP2coDkaZKRKVfCDo9s7iw7ChVmar78Gu9pC4SoR/28wFu/G5JJhTnqEg== }
+    engines: { node: '>=4' }
+    dev: false
+
   /auto-bind@4.0.0:
     resolution:
       { integrity: sha512-Hdw8qdNiqdJ8LqT0iK0sVzkFbzg6fhnQqqfWhBDxcHZvU75+B+ayzTy8x+k5Ix0Y92XOhOUlx74ps+bA6BeYMQ== }
@@ -12487,6 +12496,14 @@ packages:
     dependencies:
       flat-cache: 3.2.0
     dev: true
+
+  /file-selector@0.6.0:
+    resolution:
+      { integrity: sha512-QlZ5yJC0VxHxQQsQhXvBaC7VRJ2uaxTf+Tfpu4Z/OcVQJVpZO+DGU0rkoVW5ce2SccxugvpBJoMvUs59iILYdw== }
+    engines: { node: '>= 12' }
+    dependencies:
+      tslib: 2.6.2
+    dev: false
 
   /file-system-cache@2.3.0:
     resolution:
@@ -18040,6 +18057,19 @@ packages:
       react: 18.3.1
       scheduler: 0.23.2
 
+  /react-dropzone@14.2.3(react@18.3.1):
+    resolution:
+      { integrity: sha512-O3om8I+PkFKbxCukfIR3QAGftYXDZfOE2N1mr/7qebQJHs7U+/RSL/9xomJNpRg9kM5h9soQSdf0Gc7OHF5Fug== }
+    engines: { node: '>= 10.13' }
+    peerDependencies:
+      react: '>= 16.8 || 18.0.0'
+    dependencies:
+      attr-accept: 2.2.2
+      file-selector: 0.6.0
+      prop-types: 15.8.1
+      react: 18.3.1
+    dev: false
+
   /react-element-to-jsx-string@15.0.0(react-dom@18.3.1)(react@18.3.1):
     resolution:
       { integrity: sha512-UDg4lXB6BzlobN60P8fHWVPX3Kyw8ORrTeBtClmIlGdkOOE+GYQSFvmEU5iLLpwp/6v42DINwNcwOhOLfQ//FQ== }
@@ -22000,7 +22030,6 @@ packages:
     name: github-script
     version: 7.0.1
     engines: { node: '>=20.0.0 <21.0.0' }
-    prepare: true
     requiresBuild: true
     dependencies:
       '@actions/core': 1.10.1
