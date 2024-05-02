@@ -55,10 +55,10 @@ export const Editor = () => {
           <EditorTab filename={filename} key={filename} />
         ))}
       </div>
-      <div className="flex h-full">
+      <div className="flex h-full overflow-hidden">
         <motion.div
           animate={{ width: isSidebarOpen ? 320 : 0 }}
-          className="flex-shrink-0 overflow-scroll border-r border-slate-900/10 shadow-sm dark:border-slate-100/25"
+          className="h-full flex-shrink-0 overflow-scroll border-r border-slate-900/10 shadow-sm dark:border-slate-100/25"
           initial={{ width: 0 }}
         >
           <div className="h-full w-full">

@@ -80,6 +80,9 @@ export const EditorPane = () => {
         monaco.editor.createModel(file.content, 'javascript', uri);
       }
     }
+    return () => {
+      monaco.editor.getModels().forEach((model) => model.dispose());
+    };
   }, [isMounted, selectedInstrumentId]);
 
   const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
@@ -104,6 +107,7 @@ export const EditorPane = () => {
       className="h-full min-h-[576px]"
       defaultLanguage={fileType satisfies 'css' | 'html' | 'javascript' | 'typescript'}
       defaultValue={defaultFile.content}
+      keepCurrentModel={true}
       key={defaultFile.id}
       options={{
         automaticLayout: true,

@@ -7,6 +7,7 @@ import { ShareIcon } from 'lucide-react';
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
 import { useAppStore } from '@/store';
 import { encodeShareURL } from '@/utils/encode';
+import { formatSize } from '@/utils/format';
 
 export const ShareButton = () => {
   const label = useAppStore((store) => store.selectedInstrument.label);
@@ -32,7 +33,8 @@ export const ShareButton = () => {
         <div className="flex flex-col space-y-2 text-center sm:text-left">
           <Heading variant="h5">Share Instrument</Heading>
           <p className="text-muted-foreground text-sm">
-            Anyone with this link can open a snapshot of the current code in your playground.
+            Anyone with this link can open a snapshot of the current code in your playground. The total size of the
+            URL-encoded source files for this instrument is {formatSize(shareURL.size)}.
           </p>
         </div>
         <div className="flex gap-2 pt-4">

@@ -5,6 +5,7 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { CloudUploadIcon } from 'lucide-react';
 import { type FileRejection, useDropzone } from 'react-dropzone';
 
+import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
 import type { EditorFile } from '@/models/editor-file.model';
 import { useAppStore } from '@/store';
 import { loadNativeFileContent } from '@/utils/load';
@@ -18,14 +19,23 @@ export const UploadFileDialog = ({ isOpen, setIsOpen }: UploadFileDialogProps) =
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const [files, setFiles] = useState<File[]>([]);
   const addFiles = useAppStore((store) => store.addFiles);
+  const filesRef = useEditorFilesRef();
 
   const handleDrop = useCallback(
     (acceptedFiles: File[], rejections: FileRejection[]) => {
       for (const { errors, file } of rejections) {
-        setIsOpen(false);
-        addNotification({ message: `Invalid File: ${file.name} `, type: 'error' });
+        addNotification({ message: `Invalid file type: ${file.name} `, type: 'error' });
         console.error(errors);
+        setIsOpen(false);
         return;
+      }
+      const existingFilenames = filesRef.current.map((file) => file.name);
+      for (const file of acceptedFiles) {
+        if (existingFilenames.includes(file.name)) {
+          addNotification({ message: `File already exists: ${file.name}`, type: 'error' });
+          setIsOpen(false);
+          return;
+        }
       }
       setFiles(acceptedFiles);
     },
