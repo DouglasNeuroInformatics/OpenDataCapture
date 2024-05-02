@@ -4,14 +4,14 @@ import { Separator } from '@douglasneuroinformatics/libui/components';
 
 import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
-import { useInstrumentStore } from '@/store/instrument.store';
+import { useAppStore } from '@/store';
 import { decodeShareURL } from '@/utils/encode';
 
 const IndexPage = () => {
-  const addInstrument = useInstrumentStore((store) => store.addInstrument);
-  const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
-  const removeInstrument = useInstrumentStore((store) => store.removeInstrument);
-  const instruments = useInstrumentStore((store) => store.instruments);
+  const addInstrument = useAppStore((store) => store.addInstrument);
+  const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
+  const removeInstrument = useAppStore((store) => store.removeInstrument);
+  const instruments = useAppStore((store) => store.instruments);
 
   useEffect(() => {
     let id: null | string = null;

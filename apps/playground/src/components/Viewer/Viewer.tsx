@@ -5,15 +5,15 @@ import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import { P, match } from 'ts-pattern';
 
 import { useTranspiler } from '@/hooks/useTranspiler';
-import { useViewerStore } from '@/store/viewer.store';
+import { useAppStore } from '@/store';
 
 import { CompileErrorFallback } from './CompileErrorFallback';
 
 export const Viewer = () => {
   const state = useTranspiler();
-  const key = useViewerStore((store) => store.key);
+  const key = useAppStore((store) => store.viewer.key);
   return (
-    <div className="h-full overflow-scroll pl-12" key={key}>
+    <div className="h-full overflow-scroll" key={key}>
       {match(state)
         .with({ status: 'built' }, ({ bundle }) => (
           <InstrumentRenderer

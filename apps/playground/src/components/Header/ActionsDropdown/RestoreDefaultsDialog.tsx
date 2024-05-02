@@ -2,8 +2,7 @@ import { AlertDialog, Button } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import React from '@opendatacapture/runtime-v1/react.js';
 
-import { useInstrumentStore } from '@/store/instrument.store';
-import { useSettingsStore } from '@/store/settings.store';
+import { useAppStore } from '@/store';
 
 export type RestoreDefaultsDialogProps = {
   isOpen: boolean;
@@ -12,8 +11,8 @@ export type RestoreDefaultsDialogProps = {
 
 export const RestoreDefaultsDialog = ({ isOpen, setIsOpen }: RestoreDefaultsDialogProps) => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const resetInstruments = useInstrumentStore((store) => store.resetInstruments);
-  const resetSettings = useSettingsStore((store) => store.resetSettings);
+  const resetInstruments = useAppStore((store) => store.resetInstruments);
+  const resetSettings = useAppStore((store) => store.resetSettings);
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -29,7 +28,6 @@ export const RestoreDefaultsDialog = ({ isOpen, setIsOpen }: RestoreDefaultsDial
           <Button
             variant="danger"
             onClick={() => {
-              localStorage.clear();
               resetInstruments();
               resetSettings();
               addNotification({ type: 'success' });

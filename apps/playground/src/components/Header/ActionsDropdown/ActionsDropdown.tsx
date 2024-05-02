@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import { EllipsisVerticalIcon } from 'lucide-react';
 
-import { useInstrumentStore } from '@/store/instrument.store';
+import { useAppStore } from '@/store';
 
 import { DeleteInstrumentDialog } from './DeleteInstrumentDialog';
 import { RestoreDefaultsDialog } from './RestoreDefaultsDialog';
@@ -14,7 +14,7 @@ export const ActionsDropdown = () => {
   const [showDeleteInstrumentDialog, setShowDeleteInstrumentDialog] = useState(false);
   const [showRestoreDefaultsDialog, setShowRestoreDefaultsDialog] = useState(false);
 
-  const selectedInstrument = useInstrumentStore((store) => store.selectedInstrument);
+  const selectedInstrument = useAppStore((store) => store.selectedInstrument);
 
   return (
     <React.Fragment>

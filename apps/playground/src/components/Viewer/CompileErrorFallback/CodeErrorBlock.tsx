@@ -1,21 +1,23 @@
 import React from 'react';
 
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import { type InstrumentBundlerBuildError, resolveIndexInput } from '@opendatacapture/instrument-bundler';
+import { type InstrumentBundlerBuildError } from '@opendatacapture/instrument-bundler';
 import { range } from 'lodash-es';
 
-import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
+import { useAppStore } from '@/store';
 
 export type CodeErrorBlockProps = {
   error: InstrumentBundlerBuildError;
 };
 
 export const CodeErrorBlock = ({ error }: CodeErrorBlockProps) => {
-  const editorFilesRef = useEditorFilesRef();
-  const indexFile = resolveIndexInput(editorFilesRef.current);
+  const files = useAppStore((store) => store.files);
+  const indexFilename = useAppStore((store) => store.indexFilename);
   const location = error.cause.errors[0].location;
 
-  if (!location) {
+  const indexFile = files.find((file) => file.name === indexFilename);
+
+  if (!(indexFile && location)) {
     return null;
   }
 
@@ -23,7 +25,7 @@ export const CodeErrorBlock = ({ error }: CodeErrorBlockProps) => {
   const indexOfError = lines.indexOf(location.lineText);
 
   if (indexOfError === -1) {
-    console.error(`Count not find index of error: ${location.lineText}`);
+    console.error(`Could not find index of error: ${location.lineText}`);
     return null;
   }
 

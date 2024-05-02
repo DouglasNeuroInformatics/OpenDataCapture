@@ -3,7 +3,7 @@ import React from 'react';
 import { AlertDialog, Button } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 
-import { useInstrumentStore } from '@/store/instrument.store';
+import { useAppStore } from '@/store';
 
 export type DeleteInstrumentDialogProps = {
   isOpen: boolean;
@@ -12,10 +12,8 @@ export type DeleteInstrumentDialogProps = {
 
 export const DeleteInstrumentDialog = ({ isOpen, setIsOpen }: DeleteInstrumentDialogProps) => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const defaultInstrument = useInstrumentStore((store) => store.defaultInstrument);
-  const removeInstrument = useInstrumentStore((store) => store.removeInstrument);
-  const selectedInstrument = useInstrumentStore((store) => store.selectedInstrument);
-  const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
+  const removeInstrument = useAppStore((store) => store.removeInstrument);
+  const selectedInstrument = useAppStore((store) => store.selectedInstrument);
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -28,7 +26,6 @@ export const DeleteInstrumentDialog = ({ isOpen, setIsOpen }: DeleteInstrumentDi
           <Button
             variant="danger"
             onClick={() => {
-              setSelectedInstrument(defaultInstrument.id);
               removeInstrument(selectedInstrument.id);
               addNotification({ message: 'This instrument has been deleted', type: 'success' });
               setIsOpen(false);

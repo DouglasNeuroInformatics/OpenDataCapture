@@ -2,10 +2,9 @@ import React from 'react';
 
 import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { isUndefined, omitBy } from 'lodash-es';
 
 import { $Settings } from '@/models/settings.model';
-import { useSettingsStore } from '@/store/settings.store';
+import { useAppStore } from '@/store';
 
 export type UserSettingsDialogProps = {
   isOpen: boolean;
@@ -14,7 +13,9 @@ export type UserSettingsDialogProps = {
 
 export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProps) => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const { setSettings, ...settings } = useSettingsStore();
+  const settings = useAppStore((store) => store.settings);
+  const updateSettings = useAppStore((store) => store.updateSettings);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Dialog.Content>
@@ -35,9 +36,9 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
           submitBtnLabel="Save Changes"
           validationSchema={$Settings.partial()}
           onSubmit={(updatedSettings) => {
-            setSettings(omitBy(updatedSettings, isUndefined));
-            setIsOpen(false);
+            updateSettings(updatedSettings);
             addNotification({ type: 'success' });
+            setIsOpen(false);
           }}
         />
       </Dialog.Content>

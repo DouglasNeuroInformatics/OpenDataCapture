@@ -3,6 +3,8 @@ import envTypes from '@opendatacapture/instrument-runtime-env/lib/index.d.ts?raw
 import * as monaco from 'monaco-editor';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TypeScriptWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import { SuggestAdapter } from 'monaco-editor/esm/vs/language/typescript/tsMode';
 import prettierPluginBabel from 'prettier/plugins/babel';
@@ -19,8 +21,12 @@ self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'typescript' || label === 'javascript') {
       return new TypeScriptWorker();
-    } else if (label === 'css' || label === 'scss' || label === 'less') {
+    } else if (label === 'css') {
       return new CssWorker();
+    } else if (label === 'json') {
+      return new JsonWorker();
+    } else if (label === 'html') {
+      return new HtmlWorker();
     }
     return new EditorWorker();
   }
@@ -31,7 +37,7 @@ loader.config({ monaco });
 {
   const monaco = await loader.init();
 
-  monaco.languages.typescript.typescriptDefaults.setModeConfiguration({
+  const defaults: monaco.languages.typescript.ModeConfiguration = {
     codeActions: true,
     completionItems: false,
     definitions: true,
@@ -45,7 +51,10 @@ loader.config({ monaco });
     references: true,
     rename: true,
     signatureHelp: true
-  });
+  };
+
+  monaco.languages.typescript.javascriptDefaults.setModeConfiguration(defaults);
+  monaco.languages.typescript.typescriptDefaults.setModeConfiguration(defaults);
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   monaco.languages.onLanguage('typescript', async () => {
@@ -53,19 +62,38 @@ loader.config({ monaco });
     monaco.languages.registerCompletionItemProvider('typescript', new TypeScriptSuggestAdapter(worker));
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  monaco.languages.onLanguage('javascript', async () => {
+    const worker = await monaco.languages.typescript.getJavaScriptWorker();
+    monaco.languages.registerCompletionItemProvider('javascript', new TypeScriptSuggestAdapter(worker));
+  });
+
   /**
    * Setup the TypeScript compiler options as similarly as possible to
    * the  project setup. This is limited by an absence of modern options
    * (e.g., module resolution) in the monaco enum options.
    */
-  monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+
+  const baseTypeScriptOptions: monaco.languages.typescript.CompilerOptions = {
+    allowJs: true,
     allowSyntheticDefaultImports: false,
+    checkJs: true,
+    forceConsistentCasingInFileNames: true,
+    isolatedModules: true,
     jsx: monaco.languages.typescript.JsxEmit.React,
     module: monaco.languages.typescript.ModuleKind.ESNext,
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
     newLine: monaco.languages.typescript.NewLineKind.LineFeed,
     strict: true,
     target: monaco.languages.typescript.ScriptTarget.ES2020
+  };
+
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions(baseTypeScriptOptions);
+  monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+    ...baseTypeScriptOptions,
+    allowImportingTsExtensions: true,
+    checkJs: true,
+    strict: false
   });
 
   /**
@@ -99,7 +127,8 @@ loader.config({ monaco });
     command: 'editor.action.formatDocument',
     keybinding: monaco.KeyMod.Alt | monaco.KeyCode.KeyF
   });
-  monaco.languages.registerDocumentFormattingEditProvider('typescript', {
+
+  const documentFormattingEditProvider: monaco.languages.DocumentFormattingEditProvider = {
     async provideDocumentFormattingEdits(model) {
       const range = model.getFullModelRange();
       const value = model.getValue();
@@ -112,7 +141,10 @@ loader.config({ monaco });
       });
       return [{ range, text }];
     }
-  });
+  };
+
+  monaco.languages.registerDocumentFormattingEditProvider('javascript', documentFormattingEditProvider);
+  monaco.languages.registerDocumentFormattingEditProvider('typescript', documentFormattingEditProvider);
 
   // Other
   monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);

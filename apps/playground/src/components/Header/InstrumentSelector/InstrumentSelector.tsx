@@ -6,15 +6,18 @@ import { InstrumentIcon } from '@opendatacapture/react-core';
 import { groupBy } from 'lodash-es';
 import { CheckIcon, ChevronsUpDown } from 'lucide-react';
 
-import { type InstrumentCategory, type InstrumentStoreItem, useInstrumentStore } from '@/store/instrument.store';
+import type { InstrumentCategory, InstrumentRepository } from '@/models/instrument-repository.model';
+import { useAppStore } from '@/store';
 
 export const InstrumentSelector = () => {
   const [open, setOpen] = useState(false);
-  const { instruments, selectedInstrument, setSelectedInstrument } = useInstrumentStore();
+  const instruments = useAppStore((store) => store.instruments);
+  const selectedInstrument = useAppStore((store) => store.selectedInstrument);
+  const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
 
   const categorizedInstruments = useMemo(() => {
     return groupBy(instruments, (instrument) => instrument.category) as {
-      [K in InstrumentCategory]: InstrumentStoreItem[];
+      [K in InstrumentCategory]: InstrumentRepository[];
     };
   }, [instruments]);
 
@@ -24,7 +27,7 @@ export const InstrumentSelector = () => {
         <Button
           aria-expanded={open}
           aria-label="Load an instrument..."
-          className="w-96 flex-1 justify-between"
+          className="w-full flex-1 justify-between"
           role="combobox"
           variant="outline"
         >
@@ -32,7 +35,7 @@ export const InstrumentSelector = () => {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </Popover.Trigger>
-      <Popover.Content className="w-96 p-0">
+      <Popover.Content className="w-72 p-0 lg:w-96">
         <Command>
           <Command.Input placeholder="Search..." />
           <Command.List>

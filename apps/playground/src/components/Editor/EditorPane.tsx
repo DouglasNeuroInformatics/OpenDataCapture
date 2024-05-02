@@ -2,22 +2,21 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { useTheme } from '@douglasneuroinformatics/libui/hooks';
 import MonacoEditor from '@monaco-editor/react';
-import { useStoreWithEqualityFn } from 'zustand/traditional';
 
+import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
 import { useRuntime } from '@/hooks/useRuntime';
-import { useEditorStore } from '@/store/editor.store';
-import { inferFileLanguage } from '@/utils/file';
+import type { EditorFile } from '@/models/editor-file.model';
+import { useAppStore } from '@/store';
+import { inferFileType } from '@/utils/file';
+
+import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 
 import type { MonacoEditorType, MonacoType } from './types';
 
 export const EditorPane = () => {
-  const { selectedFile, setSelectedFileContent } = useStoreWithEqualityFn(
-    useEditorStore,
-    ({ selectedFile, setSelectedFileContent }) => {
-      return { selectedFile, setSelectedFileContent };
-    },
-    (a, b) => a.setSelectedFileContent === b.setSelectedFileContent && a.selectedFile?.id === b.selectedFile?.id
-  );
+  const selectedFilename = useAppStore((store) => store.selectedFilename);
+  const setSelectedFileContent = useAppStore((store) => store.setSelectedFileContent);
+  const selectedInstrumentId = useAppStore((store) => store.selectedInstrument.id);
 
   const [theme] = useTheme();
   const [isMounted, setIsMounted] = useState(false);
@@ -25,6 +24,9 @@ export const EditorPane = () => {
 
   const editorRef = useRef<MonacoEditorType | null>(null);
   const monacoRef = useRef<MonacoType | null>(null);
+
+  const [defaultFile, setDefaultFile] = useState<({ id: string } & EditorFile) | null>(null);
+  const filesRef = useEditorFilesRef();
 
   useEffect(() => {
     const monaco = monacoRef.current;
@@ -40,24 +42,74 @@ export const EditorPane = () => {
     });
   }, [isMounted, libs]);
 
+  useEffect(() => {
+    const selectedFile = filesRef.current.find((file) => file.name === selectedFilename);
+    if (!selectedFilename) {
+      return;
+    } else if (!selectedFile) {
+      console.error(
+        `Failed to find selected filename '${selectedFilename}' from files: ${filesRef.current.map((file) => `'${file.name}'`).join(', ')}`
+      );
+      return;
+    }
+    setDefaultFile({
+      content: selectedFile.content,
+      id: `${selectedInstrumentId}-${selectedFilename}`,
+      name: selectedFilename
+    });
+  }, [selectedFilename, selectedInstrumentId]);
+
+  useEffect(() => {
+    const monaco = monacoRef.current;
+    if (!monaco) {
+      return;
+    }
+    const files = filesRef.current;
+    for (const file of files) {
+      const fileType = inferFileType(file.name);
+      if (!(fileType === 'javascript' || fileType === 'typescript')) {
+        continue;
+      }
+      const uri = monaco.Uri.parse(file.name);
+      if (monaco.editor.getModel(uri)) {
+        continue;
+      } else if (fileType === 'typescript') {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(file.content, file.name);
+        monaco.editor.createModel(file.content, 'typescript', uri);
+      } else if (fileType === 'javascript') {
+        monaco.editor.createModel(file.content, 'javascript', uri);
+      }
+    }
+  }, [isMounted, selectedInstrumentId]);
+
   const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
     setIsMounted(true);
   };
 
-  const defaultLanguage = selectedFile ? inferFileLanguage(selectedFile.name) : null;
+  if (!defaultFile) {
+    return <EditorPanePlaceholder>No File Selected</EditorPanePlaceholder>;
+  }
+
+  const fileType = inferFileType(defaultFile.name);
+  if (!fileType) {
+    return <EditorPanePlaceholder>{`Error: Invalid file type "${fileType}"`}</EditorPanePlaceholder>;
+  } else if (fileType === 'asset') {
+    return <EditorPanePlaceholder>Cannot Display Binary Asset</EditorPanePlaceholder>;
+  }
 
   return (
     <MonacoEditor
       className="h-full min-h-[576px]"
-      defaultLanguage={defaultLanguage ?? undefined}
-      defaultValue={selectedFile?.content}
-      key={selectedFile?.id}
+      defaultLanguage={fileType satisfies 'css' | 'html' | 'javascript' | 'typescript'}
+      defaultValue={defaultFile.content}
+      key={defaultFile.id}
       options={{
         automaticLayout: true,
         codeLens: false,
         contextmenu: false,
+        fixedOverflowWidgets: true,
         minimap: {
           enabled: false
         },
@@ -71,7 +123,7 @@ export const EditorPane = () => {
         tabCompletion: 'on',
         tabSize: 2
       }}
-      path={selectedFile?.name}
+      path={defaultFile.name}
       theme={`odc-${theme}`}
       onChange={(value) => {
         setSelectedFileContent(value ?? '');
