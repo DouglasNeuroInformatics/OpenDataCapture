@@ -6,19 +6,20 @@ import { CopyPlusIcon } from 'lucide-react';
 import { z } from 'zod';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
-import { type InstrumentStoreItem, useInstrumentStore } from '@/store/instrument.store';
+import type { InstrumentRepository } from '@/models/instrument-repository.model';
+import { useAppStore } from '@/store';
 
 export const CloneButton = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const instruments = useInstrumentStore((store) => store.instruments);
-  const addInstrument = useInstrumentStore((store) => store.addInstrument);
-  const setSelectedInstrument = useInstrumentStore((store) => store.setSelectedInstrument);
+  const instruments = useAppStore((store) => store.instruments);
+  const addInstrument = useAppStore((store) => store.addInstrument);
+  const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
   const editorFilesRef = useEditorFilesRef();
 
   const handleSubmit = ({ label }: { label: string }) => {
     const files = editorFilesRef.current;
-    const item: InstrumentStoreItem = {
+    const item: InstrumentRepository = {
       category: 'Saved',
       files,
       id: crypto.randomUUID(),

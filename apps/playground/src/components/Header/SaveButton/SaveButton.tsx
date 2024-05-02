@@ -5,15 +5,15 @@ import { isEqual } from 'lodash-es';
 import { SaveIcon } from 'lucide-react';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
-import { useInstrumentStore } from '@/store/instrument.store';
+import { useAppStore } from '@/store';
 
 import { ActionButton } from '../ActionButton';
 
 export const SaveButton = () => {
   const [disabled, setDisabled] = useState(true);
   const editorFiles = useEditorFilesRef();
-  const selectedInstrument = useInstrumentStore((store) => store.selectedInstrument);
-  const updateSelectedInstrument = useInstrumentStore((store) => store.updateSelectedInstrument);
+  const selectedInstrument = useAppStore((store) => store.selectedInstrument);
+  const updateSelectedInstrument = useAppStore((store) => store.updateSelectedInstrument);
 
   useInterval(() => {
     if (selectedInstrument.category === 'Saved') {

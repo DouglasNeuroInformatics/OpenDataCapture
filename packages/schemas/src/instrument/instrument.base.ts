@@ -3,7 +3,7 @@ import type { LicenseIdentifier } from '@opendatacapture/licenses';
 import type { ConditionalKeys, Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 
-import { $Language, $LicenseIdentifier, $ZodTypeAny, type Language } from '../core/core.js';
+import { $Language, $LicenseIdentifier, $Uint8Array, $ZodTypeAny, type Language } from '../core/core.js';
 
 export type InstrumentKind = z.infer<typeof $InstrumentKind>;
 export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'UNKNOWN']);
@@ -264,7 +264,7 @@ export type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 export const $CreateInstrumentData = z.object({
   inputs: z.array(
     z.object({
-      content: z.string(),
+      content: z.union([$Uint8Array, z.string()]),
       name: z.string()
     })
   ),

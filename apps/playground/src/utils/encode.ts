@@ -2,7 +2,7 @@ import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from
 import { z } from 'zod';
 
 import { $EditorFile, type EditorFile } from '@/models/editor-file.model';
-import type { InstrumentStoreItem } from '@/store/instrument.store';
+import type { InstrumentRepository } from '@/models/instrument-repository.model';
 
 const $EditorFiles = z.array($EditorFile);
 
@@ -14,14 +14,14 @@ function encodeFiles(files: EditorFile[]): string {
   return compressToEncodedURIComponent(JSON.stringify($EditorFiles.parse(files)));
 }
 
-export function encodeShareURL({ files, label }: Pick<InstrumentStoreItem, 'files' | 'label'>) {
+export function encodeShareURL({ files, label }: Pick<InstrumentRepository, 'files' | 'label'>) {
   const url = new URL(location.origin);
   url.searchParams.append('files', encodeFiles(files));
   url.searchParams.append('label', compressToEncodedURIComponent(label));
   return url;
 }
 
-export function decodeShareURL(url: URL): Pick<InstrumentStoreItem, 'files' | 'label'> | null {
+export function decodeShareURL(url: URL): Pick<InstrumentRepository, 'files' | 'label'> | null {
   const encodedFiles = url.searchParams.get('files');
   const encodedLabel = url.searchParams.get('label');
   if (!(encodedFiles && encodedLabel)) {

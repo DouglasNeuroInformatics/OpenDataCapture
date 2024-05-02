@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-import { useEditorStore } from '@/store/editor.store';
+import { useAppStore } from '@/store';
 
 export function useEditorFilesRef() {
-  const ref = useRef(useEditorStore.getState().files);
+  const ref = useRef(useAppStore.getState().files);
   useEffect(() => {
-    useEditorStore.subscribe(
+    useAppStore.subscribe(
       (store) => store.files,
       (files) => {
         ref.current = files;

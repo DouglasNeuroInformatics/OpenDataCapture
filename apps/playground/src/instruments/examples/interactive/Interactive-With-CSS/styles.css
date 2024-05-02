@@ -28,6 +28,8 @@ body {
   background-color: var(--background-color);
   color: var(--text-color);
   display: flex;
+  flex-direction: column;
+  gap: 16px;
   justify-content: center;
   height: 100vh;
 }
@@ -38,4 +40,9 @@ body {
   color: var(--slate-300);
   padding: 8px;
   border-radius: 4px;
+}
+
+.logo {
+  width: 128px;
+  height: auto;
 }

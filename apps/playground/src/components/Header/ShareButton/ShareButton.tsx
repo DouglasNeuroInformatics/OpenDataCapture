@@ -5,11 +5,11 @@ import { CopyButton } from '@opendatacapture/react-core';
 import { ShareIcon } from 'lucide-react';
 
 import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
-import { useInstrumentStore } from '@/store/instrument.store';
+import { useAppStore } from '@/store';
 import { encodeShareURL } from '@/utils/encode';
 
 export const ShareButton = () => {
-  const label = useInstrumentStore((store) => store.selectedInstrument.label);
+  const label = useAppStore((store) => store.selectedInstrument.label);
   const editorFilesRef = useEditorFilesRef();
   const [shareURL, setShareURL] = useState(encodeShareURL({ files: editorFilesRef.current, label }));
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
