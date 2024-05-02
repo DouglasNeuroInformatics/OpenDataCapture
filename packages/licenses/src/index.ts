@@ -6,9 +6,33 @@ type License = {
   reference: string;
 };
 
-type LicenseIdentifier = 'PUBLIC-DOMAIN' | 'UNLICENSED' | Extract<keyof typeof _licenses, string>;
+type LicenseIdentifier =
+  | 'NON-FREE-COMMERCIAL-NOS'
+  | 'NON-FREE-NON-COMMERCIAL-NOS'
+  | 'NON-FREE-NOS'
+  | 'PUBLIC-DOMAIN'
+  | 'UNLICENSED'
+  | Extract<keyof typeof _licenses, string>;
 
 const licenses = new Map(Object.entries(_licenses)) as Map<LicenseIdentifier, License>;
+
+licenses.set('NON-FREE-COMMERCIAL-NOS', {
+  isOpenSource: false,
+  name: 'Non-Free License (Commercial, Not Otherwise Specified)',
+  reference: 'https://choosealicense.com'
+});
+
+licenses.set('NON-FREE-NON-COMMERCIAL-NOS', {
+  isOpenSource: false,
+  name: 'Non-Free License (Non-Commercial, Not Otherwise Specified)',
+  reference: 'https://choosealicense.com'
+});
+
+licenses.set('NON-FREE-NOS', {
+  isOpenSource: false,
+  name: 'Non-Free License (Not Otherwise Specified)',
+  reference: 'https://choosealicense.com'
+});
 
 licenses.set('UNLICENSED', {
   isOpenSource: false,
