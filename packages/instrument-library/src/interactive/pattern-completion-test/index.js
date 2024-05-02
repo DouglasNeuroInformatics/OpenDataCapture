@@ -71,9 +71,9 @@ const html = `
 
 export default defineInstrument({
   content: {
-    render() {
+    render(done) {
       document.body.innerHTML = html;
-      main();
+      main(done);
     }
   },
   details: {
@@ -94,6 +94,9 @@ export default defineInstrument({
   language: 'en',
   name: 'CPP-PatternCompletionTest',
   tags: ['CPP'],
-  validationSchema: z.any(),
+  validationSchema: z.object({
+    results: z.array(z.any()),
+    score: z.number()
+  }),
   version: 1.0
 });

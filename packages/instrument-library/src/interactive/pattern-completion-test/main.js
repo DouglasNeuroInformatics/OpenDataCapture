@@ -259,7 +259,11 @@ function simulateKeyEvent(type, keyCode) {
   document.dispatchEvent(customEvent);
 }
 
-export function main() {
+/**
+ * Wrapper for the legacy ManyBrains code
+ * @param {(data: { results: any[], score: number  }) => void} done
+ */
+export function main(done) {
   // first, get whether this is a mobile device
   const withTouch = 0;
 
@@ -1081,8 +1085,9 @@ export function main() {
     } else {
       $$$('headText').innerHTML = '';
       $$$('trialNum').innerHTML = '';
+
       // if there are no more trials, generate a score and submit the form with results
-      $$$('data').value = JSON.stringify(experiment.results);
+      //$$$('data').value = JSON.stringify(experiment.results);
 
       // calculate the score and submit results
       let score = 0;
@@ -1094,9 +1099,14 @@ export function main() {
         )
           score++;
       }
-      $$$('score').value = score;
+
+      done({
+        results: experiment.results,
+        score
+      });
+      //$$$('score').value = score;
       //alert($$$('score').value);
-      $$$('form').submit();
+      // $$$('form').submit();
     }
   }
 
