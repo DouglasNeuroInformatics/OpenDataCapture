@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
+declare module '*.html' {
+  const src: string;
+  export default src;
+}
+
 declare module '*.png' {
   const src: string;
   export default src;

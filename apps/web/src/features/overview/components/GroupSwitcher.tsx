@@ -4,10 +4,13 @@ import { Menu, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 export const GroupSwitcher = () => {
-  const { currentGroup, currentUser, setCurrentGroup } = useAuthStore();
+  const changeGroup = useAppStore((store) => store.changeGroup);
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
+
   const { t } = useTranslation('overview');
 
   // unless the user is an admin, this is set at login
@@ -38,7 +41,7 @@ export const GroupSwitcher = () => {
                 className="w-full bg-slate-50 p-2 text-left hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
                 style={{ minWidth: 100 }}
                 onClick={() => {
-                  setCurrentGroup(group);
+                  changeGroup(group);
                 }}
               >
                 {group.name}

@@ -51,7 +51,7 @@ const options = {
       tsconfigPath: tsconfig
     }),
     runtimePlugin({ outdir }),
-    prismaPlugin({ outdir: path.join(outdir, 'core') }),
+    prismaPlugin({ outdir: path.join(outdir, 'api') }),
     nativeModulesPlugin()
   ],
   target: ['node18', 'es2022'],

@@ -10,11 +10,11 @@
     "./group": "./src/group/group.ts",
     "./instrument": "./src/instrument/instrument.ts",
     "./instrument-records": "./src/instrument-records/instrument-records.ts",
+    "./session": "./src/session/session.ts",
     "./setup": "./src/setup/setup.ts",
     "./subject": "./src/subject/subject.ts",
     "./summary": "./src/summary/summary.ts",
-    "./user": "./src/user/user.ts",
-    "./visit": "./src/visit/visit.ts"
+    "./user": "./src/user/user.ts"
   },
   "scripts": {
     "format": "prettier --write src",

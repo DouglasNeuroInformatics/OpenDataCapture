@@ -13,8 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useActiveVisitStore } from '@/stores/active-visit-store';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 import { NavButton } from './NavButton';
 
@@ -31,9 +30,11 @@ export type NavigationProps = {
 };
 
 export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: NavigationProps) => {
-  const { currentUser } = useAuthStore();
-  const { activeVisit, setActiveVisit } = useActiveVisitStore();
-  const [isEndVisitModalOpen, setIsEndVisitModalOpen] = useState(false);
+  const currentSession = useAppStore((store) => store.currentSession);
+  const currentUser = useAppStore((store) => store.currentUser);
+  const endSession = useAppStore((store) => store.endSession);
+
+  const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false);
 
   const [navItems, setNavItems] = useState<NavItem[][]>([]);
   const { i18n, t } = useTranslation(['layout', 'core']);
@@ -59,35 +60,44 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
         label: t(`navLinks.viewSubjects`)
       });
     }
-    const visitItems: NavItem[] = [];
-    if (currentUser?.ability.can('create', 'Visit')) {
-      visitItems.push({
-        'data-cy': 'add-visit',
-        disabled: activeVisit !== null,
+    if (currentUser?.ability.can('manage', 'Group')) {
+      globalItems.push({
+        'data-cy': 'manage-group',
+        icon: ChartPieIcon,
+        id: '/group/manage',
+        label: t('navLinks.manageGroup')
+      });
+    }
+
+    const sessionItems: NavItem[] = [];
+    if (currentUser?.ability.can('create', 'Session')) {
+      sessionItems.push({
+        'data-cy': 'start-session',
+        disabled: currentSession !== null,
         icon: UserPlusIcon,
-        id: '/visits/add-visit',
-        label: t('navLinks.addVisit')
+        id: '/session/start-session',
+        label: t('navLinks.startSession')
       });
     }
     if (currentUser?.ability.can('create', 'InstrumentRecord')) {
-      visitItems.push({
+      sessionItems.push({
         'data-cy': 'view-instrument',
-        disabled: activeVisit === null,
+        disabled: currentSession === null,
         icon: ComputerDesktopIcon,
         id: '/instruments/available-instruments',
         label: t('navLinks.availableInstruments')
       });
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
-      visitItems.push({
-        disabled: activeVisit === null,
+      sessionItems.push({
+        disabled: currentSession === null,
         icon: EyeIcon,
-        id: `/subjects/${activeVisit?.subjectId}/table`,
+        id: `/subjects/${currentSession?.subjectId}/table`,
         label: t('navLinks.viewCurrentSubject')
       });
     }
-    setNavItems([globalItems, visitItems]);
-  }, [activeVisit, currentUser, i18n.resolvedLanguage]);
+    setNavItems([globalItems, sessionItems]);
+  }, [currentSession, currentUser, i18n.resolvedLanguage]);
 
   return (
     <>
@@ -118,12 +128,12 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
               {i === navItems.length - 1 && (
                 <NavButton
                   className={btn?.className}
-                  disabled={activeVisit === null}
+                  disabled={currentSession === null}
                   icon={StopIcon}
                   isActive={false}
-                  label={t('navLinks.endVisit')}
+                  label={t('navLinks.endSession')}
                   onClick={() => {
-                    setIsEndVisitModalOpen(true);
+                    setIsEndSessionModalOpen(true);
                   }}
                 />
               )}
@@ -132,20 +142,20 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
         ))}
       </nav>
       <LegacyModal
-        open={isEndVisitModalOpen}
-        title={t('endVisitModal.title')}
-        onClose={() => setIsEndVisitModalOpen(false)}
+        open={isEndSessionModalOpen}
+        title={t('endSessionModal.title')}
+        onClose={() => setIsEndSessionModalOpen(false)}
       >
-        <p className="text-sm">{t('endVisitModal.message')}</p>
+        <p className="text-sm">{t('endSessionModal.message')}</p>
         <div className="mt-4 flex">
           <Button
             className="mr-2 min-w-16"
             label={t('core:yes')}
             size="sm"
             onClick={() => {
-              setActiveVisit(null);
-              setIsEndVisitModalOpen(false);
-              navigate('/visits/add-visit');
+              endSession();
+              setIsEndSessionModalOpen(false);
+              navigate('/session/start-session');
             }}
           />
           <Button
@@ -154,7 +164,7 @@ export const Navigation = ({ btn, isAlwaysDark, onNavigate, orientation }: Navig
             size="sm"
             variant="secondary"
             onClick={() => {
-              setIsEndVisitModalOpen(false);
+              setIsEndSessionModalOpen(false);
             }}
           />
         </div>

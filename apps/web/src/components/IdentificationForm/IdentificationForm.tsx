@@ -6,23 +6,20 @@ import { Form } from '@douglasneuroinformatics/libui/components';
 import { $SubjectIdentificationData, type SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 
-import { useActiveVisitStore } from '@/stores/active-visit-store';
+import { useAppStore } from '@/store';
 
 export type IdentificationFormProps = {
-  /** Whether to prefill the form with the subject from the active visit, if one exists  */
-  fillActiveSubject?: boolean;
-
+  /** Whether to prefill the form with the subject from the current session, if one exists  */
+  fillCurrentSession?: boolean;
   /** Callback function invoked when validation is successful */
   onSubmit: (data: SubjectIdentificationData) => void;
-
   /** Optional override for the default submit button label */
   submitBtnLabel?: string;
 };
 
-export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel }: IdentificationFormProps) => {
-  const { activeVisit } = useActiveVisitStore();
+export const IdentificationForm = ({ fillCurrentSession, onSubmit, submitBtnLabel }: IdentificationFormProps) => {
+  const currentSession = useAppStore((store) => store.currentSession);
   const { t } = useTranslation('core');
-
   return (
     <Form
       content={{
@@ -53,8 +50,8 @@ export const IdentificationForm = ({ fillActiveSubject, onSubmit, submitBtnLabel
           variant: 'select'
         }
       }}
-      initialValues={fillActiveSubject ? activeVisit?.subject : undefined}
-      resetBtn={fillActiveSubject}
+      initialValues={fillCurrentSession ? currentSession?.subject : undefined}
+      resetBtn={fillCurrentSession}
       submitBtnLabel={submitBtnLabel ?? t('submit')}
       validationSchema={$SubjectIdentificationData}
       onSubmit={onSubmit}

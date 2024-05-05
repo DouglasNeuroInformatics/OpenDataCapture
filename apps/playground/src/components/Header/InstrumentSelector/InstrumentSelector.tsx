@@ -16,7 +16,10 @@ export const InstrumentSelector = () => {
   const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
 
   const categorizedInstruments = useMemo(() => {
-    return groupBy(instruments, (instrument) => instrument.category) as {
+    return groupBy(
+      instruments.toSorted((a, b) => a.label.localeCompare(b.label)),
+      (instrument) => instrument.category
+    ) as {
       [K in InstrumentCategory]: InstrumentRepository[];
     };
   }, [instruments]);

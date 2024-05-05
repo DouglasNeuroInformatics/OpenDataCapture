@@ -52,15 +52,6 @@ services:
     environment:
       - NODE_ENV=production
       - GATEWAY_API_KEY
-  playground:
-    image: ghcr.io/douglasneuroinformatics/open-data-capture-playground:${RELEASE_CHANNEL}
-    build:
-      context: .
-      dockerfile: ./apps/playground/Dockerfile
-    ports:
-      - ${PLAYGROUND_PORT}:80
-    expose:
-      - 80
   web:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-web:${RELEASE_CHANNEL}
     build:

@@ -6,13 +6,13 @@ import { Branding } from '@opendatacapture/react-core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
-import { useActiveVisitStore } from '@/stores/active-visit-store';
+import { useAppStore } from '@/store';
 
 import { Navigation } from './Navigation';
 import { UserDropup } from './UserDropup';
 
 export const Sidebar = () => {
-  const { activeVisit } = useActiveVisitStore();
+  const currentSession = useAppStore((store) => store.currentSession);
   const { t } = useTranslation(['core', 'common']);
   return (
     <div className="flex h-screen w-80 flex-col bg-slate-900 p-3 text-slate-300 shadow-lg dark:border-r dark:border-slate-700">
@@ -28,22 +28,22 @@ export const Sidebar = () => {
       />
       <hr className="invisible mt-auto" />
       <AnimatePresence>
-        {activeVisit && (
+        {currentSession && (
           <motion.div
             animate={{ opacity: 1 }}
             className="my-3 rounded-md border border-slate-700 bg-slate-800 p-2 tracking-tight"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
           >
-            <h3 className="font-medium">{t('common:currentSubject', { context: activeVisit.subject.sex })}</h3>
+            <h3 className="font-medium">{t('common:currentSubject', { context: currentSession.subject.sex })}</h3>
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
             <div className="text-sm">
-              <p>{`${t('fullName')}: ${activeVisit.subject.firstName} ${activeVisit.subject.lastName}`}</p>
+              <p>{`${t('fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
               <p>
-                {`${t('identificationData.dateOfBirth.label')}: ${toBasicISOString(activeVisit.subject.dateOfBirth)}`}{' '}
+                {`${t('identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
               </p>
               <p>
-                {`${t('identificationData.sex.label')}: ${t(`core:identificationData.sex.${toLowerCase(activeVisit.subject.sex)}`)}`}
+                {`${t('identificationData.sex.label')}: ${t(`core:identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)}`}
               </p>
             </div>
           </motion.div>

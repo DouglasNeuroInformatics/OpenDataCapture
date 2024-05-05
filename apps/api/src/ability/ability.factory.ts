@@ -1,7 +1,7 @@
 import { AbilityBuilder, detectSubjectType } from '@casl/ability';
 import { createPrismaAbility } from '@casl/prisma';
 import { Injectable, Logger } from '@nestjs/common';
-import { Prisma, type UserModel } from '@opendatacapture/database/core';
+import { Prisma, type UserModel } from '@opendatacapture/prisma-client/api';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
 
 import type { AppAbility } from '@/core/types';
@@ -20,24 +20,25 @@ export class AbilityFactory {
         break;
       case 'GROUP_MANAGER':
         ability.can('manage', 'Assignment');
-        ability.can('read', 'Group', { id: { in: user.groupIds } });
+        ability.can('manage', 'Group', { id: { in: user.groupIds } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
         ability.can('read', 'InstrumentRecord', { groupId: { in: user.groupIds } });
+        ability.can('create', 'Session');
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groupIds: { hasSome: user.groupIds } });
         ability.can('read', 'Summary');
         ability.can('read', 'User', { groupIds: { hasSome: user.groupIds } });
-        ability.can('create', 'Visit');
+
         break;
       case 'STANDARD':
         ability.can('read', 'Group', { id: { in: user.groupIds } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
+        ability.can('read', 'Session');
+        ability.can('create', 'Session');
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groupIds: { hasSome: user.groupIds } });
-        ability.can('read', 'Visit');
-        ability.can('create', 'Visit');
     }
     return ability.build({
       detectSubjectType: (object: { [key: string]: any }) => {

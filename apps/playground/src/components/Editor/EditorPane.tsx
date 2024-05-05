@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@douglasneuroinformatics/libui/hooks';
 import MonacoEditor from '@monaco-editor/react';
 
-import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
+import { useFilesRef } from '@/hooks/useFilesRef';
 import { useRuntime } from '@/hooks/useRuntime';
 import type { EditorFile } from '@/models/editor-file.model';
 import { useAppStore } from '@/store';
-import { inferFileType } from '@/utils/file';
+import { getImageMIMEType, inferFileType, isBase64EncodedFileType } from '@/utils/file';
 
 import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 
@@ -26,7 +26,7 @@ export const EditorPane = () => {
   const monacoRef = useRef<MonacoType | null>(null);
 
   const [defaultFile, setDefaultFile] = useState<({ id: string } & EditorFile) | null>(null);
-  const filesRef = useEditorFilesRef();
+  const filesRef = useFilesRef();
 
   useEffect(() => {
     const monaco = monacoRef.current;
@@ -99,6 +99,17 @@ export const EditorPane = () => {
   if (!fileType) {
     return <EditorPanePlaceholder>{`Error: Invalid file type "${fileType}"`}</EditorPanePlaceholder>;
   } else if (fileType === 'asset') {
+    if (isBase64EncodedFileType(defaultFile.name)) {
+      return (
+        <div className="flex h-full w-full items-center justify-center">
+          <img
+            alt={`Rendering of ${defaultFile.name}`}
+            className="h-auto max-w-96"
+            src={`data:${getImageMIMEType(defaultFile.name)};base64,${defaultFile.content}`}
+          />
+        </div>
+      );
+    }
     return <EditorPanePlaceholder>Cannot Display Binary Asset</EditorPanePlaceholder>;
   }
 

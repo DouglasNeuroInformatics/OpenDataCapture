@@ -1,13 +1,13 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
 
-import type { Exact, Merge } from 'type-fest';
+import type { Exact, Merge, Promisable, SetRequired } from 'type-fest';
 import { z } from 'zod';
 
-import { $UnilingualBaseInstrument, $UnilingualEnhancedBaseInstrumentDetails } from './instrument.base.js';
+import { $UnilingualBaseInstrument, $UnilingualInstrumentDetails } from './instrument.base.js';
 
 import type { Json, Language } from '../core/core.js';
-import type { BaseInstrument, EnhancedBaseInstrumentDetails } from './instrument.base.js';
+import type { BaseInstrument, UnilingualInstrumentDetails } from './instrument.base.js';
 
 type InteractiveInstrumentContent<TData extends Json = Json> = {
   /** attributes to inject in the iframe head */
@@ -15,14 +15,14 @@ type InteractiveInstrumentContent<TData extends Json = Json> = {
     /** base64 encoded css */
     readonly style: string;
   };
-  render: (done: <T extends Exact<TData, T>>(data: T) => void) => any;
+  render: (done: <T extends Exact<TData, T>>(data: T) => void) => Promisable<void>;
 };
 
 export type InteractiveInstrument<TData extends Json = Json> = Merge<
   BaseInstrument<TData, Language>,
   {
     content: InteractiveInstrumentContent<TData>;
-    details: EnhancedBaseInstrumentDetails<Language>;
+    details: SetRequired<UnilingualInstrumentDetails, 'estimatedDuration' | 'instructions'>;
     kind: 'INTERACTIVE';
   }
 >;
@@ -36,6 +36,9 @@ export const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $Uniling
       .readonly(),
     render: z.function().args(z.any()).returns(z.any())
   }),
-  details: $UnilingualEnhancedBaseInstrumentDetails,
+  details: $UnilingualInstrumentDetails.required({
+    estimatedDuration: true,
+    instructions: true
+  }),
   kind: z.literal('INTERACTIVE')
 });

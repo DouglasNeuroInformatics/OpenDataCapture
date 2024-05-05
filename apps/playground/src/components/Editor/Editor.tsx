@@ -6,7 +6,10 @@ import { Columns3Icon, FilePlusIcon, FileUpIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useAppStore } from '@/store';
+import { isImageLikeFileExtension } from '@/utils/file';
+import { loadEditorFilesFromNative } from '@/utils/load';
 
+import { FileUploadDialog } from '../FileUploadDialog';
 import { DeleteFileDialog } from './DeleteFileDialog';
 import { EditorAddFileButton } from './EditorAddFileButton';
 import { EditorButton } from './EditorButton';
@@ -14,7 +17,6 @@ import { EditorFileButton } from './EditorFileButton';
 import { EditorPane } from './EditorPane';
 import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 import { EditorTab } from './EditorTab';
-import { UploadFileDialog } from './UploadFileDialog';
 
 import './setup';
 
@@ -22,12 +24,33 @@ export const Editor = () => {
   const [isAddingFile, setIsAddingFile] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const [isUploadFileDialogOpen, setIsUploadFileDialogOpen] = useState(false);
+  const [isFileUploadDialogOpen, setIsFileUploadDialogOpen] = useState(false);
   const [isDeleteFileDialogOpen, setIsDeleteFileDialogOpen] = useState(false);
 
   const addFile = useAppStore((store) => store.addFile);
+  const addFiles = useAppStore((store) => store.addFiles);
   const openFilenames = useAppStore((store) => store.openFilenames);
-  const filenames = useAppStore(useShallow((store) => store.files.map((file) => file.name)));
+  const filenames = useAppStore(
+    useShallow((store) =>
+      store.files
+        .map((file) => file.name)
+        .toSorted((a, b) => {
+          if (a === store.indexFilename) {
+            return -1;
+          } else if (b === store.indexFilename) {
+            return 1;
+          }
+          const aIsImgLike = isImageLikeFileExtension(a);
+          const bIsImgLike = isImageLikeFileExtension(b);
+          if (aIsImgLike && !bIsImgLike) {
+            return 1;
+          } else if (bIsImgLike && !aIsImgLike) {
+            return -1;
+          }
+          return a.localeCompare(b);
+        })
+    )
+  );
 
   const selectedFilename = useAppStore((store) => store.selectedFilename);
   const deleteFilenameRef = useRef<null | string>(null);
@@ -48,7 +71,7 @@ export const Editor = () => {
           icon={<FileUpIcon />}
           tip="Upload Files"
           onClick={() => {
-            setIsUploadFileDialogOpen(true);
+            setIsFileUploadDialogOpen(true);
           }}
         />
         {openFilenames.map((filename) => (
@@ -97,7 +120,32 @@ export const Editor = () => {
         isOpen={isDeleteFileDialogOpen}
         setIsOpen={setIsDeleteFileDialogOpen}
       />
-      <UploadFileDialog isOpen={isUploadFileDialogOpen} setIsOpen={setIsUploadFileDialogOpen} />
+      <FileUploadDialog
+        accept={{
+          'image/jpeg': ['.jpg', '.jpeg'],
+          'image/png': ['.png'],
+          'image/webp': ['.webp'],
+          'text/css': ['.css'],
+          'text/html': ['.html'],
+          'text/plain': ['.js', '.jsx', '.ts', '.tsx']
+        }}
+        isOpen={isFileUploadDialogOpen}
+        setIsOpen={setIsFileUploadDialogOpen}
+        title="Upload Files"
+        onSubmit={async (files) => {
+          const editorFiles = await loadEditorFilesFromNative(files);
+          addFiles(editorFiles);
+          setIsFileUploadDialogOpen(false);
+        }}
+        onValidate={(files: File[]) => {
+          for (const file of files) {
+            if (filenames.includes(file.name)) {
+              return { message: `File already exists: ${file.name}`, result: 'error' };
+            }
+          }
+          return { result: 'success' };
+        }}
+      />
     </div>
   );
 };

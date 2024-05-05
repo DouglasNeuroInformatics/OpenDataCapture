@@ -1,7 +1,7 @@
 {
-  "activeVisit": {
-    "en": "Active Visit",
-    "fr": "Visite active"
+  "currentSession": {
+    "en": "Current Session",
+    "fr": "Session en cours"
   },
   "basePermissionLevel": {
     "admin": {

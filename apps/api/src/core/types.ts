@@ -3,13 +3,13 @@ import type { PrismaQuery } from '@casl/prisma';
 import type {
   GroupModel,
   InstrumentRecordModel,
+  SessionModel,
   SubjectModel,
-  UserModel,
-  VisitModel
-} from '@opendatacapture/database/core';
+  UserModel
+} from '@opendatacapture/prisma-client/api';
 import type { AppAction, AppSubjectName } from '@opendatacapture/schemas/core';
 
-type AppSubject = AppSubjectName | GroupModel | InstrumentRecordModel | SubjectModel | UserModel | VisitModel;
+type AppSubject = AppSubjectName | GroupModel | InstrumentRecordModel | SessionModel | SubjectModel | UserModel;
 
 export type AppAbility = PureAbility<[AppAction, AppSubject], PrismaQuery>;
 

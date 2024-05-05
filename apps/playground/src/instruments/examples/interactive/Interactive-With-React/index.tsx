@@ -1,9 +1,9 @@
 import { App } from './App.tsx';
 
-const { defineInstrument } = await import('/runtime/v1/core.js');
-const { default: React } = await import('/runtime/v1/react.js');
-const { createRoot } = await import('/runtime/v1/react-dom/client.js');
-const { z } = await import('/runtime/v1/zod.js');
+const { defineInstrument } = await import('/runtime/v1/opendatacapture@1.0.0/core.js');
+const { default: React } = await import('/runtime/v1/react@18.3.1/index.js');
+const { createRoot } = await import('/runtime/v1/react-dom@18.3.1/client.js');
+const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 
 import './index.css';
 

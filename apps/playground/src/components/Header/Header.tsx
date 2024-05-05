@@ -10,6 +10,7 @@ import { InstrumentSelector } from './InstrumentSelector';
 import { RefreshButton } from './RefreshButton';
 import { SaveButton } from './SaveButton';
 import { ShareButton } from './ShareButton';
+import { UploadButton } from './UploadButton';
 
 export const Header = () => {
   return (
@@ -20,7 +21,7 @@ export const Header = () => {
       <div className="mx-auto w-full max-w-lg md:w-96">
         <InstrumentSelector />
       </div>
-      <div className="mx-auto grid w-full max-w-lg grid-cols-8 gap-2 md:w-auto md:max-w-none">
+      <div className="mx-auto grid w-full max-w-lg grid-cols-9 gap-2 md:w-auto md:max-w-none">
         <div className="flex items-center justify-center">
           <SaveButton />
         </div>
@@ -29,6 +30,15 @@ export const Header = () => {
         </div>
         <div className="flex items-center justify-center">
           <ShareButton />
+        </div>
+        <div className="flex items-center justify-center">
+          <DownloadButton />
+        </div>
+        <div className="flex items-center justify-center">
+          <UploadButton />
+        </div>
+        <div className="flex items-center justify-center">
+          <RefreshButton />
         </div>
         <div className="flex items-center justify-center">
           <ThemeToggle className="h-9 w-9" />
@@ -42,12 +52,6 @@ export const Header = () => {
             }}
             triggerClassName="h-9 w-9"
           />
-        </div>
-        <div className="flex items-center justify-center">
-          <DownloadButton />
-        </div>
-        <div className="flex items-center justify-center">
-          <RefreshButton />
         </div>
         <div className="flex items-center justify-center">
           <ActionsDropdown />

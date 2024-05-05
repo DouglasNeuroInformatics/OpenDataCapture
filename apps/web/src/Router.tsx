@@ -7,12 +7,13 @@ import { BrowserRouter, Navigate, type RouteObject, useRoutes } from 'react-rout
 import { Layout } from './components/Layout';
 import { authRoutes } from './features/auth';
 import { contactRoute } from './features/contact';
+import { groupRoute } from './features/group';
 import { instrumentsRoute } from './features/instruments';
 import { overviewRoute } from './features/overview';
+import { sessionRoute } from './features/session';
 import { subjectsRoute } from './features/subjects';
 import { userRoute } from './features/user';
-import { visitsRoute } from './features/visits';
-import { useAuthStore } from './stores/auth-store';
+import { useAppStore } from './store';
 
 const publicRoutes: RouteObject[] = [
   authRoutes,
@@ -26,12 +27,12 @@ const protectedRoutes: RouteObject[] = [
   authRoutes,
   {
     element: <Layout />,
-    children: [contactRoute, instrumentsRoute, overviewRoute, subjectsRoute, userRoute, visitsRoute]
+    children: [contactRoute, groupRoute, instrumentsRoute, overviewRoute, sessionRoute, subjectsRoute, userRoute]
   }
 ];
 
 export const AppRoutes = () => {
-  const { accessToken } = useAuthStore();
+  const accessToken = useAppStore((store) => store.accessToken);
   return useRoutes(accessToken ? protectedRoutes : publicRoutes);
 };
 

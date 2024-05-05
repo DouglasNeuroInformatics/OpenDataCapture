@@ -7,12 +7,14 @@ import { AdjustmentsVerticalIcon, LockClosedIcon, UserCircleIcon } from '@heroic
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 import { LanguageToggle } from './LanguageToggle';
 
 export const UserDropup = () => {
-  const auth = useAuthStore();
+  const currentUser = useAppStore((store) => store.currentUser);
+  const logout = useAppStore((store) => store.logout);
+
   const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation('layout');
@@ -44,7 +46,7 @@ export const UserDropup = () => {
             <button
               className="flex w-full items-center px-3 py-2  hover:bg-slate-700"
               onClick={() => {
-                auth.logout();
+                logout();
               }}
             >
               <LockClosedIcon className="mr-2" height={16} width={16} />
@@ -73,7 +75,7 @@ export const UserDropup = () => {
       >
         <div className="flex flex-row-reverse items-center">
           <UserCircleIcon className="mr-2 h-8 w-8" />
-          <span>{auth.currentUser?.username}</span>
+          <span>{currentUser?.username}</span>
         </div>
       </ArrowToggle>
     </div>

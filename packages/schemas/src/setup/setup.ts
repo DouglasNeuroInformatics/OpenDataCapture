@@ -4,6 +4,7 @@ import { $CreateUserData } from '../user/user.js';
 
 export type SetupState = z.infer<typeof $SetupState>;
 export const $SetupState = z.object({
+  isDemo: z.boolean(),
   isGatewayEnabled: z.boolean(),
   isSetup: z.boolean().nullable()
 });

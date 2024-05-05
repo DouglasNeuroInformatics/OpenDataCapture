@@ -17,9 +17,9 @@
   "dependencies": {
     "@douglasneuroinformatics/libui": "^2.2.0",
     "@opendatacapture/crypto": "workspace:*",
-    "@opendatacapture/database": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
+    "@opendatacapture/prisma-client": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",

@@ -1,0 +1,188 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../dist/api"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("API_DATABASE_URL")
+}
+
+// Assignments
+
+enum AssignmentStatus {
+  CANCELED
+  COMPLETE
+  EXPIRED
+  OUTSTANDING
+}
+
+type EncryptionKeyPair {
+  publicKey  Bytes
+  privateKey Bytes
+}
+
+model AssignmentModel {
+  createdAt         DateTime               @default(now()) @db.Date
+  updatedAt         DateTime               @updatedAt @db.Date
+  id                String                 @id @map("_id")
+  completedAt       DateTime?
+  expiresAt         DateTime
+  instrument        InstrumentModel        @relation(fields: [instrumentId], references: [id])
+  instrumentId      String                 @db.ObjectId
+  instrumentRecord  InstrumentRecordModel?
+  status            AssignmentStatus
+  subject           SubjectModel           @relation(fields: [subjectId], references: [id])
+  subjectId         String
+  url               String
+  encryptionKeyPair EncryptionKeyPair
+}
+
+// Groups
+
+enum GroupType {
+  CLINICAL
+  RESEARCH
+}
+
+model GroupModel {
+  createdAt         DateTime                @default(now()) @db.Date
+  updatedAt         DateTime                @updatedAt @db.Date
+  id                String                  @id @default(auto()) @map("_id") @db.ObjectId
+  instrumentRecords InstrumentRecordModel[]
+  name              String                  @unique
+  sessions          SessionModel[]
+  subjects          SubjectModel[]          @relation(fields: [subjectIds], references: [id])
+  subjectIds        String[]
+  type              GroupType
+  userIds           String[]                @db.ObjectId
+  users             UserModel[]             @relation(fields: [userIds], references: [id])
+}
+
+/// Instrument Records
+
+model InstrumentRecordModel {
+  createdAt    DateTime         @default(now()) @db.Date
+  updatedAt    DateTime         @updatedAt @db.Date
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  data         Json?
+  date         DateTime         @db.Date
+  group        GroupModel?      @relation(fields: [groupId], references: [id])
+  groupId      String?          @db.ObjectId
+  subject      SubjectModel     @relation(fields: [subjectId], references: [id])
+  subjectId    String
+  instrument   InstrumentModel  @relation(fields: [instrumentId], references: [id])
+  instrumentId String           @db.ObjectId
+  assignment   AssignmentModel? @relation(fields: [assignmentId], references: [id])
+  assignmentId String?          @unique
+}
+
+// Instruments 
+
+enum InstrumentKind {
+  FORM
+  INTERACTIVE
+  SERIES
+  UNKNOWN
+}
+
+type InstrumentDetails {
+  authors           String[]
+  // string | Record<Language, string>
+  description       Json
+  estimatedDuration Int?
+  // string | string[] | Record<Language, string | string[]>
+  instructions      Json?
+  license           String
+  referenceUrl      String?
+  sourceUrl         String?
+  // string | Record<Language, string>
+  title             Json
+}
+
+model InstrumentModel {
+  createdAt   DateTime                @default(now()) @db.Date
+  updatedAt   DateTime                @updatedAt @db.Date
+  id          String                  @id @default(auto()) @map("_id") @db.ObjectId
+  bundle      String
+  details     InstrumentDetails
+  kind        InstrumentKind
+  /// Language | Language[]
+  language    Json
+  name        String
+  /// string[] | Record<Language, string[]>
+  tags        Json
+  version     Float
+  records     InstrumentRecordModel[]
+  assignments AssignmentModel[]
+}
+
+// Subjects
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+model SubjectModel {
+  createdAt         DateTime                @default(now()) @db.Date
+  updatedAt         DateTime                @updatedAt @db.Date
+  id                String                  @id @map("_id")
+  dateOfBirth       DateTime                @db.Date
+  firstName         String?
+  groupIds          String[]                @db.ObjectId
+  groups            GroupModel[]            @relation(fields: [groupIds], references: [id])
+  lastName          String?
+  sessions          SessionModel[]
+  sex               Sex
+  instrumentRecords InstrumentRecordModel[]
+  assignments       AssignmentModel[]
+}
+
+enum BasePermissionLevel {
+  ADMIN
+  GROUP_MANAGER
+  STANDARD
+}
+
+model UserModel {
+  createdAt           DateTime             @default(now()) @db.Date
+  updatedAt           DateTime             @updatedAt @db.Date
+  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
+  basePermissionLevel BasePermissionLevel?
+  firstName           String
+  groupIds            String[]             @db.ObjectId
+  groups              GroupModel[]         @relation(fields: [groupIds], references: [id])
+  lastName            String
+  password            String
+  username            String
+}
+
+enum SessionType {
+  RETROSPECTIVE
+  IN_PERSON
+  REMOTE
+}
+
+model SessionModel {
+  createdAt DateTime     @default(now()) @db.Date
+  updatedAt DateTime     @updatedAt @db.Date
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime     @db.Date
+  group     GroupModel?  @relation(fields: [groupId], references: [id])
+  groupId   String?      @db.ObjectId
+  subject   SubjectModel @relation(fields: [subjectId], references: [id])
+  subjectId String
+  type      SessionType
+}
+
+// Setup
+
+model SetupStateModel {
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  isDemo    Boolean
+  isSetup   Boolean
+}

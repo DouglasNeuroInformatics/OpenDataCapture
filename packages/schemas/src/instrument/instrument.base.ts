@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { $Language, $LicenseIdentifier, $Uint8Array, $ZodTypeAny, type Language } from '../core/core.js';
 
 export type InstrumentKind = z.infer<typeof $InstrumentKind>;
-export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'UNKNOWN']);
+export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'SERIES', 'UNKNOWN']);
 
 /**
  * The language(s) of the instrument. For a unilingual instrument,
@@ -68,12 +68,18 @@ export const $$InstrumentUIOption = <TSchema extends z.ZodTypeAny, TLanguage ext
  *
  * @typeParam TLanguage - the language(s) of the instrument
  */
-export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+export type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The legal person(s) that created the instrument and hold copyright to the instrument */
   authors?: null | string[];
 
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
+
+  /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
+  estimatedDuration?: number;
+
+  /** Brief sequential instructions for how the subject should complete the instrument. */
+  instructions?: InstrumentUIOption<TLanguage, string[]>;
 
   /** An identifier corresponding to the SPDX license list version d2709ad (released on 2024-01-30) */
   license: LicenseIdentifier;
@@ -87,39 +93,23 @@ export type BaseInstrumentDetails<TLanguage extends InstrumentLanguage = Instrum
   /** The title of the instrument in the language it is written, omitting the definite article */
   title: InstrumentUIOption<TLanguage, string>;
 };
-export const $BaseInstrumentDetails = z.object({
+export const $InstrumentDetails = z.object({
   authors: z.array(z.string()).nullish(),
   description: $$InstrumentUIOption(z.string().min(1)),
+  estimatedDuration: z.number().int().nonnegative().optional(),
+  instructions: $$InstrumentUIOption(z.array(z.string().min(1))).optional(),
   license: $LicenseIdentifier,
   referenceUrl: z.string().url().nullish(),
   sourceUrl: z.string().url().nullish(),
   title: $$InstrumentUIOption(z.string().min(1))
-}) satisfies z.ZodType<BaseInstrumentDetails>;
+}) satisfies z.ZodType<InstrumentDetails>;
 
-export const $UnilingualBaseInstrumentDetails = $BaseInstrumentDetails.extend({
+export type UnilingualInstrumentDetails = InstrumentDetails<Language>;
+export const $UnilingualInstrumentDetails = $InstrumentDetails.extend({
   description: z.string().min(1),
+  instructions: z.array(z.string().min(1)).optional(),
   title: z.string().min(1)
-}) satisfies z.ZodType<BaseInstrumentDetails<Language>>;
-
-/** An object with additional details relevant to multiple categories of instrument  */
-export type EnhancedBaseInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Simplify<
-  {
-    /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
-    estimatedDuration: number;
-    /** Brief sequential instructions for how the subject should complete the instrument. */
-    instructions: InstrumentUIOption<TLanguage, string[]>;
-  } & BaseInstrumentDetails<TLanguage>
->;
-export const $EnhancedBaseInstrumentDetails = $BaseInstrumentDetails.extend({
-  estimatedDuration: z.number().int().nonnegative(),
-  instructions: $$InstrumentUIOption(z.array(z.string().min(1)))
-}) satisfies z.ZodType<EnhancedBaseInstrumentDetails>;
-
-export const $UnilingualEnhancedBaseInstrumentDetails = $EnhancedBaseInstrumentDetails
-  .extend($UnilingualBaseInstrumentDetails.shape)
-  .extend({
-    instructions: z.array(z.string().min(1))
-  }) satisfies z.ZodType<EnhancedBaseInstrumentDetails<Language>>;
+}) satisfies z.ZodType<UnilingualInstrumentDetails>;
 
 export type InstrumentMeasureValue = z.infer<typeof $InstrumentMeasureValue>;
 export const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.number(), z.date(), z.undefined()]);
@@ -194,7 +184,7 @@ export type BaseInstrument<TData = any, TLanguage extends InstrumentLanguage = I
   content?: unknown;
 
   /** The details of the instrument to be displayed to the user */
-  details: BaseInstrumentDetails<TLanguage>;
+  details: InstrumentDetails<TLanguage>;
 
   id?: string;
 
@@ -205,7 +195,7 @@ export type BaseInstrument<TData = any, TLanguage extends InstrumentLanguage = I
   language: TLanguage;
 
   /** Arbitrary measures derived from the data */
-  measures?: InstrumentMeasures<TData, TLanguage>;
+  measures: InstrumentMeasures<TData, TLanguage> | null;
 
   /** The name of the instrument, which must be unique for a given version */
   name: string;
@@ -222,11 +212,11 @@ export type BaseInstrument<TData = any, TLanguage extends InstrumentLanguage = I
 
 export const $BaseInstrument = z.object({
   content: z.any(),
-  details: $BaseInstrumentDetails,
+  details: $InstrumentDetails,
   id: z.string().optional(),
   kind: $InstrumentKind,
   language: $InstrumentLanguage,
-  measures: $InstrumentMeasures.optional(),
+  measures: $InstrumentMeasures.nullable(),
   name: z.string().min(1),
   tags: $$InstrumentUIOption(z.array(z.string().min(1))),
   validationSchema: $ZodTypeAny,
@@ -234,9 +224,9 @@ export const $BaseInstrument = z.object({
 }) satisfies z.ZodType<BaseInstrument>;
 
 export const $UnilingualBaseInstrument = $BaseInstrument.extend({
-  details: $UnilingualBaseInstrumentDetails,
+  details: $UnilingualInstrumentDetails,
   language: $Language,
-  measures: $UnilingualInstrumentMeasures.optional(),
+  measures: $UnilingualInstrumentMeasures.nullable(),
   tags: z.array(z.string().min(1))
 }) satisfies z.ZodType<BaseInstrument<any, Language>>;
 

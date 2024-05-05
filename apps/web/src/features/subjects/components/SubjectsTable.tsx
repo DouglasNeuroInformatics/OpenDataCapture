@@ -9,13 +9,15 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
 import { SubjectLookup } from './SubjectLookup';
 
 export const SubjectsTable = () => {
-  const { currentGroup, currentUser } = useAuthStore();
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
+
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
   const download = useDownload();
   const navigate = useNavigate();

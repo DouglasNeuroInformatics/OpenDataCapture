@@ -8,7 +8,7 @@ import { useAppStore } from '@/store';
 import { editorFileToInput } from '@/utils/file';
 import { hashFiles } from '@/utils/hash';
 
-import { useEditorFilesRef } from './useEditorFilesRef';
+import { useFilesRef } from './useFilesRef';
 import { useInstrumentBundler } from './useInstrumentBundler';
 
 type InitialState = {
@@ -32,7 +32,7 @@ type BuildingState = {
 type TranspilerState = BuildingState | BuiltState | ErrorState | InitialState;
 
 export function useTranspiler(): TranspilerState {
-  const editorFilesRef = useEditorFilesRef();
+  const editorFilesRef = useFilesRef();
   const refreshInterval = useAppStore((store) => store.settings.refreshInterval);
   const [filesHash, setFilesHash] = useState<string>('');
   const [state, setState] = useState<TranspilerState>({ status: 'initial' });

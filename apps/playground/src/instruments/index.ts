@@ -4,6 +4,9 @@ import { capitalize } from 'lodash-es';
 import { $InstrumentCategory, type InstrumentRepository } from '@/models/instrument-repository.model';
 import { loadAssetAsBase64 } from '@/utils/load';
 
+// Instruments in development
+const EXCLUDED_LABELS = ['Interactive With JSPsych'];
+
 const textFiles: { [key: string]: string } = import.meta.glob('./**/*.{css,js,jsx,ts,tsx,svg}', {
   eager: true,
   import: 'default',
@@ -27,6 +30,10 @@ for (const [filename, content] of Object.entries({ ...binaryFiles, ...textFiles 
   const kind = await $InstrumentKind.parseAsync(segments[2].toUpperCase());
   const label = segments[3].replaceAll('-', ' ');
   const name = segments.slice(4, segments.length).join('/');
+
+  if (EXCLUDED_LABELS.includes(label)) {
+    continue;
+  }
 
   let instrument = defaultInstruments.find((instrument) => {
     return instrument.category === category && instrument.kind === kind && instrument.label === label;

@@ -4,14 +4,14 @@ import { Button, Heading, Input, Popover } from '@douglasneuroinformatics/libui/
 import { CopyButton } from '@opendatacapture/react-core';
 import { ShareIcon } from 'lucide-react';
 
-import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
+import { useFilesRef } from '@/hooks/useFilesRef';
 import { useAppStore } from '@/store';
 import { encodeShareURL } from '@/utils/encode';
 import { formatSize } from '@/utils/format';
 
 export const ShareButton = () => {
   const label = useAppStore((store) => store.selectedInstrument.label);
-  const editorFilesRef = useEditorFilesRef();
+  const editorFilesRef = useFilesRef();
   const [shareURL, setShareURL] = useState(encodeShareURL({ files: editorFilesRef.current, label }));
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 

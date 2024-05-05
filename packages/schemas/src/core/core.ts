@@ -10,10 +10,10 @@ export type AppSubjectName =
   | 'Group'
   | 'Instrument'
   | 'InstrumentRecord'
+  | 'Session'
   | 'Subject'
   | 'Summary'
   | 'User'
-  | 'Visit'
   | 'all';
 
 export type BaseAppAbility = PureAbility<[AppAction, AppSubjectName]>;

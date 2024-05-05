@@ -69,10 +69,10 @@ export const InstrumentOverview = ({ instrument, onNext }: InstrumentOverviewPro
             })}
           </p>
         </div>
-        {instrument.details.instructions.length > 0 && (
+        {Boolean(instrument.details.instructions?.length) && (
           <div>
             <Heading variant="h5">{t('instructions')}</Heading>
-            <p className="text-muted-foreground text-sm">{instrument.details.instructions.join(', ')}</p>
+            <p className="text-muted-foreground text-sm">{instrument.details.instructions!.join(', ')}</p>
           </div>
         )}
         {instrument.details.referenceUrl && (

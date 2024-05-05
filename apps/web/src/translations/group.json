@@ -1,0 +1,12 @@
+{
+  "manage": {
+    "pageTitle": {
+      "en": "Manage Group",
+      "fr": "Gestion du groupe"
+    },
+    "availableInstruments": {
+      "en": "Available Instruments",
+      "fr": "Instruments disponibles"
+    }
+  }
+}

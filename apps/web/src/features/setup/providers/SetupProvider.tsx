@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 
+import { useSetupState } from '@/hooks/useSetupState';
+
 import { useCreateSetupState } from '../hooks/useCreateSetupState';
-import { useSetupState } from '../hooks/useSetupState';
 import { SetupLoadingPage } from '../pages/SetupLoadingPage';
 import { SetupPage } from '../pages/SetupPage';
 

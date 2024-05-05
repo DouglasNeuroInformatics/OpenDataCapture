@@ -3,9 +3,9 @@ declare global {
   namespace Cypress {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Chainable {
-      addVisit(firstName: string, lastName: string): Chainable<void>;
       dragTo(prevSubject: string): Chainable<void>;
       login(username: string, password: string): Chainable<void>;
+      startSession(firstName: string, lastName: string): Chainable<void>;
     }
   }
 }
@@ -18,9 +18,9 @@ Cypress.Commands.add('login', (username, password) => {
   form.get('button[data-cy="submit-form"]').click();
 });
 
-Cypress.Commands.add('addVisit', (firstName, lastName) => {
-  cy.get('button[data-cy="add-visit"]').first().click();
-  cy.url().should('include', '/visits/add-visit');
+Cypress.Commands.add('startSession', (firstName, lastName) => {
+  cy.get('button[data-cy="start-session"]').first().click();
+  cy.url().should('include', '/session/start-session');
   cy.get('input[name=firstName]').type(firstName);
   cy.get('input[name=lastName]').type(lastName);
   cy.get('input[name="dateOfBirth"]').first().type('1999-04-01');

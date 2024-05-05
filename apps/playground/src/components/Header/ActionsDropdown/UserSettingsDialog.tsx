@@ -18,7 +18,7 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <Dialog.Content>
+      <Dialog.Content onOpenAutoFocus={(event) => event.preventDefault()}>
         <Dialog.Header>
           <Dialog.Title>User Settings</Dialog.Title>
         </Dialog.Header>

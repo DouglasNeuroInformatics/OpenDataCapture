@@ -3,12 +3,12 @@ import axios, { isAxiosError } from 'axios';
 import i18next from 'i18next';
 
 import { config } from '@/config';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 axios.defaults.baseURL = import.meta.env.MODE !== 'test' ? config.setup.apiBaseUrl : undefined;
 
 axios.interceptors.request.use((config) => {
-  const auth = useAuthStore.getState();
+  const accessToken = useAppStore.getState().accessToken;
 
   config.headers.setAccept('application/json');
 
@@ -18,8 +18,8 @@ axios.interceptors.request.use((config) => {
     config.timeoutErrorMessage = i18next.t('networkError');
   }
 
-  if (auth.accessToken) {
-    config.headers.set('Authorization', `Bearer ${auth.accessToken}`);
+  if (accessToken) {
+    config.headers.set('Authorization', `Bearer ${accessToken}`);
   }
 
   return config;

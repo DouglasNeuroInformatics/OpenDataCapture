@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, LegacyModal } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 import { useDisclaimerStore } from '../stores/disclaimer-store';
 
@@ -12,7 +12,9 @@ export type DisclaimerProps = {
 };
 
 export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProps) => {
-  const { currentUser, logout } = useAuthStore();
+  const currentUser = useAppStore((store) => store.currentUser);
+  const logout = useAppStore((store) => store.logout);
+
   const { isAccepted, setIsAccepted, username } = useDisclaimerStore();
   const { t } = useTranslation('overview');
 

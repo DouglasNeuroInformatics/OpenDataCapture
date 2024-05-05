@@ -219,11 +219,11 @@ function translateFormContent(
 }
 
 function translateMeasures(
-  measures: MultilingualInstrumentMeasures | undefined,
+  measures: MultilingualInstrumentMeasures | null,
   language: Language
-): UnilingualInstrumentMeasures | undefined {
+): UnilingualInstrumentMeasures | null {
   if (!measures) {
-    return;
+    return null;
   }
   return mapValues(measures, (measure) => {
     switch (measure.kind) {

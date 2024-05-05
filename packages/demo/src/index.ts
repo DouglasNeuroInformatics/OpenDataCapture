@@ -6,14 +6,16 @@ type DemoUser = {
   groupNames: readonly string[];
 } & Pick<User, 'basePermissionLevel' | 'firstName' | 'lastName' | 'password' | 'username'>;
 
-type DemoGroup = Pick<Group, 'name'>;
+type DemoGroup = Pick<Group, 'name' | 'type'>;
 
 export const DEMO_GROUPS: readonly DemoGroup[] = deepFreeze([
   {
-    name: 'Depression Clinic'
+    name: 'Depression Clinic',
+    type: 'CLINICAL'
   },
   {
-    name: 'Psychosis Clinic'
+    name: 'Psychosis Lab',
+    type: 'RESEARCH'
   }
 ]);
 
@@ -21,7 +23,7 @@ export const DEMO_USERS: readonly DemoUser[] = deepFreeze([
   {
     basePermissionLevel: 'GROUP_MANAGER',
     firstName: 'Jane',
-    groupNames: ['Depression Clinic', 'Psychosis Clinic'],
+    groupNames: ['Depression Clinic', 'Psychosis Lab'],
     lastName: 'Doe',
     password: 'DataCapture2023',
     username: 'JaneDoe'
@@ -37,7 +39,7 @@ export const DEMO_USERS: readonly DemoUser[] = deepFreeze([
   {
     basePermissionLevel: 'STANDARD',
     firstName: 'François',
-    groupNames: ['Psychosis Clinic'],
+    groupNames: ['Psychosis Lab'],
     lastName: 'Bouchard',
     password: 'DataCapture2023',
     username: 'FrançoisBouchard'

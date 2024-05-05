@@ -30,7 +30,7 @@ describe('InstrumentBundler', () => {
     });
     it('should include valid dynamic imports', async () => {
       const bundle = await instrumentBundler.bundle({ inputs: inputs.form });
-      expect(bundle).toMatch('import("/runtime/v1/zod.js")');
+      expect(bundle).toMatch('import("/runtime/v1/zod@3.23.6/index.js")');
     });
     it('should bundle css', async () => {
       await expect(instrumentBundler.bundle({ inputs: inputs.interactive })).resolves.toBeTypeOf('string');

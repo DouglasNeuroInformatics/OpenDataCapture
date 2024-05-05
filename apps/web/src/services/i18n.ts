@@ -1,9 +1,31 @@
 import { i18n } from '@opendatacapture/i18next';
-import Backend from 'i18next-http-backend';
 
-await i18n.use(Backend).init({
-  ns: ['auth', 'common', 'contact', 'instruments', 'layout', 'overview', 'setup', 'subjects', 'user', 'visits'],
-  partialBundledLanguages: true
+import auth from '../translations/auth.json';
+import common from '../translations/common.json';
+import contact from '../translations/contact.json';
+import group from '../translations/group.json';
+import instruments from '../translations/instruments.json';
+import layout from '../translations/layout.json';
+import overview from '../translations/overview.json';
+import session from '../translations/session.json';
+import setup from '../translations/setup.json';
+import subjects from '../translations/subjects.json';
+import user from '../translations/user.json';
+
+i18n.addPreInitTranslations({
+  auth,
+  common,
+  contact,
+  group,
+  instruments,
+  layout,
+  overview,
+  session,
+  setup,
+  subjects,
+  user
 });
+
+await i18n.init();
 
 export default i18n;

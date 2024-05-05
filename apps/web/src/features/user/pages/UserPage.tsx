@@ -2,10 +2,10 @@ import React from 'react';
 
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 export const UserPage = () => {
-  const { currentUser } = useAuthStore();
+  const currentUser = useAppStore((store) => store.currentUser);
 
   let fullName: string;
   if (currentUser?.firstName && currentUser.lastName) {

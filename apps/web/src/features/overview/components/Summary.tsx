@@ -4,13 +4,13 @@ import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@h
 import { useTranslation } from 'react-i18next';
 
 import { LoadingFallback } from '@/components/LoadingFallback';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 import { StatisticCard } from '../components/StatisticCard';
 import { useSummaryQuery } from '../hooks/useSummaryQuery';
 
 export const Summary = () => {
-  const { currentGroup } = useAuthStore();
+  const currentGroup = useAppStore((store) => store.currentGroup);
   const { t } = useTranslation('overview');
 
   const summaryQuery = useSummaryQuery({

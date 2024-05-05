@@ -1,0 +1,62 @@
+{
+  "startSession": {
+    "en": "Start Session",
+    "fr": "Commencer une session"
+  },
+  "additionalData": {
+    "title": {
+      "en": "Additional Data",
+      "fr": "Données supplémentaires"
+    }
+  },
+  "dateAssessed": {
+    "description": {
+      "en": "If the session took place on a date other than today, you can change it here.",
+      "fr": "Si la session a eu lieu à une autre date qu'aujourd'hui, vous pouvez la modifier ici."
+    },
+    "label": {
+      "en": "Date Assessed",
+      "fr": "Date d'évaluation"
+    }
+  },
+  "errors": {
+    "assessmentMustBeInPast": {
+      "en": "The assessment must be in the past",
+      "fr": "L'évaluation doit être dans le passé"
+    },
+    "mustBeAdult": {
+      "en": "The subject must be at least 18 years old",
+      "fr": "Le client doit avoir au moins 18 ans"
+    }
+  },
+  "subjectIdentification": {
+    "description": {
+      "en": "The following items are used to compute a unique identifier that enables consistent cross-session identification.",
+      "fr": "Les éléments suivants sont utilisés pour calculer un identifiant unique qui permet une identification cohérente entre les sessions."
+    },
+    "firstName": {
+      "description": {
+        "en": "The subject's first name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as their ASCII equivalents.",
+        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance. Aux fins d'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme leurs équivalents ASCII."
+      },
+      "label": {
+        "en": "First Name",
+        "fr": "Prénom"
+      }
+    },
+    "lastName": {
+      "description": {
+        "en": "The subject's last name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as their ASCII equivalents.",
+        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance. Aux fins d'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme leurs équivalents ASCII."
+      },
+      "label": {
+        "en": "Last Name",
+        "fr": "Nom de famille"
+      }
+    },
+    "title": {
+      "en": "Subject Identification",
+      "fr": "Identification du client"
+    }
+  }
+}
