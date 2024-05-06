@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import type { UserModel } from '@opendatacapture/database/core';
+import type { UserModel } from '@opendatacapture/prisma-client/api';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '../ability.factory';

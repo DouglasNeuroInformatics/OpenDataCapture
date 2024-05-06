@@ -28,7 +28,7 @@
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/throttler": "^5.1.2",
     "@opendatacapture/crypto": "workspace:*",
-    "@opendatacapture/database": "workspace:*",
+    "@opendatacapture/prisma-client": "workspace:*",
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",

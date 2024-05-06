@@ -1,0 +1,27 @@
+{
+  "name": "@opendatacapture/prisma-client",
+  "version": "0.0.0",
+  "exports": {
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "default": "./dist/api/index.js"
+    },
+    "./gateway": {
+      "types": "./dist/gateway/index.d.ts",
+      "default": "./dist/gateway/index.js"
+    }
+  },
+  "scripts": {
+    "db:generate": "prisma generate --schema schemas/api.schema.prisma && prisma generate --schema schemas/gateway.schema.prisma",
+    "db:push": "env-cmd --silent -f ../../.env prisma db push --skip-generate --schema schemas/gateway.schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.12.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.12.1"
+  },
+  "trustedDependencies": [
+    "prisma"
+  ]
+}

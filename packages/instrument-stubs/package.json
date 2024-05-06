@@ -5,7 +5,8 @@
   "license": "AGPL-3.0",
   "exports": {
     "./forms": "./src/forms.js",
-    "./interactive": "./src/interactive.js"
+    "./interactive": "./src/interactive.js",
+    "./series": "./src/series.js"
   },
   "scripts": {
     "format": "prettier --write src",

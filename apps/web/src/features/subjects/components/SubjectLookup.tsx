@@ -34,7 +34,7 @@ export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
   return (
     <LegacyModal open={show} title={t('index.lookup.title')} onClose={onClose}>
       <div>
-        <IdentificationForm fillActiveSubject onSubmit={(data) => void lookupSubject(data)} />
+        <IdentificationForm fillCurrentSession onSubmit={(data) => void lookupSubject(data)} />
       </div>
     </LegacyModal>
   );

@@ -13,10 +13,9 @@ import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
-import { FormContent } from '../FormContent';
+import { InstrumentContent } from '../InstrumentContent';
 import { InstrumentOverview } from '../InstrumentOverview';
 import { InstrumentSummary } from '../InstrumentSummary';
-import { InteractiveContent } from '../InteractiveContent';
 
 export type InstrumentRendererProps<TKind extends InstrumentKind> = {
   bundle: string;
@@ -141,11 +140,8 @@ export const InstrumentRenderer = <TKind extends InstrumentKind>({
             .with({ index: 0 }, () => (
               <InstrumentOverview instrument={instrument} onNext={() => updateIndex('increment')} />
             ))
-            .with({ index: 1, instrument: { kind: 'FORM' } }, ({ instrument }) => (
-              <FormContent instrument={instrument} onSubmit={handleSubmit} />
-            ))
-            .with({ index: 1, instrument: { kind: 'INTERACTIVE' } }, () => (
-              <InteractiveContent bundle={bundle} onSubmit={handleSubmit} />
+            .with({ index: 1 }, ({ instrument }) => (
+              <InstrumentContent bundle={bundle} instrument={instrument} onSubmit={handleSubmit} />
             ))
             .with({ index: 2 }, () => (
               <InstrumentSummary data={data} instrument={instrument} subject={subject} timeCollected={Date.now()} />

@@ -5,7 +5,7 @@ import axios from 'axios';
 
 export function useCreateAssignment() {
   const queryClient = useQueryClient();
-  const { addNotification } = useNotificationsStore();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
     mutationFn: ({ data }: { data: CreateAssignmentData }) => axios.post('/v1/assignments', data),
     onSuccess() {

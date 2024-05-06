@@ -25,7 +25,7 @@ RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 RUN pnpm dlx turbo build --filter=@opendatacapture/gateway
-RUN pnpm dlx turbo run db:push --filter=@opendatacapture/database
+RUN pnpm dlx turbo run db:push --filter=@opendatacapture/prisma-client
 
 # RUN SERVER
 FROM base AS runner

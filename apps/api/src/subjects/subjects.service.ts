@@ -1,6 +1,6 @@
 import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Prisma } from '@opendatacapture/database/core';
+import type { Prisma } from '@opendatacapture/prisma-client/api';
 import unidecode from 'unidecode';
 
 import { accessibleQuery } from '@/ability/ability.utils';

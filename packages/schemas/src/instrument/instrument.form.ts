@@ -19,15 +19,15 @@ import type {
   StaticFieldKind,
   StringFormField
 } from '@douglasneuroinformatics/libui-form-types';
-import type { KeysOfUnion, Simplify } from 'type-fest';
+import type { KeysOfUnion, SetRequired, Simplify } from 'type-fest';
 import { z } from 'zod';
 
 import { $ZodTypeAny, type Language } from '../core/core.js';
-import { $$InstrumentUIOption, $BaseInstrument, $EnhancedBaseInstrumentDetails } from './instrument.base.js';
+import { $$InstrumentUIOption, $BaseInstrument, $InstrumentDetails } from './instrument.base.js';
 
 import type {
   BaseInstrument,
-  EnhancedBaseInstrumentDetails,
+  InstrumentDetails,
   InstrumentLanguage,
   InstrumentMeasures,
   InstrumentUIOption
@@ -435,14 +435,17 @@ export type FormInstrument<
 > = Simplify<
   {
     content: FormInstrumentContent<TData, TLanguage>;
-    details: EnhancedBaseInstrumentDetails<TLanguage>;
+    details: SetRequired<InstrumentDetails<TLanguage>, 'estimatedDuration' | 'instructions'>;
     kind: 'FORM';
-    measures?: InstrumentMeasures<TData, TLanguage>;
+    measures: InstrumentMeasures<TData, TLanguage> | null;
   } & Omit<BaseInstrument<TData, TLanguage>, 'details'>
 >;
 export const $FormInstrument: z.ZodType<FormInstrument> = $BaseInstrument.extend({
   content: $FormInstrumentContent,
-  details: $EnhancedBaseInstrumentDetails,
+  details: $InstrumentDetails.required({
+    estimatedDuration: true,
+    instructions: true
+  }),
   kind: z.literal('FORM'),
   validationSchema: $ZodTypeAny
 });

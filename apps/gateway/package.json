@@ -15,11 +15,11 @@
     "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env node dist/main.mjs"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.2.0",
+    "@douglasneuroinformatics/libui": "^2.2.4",
     "@opendatacapture/crypto": "workspace:*",
-    "@opendatacapture/database": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
+    "@opendatacapture/prisma-client": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",

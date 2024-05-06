@@ -26,6 +26,7 @@ export class SetupService {
   async getState() {
     const savedOptions = await this.getSavedOptions();
     return {
+      isDemo: Boolean(savedOptions?.isDemo),
       isGatewayEnabled: this.configurationService.get('GATEWAY_ENABLED'),
       isSetup: Boolean(savedOptions?.isSetup)
     };
@@ -42,7 +43,7 @@ export class SetupService {
     if (initDemo) {
       await this.demoService.init({ dummySubjectCount: dummySubjectCount ?? 0 });
     }
-    await this.setupStateModel.create({ data: { isSetup: true } });
+    await this.setupStateModel.create({ data: { isDemo: initDemo, isSetup: true } });
     return { success: true };
   }
 

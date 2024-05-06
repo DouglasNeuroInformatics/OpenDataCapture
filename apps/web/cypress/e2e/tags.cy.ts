@@ -1,9 +1,9 @@
-import { adminUser } from '@/test/server/stubs';
+import { adminUser } from '@/testing/server/stubs';
 
 describe('tags test', () => {
   it('passes', () => {
     cy.login(adminUser.username, adminUser.password);
-    cy.addVisit('Jane', 'Doe');
+    cy.startSession('Jane', 'Doe');
 
     // navigate to view instruments, select the first tag available with dropdown
     cy.get('button[data-cy="view-instrument"]').first().click();

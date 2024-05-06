@@ -12,7 +12,8 @@
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.2.0",
+    "@douglasneuroinformatics/libjs": "^0.3.1",
+    "@douglasneuroinformatics/libui": "^2.2.4",
     "@monaco-editor/react": "^4.6.0",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-bundler": "workspace:*",

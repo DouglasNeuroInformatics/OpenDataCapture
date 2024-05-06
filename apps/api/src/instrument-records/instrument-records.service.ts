@@ -1,7 +1,7 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable } from '@nestjs/common';
-import type { InstrumentRecordModel } from '@opendatacapture/database/core';
 import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
+import type { InstrumentRecordModel } from '@opendatacapture/prisma-client/api';
 import type { AnyInstrument, InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
@@ -186,9 +186,11 @@ export class InstrumentRecordsService {
     const instrument = await this.instrumentsService
       .findById(instrumentId)
       .then((instrument) => instrument.toInstance());
+
     if (!instrument.measures) {
       return {};
     }
+
     const records = await this.instrumentRecordModel.findMany({
       include: { instrument: true },
       where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), { groupId }, { instrumentId }] }

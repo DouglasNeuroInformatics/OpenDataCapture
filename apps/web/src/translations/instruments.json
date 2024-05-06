@@ -1,12 +1,12 @@
 {
   "available": {
-    "nullActiveVisitError": {
-      "en": "Please begin a visit to continue",
-      "fr": "Veuillez commencer une visite pour continuer"
+    "nullSessionError": {
+      "en": "Please begin a session to continue",
+      "fr": "Veuillez commencer une session pour continuer"
     },
     "title": {
-      "en": "Available Instruments",
-      "fr": "Instruments disponibles"
+      "en": "Instruments",
+      "fr": "Instruments"
     }
   },
   "manage": {
@@ -81,8 +81,8 @@
       }
     },
     "title": {
-      "en": "Available Instruments",
-      "fr": "Tous les instruments"
+      "en": "Instruments",
+      "fr": "Instruments"
     }
   }
 }

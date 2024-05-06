@@ -94,6 +94,14 @@ export const EditorFileIcon = ({ filename }: EditorFileIconProps) => {
             />
           </svg>
         ))
+        .with('.html', () => (
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M4,4,6,26l10,2,10-2L28,4Zm19.72,7H11.28l.29,3H23.43l-.80243,9.335L15.99,25,9.35522,23.3537,8.93,19h3.02l.19,2,3.86.77L19.84,21l.29-4H8.84L8,8H24Z"
+              style={{ fill: '#e44d26' }}
+            />
+          </svg>
+        ))
         .otherwise(() => (
           <FileIcon />
         ))}

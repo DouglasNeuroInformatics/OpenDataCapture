@@ -1,6 +1,6 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { InstrumentKind, Prisma, PrismaClient } from '@opendatacapture/database/core';
 import { InstrumentInterpreter, type InterpretOptions } from '@opendatacapture/instrument-interpreter';
+import { InstrumentKind, Prisma, PrismaClient } from '@opendatacapture/prisma-client/api';
 
 export const PRISMA_CLIENT_TOKEN = 'PRISMA_CLIENT';
 
@@ -72,6 +72,13 @@ export class PrismaFactory {
             }
           }
         },
+        sessionModel: {
+          __model__: {
+            compute() {
+              return 'Session';
+            }
+          }
+        },
         subjectModel: {
           __model__: {
             compute() {
@@ -83,13 +90,6 @@ export class PrismaFactory {
           __model__: {
             compute() {
               return 'User';
-            }
-          }
-        },
-        visitModel: {
-          __model__: {
-            compute() {
-              return 'Visit';
             }
           }
         }

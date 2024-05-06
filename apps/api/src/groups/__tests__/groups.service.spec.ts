@@ -27,13 +27,15 @@ describe('GroupsService', () => {
 
   describe('create', () => {
     it('should call the group model', async () => {
-      await groupsService.create({ name: 'Test Group' });
+      await groupsService.create({ name: 'Test Group', type: 'CLINICAL' });
       expect(groupModel.create.mock.lastCall?.[0]).toMatchObject({ data: { name: 'Test Group' } });
     });
 
     it('should throw a ConflictException if a group with the same name already exists in the db', async () => {
       groupModel.exists.mockResolvedValueOnce(true);
-      await expect(groupsService.create({ name: 'Test Group' })).rejects.toBeInstanceOf(ConflictException);
+      await expect(groupsService.create({ name: 'Test Group', type: 'CLINICAL' })).rejects.toBeInstanceOf(
+        ConflictException
+      );
     });
   });
 

@@ -1,0 +1,51 @@
+<div id="progress"></div>
+<div id="main" style="margin-top: 20px">
+  <div id="counter" style="display: none">
+    <span id="tn"></span>
+    of 48
+  </div>
+  <p><img src="white.jpg" name="stimulus" id="stimulus" /></p>
+  <p id="instructions">
+    For each face, choose the word(s)
+    <br />
+    that best describes the face.
+    <br />
+    <br />
+    You will have 10 seconds for each face.
+    <br />
+    <br />
+    There are 48 faces.
+    <br />
+  </p>
+  <div id="response_buttons" style="display: none">
+    <table>
+      <tbody>
+        <tr>
+          <td id="angry" onmouseover="this.bgColor='#EEEEEE'" onmouseout="this.bgColor='#FFFFFF'">Angry</td>
+          <td id="fearful" onmouseover="this.bgColor='#EEEEEE'" onmouseout="this.bgColor='#FFFFFF'">Fearful</td>
+        </tr>
+        <tr>
+          <td id="sad" onmouseover="this.bgColor='#EEEEEE'" onmouseout="this.bgColor='#FFFFFF'">Sad</td>
+          <td id="happy" onmouseover="this.bgColor='#EEEEEE'" onmouseout="this.bgColor='#FFFFFF'" colspan="1">Happy</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p></p>
+  <div>
+    <div id="next_button">
+      <button type="button" id="next">Next</button>
+    </div>
+    <form id="form" action="/run" method="POST">
+      <input type="hidden" id="data" name="data" />
+      <input type="hidden" id="score" name="score" value="0" />
+      <input type="hidden" name="outcomes" id="outcomes" />
+    </form>
+  </div>
+</div>
+<div
+  id="____loading_slide"
+  style="display: none; text-align: center; padding-top: 40px; font-weight: bold; font-size: x-large"
+>
+  Working....
+</div>

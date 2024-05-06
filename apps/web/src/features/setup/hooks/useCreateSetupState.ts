@@ -5,7 +5,7 @@ import axios from 'axios';
 
 export function useCreateSetupState() {
   const queryClient = useQueryClient();
-  const { addNotification } = useNotificationsStore();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
     mutationFn: (data: InitAppOptions) => axios.post('/v1/setup', data),
     onSuccess() {

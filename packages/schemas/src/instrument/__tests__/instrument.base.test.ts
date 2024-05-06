@@ -5,8 +5,7 @@ import { z } from 'zod';
 import {
   $$InstrumentUIOption,
   $BaseInstrument,
-  $BaseInstrumentDetails,
-  $EnhancedBaseInstrumentDetails,
+  $InstrumentDetails,
   $InstrumentKind,
   $InstrumentLanguage
 } from '../instrument.base.js';
@@ -64,21 +63,12 @@ describe('$$InstrumentUIOption', () => {
   });
 });
 
-describe('$BaseInstrumentDetails', () => {
+describe('$InstrumentDetails', () => {
   it('should handle unilingual details', () => {
-    expect($BaseInstrumentDetails.safeParse(unilingualFormInstrument.instance.details).success).toBe(true);
+    expect($InstrumentDetails.safeParse(unilingualFormInstrument.instance.details).success).toBe(true);
   });
   it('should handle multilingual details', () => {
-    expect($BaseInstrumentDetails.safeParse(bilingualFormInstrument.instance.details).success).toBe(true);
-  });
-});
-
-describe('$EnhancedBaseInstrumentDetails', () => {
-  it('should handle unilingual details', () => {
-    expect($EnhancedBaseInstrumentDetails.safeParse(unilingualFormInstrument.instance.details).success).toBe(true);
-  });
-  it('should handle multilingual details', () => {
-    expect($EnhancedBaseInstrumentDetails.safeParse(bilingualFormInstrument.instance.details).success).toBe(true);
+    expect($InstrumentDetails.safeParse(bilingualFormInstrument.instance.details).success).toBe(true);
   });
 });
 

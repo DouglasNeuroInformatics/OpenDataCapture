@@ -19,6 +19,9 @@ export default config(
     }
   },
   {
-    ignores: ['apps/playground/src/instruments/examples/interactive/Interactive-With-Legacy-Script/legacy.js']
+    ignores: [
+      'apps/playground/src/instruments/examples/interactive/Interactive-With-Legacy-Script/legacy.js',
+      'runtime/v1/src/**/*.d.ts'
+    ]
   }
 );

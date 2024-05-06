@@ -2,7 +2,7 @@
 
 import { createInstrumentStub } from './utils.js';
 
-/** @type {import('./utils.js').InstrumentStub<import('./utils.js').InteractiveInstrument<{ message: string }>>} */
+/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').InteractiveInstrument<{ message: string }>>} */
 export const interactiveInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {
@@ -38,6 +38,7 @@ export const interactiveInstrument = await createInstrumentStub(async () => {
       license: 'UNLICENSED',
       title: 'Interactive Instrument'
     },
+    measures: {},
     validationSchema: z.object({
       message: z.string()
     })

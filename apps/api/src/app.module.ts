@@ -13,11 +13,11 @@ import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SessionsModule } from './sessions/sessions.module';
 import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';
 import { UsersModule } from './users/users.module';
-import { VisitsModule } from './visits/visits.module';
 
 @Module({
   imports: [
@@ -64,7 +64,7 @@ import { VisitsModule } from './visits/visits.module';
     UsersModule,
     SetupModule,
     SummaryModule,
-    VisitsModule
+    SessionsModule
   ],
   providers: [
     {

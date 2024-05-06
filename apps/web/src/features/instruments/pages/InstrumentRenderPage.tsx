@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { Spinner } from '@douglasneuroinformatics/libui/components';
+import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
@@ -10,12 +10,12 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
-import { useActiveVisitStore } from '@/stores/active-visit-store';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 export const InstrumentRenderPage = () => {
-  const { activeVisit } = useActiveVisitStore();
-  const { currentGroup } = useAuthStore();
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentSession = useAppStore((store) => store.currentSession);
+
   const params = useParams();
   const navigate = useNavigate();
   const notifications = useNotificationsStore();
@@ -28,10 +28,10 @@ export const InstrumentRenderPage = () => {
   const title = locationState?.summary?.details.title;
 
   useEffect(() => {
-    if (!activeVisit) {
-      navigate('/instruments/available-instruments');
+    if (!currentSession?.id) {
+      navigate('/instruments/accessible-instruments');
     }
-  }, [activeVisit]);
+  }, [currentSession?.id]);
 
   const handleSubmit = async (data: unknown) => {
     await axios.post('/v1/instrument-records', {
@@ -39,7 +39,7 @@ export const InstrumentRenderPage = () => {
       date: new Date(),
       groupId: currentGroup?.id,
       instrumentId: instrumentBundleQuery.data?.id,
-      subjectId: activeVisit?.subject.id
+      subjectId: currentSession!.subject.id
     });
     notifications.addNotification({ type: 'success' });
   };
@@ -50,11 +50,13 @@ export const InstrumentRenderPage = () => {
 
   return (
     <div className="flex flex-grow flex-col">
-      <PageHeader title={title ?? t('instrument')} />
+      <PageHeader>
+        <Heading variant="h2">{title ?? t('instrument')}</Heading>
+      </PageHeader>
       <div className="flex-grow">
         <InstrumentRenderer
           bundle={instrumentBundleQuery.data.bundle}
-          subject={activeVisit?.subject}
+          subject={currentSession?.subject}
           onSubmit={handleSubmit}
         />
       </div>

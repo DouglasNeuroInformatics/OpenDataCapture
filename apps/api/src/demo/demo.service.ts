@@ -9,7 +9,8 @@ import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-libra
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/happiness-questionnaire.js';
 import miniMentalStateExamination from '@opendatacapture/instrument-library/forms/mini-mental-state-examination.js';
 import montrealCognitiveAssessment from '@opendatacapture/instrument-library/forms/montreal-cognitive-assessment.js';
-import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
+import emotionRecognitionTask from '@opendatacapture/instrument-library/interactive/emotion-recognition-task.js';
+import matrixReasoningTask from '@opendatacapture/instrument-library/interactive/matrix-reasoning-task.js';
 import { type Json } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type {
@@ -24,9 +25,9 @@ import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { PrismaService } from '@/prisma/prisma.service';
+import { SessionsService } from '@/sessions/sessions.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
-import { VisitsService } from '@/visits/visits.service';
 
 faker.seed(123);
 
@@ -39,9 +40,9 @@ export class DemoService {
     private readonly instrumentRecordsService: InstrumentRecordsService,
     private readonly instrumentsService: InstrumentsService,
     private readonly prismaService: PrismaService,
+    private readonly sessionsService: SessionsService,
     private readonly subjectsService: SubjectsService,
-    private readonly usersService: UsersService,
-    private readonly visitsService: VisitsService
+    private readonly usersService: UsersService
   ) {}
 
   async init({ dummySubjectCount }: { dummySubjectCount: number }): Promise<void> {
@@ -59,7 +60,8 @@ export class DemoService {
 
       this.logger.debug('Done creating forms');
 
-      await this.instrumentsService.createFromBundle(breakoutTask);
+      await this.instrumentsService.createFromBundle(emotionRecognitionTask);
+      await this.instrumentsService.createFromBundle(matrixReasoningTask);
       this.logger.debug('Done creating interactive instruments');
 
       const groups: Group[] = [];
@@ -80,10 +82,11 @@ export class DemoService {
         this.logger.debug(`Creating dummy subject ${i + 1}/${dummySubjectCount}`);
         const group = randomValue(groups);
         const subject = await this.createSubject();
-        await this.visitsService.create({
+        await this.sessionsService.create({
           date: new Date(),
           groupId: group.id,
-          subjectIdData: subject
+          subjectIdData: subject,
+          type: 'IN_PERSON'
         });
         for (const form of forms) {
           this.logger.debug(`Creating dummy records for form ${form.name}`);

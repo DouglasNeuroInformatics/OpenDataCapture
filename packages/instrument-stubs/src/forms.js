@@ -7,7 +7,7 @@ import { createInstrumentStub } from './utils.js';
  * @typedef {{ favoriteNumber: number, reasonFavoriteNumberIsNegative?: string; }} FormInstrumentStubData
  */
 
-/** @type {import('./utils.js').InstrumentStub<import('./utils.js').FormInstrument<FormInstrumentStubData, Language>>} */
+/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').FormInstrument<FormInstrumentStubData, Language>>} */
 export const unilingualFormInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {
@@ -57,7 +57,7 @@ export const unilingualFormInstrument = await createInstrumentStub(async () => {
   };
 });
 
-/** @type {import('./utils.js').InstrumentStub<import('./utils.js').FormInstrument<FormInstrumentStubData, Language[]>>} */
+/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').FormInstrument<FormInstrumentStubData, Language[]>>} */
 export const bilingualFormInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {
@@ -111,6 +111,7 @@ export const bilingualFormInstrument = await createInstrumentStub(async () => {
       en: ['Example', 'Preferences'],
       fr: ['Exemple', 'Préférences']
     },
+    measures: {},
     validationSchema: z.object({
       favoriteNumber: z.number(),
       reasonFavoriteNumberIsNegative: z.string().optional()

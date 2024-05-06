@@ -3,6 +3,7 @@ import React from 'react';
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
+import { seriesInstrument } from '@opendatacapture/instrument-stubs/series';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { InstrumentRenderer } from './InstrumentRenderer';
@@ -40,5 +41,11 @@ export const BilingualForm: Story = {
 export const Interactive: Story = {
   args: {
     bundle: interactiveInstrument.bundle
+  }
+};
+
+export const Series: Story = {
+  args: {
+    bundle: seriesInstrument.bundle
   }
 };

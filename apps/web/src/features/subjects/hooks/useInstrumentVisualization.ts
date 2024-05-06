@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 export type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -23,7 +23,9 @@ export type UseInstrumentVisualizationOptions = {
 };
 
 export function useInstrumentVisualization({ params }: UseInstrumentVisualizationOptions) {
-  const { currentGroup, currentUser } = useAuthStore();
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
+
   const download = useDownload();
   const notifications = useNotificationsStore();
   const { t } = useTranslation('common');

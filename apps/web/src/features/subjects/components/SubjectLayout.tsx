@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 
@@ -18,7 +19,9 @@ export const SubjectLayout = () => {
 
   return (
     <React.Fragment>
-      <PageHeader title={t('layout.title', { id: subjectId.slice(0, 7) })} />
+      <PageHeader>
+        <Heading variant="h2">{t('layout.title', { id: subjectId.slice(0, 7) })}</Heading>
+      </PageHeader>
       <div className="mb-5 flex">
         {config.setup.isGatewayEnabled && (
           <TabLink

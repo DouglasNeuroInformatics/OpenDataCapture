@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import type { UserModel } from '@opendatacapture/database/core';
+import type { UserModel } from '@opendatacapture/prisma-client/api';
 
 import type { AppAbility } from '@/core/types';
 

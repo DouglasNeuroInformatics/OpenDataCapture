@@ -15,6 +15,7 @@ export type BuildOutput = {
 
 export type BundlerInputFileExtension =
   | '.css'
+  | '.html'
   | '.jpeg'
   | '.jpg'
   | '.js'

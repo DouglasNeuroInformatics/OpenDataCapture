@@ -6,7 +6,7 @@ export function setupDocs(app: NestExpressApplication) {
 
   const config = new DocumentBuilder()
     .setTitle('Open Data Capture')
-    .setContact('Joshua Unrau', '', 'joshua.unrau@mail.mcgill.ca')
+    .setContact('Douglas Neuroinformatics', '', 'support@douglasneuroinformatics.ca')
     .setDescription('Documentation for the REST API for Open Data Capture')
     .setLicense('AGPL-3.0', 'https://www.gnu.org/licenses/agpl-3.0.txt')
     .setVersion('1')

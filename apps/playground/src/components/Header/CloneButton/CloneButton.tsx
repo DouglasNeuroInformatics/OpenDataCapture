@@ -5,7 +5,7 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { CopyPlusIcon } from 'lucide-react';
 import { z } from 'zod';
 
-import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
+import { useFilesRef } from '@/hooks/useFilesRef';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import { useAppStore } from '@/store';
 
@@ -15,7 +15,7 @@ export const CloneButton = () => {
   const instruments = useAppStore((store) => store.instruments);
   const addInstrument = useAppStore((store) => store.addInstrument);
   const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
-  const editorFilesRef = useEditorFilesRef();
+  const editorFilesRef = useFilesRef();
 
   const handleSubmit = ({ label }: { label: string }) => {
     const files = editorFilesRef.current;

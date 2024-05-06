@@ -8,7 +8,7 @@ import '@douglasneuroinformatics/libui/styles/globals.css';
 const root = document.getElementById('root')!;
 
 if (import.meta.env.MODE === 'test') {
-  const worker = await import('./test/server/browser').then((module) => module.worker);
+  const worker = await import('./testing/server/browser').then((module) => module.worker);
   await worker.start();
 }
 

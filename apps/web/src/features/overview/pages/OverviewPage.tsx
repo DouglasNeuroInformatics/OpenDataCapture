@@ -1,33 +1,36 @@
 import React from 'react';
 
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 import { Disclaimer } from '../components/Disclaimer';
 import { GroupSwitcher } from '../components/GroupSwitcher';
 import { Summary } from '../components/Summary';
 
 export const OverviewPage = () => {
-  const { currentUser } = useAuthStore();
+  const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation('overview');
 
-  const pageTitle = currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome');
-
   if (!currentUser?.ability.can('read', 'Summary')) {
-    return <Navigate to="/visits/add-visit" />;
+    return <Navigate to="/session/start-session" />;
   }
 
   return (
     <div className="flex flex-grow flex-col">
       <Disclaimer isRequired={import.meta.env.PROD} />
-      <PageHeader title={pageTitle} />
+      <PageHeader className="flex justify-between">
+        <Heading variant="h2">{t('pageTitle')}</Heading>
+        <GroupSwitcher />
+      </PageHeader>
       <section className="flex flex-grow flex-col">
         <div className="mb-5 space-y-5 lg:space-y-2">
-          <h3 className="text-center text-xl font-medium lg:text-left">{t('summary')}</h3>
-          <GroupSwitcher />
+          <Heading variant="h3">
+            {currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome')}
+          </Heading>
         </div>
         <Summary />
       </section>

@@ -19,12 +19,12 @@ export const StatisticCard = ({ icon, label, value }: StatisticCardProps) => {
 
   return (
     <Card className="flex w-full rounded-lg p-4">
-      {icon && <div className="mr-2 flex items-center justify-center text-5xl">{icon}</div>}
+      {icon && <div className="mr-2 flex items-center justify-center text-4xl">{icon}</div>}
       <div className="w-full">
-        <motion.h3 className="title-font text-3xl font-medium text-slate-900 sm:text-4xl dark:text-slate-100">
+        <motion.h3 className="title-font text-2xl font-semibold text-slate-900 sm:text-3xl dark:text-slate-100">
           {rounded}
         </motion.h3>
-        <p className="leading-relaxed">{label}</p>
+        <p className="font-medium leading-relaxed">{label}</p>
       </div>
     </Card>
   );

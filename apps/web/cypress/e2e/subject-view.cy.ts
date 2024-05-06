@@ -1,4 +1,4 @@
-import { adminUser } from '@/test/server/stubs';
+import { adminUser } from '@/testing/server/stubs';
 
 import { createDownloadsFolder, deleteDownloadsFolder } from '../utils';
 

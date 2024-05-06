@@ -57,9 +57,9 @@ export const InstrumentsShowcase = () => {
   return (
     <div>
       <div className="my-5 flex flex-col justify-between gap-5 lg:flex-row">
-        <SearchBar value={searchTerm} onValueChange={setSearchTerm} />
-        <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <div className="flex flex-grow" data-cy="tags-btn-dropdown">
+        <SearchBar className="w-full flex-grow" value={searchTerm} onValueChange={setSearchTerm} />
+        <div className="flex min-w-96 flex-grow gap-2 lg:flex-shrink">
+          <div className="flex w-full" data-cy="tags-btn-dropdown">
             <LegacySelectDropdown
               options={tagOptions}
               selected={selectedTags}
@@ -67,7 +67,7 @@ export const InstrumentsShowcase = () => {
               title={t('tags')}
             />
           </div>
-          <div className="flex flex-grow" data-cy="language-btn-dropdown">
+          <div className="flex w-full" data-cy="language-btn-dropdown">
             <LegacySelectDropdown
               options={languageOptions}
               selected={selectedLanguages}

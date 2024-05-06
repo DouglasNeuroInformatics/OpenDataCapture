@@ -5,14 +5,14 @@
       "fr": "Open Data Capture"
     }
   },
-  "endVisitModal": {
+  "endSessionModal": {
     "message": {
-      "en": "Are you sure you want to end the current visit? If you choose to proceed, you'll be taken back to the begin visit page.",
-      "fr": "Êtes-vous sûr de vouloir mettre fin à la visite en cours ? Si vous décidez de continuer, vous serez ramené à la page de commencement d'une visite."
+      "en": "Are you sure you want to end the current session? If you choose to proceed, you'll be taken back to the begin session page.",
+      "fr": "Êtes-vous sûr de vouloir mettre fin à la session en cours ? Si vous décidez de continuer, vous serez ramené à la page de commencement d'une session."
     },
     "title": {
-      "en": "End Visit",
-      "fr": "Terminer la visite"
+      "en": "End Session",
+      "fr": "Terminer la session en cours"
     }
   },
   "footer": {
@@ -34,11 +34,11 @@
     }
   },
   "navLinks": {
-    "addVisit": {
-      "en": "Begin Visit",
-      "fr": "Commencer une visite"
+    "startSession": {
+      "en": "Start Session",
+      "fr": "Commencer une session"
     },
-    "availableInstruments": {
+    "accessibleInstruments": {
       "en": "Administer Instrument",
       "fr": "Administrer un instrument"
     },
@@ -46,13 +46,17 @@
       "en": "Add Instrument",
       "fr": "Ajouter un instrument"
     },
-    "endVisit": {
-      "en": "End Visit",
-      "fr": "Terminer la visite"
+    "endSession": {
+      "en": "End Current Session",
+      "fr": "Terminer la session en cours"
     },
     "overview": {
       "en": "Overview",
       "fr": "Vue d'ensemble"
+    },
+    "manageGroup": {
+      "en": "Manage Group",
+      "fr": "Gestion du groupe"
     },
     "viewCurrentSubject": {
       "en": "View Current Subject",

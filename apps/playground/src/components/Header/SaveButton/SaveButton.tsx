@@ -4,14 +4,14 @@ import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 import { isEqual } from 'lodash-es';
 import { SaveIcon } from 'lucide-react';
 
-import { useEditorFilesRef } from '@/hooks/useEditorFilesRef';
+import { useFilesRef } from '@/hooks/useFilesRef';
 import { useAppStore } from '@/store';
 
 import { ActionButton } from '../ActionButton';
 
 export const SaveButton = () => {
   const [disabled, setDisabled] = useState(true);
-  const editorFiles = useEditorFilesRef();
+  const editorFiles = useFilesRef();
   const selectedInstrument = useAppStore((store) => store.selectedInstrument);
   const updateSelectedInstrument = useAppStore((store) => store.updateSelectedInstrument);
 

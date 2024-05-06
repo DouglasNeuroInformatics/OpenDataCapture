@@ -1,0 +1,36 @@
+import { render } from './render.js';
+
+const { defineInstrument } = await import('/runtime/v1/opendatacapture@1.0.0/core.js');
+const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
+
+import './styles.css';
+
+export default defineInstrument({
+  content: {
+    render
+  },
+  details: {
+    authors: [
+      'The Many Brains Project',
+      'McLean Hospital',
+      'Paolo Martini',
+      'Jeremy Wilmer',
+      'Douglas Neuroinformatics Platform'
+    ],
+    description: 'This is a matrix reasoning task adapted from the the Many Brains Open Science Repository.',
+    estimatedDuration: 1,
+    instructions: ['Please follow the instructions on your screen.'],
+    license: 'CC-BY-SA-4.0',
+    title: 'Pattern Completion Test'
+  },
+  kind: 'INTERACTIVE',
+  language: 'en',
+  measures: {},
+  name: 'CPP-MatrixReasoningTask',
+  tags: ['CPP'],
+  validationSchema: z.object({
+    results: z.array(z.any()),
+    score: z.number()
+  }),
+  version: 1.0
+});

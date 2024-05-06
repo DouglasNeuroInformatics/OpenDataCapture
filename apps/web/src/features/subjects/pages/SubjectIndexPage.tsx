@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 import { LoadingFallback } from '@/components/LoadingFallback';
@@ -12,7 +13,11 @@ export const SubjectIndexPage = () => {
 
   return (
     <React.Fragment>
-      <PageHeader title={t('index.title')} />
+      <PageHeader>
+        <Heading className="text-center" variant="h2">
+          {t('index.title')}
+        </Heading>
+      </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
         <SubjectsTable />
       </React.Suspense>

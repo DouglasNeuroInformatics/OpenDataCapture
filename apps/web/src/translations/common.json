@@ -1,7 +1,7 @@
 {
-  "activeVisit": {
-    "en": "Active Visit",
-    "fr": "Visite active"
+  "currentSession": {
+    "en": "Current Session",
+    "fr": "Session en cours"
   },
   "basePermissionLevel": {
     "admin": {
@@ -16,6 +16,10 @@
       "en": "Standard User",
       "fr": "Utilisateur standard"
     }
+  },
+  "sessionInProgress": {
+    "en": "Session in Progress",
+    "fr": "Session en cours"
   },
   "currentSubject": {
     "en": "Current Subject",

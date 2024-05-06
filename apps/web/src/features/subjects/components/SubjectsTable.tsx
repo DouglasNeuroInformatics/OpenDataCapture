@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { LegacyClientTable, LegacyDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
+import { DropdownMenu, LegacyClientTable, LegacyDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
@@ -9,13 +9,15 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
 import { SubjectLookup } from './SubjectLookup';
 
 export const SubjectsTable = () => {
-  const { currentGroup, currentUser } = useAuthStore();
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
+
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
   const download = useDownload();
   const navigate = useNavigate();
@@ -69,8 +71,10 @@ export const SubjectsTable = () => {
             setShowLookup(true);
           }}
         />
-        <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <LegacyDropdown options={[]} title={t('index.table.filters')} onSelection={() => null} />
+        <div className="flex min-w-60 gap-2 lg:flex-shrink">
+          <DropdownMenu>
+            <DropdownMenu.Trigger></DropdownMenu.Trigger>
+          </DropdownMenu>
           <LegacyDropdown
             options={['CSV', 'JSON']}
             title={t('index.table.export')}

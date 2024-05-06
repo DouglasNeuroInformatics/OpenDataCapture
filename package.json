@@ -66,7 +66,7 @@
     "start-server-and-test": "^2.0.3",
     "storybook": "^8.0.8",
     "storybook-react-i18next": "^3.0.1",
-    "tsx": "^4.7.2",
+    "tsx": "4.8.2",
     "turbo": "^1.13.2",
     "type-fest": "^4.15.0",
     "typescript": "~5.4.5",

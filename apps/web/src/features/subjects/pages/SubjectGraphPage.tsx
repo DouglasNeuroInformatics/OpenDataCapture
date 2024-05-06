@@ -13,7 +13,7 @@ import html2canvas from 'html2canvas';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-import { useAuthStore } from '@/stores/auth-store';
+import { useAppStore } from '@/store';
 
 import { TimeDropdown } from '../components/TimeDropdown';
 import { VisualizationHeader } from '../components/VisualizationHeader';
@@ -25,7 +25,7 @@ import { useMeasureOptions } from '../hooks/useMeasureOptions';
 
 export const SubjectGraphPage = () => {
   const downloadCanvas = useDownload();
-  const { currentGroup } = useAuthStore();
+  const currentGroup = useAppStore((store) => store.currentGroup);
   const params = useParams();
   const { instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
     useInstrumentVisualization({
