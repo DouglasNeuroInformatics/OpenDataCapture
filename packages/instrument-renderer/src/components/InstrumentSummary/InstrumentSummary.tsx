@@ -7,6 +7,7 @@ import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { InstrumentKind, SomeUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import type { Subject } from '@opendatacapture/schemas/subject';
+import { filter } from 'lodash-es';
 import { DownloadIcon, PrinterIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +29,9 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
   const download = useDownload();
   const { i18n, t } = useTranslation('core');
 
-  const computedMeasures = computeInstrumentMeasures(instrument, data);
+  const computedMeasures = filter(computeInstrumentMeasures(instrument, data), (_, key) => {
+    return !instrument.measures?.[key].hidden;
+  });
 
   const handleDownload = () => {
     const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.json`;

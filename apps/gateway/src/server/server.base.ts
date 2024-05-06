@@ -71,6 +71,7 @@ export abstract class BaseServer {
 
   listen(port = CONFIG.port) {
     return this.app.listen(port, () => {
+      // eslint-disable-next-line no-console
       console.log(`Server started at http://localhost:${port}`);
     });
   }

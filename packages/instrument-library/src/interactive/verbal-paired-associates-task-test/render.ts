@@ -113,6 +113,7 @@ export async function render() {
     var choice;
 
     // if we are debugging and there was an error, log the message
+    // eslint-disable-next-line no-console
     if (debug === 'true' && tmbUI.message) console.log(tmbUI.message);
 
     // retrieve which word they chose
