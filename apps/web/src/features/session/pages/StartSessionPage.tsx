@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -17,7 +18,7 @@ export const StartSessionPage = () => {
 
   const handleSubmit = async ({ date, ...subjectIdData }: StartSessionFormData) => {
     const session = await createSessionMutation.mutateAsync({
-      date,
+      date: date!, // default set in schema
       groupId: currentGroup?.id ?? null,
       subjectIdData,
       type: 'IN_PERSON'
@@ -30,7 +31,11 @@ export const StartSessionPage = () => {
 
   return (
     <React.Fragment>
-      <PageHeader title={t('startSession')} />
+      <PageHeader>
+        <Heading className="text-center" variant="h2">
+          {t('startSession')}
+        </Heading>
+      </PageHeader>
       <StartSessionForm onSubmit={(data) => void handleSubmit(data)} />
     </React.Fragment>
   );

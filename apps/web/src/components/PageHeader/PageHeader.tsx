@@ -1,19 +1,18 @@
 import React from 'react';
 
-import { twMerge } from 'tailwind-merge';
+import { Separator } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 
 export type PageHeaderProps = {
+  children: React.ReactNode;
   className?: string;
-  title: string;
 };
 
-export const PageHeader = ({ className, title }: PageHeaderProps) => {
+export const PageHeader = ({ children, className }: PageHeaderProps) => {
   return (
-    <div className={twMerge('my-3 w-full', className)}>
-      <h2 className="my-4 text-center text-2xl font-bold text-slate-900 md:mb-6 lg:text-3xl dark:text-slate-100">
-        {title}
-      </h2>
-      <hr className="my-5 w-full border-slate-200 dark:border-slate-700" />
-    </div>
+    <React.Fragment>
+      <div className={cn('mt-5 w-full', className)}>{children}</div>
+      <Separator className="my-5 w-full" />
+    </React.Fragment>
   );
 };

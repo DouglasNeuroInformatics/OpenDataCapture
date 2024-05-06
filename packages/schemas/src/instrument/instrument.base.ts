@@ -116,11 +116,13 @@ export const $InstrumentMeasureValue = z.union([z.string(), z.boolean(), z.numbe
 
 export type InstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> =
   | {
+      hidden?: boolean;
       kind: 'computed';
       label: InstrumentUIOption<TLanguage, string>;
       value: (data: TData) => InstrumentMeasureValue;
     }
   | {
+      hidden?: boolean;
       kind: 'const';
       label?: InstrumentUIOption<TLanguage, string>;
       ref: TData extends { [key: string]: any }
@@ -141,24 +143,28 @@ export type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TDa
 const $ComputeMeasureFunction = z.function().args(z.any()).returns($InstrumentMeasureValue);
 
 const $ComputedInstrumentMeasure = z.object({
+  hidden: z.boolean().optional(),
   kind: z.literal('computed'),
   label: $$InstrumentUIOption(z.string()),
   value: $ComputeMeasureFunction
 }) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind: 'computed' }>>;
 
 const $UnilingualComputedInstrumentMeasure = z.object({
+  hidden: z.boolean().optional(),
   kind: z.literal('computed'),
   label: z.string(),
   value: $ComputeMeasureFunction
 }) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures<any, Language>>, { kind?: 'computed' }>>;
 
 const $ConstantInstrumentMeasure = z.object({
+  hidden: z.boolean().optional(),
   kind: z.literal('const'),
   label: $$InstrumentUIOption(z.string()).optional(),
   ref: z.string()
 }) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind?: 'const' }>>;
 
 const $UnilingualConstantInstrumentMeasure = z.object({
+  hidden: z.boolean().optional(),
   kind: z.literal('const'),
   label: z.string().optional(),
   ref: z.string()
@@ -246,6 +252,7 @@ export type MultilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstr
 export const $InstrumentSummary = $BaseInstrument
   .omit({
     content: true,
+    measures: true,
     validationSchema: true
   })
   .extend({ id: z.string() }) satisfies z.ZodType<InstrumentSummary>;

@@ -22,7 +22,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       onKeyDown={onClick}
     >
       <div className="mb-4 inline-flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-500 sm:mb-0 sm:mr-8">
-        <InstrumentIcon className="h-10 w-auto rounded-full" kind={instrument.kind} />
+        <InstrumentIcon className="rounded-full" kind={instrument.kind} style={{ height: 'auto', width: '32px' }} />
       </div>
       <div className="flex-grow">
         <h3

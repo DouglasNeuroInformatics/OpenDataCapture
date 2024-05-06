@@ -17,6 +17,10 @@
       "fr": "Utilisateur standard"
     }
   },
+  "sessionInProgress": {
+    "en": "Session in Progress",
+    "fr": "Session en cours"
+  },
   "currentSubject": {
     "en": "Current Subject",
     "fr": "Le client actuel"

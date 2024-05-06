@@ -30,7 +30,7 @@ model AssignmentModel {
   completedAt       DateTime?
   expiresAt         DateTime
   instrument        InstrumentModel        @relation(fields: [instrumentId], references: [id])
-  instrumentId      String                 @db.ObjectId
+  instrumentId      String
   instrumentRecord  InstrumentRecordModel?
   status            AssignmentStatus
   subject           SubjectModel           @relation(fields: [subjectId], references: [id])
@@ -47,17 +47,19 @@ enum GroupType {
 }
 
 model GroupModel {
-  createdAt         DateTime                @default(now()) @db.Date
-  updatedAt         DateTime                @updatedAt @db.Date
-  id                String                  @id @default(auto()) @map("_id") @db.ObjectId
-  instrumentRecords InstrumentRecordModel[]
-  name              String                  @unique
-  sessions          SessionModel[]
-  subjects          SubjectModel[]          @relation(fields: [subjectIds], references: [id])
-  subjectIds        String[]
-  type              GroupType
-  userIds           String[]                @db.ObjectId
-  users             UserModel[]             @relation(fields: [userIds], references: [id])
+  createdAt              DateTime                @default(now()) @db.Date
+  updatedAt              DateTime                @updatedAt @db.Date
+  id                     String                  @id @default(auto()) @map("_id") @db.ObjectId
+  accessibleInstrumentIds String[]
+  accessibleInstruments  InstrumentModel[]       @relation(fields: [accessibleInstrumentIds], references: [id])
+  instrumentRecords      InstrumentRecordModel[]
+  name                   String                  @unique
+  sessions               SessionModel[]
+  subjects               SubjectModel[]          @relation(fields: [subjectIds], references: [id])
+  subjectIds             String[]
+  type                   GroupType
+  userIds                String[]                @db.ObjectId
+  users                  UserModel[]             @relation(fields: [userIds], references: [id])
 }
 
 /// Instrument Records
@@ -73,7 +75,7 @@ model InstrumentRecordModel {
   subject      SubjectModel     @relation(fields: [subjectId], references: [id])
   subjectId    String
   instrument   InstrumentModel  @relation(fields: [instrumentId], references: [id])
-  instrumentId String           @db.ObjectId
+  instrumentId String
   assignment   AssignmentModel? @relation(fields: [assignmentId], references: [id])
   assignmentId String?          @unique
 }
@@ -104,9 +106,12 @@ type InstrumentDetails {
 model InstrumentModel {
   createdAt   DateTime                @default(now()) @db.Date
   updatedAt   DateTime                @updatedAt @db.Date
-  id          String                  @id @default(auto()) @map("_id") @db.ObjectId
+  id          String                  @id @map("_id")
+  assignments AssignmentModel[]
   bundle      String
   details     InstrumentDetails
+  groups      GroupModel[]            @relation(fields: [groupIds], references: [id])
+  groupIds    String[]                @db.ObjectId
   kind        InstrumentKind
   /// Language | Language[]
   language    Json
@@ -115,7 +120,6 @@ model InstrumentModel {
   tags        Json
   version     Float
   records     InstrumentRecordModel[]
-  assignments AssignmentModel[]
 }
 
 // Subjects

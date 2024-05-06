@@ -5,8 +5,8 @@
       "fr": "Veuillez commencer une session pour continuer"
     },
     "title": {
-      "en": "Available Instruments",
-      "fr": "Instruments disponibles"
+      "en": "Instruments",
+      "fr": "Instruments"
     }
   },
   "manage": {
@@ -81,8 +81,8 @@
       }
     },
     "title": {
-      "en": "Available Instruments",
-      "fr": "Tous les instruments"
+      "en": "Instruments",
+      "fr": "Instruments"
     }
   }
 }

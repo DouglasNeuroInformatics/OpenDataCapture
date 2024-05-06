@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
+import { $SessionType } from '@opendatacapture/schemas/session';
 import type { SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -11,8 +12,10 @@ const EIGHTEEN_YEARS = 568025136000; // milliseconds
 
 const MIN_DATE_OF_BIRTH = new Date(Date.now() - EIGHTEEN_YEARS);
 
+const now = Date.now();
+
 export type StartSessionFormData = {
-  date: Date;
+  date?: Date;
 } & SubjectIdentificationData;
 
 export type StartSessionFormProps = {
@@ -60,10 +63,28 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
         {
           title: t('session:additionalData.title'),
           fields: {
+            type: {
+              kind: 'string',
+              label: t('session:type.label'),
+              variant: 'select',
+              options: {
+                RETROSPECTIVE: t('session:type.retrospective'),
+                IN_PERSON: t('session:type.in-person')
+              }
+            },
             date: {
-              description: t('session:dateAssessed.description'),
-              kind: 'date',
-              label: t('session:dateAssessed.label')
+              kind: 'dynamic',
+              deps: ['type'],
+              render(data) {
+                if (data.type !== 'RETROSPECTIVE') {
+                  return null;
+                }
+                return {
+                  description: t('session:dateAssessed.description'),
+                  kind: 'date',
+                  label: t('session:dateAssessed.label')
+                };
+              }
             }
           }
         }
@@ -77,7 +98,11 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
         lastName: z.string(),
         dateOfBirth: z.date().max(MIN_DATE_OF_BIRTH, { message: t('session:errors.mustBeAdult') }),
         sex: z.enum(['MALE', 'FEMALE']),
-        date: z.date().max(new Date(), { message: t('session:errors.assessmentMustBeInPast') })
+        type: $SessionType.exclude(['REMOTE']),
+        date: z
+          .date()
+          .max(new Date(now), { message: t('session:errors.assessmentMustBeInPast') })
+          .default(new Date(now))
       })}
       onSubmit={onSubmit}
     />

@@ -11,7 +11,7 @@ export const instrumentsRoute: RouteObject = {
   path: 'instruments',
   children: [
     {
-      path: 'available-instruments',
+      path: 'accessible-instruments',
       element: <AvailableInstrumentsPage />
     },
     {

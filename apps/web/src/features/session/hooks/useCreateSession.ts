@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
 export function useCreateSession() {
-  const { addNotification } = useNotificationsStore();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
     mutationFn: async (data: CreateSessionData) => {
       const response = await axios.post('/v1/sessions', data);

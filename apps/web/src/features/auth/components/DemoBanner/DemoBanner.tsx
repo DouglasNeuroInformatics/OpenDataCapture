@@ -16,7 +16,7 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
   return (
     <Dialog>
       <div className="flex w-full items-center justify-center bg-sky-700 leading-tight text-white">
-        <div className="container py-2.5">
+        <div className="container py-1.5">
           <div className="flex flex-col items-center justify-between lg:flex-row">
             <div className="my-1 flex items-center gap-3">
               <InfoIcon className="hidden h-5 w-5 lg:block" />
@@ -34,12 +34,12 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
         </div>
       </div>
       <Dialog.Content
-        className="w-[98%] max-w-[600px] px-2.5 sm:w-full sm:px-6"
+        className="w-full max-w-[600px] px-2.5 sm:px-6"
         onOpenAutoFocus={(event) => {
           event.preventDefault();
         }}
       >
-        <Dialog.Header className="w-full whitespace-break-spaces">
+        <Dialog.Header className="w-full whitespace-break-spaces px-1">
           <Dialog.Title className="mb-2">{t('demo.info')}</Dialog.Title>
           <Dialog.Description className="text-pretty text-left text-xs sm:text-sm">
             {t('demo.summary')}
@@ -49,27 +49,33 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
           <Table className="overflow-x-scroll">
             <Table.Header>
               <Table.Row>
-                <Table.Head className="px-2.5 text-xs sm:px-4 sm:text-sm">{t('auth:demo.username')}</Table.Head>
-                <Table.Head className="px-2.5 text-xs sm:px-4 sm:text-sm">{t('auth:demo.groups')}</Table.Head>
-                <Table.Head className="px-2.5 text-xs sm:px-4 sm:text-sm">{t('auth:demo.role')}</Table.Head>
-                <Table.Head className="px-2.5 text-xs sm:px-4 sm:text-sm"></Table.Head>
+                <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
+                  {t('auth:demo.username')}
+                </Table.Head>
+                <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
+                  {t('auth:demo.groups')}
+                </Table.Head>
+                <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
+                  {t('auth:demo.role')}
+                </Table.Head>
+                <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm"></Table.Head>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {DEMO_USERS.map((user) => (
                 <Table.Row key={user.username}>
-                  <Table.Cell className="px-2.5 text-xs sm:px-4 sm:text-sm">{user.username}</Table.Cell>
-                  <Table.Cell className="px-2.5 text-xs sm:px-4 sm:text-sm">
+                  <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">{user.username}</Table.Cell>
+                  <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
                     {user.groupNames.map((name) => (
                       <p className="whitespace-nowrap" key={name}>
                         {name}
                       </p>
                     ))}
                   </Table.Cell>
-                  <Table.Cell className="px-2.5 text-xs sm:px-4 sm:text-sm">
+                  <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
                     {t(`common:basePermissionLevel.${snakeToCamelCase(user.basePermissionLevel!)}`)}
                   </Table.Cell>
-                  <Table.Cell className="px-2.5 sm:px-4">
+                  <Table.Cell className="p-3 px-2.5 sm:px-3.5">
                     <Tooltip delayDuration={500}>
                       <Tooltip.Trigger
                         className="h-9 w-9"

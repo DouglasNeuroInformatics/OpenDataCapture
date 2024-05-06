@@ -4,9 +4,21 @@
       "en": "Manage Group",
       "fr": "Gestion du groupe"
     },
-    "availableInstruments": {
-      "en": "Available Instruments",
-      "fr": "Instruments disponibles"
+    "accessibleInstruments": {
+      "en": "Accessible Instruments",
+      "fr": "Instruments accessibles"
+    },
+    "accessibleInstrumentsDesc": {
+      "en": "Select the instruments that are shown to you and other members of your group. This can be changed by a group manager at any time.",
+      "fr": "Sélectionnez les instruments qui vous sont présentés ainsi qu'aux autres membres de votre groupe. Cette sélection peut être modifiée à tout moment par un responsable de groupe."
+    },
+    "forms": {
+      "en": "Forms",
+      "fr": "Formulaires"
+    },
+    "interactive": {
+      "en": "Interactive Tasks",
+      "fr": "Tâches interactives"
     }
   }
 }

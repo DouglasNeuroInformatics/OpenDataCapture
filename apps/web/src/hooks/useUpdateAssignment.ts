@@ -5,7 +5,7 @@ import axios from 'axios';
 
 export function useUpdateAssignment() {
   const queryClient = useQueryClient();
-  const { addNotification } = useNotificationsStore();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
     mutationFn: ({ data, params }: { data: UpdateAssignmentData; params: { id: string } }) => {
       return axios.patch(`/v1/assignments/${params.id}`, data);

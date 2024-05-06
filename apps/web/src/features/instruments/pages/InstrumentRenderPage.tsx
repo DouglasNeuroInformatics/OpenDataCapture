@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { Spinner } from '@douglasneuroinformatics/libui/components';
+import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
@@ -29,7 +29,7 @@ export const InstrumentRenderPage = () => {
 
   useEffect(() => {
     if (!currentSession?.id) {
-      navigate('/instruments/available-instruments');
+      navigate('/instruments/accessible-instruments');
     }
   }, [currentSession?.id]);
 
@@ -50,7 +50,9 @@ export const InstrumentRenderPage = () => {
 
   return (
     <div className="flex flex-grow flex-col">
-      <PageHeader title={title ?? t('instrument')} />
+      <PageHeader>
+        <Heading variant="h2">{title ?? t('instrument')}</Heading>
+      </PageHeader>
       <div className="flex-grow">
         <InstrumentRenderer
           bundle={instrumentBundleQuery.data.bundle}

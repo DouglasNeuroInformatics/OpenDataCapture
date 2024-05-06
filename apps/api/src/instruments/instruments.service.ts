@@ -1,3 +1,4 @@
+import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 import { type BundlerInput, InstrumentBundler } from '@opendatacapture/instrument-bundler';
@@ -19,7 +20,10 @@ export class InstrumentsService {
   private readonly instrumentInterpreter = new InstrumentInterpreter();
   private readonly logger = new Logger(InstrumentsService.name);
 
-  constructor(@InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>) {}
+  constructor(
+    @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
+    private readonly cryptoService: CryptoService
+  ) {}
 
   async count(
     filter: NonNullable<Parameters<Model<'Instrument'>['count']>[0]>['where'] = {},
@@ -61,7 +65,8 @@ export class InstrumentsService {
           description: instance.details.description as Prisma.InputJsonValue,
           instructions: instance.details.instructions as Prisma.InputJsonValue,
           title: instance.details.title as Prisma.InputJsonValue
-        }
+        },
+        id: this.generateId(instance)
       }
     });
   }
@@ -92,6 +97,13 @@ export class InstrumentsService {
     return instrument;
   }
 
+  async findIds(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentModel.findMany({
+      select: { id: true },
+      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
+    });
+  }
+
   async findSources(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
     return this.instrumentModel.findMany({
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
@@ -106,6 +118,10 @@ export class InstrumentsService {
       select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
     }) as Promise<InstrumentSummary[]>;
+  }
+
+  private generateId({ name, version }: { name: string; version: number }) {
+    return this.cryptoService.hash(`${name}-${version}`);
   }
 
   private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {

@@ -40,7 +40,7 @@ export class InstrumentsController {
     return this.instrumentsService.findBundles({ kind }, { ability });
   }
 
-  @ApiOperation({ summary: 'Summarize Available Instruments' })
+  @ApiOperation({ summary: 'Summarize Instruments' })
   @Get('summaries')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async findSummaries(

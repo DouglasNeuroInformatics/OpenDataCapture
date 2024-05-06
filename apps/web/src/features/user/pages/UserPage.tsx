@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { UserCircleIcon } from '@heroicons/react/24/solid';
+import { Heading } from '@douglasneuroinformatics/libui/components';
 
+import { UserIcon } from '@/components/UserIcon';
 import { useAppStore } from '@/store';
 
 export const UserPage = () => {
@@ -17,10 +18,10 @@ export const UserPage = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <UserCircleIcon className="h-20 w-20" />
-      <h1 className="mt-2 text-3xl font-bold">{fullName}</h1>
-      <h3>{currentUser?.username}</h3>
+    <div className="mt-4 flex flex-col items-center justify-center">
+      <UserIcon className="h-16 w-16" />
+      <Heading variant="h2">{fullName}</Heading>
+      <p className="text-sm">{fullName}</p>
     </div>
   );
 };

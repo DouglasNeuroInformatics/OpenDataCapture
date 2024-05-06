@@ -27,6 +27,11 @@ const config = {
       titlePrefix: 'Components'
     },
     {
+      directory: '../src/features/auth/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Auth'
+    },
+    {
       directory: '../src/features/contact/components',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
       titlePrefix: 'Contact'

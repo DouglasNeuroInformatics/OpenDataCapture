@@ -17,6 +17,7 @@ export const ContactForm = ({ onSubmit }: ContactFormProps) => {
   const { t } = useTranslation('contact');
   return (
     <Form
+      className="mx-auto max-w-3xl"
       content={{
         contactReason: {
           kind: 'string',

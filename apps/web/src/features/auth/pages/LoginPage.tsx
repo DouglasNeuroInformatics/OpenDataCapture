@@ -52,9 +52,9 @@ export const LoginPage = () => {
     <div className="flex min-h-screen w-full flex-col">
       {setupState.data?.isDemo && <DemoBanner onLogin={(credentials) => void handleLogin(credentials)} />}
       <div className="flex w-full flex-grow flex-col items-center justify-center">
-        <Card className="sm:bg-card w-full max-w-sm border-none bg-inherit px-3 py-2 sm:border-solid">
+        <Card className="sm:bg-card w-full max-w-sm border-none bg-inherit px-2.5 py-1.5 sm:border-solid">
           <Card.Header className="flex items-center justify-center">
-            <Logo className="m-2 h-auto w-16" variant="auto" />
+            <Logo className="m-1.5 h-auto w-16" variant="auto" />
             <Heading variant="h2">{t('login')}</Heading>
           </Card.Header>
           <Card.Content>

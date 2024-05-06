@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { LegacyClientTable, LegacyDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
+import { DropdownMenu, LegacyClientTable, LegacyDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
@@ -71,8 +71,10 @@ export const SubjectsTable = () => {
             setShowLookup(true);
           }}
         />
-        <div className="flex flex-grow gap-2 lg:flex-shrink">
-          <LegacyDropdown options={[]} title={t('index.table.filters')} onSelection={() => null} />
+        <div className="flex min-w-60 gap-2 lg:flex-shrink">
+          <DropdownMenu>
+            <DropdownMenu.Trigger></DropdownMenu.Trigger>
+          </DropdownMenu>
           <LegacyDropdown
             options={['CSV', 'JSON']}
             title={t('index.table.export')}

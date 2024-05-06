@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -19,7 +20,9 @@ export const ContactPage = () => {
 
   return (
     <div>
-      <PageHeader title={t('pageTitle')} />
+      <PageHeader>
+        <Heading variant="h2">{t('pageTitle')}</Heading>
+      </PageHeader>
       <ContactForm onSubmit={handleSubmit} />
     </div>
   );
