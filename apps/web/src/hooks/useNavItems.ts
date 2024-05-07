@@ -30,10 +30,10 @@ export function useNavItems() {
     const globalItems: NavItem[] = [];
     if (currentUser?.ability.can('read', 'Summary')) {
       globalItems.push({
-        'data-cy': 'overview',
+        'data-cy': 'dashboard',
         icon: BarChartBigIcon,
-        id: '/overview',
-        label: t('navLinks.overview')
+        id: '/dashboard',
+        label: t('navLinks.dashboard')
       });
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {

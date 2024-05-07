@@ -11,10 +11,10 @@ import { Disclaimer } from '../components/Disclaimer';
 import { GroupSwitcher } from '../components/GroupSwitcher';
 import { Summary } from '../components/Summary';
 
-export const OverviewPage = () => {
+export const DashboardPage = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
-  const { t } = useTranslation('overview');
+  const { t } = useTranslation('dashboard');
 
   if (!currentUser?.ability.can('read', 'Summary')) {
     return <Navigate to="/session/start-session" />;

@@ -37,14 +37,14 @@ const config = {
       titlePrefix: 'Contact'
     },
     {
+      directory: '../src/features/dashboard/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Dashboard'
+    },
+    {
       directory: '../src/features/instruments/components',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
       titlePrefix: 'Instruments'
-    },
-    {
-      directory: '../src/features/overview/components',
-      files: '**/*.stories.@(js|jsx|ts|tsx)',
-      titlePrefix: 'Overview'
     },
     {
       directory: '../src/features/setup/pages',

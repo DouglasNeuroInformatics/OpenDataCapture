@@ -16,7 +16,7 @@ export const Disclaimer = ({ isRequired = import.meta.env.PROD }: DisclaimerProp
   const logout = useAppStore((store) => store.logout);
   const { isAccepted, setIsAccepted, username } = useDisclaimerStore();
 
-  const { t } = useTranslation('overview');
+  const { t } = useTranslation('dashboard');
 
   return (
     <AlertDialog open={(!isAccepted || currentUser?.username !== username) && isRequired}>

@@ -11,7 +11,7 @@ import { useSummaryQuery } from '../hooks/useSummaryQuery';
 
 export const Summary = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const { t } = useTranslation('overview');
+  const { t } = useTranslation('dashboard');
 
   const summaryQuery = useSummaryQuery({
     params: {

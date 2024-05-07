@@ -36,7 +36,7 @@ export const LoginPage = () => {
       return;
     }
     login(response.data.accessToken);
-    navigate('/overview');
+    navigate('/dashboard');
   };
 
   useEffect(() => {

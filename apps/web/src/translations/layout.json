@@ -50,9 +50,9 @@
       "en": "End Current Session",
       "fr": "Terminer la session en cours"
     },
-    "overview": {
-      "en": "Overview",
-      "fr": "Vue d'ensemble"
+    "dashboard": {
+      "en": "Dashboard",
+      "fr": "Tableau de bord"
     },
     "manageGroup": {
       "en": "Manage Group",
