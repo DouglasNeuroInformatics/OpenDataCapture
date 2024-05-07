@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
+const { pick, sum } = await import('/runtime/v1/lodash-es@4.17.21/index.js');
 const { defineInstrument } = await import('/runtime/v1/opendatacapture@1.0.0/core.js');
 const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 
@@ -13,31 +14,63 @@ export default defineInstrument({
   },
   version: 1,
   content: {
-    overallHappiness: {
+    personalLifeSatisfaction: {
       description: {
-        en: 'Overall happiness from 1 through 10 (inclusive)',
-        fr: 'Bonheur général de 1 à 10 (inclus)'
+        en: 'Please select a number from 1 to 10 (inclusive), where 1 is very dissatisfied and 10 is very satisfied.',
+        fr: 'Veuillez choisir un chiffre de 1 à 10 (inclus), où 1 correspond à très insatisfait et 10 à très satisfait.'
       },
       kind: 'number',
       label: {
-        en: 'Overall Happiness',
-        fr: 'Bonheur général'
+        en: 'How satisfied are you with your personal life?',
+        fr: 'Dans quelle mesure êtes-vous satisfait de votre vie personnelle ?'
       },
       max: 10,
       min: 1,
       variant: 'slider'
     },
-    reasonForSadness: {
-      deps: ['overallHappiness'],
+    professionalLifeSatisfaction: {
+      description: {
+        en: 'Please select a number from 1 to 10 (inclusive), where 1 is very dissatisfied and 10 is very satisfied.',
+        fr: 'Veuillez choisir un chiffre de 1 à 10 (inclus), où 1 correspond à très insatisfait et 10 à très satisfait.'
+      },
+      kind: 'number',
+      label: {
+        en: 'How satisfied are you with your professional life?',
+        fr: 'Dans quelle mesure êtes-vous satisfait de votre vie professionnelle ?'
+      },
+      max: 10,
+      min: 1,
+      variant: 'slider'
+    },
+    isSatisfiedOverall: {
+      kind: 'boolean',
+      label: {
+        en: 'Overall, would you say you are satisfied with your life?',
+        fr: "Dans l'ensemble, diriez-vous que vous êtes satisfait de votre vie ?"
+      },
+      options: {
+        en: {
+          true: 'Yes',
+          false: 'No'
+        },
+        fr: {
+          true: 'Oui',
+          false: 'Non'
+        }
+      },
+      variant: 'radio'
+    },
+    reasonNotSatisfied: {
+      deps: ['isSatisfiedOverall'],
       kind: 'dynamic',
       render: (data) => {
-        if (!data?.overallHappiness || data.overallHappiness >= 5) {
+        if (data.isSatisfiedOverall !== false) {
           return null;
         }
         return {
           label: {
-            en: 'Reason for Sadness',
-            fr: 'Raison de la tristesse'
+            en: 'Why do you feel dissatisfied with your life?',
+            fr: 'Pourquoi vous sentez-vous insatisfait de votre vie ?'
           },
           isRequired: false,
           kind: 'string',
@@ -53,8 +86,8 @@ export default defineInstrument({
     },
     estimatedDuration: 1,
     instructions: {
-      en: ['Please answer the question based on your current feelings.'],
-      fr: ['Veuillez répondre à la question en fonction de vos sentiments actuels.']
+      en: ['Please answer the questions based on your current feelings.'],
+      fr: ['Veuillez répondre àux questions en fonction de vos sentiments actuels.']
     },
     license: 'AGPL-3.0',
     title: {
@@ -63,13 +96,44 @@ export default defineInstrument({
     }
   },
   measures: {
-    overallHappiness: {
+    personalLifeSatisfaction: {
       kind: 'const',
-      ref: 'overallHappiness'
+      ref: 'personalLifeSatisfaction',
+      label: {
+        en: 'Satisfaction With Personal Life',
+        fr: "Satisfaction à l'égard de la vie personnelle"
+      }
+    },
+    professionalLifeSatisfaction: {
+      kind: 'const',
+      ref: 'professionalLifeSatisfaction',
+      label: {
+        en: 'Satisfaction With Professional Life',
+        fr: "Satisfaction à l'égard de la vie professionnelle"
+      }
+    },
+    overallLifeSatisfaction: {
+      kind: 'computed',
+      label: {
+        en: 'Overall Satisfaction Score',
+        fr: 'Score global de satisfaction'
+      },
+      value(data) {
+        return sum(Object.values(pick(data, ['personalLifeSatisfaction', 'professionalLifeSatisfaction'])));
+      }
     }
   },
-  validationSchema: z.object({
-    overallHappiness: z.number().int().gte(1).lte(10),
-    reasonForSadness: z.string().optional()
-  })
+  validationSchema: z
+    .object({
+      personalLifeSatisfaction: z.number().int().gte(1).lte(10),
+      professionalLifeSatisfaction: z.number().int().gte(1).lte(10),
+      isSatisfiedOverall: z.boolean(),
+      reasonNotSatisfied: z.string().optional()
+    })
+    .refine((arg) => {
+      if (arg.isSatisfiedOverall) {
+        return true;
+      }
+      return Boolean(arg.reasonNotSatisfied);
+    }, 'This field is required / Ce champ est obligatoire')
 });
