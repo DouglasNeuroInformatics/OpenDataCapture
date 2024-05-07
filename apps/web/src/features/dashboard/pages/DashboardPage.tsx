@@ -26,9 +26,11 @@ export const DashboardPage = () => {
       <PageHeader className="text-center">
         <Heading variant="h2">{t('pageTitle')}</Heading>
       </PageHeader>
-      <section className="flex flex-grow flex-col">
-        <div className="mb-5 flex w-full items-center justify-between space-y-5 lg:space-y-2">
-          <Heading variant="h3">{t('welcome', { context: currentGroup?.type })}</Heading>
+      <section className="flex flex-grow flex-col gap-5">
+        <div className="flex w-full flex-wrap items-center justify-between gap-3">
+          <Heading className="whitespace-nowrap" variant="h3">
+            {t('welcome', { context: currentGroup?.type })}
+          </Heading>
           <GroupSwitcher />
         </div>
         <Summary />

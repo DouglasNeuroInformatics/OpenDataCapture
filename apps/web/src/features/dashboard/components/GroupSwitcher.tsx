@@ -19,7 +19,7 @@ export const GroupSwitcher = () => {
       value={currentGroup.id}
       onValueChange={(id) => changeGroup(currentUser!.groups.find((group) => group.id === id)!)!}
     >
-      <Select.Trigger className="w-[180px]">
+      <Select.Trigger className="w-full md:w-[180px]">
         <Select.Value />
       </Select.Trigger>
       <Select.Content>
