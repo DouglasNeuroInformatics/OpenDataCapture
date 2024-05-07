@@ -7,9 +7,9 @@ import { Navigate, type RouteObject } from 'react-router-dom';
 import { config } from '@/config';
 
 import { SubjectLayout } from './components/SubjectLayout';
+import { DataHubPage } from './pages/DataHubPage';
 import { SubjectAssignmentsPage } from './pages/SubjectAssignmentsPage';
 import { SubjectGraphPage } from './pages/SubjectGraphPage';
-import { SubjectIndexPage } from './pages/SubjectIndexPage';
 import { SubjectTablePage } from './pages/SubjectTablePage';
 
 export const datahubRoute: RouteObject = {
@@ -17,7 +17,7 @@ export const datahubRoute: RouteObject = {
   children: [
     {
       index: true,
-      element: <SubjectIndexPage />
+      element: <DataHubPage />
     },
     {
       path: ':subjectId',

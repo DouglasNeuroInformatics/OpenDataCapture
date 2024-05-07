@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/PageHeader';
 
 import { SubjectsTable } from '../components/SubjectsTable';
 
-export const SubjectIndexPage = () => {
+export const DataHubPage = () => {
   const { t } = useTranslation('datahub');
 
   return (
