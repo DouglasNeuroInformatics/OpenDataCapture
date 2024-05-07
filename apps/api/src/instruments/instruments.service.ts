@@ -66,7 +66,7 @@ export class InstrumentsService {
           instructions: instance.details.instructions as Prisma.InputJsonValue,
           title: instance.details.title as Prisma.InputJsonValue
         },
-        id: this.generateId(instance)
+        id: this.generateInstrumentId(instance)
       }
     });
   }
@@ -120,7 +120,7 @@ export class InstrumentsService {
     }) as Promise<InstrumentSummary[]>;
   }
 
-  private generateId({ name, version }: { name: string; version: number }) {
+  generateInstrumentId({ name, version }: { name: string; version: number }) {
     return this.cryptoService.hash(`${name}-${version}`);
   }
 
