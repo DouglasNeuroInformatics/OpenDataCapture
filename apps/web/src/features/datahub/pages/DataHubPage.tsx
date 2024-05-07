@@ -81,7 +81,7 @@ export const DataHubPage = () => {
           <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
             <Dialog>
               <Dialog.Trigger className="flex-grow">
-                <SearchBar className="text-foreground [&>input]:placeholder-foreground" readOnly={true} />
+                <SearchBar className="[&>input]:text-foreground [&>input]:placeholder-foreground" readOnly={true} />
               </Dialog.Trigger>
               <Dialog.Content>
                 <Dialog.Header>
