@@ -13,7 +13,6 @@ import matrixReasoningTask from '@opendatacapture/instrument-library/interactive
 import { type Json, type Language } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
-import type { Subject, SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -85,11 +84,17 @@ export class DemoService {
       for (let i = 0; i < dummySubjectCount; i++) {
         this.logger.debug(`Creating dummy subject ${i + 1}/${dummySubjectCount}`);
         const group = randomValue(groups);
-        const subject = await this.createSubject();
+        const subjectIdData = {
+          dateOfBirth: faker.date.birthdate(),
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          sex: toUpperCase(faker.person.sexType())
+        };
+        const subject = await this.subjectsService.create(subjectIdData);
         await this.sessionsService.create({
           date: new Date(),
           groupId: group.id,
-          subjectIdData: subject,
+          subjectIdData,
           type: 'IN_PERSON'
         });
         this.logger.debug(`Creating dummy records for form ${hq.name}`);
@@ -121,14 +126,5 @@ export class DemoService {
       }
       throw err;
     }
-  }
-
-  private async createSubject() {
-    return this.subjectsService.create({
-      dateOfBirth: faker.date.birthdate(),
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      sex: toUpperCase(faker.person.sexType())
-    }) as Promise<Subject & SubjectIdentificationData>;
   }
 }
