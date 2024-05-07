@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Button, LegacySlider } from '@douglasneuroinformatics/libui/components';
+import { Button, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
+import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import { useTranslation } from 'react-i18next';
 
@@ -19,36 +20,44 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
   const instrument = useInstrument(assignment?.instrumentId ?? null);
 
   return (
-    <LegacySlider isOpen={isOpen} setIsOpen={setIsOpen} title={instrument?.details.title}>
-      {instrument && (
-        <div className="flex h-full flex-col">
-          <div className="flex gap-1 text-sm">
-            <a
-              className="overflow-hidden text-ellipsis whitespace-nowrap text-sm hover:underline"
-              href={assignment!.url}
-              rel="noreferrer"
-              target="_blank"
-            >
-              {t('datahub:assignments.link')}
-            </a>
-          </div>
-          <div className="mt-auto flex gap-2">
-            <Button
-              className="w-full text-sm"
-              disabled={assignment?.status !== 'OUTSTANDING'}
-              label={t('cancel')}
-              variant="danger"
-              onClick={() => onCancel(assignment!)}
-            />
-            <Button
-              disabled
-              className="w-full whitespace-nowrap text-sm"
-              label={t('datahub:assignments.resendNotification')}
-              variant="secondary"
-            />
-          </div>
-        </div>
-      )}
-    </LegacySlider>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet.Content className="flex h-full flex-col">
+        <Sheet.Header>
+          <Sheet.Title>{instrument?.details.title}</Sheet.Title>
+          <Sheet.Description>{t('datahub:assignments.assignmentSliderDesc')}</Sheet.Description>
+        </Sheet.Header>
+        <Sheet.Body className="flex-grow">
+          {instrument && (
+            <div className="flex flex-col gap-3">
+              <Label asChild>
+                <a className="hover:underline" href={assignment!.url} rel="noreferrer" target="_blank">
+                  {t('datahub:assignments.link')}
+                </a>
+              </Label>
+              <div className="flex gap-2">
+                <Input readOnly className="h-9" id="link" value={assignment!.url} />
+                <CopyButton size="sm" text={assignment!.url} variant="outline" />
+              </div>
+            </div>
+          )}
+        </Sheet.Body>
+        <Sheet.Footer>
+          <Button
+            className="w-full text-sm"
+            disabled={assignment?.status !== 'OUTSTANDING'}
+            label={t('cancel')}
+            variant="danger"
+            onClick={() => onCancel(assignment!)}
+          />
+          <Button
+            disabled
+            className="w-full whitespace-nowrap text-sm"
+            label={t('datahub:assignments.resendNotification')}
+            variant="secondary"
+          />
+        </Sheet.Footer>
+      </Sheet.Content>
+      <Sheet.Overlay />
+    </Sheet>
   );
 };
