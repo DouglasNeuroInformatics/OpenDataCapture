@@ -46,7 +46,15 @@
     "fr": "Nombre d'utilisateurs"
   },
   "welcome": {
-    "en": "Welcome Back",
-    "fr": "Bienvenue"
+    "en": "Summary of Application State",
+    "fr": "La cliente actuelle"
+  },
+  "welcome_CLINICAL": {
+    "en": "Overview of Your Clinic",
+    "fr": "Vue d'ensemble de votre clinique"
+  },
+  "welcome_RESEARCH": {
+    "en": "Overview of Your Research Group",
+    "fr": "Vue d'ensemble de votre groupe de recherche"
   }
 }

@@ -12,6 +12,7 @@ import { GroupSwitcher } from '../components/GroupSwitcher';
 import { Summary } from '../components/Summary';
 
 export const OverviewPage = () => {
+  const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation('overview');
 
@@ -22,15 +23,13 @@ export const OverviewPage = () => {
   return (
     <div className="flex flex-grow flex-col">
       <Disclaimer isRequired={import.meta.env.PROD} />
-      <PageHeader className="flex justify-between">
+      <PageHeader className="text-center">
         <Heading variant="h2">{t('pageTitle')}</Heading>
-        <GroupSwitcher />
       </PageHeader>
       <section className="flex flex-grow flex-col">
-        <div className="mb-5 space-y-5 lg:space-y-2">
-          <Heading variant="h3">
-            {currentUser?.firstName ? `${t('welcome')}, ${currentUser.firstName}` : t('welcome')}
-          </Heading>
+        <div className="mb-5 flex w-full items-center justify-between space-y-5 lg:space-y-2">
+          <Heading variant="h3">{t('welcome', { context: currentGroup?.type })}</Heading>
+          <GroupSwitcher />
         </div>
         <Summary />
       </section>
