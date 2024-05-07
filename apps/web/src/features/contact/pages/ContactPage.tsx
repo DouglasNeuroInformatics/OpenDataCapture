@@ -21,7 +21,9 @@ export const ContactPage = () => {
   return (
     <div>
       <PageHeader>
-        <Heading variant="h2">{t('pageTitle')}</Heading>
+        <Heading className="text-center" variant="h2">
+          {t('pageTitle')}
+        </Heading>
       </PageHeader>
       <ContactForm onSubmit={handleSubmit} />
     </div>
