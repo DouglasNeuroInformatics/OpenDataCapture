@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { LegacyDropdown } from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 export type TimeDropdownProps = {
@@ -11,8 +11,7 @@ export const TimeDropdown = ({ setMinTime }: TimeDropdownProps) => {
   const { t } = useTranslation('subjects');
 
   return (
-    <LegacyDropdown
-      className="text-sm"
+    <ActionDropdown
       options={{
         all: t('visualization.timeframeOptions.all'),
         pastMonth: t('visualization.timeframeOptions.month'),

@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 
-import { type LegacySelectOption } from '@douglasneuroinformatics/libui/components';
+import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import { getFormFields } from '@opendatacapture/instrument-utils';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
-export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null): LegacySelectOption[] {
+export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null): ListboxDropdownOption[] {
   return useMemo(() => {
-    const arr: LegacySelectOption[] = [];
+    const arr: ListboxDropdownOption[] = [];
     if (instrument) {
       const formFields = getFormFields(instrument.content);
       for (const key in instrument.measures) {

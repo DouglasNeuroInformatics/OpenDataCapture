@@ -2,11 +2,11 @@ import React, { useRef, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
+  ActionDropdown,
   Button,
-  LegacyDropdown,
-  LegacySelectDropdown,
-  type LegacySelectOption,
-  LineGraph
+  LineGraph,
+  ListboxDropdown,
+  type ListboxDropdownOption
 } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import html2canvas from 'html2canvas';
@@ -33,7 +33,7 @@ export const SubjectGraphPage = () => {
     });
   const { t } = useTranslation(['subjects', 'common', 'core']);
   const measureOptions = useMeasureOptions(instrument);
-  const [selectedMeasures, setSelectedMeasures] = useState<LegacySelectOption[]>([]);
+  const [selectedMeasures, setSelectedMeasures] = useState<ListboxDropdownOption[]>([]);
 
   const linearModelQuery = useLinearModelQuery({
     enabled: Boolean(instrumentId),
@@ -117,15 +117,14 @@ export const SubjectGraphPage = () => {
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select-dropdown-container">
-              <LegacyDropdown
-                className="text-sm"
+              <ActionDropdown
                 options={instrumentOptions}
                 title={t('visualization.instrument')}
                 onSelection={handleSelectForm}
               />
             </div>
             <div data-cy="measure-select-dropdown-container">
-              <LegacySelectDropdown
+              <ListboxDropdown
                 checkPosition="right"
                 className="text-sm"
                 options={measureOptions}

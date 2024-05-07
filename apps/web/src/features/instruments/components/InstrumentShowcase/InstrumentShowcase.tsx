@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import { LegacySelectDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
-import type { LegacySelectOption } from '@douglasneuroinformatics/libui/components';
+import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
+import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -16,9 +16,9 @@ export const InstrumentsShowcase = () => {
   const navigate = useNavigate();
   const { t } = useTranslation(['core', 'instruments']);
   const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentSummary[]>([]);
-  const [tagOptions, setTagOptions] = useState<LegacySelectOption[]>([]);
-  const [selectedLanguages, setSelectedLanguages] = useState<LegacySelectOption[]>([]);
-  const [selectedTags, setSelectedTags] = useState<LegacySelectOption[]>([]);
+  const [tagOptions, setTagOptions] = useState<ListboxDropdownOption[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<ListboxDropdownOption[]>([]);
+  const [selectedTags, setSelectedTags] = useState<ListboxDropdownOption[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   const languageOptions = [
@@ -60,7 +60,7 @@ export const InstrumentsShowcase = () => {
         <SearchBar className="w-full flex-grow" value={searchTerm} onValueChange={setSearchTerm} />
         <div className="flex min-w-96 flex-grow gap-2 lg:flex-shrink">
           <div className="flex w-full" data-cy="tags-btn-dropdown">
-            <LegacySelectDropdown
+            <ListboxDropdown
               options={tagOptions}
               selected={selectedTags}
               setSelected={setSelectedTags}
@@ -68,7 +68,7 @@ export const InstrumentsShowcase = () => {
             />
           </div>
           <div className="flex w-full" data-cy="language-btn-dropdown">
-            <LegacySelectDropdown
+            <ListboxDropdown
               options={languageOptions}
               selected={selectedLanguages}
               setSelected={setSelectedLanguages}

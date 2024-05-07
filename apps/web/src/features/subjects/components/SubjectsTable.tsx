@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { DropdownMenu, LegacyClientTable, LegacyDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown, ClientTable, DropdownMenu, SearchBar } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
@@ -75,14 +75,14 @@ export const SubjectsTable = () => {
           <DropdownMenu>
             <DropdownMenu.Trigger></DropdownMenu.Trigger>
           </DropdownMenu>
-          <LegacyDropdown
+          <ActionDropdown
             options={['CSV', 'JSON']}
             title={t('index.table.export')}
             onSelection={handleExportSelection}
           />
         </div>
       </div>
-      <LegacyClientTable<Subject>
+      <ClientTable<Subject>
         columns={[
           {
             field: (subject) => subject.id.slice(0, 7),
