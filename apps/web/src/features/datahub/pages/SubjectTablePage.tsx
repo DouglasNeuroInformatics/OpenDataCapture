@@ -30,7 +30,7 @@ export const SubjectTablePage = () => {
 
   return (
     <div>
-      <div className="my-2">
+      <div className="mb-2">
         <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row" data-cy="select-instrument-dropdown-container">

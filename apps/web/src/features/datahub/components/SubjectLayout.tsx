@@ -20,7 +20,9 @@ export const SubjectLayout = () => {
   return (
     <React.Fragment>
       <PageHeader>
-        <Heading variant="h2">{t('layout.title', { id: subjectId.slice(0, 7) })}</Heading>
+        <Heading className="text-center" variant="h2">
+          {t('layout.title', { id: subjectId.slice(0, 7) })}
+        </Heading>
       </PageHeader>
       <div className="mb-5 flex">
         {config.setup.isGatewayEnabled && (

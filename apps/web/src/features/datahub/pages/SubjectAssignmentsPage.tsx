@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button } from '@douglasneuroinformatics/libui/components';
+import { Button, Heading } from '@douglasneuroinformatics/libui/components';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +36,7 @@ export const SubjectAssignmentsPage = () => {
   return (
     <div>
       <div className="mb-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
-        <h3 className="text-lg font-semibold">{t('assignments.assignedInstruments')}</h3>
+        <Heading variant="h4">{t('assignments.assignedInstruments')}</Heading>
         <Button
           className="w-full text-sm lg:w-auto"
           size="sm"
