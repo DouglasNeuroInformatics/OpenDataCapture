@@ -31,7 +31,7 @@ export const SubjectGraphPage = () => {
     useInstrumentVisualization({
       params: { subjectId: params.subjectId! }
     });
-  const { t } = useTranslation(['subjects', 'common', 'core']);
+  const { t } = useTranslation(['datahub', 'common', 'core']);
   const measureOptions = useMeasureOptions(instrument);
   const [selectedMeasures, setSelectedMeasures] = useState<ListboxDropdownOption[]>([]);
 

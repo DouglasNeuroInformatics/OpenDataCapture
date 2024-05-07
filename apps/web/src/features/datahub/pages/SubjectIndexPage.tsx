@@ -9,7 +9,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { SubjectsTable } from '../components/SubjectsTable';
 
 export const SubjectIndexPage = () => {
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation('datahub');
 
   return (
     <React.Fragment>

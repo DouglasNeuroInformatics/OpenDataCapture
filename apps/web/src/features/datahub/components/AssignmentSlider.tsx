@@ -15,7 +15,7 @@ export type AssignmentSliderProps = {
 
 /** Component for modifying an existing assignment */
 export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: AssignmentSliderProps) => {
-  const { t } = useTranslation(['core', 'subjects']);
+  const { t } = useTranslation(['core', 'datahub']);
   const instrument = useInstrument(assignment?.instrumentId ?? null);
 
   return (
@@ -29,7 +29,7 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
               rel="noreferrer"
               target="_blank"
             >
-              {t('subjects:assignments.link')}
+              {t('datahub:assignments.link')}
             </a>
           </div>
           <div className="mt-auto flex gap-2">
@@ -43,7 +43,7 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
             <Button
               disabled
               className="w-full whitespace-nowrap text-sm"
-              label={t('subjects:assignments.resendNotification')}
+              label={t('datahub:assignments.resendNotification')}
               variant="secondary"
             />
           </div>

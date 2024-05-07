@@ -37,6 +37,11 @@ const config = {
       titlePrefix: 'Contact'
     },
     {
+      directory: '../src/features/data-hub/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Data Hub'
+    },
+    {
       directory: '../src/features/dashboard/components',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
       titlePrefix: 'Dashboard'
@@ -50,11 +55,6 @@ const config = {
       directory: '../src/features/setup/pages',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
       titlePrefix: 'Setup Pages'
-    },
-    {
-      directory: '../src/features/subjects/components',
-      files: '**/*.stories.@(js|jsx|ts|tsx)',
-      titlePrefix: 'Subjects'
     },
     {
       directory: '../src/features/user/components',

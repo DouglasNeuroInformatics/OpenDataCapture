@@ -15,7 +15,7 @@ type SubjectLookupProps = {
 };
 
 export const SubjectLookup = ({ onClose, show }: SubjectLookupProps) => {
-  const { t } = useTranslation(['subjects', 'core']);
+  const { t } = useTranslation(['datahub', 'core']);
   const notifications = useNotificationsStore();
   const navigate = useNavigate();
 

@@ -17,7 +17,7 @@ import { AssignmentsTable } from '../components/AssignmentsTable';
 
 export const SubjectAssignmentsPage = () => {
   const params = useParams();
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation('datahub');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
 

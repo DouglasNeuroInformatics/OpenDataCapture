@@ -4,12 +4,12 @@ import auth from '../translations/auth.json';
 import common from '../translations/common.json';
 import contact from '../translations/contact.json';
 import dashboard from '../translations/dashboard.json';
+import datahub from '../translations/datahub.json';
 import group from '../translations/group.json';
 import instruments from '../translations/instruments.json';
 import layout from '../translations/layout.json';
 import session from '../translations/session.json';
 import setup from '../translations/setup.json';
-import subjects from '../translations/subjects.json';
 import user from '../translations/user.json';
 
 i18n.addPreInitTranslations({
@@ -17,12 +17,12 @@ i18n.addPreInitTranslations({
   common,
   contact,
   dashboard,
+  datahub,
   group,
   instruments,
   layout,
   session,
   setup,
-  subjects,
   user
 });
 

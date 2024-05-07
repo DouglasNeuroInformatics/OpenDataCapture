@@ -12,8 +12,8 @@ import { SubjectGraphPage } from './pages/SubjectGraphPage';
 import { SubjectIndexPage } from './pages/SubjectIndexPage';
 import { SubjectTablePage } from './pages/SubjectTablePage';
 
-export const subjectsRoute: RouteObject = {
-  path: 'subjects',
+export const datahubRoute: RouteObject = {
+  path: 'datahub',
   children: [
     {
       index: true,

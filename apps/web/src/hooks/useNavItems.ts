@@ -38,10 +38,10 @@ export function useNavItems() {
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
-        'data-cy': 'view-subjects',
+        'data-cy': 'datahub',
         icon: DatabaseIcon,
-        id: '/subjects',
-        label: t(`navLinks.viewSubjects`)
+        id: '/datahub',
+        label: t(`navLinks.datahub`)
       });
     }
     if (currentGroup && currentUser?.ability.can('manage', 'Group')) {
@@ -76,7 +76,7 @@ export function useNavItems() {
       sessionItems.push({
         disabled: currentSession === null,
         icon: EyeIcon,
-        id: `/subjects/${currentSession?.subjectId}/table`,
+        id: `/datahub/${currentSession?.subjectId}/table`,
         label: t('navLinks.viewCurrentSubject')
       });
     }

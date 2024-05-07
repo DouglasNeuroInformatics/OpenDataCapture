@@ -8,7 +8,7 @@ export type TimeDropdownProps = {
 };
 
 export const TimeDropdown = ({ setMinTime }: TimeDropdownProps) => {
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation('datahub');
 
   return (
     <ActionDropdown

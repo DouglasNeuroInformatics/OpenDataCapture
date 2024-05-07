@@ -18,7 +18,7 @@ export type AssignmentModalProps = {
 
 /** Component for creating a new assignment */
 export const AssignmentModal = ({ instrumentOptions, isOpen, onSubmit, setIsOpen }: AssignmentModalProps) => {
-  const { t } = useTranslation(['subjects', 'core']);
+  const { t } = useTranslation(['datahub', 'core']);
 
   return (
     <LegacyModal open={isOpen} title="Assignment" onClose={() => setIsOpen(false)}>

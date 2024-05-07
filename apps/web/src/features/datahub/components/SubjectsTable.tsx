@@ -22,7 +22,7 @@ export const SubjectsTable = () => {
   const download = useDownload();
   const navigate = useNavigate();
 
-  const { t } = useTranslation(['subjects', 'core']);
+  const { t } = useTranslation(['datahub', 'core']);
 
   const [showLookup, setShowLookup] = useState(false);
 

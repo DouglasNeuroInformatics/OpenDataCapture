@@ -12,10 +12,10 @@ import { TabLink } from './TabLink';
 
 export const SubjectLayout = () => {
   const params = useParams();
-  const { t } = useTranslation('subjects');
+  const { t } = useTranslation('datahub');
 
   const subjectId = params.subjectId!;
-  const basePathname = `/subjects/${subjectId}`;
+  const basePathname = `/datahub/${subjectId}`;
 
   return (
     <React.Fragment>

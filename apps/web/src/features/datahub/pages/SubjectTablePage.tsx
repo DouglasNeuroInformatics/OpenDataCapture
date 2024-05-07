@@ -16,7 +16,7 @@ export const SubjectTablePage = () => {
       params: { subjectId: params.subjectId! }
     });
 
-  const { t } = useTranslation(['subjects', 'core']);
+  const { t } = useTranslation(['datahub', 'core']);
 
   const fields: { field: string; label: string }[] = [];
   for (const subItem in records[0]) {
