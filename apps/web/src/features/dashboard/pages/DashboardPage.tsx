@@ -27,7 +27,7 @@ export const DashboardPage = () => {
         <Heading variant="h2">{t('pageTitle')}</Heading>
       </PageHeader>
       <section className="flex flex-grow flex-col gap-5">
-        <div className="flex w-full flex-wrap items-center justify-between gap-3">
+        <div className="flex w-full flex-col flex-wrap justify-between gap-3 md:flex-row md:items-center">
           <Heading className="whitespace-nowrap" variant="h3">
             {t('welcome', { context: currentGroup?.type })}
           </Heading>
