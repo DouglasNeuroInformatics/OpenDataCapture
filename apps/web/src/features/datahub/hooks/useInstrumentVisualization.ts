@@ -36,7 +36,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   const instrument: AnyUnilingualFormInstrument | null = useInstrument(instrumentId, { kind: 'FORM' });
 
-  const instrumentSummariesQuery = useInstrumentSummariesQuery({ params: { kind: 'FORM' } });
+  const instrumentSummariesQuery = useInstrumentSummariesQuery({ params: { hasRecords: true, kind: 'FORM' } });
   const recordsQuery = useInstrumentRecords({
     enabled: instrumentId !== null,
     params: {
