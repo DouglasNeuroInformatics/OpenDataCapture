@@ -55,7 +55,7 @@ export class InstrumentRecordsService {
       await this.groupsService.findById(groupId, options);
     }
     await this.instrumentsService.findById(instrumentId);
-    const subject = await this.subjectsService.findById(subjectId);
+    await this.subjectsService.findById(subjectId);
 
     return this.instrumentRecordModel.create({
       data: {
@@ -73,7 +73,7 @@ export class InstrumentRecordsService {
         },
         subject: {
           connect: {
-            id: subject.id
+            id: subjectId
           }
         }
       }
