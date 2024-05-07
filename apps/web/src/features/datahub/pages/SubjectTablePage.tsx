@@ -11,7 +11,7 @@ import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization'
 
 export const SubjectTablePage = () => {
   const params = useParams();
-  const { dl, instrumentOptions, records, setInstrumentId, setMinDate } = useInstrumentVisualization({
+  const { dl, instrumentId, instrumentOptions, records, setInstrumentId, setMinDate } = useInstrumentVisualization({
     params: { subjectId: params.subjectId! }
   });
 
@@ -36,11 +36,16 @@ export const SubjectTablePage = () => {
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="time-dropdown-container">
-              <TimeDropdown setMinTime={setMinDate} />
+              <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
             </div>
-
             <div data-cy="download-dropdown-container">
-              <ActionDropdown options={['CSV', 'JSON']} title={t('core:download')} onSelection={dl} />
+              <ActionDropdown
+                disabled={!instrumentId}
+                options={['CSV', 'JSON']}
+                title={t('core:download')}
+                triggerClassName="min-w-32"
+                onSelection={dl}
+              />
             </div>
           </div>
         </div>

@@ -3,7 +3,6 @@ import React, { useRef, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   ActionDropdown,
-  Button,
   Card,
   LineGraph,
   ListboxDropdown,
@@ -17,7 +16,6 @@ import { useParams } from 'react-router-dom';
 import { useAppStore } from '@/store';
 
 import { TimeDropdown } from '../components/TimeDropdown';
-import { VisualizationHeader } from '../components/VisualizationHeader';
 import { useGraphData } from '../hooks/useGraphData';
 import { useGraphLines } from '../hooks/useGraphLines';
 import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization';
@@ -114,7 +112,6 @@ export const SubjectGraphPage = () => {
   return (
     <div>
       <div className="mb-2">
-        <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select-dropdown-container">
@@ -142,12 +139,14 @@ export const SubjectGraphPage = () => {
               <TimeDropdown setMinTime={setMinDate} />
             </div>
             <div className="relative w-full whitespace-nowrap" data-cy="download-button-container">
-              <Button
-                className="relative w-full whitespace-nowrap text-sm"
-                disabled={!instrument}
-                label={t('downloadInfo.download')}
-                variant="secondary"
-                onClick={() => void handleGraphDownload()}
+              <ActionDropdown
+                options={{
+                  png: 'PNG'
+                }}
+                title={t('downloadInfo.download')}
+                onSelection={() => {
+                  void handleGraphDownload();
+                }}
               />
             </div>
           </div>
