@@ -4,6 +4,10 @@
       "en": "Add Assignment",
       "fr": "Assigner un instrument"
     },
+    "addAssignmentDesc": {
+      "en": "Please complete the following form to create an assignment. Once an assignment is created, you can send the generated link to the client.",
+      "fr": "Veuillez remplir le formulaire suivant pour créer une affectation. Une fois la mission créée, vous pouvez envoyer le lien généré au client."
+    },
     "assignedAt": {
       "en": "Assigned",
       "fr": "Attribué"
