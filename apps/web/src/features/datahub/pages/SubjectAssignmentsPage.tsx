@@ -42,7 +42,7 @@ export const SubjectAssignmentsPage = () => {
       <div>
         <div className="mb-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
           <Heading variant="h4">{t('assignments.assignedInstruments')}</Heading>
-          <Dialog.Trigger>
+          <Dialog.Trigger asChild>
             <Button variant="outline">
               {t('assignments.addAssignment')}
               <PlusIcon />

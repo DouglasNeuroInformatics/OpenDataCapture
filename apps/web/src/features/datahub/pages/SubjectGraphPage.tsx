@@ -121,6 +121,7 @@ export const SubjectGraphPage = () => {
               <ActionDropdown
                 options={instrumentOptions}
                 title={t('visualization.instrument')}
+                triggerClassName="gap-2"
                 onSelection={handleSelectForm}
               />
             </div>
