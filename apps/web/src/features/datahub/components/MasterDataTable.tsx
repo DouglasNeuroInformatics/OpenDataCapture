@@ -14,11 +14,12 @@ import { useAppStore } from '@/store';
 import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
 import { SubjectLookup } from './SubjectLookup';
 
-export const SubjectsTable = () => {
+export const MasterDataTable = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
 
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
+
   const download = useDownload();
   const navigate = useNavigate();
 

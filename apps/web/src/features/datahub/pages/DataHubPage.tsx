@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
 
-import { SubjectsTable } from '../components/SubjectsTable';
+import { MasterDataTable } from '../components/MasterDataTable';
 
 export const DataHubPage = () => {
   const { t } = useTranslation('datahub');
@@ -19,7 +19,7 @@ export const DataHubPage = () => {
         </Heading>
       </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
-        <SubjectsTable />
+        <MasterDataTable />
       </React.Suspense>
     </React.Fragment>
   );
