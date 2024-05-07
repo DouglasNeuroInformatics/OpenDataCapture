@@ -125,20 +125,12 @@
       "fr": "Mesures"
     },
     "selectInstrument": {
-      "en": "Please select an instrument",
-      "fr": "Veuillez sélectionner un instrument"
+      "en": "Select an instrument",
+      "fr": "Sélectionnez un instrument"
     },
     "selectMeasures": {
       "en": "Please select one or more measures",
       "fr": "Veuillez sélectionner au moins une mesure"
-    },
-    "selectedInstrument": {
-      "en": "Selected Instrument: {{title}}",
-      "fr": "Instrument sélectionné : {{title}}"
-    },
-    "selectedInstrumentNone": {
-      "en": "None",
-      "fr": "aucun"
     },
     "timeframe": {
       "en": "Timeframe",

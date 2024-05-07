@@ -5,16 +5,15 @@ import { ActionDropdown, ClientTable } from '@douglasneuroinformatics/libui/comp
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
+import { SelectInstrument } from '../components/SelectInstrument';
 import { TimeDropdown } from '../components/TimeDropdown';
-import { VisualizationHeader } from '../components/VisualizationHeader';
 import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization';
 
 export const SubjectTablePage = () => {
   const params = useParams();
-  const { dl, instrument, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
-    useInstrumentVisualization({
-      params: { subjectId: params.subjectId! }
-    });
+  const { dl, instrumentOptions, records, setInstrumentId, setMinDate } = useInstrumentVisualization({
+    params: { subjectId: params.subjectId! }
+  });
 
   const { t } = useTranslation(['datahub', 'core']);
 
@@ -31,14 +30,9 @@ export const SubjectTablePage = () => {
   return (
     <div>
       <div className="mb-2">
-        <VisualizationHeader minDate={minDate} title={instrument?.details.title} />
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row" data-cy="select-instrument-dropdown-container">
-            <ActionDropdown
-              options={instrumentOptions}
-              title={t('visualization.instrument')}
-              onSelection={setInstrumentId}
-            />
+            <SelectInstrument options={instrumentOptions} onSelect={setInstrumentId} />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="time-dropdown-container">
@@ -61,7 +55,8 @@ export const SubjectTablePage = () => {
           ...fields
         ]}
         data={records}
-        minRows={10}
+        entriesPerPage={15}
+        minRows={15}
       />
     </div>
   );
