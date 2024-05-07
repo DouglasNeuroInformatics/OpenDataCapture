@@ -37,12 +37,7 @@ export const SubjectAssignmentsPage = () => {
     <div>
       <div className="mb-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
         <Heading variant="h4">{t('assignments.assignedInstruments')}</Heading>
-        <Button
-          className="w-full text-sm lg:w-auto"
-          size="sm"
-          variant="secondary"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
+        <Button className="w-full lg:w-auto" variant="secondary" onClick={() => setIsCreateModalOpen(true)}>
           {t('assignments.addAssignment')}
           <PlusIcon />
         </Button>

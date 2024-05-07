@@ -4,6 +4,7 @@ import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   ActionDropdown,
   Button,
+  Card,
   LineGraph,
   ListboxDropdown,
   type ListboxDropdownOption
@@ -151,7 +152,7 @@ export const SubjectGraphPage = () => {
           </div>
         </div>
       </div>
-      <div ref={graphContainerRef}>
+      <Card ref={graphContainerRef}>
         <LineGraph
           data={graphData}
           lines={lines}
@@ -160,7 +161,7 @@ export const SubjectGraphPage = () => {
             label: t('visualization.xLabel')
           }}
         />
-      </div>
+      </Card>
     </div>
   );
 };

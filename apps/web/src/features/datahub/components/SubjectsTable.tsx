@@ -101,6 +101,8 @@ export const SubjectsTable = () => {
           }
         ]}
         data={data}
+        entriesPerPage={15}
+        minRows={15}
         onEntryClick={(subject) => {
           navigate(`${subject.id}/assignments`);
         }}

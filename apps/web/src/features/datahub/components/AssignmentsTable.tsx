@@ -60,7 +60,8 @@ export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTablePr
         }
       ]}
       data={assignments}
-      minRows={10}
+      entriesPerPage={15}
+      minRows={15}
       onEntryClick={onSelection}
     />
   );
