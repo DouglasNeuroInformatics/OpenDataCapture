@@ -22,7 +22,7 @@ export const Root = ({ bundle, id, token }: RootProps) => {
   const notifications = useNotificationsStore();
 
   useEffect(() => {
-    ref.current!.style.display = 'block';
+    ref.current!.style.display = 'flex';
   }, []);
 
   const handleSubmit = async (data: unknown) => {

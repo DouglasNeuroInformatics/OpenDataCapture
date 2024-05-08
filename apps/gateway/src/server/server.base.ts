@@ -23,7 +23,7 @@ export abstract class BaseServer {
       res.locals.loadRoot = (props: RootProps) => {
         const { html } = render(props);
         return template
-          .replace('{{ ROOT_PROPS_OUTLET }}', JSON.stringify(props))
+          .replace('{{ ROOT_PROPS_OUTLET }}', btoa(JSON.stringify(props)))
           .replace('{{ ROOT_SSR_OUTLET }}', html);
       };
       next();
