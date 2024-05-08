@@ -51,7 +51,9 @@ export const InstrumentRenderPage = () => {
   return (
     <div className="flex flex-grow flex-col">
       <PageHeader>
-        <Heading variant="h2">{title ?? t('instrument')}</Heading>
+        <Heading className="text-center" variant="h2">
+          {title ?? t('instrument')}
+        </Heading>
       </PageHeader>
       <div className="flex-grow">
         <InstrumentRenderer
