@@ -45,19 +45,20 @@ export const Root = ({ bundle, id, token }: RootProps) => {
     <div className="flex h-screen flex-col" ref={ref} style={{ display: 'none' }}>
       <header className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
         <div className="container flex items-center justify-between py-3 font-medium">
-          <Branding className="[&>span]:hidden sm:[&>span]:block" />
+          <Branding className="[&>span]:hidden sm:[&>span]:block" fontSize="md" />
           <div className="flex gap-3">
-            <ThemeToggle />
+            <ThemeToggle className="h-9 w-9" />
             <LanguageToggle
               options={{
                 en: 'English',
                 fr: 'Français'
               }}
+              triggerClassName="h-9 w-9"
             />
           </div>
         </div>
       </header>
-      <main className="container flex max-w-3xl flex-grow flex-col pb-16 pt-32 xl:max-w-5xl">
+      <main className="container flex min-h-0 max-w-3xl flex-grow flex-col pb-16 pt-32 xl:max-w-5xl">
         <InstrumentRenderer bundle={bundle} className="min-h-full w-full" onSubmit={handleSubmit} />
       </main>
       <NotificationHub />
