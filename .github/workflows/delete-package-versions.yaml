@@ -1,15 +1,17 @@
 name: Delete Package Versions
 on:
   workflow_dispatch:
+permissions:
+  packages: write
 jobs:
-  test:
+  run:
+    name: Delete Packages
     runs-on: ubuntu-latest
-      steps:
-        - name: Delete Packages
-          uses: actions/delete-package-versions@v5
-            with:
-              owner: DouglasNeuroInformatics
-              package-name: open-data-capture-api
-              package-type: container
-              min-versions-to-keep: 5
-              delete-only-untagged-versions: true
+    steps:
+      - uses: actions/delete-package-versions@v5
+        with:
+          owner: DouglasNeuroInformatics
+          package-name: open-data-capture-api
+          package-type: container
+          min-versions-to-keep: 5
+          delete-only-untagged-versions: true
