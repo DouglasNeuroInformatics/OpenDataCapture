@@ -8,6 +8,7 @@ import { glob } from 'glob';
 
 import { name, version } from '../package.json';
 import { InstrumentBundler } from './index.js';
+import { inferLoader } from './utils.js';
 
 import type { BundlerInput } from './types.js';
 
@@ -74,10 +75,13 @@ for (const targetDir of targetDirs) {
   }
 
   const inputs: BundlerInput[] = await Promise.all(
-    inputFiles.map(async (filepath) => ({
-      content: await fs.promises.readFile(filepath, 'utf-8'),
-      name: path.basename(filepath)
-    }))
+    inputFiles.map(async (filepath) => {
+      const loader = inferLoader(filepath);
+      return {
+        content: await fs.promises.readFile(filepath, loader === 'dataurl' ? null : 'utf-8'),
+        name: path.basename(filepath)
+      };
+    })
   );
 
   logger.verbose(`Found input files: ${inputs.map((input) => `'${input.name}'`).join(', ')}`);
