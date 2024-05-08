@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // @ts-nocheck
 
 import { saveTextAs } from '../file-saver@1.1.0';

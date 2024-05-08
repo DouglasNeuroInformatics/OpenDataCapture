@@ -28,7 +28,7 @@ export const InstrumentOverview = ({ instrument, onNext }: InstrumentOverviewPro
   return (
     <div className="space-y-6">
       <Heading variant="h4">{instrument.details.title}</Heading>
-      <div className="mb-8 max-w-prose space-y-6">
+      <div className="mb-8 space-y-6">
         <div>
           <Heading variant="h5">{t('description')}</Heading>
           <p className="text-muted-foreground text-sm">{instrument.details.description}</p>

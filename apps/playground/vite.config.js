@@ -1,6 +1,5 @@
 import module from 'module';
 import path from 'path';
-import url from 'url';
 
 import { runtime } from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
@@ -9,8 +8,6 @@ import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 
 const require = module.createRequire(import.meta.url);
-
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -37,7 +34,7 @@ export default defineConfig(({ mode }) => ({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(import.meta.dirname, 'src'),
       react: path.dirname(require.resolve('react/package.json')),
       'react-dom': path.dirname(require.resolve('react-dom/package.json'))
     }

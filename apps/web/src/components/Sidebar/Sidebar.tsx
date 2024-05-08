@@ -6,7 +6,7 @@ import { Branding } from '@opendatacapture/react-core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { StopCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
@@ -19,6 +19,8 @@ export const Sidebar = () => {
   const currentSession = useAppStore((store) => store.currentSession);
   const endSession = useAppStore((store) => store.endSession);
   const location = useLocation();
+  const navigate = useNavigate();
+
   const { t } = useTranslation(['core', 'common', 'layout']);
   return (
     <div className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700">
@@ -55,7 +57,13 @@ export const Sidebar = () => {
                     <AlertDialog.Description>{t('layout:endSessionModal.message')}</AlertDialog.Description>
                   </AlertDialog.Header>
                   <AlertDialog.Footer>
-                    <AlertDialog.Action className="min-w-24" onClick={endSession}>
+                    <AlertDialog.Action
+                      className="min-w-24"
+                      onClick={() => {
+                        endSession();
+                        navigate('/session/start-session');
+                      }}
+                    >
                       {t('core:yes')}
                     </AlertDialog.Action>
                     <AlertDialog.Cancel className="min-w-24">{t('core:no')}</AlertDialog.Cancel>

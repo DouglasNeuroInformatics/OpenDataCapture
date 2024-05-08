@@ -23,7 +23,7 @@ export abstract class BaseServer {
       res.locals.loadRoot = (props: RootProps) => {
         const { html } = render(props);
         return template
-          .replace('{{ ROOT_PROPS_OUTLET }}', JSON.stringify(props))
+          .replace('{{ ROOT_PROPS_OUTLET }}', btoa(JSON.stringify(props)))
           .replace('{{ ROOT_SSR_OUTLET }}', html);
       };
       next();
@@ -40,7 +40,11 @@ export abstract class BaseServer {
 
   constructor() {
     this.app = express();
-    this.app.use(express.json());
+    this.app.use(
+      express.json({
+        limit: '50mb'
+      })
+    );
     this.app.use(
       PinoHttp(
         {
@@ -71,6 +75,7 @@ export abstract class BaseServer {
 
   listen(port = CONFIG.port) {
     return this.app.listen(port, () => {
+      // eslint-disable-next-line no-console
       console.log(`Server started at http://localhost:${port}`);
     });
   }

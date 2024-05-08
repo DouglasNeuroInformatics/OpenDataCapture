@@ -17,8 +17,8 @@ importers:
         specifier: ^19.0.3
         version: 19.0.3
       '@douglasneuroinformatics/eslint-config':
-        specifier: 4.2.1
-        version: 4.2.1(eslint@8.57.0)(typescript@5.4.5)
+        specifier: 4.2.2
+        version: 4.2.2(eslint@8.57.0)(typescript@5.4.5)
       '@douglasneuroinformatics/libui-form-types':
         specifier: ^0.7.0
         version: 0.7.0
@@ -306,8 +306,8 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.2.4
-        version: 2.2.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.4.4
+        version: 2.4.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -473,8 +473,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.2.4
-        version: 2.2.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.4.4
+        version: 2.4.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.3.1)(react@18.3.1)
@@ -600,8 +600,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.2.4
-        version: 2.2.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.4.4
+        version: 2.4.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@headlessui/react':
         specifier: ^1.7.19
         version: 1.7.19(react-dom@18.3.1)(react@18.3.1)
@@ -785,8 +785,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.2.4
-        version: 2.2.4(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.4.4
+        version: 2.4.4(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -862,8 +862,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.2.4
-        version: 2.2.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.4.4
+        version: 2.4.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -995,8 +995,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.2.4
-        version: 2.2.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.4.4
+        version: 2.4.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
@@ -1077,8 +1077,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.2.4
-        version: 2.2.4(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.4.4
+        version: 2.4.4(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       autoprefixer:
         specifier: 10.x
         version: 10.4.19(postcss@8.4.38)
@@ -3154,9 +3154,9 @@ packages:
       prisma: 5.13.0
     dev: true
 
-  /@douglasneuroinformatics/eslint-config@4.2.1(eslint@8.57.0)(typescript@5.4.5):
+  /@douglasneuroinformatics/eslint-config@4.2.2(eslint@8.57.0)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-/L/1Q39sdDbNv6dDa4a1/jfJCBA7SlZvtkJoIXSIQrRfPG6rgOnbxKIIdTU4sobTjSiD8Q7rv/Do546N+gXK5w== }
+      { integrity: sha512-pXm48p7igAe7camUSo6LlhDRZUtWwsO1WrP4Vvzj3tPkmbB34gJ2nTYfHNjQQkSVwcDBvTEni5YsHbcPbgPwKA== }
     peerDependencies:
       eslint: 8.x
       typescript: 5.x
@@ -3166,13 +3166,13 @@ packages:
     dependencies:
       '@typescript-eslint/parser': 7.8.0(eslint@8.57.0)(typescript@5.4.5)
       eslint: 8.57.0
-      eslint-plugin-astro: 0.32.0(eslint@8.57.0)
+      eslint-plugin-astro: 0.33.1(eslint@8.57.0)
       eslint-plugin-jsdoc: 48.2.3(eslint@8.57.0)
       eslint-plugin-jsonc: 2.15.1(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.8.0(eslint@8.57.0)
       eslint-plugin-perfectionist: 2.10.0(eslint@8.57.0)(typescript@5.4.5)
       eslint-plugin-react: 7.34.1(eslint@8.57.0)
-      globals: 14.0.0
+      globals: 15.1.0
       typescript: 5.4.5
       typescript-eslint: 7.8.0(eslint@8.57.0)(typescript@5.4.5)
     transitivePeerDependencies:
@@ -3228,9 +3228,9 @@ packages:
     dependencies:
       type-fest: 4.18.1
 
-  /@douglasneuroinformatics/libui@2.2.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
+  /@douglasneuroinformatics/libui@2.4.4(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-EsHWMAmMB+WEiTEJgH7Gytr+YeLmI23fxLfg+c9IjEjPmVxLl2s8RacHLUHeiC3CDh3MI3PWTihT9L3caWetEA== }
+      { integrity: sha512-VzIXV5XzE/sp3yAb1NV8t+fllj71jVXVVPHegFtXpaNmMuqaMAsvKmHMs2zYrVx9NMTblC+P08e/29/yztZDrg== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -3294,9 +3294,9 @@ packages:
       - typescript
     dev: false
 
-  /@douglasneuroinformatics/libui@2.2.4(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
+  /@douglasneuroinformatics/libui@2.4.4(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-EsHWMAmMB+WEiTEJgH7Gytr+YeLmI23fxLfg+c9IjEjPmVxLl2s8RacHLUHeiC3CDh3MI3PWTihT9L3caWetEA== }
+      { integrity: sha512-VzIXV5XzE/sp3yAb1NV8t+fllj71jVXVVPHegFtXpaNmMuqaMAsvKmHMs2zYrVx9NMTblC+P08e/29/yztZDrg== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -11667,9 +11667,9 @@ packages:
       semver: 7.6.0
     dev: true
 
-  /eslint-plugin-astro@0.32.0(eslint@8.57.0):
+  /eslint-plugin-astro@0.33.1(eslint@8.57.0):
     resolution:
-      { integrity: sha512-T8Chx9yG4vrWLCMkQGEbBvUJYSwMVXbw95+EpceFue/jr8JavjYw9A6K1xUxMyycnlWOGMiK7wJ5d/hHNsKBhg== }
+      { integrity: sha512-wVyxAf8Ulmljv5qJQLgspWe17LR4hLXcksIENtUlEC3W7rleBVEKXS+hIqzBfCbpkBLZpl1tsYes1AGpYHd13w== }
     engines: { node: ^14.18.0 || >=16.0.0 }
     peerDependencies:
       eslint: '>=7.0.0'
@@ -13011,9 +13011,9 @@ packages:
       type-fest: 0.20.2
     dev: true
 
-  /globals@14.0.0:
+  /globals@15.1.0:
     resolution:
-      { integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ== }
+      { integrity: sha512-926gJqg+4mkxwYKiFvoomM4J0kWESfk3qfTvRL2/oc/tK/eTDBbrfcKnSa2KtfdxB5onoL7D3A3qIHQFpd4+UA== }
     engines: { node: '>=18' }
     dev: true
 

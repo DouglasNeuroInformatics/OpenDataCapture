@@ -1,10 +1,6 @@
 import path from 'path';
-import url from 'url';
 
 import { z } from 'zod';
-
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const $Config = z
   .object({
@@ -27,5 +23,5 @@ export const CONFIG = await $Config.parseAsync({
   devServerPort: process.env.GATEWAY_DEV_SERVER_PORT,
   mode: process.env.NODE_ENV,
   prodServerPort: process.env.GATEWAY_PROD_SERVER_PORT,
-  root: path.resolve(__dirname, '..')
+  root: path.resolve(import.meta.dirname, '..')
 });

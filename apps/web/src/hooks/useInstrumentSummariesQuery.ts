@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 type UseInstrumentSummariesQueryOptions<TKind extends InstrumentKind> = {
   params?: {
+    hasRecords?: boolean;
     kind?: TKind;
   };
 };

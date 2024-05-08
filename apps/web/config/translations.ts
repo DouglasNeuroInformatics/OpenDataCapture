@@ -1,12 +1,11 @@
 import fs from 'fs/promises';
 import path from 'path';
-import url from 'url';
 
 import { transformTranslations } from '@douglasneuroinformatics/libui/i18n';
 import copy from 'rollup-plugin-copy';
 import type { PluginOption, ViteDevServer } from 'vite';
 
-const projectDir = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
+const projectDir = path.resolve(import.meta.dirname, '..');
 
 export const translations = () => {
   return {

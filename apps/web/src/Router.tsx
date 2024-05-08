@@ -7,11 +7,11 @@ import { BrowserRouter, Navigate, type RouteObject, useRoutes } from 'react-rout
 import { Layout } from './components/Layout';
 import { authRoutes } from './features/auth';
 import { contactRoute } from './features/contact';
+import { dashboardRoute } from './features/dashboard';
+import { datahubRoute } from './features/datahub';
 import { groupRoute } from './features/group';
 import { instrumentsRoute } from './features/instruments';
-import { overviewRoute } from './features/overview';
 import { sessionRoute } from './features/session';
-import { subjectsRoute } from './features/subjects';
 import { userRoute } from './features/user';
 import { useAppStore } from './store';
 
@@ -27,7 +27,7 @@ const protectedRoutes: RouteObject[] = [
   authRoutes,
   {
     element: <Layout />,
-    children: [contactRoute, groupRoute, instrumentsRoute, overviewRoute, sessionRoute, subjectsRoute, userRoute]
+    children: [contactRoute, datahubRoute, dashboardRoute, groupRoute, instrumentsRoute, sessionRoute, userRoute]
   }
 ];
 

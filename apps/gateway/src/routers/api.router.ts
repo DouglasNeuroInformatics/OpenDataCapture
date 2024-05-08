@@ -64,7 +64,7 @@ router.patch(
     }
     const result = await $UpdateAssignmentData.safeParseAsync(req.body);
     if (!result.success) {
-      console.log(result.error);
+      console.error(result.error);
       throw new HttpException(400, 'Bad Request');
     }
     const { data, expiresAt, status } = result.data;

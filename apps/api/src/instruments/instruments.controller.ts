@@ -45,9 +45,10 @@ export class InstrumentsController {
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async findSummaries(
     @CurrentUser('ability') ability: AppAbility,
-    @Query('kind') kind?: InstrumentKind
+    @Query('kind') kind?: InstrumentKind,
+    @Query('hasRecords') hasRecords?: boolean
   ): Promise<InstrumentSummary[]> {
-    return this.instrumentsService.findSummaries({ kind }, { ability });
+    return this.instrumentsService.findSummaries({ hasRecords, kind }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Instrument' })

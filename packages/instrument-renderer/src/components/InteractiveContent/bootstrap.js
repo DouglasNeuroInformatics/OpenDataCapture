@@ -22,7 +22,7 @@ const parentTheme = parent.document.documentElement.getAttribute(THEME_ATTRIBUTE
 if (parentTheme === 'dark' || parentTheme === 'light') {
   document.documentElement.setAttribute(THEME_ATTRIBUTE, parentTheme);
 } else {
-  console.log(`Unexpected value for 'data-mode' attribute in parent document element: '${parentTheme}'`);
+  console.error(`Unexpected value for 'data-mode' attribute in parent document element: '${parentTheme}'`);
 }
 
 // Synchronize the iframe theme with the parent document
@@ -34,7 +34,7 @@ const observer = new MutationObserver((mutations) => {
       if (updatedTheme === 'light' || updatedTheme === 'dark') {
         document.documentElement.setAttribute(THEME_ATTRIBUTE, updatedTheme);
       } else {
-        console.log(`Unexpected value for 'data-mode' attribute in parent document element: '${updatedTheme}'`);
+        console.error(`Unexpected value for 'data-mode' attribute in parent document element: '${updatedTheme}'`);
       }
     }
   });

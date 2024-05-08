@@ -8,6 +8,7 @@ import { glob } from 'glob';
 
 import { name, version } from '../package.json';
 import { InstrumentBundler } from './index.js';
+import { inferLoader } from './utils.js';
 
 import type { BundlerInput } from './types.js';
 
@@ -35,6 +36,7 @@ const options = program.opts();
 const logger = Object.create(console) as { verbose: (message: string) => void } & Console;
 logger.verbose = (message: string) => {
   if (options.verbose) {
+    // eslint-disable-next-line no-console
     console.log(message);
   }
 };
@@ -73,10 +75,13 @@ for (const targetDir of targetDirs) {
   }
 
   const inputs: BundlerInput[] = await Promise.all(
-    inputFiles.map(async (filepath) => ({
-      content: await fs.promises.readFile(filepath, 'utf-8'),
-      name: path.basename(filepath)
-    }))
+    inputFiles.map(async (filepath) => {
+      const loader = inferLoader(filepath);
+      return {
+        content: await fs.promises.readFile(filepath, loader === 'dataurl' ? null : 'utf-8'),
+        name: path.basename(filepath)
+      };
+    })
   );
 
   logger.verbose(`Found input files: ${inputs.map((input) => `'${input.name}'`).join(', ')}`);

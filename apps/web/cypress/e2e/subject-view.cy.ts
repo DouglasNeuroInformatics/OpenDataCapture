@@ -17,8 +17,8 @@ describe('Subject view test', () => {
   it('passes', () => {
     cy.login(adminUser.username, adminUser.password);
 
-    // navigates the view subjects, selects the first subject and views their graph
-    cy.get('button[data-cy="view-subjects"]').first().click();
+    // navigates to the datahub, selects the first subject and views their graph
+    cy.get('button[data-cy="datahub"]').first().click();
 
     // select first user and their instrument dropdown
     cy.get('td[data-cy="table-data-item"]').first().click({ force: true });

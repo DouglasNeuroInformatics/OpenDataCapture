@@ -12,16 +12,10 @@ export type NavButtonProps = {
   onClick?: (id: string) => void;
 } & NavItem;
 
-export const NavButton = ({
-  activeClassName,
-  className,
-  disabled,
-  icon: Icon,
-  id,
-  isActive,
-  label,
-  onClick
-}: NavButtonProps) => {
+export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(function NavButton(
+  { activeClassName, className, disabled, icon: Icon, id, isActive, label, onClick },
+  ref
+) {
   const navigate = useNavigate();
   return (
     <button
@@ -32,6 +26,7 @@ export const NavButton = ({
         className
       )}
       disabled={disabled}
+      ref={ref}
       type="button"
       onClick={() => {
         onClick?.(id) ?? navigate(id);
@@ -41,4 +36,4 @@ export const NavButton = ({
       {label}
     </button>
   );
-};
+});

@@ -1,12 +1,8 @@
 {
-  "available": {
-    "nullSessionError": {
-      "en": "Please begin a session to continue",
-      "fr": "Veuillez commencer une session pour continuer"
-    },
+  "accessible": {
     "title": {
-      "en": "Instruments",
-      "fr": "Instruments"
+      "en": "Administer Instrument",
+      "fr": "Administrer un instrument"
     }
   },
   "manage": {

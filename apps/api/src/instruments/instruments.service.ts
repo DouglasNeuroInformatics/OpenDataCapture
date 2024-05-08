@@ -66,7 +66,7 @@ export class InstrumentsService {
           instructions: instance.details.instructions as Prisma.InputJsonValue,
           title: instance.details.title as Prisma.InputJsonValue
         },
-        id: this.generateId(instance)
+        id: this.generateInstrumentId(instance)
       }
     });
   }
@@ -111,16 +111,31 @@ export class InstrumentsService {
   }
 
   async findSummaries(
-    query: { kind?: InstrumentKind } = {},
+    query: {
+      hasRecords?: boolean;
+      kind?: InstrumentKind;
+    } = {},
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentSummary[]> {
     return this.instrumentModel.findMany({
       select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
+      where: {
+        AND: [
+          {
+            kind: query.kind,
+            records: query.hasRecords
+              ? {
+                  some: {}
+                }
+              : undefined
+          },
+          accessibleQuery(ability, 'read', 'Instrument')
+        ]
+      }
     }) as Promise<InstrumentSummary[]>;
   }
 
-  private generateId({ name, version }: { name: string; version: number }) {
+  generateInstrumentId({ name, version }: { name: string; version: number }) {
     return this.cryptoService.hash(`${name}-${version}`);
   }
 
