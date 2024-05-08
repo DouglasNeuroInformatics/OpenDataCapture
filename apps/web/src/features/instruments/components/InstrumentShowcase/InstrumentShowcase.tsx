@@ -8,10 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
+import { useAppStore } from '@/store';
 
 import { InstrumentCard } from '../InstrumentCard';
 
 export const InstrumentsShowcase = () => {
+  const currentGroup = useAppStore((store) => store.currentGroup);
   const instrumentSummariesQuery = useInstrumentSummariesQuery();
   const navigate = useNavigate();
   const { t } = useTranslation(['core', 'instruments']);
@@ -35,6 +37,9 @@ export const InstrumentsShowcase = () => {
   useEffect(() => {
     setFilteredInstruments(
       instrumentSummariesQuery.data.filter((summary) => {
+        if (!currentGroup?.accessibleInstrumentIds.includes(summary.id)) {
+          return false;
+        }
         const matchesSearch = summary.details.title.toUpperCase().includes(searchTerm.toUpperCase());
         const matchesLanguages =
           selectedLanguages.length === 0 || selectedLanguages.find(({ key }) => key === summary.language);
@@ -43,7 +48,13 @@ export const InstrumentsShowcase = () => {
         return matchesSearch && matchesLanguages && matchesTags;
       })
     );
-  }, [instrumentSummariesQuery.data, searchTerm, selectedLanguages, selectedTags]);
+  }, [
+    currentGroup?.accessibleInstrumentIds,
+    instrumentSummariesQuery.data,
+    searchTerm,
+    selectedLanguages,
+    selectedTags
+  ]);
 
   useEffect(() => {
     setTagOptions(
