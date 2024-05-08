@@ -8,10 +8,27 @@ jobs:
     name: Delete Packages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/delete-package-versions@v5
+      - name: Delete API
+        uses: actions/delete-package-versions@v5
         with:
           owner: DouglasNeuroInformatics
           package-name: open-data-capture-api
+          package-type: container
+          min-versions-to-keep: 5
+          delete-only-untagged-versions: true
+      - name: Delete Gateway
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: DouglasNeuroInformatics
+          package-name: open-data-capture-gateway
+          package-type: container
+          min-versions-to-keep: 5
+          delete-only-untagged-versions: true
+      - name: Delete Web
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: DouglasNeuroInformatics
+          package-name: open-data-capture-web
           package-type: container
           min-versions-to-keep: 5
           delete-only-untagged-versions: true
