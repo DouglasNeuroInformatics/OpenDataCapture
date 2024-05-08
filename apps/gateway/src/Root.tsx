@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { NotificationHub } from '@douglasneuroinformatics/libui/components';
 import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
@@ -19,7 +19,12 @@ export type RootProps = {
 };
 
 export const Root = ({ bundle, id, token }: RootProps) => {
+  const ref = useRef<HTMLDivElement>(null);
   const notifications = useNotificationsStore();
+
+  useEffect(() => {
+    ref.current!.style.display = 'block';
+  }, []);
 
   const handleSubmit = async (data: unknown) => {
     const result = await $Json.safeParseAsync(data);
@@ -44,7 +49,7 @@ export const Root = ({ bundle, id, token }: RootProps) => {
   };
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col" ref={ref} style={{ display: 'none' }}>
       <header className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
         <div className="container flex items-center justify-between bg-inherit py-3 font-medium">
           <Branding className="[&>span]:hidden sm:[&>span]:block" />
