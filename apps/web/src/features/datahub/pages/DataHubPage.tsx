@@ -92,6 +92,7 @@ export const DataHubPage = () => {
             </Dialog>
             <div className="flex min-w-60 gap-2 lg:flex-shrink">
               <ActionDropdown
+                widthFull
                 options={['CSV', 'JSON']}
                 title={t('index.table.export')}
                 onSelection={handleExportSelection}

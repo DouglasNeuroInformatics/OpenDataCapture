@@ -15,6 +15,7 @@ import { useParams } from 'react-router-dom';
 
 import { useAppStore } from '@/store';
 
+import { SelectInstrument } from '../components/SelectInstrument';
 import { TimeDropdown } from '../components/TimeDropdown';
 import { useGraphData } from '../hooks/useGraphData';
 import { useGraphLines } from '../hooks/useGraphLines';
@@ -50,11 +51,6 @@ export const SubjectGraphPage = () => {
   const lines = useGraphLines({ selectedMeasures });
 
   const graphContainerRef = useRef<HTMLDivElement>(null);
-
-  const handleSelectForm = (id: string) => {
-    setInstrumentId(id);
-    setSelectedMeasures([]);
-  };
 
   const handleGraphDownload = async () => {
     if (!graphContainerRef.current) return;
@@ -115,17 +111,20 @@ export const SubjectGraphPage = () => {
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="instrument-select-dropdown-container">
-              <ActionDropdown
+              <SelectInstrument
                 options={instrumentOptions}
-                title={t('visualization.instrument')}
-                triggerClassName="gap-2"
-                onSelection={handleSelectForm}
+                onSelect={(id) => {
+                  setInstrumentId(id);
+                  setSelectedMeasures([]);
+                }}
               />
             </div>
+          </div>
+          <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="measure-select-dropdown-container">
               <ListboxDropdown
+                widthFull
                 checkPosition="right"
-                className="text-sm"
                 options={measureOptions}
                 selected={selectedMeasures}
                 setSelected={setSelectedMeasures}
@@ -133,13 +132,12 @@ export const SubjectGraphPage = () => {
                 variant="secondary"
               />
             </div>
-          </div>
-          <div className="flex flex-col gap-2 lg:flex-row">
             <div data-cy="time-select-dropdown-container">
               <TimeDropdown setMinTime={setMinDate} />
             </div>
             <div className="relative w-full whitespace-nowrap" data-cy="download-button-container">
               <ActionDropdown
+                widthFull
                 options={{
                   png: 'PNG'
                 }}

@@ -61,6 +61,7 @@ export const InstrumentsShowcase = () => {
         <div className="flex min-w-96 flex-grow gap-2 lg:flex-shrink">
           <div className="flex w-full" data-cy="tags-btn-dropdown">
             <ListboxDropdown
+              widthFull
               options={tagOptions}
               selected={selectedTags}
               setSelected={setSelectedTags}
@@ -69,6 +70,7 @@ export const InstrumentsShowcase = () => {
           </div>
           <div className="flex w-full" data-cy="language-btn-dropdown">
             <ListboxDropdown
+              widthFull
               options={languageOptions}
               selected={selectedLanguages}
               setSelected={setSelectedLanguages}

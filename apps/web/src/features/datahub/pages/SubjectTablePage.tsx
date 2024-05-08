@@ -40,6 +40,7 @@ export const SubjectTablePage = () => {
             </div>
             <div data-cy="download-dropdown-container">
               <ActionDropdown
+                widthFull
                 disabled={!instrumentId}
                 options={['CSV', 'JSON']}
                 title={t('core:download')}
