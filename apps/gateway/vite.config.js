@@ -1,4 +1,4 @@
-import module from 'module';
+// import module from 'module';
 import path from 'path';
 
 import { runtime } from '@opendatacapture/vite-plugin-runtime';
@@ -7,7 +7,7 @@ import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 
-const require = module.createRequire(import.meta.dirname);
+// const require = module.createRequire(import.meta.dirname);
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -33,9 +33,9 @@ export default defineConfig(({ mode }) => ({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(import.meta.dirname, 'src'),
-      react: path.dirname(require.resolve('react/package.json')),
-      'react-dom': path.dirname(require.resolve('react-dom/package.json'))
+      '@': path.resolve(import.meta.dirname, 'src')
+      // react: path.dirname(require.resolve('react/package.json')),
+      // 'react-dom': path.dirname(require.resolve('react-dom/package.json'))
     }
   }
 }));
