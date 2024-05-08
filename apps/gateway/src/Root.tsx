@@ -6,7 +6,6 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import { Branding } from '@opendatacapture/react-core';
 import type { UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
-import { $Json } from '@opendatacapture/schemas/core';
 import axios from 'axios';
 
 import './services/axios';
@@ -27,16 +26,10 @@ export const Root = ({ bundle, id, token }: RootProps) => {
   }, []);
 
   const handleSubmit = async (data: unknown) => {
-    const result = await $Json.safeParseAsync(data);
-    if (!result.success) {
-      console.error(result.error);
-      notifications.addNotification({ type: 'error' });
-      return;
-    }
     await axios.patch(
       `/api/assignments/${id}`,
       {
-        data: result.data,
+        data: data as UpdateAssignmentData['data'],
         status: 'COMPLETE'
       } satisfies UpdateAssignmentData,
       {
@@ -51,9 +44,9 @@ export const Root = ({ bundle, id, token }: RootProps) => {
   return (
     <div className="flex h-screen flex-col" ref={ref} style={{ display: 'none' }}>
       <header className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
-        <div className="container flex items-center justify-between bg-inherit py-3 font-medium">
+        <div className="container flex items-center justify-between py-3 font-medium">
           <Branding className="[&>span]:hidden sm:[&>span]:block" />
-          <div className="flex gap-3 bg-inherit">
+          <div className="flex gap-3">
             <ThemeToggle />
             <LanguageToggle
               options={{
