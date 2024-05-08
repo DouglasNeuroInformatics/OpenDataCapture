@@ -4,7 +4,7 @@ import React from 'react';
 
 import type { RouteObject } from 'react-router-dom';
 
-import { AvailableInstrumentsPage } from './pages/AvailableInstrumentsPage';
+import { AccessibleInstrumentsPage } from './pages/AccessibleInstrumentsPage';
 import { InstrumentRenderPage } from './pages/InstrumentRenderPage';
 
 export const instrumentsRoute: RouteObject = {
@@ -12,7 +12,7 @@ export const instrumentsRoute: RouteObject = {
   children: [
     {
       path: 'accessible-instruments',
-      element: <AvailableInstrumentsPage />
+      element: <AccessibleInstrumentsPage />
     },
     {
       path: 'render/:id',

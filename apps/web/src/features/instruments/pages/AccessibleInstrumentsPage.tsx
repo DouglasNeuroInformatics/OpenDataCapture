@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/PageHeader';
 
 import { InstrumentsShowcase } from '../components/InstrumentShowcase';
 
-export const AvailableInstrumentsPage = () => {
+export const AccessibleInstrumentsPage = () => {
   const { t } = useTranslation(['core', 'instruments']);
   return (
     <React.Fragment>
