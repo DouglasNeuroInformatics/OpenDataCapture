@@ -13,7 +13,9 @@ export const AccessibleInstrumentsPage = () => {
   return (
     <React.Fragment>
       <PageHeader>
-        <Heading variant="h2">{t('instruments:available.title')}</Heading>
+        <Heading className="text-center" variant="h2">
+          {t('instruments:accessible.title')}
+        </Heading>
       </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
         <InstrumentsShowcase />
