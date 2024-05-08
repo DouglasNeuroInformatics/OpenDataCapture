@@ -13,6 +13,7 @@ import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
 import { useUpdateAssignment } from '@/hooks/useUpdateAssignment';
+import { useAppStore } from '@/store';
 
 import { AssignmentSlider } from '../components/AssignmentSlider';
 import { AssignmentsTable } from '../components/AssignmentsTable';
@@ -24,6 +25,7 @@ export const SubjectAssignmentsPage = () => {
   const { t } = useTranslation(['datahub', 'core']);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
+  const currentGroup = useAppStore((store) => store.currentGroup);
 
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
@@ -34,7 +36,9 @@ export const SubjectAssignmentsPage = () => {
   const instrumentSummariesQuery = useInstrumentSummariesQuery();
 
   const instrumentOptions = Object.fromEntries(
-    instrumentSummariesQuery.data.map((instrument) => [instrument.id, instrument.details.title])
+    instrumentSummariesQuery.data
+      .filter((instrument) => currentGroup?.accessibleInstrumentIds.includes(instrument.id) ?? true)
+      .map((instrument) => [instrument.id, instrument.details.title])
   );
 
   return (
