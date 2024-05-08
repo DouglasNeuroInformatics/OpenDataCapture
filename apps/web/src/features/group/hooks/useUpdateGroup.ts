@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { UpdateGroupData } from '@opendatacapture/schemas/group';
+import { $Group, type UpdateGroupData } from '@opendatacapture/schemas/group';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -9,7 +9,10 @@ export function useUpdateGroup() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
   return useMutation({
-    mutationFn: (data: UpdateGroupData) => axios.patch(`/v1/groups/${currentGroup?.id}`, data),
+    mutationFn: async (data: UpdateGroupData) => {
+      const response = await axios.patch(`/v1/groups/${currentGroup?.id}`, data);
+      return $Group.parseAsync(response.data);
+    },
     onSuccess() {
       addNotification({ type: 'success' });
     }

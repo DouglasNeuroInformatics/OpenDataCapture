@@ -76,6 +76,7 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
         }
       ]}
       initialValues={initialValues}
+      preventResetValuesOnReset={true}
       validationSchema={z.object({
         accessibleFormInstrumentIds: z.set(z.string()),
         accessibleInteractiveInstrumentIds: z.set(z.string())
