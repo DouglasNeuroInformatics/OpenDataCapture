@@ -173,11 +173,11 @@
       "fr": "Mesures : "
     },
     "time": {
-      "en": "Time frame: ",
+      "en": "Timeframe: ",
       "fr": "Période : "
     },
     "allTime": {
-      "en": "Time frame: All time",
+      "en": "Timeframe: All time",
       "fr": "Période : Toujours"
     }
   }

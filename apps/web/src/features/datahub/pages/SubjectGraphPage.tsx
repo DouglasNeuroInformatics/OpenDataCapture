@@ -3,7 +3,6 @@ import React, { useRef, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   ActionDropdown,
-  Card,
   LineGraph,
   ListboxDropdown,
   type ListboxDropdownOption
@@ -73,9 +72,8 @@ export const SubjectGraphPage = () => {
         if (selectedMeasures) {
           const graphMeasure = document.createElement('p');
           graphMeasure.innerText = t('downloadInfo.measurement');
-          for (const selectMeasureOption of selectedMeasures) {
-            graphMeasure.innerText += selectMeasureOption.label + ' ';
-          }
+          selectedMeasures.map((measure) => measure.label).join(', ');
+          graphMeasure.innerText += selectedMeasures.map((measure) => measure.label).join(', ');
           graphMeasure.className = 'p-2 font-semibold';
           element.append(graphMeasure);
         }
@@ -125,6 +123,8 @@ export const SubjectGraphPage = () => {
               <ListboxDropdown
                 widthFull
                 checkPosition="right"
+                contentClassName="min-w-72"
+                disabled={!instrumentId}
                 options={measureOptions}
                 selected={selectedMeasures}
                 setSelected={setSelectedMeasures}
@@ -133,11 +133,12 @@ export const SubjectGraphPage = () => {
               />
             </div>
             <div data-cy="time-select-dropdown-container">
-              <TimeDropdown setMinTime={setMinDate} />
+              <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
             </div>
             <div className="relative w-full whitespace-nowrap" data-cy="download-button-container">
               <ActionDropdown
                 widthFull
+                disabled={!instrumentId}
                 options={{
                   png: 'PNG'
                 }}
@@ -150,7 +151,10 @@ export const SubjectGraphPage = () => {
           </div>
         </div>
       </div>
-      <Card ref={graphContainerRef}>
+      <div
+        className="bg-card text-muted-foreground rounded-md border p-6 tracking-tight shadow-sm"
+        ref={graphContainerRef}
+      >
         <LineGraph
           data={graphData}
           lines={lines}
@@ -159,7 +163,7 @@ export const SubjectGraphPage = () => {
             label: t('visualization.xLabel')
           }}
         />
-      </Card>
+      </div>
     </div>
   );
 };
