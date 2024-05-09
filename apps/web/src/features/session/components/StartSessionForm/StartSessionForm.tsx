@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $SessionType, type CreateSessionData } from '@opendatacapture/schemas/session';
-import { generateSubjectHash } from '@opendatacapture/subject-utils';
+import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
@@ -158,7 +158,11 @@ export const StartSessionForm = ({ defaultIdentificationMethod, onSubmit }: Star
           subjectFirstName: z.string().optional(),
           subjectLastName: z.string().optional(),
           subjectIdentificationMethod: z.enum(['CUSTOM_ID', 'PERSONAL_INFO']),
-          subjectId: z.string().min(1).optional(),
+          subjectId: z
+            .string()
+            .min(1)
+            .refine((arg) => !arg.includes('$'))
+            .optional(),
           subjectDateOfBirth: z
             .date()
             .max(MIN_DATE_OF_BIRTH, { message: t('session:errors.mustBeAdult') })
@@ -215,7 +219,9 @@ export const StartSessionForm = ({ defaultIdentificationMethod, onSubmit }: Star
           groupId: currentGroup?.id ?? null,
           type: sessionType,
           subjectData: {
-            id: subjectId,
+            id: encodeScopedSubjectId(subjectId, {
+              groupName: currentGroup?.name ?? 'root'
+            }),
             firstName: subjectFirstName,
             lastName: subjectLastName,
             dateOfBirth: subjectDateOfBirth,

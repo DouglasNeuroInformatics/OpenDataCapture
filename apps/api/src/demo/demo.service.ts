@@ -13,7 +13,7 @@ import matrixReasoningTask from '@opendatacapture/instrument-library/interactive
 import { type Json, type Language } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
-import { generateSubjectHash } from '@opendatacapture/subject-utils';
+import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -82,6 +82,7 @@ export class DemoService {
       }
       this.logger.debug('Done creating users');
 
+      let researchId = 1;
       for (let i = 0; i < dummySubjectCount; i++) {
         this.logger.debug(`Creating dummy subject ${i + 1}/${dummySubjectCount}`);
         const group = randomValue(groups);
@@ -91,10 +92,20 @@ export class DemoService {
           lastName: faker.person.lastName(),
           sex: toUpperCase(faker.person.sexType())
         };
+
+        let subjectId: string;
+        if (group.type === 'CLINICAL') {
+          subjectId = await generateSubjectHash(subjectIdData);
+        } else {
+          subjectId = encodeScopedSubjectId(researchId, { groupName: group.name });
+          researchId++;
+        }
+
         const subject = await this.subjectsService.create({
           ...subjectIdData,
-          id: await generateSubjectHash(subjectIdData)
+          id: subjectId
         });
+
         await this.sessionsService.create({
           date: new Date(),
           groupId: group.id,
