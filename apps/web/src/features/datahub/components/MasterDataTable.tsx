@@ -20,12 +20,20 @@ export const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
           label: t('index.table.subject')
         },
         {
-          field: (subject) => toBasicISOString(new Date(subject.dateOfBirth)),
+          field: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
           label: t('core:identificationData.dateOfBirth.label')
         },
         {
-          field: (subject) =>
-            subject.sex === 'FEMALE' ? t('core:identificationData.sex.female') : t('core:identificationData.sex.male'),
+          field: (subject) => {
+            switch (subject.sex) {
+              case 'FEMALE':
+                return t('core:identificationData.sex.female');
+              case 'MALE':
+                return t('core:identificationData.sex.male');
+              default:
+                return 'NULL';
+            }
+          },
           label: t('core:identificationData.sex.label')
         }
       ]}

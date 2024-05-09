@@ -3,16 +3,30 @@ import React from 'react';
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { AlertDialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { Branding } from '@opendatacapture/react-core';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import { AnimatePresence, motion } from 'framer-motion';
 import { StopCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import type { SetNonNullable } from 'type-fest';
 
 import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
 import { NavButton } from '../NavButton';
 import { UserDropup } from '../UserDropup';
+
+function isSubjectWithPersonalInfo(
+  subject: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>
+): subject is Required<SetNonNullable<Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>>> {
+  const requiredProperties = ['dateOfBirth', 'firstName', 'id', 'lastName', 'sex'] as const;
+  for (const property of requiredProperties) {
+    if (subject[property] === undefined || subject[property] === null) {
+      return false;
+    }
+  }
+  return true;
+}
 
 export const Sidebar = () => {
   const navItems = useNavItems();
@@ -85,15 +99,21 @@ export const Sidebar = () => {
           >
             <h5 className="text-sm font-medium">{t('common:sessionInProgress')}</h5>
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
-            <div className="text-sm ">
-              <p>{`${t('fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
-              <p>
-                {`${t('identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
-              </p>
-              <p>
-                {`${t('identificationData.sex.label')}: ${t(`core:identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)}`}
-              </p>
-            </div>
+            {isSubjectWithPersonalInfo(currentSession.subject) ? (
+              <div>
+                <p>{`${t('fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
+                <p>
+                  {`${t('identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
+                </p>
+                <p>
+                  {`${t('identificationData.sex.label')}: ${t(`core:identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)}`}
+                </p>
+              </div>
+            ) : (
+              <div>
+                <p>ID: {currentSession.subject.id}</p>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
