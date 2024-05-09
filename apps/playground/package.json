@@ -15,6 +15,7 @@
     "@douglasneuroinformatics/libjs": "^0.3.1",
     "@douglasneuroinformatics/libui": "^2.4.4",
     "@monaco-editor/react": "^4.6.0",
+    "@opendatacapture/crypto": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
