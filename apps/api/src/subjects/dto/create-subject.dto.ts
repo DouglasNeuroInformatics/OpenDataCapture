@@ -4,7 +4,7 @@ import { $ClinicalSubjectIdentificationData } from '@opendatacapture/schemas/sub
 import type { ClinicalSubjectIdentificationData, Sex } from '@opendatacapture/schemas/subject';
 
 @ValidationSchema($ClinicalSubjectIdentificationData)
-export class ClinicalSubjectIdentificationDataDto implements ClinicalSubjectIdentificationData {
+export class CreateSubjectDto implements ClinicalSubjectIdentificationData {
   @ApiProperty()
   dateOfBirth: Date;
 

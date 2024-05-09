@@ -8,7 +8,7 @@ import type { EntityOperationOptions } from '@/core/types';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model, ModelUpdateData } from '@/prisma/prisma.types';
 
-import { ClinicalSubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
+import { CreateSubjectDto } from './dto/create-subject.dto';
 
 @Injectable()
 export class SubjectsService {
@@ -23,7 +23,7 @@ export class SubjectsService {
     });
   }
 
-  async create({ dateOfBirth, firstName, lastName, sex }: ClinicalSubjectIdentificationDataDto) {
+  async create({ dateOfBirth, firstName, lastName, sex }: CreateSubjectDto) {
     const id = this.generateId({ dateOfBirth, firstName, lastName, sex });
     if (await this.subjectModel.exists({ id })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
@@ -64,7 +64,7 @@ export class SubjectsService {
     return subject;
   }
 
-  async findByLookup(data: ClinicalSubjectIdentificationDataDto, options?: EntityOperationOptions) {
+  async findByLookup(data: CreateSubjectDto, options?: EntityOperationOptions) {
     return this.findById(this.generateId(data), options);
   }
 
@@ -75,7 +75,7 @@ export class SubjectsService {
     });
   }
 
-  private generateId({ dateOfBirth, firstName, lastName, sex }: ClinicalSubjectIdentificationDataDto): string {
+  private generateId({ dateOfBirth, firstName, lastName, sex }: CreateSubjectDto): string {
     const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
     const info = firstName + lastName + shortDateOfBirth + sex;
     const source = unidecode(info.toUpperCase().replaceAll('-', ''));
