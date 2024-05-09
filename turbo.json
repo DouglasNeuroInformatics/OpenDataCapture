@@ -2,15 +2,19 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [".env", "eslint.config.js", "jsconfig.json", "prettier.config.js"],
   "pipeline": {
+    "gateway#build": {
+      "dependsOn": ["^db:push"]
+    },
     "build": {
       "dependsOn": ["^build", "^db:generate"],
       "outputs": ["dist/**"]
     },
     "db:generate": {
-      "dependsOn": ["db:push"],
       "outputs": ["dist/**"]
     },
-    "db:push": {},
+    "db:push": {
+      "dependsOn": ["db:generate"]
+    },
     "dev": {
       "cache": false,
       "dependsOn": ["^build", "^db:generate"],
