@@ -19,6 +19,22 @@
     "interactive": {
       "en": "Interactive Tasks",
       "fr": "Tâches interactives"
+    },
+    "groupSettings": {
+      "en": "Group Settings",
+      "fr": "Paramètres du groupe"
+    },
+    "defaultSubjectIdMethod": {
+      "en": "Subject Identification Method (Default)",
+      "fr": "Méthode d'identification du sujet par défaut"
+    },
+    "customIdentifier": {
+      "en": "Custom Identifier",
+      "fr": "Identifiant unique"
+    },
+    "personalInfo": {
+      "en": "Personal Information",
+      "fr": "Renseignements personnels"
     }
   }
 }
