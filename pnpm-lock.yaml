@@ -220,7 +220,7 @@ importers:
       '@opendatacapture/stats':
         specifier: workspace:*
         version: link:../../packages/stats
-      '@opendatacapture/subject-hash':
+      '@opendatacapture/subject-utils':
         specifier: workspace:*
         version: link:../../packages/subject-hash
       axios:
@@ -647,7 +647,7 @@ importers:
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
-      '@opendatacapture/subject-hash':
+      '@opendatacapture/subject-utils':
         specifier: workspace:*
         version: link:../../packages/subject-hash
       '@tanstack/react-query':

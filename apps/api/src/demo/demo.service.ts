@@ -13,7 +13,7 @@ import matrixReasoningTask from '@opendatacapture/instrument-library/interactive
 import { type Json, type Language } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
-import { generateSubjectHash } from '@opendatacapture/subject-hash';
+import { generateSubjectHash } from '@opendatacapture/subject-utils';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';

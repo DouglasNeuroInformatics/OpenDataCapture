@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $SessionType, type CreateSessionData } from '@opendatacapture/schemas/session';
-import { generateSubjectHash } from '@opendatacapture/subject-hash';
+import { generateSubjectHash } from '@opendatacapture/subject-utils';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';

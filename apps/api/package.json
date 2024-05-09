@@ -36,7 +36,7 @@
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/stats": "workspace:*",
-    "@opendatacapture/subject-hash": "workspace:*",
+    "@opendatacapture/subject-utils": "workspace:*",
     "axios": "^1.6.8",
     "express": "^4.19.2",
     "lodash-es": "^4.17.21",
