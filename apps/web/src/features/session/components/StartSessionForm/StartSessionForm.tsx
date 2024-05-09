@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $SessionType, type CreateSessionData } from '@opendatacapture/schemas/session';
@@ -23,9 +23,21 @@ export type StartSessionFormProps = {
 
 export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentSession = useAppStore((store) => store.currentSession);
   const { t } = useTranslation(['core', 'common', 'session']);
+
+  // this is to force reset the form when the session changes, if on the same page
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    if (currentSession === null) {
+      setKey(key + 1);
+    }
+  }, [currentSession]);
+
   return (
     <Form
+      preventResetValuesOnReset
       className="mx-auto max-w-3xl"
       content={[
         {
@@ -151,6 +163,8 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
         sessionType: 'IN_PERSON',
         subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO'
       }}
+      key={key}
+      readOnly={currentSession !== null}
       submitBtnLabel={t('submit')}
       validationSchema={z
         .object({

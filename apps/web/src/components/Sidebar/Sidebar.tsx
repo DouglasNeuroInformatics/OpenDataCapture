@@ -80,7 +80,7 @@ export const Sidebar = () => {
         {currentSession && (
           <motion.div
             animate={{ opacity: 1 }}
-            className="my-2 rounded-md border border-slate-700 bg-slate-800 p-2 tracking-tight text-slate-300"
+            className="my-2 rounded-md border border-slate-700 bg-slate-800 p-2 text-sm tracking-tight text-slate-300"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
           >
