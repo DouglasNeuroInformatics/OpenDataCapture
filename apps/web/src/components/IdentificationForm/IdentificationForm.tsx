@@ -3,7 +3,10 @@
 import React from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
-import { $SubjectIdentificationData, type SubjectIdentificationData } from '@opendatacapture/schemas/subject';
+import {
+  $ClinicalSubjectIdentificationData,
+  type ClinicalSubjectIdentificationData
+} from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 
 import { useAppStore } from '@/store';
@@ -12,7 +15,7 @@ export type IdentificationFormProps = {
   /** Whether to prefill the form with the subject from the current session, if one exists  */
   fillCurrentSession?: boolean;
   /** Callback function invoked when validation is successful */
-  onSubmit: (data: SubjectIdentificationData) => void;
+  onSubmit: (data: ClinicalSubjectIdentificationData) => void;
   /** Optional override for the default submit button label */
   submitBtnLabel?: string;
 };
@@ -53,7 +56,7 @@ export const IdentificationForm = ({ fillCurrentSession, onSubmit, submitBtnLabe
       initialValues={fillCurrentSession ? currentSession?.subject : undefined}
       resetBtn={fillCurrentSession}
       submitBtnLabel={submitBtnLabel ?? t('submit')}
-      validationSchema={$SubjectIdentificationData}
+      validationSchema={$ClinicalSubjectIdentificationData}
       onSubmit={onSubmit}
     />
   );

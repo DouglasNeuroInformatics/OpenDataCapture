@@ -3,7 +3,7 @@ import { InternalServerErrorException, NotFoundException } from '@nestjs/common/
 import type { SubjectModel } from '@opendatacapture/prisma-client/api';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
-import type { SubjectIdentificationData } from '@opendatacapture/schemas/subject';
+import type { ClinicalSubjectIdentificationData } from '@opendatacapture/schemas/subject';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
@@ -55,7 +55,7 @@ export class SessionsService {
   }
 
   /** Get the subject if they exist, otherwise create them */
-  private async resolveSubject(subjectIdData: SubjectIdentificationData) {
+  private async resolveSubject(subjectIdData: ClinicalSubjectIdentificationData) {
     this.logger.debug({ message: 'Attempting to resolve subject', subjectIdData });
     let subject: SubjectModel;
     try {

@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $SessionType } from '@opendatacapture/schemas/session';
-import type { SubjectIdentificationData } from '@opendatacapture/schemas/subject';
+import type { ClinicalSubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -16,7 +16,7 @@ const now = Date.now();
 
 export type StartSessionFormData = {
   date?: Date;
-} & SubjectIdentificationData;
+} & ClinicalSubjectIdentificationData;
 
 export type StartSessionFormProps = {
   onSubmit: (data: StartSessionFormData) => void;

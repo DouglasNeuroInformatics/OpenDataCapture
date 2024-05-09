@@ -3,7 +3,7 @@ import React from 'react';
 import { ActionDropdown, Dialog, Heading, SearchBar } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
-import type { Subject, SubjectIdentificationData } from '@opendatacapture/schemas/subject';
+import type { ClinicalSubjectIdentificationData, Subject } from '@opendatacapture/schemas/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -57,7 +57,7 @@ export const DataHubPage = () => {
     }
   };
 
-  const lookupSubject = async (data: SubjectIdentificationData) => {
+  const lookupSubject = async (data: ClinicalSubjectIdentificationData) => {
     const response = await axios.post<Subject>('/v1/subjects/lookup', data, {
       validateStatus: (status) => status === 200 || status === 404
     });
