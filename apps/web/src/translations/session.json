@@ -43,6 +43,20 @@
       "fr": "Le client doit avoir au moins 18 ans"
     }
   },
+  "identificationMethod": {
+    "title": {
+      "en": "Identification Method",
+      "fr": "Méthode d'identification"
+    },
+    "description": {
+      "en": "Please select the method by which a subject will be identified for this session.",
+      "fr": "Veuillez sélectionner la méthode par laquelle un sujet sera identifié pour cette session."
+    },
+    "method": {
+      "en": "Method",
+      "fr": "Méthode"
+    }
+  },
   "subjectIdentification": {
     "description": {
       "en": "The following items are used to compute a unique identifier that enables consistent cross-session identification.",

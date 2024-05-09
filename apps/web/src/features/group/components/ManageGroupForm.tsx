@@ -25,7 +25,7 @@ export type ManageGroupFormProps = {
 export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { i18n } = useTranslation();
-  const { t } = useTranslation('group');
+  const { t } = useTranslation(['group', 'common']);
 
   const { initialValues, options } = useMemo(() => {
     const options: InstrumentOptions = {
@@ -83,8 +83,8 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
               kind: 'string',
               label: t('manage.defaultSubjectIdMethod'),
               options: {
-                CUSTOM_ID: t('manage.customIdentifier'),
-                PERSONAL_INFO: t('manage.personalInfo')
+                CUSTOM_ID: t('common:customIdentifier'),
+                PERSONAL_INFO: t('common:personalInfo')
               },
               variant: 'select'
             }

@@ -23,21 +23,21 @@ export type StartSessionFormProps = {
 
 export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const { t } = useTranslation(['core', 'session']);
+  const { t } = useTranslation(['core', 'common', 'session']);
   return (
     <Form
       className="mx-auto max-w-3xl"
       content={[
         {
-          title: 'Identification Method',
-          description: 'Please select the method by which a subject will be identified for this session.',
+          title: t('session:identificationMethod.title'),
+          description: t('session:identificationMethod.description'),
           fields: {
             subjectIdentificationMethod: {
               kind: 'string',
               label: 'Method',
               options: {
-                CUSTOM_ID: 'Custom Identifier',
-                PERSONAL_INFO: 'Personal Information'
+                CUSTOM_ID: t('common:customIdentifier'),
+                PERSONAL_INFO: t('common:personalInfo')
               },
               variant: 'select'
             }
@@ -53,7 +53,7 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
                 return subjectIdentificationMethod === 'CUSTOM_ID'
                   ? {
                       kind: 'string',
-                      label: 'Subject ID',
+                      label: t('common:identifier'),
                       variant: 'input'
                     }
                   : null;

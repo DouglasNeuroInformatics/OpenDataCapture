@@ -21,6 +21,18 @@
     "en": "Session in Progress",
     "fr": "Session en cours"
   },
+  "identifier": {
+    "en": "Identifier",
+    "fr": "Identifiant"
+  },
+  "customIdentifier": {
+    "en": "Custom Identifier",
+    "fr": "Identifiant unique"
+  },
+  "personalInfo": {
+    "en": "Personal Information",
+    "fr": "Renseignements personnels"
+  },
   "errors": {
     "failedToChangeLanguage": {
       "en": "Failed to change languages",
