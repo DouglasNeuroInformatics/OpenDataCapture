@@ -47,19 +47,19 @@ enum GroupType {
 }
 
 model GroupModel {
-  createdAt              DateTime                @default(now()) @db.Date
-  updatedAt              DateTime                @updatedAt @db.Date
-  id                     String                  @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt               DateTime                @default(now()) @db.Date
+  updatedAt               DateTime                @updatedAt @db.Date
+  id                      String                  @id @default(auto()) @map("_id") @db.ObjectId
   accessibleInstrumentIds String[]
-  accessibleInstruments  InstrumentModel[]       @relation(fields: [accessibleInstrumentIds], references: [id])
-  instrumentRecords      InstrumentRecordModel[]
-  name                   String                  @unique
-  sessions               SessionModel[]
-  subjects               SubjectModel[]          @relation(fields: [subjectIds], references: [id])
-  subjectIds             String[]
-  type                   GroupType
-  userIds                String[]                @db.ObjectId
-  users                  UserModel[]             @relation(fields: [userIds], references: [id])
+  accessibleInstruments   InstrumentModel[]       @relation(fields: [accessibleInstrumentIds], references: [id])
+  instrumentRecords       InstrumentRecordModel[]
+  name                    String                  @unique
+  sessions                SessionModel[]
+  subjects                SubjectModel[]          @relation(fields: [subjectIds], references: [id])
+  subjectIds              String[]
+  type                    GroupType
+  userIds                 String[]                @db.ObjectId
+  users                   UserModel[]             @relation(fields: [userIds], references: [id])
 }
 
 /// Instrument Records
@@ -133,13 +133,13 @@ model SubjectModel {
   createdAt         DateTime                @default(now()) @db.Date
   updatedAt         DateTime                @updatedAt @db.Date
   id                String                  @id @map("_id")
-  dateOfBirth       DateTime                @db.Date
+  dateOfBirth       DateTime?               @db.Date
   firstName         String?
   groupIds          String[]                @db.ObjectId
   groups            GroupModel[]            @relation(fields: [groupIds], references: [id])
   lastName          String?
   sessions          SessionModel[]
-  sex               Sex
+  sex               Sex?
   instrumentRecords InstrumentRecordModel[]
   assignments       AssignmentModel[]
 }
