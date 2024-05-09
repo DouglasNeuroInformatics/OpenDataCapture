@@ -220,6 +220,9 @@ importers:
       '@opendatacapture/stats':
         specifier: workspace:*
         version: link:../../packages/stats
+      '@opendatacapture/subject-hash':
+        specifier: workspace:*
+        version: link:../../packages/subject-hash
       axios:
         specifier: ^1.6.8
         version: 1.6.8(debug@4.3.4)

@@ -1,19 +1,22 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { $ClinicalSubjectIdentificationData } from '@opendatacapture/schemas/subject';
-import type { ClinicalSubjectIdentificationData, Sex } from '@opendatacapture/schemas/subject';
+import { $CreateSubjectData } from '@opendatacapture/schemas/subject';
+import type { Sex } from '@opendatacapture/schemas/subject';
 
-@ValidationSchema($ClinicalSubjectIdentificationData)
-export class CreateSubjectDto implements ClinicalSubjectIdentificationData {
+@ValidationSchema($CreateSubjectData)
+export class CreateSubjectDto {
   @ApiProperty()
-  dateOfBirth: Date;
-
-  @ApiProperty()
-  firstName: string;
+  dateOfBirth?: Date | null;
 
   @ApiProperty()
-  lastName: string;
+  firstName?: null | string;
 
   @ApiProperty()
-  sex: Sex;
+  id: string;
+
+  @ApiProperty()
+  lastName?: null | string;
+
+  @ApiProperty()
+  sex?: Sex | null;
 }

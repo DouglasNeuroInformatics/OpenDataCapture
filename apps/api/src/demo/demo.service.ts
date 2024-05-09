@@ -13,6 +13,7 @@ import matrixReasoningTask from '@opendatacapture/instrument-library/interactive
 import { type Json, type Language } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
+import { generateSubjectHash } from '@opendatacapture/subject-hash';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -90,11 +91,14 @@ export class DemoService {
           lastName: faker.person.lastName(),
           sex: toUpperCase(faker.person.sexType())
         };
-        const subject = await this.subjectsService.create(subjectIdData);
+        const subject = await this.subjectsService.create({
+          ...subjectIdData,
+          id: await generateSubjectHash(subjectIdData)
+        });
         await this.sessionsService.create({
           date: new Date(),
           groupId: group.id,
-          subjectIdData,
+          subjectData: subject,
           type: 'IN_PERSON'
         });
         this.logger.debug(`Creating dummy records for form ${hq.name}`);

@@ -1,5 +1,5 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -39,13 +39,5 @@ export class SubjectsController {
   @RouteAccess({ action: 'read', subject: 'Subject' })
   findById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.subjectsService.findById(id, { ability });
-  }
-
-  @ApiOperation({ summary: 'Lookup Subject' })
-  @Post('lookup')
-  @RouteAccess({ action: 'read', subject: 'Subject' })
-  @HttpCode(HttpStatus.OK)
-  findByLookup(@Body() data: CreateSubjectDto, @CurrentUser('ability') ability: AppAbility) {
-    return this.subjectsService.findByLookup(data, { ability });
   }
 }

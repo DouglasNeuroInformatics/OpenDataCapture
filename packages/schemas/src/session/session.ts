@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { $BaseModel } from '../core/core.js';
-import { $ClinicalSubjectIdentificationData, $Subject } from '../subject/subject.js';
+import { $CreateSubjectData, $Subject } from '../subject/subject.js';
 
 export type SessionType = z.infer<typeof $SessionType>;
 export const $SessionType = z.enum(['RETROSPECTIVE', 'IN_PERSON', 'REMOTE']);
@@ -19,6 +19,6 @@ export type CreateSessionData = z.infer<typeof $CreateSessionData>;
 export const $CreateSessionData = z.object({
   date: z.coerce.date(),
   groupId: z.string().nullable(),
-  subjectIdData: $ClinicalSubjectIdentificationData,
+  subjectData: $CreateSubjectData,
   type: $SessionType
 });
