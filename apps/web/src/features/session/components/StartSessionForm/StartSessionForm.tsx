@@ -18,11 +18,10 @@ const EIGHTEEN_YEARS = 568025136000; // milliseconds
 const MIN_DATE_OF_BIRTH = new Date(currentDate.getTime() - EIGHTEEN_YEARS);
 
 export type StartSessionFormProps = {
-  defaultIdentificationMethod: 'CUSTOM_ID' | 'PERSONAL_INFO';
   onSubmit: (data: CreateSessionData) => Promisable<void>;
 };
 
-export const StartSessionForm = ({ defaultIdentificationMethod, onSubmit }: StartSessionFormProps) => {
+export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { t } = useTranslation(['core', 'session']);
   return (
@@ -150,7 +149,7 @@ export const StartSessionForm = ({ defaultIdentificationMethod, onSubmit }: Star
       ]}
       initialValues={{
         sessionType: 'IN_PERSON',
-        subjectIdentificationMethod: defaultIdentificationMethod
+        subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO'
       }}
       submitBtnLabel={t('submit')}
       validationSchema={z

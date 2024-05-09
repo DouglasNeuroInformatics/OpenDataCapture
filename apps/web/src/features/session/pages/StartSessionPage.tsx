@@ -23,7 +23,6 @@ export const StartSessionPage = () => {
         </Heading>
       </PageHeader>
       <StartSessionForm
-        defaultIdentificationMethod="CUSTOM_ID"
         onSubmit={async (data) => {
           const session = await createSessionMutation.mutateAsync(data);
           startSession(session);
