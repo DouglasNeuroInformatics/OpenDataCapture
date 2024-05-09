@@ -46,6 +46,15 @@ enum GroupType {
   RESEARCH
 }
 
+enum SubjectIdentificationMethod {
+  CUSTOM_ID
+  PERSONAL_INFO
+}
+
+type GroupSettings {
+  defaultIdentificationMethod SubjectIdentificationMethod
+}
+
 model GroupModel {
   createdAt               DateTime                @default(now()) @db.Date
   updatedAt               DateTime                @updatedAt @db.Date
@@ -54,6 +63,7 @@ model GroupModel {
   accessibleInstruments   InstrumentModel[]       @relation(fields: [accessibleInstrumentIds], references: [id])
   instrumentRecords       InstrumentRecordModel[]
   name                    String                  @unique
+  settings                GroupSettings
   sessions                SessionModel[]
   subjects                SubjectModel[]          @relation(fields: [subjectIds], references: [id])
   subjectIds              String[]
