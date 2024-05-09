@@ -6,6 +6,7 @@ import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { InstrumentKind, SomeUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import { isSubjectWithPersonalInfo } from '@opendatacapture/subject-utils';
 import { filter } from 'lodash-es';
 import { DownloadIcon, PrinterIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -13,22 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
 import type { SubjectDisplayInfo } from '../InstrumentRenderer';
-
-function isSubjectWithPersonalInfo(subject: SubjectDisplayInfo): subject is Required<SubjectDisplayInfo> {
-  const requiredProperties: Extract<keyof SubjectDisplayInfo, string>[] = [
-    'dateOfBirth',
-    'firstName',
-    'id',
-    'lastName',
-    'sex'
-  ];
-  for (const property of requiredProperties) {
-    if (subject[property] === undefined || subject[property] === null) {
-      return false;
-    }
-  }
-  return true;
-}
 
 export type InstrumentSummaryProps<TKind extends InstrumentKind> = {
   data: any;

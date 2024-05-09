@@ -222,7 +222,7 @@ importers:
         version: link:../../packages/stats
       '@opendatacapture/subject-utils':
         specifier: workspace:*
-        version: link:../../packages/subject-hash
+        version: link:../../packages/subject-utils
       axios:
         specifier: ^1.6.8
         version: 1.6.8(debug@4.3.4)
@@ -649,7 +649,7 @@ importers:
         version: link:../../packages/schemas
       '@opendatacapture/subject-utils':
         specifier: workspace:*
-        version: link:../../packages/subject-hash
+        version: link:../../packages/subject-utils
       '@tanstack/react-query':
         specifier: ^5.29.2
         version: 5.34.2(react@18.3.1)
@@ -897,6 +897,9 @@ importers:
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
+      '@opendatacapture/subject-utils':
+        specifier: workspace:*
+        version: link:../subject-utils
       i18next:
         specifier: ^23.11.2
         version: 23.11.3
@@ -1083,7 +1086,7 @@ importers:
 
   packages/stats: {}
 
-  packages/subject-hash:
+  packages/subject-utils:
     dependencies:
       '@opendatacapture/crypto':
         specifier: workspace:*
