@@ -35,9 +35,9 @@ export type InstrumentRecordsExport = {
   instrumentName: string;
   instrumentVersion: number;
   measure: string;
-  subjectAge: number;
+  subjectAge: null | number;
   subjectId: string;
-  subjectSex: string;
+  subjectSex: null | string;
   timestamp: string;
   value: InstrumentMeasureValue;
 }[];

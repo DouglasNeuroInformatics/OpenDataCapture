@@ -122,7 +122,7 @@ export class InstrumentRecordsService {
             instrumentName: record.instrument.name,
             instrumentVersion: record.instrument.version,
             measure: measureKey,
-            subjectAge: yearsPassed(subject.dateOfBirth),
+            subjectAge: subject.dateOfBirth ? yearsPassed(subject.dateOfBirth) : null,
             subjectId: subject.id,
             subjectSex: subject.sex,
             timestamp: record.date.toISOString(),
