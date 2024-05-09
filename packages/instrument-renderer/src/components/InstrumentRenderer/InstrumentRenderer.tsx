@@ -17,13 +17,15 @@ import { InstrumentContent } from '../InstrumentContent';
 import { InstrumentOverview } from '../InstrumentOverview';
 import { InstrumentSummary } from '../InstrumentSummary';
 
+export type SubjectDisplayInfo = Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
+
 export type InstrumentRendererProps<TKind extends InstrumentKind> = {
   bundle: string;
   className?: string;
   customErrorFallback?: React.FC<{ error: Error }>;
   onSubmit: (data: unknown) => Promisable<void>;
   options?: InterpretOptions<TKind>;
-  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
+  subject?: SubjectDisplayInfo;
 };
 
 export const InstrumentRenderer = <TKind extends InstrumentKind>({
