@@ -174,7 +174,7 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
           subjectId: z
             .string()
             .min(1)
-            .refine((arg) => !arg.includes('$'))
+            .refine((arg) => !arg.includes('$'), t('common:illegalCharacter', { char: '$' }))
             .optional(),
           subjectDateOfBirth: z
             .date()
@@ -209,7 +209,6 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
             }
           }
         })}
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={async ({
         sessionType,
         sessionDate,

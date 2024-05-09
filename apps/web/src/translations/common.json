@@ -25,6 +25,10 @@
     "en": "Identifier",
     "fr": "Identifiant"
   },
+  "illegalCharacter": {
+    "en": "Illegal character: {{char}}",
+    "fr": "Caractère illégal : {{char}}"
+  },
   "customIdentifier": {
     "en": "Custom Identifier",
     "fr": "Identifiant unique"
