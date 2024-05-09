@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 import { $BaseModel } from '../core/core.js';
 
+export type SubjectIdentificationMethod = z.infer<typeof $SubjectIdentificationMethod>;
+export const $SubjectIdentificationMethod = z.enum(['CUSTOM_ID', 'PERSONAL_INFO']);
+
 export type Sex = z.infer<typeof $Sex>;
 export const $Sex = z.enum(['MALE', 'FEMALE']);
 

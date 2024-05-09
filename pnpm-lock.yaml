@@ -647,6 +647,9 @@ importers:
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
+      '@opendatacapture/subject-hash':
+        specifier: workspace:*
+        version: link:../../packages/subject-hash
       '@tanstack/react-query':
         specifier: ^5.29.2
         version: 5.34.2(react@18.3.1)
