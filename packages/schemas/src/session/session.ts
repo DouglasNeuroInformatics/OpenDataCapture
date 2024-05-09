@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { $BaseModel } from '../core/core.js';
-import { $Subject, $ClinicalSubjectIdentificationData } from '../subject/subject.js';
+import { $ClinicalSubjectIdentificationData, $Subject } from '../subject/subject.js';
 
 export type SessionType = z.infer<typeof $SessionType>;
 export const $SessionType = z.enum(['RETROSPECTIVE', 'IN_PERSON', 'REMOTE']);
