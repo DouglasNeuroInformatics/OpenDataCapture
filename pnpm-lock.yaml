@@ -1079,6 +1079,9 @@ importers:
 
   packages/subject-id-hash:
     dependencies:
+      '@opendatacapture/crypto':
+        specifier: workspace:*
+        version: link:../crypto
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas

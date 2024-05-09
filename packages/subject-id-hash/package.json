@@ -1,0 +1,21 @@
+{
+  "name": "@opendatacapture/subject-id-hash",
+  "type": "module",
+  "version": "0.0.0",
+  "license": "LGPL-3.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src"
+  },
+  "dependencies": {
+    "@opendatacapture/crypto": "workspace:*",
+    "@opendatacapture/schemas": "workspace:*",
+    "unidecode": "^0.1.8"
+  },
+  "devDependencies": {
+    "@types/unidecode": "^0.1.3"
+  }
+}
