@@ -1077,7 +1077,7 @@ importers:
 
   packages/stats: {}
 
-  packages/subject-id-hash:
+  packages/subject-hash:
     dependencies:
       '@opendatacapture/crypto':
         specifier: workspace:*

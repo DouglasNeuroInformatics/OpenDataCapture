@@ -1,5 +1,5 @@
 {
-  "name": "@opendatacapture/subject-id-hash",
+  "name": "@opendatacapture/subject-hash",
   "type": "module",
   "version": "0.0.0",
   "license": "LGPL-3.0",
