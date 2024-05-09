@@ -30,3 +30,10 @@ export function isSubjectWithPersonalInfo<T extends SubjectPersonalInfo>(
 export function encodeScopedSubjectId(id: number | string, options: { groupName: string }) {
   return options.groupName.replaceAll(' ', '_') + '$' + id;
 }
+
+export function removeSubjectIdScope(id: string) {
+  if (id.includes('$')) {
+    return id.split('$')[1];
+  }
+  return id;
+}

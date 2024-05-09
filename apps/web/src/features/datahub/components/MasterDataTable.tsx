@@ -3,6 +3,7 @@ import React from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
 import type { Subject } from '@opendatacapture/schemas/subject';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { useTranslation } from 'react-i18next';
 
 export type MasterDataTableProps = {
@@ -16,7 +17,7 @@ export const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
     <ClientTable<Subject>
       columns={[
         {
-          field: (subject) => subject.id.slice(0, 7),
+          field: (subject) => removeSubjectIdScope(subject.id).slice(0, 7),
           label: t('index.table.subject')
         },
         {

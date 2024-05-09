@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 
@@ -14,7 +15,7 @@ export const SubjectLayout = () => {
   const params = useParams();
   const { t } = useTranslation('datahub');
 
-  const subjectId = params.subjectId!;
+  const subjectId = removeSubjectIdScope(params.subjectId!);
   const basePathname = `/datahub/${subjectId}`;
 
   return (

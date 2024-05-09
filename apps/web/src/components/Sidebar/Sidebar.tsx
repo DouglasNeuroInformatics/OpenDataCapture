@@ -3,7 +3,7 @@ import React from 'react';
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { AlertDialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { Branding } from '@opendatacapture/react-core';
-import { isSubjectWithPersonalInfo } from '@opendatacapture/subject-utils';
+import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { StopCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -98,7 +98,7 @@ export const Sidebar = () => {
               </div>
             ) : (
               <div>
-                <p>ID: {currentSession.subject.id}</p>
+                <p>ID: {removeSubjectIdScope(currentSession.subject.id)}</p>
               </div>
             )}
           </motion.div>
