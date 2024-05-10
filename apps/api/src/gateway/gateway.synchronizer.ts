@@ -6,7 +6,7 @@ import { $Json } from '@opendatacapture/schemas/core';
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
-import type { SessionsService } from '@/sessions/sessions.service';
+import { SessionsService } from '@/sessions/sessions.service';
 import { SetupService } from '@/setup/setup.service';
 
 import { GatewayService } from './gateway.service';
