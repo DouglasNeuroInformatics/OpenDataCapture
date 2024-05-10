@@ -42,8 +42,8 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
       className="mx-auto max-w-3xl"
       content={[
         {
-          title: t('session:identificationMethod.title'),
-          description: t('session:identificationMethod.description'),
+          title: t('common:identificationMethod'),
+          description: t('common:identificationMethodDesc'),
           fields: {
             subjectIdentificationMethod: {
               kind: 'string',
@@ -57,7 +57,7 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
           }
         },
         {
-          title: t('session:subjectIdentification.title'),
+          title: t('common:subjectIdentification.title'),
           fields: {
             subjectId: {
               kind: 'dynamic',
@@ -78,9 +78,9 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
               render({ subjectIdentificationMethod }) {
                 return subjectIdentificationMethod === 'PERSONAL_INFO'
                   ? {
-                      description: t('session:subjectIdentification.firstName.description'),
+                      description: t('common:subjectIdentification.firstName.description'),
                       kind: 'string',
-                      label: t('session:subjectIdentification.firstName.label'),
+                      label: t('common:subjectIdentification.firstName.label'),
                       variant: 'input'
                     }
                   : null;
@@ -92,9 +92,9 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
               render({ subjectIdentificationMethod }) {
                 return subjectIdentificationMethod === 'PERSONAL_INFO'
                   ? {
-                      description: t('session:subjectIdentification.lastName.description'),
+                      description: t('common:subjectIdentification.lastName.description'),
                       kind: 'string',
-                      label: t('session:subjectIdentification.lastName.label'),
+                      label: t('common:subjectIdentification.lastName.label'),
                       variant: 'input'
                     }
                   : null;

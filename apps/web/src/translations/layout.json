@@ -34,10 +34,6 @@
     }
   },
   "navLinks": {
-    "startSession": {
-      "en": "Start Session",
-      "fr": "Commencer une session"
-    },
     "accessibleInstruments": {
       "en": "Administer Instrument",
       "fr": "Administrer un instrument"
@@ -46,25 +42,29 @@
       "en": "Add Instrument",
       "fr": "Ajouter un instrument"
     },
-    "endSession": {
-      "en": "End Current Session",
-      "fr": "Terminer la session en cours"
-    },
     "dashboard": {
       "en": "Dashboard",
       "fr": "Tableau de bord"
+    },
+    "datahub": {
+      "en": "Data Hub",
+      "fr": "Centre de données"
+    },
+    "endSession": {
+      "en": "End Current Session",
+      "fr": "Terminer la session en cours"
     },
     "manageGroup": {
       "en": "Manage Group",
       "fr": "Gestion du groupe"
     },
+    "startSession": {
+      "en": "Start Session",
+      "fr": "Commencer une session"
+    },
     "viewCurrentSubject": {
       "en": "View Current Subject",
       "fr": "Voir le client actuel"
-    },
-    "datahub": {
-      "en": "Data Hub",
-      "fr": "Centre de données"
     }
   },
   "organization": {

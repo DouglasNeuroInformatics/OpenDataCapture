@@ -1,8 +1,4 @@
 {
-  "startSession": {
-    "en": "Start Session",
-    "fr": "Commencer une session"
-  },
   "additionalData": {
     "title": {
       "en": "Additional Data",
@@ -19,20 +15,6 @@
       "fr": "Date d'évaluation"
     }
   },
-  "type": {
-    "label": {
-      "en": "Type of Assessment",
-      "fr": "Type d'évaluation"
-    },
-    "retrospective": {
-      "en": "Retrospective",
-      "fr": "Rétrospective"
-    },
-    "in-person": {
-      "en": "In-Person",
-      "fr": "En personne"
-    }
-  },
   "errors": {
     "assessmentMustBeInPast": {
       "en": "The assessment must be in the past",
@@ -43,48 +25,22 @@
       "fr": "Le client doit avoir au moins 18 ans"
     }
   },
-  "identificationMethod": {
-    "title": {
-      "en": "Identification Method",
-      "fr": "Méthode d'identification"
-    },
-    "description": {
-      "en": "Please select the method by which a subject will be identified for this session.",
-      "fr": "Veuillez sélectionner la méthode par laquelle un sujet sera identifié pour cette session."
-    },
-    "method": {
-      "en": "Method",
-      "fr": "Méthode"
-    }
+  "startSession": {
+    "en": "Start Session",
+    "fr": "Commencer une session"
   },
-  "subjectIdentification": {
-    "description": {
-      "en": "The following items are used to compute a unique identifier that enables consistent cross-session identification.",
-      "fr": "Les éléments suivants sont utilisés pour calculer un identifiant unique qui permet une identification cohérente entre les sessions."
+  "type": {
+    "in-person": {
+      "en": "In-Person",
+      "fr": "En personne"
     },
-    "firstName": {
-      "description": {
-        "en": "The subject's first name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as a fixed ASCII transliteration.",
-        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance. Pour les besoins de l'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme une translittération ASCII fixe."
-      },
-      "label": {
-        "en": "First Name",
-        "fr": "Prénom"
-      }
+    "label": {
+      "en": "Type of Assessment",
+      "fr": "Type d'évaluation"
     },
-    "lastName": {
-      "description": {
-        "en": "The subject's last name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as their ASCII equivalents.",
-        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance. Aux fins d'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme leurs équivalents ASCII."
-      },
-      "label": {
-        "en": "Last Name",
-        "fr": "Nom de famille"
-      }
-    },
-    "title": {
-      "en": "Subject Identification",
-      "fr": "Identification du client"
+    "retrospective": {
+      "en": "Retrospective",
+      "fr": "Rétrospective"
     }
   }
 }
