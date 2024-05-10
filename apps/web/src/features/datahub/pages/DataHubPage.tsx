@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ActionDropdown, Dialog, Heading, SearchBar } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
-import type { Subject, SubjectIdentificationData } from '@opendatacapture/schemas/subject';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,8 @@ import { MasterDataTable } from '../components/MasterDataTable';
 import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
 
 export const DataHubPage = () => {
+  const [isLookupOpen, setIsLookupOpen] = useState(false);
+
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
 
@@ -57,16 +59,17 @@ export const DataHubPage = () => {
     }
   };
 
-  const lookupSubject = async (data: SubjectIdentificationData) => {
-    const response = await axios.post<Subject>('/v1/subjects/lookup', data, {
+  const lookupSubject = async ({ id }: { id: string }) => {
+    const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
       validateStatus: (status) => status === 200 || status === 404
     });
     if (response.status === 404) {
       addNotification({ message: t('core:notFound'), type: 'warning' });
-      return;
+      setIsLookupOpen(false);
+    } else {
+      addNotification({ type: 'success' });
+      navigate(`${response.data.id}/assignments`);
     }
-    addNotification({ type: 'success' });
-    navigate(`${response.data.id}/assignments`);
   };
 
   return (
@@ -79,7 +82,7 @@ export const DataHubPage = () => {
       <React.Suspense fallback={<LoadingFallback />}>
         <div>
           <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
-            <Dialog>
+            <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
               <Dialog.Trigger className="flex-grow">
                 <SearchBar className="[&>input]:text-foreground [&>input]:placeholder-foreground" readOnly={true} />
               </Dialog.Trigger>
@@ -87,7 +90,7 @@ export const DataHubPage = () => {
                 <Dialog.Header>
                   <Dialog.Title>{t('index.lookup.title')}</Dialog.Title>
                 </Dialog.Header>
-                <IdentificationForm fillCurrentSession onSubmit={(data) => void lookupSubject(data)} />
+                <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
               </Dialog.Content>
             </Dialog>
             <div className="flex min-w-60 gap-2 lg:flex-shrink">

@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
+import type { UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
+import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
@@ -17,13 +19,13 @@ type InstrumentOptions = {
 
 export type ManageGroupFormProps = {
   availableInstruments: UnilingualInstrumentSummary[];
-  onSubmit: (data: { accessibleInstrumentIds: string[] }) => Promisable<any>;
+  onSubmit: (data: UpdateGroupData) => Promisable<any>;
 };
 
 export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { i18n } = useTranslation();
-  const { t } = useTranslation('group');
+  const { t } = useTranslation(['group', 'common']);
 
   const { initialValues, options } = useMemo(() => {
     const options: InstrumentOptions = {
@@ -34,7 +36,8 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
     };
     const initialValues = {
       accessibleFormInstrumentIds: new Set<string>(),
-      accessibleInteractiveInstrumentIds: new Set<string>()
+      accessibleInteractiveInstrumentIds: new Set<string>(),
+      defaultIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod
     };
     for (const instrument of availableInstruments) {
       if (instrument.kind === 'FORM') {
@@ -73,17 +76,35 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
             }
           },
           title: t('manage.accessibleInstruments')
+        },
+        {
+          fields: {
+            defaultIdentificationMethod: {
+              kind: 'string',
+              label: t('manage.defaultSubjectIdMethod'),
+              options: {
+                CUSTOM_ID: t('common:customIdentifier'),
+                PERSONAL_INFO: t('common:personalInfo')
+              },
+              variant: 'select'
+            }
+          },
+          title: t('manage.groupSettings')
         }
       ]}
       initialValues={initialValues}
       preventResetValuesOnReset={true}
       validationSchema={z.object({
         accessibleFormInstrumentIds: z.set(z.string()),
-        accessibleInteractiveInstrumentIds: z.set(z.string())
+        accessibleInteractiveInstrumentIds: z.set(z.string()),
+        defaultIdentificationMethod: $SubjectIdentificationMethod.optional()
       })}
       onSubmit={(data) =>
         void onSubmit({
-          accessibleInstrumentIds: [...data.accessibleFormInstrumentIds, ...data.accessibleInteractiveInstrumentIds]
+          accessibleInstrumentIds: [...data.accessibleFormInstrumentIds, ...data.accessibleInteractiveInstrumentIds],
+          settings: {
+            defaultIdentificationMethod: data.defaultIdentificationMethod
+          }
         })
       }
     />

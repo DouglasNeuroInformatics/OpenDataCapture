@@ -4,7 +4,7 @@ import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libne
 import { HttpStatus } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import type { SubjectIdentificationData } from '@opendatacapture/schemas/subject';
+import type { ClinicalSubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
@@ -43,7 +43,7 @@ describe('/subjects', () => {
   });
 
   describe('POST /subjects', () => {
-    let createSubjectDto: SubjectIdentificationData;
+    let createSubjectDto: ClinicalSubjectIdentificationData;
     beforeEach(() => {
       createSubjectDto = {
         dateOfBirth: new Date(),

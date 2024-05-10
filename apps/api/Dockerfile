@@ -1,5 +1,6 @@
 FROM node:lts-alpine as base
 WORKDIR /app
+ENV GATEWAY_DATABASE_URL="file:/dev/null"
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NODE_OPTIONS="--max-old-space-size=8192"

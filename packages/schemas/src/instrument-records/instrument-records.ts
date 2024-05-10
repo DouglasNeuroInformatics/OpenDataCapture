@@ -4,6 +4,7 @@ import { $BaseModel, $Json } from '../core/core.js';
 import { $InstrumentKind, $InstrumentMeasureValue } from '../instrument/instrument.js';
 
 import type { InstrumentKind, InstrumentMeasureValue } from '../instrument/instrument.js';
+import type { SessionType } from '../session/session.js';
 
 export const $CreateInstrumentRecordData = z.object({
   assignmentId: z.string().optional(),
@@ -11,6 +12,7 @@ export const $CreateInstrumentRecordData = z.object({
   date: z.coerce.date(),
   groupId: z.string().optional(),
   instrumentId: z.string(),
+  sessionId: z.string(),
   subjectId: z.string()
 });
 
@@ -35,9 +37,12 @@ export type InstrumentRecordsExport = {
   instrumentName: string;
   instrumentVersion: number;
   measure: string;
-  subjectAge: number;
+  sessionDate: string;
+  sessionId: string;
+  sessionType: SessionType;
+  subjectAge: null | number;
   subjectId: string;
-  subjectSex: string;
+  subjectSex: null | string;
   timestamp: string;
   value: InstrumentMeasureValue;
 }[];

@@ -8,7 +8,7 @@ import type { AuthSlice, SliceCreator } from '../types';
 export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
   accessToken: null,
   changeGroup: (group) => {
-    set({ currentGroup: group });
+    set({ currentGroup: group, currentSession: null });
   },
   currentGroup: null,
   currentUser: null,

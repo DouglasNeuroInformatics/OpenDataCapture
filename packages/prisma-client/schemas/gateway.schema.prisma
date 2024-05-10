@@ -4,7 +4,7 @@
 generator client {
   provider      = "prisma-client-js"
   output        = "../dist/gateway"
-  binaryTargets = ["native"]
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -17,6 +17,7 @@ model RemoteAssignmentModel {
   createdAt        DateTime  @default(now())
   completedAt      DateTime?
   expiresAt        DateTime
+  groupId          String?
   instrumentBundle String
   instrumentId     String
   rawPublicKey     Bytes

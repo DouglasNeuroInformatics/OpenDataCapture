@@ -4,6 +4,7 @@ import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -35,12 +36,14 @@ export const InstrumentRenderPage = () => {
 
   const handleSubmit = async (data: unknown) => {
     await axios.post('/v1/instrument-records', {
+      // @ts-expect-error - better than no safety for now
       data,
       date: new Date(),
       groupId: currentGroup?.id,
-      instrumentId: instrumentBundleQuery.data?.id,
+      instrumentId: instrumentBundleQuery.data!.id,
+      sessionId: currentSession!.id,
       subjectId: currentSession!.subject.id
-    });
+    } satisfies CreateInstrumentRecordData);
     notifications.addNotification({ type: 'success' });
   };
 
