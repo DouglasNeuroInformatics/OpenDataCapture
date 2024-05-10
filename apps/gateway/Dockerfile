@@ -32,5 +32,7 @@ FROM base AS runner
 COPY --from=installer /app/gateway.db /app/gateway.db
 COPY --from=installer /app/apps/gateway/dist/ /app/dist/
 COPY --from=installer /app/apps/gateway/public/ /app/public/
+COPY --from=installer /app/apps/gateway/dist/runtime/ /runtime/
 RUN echo '{ "type": "module" }' > package.json
+RUN echo '{ "type": "module" }' > /runtime/package.json
 CMD [ "node", "./dist/main.mjs" ]
