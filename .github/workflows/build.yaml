@@ -5,7 +5,7 @@ on:
     branches: ['main']
     tags: ['v*']
   # pull_request:
-    # branches: ['main']
+  # branches: ['main']
 permissions:
   contents: read
   packages: write
@@ -20,8 +20,6 @@ jobs:
             image: ghcr.io/douglasneuroinformatics/open-data-capture-api
           - dockerfile: ./apps/gateway/Dockerfile
             image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway
-          - dockerfile: ./apps/playground/Dockerfile
-            image: ghcr.io/douglasneuroinformatics/open-data-capture-playground
           - dockerfile: ./apps/web/Dockerfile
             image: ghcr.io/douglasneuroinformatics/open-data-capture-web
     steps:
@@ -34,7 +32,7 @@ jobs:
       - name: Set Up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Container Registry
-        if: github.event_name != 'pull_request'
+        # if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
