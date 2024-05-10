@@ -59,6 +59,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       assignmentId: assignment.id,
       data,
       date: completedAt,
+      groupId: assignment.groupId ?? undefined,
       instrumentId: assignment.instrumentId,
       sessionId: session.id,
       subjectId: assignment.subjectId
