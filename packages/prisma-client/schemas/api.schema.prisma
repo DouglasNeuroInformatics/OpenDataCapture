@@ -29,6 +29,8 @@ model AssignmentModel {
   id                String                 @id @map("_id")
   completedAt       DateTime?
   expiresAt         DateTime
+  group             GroupModel?            @relation(fields: [groupId], references: [id])
+  groupId           String?                @db.ObjectId
   instrument        InstrumentModel        @relation(fields: [instrumentId], references: [id])
   instrumentId      String
   instrumentRecord  InstrumentRecordModel?
@@ -61,6 +63,7 @@ model GroupModel {
   id                      String                  @id @default(auto()) @map("_id") @db.ObjectId
   accessibleInstrumentIds String[]
   accessibleInstruments   InstrumentModel[]       @relation(fields: [accessibleInstrumentIds], references: [id])
+  assignments             AssignmentModel[]
   instrumentRecords       InstrumentRecordModel[]
   name                    String                  @unique
   settings                GroupSettings
