@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ActionDropdown, Dialog, Heading, SearchBar } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
@@ -17,6 +17,8 @@ import { MasterDataTable } from '../components/MasterDataTable';
 import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
 
 export const DataHubPage = () => {
+  const [isLookupOpen, setIsLookupOpen] = useState(false);
+
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
 
@@ -63,10 +65,11 @@ export const DataHubPage = () => {
     });
     if (response.status === 404) {
       addNotification({ message: t('core:notFound'), type: 'warning' });
-      return;
+      setIsLookupOpen(false);
+    } else {
+      addNotification({ type: 'success' });
+      navigate(`${response.data.id}/assignments`);
     }
-    addNotification({ type: 'success' });
-    navigate(`${response.data.id}/assignments`);
   };
 
   return (
@@ -79,7 +82,7 @@ export const DataHubPage = () => {
       <React.Suspense fallback={<LoadingFallback />}>
         <div>
           <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
-            <Dialog>
+            <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
               <Dialog.Trigger className="flex-grow">
                 <SearchBar className="[&>input]:text-foreground [&>input]:placeholder-foreground" readOnly={true} />
               </Dialog.Trigger>

@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $Sex, $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
-import { generateSubjectHash } from '@opendatacapture/subject-utils';
+import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
@@ -21,6 +21,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
 
   return (
     <Form
+      preventResetValuesOnReset
       content={[
         {
           title: t('identificationMethod'),
@@ -155,6 +156,10 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
             lastName: lastName!,
             dateOfBirth: dateOfBirth!,
             sex: sex!
+          });
+        } else {
+          id = encodeScopedSubjectId(id, {
+            groupName: currentGroup?.name ?? 'root'
           });
         }
         await onSubmit({ id });
