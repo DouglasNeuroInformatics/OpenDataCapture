@@ -226,15 +226,17 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
             dateOfBirth: subjectDateOfBirth!,
             sex: subjectSex!
           });
+        } else {
+          subjectId = encodeScopedSubjectId(subjectId, {
+            groupName: currentGroup?.name ?? 'root'
+          });
         }
         await onSubmit({
           date: sessionDate!,
           groupId: currentGroup?.id ?? null,
           type: sessionType,
           subjectData: {
-            id: encodeScopedSubjectId(subjectId, {
-              groupName: currentGroup?.name ?? 'root'
-            }),
+            id: subjectId,
             firstName: subjectFirstName,
             lastName: subjectLastName,
             dateOfBirth: subjectDateOfBirth,
