@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $SessionType, type CreateSessionData } from '@opendatacapture/schemas/session';
+import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
@@ -170,7 +171,7 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
         .object({
           subjectFirstName: z.string().optional(),
           subjectLastName: z.string().optional(),
-          subjectIdentificationMethod: z.enum(['CUSTOM_ID', 'PERSONAL_INFO']),
+          subjectIdentificationMethod: $SubjectIdentificationMethod,
           subjectId: z
             .string()
             .min(1)
