@@ -14,15 +14,14 @@ import { TabLink } from './TabLink';
 export const SubjectLayout = () => {
   const params = useParams();
   const { t } = useTranslation('datahub');
-
-  const subjectId = removeSubjectIdScope(params.subjectId!);
+  const subjectId = params.subjectId!;
   const basePathname = `/datahub/${subjectId}`;
 
   return (
     <React.Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t('layout.title', { id: subjectId.slice(0, 7) })}
+          {t('layout.title', { id: removeSubjectIdScope(subjectId).slice(0, 7) })}
         </Heading>
       </PageHeader>
       <div className="mb-5 flex">
