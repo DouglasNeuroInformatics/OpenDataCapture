@@ -30,7 +30,7 @@ export const $RemoteAssignment = $Assignment.omit({ updatedAt: true }).extend({
 export type CreateAssignmentData = z.infer<typeof $CreateAssignmentData>;
 export const $CreateAssignmentData = z.object({
   expiresAt: z.coerce.date().min(new Date()),
-  groupId: z.string().optional(),
+  groupId: z.string().nullish(),
   instrumentId: z.string(),
   subjectId: z.string()
 });

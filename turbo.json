@@ -13,6 +13,7 @@
       "outputs": ["dist/**"]
     },
     "db:push": {
+      "cache": false,
       "dependsOn": ["db:generate"]
     },
     "dev": {
