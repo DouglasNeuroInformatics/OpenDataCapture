@@ -5,6 +5,8 @@ import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
 
+import { accessibleQuery } from '@/ability/ability.utils';
+import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
@@ -52,6 +54,16 @@ export class SessionsService {
       },
       where: { id }
     }))!;
+  }
+
+  async findById(id: string, { ability }: EntityOperationOptions = {}) {
+    const session = await this.sessionModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'read', 'Session')], id }
+    });
+    if (!session) {
+      throw new NotFoundException(`Failed to find session with ID: ${id}`);
+    }
+    return session;
   }
 
   /** Get the subject if they exist, otherwise create them */

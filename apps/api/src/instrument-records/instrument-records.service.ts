@@ -20,6 +20,7 @@ import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
+import { SessionsService } from '@/sessions/sessions.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
@@ -33,6 +34,7 @@ export class InstrumentRecordsService {
     private readonly groupsService: GroupsService,
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
+    private readonly sessionsService: SessionsService,
     private readonly subjectsService: SubjectsService
   ) {
     this.interpreter = new InstrumentInterpreter();
@@ -48,7 +50,7 @@ export class InstrumentRecordsService {
   }
 
   async create(
-    { data, date, groupId, instrumentId, subjectId }: CreateInstrumentRecordData,
+    { data, date, groupId, instrumentId, sessionId, subjectId }: CreateInstrumentRecordData,
     options?: EntityOperationOptions
   ): Promise<InstrumentRecordModel> {
     if (groupId) {
@@ -56,6 +58,7 @@ export class InstrumentRecordsService {
     }
     await this.instrumentsService.findById(instrumentId);
     await this.subjectsService.findById(subjectId);
+    await this.sessionsService.findById(sessionId);
 
     return this.instrumentRecordModel.create({
       data: {
@@ -69,6 +72,11 @@ export class InstrumentRecordsService {
         instrument: {
           connect: {
             id: instrumentId
+          }
+        },
+        session: {
+          connect: {
+            id: sessionId
           }
         },
         subject: {
@@ -116,12 +124,16 @@ export class InstrumentRecordsService {
         }
 
         const measures = this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data);
+        const session = await this.sessionsService.findById(record.sessionId);
 
         for (const [measureKey, measureValue] of Object.entries(measures)) {
           data.push({
             instrumentName: record.instrument.name,
             instrumentVersion: record.instrument.version,
             measure: measureKey,
+            sessionDate: session.date.toISOString(),
+            sessionId: session.id,
+            sessionType: session.type,
             subjectAge: subject.dateOfBirth ? yearsPassed(subject.dateOfBirth) : null,
             subjectId: subject.id,
             subjectSex: subject.sex,

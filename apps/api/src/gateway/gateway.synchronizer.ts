@@ -6,6 +6,7 @@ import { $Json } from '@opendatacapture/schemas/core';
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
+import type { SessionsService } from '@/sessions/sessions.service';
 import { SetupService } from '@/setup/setup.service';
 
 import { GatewayService } from './gateway.service';
@@ -20,6 +21,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     private readonly assignmentsService: AssignmentsService,
     private readonly gatewayService: GatewayService,
     private readonly instrumentRecordsService: InstrumentRecordsService,
+    private readonly sessionsService: SessionsService,
     private readonly setupService: SetupService
   ) {
     this.refreshInterval = configurationService.get('GATEWAY_REFRESH_INTERVAL');
@@ -44,11 +46,21 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     const data = await $Json.parseAsync(JSON.parse(await decrypter.decrypt(remoteAssignment.encryptedData)));
 
+    const session = await this.sessionsService.create({
+      date: completedAt,
+      groupId: remoteAssignment.groupId ?? null,
+      subjectData: {
+        id: assignment.subjectId
+      },
+      type: 'REMOTE'
+    });
+
     const record = await this.instrumentRecordsService.create({
       assignmentId: assignment.id,
       data,
       date: completedAt,
       instrumentId: assignment.instrumentId,
+      sessionId: session.id,
       subjectId: assignment.subjectId
     });
 

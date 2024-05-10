@@ -106,7 +106,7 @@ export class DemoService {
           id: subjectId
         });
 
-        await this.sessionsService.create({
+        const session = await this.sessionsService.create({
           date: new Date(),
           groupId: group.id,
           subjectData: subject,
@@ -129,6 +129,7 @@ export class DemoService {
             date: faker.date.past({ years: 2 }),
             groupId: group.id,
             instrumentId: this.instrumentsService.generateInstrumentId(hq),
+            sessionId: session.id,
             subjectId: subject.id
           });
         }
