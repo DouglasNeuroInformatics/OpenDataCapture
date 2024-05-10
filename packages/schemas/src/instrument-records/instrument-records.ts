@@ -11,6 +11,7 @@ export const $CreateInstrumentRecordData = z.object({
   date: z.coerce.date(),
   groupId: z.string().optional(),
   instrumentId: z.string(),
+  sessionId: z.string(),
   subjectId: z.string()
 });
 

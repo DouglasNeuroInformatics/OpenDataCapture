@@ -17,6 +17,7 @@ model RemoteAssignmentModel {
   createdAt        DateTime  @default(now())
   completedAt      DateTime?
   expiresAt        DateTime
+  groupId          String?
   instrumentBundle String
   instrumentId     String
   rawPublicKey     Bytes

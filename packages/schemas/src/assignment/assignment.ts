@@ -13,6 +13,7 @@ export type Assignment = z.infer<typeof $Assignment>;
 export const $Assignment = $BaseModel.extend({
   completedAt: z.coerce.date().nullable(),
   expiresAt: z.coerce.date(),
+  groupId: z.string().min(1).optional(),
   instrumentId: z.string().min(1),
   status: $AssignmentStatus,
   subjectId: z.string().min(1),

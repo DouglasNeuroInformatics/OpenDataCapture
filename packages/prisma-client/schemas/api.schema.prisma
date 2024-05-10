@@ -88,6 +88,8 @@ model InstrumentRecordModel {
   instrumentId String
   assignment   AssignmentModel? @relation(fields: [assignmentId], references: [id])
   assignmentId String?          @unique
+  session      SessionModel     @relation(fields: [sessionId], references: [id])
+  sessionId    String           @db.ObjectId
 }
 
 // Instruments 
@@ -180,15 +182,16 @@ enum SessionType {
 }
 
 model SessionModel {
-  createdAt DateTime     @default(now()) @db.Date
-  updatedAt DateTime     @updatedAt @db.Date
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime     @db.Date
-  group     GroupModel?  @relation(fields: [groupId], references: [id])
-  groupId   String?      @db.ObjectId
-  subject   SubjectModel @relation(fields: [subjectId], references: [id])
-  subjectId String
-  type      SessionType
+  createdAt         DateTime                @default(now()) @db.Date
+  updatedAt         DateTime                @updatedAt @db.Date
+  id                String                  @id @default(auto()) @map("_id") @db.ObjectId
+  date              DateTime                @db.Date
+  group             GroupModel?             @relation(fields: [groupId], references: [id])
+  groupId           String?                 @db.ObjectId
+  instrumentRecords InstrumentRecordModel[]
+  subject           SubjectModel            @relation(fields: [subjectId], references: [id])
+  subjectId         String
+  type              SessionType
 }
 
 // Setup
