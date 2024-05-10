@@ -3,7 +3,7 @@ import React from 'react';
 import { ActionDropdown, Dialog, Heading, SearchBar } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
-import type { ClinicalSubjectIdentificationData, Subject } from '@opendatacapture/schemas/subject';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -57,8 +57,8 @@ export const DataHubPage = () => {
     }
   };
 
-  const lookupSubject = async (data: ClinicalSubjectIdentificationData) => {
-    const response = await axios.post<Subject>('/v1/subjects/lookup', data, {
+  const lookupSubject = async ({ id }: { id: string }) => {
+    const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
       validateStatus: (status) => status === 200 || status === 404
     });
     if (response.status === 404) {
@@ -87,7 +87,7 @@ export const DataHubPage = () => {
                 <Dialog.Header>
                   <Dialog.Title>{t('index.lookup.title')}</Dialog.Title>
                 </Dialog.Header>
-                <IdentificationForm fillCurrentSession onSubmit={(data) => void lookupSubject(data)} />
+                <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
               </Dialog.Content>
             </Dialog>
             <div className="flex min-w-60 gap-2 lg:flex-shrink">
