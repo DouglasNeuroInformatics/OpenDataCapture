@@ -3,7 +3,6 @@ import React from 'react';
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { AlertDialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { Branding } from '@opendatacapture/react-core';
-import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { StopCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -80,27 +79,21 @@ export const Sidebar = () => {
         {currentSession && (
           <motion.div
             animate={{ opacity: 1 }}
-            className="my-2 rounded-md border border-slate-700 bg-slate-800 p-2 text-sm tracking-tight text-slate-300"
+            className="my-2 rounded-md border border-slate-700 bg-slate-800 p-2 tracking-tight text-slate-300"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
           >
             <h5 className="text-sm font-medium">{t('common:sessionInProgress')}</h5>
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
-            {isSubjectWithPersonalInfo(currentSession.subject) ? (
-              <div>
-                <p>{`${t('fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
-                <p>
-                  {`${t('identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
-                </p>
-                <p>
-                  {`${t('identificationData.sex.label')}: ${t(`core:identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)}`}
-                </p>
-              </div>
-            ) : (
-              <div>
-                <p>ID: {removeSubjectIdScope(currentSession.subject.id)}</p>
-              </div>
-            )}
+            <div className="text-sm ">
+              <p>{`${t('fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
+              <p>
+                {`${t('identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
+              </p>
+              <p>
+                {`${t('identificationData.sex.label')}: ${t(`core:identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)}`}
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

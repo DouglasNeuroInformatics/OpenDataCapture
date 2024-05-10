@@ -3,167 +3,58 @@
 import React from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
-import { $Sex, $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
-import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
+import { $SubjectIdentificationData, type SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
-import type { Promisable } from 'type-fest';
-import { z } from 'zod';
 
 import { useAppStore } from '@/store';
 
 export type IdentificationFormProps = {
-  onSubmit: (data: { id: string }) => Promisable<void>;
+  /** Whether to prefill the form with the subject from the current session, if one exists  */
+  fillCurrentSession?: boolean;
+  /** Callback function invoked when validation is successful */
+  onSubmit: (data: SubjectIdentificationData) => void;
+  /** Optional override for the default submit button label */
+  submitBtnLabel?: string;
 };
 
-export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
-  const currentGroup = useAppStore((store) => store.currentGroup);
-  const { t } = useTranslation(['common', 'core']);
-
+export const IdentificationForm = ({ fillCurrentSession, onSubmit, submitBtnLabel }: IdentificationFormProps) => {
+  const currentSession = useAppStore((store) => store.currentSession);
+  const { t } = useTranslation('core');
   return (
     <Form
-      preventResetValuesOnReset
-      content={[
-        {
-          title: t('identificationMethod'),
-          fields: {
-            identificationMethod: {
-              kind: 'string',
-              label: 'Method',
-              options: {
-                CUSTOM_ID: t('customIdentifier'),
-                PERSONAL_INFO: t('personalInfo')
-              },
-              variant: 'select'
-            }
-          }
+      content={{
+        firstName: {
+          description: t('identificationData.firstName.description'),
+          kind: 'string',
+          label: t('identificationData.firstName.label'),
+          variant: 'input'
         },
-        {
-          title: t('subjectIdentification.title'),
-          fields: {
-            id: {
-              kind: 'dynamic',
-              deps: ['identificationMethod'],
-              render({ identificationMethod }) {
-                return identificationMethod === 'CUSTOM_ID'
-                  ? {
-                      kind: 'string',
-                      label: t('identifier'),
-                      variant: 'input'
-                    }
-                  : null;
-              }
-            },
-            firstName: {
-              kind: 'dynamic',
-              deps: ['identificationMethod'],
-              render({ identificationMethod }) {
-                return identificationMethod === 'PERSONAL_INFO'
-                  ? {
-                      description: t('subjectIdentification.firstName.description'),
-                      kind: 'string',
-                      label: t('subjectIdentification.firstName.label'),
-                      variant: 'input'
-                    }
-                  : null;
-              }
-            },
-            lastName: {
-              kind: 'dynamic',
-              deps: ['identificationMethod'],
-              render({ identificationMethod }) {
-                return identificationMethod === 'PERSONAL_INFO'
-                  ? {
-                      description: t('subjectIdentification.lastName.description'),
-                      kind: 'string',
-                      label: t('subjectIdentification.lastName.label'),
-                      variant: 'input'
-                    }
-                  : null;
-              }
-            },
-            dateOfBirth: {
-              kind: 'dynamic',
-              deps: ['identificationMethod'],
-              render({ identificationMethod }) {
-                return identificationMethod === 'PERSONAL_INFO'
-                  ? {
-                      kind: 'date',
-                      label: t('core:identificationData.dateOfBirth.label')
-                    }
-                  : null;
-              }
-            },
-            sex: {
-              kind: 'dynamic',
-              deps: ['identificationMethod'],
-              render({ identificationMethod }) {
-                return identificationMethod === 'PERSONAL_INFO'
-                  ? {
-                      description: t('core:identificationData.sex.description'),
-                      kind: 'string',
-                      label: t('core:identificationData.sex.label'),
-                      options: {
-                        FEMALE: t('core:identificationData.sex.female'),
-                        MALE: t('core:identificationData.sex.male')
-                      },
-                      variant: 'select'
-                    }
-                  : null;
-              }
-            }
-          }
+        lastName: {
+          description: t('identificationData.lastName.description'),
+          kind: 'string',
+          label: t('identificationData.lastName.label'),
+          variant: 'input'
+        },
+        dateOfBirth: {
+          kind: 'date',
+          label: t('identificationData.dateOfBirth.label')
+        },
+        sex: {
+          description: t('identificationData.sex.description'),
+          kind: 'string',
+          label: t('identificationData.sex.label'),
+          options: {
+            FEMALE: t('identificationData.sex.female'),
+            MALE: t('identificationData.sex.male')
+          },
+          variant: 'select'
         }
-      ]}
-      initialValues={{
-        identificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO'
       }}
-      submitBtnLabel={t('core:submit')}
-      validationSchema={z
-        .object({
-          firstName: z.string().min(1).optional(),
-          lastName: z.string().min(1).optional(),
-          identificationMethod: $SubjectIdentificationMethod,
-          id: z.string().min(1).optional(),
-          dateOfBirth: z.date().optional(),
-          sex: $Sex.optional()
-        })
-        .superRefine((val, ctx) => {
-          if (val.identificationMethod === 'CUSTOM_ID') {
-            if (!val.id) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: t('core:form.requiredField'),
-                path: ['id']
-              });
-            }
-          } else if (val.identificationMethod === 'PERSONAL_INFO') {
-            const requiredKeys = ['firstName', 'lastName', 'sex', 'dateOfBirth'] as const;
-            for (const key of requiredKeys) {
-              if (!val[key]) {
-                ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: t('core:form.requiredField'),
-                  path: [key]
-                });
-              }
-            }
-          }
-        })}
-      onSubmit={async ({ id, firstName, lastName, dateOfBirth, sex }) => {
-        if (!id) {
-          id = await generateSubjectHash({
-            firstName: firstName!,
-            lastName: lastName!,
-            dateOfBirth: dateOfBirth!,
-            sex: sex!
-          });
-        } else {
-          id = encodeScopedSubjectId(id, {
-            groupName: currentGroup?.name ?? 'root'
-          });
-        }
-        await onSubmit({ id });
-      }}
+      initialValues={fillCurrentSession ? currentSession?.subject : undefined}
+      resetBtn={fillCurrentSession}
+      submitBtnLabel={submitBtnLabel ?? t('submit')}
+      validationSchema={$SubjectIdentificationData}
+      onSubmit={onSubmit}
     />
   );
 };

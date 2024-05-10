@@ -6,19 +6,17 @@ import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { InstrumentKind, SomeUnilingualInstrument } from '@opendatacapture/schemas/instrument';
-import { isSubjectWithPersonalInfo } from '@opendatacapture/subject-utils';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import { filter } from 'lodash-es';
 import { DownloadIcon, PrinterIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
-import type { SubjectDisplayInfo } from '../InstrumentRenderer';
-
 export type InstrumentSummaryProps<TKind extends InstrumentKind> = {
   data: any;
   instrument: SomeUnilingualInstrument<TKind>;
-  subject?: SubjectDisplayInfo;
+  subject?: Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
   timeCollected: number;
 };
 
@@ -86,32 +84,21 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
       <Separator />
       {subject && (
         <InstrumentSummaryGroup
-          items={
-            isSubjectWithPersonalInfo(subject)
-              ? [
-                  {
-                    label: t('fullName'),
-                    value:
-                      subject?.firstName && subject.lastName
-                        ? `${subject.firstName} ${subject.lastName}`
-                        : t('anonymous')
-                  },
-                  {
-                    label: t('identificationData.dateOfBirth.label'),
-                    value: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : null
-                  },
-                  {
-                    label: t('identificationData.sex.label'),
-                    value: subject.sex ? t(`identificationData.sex.${toLowerCase(subject.sex)}`) : null
-                  }
-                ]
-              : [
-                  {
-                    label: 'ID',
-                    value: subject.id
-                  }
-                ]
-          }
+          items={[
+            {
+              label: t('fullName'),
+              value:
+                subject?.firstName && subject.lastName ? `${subject.firstName} ${subject.lastName}` : t('anonymous')
+            },
+            {
+              label: t('identificationData.dateOfBirth.label'),
+              value: toBasicISOString(subject.dateOfBirth)
+            },
+            {
+              label: t('identificationData.sex.label'),
+              value: t(`identificationData.sex.${toLowerCase(subject.sex)}`)
+            }
+          ]}
           title={t('subject')}
         />
       )}

@@ -3,10 +3,8 @@ import { InternalServerErrorException, NotFoundException } from '@nestjs/common/
 import type { SubjectModel } from '@opendatacapture/prisma-client/api';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
-import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
+import type { SubjectIdentificationData } from '@opendatacapture/schemas/subject';
 
-import { accessibleQuery } from '@/ability/ability.utils';
-import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
@@ -22,9 +20,9 @@ export class SessionsService {
     private readonly subjectsService: SubjectsService
   ) {}
 
-  async create({ date, groupId, subjectData, type }: CreateSessionData): Promise<Session> {
+  async create({ date, groupId, subjectIdData, type }: CreateSessionData): Promise<Session> {
     this.logger.debug({ message: 'Attempting to create session' });
-    const subject = await this.resolveSubject(subjectData);
+    const subject = await this.resolveSubject(subjectIdData);
 
     // If the subject is not yet associated with the group, check it exists then append it
     let group: Group | null = null;
@@ -56,27 +54,17 @@ export class SessionsService {
     }))!;
   }
 
-  async findById(id: string, { ability }: EntityOperationOptions = {}) {
-    const session = await this.sessionModel.findFirst({
-      where: { AND: [accessibleQuery(ability, 'read', 'Session')], id }
-    });
-    if (!session) {
-      throw new NotFoundException(`Failed to find session with ID: ${id}`);
-    }
-    return session;
-  }
-
   /** Get the subject if they exist, otherwise create them */
-  private async resolveSubject(subjectData: CreateSubjectData) {
-    this.logger.debug({ message: 'Attempting to resolve subject', subjectData });
+  private async resolveSubject(subjectIdData: SubjectIdentificationData) {
+    this.logger.debug({ message: 'Attempting to resolve subject', subjectIdData });
     let subject: SubjectModel;
     try {
-      subject = await this.subjectsService.findById(subjectData.id);
+      subject = await this.subjectsService.findByLookup(subjectIdData);
     } catch (err) {
       if (!(err instanceof NotFoundException)) {
         throw new InternalServerErrorException('Unexpected Error', { cause: err });
       }
-      subject = await this.subjectsService.create(subjectData);
+      subject = await this.subjectsService.create(subjectIdData);
     }
     return subject;
   }

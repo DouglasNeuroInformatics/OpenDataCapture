@@ -1,11 +1,11 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
 
-import { CreateSubjectDto } from './dto/create-subject.dto';
+import { SubjectIdentificationDataDto } from './dto/subject-identification-data.dto';
 import { SubjectsService } from './subjects.service';
 
 @ApiTags('Subjects')
@@ -16,7 +16,7 @@ export class SubjectsController {
   @ApiOperation({ summary: 'Create Subject' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Subject' })
-  create(@Body() subject: CreateSubjectDto) {
+  create(@Body() subject: SubjectIdentificationDataDto) {
     return this.subjectsService.create(subject);
   }
 
@@ -39,5 +39,13 @@ export class SubjectsController {
   @RouteAccess({ action: 'read', subject: 'Subject' })
   findById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.subjectsService.findById(id, { ability });
+  }
+
+  @ApiOperation({ summary: 'Lookup Subject' })
+  @Post('lookup')
+  @RouteAccess({ action: 'read', subject: 'Subject' })
+  @HttpCode(HttpStatus.OK)
+  findByLookup(@Body() data: SubjectIdentificationDataDto, @CurrentUser('ability') ability: AppAbility) {
+    return this.subjectsService.findByLookup(data, { ability });
   }
 }

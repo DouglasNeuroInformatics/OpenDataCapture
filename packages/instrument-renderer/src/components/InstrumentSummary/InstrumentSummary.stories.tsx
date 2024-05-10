@@ -25,33 +25,12 @@ export default {
 
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
-
-export const Clinical: Story = {
+export const Default: Story = {
   args: {
     data: {
       favoriteNumber: 4
     },
     instrument: unilingualFormInstrument.instance as AnyUnilingualInstrument,
-    subject: {
-      dateOfBirth: new Date(2000),
-      firstName: 'Jane',
-      id: '123',
-      lastName: 'Doe',
-      sex: 'FEMALE'
-    },
-    timeCollected: Date.now()
-  }
-};
-
-export const Research: Story = {
-  args: {
-    data: {
-      favoriteNumber: 4
-    },
-    instrument: unilingualFormInstrument.instance as AnyUnilingualInstrument,
-    subject: {
-      id: '123'
-    },
     timeCollected: Date.now()
   }
 };

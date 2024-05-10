@@ -31,20 +31,13 @@ export class AssignmentsService {
     }
   }
 
-  async create({ expiresAt, groupId, instrumentId, subjectId }: CreateAssignmentDto): Promise<Assignment> {
+  async create({ expiresAt, instrumentId, subjectId }: CreateAssignmentDto): Promise<Assignment> {
     const encryptionKeyPair = await AsymmetricEncryptionKeyPair.generate();
     const id = crypto.randomUUID();
     const assignment = await this.assignmentModel.create({
       data: {
         encryptionKeyPair: await encryptionKeyPair.toBuffer(),
         expiresAt,
-        group: groupId
-          ? {
-              connect: {
-                id: groupId
-              }
-            }
-          : undefined,
         id,
         instrument: {
           connect: {

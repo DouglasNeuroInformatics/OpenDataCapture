@@ -26,9 +26,6 @@ export class GroupsService {
         accessibleInstruments: {
           connect: await this.instrumentsService.findIds()
         },
-        settings: {
-          defaultIdentificationMethod: group.type === 'CLINICAL' ? 'PERSONAL_INFO' : 'CUSTOM_ID'
-        },
         ...group
       }
     });

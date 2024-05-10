@@ -97,9 +97,7 @@ export const SubjectAssignmentsPage = () => {
               }) satisfies z.ZodType<Omit<CreateAssignmentData, 'subjectId'>>
             }
             onSubmit={(data) => {
-              createAssignmentMutation.mutate({
-                data: { ...data, groupId: currentGroup?.id, subjectId: params.subjectId! }
-              });
+              createAssignmentMutation.mutate({ data: { ...data, subjectId: params.subjectId! } });
               setIsCreateModalOpen(false);
             }}
           />

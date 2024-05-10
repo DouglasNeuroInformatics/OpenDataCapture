@@ -8,9 +8,6 @@ export class CreateAssignmentDto implements CreateAssignmentData {
   expiresAt: Date;
 
   @ApiProperty()
-  groupId?: null | string;
-
-  @ApiProperty()
   instrumentId: string;
 
   @ApiProperty()

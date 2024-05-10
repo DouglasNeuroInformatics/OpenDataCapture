@@ -3,7 +3,6 @@ import React from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
 import type { Subject } from '@opendatacapture/schemas/subject';
-import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { useTranslation } from 'react-i18next';
 
 export type MasterDataTableProps = {
@@ -17,24 +16,16 @@ export const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
     <ClientTable<Subject>
       columns={[
         {
-          field: (subject) => removeSubjectIdScope(subject.id).slice(0, 7),
+          field: (subject) => subject.id.slice(0, 7),
           label: t('index.table.subject')
         },
         {
-          field: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
+          field: (subject) => toBasicISOString(new Date(subject.dateOfBirth)),
           label: t('core:identificationData.dateOfBirth.label')
         },
         {
-          field: (subject) => {
-            switch (subject.sex) {
-              case 'FEMALE':
-                return t('core:identificationData.sex.female');
-              case 'MALE':
-                return t('core:identificationData.sex.male');
-              default:
-                return 'NULL';
-            }
-          },
+          field: (subject) =>
+            subject.sex === 'FEMALE' ? t('core:identificationData.sex.female') : t('core:identificationData.sex.male'),
           label: t('core:identificationData.sex.label')
         }
       ]}

@@ -1,4 +1,8 @@
 {
+  "currentSession": {
+    "en": "Current Session",
+    "fr": "Session en cours"
+  },
   "basePermissionLevel": {
     "admin": {
       "en": "Admin",
@@ -13,13 +17,9 @@
       "fr": "Utilisateur standard"
     }
   },
-  "currentSession": {
-    "en": "Current Session",
+  "sessionInProgress": {
+    "en": "Session in Progress",
     "fr": "Session en cours"
-  },
-  "customIdentifier": {
-    "en": "Custom Identifier",
-    "fr": "Identifiant unique"
   },
   "errors": {
     "failedToChangeLanguage": {
@@ -42,64 +42,6 @@
   "groupTrend": {
     "en": "Group Trend",
     "fr": "Tendance du groupe"
-  },
-  "identificationMethod": {
-    "en": "Identification Method",
-    "fr": "Méthode d'identification"
-  },
-  "identificationMethodDesc": {
-    "en": "Please select the method by which a subject will be identified for this session.",
-    "fr": "Veuillez sélectionner la méthode par laquelle un sujet sera identifié pour cette session."
-  },
-  "identifier": {
-    "en": "Identifier",
-    "fr": "Identifiant"
-  },
-  "illegalCharacter": {
-    "en": "Illegal character: {{char}}",
-    "fr": "Caractère illégal : {{char}}"
-  },
-  "method": {
-    "en": "Method",
-    "fr": "Méthode"
-  },
-  "personalInfo": {
-    "en": "Personal Information",
-    "fr": "Renseignements personnels"
-  },
-  "sessionInProgress": {
-    "en": "Session in Progress",
-    "fr": "Session en cours"
-  },
-  "subjectIdentification": {
-    "description": {
-      "en": "The following items are used to compute a unique identifier that enables consistent cross-session identification.",
-      "fr": "Les éléments suivants sont utilisés pour calculer un identifiant unique qui permet une identification cohérente entre les sessions."
-    },
-    "firstName": {
-      "description": {
-        "en": "The subject's first name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as a fixed ASCII transliteration.",
-        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance. Pour les besoins de l'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme une translittération ASCII fixe."
-      },
-      "label": {
-        "en": "First Name",
-        "fr": "Prénom"
-      }
-    },
-    "lastName": {
-      "description": {
-        "en": "The subject's last name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as their ASCII equivalents.",
-        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance. Aux fins d'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme leurs équivalents ASCII."
-      },
-      "label": {
-        "en": "Last Name",
-        "fr": "Nom de famille"
-      }
-    },
-    "title": {
-      "en": "Subject Identification",
-      "fr": "Identification du client"
-    }
   },
   "tags": {
     "en": "Tags",

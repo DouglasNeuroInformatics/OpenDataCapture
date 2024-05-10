@@ -52,19 +52,19 @@ const config = {
       titlePrefix: 'Instruments'
     },
     {
-      directory: '../src/features/session/components',
-      files: '**/*.stories.@(js|jsx|ts|tsx)',
-      titlePrefix: 'Session'
-    },
-    {
       directory: '../src/features/setup/pages',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
-      titlePrefix: 'Setup'
+      titlePrefix: 'Setup Pages'
     },
     {
       directory: '../src/features/user/components',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
       titlePrefix: 'User'
+    },
+    {
+      directory: '../src/features/visits/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Visits'
     }
   ],
   viteFinal(config) {
