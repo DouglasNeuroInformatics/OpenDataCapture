@@ -8,10 +8,6 @@
       "en": "Please complete the following form to create an assignment. Once an assignment is created, you can send the generated link to the client.",
       "fr": "Veuillez remplir le formulaire suivant pour créer une affectation. Une fois la mission créée, vous pouvez envoyer le lien généré au client."
     },
-    "assignmentSliderDesc": {
-      "en": "View additional details related to this assignment here. This includes the link to the assignment, which you can send to the client.",
-      "fr": "Consultez ici les détails supplémentaires relatifs à cette mission. Il s'agit notamment du lien vers la mission, que vous pouvez envoyer au client."
-    },
     "assignedAt": {
       "en": "Assigned",
       "fr": "Attribué"
@@ -19,6 +15,10 @@
     "assignedInstruments": {
       "en": "Assigned Instruments",
       "fr": "Instruments assignés"
+    },
+    "assignmentSliderDesc": {
+      "en": "View additional details related to this assignment here. This includes the link to the assignment, which you can send to the client.",
+      "fr": "Consultez ici les détails supplémentaires relatifs à cette mission. Il s'agit notamment du lien vers la mission, que vous pouvez envoyer au client."
     },
     "expiresAt": {
       "en": "Expires",
@@ -57,6 +57,28 @@
     "title": {
       "en": "Title",
       "fr": "Titre"
+    }
+  },
+  "downloadInfo": {
+    "allTime": {
+      "en": "Timeframe: All time",
+      "fr": "Période : Toujours"
+    },
+    "download": {
+      "en": "Download",
+      "fr": "Télécharger"
+    },
+    "measurement": {
+      "en": "Measures: ",
+      "fr": "Mesures : "
+    },
+    "subjectText": {
+      "en": "{{form}} of Subject: {{id}}",
+      "fr": "{{form}} du client : {{id}}"
+    },
+    "time": {
+      "en": "Timeframe: ",
+      "fr": "Période : "
     }
   },
   "errors": {
@@ -157,28 +179,6 @@
     "yLabel": {
       "en": "Value",
       "fr": "Valeur"
-    }
-  },
-  "downloadInfo": {
-    "download": {
-      "en": "Download",
-      "fr": "Télécharger"
-    },
-    "subjectText": {
-      "en": "{{form}} of Subject: {{id}}",
-      "fr": "{{form}} du client : {{id}}"
-    },
-    "measurement": {
-      "en": "Measures: ",
-      "fr": "Mesures : "
-    },
-    "time": {
-      "en": "Timeframe: ",
-      "fr": "Période : "
-    },
-    "allTime": {
-      "en": "Timeframe: All time",
-      "fr": "Période : Toujours"
     }
   }
 }

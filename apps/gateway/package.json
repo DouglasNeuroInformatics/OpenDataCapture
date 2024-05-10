@@ -12,10 +12,10 @@
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env tsx dist/main.mjs"
+    "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env node dist/main.mjs"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.4.4",
+    "@douglasneuroinformatics/libui": "^2.5.1",
     "@opendatacapture/crypto": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",

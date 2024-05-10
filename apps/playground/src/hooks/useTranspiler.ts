@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
+import { sha256 } from '@opendatacapture/crypto';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useAppStore } from '@/store';
 import { editorFileToInput } from '@/utils/file';
-import { hashFiles } from '@/utils/hash';
 
 import { useFilesRef } from './useFilesRef';
 import { useInstrumentBundler } from './useInstrumentBundler';
@@ -30,6 +30,10 @@ type BuildingState = {
 };
 
 type TranspilerState = BuildingState | BuiltState | ErrorState | InitialState;
+
+async function hashFiles(files: EditorFile[]) {
+  return sha256(files.map((file) => file.content + file.name).join());
+}
 
 export function useTranspiler(): TranspilerState {
   const editorFilesRef = useFilesRef();

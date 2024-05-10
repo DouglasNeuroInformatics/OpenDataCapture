@@ -1,9 +1,5 @@
 {
   "manage": {
-    "pageTitle": {
-      "en": "Manage Group",
-      "fr": "Gestion du groupe"
-    },
     "accessibleInstruments": {
       "en": "Accessible Instruments",
       "fr": "Instruments accessibles"
@@ -12,13 +8,25 @@
       "en": "Select the instruments that are shown to you and other members of your group. This can be changed by a group manager at any time.",
       "fr": "Sélectionnez les instruments qui vous sont présentés ainsi qu'aux autres membres de votre groupe. Cette sélection peut être modifiée à tout moment par un responsable de groupe."
     },
+    "defaultSubjectIdMethod": {
+      "en": "Subject Identification Method (Default)",
+      "fr": "Méthode d'identification du sujet par défaut"
+    },
     "forms": {
       "en": "Forms",
       "fr": "Formulaires"
     },
+    "groupSettings": {
+      "en": "Group Settings",
+      "fr": "Paramètres du groupe"
+    },
     "interactive": {
       "en": "Interactive Tasks",
       "fr": "Tâches interactives"
+    },
+    "pageTitle": {
+      "en": "Manage Group",
+      "fr": "Gestion du groupe"
     }
   }
 }

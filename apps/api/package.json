@@ -9,7 +9,7 @@
     "dev": "NODE_ENV=development env-cmd -f ../../.env node scripts/dev.js",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "preview": "env-cmd -f ../../.env --use-shell 'NODE_OPTIONS=\"--enable-source-maps\" API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=production ESBUILD_BINARY_PATH=dist/bin/esbuild GATEWAY_SITE_ADDRESS=http://localhost:$GATEWAY_DEV_SERVER_PORT tsx dist/app.mjs'"
+    "preview": "env-cmd -f ../../.env --use-shell 'NODE_OPTIONS=\"--enable-source-maps\" API_PROD_SERVER_PORT=$API_DEV_SERVER_PORT NODE_ENV=production ESBUILD_BINARY_PATH=dist/bin/esbuild GATEWAY_SITE_ADDRESS=http://localhost:$GATEWAY_DEV_SERVER_PORT node dist/app.mjs'"
   },
   "dependencies": {
     "@casl/ability": "^6.7.1",
@@ -28,14 +28,15 @@
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/throttler": "^5.1.2",
     "@opendatacapture/crypto": "workspace:*",
-    "@opendatacapture/prisma-client": "workspace:*",
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-library": "workspace:*",
+    "@opendatacapture/prisma-client": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/stats": "workspace:*",
+    "@opendatacapture/subject-utils": "workspace:*",
     "axios": "^1.6.8",
     "express": "^4.19.2",
     "lodash-es": "^4.17.21",
