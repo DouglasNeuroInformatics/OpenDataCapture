@@ -17,7 +17,7 @@
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^build", "^db:generate", "db:push"],
       "persistent": true
     },
     "format": {},
@@ -26,14 +26,14 @@
       "outputs": ["dist/**"]
     },
     "lint": {
-      "dependsOn": ["^build", "^db:generate"]
+      "dependsOn": ["^build", "^db:generate", "db:push"]
     },
     "preview": {
       "dependsOn": ["build", "inject"],
       "persistent": true
     },
     "test:e2e": {
-      "dependsOn": ["^build", "^db:generate"]
+      "dependsOn": ["^build", "^db:generate", "db:push"]
     }
   }
 }
