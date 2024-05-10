@@ -30,6 +30,8 @@ RUN pnpm dlx turbo build --filter=@opendatacapture/api
 FROM base AS runner
 COPY --from=installer /app/apps/api/dist/ /app/dist/
 COPY --from=installer /app/apps/api/public/ /app/public/
+COPY --from=installer /app/apps/api/dist/runtime/ /runtime/
 RUN echo '{ "type": "module" }' > package.json
+RUN echo '{ "type": "module" }' > /runtime/package.json
 USER node
 CMD [ "node", "./dist/app.mjs" ]
