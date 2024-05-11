@@ -25,11 +25,24 @@ export default defineInstrument({
   },
   kind: 'INTERACTIVE',
   language: 'en',
-  measures: {},
+  measures: {
+    score: {
+      kind: 'const',
+      ref: 'score'
+    }
+  },
   name: 'CPP-MatrixReasoningTask',
   tags: ['CPP'],
   validationSchema: z.object({
-    results: z.array(z.any()),
+    results: z.array(
+      z.object({
+        correct: z.any(),
+        correctResponse: z.any(),
+        response: z.any(),
+        rt: z.any(),
+        type: z.any()
+      })
+    ),
     score: z.number()
   }),
   version: 1.0
