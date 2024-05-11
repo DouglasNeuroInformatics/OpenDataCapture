@@ -53,6 +53,7 @@ import img_sadB18 from './sadB-18.webp';
 import img_sadB20 from './sadB-20.webp';
 import img_sadB32 from './sadB-32.webp';
 import img_sadB25 from './sadB2-5.webp';
+import type { Data } from './index.ts';
 
 type Result = {
   accuracy: number;
@@ -60,7 +61,7 @@ type Result = {
   // It seems like NA is coded as 99 (SPSS lol)
   response: number | string;
   rt: number;
-  stimulus: any;
+  stimulus: string;
 };
 
 type Outcomes = {
@@ -90,7 +91,7 @@ type Outcomes = {
   emoRecog_sdRTc: null | number;
 };
 
-type DoneFunction = (data: { outcomes: Outcomes; results: Result[]; score: number }) => void;
+type DoneFunction = (data: Data) => void;
 
 export async function render(done: DoneFunction) {
   const { attachLoadingSlide, codeToKey, keyToCode, simulateKeyEvent } = await import(
