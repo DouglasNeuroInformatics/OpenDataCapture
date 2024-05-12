@@ -309,8 +309,8 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -476,8 +476,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.3.1)(react@18.3.1)
@@ -606,8 +606,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@headlessui/react':
         specifier: ^1.7.19
         version: 1.7.19(react-dom@18.3.1)(react@18.3.1)
@@ -798,8 +798,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -878,8 +878,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -1014,8 +1014,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
@@ -1112,8 +1112,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       autoprefixer:
         specifier: 10.x
         version: 10.4.19(postcss@8.4.38)
@@ -3257,9 +3257,9 @@ packages:
     dependencies:
       type-fest: 4.18.1
 
-  /@douglasneuroinformatics/libui@2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
+  /@douglasneuroinformatics/libui@2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-PMQSTW4a377abzduaJkGQGM/nnVoVsSgXErkY7VNqaTldCfk5bNJJcBBX+JQImD3xaDaPcbRf1SYeiMGF4jN5g== }
+      { integrity: sha512-Ab/bBEh/zrjOfsGfum7Gq0mhTgdFW2CySmNdo5bnnW0ym3Umo/Ch1cbSeumfd8k54ol30V0KwNKoaYnTPZQR1Q== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -3323,9 +3323,9 @@ packages:
       - typescript
     dev: false
 
-  /@douglasneuroinformatics/libui@2.5.1(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
+  /@douglasneuroinformatics/libui@2.5.2(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-PMQSTW4a377abzduaJkGQGM/nnVoVsSgXErkY7VNqaTldCfk5bNJJcBBX+JQImD3xaDaPcbRf1SYeiMGF4jN5g== }
+      { integrity: sha512-Ab/bBEh/zrjOfsGfum7Gq0mhTgdFW2CySmNdo5bnnW0ym3Umo/Ch1cbSeumfd8k54ol30V0KwNKoaYnTPZQR1Q== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
