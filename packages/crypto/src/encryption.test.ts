@@ -1,3 +1,5 @@
+import crypto from 'node:crypto';
+
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { AsymmetricEncryptionKeyPair, Decrypter, Encrypter, PrivateKey, PublicKey } from './encryption.js';
@@ -68,6 +70,13 @@ describe('Encrypter and Decrypter', () => {
     });
 
     it('decrypt should return original text', async () => {
+      const encrypted = await encrypter.encrypt(originalText);
+      const decrypted = await decrypter.decrypt(encrypted);
+      expect(decrypted).toBe(originalText);
+    });
+
+    it('should work with very large data', async () => {
+      const originalText = crypto.randomBytes(100000000).toString('hex');
       const encrypted = await encrypter.encrypt(originalText);
       const decrypted = await decrypter.decrypt(encrypted);
       expect(decrypted).toBe(originalText);
