@@ -51,7 +51,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  const dl = (option: 'CSV' | 'JSON') => {
+  const dl = (option: 'JSON' | 'TSV') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
       return;
@@ -70,10 +70,16 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       case 'JSON':
         void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(exportRecords, null, 2)));
         break;
-      case 'CSV':
-        void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(exportRecords[0]).join(',');
-          const rows = exportRecords.map((item) => Object.values(item).join(',')).join('\n');
+      case 'TSV':
+        void download(`${baseFilename}.tsv`, () => {
+          const columnNames = Object.keys(exportRecords[0]).join('\t');
+          const rows = exportRecords
+            .map((item) =>
+              Object.values(item)
+                .map((val) => JSON.stringify(val))
+                .join('\t')
+            )
+            .join('\n');
           return columnNames + '\n' + rows;
         });
     }

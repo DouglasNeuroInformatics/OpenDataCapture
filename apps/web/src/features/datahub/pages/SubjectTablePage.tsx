@@ -42,7 +42,7 @@ export const SubjectTablePage = () => {
               <ActionDropdown
                 widthFull
                 disabled={!instrumentId}
-                options={['CSV', 'JSON']}
+                options={['TSV', 'JSON']}
                 title={t('core:download')}
                 triggerClassName="min-w-32"
                 onSelection={dl}
@@ -52,6 +52,7 @@ export const SubjectTablePage = () => {
         </div>
       </div>
       <ClientTable
+        noWrap
         columns={[
           {
             field: '__date__',
