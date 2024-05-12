@@ -496,6 +496,9 @@ importers:
       '@opendatacapture/instrument-runtime-env':
         specifier: workspace:*
         version: link:../../packages/instrument-runtime-env
+      '@opendatacapture/json-utils':
+        specifier: workspace:*
+        version: link:../../packages/json-utils
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -995,6 +998,12 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
+
+  packages/json-utils:
+    dependencies:
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
 
   packages/licenses: {}
 

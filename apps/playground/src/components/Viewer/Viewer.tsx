@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import { replacer } from '@opendatacapture/json-utils';
 import { ErrorBoundary } from 'react-error-boundary';
 import { P, match } from 'ts-pattern';
 
@@ -25,7 +26,7 @@ export const Viewer = () => {
               options={{ validate: true }}
               onSubmit={(data) => {
                 // eslint-disable-next-line no-alert
-                alert(JSON.stringify({ _message: 'The following data will be submitted', data }, null, 2));
+                alert(JSON.stringify({ _message: 'The following data will be submitted', data }, replacer, 2));
               }}
             />
           </ErrorBoundary>

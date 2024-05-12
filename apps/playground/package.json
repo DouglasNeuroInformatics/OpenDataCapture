@@ -20,6 +20,7 @@
     "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
     "@opendatacapture/instrument-runtime-env": "workspace:*",
+    "@opendatacapture/json-utils": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
