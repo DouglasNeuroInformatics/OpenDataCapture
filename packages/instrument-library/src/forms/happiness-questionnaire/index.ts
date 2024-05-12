@@ -77,6 +77,38 @@ export default defineInstrument({
           variant: 'textarea'
         };
       }
+    },
+    causesOfDissatisfaction: {
+      deps: ['isSatisfiedOverall'],
+      kind: 'dynamic',
+      render: (data) => {
+        if (data.isSatisfiedOverall !== false) {
+          return null;
+        }
+        return {
+          label: {
+            en: 'Which of the following are causes of your dissatisfaction? ',
+            fr: "Parmi les causes suivantes, lesquelles sont à l'origine de votre insatisfaction ? "
+          },
+          isRequired: false,
+          kind: 'set',
+          variant: 'listbox',
+          options: {
+            en: {
+              EXISTENTIAL_CRISIS: 'Existential Crisis',
+              FRIENDS: 'Friends',
+              ROMANTIC_PARTNER: 'Romantic Partner',
+              MONEY: 'Money'
+            },
+            fr: {
+              EXISTENTIAL_CRISIS: 'Crise existentielle',
+              FRIENDS: 'Amis',
+              ROMANTIC_PARTNER: 'Partenaire romantique',
+              MONEY: "L'argent"
+            }
+          }
+        };
+      }
     }
   },
   details: {
@@ -128,12 +160,15 @@ export default defineInstrument({
       personalLifeSatisfaction: z.number().int().gte(1).lte(10),
       professionalLifeSatisfaction: z.number().int().gte(1).lte(10),
       isSatisfiedOverall: z.boolean(),
-      reasonNotSatisfied: z.string().optional()
+      reasonNotSatisfied: z.string().optional(),
+      causesOfDissatisfaction: z.set(z.enum(['MONEY', 'FRIENDS', 'ROMANTIC_PARTNER', 'EXISTENTIAL_CRISIS'])).optional()
     })
-    .refine((arg) => {
-      if (arg.isSatisfiedOverall) {
-        return true;
+    .superRefine((arg, ctx) => {
+      if (!arg.isSatisfiedOverall && !arg.reasonNotSatisfied) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'This field is required / Ce champ est obligatoire'
+        });
       }
-      return Boolean(arg.reasonNotSatisfied);
-    }, 'This field is required / Ce champ est obligatoire')
+    })
 });
