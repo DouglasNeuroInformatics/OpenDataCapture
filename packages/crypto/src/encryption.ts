@@ -1,11 +1,9 @@
 import { Aes128Gcm, CipherSuite, DhkemP256HkdfSha256, HkdfSha256 } from '@hpke/core';
 
-import { SerializableUint8Array } from './utils.js';
-
 type DecryptParams = {
-  cipherText: ArrayBufferLike;
+  cipherText: Uint8Array;
   privateKey: CryptoKey;
-  symmetricKey: ArrayBufferLike;
+  symmetricKey: Uint8Array;
 };
 
 type EncryptParams = {
@@ -14,8 +12,8 @@ type EncryptParams = {
 };
 
 type EncryptResult = {
-  cipherText: ArrayBufferLike;
-  symmetricKey: ArrayBufferLike;
+  cipherText: Uint8Array;
+  symmetricKey: Uint8Array;
 };
 
 export class HybridCrypto {
@@ -40,8 +38,8 @@ export class HybridCrypto {
       recipientPublicKey: publicKey
     });
     return {
-      cipherText: await sender.seal(this.encoder.encode(plainText)),
-      symmetricKey: sender.enc
+      cipherText: new Uint8Array(await sender.seal(this.encoder.encode(plainText))),
+      symmetricKey: new Uint8Array(sender.enc)
     };
   }
 
@@ -51,8 +49,8 @@ export class HybridCrypto {
 
   static async serializeKeyPair({ privateKey, publicKey }: CryptoKeyPair) {
     return {
-      privateKey: new SerializableUint8Array(await this.suite.kem.serializePrivateKey(privateKey)),
-      publicKey: new SerializableUint8Array(await this.suite.kem.serializePublicKey(publicKey))
+      privateKey: new Uint8Array(await this.suite.kem.serializePrivateKey(privateKey)),
+      publicKey: new Uint8Array(await this.suite.kem.serializePublicKey(publicKey))
     };
   }
 }
