@@ -28,7 +28,10 @@ export const SubjectGraphPage = () => {
   const params = useParams();
   const { instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
     useInstrumentVisualization({
-      params: { subjectId: params.subjectId! }
+      params: {
+        kind: 'FORM',
+        subjectId: params.subjectId!
+      }
     });
   const { t } = useTranslation(['datahub', 'common', 'core']);
   const measureOptions = useMeasureOptions(instrument);

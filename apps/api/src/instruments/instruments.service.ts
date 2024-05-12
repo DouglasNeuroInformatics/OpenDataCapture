@@ -112,8 +112,8 @@ export class InstrumentsService {
 
   async findSummaries(
     query: {
-      hasRecords?: boolean;
       kind?: InstrumentKind;
+      subjectId?: string;
     } = {},
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentSummary[]> {
@@ -123,9 +123,11 @@ export class InstrumentsService {
         AND: [
           {
             kind: query.kind,
-            records: query.hasRecords
+            records: query.subjectId
               ? {
-                  some: {}
+                  some: {
+                    subjectId: query.subjectId
+                  }
                 }
               : undefined
           },

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualFormInstrument, InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { omit } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +18,7 @@ export type InstrumentVisualizationRecord = {
 
 export type UseInstrumentVisualizationOptions = {
   params: {
+    kind?: InstrumentKind;
     subjectId: string;
   };
 };
@@ -34,15 +35,17 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
 
-  const instrument: AnyUnilingualFormInstrument | null = useInstrument(instrumentId, { kind: 'FORM' });
+  const instrument: AnyUnilingualFormInstrument | null = useInstrument(instrumentId);
 
-  const instrumentSummariesQuery = useInstrumentSummariesQuery({ params: { hasRecords: true, kind: 'FORM' } });
+  const instrumentSummariesQuery = useInstrumentSummariesQuery({
+    params: { kind: params.kind, subjectId: params.subjectId }
+  });
   const recordsQuery = useInstrumentRecords({
     enabled: instrumentId !== null,
     params: {
       groupId: currentGroup?.id,
       instrumentId: instrumentId!,
-      kind: 'FORM',
+      kind: params.kind,
       minDate: minDate ?? undefined,
       subjectId: params.subjectId
     }
