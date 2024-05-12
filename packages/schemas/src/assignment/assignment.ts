@@ -23,7 +23,8 @@ export const $Assignment = $BaseModel.extend({
 export type RemoteAssignment = z.infer<typeof $RemoteAssignment>;
 export const $RemoteAssignment = $Assignment.omit({ updatedAt: true }).extend({
   encryptedData: $Uint8Array.nullable(),
-  instrumentBundle: z.string()
+  instrumentBundle: z.string(),
+  symmetricKey: $Uint8Array.nullable()
 });
 
 /** The DTO transferred from the web client to the core API when creating an assignment */
@@ -37,7 +38,7 @@ export const $CreateAssignmentData = z.object({
 
 /** The DTO transferred from the core API to the external gateway when creating an assignment */
 export type CreateRemoteAssignmentInputData = z.input<typeof $CreateRemoteAssignmentData>;
-export const $CreateRemoteAssignmentData = $RemoteAssignment.omit({ encryptedData: true }).extend({
+export const $CreateRemoteAssignmentData = $RemoteAssignment.omit({ encryptedData: true, symmetricKey: true }).extend({
   publicKey: $Uint8Array
 });
 

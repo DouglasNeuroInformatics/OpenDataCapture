@@ -1,4 +1,4 @@
-import { Encrypter } from '@opendatacapture/crypto';
+import { type EncryptResult, HybridCrypto } from '@opendatacapture/crypto';
 import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { AssignmentStatus, MutateAssignmentResponseBody } from '@opendatacapture/schemas/assignment';
 import { Router } from 'express';
@@ -22,11 +22,12 @@ router.get(
       }
     });
     return res.status(200).json(
-      assignments.map(({ encryptedData, ...assignment }) => {
+      assignments.map(({ encryptedData, symmetricKey, ...assignment }) => {
         return {
           ...assignment,
           encryptedData: encryptedData ? Array.from(encryptedData) : null,
-          status: assignment.status as AssignmentStatus
+          status: assignment.status as AssignmentStatus,
+          symmetricKey: symmetricKey ? Array.from(symmetricKey) : null
         };
       })
     );
@@ -69,15 +70,22 @@ router.patch(
     }
     const { data, expiresAt, status } = result.data;
     const publicKey = await assignment.getPublicKey();
-    const encrypter = new Encrypter(publicKey);
-    const encryptedData = data ? Buffer.from(await encrypter.encrypt(JSON.stringify(data))) : null;
+
+    let encryptResult: EncryptResult | null = null;
+    if (!encryptResult) {
+      encryptResult = await HybridCrypto.encrypt({
+        plainText: JSON.stringify(data),
+        publicKey
+      });
+    }
 
     await prisma.remoteAssignmentModel.update({
       data: {
         completedAt: result.data.data ? new Date() : undefined,
-        encryptedData,
+        encryptedData: encryptResult ? Buffer.from(encryptResult.cipherText) : null,
         expiresAt,
-        status: data ? ('COMPLETE' satisfies AssignmentStatus) : status
+        status: data ? ('COMPLETE' satisfies AssignmentStatus) : status,
+        symmetricKey: encryptResult ? Buffer.from(encryptResult.symmetricKey) : null
       },
       where: {
         id: assignment.id

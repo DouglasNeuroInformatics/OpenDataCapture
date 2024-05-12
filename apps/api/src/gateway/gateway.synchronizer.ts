@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
-import { Decrypter } from '@opendatacapture/crypto';
+import { HybridCrypto } from '@opendatacapture/crypto';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import { $Json } from '@opendatacapture/schemas/core';
 
@@ -36,15 +36,26 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       throw new Error(`Data is undefined for completed remote assignment with id '${remoteAssignment.id}'`);
     }
     const assignment = await this.assignmentsService.findById(remoteAssignment.id);
-    const decrypter = await Decrypter.fromRaw(assignment.encryptionKeyPair.privateKey);
 
     const completedAt = remoteAssignment.completedAt;
+    const symmetricKey = remoteAssignment.symmetricKey;
     if (!completedAt) {
-      this.logger.error(`Field 'completedAt' is '${typeof completedAt}' for assignment '${assignment.id}'`);
+      this.logger.error(`Field 'completedAt' is null for assignment '${assignment.id}'`);
+      return;
+    } else if (!symmetricKey) {
+      this.logger.error(`Field 'symmetricKey' is null for assignment '${assignment.id}'`);
       return;
     }
 
-    const data = await $Json.parseAsync(JSON.parse(await decrypter.decrypt(remoteAssignment.encryptedData)));
+    const data = await $Json.parseAsync(
+      JSON.parse(
+        await HybridCrypto.decrypt({
+          cipherText: remoteAssignment.encryptedData,
+          privateKey: await HybridCrypto.deserializePrivateKey(assignment.encryptionKeyPair.privateKey),
+          symmetricKey
+        })
+      )
+    );
 
     const session = await this.sessionsService.create({
       date: completedAt,

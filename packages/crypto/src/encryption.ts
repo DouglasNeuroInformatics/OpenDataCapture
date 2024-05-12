@@ -1,17 +1,17 @@
 import { Aes128Gcm, CipherSuite, DhkemP256HkdfSha256, HkdfSha256 } from '@hpke/core';
 
-type DecryptParams = {
+export type DecryptParams = {
   cipherText: Uint8Array;
   privateKey: CryptoKey;
   symmetricKey: Uint8Array;
 };
 
-type EncryptParams = {
+export type EncryptParams = {
   plainText: string;
   publicKey: CryptoKey;
 };
 
-type EncryptResult = {
+export type EncryptResult = {
   cipherText: Uint8Array;
   symmetricKey: Uint8Array;
 };
@@ -33,6 +33,14 @@ export class HybridCrypto {
     return this.decoder.decode(await recipient.open(cipherText));
   }
 
+  static async deserializePrivateKey(privateKey: ArrayBufferLike) {
+    return this.suite.kem.deserializePrivateKey(privateKey);
+  }
+
+  static async deserializePublicKey(publicKey: ArrayBufferLike) {
+    return this.suite.kem.deserializePublicKey(publicKey);
+  }
+
   static async encrypt({ plainText, publicKey }: EncryptParams): Promise<EncryptResult> {
     const sender = await this.suite.createSenderContext({
       recipientPublicKey: publicKey
@@ -49,8 +57,16 @@ export class HybridCrypto {
 
   static async serializeKeyPair({ privateKey, publicKey }: CryptoKeyPair) {
     return {
-      privateKey: new Uint8Array(await this.suite.kem.serializePrivateKey(privateKey)),
-      publicKey: new Uint8Array(await this.suite.kem.serializePublicKey(publicKey))
+      privateKey: await this.serializePrivateKey(privateKey),
+      publicKey: await this.serializePublicKey(publicKey)
     };
+  }
+
+  static async serializePrivateKey(privateKey: CryptoKey) {
+    return new Uint8Array(await this.suite.kem.serializePrivateKey(privateKey));
+  }
+
+  static async serializePublicKey(publicKey: CryptoKey) {
+    return new Uint8Array(await this.suite.kem.serializePublicKey(publicKey));
   }
 }
