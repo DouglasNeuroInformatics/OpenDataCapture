@@ -1,1 +1,1 @@
-export { z } from 'zod@3.23.6';
+export { z } from 'zod__3.23.6';
