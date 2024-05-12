@@ -1,163 +1,58 @@
+import { Aes128Gcm, CipherSuite, DhkemP256HkdfSha256, HkdfSha256 } from '@hpke/core';
+
 import { SerializableUint8Array } from './utils.js';
 
-const ALGORITHM_NAME = 'RSA-OAEP';
-
-abstract class EncryptionKey<T extends string> {
-  static algorithm = {
-    hash: 'SHA-512',
-    modulusLength: 4096,
-    name: ALGORITHM_NAME,
-    publicExponent: new Uint8Array([1, 0, 1])
-  };
-
-  constructor(public cryptoKey: CryptoKey) {}
-
-  async toBuffer(): Promise<Buffer> {
-    return Buffer.from(await this.toRaw());
-  }
-
-  async toJSON() {
-    return Array.from(await this.toRaw());
-  }
-
-  abstract __type: T;
-
-  abstract toRaw(): Promise<SerializableUint8Array>;
-}
-
-type EncryptionKeyConstructor<T extends string> = {
-  fromRaw: (key: Uint8Array) => Promise<EncryptionKey<T>>;
-  new (cryptoKey: CryptoKey): EncryptionKey<T>;
+type DecryptParams = {
+  cipherText: ArrayBufferLike;
+  privateKey: CryptoKey;
+  symmetricKey: ArrayBufferLike;
 };
 
-export type PublicEncryptionKey = EncryptionKey<'PUBLIC'>;
-
-export const PublicKey: EncryptionKeyConstructor<'PUBLIC'> = class
-  extends EncryptionKey<'PUBLIC'>
-  implements PublicEncryptionKey
-{
-  __type = 'PUBLIC' as const;
-  static async fromRaw(key: Uint8Array) {
-    return new this(await globalThis.crypto.subtle.importKey('spki', key, this.algorithm, true, ['encrypt']));
-  }
-  async toRaw() {
-    return new SerializableUint8Array(await globalThis.crypto.subtle.exportKey('spki', this.cryptoKey));
-  }
+type EncryptParams = {
+  plainText: string;
+  publicKey: CryptoKey;
 };
 
-export type PrivateEncryptionKey = EncryptionKey<'PRIVATE'>;
-
-export const PrivateKey: EncryptionKeyConstructor<'PRIVATE'> = class
-  extends EncryptionKey<'PRIVATE'>
-  implements PrivateEncryptionKey
-{
-  __type = 'PRIVATE' as const;
-  static async fromRaw(key: Uint8Array) {
-    return new this(await globalThis.crypto.subtle.importKey('pkcs8', key, this.algorithm, true, ['decrypt']));
-  }
-  async toRaw() {
-    return new SerializableUint8Array(await globalThis.crypto.subtle.exportKey('pkcs8', this.cryptoKey));
-  }
+type EncryptResult = {
+  cipherText: ArrayBufferLike;
+  symmetricKey: ArrayBufferLike;
 };
 
-export class AsymmetricEncryptionKeyPair {
-  privateKey: PrivateEncryptionKey;
-  publicKey: PublicEncryptionKey;
+export class HybridCrypto {
+  private static decoder = new TextDecoder();
+  private static encoder = new TextEncoder();
+  private static suite = new CipherSuite({
+    aead: new Aes128Gcm(),
+    kdf: new HkdfSha256(),
+    kem: new DhkemP256HkdfSha256()
+  });
 
-  constructor({ privateKey, publicKey }: { privateKey: PrivateEncryptionKey; publicKey: PublicEncryptionKey }) {
-    this.privateKey = privateKey;
-    this.publicKey = publicKey;
-  }
-
-  static async fromRaw({ privateKey, publicKey }: { privateKey: Uint8Array; publicKey: Uint8Array }) {
-    return new this({
-      privateKey: await PrivateKey.fromRaw(privateKey),
-      publicKey: await PublicKey.fromRaw(publicKey)
+  static async decrypt({ cipherText, privateKey, symmetricKey }: DecryptParams): Promise<string> {
+    const recipient = await this.suite.createRecipientContext({
+      enc: symmetricKey,
+      recipientKey: privateKey
     });
+    return this.decoder.decode(await recipient.open(cipherText));
   }
 
-  static async generate() {
-    const cryptoKeys = await globalThis.crypto.subtle.generateKey(EncryptionKey.algorithm, true, [
-      'encrypt',
-      'decrypt'
-    ]);
-    return new this({
-      privateKey: new PrivateKey(cryptoKeys.privateKey),
-      publicKey: new PublicKey(cryptoKeys.publicKey)
+  static async encrypt({ plainText, publicKey }: EncryptParams): Promise<EncryptResult> {
+    const sender = await this.suite.createSenderContext({
+      recipientPublicKey: publicKey
     });
-  }
-
-  async toBuffer() {
     return {
-      privateKey: await this.privateKey.toBuffer(),
-      publicKey: await this.publicKey.toBuffer()
+      cipherText: await sender.seal(this.encoder.encode(plainText)),
+      symmetricKey: sender.enc
     };
   }
 
-  async toJSON() {
+  static async generateKeyPair() {
+    return this.suite.kem.generateKeyPair();
+  }
+
+  static async serializeKeyPair({ privateKey, publicKey }: CryptoKeyPair) {
     return {
-      privateKey: await this.privateKey.toJSON(),
-      publicKey: await this.publicKey.toJSON()
+      privateKey: new SerializableUint8Array(await this.suite.kem.serializePrivateKey(privateKey)),
+      publicKey: new SerializableUint8Array(await this.suite.kem.serializePublicKey(publicKey))
     };
-  }
-
-  async toRaw() {
-    return {
-      privateKey: await this.privateKey.toRaw(),
-      publicKey: await this.publicKey.toRaw()
-    };
-  }
-}
-
-export class Encrypter {
-  private textEncoder = new TextEncoder();
-
-  constructor(private publicKey: PublicEncryptionKey) {}
-
-  static async fromRaw(publicKey: Uint8Array) {
-    return new this(await PublicKey.fromRaw(publicKey));
-  }
-
-  /**
-   * Encrypts a string using the public key
-   *
-   * @param text - The text to be encrypted.
-   * @return A promise that resolves to the encrypted data
-   */
-  async encrypt(text: string): Promise<SerializableUint8Array> {
-    const encoded = this.textEncoder.encode(text);
-    const arrayBuffer = await globalThis.crypto.subtle.encrypt(
-      { name: ALGORITHM_NAME },
-      this.publicKey.cryptoKey,
-      encoded
-    );
-    return new SerializableUint8Array(arrayBuffer);
-  }
-}
-
-export class Decrypter {
-  private textDecoder = new TextDecoder();
-
-  constructor(private privateKey: PrivateEncryptionKey) {}
-
-  static async fromRaw(privateKey: Uint8Array) {
-    return new this(await PrivateKey.fromRaw(privateKey));
-  }
-
-  /**
-   * Decrypts the encrypted data using the private key.
-   *
-   * @param data - The data to be decrypted.
-   * @returns A promise that resolves to the decrypted string.
-   */
-  async decrypt(data: Uint8Array): Promise<string> {
-    const decrypted = await globalThis.crypto.subtle.decrypt(
-      {
-        name: ALGORITHM_NAME
-      },
-      this.privateKey.cryptoKey,
-      data
-    );
-    return this.textDecoder.decode(decrypted);
   }
 }

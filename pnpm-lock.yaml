@@ -769,7 +769,11 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(vite@5.2.11)
 
-  packages/crypto: {}
+  packages/crypto:
+    dependencies:
+      '@hpke/core':
+        specifier: ^1.2.7
+        version: 1.2.7
 
   packages/demo:
     dependencies:
@@ -3815,6 +3819,12 @@ packages:
       react: '>= 16'
     dependencies:
       react: 18.3.1
+    dev: false
+
+  /@hpke/core@1.2.7:
+    resolution:
+      { integrity: sha512-wEbNmyZ2qtFSNnnhkZV/vJi7BnMKYDjQNxiaktJP68rfVTVcgRnsO6o4+59kzX2OrgEbEKWSp7mNSUJeJU5ncQ== }
+    engines: { node: '>=16.0.0' }
     dev: false
 
   /@humanwhocodes/config-array@0.11.14:
