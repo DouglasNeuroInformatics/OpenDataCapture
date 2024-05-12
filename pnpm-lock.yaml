@@ -814,9 +814,6 @@ importers:
 
   packages/instrument-bundler:
     dependencies:
-      '@opendatacapture/runtime-v1':
-        specifier: workspace:*
-        version: link:../../runtime/v1
       commander:
         specifier: ^12.0.0
         version: 12.0.0
@@ -832,6 +829,9 @@ importers:
       ts-pattern:
         specifier: ^5.1.1
         version: 5.1.1
+      tsx:
+        specifier: 4.x
+        version: 4.8.2
       zod:
         specifier: ^3.22.5
         version: 3.23.6
@@ -842,6 +842,9 @@ importers:
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../instrument-stubs
+      '@opendatacapture/runtime-v1':
+        specifier: workspace:*
+        version: link:../../runtime/v1
 
   packages/instrument-interpreter:
     dependencies:
@@ -12866,7 +12869,6 @@ packages:
       { integrity: sha512-ZvkrzoUA0PQZM6fy6+/Hce561s+faD1rsNwhnO5FelNjyy7EMGJ3Rz1AQ8GYDWjhRs/7dBLOEJvhK8MiEJOAFg== }
     dependencies:
       resolve-pkg-maps: 1.0.0
-    dev: true
 
   /get-uri@6.0.3:
     resolution:
@@ -18576,7 +18578,6 @@ packages:
   /resolve-pkg-maps@1.0.0:
     resolution:
       { integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw== }
-    dev: true
 
   /resolve@1.22.8:
     resolution:
@@ -20287,7 +20288,6 @@ packages:
       get-tsconfig: 4.7.3
     optionalDependencies:
       fsevents: 2.3.3
-    dev: true
 
   /tunnel-agent@0.6.0:
     resolution:
