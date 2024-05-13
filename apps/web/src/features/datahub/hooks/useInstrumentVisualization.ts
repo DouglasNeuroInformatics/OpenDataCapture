@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualFormInstrument, InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { omit } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +18,7 @@ export type InstrumentVisualizationRecord = {
 
 export type UseInstrumentVisualizationOptions = {
   params: {
+    kind?: InstrumentKind;
     subjectId: string;
   };
 };
@@ -34,21 +35,23 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
 
-  const instrument: AnyUnilingualFormInstrument | null = useInstrument(instrumentId, { kind: 'FORM' });
+  const instrument: AnyUnilingualFormInstrument | null = useInstrument(instrumentId);
 
-  const instrumentSummariesQuery = useInstrumentSummariesQuery({ params: { hasRecords: true, kind: 'FORM' } });
+  const instrumentSummariesQuery = useInstrumentSummariesQuery({
+    params: { kind: params.kind, subjectId: params.subjectId }
+  });
   const recordsQuery = useInstrumentRecords({
     enabled: instrumentId !== null,
     params: {
       groupId: currentGroup?.id,
       instrumentId: instrumentId!,
-      kind: 'FORM',
+      kind: params.kind,
       minDate: minDate ?? undefined,
       subjectId: params.subjectId
     }
   });
 
-  const dl = (option: 'CSV' | 'JSON') => {
+  const dl = (option: 'JSON' | 'TSV') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
       return;
@@ -67,10 +70,16 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       case 'JSON':
         void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(exportRecords, null, 2)));
         break;
-      case 'CSV':
-        void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(exportRecords[0]).join(',');
-          const rows = exportRecords.map((item) => Object.values(item).join(',')).join('\n');
+      case 'TSV':
+        void download(`${baseFilename}.tsv`, () => {
+          const columnNames = Object.keys(exportRecords[0]).join('\t');
+          const rows = exportRecords
+            .map((item) =>
+              Object.values(item)
+                .map((val) => JSON.stringify(val))
+                .join('\t')
+            )
+            .join('\n');
           return columnNames + '\n' + rows;
         });
     }

@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { AsymmetricEncryptionKeyPair } from '@opendatacapture/crypto';
+import { HybridCrypto } from '@opendatacapture/crypto';
 import type { Assignment, UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -32,11 +32,14 @@ export class AssignmentsService {
   }
 
   async create({ expiresAt, groupId, instrumentId, subjectId }: CreateAssignmentDto): Promise<Assignment> {
-    const encryptionKeyPair = await AsymmetricEncryptionKeyPair.generate();
+    const { privateKey, publicKey } = await HybridCrypto.generateKeyPair();
     const id = crypto.randomUUID();
     const assignment = await this.assignmentModel.create({
       data: {
-        encryptionKeyPair: await encryptionKeyPair.toBuffer(),
+        encryptionKeyPair: {
+          privateKey: Buffer.from(await HybridCrypto.serializePrivateKey(privateKey)),
+          publicKey: Buffer.from(await HybridCrypto.serializePublicKey(publicKey))
+        },
         expiresAt,
         group: groupId
           ? {
@@ -61,7 +64,7 @@ export class AssignmentsService {
       }
     });
     try {
-      await this.gatewayService.createRemoteAssignment(assignment, encryptionKeyPair.publicKey);
+      await this.gatewayService.createRemoteAssignment(assignment, publicKey);
     } catch (err) {
       await this.assignmentModel.delete({ where: { id } });
       throw err;

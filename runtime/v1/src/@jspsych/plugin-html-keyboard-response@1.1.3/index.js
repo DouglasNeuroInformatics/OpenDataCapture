@@ -1,1 +1,1 @@
-export * from '@jspsych/plugin-html-keyboard-response@1.1.3';
+export * from '@jspsych/plugin-html-keyboard-response__1.1.3';

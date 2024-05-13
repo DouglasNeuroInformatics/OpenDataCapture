@@ -46,9 +46,9 @@ export class InstrumentsController {
   async findSummaries(
     @CurrentUser('ability') ability: AppAbility,
     @Query('kind') kind?: InstrumentKind,
-    @Query('hasRecords') hasRecords?: boolean
+    @Query('subjectId') subjectId?: string
   ): Promise<InstrumentSummary[]> {
-    return this.instrumentsService.findSummaries({ hasRecords, kind }, { ability });
+    return this.instrumentsService.findSummaries({ kind, subjectId }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Instrument' })

@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import type { PublicEncryptionKey } from '@opendatacapture/crypto';
+import { HybridCrypto } from '@opendatacapture/crypto';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import type {
   Assignment,
@@ -20,15 +20,12 @@ export class GatewayService {
     private readonly instrumentsService: InstrumentsService
   ) {}
 
-  async createRemoteAssignment(
-    assignment: Assignment,
-    publicKey: PublicEncryptionKey
-  ): Promise<MutateAssignmentResponseBody> {
+  async createRemoteAssignment(assignment: Assignment, publicKey: CryptoKey): Promise<MutateAssignmentResponseBody> {
     const instrument = await this.instrumentsService.findById(assignment.instrumentId);
     const response = await this.httpService.axiosRef.post(`/api/assignments`, {
       ...assignment,
       instrumentBundle: instrument.bundle,
-      publicKey: await publicKey.toJSON()
+      publicKey: Array.from(await HybridCrypto.serializePublicKey(publicKey))
     } satisfies CreateRemoteAssignmentInputData);
     if (response.status !== HttpStatus.CREATED) {
       throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {

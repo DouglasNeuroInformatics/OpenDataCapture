@@ -21,6 +21,7 @@ model RemoteAssignmentModel {
   instrumentBundle String
   instrumentId     String
   rawPublicKey     Bytes
+  symmetricKey     Bytes?
   encryptedData    Bytes?
   status           String
   subjectId        String

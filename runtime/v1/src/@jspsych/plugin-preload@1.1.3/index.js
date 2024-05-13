@@ -1,1 +1,1 @@
-export * from '@jspsych/plugin-preload@1.1.3';
+export * from '@jspsych/plugin-preload__1.1.3';

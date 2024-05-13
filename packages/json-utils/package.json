@@ -1,8 +1,7 @@
 {
-  "name": "@opendatacapture/crypto",
+  "name": "@opendatacapture/json-utils",
   "type": "module",
   "version": "0.0.0",
-  "description": "Wrappers for the Web Crypto API",
   "license": "LGPL-3.0",
   "exports": {
     ".": "./src/index.ts"
@@ -12,6 +11,6 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
-    "@hpke/core": "^1.2.7"
+    "@douglasneuroinformatics/libjs": "^0.3.1"
   }
 }

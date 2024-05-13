@@ -4,7 +4,9 @@ import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useWindowSize } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
+import { replacer } from '@opendatacapture/json-utils';
 import { ErrorFallback } from '@opendatacapture/react-core';
+import type { Json } from '@opendatacapture/schemas/core';
 import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { FileCheckIcon, MonitorIcon, PrinterIcon } from 'lucide-react';
@@ -23,7 +25,7 @@ export type InstrumentRendererProps<TKind extends InstrumentKind> = {
   bundle: string;
   className?: string;
   customErrorFallback?: React.FC<{ error: Error }>;
-  onSubmit: (data: unknown) => Promisable<void>;
+  onSubmit: (data: Json) => Promisable<void>;
   options?: InterpretOptions<TKind>;
   subject?: SubjectDisplayInfo;
 };
@@ -84,7 +86,7 @@ export const InstrumentRenderer = <TKind extends InstrumentKind>({
   }, [height, width]);
 
   async function handleSubmit<T>(data: T) {
-    await onSubmit(data);
+    await onSubmit(JSON.parse(JSON.stringify(data, replacer)) as Json);
     updateIndex('increment');
     setData(data);
   }

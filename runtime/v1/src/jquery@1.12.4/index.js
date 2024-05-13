@@ -1,6 +1,6 @@
 /* global $ */
 
-import 'jquery@1.12.4';
+import 'jquery__1.12.4';
 
 window.$ = window.jQuery = $;
 

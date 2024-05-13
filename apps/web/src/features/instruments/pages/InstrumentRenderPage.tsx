@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import type { Json } from '@opendatacapture/schemas/core';
 import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
 import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
@@ -34,9 +35,8 @@ export const InstrumentRenderPage = () => {
     }
   }, [currentSession?.id]);
 
-  const handleSubmit = async (data: unknown) => {
+  const handleSubmit = async (data: Json) => {
     await axios.post('/v1/instrument-records', {
-      // @ts-expect-error - better than no safety for now
       data,
       date: new Date(),
       groupId: currentGroup?.id,

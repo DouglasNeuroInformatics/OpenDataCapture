@@ -1,1 +1,1 @@
-export * from '@jspsych/plugin-image-keyboard-response@1.1.3';
+export * from '@jspsych/plugin-image-keyboard-response__1.1.3';

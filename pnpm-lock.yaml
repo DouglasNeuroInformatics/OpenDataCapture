@@ -309,8 +309,8 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -476,8 +476,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.3.1)(react@18.3.1)
@@ -606,8 +606,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@headlessui/react':
         specifier: ^1.7.19
         version: 1.7.19(react-dom@18.3.1)(react@18.3.1)
@@ -769,7 +769,11 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(vite@5.2.11)
 
-  packages/crypto: {}
+  packages/crypto:
+    dependencies:
+      '@hpke/core':
+        specifier: ^1.2.7
+        version: 1.2.7
 
   packages/demo:
     dependencies:
@@ -794,8 +798,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -814,9 +818,6 @@ importers:
 
   packages/instrument-bundler:
     dependencies:
-      '@opendatacapture/runtime-v1':
-        specifier: workspace:*
-        version: link:../../runtime/v1
       commander:
         specifier: ^12.0.0
         version: 12.0.0
@@ -832,6 +833,9 @@ importers:
       ts-pattern:
         specifier: ^5.1.1
         version: 5.1.1
+      tsx:
+        specifier: 4.x
+        version: 4.8.2
       zod:
         specifier: ^3.22.5
         version: 3.23.6
@@ -842,6 +846,9 @@ importers:
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../instrument-stubs
+      '@opendatacapture/runtime-v1':
+        specifier: workspace:*
+        version: link:../../runtime/v1
 
   packages/instrument-interpreter:
     dependencies:
@@ -871,8 +878,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -885,6 +892,9 @@ importers:
       '@opendatacapture/instrument-utils':
         specifier: workspace:*
         version: link:../instrument-utils
+      '@opendatacapture/json-utils':
+        specifier: workspace:*
+        version: link:../json-utils
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -989,6 +999,12 @@ importers:
         specifier: ^4.17.12
         version: 4.17.12
 
+  packages/json-utils:
+    dependencies:
+      '@douglasneuroinformatics/libjs':
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.4.5)
+
   packages/licenses: {}
 
   packages/prisma-client:
@@ -1007,8 +1023,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
@@ -1105,8 +1121,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.1
-        version: 2.5.1(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5)
       autoprefixer:
         specifier: 10.x
         version: 10.4.19(postcss@8.4.38)
@@ -1141,13 +1157,13 @@ importers:
 
   runtime/v1:
     devDependencies:
-      '@jspsych/plugin-html-keyboard-response@1.1.3':
+      '@jspsych/plugin-html-keyboard-response__1.1.3':
         specifier: npm:@jspsych/plugin-html-keyboard-response@1.1.3
         version: /@jspsych/plugin-html-keyboard-response@1.1.3(jspsych@7.3.4)
-      '@jspsych/plugin-image-keyboard-response@1.1.3':
+      '@jspsych/plugin-image-keyboard-response__1.1.3':
         specifier: npm:@jspsych/plugin-image-keyboard-response@1.1.3
         version: /@jspsych/plugin-image-keyboard-response@1.1.3(jspsych@7.3.4)
-      '@jspsych/plugin-preload@1.1.3':
+      '@jspsych/plugin-preload__1.1.3':
         specifier: npm:@jspsych/plugin-preload@1.1.3
         version: /@jspsych/plugin-preload@1.1.3(jspsych@7.3.4)
       '@opendatacapture/evaluate-instrument':
@@ -1174,25 +1190,19 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^11.1.6
         version: 11.1.6(rollup@4.17.2)(typescript@5.4.5)
-      '@types/react-dom@18.3.1':
-        specifier: npm:@types/react-dom@18.3.0
-        version: /@types/react-dom@18.3.0
-      '@types/react@18.3.1':
-        specifier: npm:@types/react@18.3.1
-        version: /@types/react@18.3.1
-      jquery@1.12.4:
+      jquery__1.12.4:
         specifier: npm:jquery@1.12.4
         version: /jquery@1.12.4
-      jspsych@7.3.4:
+      jspsych__7.3.4:
         specifier: npm:jspsych@7.3.4
         version: /jspsych@7.3.4
-      lodash-es@4.17.21:
+      lodash-es__4.17.21:
         specifier: npm:lodash-es@4.17.21
         version: /lodash-es@4.17.21
-      react-dom@18.3.1:
+      react-dom__18.3.1:
         specifier: npm:react-dom@18.3.1
         version: /react-dom@18.3.1(react@18.3.1)
-      react@18.3.1:
+      react__18.3.1:
         specifier: npm:react@18.3.1
         version: /react@18.3.1
       rollup:
@@ -1201,7 +1211,7 @@ importers:
       rollup-plugin-dts:
         specifier: ^6.1.0
         version: 6.1.0(rollup@4.17.2)(typescript@5.4.5)
-      zod@3.23.6:
+      zod__3.23.6:
         specifier: npm:zod@3.23.6
         version: /zod@3.23.6
 
@@ -3256,9 +3266,9 @@ packages:
     dependencies:
       type-fest: 4.18.1
 
-  /@douglasneuroinformatics/libui@2.5.1(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
+  /@douglasneuroinformatics/libui@2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-PMQSTW4a377abzduaJkGQGM/nnVoVsSgXErkY7VNqaTldCfk5bNJJcBBX+JQImD3xaDaPcbRf1SYeiMGF4jN5g== }
+      { integrity: sha512-Ab/bBEh/zrjOfsGfum7Gq0mhTgdFW2CySmNdo5bnnW0ym3Umo/Ch1cbSeumfd8k54ol30V0KwNKoaYnTPZQR1Q== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -3322,9 +3332,9 @@ packages:
       - typescript
     dev: false
 
-  /@douglasneuroinformatics/libui@2.5.1(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
+  /@douglasneuroinformatics/libui@2.5.2(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.3)(typescript@5.4.5):
     resolution:
-      { integrity: sha512-PMQSTW4a377abzduaJkGQGM/nnVoVsSgXErkY7VNqaTldCfk5bNJJcBBX+JQImD3xaDaPcbRf1SYeiMGF4jN5g== }
+      { integrity: sha512-Ab/bBEh/zrjOfsGfum7Gq0mhTgdFW2CySmNdo5bnnW0ym3Umo/Ch1cbSeumfd8k54ol30V0KwNKoaYnTPZQR1Q== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -3818,6 +3828,12 @@ packages:
       react: '>= 16'
     dependencies:
       react: 18.3.1
+    dev: false
+
+  /@hpke/core@1.2.7:
+    resolution:
+      { integrity: sha512-wEbNmyZ2qtFSNnnhkZV/vJi7BnMKYDjQNxiaktJP68rfVTVcgRnsO6o4+59kzX2OrgEbEKWSp7mNSUJeJU5ncQ== }
+    engines: { node: '>=16.0.0' }
     dev: false
 
   /@humanwhocodes/config-array@0.11.14:
@@ -12866,7 +12882,6 @@ packages:
       { integrity: sha512-ZvkrzoUA0PQZM6fy6+/Hce561s+faD1rsNwhnO5FelNjyy7EMGJ3Rz1AQ8GYDWjhRs/7dBLOEJvhK8MiEJOAFg== }
     dependencies:
       resolve-pkg-maps: 1.0.0
-    dev: true
 
   /get-uri@6.0.3:
     resolution:
@@ -18576,7 +18591,6 @@ packages:
   /resolve-pkg-maps@1.0.0:
     resolution:
       { integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw== }
-    dev: true
 
   /resolve@1.22.8:
     resolution:
@@ -20287,7 +20301,6 @@ packages:
       get-tsconfig: 4.7.3
     optionalDependencies:
       fsevents: 2.3.3
-    dev: true
 
   /tunnel-agent@0.6.0:
     resolution:

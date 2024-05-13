@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 
 type UseInstrumentSummariesQueryOptions<TKind extends InstrumentKind> = {
   params?: {
-    hasRecords?: boolean;
     kind?: TKind;
+    subjectId?: string;
   };
 };
 
@@ -24,6 +24,6 @@ export function useInstrumentSummariesQuery<TKind extends InstrumentKind>({
       const summaries = await $InstrumentSummary.array().parseAsync(response.data);
       return summaries.map((summary) => translateInstrumentSummary(summary, i18n.resolvedLanguage ?? 'en'));
     },
-    queryKey: ['instrument-summaries', params?.kind]
+    queryKey: ['instrument-summaries', params?.kind, params?.subjectId]
   });
 }

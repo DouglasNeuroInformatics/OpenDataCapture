@@ -1,4 +1,4 @@
-import React from 'react@18.3.1';
+import React from 'react__18.3.1';
 
 const {
   Children,

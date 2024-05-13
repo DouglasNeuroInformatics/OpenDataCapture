@@ -1,7 +1,7 @@
 {
   "name": "@opendatacapture/runtime-v1",
   "type": "module",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0",
   "author": {
     "name": "Douglas Neuroinformatics",
     "email": "support@douglasneuroinformatics.ca"
@@ -28,9 +28,9 @@
     "lint": "tsc && eslint --fix src"
   },
   "devDependencies": {
-    "@jspsych/plugin-html-keyboard-response@1.1.3": "npm:@jspsych/plugin-html-keyboard-response@1.1.3",
-    "@jspsych/plugin-image-keyboard-response@1.1.3": "npm:@jspsych/plugin-image-keyboard-response@1.1.3",
-    "@jspsych/plugin-preload@1.1.3": "npm:@jspsych/plugin-preload@1.1.3",
+    "@jspsych/plugin-html-keyboard-response__1.1.3": "npm:@jspsych/plugin-html-keyboard-response@1.1.3",
+    "@jspsych/plugin-image-keyboard-response__1.1.3": "npm:@jspsych/plugin-image-keyboard-response@1.1.3",
+    "@jspsych/plugin-preload__1.1.3": "npm:@jspsych/plugin-preload@1.1.3",
     "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -39,15 +39,13 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/react-dom@18.3.1": "npm:@types/react-dom@18.3.0",
-    "@types/react@18.3.1": "npm:@types/react@18.3.1",
-    "jquery@1.12.4": "npm:jquery@1.12.4",
-    "jspsych@7.3.4": "npm:jspsych@7.3.4",
-    "lodash-es@4.17.21": "npm:lodash-es@4.17.21",
-    "react-dom@18.3.1": "npm:react-dom@18.3.1",
-    "react@18.3.1": "npm:react@18.3.1",
+    "jquery__1.12.4": "npm:jquery@1.12.4",
+    "jspsych__7.3.4": "npm:jspsych@7.3.4",
+    "lodash-es__4.17.21": "npm:lodash-es@4.17.21",
+    "react-dom__18.3.1": "npm:react-dom@18.3.1",
+    "react__18.3.1": "npm:react@18.3.1",
     "rollup": "^4.14.3",
     "rollup-plugin-dts": "^6.1.0",
-    "zod@3.23.6": "npm:zod@3.23.6"
+    "zod__3.23.6": "npm:zod@3.23.6"
   }
 }
