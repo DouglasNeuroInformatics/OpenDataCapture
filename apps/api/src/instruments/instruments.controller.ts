@@ -9,6 +9,7 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
+import { CreateInstrumentFromBundleDto } from './dto/create-instrument-from-bundle.dto';
 import { InstrumentsService } from './instruments.service';
 
 @ApiTags('Instruments')
@@ -21,6 +22,13 @@ export class InstrumentsController {
   @RouteAccess({ action: 'create', subject: 'Instrument' })
   create(@Body() data: CreateInstrumentDto): Promise<unknown> {
     return this.instrumentsService.create(data);
+  }
+
+  @ApiOperation({ summary: 'Create Instrument From Bundle' })
+  @Post('bundle')
+  @RouteAccess({ action: 'create', subject: 'Instrument' })
+  createFromBundle(@Body() data: CreateInstrumentFromBundleDto): Promise<unknown> {
+    return this.instrumentsService.createFromBundle(data.bundle, { kind: data.kind });
   }
 
   @ApiOperation({ summary: 'Find All Instruments' })
