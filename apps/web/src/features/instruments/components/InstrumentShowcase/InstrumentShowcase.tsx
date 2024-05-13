@@ -37,7 +37,7 @@ export const InstrumentsShowcase = () => {
   useEffect(() => {
     setFilteredInstruments(
       instrumentSummariesQuery.data.filter((summary) => {
-        if (!currentGroup?.accessibleInstrumentIds.includes(summary.id)) {
+        if (currentGroup && !currentGroup?.accessibleInstrumentIds.includes(summary.id)) {
           return false;
         }
         const matchesSearch = summary.details.title.toUpperCase().includes(searchTerm.toUpperCase());
