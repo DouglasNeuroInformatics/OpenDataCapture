@@ -6,6 +6,7 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import { Branding } from '@opendatacapture/react-core';
 import type { UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { Json } from '@opendatacapture/schemas/core';
 import axios from 'axios';
 
 import './services/axios';
@@ -25,7 +26,7 @@ export const Root = ({ bundle, id, token }: RootProps) => {
     ref.current!.style.display = 'flex';
   }, []);
 
-  const handleSubmit = async (data: string) => {
+  const handleSubmit = async (data: Json) => {
     await axios.patch(
       `/api/assignments/${id}`,
       {
