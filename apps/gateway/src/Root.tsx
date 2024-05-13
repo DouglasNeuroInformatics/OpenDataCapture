@@ -25,11 +25,11 @@ export const Root = ({ bundle, id, token }: RootProps) => {
     ref.current!.style.display = 'flex';
   }, []);
 
-  const handleSubmit = async (data: unknown) => {
+  const handleSubmit = async (data: string) => {
     await axios.patch(
       `/api/assignments/${id}`,
       {
-        data: data as UpdateAssignmentData['data'],
+        data,
         status: 'COMPLETE'
       } satisfies UpdateAssignmentData,
       {

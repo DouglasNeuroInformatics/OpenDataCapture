@@ -26,6 +26,7 @@
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
+    "@opendatacapture/json-utils": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",

@@ -496,9 +496,6 @@ importers:
       '@opendatacapture/instrument-runtime-env':
         specifier: workspace:*
         version: link:../../packages/instrument-runtime-env
-      '@opendatacapture/json-utils':
-        specifier: workspace:*
-        version: link:../../packages/json-utils
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -895,6 +892,9 @@ importers:
       '@opendatacapture/instrument-utils':
         specifier: workspace:*
         version: link:../instrument-utils
+      '@opendatacapture/json-utils':
+        specifier: workspace:*
+        version: link:../json-utils
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses

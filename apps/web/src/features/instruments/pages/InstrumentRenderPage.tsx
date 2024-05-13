@@ -34,9 +34,8 @@ export const InstrumentRenderPage = () => {
     }
   }, [currentSession?.id]);
 
-  const handleSubmit = async (data: unknown) => {
+  const handleSubmit = async (data: string) => {
     await axios.post('/v1/instrument-records', {
-      // @ts-expect-error - better than no safety for now
       data,
       date: new Date(),
       groupId: currentGroup?.id,
