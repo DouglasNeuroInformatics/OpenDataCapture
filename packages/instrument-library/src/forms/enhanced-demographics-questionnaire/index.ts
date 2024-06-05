@@ -593,12 +593,14 @@ const yesNoOptions = /** @type {const} */ {
 export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  name: 'EnhancedDemographicsQuestionnaire',
+  internal: {
+    edition: 1,
+    name: 'ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE'
+  },
   tags: {
     en: ['Demographics'],
     fr: ['Démographie']
   },
-  version: 1,
   content: [
     {
       fields: {

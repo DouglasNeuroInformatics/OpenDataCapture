@@ -43,12 +43,18 @@ export class InstrumentsService {
   async createFromBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
     const instance = await this.interpretBundle(bundle, options);
 
-    this.logger.debug(`Checking if instrument '${instance.name}' exists...`);
-    if (await this.instrumentModel.exists({ name: instance.name })) {
-      throw new ConflictException(`Instrument with name '${instance.name}' already exists!`);
+    this.logger.debug(
+      `Checking if instrument '${instance.internal.name}' edition '${instance.internal.edition}' exists...`
+    );
+    if (await this.instrumentModel.exists({ internal: instance.internal })) {
+      throw new ConflictException(
+        `Instrument with name '${instance.internal.name}' and edition '${instance.internal.edition}' already exists!`
+      );
     }
 
-    this.logger.debug(`Instrument '${instance.name}' does not exist`);
+    this.logger.debug(
+      `Instrument with name '${instance.internal.name}' and edition '${instance.internal.edition}' does not exist`
+    );
 
     /**
      * After upgrading TypeScript from v5.3 to 5.4, the type of string | { en: string, fr: string }
@@ -66,7 +72,7 @@ export class InstrumentsService {
           instructions: instance.details.instructions as Prisma.InputJsonValue,
           title: instance.details.title as Prisma.InputJsonValue
         },
-        id: this.generateInstrumentId(instance)
+        id: this.generateInstrumentId(instance.internal)
       }
     });
   }
@@ -118,7 +124,7 @@ export class InstrumentsService {
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentSummary[]> {
     return this.instrumentModel.findMany({
-      select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
+      select: { details: true, id: true, internal: true, kind: true, language: true, tags: true },
       where: {
         AND: [
           {
@@ -137,8 +143,8 @@ export class InstrumentsService {
     }) as Promise<InstrumentSummary[]>;
   }
 
-  generateInstrumentId({ name, version }: { name: string; version: number }) {
-    return this.cryptoService.hash(`${name}-${version}`);
+  generateInstrumentId({ edition, name }: { edition: number; name: string }) {
+    return this.cryptoService.hash(`${name}-${edition}`);
   }
 
   private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {

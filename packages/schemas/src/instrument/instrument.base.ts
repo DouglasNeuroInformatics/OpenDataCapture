@@ -194,6 +194,13 @@ export type BaseInstrument<TData = any, TLanguage extends InstrumentLanguage = I
 
   id?: string;
 
+  internal: {
+    /** The internal version of the instrument (a positive integer) */
+    edition: number;
+    /** The name of the instrument, which must be unique for a given edition */
+    name: string;
+  };
+
   /** The discriminator key for the type of instrument */
   kind: InstrumentKind;
 
@@ -203,30 +210,26 @@ export type BaseInstrument<TData = any, TLanguage extends InstrumentLanguage = I
   /** Arbitrary measures derived from the data */
   measures: InstrumentMeasures<TData, TLanguage> | null;
 
-  /** The name of the instrument, which must be unique for a given version */
-  name: string;
-
   /** A list of tags that users can use to filter instruments */
   tags: InstrumentUIOption<TLanguage, string[]>;
 
   /** The zod validation schema for the instrument data */
   validationSchema: z.ZodType<TData>;
-
-  /** The version of the instrument */
-  version: number;
 };
 
 export const $BaseInstrument = z.object({
   content: z.any(),
   details: $InstrumentDetails,
   id: z.string().optional(),
+  internal: z.object({
+    edition: z.number().int().positive(),
+    name: z.string().min(1)
+  }),
   kind: $InstrumentKind,
   language: $InstrumentLanguage,
   measures: $InstrumentMeasures.nullable(),
-  name: z.string().min(1),
   tags: $$InstrumentUIOption(z.array(z.string().min(1))),
-  validationSchema: $ZodTypeAny,
-  version: z.number()
+  validationSchema: $ZodTypeAny
 }) satisfies z.ZodType<BaseInstrument>;
 
 export const $UnilingualBaseInstrument = $BaseInstrument.extend({

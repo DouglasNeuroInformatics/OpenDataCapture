@@ -10,9 +10,11 @@ import './styles.css';
 export default defineInstrument({
   kind: 'INTERACTIVE',
   language: 'en',
-  name: '<PLACEHOLDER>',
+  internal: {
+    edition: 1,
+    name: '<PLACEHOLDER>'
+  },
   tags: ['<PLACEHOLDER>'],
-  version: 1.0,
   content: {
     render(done) {
       const logo = document.createElement('img');

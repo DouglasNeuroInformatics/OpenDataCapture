@@ -28,7 +28,7 @@ export const useAppStore = create(
         name: 'app',
         partialize: (state) => pick(state, ['instruments', 'selectedInstrument', 'settings']),
         storage: createJSONStorage(() => localStorage),
-        version: 0
+        version: 1
       }
     )
   )

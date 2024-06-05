@@ -6,12 +6,14 @@ const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  name: 'HAPPINESS_QUESTIONNAIRE',
+  internal: {
+    edition: 1,
+    name: 'HAPPINESS_QUESTIONNAIRE'
+  },
   tags: {
     en: ['Well-Being'],
     fr: ['Bien-être']
   },
-  version: 1.0,
   content: [
     {
       title: {

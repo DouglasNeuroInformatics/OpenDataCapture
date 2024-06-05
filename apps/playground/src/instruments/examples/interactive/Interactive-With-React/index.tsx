@@ -23,6 +23,10 @@ export default defineInstrument({
     license: 'AGPL-3.0',
     title: 'React Click Task'
   },
+  internal: {
+    edition: 1,
+    name: 'INTERACTIVE_INSTRUMENT'
+  },
   kind: 'INTERACTIVE',
   language: 'en',
   measures: {
@@ -32,10 +36,9 @@ export default defineInstrument({
       ref: 'count'
     }
   },
-  name: 'InteractiveInstrument',
+
   tags: ['Interactive'],
   validationSchema: z.object({
     count: z.number().int()
-  }),
-  version: 1.0
+  })
 });

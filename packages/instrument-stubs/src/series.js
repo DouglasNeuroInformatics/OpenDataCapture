@@ -8,9 +8,11 @@ export const seriesInstrument = await createInstrumentStub(async () => {
   return {
     kind: 'SERIES',
     language: 'en',
-    name: 'series-instrument',
     tags: ['Example', 'Useless'],
-    version: 1.0,
+    internal: {
+      edition: 1,
+      name: 'SERIES_INSTRUMENT'
+    },
     content: {
       ids: []
     },

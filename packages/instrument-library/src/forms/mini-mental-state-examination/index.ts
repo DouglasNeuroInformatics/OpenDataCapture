@@ -6,12 +6,15 @@ const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  name: 'MiniMentalStateExamination',
+
   tags: {
     en: ['Cognitive'],
     fr: ['Cognitif']
   },
-  version: 1,
+  internal: {
+    edition: 1,
+    name: 'MINI_MENTAL_STATE_EXAMINATION'
+  },
   content: [
     {
       fields: {

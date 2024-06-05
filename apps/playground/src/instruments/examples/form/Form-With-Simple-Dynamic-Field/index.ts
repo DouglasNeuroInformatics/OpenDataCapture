@@ -6,9 +6,11 @@ const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 export default defineInstrument({
   kind: 'FORM',
   language: 'en',
-  name: 'FAVORITE_COLOR',
+  internal: {
+    edition: 1,
+    name: 'FAVORITE_COLOR'
+  },
   tags: ['Dynamic'],
-  version: 1.0,
   content: {
     hasFavoriteColor: {
       kind: 'boolean',

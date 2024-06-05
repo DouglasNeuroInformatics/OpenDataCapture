@@ -47,6 +47,10 @@
     "en": "Download",
     "fr": "Télécharger"
   },
+  "edition": {
+    "en": "Edition",
+    "fr": "Édition"
+  },
   "editor": {
     "keyboardShortcuts": {
       "format": {
