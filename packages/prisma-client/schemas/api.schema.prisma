@@ -118,23 +118,28 @@ type InstrumentDetails {
   title             Json
 }
 
+type InstrumentInternal {
+  name    String
+  edition Float
+}
+
 model InstrumentModel {
-  createdAt   DateTime                @default(now()) @db.Date
-  updatedAt   DateTime                @updatedAt @db.Date
-  id          String                  @id @map("_id")
+  createdAt   DateTime           @default(now()) @db.Date
+  updatedAt   DateTime           @updatedAt @db.Date
+  id          String             @id @map("_id")
   assignments AssignmentModel[]
   bundle      String
   details     InstrumentDetails
-  groups      GroupModel[]            @relation(fields: [groupIds], references: [id])
-  groupIds    String[]                @db.ObjectId
+  groups      GroupModel[]       @relation(fields: [groupIds], references: [id])
+  groupIds    String[]           @db.ObjectId
+  internal    InstrumentInternal
   kind        InstrumentKind
   /// Language | Language[]
   language    Json
-  name        String
+
   /// string[] | Record<Language, string[]>
-  tags        Json
-  edition     Float
-  records     InstrumentRecordModel[]
+  tags    Json
+  records InstrumentRecordModel[]
 }
 
 // Subjects

@@ -30,9 +30,11 @@ const programmingLanguageKnowledgeFields = Object.fromEntries(
 export default defineInstrument({
   kind: 'FORM',
   language: 'en',
-  name: 'PROGRAMMING_LANGUAGE_COMPETENCY',
+  internal: {
+    edition: 1,
+    name: 'PROGRAMMING_LANGUAGE_COMPETENCY'
+  },
   tags: ['Dynamic'],
-  edition: 1,
   content: {
     ...programmingLanguageKnowledgeFields
   },

@@ -8,9 +8,11 @@ import './legacy.js';
 export default defineInstrument({
   kind: 'INTERACTIVE',
   language: 'en',
-  name: 'INTERACTIVE_WITH_LEGACY_SCRIPT',
+  internal: {
+    edition: 1,
+    name: 'INTERACTIVE_WITH_LEGACY_SCRIPT'
+  },
   tags: ['Legacy', 'Internet Explorer 6'],
-  edition: 1,
   content: {
     render(done) {
       const button = document.createElement('button');

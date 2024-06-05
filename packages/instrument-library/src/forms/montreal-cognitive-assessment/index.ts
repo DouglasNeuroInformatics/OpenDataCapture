@@ -6,12 +6,15 @@ const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  name: 'MONTREAL_COGNITIVE_ASSESSMENT_8.1',
+
   tags: {
     en: ['Cognitive'],
     fr: ['Cognitif']
   },
-  edition: 1,
+  internal: {
+    edition: 1,
+    name: 'MONTREAL_COGNITIVE_ASSESSMENT_8.1'
+  },
   content: {
     abstraction: {
       kind: 'number',

@@ -112,7 +112,7 @@ export class DemoService {
           subjectData: subject,
           type: 'IN_PERSON'
         });
-        this.logger.debug(`Creating dummy records for form ${hq.name}`);
+
         for (let i = 0; i < 10; i++) {
           const isSatisfiedOverall = faker.datatype.boolean();
           const [min, max] = isSatisfiedOverall ? [5, 10] : [1, 5];
@@ -128,7 +128,7 @@ export class DemoService {
             data: data as Json,
             date: faker.date.past({ years: 2 }),
             groupId: group.id,
-            instrumentId: this.instrumentsService.generateInstrumentId(hq),
+            instrumentId: this.instrumentsService.generateInstrumentId(hq.internal),
             sessionId: session.id,
             subjectId: subject.id
           });

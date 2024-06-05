@@ -23,7 +23,10 @@ export default defineInstrument({
     license: 'CC-BY-SA-4.0',
     title: 'Pattern Completion Test'
   },
-  edition: 1,
+  internal: {
+    edition: 1,
+    name: 'CPP_MATRIX_REASONING_TASK'
+  },
   kind: 'INTERACTIVE',
   language: 'en',
   measures: {
@@ -32,7 +35,6 @@ export default defineInstrument({
       ref: 'score'
     }
   },
-  name: 'CPP_MATRIX_REASONING_TASK',
   tags: ['CPP'],
   validationSchema: z.object({
     results: z.array(

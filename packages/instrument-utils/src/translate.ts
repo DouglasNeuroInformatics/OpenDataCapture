@@ -286,11 +286,10 @@ export function translateInstrumentSummary(
       license: summary.details.license,
       title: summary.details.title[targetLanguage]
     },
-    edition: summary.edition,
     id: summary.id,
+    internal: summary.internal,
     kind: summary.kind,
     language: targetLanguage,
-    name: summary.name,
     tags: summary.tags[targetLanguage]
   };
 }

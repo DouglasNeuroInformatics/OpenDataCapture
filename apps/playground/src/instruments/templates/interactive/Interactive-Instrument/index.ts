@@ -6,9 +6,12 @@ const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 export default defineInstrument({
   kind: 'INTERACTIVE',
   language: 'en',
-  name: '<PLACEHOLDER>',
+
   tags: ['<PLACEHOLDER>'],
-  edition: 1,
+  internal: {
+    edition: 1,
+    name: '<PLACEHOLDER>'
+  },
   content: {
     render(done) {
       const button = document.createElement('button');

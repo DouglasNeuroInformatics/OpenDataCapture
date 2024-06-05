@@ -6,9 +6,11 @@ const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 export default defineInstrument({
   kind: 'FORM',
   language: 'en',
-  name: '<PLACEHOLDER>',
   tags: ['<PLACEHOLDER>'],
-  edition: 1,
+  internal: {
+    name: '<PLACEHOLDER>',
+    edition: 1
+  },
   content: {},
   details: {
     description: '<PLACEHOLDER>',
