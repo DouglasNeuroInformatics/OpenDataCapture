@@ -594,8 +594,8 @@ export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
   internal: {
-    name: 'EnhancedDemographicsQuestionnaire',
-    edition: 1
+    edition: 1,
+    name: 'ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE'
   },
   tags: {
     en: ['Demographics'],

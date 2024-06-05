@@ -12,8 +12,8 @@ export default defineInstrument({
     fr: ['Bien-être']
   },
   internal: {
-    name: 'HAPPINESS_QUESTIONNAIRE',
-    edition: 1
+    edition: 1,
+    name: 'HAPPINESS_QUESTIONNAIRE'
   },
   content: {
     personalLifeSatisfaction: {

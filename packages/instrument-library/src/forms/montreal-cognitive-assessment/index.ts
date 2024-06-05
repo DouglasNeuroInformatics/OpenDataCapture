@@ -117,8 +117,8 @@ export default defineInstrument({
     },
     license: 'UNLICENSED',
     title: {
-      en: 'Montreal Cognitive Assessment (8.1)',
-      fr: 'Montreal Cognitive Assessment (8.1)'
+      en: 'Montreal Cognitive Assessment (v8.1)',
+      fr: 'Montreal Cognitive Assessment (v8.1)'
     }
   },
   measures: {

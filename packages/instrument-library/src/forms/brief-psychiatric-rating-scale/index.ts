@@ -7,8 +7,8 @@ export default defineInstrument({
   kind: 'FORM',
   language: 'en',
   internal: {
-    name: 'BRIEF_PSYCHIATRIC_RATING_SCALE',
-    edition: 1
+    edition: 1,
+    name: 'BRIEF_PSYCHIATRIC_RATING_SCALE'
   },
   tags: ['Schizophrenia', 'Psychosis'],
   content: {

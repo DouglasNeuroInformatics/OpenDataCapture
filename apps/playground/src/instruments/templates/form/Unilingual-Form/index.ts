@@ -8,8 +8,8 @@ export default defineInstrument({
   language: 'en',
   tags: ['<PLACEHOLDER>'],
   internal: {
-    name: '<PLACEHOLDER>',
-    edition: 1
+    edition: 1,
+    name: '<PLACEHOLDER>'
   },
   content: {},
   details: {
