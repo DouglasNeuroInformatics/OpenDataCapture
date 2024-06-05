@@ -61,7 +61,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
 
     const baseFilename = `${currentUser!.username}_${instrument.name}_${
-      instrument.version
+      instrument.edition
     }_${new Date().toISOString()}`;
 
     const exportRecords = records.map((record) => omit(record, ['__date__', '__time__']));

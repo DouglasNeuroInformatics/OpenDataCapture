@@ -133,7 +133,7 @@ model InstrumentModel {
   name        String
   /// string[] | Record<Language, string[]>
   tags        Json
-  version     Float
+  edition     Float
   records     InstrumentRecordModel[]
 }
 

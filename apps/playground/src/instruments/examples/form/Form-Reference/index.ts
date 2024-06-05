@@ -8,7 +8,7 @@ export default defineInstrument({
   language: 'en',
   name: 'FORM_REFERENCE',
   tags: ['Reference'],
-  version: 1.0,
+  edition: 1,
   content: [
     {
       title: 'Boolean',

@@ -36,7 +36,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
   });
 
   const handleDownload = () => {
-    const filename = `${instrument.name}_v${instrument.version}_${new Date(timeCollected).toISOString()}.json`;
+    const filename = `${instrument.name}_${instrument.edition}_${new Date(timeCollected).toISOString()}.json`;
     void download(filename, () => JSON.stringify(data, null, 2));
   };
 
@@ -126,8 +126,8 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
             value: language
           },
           {
-            label: t('version'),
-            value: instrument.version
+            label: t('edition'),
+            value: instrument.edition
           }
         ]}
         title={t('instrument')}

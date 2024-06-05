@@ -60,11 +60,11 @@ export default defineInstrument({
     license: 'CC-BY-SA-4.0',
     title: 'Emotion Recognition Task'
   },
+  edition: 1,
   kind: 'INTERACTIVE',
   language: 'en',
   measures: {},
-  name: 'CPP-EmotionRecognitionTask',
+  name: 'CPP_EMOTION_RECOGNITION_TASK',
   tags: ['CPP'],
-  validationSchema: $Data,
-  version: 1.0
+  validationSchema: $Data
 });

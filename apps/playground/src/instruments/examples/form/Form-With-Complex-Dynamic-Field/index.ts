@@ -32,7 +32,7 @@ export default defineInstrument({
   language: 'en',
   name: 'PROGRAMMING_LANGUAGE_COMPETENCY',
   tags: ['Dynamic'],
-  version: 1.0,
+  edition: 1,
   content: {
     ...programmingLanguageKnowledgeFields
   },

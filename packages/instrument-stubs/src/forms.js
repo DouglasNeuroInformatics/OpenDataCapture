@@ -47,13 +47,13 @@ export const unilingualFormInstrument = await createInstrumentStub(async () => {
     },
     kind: 'FORM',
     language: 'en',
-    name: 'unilingual-form',
+    name: 'UNILINGUAL_FORM',
     tags: ['Example', 'Preferences'],
     validationSchema: z.object({
       favoriteNumber: z.number(),
       reasonFavoriteNumberIsNegative: z.string().optional()
     }),
-    version: 1.0
+    edition: 1
   };
 });
 
@@ -106,7 +106,7 @@ export const bilingualFormInstrument = await createInstrumentStub(async () => {
     },
     kind: 'FORM',
     language: ['en', 'fr'],
-    name: 'bilingual-form',
+    name: 'BILINGUAL_FORM',
     tags: {
       en: ['Example', 'Preferences'],
       fr: ['Exemple', 'Préférences']
@@ -116,6 +116,6 @@ export const bilingualFormInstrument = await createInstrumentStub(async () => {
       favoriteNumber: z.number(),
       reasonFavoriteNumberIsNegative: z.string().optional()
     }),
-    version: 1.0
+    edition: 1
   };
 });

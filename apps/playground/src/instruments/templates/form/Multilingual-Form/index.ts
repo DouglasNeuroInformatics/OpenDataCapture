@@ -11,7 +11,7 @@ export default defineInstrument({
     en: ['<PLACEHOLDER>'],
     fr: ['<PLACEHOLDER>']
   },
-  version: 1.0,
+  edition: 1,
   content: {},
   details: {
     description: {

@@ -598,7 +598,7 @@ export default defineInstrument({
     en: ['Demographics'],
     fr: ['Démographie']
   },
-  version: 1,
+  edition: 1,
   content: [
     {
       fields: {

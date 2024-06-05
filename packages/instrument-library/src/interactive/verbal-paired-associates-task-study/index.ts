@@ -19,11 +19,11 @@ export default defineInstrument({
     license: 'CC-BY-SA-4.0',
     title: 'Verbal Paired Associates Task'
   },
+  edition: 1,
   kind: 'INTERACTIVE',
   language: 'en',
   measures: {},
-  name: 'CPP-VerbalPairedAssociatesTaskStudy',
+  name: 'CPP_VERBAL_PAIRED_ASSOCIATES_STUDY',
   tags: ['CPP', 'Cognitive'],
-  validationSchema: z.object({ success: z.boolean() }),
-  version: 1.0
+  validationSchema: z.object({ success: z.boolean() })
 });

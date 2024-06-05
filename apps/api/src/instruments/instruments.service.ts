@@ -118,7 +118,7 @@ export class InstrumentsService {
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentSummary[]> {
     return this.instrumentModel.findMany({
-      select: { details: true, id: true, kind: true, language: true, name: true, tags: true, version: true },
+      select: { details: true, edition: true, id: true, kind: true, language: true, name: true, tags: true },
       where: {
         AND: [
           {
@@ -137,8 +137,8 @@ export class InstrumentsService {
     }) as Promise<InstrumentSummary[]>;
   }
 
-  generateInstrumentId({ name, version }: { name: string; version: number }) {
-    return this.cryptoService.hash(`${name}-${version}`);
+  generateInstrumentId({ edition, name }: { edition: number; name: string }) {
+    return this.cryptoService.hash(`${name}-${edition}`);
   }
 
   private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {

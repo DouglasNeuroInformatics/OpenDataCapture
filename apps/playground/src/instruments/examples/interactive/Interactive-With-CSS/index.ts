@@ -12,7 +12,7 @@ export default defineInstrument({
   language: 'en',
   name: '<PLACEHOLDER>',
   tags: ['<PLACEHOLDER>'],
-  version: 1.0,
+  edition: 1,
   content: {
     render(done) {
       const logo = document.createElement('img');

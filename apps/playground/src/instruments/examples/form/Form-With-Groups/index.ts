@@ -11,7 +11,7 @@ export default defineInstrument({
     en: ['Well-Being'],
     fr: ['Bien-être']
   },
-  version: 1.0,
+  edition: 1,
   content: [
     {
       title: {

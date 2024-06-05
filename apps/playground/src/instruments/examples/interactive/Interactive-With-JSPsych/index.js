@@ -136,11 +136,11 @@ export default defineInstrument({
     license: 'MIT',
     title: 'Reaction Time Task'
   },
+  edition: 1,
   kind: 'INTERACTIVE',
   language: 'en',
   measures: {},
-  name: 'ReactionTimeTask',
+  name: 'REACTION_TIME_TASK',
   tags: ['Interactive'],
-  validationSchema: z.any(),
-  version: 1.0
+  validationSchema: z.any()
 });

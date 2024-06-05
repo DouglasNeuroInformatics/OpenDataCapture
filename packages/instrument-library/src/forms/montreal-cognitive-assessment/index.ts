@@ -6,12 +6,12 @@ const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
-  name: 'MontrealCognitiveAssessment',
+  name: 'MONTREAL_COGNITIVE_ASSESSMENT_8.1',
   tags: {
     en: ['Cognitive'],
     fr: ['Cognitif']
   },
-  version: 8.1,
+  edition: 1,
   content: {
     abstraction: {
       kind: 'number',
@@ -114,8 +114,8 @@ export default defineInstrument({
     },
     license: 'UNLICENSED',
     title: {
-      en: 'Montreal Cognitive Assessment',
-      fr: 'Montreal Cognitive Assessment'
+      en: 'Montreal Cognitive Assessment (8.1)',
+      fr: 'Montreal Cognitive Assessment (8.1)'
     }
   },
   measures: {

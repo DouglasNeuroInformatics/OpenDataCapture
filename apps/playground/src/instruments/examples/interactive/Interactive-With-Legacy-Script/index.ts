@@ -10,7 +10,7 @@ export default defineInstrument({
   language: 'en',
   name: 'INTERACTIVE_WITH_LEGACY_SCRIPT',
   tags: ['Legacy', 'Internet Explorer 6'],
-  version: 1.0,
+  edition: 1,
   content: {
     render(done) {
       const button = document.createElement('button');

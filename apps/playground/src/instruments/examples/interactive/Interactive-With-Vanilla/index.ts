@@ -191,6 +191,7 @@ export default defineInstrument({
     sourceUrl: 'https://github.com/end3r/Gamedev-Canvas-workshop/tree/gh-pages',
     title: 'Breakout Task'
   },
+  edition: 1,
   kind: 'INTERACTIVE',
   language: 'en',
   measures: {
@@ -219,6 +220,5 @@ export default defineInstrument({
   validationSchema: z.object({
     livesRemaining: z.number().int(),
     timeElapsed: z.number()
-  }),
-  version: 1.0
+  })
 });

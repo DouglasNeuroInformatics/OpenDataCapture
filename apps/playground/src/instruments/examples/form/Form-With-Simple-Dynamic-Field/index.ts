@@ -8,7 +8,7 @@ export default defineInstrument({
   language: 'en',
   name: 'FAVORITE_COLOR',
   tags: ['Dynamic'],
-  version: 1.0,
+  edition: 1,
   content: {
     hasFavoriteColor: {
       kind: 'boolean',

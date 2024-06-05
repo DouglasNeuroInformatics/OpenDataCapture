@@ -8,9 +8,9 @@ export const interactiveInstrument = await createInstrumentStub(async () => {
   return {
     kind: 'INTERACTIVE',
     language: 'en',
-    name: 'interactive-instrument',
+    name: 'INTERACTIVE_INSTRUMENT',
     tags: ['Example', 'Useless'],
-    version: 1.0,
+    edition: 1,
     content: {
       render(done) {
         document.body.style.display = 'flex';

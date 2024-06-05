@@ -6,9 +6,9 @@ const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 export default defineInstrument({
   kind: 'FORM',
   language: 'en',
-  name: 'BriefPsychiatricRatingScale',
+  name: 'BRIEF_PSYCHIATRIC_RATING_SCALE',
   tags: ['Schizophrenia', 'Psychosis'],
-  version: 1,
+  edition: 1,
   content: {
     anxiety: {
       description:

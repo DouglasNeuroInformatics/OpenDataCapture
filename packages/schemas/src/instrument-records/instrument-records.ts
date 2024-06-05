@@ -34,8 +34,8 @@ export const $InstrumentRecord = $BaseModel.extend({
 export type InstrumentRecord = z.infer<typeof $InstrumentRecord>;
 
 export type InstrumentRecordsExport = {
+  instrumentEdition: number;
   instrumentName: string;
-  instrumentVersion: number;
   measure: string;
   sessionDate: string;
   sessionId: string;

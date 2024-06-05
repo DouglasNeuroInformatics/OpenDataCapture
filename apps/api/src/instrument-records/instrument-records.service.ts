@@ -128,8 +128,8 @@ export class InstrumentRecordsService {
 
         for (const [measureKey, measureValue] of Object.entries(measures)) {
           data.push({
+            instrumentEdition: record.instrument.edition,
             instrumentName: record.instrument.name,
-            instrumentVersion: record.instrument.version,
             measure: measureKey,
             sessionDate: session.date.toISOString(),
             sessionId: session.id,
