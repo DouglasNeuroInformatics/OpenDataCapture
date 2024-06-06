@@ -417,6 +417,9 @@ importers:
 
   apps/outreach:
     dependencies:
+      '@douglasneuroinformatics/libui':
+        specifier: ^2.5.2
+        version: 2.5.2(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas

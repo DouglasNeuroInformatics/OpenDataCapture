@@ -170,6 +170,7 @@ export default defineConfig({
       title: 'Open Data Capture'
     }),
     tailwind({
+      applyBaseStyles: false,
       configFile: path.resolve(import.meta.dirname, 'tailwind.config.cjs')
     })
   ],
