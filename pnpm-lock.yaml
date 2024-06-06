@@ -125,8 +125,8 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(i18next-browser-languagedetector@8.0.0)(i18next-http-backend@2.5.2)(i18next@23.11.5)(react-i18next@14.1.2)(vitest@1.6.0)
       tsx:
-        specifier: 4.12.0
-        version: 4.12.0
+        specifier: 4.8.2
+        version: 4.8.2
       turbo:
         specifier: ^1.13.2
         version: 1.13.4
@@ -20691,6 +20691,19 @@ packages:
       get-tsconfig: 4.7.5
     optionalDependencies:
       fsevents: 2.3.3
+    dev: false
+
+  /tsx@4.8.2:
+    resolution:
+      { integrity: sha512-hmmzS4U4mdy1Cnzpl/NQiPUC2k34EcNSTZYVJThYKhdqTwuBeF+4cG9KUK/PFQ7KHaAaYwqlb7QfmsE2nuj+WA== }
+    engines: { node: '>=18.0.0' }
+    hasBin: true
+    dependencies:
+      esbuild: 0.20.2
+      get-tsconfig: 4.7.5
+    optionalDependencies:
+      fsevents: 2.3.3
+    dev: true
 
   /tunnel-agent@0.6.0:
     resolution:
