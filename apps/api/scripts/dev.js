@@ -4,4 +4,6 @@ import { clean, outfile, watch } from './build.js';
 
 await clean();
 await watch();
-nodemon(outfile);
+nodemon({
+  script: outfile
+});

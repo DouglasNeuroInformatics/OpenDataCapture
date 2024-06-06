@@ -21,12 +21,12 @@
     "tsx": "4.x"
   },
   "dependencies": {
-    "commander": "^12.0.0",
-    "esbuild": "^0.20.2",
-    "esbuild-wasm": "^0.20.2",
-    "glob": "^10.3.12",
-    "ts-pattern": "^5.1.1",
-    "zod": "^3.22.5"
+    "commander": "^12.1.0",
+    "esbuild": "^0.21.4",
+    "esbuild-wasm": "^0.21.4",
+    "glob": "^10.4.1",
+    "ts-pattern": "^5.1.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@opendatacapture/instrument-runtime-env": "workspace:*",

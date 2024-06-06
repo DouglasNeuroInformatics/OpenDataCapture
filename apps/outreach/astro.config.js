@@ -104,13 +104,6 @@ export default defineConfig({
     assets: '_assets'
   },
   compressHTML: true,
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'fr'],
-    routing: {
-      prefixDefaultLocale: true
-    }
-  },
   image: {
     service: squooshImageService()
   },
@@ -177,6 +170,7 @@ export default defineConfig({
       title: 'Open Data Capture'
     }),
     tailwind({
+      applyBaseStyles: false,
       configFile: path.resolve(import.meta.dirname, 'tailwind.config.cjs')
     })
   ],

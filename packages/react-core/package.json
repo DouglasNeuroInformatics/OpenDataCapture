@@ -24,17 +24,17 @@
     "@douglasneuroinformatics/libui": "^2.5.2",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
-    "framer-motion": "^11.1.7",
-    "lucide-react": "^0.372.0",
-    "react-i18next": "^14.1.0",
-    "ts-pattern": "^5.1.1"
+    "framer-motion": "^11.2.10",
+    "lucide-react": "^0.390.0",
+    "react-i18next": "^14.1.2",
+    "ts-pattern": "^5.1.2"
   },
   "devDependencies": {
     "@opendatacapture/tailwindcss": "workspace:*",
-    "@types/react": "^18.2.79",
-    "@types/react-dom": "^18.2.25",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
-    "vite": "^5.2.9"
+    "vite": "^5.2.12"
   }
 }
