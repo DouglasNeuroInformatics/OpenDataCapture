@@ -104,13 +104,6 @@ export default defineConfig({
     assets: '_assets'
   },
   compressHTML: true,
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'fr'],
-    routing: {
-      prefixDefaultLocale: true
-    }
-  },
   image: {
     service: squooshImageService()
   },
