@@ -17,7 +17,11 @@ const { resolvedLanguage } = useTranslations(Astro.url);
 <div class:list={['flex items-center', className]}>
   <div class="flex-shrink-0">
     <span class="sr-only">{author.data.fullName}</span>
-    <Image alt={author.data.fullName} class="h-10 w-10 rounded-full" src={author.data.image} />
+    <Image
+      alt={author.data.fullName}
+      class="h-10 w-10 rounded-full bg-slate-200 shadow dark:bg-slate-700"
+      src={author.data.image}
+    />
   </div>
   <div class="ml-3">
     <p class="text-sm font-semibold">
