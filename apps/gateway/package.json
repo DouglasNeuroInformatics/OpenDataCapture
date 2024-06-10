@@ -28,8 +28,8 @@
     "express": "^4.19.2",
     "i18next": "^23.11.5",
     "lodash-es": "^4.17.21",
-    "pino-http": "^9.0.0",
-    "pino-pretty": "^10.3.1",
+    "pino-http": "^10.1.0",
+    "pino-pretty": "^11.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^14.1.2",
@@ -49,10 +49,10 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.7.0",
     "autoprefixer": "^10.4.19",
-    "esbuild": "^0.21.4",
+    "esbuild": "^0.21.5",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
-    "vite": "^5.2.12"
+    "vite": "^5.2.13"
   },
   "trustedDependencies": [
     "sqlite3"
