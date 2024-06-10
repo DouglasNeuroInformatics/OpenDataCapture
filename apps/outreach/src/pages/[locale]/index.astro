@@ -27,8 +27,8 @@ const resolveScreenshot = (filename: string, language: Language): Promise<ImageM
   });
 };
 
-const addVisit = await resolveScreenshot('add-visit.png', resolvedLanguage);
-const viewSubjects = await resolveScreenshot('view-subjects.png', resolvedLanguage);
+const startSession = await resolveScreenshot('start-session.png', resolvedLanguage);
+const dataHub = await resolveScreenshot('data-hub.png', resolvedLanguage);
 
 const testimonials = await getCollection('testimonials').then((testimonials) => ({
   simon: testimonials.find(({ id }) => id === 'simon-ducharme')!.data,
@@ -74,16 +74,16 @@ export const getStaticPaths = () => {
       <Hero class="rounded-md brightness-90" />
     </div>
   </Section>
-  <Section class="grid gap-8 lg:grid-cols-2" id="add-visit-section">
+  <Section class="grid gap-8 lg:grid-cols-2" id="start-session-section">
     <div class="flex flex-col justify-end lg:order-last lg:justify-center">
-      <span class="text-sm font-semibold uppercase tracking-wide">{t('landing.addVisit.subheading')}</span>
-      <h2 class="mt-3 text-3xl font-extrabold">{t('landing.addVisit.heading')}</h2>
+      <span class="text-sm font-semibold uppercase tracking-wide">{t('landing.startSession.subheading')}</span>
+      <h2 class="mt-3 text-3xl font-extrabold">{t('landing.startSession.heading')}</h2>
       <p class="mt-6">
-        {t('landing.addVisit.description')}
+        {t('landing.startSession.description')}
       </p>
     </div>
     <div class="flex flex-col items-center lg:justify-center">
-      <Image alt={t('landing.dataManagement.viewSubjectsScreenshot')} src={addVisit} />
+      <Image alt={t('landing.startSession.startSessionScreenshot')} src={startSession} />
     </div>
   </Section>
   <Section class="grid gap-8 lg:grid-cols-2">
@@ -95,7 +95,7 @@ export const getStaticPaths = () => {
       </p>
     </div>
     <div class="flex flex-col items-center justify-center">
-      <Image alt={t('landing.dataManagement.viewSubjectsScreenshot')} src={viewSubjects} />
+      <Image alt={t('landing.dataManagement.dataHubScreenshot')} src={dataHub} />
     </div>
   </Section>
   <Section class="flex flex-col items-center justify-center">
@@ -133,13 +133,13 @@ export const getStaticPaths = () => {
 <script>
   window.addEventListener('load', () => {
     const heroSection = document.getElementById('hero-section')!;
-    const addVisitSection = document.getElementById('add-visit-section')!;
+    const startSessionSection = document.getElementById('start-session-section')!;
 
     heroSection.children.item(0)?.classList.replace('opacity-0', 'opacity-100');
     heroSection.children.item(1)?.classList.replace('opacity-0', 'opacity-100');
 
     document.getElementById('learn-more-btn')?.addEventListener('click', () => {
-      addVisitSection?.scrollIntoView({
+      startSessionSection?.scrollIntoView({
         behavior: 'smooth'
       });
     });
