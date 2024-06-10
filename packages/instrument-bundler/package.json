@@ -22,8 +22,8 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
-    "esbuild": "^0.21.4",
-    "esbuild-wasm": "^0.21.4",
+    "esbuild": "^0.21.5",
+    "esbuild-wasm": "^0.21.5",
     "glob": "^10.4.1",
     "ts-pattern": "^5.1.2",
     "zod": "^3.23.8"

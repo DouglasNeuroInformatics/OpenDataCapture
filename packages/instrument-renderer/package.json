@@ -34,7 +34,7 @@
     "@opendatacapture/subject-utils": "workspace:*",
     "i18next": "^23.11.5",
     "lodash-es": "^4.17.21",
-    "lucide-react": "^0.390.0",
+    "lucide-react": "^0.394.0",
     "react-i18next": "^14.1.2",
     "ts-pattern": "^5.1.2"
   },
@@ -46,8 +46,8 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
-    "esbuild-wasm": "^0.21.4",
+    "esbuild-wasm": "^0.21.5",
     "postcss": "^8.4.38",
-    "vite": "^5.2.12"
+    "vite": "^5.2.13"
   }
 }

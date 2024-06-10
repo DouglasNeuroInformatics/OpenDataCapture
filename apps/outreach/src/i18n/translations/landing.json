@@ -1,5 +1,5 @@
 {
-  "addVisit": {
+  "startSession": {
     "description": {
       "en": "Using state-of-the-art cryptographic algorithms, we compute patient identifiers based on core demographic characteristics. This innovative approach ensures zero personal data retention while enabling consistent cross-visit association.",
       "fr": "Grâce à des algorithmes cryptographiques de pointe, nous calculons les identifiants des patients en fonction de leurs caractéristiques démographiques de base. Cette approche innovante garantit qu'aucune donnée personnelle n'est conservée tout en permettant une association cohérente entre les visites."
@@ -11,6 +11,10 @@
     "subheading": {
       "en": "Precision in Anonymity",
       "fr": "La précision dans l'anonymat"
+    },
+    "startSessionScreenshot": {
+      "en": "Screenshot of the start session page",
+      "fr": "Capture d'écran de la page de démarrage d'une session"
     }
   },
   "dataManagement": {
@@ -26,9 +30,9 @@
       "en": "Excel at Data Management, Spreadsheets Not Required",
       "fr": "Excel pour la gestion des données, feuilles de calcul non requises"
     },
-    "viewSubjectsScreenshot": {
-      "en": "Screenshot of view subjects page",
-      "fr": "Capture d'écran de la page de présentation de tous les sujets"
+    "dataHubScreenshot": {
+      "en": "Screenshot of the ata hub page",
+      "fr": "Capture d'écran de la page du hub de données"
     }
   },
   "hero": {
