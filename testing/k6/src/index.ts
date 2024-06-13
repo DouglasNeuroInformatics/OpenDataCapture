@@ -52,37 +52,31 @@ export default function () {
       }
     }
   );
-  check(res, { 'the status code is 200': (res) => res.status === 200 });
-  const accessToken = res.json('accessToken') as string;
-  check(accessToken, {
-    'the access token is a non-empty string': (accessToken) => {
+  check(res, {
+    'the access token is a non-empty string': (res) => {
+      const accessToken = res.json('accessToken');
       return typeof accessToken === 'string' && accessToken.length > 0;
-    }
+    },
+    'the status code is 200': (res) => res.status === 200
   });
+
+  const accessToken = res.json('accessToken') as string;
+  client.defaultHeaders.common.Authorization = `Bearer ${accessToken}`;
 
   // select a random group and get the group id
-  // {
-  //   // const groupName = user.groupNames[random(user.groupNames.length - 1)];
-  //   const res = http.get<'text'>(`${BASE_URL}/api/v1/groups`, {
-  //     headers: {
-  //       Accept: 'application/json',
-  //       Authorization: `Bearer ${accessToken}`
-  //     }
-  //   });
-  //   check(res, {
-  //     'the number of groups is the same as the number of expected groups': (res) => {
-  //       return (res.json() as any[]).length === user.groupNames.length;
-  //     },
-  //     'the status code is 200': (res) => res.status === 200
-  //   });
-  // }
+  // const groupName = user.groupNames[random(user.groupNames.length - 1)];
+  // res = client.get('/api/v1/groups');
+  // check(res, {
+  //   'the number of groups is the same as the number of expected groups': (res) => {
+  //     return (res.json() as any[]).length === user.groupNames.length;
+  //   },
+  //   'the status code is 200': (res) => res.status === 200
+  // });
+  // const groups
+  // const selectedGroup =
 
   // get a summary of available data
-  res = client.get('/api/v1/summary', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  });
+  res = client.get('/api/v1/summary');
   check(res, {
     'the response body includes an object for the counts property': (res) => {
       const counts = res.json('counts');
