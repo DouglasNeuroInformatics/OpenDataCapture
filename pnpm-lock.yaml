@@ -1226,10 +1226,19 @@ importers:
       '@opendatacapture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
+      '@opendatacapture/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
     devDependencies:
       '@types/k6':
         specifier: ~0.51.0
         version: 0.51.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       esbuild:
         specifier: ^0.21.5
         version: 0.21.5
