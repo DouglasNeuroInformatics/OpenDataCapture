@@ -1,11 +1,12 @@
 import { check, sleep } from 'k6';
-import http from 'k6/http';
+import * as http from 'k6/http';
+import type { RefinedResponse } from 'k6/http';
+import type { Options } from 'k6/options';
 
 const MAX_TARGET_USERS = 1;
 const BASE_URL = 'https://demo.opendatacapture.org';
 
-/** @type {import('k6/options').Options} */
-export const options = {
+export const options: Options = {
   duration: '3s',
   thresholds: {
     checks: ['rate == 1'] // 100% of checks must pass
@@ -28,14 +29,13 @@ export const options = {
 };
 
 export default function () {
-  /** @type {http.RefinedResponse<"text" | undefined>} */
-  let res;
+  let res: RefinedResponse<'text' | undefined>;
 
   // check the single page app
   res = http.get(BASE_URL);
   check(res, {
     'the response body includes the expected title': (req) => {
-      return Boolean(req.body && req.body.includes('<title>Open Data Capture</title>'));
+      return Boolean(req.body?.includes('<title>Open Data Capture</title>'));
     },
     'the status code is 200': (res) => res.status === 200
   });
@@ -64,7 +64,7 @@ export default function () {
   );
 
   check(res, { 'the status code is 200': (res) => res.status === 200 });
-  const accessToken = /** @type {string} */ (res.json('accessToken'));
+  const accessToken = res.json('accessToken') as string;
   check(accessToken, {
     'the access token is a non-empty string': (accessToken) => {
       return typeof accessToken === 'string' && accessToken.length > 0;

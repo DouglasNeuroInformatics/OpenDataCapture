@@ -1221,6 +1221,19 @@ importers:
         specifier: npm:zod@3.23.6
         version: /zod@3.23.6
 
+  testing/k6:
+    dependencies:
+      '@opendatacapture/demo':
+        specifier: workspace:*
+        version: link:../../packages/demo
+    devDependencies:
+      '@types/k6':
+        specifier: ~0.51.0
+        version: 0.51.0
+      esbuild:
+        specifier: ^0.21.5
+        version: 0.21.5
+
 packages:
   /@actions/core@1.10.1:
     resolution:
@@ -8253,6 +8266,11 @@ packages:
       { integrity: sha512-/5hndP5dCjloafCXns6SZyESp3Ldq7YjH3zwzwczYnjxIT0Fqzk5ROSYVGfFyczIue7IUEj8hkvLbPoLQ18vQw== }
     dependencies:
       '@types/node': 20.14.2
+    dev: true
+
+  /@types/k6@0.51.0:
+    resolution:
+      { integrity: sha512-xelcvFGPI4VYrV5ozADmRuFQBKmDqDRzxfHVuCDD1/firZiSQvTP0pntxHuYUSkRyL8I83kvABXUlnLYNT2VuA== }
     dev: true
 
   /@types/keyv@3.1.4:
