@@ -22,6 +22,12 @@ type RequestOptions = {
   headers?: RequestHeaders;
 };
 
+type GetRequestOptions = {
+  params?: {
+    [key: string]: string;
+  };
+} & RequestOptions;
+
 type ClientResponse<TData extends JSONValue> = {
   json<K extends Extract<keyof TData, string> | undefined = undefined>(
     selector?: K
@@ -44,8 +50,16 @@ export class Client {
     this.baseUrl = options.baseUrl;
   }
 
-  get<TData extends JSONValue = JSONValue>(path: string, options?: RequestOptions): ClientResponse<TData> {
-    return http.get<'text'>(this.baseUrl + path, {
+  get<TData extends JSONValue = JSONValue>(path: string, options?: GetRequestOptions): ClientResponse<TData> {
+    let url = this.baseUrl + path;
+    if (options?.params) {
+      url += '?'.concat(
+        Object.entries(options.params)
+          .map((entry) => entry.join('='))
+          .join('&')
+      );
+    }
+    return http.get<'text'>(url, {
       headers: { ...this.defaultHeaders.common, ...this.defaultHeaders.get, ...options?.headers }
     }) as ClientResponse<TData>;
   }
