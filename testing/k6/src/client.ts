@@ -1,26 +1,30 @@
 import * as http from 'k6/http';
 
-type DefaultHeaders = {
-  get?: { [key: string]: string };
-  post?: { [key: string]: string };
-};
-
 type ClientOptions = {
   baseUrl: string;
-  defaultHeaders?: DefaultHeaders;
 };
 
 type RequestOptions = {
-  headers?: { [key: string]: string };
+  headers?: {
+    Accept?: 'application/json' | 'text/html';
+    Authorization?: `Bearer ${string}`;
+    'Content-Type'?: 'application/json';
+  };
 };
 
 export class Client {
   private baseUrl: string;
-  private defaultHeaders: DefaultHeaders;
+  private defaultHeaders = {
+    get: {
+      Accept: 'application/json'
+    },
+    post: {
+      'Content-Type': 'application/json'
+    }
+  };
 
   constructor(options: ClientOptions) {
     this.baseUrl = options.baseUrl;
-    this.defaultHeaders = options.defaultHeaders ?? {};
   }
 
   get(path: string, options?: RequestOptions) {

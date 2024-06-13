@@ -12,15 +12,7 @@ export const options = new Config('smoke');
 
 export default function () {
   const client = new Client({
-    baseUrl: 'https://demo.opendatacapture.org',
-    defaultHeaders: {
-      get: {
-        Accept: 'application/json'
-      },
-      post: {
-        'Content-Type': 'application/json'
-      }
-    }
+    baseUrl: 'https://demo.opendatacapture.org'
   });
   const user = DEMO_USERS[random(DEMO_USERS.length - 1)];
 
