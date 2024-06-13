@@ -1154,15 +1154,24 @@ importers:
 
   runtime/v1:
     devDependencies:
+      '@jspsych/plugin-html-button-response__1.2.0':
+        specifier: npm:@jspsych/plugin-html-button-response@1.2.0
+        version: /@jspsych/plugin-html-button-response@1.2.0(jspsych@7.3.4)
       '@jspsych/plugin-html-keyboard-response__1.1.3':
         specifier: npm:@jspsych/plugin-html-keyboard-response@1.1.3
         version: /@jspsych/plugin-html-keyboard-response@1.1.3(jspsych@7.3.4)
+      '@jspsych/plugin-image-button-response__1.2.0':
+        specifier: npm:@jspsych/plugin-image-button-response@1.2.0
+        version: /@jspsych/plugin-image-button-response@1.2.0(jspsych@7.3.4)
       '@jspsych/plugin-image-keyboard-response__1.1.3':
         specifier: npm:@jspsych/plugin-image-keyboard-response@1.1.3
         version: /@jspsych/plugin-image-keyboard-response@1.1.3(jspsych@7.3.4)
       '@jspsych/plugin-preload__1.1.3':
         specifier: npm:@jspsych/plugin-preload@1.1.3
         version: /@jspsych/plugin-preload@1.1.3(jspsych@7.3.4)
+      '@jspsych/plugin-survey-text__1.1.3':
+        specifier: npm:@jspsych/plugin-survey-text@1.1.3
+        version: /@jspsych/plugin-survey-text@1.1.3(jspsych@7.3.4)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../../packages/evaluate-instrument
@@ -1211,6 +1220,28 @@ importers:
       zod__3.23.6:
         specifier: npm:zod@3.23.6
         version: /zod@3.23.6
+
+  testing/k6:
+    dependencies:
+      '@opendatacapture/demo':
+        specifier: workspace:*
+        version: link:../../packages/demo
+      '@opendatacapture/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@types/k6':
+        specifier: ~0.51.0
+        version: 0.51.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
+      esbuild:
+        specifier: ^0.21.5
+        version: 0.21.5
 
 packages:
   /@actions/core@1.10.1:
@@ -4554,9 +4585,27 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
+  /@jspsych/plugin-html-button-response@1.2.0(jspsych@7.3.4):
+    resolution:
+      { integrity: sha512-LfN7mGjQWbWc6tL+RzE9PG43SHOTLDkAr5YhVGWrwB/9Q6oozMPFHP5y6aOUkP2HeBF2Hbdu+pdOzLWj7BYvYg== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+    dependencies:
+      jspsych: 7.3.4
+    dev: true
+
   /@jspsych/plugin-html-keyboard-response@1.1.3(jspsych@7.3.4):
     resolution:
       { integrity: sha512-QlItqZRJJSYROvAVQzUlujjgcqFNimKTIoHu5qVM/HP2oJ1HLB4cQlWcntdwGeNBQGqDgFq8PBKBFCLvC/hFNg== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+    dependencies:
+      jspsych: 7.3.4
+    dev: true
+
+  /@jspsych/plugin-image-button-response@1.2.0(jspsych@7.3.4):
+    resolution:
+      { integrity: sha512-wrSGMpjoO4QXhReJGHx1BhO7KMvJMWNH1kaitCTYU3pBy0FxVYnk6WWnu+ZLxpVkMYKp+A8rt2SThkZ4DudoDA== }
     peerDependencies:
       jspsych: '>=7.1.0'
     dependencies:
@@ -4575,6 +4624,15 @@ packages:
   /@jspsych/plugin-preload@1.1.3(jspsych@7.3.4):
     resolution:
       { integrity: sha512-yJ5M1oEQ8rUi4DsDCMLzvw+isCBL8Tj8O1NyY07IM8tJ75jQopT1kK32Puoqi214BrG9qFYScAYxUvkNqHtOHg== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+    dependencies:
+      jspsych: 7.3.4
+    dev: true
+
+  /@jspsych/plugin-survey-text@1.1.3(jspsych@7.3.4):
+    resolution:
+      { integrity: sha512-WZVZbQ0w2zpMF6nP546I1vmIIvqTvcS6WktiqrjFPj6FNMHR8JsT3YCHv7JBsOaoNAl1F9zhDevpiJuNXuqwpg== }
     peerDependencies:
       jspsych: '>=7.1.0'
     dependencies:
@@ -8217,6 +8275,11 @@ packages:
       { integrity: sha512-/5hndP5dCjloafCXns6SZyESp3Ldq7YjH3zwzwczYnjxIT0Fqzk5ROSYVGfFyczIue7IUEj8hkvLbPoLQ18vQw== }
     dependencies:
       '@types/node': 20.14.2
+    dev: true
+
+  /@types/k6@0.51.0:
+    resolution:
+      { integrity: sha512-xelcvFGPI4VYrV5ozADmRuFQBKmDqDRzxfHVuCDD1/firZiSQvTP0pntxHuYUSkRyL8I83kvABXUlnLYNT2VuA== }
     dev: true
 
   /@types/keyv@3.1.4:
@@ -22230,7 +22293,6 @@ packages:
     name: github-script
     version: 7.0.1
     engines: { node: '>=20.0.0 <21.0.0' }
-    prepare: true
     requiresBuild: true
     dependencies:
       '@actions/core': 1.10.1

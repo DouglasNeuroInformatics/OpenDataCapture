@@ -1,0 +1,21 @@
+{
+  "name": "@opendatacapture/k6",
+  "type": "module",
+  "version": "0.0.0",
+  "license": "LGPL-3.0",
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "test:demo": "pnpm exec esbuild --bundle --external:k6 --format=esm --target=es2015 src/index.ts | k6 run -"
+  },
+  "dependencies": {
+    "@opendatacapture/demo": "workspace:*",
+    "@opendatacapture/schemas": "workspace:*",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/k6": "~0.51.0",
+    "@types/lodash-es": "^4.17.12",
+    "esbuild": "^0.21.5"
+  }
+}

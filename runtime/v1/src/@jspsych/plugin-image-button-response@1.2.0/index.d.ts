@@ -1,7 +1,7 @@
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from '../../jspsych@7.3.4/index.d.ts';
 
 declare const info: {
-  readonly name: 'image-keyboard-response';
+  readonly name: 'image-button-response';
   readonly parameters: {
     /** The image to be displayed */
     readonly stimulus: {
@@ -27,13 +27,21 @@ declare const info: {
       readonly pretty_name: 'Maintain aspect ratio';
       readonly default: true;
     };
-    /** Array containing the key(s) the subject is allowed to press to respond to the stimulus. */
+    /** Array containing the label(s) for the button(s). */
     readonly choices: {
-      readonly type: ParameterType.KEYS;
+      readonly type: ParameterType.STRING;
       readonly pretty_name: 'Choices';
-      readonly default: 'ALL_KEYS';
+      readonly default: any;
+      readonly array: true;
     };
-    /** Any content here will be displayed below the stimulus. */
+    /** The HTML for creating button. Can create own style. Use the "%choice%" string to indicate where the label from the choices parameter should be inserted. */
+    readonly button_html: {
+      readonly type: ParameterType.HTML_STRING;
+      readonly pretty_name: 'Button HTML';
+      readonly default: '<button class="jspsych-btn">%choice%</button>';
+      readonly array: true;
+    };
+    /** Any content here will be displayed under the button. */
     readonly prompt: {
       readonly type: ParameterType.HTML_STRING;
       readonly pretty_name: 'Prompt';
@@ -45,13 +53,25 @@ declare const info: {
       readonly pretty_name: 'Stimulus duration';
       readonly default: any;
     };
-    /** How long to show trial before it ends */
+    /** How long to show the trial. */
     readonly trial_duration: {
       readonly type: ParameterType.INT;
       readonly pretty_name: 'Trial duration';
       readonly default: any;
     };
-    /** If true, trial will end when subject makes a response. */
+    /** The vertical margin of the button. */
+    readonly margin_vertical: {
+      readonly type: ParameterType.STRING;
+      readonly pretty_name: 'Margin vertical';
+      readonly default: '0px';
+    };
+    /** The horizontal margin of the button. */
+    readonly margin_horizontal: {
+      readonly type: ParameterType.STRING;
+      readonly pretty_name: 'Margin horizontal';
+      readonly default: '8px';
+    };
+    /** If true, then trial will end when user responds. */
     readonly response_ends_trial: {
       readonly type: ParameterType.BOOL;
       readonly pretty_name: 'Response ends trial';
@@ -66,21 +86,27 @@ declare const info: {
       readonly pretty_name: 'Render on canvas';
       readonly default: true;
     };
+    /** The delay of enabling button */
+    readonly enable_button_after: {
+      readonly type: ParameterType.INT;
+      readonly pretty_name: 'Enable button after';
+      readonly default: 0;
+    };
   };
 };
 type Info = typeof info;
 /**
- * **image-keyboard-response**
+ * **image-button-response**
  *
- * jsPsych plugin for displaying an image stimulus and getting a keyboard response
+ * jsPsych plugin for displaying an image stimulus and getting a button response
  *
  * @author Josh de Leeuw
- * @see {@link https://www.jspsych.org/plugins/jspsych-image-keyboard-response/ image-keyboard-response plugin documentation on jspsych.org}
+ * @see {@link https://www.jspsych.org/plugins/jspsych-image-button-response/ image-button-response plugin documentation on jspsych.org}
  */
-declare class ImageKeyboardResponsePlugin implements JsPsychPlugin<Info> {
+declare class ImageButtonResponsePlugin implements JsPsychPlugin<Info> {
   private jsPsych;
   static info: {
-    readonly name: 'image-keyboard-response';
+    readonly name: 'image-button-response';
     readonly parameters: {
       /** The image to be displayed */
       readonly stimulus: {
@@ -106,13 +132,21 @@ declare class ImageKeyboardResponsePlugin implements JsPsychPlugin<Info> {
         readonly pretty_name: 'Maintain aspect ratio';
         readonly default: true;
       };
-      /** Array containing the key(s) the subject is allowed to press to respond to the stimulus. */
+      /** Array containing the label(s) for the button(s). */
       readonly choices: {
-        readonly type: ParameterType.KEYS;
+        readonly type: ParameterType.STRING;
         readonly pretty_name: 'Choices';
-        readonly default: 'ALL_KEYS';
+        readonly default: any;
+        readonly array: true;
       };
-      /** Any content here will be displayed below the stimulus. */
+      /** The HTML for creating button. Can create own style. Use the "%choice%" string to indicate where the label from the choices parameter should be inserted. */
+      readonly button_html: {
+        readonly type: ParameterType.HTML_STRING;
+        readonly pretty_name: 'Button HTML';
+        readonly default: '<button class="jspsych-btn">%choice%</button>';
+        readonly array: true;
+      };
+      /** Any content here will be displayed under the button. */
       readonly prompt: {
         readonly type: ParameterType.HTML_STRING;
         readonly pretty_name: 'Prompt';
@@ -124,13 +158,25 @@ declare class ImageKeyboardResponsePlugin implements JsPsychPlugin<Info> {
         readonly pretty_name: 'Stimulus duration';
         readonly default: any;
       };
-      /** How long to show trial before it ends */
+      /** How long to show the trial. */
       readonly trial_duration: {
         readonly type: ParameterType.INT;
         readonly pretty_name: 'Trial duration';
         readonly default: any;
       };
-      /** If true, trial will end when subject makes a response. */
+      /** The vertical margin of the button. */
+      readonly margin_vertical: {
+        readonly type: ParameterType.STRING;
+        readonly pretty_name: 'Margin vertical';
+        readonly default: '0px';
+      };
+      /** The horizontal margin of the button. */
+      readonly margin_horizontal: {
+        readonly type: ParameterType.STRING;
+        readonly pretty_name: 'Margin horizontal';
+        readonly default: '8px';
+      };
+      /** If true, then trial will end when user responds. */
       readonly response_ends_trial: {
         readonly type: ParameterType.BOOL;
         readonly pretty_name: 'Response ends trial';
@@ -145,14 +191,20 @@ declare class ImageKeyboardResponsePlugin implements JsPsychPlugin<Info> {
         readonly pretty_name: 'Render on canvas';
         readonly default: true;
       };
+      /** The delay of enabling button */
+      readonly enable_button_after: {
+        readonly type: ParameterType.INT;
+        readonly pretty_name: 'Enable button after';
+        readonly default: 0;
+      };
     };
   };
   constructor(jsPsych: JsPsych);
   trial(display_element: HTMLElement, trial: TrialType<Info>): void;
   simulate(trial: TrialType<Info>, simulation_mode: any, simulation_options: any, load_callback: () => void): void;
+  private create_simulation_data;
   private simulate_data_only;
   private simulate_visual;
-  private create_simulation_data;
 }
 
-export default ImageKeyboardResponsePlugin;
+export default ImageButtonResponsePlugin;
