@@ -1,4 +1,6 @@
+import type { JSONValue } from 'k6';
 import * as http from 'k6/http';
+import type { RefinedResponse } from 'k6/http';
 
 type ClientOptions = {
   baseUrl: string;
@@ -20,6 +22,12 @@ type RequestOptions = {
   headers?: RequestHeaders;
 };
 
+type ClientResponse<TData extends JSONValue> = {
+  json<K extends Extract<keyof TData, string> | undefined = undefined>(
+    selector?: K
+  ): K extends string ? TData[K] : TData;
+} & Omit<RefinedResponse<'text'>, 'json'>;
+
 export class Client {
   public defaultHeaders: DefaultHeaders = {
     common: {},
@@ -36,15 +44,19 @@ export class Client {
     this.baseUrl = options.baseUrl;
   }
 
-  get(path: string, options?: RequestOptions) {
+  get<TData extends JSONValue = JSONValue>(path: string, options?: RequestOptions): ClientResponse<TData> {
     return http.get<'text'>(this.baseUrl + path, {
       headers: { ...this.defaultHeaders.common, ...this.defaultHeaders.get, ...options?.headers }
-    });
+    }) as ClientResponse<TData>;
   }
 
-  post(path: string, body: { [key: string]: unknown }, options?: RequestOptions) {
+  post<TBody extends JSONValue, TData extends JSONValue = JSONValue>(
+    path: string,
+    body: TBody,
+    options?: RequestOptions
+  ): ClientResponse<TData> {
     return http.post<'text'>(this.baseUrl + path, JSON.stringify(body), {
       headers: { ...this.defaultHeaders.common, ...this.defaultHeaders.post, ...options?.headers }
-    });
+    }) as ClientResponse<TData>;
   }
 }

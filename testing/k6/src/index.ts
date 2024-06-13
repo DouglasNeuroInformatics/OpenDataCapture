@@ -1,8 +1,9 @@
 import { DEMO_USERS } from '@opendatacapture/demo';
-import type { LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { AuthPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { Group } from '@opendatacapture/schemas/group';
 import type { SetupState } from '@opendatacapture/schemas/setup';
+import type { Summary } from '@opendatacapture/schemas/summary';
 import { check, sleep } from 'k6';
-import type { RefinedResponse } from 'k6/http';
 import { isMatch, random } from 'lodash-es';
 
 import { Client } from './client';
@@ -16,73 +17,49 @@ export default function () {
   });
   const user = DEMO_USERS[random(DEMO_USERS.length - 1)];
 
-  let res: RefinedResponse<'text'>;
-
   // check single page app
-  res = client.get('/', { headers: { Accept: 'text/html' } });
-  check(res, {
-    'the response body includes the expected title': (req) => {
-      return Boolean(req.body?.includes('<title>Open Data Capture</title>'));
-    },
-    'the status code is 200': (res) => res.status === 200
+  check(client.get('/', { headers: { Accept: 'text/html' } }), {
+    'the status code is 200': (res) => res.status === 200,
+    'the title is "Open Data Capture"': (res) => res.html('title').html() === 'Open Data Capture'
   });
 
   // check the demo is setup
-  res = client.get('/api/v1/setup');
-  check(res, {
-    'the response body matches the expected structure': (res) =>
-      isMatch(res.json() as object, {
+  check(client.get<SetupState>('/api/v1/setup'), {
+    'the response body matches the expected structure': (res) => {
+      return isMatch(res.json(), {
         isDemo: true,
         isGatewayEnabled: true,
         isSetup: true
-      } satisfies SetupState),
+      } satisfies SetupState);
+    },
     'the status code is 200': (res) => res.status === 200
   });
 
   // login and get an access token
-  res = client.post(
-    '/api/v1/auth/login',
-    {
-      password: user.password,
-      username: user.username
-    } satisfies LoginCredentials,
-    {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }
-  );
-  check(res, {
-    'the access token is a non-empty string': (res) => {
-      const accessToken = res.json('accessToken');
-      return typeof accessToken === 'string' && accessToken.length > 0;
-    },
+  const loginResponse = client.post<LoginCredentials, AuthPayload>('/api/v1/auth/login', {
+    password: user.password,
+    username: user.username
+  });
+  check(loginResponse, {
+    'the access token is not empty': (res) => res.json('accessToken').length > 0,
     'the status code is 200': (res) => res.status === 200
   });
 
-  const accessToken = res.json('accessToken') as string;
+  const accessToken = loginResponse.json('accessToken');
   client.defaultHeaders.common.Authorization = `Bearer ${accessToken}`;
 
   // select a random group and get the group id
-  // const groupName = user.groupNames[random(user.groupNames.length - 1)];
-  // res = client.get('/api/v1/groups');
-  // check(res, {
-  //   'the number of groups is the same as the number of expected groups': (res) => {
-  //     return (res.json() as any[]).length === user.groupNames.length;
-  //   },
-  //   'the status code is 200': (res) => res.status === 200
-  // });
-  // const groups
-  // const selectedGroup =
+  const groupsResponse = client.get<Omit<Group, 'createdAt' | 'updatedAt'>[]>('/api/v1/groups');
+  check(groupsResponse, { 'the status code is 200': (res) => res.status === 200 });
+  const groups = groupsResponse.json();
+  check(groups, { 'the number of groups is the expected value': (groups) => groups.length === user.groupNames.length });
+  const selectedGroup = groups[random(groups.length - 1)];
 
   // get a summary of available data
-  res = client.get('/api/v1/summary');
-  check(res, {
-    'the response body includes an object for the counts property': (res) => {
-      const counts = res.json('counts');
-      return Boolean(counts && typeof counts === 'object');
-    },
+  check(client.get<Summary>(`/api/v1/summary?groupId=${selectedGroup.id}`), {
+    'the number of users is greater than zero': (res) => res.json('counts').users > 0,
     'the status code is 200': (res) => res.status === 200
   });
+
   sleep(3);
 }
