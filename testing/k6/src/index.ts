@@ -2,6 +2,7 @@ import { DEMO_USERS } from '@opendatacapture/demo';
 import type { AuthPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { SetupState } from '@opendatacapture/schemas/setup';
+import type { Subject } from '@opendatacapture/schemas/subject';
 import type { Summary } from '@opendatacapture/schemas/summary';
 import { check, sleep } from 'k6';
 import { isMatch, random } from 'lodash-es';
@@ -58,6 +59,20 @@ export default function () {
   // get a summary of available data
   check(client.get<Summary>(`/api/v1/summary?groupId=${selectedGroup.id}`), {
     'the number of users is greater than zero': (res) => res.json('counts').users > 0,
+    'the status code is 200': (res) => res.status === 200
+  });
+
+  // get all subjects (e.g., when accessing the data hub)
+  const subjectsResponse = client.get<Pick<Subject, 'id'>[]>(`/api/v1/subjects?groupId=${selectedGroup.id}`);
+  check(subjectsResponse, {
+    'the number of subjects is greater than zero': (res) => res.json().length > 0,
+    'the status code is 200': (res) => res.status === 200
+  });
+
+  // view a random subject
+  const subjects = subjectsResponse.json();
+  const selectedSubject = subjects[random(subjects.length - 1)];
+  check(client.get<any[]>(`/api/v1/assignments?subjectId=${selectedSubject.id}`), {
     'the status code is 200': (res) => res.status === 200
   });
 
