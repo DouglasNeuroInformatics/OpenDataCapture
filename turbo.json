@@ -29,10 +29,6 @@
     "lint": {
       "dependsOn": ["^build", "^db:generate", "db:push"]
     },
-    "preview": {
-      "dependsOn": ["build", "inject"],
-      "persistent": true
-    },
     "test:e2e": {
       "dependsOn": ["^build", "^db:generate", "db:push"]
     }
