@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.1",
   "private": true,
-  "packageManager": "pnpm@8.15.3",
+  "packageManager": "pnpm@9.3.0",
   "license": "AGPL-3.0",
   "scripts": {
     "build": "NODE_ENV=production env-cmd turbo run build",
@@ -20,7 +20,6 @@
     "generate:env": "./scripts/generate-env.sh",
     "lint": "turbo run lint",
     "prepare": "husky",
-    "preview": "NODE_ENV=production env-cmd turbo run preview",
     "preview:core": "NODE_ENV=production env-cmd turbo run preview --filter=@opendatacapture/api --filter=@opendatacapture/gateway --filter=@opendatacapture/web",
     "test": "vitest",
     "test:coverage": "vitest --coverage",

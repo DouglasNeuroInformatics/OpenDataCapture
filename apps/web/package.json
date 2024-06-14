@@ -13,7 +13,6 @@
     "format:translations": "find src/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "inject": "pnpm exec import-meta-env -x .env.public -p dist/index.html",
     "lint": "tsc && eslint --fix src",
-    "preview": "vite preview --port $WEB_DEV_SERVER_PORT",
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
     "test:e2e": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:run'",
     "test:e2e:dev": "env-cmd -f ../../.env --use-shell 'start-server-and-test \"pnpm exec vite --mode test\" \"http://localhost:${WEB_DEV_SERVER_PORT}\" cy:open'"

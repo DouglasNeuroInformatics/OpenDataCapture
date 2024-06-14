@@ -11,8 +11,7 @@
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx src/main.ts",
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
-    "preview": "NODE_ENV=production GATEWAY_PROD_SERVER_PORT=$GATEWAY_DEV_SERVER_PORT env-cmd -f ../../.env node dist/main.mjs"
+    "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
     "@douglasneuroinformatics/libui": "^2.5.2",

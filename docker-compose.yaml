@@ -23,7 +23,6 @@ services:
     depends_on:
       - mongo
     environment:
-      - ESBUILD_BINARY_PATH=dist/bin/esbuild
       - GATEWAY_INTERNAL_NETWORK_URL=http://gateway:80
       - MONGO_REPLICA_SET=rs0
       - MONGO_RETRY_WRITES=true
