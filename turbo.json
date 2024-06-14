@@ -1,12 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [".env", "eslint.config.js", "jsconfig.json", "prettier.config.js"],
+  "globalEnv": ["NODE_ENV", "NODE_OPTIONS"],
   "tasks": {
     "gateway#build": {
       "dependsOn": ["^db:push"]
     },
     "build": {
       "dependsOn": ["^build", "^db:generate"],
+      "env": ["API_BASE_URL", "CONTACT_EMAIL", "DOCS_URL", "GITHUB_REPO_URL", "LICENSE_URL", "GATEWAY_ENABLED"],
       "outputs": ["dist/**"]
     },
     "db:generate": {
@@ -14,6 +16,7 @@
     },
     "db:push": {
       "cache": false,
+      "env": ["GATEWAY_DATABASE_URL"],
       "dependsOn": ["db:generate"]
     },
     "dev": {
