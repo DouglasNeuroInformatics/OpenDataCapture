@@ -65,6 +65,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.7.0",
     "autoprefixer": "^10.4.19",
+    "cypress": "^13.11.0",
     "esbuild-wasm": "^0.21.5",
     "jose": "^5.4.0",
     "msw": "^2.3.1",
