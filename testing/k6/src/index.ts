@@ -11,7 +11,7 @@ import { isMatch, random } from 'lodash-es';
 import { Client } from './client';
 import { Config } from './config';
 
-export const options = new Config('smoke');
+export const options = new Config('average');
 
 export default function () {
   const client = new Client({
