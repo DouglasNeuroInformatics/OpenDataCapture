@@ -38,3 +38,6 @@ yarn-error.log*
 
 # docker dev
 data/
+
+# k6
+testing/k6/results
