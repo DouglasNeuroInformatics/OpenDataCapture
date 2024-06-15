@@ -11,11 +11,12 @@ import { isMatch, random } from 'lodash-es';
 import { Client } from './client';
 import { Config } from './config';
 
-export const options = new Config('average');
+export const options = new Config('stress');
 
 export default function () {
   const client = new Client({
-    baseUrl: 'https://demo.opendatacapture.org'
+    // baseUrl: 'https://demo.opendatacapture.org',
+    baseUrl: 'http://localhost:5500'
   });
   const user = DEMO_USERS[random(DEMO_USERS.length - 1)];
 

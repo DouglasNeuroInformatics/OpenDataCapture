@@ -36,6 +36,7 @@ services:
       - GATEWAY_REFRESH_INTERVAL
       - GATEWAY_SITE_ADDRESS
       - SECRET_KEY
+      - THROTTLER_ENABLED
       - VERBOSE
     expose:
       - 80
