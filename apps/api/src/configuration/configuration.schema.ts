@@ -31,6 +31,7 @@ export const $Configuration = z
     MONGO_WRITE_CONCERN: z.string().optional(),
     NODE_ENV: z.enum(['development', 'production', 'test']),
     SECRET_KEY: z.string().min(32),
+    THROTTLER_ENABLED: $BooleanString.default(true),
     VERBOSE: $BooleanString
   })
   .superRefine((env, ctx) => {
