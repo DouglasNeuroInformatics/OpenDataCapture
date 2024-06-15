@@ -1169,6 +1169,9 @@ importers:
       '@jspsych/plugin-preload__1.1.3':
         specifier: npm:@jspsych/plugin-preload@1.1.3
         version: '@jspsych/plugin-preload@1.1.3(jspsych@7.3.4)'
+      '@jspsych/plugin-survey-html-form__1.0.3':
+        specifier: npm:@jspsych/plugin-survey-html-form@1.0.3
+        version: '@jspsych/plugin-survey-html-form@1.0.3(jspsych@7.3.4)'
       '@jspsych/plugin-survey-text__1.1.3':
         specifier: npm:@jspsych/plugin-survey-text@1.1.3
         version: '@jspsych/plugin-survey-text@1.1.3(jspsych@7.3.4)'
@@ -3058,6 +3061,12 @@ packages:
   '@jspsych/plugin-preload@1.1.3':
     resolution:
       { integrity: sha512-yJ5M1oEQ8rUi4DsDCMLzvw+isCBL8Tj8O1NyY07IM8tJ75jQopT1kK32Puoqi214BrG9qFYScAYxUvkNqHtOHg== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
+  '@jspsych/plugin-survey-html-form@1.0.3':
+    resolution:
+      { integrity: sha512-4Zl4UiXLuBoO78PT02ELiVsyCUZk4RFsiVGJvW1DOYy+IttryLAAgQuSv68r1vbqsI0qaGfZEVND896ur9X+pw== }
     peerDependencies:
       jspsych: '>=7.1.0'
 
@@ -14867,6 +14876,10 @@ snapshots:
       jspsych: 7.3.4
 
   '@jspsych/plugin-preload@1.1.3(jspsych@7.3.4)':
+    dependencies:
+      jspsych: 7.3.4
+
+  '@jspsych/plugin-survey-html-form@1.0.3(jspsych@7.3.4)':
     dependencies:
       jspsych: 7.3.4
 
