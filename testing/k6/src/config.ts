@@ -43,15 +43,15 @@ export class Config implements Options {
       ],
       stress: [
         {
-          duration: '10m',
-          target: 100
-        },
-        {
-          duration: '20m',
-          target: 100
+          duration: '5m',
+          target: 1000
         },
         {
           duration: '10m',
+          target: 1000
+        },
+        {
+          duration: '5m',
           target: 0
         }
       ]
