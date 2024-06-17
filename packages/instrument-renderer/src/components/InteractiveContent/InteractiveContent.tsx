@@ -38,7 +38,16 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
     <div className="flex h-full w-full flex-col">
       <div className="text-muted-foreground mb-2 flex items-center justify-end gap-2">
         <span className="text-foreground-muted text-sm">{scale}%</span>
-        <Button size="icon" type="button" variant="outline" onClick={() => setScale(scale - 25)}>
+        <Button
+          size="icon"
+          type="button"
+          variant="outline"
+          onClick={() => {
+            if (scale > 25) {
+              setScale(scale - 25);
+            }
+          }}
+        >
           <ZoomOutIcon />
         </Button>
         <Button size="icon" type="button" variant="outline" onClick={() => setScale(scale + 25)}>
