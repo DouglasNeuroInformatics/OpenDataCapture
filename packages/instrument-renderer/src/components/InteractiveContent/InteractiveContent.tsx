@@ -30,13 +30,15 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
   }, [handler]);
 
   return (
-    <iframe
-      allow="fullscreen"
-      className="h-full w-full rounded-md border border-slate-300 dark:border-slate-700"
-      data-bundle={bundle}
-      name="interactive-instrument"
-      srcDoc={`<script type="module">${bootstrapScript}</script>`}
-      title="Open Data Capture - Interactive Instrument"
-    />
+    <div className="h-full w-full">
+      <iframe
+        allow="fullscreen"
+        className="h-full w-full rounded-md border border-slate-300 dark:border-slate-700"
+        data-bundle={bundle}
+        name="interactive-instrument"
+        srcDoc={`<script type="module">${bootstrapScript}</script>`}
+        title="Open Data Capture - Interactive Instrument"
+      />
+    </div>
   );
 });
