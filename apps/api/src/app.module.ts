@@ -27,26 +27,6 @@ import { UsersModule } from './users/users.module';
         {
           condition: 'GATEWAY_ENABLED',
           modules: [AssignmentsModule, GatewayModule]
-        },
-        {
-          condition: 'THROTTLER_ENABLED',
-          module: ThrottlerModule.forRoot([
-            {
-              limit: 25,
-              name: 'short',
-              ttl: 1000
-            },
-            {
-              limit: 100,
-              name: 'medium',
-              ttl: 10000
-            },
-            {
-              limit: 250,
-              name: 'long',
-              ttl: 60000
-            }
-          ])
         }
       ]
     }),
@@ -67,7 +47,32 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     SetupModule,
     SummaryModule,
-    SessionsModule
+    SessionsModule,
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigurationService],
+      useFactory(configurationService: ConfigurationService) {
+        // this cannot be used with conditional module easily, since APP_GUARD requires something
+        return configurationService.get('THROTTLER_ENABLED')
+          ? [
+              {
+                limit: 25,
+                name: 'short',
+                ttl: 1000
+              },
+              {
+                limit: 100,
+                name: 'medium',
+                ttl: 10000
+              },
+              {
+                limit: 250,
+                name: 'long',
+                ttl: 60000
+              }
+            ]
+          : [];
+      }
+    })
   ],
   providers: [
     {
