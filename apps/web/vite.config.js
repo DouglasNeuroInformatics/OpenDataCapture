@@ -10,8 +10,6 @@ import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
-import { translations } from './config/translations';
-
 const require = module.createRequire(import.meta.url);
 
 export default defineConfig(({ mode }) => ({
@@ -43,7 +41,6 @@ export default defineConfig(({ mode }) => ({
     importMetaEnv.vite({
       example: path.resolve(import.meta.dirname, '.env.public')
     }),
-    translations(),
     runtime({
       disabled: mode === 'test'
     })

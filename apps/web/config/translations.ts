@@ -1,3 +1,13 @@
+/**
+ * This used to be used to handle converting our translation format to the default
+ * to use with i18next-http-backend. However, since our bundle size is already quite large
+ * given the context of our app, and for our use case that is fine, this seemed like a lot
+ * of added complexity for negligible benefit.
+ *
+ * If this is ever added back, it should be moved into a separate package to be consistant
+ * with our other custom vite plugins.
+ */
+
 import fs from 'fs/promises';
 import path from 'path';
 
