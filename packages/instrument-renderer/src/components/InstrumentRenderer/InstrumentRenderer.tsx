@@ -92,7 +92,7 @@ export const InstrumentRenderer = <TKind extends InstrumentKind>({
   }
 
   return (
-    <div className={cn('h-full w-full', className)}>
+    <div className={cn('flex h-full w-full flex-col', className)}>
       <div className="relative mb-10 flex items-center justify-between">
         {steps.map((step, i) => {
           return (
