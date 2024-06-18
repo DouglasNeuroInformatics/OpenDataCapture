@@ -1,0 +1,38 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { useTranslations, type Language } from '@/i18n';
+
+interface Props {
+  alt: string;
+  filename: string;
+}
+
+const { altLanguage, resolvedLanguage } = useTranslations(Astro.url);
+
+const { alt, filename } = Astro.props;
+const images = import.meta.glob<ImageMetadata>(`@/assets/screenshots/(en|fr)/*.{jpeg,jpg,png,gif}`, {
+  import: 'default'
+});
+
+let screenshots: { en?: () => Promise<ImageMetadata>; fr?: () => Promise<ImageMetadata> } = {};
+for (const path in images) {
+  const segments = path.split('/screenshots/').at(-1)?.split('/');
+  if (segments?.length !== 2) {
+    throw new Error(`Unexpected screenshot path: ${path}`);
+  } else if (segments[1] === filename) {
+    screenshots[segments[0] as Language] = images[path];
+  }
+}
+
+let src: ImageMetadata;
+if (screenshots[resolvedLanguage]) {
+  src = await screenshots[resolvedLanguage]!();
+} else if (screenshots[altLanguage]) {
+  src = await screenshots[altLanguage]!();
+} else {
+  throw new Error(`Failed to find screenshot with filename: ${filename}`);
+}
+---
+
+<Image src={src} alt={alt} />
