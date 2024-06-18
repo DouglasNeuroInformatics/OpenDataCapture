@@ -1,20 +1,13 @@
 import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
+import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { HttpStatus } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-// import {
-//   briefPsychiatricRatingScale,
-//   enhancedDemographicsQuestionnaire,
-//   happinessQuestionnaire,
-//   miniMentalStateExamination,
-//   montrealCognitiveAssessment
-// } from '@opendatacapture/instrument-library';
-import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { ConfigurationService } from '@/configuration/configuration.service';
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
 
@@ -33,7 +26,7 @@ describe('/instruments', () => {
       providers: [
         InstrumentsService,
         MockFactory.createForModelToken(getModelToken('Instrument')),
-        MockFactory.createForService(ConfigurationService)
+        MockFactory.createForService(CryptoService)
       ]
     }).compile();
 
