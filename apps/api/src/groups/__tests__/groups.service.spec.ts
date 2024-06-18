@@ -3,6 +3,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { InstrumentsService } from '@/instruments/instruments.service';
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
 
@@ -14,7 +15,11 @@ describe('GroupsService', () => {
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [GroupsService, MockFactory.createForModelToken(getModelToken('Group'))]
+      providers: [
+        GroupsService,
+        MockFactory.createForModelToken(getModelToken('Group')),
+        MockFactory.createForService(InstrumentsService)
+      ]
     }).compile();
     groupModel = moduleRef.get(getModelToken('Group'));
     groupsService = moduleRef.get(GroupsService);
