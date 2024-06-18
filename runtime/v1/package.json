@@ -10,7 +10,8 @@
   "homepage": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DouglasNeuroInformatics/OpenDataCapture/.git"
+    "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture.git",
+    "directory": "runtime/v1"
   },
   "bugs": {
     "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues"
