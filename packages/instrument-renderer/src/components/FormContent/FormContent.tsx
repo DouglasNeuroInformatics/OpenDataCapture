@@ -15,6 +15,7 @@ export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
     <div className="space-y-6">
       <Heading variant="h4">{instrument.details.title}</Heading>
       <Form
+        preventResetValuesOnReset
         content={instrument.content}
         data-cy="form-content"
         validationSchema={instrument.validationSchema}

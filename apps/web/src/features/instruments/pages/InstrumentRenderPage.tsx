@@ -61,6 +61,7 @@ export const InstrumentRenderPage = () => {
       <div className="flex-grow">
         <InstrumentRenderer
           bundle={instrumentBundleQuery.data.bundle}
+          className="mx-auto max-w-3xl"
           subject={currentSession?.subject}
           onSubmit={handleSubmit}
         />
