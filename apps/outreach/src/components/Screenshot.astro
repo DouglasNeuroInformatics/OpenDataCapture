@@ -1,27 +1,29 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
-import { useTranslations, type Language } from '@/i18n';
+import { useTranslations } from '@/i18n';
 
 interface Props {
   alt: string;
-  filename: string;
+  name: string;
 }
 
 const { altLanguage, resolvedLanguage } = useTranslations(Astro.url);
 
-const { alt, filename } = Astro.props;
-const images = import.meta.glob<ImageMetadata>(`@/assets/screenshots/(en|fr)/*.{jpeg,jpg,png,gif}`, {
+const { alt, name } = Astro.props;
+const images = import.meta.glob<ImageMetadata>(`@/assets/screenshots/*.{jpeg,jpg,png,gif}`, {
   import: 'default'
 });
 
 let screenshots: { en?: () => Promise<ImageMetadata>; fr?: () => Promise<ImageMetadata> } = {};
 for (const path in images) {
-  const segments = path.split('/screenshots/').at(-1)?.split('/');
-  if (segments?.length !== 2) {
-    throw new Error(`Unexpected screenshot path: ${path}`);
-  } else if (segments[1] === filename) {
-    screenshots[segments[0] as Language] = images[path];
+  const [basename, theme, language] = path.split('/screenshots/').at(-1)?.split('.')!;
+  if (!(basename && (theme === 'dark' || theme === 'light') && (language === 'en' || language === 'fr'))) {
+    throw new Error(
+      `Invalid screenshot path '${path}', expected filename format '*.(dark|light).(en|fr).(jpeg|jpg|png,gif)'`
+    );
+  } else if (basename === name) {
+    screenshots[language] = images[path];
   }
 }
 
@@ -31,7 +33,7 @@ if (screenshots[resolvedLanguage]) {
 } else if (screenshots[altLanguage]) {
   src = await screenshots[altLanguage]!();
 } else {
-  throw new Error(`Failed to find screenshot with filename: ${filename}`);
+  throw new Error(`Failed to find screenshot '${name}' from files: ${Object.keys(images).join(', ')}`);
 }
 ---
 
