@@ -7,11 +7,14 @@ import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
+import { InstrumentsService } from '@/instruments/instruments.service';
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
 
 import { GroupsController } from '../groups.controller';
 import { GroupsService } from '../groups.service';
+
+import type { CreateGroupDto } from '../dto/create-group.dto';
 
 describe('/groups', () => {
   let app: NestExpressApplication;
@@ -22,7 +25,11 @@ describe('/groups', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [GroupsController],
-      providers: [GroupsService, MockFactory.createForModelToken(getModelToken('Group'))]
+      providers: [
+        GroupsService,
+        MockFactory.createForModelToken(getModelToken('Group')),
+        MockFactory.createForService(InstrumentsService)
+      ]
     }).compile();
 
     app = moduleRef.createNestApplication({
@@ -48,11 +55,15 @@ describe('/groups', () => {
     });
     it('should reject a request where the group already exists', async () => {
       groupModel.exists.mockResolvedValueOnce(true);
-      const response = await request(server).post('/groups').send({ name: 'foo' });
+      const response = await request(server)
+        .post('/groups')
+        .send({ name: 'foo', type: 'RESEARCH' } satisfies CreateGroupDto);
       expect(response.status).toBe(HttpStatus.CONFLICT);
     });
     it('should return status code 201 if successful', async () => {
-      const response = await request(server).post('/groups').send({ name: 'foo' });
+      const response = await request(server)
+        .post('/groups')
+        .send({ name: 'foo', type: 'RESEARCH' } satisfies CreateGroupDto);
       expect(response.status).toBe(HttpStatus.CREATED);
     });
   });

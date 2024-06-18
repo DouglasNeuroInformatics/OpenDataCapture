@@ -4,7 +4,7 @@
  * @opendatacapture/runtime-v1 specified as a peer dependency.
  */
 
-const { evaluateInstrument } = await import('/runtime/v1/opendatacapture@1.0.0/internal.js');
+import { evaluateInstrument } from '/runtime/v1/opendatacapture@1.0.0/internal.js';
 
 const THEME_ATTRIBUTE = 'data-mode';
 
