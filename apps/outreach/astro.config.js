@@ -158,6 +158,10 @@ export default defineConfig({
         {
           autogenerate: { directory: '5-reference' },
           label: 'Reference'
+        },
+        {
+          autogenerate: { directory: '6-changelogs' },
+          label: 'Changelogs'
         }
       ],
       social: {
