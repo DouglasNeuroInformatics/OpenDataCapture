@@ -4,7 +4,6 @@ import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libne
 import { HttpStatus } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import type { ClinicalSubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
@@ -13,6 +12,8 @@ import { getModelToken } from '@/prisma/prisma.utils';
 
 import { SubjectsController } from '../subjects.controller';
 import { SubjectsService } from '../subjects.service';
+
+import type { CreateSubjectDto } from '../dto/create-subject.dto';
 
 describe('/subjects', () => {
   let app: NestExpressApplication;
@@ -43,11 +44,12 @@ describe('/subjects', () => {
   });
 
   describe('POST /subjects', () => {
-    let createSubjectDto: ClinicalSubjectIdentificationData;
+    let createSubjectDto: CreateSubjectDto;
     beforeEach(() => {
       createSubjectDto = {
         dateOfBirth: new Date(),
         firstName: 'John',
+        id: 'root$123',
         lastName: 'Smith',
         sex: 'MALE'
       };
