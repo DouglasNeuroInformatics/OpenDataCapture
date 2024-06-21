@@ -5,7 +5,7 @@
   </a>
   <h3 align="center">Open Data Capture</h3>
   <p align="center">
-    An electronic data capture platform designed for administering remote and in-person clinical instruments, including both interactive tasks and forms 
+    An electronic data capture platform designed for administering remote and in-person clinical instruments
     <br />
     <a href="https://opendatacapture.org/docs">
       <strong>Explore the docs »
@@ -30,14 +30,25 @@
 ![version](https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/OpenDataCapture)
 ![build](https://github.com/DouglasNeuroInformatics/OpenDataCapture/actions/workflows/build.yaml/badge.svg)
 
-<!-- [![codecov](https://codecov.io/gh/DouglasNeuroInformatics/OpenDataCapture/branch/main/graph/badge.svg?token=XHC7BY6PJ1)](https://codecov.io/gh/DouglasNeuroInformatics/OpenDataCapture) -->
-
 </div>
 <hr />
 
 ## About
 
-Open Data Capture is a web-based platform designed for continuous clinical data collection. Designed with clinician-researchers in mind, the platform enables both remote and in-person evaluations, encompassing a range of applications — from patient questionnaires completed at home to interactive memory tasks conducted in clinical settings. The platform is designed with a robust security framework, ensuring that all collected data is securely stored in a structured, standardized manner. It offers an intuitive, user-friendly interface to filter the stored data according to various criteria. Once filtered, the data can be used to generate dynamic graphs and tables, or exported for research purposes.
+Open Data Capture is a web-based platform designed for continuous clinical data collection. The platform is centered on the [concept of an instrument](https://opendatacapture.org/en/concepts/instruments/). Broadly defined, an instrument refers to any tool that can be used to collect data (e.g., forms, interactive tasks).
+
+## Features
+
+- **Built with TypeScript and modern frameworks** for robustness and scalability 🚀
+- **Natively multilingual** for global accessibility 🇬🇧🇫🇷
+- **Intuitive interface** for clinicians to conduct in-person assessments 🏥
+- **External gateway service** for patients to self-administer remote assignments 🏠
+- **Flexible instrument build system** implemented [directly in the browser](https://playground.opendatacapture.org/) via WebAssembly ⚡
+  - Declarative form creation with a JSON-like syntax for accessibility ✨
+  - Custom instrument runtime with dynamic imports and native ES modules for experienced users 🔥
+- **Secure by default** with JWT authentication and granular permission controls 🔐
+- **Beautiful data visualization** 📈
+- **On-demand data export** for research integration 🔬
 
 ## Quick Start
 
