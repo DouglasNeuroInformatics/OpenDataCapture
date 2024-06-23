@@ -6,6 +6,7 @@
   "license": "AGPL-3.0",
   "scripts": {
     "build": "tsc && pnpm exec vite build",
+    "deploy": "rsync -r dist/* douglasneuroinformatics.ca:/home/unrjos/www/playground.opendatacapture.org",
     "dev": "NODE_ENV=development env-cmd -f ../../.env pnpm exec vite",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
@@ -13,7 +14,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.1",
-    "@douglasneuroinformatics/libui": "^2.5.2",
+    "@douglasneuroinformatics/libui": "^2.6.0",
     "@monaco-editor/react": "^4.6.0",
     "@opendatacapture/crypto": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",

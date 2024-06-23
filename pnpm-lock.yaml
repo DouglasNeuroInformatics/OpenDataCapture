@@ -20,8 +20,8 @@ importers:
         specifier: 4.2.2
         version: 4.2.2(eslint@8.57.0)(typescript@5.4.5)
       '@douglasneuroinformatics/libui-form-types':
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.8.0
+        version: 0.8.0
       '@storybook/addon-essentials':
         specifier: ^8.1.6
         version: 8.1.9(@types/react-dom@18.3.0)(@types/react@18.3.3)(encoding@0.1.13)(prettier@3.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -120,7 +120,7 @@ importers:
         version: 8.1.9(@babel/preset-env@7.24.7(@babel/core@7.24.7))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       storybook-react-i18next:
         specifier: ^3.1.1
-        version: 3.1.1(i18next-browser-languagedetector@7.2.1)(i18next-http-backend@2.5.2(encoding@0.1.13))(i18next@23.11.5)(react-i18next@14.1.2(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@1.6.0)(happy-dom@14.12.0)(terser@5.31.1))
+        version: 3.1.1(i18next-browser-languagedetector@8.0.0)(i18next-http-backend@2.5.2(encoding@0.1.13))(i18next@23.11.5)(react-i18next@14.1.2(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@1.6.0)(happy-dom@14.12.0)(terser@5.31.1))
       tsx:
         specifier: 4.8.2
         version: 4.8.2
@@ -303,8 +303,8 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.2
-        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.6.0
+        version: 2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -415,8 +415,8 @@ importers:
   apps/outreach:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.2
-        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.6.0
+        version: 2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -473,8 +473,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.2
-        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.6.0
+        version: 2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.49.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -603,8 +603,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.2
-        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.6.0
+        version: 2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@heroicons/react':
         specifier: ^2.1.3
         version: 2.1.3(react@18.3.1)
@@ -795,8 +795,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.2
-        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.6.0
+        version: 2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -875,8 +875,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.2
-        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.6.0
+        version: 2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -1020,8 +1020,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.2
-        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.6.0
+        version: 2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
@@ -1118,8 +1118,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.5.2
-        version: 2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.6.0
+        version: 2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       autoprefixer:
         specifier: 10.x
         version: 10.4.19(postcss@8.4.38)
@@ -2288,13 +2288,13 @@ packages:
       reflect-metadata: ^0.1.13
       rxjs: ^7.8.1
 
-  '@douglasneuroinformatics/libui-form-types@0.7.0':
+  '@douglasneuroinformatics/libui-form-types@0.8.0':
     resolution:
-      { integrity: sha512-J2m0Qxtl/UaRyxE54J5fVdAcqz2T4jwyVaf7If3cyLtOR6+BiccQ5+t1ZQWRLXvFLOuWr3w4ZcxbZiN+0NbL/A== }
+      { integrity: sha512-5MiwGkLCNn/w9zWT9oDs3saiK0cK+8qUR1bE4vRQlrUTrYmHIjgqE20/8tkadHXqnoazOI0yCtcn+YsuUwzvcg== }
 
-  '@douglasneuroinformatics/libui@2.5.2':
+  '@douglasneuroinformatics/libui@2.6.0':
     resolution:
-      { integrity: sha512-Ab/bBEh/zrjOfsGfum7Gq0mhTgdFW2CySmNdo5bnnW0ym3Umo/Ch1cbSeumfd8k54ol30V0KwNKoaYnTPZQR1Q== }
+      { integrity: sha512-E9DhVpVYTOY5iONW0QjBghTv2h6FI2OrMWpb0Pru5OSsMyBCV0QsHh2kFheJgp4XhWCRo1+tCGGoXYE/V6nPgA== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -2746,14 +2746,6 @@ packages:
   '@hapi/topo@5.1.0':
     resolution:
       { integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg== }
-
-  '@headlessui/react@1.7.19':
-    resolution:
-      { integrity: sha512-Ll+8q3OlMJfJbAKM/+/Y2q6PPYbryqNTXDbryx7SXLIDamkF6iQFbriYHga0dY44PvDhvvBWCx1Xj4U5+G4hOw== }
-    engines: { node: '>=10' }
-    peerDependencies:
-      react: ^16 || ^17 || ^18
-      react-dom: ^16 || ^17 || ^18
 
   '@headlessui/tailwindcss@0.2.1':
     resolution:
@@ -4678,17 +4670,6 @@ packages:
     peerDependencies:
       react: ^18.0.0
 
-  '@tanstack/react-virtual@3.5.1':
-    resolution:
-      { integrity: sha512-jIsuhfgy8GqA67PdWqg73ZB2LFE+HD9hjWL1L6ifEIZVyZVAKpYmgUG4WsKQ005aEyImJmbuimPiEvc57IY0Aw== }
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-
-  '@tanstack/virtual-core@3.5.1':
-    resolution:
-      { integrity: sha512-046+AUSiDru/V9pajE1du8WayvBKeCvJ2NmKPy/mR8/SbKKrqmSbj7LJBfXE+nSq4f5TBXvnCzu0kcYebI9WdQ== }
-
   '@testing-library/dom@10.1.0':
     resolution:
       { integrity: sha512-wdsYKy5zupPyLCW2Je5DLHSxSfbIp6h80WoHOQc+RPtmPGA52O9x5MJEkv92Sjonpq+poOAtUKhh1kBGAXBrNA== }
@@ -6207,10 +6188,6 @@ packages:
     resolution:
       { integrity: sha512-ouuZd4/dm2Sw5Gmqy6bGyNNNe1qt9RpmxveLSO7KcgsTnU7RXfsw+/bukWGo1abgBiMAic068rclZsO4IWmmxQ== }
     engines: { node: '>= 12' }
-
-  client-only@0.0.1:
-    resolution:
-      { integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA== }
 
   cliui@8.0.1:
     resolution:
@@ -8202,9 +8179,9 @@ packages:
     engines: { node: '>=18' }
     hasBin: true
 
-  i18next-browser-languagedetector@7.2.1:
+  i18next-browser-languagedetector@8.0.0:
     resolution:
-      { integrity: sha512-h/pM34bcH6tbz8WgGXcmWauNpQupCGr25XPp9cZwZInR9XHSjIFDYp1SIok7zSPsTOMxdvuLyu86V+g2Kycnfw== }
+      { integrity: sha512-zhXdJXTTCoG39QsrOCiOabnWj2jecouOqbchu3EfhtSHxIB5Uugnm9JaizenOy39h7ne3+fLikIjeW88+rgszw== }
 
   i18next-http-backend@2.5.2:
     resolution:
@@ -9175,9 +9152,9 @@ packages:
       { integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA== }
     engines: { node: '>=12' }
 
-  lucide-react@0.364.0:
+  lucide-react@0.390.0:
     resolution:
-      { integrity: sha512-eHfdbJExWtTaZ0tBMGtI7PA/MbqV5wt+o4/yitDce17tadH/75Gq3Tq8jSteb3LhLr0eay/j5YUuN4yXjnI3aw== }
+      { integrity: sha512-APqbfEcVuHnZbiy3E97gYWLeBdkE4e6NbY6AuVETZDZVn/bQCHYUoHyxcUHyvRopfPOHhFUEvDyyQzHwM+S9/w== }
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
 
@@ -12232,6 +12209,11 @@ packages:
       { integrity: sha512-MBh+PHUHHisjXf4tlx0CFWoMdjx8zCMLJHOjnV1prABYZFHqtFOyauCIK2/7w4oIfwkF8iNhLtnJEfVY2vn3iw== }
     engines: { node: '>=16' }
 
+  type-fest@4.20.1:
+    resolution:
+      { integrity: sha512-R6wDsVsoS9xYOpy8vgeBlqpdOyzJ12HNfQhC/aAKWM3YoCV9TtunJzh/QpkMgeDhkoynDcw5f1y+qF9yc/HHyg== }
+    engines: { node: '>=16' }
+
   type-is@1.6.18:
     resolution:
       { integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g== }
@@ -14333,15 +14315,14 @@ snapshots:
       type-fest: 4.20.0
       zod: 3.23.8
 
-  '@douglasneuroinformatics/libui-form-types@0.7.0':
+  '@douglasneuroinformatics/libui-form-types@0.8.0':
     dependencies:
-      type-fest: 4.20.0
+      type-fest: 4.20.1
 
-  '@douglasneuroinformatics/libui@2.5.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)':
+  '@douglasneuroinformatics/libui@2.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)':
     dependencies:
       '@douglasneuroinformatics/libjs': 0.3.1(typescript@5.4.5)
-      '@douglasneuroinformatics/libui-form-types': 0.7.0
-      '@headlessui/react': 1.7.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@douglasneuroinformatics/libui-form-types': 0.8.0
       '@headlessui/tailwindcss': 0.2.1(tailwindcss@3.4.4)
       '@heroicons/react': 2.1.3(react@18.3.1)
       '@radix-ui/react-accordion': 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -14372,9 +14353,9 @@ snapshots:
       cmdk: 1.0.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       framer-motion: 11.2.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       i18next: 23.11.5
-      i18next-browser-languagedetector: 7.2.1
+      i18next-browser-languagedetector: 8.0.0
       lodash-es: 4.17.21
-      lucide-react: 0.364.0(react@18.3.1)
+      lucide-react: 0.390.0(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-error-boundary: 4.0.13(react@18.3.1)
@@ -14655,13 +14636,6 @@ snapshots:
   '@hapi/topo@5.1.0':
     dependencies:
       '@hapi/hoek': 9.3.0
-
-  '@headlessui/react@1.7.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@tanstack/react-virtual': 3.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      client-only: 0.0.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   '@headlessui/tailwindcss@0.2.1(tailwindcss@3.4.4)':
     dependencies:
@@ -16772,14 +16746,6 @@ snapshots:
       '@tanstack/query-core': 5.45.0
       react: 18.3.1
 
-  '@tanstack/react-virtual@3.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@tanstack/virtual-core': 3.5.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
-  '@tanstack/virtual-core@3.5.1': {}
-
   '@testing-library/dom@10.1.0':
     dependencies:
       '@babel/code-frame': 7.24.7
@@ -18264,8 +18230,6 @@ snapshots:
       string-width: 4.2.3
 
   cli-width@4.1.0: {}
-
-  client-only@0.0.1: {}
 
   cliui@8.0.1:
     dependencies:
@@ -20303,7 +20267,7 @@ snapshots:
 
   husky@9.0.11: {}
 
-  i18next-browser-languagedetector@7.2.1:
+  i18next-browser-languagedetector@8.0.0:
     dependencies:
       '@babel/runtime': 7.24.7
 
@@ -21009,7 +20973,7 @@ snapshots:
 
   lru-cache@7.18.3: {}
 
-  lucide-react@0.364.0(react@18.3.1):
+  lucide-react@0.390.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 
@@ -23522,11 +23486,11 @@ snapshots:
 
   storybook-i18n@3.0.1: {}
 
-  storybook-react-i18next@3.1.1(i18next-browser-languagedetector@7.2.1)(i18next-http-backend@2.5.2(encoding@0.1.13))(i18next@23.11.5)(react-i18next@14.1.2(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@1.6.0)(happy-dom@14.12.0)(terser@5.31.1)):
+  storybook-react-i18next@3.1.1(i18next-browser-languagedetector@8.0.0)(i18next-http-backend@2.5.2(encoding@0.1.13))(i18next@23.11.5)(react-i18next@14.1.2(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@1.6.0)(happy-dom@14.12.0)(terser@5.31.1)):
     dependencies:
       '@storybook/test': 8.1.9(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@1.6.0)(happy-dom@14.12.0)(terser@5.31.1))
       i18next: 23.11.5
-      i18next-browser-languagedetector: 7.2.1
+      i18next-browser-languagedetector: 8.0.0
       i18next-http-backend: 2.5.2(encoding@0.1.13)
       react-i18next: 14.1.2(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       storybook-i18n: 3.0.1
@@ -24034,6 +23998,8 @@ snapshots:
   type-fest@2.19.0: {}
 
   type-fest@4.20.0: {}
+
+  type-fest@4.20.1: {}
 
   type-is@1.6.18:
     dependencies:
