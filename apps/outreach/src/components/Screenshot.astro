@@ -47,13 +47,46 @@ const id = crypto.randomUUID();
 ---
 
 <div class="image-container relative">
-  <Image class="hidden" data-variant="light" id={id} src={sources.light} alt={alt} />
-  <Image class="hidden" data-variant="dark" id={id} src={sources.dark} alt={alt} />
+  <Image style="display: none;" data-variant="light" id={id} src={sources.light} alt={alt} />
+  <Image style="display: none;" data-variant="dark" id={id} src={sources.dark} alt={alt} />
 </div>
 
 <script>
-  const theme = document.documentElement.getAttribute('data-mode');
-  document.querySelectorAll(`.image-container [data-variant="${theme}"]`).forEach((image) => {
-    image.classList.remove('hidden');
+  function getCurrentTheme() {
+    return (
+      document.documentElement.getAttribute('data-mode') ??
+      document.documentElement.getAttribute('data-theme') ??
+      'light'
+    );
+  }
+  function toggleScreenshots(theme: string) {
+    document.querySelectorAll<HTMLImageElement>('.image-container [data-variant]').forEach((image) => {
+      if (image.getAttribute('data-variant') === theme) {
+        image.style.display = 'block';
+      } else {
+        image.style.display = 'none';
+      }
+    });
+  }
+
+  const theme = getCurrentTheme();
+  toggleScreenshots(theme);
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-mode' || mutation.attributeName === 'data-theme') {
+        const target = mutation.target as HTMLHtmlElement;
+        const updatedTheme = target.getAttribute(mutation.attributeName);
+        if (updatedTheme === 'light' || updatedTheme === 'dark') {
+          toggleScreenshots(updatedTheme);
+        } else {
+          console.error(`Unexpected value for '${mutation.attributeName}' attribute: ${updatedTheme}`);
+        }
+      }
+    });
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true
   });
 </script>

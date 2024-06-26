@@ -22,7 +22,7 @@ const observer = new MutationObserver((mutations) => {
       if (updatedTheme === 'light' || updatedTheme === 'dark') {
         window.localStorage.setItem(PRIMARY_THEME_KEY, updatedTheme);
       } else {
-        console.error(`Unexpected value for 'data-mode' attribute: ${updatedTheme}`);
+        console.error(`Unexpected value for '${DOCS_THEME_ATTRIBUTE}' attribute: ${updatedTheme}`);
       }
     }
   });
