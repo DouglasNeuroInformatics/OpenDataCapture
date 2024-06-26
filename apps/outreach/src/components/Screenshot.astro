@@ -34,16 +34,26 @@ for (const path in images) {
   }
 }
 
-let src: ImageMetadata;
-if (screenshots[resolvedLanguage].light) {
-  src = await screenshots[resolvedLanguage].light!();
-} else if (screenshots[altLanguage].light) {
-  src = await screenshots[altLanguage].light!();
-} else {
+const sources = {
+  light: await (screenshots[resolvedLanguage]?.light?.() ?? screenshots[altLanguage]?.light?.()),
+  dark: await (screenshots[resolvedLanguage]?.dark?.() ?? screenshots[altLanguage]?.dark?.())
+};
+
+if (!(sources.light && sources.dark)) {
   throw new Error(`Failed to find screenshot '${name}' from files: ${Object.keys(images).join(', ')}`);
 }
 
 const id = crypto.randomUUID();
 ---
 
-<Image id={id} src={src} alt={alt} />
+<div class="image-container relative">
+  <Image class="hidden" data-variant="light" id={id} src={sources.light} alt={alt} />
+  <Image class="hidden" data-variant="dark" id={id} src={sources.dark} alt={alt} />
+</div>
+
+<script>
+  const theme = document.documentElement.getAttribute('data-mode');
+  document.querySelectorAll(`.image-container [data-variant="${theme}"]`).forEach((image) => {
+    image.classList.remove('hidden');
+  });
+</script>
