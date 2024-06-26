@@ -3,6 +3,7 @@ import { useTranslations } from '@/i18n';
 
 type Props = {
   bilingual?: boolean;
+  hasDefaultLocaleRedirect?: boolean;
   meta?: {
     title?: string;
     description?: string;
@@ -11,7 +12,7 @@ type Props = {
   };
 };
 
-const { bilingual, meta } = Astro.props;
+const { bilingual, hasDefaultLocaleRedirect, meta } = Astro.props;
 const { altLanguage, resolvedLanguage, t } = useTranslations(Astro.url);
 const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
 ---
@@ -32,6 +33,7 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
       <>
         <meta property="og:locale" content={resolvedLanguage} />
         <meta property="og:locale:alternate" content={altLanguage} />
+        {hasDefaultLocaleRedirect && <link rel="alternate" href={new URL(path, Astro.site)} hreflang="x-default" />}
         <link rel="alternate" href={new URL(`/en${path}`, Astro.site)} hreflang="en" />
         <link rel="alternate" href={new URL(`/fr${path}`, Astro.site)} hreflang="fr" />
       </>

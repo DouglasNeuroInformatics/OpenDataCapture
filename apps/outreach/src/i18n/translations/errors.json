@@ -1,0 +1,12 @@
+{
+  "404": {
+    "heading": {
+      "en": "404 - Not Found",
+      "fr": "404 - Introuvable"
+    },
+    "message": {
+      "en": "Please verify the URL or use the navigation menu above to find what you're looking for.",
+      "fr": "Veuillez vérifier l'URL ou utiliser le menu de navigation pour trouver ce que vous cherchez."
+    }
+  }
+}

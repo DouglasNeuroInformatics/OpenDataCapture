@@ -1,0 +1,11 @@
+---
+import { TRANSLATIONS } from '@/i18n';
+---
+
+<script define:vars={{ TRANSLATIONS }} is:inline>
+  // @ts-nocheck
+  Object.defineProperty(window, '__TRANSLATIONS__', {
+    writable: false,
+    value: TRANSLATIONS
+  });
+</script>

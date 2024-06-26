@@ -7,26 +7,29 @@ import ThemeToggle from './ThemeToggle.astro';
 import XMarkIcon from './XMarkIcon.astro';
 
 import { useTranslations } from '@/i18n';
+import type { TranslationKey, TranslationMode } from '@/i18n';
+
+type Props = {
+  translationMode: TranslationMode;
+};
 
 const { t, translatePath } = useTranslations(Astro.url);
+const { translationMode } = Astro.props;
+
+const generateNavLinkProps = (href: string, translationKey: TranslationKey) => {
+  return {
+    'data-path': translationMode === 'client' ? href : null,
+    'data-translation-key': translationMode === 'client' ? translationKey : null,
+    href: translationMode === 'static' ? translatePath(href) : '',
+    label: translationMode === 'static' ? t(translationKey) : ''
+  };
+};
 
 const navLinks = [
-  {
-    href: translatePath('/'),
-    label: t('common.overview')
-  },
-  {
-    href: translatePath('/team'),
-    label: t('common.team')
-  },
-  {
-    href: translatePath('/blog'),
-    label: t('common.blog')
-  },
-  {
-    href: translatePath('/introduction/home'),
-    label: t('common.docs')
-  }
+  generateNavLinkProps('/', 'common.overview'),
+  generateNavLinkProps('/team', 'common.team'),
+  generateNavLinkProps('/blog', 'common.blog'),
+  generateNavLinkProps('/introduction/home', 'common.docs')
 ];
 ---
 
@@ -110,4 +113,19 @@ const navLinks = [
       closeSlider();
     }
   });
+</script>
+<script>
+  import { useClientTranslations, type TranslationKey } from '@/i18n';
+  const { getTranslationMode, translatePath, t } = useClientTranslations();
+  if (getTranslationMode() === 'client') {
+    for (const query of [
+      'header nav a[data-translation-key][data-path]',
+      '#mobile-slider a[data-translation-key][data-path]'
+    ]) {
+      document.querySelectorAll<HTMLAnchorElement>(query).forEach((element) => {
+        element.textContent = t(element.getAttribute('data-translation-key') as TranslationKey);
+        element.href = translatePath(element.getAttribute('data-path') as string);
+      });
+    }
+  }
 </script>

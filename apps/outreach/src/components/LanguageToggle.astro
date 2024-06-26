@@ -3,12 +3,15 @@ import { useTranslations } from '../i18n';
 import ChevronDownIcon from './ChevronDownIcon.astro';
 
 const { t, resolvedLanguage } = useTranslations(Astro.url);
+
+const is404 = /^\/404\/?$/.test(Astro.url.pathname);
 ---
 
 <div class="relative">
   <button
     aria-label={t('common.changeLanguage')}
-    class="flex items-center justify-center rounded-md p-2 hover:backdrop-brightness-95 dark:text-slate-300 dark:hover:text-slate-100 dark:hover:backdrop-brightness-150"
+    class="flex items-center justify-center rounded-md p-2 hover:backdrop-brightness-95 disabled:cursor-not-allowed dark:text-slate-300 dark:hover:text-slate-100 dark:hover:backdrop-brightness-150"
+    disabled={is404}
     id="language-toggle"
     type="button"
   >
