@@ -21,7 +21,7 @@ export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
 
-const { t } = useTranslations(Astro.url);
+const { resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
 <Page bilingual>
@@ -40,8 +40,12 @@ const { t } = useTranslations(Astro.url);
             </div>
             <div class="col-span-2 space-y-1 leading-relaxed">
               <h3 class="text-lg font-bold tracking-tight">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h3>
-              <span class="font-semibold tracking-tight text-sky-700 dark:text-sky-400">{position}</span>
-              <p class="mt-1 text-sm font-normal leading-tight text-slate-700 dark:text-slate-300">{description}</p>
+              <span class="font-semibold tracking-tight text-sky-700 dark:text-sky-400">
+                {position[resolvedLanguage]}
+              </span>
+              <p class="mt-1 text-sm font-normal leading-tight text-slate-700 dark:text-slate-300">
+                {description[resolvedLanguage]}
+              </p>
             </div>
           </div>
         </li>

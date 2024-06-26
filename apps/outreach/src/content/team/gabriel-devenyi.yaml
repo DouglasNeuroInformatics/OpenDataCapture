@@ -1,6 +1,10 @@
 fullName: Gabriel Devenyi
 suffix: PhD
-position: Project Lead
+position:
+  en: Project Lead
+  fr: Responsable de projet
 image: '@/assets/headshots/gabriel-devenyi.jpg'
-description: "Gabe, with a PhD in Engineering Physics and extensive knowledge of Linux system administration, leads the DNP, architecting its software, platforms, and infrastructure."
+description:
+  en: Gabriel holds a PhD in Engineering Physics and has extensive knowledge of Linux system administration. He leads the Douglas Neuroinformatics Platform, architecting its software, platforms, and infrastructure.
+  fr: Gabriel est titulaire d'un doctorat en ingénierie et possède une connaissance considérable de l'administration des systèmes Linux. Il dirige le Douglas Neuroinformatics Platform, dont il conçoit les logiciels, les plateformes et l'infrastructure.
 seniority: 3

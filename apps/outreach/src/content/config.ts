@@ -17,12 +17,18 @@ export const collections = {
   team: defineCollection({
     schema: ({ image }) =>
       z.object({
-        description: z.string(),
+        description: z.object({
+          en: z.string(),
+          fr: z.string()
+        }),
         fullName: z.string(),
         image: image().refine((arg) => arg.height === arg.width, {
           message: 'Image must be square (1:1 aspect ratio)'
         }),
-        position: z.string(),
+        position: z.object({
+          en: z.string(),
+          fr: z.string()
+        }),
         seniority: z.number().positive().int(),
         suffix: z.enum(['MD', 'PhD']).optional()
       }),
