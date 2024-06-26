@@ -1,0 +1,16 @@
+{
+  "name": "@opendatacapture/vite-plugin-symlink",
+  "type": "module",
+  "version": "0.0.0",
+  "license": "LGPL-3.0",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "eslint --fix src"
+  },
+  "peerDependencies": {
+    "vite": "5.x"
+  }
+}
