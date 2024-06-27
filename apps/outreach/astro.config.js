@@ -55,27 +55,27 @@ export default defineConfig({
       },
       sidebar: [
         {
-          autogenerate: { directory: '1-introduction' },
+          autogenerate: { directory: 'docs/1-introduction' },
           label: 'Introduction'
         },
         {
-          autogenerate: { directory: '2-tutorials' },
+          autogenerate: { directory: 'docs/2-tutorials' },
           label: 'Tutorials'
         },
         {
-          autogenerate: { directory: '3-guides' },
+          autogenerate: { directory: 'docs/3-guides' },
           label: 'Guides'
         },
         {
-          autogenerate: { directory: '4-concepts' },
+          autogenerate: { directory: 'docs/4-concepts' },
           label: 'Concepts'
         },
         {
-          autogenerate: { directory: '5-reference' },
+          autogenerate: { directory: 'docs/5-reference' },
           label: 'Reference'
         },
         {
-          autogenerate: { directory: '6-changelogs' },
+          autogenerate: { directory: 'docs/6-changelogs' },
           label: 'Changelogs'
         }
       ],
@@ -107,9 +107,9 @@ export default defineConfig({
   },
   output: 'static',
   redirects: {
-    '/docs': '/en/introduction/home',
-    '/en/docs': '/en/introduction/home',
-    '/fr/docs': '/fr/introduction/home'
+    '/docs': '/en/docs/introduction/home',
+    '/en/docs': '/en/docs/introduction/home',
+    '/fr/docs': '/fr/docs/introduction/home'
   },
   server: {
     port: parseInt(process.env.OUTREACH_DEV_SERVER_PORT ?? '4000')
@@ -120,7 +120,8 @@ export default defineConfig({
       symlink({
         collections: {
           blog: '../../blog',
-          docs: '../../docs'
+          'docs/en/docs': '../../docs/en',
+          'docs/fr/docs': '../../docs/fr'
         }
       })
     ],
@@ -129,9 +130,7 @@ export default defineConfig({
       alias: {
         '@': path.resolve(import.meta.dirname, 'src'),
         '@astrojs/starlight': path.dirname(require.resolve('@astrojs/starlight'))
-      },
-      // this is the default, but is noted explicitly since this is handled by vite-plugin-symlink
-      preserveSymlinks: false
+      }
     }
   }
 });

@@ -1,5 +1,8 @@
-import fs from 'fs/promises';
+// @ts-check
+
+import fs from 'fs';
 import path from 'path';
+import url from 'url';
 
 /**
  * Finds the plugin object with the specified name
@@ -22,7 +25,7 @@ function resolveTargetPlugin(plugins, targetName) {
 }
 
 /**
- * Attempt to resolve the absolute path to the symbolic link for the real directory 'id'
+ * Attempt to resolve the symbolic link for the real path 'id'
  * @param {Object} options
  * @param {Record<string, string>} options.collections
  * @param {string} options.id
@@ -31,18 +34,17 @@ function resolveTargetPlugin(plugins, targetName) {
  */
 async function resolveSymbolicLink({ collections, id, root }) {
   const contentDir = path.resolve(root, './src/content');
-  const collectionDirents = await fs.readdir(contentDir, { encoding: 'utf-8', withFileTypes: true });
   for (const [name, relpath] of Object.entries(collections)) {
     const targetPrefix = path.resolve(root, relpath);
-    if (id.startsWith(targetPrefix)) {
-      const dirent = collectionDirents.find((dirent) => dirent.name === name);
-      if (!dirent) {
-        throw new Error(`Expected collection '${name}' does not exist in directory: ${contentDir}`);
-      } else if (!dirent.isSymbolicLink()) {
-        throw new Error(`File is not a symbolic link: ${path.join(dirent.path, dirent.name)}`);
-      }
-      return id.replace(targetPrefix, path.join(dirent.path, dirent.name));
+    if (!id.startsWith(targetPrefix)) {
+      continue;
     }
+    const resolvedId = path.join(contentDir, name, id.replace(targetPrefix, ''));
+    const resolvedFilepath = url.fileURLToPath(new URL(`file://${resolvedId}`));
+    if (!fs.existsSync(resolvedFilepath)) {
+      throw new Error(`File does not exist: ${resolvedFilepath}`);
+    }
+    return resolvedId;
   }
   throw new Error(`Failed to resolve symbolic link for ID: ${id}`);
 }
@@ -51,7 +53,7 @@ async function resolveSymbolicLink({ collections, id, root }) {
  * Workaround to allow Astro content collections to work with symlinks and pnpm
 
  * @param {Object} options
- * @param {Record<string, string>} options.collections - a mapping of collection names to directories, relative to the root defined in astro.config.js
+ * @param {Record<string, string>} options.collections - a mapping of collection names (or directories in collections) to directories, relative to the root defined in astro.config.js
  * @returns {import('vite').Plugin}
  */
 export function symlink({ collections }) {
