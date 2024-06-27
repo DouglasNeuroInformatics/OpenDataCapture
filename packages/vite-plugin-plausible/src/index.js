@@ -1,6 +1,6 @@
 /**
  *
- * @param {object} options
+ * @param {Object} options
  * @param {string} options.baseUrl
  * @param {string} options.dataDomain
  * @returns {import('vite').PluginOption}
