@@ -22,6 +22,32 @@ function resolveTargetPlugin(plugins, targetName) {
 }
 
 /**
+ * Attempt to resolve the absolute path to the symbolic link for the real directory 'id'
+ * @param {Object} options
+ * @param {Record<string, string>} options.collections
+ * @param {string} options.id
+ * @param {string} options.root
+ * @returns {Promise<string>}
+ */
+async function resolveSymbolicLink({ collections, id, root }) {
+  const contentDir = path.resolve(root, './src/content');
+  const collectionDirents = await fs.readdir(contentDir, { encoding: 'utf-8', withFileTypes: true });
+  for (const [name, relpath] of Object.entries(collections)) {
+    const targetPrefix = path.resolve(root, relpath);
+    if (id.startsWith(targetPrefix)) {
+      const dirent = collectionDirents.find((dirent) => dirent.name === name);
+      if (!dirent) {
+        throw new Error(`Expected collection '${name}' does not exist in directory: ${contentDir}`);
+      } else if (!dirent.isSymbolicLink()) {
+        throw new Error(`File is not a symbolic link: ${path.join(dirent.path, dirent.name)}`);
+      }
+      return id.replace(targetPrefix, path.join(dirent.path, dirent.name));
+    }
+  }
+  throw new Error(`Failed to resolve symbolic link for ID: ${id}`);
+}
+
+/**
  * Workaround to allow Astro content collections to work with symlinks and pnpm
 
  * @param {Object} options
@@ -34,9 +60,6 @@ export function symlink({ collections }) {
       if (!root) {
         throw new TypeError('Expected root to be defined in astro config');
       }
-      const contentDir = path.resolve(root, './src/content');
-      const collectionDirents = await fs.readdir(contentDir, { encoding: 'utf-8', withFileTypes: true });
-
       const targetName = 'astro:content-imports';
       const target = resolveTargetPlugin(plugins, targetName);
       const transform = target?.transform;
@@ -45,27 +68,6 @@ export function symlink({ collections }) {
       } else if (typeof transform !== 'function') {
         throw new Error(`Unexpected type of transform method: ${typeof transform}`);
       }
-
-      /**
-       * Attempt to resolve the absolute path to the symbolic link for the real directory 'id'
-       * @param {string} id
-       */
-      const resolveSymbolicLink = (id) => {
-        for (const [name, relpath] of Object.entries(collections)) {
-          const targetPrefix = path.resolve(root, relpath);
-          if (id.startsWith(targetPrefix)) {
-            const dirent = collectionDirents.find((dirent) => dirent.name === name);
-            if (!dirent) {
-              throw new Error(`Expected collection '${name}' does not exist in directory: ${contentDir}`);
-            } else if (!dirent.isSymbolicLink()) {
-              throw new Error(`File is not a symbolic link: ${path.join(dirent.path, dirent.name)}`);
-            }
-            return id.replace(targetPrefix, path.join(dirent.path, dirent.name));
-          }
-        }
-        throw new Error(`Failed to resolve symbolic link for ID: ${id}`);
-      };
-
       target.transform = async function (code, id, options) {
         /** @type {ReturnType<Extract<import('vite').Plugin['transform'], Function>>} */
         let result;
@@ -75,7 +77,7 @@ export function symlink({ collections }) {
           if (!(err instanceof Error && err.name === 'UnknownContentCollectionError')) {
             throw err;
           }
-          id = resolveSymbolicLink(id);
+          id = await resolveSymbolicLink({ collections, id, root });
           result = await transform.call(this, code, id, options);
         }
         return result;
