@@ -29,9 +29,9 @@ const { className, translationMode = 'static', ...props } = Astro.props;
 <!doctype html>
 <html data-translation-mode={translationMode} lang={translationMode === 'static' ? resolvedLanguage : null}>
   <Head {...props} />
-  <body class="flex min-h-screen flex-col bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+  <body class="flex min-h-screen flex-col bg-slate-100 pt-16 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
     <Header translationMode={translationMode} />
-    <main class={twMerge('container grow py-16', className)}>
+    <main class={twMerge('container grow mb-16', className)}>
       <slot />
     </main>
     <Footer />
