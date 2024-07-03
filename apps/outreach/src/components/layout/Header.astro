@@ -1,0 +1,114 @@
+---
+import { useTranslations } from '@/i18n';
+
+import LanguageToggle from './LanguageToggle.astro';
+import NavLink from './NavLink.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+import SiteTitle from '../common/SiteTitle.astro';
+import MenuIcon from '../icons/MenuIcon.astro';
+import XMarkIcon from '../icons/XMarkIcon.astro';
+
+const { t, translatePath } = useTranslations(Astro.url);
+
+const navLinks = [
+  {
+    href: translatePath('/'),
+    label: t('common.overview')
+  },
+  {
+    href: translatePath('/team'),
+    label: t('common.team')
+  },
+  {
+    href: translatePath('/blog'),
+    label: t('common.blog')
+  },
+  {
+    href: translatePath('/docs/introduction/home'),
+    label: t('common.docs')
+  }
+];
+---
+
+<header
+  class="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300"
+>
+  <div class="container flex items-center justify-between py-3 font-medium">
+    <SiteTitle className="[&>span]:hidden [&>span]:lg:block" />
+    <div class="hidden shrink md:flex">
+      <nav class="flex gap-3 overflow-hidden duration-300" id="nav-dropdown">
+        {navLinks.map((props) => <NavLink {...props} />)}
+      </nav>
+      <div class="mx-5 h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700"></div>
+      <div class="flex flex-grow justify-end gap-3">
+        <ThemeToggle />
+        <LanguageToggle />
+      </div>
+    </div>
+    <button class="flex h-10 items-center md:hidden [&>svg]:h-full [&>svg]:w-auto" id="nav-toggle" type="button">
+      <MenuIcon />
+    </button>
+  </div>
+</header>
+<div
+  class="fixed z-20 bg-black transition-opacity duration-300"
+  id="mobile-slider-backdrop"
+  style="height: 0px; width: 0px; opacity: 0%;"
+>
+</div>
+<div
+  class="fixed right-0 z-30 flex h-screen w-full max-w-[28rem] translate-x-[28rem] flex-col overflow-y-scroll bg-slate-50 py-6 shadow-xl transition-transform duration-300 dark:bg-slate-800"
+  id="mobile-slider"
+>
+  <div class="flex items-center justify-between px-4">
+    <div class="px-2">
+      <SiteTitle />
+    </div>
+    <button
+      class="rounded-lg p-2 text-slate-700 transition-colors dark:text-slate-300"
+      type="button"
+      id="close-slider-button"
+    >
+      <XMarkIcon />
+    </button>
+  </div>
+  <hr class="mx-4 my-4 border-slate-300 dark:border-slate-700" />
+  <nav class="flex flex-col px-4">
+    {navLinks.map((props) => <NavLink {...props} />)}
+  </nav>
+</div>
+<script>
+  const backdrop = document.getElementById('mobile-slider-backdrop')!;
+  const close = document.getElementById('close-slider-button')!;
+  const slider = document.getElementById('mobile-slider')!;
+  const toggle = document.getElementById('nav-toggle')!;
+
+  const closeSlider = () => {
+    document.body.style.overflow = 'auto';
+    backdrop.style.opacity = '0%';
+    slider.classList.add('translate-x-[28rem]');
+    setTimeout(() => {
+      backdrop.style.height = '0vh';
+      backdrop.style.width = '0vw';
+    }, 300);
+  };
+
+  const openSlider = () => {
+    document.body.style.overflow = 'hidden';
+    backdrop.style.height = '100vh';
+    backdrop.style.width = '100vw';
+    backdrop.style.opacity = '50%';
+    slider.classList.remove('translate-x-[28rem]');
+  };
+
+  close.addEventListener('click', closeSlider);
+  toggle.addEventListener('click', openSlider);
+
+  matchMedia('(min-width: 768px)').addEventListener('change', (event) => {
+    const isDesktop = event.matches;
+    if (isDesktop) {
+      closeSlider();
+    }
+  });
+</script>

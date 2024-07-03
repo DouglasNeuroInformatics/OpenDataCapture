@@ -1,8 +1,8 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 
-import PageHeader from '@/components/PageHeader.astro';
+import Headshot from '@/components/common/Headshot.astro';
+import PageHeading from '@/components/common/PageHeading.astro';
 import Page from '@/layouts/Page.astro';
 
 import { useTranslations } from '@/i18n';
@@ -25,22 +25,18 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
 <Page bilingual>
-  <PageHeader title={t('team.heading')} />
+  <PageHeading title={t('team.heading')} />
   <ul class="grid gap-6 md:gap-8 lg:grid-cols-2" id="team-members-list">
     {
       team.map(({ data: { fullName, suffix, position, image, description } }) => (
         <li class="translate-y-6 opacity-0 transition-all duration-500 ease-in-out">
           <div class="relative grid h-full gap-8 rounded-md border border-slate-300 bg-slate-50 p-5 shadow-sm md:grid-cols-4 md:rounded-none md:border-none md:bg-inherit md:p-0 md:shadow-none lg:grid-cols-3 dark:border-slate-600 dark:bg-slate-800 md:dark:bg-inherit">
             <div class="absolute left-5 top-5 h-14 w-14 md:static md:flex md:h-auto md:w-auto md:items-center md:justify-center">
-              <Image
-                src={image}
-                alt={fullName}
-                class="rounded-full border-slate-300 bg-slate-200 object-cover shadow-lg md:rounded-lg md:border dark:border-slate-600 dark:bg-slate-700"
-              />
+              <Headshot className="md:rounded-lg md:shadow-lg" src={image} alt={fullName} />
             </div>
             <div class="flex flex-col md:col-span-3 lg:col-span-2">
               <div class="mb-2 flex h-14 flex-col justify-between py-2.5 pl-[4.25rem] md:mb-0 md:py-1.5 md:pl-0">
-                <h3 class="font-bold leading-none tracking-tight md:text-lg">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h3>
+                <h5 class="font-bold leading-none tracking-tight md:text-lg">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h5>
                 <span class="text-sm font-semibold leading-none tracking-tight text-sky-700 md:text-base dark:text-sky-500 md:dark:text-sky-400">
                   {position[resolvedLanguage]}
                 </span>

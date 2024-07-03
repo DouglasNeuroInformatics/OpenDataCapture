@@ -33,9 +33,9 @@ export default defineConfig({
     }),
     starlight({
       components: {
-        SiteTitle: path.resolve(import.meta.dirname, './src/components/SiteTitle.astro')
+        SiteTitle: path.resolve(import.meta.dirname, './src/components/common/SiteTitle.astro')
       },
-      customCss: [path.resolve(import.meta.dirname, './src/styles/starlight-custom.css')],
+      customCss: [path.resolve(import.meta.dirname, './src/styles/starlight.css')],
       defaultLocale: 'en',
       disable404Route: true,
       favicon: '/favicon.ico',

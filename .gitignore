@@ -36,6 +36,9 @@ yarn-error.log*
 # turbo
 .turbo
 
+# astro
+.astro
+
 # docker dev
 data/
 

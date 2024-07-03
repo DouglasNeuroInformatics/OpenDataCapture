@@ -1,0 +1,59 @@
+---
+import { useTranslations } from '@/i18n';
+
+import Medical from './Medical.astro';
+
+const { t } = useTranslations(Astro.url);
+---
+
+<section class="flex min-h-[calc(100vh-4rem)] gap-12 text-center lg:-mt-8 lg:text-left" id="hero-section">
+  <div class="flex translate-y-10 flex-col justify-center opacity-0 transition-all duration-1000 lg:w-1/2 xl:w-7/12">
+    <h1
+      class="text-pretty text-3xl font-bold tracking-tight text-slate-900 md:text-4xl xl:text-5xl dark:text-slate-100"
+    >
+      {t('landing.hero.heading')}
+    </h1>
+    <p class="mt-3 text-slate-700 md:text-lg dark:text-slate-300">
+      {t('landing.hero.subheading')}
+    </p>
+    <div class="mt-5 flex justify-center gap-3 lg:justify-start">
+      <a
+        class="flex items-center justify-center rounded-md bg-slate-800 px-6 py-2 font-medium text-slate-100 shadow-md hover:bg-slate-700 focus:outline-none dark:bg-sky-700 dark:hover:bg-sky-600"
+        href="https://demo.opendatacapture.org"
+        rel="noreferrer"
+        target="_blank"
+      >
+        {t('landing.hero.viewDemo')}
+      </a>
+      <button
+        class="flex items-center justify-center rounded-md border bg-inherit px-6 py-2 font-medium shadow-md focus:outline-none"
+        id="learn-more-btn"
+        type="button"
+      >
+        {t('landing.hero.learnMore')}
+      </button>
+    </div>
+  </div>
+  <div
+    class="hidden translate-x-10 translate-y-10 opacity-0 transition-all duration-1000 lg:flex lg:w-1/2 lg:items-center lg:justify-center xl:w-5/12"
+  >
+    <Medical class="rounded-md brightness-90" />
+  </div>
+</section>
+<script>
+  const heroSection = document.getElementById('hero-section')!;
+  const startSessionSection = document.getElementById('start-session-section')!;
+
+  heroSection.children.item(0)!.classList.toggle('opacity-0');
+  heroSection.children.item(0)!.classList.toggle('translate-y-10');
+  heroSection.children.item(1)!.classList.toggle('opacity-0');
+  heroSection.children.item(1)!.classList.toggle('translate-x-10');
+  heroSection.children.item(1)!.classList.toggle('translate-y-10');
+
+  document.getElementById('learn-more-btn')?.addEventListener('click', () => {
+    startSessionSection?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+  });
+</script>

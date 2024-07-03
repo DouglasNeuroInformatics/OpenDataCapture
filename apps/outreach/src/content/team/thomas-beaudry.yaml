@@ -2,7 +2,7 @@ fullName: Thomas Beaudry
 position:
   en: System Administrator
   fr: Administrateur système
-image: '@/assets/headshots/thomas-beaudry.jpg'
+image: '@/assets/headshots/thomas-beaudry.webp'
 description:
   en: Tom is responsible for the internal deployment of Open Data Capture. He offers valuable feedback on the deployment setup and the instrument development workflow.
   fr: Tom est responsable du déploiement interne d'Open Data Capture. Il apporte un retour d'information précieux sur la configuration du déploiement et le flux de travail du développement de l'instrument.

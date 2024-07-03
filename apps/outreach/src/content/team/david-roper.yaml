@@ -2,7 +2,7 @@ fullName: David Roper
 position:
   en: Junior Developer
   fr: Développeur junior
-image: '@/assets/headshots/david-roper.jpg'
+image: '@/assets/headshots/david-roper.webp'
 description:
   en: David contributes to the project by specializing in writing tests. He is also currently developing instruments for conducting animal studies using Open Data Capture, as part of a collaboration with Western University.
   fr: David contribue au projet en se spécialisant dans la rédaction de tests. Il développe également des instruments pour mener des études sur les animaux en utilisant Open Data Capture, dans le cadre d'une collaboration avec l'Université de Western.

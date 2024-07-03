@@ -11,8 +11,9 @@
     "lint": "astro check && eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.6.1",
+    "@douglasneuroinformatics/libui": "^2.6.4",
     "@opendatacapture/schemas": "workspace:*",
+    "clsx": "^2.1.1",
     "lodash-es": "^4.17.21",
     "mdast-util-to-string": "^4.0.0",
     "reading-time": "^1.5.0",
@@ -23,6 +24,7 @@
     "@astrojs/check": "^0.7.0",
     "@astrojs/sitemap": "^3.1.6",
     "@astrojs/starlight": "^0.24.4",
+    "@astrojs/starlight-tailwind": "^2.0.3",
     "@astrojs/tailwind": "^5.1.0",
     "@opendatacapture/tailwindcss": "workspace:*",
     "@opendatacapture/vite-plugin-symlink": "workspace:*",

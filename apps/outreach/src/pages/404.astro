@@ -2,13 +2,9 @@
 import Page from '@/layouts/Page.astro';
 ---
 
-<Page className="flex flex-col items-center justify-center" translationMode="client">
-  <h3 class="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl" id="404-heading"></h3>
-  <p class="text-muted-foreground mt-2 max-w-prose text-center text-sm sm:text-base" id="404-message"></p>
+<Page className="flex flex-col items-center justify-center">
+  <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">404 - Not Found</h1>
+  <p class="text-muted-foreground mt-2 max-w-prose text-center text-sm sm:text-base">
+    Please verify the URL or use the navigation menu above to find what you're looking for.
+  </p>
 </Page>
-<script>
-  import { useClientTranslations } from '@/i18n';
-  const { t } = useClientTranslations();
-  document.getElementById('404-heading')!.textContent = t('errors.404.heading');
-  document.getElementById('404-message')!.textContent = t('errors.404.message');
-</script>

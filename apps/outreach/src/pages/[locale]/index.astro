@@ -1,21 +1,12 @@
 ---
-import { getCollection } from 'astro:content';
-
-import Hero from '@/components/Hero.astro';
+import Hero from '@/components/overview/Hero.astro';
 import Page from '@/layouts/Page.astro';
-import Section from '@/layouts/Section.astro';
-import Testimonial from '@/components/Testimonial.astro';
+import Testimonials from '@/components/overview/Testimonials.astro';
 
 import { useTranslations } from '@/i18n';
-import Screenshot from '@/components/Screenshot.astro';
+import Feature from '@/components/overview/Feature.astro';
 
-const { resolvedLanguage, t } = useTranslations(Astro.url);
-
-const testimonials = await getCollection('testimonials').then((testimonials) => ({
-  simon: testimonials.find(({ id }) => id === 'simon-ducharme')!.data,
-  maxime: testimonials.find(({ id }) => id === 'maxime-montembeault')!.data,
-  massi: testimonials.find(({ id }) => id === 'massimiliano-orri')!.data
-}));
+const { t } = useTranslations(Astro.url);
 
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
@@ -23,106 +14,21 @@ export const getStaticPaths = () => {
 ---
 
 <Page bilingual hasDefaultLocaleRedirect>
-  <Section class="-mt-8 flex gap-8 text-center lg:text-left xl:gap-12" id="hero-section">
-    <div class="flex flex-col justify-center opacity-0 transition-opacity duration-1000 lg:w-1/2 xl:w-7/12">
-      <h1 class="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl xl:text-5xl dark:text-slate-100">
-        {t('landing.hero.heading')}
-      </h1>
-      <p class="mt-3 text-slate-700 md:text-lg dark:text-slate-300">
-        {t('landing.hero.subheading')}
-      </p>
-      <div class="mt-5 flex justify-center gap-3 lg:justify-start">
-        <a
-          class="text-md flex items-center justify-center rounded-md bg-slate-800 px-6 py-2 font-medium text-slate-100 shadow-md hover:bg-slate-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 dark:bg-sky-700 dark:hover:bg-sky-600"
-          href="https://demo.opendatacapture.org"
-          rel="noreferrer"
-          target="_blank"
-        >
-          {t('landing.hero.viewDemo')}
-        </a>
-        <button
-          class="text-md flex items-center justify-center rounded-md border bg-inherit px-6 py-2 font-medium shadow-md focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
-          id="learn-more-btn"
-          type="button"
-        >
-          {t('landing.hero.learnMore')}
-        </button>
-      </div>
-    </div>
-    <div
-      class="hidden opacity-0 transition-opacity duration-1000 lg:flex lg:w-1/2 lg:items-center lg:justify-center xl:w-5/12"
-    >
-      <Hero class="rounded-md brightness-90" />
-    </div>
-  </Section>
-  <Section class="grid gap-8 lg:grid-cols-2" id="start-session-section">
-    <div class="flex flex-col justify-end lg:order-last lg:justify-center">
-      <span class="text-sm font-semibold uppercase tracking-wide">{t('landing.startSession.subheading')}</span>
-      <h2 class="mt-3 text-3xl font-extrabold">{t('landing.startSession.heading')}</h2>
-      <p class="mt-6">
-        {t('landing.startSession.description')}
-      </p>
-    </div>
-    <div class="flex flex-col items-center lg:justify-center">
-      <Screenshot alt={t('landing.startSession.startSessionScreenshot')} name="start-session" />
-    </div>
-  </Section>
-  <Section class="grid gap-8 lg:grid-cols-2">
-    <div class="flex flex-col justify-end lg:justify-center">
-      <span class="text-sm font-semibold uppercase tracking-wide">{t('landing.dataManagement.heading')}</span>
-      <h2 class="mt-3 text-3xl font-extrabold">{t('landing.dataManagement.subheading')}</h2>
-      <p class="mt-6">
-        {t('landing.dataManagement.description')}
-      </p>
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <Screenshot alt={t('landing.dataManagement.dataHubScreenshot')} name="data-hub" />
-    </div>
-  </Section>
-  <Section class="flex flex-col items-center justify-center">
-    <h2 class="pb-12 text-3xl font-extrabold">{t('landing.testimonials.heading')}</h2>
-    <div
-      class="grid auto-cols-fr divide-y divide-slate-300 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-16 lg:divide-none dark:divide-slate-700"
-    >
-      <Testimonial
-        format={testimonials.simon.format}
-        image={testimonials.simon.image}
-        quote={testimonials.simon.quote[resolvedLanguage]}
-        fullName={testimonials.simon.fullName}
-        suffix={testimonials.simon.suffix}
-        position={testimonials.simon.position[resolvedLanguage]}
-      />
-      <Testimonial
-        format={testimonials.maxime.format}
-        image={testimonials.maxime.image}
-        quote={testimonials.maxime.quote[resolvedLanguage]}
-        fullName={testimonials.maxime.fullName}
-        suffix={testimonials.maxime.suffix}
-        position={testimonials.maxime.position[resolvedLanguage]}
-      />
-      <Testimonial
-        format={testimonials.massi.format}
-        image={testimonials.massi.image}
-        quote={testimonials.massi.quote[resolvedLanguage]}
-        fullName={testimonials.massi.fullName}
-        suffix={testimonials.massi.suffix}
-        position={testimonials.massi.position[resolvedLanguage]}
-      />
-    </div>
-  </Section>
+  <Hero />
+  <Feature
+    id="start-session-section"
+    description={t('landing.startSession.description')}
+    heading={t('landing.startSession.heading')}
+    subheading={t('landing.startSession.subheading')}
+    screenshot={{ alt: t('landing.startSession.startSessionScreenshot'), name: 'start-session-hash' }}
+  />
+  <Feature
+    reversed
+    id="data-management-section"
+    description={t('landing.dataManagement.description')}
+    heading={t('landing.dataManagement.heading')}
+    subheading={t('landing.dataManagement.subheading')}
+    screenshot={{ alt: t('landing.dataManagement.dataHubScreenshot'), name: 'data-hub' }}
+  />
+  <Testimonials />
 </Page>
-<script>
-  window.addEventListener('load', () => {
-    const heroSection = document.getElementById('hero-section')!;
-    const startSessionSection = document.getElementById('start-session-section')!;
-
-    heroSection.children.item(0)?.classList.replace('opacity-0', 'opacity-100');
-    heroSection.children.item(1)?.classList.replace('opacity-0', 'opacity-100');
-
-    document.getElementById('learn-more-btn')?.addEventListener('click', () => {
-      startSessionSection?.scrollIntoView({
-        behavior: 'smooth'
-      });
-    });
-  });
-</script>
