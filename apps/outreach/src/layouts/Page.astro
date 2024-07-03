@@ -1,15 +1,16 @@
 ---
-import Footer from '@/components/Footer.astro';
-import Head from '@/components/Head.astro';
-import Header from '@/components/Header.astro';
-
+import Footer from '@/components/layout/Footer.astro';
+import Head from '@/components/layout/Head.astro';
+import Header from '@/components/layout/Header.astro';
 import { useTranslations } from '@/i18n';
-import { twMerge } from 'tailwind-merge';
+import type { TranslationMode } from '@/i18n';
+import { cn } from '@/utils';
 
-import '@douglasneuroinformatics/libui/styles/globals.css';
+import '@/styles/main.css';
 
 type Props = {
   bilingual?: boolean;
+  hasDefaultLocaleRedirect?: boolean;
   className?: string;
   meta?: {
     title?: string;
@@ -17,18 +18,19 @@ type Props = {
     author?: string;
     keywords?: string[];
   };
+  translationMode?: TranslationMode;
 };
 
 const { resolvedLanguage } = useTranslations(Astro.url);
-const { bilingual, className, meta } = Astro.props;
+const { className, translationMode = 'static', ...props } = Astro.props;
 ---
 
 <!doctype html>
-<html lang={resolvedLanguage}>
-  <Head bilingual={bilingual} meta={meta} />
-  <body class="flex min-h-screen flex-col bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
-    <Header />
-    <main class={twMerge('container grow py-16', className)}>
+<html data-translation-mode={translationMode} lang={translationMode === 'static' ? resolvedLanguage : null}>
+  <Head {...props} />
+  <body class="flex min-h-screen flex-col">
+    <Header translationMode={translationMode} />
+    <main class={cn('container grow py-16', className)}>
       <slot />
     </main>
     <Footer />

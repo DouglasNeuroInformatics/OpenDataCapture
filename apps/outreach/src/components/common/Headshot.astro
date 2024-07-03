@@ -1,0 +1,21 @@
+---
+import { Image } from 'astro:assets';
+
+import { cn } from '@/utils';
+
+type Props = {
+  alt: string;
+  className?: string;
+  src: ImageMetadata;
+};
+
+const { className, ...props } = Astro.props;
+---
+
+<Image
+  class={cn(
+    'bg-slate-200 object-cover shadow-sm rounded-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700',
+    className
+  )}
+  {...props}
+/>

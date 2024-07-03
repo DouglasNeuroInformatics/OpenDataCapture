@@ -1,9 +1,0 @@
----
-import { twMerge } from 'tailwind-merge';
-
-type Props = astroHTML.JSX.HTMLAttributes;
-
-const { class: className, ...props } = Astro.props;
----
-
-<hr class={twMerge('bg-slate-200 dark:bg-slate-700 mt-auto h-[1px] border-none w-full', className)} {...props} />

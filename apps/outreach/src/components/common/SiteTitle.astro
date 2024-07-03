@@ -1,0 +1,18 @@
+---
+import Logo from './Logo.astro';
+
+import { useTranslations } from '@/i18n';
+import { cn } from '@/utils';
+
+type Props = { className?: string };
+
+const { t, translatePath } = useTranslations(Astro.url);
+const { className } = Astro.props;
+---
+
+<a class={cn('flex h-10 items-center no-underline [&>svg]:h-full [&>svg]:w-auto', className)} href={translatePath('/')}>
+  <Logo class="fill-sky-900 dark:fill-slate-100" />
+  <span class="ml-3 whitespace-nowrap font-semibold tracking-tight text-slate-700 dark:text-slate-300">
+    {t('meta.title')}
+  </span>
+</a>

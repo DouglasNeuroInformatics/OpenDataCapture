@@ -1,6 +1,10 @@
 fullName: Mallar Chakravarty
 suffix: PhD
-position: Program Director
-image: '@/assets/headshots/mallar-chakravarty.jpg'
-description: Mallar leverages his engineering and neuroscience expertise to drive innovation in his role as director of the DNP. His expertise in computational techniques is key to developing groundbreaking psychiatric interventions with significant clinical impact.
+position:
+  en: Program Director
+  fr: Directeur du programme
+image: '@/assets/headshots/mallar-chakravarty.webp'
+description:
+  en: Mallar serves as director of the Douglas Neuroinformatics Platform. He has a background in engineering and neuroscience, as well as substantial experience navigating complex regulatory environments.
+  fr: Mallar est directeur du Douglas Neuroinformatics Platform. Il possède une formation en ingénierie et en neurosciences, ainsi qu'une expérience substantielle dans la gestion d'environnements réglementaires complexes.
 seniority: 1

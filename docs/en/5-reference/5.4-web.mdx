@@ -1,0 +1,20 @@
+---
+title: Web
+slug: en/docs/reference/web
+sidebar:
+  order: 4
+---
+
+import { FileTree } from '@astrojs/starlight/components';
+
+The web client is a single page application (SPA), the architecture of which is based heavily on the patterns
+in [Bulletproof React](https://github.com/alan2207/bulletproof-react).
+
+### Directory Structure
+
+<FileTree>
+  - src/ - assets contains static files (e.g., images, fonts) - components common reusable components - features
+  contains code specific to a feature - hooks shared hooks - services re-exporting preconfigured libraries - store
+  global state stores managed with zustand - testing - translations - typings - App.tsx the top-level element of the
+  application - Router.tsx the routing configuration - config.ts - main.tsx the entry point to the application
+</FileTree>

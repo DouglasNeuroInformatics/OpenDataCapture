@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.3.1",
-    "@douglasneuroinformatics/libui": "^2.6.0",
+    "@douglasneuroinformatics/libui": "^2.6.4",
     "@monaco-editor/react": "^4.6.0",
     "@opendatacapture/crypto": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",

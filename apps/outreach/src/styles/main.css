@@ -1,0 +1,4 @@
+@import '@douglasneuroinformatics/libui/styles/globals.css';
+@import './common.css';
+
+@config "../../tailwind.config.cjs";

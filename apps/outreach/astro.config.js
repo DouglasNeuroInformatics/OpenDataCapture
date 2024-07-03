@@ -5,98 +5,12 @@ import path from 'path';
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
 import tailwind from '@astrojs/tailwind';
+import { symlink } from '@opendatacapture/vite-plugin-symlink';
 import { defineConfig, squooshImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
 
 const require = module.createRequire(import.meta.dirname);
-
-/** @typedef {NonNullable<import('astro').ViteUserConfig['plugins']>[number] } VitePluginOption */
-/** @typedef {Extract<VitePluginOption, { name: string}>} VitePlugin */
-
-/**
- * Workaround to allow Astro content collections to work with symlinks and pnpm
-
- * @param {Object} options
- * @param {Record<string, string>} options.collections - a mapping of collection names to directories, relative to the root defined in astro.config.js
- * @returns {VitePlugin}
- */
-const plugin = ({ collections }) => {
-  /**
-   * Finds the plugin object with the specified name
-   * @param {VitePluginOption[] | null | undefined} plugins
-   * @param {string} targetName
-   * @returns {VitePlugin | null}
-   */
-  const resolveTargetPlugin = (plugins, targetName) => {
-    for (const plugin of plugins ?? []) {
-      if (!plugin || typeof plugin !== 'object' || plugin instanceof Promise) {
-        continue;
-      } else if (Array.isArray(plugin)) {
-        const target = resolveTargetPlugin(plugin, targetName);
-        if (target) return target;
-      } else if (plugin.name === targetName) {
-        return plugin;
-      }
-    }
-    return null;
-  };
-
-  return {
-    config: async ({ plugins, root }) => {
-      if (!root) {
-        throw new TypeError('Expected root to be defined in astro config');
-      }
-      const contentDir = path.resolve(root, './src/content');
-      const collectionDirents = await fs.readdir(contentDir, { encoding: 'utf-8', withFileTypes: true });
-
-      const targetName = 'astro:content-imports';
-      const target = resolveTargetPlugin(plugins, targetName);
-      const transform = target?.transform;
-      if (!target) {
-        throw new Error(`Failed to find target plugin: ${targetName}`);
-      } else if (typeof transform !== 'function') {
-        throw new Error(`Unexpected type of transform method: ${typeof transform}`);
-      }
-
-      /**
-       * Attempt to resolve the absolute path to the symbolic link for the real directory 'id'
-       * @param {string} id
-       */
-      const resolveSymbolicLink = (id) => {
-        for (const [name, relpath] of Object.entries(collections)) {
-          const targetPrefix = path.resolve(root, relpath);
-          if (id.startsWith(targetPrefix)) {
-            const dirent = collectionDirents.find((dirent) => dirent.name === name);
-            if (!dirent) {
-              throw new Error(`Expected collection '${name}' does not exist in directory: ${contentDir}`);
-            } else if (!dirent.isSymbolicLink()) {
-              throw new Error(`File is not a symbolic link: ${path.join(dirent.path, dirent.name)}`);
-            }
-            return id.replace(targetPrefix, path.join(dirent.path, dirent.name));
-          }
-        }
-        throw new Error(`Failed to resolve symbolic link for ID: ${id}`);
-      };
-
-      target.transform = async function (code, id, options) {
-        /** @type {ReturnType<Extract<VitePlugin['transform'], Function>>} */
-        let result;
-        try {
-          result = await transform.call(this, code, id, options);
-        } catch (err) {
-          if (!(err instanceof Error && err.name === 'UnknownContentCollectionError')) {
-            throw err;
-          }
-          id = resolveSymbolicLink(id);
-          result = await transform.call(this, code, id, options);
-        }
-        return result;
-      };
-    },
-    name: 'symlink-plugin'
-  };
-};
 
 // https://astro.build/config
 export default defineConfig({
@@ -119,10 +33,11 @@ export default defineConfig({
     }),
     starlight({
       components: {
-        SiteTitle: path.resolve(import.meta.dirname, './src/components/SiteTitle.astro')
+        SiteTitle: path.resolve(import.meta.dirname, './src/components/common/SiteTitle.astro')
       },
-      customCss: [path.resolve(import.meta.dirname, './src/styles/starlight-custom.css')],
+      customCss: [path.resolve(import.meta.dirname, './src/styles/starlight.css')],
       defaultLocale: 'en',
+      disable404Route: true,
       favicon: '/favicon.ico',
       head: [
         {
@@ -140,27 +55,27 @@ export default defineConfig({
       },
       sidebar: [
         {
-          autogenerate: { directory: '1-introduction' },
+          autogenerate: { directory: 'docs/1-introduction' },
           label: 'Introduction'
         },
         {
-          autogenerate: { directory: '2-tutorials' },
+          autogenerate: { directory: 'docs/2-tutorials' },
           label: 'Tutorials'
         },
         {
-          autogenerate: { directory: '3-guides' },
+          autogenerate: { directory: 'docs/3-guides' },
           label: 'Guides'
         },
         {
-          autogenerate: { directory: '4-concepts' },
+          autogenerate: { directory: 'docs/4-concepts' },
           label: 'Concepts'
         },
         {
-          autogenerate: { directory: '5-reference' },
+          autogenerate: { directory: 'docs/5-reference' },
           label: 'Reference'
         },
         {
-          autogenerate: { directory: '6-changelogs' },
+          autogenerate: { directory: 'docs/6-changelogs' },
           label: 'Changelogs'
         }
       ],
@@ -190,10 +105,11 @@ export default defineConfig({
       }
     ]
   },
+  output: 'static',
   redirects: {
-    '/docs': '/en/introduction/home',
-    '/en/docs': '/en/introduction/home',
-    '/fr/docs': '/fr/introduction/home'
+    '/docs': '/en/docs/introduction/home',
+    '/en/docs': '/en/docs/introduction/home',
+    '/fr/docs': '/fr/docs/introduction/home'
   },
   server: {
     port: parseInt(process.env.OUTREACH_DEV_SERVER_PORT ?? '4000')
@@ -201,16 +117,18 @@ export default defineConfig({
   site: 'https://opendatacapture.org',
   vite: {
     plugins: [
-      plugin({
+      symlink({
         collections: {
           blog: '../../blog',
-          docs: '../../docs'
+          'docs/en/docs': '../../docs/en',
+          'docs/fr/docs': '../../docs/fr'
         }
       })
     ],
     // this is necessary because the MDX imports will attempt to resolve from their actual location
     resolve: {
       alias: {
+        '@': path.resolve(import.meta.dirname, 'src'),
         '@astrojs/starlight': path.dirname(require.resolve('@astrojs/starlight'))
       }
     }

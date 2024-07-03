@@ -1,8 +1,8 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 
-import PageHeader from '@/components/PageHeader.astro';
+import Headshot from '@/components/common/Headshot.astro';
+import PageHeading from '@/components/common/PageHeading.astro';
 import Page from '@/layouts/Page.astro';
 
 import { useTranslations } from '@/i18n';
@@ -21,27 +21,29 @@ export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
 
-const { t } = useTranslations(Astro.url);
+const { resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
 <Page bilingual>
-  <PageHeader title={t('team.heading')} />
-  <ul class="grid gap-8 lg:grid-cols-2" id="team-members-list">
+  <PageHeading title={t('team.heading')} />
+  <ul class="grid gap-6 md:gap-8 lg:grid-cols-2" id="team-members-list">
     {
       team.map(({ data: { fullName, suffix, position, image, description } }) => (
         <li class="translate-y-6 opacity-0 transition-all duration-500 ease-in-out">
-          <div class="grid h-full grid-cols-3 gap-8">
-            <div class="flex items-center justify-center">
-              <Image
-                class="rounded-lg border border-slate-300 bg-slate-200 object-cover shadow-lg dark:border-slate-600 dark:bg-slate-700"
-                src={image}
-                alt={fullName}
-              />
+          <div class="relative grid h-full gap-8 rounded-md border border-slate-300 bg-slate-50 p-5 shadow-sm md:grid-cols-4 md:rounded-none md:border-none md:bg-inherit md:p-0 md:shadow-none lg:grid-cols-3 dark:border-slate-600 dark:bg-slate-800 md:dark:bg-inherit">
+            <div class="absolute left-5 top-5 h-14 w-14 md:static md:flex md:h-auto md:w-auto md:items-center md:justify-center">
+              <Headshot className="md:rounded-lg md:shadow-lg" src={image} alt={fullName} />
             </div>
-            <div class="col-span-2 space-y-1 leading-relaxed">
-              <h3 class="text-lg font-bold tracking-tight">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h3>
-              <span class="font-semibold tracking-tight text-sky-700 dark:text-sky-400">{position}</span>
-              <p class="mt-1 text-sm font-normal leading-tight text-slate-700 dark:text-slate-300">{description}</p>
+            <div class="flex flex-col md:col-span-3 lg:col-span-2">
+              <div class="mb-2 flex h-14 flex-col justify-between py-2.5 pl-[4.25rem] md:mb-0 md:py-1.5 md:pl-0">
+                <h5 class="font-bold leading-none tracking-tight md:text-lg">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h5>
+                <span class="text-sm font-semibold leading-none tracking-tight text-sky-700 md:text-base dark:text-sky-500 md:dark:text-sky-400">
+                  {position[resolvedLanguage]}
+                </span>
+              </div>
+              <p class="py-1.5 text-sm font-normal leading-tight text-slate-700 dark:text-slate-300">
+                {description[resolvedLanguage]}
+              </p>
             </div>
           </div>
         </li>
@@ -49,15 +51,7 @@ const { t } = useTranslations(Astro.url);
     }
   </ul>
   <script>
-    window.addEventListener('load', () => {
-      const ul = document.getElementById('team-members-list')!;
-      for (let i = 0; i < ul.children.length; i++) {
-        const li = ul.children.item(i) as HTMLLIElement;
-        setTimeout(() => {
-          li.classList.replace('opacity-0', 'opacity-100');
-          li.classList.replace('translate-y-6', 'translate-y-0');
-        }, i * 100);
-      }
-    });
+    import { animateUnorderedListEntry } from '@/modules/animate';
+    animateUnorderedListEntry('team-members-list');
   </script>
 </Page>

@@ -1,0 +1,126 @@
+---
+import { getCollection } from 'astro:content';
+
+import ArrowLeftIcon from '@/components/icons/ArrowLeftIcon.astro';
+import ArrowRightIcon from '@/components/icons/ArrowRightIcon.astro';
+import { useTranslations } from '@/i18n';
+
+import Headshot from '../common/Headshot.astro';
+
+const order = ['simon-ducharme', 'massimiliano-orri', 'maxime-montembeault'];
+const testimonials = await getCollection('testimonials').then((collection) => {
+  collection.sort((a, b) => (order.indexOf(a.id) > order.indexOf(b.id) ? 1 : -1));
+  return collection.map((item) => item.data);
+});
+
+const { resolvedLanguage, t } = useTranslations(Astro.url);
+---
+
+<section
+  class="flex translate-y-10 flex-col items-center justify-center opacity-0 transition-all duration-700 lg:mb-16"
+  id="testimonials-section"
+>
+  <h3 class="pb-12 text-3xl font-extrabold">{t('landing.testimonials.heading')}</h3>
+  <div class="flex w-full items-center justify-center overflow-hidden" id="testimonials-container">
+    <button
+      class="text-muted-foreground hidden rounded-full border border-slate-300 bg-slate-200 p-2 sm:block dark:border-slate-700 dark:bg-slate-800"
+      id="left-testimonial-button"
+    >
+      <ArrowLeftIcon />
+    </button>
+    <div
+      class="scrollbar-none flex w-full max-w-screen-md snap-x snap-mandatory overflow-x-scroll scroll-smooth"
+      id="testimonials-slider"
+    >
+      {
+        testimonials.map(({ fullName, image, quote, position, suffix }) => (
+          <div class="testimonial flex h-full w-full flex-shrink-0 snap-center snap-always flex-col items-center justify-center gap-6 transition-all duration-1000">
+            <Headshot alt={fullName} className="h-24 w-24" src={image} />
+            <blockquote class="text-muted-foreground max-w-prose text-center">{quote[resolvedLanguage]}</blockquote>
+            <span class="inline-block h-1 w-10 rounded bg-sky-700" />
+            <div class="flex flex-col items-center">
+              <h5 class="text-foreground overflow-hidden text-ellipsis whitespace-nowrap font-semibold tracking-wide md:text-lg">
+                {`${fullName}${suffix ? `, ${suffix}` : ''}`}
+              </h5>
+              <p class="text-muted-foreground text-center text-sm tracking-tight">{position[resolvedLanguage]}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <button
+      class="text-muted-foreground hidden rounded-full border border-slate-300 bg-slate-200 p-2 sm:block dark:border-slate-700 dark:bg-slate-800"
+      id="right-testimonial-button"
+    >
+      <ArrowRightIcon />
+    </button>
+  </div>
+</section>
+
+<script>
+  const leftButton = document.getElementById('left-testimonial-button') as HTMLButtonElement;
+  const rightButton = document.getElementById('right-testimonial-button') as HTMLButtonElement;
+
+  const slider = document.getElementById('testimonials-slider')!;
+  const testimonials = document.querySelectorAll<HTMLDivElement>('.testimonial');
+
+  let currentIndex = 0;
+  const maxIndex = testimonials.length - 1;
+
+  const section = document.getElementById('testimonials-section')!;
+  const observer = new IntersectionObserver(
+    (entries, observer) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          section.classList.toggle('opacity-0');
+          section.classList.toggle('translate-y-10');
+          observer.disconnect();
+        }
+      }
+    },
+    {
+      threshold: 0.5
+    }
+  );
+  observer.observe(section);
+
+  testimonials.forEach((testimonial, i) => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            currentIndex = i;
+            return;
+          }
+        }
+      },
+      {
+        rootMargin: '0px',
+        threshold: 0.5
+      }
+    );
+    observer.observe(testimonial);
+  });
+
+  const setButtonsDisabled = (value: boolean) => {
+    leftButton.disabled = value;
+    rightButton.disabled = value;
+  };
+
+  const slide = (index: number) => {
+    setButtonsDisabled(true);
+    testimonials[index].scrollIntoView({ block: 'nearest' });
+  };
+
+  slider.addEventListener('scrollend', () => {
+    setButtonsDisabled(false);
+  });
+
+  leftButton.addEventListener('click', () => {
+    slide(currentIndex === 0 ? maxIndex : currentIndex - 1);
+  });
+
+  rightButton.addEventListener('click', () => {
+    slide(currentIndex === maxIndex ? 0 : currentIndex + 1);
+  });
+</script>

@@ -31,26 +31,22 @@
       "fr": "Excel pour la gestion des données, feuilles de calcul non requises"
     },
     "dataHubScreenshot": {
-      "en": "Screenshot of the ata hub page",
+      "en": "Screenshot of the data hub page",
       "fr": "Capture d'écran de la page du hub de données"
     }
   },
   "hero": {
-    "happyPerson": {
-      "en": "Happy Person",
-      "fr": "Personne heureuse"
-    },
     "heading": {
-      "en": "Modern, Secure, and User-Friendly Electronic Data Capture",
-      "fr": "Une plateforme de saisie électronique des données moderne, sécurisée et conviviale"
+      "en": "The Ultimate Data Capture Solution for Clinical Researchers",
+      "fr": "La solution ultime de capture de données pour les chercheurs cliniques"
     },
     "learnMore": {
       "en": "Learn More",
       "fr": "En savoir plus"
     },
     "subheading": {
-      "en": "Finally, an easy-to-use, reliable, and open-source solution for clinical researchers",
-      "fr": "Enfin une solution facile à utiliser, fiable et open-source pour les chercheurs cliniques"
+      "en": "Open Data Capture is an open-source web platform for easily administering questionnaires and interactive tasks, whether remotely or in person.",
+      "fr": "Open Data Capture est une plateforme web open-source permettant d'administrer facilement des questionnaires et des tâches interactives, que ce soit à distance ou en personne."
     },
     "viewDemo": {
       "en": "View Demo",

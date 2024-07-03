@@ -1,0 +1,67 @@
+---
+import { cn } from '@/utils';
+import Screenshot from '../common/Screenshot.astro';
+
+type Props = {
+  reversed?: boolean;
+  id?: string;
+  heading: string;
+  subheading: string;
+  description: string;
+  screenshot: {
+    alt: string;
+    name: string;
+  };
+};
+
+const screenshotId = crypto.randomUUID();
+const mainContentId = crypto.randomUUID();
+
+const { description, id = crypto.randomUUID(), heading, subheading, screenshot, reversed } = Astro.props;
+---
+
+<section class="mb-32 grid gap-8 lg:mb-40 lg:grid-cols-2 lg:gap-12" id={id}>
+  <div
+    class={cn(
+      'flex flex-col items-center transition-all duration-700 justify-center opacity-0 translate-y-10',
+      reversed && 'order-2'
+    )}
+    id={screenshotId}
+  >
+    <Screenshot {...screenshot} />
+  </div>
+  <div
+    class="flex translate-y-10 flex-col justify-end opacity-0 transition-all duration-700 lg:justify-center"
+    id={mainContentId}
+  >
+    <span class="text-muted-foreground text-sm font-semibold uppercase tracking-wide">{subheading}</span>
+    <h3 class="mt-2 text-3xl font-extrabold">{heading}</h3>
+    <p class="text-muted-foreground mt-5">
+      {description}
+    </p>
+  </div>
+</section>
+<script define:vars={{ id, mainContentId, screenshotId }} type="module" is:inline>
+  // @ts-nocheck
+  const section = document.getElementById(id);
+  const screenshot = document.getElementById(screenshotId);
+  const mainContent = document.getElementById(mainContentId);
+
+  const observer = new IntersectionObserver(
+    (entries, observer) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          screenshot.classList.toggle('opacity-0');
+          screenshot.classList.toggle('translate-y-10');
+          mainContent.classList.toggle('opacity-0');
+          mainContent.classList.toggle('translate-y-10');
+          observer.disconnect();
+        }
+      }
+    },
+    {
+      threshold: 0.5
+    }
+  );
+  observer.observe(section);
+</script>
