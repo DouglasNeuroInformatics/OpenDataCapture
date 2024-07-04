@@ -22,6 +22,7 @@ services:
       dockerfile: ./apps/api/Dockerfile
     depends_on:
       - mongo
+    restart: unless-stopped
     environment:
       - GATEWAY_INTERNAL_NETWORK_URL=http://gateway:80
       - MONGO_REPLICA_SET=rs0
@@ -49,6 +50,7 @@ services:
       - ${GATEWAY_PORT}:80
     expose:
       - 80
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
       - GATEWAY_API_KEY
@@ -66,11 +68,13 @@ services:
       - GATEWAY_ENABLED
     expose:
       - 80
+    restart: unless-stopped
   mongo:
     image: mongo:${MONGODB_VERSION}
     command: ['--replSet', 'rs0', '--bind_ip_all', '--port', '27017']
     expose:
       - 27017
+    restart: unless-stopped
     healthcheck:
       test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }" | mongosh --port 27017 --quiet
       interval: 5s
