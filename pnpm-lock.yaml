@@ -499,9 +499,6 @@ importers:
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
-      '@opendatacapture/instrument-runtime-env':
-        specifier: workspace:*
-        version: link:../../packages/instrument-runtime-env
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -846,9 +843,6 @@ importers:
         specifier: ^3.23.8
         version: 3.23.8
     devDependencies:
-      '@opendatacapture/instrument-runtime-env':
-        specifier: workspace:*
-        version: link:../instrument-runtime-env
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../instrument-stubs
@@ -874,9 +868,6 @@ importers:
       '@opendatacapture/instrument-bundler':
         specifier: workspace:*
         version: link:../instrument-bundler
-      '@opendatacapture/instrument-runtime-env':
-        specifier: workspace:*
-        version: link:../instrument-runtime-env
 
   packages/instrument-renderer:
     dependencies:
@@ -971,8 +962,6 @@ importers:
       vite:
         specifier: ^5.2.13
         version: 5.3.1(@types/node@20.14.2)(terser@5.31.1)
-
-  packages/instrument-runtime-env: {}
 
   packages/instrument-stubs:
     dependencies:

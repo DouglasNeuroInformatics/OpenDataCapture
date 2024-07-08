@@ -29,7 +29,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@opendatacapture/instrument-runtime-env": "workspace:*",
     "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*"
   }

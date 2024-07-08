@@ -16,7 +16,6 @@
     "@opendatacapture/runtime-v1": "workspace:*"
   },
   "devDependencies": {
-    "@opendatacapture/instrument-bundler": "workspace:*",
-    "@opendatacapture/instrument-runtime-env": "workspace:*"
+    "@opendatacapture/instrument-bundler": "workspace:*"
   }
 }
