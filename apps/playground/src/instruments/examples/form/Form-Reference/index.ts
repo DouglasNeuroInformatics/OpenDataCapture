@@ -193,7 +193,7 @@ export default defineInstrument({
     title: 'Reference Instrument',
     estimatedDuration: 5,
     instructions: ['Please complete all questions'],
-    license: 'AGPL-3.0'
+    license: 'Apache-2.0'
   },
   measures: {},
   validationSchema: z.object({

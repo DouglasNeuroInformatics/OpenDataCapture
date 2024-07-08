@@ -23,7 +23,7 @@ const formInstrument = {
     description: 'The Happiness Questionnaire is a questionnaire about happiness.',
     estimatedDuration: 1,
     instructions: ['Please answer the questions based on your current feelings.'],
-    license: 'AGPL-3.0',
+    license: 'Apache-2.0',
     title: 'Happiness Questionnaire'
   },
   measures: null,
@@ -60,7 +60,7 @@ const interactiveInstrument = {
     description: 'This is a very simple interactive instrument.',
     estimatedDuration: 1,
     instructions: ['Please click the button when you are done.'],
-    license: 'AGPL-3.0',
+    license: 'Apache-2.0',
     title: 'Click the Button Task'
   },
   measures: null,

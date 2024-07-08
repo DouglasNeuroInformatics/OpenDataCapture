@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "license": "AGPL-3.0",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "tsc && pnpm exec vite build",
     "deploy": "rsync -r dist/* douglasneuroinformatics.ca:/home/unrjos/www/playground.opendatacapture.org",
@@ -20,7 +20,6 @@
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
-    "@opendatacapture/instrument-runtime-env": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",

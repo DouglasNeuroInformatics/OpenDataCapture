@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "license": "AGPL-3.0",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "tsc && NODE_ENV=production NODE_OPTIONS='--import=tsx' pnpm exec vite build",
     "cy:open": "cypress open",

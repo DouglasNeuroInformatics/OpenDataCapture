@@ -101,7 +101,7 @@ export default defineInstrument({
       en: ['Please respond to all questions'],
       fr: ['Veuillez répondre à toutes les questions']
     },
-    license: 'AGPL-3.0',
+    license: 'Apache-2.0',
     title: {
       en: 'Happiness Questionnaire',
       fr: 'Questionnaire sur le bonheur'

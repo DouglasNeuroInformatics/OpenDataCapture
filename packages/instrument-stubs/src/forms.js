@@ -36,7 +36,7 @@ export const unilingualFormInstrument = await createInstrumentStub(async () => {
       description: 'This is a unilingual form instrument',
       estimatedDuration: 1,
       instructions: ['Please complete all questions'],
-      license: 'AGPL-3.0',
+      license: 'Apache-2.0',
       title: 'Unilingual Form'
     },
     measures: {
@@ -101,7 +101,7 @@ export const bilingualFormInstrument = await createInstrumentStub(async () => {
         en: ['Please complete all questions'],
         fr: ['Veuillez répondre à toutes les questions']
       },
-      license: 'AGPL-3.0',
+      license: 'Apache-2.0',
       title: {
         en: 'Bilingual Form',
         fr: 'Formulaire bilingue'
