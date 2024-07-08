@@ -22,7 +22,8 @@
     "./*": "./dist/*"
   },
   "files": [
-    "dist"
+    "dist",
+    "env.d.ts"
   ],
   "scripts": {
     "build": "rm -rf dist && pnpm exec rollup -c",
