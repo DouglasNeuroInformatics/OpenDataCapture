@@ -17,6 +17,7 @@
     "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues"
   },
   "exports": {
+    "./env": "./env.d.ts",
     "./package.json": "./package.json",
     "./*": "./dist/*"
   },

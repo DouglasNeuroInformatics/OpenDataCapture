@@ -8,5 +8,5 @@
     "rootDir": "../.."
   },
   "extends": "../../jsconfig.json",
-  "include": ["src/**/*", "*.js", "*.cjs"]
+  "include": ["src/**/*", "*.js", "*.cjs", "env.d.ts"]
 }
