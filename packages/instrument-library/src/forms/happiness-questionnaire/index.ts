@@ -123,7 +123,7 @@ export default defineInstrument({
       en: ['Please answer the questions based on your current feelings.'],
       fr: ['Veuillez répondre àux questions en fonction de vos sentiments actuels.']
     },
-    license: 'AGPL-3.0',
+    license: 'Apache-2.0',
     title: {
       en: 'Happiness Questionnaire',
       fr: 'Questionnaire sur le bonheur'

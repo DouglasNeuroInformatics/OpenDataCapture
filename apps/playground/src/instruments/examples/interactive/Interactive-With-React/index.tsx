@@ -20,7 +20,7 @@ export default defineInstrument({
     description: 'This task is completely useless. It is a proof of concept for an interactive instrument.',
     estimatedDuration: 1,
     instructions: ['Please submit whatever count you want!'],
-    license: 'AGPL-3.0',
+    license: 'Apache-2.0',
     title: 'React Click Task'
   },
   internal: {

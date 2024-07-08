@@ -2,7 +2,7 @@
   "name": "@opendatacapture/vite-plugin-plausible",
   "type": "module",
   "version": "0.0.0",
-  "license": "AGPL-3.0",
+  "license": "Apache-2.0",
   "main": "./src/index.js",
   "scripts": {
     "format": "prettier --write src",

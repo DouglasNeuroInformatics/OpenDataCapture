@@ -2,7 +2,7 @@
   "name": "@opendatacapture/instrument-library",
   "type": "module",
   "version": "0.0.0",
-  "license": "AGPL-3.0",
+  "license": "Apache-2.0",
   "exports": {
     "./forms/*": "./dist/forms/*",
     "./interactive/*": "./dist/interactive/*"

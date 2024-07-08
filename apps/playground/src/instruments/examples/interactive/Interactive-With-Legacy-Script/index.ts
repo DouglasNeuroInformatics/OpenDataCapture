@@ -27,7 +27,7 @@ export default defineInstrument({
     description: 'This is an example of how ancient scripts, that fail in strict mode, can be used in an instrument.',
     estimatedDuration: 1,
     instructions: ['Please complete the task.'],
-    license: 'AGPL-3.0',
+    license: 'Apache-2.0',
     title: 'Interactive Instrument With Legacy Script'
   },
   measures: {},

@@ -2,7 +2,7 @@
   "name": "@opendatacapture/instrument-runtime-env",
   "type": "module",
   "version": "0.0.0",
-  "license": "LGPL-3.0",
+  "license": "Apache-2.0",
   "exports": {
     ".": {
       "types": "./lib/index.d.ts"

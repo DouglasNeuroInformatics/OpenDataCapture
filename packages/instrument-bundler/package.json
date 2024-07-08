@@ -2,7 +2,7 @@
   "name": "@opendatacapture/instrument-bundler",
   "type": "module",
   "version": "0.0.1",
-  "license": "LGPL-3.0",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./src/index.ts"
   },

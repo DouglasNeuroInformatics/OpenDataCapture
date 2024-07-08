@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "license": "AGPL-3.0",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "tsc && pnpm exec vite build",
     "deploy": "rsync -r dist/* douglasneuroinformatics.ca:/home/unrjos/www/playground.opendatacapture.org",

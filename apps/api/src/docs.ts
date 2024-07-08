@@ -8,7 +8,7 @@ export function setupDocs(app: NestExpressApplication) {
     .setTitle('Open Data Capture')
     .setContact('Douglas Neuroinformatics', '', 'support@douglasneuroinformatics.ca')
     .setDescription('Documentation for the REST API for Open Data Capture')
-    .setLicense('AGPL-3.0', 'https://www.gnu.org/licenses/agpl-3.0.txt')
+    .setLicense('Apache-2.0', 'https://www.apache.org/licenses/LICENSE-2.0')
     .setVersion('1')
     .setExternalDoc('Homepage', 'https://opendatacapture.org')
     .addTag('Authentication')
