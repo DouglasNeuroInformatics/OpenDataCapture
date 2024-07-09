@@ -3,27 +3,26 @@
 import React from 'react';
 
 import { Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { estimatePasswordStrength } from '@opendatacapture/password';
 import { Logo } from '@opendatacapture/react-core';
-import { $StrongPassword } from '@opendatacapture/schemas/user';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-type SetupData = z.infer<typeof $SetupData>;
-const $SetupData = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  username: z.string().min(1),
-  password: $StrongPassword,
-  initDemo: z.boolean(),
-  dummySubjectCount: z.number().int().nonnegative().optional()
-});
+type SetupData = {
+  dummySubjectCount?: number | undefined;
+  firstName: string;
+  initDemo: boolean;
+  lastName: string;
+  password: string;
+  username: string;
+};
 
 export type SetupPageProps = {
   onSubmit: (data: SetupData) => void;
 };
-//
+
 export const SetupPage = ({ onSubmit }: SetupPageProps) => {
-  const { t } = useTranslation(['core', 'setup']);
+  const { t } = useTranslation(['core', 'common', 'setup']);
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <Card className="w-full grow px-4 sm:m-8 sm:max-w-xl sm:grow-0 md:max-w-2xl">
@@ -53,6 +52,9 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                     variant: 'input'
                   },
                   password: {
+                    calculateStrength: (password) => {
+                      return estimatePasswordStrength(password).score;
+                    },
                     kind: 'string',
                     label: t('setup:admin.password'),
                     variant: 'password'
@@ -91,7 +93,17 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
               }
             ]}
             submitBtnLabel={t('submit')}
-            validationSchema={$SetupData}
+            validationSchema={z.object({
+              firstName: z.string().min(1),
+              lastName: z.string().min(1),
+              username: z.string().min(1),
+              password: z
+                .string()
+                .min(1)
+                .refine((val) => estimatePasswordStrength(val).success, t('common:insufficientPasswordStrength')),
+              initDemo: z.boolean(),
+              dummySubjectCount: z.number().int().nonnegative().optional()
+            })}
             onSubmit={onSubmit}
           />
         </Card.Content>

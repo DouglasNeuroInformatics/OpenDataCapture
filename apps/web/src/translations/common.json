@@ -112,5 +112,9 @@
   "uploadSuccessful": {
     "en": "Upload Successful",
     "fr": "Téléchargement réussi"
+  },
+  "insufficientPasswordStrength": {
+    "en": "Insufficient password strength",
+    "fr": "Mot de passe trop faible"
   }
 }

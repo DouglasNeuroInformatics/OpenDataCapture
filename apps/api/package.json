@@ -31,6 +31,7 @@
     "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-library": "workspace:*",
+    "@opendatacapture/password": "workspace:*",
     "@opendatacapture/prisma-client": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",

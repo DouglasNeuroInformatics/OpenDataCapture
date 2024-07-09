@@ -78,7 +78,7 @@ export class UsersService {
   async find({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     return this.userModel.findMany({
       where: {
-        AND: [accessibleQuery(ability, 'read', 'User'), { groupIds: { has: groupId } }]
+        AND: [accessibleQuery(ability, 'read', 'User'), { groupIds: groupId ? { has: groupId } : undefined }]
       }
     });
   }

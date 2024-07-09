@@ -205,6 +205,9 @@ importers:
       '@opendatacapture/instrument-library':
         specifier: workspace:*
         version: link:../../packages/instrument-library
+      '@opendatacapture/password':
+        specifier: workspace:*
+        version: link:../../packages/password
       '@opendatacapture/prisma-client':
         specifier: workspace:*
         version: link:../../packages/prisma-client
@@ -303,8 +306,8 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.6.4
-        version: 2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.8.1
+        version: 2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
@@ -415,8 +418,8 @@ importers:
   apps/outreach:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.6.4
-        version: 2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.8.1
+        version: 2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -482,8 +485,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.6.4
-        version: 2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.8.1
+        version: 2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.49.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -609,8 +612,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.6.4
-        version: 2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.8.1
+        version: 2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@heroicons/react':
         specifier: ^2.1.3
         version: 2.1.3(react@18.3.1)
@@ -638,6 +641,9 @@ importers:
       '@opendatacapture/instrument-utils':
         specifier: workspace:*
         version: link:../../packages/instrument-utils
+      '@opendatacapture/password':
+        specifier: workspace:*
+        version: link:../../packages/password
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -801,8 +807,8 @@ importers:
   packages/i18next:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.6.4
-        version: 2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.8.1
+        version: 2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -875,8 +881,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.6.4
-        version: 2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.8.1
+        version: 2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -1002,6 +1008,24 @@ importers:
 
   packages/licenses: {}
 
+  packages/password:
+    dependencies:
+      '@opendatacapture/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+      '@zxcvbn-ts/core':
+        specifier: ^3.0.4
+        version: 3.0.4
+      '@zxcvbn-ts/language-common':
+        specifier: ^3.0.4
+        version: 3.0.4
+      '@zxcvbn-ts/language-en':
+        specifier: ^3.0.2
+        version: 3.0.2
+      '@zxcvbn-ts/language-fr':
+        specifier: ^3.0.2
+        version: 3.0.2
+
   packages/prisma-client:
     dependencies:
       '@prisma/client':
@@ -1018,8 +1042,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libui':
-        specifier: ^2.6.4
-        version: 2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.8.1
+        version: 2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       '@opendatacapture/i18next':
         specifier: workspace:*
         version: link:../i18next
@@ -1116,8 +1140,8 @@ importers:
   packages/tailwindcss:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^2.6.4
-        version: 2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
+        specifier: ^2.8.1
+        version: 2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)
       autoprefixer:
         specifier: 10.x
         version: 10.4.19(postcss@8.4.38)
@@ -2312,9 +2336,13 @@ packages:
     resolution:
       { integrity: sha512-5MiwGkLCNn/w9zWT9oDs3saiK0cK+8qUR1bE4vRQlrUTrYmHIjgqE20/8tkadHXqnoazOI0yCtcn+YsuUwzvcg== }
 
-  '@douglasneuroinformatics/libui@2.6.4':
+  '@douglasneuroinformatics/libui-form-types@0.9.0':
     resolution:
-      { integrity: sha512-41T5crTIymYD9/eDmioWduhDzvKsJ8WYB9bXvMhc1s/57x64uWZk8dMo9LT6A3m4su+1/Cv1ZN10xUhrEubJRA== }
+      { integrity: sha512-V+RuYf5/HTGWv2VnSv1WOJsPn5grGWJZOXeIH8mWOw6kA3oStC7Q1cvw13vU65e154JL0BfUfgtmO5k3uJ9d6A== }
+
+  '@douglasneuroinformatics/libui@2.8.1':
+    resolution:
+      { integrity: sha512-CrIdLl09g9iOcVGS/xPvcp6+928KZmkzDFaQqj46A8X7rzAUi/oeGmU+qtY9EWRLlH5or5ygyQbAwOfqyRv8Cg== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -5396,6 +5424,22 @@ packages:
       { integrity: sha512-Mm2EXF33DJQ/3GWWEWeP1UCqzpQ5+fiMvT3QWspsXY05DyqqxWu7a9awSzU4/spHMHVFrTjani1PR0vprgZpow== }
     engines: { bun: '>=0.7.0', deno: '>=1.0.0', node: '>=16.5.0' }
 
+  '@zxcvbn-ts/core@3.0.4':
+    resolution:
+      { integrity: sha512-aQeiT0F09FuJaAqNrxynlAwZ2mW/1MdXakKWNmGM1Qp/VaY6CnB/GfnMS2T8gB2231Esp1/maCWd8vTG4OuShw== }
+
+  '@zxcvbn-ts/language-common@3.0.4':
+    resolution:
+      { integrity: sha512-viSNNnRYtc7ULXzxrQIVUNwHAPSXRtoIwy/Tq4XQQdIknBzw4vz36lQLF6mvhMlTIlpjoN/Z1GFu/fwiAlUSsw== }
+
+  '@zxcvbn-ts/language-en@3.0.2':
+    resolution:
+      { integrity: sha512-Zp+zL+I6Un2Bj0tRXNs6VUBq3Djt+hwTwUz4dkt2qgsQz47U0/XthZ4ULrT/RxjwJRl5LwiaKOOZeOtmixHnjg== }
+
+  '@zxcvbn-ts/language-fr@3.0.2':
+    resolution:
+      { integrity: sha512-Tj9jS/Z8mNBAD21pn8Mp4O86CPrwImysO1fM3DG+fsfk8W79/MDzqpFDBHiqpu69Uo3LPPctMHEEteakFWt4Qg== }
+
   JSONStream@1.3.5:
     resolution:
       { integrity: sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ== }
@@ -7460,6 +7504,11 @@ packages:
   fast-safe-stringify@2.1.1:
     resolution:
       { integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA== }
+
+  fastest-levenshtein@1.0.16:
+    resolution:
+      { integrity: sha512-eRnCtTTtGZFpQCwhJiUOuxPQWRXVKYDn0b2PeHfXL6/Zi53SLAzAHfVhVWK2AryC/WH05kGfxhFIPvTF0SXQzg== }
+    engines: { node: '>= 4.9.1' }
 
   fastq@1.17.1:
     resolution:
@@ -14408,10 +14457,14 @@ snapshots:
     dependencies:
       type-fest: 4.20.1
 
-  '@douglasneuroinformatics/libui@2.6.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)':
+  '@douglasneuroinformatics/libui-form-types@0.9.0':
+    dependencies:
+      type-fest: 4.20.1
+
+  '@douglasneuroinformatics/libui@2.8.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.4)(typescript@5.4.5)':
     dependencies:
       '@douglasneuroinformatics/libjs': 0.3.1(typescript@5.4.5)
-      '@douglasneuroinformatics/libui-form-types': 0.8.0
+      '@douglasneuroinformatics/libui-form-types': 0.9.0
       '@headlessui/tailwindcss': 0.2.1(tailwindcss@3.4.4)
       '@heroicons/react': 2.1.3(react@18.3.1)
       '@radix-ui/react-accordion': 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -17522,6 +17575,16 @@ snapshots:
 
   '@zip.js/zip.js@2.7.45': {}
 
+  '@zxcvbn-ts/core@3.0.4':
+    dependencies:
+      fastest-levenshtein: 1.0.16
+
+  '@zxcvbn-ts/language-common@3.0.4': {}
+
+  '@zxcvbn-ts/language-en@3.0.2': {}
+
+  '@zxcvbn-ts/language-fr@3.0.2': {}
+
   JSONStream@1.3.5:
     dependencies:
       jsonparse: 1.3.1
@@ -19563,6 +19626,8 @@ snapshots:
   fast-redact@3.5.0: {}
 
   fast-safe-stringify@2.1.1: {}
+
+  fastest-levenshtein@1.0.16: {}
 
   fastq@1.17.1:
     dependencies:
