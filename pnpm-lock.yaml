@@ -205,6 +205,9 @@ importers:
       '@opendatacapture/instrument-library':
         specifier: workspace:*
         version: link:../../packages/instrument-library
+      '@opendatacapture/password':
+        specifier: workspace:*
+        version: link:../../packages/password
       '@opendatacapture/prisma-client':
         specifier: workspace:*
         version: link:../../packages/prisma-client
