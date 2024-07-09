@@ -4,9 +4,13 @@ import React from 'react';
 
 import { Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { Logo } from '@opendatacapture/react-core';
-import { $StrongPassword } from '@opendatacapture/schemas/user';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+
+const $StrongPassword = z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{12,}$/, {
+  message:
+    'Password must be string of 12 or more characters, with a minimum of one upper case letter, lowercase letter, and number'
+});
 
 type SetupData = z.infer<typeof $SetupData>;
 const $SetupData = z.object({
