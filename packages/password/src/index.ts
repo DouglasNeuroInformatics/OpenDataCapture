@@ -4,6 +4,7 @@ import type { FeedbackType } from '@zxcvbn-ts/core';
 import { adjacencyGraphs, dictionary } from '@zxcvbn-ts/language-common';
 import { translations as enTranslations } from '@zxcvbn-ts/language-en';
 import { translations as frTranslations } from '@zxcvbn-ts/language-fr';
+import type { IntRange } from 'type-fest';
 
 zxcvbnOptions.setOptions({ dictionary, graphs: adjacencyGraphs });
 
@@ -18,6 +19,7 @@ type PasswordStrengthOptions = {
 
 type PasswordStrengthResult = {
   feedback: FeedbackType;
+  score: IntRange<0, 5>;
   success: boolean;
 };
 
@@ -33,6 +35,7 @@ export function estimatePasswordStrength(password: string, options?: PasswordStr
   const result = zxcvbn(password);
   return {
     feedback: translateFeedback(result.feedback, options?.feedbackLanguage ?? 'en'),
+    score: result.score,
     success: result.score > 2
   };
 }
