@@ -11,7 +11,7 @@
     "lint": "astro check && eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.7.0",
+    "@douglasneuroinformatics/libui": "^2.8.0",
     "@opendatacapture/schemas": "workspace:*",
     "clsx": "^2.1.1",
     "lodash-es": "^4.17.21",
