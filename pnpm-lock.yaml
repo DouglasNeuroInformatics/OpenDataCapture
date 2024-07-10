@@ -1248,6 +1248,9 @@ importers:
       rollup-plugin-dts:
         specifier: ^6.1.1
         version: 6.1.1(rollup@4.18.0)(typescript@5.4.5)
+      simple-statistics__7.8.3:
+        specifier: npm:simple-statistics@7.8.3
+        version: simple-statistics@7.8.3
       zod__3.23.6:
         specifier: npm:zod@3.23.6
         version: zod@3.23.6
@@ -11491,6 +11494,10 @@ packages:
   simple-get@4.0.1:
     resolution:
       { integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA== }
+
+  simple-statistics@7.8.3:
+    resolution:
+      { integrity: sha512-JFvMY00t6SBGtwMuJ+nqgsx9ylkMiJ5JlK9bkj8AdvniIe5615wWQYkKHXe84XtSuc40G/tlrPu0A5/NlJvv8A== }
 
   simple-swizzle@0.2.2:
     resolution:
@@ -23469,6 +23476,8 @@ snapshots:
       decompress-response: 6.0.0
       once: 1.4.0
       simple-concat: 1.0.1
+
+  simple-statistics@7.8.3: {}
 
   simple-swizzle@0.2.2:
     dependencies:
