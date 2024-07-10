@@ -24,6 +24,6 @@ export function useInstrumentSummariesQuery<TKind extends InstrumentKind>({
       const summaries = await $InstrumentSummary.array().parseAsync(response.data);
       return summaries.map((summary) => translateInstrumentSummary(summary, i18n.resolvedLanguage ?? 'en'));
     },
-    queryKey: ['instrument-summaries', params?.kind, params?.subjectId]
+    queryKey: ['instrument-summaries', params?.kind, params?.subjectId, i18n.resolvedLanguage]
   });
 }
