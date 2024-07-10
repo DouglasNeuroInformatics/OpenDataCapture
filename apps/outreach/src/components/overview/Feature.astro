@@ -20,7 +20,7 @@ const mainContentId = crypto.randomUUID();
 const { description, id = crypto.randomUUID(), heading, subheading, screenshot, reversed } = Astro.props;
 ---
 
-<section class="mb-32 grid gap-8 lg:mb-40 lg:grid-cols-2 lg:gap-12" id={id}>
+<section class="mb-32 grid gap-8 lg:mb-40 lg:grid-cols-2 lg:gap-12 xl:mb-72" id={id}>
   <div
     class={cn(
       'flex flex-col items-center transition-all duration-700 justify-center opacity-0 translate-y-10',

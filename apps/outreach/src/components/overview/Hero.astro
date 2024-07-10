@@ -35,7 +35,7 @@ const { t } = useTranslations(Astro.url);
     </div>
   </div>
   <div
-    class="hidden translate-x-10 translate-y-10 opacity-0 transition-all duration-1000 lg:flex lg:w-1/2 lg:items-center lg:justify-center xl:w-5/12"
+    class="hidden translate-y-10 opacity-0 transition-all duration-1000 lg:flex lg:w-1/2 lg:items-center lg:justify-center xl:w-5/12"
   >
     <Medical class="rounded-md brightness-90" />
   </div>
@@ -47,7 +47,6 @@ const { t } = useTranslations(Astro.url);
   heroSection.children.item(0)!.classList.toggle('opacity-0');
   heroSection.children.item(0)!.classList.toggle('translate-y-10');
   heroSection.children.item(1)!.classList.toggle('opacity-0');
-  heroSection.children.item(1)!.classList.toggle('translate-x-10');
   heroSection.children.item(1)!.classList.toggle('translate-y-10');
 
   document.getElementById('learn-more-btn')?.addEventListener('click', () => {
