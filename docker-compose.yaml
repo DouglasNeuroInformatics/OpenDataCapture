@@ -13,7 +13,7 @@ services:
     environment:
       - SITE_ADDRESS
     volumes:
-      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
   api:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-api:${RELEASE_CHANNEL}
