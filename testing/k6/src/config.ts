@@ -9,13 +9,17 @@ import type { Options, Stage } from 'k6/options';
  */
 type TestType = 'average' | 'smoke' | 'stress';
 
+export type ConfigParams = {
+  type: TestType;
+};
+
 export class Config implements Options {
   stages: Stage[];
   thresholds = {
     checks: ['rate>.9'] // 90% of checks must pass
   };
 
-  constructor(type: TestType) {
+  constructor({ type }: ConfigParams) {
     this.stages = this.workloads[type];
   }
 
@@ -23,15 +27,15 @@ export class Config implements Options {
     return {
       average: [
         {
-          duration: '5m',
-          target: 10 // traffic ramp-up from 1 to 10 users
+          duration: '1m',
+          target: 100 // traffic ramp-up from 1 to 100 users
         },
         {
-          duration: '10m', // stay at 10 users
-          target: 10
+          duration: '2m', // stay at 100 users
+          target: 100
         },
         {
-          duration: '5m', // ramp-down to 0 users
+          duration: '1m', // ramp-down to 0 users
           target: 0
         }
       ],

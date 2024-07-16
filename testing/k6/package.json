@@ -6,7 +6,8 @@
   "scripts": {
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "test:demo": "pnpm exec esbuild --bundle --external:k6 --format=esm --target=es2015 src/index.ts  | k6 run --out csv=results/results.csv  -"
+    "test:demo": "node scripts/build.js --base-url='https://demo.opendatacapture.org/api' --type=smoke | k6 run --out csv=results/results.csv -",
+    "test:preview": "node scripts/build.js --base-url='http://localhost:80' --type=average | k6 run --out csv=results/results.csv -"
   },
   "dependencies": {
     "@opendatacapture/demo": "workspace:*",
