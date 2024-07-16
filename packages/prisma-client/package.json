@@ -16,10 +16,10 @@
     "db:push": "env-cmd --silent -f ../../.env prisma db push --skip-generate --schema schemas/gateway.schema.prisma"
   },
   "dependencies": {
-    "@prisma/client": "^5.15.0"
+    "@prisma/client": "^5.17.0"
   },
   "devDependencies": {
-    "prisma": "^5.15.0"
+    "prisma": "^5.17.0"
   },
   "trustedDependencies": [
     "prisma"

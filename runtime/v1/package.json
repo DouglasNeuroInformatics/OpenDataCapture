@@ -51,7 +51,7 @@
     "lodash-es__4.17.21": "npm:lodash-es@4.17.21",
     "react-dom__18.3.1": "npm:react-dom@18.3.1",
     "react__18.3.1": "npm:react@18.3.1",
-    "rollup": "^4.18.0",
+    "rollup": "^4.18.1",
     "rollup-plugin-dts": "^6.1.1",
     "simple-statistics__7.8.3": "npm:simple-statistics@7.8.3",
     "zod__3.23.6": "npm:zod@3.23.6"
