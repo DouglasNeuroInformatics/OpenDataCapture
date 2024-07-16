@@ -4,5 +4,5 @@
     "module": "ESNext",
     "moduleResolution": "Bundler"
   },
-  "include": ["src/**/*", "*.js", "*.cjs"]
+  "include": ["scripts/build.js", "src/**/*", "*.js", "*.cjs"]
 }

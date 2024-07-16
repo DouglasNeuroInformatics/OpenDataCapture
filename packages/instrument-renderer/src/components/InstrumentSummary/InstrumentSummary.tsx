@@ -6,7 +6,7 @@ import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { InstrumentKind, SomeUnilingualInstrument } from '@opendatacapture/schemas/instrument';
-import { isSubjectWithPersonalInfo } from '@opendatacapture/subject-utils';
+import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { filter } from 'lodash-es';
 import { DownloadIcon, PrinterIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -90,6 +90,10 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
             isSubjectWithPersonalInfo(subject)
               ? [
                   {
+                    label: 'ID',
+                    value: subject.id
+                  },
+                  {
                     label: t('fullName'),
                     value:
                       subject?.firstName && subject.lastName
@@ -108,7 +112,7 @@ export const InstrumentSummary = <TKind extends InstrumentKind>({
               : [
                   {
                     label: 'ID',
-                    value: subject.id
+                    value: removeSubjectIdScope(subject.id)
                   }
                 ]
           }

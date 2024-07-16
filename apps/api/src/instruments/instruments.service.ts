@@ -2,8 +2,14 @@ import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 import { type BundlerInput, InstrumentBundler } from '@opendatacapture/instrument-bundler';
-import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
-import type { InstrumentKind, InstrumentSummary, SomeInstrument } from '@opendatacapture/schemas/instrument';
+import {
+  $AnyInstrument,
+  $FormInstrument,
+  $InteractiveInstrument,
+  type InstrumentKind,
+  type InstrumentSummary,
+  type SomeInstrument
+} from '@opendatacapture/schemas/instrument';
 import type { Prisma } from '@prisma/client';
 import { omit } from 'lodash-es';
 
@@ -11,18 +17,19 @@ import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
+import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
 
 @Injectable()
 export class InstrumentsService {
   private readonly instrumentBundler = new InstrumentBundler();
-  private readonly instrumentInterpreter = new InstrumentInterpreter();
   private readonly logger = new Logger(InstrumentsService.name);
 
   constructor(
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
-    private readonly cryptoService: CryptoService
+    private readonly cryptoService: CryptoService,
+    private readonly virtualizationService: VirtualizationService
   ) {}
 
   async count(
@@ -150,22 +157,22 @@ export class InstrumentsService {
   private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
     let instance: SomeInstrument<TKind>;
     try {
-      instance = await this.instrumentInterpreter.interpret(bundle, {
-        kind: options?.kind,
-        validate: true
-      });
-    } catch (err) {
-      if (err instanceof Error) {
-        this.logger.debug(err.cause);
-        if (err.cause instanceof Error) {
-          this.logger.debug(err.cause.cause);
-        }
+      instance = await this.virtualizationService.runInContext(bundle);
+      switch (options?.kind) {
+        case undefined:
+          return $AnyInstrument.parseAsync(instance);
+        case 'FORM':
+          return $FormInstrument.parseAsync(instance);
+        case 'INTERACTIVE':
+          return $InteractiveInstrument.parseAsync(instance);
+        default:
+          throw new Error(`Unexpected instrument kind: ${options?.kind}`);
       }
+    } catch (err) {
       throw new UnprocessableEntityException('Failed to interpret instrument bundle', {
         cause: err
       });
     }
-    return instance;
   }
 
   /**

@@ -2,7 +2,7 @@ import type { JSONValue } from 'k6';
 import * as http from 'k6/http';
 import type { RefinedResponse } from 'k6/http';
 
-type ClientOptions = {
+type ClientParams = {
   baseUrl: string;
 };
 
@@ -46,8 +46,8 @@ export class Client {
   };
   private baseUrl: string;
 
-  constructor(options: ClientOptions) {
-    this.baseUrl = options.baseUrl;
+  constructor({ baseUrl }: ClientParams) {
+    this.baseUrl = baseUrl;
   }
 
   get<TData extends JSONValue = JSONValue>(path: string, options?: GetRequestOptions): ClientResponse<TData> {
@@ -74,3 +74,5 @@ export class Client {
     }) as ClientResponse<TData>;
   }
 }
+
+export type { ClientParams };

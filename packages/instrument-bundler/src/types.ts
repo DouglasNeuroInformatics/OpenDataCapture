@@ -5,6 +5,7 @@ export type BundlerInput = {
 
 export type BundleOptions = {
   debug?: boolean;
+  dynamicImport?: 'mapped' | 'preserve';
   inputs: BundlerInput[];
 };
 

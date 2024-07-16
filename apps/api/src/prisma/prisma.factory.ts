@@ -1,6 +1,5 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { InstrumentInterpreter, type InterpretOptions } from '@opendatacapture/instrument-interpreter';
-import { InstrumentKind, Prisma, PrismaClient } from '@opendatacapture/prisma-client/api';
+import { Prisma, PrismaClient } from '@opendatacapture/prisma-client/api';
 
 export const PRISMA_CLIENT_TOKEN = 'PRISMA_CLIENT';
 
@@ -54,15 +53,6 @@ export class PrismaFactory {
             compute() {
               return 'Instrument';
             }
-          },
-          toInstance: {
-            compute({ bundle }) {
-              return async function <TKind extends InstrumentKind>(options?: InterpretOptions<TKind>) {
-                const interpreter = new InstrumentInterpreter();
-                return interpreter.interpret(bundle, options);
-              };
-            },
-            needs: { bundle: true }
           }
         },
         instrumentRecordModel: {

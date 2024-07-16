@@ -8,40 +8,47 @@ import type { Summary } from '@opendatacapture/schemas/summary';
 import { check, sleep } from 'k6';
 import { isMatch, random } from 'lodash-es';
 
-import { Client } from './client';
-import { Config } from './config';
+import { Client, type ClientParams } from './client';
+import { Config, type ConfigParams } from './config';
 
-export const options = new Config('stress');
+// these are injected via the build script during transpilation
+declare global {
+  const __CONFIG_PARAMS: ConfigParams;
+  const __CLIENT_PARAMS: ClientParams;
+}
+
+const GROUP_MANAGERS = DEMO_USERS.filter((user) => user.basePermissionLevel === 'GROUP_MANAGER');
+
+export const options = new Config(__CONFIG_PARAMS);
 
 export default function () {
-  const client = new Client({
-    // baseUrl: 'https://demo.opendatacapture.org',
-    baseUrl: 'http://localhost:5500'
-  });
-  const user = DEMO_USERS[random(DEMO_USERS.length - 1)];
+  const client = new Client(__CLIENT_PARAMS);
+  const user = GROUP_MANAGERS[random(GROUP_MANAGERS.length - 1)];
 
   // check single page app
-  check(client.get('/', { headers: { Accept: 'text/html' } }), {
-    'the status code is 200': (res) => res.status === 200,
-    'the title is "Open Data Capture"': (res) => res.html('title').html() === 'Open Data Capture'
-  });
+  // this is currently disabled since we need to test the API alone locally
+  // check(client.get('/', { headers: { Accept: 'text/html' } }), {
+  //   'the status code is 200': (res) => res.status === 200,
+  //   'the title is "Open Data Capture"': (res) => res.html('title').html() === 'Open Data Capture'
+  // });
 
   // check the demo is setup
-  check(client.get<SetupState>('/api/v1/setup'), {
+  const setupResponse = client.get<SetupState>('/v1/setup');
+  check(setupResponse, {
     'the response body matches the expected structure': (res) => {
       return isMatch(res.json(), {
         isDemo: true,
-        isGatewayEnabled: true,
         isSetup: true
-      } satisfies SetupState);
+      } satisfies Partial<SetupState>);
     },
     'the status code is 200': (res) => res.status === 200
   });
+  const isGatewayEnabled = setupResponse.json('isGatewayEnabled');
 
   sleep(0.5);
 
   // login and get an access token
-  const loginResponse = client.post<LoginCredentials, AuthPayload>('/api/v1/auth/login', {
+  const loginResponse = client.post<LoginCredentials, AuthPayload>('/v1/auth/login', {
     password: user.password,
     username: user.username
   });
@@ -56,7 +63,7 @@ export default function () {
   sleep(0.5);
 
   // select a random group and get the group id
-  const groupsResponse = client.get<Omit<Group, 'createdAt' | 'updatedAt'>[]>('/api/v1/groups');
+  const groupsResponse = client.get<Omit<Group, 'createdAt' | 'updatedAt'>[]>('/v1/groups');
   check(groupsResponse, { 'the status code is 200': (res) => res.status === 200 });
   const groups = groupsResponse.json();
   check(groups, { 'the number of groups is the expected value': (groups) => groups.length === user.groupNames.length });
@@ -65,7 +72,7 @@ export default function () {
   sleep(0.5);
 
   // get a summary of available data
-  check(client.get<Summary>(`/api/v1/summary?groupId=${selectedGroup.id}`), {
+  check(client.get<Summary>(`/v1/summary?groupId=${selectedGroup.id}`), {
     'the number of users is greater than zero': (res) => res.json('counts').users > 0,
     'the status code is 200': (res) => res.status === 200
   });
@@ -73,7 +80,7 @@ export default function () {
   sleep(0.5);
 
   // get all subjects (e.g., when accessing the data hub)
-  const subjectsResponse = client.get<Pick<Subject, 'id'>[]>(`/api/v1/subjects?groupId=${selectedGroup.id}`);
+  const subjectsResponse = client.get<Pick<Subject, 'id'>[]>(`/v1/subjects?groupId=${selectedGroup.id}`);
   check(subjectsResponse, {
     'the number of subjects is greater than zero': (res) => res.json().length > 0,
     'the status code is 200': (res) => res.status === 200
@@ -84,7 +91,7 @@ export default function () {
 
   // export all data
   check(
-    client.get<any[]>('/api/v1/instrument-records/export', {
+    client.get<any[]>('/v1/instrument-records/export', {
       params: {
         groupId: selectedGroup.id
       }
@@ -100,14 +107,18 @@ export default function () {
   // view a random subject (x3)
   for (let i = 0; i < 3; i++) {
     const selectedSubject = subjects[random(subjects.length - 1)];
-    check(client.get<any[]>(`/api/v1/assignments?subjectId=${selectedSubject.id}`), {
-      'the status code is 200': (res) => res.status === 200
-    });
-    sleep(0.5);
+
+    // view assignments (if gateway enabled)
+    if (isGatewayEnabled) {
+      check(client.get<any[]>(`/v1/assignments?subjectId=${selectedSubject.id}`), {
+        'the status code is 200': (res) => res.status === 200
+      });
+      sleep(0.5);
+    }
 
     // get summaries
     const instrumentSummariesResponse = client.get<InstrumentSummary[]>(
-      `/api/v1/instruments/summaries?subjectId=${selectedSubject.id}`
+      `/v1/instruments/summaries?subjectId=${selectedSubject.id}`
     );
     check(instrumentSummariesResponse, { 'the status code is 200': (res) => res.status === 200 });
     const instrumentSummaries = instrumentSummariesResponse.json();
@@ -116,11 +127,11 @@ export default function () {
 
     // for each summary, get the full instrument and all records for this subject
     for (const summary of instrumentSummaries) {
-      check(client.get(`/api/v1/instruments/${summary.id}`), {
+      check(client.get(`/v1/instruments/${summary.id}`), {
         'the status code is 200': (res) => res.status === 200
       });
       check(
-        client.get('/api/v1/instrument-records', {
+        client.get('/v1/instrument-records', {
           params: {
             groupId: selectedGroup.id,
             instrumentId: summary.id,
