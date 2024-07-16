@@ -1,6 +1,5 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable } from '@nestjs/common';
-import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
 import type { InstrumentRecordModel } from '@opendatacapture/prisma-client/api';
 import type { AnyInstrument, InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
 import type {
@@ -22,23 +21,21 @@ import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
 import { SessionsService } from '@/sessions/sessions.service';
 import { SubjectsService } from '@/subjects/subjects.service';
+import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
 @Injectable()
 export class InstrumentRecordsService {
-  private readonly interpreter: InstrumentInterpreter;
-
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     private readonly groupsService: GroupsService,
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
     private readonly sessionsService: SessionsService,
-    private readonly subjectsService: SubjectsService
-  ) {
-    this.interpreter = new InstrumentInterpreter();
-  }
+    private readonly subjectsService: SubjectsService,
+    private readonly virtualizationService: VirtualizationService
+  ) {}
 
   async count(
     filter: NonNullable<Parameters<Model<'InstrumentRecord'>['count']>[0]>['where'] = {},
@@ -115,7 +112,7 @@ export class InstrumentRecordsService {
         if (instruments.has(record.instrumentId)) {
           instrument = instruments.get(record.instrumentId)!;
         } else {
-          instrument = await record.instrument.toInstance();
+          instrument = await this.virtualizationService.getInstrumentInstance(record.instrument);
           instruments.set(record.instrumentId, instrument);
         }
 
@@ -158,6 +155,7 @@ export class InstrumentRecordsService {
         instrument: {
           select: {
             bundle: true,
+            id: true,
             kind: true
           }
         }
@@ -180,7 +178,7 @@ export class InstrumentRecordsService {
 
     return await Promise.all(
       records.map(async (record) => {
-        const instance = await this.interpreter.interpret(record.instrument.bundle);
+        const instance = await this.virtualizationService.getInstrumentInstance(record.instrument);
         let computedMeasures: { [key: string]: InstrumentMeasureValue } | undefined;
         if (instance.measures) {
           computedMeasures = this.instrumentMeasuresService.computeMeasures(instance.measures, record.data);
@@ -197,7 +195,7 @@ export class InstrumentRecordsService {
     groupId && (await this.groupsService.findById(groupId));
     const instrument = await this.instrumentsService
       .findById(instrumentId)
-      .then((instrument) => instrument.toInstance());
+      .then((instrument) => this.virtualizationService.getInstrumentInstance(instrument));
 
     if (!instrument.measures) {
       return {};

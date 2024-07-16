@@ -6,12 +6,21 @@ import { InstrumentsModule } from '@/instruments/instruments.module';
 import { SessionsModule } from '@/sessions/sessions.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
 import { UsersModule } from '@/users/users.module';
+import { VirtualizationModule } from '@/virtualization/virtualization.module';
 
 import { DemoService } from './demo.service';
 
 @Module({
   exports: [DemoService],
-  imports: [GroupsModule, InstrumentRecordsModule, InstrumentsModule, SessionsModule, SubjectsModule, UsersModule],
+  imports: [
+    GroupsModule,
+    InstrumentRecordsModule,
+    InstrumentsModule,
+    SessionsModule,
+    SubjectsModule,
+    UsersModule,
+    VirtualizationModule
+  ],
   providers: [DemoService]
 })
 export class DemoModule {}

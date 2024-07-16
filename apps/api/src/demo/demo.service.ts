@@ -20,6 +20,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
+import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 type HappinessQuestionnaireData = {
   isSatisfiedOverall: boolean;
@@ -41,7 +42,8 @@ export class DemoService {
     private readonly prismaService: PrismaService,
     private readonly sessionsService: SessionsService,
     private readonly subjectsService: SubjectsService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly virtualizationService: VirtualizationService
   ) {}
 
   async init({ dummySubjectCount }: { dummySubjectCount: number }): Promise<void> {
@@ -51,7 +53,10 @@ export class DemoService {
 
       const hq = (await this.instrumentsService
         .createFromBundle(happinessQuestionnaire)
-        .then((entity) => entity.toInstance())) as FormInstrument<HappinessQuestionnaireData, Language[]>;
+        .then((entity) => this.virtualizationService.getInstrumentInstance(entity))) as FormInstrument<
+        HappinessQuestionnaireData,
+        Language[]
+      >;
 
       await Promise.all([
         this.instrumentsService.createFromBundle(briefPsychiatricRatingScale),
