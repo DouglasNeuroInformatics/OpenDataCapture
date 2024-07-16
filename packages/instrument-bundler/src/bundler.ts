@@ -13,14 +13,22 @@ import esbuild from './vendor/esbuild.js';
 import type { BuildOutput, BundleOptions, BundlerInput } from './types.js';
 
 export class InstrumentBundler {
-  async bundle({ debug, inputs }: BundleOptions) {
+  async bundle({ debug, dynamicImport, inputs }: BundleOptions) {
     this.validateInputs(inputs);
     const index = resolveIndexInput(inputs);
-    const output = await this.build({ index, inputs });
+    const output = await this.build({ dynamicImport, index, inputs });
     return this.transformBundle(output, { debug });
   }
 
-  private async build({ index, inputs }: { index: BundlerInput; inputs: BundlerInput[] }): Promise<BuildOutput> {
+  private async build({
+    dynamicImport,
+    index,
+    inputs
+  }: {
+    dynamicImport?: BundleOptions['dynamicImport'];
+    index: BundlerInput;
+    inputs: BundlerInput[];
+  }): Promise<BuildOutput> {
     let output: BuildOutput;
     try {
       const result = await esbuild.build({
@@ -32,7 +40,7 @@ export class InstrumentBundler {
         minify: false,
         outfile: 'bundle.js',
         platform: 'browser',
-        plugins: [resolvePlugin({ inputs })],
+        plugins: [resolvePlugin({ dynamicImport, inputs })],
         stdin: {
           contents: `import instrument from './${index.name}'; var __exports = instrument;`,
           loader: inferLoader(index.name)

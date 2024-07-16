@@ -10,7 +10,7 @@ import { name, version } from '../package.json';
 import { InstrumentBundler } from './index.js';
 import { inferLoader } from './utils.js';
 
-import type { BundlerInput } from './types.js';
+import type { BundleOptions, BundlerInput } from './types.js';
 
 const program = new Command();
 program.name(name);
@@ -28,6 +28,12 @@ program.requiredOption('--outdir <path>', 'path to output directory');
 program.option('--clean', 'delete the output directory before build');
 program.option('--debug', 'disable minification');
 program.option('--declaration', 'emit typescript declarations');
+program.option('--dynamic-import <mode>', 'dynamic import mode', (mode) => {
+  if (!(mode === 'mapped' || mode === 'preserve')) {
+    throw new InvalidArgumentError(`Invalid dynamic import mode '${mode}' must 'mapped' or 'preserve`);
+  }
+  return mode satisfies BundleOptions['dynamicImport'];
+});
 program.option('--verbose', 'enable verbose mode');
 program.parse();
 
@@ -64,6 +70,7 @@ const targetDirs = Array.from(new Set(indexFiles.map((filename) => path.dirname(
 
 const bundler = new InstrumentBundler();
 const debug = Boolean(options.debug);
+const dynamicImport = options.dynamicImport as BundleOptions['dynamicImport'];
 
 for (const targetDir of targetDirs) {
   logger.verbose(`Searching for entry in target directory: ${targetDir}`);
@@ -95,7 +102,7 @@ for (const targetDir of targetDirs) {
   }
 
   logger.verbose('Generating bundle...');
-  const bundle = await bundler.bundle({ debug, inputs });
+  const bundle = await bundler.bundle({ debug, dynamicImport, inputs });
 
   logger.verbose(`Writing output bundle to file: ${outputBundlePath}`);
 
