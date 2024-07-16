@@ -1,9 +1,25 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
 import { ApiProperty } from '@nestjs/swagger';
+import { estimatePasswordStrength } from '@opendatacapture/password';
 import { $CreateUserData } from '@opendatacapture/schemas/user';
 import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
+import { z } from 'zod';
 
-@ValidationSchema($CreateUserData)
+@ValidationSchema(
+  $CreateUserData.extend({
+    password: $CreateUserData.shape.password.superRefine((val, ctx) => {
+      const result = estimatePasswordStrength(val, {
+        feedbackLanguage: 'en'
+      });
+      if (!result.success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Insufficient password strength: ${result.score}`
+        });
+      }
+    })
+  })
+)
 export class CreateUserDto {
   @ApiProperty({
     description: "Determines the user's base permissions, which may later be modified by an admin",
@@ -24,8 +40,7 @@ export class CreateUserDto {
   lastName: string;
 
   @ApiProperty({
-    description: 'A minimum of 8 characters, including one number, one upper case, and one lower case letter',
-    example: 'TheMinimumLengthIs8ButThereIsNotAMaximumLength'
+    description: 'A password with an accessed strength of three or more, see https://github.com/zxcvbn-ts/zxcvbn'
   })
   password: string;
 
