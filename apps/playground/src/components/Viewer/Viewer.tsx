@@ -15,7 +15,11 @@ export const Viewer = () => {
   const state = useTranspiler();
   const key = useAppStore((store) => store.viewer.key);
   return (
-    <div className="h-full overflow-scroll" key={key}>
+    <div
+      className="h-full overflow-y-scroll pr-1.5 lg:pr-3"
+      key={key}
+      style={{ scrollbarColor: 'var(--muted) var(--background)', scrollbarWidth: 'thin' }}
+    >
       {match(state)
         .with({ status: 'built' }, ({ bundle }) => (
           <ErrorBoundary FallbackComponent={RuntimeErrorFallback}>

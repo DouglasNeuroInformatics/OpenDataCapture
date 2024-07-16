@@ -21,7 +21,7 @@ export const MainContent = () => {
           </Resizable.Panel>
         </Resizable.PanelGroup>
       ) : (
-        <Tabs className="flex flex-grow flex-col" defaultValue="editor">
+        <Tabs className="flex flex-grow flex-col overflow-hidden" defaultValue="editor">
           <Tabs.List className="grid w-full grid-cols-2">
             <Tabs.Trigger value="editor">Editor</Tabs.Trigger>
             <Tabs.Trigger value="viewer">Viewer</Tabs.Trigger>
@@ -29,7 +29,7 @@ export const MainContent = () => {
           <Tabs.Content className="flex-grow" value="editor">
             <Editor />
           </Tabs.Content>
-          <Tabs.Content className="flex-grow pt-6" value="viewer">
+          <Tabs.Content className="flex-grow overflow-hidden pt-6" value="viewer">
             <Viewer />
           </Tabs.Content>
         </Tabs>
