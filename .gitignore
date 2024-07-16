@@ -44,3 +44,9 @@ data/
 
 # k6
 testing/k6/results
+
+# bruno
+.bruno/
+
+# logs
+*.log
