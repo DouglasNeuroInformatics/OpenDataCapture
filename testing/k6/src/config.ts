@@ -20,6 +20,7 @@ export class Config implements Options {
     checks: [
       {
         abortOnFail: true,
+        delayAbortEval: '30s',
         threshold: 'rate==1.0'
       }
     ],
@@ -27,6 +28,7 @@ export class Config implements Options {
     http_req_duration: [
       {
         abortOnFail: true,
+        delayAbortEval: '30s',
         threshold: 'p(95)<500'
       }
     ],
@@ -34,6 +36,7 @@ export class Config implements Options {
     http_req_failed: [
       {
         abortOnFail: true,
+        delayAbortEval: '30s',
         threshold: 'rate<0.01'
       }
     ]
