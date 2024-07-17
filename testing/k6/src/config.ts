@@ -61,8 +61,8 @@ export class Config implements Options {
       ],
       breakpoint: [
         {
-          duration: '5m',
-          target: 10000
+          duration: '2h',
+          target: 20000
         }
       ],
       smoke: [
