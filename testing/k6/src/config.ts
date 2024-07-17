@@ -16,7 +16,30 @@ export type ConfigParams = {
 export class Config implements Options {
   stages: Stage[];
   thresholds = {
-    checks: ['rate>.9'] // 90% of checks must pass
+    // 100% of checks must pass
+    checks: [
+      {
+        abortOnFail: true,
+        delayAbortEval: '30s',
+        threshold: 'rate==1.0'
+      }
+    ],
+    // 95% of requests should be below 500ms
+    http_req_duration: [
+      {
+        abortOnFail: true,
+        delayAbortEval: '30s',
+        threshold: 'p(95)<500'
+      }
+    ],
+    // http errors should be less than 1%
+    http_req_failed: [
+      {
+        abortOnFail: true,
+        delayAbortEval: '30s',
+        threshold: 'rate<0.01'
+      }
+    ]
   };
 
   constructor({ type }: ConfigParams) {
@@ -41,8 +64,8 @@ export class Config implements Options {
       ],
       breakpoint: [
         {
-          duration: '5m',
-          target: 1000
+          duration: '2h',
+          target: 20000
         }
       ],
       smoke: [

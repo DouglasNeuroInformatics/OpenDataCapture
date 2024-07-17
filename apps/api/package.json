@@ -10,6 +10,7 @@
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
     "start": "NODE_ENV=production env-cmd -f ../../.env node  dist/app.mjs",
+    "start:inspect": "NODE_ENV=production env-cmd -f ../../.env node --inspect dist/app.mjs",
     "start:profile": "NODE_ENV=production env-cmd -f ../../.env node --prof dist/app.mjs"
   },
   "dependencies": {
