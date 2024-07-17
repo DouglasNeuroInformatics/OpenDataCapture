@@ -7,7 +7,7 @@
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
     "test:demo": "node scripts/build.js --base-url='https://demo.opendatacapture.org/api' --type=breakpoint | k6 run --out csv=results/results.csv -",
-    "test:preview": "node scripts/build.js --base-url='http://localhost:80' --type=average | k6 run --out csv=results/results.csv -"
+    "test:preview": "node scripts/build.js --base-url='http://localhost:80' --type=breakpoint | k6 run --out csv=results/results.csv -"
   },
   "dependencies": {
     "@opendatacapture/demo": "workspace:*",
