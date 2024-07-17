@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "tsx ../instrument-bundler/src/cli.ts --clean --declaration --outdir dist src",
+    "build:mapped": "tsx ../instrument-bundler/src/cli.ts --clean --declaration --dynamic-import=mapped --outdir dist src",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
