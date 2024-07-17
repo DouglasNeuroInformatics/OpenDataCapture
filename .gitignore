@@ -44,9 +44,11 @@ data/
 
 # k6
 testing/k6/results
+testing/k6/notebooks/
 
 # bruno
 .bruno/
 
 # logs
 *.log
+
