@@ -15,8 +15,8 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@types/k6": "~0.52.0",
+    "@types/k6": "~0.51.0",
     "@types/lodash-es": "^4.17.12",
-    "esbuild": "^0.23.0"
+    "esbuild": "^0.21.5"
   }
 }
