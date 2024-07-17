@@ -7,7 +7,7 @@ import type { Options, Stage } from 'k6/options';
  * - Stress tests assess how a system performs at its limits when load exceeds the expected average.
  * @see https://grafana.com/docs/k6/latest/testing-guides/test-types/
  */
-type TestType = 'average' | 'smoke' | 'stress';
+type TestType = 'average' | 'breakpoint' | 'smoke' | 'stress';
 
 export type ConfigParams = {
   type: TestType;
@@ -37,6 +37,12 @@ export class Config implements Options {
         {
           duration: '1m', // ramp-down to 0 users
           target: 0
+        }
+      ],
+      breakpoint: [
+        {
+          duration: '5m',
+          target: 1000
         }
       ],
       smoke: [

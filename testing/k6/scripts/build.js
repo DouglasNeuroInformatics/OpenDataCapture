@@ -31,7 +31,7 @@ const clientParams = {
 /** @type {import('../src/config.js').ConfigParams} */
 const configParams = {
   type: parseOption('type', (value) => {
-    if (value === 'average' || value === 'smoke' || value === 'stress') {
+    if (value === 'breakpoint' || value === 'average' || value === 'smoke' || value === 'stress') {
       return value;
     }
     throw new Error(`Invalid test type '${value}'`);
