@@ -1,0 +1,3 @@
+[workspace]
+members = ["packages/__rust"]
+resolver = "2"

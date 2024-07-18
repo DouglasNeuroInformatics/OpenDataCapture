@@ -1,0 +1,12 @@
+[package]
+name = "__rust"
+version = "0.0.0"
+license = "Apache-2.0"
+edition = "2021"
+exclude = ["index.node"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+neon = "1"

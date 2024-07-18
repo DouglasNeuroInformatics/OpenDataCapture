@@ -54,3 +54,6 @@ testing/k6/notebooks/
 
 # scratch directory
 /misc/
+
+# rust
+target/
