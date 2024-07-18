@@ -1,0 +1,21 @@
+{
+  "name": "@opendatacapture/__rust",
+  "type": "module",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./dist/index.node"
+    }
+  },
+  "scripts": {
+    "build": "cargo-cp-artifact --npm cdylib ./dist/index.node -- cargo build --message-format=json-render-diagnostics",
+    "compile:debug": "pnpm run build --",
+    "compile:release": "pnpm run build -- --release"
+  },
+  "devDependencies": {
+    "cargo-cp-artifact": "^0.1.9"
+  }
+}

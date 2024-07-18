@@ -778,6 +778,12 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(vite@5.3.1(@types/node@20.14.2)(terser@5.31.1))
 
+  packages/__rust:
+    devDependencies:
+      cargo-cp-artifact:
+        specifier: ^0.1.9
+        version: 0.1.9
+
   packages/crypto:
     dependencies:
       '@hpke/core':
@@ -6123,6 +6129,11 @@ packages:
   caniuse-lite@1.0.30001634:
     resolution:
       { integrity: sha512-fbBYXQ9q3+yp1q1gBk86tOFs4pyn/yxFm5ZNP18OXJDfA3txImOY9PhfxVggZ4vRHDqoU8NrKU81eN0OtzOgRA== }
+
+  cargo-cp-artifact@0.1.9:
+    resolution:
+      { integrity: sha512-6F+UYzTaGB+awsTXg0uSJA1/b/B3DDJzpKVRu0UmyI7DmNeaAl2RFHuTGIN6fEgpadRxoXGb7gbC1xo4C3IdyA== }
+    hasBin: true
 
   caseless@0.12.0:
     resolution:
@@ -18285,6 +18296,8 @@ snapshots:
   camelcase@7.0.1: {}
 
   caniuse-lite@1.0.30001634: {}
+
+  cargo-cp-artifact@0.1.9: {}
 
   caseless@0.12.0: {}
 

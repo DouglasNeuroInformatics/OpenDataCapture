@@ -1,7 +1,7 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable } from '@nestjs/common';
 import type { InstrumentRecordModel } from '@opendatacapture/prisma-client/api';
-import type { AnyInstrument, InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
+import type { InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -95,51 +95,59 @@ export class InstrumentRecordsService {
     return this.instrumentRecordModel.exists(where);
   }
 
-  async exportRecords(
-    { groupId }: { groupId?: string } = {},
-    { ability }: EntityOperationOptions = {}
-  ): Promise<InstrumentRecordsExport> {
-    const subjects = await this.subjectsService.find({ groupId }, { ability });
+  async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     const data: InstrumentRecordsExport = [];
-    const instruments = new Map<string, AnyInstrument>();
-    for (const subject of subjects) {
-      const records = await this.instrumentRecordModel.findMany({
-        include: { instrument: true },
-        where: { groupId, subjectId: subject.id }
-      });
-      for (const record of records) {
-        let instrument: AnyInstrument;
-        if (instruments.has(record.instrumentId)) {
-          instrument = instruments.get(record.instrumentId)!;
-        } else {
-          instrument = await this.virtualizationService.getInstrumentInstance(record.instrument);
-          instruments.set(record.instrumentId, instrument);
-        }
+    const records = await this.instrumentRecordModel.findMany({
+      include: {
+        instrument: {
+          select: {
+            bundle: true,
+            id: true,
+            internal: true
+          }
+        },
+        session: {
+          select: {
+            date: true,
+            id: true,
+            type: true
+          }
+        },
+        subject: true
+      },
+      where: {
+        AND: [
+          {
+            subject: groupId ? { groupIds: { has: groupId } } : {}
+          },
+          accessibleQuery(ability, 'read', 'InstrumentRecord')
+        ]
+      }
+    });
 
-        if (!instrument.measures) {
-          continue;
-        }
-
-        const measures = this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data);
-        const session = await this.sessionsService.findById(record.sessionId);
-
-        for (const [measureKey, measureValue] of Object.entries(measures)) {
-          data.push({
-            instrumentEdition: record.instrument.internal.edition,
-            instrumentName: record.instrument.internal.name,
-            measure: measureKey,
-            sessionDate: session.date.toISOString(),
-            sessionId: session.id,
-            sessionType: session.type,
-            subjectAge: subject.dateOfBirth ? yearsPassed(subject.dateOfBirth) : null,
-            subjectId: subject.id,
-            subjectSex: subject.sex,
-            timestamp: record.date.toISOString(),
-            value: measureValue
-          });
-        }
+    for (const record of records) {
+      const instrument = await this.virtualizationService.getInstrumentInstance(record.instrument);
+      if (!instrument.measures) {
+        continue;
+      }
+      const measures = this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data);
+      for (const [measureKey, measureValue] of Object.entries(measures)) {
+        data.push({
+          instrumentEdition: record.instrument.internal.edition,
+          instrumentName: record.instrument.internal.name,
+          measure: measureKey,
+          sessionDate: record.session.date.toISOString(),
+          sessionId: record.session.id,
+          sessionType: record.session.type,
+          subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+          subjectId: record.subject.id,
+          subjectSex: record.subject.sex,
+          timestamp: record.date.toISOString(),
+          value: measureValue
+        });
       }
     }
+
     return data;
   }
 

@@ -1,0 +1,8 @@
+imports_layout="Horizontal"
+max_width=120
+newline_style="Unix"
+reorder_impl_items=true
+reorder_imports = true
+group_imports="StdExternalCrate"
+trailing_comma="Never"
+use_small_heuristics="Default"
