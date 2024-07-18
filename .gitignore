@@ -52,3 +52,5 @@ testing/k6/notebooks/
 # logs
 *.log
 
+# scratch directory
+/misc/
