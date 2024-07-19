@@ -155,8 +155,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.4.5)
       '@douglasneuroinformatics/libnest':
-        specifier: ^0.0.2
-        version: 0.0.2(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9))(@nestjs/testing@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9)))(express@4.19.2)(mongodb@6.7.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)
+        specifier: ^0.1.0
+        version: 0.1.0(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9))(@nestjs/testing@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9)))(express@4.19.2)(mongodb@6.7.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
@@ -2328,9 +2328,9 @@ packages:
     peerDependencies:
       typescript: ^5.1.0
 
-  '@douglasneuroinformatics/libnest@0.0.2':
+  '@douglasneuroinformatics/libnest@0.1.0':
     resolution:
-      { integrity: sha512-r3OE6SkefjJWYmnTN1YXPBQ5aNm3GOn71SoZNQgRAbwsvs3KVXYVk1nCYeL1Jna7X/OaJvya+cwsL8WQsHFMJQ== }
+      { integrity: sha512-g2Rxx7Z45edPvU4rUgF5OUJotjT8gYWIes8xIbaJ2sqMc/EwSHFqToJdwUoLjp1J2eWUOEVFm3RRqVbcPxaeYg== }
     peerDependencies:
       '@nestjs/common': ^10.2.3
       '@nestjs/core': ^10.2.3
@@ -14453,7 +14453,7 @@ snapshots:
       type-fest: 4.20.0
       typescript: 5.4.5
 
-  '@douglasneuroinformatics/libnest@0.0.2(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9))(@nestjs/testing@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9)))(express@4.19.2)(mongodb@6.7.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)':
+  '@douglasneuroinformatics/libnest@0.1.0(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9))(@nestjs/testing@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.3.9)))(express@4.19.2)(mongodb@6.7.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)':
     dependencies:
       '@nestjs/common': 10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1)
       '@nestjs/core': 10.3.9(@nestjs/common@10.3.9(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.3.9)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)
@@ -14468,7 +14468,7 @@ snapshots:
       pino-pretty: 10.3.1
       reflect-metadata: 0.1.14
       rxjs: 7.8.1
-      type-fest: 4.20.0
+      type-fest: 4.20.1
       zod: 3.23.8
 
   '@douglasneuroinformatics/libui-form-types@0.8.0':

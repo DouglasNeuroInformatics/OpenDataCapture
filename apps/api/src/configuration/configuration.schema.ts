@@ -14,6 +14,7 @@ export const $Configuration = z
   .object({
     API_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),
     API_PROD_SERVER_PORT: z.coerce.number().positive().int().default(80),
+    DANGEROUSLY_DISABLE_PBKDF2_ITERATION: $BooleanString.default(false),
     DEBUG: $BooleanString,
     GATEWAY_API_KEY: z.string().min(32),
     GATEWAY_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),

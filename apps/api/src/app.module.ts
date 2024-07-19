@@ -34,6 +34,9 @@ import { UsersModule } from './users/users.module';
       inject: [ConfigurationService],
       isGlobal: true,
       useFactory: (configurationService: ConfigurationService) => ({
+        pbkdf2Params: {
+          iterations: configurationService.get('DANGEROUSLY_DISABLE_PBKDF2_ITERATION') ? 1 : 100_000
+        },
         secretKey: configurationService.get('SECRET_KEY')
       })
     }),
