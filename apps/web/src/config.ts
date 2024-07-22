@@ -3,6 +3,12 @@ import { $BooleanString } from '@opendatacapture/schemas/core';
 import { z } from 'zod';
 
 const $Config = z.object({
+  analytics: z
+    .object({
+      plausibleBaseUrl: z.string().min(1),
+      plausibleDataDomain: z.string().min(1)
+    })
+    .optional(),
   dev: z.object({
     isBypassAuthEnabled: $BooleanString.optional(),
     networkLatency: z.coerce.number().int().nonnegative().optional(),
@@ -23,6 +29,13 @@ const $Config = z.object({
 
 export const config = await $Config
   .parseAsync({
+    analytics:
+      import.meta.env.PLAUSIBLE_BASE_URL && import.meta.env.PLAUSIBLE_WEB_DATA_DOMAIN
+        ? {
+            plausibleBaseUrl: import.meta.env.PLAUSIBLE_BASE_URL,
+            plausibleDataDomain: import.meta.env.PLAUSIBLE_WEB_DATA_DOMAIN
+          }
+        : undefined,
     dev: {
       isBypassAuthEnabled: import.meta.env.VITE_DEV_BYPASS_AUTH,
       networkLatency: import.meta.env.VITE_DEV_NETWORK_LATENCY,
