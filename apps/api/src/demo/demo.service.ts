@@ -8,6 +8,7 @@ import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-libra
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/happiness-questionnaire.js';
 import miniMentalStateExamination from '@opendatacapture/instrument-library/forms/mini-mental-state-examination.js';
 import montrealCognitiveAssessment from '@opendatacapture/instrument-library/forms/montreal-cognitive-assessment.js';
+import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
 import { type Json, type Language } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
@@ -66,6 +67,9 @@ export class DemoService {
       ]);
 
       this.logger.debug('Done creating forms');
+
+      await this.instrumentsService.createFromBundle(breakoutTask);
+      this.logger.debug('Done creating interactive instruments');
 
       const groups: Group[] = [];
       for (const group of DEMO_GROUPS) {
