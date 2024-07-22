@@ -15,6 +15,11 @@ router.get(
     });
     if (!assignment) {
       return next();
+    } else if (assignment.completedAt) {
+      return res
+        .status(409)
+        .set({ 'Content-Type': 'application/json' })
+        .json({ error: 'Conflict', message: 'Assignment already completed', statusCode: 409 });
     }
     const token = generateToken(assignment.id);
     const html = res.locals.loadRoot({ bundle: assignment.instrumentBundle, id, token });
