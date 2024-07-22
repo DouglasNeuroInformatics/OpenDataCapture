@@ -45,7 +45,6 @@ router.post(
     await prisma.remoteAssignmentModel.create({
       data: {
         ...assignment,
-        completedAt: new Date(),
         rawPublicKey: Buffer.from(publicKey)
       }
     });
