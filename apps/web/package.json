@@ -59,7 +59,6 @@
   },
   "devDependencies": {
     "@opendatacapture/tailwindcss": "workspace:*",
-    "@opendatacapture/vite-plugin-plausible": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.3.3",

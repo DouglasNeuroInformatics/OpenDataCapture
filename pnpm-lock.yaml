@@ -723,9 +723,6 @@ importers:
       '@opendatacapture/tailwindcss':
         specifier: workspace:*
         version: link:../../packages/tailwindcss
-      '@opendatacapture/vite-plugin-plausible':
-        specifier: workspace:*
-        version: link:../../packages/vite-plugin-plausible
       '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-runtime
@@ -1157,12 +1154,6 @@ importers:
       tailwindcss:
         specifier: ^3.x
         version: 3.4.4
-
-  packages/vite-plugin-plausible:
-    dependencies:
-      vite:
-        specifier: 5.x
-        version: 5.3.1(@types/node@20.14.2)(terser@5.31.1)
 
   packages/vite-plugin-runtime:
     dependencies:
