@@ -24,7 +24,7 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <SetupPage
-      onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, username }) => {
+      onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, recordsPerSubject, username }) => {
         createSetupStateMutation.mutate({
           admin: {
             firstName,
@@ -33,7 +33,8 @@ export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
             username
           },
           dummySubjectCount,
-          initDemo
+          initDemo,
+          recordsPerSubject
         });
       }}
     />

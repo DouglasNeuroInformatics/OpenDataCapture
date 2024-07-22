@@ -47,7 +47,13 @@ export class DemoService {
     private readonly virtualizationService: VirtualizationService
   ) {}
 
-  async init({ dummySubjectCount }: { dummySubjectCount: number }): Promise<void> {
+  async init({
+    dummySubjectCount,
+    recordsPerSubject
+  }: {
+    dummySubjectCount: number;
+    recordsPerSubject: number;
+  }): Promise<void> {
     try {
       const dbName = await this.prismaService.getDbName();
       this.logger.log(`Initializing demo for database: '${dbName}'`);
@@ -116,7 +122,7 @@ export class DemoService {
           type: 'IN_PERSON'
         });
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < recordsPerSubject; i++) {
           const isSatisfiedOverall = faker.datatype.boolean();
           const [min, max] = isSatisfiedOverall ? [5, 10] : [1, 5];
           const data: HappinessQuestionnaireData = {
