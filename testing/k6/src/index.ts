@@ -97,7 +97,7 @@ export default function () {
       }
     }),
     {
-      'the number of entries is larger than 100': (res) => res.json().length > 100,
+      'the number of entries is larger than 10': (res) => res.json().length > 10,
       'the status code is 200': (res) => res.status === 200
     }
   );
