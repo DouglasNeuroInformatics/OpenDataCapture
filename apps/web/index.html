@@ -15,6 +15,7 @@
         const script = document.createElement('script');
         script.defer = true;
         script.setAttribute('data-domain', dataDomain);
+        script.setAttribute('data-api', new URL('./api/event', baseUrl).href);
         script.src = new URL('./js/script.js', baseUrl).href;
         document.head.appendChild(script);
       }
