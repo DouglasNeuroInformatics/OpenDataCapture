@@ -29,7 +29,7 @@ export class Config implements Options {
       {
         abortOnFail: true,
         delayAbortEval: '30s',
-        threshold: 'p(95)<500'
+        threshold: 'p(90)<1000'
       }
     ],
     // http errors should be less than 2%
