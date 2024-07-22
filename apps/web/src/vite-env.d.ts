@@ -17,6 +17,8 @@ interface ImportMetaEnv extends ImportMetaDevEnv {
   readonly GATEWAY_ENABLED?: string;
   readonly GITHUB_REPO_URL?: string;
   readonly LICENSE_URL?: string;
+  readonly PLAUSIBLE_BASE_URL?: string;
+  readonly PLAUSIBLE_WEB_DATA_DOMAIN?: string;
   readonly VITE_DEV_NETWORK_LATENCY?: string;
 }
 

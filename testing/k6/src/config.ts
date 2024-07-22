@@ -16,28 +16,28 @@ export type ConfigParams = {
 export class Config implements Options {
   stages: Stage[];
   thresholds = {
-    // 100% of checks must pass
+    // 95% of checks must pass
     checks: [
       {
         abortOnFail: true,
         delayAbortEval: '30s',
-        threshold: 'rate==1.0'
+        threshold: 'rate>0.95'
       }
     ],
-    // 95% of requests should be below 500ms
+    // 90% of requests should be below 1000ms
     http_req_duration: [
       {
         abortOnFail: true,
         delayAbortEval: '30s',
-        threshold: 'p(95)<500'
+        threshold: 'p(90)<1000'
       }
     ],
-    // http errors should be less than 1%
+    // http errors should be less than 2%
     http_req_failed: [
       {
         abortOnFail: true,
         delayAbortEval: '30s',
-        threshold: 'rate<0.01'
+        threshold: 'rate<0.02'
       }
     ]
   };

@@ -67,6 +67,8 @@ services:
       - GITHUB_REPO_URL
       - LICENSE_URL
       - GATEWAY_ENABLED
+      - PLAUSIBLE_BASE_URL
+      - PLAUSIBLE_WEB_DATA_DOMAIN
     expose:
       - 80
     restart: unless-stopped
