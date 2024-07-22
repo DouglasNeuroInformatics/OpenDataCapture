@@ -31,6 +31,7 @@ services:
       - MONGO_DIRECT_CONNECTION=true
       - MONGO_URI=mongodb://mongo:27017
       - NODE_ENV=production
+      - DANGEROUSLY_DISABLE_PBKDF2_ITERATION
       - DEBUG
       - GATEWAY_API_KEY
       - GATEWAY_ENABLED
