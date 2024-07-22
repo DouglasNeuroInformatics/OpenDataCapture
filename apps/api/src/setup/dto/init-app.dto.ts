@@ -13,4 +13,7 @@ export class InitAppDto implements InitAppOptions {
 
   @ApiProperty()
   initDemo: boolean;
+
+  @ApiProperty()
+  recordsPerSubject?: number;
 }

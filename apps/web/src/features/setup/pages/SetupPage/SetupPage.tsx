@@ -14,6 +14,7 @@ type SetupData = {
   initDemo: boolean;
   lastName: string;
   password: string;
+  recordsPerSubject?: number | undefined;
   username: string;
 };
 
@@ -87,6 +88,20 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                       };
                     },
                     deps: ['initDemo']
+                  },
+                  recordsPerSubject: {
+                    kind: 'dynamic',
+                    render: (data) => {
+                      if (!data?.initDemo) {
+                        return null;
+                      }
+                      return {
+                        kind: 'number',
+                        label: t('setup:demo.recordsPerSubject'),
+                        variant: 'input'
+                      };
+                    },
+                    deps: ['initDemo']
                   }
                 },
                 title: t('setup:demo.title')
@@ -102,6 +117,7 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                 .min(1)
                 .refine((val) => estimatePasswordStrength(val).success, t('common:insufficientPasswordStrength')),
               initDemo: z.boolean(),
+              recordsPerSubject: z.number().int().nonnegative().optional(),
               dummySubjectCount: z.number().int().nonnegative().optional()
             })}
             onSubmit={onSubmit}
