@@ -8,6 +8,7 @@ import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-libra
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/happiness-questionnaire.js';
 import miniMentalStateExamination from '@opendatacapture/instrument-library/forms/mini-mental-state-examination.js';
 import montrealCognitiveAssessment from '@opendatacapture/instrument-library/forms/montreal-cognitive-assessment.js';
+import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
 import { type Json, type Language } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
@@ -46,7 +47,13 @@ export class DemoService {
     private readonly virtualizationService: VirtualizationService
   ) {}
 
-  async init({ dummySubjectCount }: { dummySubjectCount: number }): Promise<void> {
+  async init({
+    dummySubjectCount,
+    recordsPerSubject
+  }: {
+    dummySubjectCount: number;
+    recordsPerSubject: number;
+  }): Promise<void> {
     try {
       const dbName = await this.prismaService.getDbName();
       this.logger.log(`Initializing demo for database: '${dbName}'`);
@@ -66,6 +73,9 @@ export class DemoService {
       ]);
 
       this.logger.debug('Done creating forms');
+
+      await this.instrumentsService.createFromBundle(breakoutTask);
+      this.logger.debug('Done creating interactive instruments');
 
       const groups: Group[] = [];
       for (const group of DEMO_GROUPS) {
@@ -112,7 +122,7 @@ export class DemoService {
           type: 'IN_PERSON'
         });
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < recordsPerSubject; i++) {
           const isSatisfiedOverall = faker.datatype.boolean();
           const [min, max] = isSatisfiedOverall ? [5, 10] : [1, 5];
           const data: HappinessQuestionnaireData = {
