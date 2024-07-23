@@ -95,7 +95,9 @@ function createInputKey(filepath, suffixes) {
 }
 
 for await (const filepath of walk(SRC_DIR)) {
-  if (filepath.endsWith('.d.ts')) {
+  if (filepath.split('/').at(-1) === 'LICENSE') {
+    continue;
+  } else if (filepath.endsWith('.d.ts')) {
     declarationOptions.input[createInputKey(filepath, ['.d.ts'])] = filepath;
   } else if (filepath.endsWith('.ts') || filepath.endsWith('.tsx')) {
     declarationOptions.input[createInputKey(filepath, ['.ts', '.tsx'])] = filepath;
