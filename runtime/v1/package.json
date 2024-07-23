@@ -48,6 +48,7 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "jquery__1.12.4": "npm:jquery@1.12.4",
     "jspsych__7.3.4": "npm:jspsych@7.3.4",
+    "jspsych__8.0.1": "npm:jspsych@8.0.1",
     "lodash-es__4.17.21": "npm:lodash-es@4.17.21",
     "react-dom__18.3.1": "npm:react-dom@18.3.1",
     "react__18.3.1": "npm:react@18.3.1",
