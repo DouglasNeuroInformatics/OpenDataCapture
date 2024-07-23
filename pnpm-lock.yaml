@@ -1182,24 +1182,45 @@ importers:
       '@jspsych/plugin-html-button-response__1.2.0':
         specifier: npm:@jspsych/plugin-html-button-response@1.2.0
         version: '@jspsych/plugin-html-button-response@1.2.0(jspsych@8.0.1)'
+      '@jspsych/plugin-html-button-response__2.0.0':
+        specifier: npm:@jspsych/plugin-html-button-response@2.0.0
+        version: '@jspsych/plugin-html-button-response@2.0.0(jspsych@8.0.1)'
       '@jspsych/plugin-html-keyboard-response__1.1.3':
         specifier: npm:@jspsych/plugin-html-keyboard-response@1.1.3
         version: '@jspsych/plugin-html-keyboard-response@1.1.3(jspsych@8.0.1)'
+      '@jspsych/plugin-html-keyboard-response__2.0.0':
+        specifier: npm:@jspsych/plugin-html-keyboard-response@2.0.0
+        version: '@jspsych/plugin-html-keyboard-response@2.0.0(jspsych@8.0.1)'
       '@jspsych/plugin-image-button-response__1.2.0':
         specifier: npm:@jspsych/plugin-image-button-response@1.2.0
         version: '@jspsych/plugin-image-button-response@1.2.0(jspsych@8.0.1)'
+      '@jspsych/plugin-image-button-response__2.0.0':
+        specifier: npm:@jspsych/plugin-image-button-response@2.0.0
+        version: '@jspsych/plugin-image-button-response@2.0.0(jspsych@8.0.1)'
       '@jspsych/plugin-image-keyboard-response__1.1.3':
         specifier: npm:@jspsych/plugin-image-keyboard-response@1.1.3
         version: '@jspsych/plugin-image-keyboard-response@1.1.3(jspsych@8.0.1)'
+      '@jspsych/plugin-image-keyboard-response__2.0.0':
+        specifier: npm:@jspsych/plugin-image-keyboard-response@2.0.0
+        version: '@jspsych/plugin-image-keyboard-response@2.0.0(jspsych@8.0.1)'
       '@jspsych/plugin-preload__1.1.3':
         specifier: npm:@jspsych/plugin-preload@1.1.3
         version: '@jspsych/plugin-preload@1.1.3(jspsych@8.0.1)'
+      '@jspsych/plugin-preload__2.0.0':
+        specifier: npm:@jspsych/plugin-preload@2.0.0
+        version: '@jspsych/plugin-preload@2.0.0(jspsych@8.0.1)'
       '@jspsych/plugin-survey-html-form__1.0.3':
         specifier: npm:@jspsych/plugin-survey-html-form@1.0.3
         version: '@jspsych/plugin-survey-html-form@1.0.3(jspsych@8.0.1)'
+      '@jspsych/plugin-survey-html-form__2.0.0':
+        specifier: npm:@jspsych/plugin-survey-html-form@2.0.0
+        version: '@jspsych/plugin-survey-html-form@2.0.0(jspsych@8.0.1)'
       '@jspsych/plugin-survey-text__1.1.3':
         specifier: npm:@jspsych/plugin-survey-text@1.1.3
         version: '@jspsych/plugin-survey-text@1.1.3(jspsych@8.0.1)'
+      '@jspsych/plugin-survey-text__2.0.0':
+        specifier: npm:@jspsych/plugin-survey-text@2.0.0
+        version: '@jspsych/plugin-survey-text@2.0.0(jspsych@8.0.1)'
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../../packages/evaluate-instrument
@@ -3083,9 +3104,21 @@ packages:
     peerDependencies:
       jspsych: '>=7.1.0'
 
+  '@jspsych/plugin-html-button-response@2.0.0':
+    resolution:
+      { integrity: sha512-Fyu31Fo8YMYJrzA7S5CcaEiJQ+aIW/M9SvpXXBi3gh/EUuGf9otxk8ktMsffrmwEN8qZwGEYkm/QMyFwI3ZJLA== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
   '@jspsych/plugin-html-keyboard-response@1.1.3':
     resolution:
       { integrity: sha512-QlItqZRJJSYROvAVQzUlujjgcqFNimKTIoHu5qVM/HP2oJ1HLB4cQlWcntdwGeNBQGqDgFq8PBKBFCLvC/hFNg== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
+  '@jspsych/plugin-html-keyboard-response@2.0.0':
+    resolution:
+      { integrity: sha512-O4tfd91ve4RJr0ilHmnk6rdxWX7IwGnOKbFpi85p1t0POUNm21Kfq39pUnyoSZTWr2anibIS3OuHP2IvUtIoMA== }
     peerDependencies:
       jspsych: '>=7.1.0'
 
@@ -3095,9 +3128,21 @@ packages:
     peerDependencies:
       jspsych: '>=7.1.0'
 
+  '@jspsych/plugin-image-button-response@2.0.0':
+    resolution:
+      { integrity: sha512-dLDT7iZrwz7TIlKQGV5HuOjyMdzLvUcCiKF5zo8iEizDAU0eWGlEtnBSziospAiOvu/FiaWsbAZ+46wGXO3zJg== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
   '@jspsych/plugin-image-keyboard-response@1.1.3':
     resolution:
       { integrity: sha512-IZZgAXaUeZCKoW+FteHL3PWcoTTW1cRAfZyJKDSfUcBOe7M8wbpPuVau6ubS40pDB5WWggEh4CYjJklF7b5ZHw== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
+  '@jspsych/plugin-image-keyboard-response@2.0.0':
+    resolution:
+      { integrity: sha512-eTmOz2fH7KNKTEJuEK1iGhjTwPqwVaPcPeW0IbWNg6mLuwLWgTGnZNA+WUoyi1VS6usW2uZHn2oBs0NRgk5pJg== }
     peerDependencies:
       jspsych: '>=7.1.0'
 
@@ -3107,15 +3152,33 @@ packages:
     peerDependencies:
       jspsych: '>=7.1.0'
 
+  '@jspsych/plugin-preload@2.0.0':
+    resolution:
+      { integrity: sha512-vBgRH62QAYzoDgDaPD1w/fuIF1JlW1YxnTAQOr/MWXlivqngvezNB7y92kXuHp7wXWexDLbonDGFP+TLIA1irQ== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
   '@jspsych/plugin-survey-html-form@1.0.3':
     resolution:
       { integrity: sha512-4Zl4UiXLuBoO78PT02ELiVsyCUZk4RFsiVGJvW1DOYy+IttryLAAgQuSv68r1vbqsI0qaGfZEVND896ur9X+pw== }
     peerDependencies:
       jspsych: '>=7.1.0'
 
+  '@jspsych/plugin-survey-html-form@2.0.0':
+    resolution:
+      { integrity: sha512-d9uZ3HY+sdvesUT9+qr/R5R13IjGxtzOBQE3UGV+t0gwHt0rTVElLPC20KtAhFFoRaf1iuyqA7AqcS6sLaZTew== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
   '@jspsych/plugin-survey-text@1.1.3':
     resolution:
       { integrity: sha512-WZVZbQ0w2zpMF6nP546I1vmIIvqTvcS6WktiqrjFPj6FNMHR8JsT3YCHv7JBsOaoNAl1F9zhDevpiJuNXuqwpg== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
+  '@jspsych/plugin-survey-text@2.0.0':
+    resolution:
+      { integrity: sha512-e30br1zD5umZrUdbhZId/00OIRejkgyExP7CWqLBOvC9i8SfBMrjuxgNeJwFf0gpdglQ+HYwE+jkXBNXdSYszQ== }
     peerDependencies:
       jspsych: '>=7.1.0'
 
@@ -14995,7 +15058,15 @@ snapshots:
     dependencies:
       jspsych: 8.0.1
 
+  '@jspsych/plugin-html-button-response@2.0.0(jspsych@8.0.1)':
+    dependencies:
+      jspsych: 8.0.1
+
   '@jspsych/plugin-html-keyboard-response@1.1.3(jspsych@8.0.1)':
+    dependencies:
+      jspsych: 8.0.1
+
+  '@jspsych/plugin-html-keyboard-response@2.0.0(jspsych@8.0.1)':
     dependencies:
       jspsych: 8.0.1
 
@@ -15003,7 +15074,15 @@ snapshots:
     dependencies:
       jspsych: 8.0.1
 
+  '@jspsych/plugin-image-button-response@2.0.0(jspsych@8.0.1)':
+    dependencies:
+      jspsych: 8.0.1
+
   '@jspsych/plugin-image-keyboard-response@1.1.3(jspsych@8.0.1)':
+    dependencies:
+      jspsych: 8.0.1
+
+  '@jspsych/plugin-image-keyboard-response@2.0.0(jspsych@8.0.1)':
     dependencies:
       jspsych: 8.0.1
 
@@ -15011,11 +15090,23 @@ snapshots:
     dependencies:
       jspsych: 8.0.1
 
+  '@jspsych/plugin-preload@2.0.0(jspsych@8.0.1)':
+    dependencies:
+      jspsych: 8.0.1
+
   '@jspsych/plugin-survey-html-form@1.0.3(jspsych@8.0.1)':
     dependencies:
       jspsych: 8.0.1
 
+  '@jspsych/plugin-survey-html-form@2.0.0(jspsych@8.0.1)':
+    dependencies:
+      jspsych: 8.0.1
+
   '@jspsych/plugin-survey-text@1.1.3(jspsych@8.0.1)':
+    dependencies:
+      jspsych: 8.0.1
+
+  '@jspsych/plugin-survey-text@2.0.0(jspsych@8.0.1)':
     dependencies:
       jspsych: 8.0.1
 
