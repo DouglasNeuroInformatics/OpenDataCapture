@@ -20,7 +20,7 @@ export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordD
 
 export const $InstrumentRecord = $BaseModel.extend({
   assignmentId: z.string().nullish(),
-  computedMeasures: z.record($InstrumentMeasureValue).optional(),
+  computedMeasures: z.record($InstrumentMeasureValue).nullish(),
   data: z.unknown(),
   date: z.coerce.date(),
   groupId: z.string().nullish(),

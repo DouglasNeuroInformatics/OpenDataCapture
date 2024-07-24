@@ -13,7 +13,15 @@ import { match } from 'ts-pattern';
 export class InstrumentMeasuresService {
   private readonly logger = new Logger(InstrumentMeasuresService.name);
 
-  computeMeasure(measure: InstrumentMeasure, data: FormDataType | Json | Prisma.JsonValue) {
+  computeMeasures(measures: InstrumentMeasures, data: FormDataType | Json | Prisma.JsonValue) {
+    const computedMeasures: { [key: string]: InstrumentMeasureValue } = {};
+    for (const key in measures) {
+      computedMeasures[key] = this.computeMeasure(measures[key], data);
+    }
+    return computedMeasures;
+  }
+
+  private computeMeasure(measure: InstrumentMeasure, data: FormDataType | Json | Prisma.JsonValue) {
     return match(measure)
       .with({ kind: 'computed' }, (measure) => {
         return measure.value(data);
@@ -27,13 +35,5 @@ export class InstrumentMeasuresService {
         return Reflect.get(data, measure.ref) as InstrumentMeasureValue;
       })
       .exhaustive();
-  }
-
-  computeMeasures(measures: InstrumentMeasures, data: FormDataType | Json | Prisma.JsonValue) {
-    const computedMeasures: { [key: string]: InstrumentMeasureValue } = {};
-    for (const key in measures) {
-      computedMeasures[key] = this.computeMeasure(measures[key], data);
-    }
-    return computedMeasures;
   }
 }

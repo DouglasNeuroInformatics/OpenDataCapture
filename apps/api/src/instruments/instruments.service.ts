@@ -117,6 +117,12 @@ export class InstrumentsService {
     });
   }
 
+  async findInstanceById(id: string, options: EntityOperationOptions = {}) {
+    return this.findById(id, options).then((instrument) => {
+      return this.virtualizationService.getInstrumentInstance(instrument);
+    });
+  }
+
   async findSources(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
     return this.instrumentModel.findMany({
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
