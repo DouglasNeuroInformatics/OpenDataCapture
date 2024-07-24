@@ -78,21 +78,22 @@ model GroupModel {
 /// Instrument Records
 
 model InstrumentRecordModel {
-  createdAt    DateTime         @default(now()) @db.Date
-  updatedAt    DateTime         @updatedAt @db.Date
-  id           String           @id @default(auto()) @map("_id") @db.ObjectId
-  data         Json?
-  date         DateTime         @db.Date
-  group        GroupModel?      @relation(fields: [groupId], references: [id])
-  groupId      String?          @db.ObjectId
-  subject      SubjectModel     @relation(fields: [subjectId], references: [id])
-  subjectId    String
-  instrument   InstrumentModel  @relation(fields: [instrumentId], references: [id])
-  instrumentId String
-  assignment   AssignmentModel? @relation(fields: [assignmentId], references: [id])
-  assignmentId String?          @unique
-  session      SessionModel     @relation(fields: [sessionId], references: [id])
-  sessionId    String           @db.ObjectId
+  createdAt        DateTime         @default(now()) @db.Date
+  updatedAt        DateTime         @updatedAt @db.Date
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  computedMeasures Json?
+  data             Json?
+  date             DateTime         @db.Date
+  group            GroupModel?      @relation(fields: [groupId], references: [id])
+  groupId          String?          @db.ObjectId
+  subject          SubjectModel     @relation(fields: [subjectId], references: [id])
+  subjectId        String
+  instrument       InstrumentModel  @relation(fields: [instrumentId], references: [id])
+  instrumentId     String
+  assignment       AssignmentModel? @relation(fields: [assignmentId], references: [id])
+  assignmentId     String?          @unique
+  session          SessionModel     @relation(fields: [sessionId], references: [id])
+  sessionId        String           @db.ObjectId
 }
 
 // Instruments 

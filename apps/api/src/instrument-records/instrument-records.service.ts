@@ -1,7 +1,7 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable } from '@nestjs/common';
 import type { InstrumentRecordModel } from '@opendatacapture/prisma-client/api';
-import type { InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
+import type { InstrumentMeasureValue, InstrumentMeasures } from '@opendatacapture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -53,12 +53,16 @@ export class InstrumentRecordsService {
     if (groupId) {
       await this.groupsService.findById(groupId, options);
     }
-    await this.instrumentsService.findById(instrumentId);
+    const instrument = await this.instrumentsService.findInstanceById(instrumentId);
+
     await this.subjectsService.findById(subjectId);
     await this.sessionsService.findById(sessionId);
 
     return this.instrumentRecordModel.create({
       data: {
+        computedMeasures: instrument.measures
+          ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
+          : null,
         data,
         date,
         group: groupId
@@ -126,12 +130,10 @@ export class InstrumentRecordsService {
     });
 
     for (const record of records) {
-      const instrument = await this.virtualizationService.getInstrumentInstance(record.instrument);
-      if (!instrument.measures) {
+      if (!record.computedMeasures) {
         continue;
       }
-      const measures = this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data);
-      for (const [measureKey, measureValue] of Object.entries(measures)) {
+      for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
         data.push({
           instrumentEdition: record.instrument.internal.edition,
           instrumentName: record.instrument.internal.name,
@@ -143,7 +145,8 @@ export class InstrumentRecordsService {
           subjectId: record.subject.id,
           subjectSex: record.subject.sex,
           timestamp: record.date.toISOString(),
-          value: measureValue
+          // Prisma does not allow index signature, so this is typed as "JSON"
+          value: measureValue as InstrumentMeasureValue
         });
       }
     }
@@ -158,7 +161,7 @@ export class InstrumentRecordsService {
     groupId && (await this.groupsService.findById(groupId));
     instrumentId && (await this.instrumentsService.findById(instrumentId));
 
-    const records = await this.instrumentRecordModel.findMany({
+    return (await this.instrumentRecordModel.findMany({
       include: {
         instrument: {
           select: {
@@ -182,18 +185,7 @@ export class InstrumentRecordsService {
           }
         ]
       }
-    });
-
-    return await Promise.all(
-      records.map(async (record) => {
-        const instance = await this.virtualizationService.getInstrumentInstance(record.instrument);
-        let computedMeasures: { [key: string]: InstrumentMeasureValue } | undefined;
-        if (instance.measures) {
-          computedMeasures = this.instrumentMeasuresService.computeMeasures(instance.measures, record.data);
-        }
-        return Object.assign(record, { computedMeasures });
-      })
-    );
+    })) satisfies Omit<InstrumentRecord, 'computedMeasures'>[] as InstrumentRecord[];
   }
 
   async linearModel(
@@ -216,8 +208,7 @@ export class InstrumentRecordsService {
 
     const data: { [key: string]: [number, number][] } = {};
     for (const record of records) {
-      const computedMeasures = this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data);
-      const numericMeasures = pickBy(computedMeasures, isNumber);
+      const numericMeasures = pickBy(record.computedMeasures as InstrumentMeasures, isNumber);
       for (const measure in numericMeasures) {
         const x = record.date.getTime();
         const y = numericMeasures[measure];
