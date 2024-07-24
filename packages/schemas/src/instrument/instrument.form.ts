@@ -245,7 +245,7 @@ export type FormInstrumentDynamicFieldsetField<
 };
 const $FormInstrumentDynamicFieldsetField: z.ZodType<FormInstrumentDynamicFieldsetField> = z.object({
   kind: z.literal('dynamic'),
-  render: z.function().args(z.any()).returns($FormInstrumentScalarField)
+  render: z.function().args(z.any()).returns($FormInstrumentScalarField.nullable())
 });
 
 export type FormInstrumentFieldset<
@@ -365,10 +365,7 @@ export type FormInstrumentDynamicField<
 export const $FormInstrumentDynamicField: z.ZodType<FormInstrumentDynamicField> = z.object({
   deps: z.array(z.string()),
   kind: z.literal('dynamic'),
-  render: z
-    .function()
-    .args(z.any())
-    .returns(z.union([$FormInstrumentStaticField, z.null()]))
+  render: z.function().args(z.any()).returns($FormInstrumentStaticField.nullable())
 });
 
 export type AnyFormInstrumentField =
