@@ -8,6 +8,7 @@ import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-libra
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/happiness-questionnaire.js';
 import miniMentalStateExamination from '@opendatacapture/instrument-library/forms/mini-mental-state-examination.js';
 import montrealCognitiveAssessment from '@opendatacapture/instrument-library/forms/montreal-cognitive-assessment.js';
+import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/patient-health-questionnaire-9.js';
 import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
 import { type Json, type Language } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
@@ -69,7 +70,8 @@ export class DemoService {
         this.instrumentsService.createFromBundle(briefPsychiatricRatingScale),
         this.instrumentsService.createFromBundle(enhancedDemographicsQuestionnaire),
         this.instrumentsService.createFromBundle(miniMentalStateExamination),
-        this.instrumentsService.createFromBundle(montrealCognitiveAssessment)
+        this.instrumentsService.createFromBundle(montrealCognitiveAssessment),
+        this.instrumentsService.createFromBundle(patientHealthQuestionnaire9)
       ]);
 
       this.logger.debug('Done creating forms');
