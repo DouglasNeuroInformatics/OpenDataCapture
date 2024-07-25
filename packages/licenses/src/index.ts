@@ -7,6 +7,7 @@ type License = {
 };
 
 type LicenseIdentifier =
+  | 'FREE-NOS'
   | 'NON-FREE-COMMERCIAL-NOS'
   | 'NON-FREE-NON-COMMERCIAL-NOS'
   | 'NON-FREE-NOS'
@@ -15,6 +16,12 @@ type LicenseIdentifier =
   | Extract<keyof typeof _licenses, string>;
 
 const licenses = new Map(Object.entries(_licenses)) as Map<LicenseIdentifier, License>;
+
+licenses.set('FREE-NOS', {
+  isOpenSource: false,
+  name: 'Free License (Not Otherwise Specified)',
+  reference: 'https://choosealicense.com'
+});
 
 licenses.set('NON-FREE-COMMERCIAL-NOS', {
   isOpenSource: false,
