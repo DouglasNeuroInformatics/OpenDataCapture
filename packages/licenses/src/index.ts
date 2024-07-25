@@ -18,7 +18,7 @@ type LicenseIdentifier =
 const licenses = new Map(Object.entries(_licenses)) as Map<LicenseIdentifier, License>;
 
 licenses.set('FREE-NOS', {
-  isOpenSource: false,
+  isOpenSource: true,
   name: 'Free License (Not Otherwise Specified)',
   reference: 'https://choosealicense.com'
 });
