@@ -775,12 +775,6 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(vite@5.3.1(@types/node@20.14.2)(terser@5.31.1))
 
-  packages/__rust:
-    devDependencies:
-      cargo-cp-artifact:
-        specifier: ^0.1.9
-        version: 0.1.9
-
   packages/crypto:
     dependencies:
       '@hpke/core':
@@ -1122,7 +1116,11 @@ importers:
         specifier: workspace:*
         version: link:../instrument-stubs
 
-  packages/stats: {}
+  packages/stats:
+    devDependencies:
+      cargo-cp-artifact:
+        specifier: ^0.1.9
+        version: 0.1.9
 
   packages/subject-utils:
     dependencies:
