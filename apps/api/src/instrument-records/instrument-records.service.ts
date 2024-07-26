@@ -1,3 +1,5 @@
+import module from 'node:module';
+
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable } from '@nestjs/common';
 import type { InstrumentRecordModel } from '@opendatacapture/prisma-client/api';
@@ -9,7 +11,6 @@ import type {
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@opendatacapture/schemas/instrument-records';
-import { linearRegression } from '@opendatacapture/stats';
 import type { Prisma } from '@prisma/client';
 import { isNumber, pickBy } from 'lodash-es';
 
@@ -24,6 +25,10 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
+
+const require = module.createRequire(import.meta.url);
+
+const { linearRegression } = require('@opendatacapture/stats') as typeof import('@opendatacapture/stats');
 
 @Injectable()
 export class InstrumentRecordsService {

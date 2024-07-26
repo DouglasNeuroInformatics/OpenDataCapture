@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import * as stats from './index.js';
+import * as stats from './index.cjs';
 
 describe('sum', () => {
   it('should return NaN for an empty array', () => {
@@ -10,6 +10,7 @@ describe('sum', () => {
     expect(stats.sum([1, 2, 3])).toBe(6);
   });
 });
+
 describe('mean', () => {
   it('should return NaN for an empty array', () => {
     expect(Number.isNaN(stats.mean([]))).toBe(true);

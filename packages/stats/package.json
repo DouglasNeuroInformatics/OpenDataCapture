@@ -3,12 +3,18 @@
   "type": "module",
   "version": "0.0.0",
   "license": "Apache-2.0",
-  "main": "./src/index.js",
-  "files": [
-    "dist"
-  ],
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.cts",
+      "default": "./lib/index.cjs"
+    }
+  },
   "scripts": {
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "build": "cargo-cp-artifact --npm cdylib ./dist/index.node -- cargo build --message-format=json-render-diagnostics",
+    "compile:debug": "pnpm run build --",
+    "compile:release": "pnpm run build -- --release"
+  },
+  "devDependencies": {
+    "cargo-cp-artifact": "^0.1.9"
   }
 }
