@@ -1,7 +1,7 @@
 import { isPlainObject } from '@douglasneuroinformatics/libjs';
 import {
   $InstrumentMeasureValue,
-  type AnyUnilingualInstrument,
+  type AnyUnilingualScalarInstrument,
   type InstrumentMeasureValue
 } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
@@ -11,7 +11,7 @@ import { isFormInstrument } from './guards.js';
 
 export type ComputedMeasures = { [key: string]: { label: string; value: InstrumentMeasureValue } };
 
-export function computeInstrumentMeasures(instrument: AnyUnilingualInstrument, data: unknown) {
+export function computeInstrumentMeasures(instrument: AnyUnilingualScalarInstrument, data: unknown) {
   const computedMeasures: ComputedMeasures = {};
   if (!isPlainObject(data)) {
     console.error(`Cannot compute measures from data: ${JSON.stringify(data)} is not an object`);

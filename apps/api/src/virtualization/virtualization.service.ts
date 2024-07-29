@@ -1,10 +1,10 @@
 import vm from 'vm';
 
 import { Injectable } from '@nestjs/common';
-import type { AnyInstrument, InstrumentKind, SomeInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyScalarInstrument, InstrumentKind, SomeScalarInstrument } from '@opendatacapture/schemas/instrument';
 
 type VirtualizationContext = {
-  instruments: Map<string, AnyInstrument>;
+  instruments: Map<string, AnyScalarInstrument>;
 };
 
 @Injectable()
@@ -36,6 +36,6 @@ export class VirtualizationService {
       vm.runInContext(code, this.ctx, {
         importModuleDynamically: vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER
       })
-    ) as Promise<SomeInstrument<TKind>>;
+    ) as Promise<SomeScalarInstrument<TKind>>;
   }
 }

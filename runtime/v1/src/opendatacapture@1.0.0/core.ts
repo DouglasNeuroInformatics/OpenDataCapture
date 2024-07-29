@@ -5,6 +5,7 @@ import type {
   InstrumentKind,
   InstrumentLanguage,
   InteractiveInstrument,
+  SeriesInstrument,
   StrictFormInstrument
 } from '@opendatacapture/schemas/instrument';
 
@@ -14,7 +15,9 @@ type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends
   ? FormDataType
   : [TKind] extends ['INTERACTIVE']
     ? Json
-    : never;
+    : [TKind] extends ['SERIES']
+      ? undefined
+      : never;
 
 type DiscriminatedInstrument<
   TKind extends InstrumentKind,
@@ -68,4 +71,4 @@ export function defineInstrument<
   return def;
 }
 
-export type { InstrumentKind, InstrumentLanguage, InteractiveInstrument, StrictFormInstrument };
+export type { InstrumentKind, InstrumentLanguage, InteractiveInstrument, SeriesInstrument, StrictFormInstrument };

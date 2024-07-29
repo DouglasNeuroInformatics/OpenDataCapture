@@ -4,10 +4,10 @@
 import type { Exact, Merge, Promisable, SetRequired } from 'type-fest';
 import { z } from 'zod';
 
-import { $UnilingualBaseInstrument, $UnilingualInstrumentDetails } from './instrument.base.js';
+import { $UnilingualInstrumentDetails, $UnilingualScalarInstrument } from './instrument.base.js';
 
 import type { Json, Language } from '../core/core.js';
-import type { BaseInstrument, UnilingualInstrumentDetails } from './instrument.base.js';
+import type { ScalarInstrument, UnilingualInstrumentDetails } from './instrument.base.js';
 
 type InteractiveInstrumentContent<TData extends Json = Json> = {
   /** attributes to inject in the iframe head */
@@ -19,14 +19,14 @@ type InteractiveInstrumentContent<TData extends Json = Json> = {
 };
 
 export type InteractiveInstrument<TData extends Json = Json> = Merge<
-  BaseInstrument<TData, Language>,
+  ScalarInstrument<TData, Language>,
   {
     content: InteractiveInstrumentContent<TData>;
     details: SetRequired<UnilingualInstrumentDetails, 'estimatedDuration' | 'instructions'>;
     kind: 'INTERACTIVE';
   }
 >;
-export const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $UnilingualBaseInstrument.extend({
+export const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $UnilingualScalarInstrument.extend({
   content: z.object({
     __injectHead: z
       .object({

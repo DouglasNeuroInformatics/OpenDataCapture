@@ -23,14 +23,14 @@ import type { KeysOfUnion, SetRequired, Simplify } from 'type-fest';
 import { z } from 'zod';
 
 import { $ZodTypeAny, type Language } from '../core/core.js';
-import { $$InstrumentUIOption, $BaseInstrument, $InstrumentDetails } from './instrument.base.js';
+import { $$InstrumentUIOption, $InstrumentDetails, $ScalarInstrument } from './instrument.base.js';
 
 import type {
-  BaseInstrument,
   InstrumentDetails,
   InstrumentLanguage,
   InstrumentMeasures,
-  InstrumentUIOption
+  InstrumentUIOption,
+  ScalarInstrument
 } from './instrument.base.js';
 
 const $StaticFieldKind: z.ZodType<StaticFieldKind> = z.enum([
@@ -432,16 +432,15 @@ export type FormInstrument<
 > = Simplify<
   {
     content: FormInstrumentContent<TData, TLanguage>;
-    details: SetRequired<InstrumentDetails<TLanguage>, 'estimatedDuration' | 'instructions'>;
+    details: SetRequired<InstrumentDetails<TLanguage>, 'estimatedDuration'>;
     kind: 'FORM';
     measures: InstrumentMeasures<TData, TLanguage> | null;
-  } & Omit<BaseInstrument<TData, TLanguage>, 'details'>
+  } & Omit<ScalarInstrument<TData, TLanguage>, 'details'>
 >;
-export const $FormInstrument: z.ZodType<FormInstrument> = $BaseInstrument.extend({
+export const $FormInstrument: z.ZodType<FormInstrument> = $ScalarInstrument.extend({
   content: $FormInstrumentContent,
   details: $InstrumentDetails.required({
-    estimatedDuration: true,
-    instructions: true
+    estimatedDuration: true
   }),
   kind: z.literal('FORM'),
   validationSchema: $ZodTypeAny

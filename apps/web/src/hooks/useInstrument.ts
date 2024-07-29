@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { translateInstrument } from '@opendatacapture/instrument-utils';
-import type { InstrumentKind, SomeUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { InstrumentKind, SomeUnilingualScalarInstrument } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrumentBundle } from './useInstrumentBundle';
@@ -10,7 +10,7 @@ import { useInstrumentInterpreter } from './useInstrumentInterpreter';
 export function useInstrument<TKind extends InstrumentKind>(id: null | string, options?: { kind?: TKind }) {
   const instrumentBundleQuery = useInstrumentBundle(id);
   const interpreter = useInstrumentInterpreter();
-  const [instrument, setInstrument] = useState<SomeUnilingualInstrument<TKind> | null>(null);
+  const [instrument, setInstrument] = useState<SomeUnilingualScalarInstrument<TKind> | null>(null);
   const { i18n } = useTranslation();
 
   useEffect(() => {

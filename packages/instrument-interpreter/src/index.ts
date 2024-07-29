@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-implied-eval */
 
 import { evaluateInstrument } from '@opendatacapture/evaluate-instrument';
-import { $AnyInstrument, $FormInstrument, $InteractiveInstrument } from '@opendatacapture/schemas/instrument';
-import type { AnyInstrument, InstrumentKind } from '@opendatacapture/schemas/instrument';
+import { $AnyScalarInstrument, $FormInstrument, $InteractiveInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyScalarInstrument, InstrumentKind } from '@opendatacapture/schemas/instrument';
 import type { Promisable } from 'type-fest';
 export type InstrumentInterpreterOptions = {
   /** An optional function to preprocess a bundle */
@@ -22,18 +22,18 @@ export class InstrumentInterpreter {
   async interpret<TKind extends InstrumentKind>(
     bundle: string,
     options?: InterpretOptions<TKind>
-  ): Promise<Extract<AnyInstrument, { kind: TKind }>> {
-    let instrument: AnyInstrument;
+  ): Promise<Extract<AnyScalarInstrument, { kind: TKind }>> {
+    let instrument: AnyScalarInstrument;
     try {
       const value: unknown = await evaluateInstrument(bundle);
       if (!options?.validate) {
-        instrument = value as Extract<AnyInstrument, { kind: TKind }>;
+        instrument = value as Extract<AnyScalarInstrument, { kind: TKind }>;
       } else if (options.kind === 'FORM') {
         instrument = await $FormInstrument.parseAsync(value);
       } else if (options.kind === 'INTERACTIVE') {
         instrument = await $InteractiveInstrument.parseAsync(value);
       } else if (options.kind === undefined) {
-        instrument = await $AnyInstrument.parseAsync(value);
+        instrument = await $AnyScalarInstrument.parseAsync(value);
       } else {
         throw new Error(`Unexpected kind: ${options.kind}`);
       }
@@ -41,6 +41,6 @@ export class InstrumentInterpreter {
       throw new Error(`Failed to evaluate instrument bundle`, { cause: error });
     }
     instrument.id = options?.id;
-    return instrument as Extract<AnyInstrument, { kind: TKind }>;
+    return instrument as Extract<AnyScalarInstrument, { kind: TKind }>;
   }
 }

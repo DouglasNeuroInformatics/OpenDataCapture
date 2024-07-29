@@ -11,8 +11,8 @@ import type {
 } from '@douglasneuroinformatics/libui-form-types';
 import type { Language } from '@opendatacapture/schemas/core';
 import type {
-  AnyInstrument,
   AnyMultilingualFormInstrument,
+  AnyScalarInstrument,
   AnyUnilingualFormInstrument,
   FormInstrumentFields,
   FormInstrumentFieldset,
@@ -21,8 +21,8 @@ import type {
   InstrumentKind,
   InstrumentSummary,
   MultilingualInstrumentMeasures,
-  SomeInstrument,
-  SomeUnilingualInstrument,
+  SomeScalarInstrument,
+  SomeUnilingualScalarInstrument,
   UnilingualInstrumentMeasures,
   UnilingualInstrumentSummary
 } from '@opendatacapture/schemas/instrument';
@@ -43,7 +43,7 @@ import {
  * @param preferredLanguage - The user's preferred language.
  * @returns The target language for translation.
  */
-function getTargetLanguage(instrument: Pick<AnyInstrument, 'language'>, preferredLanguage: Language): Language {
+function getTargetLanguage(instrument: Pick<AnyScalarInstrument, 'language'>, preferredLanguage: Language): Language {
   if (typeof instrument.language === 'string') {
     return instrument.language;
   } else if (instrument.language.includes(preferredLanguage)) {
@@ -306,9 +306,9 @@ export function translateInstrumentSummary(
  * @returns A translated unilingual instrument.
  */
 export function translateInstrument<const TKind extends InstrumentKind>(
-  instrument: SomeInstrument<TKind>,
+  instrument: SomeScalarInstrument<TKind>,
   preferredLanguage: Language
-): SomeUnilingualInstrument<TKind> {
+): SomeUnilingualScalarInstrument<TKind> {
   if (isUnilingualInstrument(instrument)) {
     return instrument;
   } else if (!isMultilingualInstrument(instrument)) {
@@ -317,7 +317,7 @@ export function translateInstrument<const TKind extends InstrumentKind>(
   const targetLanguage = getTargetLanguage(instrument, preferredLanguage);
   switch (instrument.kind) {
     case 'FORM':
-      return translateForm(instrument, targetLanguage) as SomeUnilingualInstrument<TKind>;
+      return translateForm(instrument, targetLanguage) as SomeUnilingualScalarInstrument<TKind>;
     default:
       throw new Error(`Unexpected instrument kind: ${instrument.kind}`);
   }

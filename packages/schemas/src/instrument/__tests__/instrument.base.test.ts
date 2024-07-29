@@ -4,10 +4,10 @@ import { z } from 'zod';
 
 import {
   $$InstrumentUIOption,
-  $BaseInstrument,
   $InstrumentDetails,
   $InstrumentKind,
-  $InstrumentLanguage
+  $InstrumentLanguage,
+  $ScalarInstrument
 } from '../instrument.base.js';
 
 test('$InstrumentKind', () => {
@@ -72,11 +72,11 @@ describe('$InstrumentDetails', () => {
   });
 });
 
-describe('$BaseInstrument', () => {
+describe('$ScalarInstrument', () => {
   it('should handle a unilingual form', () => {
-    expect($BaseInstrument.safeParse(unilingualFormInstrument.instance).success).toBe(true);
+    expect($ScalarInstrument.safeParse(unilingualFormInstrument.instance).success).toBe(true);
   });
   it('should handle a multilingual form', () => {
-    expect($BaseInstrument.safeParse(bilingualFormInstrument.instance).success).toBe(true);
+    expect($ScalarInstrument.safeParse(bilingualFormInstrument.instance).success).toBe(true);
   });
 });
