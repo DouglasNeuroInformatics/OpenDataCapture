@@ -36,9 +36,7 @@ type DiscriminatedInstrument<
         ? InteractiveInstrument<TData>
         : never
       : never
-    : [TKind] extends ['SERIES']
-      ? SeriesInstrument
-      : never;
+    : never;
 
 type InstrumentDef<
   TKind extends InstrumentKind,
@@ -73,4 +71,4 @@ export function defineInstrument<
   return def;
 }
 
-export type { InstrumentKind, InstrumentLanguage, InteractiveInstrument, StrictFormInstrument };
+export type { InstrumentKind, InstrumentLanguage, InteractiveInstrument, SeriesInstrument, StrictFormInstrument };
