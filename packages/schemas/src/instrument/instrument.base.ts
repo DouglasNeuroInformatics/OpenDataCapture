@@ -1,6 +1,6 @@
 import { isUnique } from '@douglasneuroinformatics/libjs';
 import type { LicenseIdentifier } from '@opendatacapture/licenses';
-import type { ConditionalKeys, Simplify, ValueOf } from 'type-fest';
+import type { ConditionalKeys, Merge, Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 
 import { $Language, $LicenseIdentifier, $Uint8Array, $ZodTypeAny, type Language } from '../core/core.js';
@@ -178,81 +178,85 @@ export const $UnilingualInstrumentMeasures = z.record(
   z.union([$UnilingualComputedInstrumentMeasure, $UnilingualConstantInstrumentMeasure])
 ) satisfies z.ZodType<UnilingualInstrumentMeasures>;
 
+export type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+  /** The content in the instrument to be rendered to the user */
+  content?: unknown;
+  /** The details of the instrument to be displayed to the user */
+  details: InstrumentDetails<TLanguage>;
+  /** The database ID for the instrument. For scalar instruments, this is derived by the internal property. */
+  id?: string;
+  /** The discriminator key for the type of instrument */
+  kind: InstrumentKind;
+  /** The language(s) in which the instrument is written */
+  language: TLanguage;
+  /** A list of tags that users can use to filter instruments */
+  tags: InstrumentUIOption<TLanguage, string[]>;
+};
+
 /**
- * The basic properties common to all instruments. Specific types of instruments (e.g., form, interactive)
+ * The basic properties common to all scalar instruments. Specific types of instruments (e.g., form, interactive)
  * extend this type and are discriminated according to the `kind` property.
  *
  * @typeParam TData - the structure of the data derived from this instrument
  * @typeParam TLanguage - the language(s) of the instrument
  */
-export type BaseInstrument<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
-  /** The content in the instrument to be rendered to the user */
-  content?: unknown;
+export type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
+  BaseInstrument<TLanguage>,
+  {
+    internal: {
+      /** The internal version of the instrument (a positive integer) */
+      edition: number;
+      /** The name of the instrument, which must be unique for a given edition */
+      name: string;
+    };
 
-  /** The details of the instrument to be displayed to the user */
-  details: InstrumentDetails<TLanguage>;
+    /** Arbitrary measures derived from the data */
+    measures: InstrumentMeasures<TData, TLanguage> | null;
 
-  id?: string;
+    /** The zod validation schema for the instrument data */
+    validationSchema: z.ZodType<TData>;
+  }
+>;
 
-  internal: {
-    /** The internal version of the instrument (a positive integer) */
-    edition: number;
-    /** The name of the instrument, which must be unique for a given edition */
-    name: string;
-  };
+export type ScalarInstrumentInternal = z.infer<typeof $ScalarInstrumentInternal>;
+export const $ScalarInstrumentInternal = z.object({
+  edition: z.number().int().positive(),
+  name: z.string().min(1)
+});
 
-  /** The discriminator key for the type of instrument */
-  kind: InstrumentKind;
-
-  /** The language(s) in which the instrument is written */
-  language: TLanguage;
-
-  /** Arbitrary measures derived from the data */
-  measures: InstrumentMeasures<TData, TLanguage> | null;
-
-  /** A list of tags that users can use to filter instruments */
-  tags: InstrumentUIOption<TLanguage, string[]>;
-
-  /** The zod validation schema for the instrument data */
-  validationSchema: z.ZodType<TData>;
-};
-
-export const $BaseInstrument = z.object({
+export const $ScalarInstrument = z.object({
   content: z.any(),
   details: $InstrumentDetails,
   id: z.string().optional(),
-  internal: z.object({
-    edition: z.number().int().positive(),
-    name: z.string().min(1)
-  }),
+  internal: $ScalarInstrumentInternal,
   kind: $InstrumentKind,
   language: $InstrumentLanguage,
   measures: $InstrumentMeasures.nullable(),
   tags: $$InstrumentUIOption(z.array(z.string().min(1))),
   validationSchema: $ZodTypeAny
-}) satisfies z.ZodType<BaseInstrument>;
+}) satisfies z.ZodType<ScalarInstrument>;
 
-export const $UnilingualBaseInstrument = $BaseInstrument.extend({
+export const $UnilingualScalarInstrument = $ScalarInstrument.extend({
   details: $UnilingualInstrumentDetails,
   language: $Language,
   measures: $UnilingualInstrumentMeasures.nullable(),
   tags: z.array(z.string().min(1))
-}) satisfies z.ZodType<BaseInstrument<any, Language>>;
+}) satisfies z.ZodType<ScalarInstrument<any, Language>>;
 
 /**
  * An object containing the essential data describing an instrument, but omitting the content
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
  */
-export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = {
+export type InstrumentSummary<T extends ScalarInstrument = ScalarInstrument> = {
   id: string;
 } & Omit<T, 'content' | 'measures' | 'validationSchema'>;
 
-export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<any, Language>>>;
+export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<ScalarInstrument<any, Language>>>;
 
-export type MultilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<any, Language[]>>>;
+export type MultilingualInstrumentSummary = Simplify<InstrumentSummary<ScalarInstrument<any, Language[]>>>;
 
-export const $InstrumentSummary = $BaseInstrument
+export const $InstrumentSummary = $ScalarInstrument
   .omit({
     content: true,
     measures: true,

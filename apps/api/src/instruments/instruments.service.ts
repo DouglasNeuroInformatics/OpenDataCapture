@@ -3,12 +3,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 import { type BundlerInput, InstrumentBundler } from '@opendatacapture/instrument-bundler';
 import {
-  $AnyInstrument,
+  $AnyScalarInstrument,
   $FormInstrument,
   $InteractiveInstrument,
   type InstrumentKind,
   type InstrumentSummary,
-  type SomeInstrument
+  type SomeScalarInstrument
 } from '@opendatacapture/schemas/instrument';
 import type { Prisma } from '@prisma/client';
 import { omit } from 'lodash-es';
@@ -161,12 +161,12 @@ export class InstrumentsService {
   }
 
   private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
-    let instance: SomeInstrument<TKind>;
+    let instance: SomeScalarInstrument<TKind>;
     try {
       instance = await this.virtualizationService.runInContext(bundle);
       switch (options?.kind) {
         case undefined:
-          return $AnyInstrument.parseAsync(instance);
+          return $AnyScalarInstrument.parseAsync(instance);
         case 'FORM':
           return $FormInstrument.parseAsync(instance);
         case 'INTERACTIVE':

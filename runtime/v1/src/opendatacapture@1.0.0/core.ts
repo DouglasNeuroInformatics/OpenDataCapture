@@ -5,6 +5,7 @@ import type {
   InstrumentKind,
   InstrumentLanguage,
   InteractiveInstrument,
+  SeriesInstrument,
   StrictFormInstrument
 } from '@opendatacapture/schemas/instrument';
 
@@ -14,7 +15,9 @@ type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends
   ? FormDataType
   : [TKind] extends ['INTERACTIVE']
     ? Json
-    : never;
+    : [TKind] extends ['SERIES']
+      ? undefined
+      : never;
 
 type DiscriminatedInstrument<
   TKind extends InstrumentKind,
@@ -33,7 +36,9 @@ type DiscriminatedInstrument<
         ? InteractiveInstrument<TData>
         : never
       : never
-    : never;
+    : [TKind] extends ['SERIES']
+      ? SeriesInstrument
+      : never;
 
 type InstrumentDef<
   TKind extends InstrumentKind,

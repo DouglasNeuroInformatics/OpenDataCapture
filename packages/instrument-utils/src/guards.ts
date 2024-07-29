@@ -1,19 +1,19 @@
 import type {
-  AnyInstrument,
+  AnyMultilingualFormInstrument,
+  AnyScalarInstrument,
   FormInstrument,
   InstrumentKind,
   InstrumentSummary,
   InteractiveInstrument,
   MultilingualInstrumentSummary,
-  SomeInstrument,
-  SomeMultilingualInstrument,
-  SomeUnilingualInstrument,
+  SomeScalarInstrument,
+  SomeUnilingualScalarInstrument,
   UnilingualInstrumentSummary
 } from '@opendatacapture/schemas/instrument';
 
 export function isUnilingualInstrument<TKind extends InstrumentKind>(
-  instrument: SomeInstrument<TKind>
-): instrument is SomeUnilingualInstrument<TKind> {
+  instrument: SomeScalarInstrument<TKind>
+): instrument is SomeUnilingualScalarInstrument<TKind> {
   return typeof instrument.language === 'string';
 }
 
@@ -21,9 +21,7 @@ export function isUnilingualInstrumentSummary(summary: InstrumentSummary): summa
   return typeof summary.language === 'string';
 }
 
-export function isMultilingualInstrument<TKind extends InstrumentKind>(
-  instrument: SomeInstrument<TKind>
-): instrument is SomeMultilingualInstrument<TKind> {
+export function isMultilingualInstrument(instrument: AnyScalarInstrument): instrument is AnyMultilingualFormInstrument {
   return Array.isArray(instrument.language);
 }
 
@@ -31,10 +29,10 @@ export function isMultilingualInstrumentSummary(summary: InstrumentSummary): sum
   return Array.isArray(summary.language);
 }
 
-export function isFormInstrument(instrument: AnyInstrument): instrument is FormInstrument {
+export function isFormInstrument(instrument: AnyScalarInstrument): instrument is FormInstrument {
   return instrument.kind === 'FORM';
 }
 
-export function isInteractiveInstrument(instrument: AnyInstrument): instrument is InteractiveInstrument {
+export function isInteractiveInstrument(instrument: AnyScalarInstrument): instrument is InteractiveInstrument {
   return instrument.kind === 'INTERACTIVE';
 }

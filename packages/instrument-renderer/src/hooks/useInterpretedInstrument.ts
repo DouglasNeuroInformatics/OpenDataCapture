@@ -2,12 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { InstrumentInterpreter, type InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import { translateInstrument } from '@opendatacapture/instrument-utils';
-import type { AnyInstrument, AnyUnilingualInstrument, InstrumentKind } from '@opendatacapture/schemas/instrument';
+import type {
+  AnyScalarInstrument,
+  AnyUnilingualScalarInstrument,
+  InstrumentKind
+} from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 
 export type InterpretedInstrumentState =
   | { error: Error; status: 'ERROR' }
-  | { instrument: AnyUnilingualInstrument; status: 'DONE' }
+  | { instrument: AnyUnilingualScalarInstrument; status: 'DONE' }
   | { status: 'LOADING' };
 
 /**
@@ -21,7 +25,7 @@ export function useInterpretedInstrument<TKind extends InstrumentKind>(
   options?: InterpretOptions<TKind>
 ) {
   const interpreter = useMemo(() => new InstrumentInterpreter(), []);
-  const [instrument, setInstrument] = useState<AnyInstrument | null>(null);
+  const [instrument, setInstrument] = useState<AnyScalarInstrument | null>(null);
   const [state, setState] = useState<InterpretedInstrumentState>({ status: 'LOADING' });
   const { i18n } = useTranslation();
 

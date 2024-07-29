@@ -24,14 +24,14 @@ export default {
 } as Meta<typeof InstrumentSummary>;
 
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualScalarInstrument } from '@opendatacapture/schemas/instrument';
 
 export const Clinical: Story = {
   args: {
     data: {
       favoriteNumber: 4
     },
-    instrument: unilingualFormInstrument.instance as AnyUnilingualInstrument,
+    instrument: unilingualFormInstrument.instance as AnyUnilingualScalarInstrument,
     subject: {
       dateOfBirth: new Date(2000),
       firstName: 'Jane',
@@ -48,7 +48,7 @@ export const Research: Story = {
     data: {
       favoriteNumber: 4
     },
-    instrument: unilingualFormInstrument.instance as AnyUnilingualInstrument,
+    instrument: unilingualFormInstrument.instance as AnyUnilingualScalarInstrument,
     subject: {
       id: '123'
     },
