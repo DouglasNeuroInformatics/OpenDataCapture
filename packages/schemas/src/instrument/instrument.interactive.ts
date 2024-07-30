@@ -9,19 +9,17 @@ import { $UnilingualInstrumentDetails, $UnilingualScalarInstrument } from './ins
 import type { Json, Language } from '../core/core.js';
 import type { ScalarInstrument, UnilingualInstrumentDetails } from './instrument.base.js';
 
-type InteractiveInstrumentContent<TData extends Json = Json> = {
-  /** attributes to inject in the iframe head */
-  readonly __injectHead?: {
-    /** base64 encoded css */
-    readonly style: string;
-  };
-  render: (done: <T extends Exact<TData, T>>(data: T) => void) => Promisable<void>;
-};
-
 export type InteractiveInstrument<TData extends Json = Json> = Merge<
   ScalarInstrument<TData, Language>,
   {
-    content: InteractiveInstrumentContent<TData>;
+    content: {
+      /** attributes to inject in the iframe head */
+      readonly __injectHead?: {
+        /** base64 encoded css */
+        readonly style: string;
+      };
+      render: (done: <T extends Exact<TData, T>>(data: T) => void) => Promisable<void>;
+    };
     details: SetRequired<UnilingualInstrumentDetails, 'estimatedDuration' | 'instructions'>;
     kind: 'INTERACTIVE';
   }

@@ -48,50 +48,51 @@ export const interactiveInstrument = await createInstrumentStub(async () => {
   };
 });
 
-/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').InteractiveInstrument<{ message: string }>>} */
-export const maliciousInstrument = await createInstrumentStub(async () => {
-  const { z } = await import('zod');
+// This is commented out for now, since it cannot be used in tests (TypeError: A dynamic import callback was not specified.)
+// /** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').InteractiveInstrument<{ message: string }>>} */
+// export const maliciousInstrument = await createInstrumentStub(async () => {
+//   const { z } = await import('zod');
 
-  /** @type {import('node:child_process')} */
-  const { exec } = await (0, eval)(`import('node:child_process')`);
+//   /** @type {import('node:child_process')} */
+//   const { exec } = await (0, eval)(`import('node:child_process')`);
 
-  exec('echo hello!', (err, stdout, stderr) => {
-    if (err) {
-      console.error(`exec error: ${err}`);
-      return;
-    }
-    console.log(`stdout: ${stdout}`);
-    console.error(`stderr: ${stderr}`);
-  });
+//   exec('echo hello!', (err, stdout, stderr) => {
+//     if (err) {
+//       console.error(`exec error: ${err}`);
+//       return;
+//     }
+//     console.log(`stdout: ${stdout}`);
+//     console.error(`stderr: ${stderr}`);
+//   });
 
-  return {
-    kind: 'INTERACTIVE',
-    language: 'en',
-    tags: ['<PLACEHOLDER>'],
-    internal: {
-      edition: 1,
-      name: '<PLACEHOLDER>'
-    },
-    content: {
-      render(done) {
-        const button = document.createElement('button');
-        button.textContent = 'Submit Instrument';
-        document.body.appendChild(button);
-        button.addEventListener('click', () => {
-          done({ message: 'Hello World' });
-        });
-      }
-    },
-    details: {
-      description: '<PLACEHOLDER>',
-      estimatedDuration: 1,
-      instructions: ['<PLACEHOLDER>'],
-      license: 'UNLICENSED',
-      title: '<PLACEHOLDER>'
-    },
-    measures: {},
-    validationSchema: z.object({
-      message: z.string()
-    })
-  };
-});
+//   return {
+//     kind: 'INTERACTIVE',
+//     language: 'en',
+//     tags: ['<PLACEHOLDER>'],
+//     internal: {
+//       edition: 1,
+//       name: '<PLACEHOLDER>'
+//     },
+//     content: {
+//       render(done) {
+//         const button = document.createElement('button');
+//         button.textContent = 'Submit Instrument';
+//         document.body.appendChild(button);
+//         button.addEventListener('click', () => {
+//           done({ message: 'Hello World' });
+//         });
+//       }
+//     },
+//     details: {
+//       description: '<PLACEHOLDER>',
+//       estimatedDuration: 1,
+//       instructions: ['<PLACEHOLDER>'],
+//       license: 'UNLICENSED',
+//       title: '<PLACEHOLDER>'
+//     },
+//     measures: {},
+//     validationSchema: z.object({
+//       message: z.string()
+//     })
+//   };
+// });

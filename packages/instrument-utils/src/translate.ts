@@ -287,7 +287,6 @@ export function translateInstrumentSummary(
       title: summary.details.title[targetLanguage]
     },
     id: summary.id,
-    internal: summary.internal,
     kind: summary.kind,
     language: targetLanguage,
     tags: summary.tags[targetLanguage]

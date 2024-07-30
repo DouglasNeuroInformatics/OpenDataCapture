@@ -1,6 +1,7 @@
 import type { PureAbility, RawRuleOf } from '@casl/ability';
 import { isObject } from '@douglasneuroinformatics/libjs';
 import { type LicenseIdentifier, licenses } from '@opendatacapture/licenses';
+import type { Simplify } from 'type-fest';
 import { z } from 'zod';
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
@@ -80,3 +81,5 @@ export const $LicenseIdentifier = z.string().refine((arg) => licenses.has(arg as
   z.ZodTypeDef,
   LicenseIdentifier
 >;
+
+export type WithID<T extends { [key: string]: any }> = Simplify<{ id: string } & T>;

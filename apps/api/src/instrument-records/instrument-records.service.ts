@@ -1,9 +1,9 @@
 import module from 'node:module';
 
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import type { InstrumentRecordModel } from '@opendatacapture/prisma-client/api';
-import type { InstrumentMeasureValue, InstrumentMeasures } from '@opendatacapture/schemas/instrument';
+import type { InstrumentMeasureValue, InstrumentMeasures, ScalarInstrument } from '@opendatacapture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -58,7 +58,12 @@ export class InstrumentRecordsService {
     if (groupId) {
       await this.groupsService.findById(groupId, options);
     }
-    const instrument = await this.instrumentsService.findInstanceById(instrumentId);
+    const instrument = await this.instrumentsService.findById(instrumentId);
+    if (instrument.kind === 'SERIES') {
+      throw new UnprocessableEntityException(
+        `Cannot create instrument record for series instrument '${instrument.id}'`
+      );
+    }
 
     await this.subjectsService.findById(subjectId);
     await this.sessionsService.findById(sessionId);
@@ -108,13 +113,6 @@ export class InstrumentRecordsService {
     const data: InstrumentRecordsExport = [];
     const records = await this.instrumentRecordModel.findMany({
       include: {
-        instrument: {
-          select: {
-            bundle: true,
-            id: true,
-            internal: true
-          }
-        },
         session: {
           select: {
             date: true,
@@ -134,14 +132,23 @@ export class InstrumentRecordsService {
       }
     });
 
+    const instruments = new Map<string, ScalarInstrument>();
     for (const record of records) {
       if (!record.computedMeasures) {
         continue;
       }
+      let instrument: ScalarInstrument;
+      if (instruments.has(record.instrumentId)) {
+        instrument = instruments.get(record.instrumentId)!;
+      } else {
+        instrument = (await this.instrumentsService.findById(record.instrumentId)) as ScalarInstrument;
+        instruments.set(record.instrumentId, instrument);
+      }
+
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
         data.push({
-          instrumentEdition: record.instrument.internal.edition,
-          instrumentName: record.instrument.internal.name,
+          instrumentEdition: instrument.internal.edition,
+          instrumentName: instrument.internal.name,
           measure: measureKey,
           sessionDate: record.session.date.toISOString(),
           sessionId: record.session.id,
@@ -166,13 +173,16 @@ export class InstrumentRecordsService {
     groupId && (await this.groupsService.findById(groupId));
     instrumentId && (await this.instrumentsService.findById(instrumentId));
 
+    const instrumentKindIds = await this.instrumentsService
+      .find({ kind })
+      .then((instruments) => instruments.map((instrument) => instrument.id));
+
     return (await this.instrumentRecordModel.findMany({
       include: {
         instrument: {
           select: {
             bundle: true,
-            id: true,
-            kind: true
+            id: true
           }
         }
       },
@@ -181,13 +191,9 @@ export class InstrumentRecordsService {
           { date: { gte: minDate } },
           { groupId },
           { instrumentId },
+          { instrumentId: { in: instrumentKindIds } },
           accessibleQuery(ability, 'read', 'InstrumentRecord'),
-          { subjectId },
-          {
-            instrument: {
-              kind
-            }
-          }
+          { subjectId }
         ]
       }
     })) satisfies Omit<InstrumentRecord, 'computedMeasures'>[] as InstrumentRecord[];
@@ -201,6 +207,10 @@ export class InstrumentRecordsService {
     const instrument = await this.instrumentsService
       .findById(instrumentId)
       .then((instrument) => this.virtualizationService.getInstrumentInstance(instrument));
+
+    if (instrument.kind === 'SERIES') {
+      throw new UnprocessableEntityException(`Cannot create linear model for series instrument '${instrument.id}'`);
+    }
 
     if (!instrument.measures) {
       return {};

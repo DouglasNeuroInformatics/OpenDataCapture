@@ -1,17 +1,17 @@
 import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import { type BundlerInput, InstrumentBundler } from '@opendatacapture/instrument-bundler';
-import {
-  $AnyScalarInstrument,
-  $FormInstrument,
-  $InteractiveInstrument,
-  type InstrumentKind,
-  type InstrumentSummary,
-  type SomeScalarInstrument
+import { isScalarInstrument } from '@opendatacapture/instrument-utils';
+import type { WithID } from '@opendatacapture/schemas/core';
+import type {
+  AnyInstrument,
+  AnyScalarInstrument,
+  InstrumentBundleContainer,
+  InstrumentKind,
+  InstrumentSummary,
+  SeriesInstrument,
+  SomeInstrument
 } from '@opendatacapture/schemas/instrument';
-import type { Prisma } from '@prisma/client';
-import { omit } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -21,9 +21,13 @@ import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
 
+type InstrumentQuery<TKind extends InstrumentKind> = {
+  kind?: TKind;
+  subjectId?: string;
+};
+
 @Injectable()
 export class InstrumentsService {
-  private readonly instrumentBundler = new InstrumentBundler();
   private readonly logger = new Logger(InstrumentsService.name);
 
   constructor(
@@ -32,116 +36,41 @@ export class InstrumentsService {
     private readonly virtualizationService: VirtualizationService
   ) {}
 
-  async count(
-    filter: NonNullable<Parameters<Model<'Instrument'>['count']>[0]>['where'] = {},
-    { ability }: EntityOperationOptions = {}
-  ) {
-    return this.instrumentModel.count({ where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), filter] } });
+  async count<TKind extends InstrumentKind>(
+    query: InstrumentQuery<TKind> = {},
+    options: EntityOperationOptions = {}
+  ): Promise<number> {
+    return (await this.find(query, options)).length;
   }
 
-  async create<TKind extends InstrumentKind>({ inputs, kind }: CreateInstrumentDto<TKind>) {
-    this.logger.debug('Attempting to parse instrument source...');
-    const bundle = await this.parseInputs(inputs);
-    this.logger.debug('Done parsing source for instrument');
-
-    return this.createFromBundle(bundle, { kind });
-  }
-
-  async createFromBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
-    const instance = await this.interpretBundle(bundle, options);
-
-    this.logger.debug(
-      `Checking if instrument '${instance.internal.name}' edition '${instance.internal.edition}' exists...`
-    );
-    if (await this.instrumentModel.exists({ internal: instance.internal })) {
-      throw new ConflictException(
-        `Instrument with name '${instance.internal.name}' and edition '${instance.internal.edition}' already exists!`
-      );
+  async create({ bundle }: CreateInstrumentDto): Promise<WithID<AnyInstrument>> {
+    let instance: AnyInstrument;
+    try {
+      instance = await this.virtualizationService.runInContext(bundle, { validate: true });
+    } catch (err) {
+      this.logger.error(err);
+      throw new UnprocessableEntityException('Failed to interpret instrument bundle', {
+        cause: err
+      });
     }
 
-    this.logger.debug(
-      `Instrument with name '${instance.internal.name}' and edition '${instance.internal.edition}' does not exist`
-    );
-
-    /**
-     * After upgrading TypeScript from v5.3 to 5.4, the type of string | { en: string, fr: string }
-     * does not seem to be assignable to as Prisma.InputJsonValue anymore. I know this works and
-     * don't have the time to fix it at the moment (the type error gives no useful info).
-     */
-    return this.instrumentModel.create({
-      data: {
-        ...omit({ ...instance }, ['content', 'measures', 'validationSchema']),
-        bundle,
-        details: {
-          ...instance.details,
-          authors: instance.details.authors ?? [],
-          description: instance.details.description as Prisma.InputJsonValue,
-          instructions: instance.details.instructions as Prisma.InputJsonValue,
-          title: instance.details.title as Prisma.InputJsonValue
-        },
-        id: this.generateInstrumentId(instance.internal)
-      }
-    });
-  }
-
-  async find(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
-    return this.instrumentModel.findMany({
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
-    });
-  }
-
-  async findBundles(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
-    return this.instrumentModel.findMany({
-      select: {
-        bundle: true,
-        id: true
-      },
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
-    });
-  }
-
-  async findById(id: string, { ability }: EntityOperationOptions = {}) {
-    const instrument = await this.instrumentModel.findFirst({
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument')], id }
-    });
-    if (!instrument) {
-      throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
+    const id = this.generateInstrumentId(instance);
+    if (await this.instrumentModel.exists({ id })) {
+      throw new ConflictException(`Instrument with ID '${instance.id}' already exists!`);
     }
-    return instrument;
+
+    await this.instrumentModel.create({ data: { bundle, id } });
+    return { ...instance, id };
   }
 
-  async findIds(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
-    return this.instrumentModel.findMany({
-      select: { id: true },
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
-    });
-  }
-
-  async findInstanceById(id: string, options: EntityOperationOptions = {}) {
-    return this.findById(id, options).then((instrument) => {
-      return this.virtualizationService.getInstrumentInstance(instrument);
-    });
-  }
-
-  async findSources(query: { kind?: InstrumentKind } = {}, { ability }: EntityOperationOptions = {}) {
-    return this.instrumentModel.findMany({
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), query] }
-    });
-  }
-
-  async findSummaries(
-    query: {
-      kind?: InstrumentKind;
-      subjectId?: string;
-    } = {},
+  async find<TKind extends InstrumentKind>(
+    query: InstrumentQuery<TKind> = {},
     { ability }: EntityOperationOptions = {}
-  ): Promise<InstrumentSummary[]> {
-    return this.instrumentModel.findMany({
-      select: { details: true, id: true, internal: true, kind: true, language: true, tags: true },
+  ): Promise<WithID<SomeInstrument<TKind>>[]> {
+    const instruments = await this.instrumentModel.findMany({
       where: {
         AND: [
           {
-            kind: query.kind,
             records: query.subjectId
               ? {
                   some: {
@@ -153,53 +82,55 @@ export class InstrumentsService {
           accessibleQuery(ability, 'read', 'Instrument')
         ]
       }
-    }) as Promise<InstrumentSummary[]>;
+    });
+    const instances = await this.instantiate(instruments);
+    if (!query.kind) {
+      return instances as WithID<SomeInstrument<TKind>>[];
+    }
+    return instances.filter((instance) => instance.kind === query.kind) as WithID<SomeInstrument<TKind>>[];
   }
 
-  generateInstrumentId({ edition, name }: { edition: number; name: string }) {
+  async findById(
+    id: string,
+    { ability }: EntityOperationOptions = {}
+  ): Promise<{ bundle: string; id: string } & AnyInstrument> {
+    const instrument = await this.instrumentModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'read', 'Instrument')], id }
+    });
+    if (!instrument) {
+      throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
+    }
+    return { bundle: instrument.bundle, ...(await this.virtualizationService.getInstrumentInstance(instrument)) };
+  }
+
+  async findSummaries<TKind extends InstrumentKind>(
+    query: InstrumentQuery<TKind> = {},
+    options: EntityOperationOptions = {}
+  ): Promise<InstrumentSummary[]> {
+    const instances = await this.find(query, options);
+    return instances.map(({ details, id, kind, language, tags }) => ({ details, id, kind, language, tags }));
+  }
+
+  private generateInstrumentId(instrument: AnyInstrument) {
+    if (isScalarInstrument(instrument)) {
+      return this.generateScalarInstrumentId(instrument);
+    }
+    return this.generateSeriesInstrumentId(instrument);
+  }
+
+  private generateScalarInstrumentId({ internal: { edition, name } }: AnyScalarInstrument) {
     return this.cryptoService.hash(`${name}-${edition}`);
   }
 
-  private async interpretBundle<TKind extends InstrumentKind>(bundle: string, options?: { kind?: TKind }) {
-    let instance: SomeScalarInstrument<TKind>;
-    try {
-      instance = await this.virtualizationService.runInContext(bundle);
-      switch (options?.kind) {
-        case undefined:
-          return $AnyScalarInstrument.parseAsync(instance);
-        case 'FORM':
-          return $FormInstrument.parseAsync(instance);
-        case 'INTERACTIVE':
-          return $InteractiveInstrument.parseAsync(instance);
-        default:
-          throw new Error(`Unexpected instrument kind: ${options?.kind}`);
-      }
-    } catch (err) {
-      throw new UnprocessableEntityException('Failed to interpret instrument bundle', {
-        cause: err
-      });
-    }
+  private generateSeriesInstrumentId(instrument: SeriesInstrument) {
+    return this.cryptoService.hash(instrument.content.map(({ edition, name }) => `${name}-${edition}`).join('--'));
   }
 
-  /**
-   * Attempt to resolve an instance of an instrument from inputs.
-   * If this fails, then throws an UnprocessableContentException
-   */
-  private async parseInputs(inputs: BundlerInput[]) {
-    let bundle: string;
-    try {
-      bundle = await this.instrumentBundler.bundle({ inputs });
-    } catch (err) {
-      if (err instanceof Error) {
-        this.logger.debug(err.cause);
-        if (err.cause instanceof Error) {
-          this.logger.debug(err.cause.cause);
-        }
-      }
-      throw new UnprocessableEntityException('Failed to parse instrument source', {
-        cause: err
-      });
-    }
-    return bundle;
+  private async instantiate(instruments: InstrumentBundleContainer[]) {
+    return Promise.all(
+      instruments.map((instrument) => {
+        return this.virtualizationService.getInstrumentInstance(instrument);
+      })
+    );
   }
 }

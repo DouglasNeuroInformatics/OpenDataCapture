@@ -5,7 +5,8 @@
   "license": "Apache-2.0",
   "exports": {
     "./forms/*": "./dist/forms/*",
-    "./interactive/*": "./dist/interactive/*"
+    "./interactive/*": "./dist/interactive/*",
+    "./series/*": "./dist/series/*"
   },
   "scripts": {
     "build": "tsx ../instrument-bundler/src/cli.ts --clean --declaration --outdir dist src",

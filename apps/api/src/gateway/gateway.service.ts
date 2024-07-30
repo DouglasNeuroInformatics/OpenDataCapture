@@ -22,6 +22,7 @@ export class GatewayService {
 
   async createRemoteAssignment(assignment: Assignment, publicKey: CryptoKey): Promise<MutateAssignmentResponseBody> {
     const instrument = await this.instrumentsService.findById(assignment.instrumentId);
+
     const response = await this.httpService.axiosRef.post(`/api/assignments`, {
       ...assignment,
       instrumentBundle: instrument.bundle,

@@ -105,42 +105,20 @@ enum InstrumentKind {
   UNKNOWN
 }
 
-type InstrumentDetails {
-  authors           String[]
-  // string | Record<Language, string>
-  description       Json
-  estimatedDuration Int?
-  // string | string[] | Record<Language, string | string[]>
-  instructions      Json?
-  license           String
-  referenceUrl      String?
-  sourceUrl         String?
-  // string | Record<Language, string>
-  title             Json
-}
-
 type InstrumentInternal {
   name    String
   edition Float
 }
 
 model InstrumentModel {
-  createdAt   DateTime           @default(now()) @db.Date
-  updatedAt   DateTime           @updatedAt @db.Date
-  id          String             @id @map("_id")
+  createdAt   DateTime                @default(now()) @db.Date
+  updatedAt   DateTime                @updatedAt @db.Date
+  id          String                  @id @map("_id")
   assignments AssignmentModel[]
   bundle      String
-  details     InstrumentDetails
-  groups      GroupModel[]       @relation(fields: [groupIds], references: [id])
-  groupIds    String[]           @db.ObjectId
-  internal    InstrumentInternal
-  kind        InstrumentKind
-  /// Language | Language[]
-  language    Json
-
-  /// string[] | Record<Language, string[]>
-  tags    Json
-  records InstrumentRecordModel[]
+  groups      GroupModel[]            @relation(fields: [groupIds], references: [id])
+  groupIds    String[]                @db.ObjectId
+  records     InstrumentRecordModel[]
 }
 
 // Subjects

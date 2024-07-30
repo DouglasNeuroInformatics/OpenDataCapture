@@ -24,7 +24,7 @@ export class GroupsService {
     return this.groupModel.create({
       data: {
         accessibleInstruments: {
-          connect: await this.instrumentsService.findIds()
+          connect: (await this.instrumentsService.find()).map(({ id }) => ({ id }))
         },
         settings: {
           defaultIdentificationMethod: group.type === 'CLINICAL' ? 'PERSONAL_INFO' : 'CUSTOM_ID'
