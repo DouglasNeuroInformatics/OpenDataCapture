@@ -1,4 +1,5 @@
 import type {
+  AnyInstrument,
   AnyMultilingualFormInstrument,
   AnyScalarInstrument,
   FormInstrument,
@@ -35,4 +36,8 @@ export function isFormInstrument(instrument: AnyScalarInstrument): instrument is
 
 export function isInteractiveInstrument(instrument: AnyScalarInstrument): instrument is InteractiveInstrument {
   return instrument.kind === 'INTERACTIVE';
+}
+
+export function isScalarInstrument(instrument: AnyInstrument): instrument is AnyScalarInstrument {
+  return Object.hasOwn(instrument, 'internal');
 }

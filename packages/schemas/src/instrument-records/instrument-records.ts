@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { $BaseModel, $Json } from '../core/core.js';
-import { $InstrumentKind, $InstrumentMeasureValue } from '../instrument/instrument.js';
+import { $InstrumentMeasureValue } from '../instrument/instrument.js';
 
 import type { InstrumentKind, InstrumentMeasureValue } from '../instrument/instrument.js';
 import type { SessionType } from '../session/session.js';
@@ -24,9 +24,6 @@ export const $InstrumentRecord = $BaseModel.extend({
   data: z.unknown(),
   date: z.coerce.date(),
   groupId: z.string().nullish(),
-  instrument: z.object({
-    kind: $InstrumentKind
-  }),
   instrumentId: z.string(),
   subjectId: z.string()
 });

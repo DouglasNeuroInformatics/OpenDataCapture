@@ -66,7 +66,7 @@
     "storybook": "^8.1.6",
     "storybook-react-i18next": "^3.1.1",
     "tsx": "4.8.2",
-    "turbo": "^2.0.3",
+    "turbo": "^2.0.9",
     "type-fest": "^4.20.0",
     "typescript": "~5.4.5",
     "unplugin-swc": "^1.4.5",

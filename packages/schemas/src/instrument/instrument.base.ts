@@ -3,7 +3,7 @@ import type { LicenseIdentifier } from '@opendatacapture/licenses';
 import type { ConditionalKeys, Merge, Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 
-import { $Language, $LicenseIdentifier, $Uint8Array, $ZodTypeAny, type Language } from '../core/core.js';
+import { $Language, $LicenseIdentifier, $ZodTypeAny, type Language } from '../core/core.js';
 
 export type InstrumentKind = z.infer<typeof $InstrumentKind>;
 export const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'SERIES', 'UNKNOWN']);
@@ -218,21 +218,24 @@ export type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage =
   }
 >;
 
+export const $BaseInstrument = z.object({
+  content: z.any(),
+  details: $InstrumentDetails,
+  id: z.string().optional(),
+  kind: $InstrumentKind,
+  language: $InstrumentLanguage,
+  tags: $$InstrumentUIOption(z.array(z.string().min(1)))
+}) satisfies z.ZodType<BaseInstrument>;
+
 export type ScalarInstrumentInternal = z.infer<typeof $ScalarInstrumentInternal>;
 export const $ScalarInstrumentInternal = z.object({
   edition: z.number().int().positive(),
   name: z.string().min(1)
 });
 
-export const $ScalarInstrument = z.object({
-  content: z.any(),
-  details: $InstrumentDetails,
-  id: z.string().optional(),
+export const $ScalarInstrument = $BaseInstrument.extend({
   internal: $ScalarInstrumentInternal,
-  kind: $InstrumentKind,
-  language: $InstrumentLanguage,
   measures: $InstrumentMeasures.nullable(),
-  tags: $$InstrumentUIOption(z.array(z.string().min(1))),
   validationSchema: $ZodTypeAny
 }) satisfies z.ZodType<ScalarInstrument>;
 
@@ -248,31 +251,23 @@ export const $UnilingualScalarInstrument = $ScalarInstrument.extend({
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
  */
-export type InstrumentSummary<T extends ScalarInstrument = ScalarInstrument> = {
+export type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = {
   id: string;
-} & Omit<T, 'content' | 'measures' | 'validationSchema'>;
+} & Omit<T, 'content'>;
 
-export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<ScalarInstrument<any, Language>>>;
+export type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<Language>>>;
 
-export type MultilingualInstrumentSummary = Simplify<InstrumentSummary<ScalarInstrument<any, Language[]>>>;
+export type MultilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<Language[]>>>;
 
-export const $InstrumentSummary = $ScalarInstrument
+export const $InstrumentSummary = $BaseInstrument
   .omit({
-    content: true,
-    measures: true,
-    validationSchema: true
+    content: true
   })
   .extend({ id: z.string() }) satisfies z.ZodType<InstrumentSummary>;
 
 export type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 export const $CreateInstrumentData = z.object({
-  inputs: z.array(
-    z.object({
-      content: z.union([$Uint8Array, z.string()]),
-      name: z.string()
-    })
-  ),
-  kind: $InstrumentKind.optional()
+  bundle: z.string().min(1)
 });
 
 export type InstrumentBundleContainer = z.infer<typeof $InstrumentBundleContainer>;

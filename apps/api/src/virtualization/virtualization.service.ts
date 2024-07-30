@@ -1,10 +1,11 @@
 import vm from 'vm';
 
 import { Injectable } from '@nestjs/common';
-import type { AnyScalarInstrument, InstrumentKind, SomeScalarInstrument } from '@opendatacapture/schemas/instrument';
+import type { WithID } from '@opendatacapture/schemas/core';
+import { $AnyInstrument, type AnyInstrument } from '@opendatacapture/schemas/instrument';
 
 type VirtualizationContext = {
-  instruments: Map<string, AnyScalarInstrument>;
+  instruments: Map<string, WithID<AnyInstrument>>;
 };
 
 @Injectable()
@@ -25,17 +26,19 @@ export class VirtualizationService {
   async getInstrumentInstance(instrument: { bundle: string; id: string }) {
     let instance = this.ctx.instruments.get(instrument.id);
     if (!instance) {
-      instance = await this.runInContext(instrument.bundle);
+      instance = { ...(await this.runInContext(instrument.bundle)), id: instrument.id };
       this.ctx.instruments.set(instrument.id, instance);
     }
     return instance;
   }
 
-  async runInContext<TKind extends InstrumentKind = InstrumentKind>(code: string) {
-    return Promise.resolve(
-      vm.runInContext(code, this.ctx, {
-        importModuleDynamically: vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER
-      })
-    ) as Promise<SomeScalarInstrument<TKind>>;
+  async runInContext(code: string, options?: { validate?: boolean }) {
+    const instance: unknown = await vm.runInContext(code, this.ctx, {
+      importModuleDynamically: vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER
+    });
+    if (options?.validate) {
+      return $AnyInstrument.parseAsync(instance);
+    }
+    return instance as AnyInstrument;
   }
 }

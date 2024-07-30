@@ -10,7 +10,7 @@ import miniMentalStateExamination from '@opendatacapture/instrument-library/form
 import montrealCognitiveAssessment from '@opendatacapture/instrument-library/forms/montreal-cognitive-assessment.js';
 import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/patient-health-questionnaire-9.js';
 import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
-import { type Json, type Language } from '@opendatacapture/schemas/core';
+import { type Json, type Language, type WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
@@ -22,7 +22,6 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
-import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 type HappinessQuestionnaireData = {
   isSatisfiedOverall: boolean;
@@ -44,8 +43,7 @@ export class DemoService {
     private readonly prismaService: PrismaService,
     private readonly sessionsService: SessionsService,
     private readonly subjectsService: SubjectsService,
-    private readonly usersService: UsersService,
-    private readonly virtualizationService: VirtualizationService
+    private readonly usersService: UsersService
   ) {}
 
   async init({
@@ -59,24 +57,21 @@ export class DemoService {
       const dbName = await this.prismaService.getDbName();
       this.logger.log(`Initializing demo for database: '${dbName}'`);
 
-      const hq = (await this.instrumentsService
-        .createFromBundle(happinessQuestionnaire)
-        .then((entity) => this.virtualizationService.getInstrumentInstance(entity))) as FormInstrument<
-        HappinessQuestionnaireData,
-        Language[]
+      const hq = (await this.instrumentsService.create({ bundle: happinessQuestionnaire })) as WithID<
+        FormInstrument<HappinessQuestionnaireData, Language[]>
       >;
 
       await Promise.all([
-        this.instrumentsService.createFromBundle(briefPsychiatricRatingScale),
-        this.instrumentsService.createFromBundle(enhancedDemographicsQuestionnaire),
-        this.instrumentsService.createFromBundle(miniMentalStateExamination),
-        this.instrumentsService.createFromBundle(montrealCognitiveAssessment),
-        this.instrumentsService.createFromBundle(patientHealthQuestionnaire9)
+        this.instrumentsService.create({ bundle: briefPsychiatricRatingScale }),
+        this.instrumentsService.create({ bundle: enhancedDemographicsQuestionnaire }),
+        this.instrumentsService.create({ bundle: miniMentalStateExamination }),
+        this.instrumentsService.create({ bundle: montrealCognitiveAssessment }),
+        this.instrumentsService.create({ bundle: patientHealthQuestionnaire9 })
       ]);
 
       this.logger.debug('Done creating forms');
 
-      await this.instrumentsService.createFromBundle(breakoutTask);
+      await this.instrumentsService.create({ bundle: breakoutTask });
       this.logger.debug('Done creating interactive instruments');
 
       const groups: Group[] = [];
@@ -139,7 +134,7 @@ export class DemoService {
             data: data as Json,
             date: faker.date.past({ years: 2 }),
             groupId: group.id,
-            instrumentId: this.instrumentsService.generateInstrumentId(hq.internal),
+            instrumentId: hq.id,
             sessionId: session.id,
             subjectId: subject.id
           });
