@@ -3,13 +3,12 @@ import { toUpperCase } from '@douglasneuroinformatics/libjs';
 import { faker } from '@faker-js/faker';
 import { Injectable, Logger } from '@nestjs/common';
 import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
-import briefPsychiatricRatingScale from '@opendatacapture/instrument-library/forms/brief-psychiatric-rating-scale.js';
 import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/enhanced-demographics-questionnaire.js';
+import generalConsentForm from '@opendatacapture/instrument-library/forms/general-consent-form.js';
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/happiness-questionnaire.js';
-import miniMentalStateExamination from '@opendatacapture/instrument-library/forms/mini-mental-state-examination.js';
-import montrealCognitiveAssessment from '@opendatacapture/instrument-library/forms/montreal-cognitive-assessment.js';
 import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/patient-health-questionnaire-9.js';
 import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
+import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/happiness-questionnaire-with-consent.js';
 import { type Json, type Language, type WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { FormInstrument } from '@opendatacapture/schemas/instrument';
@@ -62,10 +61,8 @@ export class DemoService {
       >;
 
       await Promise.all([
-        this.instrumentsService.create({ bundle: briefPsychiatricRatingScale }),
         this.instrumentsService.create({ bundle: enhancedDemographicsQuestionnaire }),
-        this.instrumentsService.create({ bundle: miniMentalStateExamination }),
-        this.instrumentsService.create({ bundle: montrealCognitiveAssessment }),
+        this.instrumentsService.create({ bundle: generalConsentForm }),
         this.instrumentsService.create({ bundle: patientHealthQuestionnaire9 })
       ]);
 
@@ -73,6 +70,9 @@ export class DemoService {
 
       await this.instrumentsService.create({ bundle: breakoutTask });
       this.logger.debug('Done creating interactive instruments');
+
+      await this.instrumentsService.create({ bundle: happinessQuestionnaireWithConsent });
+      this.logger.debug('Done creating series instruments');
 
       const groups: Group[] = [];
       for (const group of DEMO_GROUPS) {

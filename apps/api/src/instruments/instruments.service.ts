@@ -1,8 +1,9 @@
 import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 import { isScalarInstrument } from '@opendatacapture/instrument-utils';
-import type { WithID } from '@opendatacapture/schemas/core';
+import { $Error, type WithID } from '@opendatacapture/schemas/core';
+import { $AnyInstrument } from '@opendatacapture/schemas/instrument';
 import type {
   AnyInstrument,
   AnyScalarInstrument,
@@ -28,8 +29,6 @@ type InstrumentQuery<TKind extends InstrumentKind> = {
 
 @Injectable()
 export class InstrumentsService {
-  private readonly logger = new Logger(InstrumentsService.name);
-
   constructor(
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     private readonly cryptoService: CryptoService,
@@ -44,19 +43,40 @@ export class InstrumentsService {
   }
 
   async create({ bundle }: CreateInstrumentDto): Promise<WithID<AnyInstrument>> {
-    let instance: AnyInstrument;
+    let bundleReturn: unknown;
     try {
-      instance = await this.virtualizationService.runInContext(bundle, { validate: true });
+      bundleReturn = await this.virtualizationService.runInContext(bundle);
     } catch (err) {
-      this.logger.error(err);
-      throw new UnprocessableEntityException('Failed to interpret instrument bundle', {
-        cause: err
+      let cause: unknown;
+      const parsed = await $Error.safeParseAsync(err);
+      if (parsed.success) {
+        cause = { message: parsed.data.message, name: parsed.data.name };
+      }
+      throw new UnprocessableEntityException({
+        cause,
+        message: 'Failed to interpret instrument bundle'
       });
     }
 
+    const parseResult = await $AnyInstrument.safeParseAsync(bundleReturn);
+    if (!parseResult.success) {
+      throw new UnprocessableEntityException({
+        issues: parseResult.error.issues,
+        message: 'Instrument validation failed'
+      });
+    }
+    const instance = parseResult.data;
+
     const id = this.generateInstrumentId(instance);
     if (await this.instrumentModel.exists({ id })) {
-      throw new ConflictException(`Instrument with ID '${instance.id}' already exists!`);
+      throw new ConflictException(`Instrument with ID '${id}' already exists!`);
+    }
+
+    if (instance.kind === 'SERIES') {
+      const result = await this.validateSeriesInstrument(instance);
+      if (!result.success) {
+        throw new UnprocessableEntityException(result.message);
+      }
     }
 
     await this.instrumentModel.create({ data: { bundle, id } });
@@ -118,7 +138,7 @@ export class InstrumentsService {
     return this.generateSeriesInstrumentId(instrument);
   }
 
-  private generateScalarInstrumentId({ internal: { edition, name } }: AnyScalarInstrument) {
+  private generateScalarInstrumentId({ internal: { edition, name } }: Pick<AnyScalarInstrument, 'internal'>) {
     return this.cryptoService.hash(`${name}-${edition}`);
   }
 
@@ -132,5 +152,22 @@ export class InstrumentsService {
         return this.virtualizationService.getInstrumentInstance(instrument);
       })
     );
+  }
+
+  private async validateSeriesInstrument(instrument: SeriesInstrument) {
+    if (instrument.content.length < 2) {
+      return { message: 'Series instrument must include at least two items', success: false };
+    }
+    for (const internal of instrument.content) {
+      const id = this.generateScalarInstrumentId({ internal });
+      const exists = await this.instrumentModel.exists({ id });
+      if (!exists) {
+        return {
+          message: `Cannot find instrument '${internal.name}' with edition '${internal.edition}'`,
+          success: false
+        };
+      }
+    }
+    return { success: true };
   }
 }

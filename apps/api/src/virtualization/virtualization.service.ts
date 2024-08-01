@@ -2,7 +2,7 @@ import vm from 'vm';
 
 import { Injectable } from '@nestjs/common';
 import type { WithID } from '@opendatacapture/schemas/core';
-import { $AnyInstrument, type AnyInstrument } from '@opendatacapture/schemas/instrument';
+import { type AnyInstrument } from '@opendatacapture/schemas/instrument';
 
 type VirtualizationContext = {
   instruments: Map<string, WithID<AnyInstrument>>;
@@ -26,19 +26,16 @@ export class VirtualizationService {
   async getInstrumentInstance(instrument: { bundle: string; id: string }) {
     let instance = this.ctx.instruments.get(instrument.id);
     if (!instance) {
-      instance = { ...(await this.runInContext(instrument.bundle)), id: instrument.id };
+      instance = { ...((await this.runInContext(instrument.bundle)) as AnyInstrument), id: instrument.id };
       this.ctx.instruments.set(instrument.id, instance);
     }
     return instance;
   }
 
-  async runInContext(code: string, options?: { validate?: boolean }) {
+  async runInContext(code: string) {
     const instance: unknown = await vm.runInContext(code, this.ctx, {
       importModuleDynamically: vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER
     });
-    if (options?.validate) {
-      return $AnyInstrument.parseAsync(instance);
-    }
-    return instance as AnyInstrument;
+    return instance;
   }
 }

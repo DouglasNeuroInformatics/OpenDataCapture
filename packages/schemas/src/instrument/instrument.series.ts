@@ -2,8 +2,8 @@ import type { Merge } from 'type-fest';
 import { z } from 'zod';
 
 import {
+  $BaseInstrument,
   $ScalarInstrumentInternal,
-  $UnilingualScalarInstrument,
   type BaseInstrument,
   type InstrumentLanguage,
   type ScalarInstrumentInternal
@@ -17,7 +17,7 @@ export type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLa
   }
 >;
 
-export const $SeriesInstrument: z.ZodType<SeriesInstrument> = $UnilingualScalarInstrument.extend({
+export const $SeriesInstrument: z.ZodType<SeriesInstrument> = $BaseInstrument.extend({
   content: z.array($ScalarInstrumentInternal),
   kind: z.literal('SERIES')
 });
