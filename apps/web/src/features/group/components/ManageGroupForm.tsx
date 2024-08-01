@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
+import { useSetupState } from '@/hooks/useSetupState';
 import { useAppStore } from '@/store';
 
 type InstrumentOptions = {
@@ -26,6 +27,7 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { i18n } = useTranslation();
   const { t } = useTranslation(['group', 'common']);
+  const setupState = useSetupState();
 
   const { initialValues, options } = useMemo(() => {
     const options: InstrumentOptions = {
@@ -55,12 +57,19 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
     return { initialValues, options };
   }, [availableInstruments, currentGroup, i18n.resolvedLanguage]);
 
+  const isDisabled = Boolean(setupState.data?.isDemo && import.meta.env.PROD);
+
+  let description = t('manage.accessibleInstrumentsDesc');
+  if (isDisabled) {
+    description += ` ${t('manage.accessibleInstrumentDemoNote')}`;
+  }
+
   return (
     <Form
       className="mx-auto max-w-3xl"
       content={[
         {
-          description: t('manage.accessibleInstrumentsDesc'),
+          description,
           fields: {
             accessibleFormInstrumentIds: {
               kind: 'set',
@@ -94,6 +103,7 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
       ]}
       initialValues={initialValues}
       preventResetValuesOnReset={true}
+      readOnly={isDisabled}
       validationSchema={z.object({
         accessibleFormInstrumentIds: z.set(z.string()),
         accessibleInteractiveInstrumentIds: z.set(z.string()),
