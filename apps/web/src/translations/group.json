@@ -8,6 +8,10 @@
       "en": "Select the instruments that are shown to you and other members of your group. This can be changed by a group manager at any time.",
       "fr": "Sélectionnez les instruments qui vous sont présentés ainsi qu'aux autres membres de votre groupe. Cette sélection peut être modifiée à tout moment par un responsable de groupe."
     },
+    "accessibleInstrumentDemoNote": {
+      "en": "Please note that this feature is disabled in demo mode to avoid disrupting other users.",
+      "fr": "Veuillez noter que cette fonction est désactivée en mode démo, afin d'éviter de perturber les autres utilisateurs."
+    },
     "defaultSubjectIdMethod": {
       "en": "Subject Identification Method (Default)",
       "fr": "Méthode d'identification du sujet par défaut"

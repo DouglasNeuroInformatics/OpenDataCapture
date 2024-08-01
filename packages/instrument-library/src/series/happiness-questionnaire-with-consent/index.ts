@@ -1,6 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
-export default {
+import type { SeriesInstrument } from '/runtime/v1/opendatacapture@1.0.0/core.js';
+
+const instrument: SeriesInstrument = {
   kind: 'SERIES',
   language: ['en', 'fr'],
   tags: {
@@ -28,4 +30,6 @@ export default {
       edition: 1
     }
   ]
-} satisfies import('/runtime/v1/opendatacapture@1.0.0/core.js').SeriesInstrument;
+};
+
+export default instrument;

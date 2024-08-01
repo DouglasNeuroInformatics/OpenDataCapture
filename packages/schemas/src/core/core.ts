@@ -83,3 +83,10 @@ export const $LicenseIdentifier = z.string().refine((arg) => licenses.has(arg as
 >;
 
 export type WithID<T extends { [key: string]: any }> = Simplify<{ id: string } & T>;
+
+export const $Error: z.ZodType<Error> = z.object({
+  cause: z.unknown(),
+  message: z.string(),
+  name: z.string(),
+  stack: z.string().optional()
+});

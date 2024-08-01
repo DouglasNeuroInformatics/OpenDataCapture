@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
-import { ClipboardCheckIcon, FileQuestionIcon, type LucideIcon, MonitorCheckIcon } from 'lucide-react';
+import { ClipboardCheckIcon, FileQuestionIcon, ListChecksIcon, type LucideIcon, MonitorCheckIcon } from 'lucide-react';
 
 export type InstrumentIconProps = {
   kind: InstrumentKind;
@@ -13,6 +13,8 @@ export const InstrumentIcon = ({ kind, ...props }: InstrumentIconProps) => {
       return <ClipboardCheckIcon {...props} />;
     case 'INTERACTIVE':
       return <MonitorCheckIcon {...props} />;
+    case 'SERIES':
+      return <ListChecksIcon {...props} />;
     case 'UNKNOWN':
       return <FileQuestionIcon {...props} />;
     default:
