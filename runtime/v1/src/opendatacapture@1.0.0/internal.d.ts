@@ -6,6 +6,4 @@
  * TO THIS IS ON A COMPLETELY STATIC WEBSITE THAT NEVER INTERACTS WITH OUR SERVERS (I.E., THE INSTRUMENT
  * PLAYGROUND).**
  */
-export async function evaluateInstrument(bundle: string) {
-  return (await new Function(`return ${bundle}`)()) as Promise<any>;
-}
+export declare function evaluateInstrument(bundle: string): Promise<any>;
