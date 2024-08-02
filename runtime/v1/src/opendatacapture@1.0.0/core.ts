@@ -44,19 +44,6 @@ type InstrumentDef<
   TLanguage extends InstrumentLanguage
 > = Omit<DiscriminatedInstrument<TKind, TData, TLanguage, { strict: true }>, 'kind' | 'language' | 'validationSchema'>;
 
-/** @deprecated use `defineInstrument` */
-export class InstrumentFactory<
-  TKind extends InstrumentKind,
-  TLanguage extends InstrumentLanguage,
-  TSchema extends z.ZodType<DiscriminatedInstrumentData<TKind>>
-> {
-  constructor(private options: { kind: TKind; language: TLanguage; validationSchema: TSchema }) {}
-
-  defineInstrument(def: InstrumentDef<TKind, z.TypeOf<TSchema>, TLanguage>) {
-    return { ...this.options, ...def };
-  }
-}
-
 export function defineInstrument<
   TKind extends InstrumentKind,
   TLanguage extends InstrumentLanguage,
