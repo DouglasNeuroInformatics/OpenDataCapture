@@ -27,7 +27,6 @@
     "@astrojs/starlight-tailwind": "^2.0.3",
     "@astrojs/tailwind": "^5.1.0",
     "@opendatacapture/tailwindcss": "workspace:*",
-    "@opendatacapture/vite-plugin-symlink": "workspace:*",
     "@tailwindcss/typography": "^0.5.13",
     "@types/lodash-es": "^4.17.12",
     "astro": "^4.11.1",
