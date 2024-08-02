@@ -1,14 +1,15 @@
 import React from 'react';
 
-import type { AnyUnilingualScalarInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import type { Promisable } from 'type-fest';
 
 import { FormContent } from '../FormContent';
 import { InteractiveContent } from '../InteractiveContent';
+import { SeriesInstrument } from '../SeriesInstrument';
 
 export type InstrumentContentProps = {
   bundle: string;
-  instrument: AnyUnilingualScalarInstrument;
+  instrument: AnyUnilingualInstrument;
   onSubmit: (data: unknown) => Promisable<void>;
 };
 
@@ -18,6 +19,8 @@ export const InstrumentContent = ({ bundle, instrument, onSubmit }: InstrumentCo
       return <FormContent instrument={instrument} onSubmit={onSubmit} />;
     case 'INTERACTIVE':
       return <InteractiveContent bundle={bundle} onSubmit={onSubmit} />;
+    case 'SERIES':
+      return <SeriesInstrument />;
     default:
       return null;
   }

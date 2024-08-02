@@ -2,16 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { InstrumentInterpreter, type InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import { translateInstrument } from '@opendatacapture/instrument-utils';
-import type {
-  AnyScalarInstrument,
-  AnyUnilingualScalarInstrument,
-  InstrumentKind
-} from '@opendatacapture/schemas/instrument';
+import type { AnyInstrument, AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 
 export type InterpretedInstrumentState =
   | { error: Error; status: 'ERROR' }
-  | { instrument: AnyUnilingualScalarInstrument; status: 'DONE' }
+  | { instrument: AnyUnilingualInstrument; status: 'DONE' }
   | { status: 'LOADING' };
 
 /**
@@ -20,12 +16,9 @@ export type InterpretedInstrumentState =
  * @param bundle - the JavaScript code to be interpreted directly in the browser
  * @returns The instrument generated from the code, translated into the current locale, if possible, otherwise the default
  */
-export function useInterpretedInstrument<TKind extends InstrumentKind>(
-  bundle: string,
-  options?: InterpretOptions<TKind>
-) {
+export function useInterpretedInstrument(bundle: string, options?: InterpretOptions) {
   const interpreter = useMemo(() => new InstrumentInterpreter(), []);
-  const [instrument, setInstrument] = useState<AnyScalarInstrument | null>(null);
+  const [instrument, setInstrument] = useState<AnyInstrument | null>(null);
   const [state, setState] = useState<InterpretedInstrumentState>({ status: 'LOADING' });
   const { i18n } = useTranslation();
 

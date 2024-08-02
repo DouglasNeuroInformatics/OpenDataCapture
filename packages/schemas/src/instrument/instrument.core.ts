@@ -4,9 +4,9 @@ import { $FormInstrument } from './instrument.form.js';
 import { $InteractiveInstrument } from './instrument.interactive.js';
 import { $SeriesInstrument } from './instrument.series.js';
 
-import type { Json } from '../core/core.js';
+import type { Json, Language } from '../core/core.js';
 import type { InstrumentKind } from './instrument.base.js';
-import type { AnyUnilingualFormInstrument, FormInstrument } from './instrument.form.js';
+import type { AnyMultilingualFormInstrument, AnyUnilingualFormInstrument, FormInstrument } from './instrument.form.js';
 import type { InteractiveInstrument } from './instrument.interactive.js';
 import type { SeriesInstrument } from './instrument.series.js';
 
@@ -23,8 +23,13 @@ export const $AnyInstrument: z.ZodType<AnyInstrument> = z.union([
   $SeriesInstrument
 ]);
 
+export type AnyUnilingualInstrument = AnyUnilingualFormInstrument | InteractiveInstrument | SeriesInstrument<Language>;
+export type SomeUnilingualInstrument<TKind extends InstrumentKind> = Extract<AnyUnilingualInstrument, { kind: TKind }>;
+
 export type AnyUnilingualScalarInstrument = AnyUnilingualFormInstrument | InteractiveInstrument<Json>;
 export type SomeUnilingualScalarInstrument<TKind extends InstrumentKind> = Extract<
   AnyUnilingualScalarInstrument,
   { kind: TKind }
 >;
+
+export type AnyMultilingualInstrument = AnyMultilingualFormInstrument | SeriesInstrument<Language[]>;

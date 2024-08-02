@@ -7,7 +7,6 @@ import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import { replacer } from '@opendatacapture/json-utils';
 import { ErrorFallback } from '@opendatacapture/react-core';
 import type { Json } from '@opendatacapture/schemas/core';
-import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { FileCheckIcon, MonitorIcon, PrinterIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -21,23 +20,23 @@ import { InstrumentSummary } from '../InstrumentSummary';
 
 export type SubjectDisplayInfo = Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 
-export type InstrumentRendererProps<TKind extends InstrumentKind> = {
+export type InstrumentRendererProps = {
   bundle: string;
   className?: string;
   customErrorFallback?: React.FC<{ error: Error }>;
   onSubmit: (data: Json) => Promisable<void>;
-  options?: InterpretOptions<TKind>;
+  options?: InterpretOptions;
   subject?: SubjectDisplayInfo;
 };
 
-export const InstrumentRenderer = <TKind extends InstrumentKind>({
+export const InstrumentRenderer = ({
   bundle,
   className,
   customErrorFallback,
   onSubmit,
   options,
   subject
-}: InstrumentRendererProps<TKind>) => {
+}: InstrumentRendererProps) => {
   const [data, setData] = useState<unknown>();
   const { height, width } = useWindowSize();
   const { i18n, t } = useTranslation();

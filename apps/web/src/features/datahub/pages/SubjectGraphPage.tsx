@@ -8,6 +8,7 @@ import {
   type ListboxDropdownOption
 } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
 import html2canvas from 'html2canvas';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -34,7 +35,7 @@ export const SubjectGraphPage = () => {
       }
     });
   const { t } = useTranslation(['datahub', 'common', 'core']);
-  const measureOptions = useMeasureOptions(instrument);
+  const measureOptions = useMeasureOptions(instrument as AnyUnilingualFormInstrument);
   const [selectedMeasures, setSelectedMeasures] = useState<ListboxDropdownOption[]>([]);
 
   const linearModelQuery = useLinearModelQuery({
@@ -61,7 +62,7 @@ export const SubjectGraphPage = () => {
       onclone: (_, element) => {
         const graphDesc = document.createElement('p');
 
-        const formType = instrument!.details.title;
+        const formType = instrument.details.title;
         const subjectId = params.subjectId!.slice(0, 7);
 
         graphDesc.innerText = t('downloadInfo.subjectText', {

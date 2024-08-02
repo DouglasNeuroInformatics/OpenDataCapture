@@ -1,7 +1,3 @@
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-/// <reference types="vite/client" />
-
 declare global {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface GlobalEventHandlersEventMap {
@@ -9,5 +5,4 @@ declare global {
   }
 }
 
-export * from './components/InstrumentRenderer';
-export * from './hooks/useInterpretedInstrument';
+export { InstrumentRenderer, type InstrumentRendererProps } from './components/InstrumentRenderer';
