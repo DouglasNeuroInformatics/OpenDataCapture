@@ -5,7 +5,7 @@ import { Button, Heading, Separator } from '@douglasneuroinformatics/libui/compo
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 import { CopyButton } from '@opendatacapture/react-core';
-import type { InstrumentKind, SomeUnilingualScalarInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { filter } from 'lodash-es';
 import { DownloadIcon, PrinterIcon } from 'lucide-react';
@@ -15,21 +15,20 @@ import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
 import type { SubjectDisplayInfo } from '../InstrumentRenderer';
 
-export type InstrumentSummaryProps<TKind extends InstrumentKind> = {
+export type InstrumentSummaryProps = {
   data: any;
-  instrument: SomeUnilingualScalarInstrument<TKind>;
+  instrument: AnyUnilingualInstrument;
   subject?: SubjectDisplayInfo;
   timeCollected: number;
 };
 
-export const InstrumentSummary = <TKind extends InstrumentKind>({
-  data,
-  instrument,
-  subject,
-  timeCollected
-}: InstrumentSummaryProps<TKind>) => {
+export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: InstrumentSummaryProps) => {
   const download = useDownload();
   const { i18n, t } = useTranslation('core');
+
+  if (instrument.kind === 'SERIES') {
+    return null;
+  }
 
   const computedMeasures = filter(computeInstrumentMeasures(instrument, data), (_, key) => {
     return !instrument.measures?.[key].hidden;

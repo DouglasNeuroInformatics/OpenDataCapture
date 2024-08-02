@@ -2,12 +2,12 @@ import React from 'react';
 
 import { Button, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { licenses } from '@opendatacapture/licenses';
-import type { AnyUnilingualScalarInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import { BadgeAlertIcon, BadgeCheckIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export type InstrumentOverviewProps = {
-  instrument: Omit<AnyUnilingualScalarInstrument, 'content' | 'measures' | 'validationSchema'>;
+  instrument: AnyUnilingualInstrument;
   onNext: () => void;
 };
 

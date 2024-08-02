@@ -11,8 +11,8 @@ import type {
 } from '@douglasneuroinformatics/libui-form-types';
 import type { Language } from '@opendatacapture/schemas/core';
 import type {
+  AnyInstrument,
   AnyMultilingualFormInstrument,
-  AnyScalarInstrument,
   AnyUnilingualFormInstrument,
   FormInstrumentFields,
   FormInstrumentFieldset,
@@ -21,8 +21,9 @@ import type {
   InstrumentKind,
   InstrumentSummary,
   MultilingualInstrumentMeasures,
-  SomeScalarInstrument,
-  SomeUnilingualScalarInstrument,
+  SeriesInstrument,
+  SomeInstrument,
+  SomeUnilingualInstrument,
   UnilingualInstrumentMeasures,
   UnilingualInstrumentSummary
 } from '@opendatacapture/schemas/instrument';
@@ -30,8 +31,10 @@ import { mapValues, wrap } from 'lodash-es';
 import { P, match } from 'ts-pattern';
 
 import {
+  isFormInstrument,
   isMultilingualInstrument,
   isMultilingualInstrumentSummary,
+  isSeriesInstrument,
   isUnilingualInstrument,
   isUnilingualInstrumentSummary
 } from './guards.js';
@@ -43,7 +46,7 @@ import {
  * @param preferredLanguage - The user's preferred language.
  * @returns The target language for translation.
  */
-function getTargetLanguage(instrument: Pick<AnyScalarInstrument, 'language'>, preferredLanguage: Language): Language {
+function getTargetLanguage(instrument: Pick<AnyInstrument, 'language'>, preferredLanguage: Language): Language {
   if (typeof instrument.language === 'string') {
     return instrument.language;
   } else if (instrument.language.includes(preferredLanguage)) {
@@ -253,9 +256,24 @@ function translateForm(form: AnyMultilingualFormInstrument, language: Language):
       license: form.details.license,
       title: form.details.title[language]
     },
-    language: language,
+    language,
     measures: translateMeasures(form.measures, language),
     tags: form.tags[language]
+  };
+}
+
+function translateSeries(series: SeriesInstrument<Language[]>, language: Language): SeriesInstrument<Language> {
+  return {
+    ...series,
+    details: {
+      description: series.details.description[language],
+      estimatedDuration: series.details.estimatedDuration,
+      instructions: series.details.instructions?.[language],
+      license: series.details.license,
+      title: series.details.title[language]
+    },
+    language,
+    tags: series.tags[language]
   };
 }
 
@@ -305,19 +323,19 @@ export function translateInstrumentSummary(
  * @returns A translated unilingual instrument.
  */
 export function translateInstrument<const TKind extends InstrumentKind>(
-  instrument: SomeScalarInstrument<TKind>,
+  instrument: SomeInstrument<TKind>,
   preferredLanguage: Language
-): SomeUnilingualScalarInstrument<TKind> {
+): SomeUnilingualInstrument<TKind> {
   if (isUnilingualInstrument(instrument)) {
     return instrument;
   } else if (!isMultilingualInstrument(instrument)) {
     throw new Error(`Unexpected value for property 'language': ${JSON.stringify(instrument.language)}`);
   }
   const targetLanguage = getTargetLanguage(instrument, preferredLanguage);
-  switch (instrument.kind) {
-    case 'FORM':
-      return translateForm(instrument, targetLanguage) as SomeUnilingualScalarInstrument<TKind>;
-    default:
-      throw new Error(`Unexpected instrument kind: ${instrument.kind}`);
+  if (isFormInstrument(instrument)) {
+    return translateForm(instrument, targetLanguage) as SomeUnilingualInstrument<TKind>;
+  } else if (isSeriesInstrument(instrument)) {
+    return translateSeries(instrument, targetLanguage) as SomeUnilingualInstrument<TKind>;
   }
+  throw new Error(`Unexpected instrument kind: ${(instrument as AnyInstrument).kind}`);
 }

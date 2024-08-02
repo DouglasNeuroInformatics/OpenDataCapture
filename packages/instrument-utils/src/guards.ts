@@ -1,20 +1,17 @@
 import type {
   AnyInstrument,
-  AnyMultilingualFormInstrument,
+  AnyMultilingualInstrument,
   AnyScalarInstrument,
+  AnyUnilingualInstrument,
   FormInstrument,
-  InstrumentKind,
   InstrumentSummary,
   InteractiveInstrument,
   MultilingualInstrumentSummary,
-  SomeScalarInstrument,
-  SomeUnilingualScalarInstrument,
+  SeriesInstrument,
   UnilingualInstrumentSummary
 } from '@opendatacapture/schemas/instrument';
 
-export function isUnilingualInstrument<TKind extends InstrumentKind>(
-  instrument: SomeScalarInstrument<TKind>
-): instrument is SomeUnilingualScalarInstrument<TKind> {
+export function isUnilingualInstrument(instrument: AnyInstrument): instrument is AnyUnilingualInstrument {
   return typeof instrument.language === 'string';
 }
 
@@ -22,7 +19,7 @@ export function isUnilingualInstrumentSummary(summary: InstrumentSummary): summa
   return typeof summary.language === 'string';
 }
 
-export function isMultilingualInstrument(instrument: AnyScalarInstrument): instrument is AnyMultilingualFormInstrument {
+export function isMultilingualInstrument(instrument: AnyInstrument): instrument is AnyMultilingualInstrument {
   return Array.isArray(instrument.language);
 }
 
@@ -30,12 +27,16 @@ export function isMultilingualInstrumentSummary(summary: InstrumentSummary): sum
   return Array.isArray(summary.language);
 }
 
-export function isFormInstrument(instrument: AnyScalarInstrument): instrument is FormInstrument {
+export function isFormInstrument(instrument: AnyInstrument): instrument is FormInstrument {
   return instrument.kind === 'FORM';
 }
 
-export function isInteractiveInstrument(instrument: AnyScalarInstrument): instrument is InteractiveInstrument {
+export function isInteractiveInstrument(instrument: AnyInstrument): instrument is InteractiveInstrument {
   return instrument.kind === 'INTERACTIVE';
+}
+
+export function isSeriesInstrument(instrument: AnyInstrument): instrument is SeriesInstrument {
+  return instrument.kind === 'SERIES';
 }
 
 export function isScalarInstrument(instrument: AnyInstrument): instrument is AnyScalarInstrument {

@@ -9,6 +9,8 @@ import {
   type ScalarInstrumentInternal
 } from './instrument.base.js';
 
+import type { Language } from '../core/core.js';
+
 export type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
   BaseInstrument<TLanguage>,
   {
@@ -16,6 +18,9 @@ export type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLa
     kind: 'SERIES';
   }
 >;
+
+export type UnilingualSeriesInstrument = SeriesInstrument<Language>;
+export type MultilingualSeriesInstrument = SeriesInstrument<Language[]>;
 
 export const $SeriesInstrument: z.ZodType<SeriesInstrument> = $BaseInstrument.extend({
   content: z.array($ScalarInstrumentInternal),

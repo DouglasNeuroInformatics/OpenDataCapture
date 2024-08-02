@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
+import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
 import type { Meta, StoryObj } from '@storybook/react';
 import { cloneDeep, merge } from 'lodash-es';
 
@@ -17,7 +18,7 @@ export const Default: Story = {
         referenceUrl: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture',
         sourceUrl: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'
       }
-    })
+    }) as AnyUnilingualInstrument
   },
   decorators: [
     (Story) => {
