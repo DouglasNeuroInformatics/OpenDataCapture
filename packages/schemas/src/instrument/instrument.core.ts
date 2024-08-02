@@ -11,7 +11,6 @@ import type { InteractiveInstrument } from './instrument.interactive.js';
 import type { SeriesInstrument } from './instrument.series.js';
 
 export type AnyScalarInstrument = FormInstrument | InteractiveInstrument;
-export type SomeScalarInstrument<TKind extends InstrumentKind> = Extract<AnyScalarInstrument, { kind: TKind }>;
 
 export type AnyInstrument = AnyScalarInstrument | SeriesInstrument;
 export type SomeInstrument<TKind extends InstrumentKind> = Extract<AnyInstrument, { kind: TKind }>;
