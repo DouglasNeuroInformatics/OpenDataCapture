@@ -9,7 +9,7 @@ import { $UnilingualInstrumentDetails, $UnilingualScalarInstrument } from './ins
 import type { Json, Language } from '../core/core.js';
 import type { ScalarInstrument, UnilingualInstrumentDetails } from './instrument.base.js';
 
-export type InteractiveInstrument<TData extends Json = Json> = Merge<
+type InteractiveInstrument<TData extends Json = Json> = Merge<
   ScalarInstrument<TData, Language>,
   {
     content: {
@@ -24,7 +24,8 @@ export type InteractiveInstrument<TData extends Json = Json> = Merge<
     kind: 'INTERACTIVE';
   }
 >;
-export const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $UnilingualScalarInstrument.extend({
+
+const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $UnilingualScalarInstrument.extend({
   content: z.object({
     __injectHead: z
       .object({
@@ -40,3 +41,6 @@ export const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $Uniling
   }),
   kind: z.literal('INTERACTIVE')
 });
+
+export { $InteractiveInstrument };
+export type { InteractiveInstrument };

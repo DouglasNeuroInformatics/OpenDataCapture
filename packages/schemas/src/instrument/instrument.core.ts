@@ -10,25 +10,33 @@ import type { AnyMultilingualFormInstrument, AnyUnilingualFormInstrument, FormIn
 import type { InteractiveInstrument } from './instrument.interactive.js';
 import type { SeriesInstrument } from './instrument.series.js';
 
-export type AnyScalarInstrument = FormInstrument | InteractiveInstrument;
+type AnyScalarInstrument = FormInstrument | InteractiveInstrument;
 
-export type AnyInstrument = AnyScalarInstrument | SeriesInstrument;
-export type SomeInstrument<TKind extends InstrumentKind> = Extract<AnyInstrument, { kind: TKind }>;
+type AnyInstrument = AnyScalarInstrument | SeriesInstrument;
+type SomeInstrument<TKind extends InstrumentKind> = Extract<AnyInstrument, { kind: TKind }>;
 
-export const $AnyScalarInstrument: z.ZodType<AnyScalarInstrument> = z.union([$FormInstrument, $InteractiveInstrument]);
-export const $AnyInstrument: z.ZodType<AnyInstrument> = z.union([
-  $FormInstrument,
-  $InteractiveInstrument,
-  $SeriesInstrument
-]);
+const $AnyScalarInstrument: z.ZodType<AnyScalarInstrument> = z.union([$FormInstrument, $InteractiveInstrument]);
+const $AnyInstrument: z.ZodType<AnyInstrument> = z.union([$FormInstrument, $InteractiveInstrument, $SeriesInstrument]);
 
-export type AnyUnilingualInstrument = AnyUnilingualFormInstrument | InteractiveInstrument | SeriesInstrument<Language>;
-export type SomeUnilingualInstrument<TKind extends InstrumentKind> = Extract<AnyUnilingualInstrument, { kind: TKind }>;
+type AnyUnilingualInstrument = AnyUnilingualFormInstrument | InteractiveInstrument | SeriesInstrument<Language>;
+type SomeUnilingualInstrument<TKind extends InstrumentKind> = Extract<AnyUnilingualInstrument, { kind: TKind }>;
 
-export type AnyUnilingualScalarInstrument = AnyUnilingualFormInstrument | InteractiveInstrument<Json>;
-export type SomeUnilingualScalarInstrument<TKind extends InstrumentKind> = Extract<
+type AnyUnilingualScalarInstrument = AnyUnilingualFormInstrument | InteractiveInstrument<Json>;
+type SomeUnilingualScalarInstrument<TKind extends InstrumentKind> = Extract<
   AnyUnilingualScalarInstrument,
   { kind: TKind }
 >;
 
-export type AnyMultilingualInstrument = AnyMultilingualFormInstrument | SeriesInstrument<Language[]>;
+type AnyMultilingualInstrument = AnyMultilingualFormInstrument | SeriesInstrument<Language[]>;
+
+export { $AnyInstrument, $AnyScalarInstrument };
+export type {
+  AnyInstrument,
+  AnyMultilingualInstrument,
+  AnyScalarInstrument,
+  AnyUnilingualInstrument,
+  AnyUnilingualScalarInstrument,
+  SomeInstrument,
+  SomeUnilingualInstrument,
+  SomeUnilingualScalarInstrument
+};
