@@ -11,7 +11,7 @@ import {
 
 import type { Language } from '../core/core.js';
 
-export type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
+type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
   BaseInstrument<TLanguage>,
   {
     content: ScalarInstrumentInternal[];
@@ -19,10 +19,13 @@ export type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLa
   }
 >;
 
-export type UnilingualSeriesInstrument = SeriesInstrument<Language>;
-export type MultilingualSeriesInstrument = SeriesInstrument<Language[]>;
+type UnilingualSeriesInstrument = SeriesInstrument<Language>;
+type MultilingualSeriesInstrument = SeriesInstrument<Language[]>;
 
-export const $SeriesInstrument: z.ZodType<SeriesInstrument> = $BaseInstrument.extend({
+const $SeriesInstrument: z.ZodType<SeriesInstrument> = $BaseInstrument.extend({
   content: z.array($ScalarInstrumentInternal),
   kind: z.literal('SERIES')
 });
+
+export { $SeriesInstrument };
+export type { MultilingualSeriesInstrument, SeriesInstrument, UnilingualSeriesInstrument };

@@ -14,16 +14,14 @@ import type {
   AnyInstrument,
   AnyMultilingualFormInstrument,
   AnyUnilingualFormInstrument,
+  AnyUnilingualInstrument,
   FormInstrumentFields,
   FormInstrumentFieldset,
   FormInstrumentScalarField,
   FormInstrumentStaticField,
-  InstrumentKind,
   InstrumentSummary,
   MultilingualInstrumentMeasures,
   SeriesInstrument,
-  SomeInstrument,
-  SomeUnilingualInstrument,
   UnilingualInstrumentMeasures,
   UnilingualInstrumentSummary
 } from '@opendatacapture/schemas/instrument';
@@ -322,10 +320,7 @@ export function translateInstrumentSummary(
  * @param preferredLanguage - The user's preferred language.
  * @returns A translated unilingual instrument.
  */
-export function translateInstrument<const TKind extends InstrumentKind>(
-  instrument: SomeInstrument<TKind>,
-  preferredLanguage: Language
-): SomeUnilingualInstrument<TKind> {
+export function translateInstrument(instrument: AnyInstrument, preferredLanguage: Language): AnyUnilingualInstrument {
   if (isUnilingualInstrument(instrument)) {
     return instrument;
   } else if (!isMultilingualInstrument(instrument)) {
@@ -333,9 +328,9 @@ export function translateInstrument<const TKind extends InstrumentKind>(
   }
   const targetLanguage = getTargetLanguage(instrument, preferredLanguage);
   if (isFormInstrument(instrument)) {
-    return translateForm(instrument, targetLanguage) as SomeUnilingualInstrument<TKind>;
+    return translateForm(instrument, targetLanguage);
   } else if (isSeriesInstrument(instrument)) {
-    return translateSeries(instrument, targetLanguage) as SomeUnilingualInstrument<TKind>;
+    return translateSeries(instrument, targetLanguage);
   }
   throw new Error(`Unexpected instrument kind: ${(instrument as AnyInstrument).kind}`);
 }

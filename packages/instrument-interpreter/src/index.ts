@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-implied-eval */
 
-import { evaluateInstrument } from '@opendatacapture/evaluate-instrument';
+import { evaluateInstrument } from '@opendatacapture/runtime-v1/opendatacapture@1.0.0/internal.js';
 import {
   $AnyInstrument,
   $FormInstrument,

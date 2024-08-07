@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { Branding } from '@opendatacapture/react-core';
 
 import { ActionsDropdown } from './ActionsDropdown';
@@ -16,7 +17,15 @@ export const Header = () => {
   return (
     <header className="flex flex-col gap-4 py-4 md:flex-row md:gap-2">
       <div className="hidden flex-grow md:flex md:items-center">
-        <Branding className="[&>span]:hidden lg:[&>span]:inline" />
+        <Branding
+          className={cn(
+            '[&>span]:hidden lg:[&>span]:inline',
+            __GITHUB_REPO_URL__ && 'underline-offset-3 cursor-pointer hover:underline'
+          )}
+          onClick={() => {
+            window.open(__GITHUB_REPO_URL__, '_blank');
+          }}
+        />
       </div>
       <div className="mx-auto w-full max-w-lg md:w-96">
         <InstrumentSelector />
