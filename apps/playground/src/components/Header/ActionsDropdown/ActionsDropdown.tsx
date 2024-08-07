@@ -7,12 +7,14 @@ import { useAppStore } from '@/store';
 
 import { DeleteInstrumentDialog } from './DeleteInstrumentDialog';
 import { RestoreDefaultsDialog } from './RestoreDefaultsDialog';
+import { UploadBundleDialog } from './UploadBundleDialog';
 import { UserSettingsDialog } from './UserSettingsDialog';
 
 export const ActionsDropdown = () => {
   const [showUserSettingsDialog, setShowUserSettingsDialog] = useState(false);
   const [showDeleteInstrumentDialog, setShowDeleteInstrumentDialog] = useState(false);
   const [showRestoreDefaultsDialog, setShowRestoreDefaultsDialog] = useState(false);
+  const [showUploadBundleDialog, setShowUploadBundleDialog] = useState(false);
 
   const selectedInstrument = useAppStore((store) => store.selectedInstrument);
 
@@ -35,8 +37,11 @@ export const ActionsDropdown = () => {
               <span>GitHub</span>
             </a>
           </DropdownMenu.Item>
-          <DropdownMenu.Separator />
-
+          <DropdownMenu.Item asChild onSelect={() => setShowUploadBundleDialog(true)}>
+            <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
+              Upload Bundle
+            </button>
+          </DropdownMenu.Item>
           <DropdownMenu.Item asChild onSelect={() => setShowUserSettingsDialog(true)}>
             <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
               User Settings
@@ -52,7 +57,6 @@ export const ActionsDropdown = () => {
               Delete Instrument
             </button>
           </DropdownMenu.Item>
-          <DropdownMenu.Separator />
           <DropdownMenu.Item asChild onSelect={() => setShowRestoreDefaultsDialog(true)}>
             <button
               className="w-full cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
@@ -66,6 +70,7 @@ export const ActionsDropdown = () => {
       <UserSettingsDialog isOpen={showUserSettingsDialog} setIsOpen={setShowUserSettingsDialog} />
       <DeleteInstrumentDialog isOpen={showDeleteInstrumentDialog} setIsOpen={setShowDeleteInstrumentDialog} />
       <RestoreDefaultsDialog isOpen={showRestoreDefaultsDialog} setIsOpen={setShowRestoreDefaultsDialog} />
+      <UploadBundleDialog isOpen={showUploadBundleDialog} setIsOpen={setShowUploadBundleDialog} />
     </React.Fragment>
   );
 };
