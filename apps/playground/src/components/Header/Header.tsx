@@ -20,13 +20,10 @@ export const Header = () => {
         <Branding
           className={cn(
             '[&>span]:hidden lg:[&>span]:inline',
-            window.__GITHUB_REPO_URL__ && 'underline-offset-3 cursor-pointer hover:underline'
+            __GITHUB_REPO_URL__ && 'underline-offset-3 cursor-pointer hover:underline'
           )}
           onClick={() => {
-            if (!window.__GITHUB_REPO_URL__) {
-              return;
-            }
-            window.open(window.__GITHUB_REPO_URL__, '_blank');
+            window.open(__GITHUB_REPO_URL__, '_blank');
           }}
         />
       </div>

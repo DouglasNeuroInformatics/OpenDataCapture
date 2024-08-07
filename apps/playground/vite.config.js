@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
     }
   },
   define: {
-    __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL}'`
+    __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL ?? '#'}'`
   },
   optimizeDeps: {
     esbuildOptions: {
