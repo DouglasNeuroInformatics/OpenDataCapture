@@ -41,7 +41,7 @@ export const CloneButton = () => {
       </Dialog.Trigger>
       <Dialog.Content className="sm:max-w-[475px]">
         <Dialog.Header>
-          <Dialog.Title>Clone New Instrument</Dialog.Title>
+          <Dialog.Title>Create New Instrument</Dialog.Title>
           <Dialog.Description>
             This will save the current playground state in local storage as a new instrument.
           </Dialog.Description>
