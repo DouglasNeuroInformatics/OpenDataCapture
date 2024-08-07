@@ -25,6 +25,21 @@ export const ActionsDropdown = () => {
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content align="end">
+          {window.__GITHUB_REPO_URL__ && (
+            <React.Fragment>
+              <DropdownMenu.Item asChild>
+                <a
+                  className="flex w-full cursor-pointer items-center disabled:cursor-not-allowed disabled:opacity-50"
+                  href={window.__GITHUB_REPO_URL__}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <span>GitHub</span>
+                </a>
+              </DropdownMenu.Item>
+              <DropdownMenu.Separator />
+            </React.Fragment>
+          )}
           <DropdownMenu.Item asChild onSelect={() => setShowUserSettingsDialog(true)}>
             <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
               User Settings

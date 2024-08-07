@@ -20,6 +20,9 @@ export default defineConfig(({ mode }) => ({
       plugins: [autoprefixer(), tailwindcss()]
     }
   },
+  define: {
+    __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL}'`
+  },
   optimizeDeps: {
     esbuildOptions: {
       target: 'es2022'
