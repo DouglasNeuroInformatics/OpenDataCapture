@@ -64,6 +64,7 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
                   description:
                     "The base path for your Open Data Capture REST API. If you're not using the functionality to submit instruments to your instance, you can leave this empty.",
                   kind: 'string',
+                  placeholder: 'https://demo.opendatacapture.org/api',
                   label: 'API Base URL',
                   variant: 'input'
                 },
