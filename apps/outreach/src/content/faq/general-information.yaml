@@ -1,0 +1,28 @@
+title:
+  en: General Information
+  fr: Informations générales
+entries:
+  - question:
+      en: What Is Open Data Capture?
+      fr: Qu'est-ce que la plateforme Open Data Capture ?
+    answer:
+      en: Open Data Capture is a web-based electronic data capture platform. It is designed for administering remote and in-person clinical instruments.
+      fr: Open Data Capture est une plateforme de saisie électronique des données basée sur le web. Elle est conçue pour l'administration d'instruments cliniques à distance et en personne.
+  - question:
+      en: Who Can Use Open Data Capture?
+      fr: Qui peut utiliser la plateforme Open Data Capture ?
+    answer:
+      en:
+        - To answer this question, it is important to understand the distinction between Open Data Capture (the software) and a specific installation of Open Data Capture.
+        - Open Data Capture is free software designed to run on a web server. This means that any individual or organization can install their own version of Open Data Capture. However, doing so requires access to a web server and specialized technical knowledge.
+        - The Douglas Neuroinformatics Platform manages an installation of Open Data Capture. This installation is available to any researcher at the Douglas Research Centre.
+      fr:
+        - Pour répondre à cette question, il est important de comprendre la distinction entre la plateforme Open Data Capture (le logiciel) et une installation spécifique de la plateforme.
+        - Open Data Capture est un logiciel gratuit conçu pour fonctionner sur un serveur web. Cela signifie que toute personne ou organisation peut installer sa propre version d'Open Data Capture. Cependant, cela nécessite un accès à un serveur web et des connaissances techniques spécialisées.
+        - The Douglas Neuroinformatics Platform gère une installation d'Open Data Capture. Cette installation est disponible pour tous les chercheurs du Centre de recherche Douglas.
+  - question:
+      en: What Is an Instrument?
+      fr: Qu'est-ce qu'un instrument ?
+    answer:
+      en: An instrument refers to any tool that can be used to collect data. Currently, this includes forms and interactive tasks. In the future, we have plans to support binary data formats (e.g., data from wearable devices, neuroimaging data).
+      fr: Un instrument désigne tout outil pouvant être utilisé pour collecter des données. Actuellement, cela inclut les formulaires et les tâches interactives. À l'avenir, nous prévoyons de prendre en charge les formats de données binaires (par exemple, les données provenant de dispositifs portables, les données de neuro-imagerie).
