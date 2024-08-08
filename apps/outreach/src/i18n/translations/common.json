@@ -24,6 +24,10 @@
     "en": "Team",
     "fr": "L'équipe"
   },
+  "faq": {
+    "en": "FAQ",
+    "fr": "FAQ"
+  },
   "viewAltLangPrefix": {
     "en": "You can also view our",
     "fr": "Vous pouvez également consulter notre"

@@ -3,6 +3,7 @@ import { get } from 'lodash-es';
 import blog from './translations/blog.json';
 import common from './translations/common.json';
 import docs from './translations/docs.json';
+import faq from './translations/faq.json';
 import landing from './translations/landing.json';
 import meta from './translations/meta.json';
 import team from './translations/team.json';
@@ -19,6 +20,7 @@ const TRANSLATIONS = {
   blog,
   common,
   docs,
+  faq,
   landing,
   meta,
   team

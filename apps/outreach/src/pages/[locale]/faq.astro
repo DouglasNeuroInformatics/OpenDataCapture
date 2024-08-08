@@ -1,0 +1,15 @@
+---
+import PageHeading from '@/components/common/PageHeading.astro';
+import { useTranslations } from '@/i18n';
+import Page from '@/layouts/Page.astro';
+
+const { t } = useTranslations(Astro.url);
+
+export const getStaticPaths = () => {
+  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
+};
+---
+
+<Page bilingual>
+  <PageHeading title={t('faq.heading')} />
+</Page>
