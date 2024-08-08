@@ -1,0 +1,11 @@
+order: 2
+title:
+  en: Fundamental Concepts
+  fr: Concepts fondamentaux
+entries:
+  - question:
+      en: What Is an Instrument?
+      fr: Qu'est-ce qu'un instrument ?
+    answer:
+      en: An instrument refers to any tool that can be used to collect data. Currently, this includes forms and interactive tasks. In the future, we have plans to support binary data formats (e.g., data from wearable devices, neuroimaging data).
+      fr: Un instrument désigne tout outil pouvant être utilisé pour collecter des données. Actuellement, cela inclut les formulaires et les tâches interactives. À l'avenir, nous prévoyons de prendre en charge les formats de données binaires (par exemple, les données provenant de dispositifs portables, les données de neuro-imagerie).

@@ -28,6 +28,7 @@ export const collections = {
           })
         })
       ),
+      order: z.number().positive().int(),
       title: z.object({
         en: z.string().min(1),
         fr: z.string().min(1)
