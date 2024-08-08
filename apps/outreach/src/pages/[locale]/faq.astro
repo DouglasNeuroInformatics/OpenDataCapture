@@ -35,7 +35,7 @@ faq.sort((a, b) => {
               <li class="accordion-item border-b">
                 <button class="accordion-trigger flex w-full flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
                   {question[resolvedLanguage]}
-                  <ChevronDownIcon class="text-muted-foreground h-4 w-4 shrink-0 transition-transform duration-200" />
+                  <ChevronDownIcon class="text-muted-foreground accordion-trigger-icon h-4 w-4 shrink-0 rotate-90 transition-transform duration-200" />
                 </button>
                 <div class="accordion-content h-0 overflow-hidden text-sm">
                   <div class="text-muted-foreground pb-4">
@@ -60,9 +60,11 @@ faq.sort((a, b) => {
   const items = document.querySelectorAll('.accordion > .accordion-item');
   items.forEach((item) => {
     const trigger = item.querySelector('.accordion-trigger') as HTMLButtonElement;
+    const triggerIcon = trigger.querySelector('.accordion-trigger-icon ') as SVGElement;
     const content = item.querySelector('.accordion-content') as HTMLDivElement;
     trigger.addEventListener('click', () => {
       content.classList.toggle('h-0');
+      triggerIcon.classList.toggle('rotate-90');
     });
   });
 </script>
