@@ -5,6 +5,35 @@ import type { EditorFile } from '@/models/editor-file.model';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import type { Settings } from '@/models/settings.model';
 
+type TranspilerBuiltState = {
+  bundle: string;
+  status: 'built';
+};
+
+type TranspilerErrorState = {
+  error: Error;
+  status: 'error';
+};
+
+type TranspilerBuildingState = {
+  status: 'building';
+};
+
+export type TranspilerInitialState = {
+  status: 'initial';
+};
+
+export type TranspilerState =
+  | TranspilerBuildingState
+  | TranspilerBuiltState
+  | TranspilerErrorState
+  | TranspilerInitialState;
+
+export type TranspilerSlice = {
+  setTranspilerState: (state: TranspilerState) => void;
+  transpilerState: TranspilerState;
+};
+
 export type EditorState = {
   files: EditorFile[];
   indexFilename: null | string;
@@ -48,7 +77,7 @@ export type ViewerSlice = {
   };
 };
 
-export type AppStore = EditorSlice & InstrumentSlice & SettingsSlice & ViewerSlice;
+export type AppStore = EditorSlice & InstrumentSlice & SettingsSlice & TranspilerSlice & ViewerSlice;
 
 export type SliceCreator<T extends { [key: string]: unknown }> = StateCreator<
   AppStore,

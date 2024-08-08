@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 import React from 'react';
 
 import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
@@ -24,17 +25,34 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
         </Dialog.Header>
         <Form
           className="py-4"
-          content={{
-            refreshInterval: {
-              description: 'The interval, in milliseconds, between builds, assuming the source code has changed',
-              kind: 'number',
-              label: 'Refresh Interval',
-              variant: 'input'
+          content={[
+            {
+              title: 'Default Instance Settings',
+              fields: {
+                apiBaseUrl: {
+                  description: 'The base path for your Open Data Capture REST API.',
+                  kind: 'string',
+                  placeholder: 'e.g., https://demo.opendatacapture.org/api',
+                  label: 'API Base URL',
+                  variant: 'input'
+                }
+              }
+            },
+            {
+              title: 'Editor Settings',
+              fields: {
+                refreshInterval: {
+                  description: 'The interval, in milliseconds, between builds, assuming the source code has changed',
+                  kind: 'number',
+                  label: 'Refresh Interval',
+                  variant: 'input'
+                }
+              }
             }
-          }}
+          ]}
           initialValues={settings}
           submitBtnLabel="Save Changes"
-          validationSchema={$Settings.partial()}
+          validationSchema={$Settings}
           onSubmit={(updatedSettings) => {
             updateSettings(updatedSettings);
             addNotification({ type: 'success' });
