@@ -9,6 +9,7 @@ import { resolveIndexFilename } from '@/utils/file';
 import { createEditorSlice } from './slices/editor.slice';
 import { createInstrumentSlice } from './slices/instrument.slice';
 import { createSettingsSlice } from './slices/settings.slice';
+import { createTranspilerSlice } from './slices/transpiler.slice';
 import { createViewerSlice } from './slices/viewer.slice';
 
 import type { AppStore } from './types';
@@ -21,6 +22,7 @@ export const useAppStore = create(
           ...createEditorSlice(...a),
           ...createInstrumentSlice(...a),
           ...createSettingsSlice(...a),
+          ...createTranspilerSlice(...a),
           ...createViewerSlice(...a)
         }))
       ),

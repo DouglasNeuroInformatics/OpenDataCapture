@@ -6,30 +6,11 @@ import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 
 import type { EditorFile } from '@/models/editor-file.model';
 import { useAppStore } from '@/store';
+import type { TranspilerState } from '@/store/types';
 import { editorFileToInput } from '@/utils/file';
 
 import { useFilesRef } from './useFilesRef';
 import { useInstrumentBundler } from './useInstrumentBundler';
-
-type InitialState = {
-  status: 'initial';
-};
-
-type BuiltState = {
-  bundle: string;
-  status: 'built';
-};
-
-type ErrorState = {
-  error: Error;
-  status: 'error';
-};
-
-type BuildingState = {
-  status: 'building';
-};
-
-type TranspilerState = BuildingState | BuiltState | ErrorState | InitialState;
 
 async function hashFiles(files: EditorFile[]) {
   return sha256(files.map((file) => file.content + file.name).join());
@@ -39,8 +20,10 @@ export function useTranspiler(): TranspilerState {
   const editorFilesRef = useFilesRef();
   const refreshInterval = useAppStore((store) => store.settings.refreshInterval);
   const [filesHash, setFilesHash] = useState<string>('');
-  const [state, setState] = useState<TranspilerState>({ status: 'initial' });
   const instrumentBundler = useInstrumentBundler();
+
+  const state = useAppStore((store) => store.transpilerState);
+  const setState = useAppStore((store) => store.setTranspilerState);
 
   const transpile = useCallback(async (files: EditorFile[]) => {
     setState({ status: 'building' });
