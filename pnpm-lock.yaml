@@ -1226,6 +1226,9 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^11.1.6
         version: 11.1.6(rollup@4.18.0)(tslib@2.6.3)(typescript@5.4.5)
+      dompurify__3.1.6:
+        specifier: npm:dompurify@3.1.6
+        version: dompurify@3.1.6
       jquery__1.12.4:
         specifier: npm:jquery@1.12.4
         version: jquery@1.12.4
@@ -1238,6 +1241,12 @@ importers:
       lodash-es__4.17.21:
         specifier: npm:lodash-es@4.17.21
         version: lodash-es@4.17.21
+      papaparse__5.4.1:
+        specifier: npm:papaparse@5.4.1
+        version: papaparse@5.4.1
+      pure-rand__6.1.0:
+        specifier: npm:pure-rand@6.1.0
+        version: pure-rand@6.1.0
       react-dom__18.3.1:
         specifier: npm:react-dom@18.3.1
         version: react-dom@18.3.1(react@18.3.1)
@@ -7026,6 +7035,10 @@ packages:
     resolution:
       { integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA== }
 
+  dompurify@3.1.6:
+    resolution:
+      { integrity: sha512-cTOAhc36AalkjtBpfG6O8JimdTMWNXjiePT2xQH/ppBGi/4uIpmj8eKyIkMJErXWARyINV/sB38yf8JCLF5pbQ== }
+
   dot-prop@5.3.0:
     resolution:
       { integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q== }
@@ -10248,6 +10261,10 @@ packages:
     resolution:
       { integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw== }
 
+  papaparse@5.4.1:
+    resolution:
+      { integrity: sha512-HipMsgJkZu8br23pW15uvo6sib6wne/4woLZPlFf3rpDyMe9ywEXUsuD7+6K9PRkJlVT51j/sCOYDKGGS3ZJrw== }
+
   parent-module@1.0.1:
     resolution:
       { integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g== }
@@ -10783,6 +10800,10 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  pure-rand@6.1.0:
+    resolution:
+      { integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA== }
 
   qs@6.10.4:
     resolution:
@@ -19048,6 +19069,8 @@ snapshots:
       '@babel/runtime': 7.24.7
       csstype: 3.1.3
 
+  dompurify@3.1.6: {}
+
   dot-prop@5.3.0:
     dependencies:
       is-obj: 2.0.0
@@ -22302,6 +22325,8 @@ snapshots:
 
   pako@1.0.11: {}
 
+  papaparse@5.4.1: {}
+
   parent-module@1.0.1:
     dependencies:
       callsites: 3.1.0
@@ -22756,6 +22781,8 @@ snapshots:
       - encoding
       - supports-color
       - utf-8-validate
+
+  pure-rand@6.1.0: {}
 
   qs@6.10.4:
     dependencies:
