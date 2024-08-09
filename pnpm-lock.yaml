@@ -1244,6 +1244,9 @@ importers:
       papaparse__5.4.1:
         specifier: npm:papaparse@5.4.1
         version: papaparse@5.4.1
+      pure-rand__6.1.0:
+        specifier: npm:pure-rand@6.1.0
+        version: pure-rand@6.1.0
       react-dom__18.3.1:
         specifier: npm:react-dom@18.3.1
         version: react-dom@18.3.1(react@18.3.1)
@@ -10797,6 +10800,10 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  pure-rand@6.1.0:
+    resolution:
+      { integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA== }
 
   qs@6.10.4:
     resolution:
@@ -22774,6 +22781,8 @@ snapshots:
       - encoding
       - supports-color
       - utf-8-validate
+
+  pure-rand@6.1.0: {}
 
   qs@6.10.4:
     dependencies:

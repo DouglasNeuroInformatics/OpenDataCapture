@@ -58,6 +58,7 @@
     "jspsych__8.0.1": "npm:jspsych@8.0.1",
     "lodash-es__4.17.21": "npm:lodash-es@4.17.21",
     "papaparse__5.4.1": "npm:papaparse@5.4.1",
+    "pure-rand__6.1.0": "npm:pure-rand@6.1.0",
     "react-dom__18.3.1": "npm:react-dom@18.3.1",
     "react__18.3.1": "npm:react@18.3.1",
     "rollup": "^4.18.0",
