@@ -24,11 +24,11 @@ const IndexPage = () => {
       let suffixNumber = 1;
       let uniqueLabel = instrument.label;
 
-      const prevForm = instruments.find((x) => x.label === uniqueLabel);
+      const previousForm = instruments.find((formInstrument) => formInstrument.label === uniqueLabel);
 
-      if (prevForm && prevForm.files[0].content === instrument.files[0].content) {
+      if (previousForm && previousForm.files[0].content === instrument.files[0].content) {
         //go to previous existing form instead of creating duplicate
-        setSelectedInstrument(prevForm.id);
+        setSelectedInstrument(previousForm.id);
       } else {
         //look for forms without the same content but the same name
         // and add a new version with a suffix
