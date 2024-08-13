@@ -6,6 +6,7 @@ import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
 import { useAppStore } from '@/store';
 import { decodeShareURL } from '@/utils/encode';
+import { file } from 'jszip';
 
 const IndexPage = () => {
   const addInstrument = useAppStore((store) => store.addInstrument);
@@ -26,7 +27,7 @@ const IndexPage = () => {
 
       const previousForm = instruments.find((formInstrument) => formInstrument.label === uniqueLabel);
 
-      if (previousForm && previousForm.files[0].content === instrument.files[0].content) {
+      if (previousForm?.files.every((file, index) => file.content === instrument.files[index].content)) {
         //go to previous existing form instead of creating duplicate
         setSelectedInstrument(previousForm.id);
       } else {
