@@ -23,18 +23,28 @@ const IndexPage = () => {
       id = crypto.randomUUID();
       let suffixNumber = 1;
       let uniqueLabel = instrument.label;
-      while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
-        uniqueLabel = `${instrument.label} (${suffixNumber})`;
-        suffixNumber++;
+
+      const prevForm = instruments.find((x) => x.label === uniqueLabel);
+
+      if (prevForm && prevForm.files[0].content === instrument.files[0].content) {
+        //go to previous existing form instead of creating duplicate
+        setSelectedInstrument(prevForm.id);
+      } else {
+        //look for forms without the same content but the same name
+        // and add a new version with a suffix
+        while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
+          uniqueLabel = `${instrument.label} (${suffixNumber})`;
+          suffixNumber++;
+        }
+        addInstrument({
+          category: 'Saved',
+          files: instrument.files,
+          id,
+          kind: 'UNKNOWN',
+          label: uniqueLabel
+        });
+        setSelectedInstrument(id);
       }
-      addInstrument({
-        category: 'Saved',
-        files: instrument.files,
-        id,
-        kind: 'UNKNOWN',
-        label: uniqueLabel
-      });
-      setSelectedInstrument(id);
     } catch (err) {
       console.error(err);
     }
