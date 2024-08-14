@@ -6,6 +6,7 @@ import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
 import { useAppStore } from '@/store';
 import { decodeShareURL } from '@/utils/encode';
+import { file } from 'jszip';
 
 const IndexPage = () => {
   const addInstrument = useAppStore((store) => store.addInstrument);
@@ -23,18 +24,28 @@ const IndexPage = () => {
       id = crypto.randomUUID();
       let suffixNumber = 1;
       let uniqueLabel = instrument.label;
-      while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
-        uniqueLabel = `${instrument.label} (${suffixNumber})`;
-        suffixNumber++;
+
+      const previousForm = instruments.find((formInstrument) => formInstrument.label === uniqueLabel);
+
+      if (previousForm?.files.every((file, index) => file.content === instrument.files[index].content)) {
+        //go to previous existing form instead of creating duplicate
+        setSelectedInstrument(previousForm.id);
+      } else {
+        //look for forms without the same content but the same name
+        // and add a new version with a suffix
+        while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
+          uniqueLabel = `${instrument.label} (${suffixNumber})`;
+          suffixNumber++;
+        }
+        addInstrument({
+          category: 'Saved',
+          files: instrument.files,
+          id,
+          kind: 'UNKNOWN',
+          label: uniqueLabel
+        });
+        setSelectedInstrument(id);
       }
-      addInstrument({
-        category: 'Saved',
-        files: instrument.files,
-        id,
-        kind: 'UNKNOWN',
-        label: uniqueLabel
-      });
-      setSelectedInstrument(id);
     } catch (err) {
       console.error(err);
     }
