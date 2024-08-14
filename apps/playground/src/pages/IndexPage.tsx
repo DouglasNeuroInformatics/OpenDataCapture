@@ -16,29 +16,29 @@ const IndexPage = () => {
   useEffect(() => {
     let id: null | string = null;
     try {
-      const instrument = decodeShareURL(new URL(location.href));
-      if (!instrument) {
+      const decodedInstrument = decodeShareURL(new URL(location.href));
+      if (!decodedInstrument) {
         return;
       }
       id = crypto.randomUUID();
       let suffixNumber = 1;
-      let uniqueLabel = instrument.label;
+      let uniqueLabel = decodedInstrument.label;
 
-      const previousForm = instruments.find((formInstrument) => formInstrument.label === uniqueLabel);
+      const previousInstrument = instruments.find((formInstrument) => formInstrument.label === uniqueLabel);
 
-      if (previousForm?.files.every((file, index) => file.content === instrument.files[index].content)) {
+      if (previousInstrument?.files.every((file, index) => file.content === decodedInstrument.files[index].content)) {
         //go to previous existing form instead of creating duplicate
-        setSelectedInstrument(previousForm.id);
+        setSelectedInstrument(previousInstrument.id);
       } else {
         //look for forms without the same content but the same name
         // and add a new version with a suffix
         while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
-          uniqueLabel = `${instrument.label} (${suffixNumber})`;
+          uniqueLabel = `${decodedInstrument.label} (${suffixNumber})`;
           suffixNumber++;
         }
         addInstrument({
           category: 'Saved',
-          files: instrument.files,
+          files: decodedInstrument.files,
           id,
           kind: 'UNKNOWN',
           label: uniqueLabel
