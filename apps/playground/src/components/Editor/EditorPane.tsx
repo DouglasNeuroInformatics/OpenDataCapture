@@ -8,6 +8,7 @@ import { useRuntime } from '@/hooks/useRuntime';
 import type { EditorFile } from '@/models/editor-file.model';
 import { useAppStore } from '@/store';
 import { getImageMIMEType, inferFileType, isBase64EncodedFileType } from '@/utils/file';
+import { VimMode } from '@/vim';
 
 import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 
@@ -17,6 +18,7 @@ export const EditorPane = () => {
   const selectedFilename = useAppStore((store) => store.selectedFilename);
   const setSelectedFileContent = useAppStore((store) => store.setSelectedFileContent);
   const selectedInstrumentId = useAppStore((store) => store.selectedInstrument.id);
+  const isVimModeEnabled = useAppStore((store) => Boolean(store.settings.enableVimMode));
 
   const [theme] = useTheme();
   const [isMounted, setIsMounted] = useState(false);
@@ -24,6 +26,7 @@ export const EditorPane = () => {
 
   const editorRef = useRef<MonacoEditorType | null>(null);
   const monacoRef = useRef<MonacoType | null>(null);
+  const vimModeRef = useRef<VimMode | null>(null);
 
   const [defaultFile, setDefaultFile] = useState<({ id: string } & EditorFile) | null>(null);
   const filesRef = useFilesRef();
@@ -84,6 +87,15 @@ export const EditorPane = () => {
       monaco.editor.getModels().forEach((model) => model.dispose());
     };
   }, [isMounted, selectedInstrumentId]);
+
+  useEffect(() => {
+    if (isMounted) {
+      if (!vimModeRef.current) {
+        vimModeRef.current = new VimMode(editorRef.current!);
+      }
+      isVimModeEnabled ? vimModeRef.current.enable() : vimModeRef.current.disable();
+    }
+  }, [isMounted, isVimModeEnabled]);
 
   const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
     editorRef.current = editor;

@@ -4,9 +4,9 @@ import { Separator } from '@douglasneuroinformatics/libui/components';
 
 import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
+import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import { useAppStore } from '@/store';
 import { decodeShareURL } from '@/utils/encode';
-import { file } from 'jszip';
 
 const IndexPage = () => {
   const addInstrument = useAppStore((store) => store.addInstrument);
@@ -14,38 +14,53 @@ const IndexPage = () => {
   const removeInstrument = useAppStore((store) => store.removeInstrument);
   const instruments = useAppStore((store) => store.instruments);
 
+  const isSameInstrument = (
+    instrumentA: Pick<InstrumentRepository, 'files'>,
+    instrumentB: Pick<InstrumentRepository, 'files'>
+  ) => {
+    if (instrumentA.files.length !== instrumentB.files.length) {
+      return false;
+    }
+    for (const fileA of instrumentA.files) {
+      const fileB = instrumentB.files.find((file) => file.name === fileA.name);
+      if (!fileB || fileA.content !== fileB.content) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   useEffect(() => {
     let id: null | string = null;
     try {
-      const instrument = decodeShareURL(new URL(location.href));
-      if (!instrument) {
+      const decodedInstrument = decodeShareURL(new URL(location.href));
+      if (!decodedInstrument) {
         return;
       }
+
+      // If the instrument is exactly the same, go to existing instead of creating duplicate
+      const existingInstrument = instruments.find(({ label }) => label === decodedInstrument.label);
+      if (existingInstrument && isSameInstrument(decodedInstrument, existingInstrument)) {
+        setSelectedInstrument(existingInstrument.id);
+        return;
+      }
+
       id = crypto.randomUUID();
       let suffixNumber = 1;
-      let uniqueLabel = instrument.label;
+      let uniqueLabel = decodedInstrument.label;
 
-      const previousForm = instruments.find((formInstrument) => formInstrument.label === uniqueLabel);
-
-      if (previousForm?.files.every((file, index) => file.content === instrument.files[index].content)) {
-        //go to previous existing form instead of creating duplicate
-        setSelectedInstrument(previousForm.id);
-      } else {
-        //look for forms without the same content but the same name
-        // and add a new version with a suffix
-        while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
-          uniqueLabel = `${instrument.label} (${suffixNumber})`;
-          suffixNumber++;
-        }
-        addInstrument({
-          category: 'Saved',
-          files: instrument.files,
-          id,
-          kind: 'UNKNOWN',
-          label: uniqueLabel
-        });
-        setSelectedInstrument(id);
+      while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
+        uniqueLabel = `${decodedInstrument.label} (${suffixNumber})`;
+        suffixNumber++;
       }
+      addInstrument({
+        category: 'Saved',
+        files: decodedInstrument.files,
+        id,
+        kind: 'UNKNOWN',
+        label: uniqueLabel
+      });
+      setSelectedInstrument(id);
     } catch (err) {
       console.error(err);
     }

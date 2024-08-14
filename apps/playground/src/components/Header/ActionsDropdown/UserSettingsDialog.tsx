@@ -41,6 +41,11 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
             {
               title: 'Editor Settings',
               fields: {
+                enableVimMode: {
+                  kind: 'boolean',
+                  label: 'Enable VIM Mode (Experimental)',
+                  variant: 'radio'
+                },
                 refreshInterval: {
                   description: 'The interval, in milliseconds, between builds, assuming the source code has changed',
                   kind: 'number',

@@ -5,6 +5,7 @@ import type { Settings } from '@/models/settings.model';
 import type { SettingsSlice, SliceCreator } from '../types';
 
 const defaultSettings: Settings = {
+  enableVimMode: false,
   refreshInterval: 2000
 };
 
