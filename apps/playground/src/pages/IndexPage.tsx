@@ -6,7 +6,6 @@ import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
 import { useAppStore } from '@/store';
 import { decodeShareURL } from '@/utils/encode';
-import { file } from 'jszip';
 
 const IndexPage = () => {
   const addInstrument = useAppStore((store) => store.addInstrument);
