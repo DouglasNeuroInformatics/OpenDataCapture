@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
 import { motion } from 'framer-motion';
@@ -8,13 +8,14 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/store';
 import { isImageLikeFileExtension } from '@/utils/file';
 import { loadEditorFilesFromNative } from '@/utils/load';
+import { VimMode } from '@/vim';
 
 import { FileUploadDialog } from '../FileUploadDialog';
 import { DeleteFileDialog } from './DeleteFileDialog';
 import { EditorAddFileButton } from './EditorAddFileButton';
 import { EditorButton } from './EditorButton';
 import { EditorFileButton } from './EditorFileButton';
-import { EditorPane } from './EditorPane';
+import { EditorPane, type EditorPaneRef } from './EditorPane';
 import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 import { EditorTab } from './EditorTab';
 
@@ -54,6 +55,20 @@ export const Editor = () => {
 
   const selectedFilename = useAppStore((store) => store.selectedFilename);
   const deleteFilenameRef = useRef<null | string>(null);
+
+  const isVimModeEnabled = useAppStore((store) => Boolean(store.settings.enableVimMode));
+  const [isEditorMounted, setIsEditorMounted] = useState(false);
+  const editorPaneRef = useRef<EditorPaneRef>(null);
+  const vimModeRef = useRef<VimMode | null>(null);
+
+  useEffect(() => {
+    if (isEditorMounted) {
+      if (!vimModeRef.current) {
+        vimModeRef.current = new VimMode(editorPaneRef.current!.editor!);
+      }
+      isVimModeEnabled ? vimModeRef.current.enable() : vimModeRef.current.disable();
+    }
+  }, [isEditorMounted, isVimModeEnabled]);
 
   return (
     <div className="flex h-full w-full flex-col border border-r-0 bg-slate-50 dark:bg-slate-800">
@@ -113,7 +128,11 @@ export const Editor = () => {
             )}
           </div>
         </motion.div>
-        {openFilenames.length ? <EditorPane /> : <EditorPanePlaceholder>No File Selected</EditorPanePlaceholder>}
+        {openFilenames.length ? (
+          <EditorPane ref={editorPaneRef} onEditorMount={() => setIsEditorMounted(true)} />
+        ) : (
+          <EditorPanePlaceholder>No File Selected</EditorPanePlaceholder>
+        )}
       </div>
       <DeleteFileDialog
         filename={deleteFilenameRef.current}
