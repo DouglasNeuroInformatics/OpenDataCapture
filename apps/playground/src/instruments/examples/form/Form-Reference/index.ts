@@ -205,7 +205,12 @@ export default defineInstrument({
     numberSelect: z.union([z.literal(1), z.literal(2), z.literal(3)]),
     numberSlider: z.number(),
     stringInput: z.string(),
-    stringPassword: z.string(),
+    stringPassword: z
+      .string()
+      .regex(
+        /"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"/,
+        'Password must contain eight or more characters and at least one letter and one number'
+      ),
     stringRadio: z.enum(['a', 'b', 'c']),
     stringSelect: z.enum(['a', 'b', 'c']),
     stringTextArea: z.string(),
