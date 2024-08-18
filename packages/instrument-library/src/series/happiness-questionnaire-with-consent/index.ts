@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import type { SeriesInstrument } from '/runtime/v1/opendatacapture@1.0.0/core.js';
+import type { SeriesInstrument } from '/runtime/v1/@opendatacapture/runtime-core/index.js';
 
 const instrument: SeriesInstrument = {
   kind: 'SERIES',

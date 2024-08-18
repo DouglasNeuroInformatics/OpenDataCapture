@@ -16,7 +16,7 @@ axios.interceptors.response.use(
     if (!isAxiosError(error)) {
       notifications.addNotification({ message: i18next.t('unknownError'), type: 'error' });
       console.error(error);
-      return Promise.reject(error);
+      return Promise.reject(error as Error);
     }
     notifications.addNotification({
       message: i18next.t('httpRequestFailed'),

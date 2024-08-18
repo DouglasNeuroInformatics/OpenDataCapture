@@ -1,6 +1,6 @@
 import type { AuthPayload, JwtPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
 import { UnsecuredJWT } from 'jose';
-import { HttpResponse, http } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { type RequestHandler } from 'msw';
 
 import { adminUser } from '../stubs';

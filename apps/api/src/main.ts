@@ -17,12 +17,10 @@ async function bootstrap() {
   const configurationService = app.get(ConfigurationService);
   const logLevels: LogLevel[] = ['error', 'fatal', 'log', 'warn'];
   if (configurationService.get('DEBUG')) {
-    // eslint-disable-next-line no-console
     console.log("Enabled 'debug' logs");
     logLevels.push('debug');
   }
   if (configurationService.get('VERBOSE')) {
-    // eslint-disable-next-line no-console
     console.log("Enabled 'verbose' logs");
     logLevels.push('verbose');
   }
@@ -43,7 +41,7 @@ async function bootstrap() {
   const port = configurationService.get(isProduction ? 'API_PROD_SERVER_PORT' : 'API_DEV_SERVER_PORT');
 
   await app.listen(port);
-  // eslint-disable-next-line no-console
+
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 

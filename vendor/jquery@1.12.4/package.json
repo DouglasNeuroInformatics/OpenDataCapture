@@ -1,0 +1,16 @@
+{
+  "name": "jquery__1.12.4",
+  "type": "module",
+  "version": "1.12.4",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "jquery": "1.12.4"
+  }
+}

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { Card } from '@douglasneuroinformatics/libui/components';
-import { type MotionValue, motion, useSpring, useTransform } from 'framer-motion';
+import { motion, useSpring, useTransform } from 'framer-motion';
 
 type StatisticCardProps = {
   icon?: JSX.Element;
@@ -10,7 +10,7 @@ type StatisticCardProps = {
 };
 
 export const StatisticCard = ({ icon, label, value }: StatisticCardProps) => {
-  const spring = useSpring(0, { bounce: 0 }) as MotionValue<number>;
+  const spring = useSpring(0, { bounce: 0 });
   const rounded = useTransform(spring, (latest: number) => Math.floor(latest));
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { type BundlerInput, extractInputFileExtension, resolveIndexInput } from '@opendatacapture/instrument-bundler';
-import { P, match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 
 import type { EditorFile } from '@/models/editor-file.model';
 

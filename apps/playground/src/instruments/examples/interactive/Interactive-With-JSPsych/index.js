@@ -7,7 +7,7 @@ const { default: ImageKeyboardResponsePlugin } = await import(
 );
 const { default: PreloadPlugin } = await import('/runtime/v1/@jspsych/plugin-preload@1.1.3/index.js');
 
-const { defineInstrument } = await import('/runtime/v1/opendatacapture@1.0.0/core.js');
+const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
 const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 
 // import blue from '../../assets/img/blue.png';

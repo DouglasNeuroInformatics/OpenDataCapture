@@ -3,7 +3,7 @@ import React from 'react';
 import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import { ErrorBoundary } from 'react-error-boundary';
-import { P, match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 
 import { useTranspiler } from '@/hooks/useTranspiler';
 import { useAppStore } from '@/store';

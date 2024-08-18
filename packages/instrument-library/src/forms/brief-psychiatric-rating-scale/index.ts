@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { defineInstrument } = await import('/runtime/v1/opendatacapture@1.0.0/core.js');
+const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
 const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 
 export default defineInstrument({
@@ -192,7 +192,6 @@ export default defineInstrument({
       label: 'Total Score',
       value: (data) => {
         let sum = 0;
-        data;
         Object.values(data).forEach((value) => {
           sum += value;
         });

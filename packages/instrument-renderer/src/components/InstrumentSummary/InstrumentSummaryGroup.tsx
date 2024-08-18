@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
-import { P, match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 
 export type InstrumentSummaryGroupProps = {
   items: ({

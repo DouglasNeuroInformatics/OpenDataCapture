@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import { getFormFields } from '@opendatacapture/instrument-utils';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { match } from 'ts-pattern';
 
 export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null): ListboxDropdownOption[] {

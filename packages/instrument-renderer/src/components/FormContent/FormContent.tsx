@@ -1,13 +1,12 @@
 import React from 'react';
 
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
-import type { FormDataType } from '@douglasneuroinformatics/libui-form-types';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualFormInstrument, FormTypes } from '@opendatacapture/runtime-core';
 import type { Promisable } from 'type-fest';
 
 export type FormContentProps = {
   instrument: AnyUnilingualFormInstrument;
-  onSubmit: (data: FormDataType) => Promisable<void>;
+  onSubmit: (data: FormTypes.FormDataType) => Promisable<void>;
 };
 
 export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {

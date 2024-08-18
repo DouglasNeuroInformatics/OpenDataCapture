@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { licenses } from '@opendatacapture/licenses';
-import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 import { BadgeAlertIcon, BadgeCheckIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

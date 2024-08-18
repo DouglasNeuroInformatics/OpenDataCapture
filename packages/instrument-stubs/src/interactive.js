@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
 /* eslint-disable perfectionist/sort-objects */
 
 import { createInstrumentStub } from './utils.js';
 
-/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').InteractiveInstrument<{ message: string }>>} */
+/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/runtime-core').InteractiveInstrument<{ message: string }>>} */
 export const interactiveInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {
@@ -49,7 +48,7 @@ export const interactiveInstrument = await createInstrumentStub(async () => {
 });
 
 // This is commented out for now, since it cannot be used in tests (TypeError: A dynamic import callback was not specified.)
-// /** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').InteractiveInstrument<{ message: string }>>} */
+// /** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/runtime-core').InteractiveInstrument<{ message: string }>>} */
 // export const maliciousInstrument = await createInstrumentStub(async () => {
 //   const { z } = await import('zod');
 

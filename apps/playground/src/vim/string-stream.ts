@@ -80,7 +80,7 @@ export class StringStream {
     pattern: RegExp | string,
     consume?: boolean,
     caseInsensitive?: boolean
-  ): RegExpMatchArray | boolean | null | string {
+  ): boolean | null | RegExpMatchArray | string {
     if (typeof pattern == 'string') {
       const cased = (str: string) => {
         return caseInsensitive ? str.toLowerCase() : str;

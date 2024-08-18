@@ -1,4 +1,4 @@
-import { MockFactory, type MockedInstance } from '@douglasneuroinformatics/libnest/testing';
+import { type MockedInstance, MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 

@@ -1,5 +1,5 @@
 import type { SetupState } from '@opendatacapture/schemas/setup';
-import { HttpResponse, http } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 export const setupHandlers = [
   http.get('/v1/setup', () => {

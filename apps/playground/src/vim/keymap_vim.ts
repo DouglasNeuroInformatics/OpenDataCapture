@@ -335,7 +335,7 @@ export const copyArgs = <T>(args: T): T => ({ ...args });
 
 export function offsetCursor(cur: Pos, offsetLine: Pos): Pos;
 export function offsetCursor(cur: Pos, offsetLine: number, offsetCh: number): Pos;
-export function offsetCursor(cur: Pos, offsetLine: Pos | number, offsetCh?: number): Pos {
+export function offsetCursor(cur: Pos, offsetLine: number | Pos, offsetCh?: number): Pos {
   if (isPos(offsetLine)) {
     return makePos(cur.line + offsetLine.line, cur.ch + offsetLine.ch);
   }
@@ -478,6 +478,26 @@ export function makeCmSelection(
   let head = copyCursor(sel.head);
   let anchor = copyCursor(sel.anchor);
   switch (mode) {
+    case 'block':
+      const top = Math.min(anchor.line, head.line);
+      let fromCh = anchor.ch;
+      const bottom = Math.max(anchor.line, head.line);
+      let toCh = head.ch;
+      if (fromCh < toCh) {
+        toCh += 1;
+      } else {
+        fromCh += 1;
+      }
+      const height = bottom - top + 1;
+      const primary = head.line == top ? 0 : height - 1;
+      const ranges: CmSelection[] = [];
+      for (let i = 0; i < height; i++) {
+        ranges.push(new CmSelection(makePos(top + i, fromCh), makePos(top + i, toCh)));
+      }
+      return {
+        primary: primary,
+        ranges: ranges
+      };
     case 'char':
       const headOffset = !exclusive && !cursorIsBefore(sel.head, sel.anchor) ? 1 : 0;
       const anchorOffset = cursorIsBefore(sel.head, sel.anchor) ? 1 : 0;
@@ -503,26 +523,6 @@ export function makeCmSelection(
       return {
         primary: 0,
         ranges: [new CmSelection(anchor, head)]
-      };
-    case 'block':
-      const top = Math.min(anchor.line, head.line);
-      let fromCh = anchor.ch;
-      const bottom = Math.max(anchor.line, head.line);
-      let toCh = head.ch;
-      if (fromCh < toCh) {
-        toCh += 1;
-      } else {
-        fromCh += 1;
-      }
-      const height = bottom - top + 1;
-      const primary = head.line == top ? 0 : height - 1;
-      const ranges: CmSelection[] = [];
-      for (let i = 0; i < height; i++) {
-        ranges.push(new CmSelection(makePos(top + i, fromCh), makePos(top + i, toCh)));
-      }
-      return {
-        primary: primary,
-        ranges: ranges
       };
   }
 }
@@ -705,7 +705,7 @@ function translateRegex(str: string) {
   for (let i = -1; i < str.length; i++) {
     const c = str.charAt(i) || '';
     const n = str.charAt(i + 1) || '';
-    let specialComesNext = n && specials.indexOf(n) != -1;
+    let specialComesNext = n && specials.includes(n);
     if (escapeNextChar) {
       if (c !== '\\' || !specialComesNext) {
         out.push(c);
@@ -715,7 +715,7 @@ function translateRegex(str: string) {
       if (c === '\\') {
         escapeNextChar = true;
         // Treat the unescape list as special for removing, but not adding '\'.
-        if (n && unescape.indexOf(n) != -1) {
+        if (n && unescape.includes(n)) {
           specialComesNext = true;
         }
         // Not passing this test means removing a '\'.
@@ -972,7 +972,7 @@ export function clearSearchHighlight(adapter: EditorAdapter) {
  *   if there are 2 range arguments, then check if pos is in between the two
  *       range arguments.
  */
-function isInRange(pos: Pos | number, start: number | number[], end?: number) {
+function isInRange(pos: number | Pos, start: number | number[], end?: number) {
   if (isPos(pos)) {
     // Assume it is a cursor position. Get the line number.
     pos = pos.line;
@@ -1000,8 +1000,8 @@ export function getMarkPos(adapter: EditorAdapter, vim: VimState, markName: stri
 }
 
 export type ExCommandOptionalParameters = {
-  argString?: string;
   args?: string[];
+  argString?: string;
   callback?: () => void;
   commandName?: string;
   input?: string;
@@ -1309,11 +1309,11 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
           return 'Invalid arguments';
         }
         if (opts[1]) {
-          ignoreCase = opts[1].indexOf('i') != -1;
-          unique = opts[1].indexOf('u') != -1;
-          const decimal = opts[1].indexOf('d') != -1 || opts[1].indexOf('n') != -1 ? 1 : 0;
-          const hex = opts[1].indexOf('x') != -1 ? 1 : 0;
-          const octal = opts[1].indexOf('o') != -1 ? 1 : 0;
+          ignoreCase = opts[1].includes('i');
+          unique = opts[1].includes('u');
+          const decimal = opts[1].includes('d') || opts[1].includes('n') ? 1 : 0;
+          const hex = opts[1].includes('x') ? 1 : 0;
+          const octal = opts[1].includes('o') ? 1 : 0;
           if (decimal + hex + octal > 1) {
             return 'Invalid arguments';
           }
@@ -1721,13 +1721,17 @@ export function _mapCommand(command: KeyMapping) {
 export function mapCommand(keys: string, type: MappableCommandType, name: string, args: MappableArgType, extra: any) {
   const command: KeyMapping = { keys: keys, type: type };
   switch (type) {
-    case 'motion':
-      command.motion = name;
-      command.motionArgs = args as MotionArgs;
-      break;
     case 'action':
       command.action = name;
       command.actionArgs = args as ActionArgs;
+      break;
+    case 'ex':
+      command.ex = name;
+      command.exArgs = args as ExArgs;
+      break;
+    case 'motion':
+      command.motion = name;
+      command.motionArgs = args as MotionArgs;
       break;
     case 'operator':
       command.operator = name;
@@ -1740,10 +1744,6 @@ export function mapCommand(keys: string, type: MappableCommandType, name: string
     case 'search':
       command.search = name;
       command.searchArgs = args as SearchArgs;
-      break;
-    case 'ex':
-      command.ex = name;
-      command.exArgs = args as ExArgs;
       break;
   }
   for (const key of Object.keys(extra)) {
@@ -1815,7 +1815,7 @@ export function onChange(adapter: EditorAdapter, change: Change): void {
           lastChange.maybeReset = false;
         }
         if (text) {
-          if (adapter.state.overwrite && !/\n/.test(text)) {
+          if (adapter.state.overwrite && !text.includes('\n')) {
             lastChange.changes.push(text);
           } else {
             lastChange.changes.push(text);
@@ -2045,7 +2045,7 @@ defineOption(
         return [...l, { from: at, to: at }];
       }
       //  <num>-<num> is an inclusive range of characters
-      const m = p.match(/^(\d+)-(\d+)$/);
+      const m = /^(\d+)-(\d+)$/.exec(p);
       if (m) {
         return [...l, { from: Number(m[1]), to: Number(m[2]) }];
       }
@@ -2093,11 +2093,11 @@ defineOption('background', 'dark', 'string', ['bg'], (value?: boolean | number |
   }
 
   switch (value) {
-    case 'light':
-      adapter.setOption('theme', `${theme.substring(0, theme.length - 4)}Light`);
-      break;
     case 'dark':
       adapter.setOption('theme', `${theme.substring(0, theme.length - 5)}Dark`);
+      break;
+    case 'light':
+      adapter.setOption('theme', `${theme.substring(0, theme.length - 4)}Light`);
       break;
     default:
       new Error(`Invalid option: background=${value}`);

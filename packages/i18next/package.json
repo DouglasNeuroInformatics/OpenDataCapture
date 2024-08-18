@@ -18,10 +18,11 @@
   "peerDependencies": {
     "react": "18.x",
     "react-dom": "18.x",
-    "tailwindcss": "3.x"
+    "tailwindcss": "3.x",
+    "zod": "workspace:zod__3.23.6@*"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.9.0",
+    "@douglasneuroinformatics/libui": "^2.10.0",
     "@opendatacapture/schemas": "workspace:*",
     "i18next": "^23.11.5"
   }

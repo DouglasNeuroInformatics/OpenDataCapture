@@ -1,4 +1,4 @@
-import { type EncryptResult, HybridCrypto } from '@opendatacapture/crypto';
+import { type EncryptResult, HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { AssignmentStatus, MutateAssignmentResponseBody } from '@opendatacapture/schemas/assignment';
 import { Router } from 'express';

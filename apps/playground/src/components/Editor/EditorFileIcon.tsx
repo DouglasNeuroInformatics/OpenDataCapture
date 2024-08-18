@@ -2,7 +2,7 @@ import React from 'react';
 
 import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
 import { FileIcon } from 'lucide-react';
-import { P, match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 
 // icons from https://github.com/PKief/vscode-material-icon-theme
 

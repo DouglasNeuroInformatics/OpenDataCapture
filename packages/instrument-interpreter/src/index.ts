@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-implied-eval */
-
-import { evaluateInstrument } from '@opendatacapture/runtime-v1/opendatacapture@1.0.0/internal.js';
+import { evaluateInstrument } from '@opendatacapture/evaluate-instrument';
+import type { AnyInstrument, InstrumentKind, SomeInstrument } from '@opendatacapture/runtime-core';
 import {
   $AnyInstrument,
   $FormInstrument,
   $InteractiveInstrument,
   $SeriesInstrument
 } from '@opendatacapture/schemas/instrument';
-import type { AnyInstrument, InstrumentKind, SomeInstrument } from '@opendatacapture/schemas/instrument';
 import type { Promisable } from 'type-fest';
 
 export type InstrumentInterpreterOptions = {

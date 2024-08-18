@@ -56,6 +56,7 @@ export const createEditorSlice: SliceCreator<EditorSlice> = (set, get) => ({
   renameFile: (currentName, updatedName) => {
     get().updateFile(currentName, { name: updatedName });
   },
+  selectedFilename: null,
   selectFile: (name) => {
     set((state) => {
       const file = state.files.find((file) => file.name === name);
@@ -69,7 +70,6 @@ export const createEditorSlice: SliceCreator<EditorSlice> = (set, get) => ({
       state.selectedFilename = file.name;
     });
   },
-  selectedFilename: null,
   setSelectedFileContent: (content) => {
     const { selectedFilename, updateFile } = get();
     if (!selectedFilename) {

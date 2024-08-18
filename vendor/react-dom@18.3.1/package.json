@@ -1,0 +1,17 @@
+{
+  "name": "react-dom__18.3.1",
+  "type": "module",
+  "version": "18.3.1",
+  "license": "MIT",
+  "exports": {
+    "./client": {
+      "import": "./src/client.js",
+      "types": "./src/client.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "react__18.3.1": "workspace:",
+    "react-dom": "18.3.1"
+  }
+}

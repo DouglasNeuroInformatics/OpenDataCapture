@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-fallthrough */
-/* eslint-disable no-constant-condition */
+
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -838,12 +837,6 @@ export default class EditorAdapter {
     const range = makeRange(pos, pos);
 
     switch (viewPosition) {
-      case 'top':
-        this.editor.revealRangeAtTop(range);
-        break;
-      case 'center':
-        this.editor.revealRangeInCenter(range);
-        break;
       case 'bottom':
         // private api. no other way
         if (Reflect.has(this.editor, '_revealRange')) {
@@ -863,6 +856,12 @@ export default class EditorAdapter {
             );
           }
         }
+        break;
+      case 'center':
+        this.editor.revealRangeInCenter(range);
+        break;
+      case 'top':
+        this.editor.revealRangeAtTop(range);
         break;
     }
   }
@@ -1067,7 +1066,7 @@ export default class EditorAdapter {
 
   setCursor(line: number, ch: number): void;
 
-  setCursor(line: Pos | number, ch: number) {
+  setCursor(line: number | Pos, ch: number) {
     const pos = typeof line === 'number' ? makePos(line, ch) : line;
 
     const monacoPos = this.getModel_().validatePosition(toMonacoPos(pos));

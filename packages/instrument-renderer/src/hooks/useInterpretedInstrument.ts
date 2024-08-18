@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { InstrumentInterpreter, type InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import { translateInstrument } from '@opendatacapture/instrument-utils';
-import type { AnyInstrument, AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyInstrument, AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 import { useTranslation } from 'react-i18next';
 
 export type InterpretedInstrumentState =

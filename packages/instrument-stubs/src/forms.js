@@ -3,11 +3,11 @@
 import { createInstrumentStub } from './utils.js';
 
 /**
- * @typedef {import('@opendatacapture/schemas/core').Language} Language
+ * @typedef {import('@opendatacapture/runtime-core').Language} Language
  * @typedef {{ favoriteNumber: number, reasonFavoriteNumberIsNegative?: string; }} FormInstrumentStubData
  */
 
-/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').FormInstrument<FormInstrumentStubData, Language>>} */
+/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/runtime-core').FormInstrument<FormInstrumentStubData, Language>>} */
 export const unilingualFormInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {
@@ -60,7 +60,7 @@ export const unilingualFormInstrument = await createInstrumentStub(async () => {
   };
 });
 
-/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/schemas/instrument').FormInstrument<FormInstrumentStubData, Language[]>>} */
+/** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/runtime-core').FormInstrument<FormInstrumentStubData, Language[]>>} */
 export const bilingualFormInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {

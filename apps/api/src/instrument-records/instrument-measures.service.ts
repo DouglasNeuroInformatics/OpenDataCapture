@@ -1,11 +1,11 @@
-import type { FormDataType } from '@douglasneuroinformatics/libui-form-types';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import type { Json } from '@opendatacapture/schemas/core';
 import type {
+  FormTypes,
   InstrumentMeasure,
+  InstrumentMeasures,
   InstrumentMeasureValue,
-  InstrumentMeasures
-} from '@opendatacapture/schemas/instrument';
+  Json
+} from '@opendatacapture/runtime-core';
 import type { Prisma } from '@prisma/client';
 import { match } from 'ts-pattern';
 
@@ -13,7 +13,7 @@ import { match } from 'ts-pattern';
 export class InstrumentMeasuresService {
   private readonly logger = new Logger(InstrumentMeasuresService.name);
 
-  computeMeasures(measures: InstrumentMeasures, data: FormDataType | Json | Prisma.JsonValue) {
+  computeMeasures(measures: InstrumentMeasures, data: FormTypes.FormDataType | Json | Prisma.JsonValue) {
     const computedMeasures: { [key: string]: InstrumentMeasureValue } = {};
     for (const key in measures) {
       computedMeasures[key] = this.computeMeasure(measures[key], data);
@@ -21,7 +21,7 @@ export class InstrumentMeasuresService {
     return computedMeasures;
   }
 
-  private computeMeasure(measure: InstrumentMeasure, data: FormDataType | Json | Prisma.JsonValue) {
+  private computeMeasure(measure: InstrumentMeasure, data: FormTypes.FormDataType | Json | Prisma.JsonValue) {
     return match(measure)
       .with({ kind: 'computed' }, (measure) => {
         return measure.value(data);

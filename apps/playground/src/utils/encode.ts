@@ -24,7 +24,7 @@ export function encodeShareURL({ files, label }: Pick<InstrumentRepository, 'fil
   return url;
 }
 
-export function decodeShareURL(url: URL): Pick<InstrumentRepository, 'files' | 'label'> | null {
+export function decodeShareURL(url: URL): null | Pick<InstrumentRepository, 'files' | 'label'> {
   const encodedFiles = url.searchParams.get('files');
   const encodedLabel = url.searchParams.get('label');
   if (!(encodedFiles && encodedLabel)) {

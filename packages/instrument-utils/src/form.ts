@@ -1,9 +1,13 @@
-import type { FormDataType, PartialFormDataType } from '@douglasneuroinformatics/libui-form-types';
-import type { Language } from '@opendatacapture/schemas/core';
-import type { FormInstrument, FormInstrumentContent, FormInstrumentFields } from '@opendatacapture/schemas/instrument';
+import type {
+  FormInstrument,
+  FormInstrumentContent,
+  FormInstrumentFields,
+  FormTypes,
+  Language
+} from '@opendatacapture/runtime-core';
 
 /** Extract a flat array of form fields from the content. This function assumes there are no duplicate keys in groups  */
-export function getFormFields<TData extends FormDataType>(
+export function getFormFields<TData extends FormTypes.FormDataType>(
   content: FormInstrumentContent<TData, Language>
 ): FormInstrumentFields<TData, Language> {
   if (!Array.isArray(content)) {
@@ -15,14 +19,14 @@ export function getFormFields<TData extends FormDataType>(
   >;
 }
 
-export function extractFieldLabel<TData extends FormDataType>(
+export function extractFieldLabel<TData extends FormTypes.FormDataType>(
   form: FormInstrument<TData, Language>,
   key: string,
-  data: TData | null = null
+  data: null | TData = null
 ) {
   const field = getFormFields(form.content)[key];
   if (field.kind === 'dynamic') {
-    return field.render(data as PartialFormDataType<TData>)?.label;
+    return field.render(data as FormTypes.PartialFormDataType<TData>)?.label;
   }
   return field.label;
 }

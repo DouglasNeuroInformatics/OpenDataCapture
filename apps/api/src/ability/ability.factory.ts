@@ -1,12 +1,11 @@
 import { AbilityBuilder, detectSubjectType } from '@casl/ability';
 import { createPrismaAbility } from '@casl/prisma';
 import { Injectable, Logger } from '@nestjs/common';
-import { Prisma, type UserModel } from '@opendatacapture/prisma-client/api';
+import { type UserModel } from '@opendatacapture/prisma-client/api';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
 
 import type { AppAbility } from '@/core/types';
 
-Prisma;
 @Injectable()
 export class AbilityFactory {
   private readonly logger = new Logger(AbilityFactory.name);

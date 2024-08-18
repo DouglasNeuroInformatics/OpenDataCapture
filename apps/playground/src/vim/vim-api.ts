@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/prefer-optional-chain */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
 import { defineAction } from './actions';
 import EditorAdapter from './adapter';
@@ -9,12 +8,12 @@ import { findDigraph } from './digraph';
 import { resetVimGlobalState, vimGlobalState } from './global';
 import {
   _mapCommand,
-  InsertModeKey,
   clearInputState,
   exCommandDispatcher,
   exCommands,
   exitInsertMode,
   exitVisualMode,
+  InsertModeKey,
   logKey,
   mapCommand,
   maybeInitVimState,
@@ -42,9 +41,13 @@ export class VimApi {
     resetVimGlobalState();
   }
 
+  _mapCommand(command: KeyMapping) {
+    _mapCommand(command);
+  }
   buildKeyMap() {
     // TODO: Convert keymap into dictionary format for fast lookup.
   }
+
   // Testing hook, though it might be useful to expose the register
   defineAction(name: string, fn: ActionFunc) {
     defineAction(name, fn);
@@ -63,15 +66,15 @@ export class VimApi {
       type: 'api'
     });
   }
-
+  // Non-recursive map function.
   defineMotion(name: string, fn: MotionFunc) {
     defineMotion(name, fn);
   }
-  // Non-recursive map function.
   // NOTE: This will not create mappings to key maps that aren't present
   defineOperator(name: string, fn: OperatorFunc) {
     defineOperator(name, fn);
   }
+
   defineOption(
     name: string,
     defaultValue: boolean | number | string | undefined,
@@ -320,10 +323,6 @@ export class VimApi {
     exCommandDispatcher.map(lhs, rhs, ctx);
   }
 
-  mapCommand(keys: string, type: MappableCommandType, name: string, args: MappableArgType, extra: any) {
-    mapCommand(keys, type, name, args, extra);
-  }
-
   // Remove all user-defined mappings for the provided context.
   mapclear(ctx?: Context) {
     // Partition the existing keymap into user-defined and true defaults.
@@ -352,6 +351,10 @@ export class VimApi {
         }
       }
     }
+  }
+
+  mapCommand(keys: string, type: MappableCommandType, name: string, args: MappableArgType, extra: any) {
+    mapCommand(keys, type, name, args, extra);
   }
 
   // in the default key map. See TODO at bottom of function.
@@ -385,7 +388,7 @@ export class VimApi {
         // Record the mapped contexts as complete.
         const mappedCtxs = toCtxArray(mapping.context);
         ctxsToMap = ctxsToMap.filter(function (el) {
-          return mappedCtxs.indexOf(el) === -1;
+          return !mappedCtxs.includes(el);
         });
       }
     }
@@ -396,11 +399,7 @@ export class VimApi {
   setOption(name: string, value: boolean | number | string, adapter?: EditorAdapter, cfg?: OptionConfig) {
     setOption(name, value, adapter, cfg);
   }
-
   unmap(lhs: string, ctx?: Context) {
     return exCommandDispatcher.unmap(lhs, ctx);
-  }
-  _mapCommand(command: KeyMapping) {
-    _mapCommand(command);
   }
 }

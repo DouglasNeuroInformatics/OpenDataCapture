@@ -1,5 +1,5 @@
 import type { Summary } from '@opendatacapture/schemas/summary';
-import { HttpResponse, http } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 export const summaryHandlers = [
   http.get('v1/summary', () => {

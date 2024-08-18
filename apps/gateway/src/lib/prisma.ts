@@ -1,4 +1,4 @@
-import { HybridCrypto } from '@opendatacapture/crypto';
+import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { PrismaClient } from '@opendatacapture/prisma-client/gateway';
 
 export const prisma = new PrismaClient().$extends({

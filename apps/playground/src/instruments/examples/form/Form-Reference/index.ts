@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { defineInstrument } = await import('/runtime/v1/opendatacapture@1.0.0/core.js');
+const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
 const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 
 export default defineInstrument({
@@ -205,7 +205,12 @@ export default defineInstrument({
     numberSelect: z.union([z.literal(1), z.literal(2), z.literal(3)]),
     numberSlider: z.number(),
     stringInput: z.string(),
-    stringPassword: z.string(),
+    stringPassword: z
+      .string()
+      .regex(
+        /"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"/,
+        'Password must contain eight or more characters and at least one letter and one number'
+      ),
     stringRadio: z.enum(['a', 'b', 'c']),
     stringSelect: z.enum(['a', 'b', 'c']),
     stringTextArea: z.string(),

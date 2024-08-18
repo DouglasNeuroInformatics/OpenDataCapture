@@ -1,0 +1,12 @@
+{
+  "name": "type-fest__4.23.0",
+  "type": "module",
+  "version": "4.23.0",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}

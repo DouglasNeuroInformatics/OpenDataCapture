@@ -17,13 +17,14 @@
   "peerDependencies": {
     "react": "18.x",
     "react-dom": "18.x",
-    "tailwindcss": "3.x"
+    "tailwindcss": "3.x",
+    "zod": "workspace:zod__3.23.6@*"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^0.3.1",
-    "@douglasneuroinformatics/libui": "^2.9.0",
+    "@douglasneuroinformatics/libjs": "^0.6.0",
+    "@douglasneuroinformatics/libui": "^2.10.0",
     "@opendatacapture/i18next": "workspace:*",
-    "@opendatacapture/schemas": "workspace:*",
+    "@opendatacapture/runtime-core": "workspace:*",
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.394.0",
     "react-i18next": "^14.1.2",

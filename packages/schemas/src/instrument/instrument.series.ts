@@ -1,26 +1,7 @@
-import type { Merge } from 'type-fest';
+import type { SeriesInstrument } from '@opendatacapture/runtime-core';
 import { z } from 'zod';
 
-import {
-  $BaseInstrument,
-  $ScalarInstrumentInternal,
-  type BaseInstrument,
-  type InstrumentLanguage,
-  type ScalarInstrumentInternal
-} from './instrument.base.js';
-
-import type { Language } from '../core/core.js';
-
-type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
-  BaseInstrument<TLanguage>,
-  {
-    content: ScalarInstrumentInternal[];
-    kind: 'SERIES';
-  }
->;
-
-type UnilingualSeriesInstrument = SeriesInstrument<Language>;
-type MultilingualSeriesInstrument = SeriesInstrument<Language[]>;
+import { $BaseInstrument, $ScalarInstrumentInternal } from './instrument.base.js';
 
 const $SeriesInstrument: z.ZodType<SeriesInstrument> = $BaseInstrument.extend({
   content: z.array($ScalarInstrumentInternal),
@@ -28,4 +9,3 @@ const $SeriesInstrument: z.ZodType<SeriesInstrument> = $BaseInstrument.extend({
 });
 
 export { $SeriesInstrument };
-export type { MultilingualSeriesInstrument, SeriesInstrument, UnilingualSeriesInstrument };

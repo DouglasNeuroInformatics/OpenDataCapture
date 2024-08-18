@@ -5,6 +5,9 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "Node16",
     "moduleResolution": "Node16",
+    "paths": {
+      "/runtime/v1/*": ["../../runtime/v1/dist/*"]
+    },
     "types": ["@opendatacapture/runtime-v1/env"]
   },
   "extends": "../../jsconfig.json",

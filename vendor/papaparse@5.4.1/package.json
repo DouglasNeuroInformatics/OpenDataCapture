@@ -1,0 +1,16 @@
+{
+  "name": "papaparse__5.4.1",
+  "type": "module",
+  "version": "5.4.1",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "papaparse": "5.4.1"
+  }
+}

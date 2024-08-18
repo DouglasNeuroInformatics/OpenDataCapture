@@ -12,7 +12,7 @@ export class AuthorizationGuard implements CanActivate {
 
   constructor(private readonly reflector: Reflector) {}
 
-  canActivate(context: ExecutionContext): Observable<boolean> | Promise<boolean> | boolean {
+  canActivate(context: ExecutionContext): boolean | Observable<boolean> | Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     this.logger.verbose(`Request URL: ${request.url}`);
 

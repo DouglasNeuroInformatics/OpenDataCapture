@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 import type { Promisable } from 'type-fest';
 
 import { FormContent } from '../FormContent';

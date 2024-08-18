@@ -19,7 +19,7 @@ export type AuthSlice = {
 };
 
 export type SessionSlice = {
-  currentSession: Session | null;
+  currentSession: null | Session;
   endSession: () => void;
   startSession: (session: Session) => void;
 };

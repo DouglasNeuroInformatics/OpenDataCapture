@@ -8,7 +8,7 @@ import {
   type ListboxDropdownOption
 } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import html2canvas from 'html2canvas';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';

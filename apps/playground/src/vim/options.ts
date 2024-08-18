@@ -8,7 +8,7 @@ import type { VimState } from './types';
 export type OptionCallback = (
   value?: boolean | number | string,
   adapter?: EditorAdapter
-) => Error | boolean | number | string;
+) => boolean | Error | number | string;
 
 export type OptionConfig = {
   append?: boolean;

@@ -59,14 +59,18 @@ export const Editor = () => {
   const isVimModeEnabled = useAppStore((store) => Boolean(store.settings.enableVimMode));
   const [isEditorMounted, setIsEditorMounted] = useState(false);
   const editorPaneRef = useRef<EditorPaneRef>(null);
-  const vimModeRef = useRef<VimMode | null>(null);
+  const vimModeRef = useRef<null | VimMode>(null);
 
   useEffect(() => {
     if (isEditorMounted) {
       if (!vimModeRef.current) {
         vimModeRef.current = new VimMode(editorPaneRef.current!.editor!);
       }
-      isVimModeEnabled ? vimModeRef.current.enable() : vimModeRef.current.disable();
+      if (isVimModeEnabled) {
+        vimModeRef.current.enable();
+      } else {
+        vimModeRef.current.disable();
+      }
     }
   }, [isEditorMounted, isVimModeEnabled]);
 

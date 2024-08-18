@@ -24,7 +24,7 @@ function extractFilenameFromPath(path: string): string {
   throw new Error(`Invalid path '${path}': expected relative path to file in same directory`);
 }
 
-function resolveInput<T extends BundlerInput>(path: string, inputs: T[]): T | null {
+function resolveInput<T extends BundlerInput>(path: string, inputs: T[]): null | T {
   const filename = extractFilenameFromPath(path);
   return inputs.find((input) => input.name === filename) ?? null;
 }

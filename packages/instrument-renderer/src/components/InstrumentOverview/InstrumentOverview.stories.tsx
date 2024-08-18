@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 import type { Meta, StoryObj } from '@storybook/react';
 import { cloneDeep, merge } from 'lodash-es';
 

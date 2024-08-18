@@ -133,7 +133,7 @@ export class VimMode implements EventTarget {
   removeEventListener(
     type: string,
     callback: EventHandler<Event> | EventHandler<FileEvent>,
-    _options?: EventListenerOptions | boolean
+    _options?: boolean | EventListenerOptions
   ): void {
     const typeListeners = this.listeners_.get(type);
     if (typeListeners) {

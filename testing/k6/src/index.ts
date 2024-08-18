@@ -1,7 +1,7 @@
 import { DEMO_USERS } from '@opendatacapture/demo';
+import type { InstrumentSummary } from '@opendatacapture/runtime-core';
 import type { AuthPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Group } from '@opendatacapture/schemas/group';
-import type { InstrumentSummary } from '@opendatacapture/schemas/instrument';
 import type { SetupState } from '@opendatacapture/schemas/setup';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import type { Summary } from '@opendatacapture/schemas/summary';

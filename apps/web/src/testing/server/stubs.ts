@@ -1,4 +1,4 @@
-import { PureAbility, createMongoAbility } from '@casl/ability';
+import { createMongoAbility, PureAbility } from '@casl/ability';
 import type { AppAction, AppSubjectName } from '@opendatacapture/schemas/core';
 import type { Session } from '@opendatacapture/schemas/session';
 import type { Subject } from '@opendatacapture/schemas/subject';

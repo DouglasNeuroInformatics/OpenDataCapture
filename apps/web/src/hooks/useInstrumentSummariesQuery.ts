@@ -1,6 +1,6 @@
 import { translateInstrumentSummary } from '@opendatacapture/instrument-utils';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { $InstrumentSummary } from '@opendatacapture/schemas/instrument';
-import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
