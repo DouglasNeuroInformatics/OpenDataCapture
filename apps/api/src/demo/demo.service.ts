@@ -9,9 +9,9 @@ import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/ha
 import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/patient-health-questionnaire-9.js';
 import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
 import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/happiness-questionnaire-with-consent.js';
+import type { FormInstrument } from '@opendatacapture/runtime-core';
 import { type Json, type Language, type WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
-import type { FormInstrument } from '@opendatacapture/schemas/instrument';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 
 import { GroupsService } from '@/groups/groups.service';
@@ -91,7 +91,7 @@ export class DemoService {
       let researchId = 1;
       for (let i = 0; i < dummySubjectCount; i++) {
         this.logger.debug(`Creating dummy subject ${i + 1}/${dummySubjectCount}`);
-        const group = randomValue(groups);
+        const group = randomValue(groups)!;
         const subjectIdData = {
           dateOfBirth: faker.date.birthdate(),
           firstName: faker.person.firstName(),

@@ -1,6 +1,6 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
+import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { ApiProperty } from '@nestjs/swagger';
-import { estimatePasswordStrength } from '@opendatacapture/password';
 import { $CreateUserData } from '@opendatacapture/schemas/user';
 import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { z } from 'zod';

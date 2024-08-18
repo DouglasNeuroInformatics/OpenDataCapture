@@ -18,5 +18,5 @@ export class CreateSubjectDto {
   lastName?: null | string;
 
   @ApiProperty()
-  sex?: Sex | null;
+  sex?: null | Sex;
 }

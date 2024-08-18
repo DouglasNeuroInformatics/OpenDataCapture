@@ -29,7 +29,11 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
       ref={ref}
       type="button"
       onClick={() => {
-        onClick?.(id) ?? navigate(id);
+        if (onClick) {
+          onClick(id);
+        } else {
+          navigate(id);
+        }
       }}
     >
       <Icon className="mr-2" />

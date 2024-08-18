@@ -1,8 +1,8 @@
 import vm from 'vm';
 
 import { Injectable } from '@nestjs/common';
+import type { AnyInstrument } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
-import { type AnyInstrument } from '@opendatacapture/schemas/instrument';
 
 type VirtualizationContext = {
   instruments: Map<string, WithID<AnyInstrument>>;

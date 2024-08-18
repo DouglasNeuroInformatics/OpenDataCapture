@@ -22,12 +22,14 @@
   },
   "dependencies": {
     "@casl/ability": "^6.7.1",
-    "@douglasneuroinformatics/libjs": "^0.3.1",
+    "@douglasneuroinformatics/libjs": "^0.6.0",
     "@opendatacapture/licenses": "workspace:*",
-    "zod": "^3.23.8"
+    "@opendatacapture/runtime-core": "workspace:*",
+    "zod": "workspace:zod__3.23.6@*"
   },
   "devDependencies": {
     "@casl/prisma": "^1.4.1",
-    "@opendatacapture/instrument-stubs": "workspace:*"
+    "@opendatacapture/instrument-stubs": "workspace:*",
+    "type-fest": "workspace:type-fest__4.23.0@*"
   }
 }

@@ -1,5 +1,5 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module, forwardRef } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { AssignmentsModule } from '@/assignments/assignments.module';
 import { ConfigurationService } from '@/configuration/configuration.service';

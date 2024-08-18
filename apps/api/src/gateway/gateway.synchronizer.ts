@@ -1,5 +1,5 @@
+import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { Injectable, InternalServerErrorException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
-import { HybridCrypto } from '@opendatacapture/crypto';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import { $Json } from '@opendatacapture/schemas/core';
 

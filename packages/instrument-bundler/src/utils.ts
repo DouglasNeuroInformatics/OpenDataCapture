@@ -1,4 +1,4 @@
-import { P, match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 
 import { InstrumentBundlerMiscInternalError } from './error.js';
 
@@ -6,7 +6,7 @@ import type { BundlerInputFileExtension } from './types.js';
 import type { Loader } from './vendor/esbuild.js';
 
 export function extractInputFileExtension(filename: string) {
-  const ext = filename.match(/\.(css|html|jpeg|jpg|js|jsx|png|svg|ts|tsx|webp)$/i)?.[0];
+  const ext = /\.(css|html|jpeg|jpg|js|jsx|png|svg|ts|tsx|webp)$/i.exec(filename)?.[0];
   return (ext ?? null) as BundlerInputFileExtension | null;
 }
 

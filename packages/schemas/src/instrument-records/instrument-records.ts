@@ -1,9 +1,9 @@
+import type { InstrumentKind, InstrumentMeasureValue } from '@opendatacapture/runtime-core';
 import { z } from 'zod';
 
 import { $BaseModel, $Json } from '../core/core.js';
 import { $InstrumentMeasureValue } from '../instrument/instrument.js';
 
-import type { InstrumentKind, InstrumentMeasureValue } from '../instrument/instrument.js';
 import type { SessionType } from '../session/session.js';
 
 export const $CreateInstrumentRecordData = z.object({

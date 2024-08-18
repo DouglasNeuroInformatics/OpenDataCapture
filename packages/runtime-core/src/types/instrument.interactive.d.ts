@@ -1,0 +1,23 @@
+import type { Exact, Merge, Promisable, SetRequired } from 'type-fest';
+
+import type { Json, Language } from './core.d.ts';
+import type { ScalarInstrument, UnilingualInstrumentDetails } from './instrument.base.d.ts';
+
+/** @public */
+type InteractiveInstrument<TData extends Json = Json> = Merge<
+  ScalarInstrument<TData, Language>,
+  {
+    content: {
+      /** attributes to inject in the iframe head */
+      readonly __injectHead?: {
+        /** base64 encoded css */
+        readonly style: string;
+      };
+      render: (done: <T extends Exact<TData, T>>(data: T) => void) => Promisable<void>;
+    };
+    details: SetRequired<UnilingualInstrumentDetails, 'estimatedDuration' | 'instructions'>;
+    kind: 'INTERACTIVE';
+  }
+>;
+
+export type { InteractiveInstrument };

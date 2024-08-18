@@ -1,6 +1,6 @@
+import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { HybridCrypto } from '@opendatacapture/crypto';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import type {
   Assignment,

@@ -164,13 +164,9 @@ export class RegisterController {
     // default registers
     if (!register) {
       switch (operator) {
-        case 'yank':
-          // The 0 register contains the text from the most recent yank.
-          this.registers['0'] = new Register(text, linewise, blockwise);
-          break;
-        case 'delete':
         case 'change':
-          if (text.indexOf('\n') == -1) {
+        case 'delete':
+          if (!text.includes('\n')) {
             // Delete less than 1 line. Update the small delete register.
             this.registers['-'] = new Register(text, linewise);
           } else {
@@ -179,6 +175,10 @@ export class RegisterController {
             this.shiftNumericRegisters_();
             this.registers['1'] = new Register(text, linewise);
           }
+          break;
+        case 'yank':
+          // The 0 register contains the text from the most recent yank.
+          this.registers['0'] = new Register(text, linewise, blockwise);
           break;
       }
       // Make sure the unnamed register is set to what just happened

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { InstrumentKind } from '@opendatacapture/schemas/instrument';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { ClipboardCheckIcon, FileQuestionIcon, ListChecksIcon, type LucideIcon, MonitorCheckIcon } from 'lucide-react';
 
 export type InstrumentIconProps = {

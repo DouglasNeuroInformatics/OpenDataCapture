@@ -1,5 +1,5 @@
 import type { Session } from '@opendatacapture/schemas/session';
-import { HttpResponse, http } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 import { testSubject } from '../stubs';
 

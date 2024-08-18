@@ -3,7 +3,7 @@ import module from 'node:module';
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import type { InstrumentRecordModel } from '@opendatacapture/prisma-client/api';
-import type { InstrumentMeasureValue, InstrumentMeasures, ScalarInstrument } from '@opendatacapture/schemas/instrument';
+import type { InstrumentMeasures, InstrumentMeasureValue, ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -170,8 +170,12 @@ export class InstrumentRecordsService {
     { groupId, instrumentId, kind, minDate, subjectId }: InstrumentRecordQueryParams,
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentRecord[]> {
-    groupId && (await this.groupsService.findById(groupId));
-    instrumentId && (await this.instrumentsService.findById(instrumentId));
+    if (groupId) {
+      await this.groupsService.findById(groupId);
+    }
+    if (instrumentId) {
+      await this.instrumentsService.findById(instrumentId);
+    }
 
     const instrumentKindIds = await this.instrumentsService
       .find({ kind })
@@ -203,7 +207,9 @@ export class InstrumentRecordsService {
     { groupId, instrumentId }: { groupId?: string; instrumentId: string },
     { ability }: EntityOperationOptions = {}
   ): Promise<LinearRegressionResults> {
-    groupId && (await this.groupsService.findById(groupId));
+    if (groupId) {
+      await this.groupsService.findById(groupId);
+    }
     const instrument = await this.instrumentsService
       .findById(instrumentId)
       .then((instrument) => this.virtualizationService.getInstrumentInstance(instrument));

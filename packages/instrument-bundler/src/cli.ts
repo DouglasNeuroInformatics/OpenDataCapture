@@ -42,7 +42,6 @@ const options = program.opts();
 const logger = Object.create(console) as { verbose: (message: string) => void } & Console;
 logger.verbose = (message: string) => {
   if (options.verbose) {
-    // eslint-disable-next-line no-console
     console.log(message);
   }
 };

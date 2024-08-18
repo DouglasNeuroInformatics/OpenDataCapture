@@ -4,13 +4,13 @@
  * @opendatacapture/runtime-v1 specified as a peer dependency.
  */
 
-import { evaluateInstrument } from '/runtime/v1/opendatacapture@1.0.0/internal.js';
+import { evaluateInstrument } from '/runtime/v1/@opendatacapture/evaluate-instrument/index.js';
 
 const THEME_ATTRIBUTE = 'data-mode';
 
 /** @typedef {import('@douglasneuroinformatics/libui/hooks').Theme} Theme */
-/** @typedef {import('@opendatacapture/schemas/core').Json} Json */
-/** @typedef {import('@opendatacapture/schemas/instrument').InteractiveInstrument} InteractiveInstrument */
+/** @typedef {import('@opendatacapture/runtime-core').Json} Json */
+/** @typedef {import('@opendatacapture/runtime-core').InteractiveInstrument} InteractiveInstrument */
 
 /** @param {Json} data */
 function done(data) {

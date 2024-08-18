@@ -1,4 +1,4 @@
-import { sha256 } from '@opendatacapture/crypto';
+import { sha256 } from '@douglasneuroinformatics/libcrypto';
 import { $ClinicalSubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import type { ClinicalSubjectIdentificationData, Subject } from '@opendatacapture/schemas/subject';
 import type { SetNonNullable } from 'type-fest';

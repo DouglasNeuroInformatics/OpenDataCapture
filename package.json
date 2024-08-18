@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.1.7",
   "private": true,
-  "packageManager": "pnpm@9.3.0",
+  "packageManager": "pnpm@9.7.1",
   "license": "Apache-2.0",
   "scripts": {
     "build": "NODE_ENV=production env-cmd turbo run build",
@@ -30,8 +30,7 @@
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@commitlint/types": "^19.0.3",
-    "@douglasneuroinformatics/eslint-config": "4.2.2",
-    "@douglasneuroinformatics/libui-form-types": "^0.10.0",
+    "@douglasneuroinformatics/eslint-config": "^5.0.0",
     "@storybook/addon-essentials": "^8.1.6",
     "@storybook/addon-interactions": "^8.1.6",
     "@storybook/addon-links": "^8.1.6",
@@ -54,7 +53,7 @@
     "@vitest/browser": "^1.6.0",
     "@vitest/coverage-v8": "^1.6.0",
     "env-cmd": "^10.1.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.9.0",
     "expect-type": "^0.19.0",
     "happy-dom": "^14.12.0",
     "husky": "^9.0.11",
@@ -67,7 +66,6 @@
     "storybook-react-i18next": "^3.1.1",
     "tsx": "4.8.2",
     "turbo": "^2.0.9",
-    "type-fest": "^4.20.0",
     "typescript": "~5.4.5",
     "unplugin-swc": "^1.4.5",
     "vitest": "^1.6.0",
@@ -80,5 +78,12 @@
   "cpu": [
     "x64",
     "arm64"
-  ]
+  ],
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "eslint": "9.x"
+      }
+    }
+  }
 }

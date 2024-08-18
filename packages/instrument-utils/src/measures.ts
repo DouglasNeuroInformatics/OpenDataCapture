@@ -1,9 +1,6 @@
 import { isPlainObject } from '@douglasneuroinformatics/libjs';
-import {
-  $InstrumentMeasureValue,
-  type AnyUnilingualScalarInstrument,
-  type InstrumentMeasureValue
-} from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualScalarInstrument, InstrumentMeasureValue } from '@opendatacapture/runtime-core';
+import { $InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
 import { extractFieldLabel } from './form.js';

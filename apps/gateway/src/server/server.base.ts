@@ -3,11 +3,11 @@ import PinoHttp from 'pino-http';
 import PinoPretty from 'pino-pretty';
 import type { Promisable } from 'type-fest';
 
-import type { RootProps } from '@/Root';
 import { CONFIG } from '@/config';
 import type { RenderFunction } from '@/entry-server';
 import { apiKeyMiddleware } from '@/middleware/api-key.middleware';
 import { errorHandlerMiddleware } from '@/middleware/error-handler.middleware';
+import type { RootProps } from '@/Root';
 import { apiRouter } from '@/routers/api.router';
 import { rootRouter } from '@/routers/root.router';
 import { ah } from '@/utils/async-handler';
@@ -75,7 +75,6 @@ export abstract class BaseServer {
 
   listen(port = CONFIG.port) {
     return this.app.listen(port, () => {
-      // eslint-disable-next-line no-console
       console.log(`Server started at http://localhost:${port}`);
     });
   }

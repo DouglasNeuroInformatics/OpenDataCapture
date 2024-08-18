@@ -5,7 +5,7 @@ import { Button, Heading, Separator } from '@douglasneuroinformatics/libui/compo
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 import { CopyButton } from '@opendatacapture/react-core';
-import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { filter } from 'lodash-es';
 import { DownloadIcon, PrinterIcon } from 'lucide-react';

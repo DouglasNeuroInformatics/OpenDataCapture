@@ -3,7 +3,8 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { InstrumentKind, InstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
+import type { InstrumentSummary } from '@opendatacapture/schemas/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';

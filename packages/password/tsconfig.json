@@ -1,7 +1,0 @@
-{
-  "extends": "../../jsconfig.json",
-  "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ESNext"]
-  },
-  "include": ["src/**/*", "*.js", "*.cjs"]
-}

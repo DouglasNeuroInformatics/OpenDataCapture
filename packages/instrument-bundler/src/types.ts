@@ -1,5 +1,5 @@
 export type BundlerInput = {
-  content: Uint8Array | string;
+  content: string | Uint8Array;
   name: string;
 };
 

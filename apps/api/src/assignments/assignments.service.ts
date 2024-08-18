@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
+import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { HybridCrypto } from '@opendatacapture/crypto';
 import type { Assignment, UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 
 import { accessibleQuery } from '@/ability/ability.utils';

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { translateInstrument } from '@opendatacapture/instrument-utils';
-import type { AnyUnilingualInstrument } from '@opendatacapture/schemas/instrument';
+import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrumentBundle } from './useInstrumentBundle';

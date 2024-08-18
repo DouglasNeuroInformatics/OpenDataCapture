@@ -5,6 +5,9 @@
     "jsx": "react",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "paths": {
+      "/runtime/v1/*": ["../../runtime/v1/dist/*"]
+    },
     "types": ["vite/client"]
   },
   "include": [".storybook/*", "src/**/*", "*.js", "*.cjs"]

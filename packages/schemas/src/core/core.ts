@@ -1,12 +1,14 @@
 import type { PureAbility, RawRuleOf } from '@casl/ability';
 import { isObject } from '@douglasneuroinformatics/libjs';
 import { type LicenseIdentifier, licenses } from '@opendatacapture/licenses';
+import type { Json, JsonLiteral, Language } from '@opendatacapture/runtime-core';
 import type { Simplify } from 'type-fest';
 import { z } from 'zod';
 
 export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
 export type AppSubjectName =
+  | 'all'
   | 'Assignment'
   | 'Group'
   | 'Instrument'
@@ -14,16 +16,13 @@ export type AppSubjectName =
   | 'Session'
   | 'Subject'
   | 'Summary'
-  | 'User'
-  | 'all';
+  | 'User';
 
 export type BaseAppAbility = PureAbility<[AppAction, AppSubjectName]>;
 
 export type Permissions = RawRuleOf<BaseAppAbility>[];
 
-export const $Language = z.enum(['en', 'fr']);
-
-export type Language = z.infer<typeof $Language>;
+export const $Language: z.ZodType<Language> = z.enum(['en', 'fr']);
 
 export type BaseModel = z.infer<typeof $BaseModel>;
 export const $BaseModel = z.object({
@@ -32,11 +31,7 @@ export const $BaseModel = z.object({
   updatedAt: z.coerce.date()
 });
 
-export const $JsonLiteral = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-
-export type JsonLiteral = z.infer<typeof $JsonLiteral>;
-
-export type Json = { [key: string]: Json } | Json[] | JsonLiteral;
+export const $JsonLiteral: z.ZodType<JsonLiteral> = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 
 export const $Json: z.ZodType<Json> = z.lazy(() => z.union([$JsonLiteral, z.array($Json), z.record($Json)]));
 
@@ -67,7 +62,7 @@ export const $BooleanString = z.preprocess((arg) => {
   return arg;
 }, z.boolean());
 
-export const $Uint8Array: z.ZodType<Uint8Array, z.ZodTypeDef, Uint8Array | number[]> = z
+export const $Uint8Array: z.ZodType<Uint8Array, z.ZodTypeDef, number[] | Uint8Array> = z
   .union([z.array(z.number().int().min(0).max(255)), z.instanceof(Uint8Array)])
   .transform((arg) => {
     if (Array.isArray(arg)) {
@@ -90,3 +85,5 @@ export const $Error: z.ZodType<Error> = z.object({
   name: z.string(),
   stack: z.string().optional()
 });
+
+export type { Json, Language };

@@ -2,8 +2,7 @@
 
 import { translations } from './translations.ts';
 
-const { defineInstrument } = await import('/runtime/v1/opendatacapture@1.0.0/core.js');
-const { i18n } = await import('/runtime/v1/opendatacapture@1.0.0/unstable/i18n.js');
+const { defineInstrument, i18n } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
 const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 
 i18n.init();

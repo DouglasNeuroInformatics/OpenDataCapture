@@ -9,7 +9,7 @@ import type {
   MultilingualInstrumentSummary,
   SeriesInstrument,
   UnilingualInstrumentSummary
-} from '@opendatacapture/schemas/instrument';
+} from '@opendatacapture/runtime-core';
 
 export function isUnilingualInstrument(instrument: AnyInstrument): instrument is AnyUnilingualInstrument {
   return typeof instrument.language === 'string';

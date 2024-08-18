@@ -11,7 +11,11 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
-    "@opendatacapture/runtime-v1": "workspace:*",
+    "@opendatacapture/evaluate-instrument": "workspace:*",
+    "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/schemas": "workspace:*"
+  },
+  "devDependencies": {
+    "type-fest": "workspace:type-fest__4.23.0@*"
   }
 }

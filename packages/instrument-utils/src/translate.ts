@@ -1,16 +1,4 @@
 import type {
-  Fieldset,
-  FieldsetValue,
-  FormDataType,
-  FormFields,
-  NonNullableRecord,
-  PartialFormDataType,
-  RequiredFieldValue,
-  ScalarFormField,
-  StaticFormField
-} from '@douglasneuroinformatics/libui-form-types';
-import type { Language } from '@opendatacapture/schemas/core';
-import type {
   AnyInstrument,
   AnyMultilingualFormInstrument,
   AnyUnilingualFormInstrument,
@@ -19,14 +7,16 @@ import type {
   FormInstrumentFieldset,
   FormInstrumentScalarField,
   FormInstrumentStaticField,
+  FormTypes,
   InstrumentSummary,
+  Language,
   MultilingualInstrumentMeasures,
   SeriesInstrument,
   UnilingualInstrumentMeasures,
   UnilingualInstrumentSummary
-} from '@opendatacapture/schemas/instrument';
+} from '@opendatacapture/runtime-core';
 import { mapValues, wrap } from 'lodash-es';
-import { P, match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 
 import {
   isFormInstrument,
@@ -60,7 +50,10 @@ function getTargetLanguage(instrument: Pick<AnyInstrument, 'language'>, preferre
  * @param language - The target language for translation.
  * @returns A translated scalar form field.
  */
-function translateScalarField(field: FormInstrumentScalarField<Language[]>, language: Language): ScalarFormField {
+function translateScalarField(
+  field: FormInstrumentScalarField<Language[]>,
+  language: Language
+): FormTypes.ScalarFormField {
   const base = {
     description: field.description?.[language],
     label: field.label[language]
@@ -103,15 +96,14 @@ function translateScalarField(field: FormInstrumentScalarField<Language[]>, lang
 function translateRecordArrayFieldset(
   fieldset: FormInstrumentFieldset<Language[]>,
   language: Language
-): Fieldset<NonNullableRecord<FieldsetValue>> {
+): FormTypes.Fieldset<FormTypes.NonNullableRecord<FormTypes.FieldsetValue>> {
   const transformedFieldset: FormInstrumentFieldset<Language> = {};
   for (const key in fieldset) {
-    fieldset[key];
     const field = fieldset[key];
     if (field.kind === 'dynamic') {
       transformedFieldset[key] = {
         kind: 'dynamic',
-        render: (fieldset: Partial<FieldsetValue>) => {
+        render: (fieldset: Partial<FormTypes.FieldsetValue>) => {
           const result: FormInstrumentScalarField<Language[]> | null = field.render(fieldset);
           if (result === null) {
             return null;
@@ -136,7 +128,7 @@ function translateRecordArrayFieldset(
 function translateStaticField(
   field: FormInstrumentStaticField<Language[]>,
   language: Language
-): StaticFormField<RequiredFieldValue> {
+): FormTypes.StaticFormField<FormTypes.RequiredFieldValue> {
   return match(field)
     .with({ kind: 'record-array' }, (field) => ({
       ...field,
@@ -170,10 +162,10 @@ function translateStaticField(
  * @returns Translated form fields.
  */
 function translateFormFields(
-  fields: Partial<FormInstrumentFields<FormDataType, Language[]>>,
+  fields: Partial<FormInstrumentFields<FormTypes.FormDataType, Language[]>>,
   language: Language
-): FormFields {
-  const translatedFields: FormFields = {};
+): FormTypes.FormFields {
+  const translatedFields: FormTypes.FormFields = {};
   for (const fieldName in fields) {
     const field = fields[fieldName];
     if (!field) {
@@ -183,7 +175,7 @@ function translateFormFields(
       translatedFields[fieldName] = {
         deps: field.deps,
         kind: 'dynamic',
-        render: wrap(field.render, (func, data: PartialFormDataType) => {
+        render: wrap(field.render, (func, data: FormTypes.PartialFormDataType) => {
           const result = func(data);
           if (result === null) {
             return null;
@@ -222,7 +214,7 @@ function translateFormContent(
 function translateMeasures(
   measures: MultilingualInstrumentMeasures | null,
   language: Language
-): UnilingualInstrumentMeasures | null {
+): null | UnilingualInstrumentMeasures {
   if (!measures) {
     return null;
   }

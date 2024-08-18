@@ -1,6 +1,8 @@
 import React from 'react';
 
 import { Card } from '@douglasneuroinformatics/libui/components';
+import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
+import type { AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-core';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { InstrumentSummary } from './InstrumentSummary';
@@ -22,9 +24,6 @@ export default {
     layout: 'centered'
   }
 } as Meta<typeof InstrumentSummary>;
-
-import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import type { AnyUnilingualScalarInstrument } from '@opendatacapture/schemas/instrument';
 
 export const Clinical: Story = {
   args: {

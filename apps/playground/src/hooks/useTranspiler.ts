@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
+import { sha256 } from '@douglasneuroinformatics/libcrypto';
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
-import { sha256 } from '@opendatacapture/crypto';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 
 import type { EditorFile } from '@/models/editor-file.model';

@@ -2,8 +2,8 @@
 
 import React from 'react';
 
+import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
-import { estimatePasswordStrength } from '@opendatacapture/password';
 import { Logo } from '@opendatacapture/react-core';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';

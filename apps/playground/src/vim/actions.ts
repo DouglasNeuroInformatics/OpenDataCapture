@@ -4,14 +4,14 @@
 
 import EditorAdapter, { CmSelection } from './adapter';
 import {
-  type Pos,
   copyCursor,
   cursorEqual,
   cursorIsBefore,
   cursorMax,
   cursorMin,
   findFirstNonWhiteSpaceCharacter,
-  makePos
+  makePos,
+  type Pos
 } from './common';
 import { vimGlobalState } from './global';
 import {
@@ -130,7 +130,7 @@ export const actions: { [key: string]: ActionFunc } = {
       '0b': 2,
       '0x': 16
     };
-    let match: RegExpExecArray | null;
+    let match: null | RegExpExecArray;
     let start: number | undefined;
     let end: number | undefined;
     while ((match = re.exec(lineStr)) !== null) {
@@ -244,11 +244,11 @@ export const actions: { [key: string]: ActionFunc } = {
         return tabs * tabSize + spaces * 1;
       };
       const currentLine = adapter.getLine(adapter.getCursor().line);
-      const indent = whitespaceLength(currentLine.match(/^\s*/)![0]);
+      const indent = whitespaceLength(/^\s*/.exec(currentLine)![0]);
       // chomp last newline b/c don't want it to match /^\s*/gm
       const chompedText = text.replace(/\n$/, '');
       const wasChomped = text !== chompedText;
-      const firstIndent = whitespaceLength(text.match(/^\s*/)![0]);
+      const firstIndent = whitespaceLength(/^\s*/.exec(text)![0]);
       text = chompedText.replace(/^\s*/gm, (wspace: string) => {
         const newIndent = indent + (whitespaceLength(wspace) - firstIndent);
         if (newIndent < 0) {

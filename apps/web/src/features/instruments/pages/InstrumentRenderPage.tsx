@@ -26,7 +26,7 @@ export const InstrumentRenderPage = () => {
 
   const instrumentBundleQuery = useInstrumentBundle(params.id!);
 
-  const locationState = location.state as { summary?: UnilingualInstrumentSummary | undefined } | undefined;
+  const locationState = location.state as { summary?: undefined | UnilingualInstrumentSummary } | undefined;
   const title = locationState?.summary?.details.title;
 
   useEffect(() => {

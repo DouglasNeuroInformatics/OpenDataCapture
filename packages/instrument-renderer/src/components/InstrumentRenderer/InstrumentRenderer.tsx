@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
+import { replacer } from '@douglasneuroinformatics/libjs';
 import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useWindowSize } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
-import { replacer } from '@opendatacapture/json-utils';
 import { ErrorFallback } from '@opendatacapture/react-core';
 import type { Json } from '@opendatacapture/schemas/core';
 import type { Subject } from '@opendatacapture/schemas/subject';
