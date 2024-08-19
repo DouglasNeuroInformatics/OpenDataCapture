@@ -50,7 +50,7 @@ function getTargetLanguage(instrument: Pick<AnyInstrument, 'language'>, preferre
 function translateScalarField(
   field: FormInstrument.ScalarField<Language[]>,
   language: Language
-): FormTypes.ScalarFormField {
+): FormInstrument.ScalarField<Language> {
   const base = {
     description: field.description?.[language],
     label: field.label[language]
@@ -93,7 +93,7 @@ function translateScalarField(
 function translateRecordArrayFieldset(
   fieldset: FormInstrument.Fieldset<Language[]>,
   language: Language
-): FormTypes.Fieldset<FormTypes.NonNullableRecord<FormTypes.FieldsetValue>> {
+): FormInstrument.Fieldset<Language> {
   const transformedFieldset: FormInstrument.Fieldset<Language> = {};
   for (const key in fieldset) {
     const field = fieldset[key];
@@ -125,7 +125,7 @@ function translateRecordArrayFieldset(
 function translateStaticField(
   field: FormInstrument.StaticField<Language[]>,
   language: Language
-): FormTypes.StaticFormField<FormTypes.RequiredFieldValue> {
+): FormInstrument.StaticField<Language> {
   return match(field)
     .with({ kind: 'record-array' }, (field) => ({
       ...field,
@@ -159,10 +159,10 @@ function translateStaticField(
  * @returns Translated form fields.
  */
 function translateFormFields(
-  fields: Partial<FormInstrument.Fields<FormTypes.FormDataType, Language[]>>,
+  fields: Partial<FormInstrument.Fields<FormInstrument.Data, Language[]>>,
   language: Language
-): FormTypes.FormFields {
-  const translatedFields: FormTypes.FormFields = {};
+): FormInstrument.Fields<FormInstrument.Data, Language> {
+  const translatedFields: FormInstrument.Fields<FormInstrument.Data, Language> = {};
   for (const fieldName in fields) {
     const field = fields[fieldName];
     if (!field) {
@@ -172,7 +172,7 @@ function translateFormFields(
       translatedFields[fieldName] = {
         deps: field.deps,
         kind: 'dynamic',
-        render: wrap(field.render, (func, data: FormTypes.PartialFormDataType) => {
+        render: wrap(field.render, (func, data: FormInstrument.PartialData) => {
           const result = func(data);
           if (result === null) {
             return null;

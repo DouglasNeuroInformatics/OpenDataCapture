@@ -19,7 +19,7 @@ const $FormInstrumentBaseField = z.object({
   isRequired: z.boolean().optional(),
   kind: $StaticFieldKind,
   label: $$InstrumentUIOption(z.string().min(1))
-}) satisfies z.ZodType<FormInstrument.FieldMixin<InstrumentLanguage, FormTypes.BaseFormField>>;
+}) satisfies z.ZodType<FormInstrument.FieldMixin<InstrumentLanguage, FormTypes.BaseField>>;
 
 const $FormInstrumentStringField: z.ZodType<FormInstrument.StringField> = z.union([
   $FormInstrumentBaseField.extend({

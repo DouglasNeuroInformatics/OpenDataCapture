@@ -12,8 +12,8 @@ import type {
 
 /** @public */
 declare namespace FormInstrument {
-  export type Data = FormTypes.FormDataType;
-  export type PartialData<TData extends Data = Data> = FormTypes.PartialFormDataType<TData>;
+  export type Data = FormTypes.Data;
+  export type PartialData<TData extends Data = Data> = FormTypes.PartialData<TData>;
 
   /**
    * Utility type to implement one of the core field types defined in `@douglasneuroinformatics/libui-form-types`
@@ -24,7 +24,7 @@ declare namespace FormInstrument {
    */
   export type FieldMixin<
     TLanguage extends InstrumentLanguage,
-    TBase extends FormTypes.BaseFormField,
+    TBase extends FormTypes.BaseField,
     TField extends object = object
   > = Simplify<
     TBase extends any
@@ -46,7 +46,7 @@ declare namespace FormInstrument {
     TValue extends string = string
   > = FieldMixin<
     TLanguage,
-    FormTypes.StringFormField,
+    FormTypes.StringField,
     {
       options: InstrumentUIOption<
         TLanguage,
@@ -62,7 +62,7 @@ declare namespace FormInstrument {
     TValue extends number = number
   > = FieldMixin<
     TLanguage,
-    FormTypes.NumberFormField,
+    FormTypes.NumberField,
     {
       options: InstrumentUIOption<
         TLanguage,
@@ -75,12 +75,12 @@ declare namespace FormInstrument {
 
   type DateField<TLanguage extends InstrumentLanguage = InstrumentLanguage> = FieldMixin<
     TLanguage,
-    FormTypes.DateFormField
+    FormTypes.DateField
   >;
 
   type BooleanField<TLanguage extends InstrumentLanguage = InstrumentLanguage> = FieldMixin<
     TLanguage,
-    FormTypes.BooleanFormField,
+    FormTypes.BooleanField,
     {
       options?: InstrumentUIOption<
         TLanguage,
@@ -97,7 +97,7 @@ declare namespace FormInstrument {
     TValue extends Set<string> = Set<string>
   > = FieldMixin<
     TLanguage,
-    FormTypes.SetFormField<TValue>,
+    FormTypes.SetField<TValue>,
     {
       options: TValue extends Set<infer TItem extends string>
         ? InstrumentUIOption<
@@ -118,7 +118,7 @@ declare namespace FormInstrument {
     | StringField<TLanguage>;
 
   /**
-   * Conditional type representing a static field corresponding for a `FormTypes.ScalarFieldValue`
+   * Conditional type representing a static field corresponding for a `ScalarFieldValue`
    *
    * @typeParam TLanguage - the language(s) of the instrument
    * @typeParam TValue - the value corresponding to this field in `Data`, excluding undefined
@@ -168,7 +168,7 @@ declare namespace FormInstrument {
       FormTypes.RequiredFieldValue<FormTypes.RecordArrayFieldValue> = FormTypes.RequiredFieldValue<FormTypes.RecordArrayFieldValue>
   > = FieldMixin<
     TLanguage,
-    FormTypes.RecordArrayFormField<TValue>,
+    FormTypes.RecordArrayField<TValue>,
     {
       fieldset: Fieldset<TLanguage, TValue[number]>;
     }
@@ -180,7 +180,7 @@ declare namespace FormInstrument {
       FormTypes.RequiredFieldValue<FormTypes.NumberRecordFieldValue> = FormTypes.RequiredFieldValue<FormTypes.NumberRecordFieldValue>
   > = FieldMixin<
     TLanguage,
-    FormTypes.NumberRecordFormField,
+    FormTypes.NumberRecordField,
     {
       items: {
         [K in keyof TValue]: {
@@ -239,7 +239,7 @@ declare namespace FormInstrument {
   > = {
     deps: readonly Extract<keyof TData, string>[];
     kind: 'dynamic';
-    render: (this: void, data: FormTypes.PartialFormDataType<TData>) => null | StaticField<TLanguage, TValue>;
+    render: (this: void, data: FormTypes.PartialData<TData>) => null | StaticField<TLanguage, TValue>;
   };
 
   type AnyField =
@@ -257,7 +257,7 @@ declare namespace FormInstrument {
     TKey extends keyof TData = keyof TData,
     TLanguage extends InstrumentLanguage = InstrumentLanguage
   > =
-    FormTypes.RequiredFormDataType<TData> extends infer TRequiredData extends FormTypes.RequiredFormDataType<TData>
+    FormTypes.RequiredData<TData> extends infer TRequiredData extends FormTypes.RequiredData<TData>
       ? DynamicField<TData, TRequiredData[TKey], TLanguage> | StaticField<TLanguage, TRequiredData[TKey]>
       : never;
 

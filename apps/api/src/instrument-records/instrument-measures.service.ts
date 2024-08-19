@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import type {
-  FormTypes,
+  FormInstrument,
   InstrumentMeasure,
   InstrumentMeasures,
   InstrumentMeasureValue,
@@ -13,7 +13,7 @@ import { match } from 'ts-pattern';
 export class InstrumentMeasuresService {
   private readonly logger = new Logger(InstrumentMeasuresService.name);
 
-  computeMeasures(measures: InstrumentMeasures, data: FormTypes.FormDataType | Json | Prisma.JsonValue) {
+  computeMeasures(measures: InstrumentMeasures, data: FormInstrument.Data | Json | Prisma.JsonValue) {
     const computedMeasures: { [key: string]: InstrumentMeasureValue } = {};
     for (const key in measures) {
       computedMeasures[key] = this.computeMeasure(measures[key], data);
@@ -21,7 +21,7 @@ export class InstrumentMeasuresService {
     return computedMeasures;
   }
 
-  private computeMeasure(measure: InstrumentMeasure, data: FormTypes.FormDataType | Json | Prisma.JsonValue) {
+  private computeMeasure(measure: InstrumentMeasure, data: FormInstrument.Data | Json | Prisma.JsonValue) {
     return match(measure)
       .with({ kind: 'computed' }, (measure) => {
         return measure.value(data);
