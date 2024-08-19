@@ -6,7 +6,8 @@
     "enabled": false
   },
   "docModel": {
-    "enabled": false
+    "enabled": true,
+    "apiJsonFilePath": "<projectFolder>/dist/tmp/api.json"
   },
   "dtsRollup": {
     "enabled": true,

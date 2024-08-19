@@ -1,7 +1,6 @@
 import fs from 'fs';
 import module from 'module';
 import path from 'path';
-import url from 'url';
 
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
@@ -10,95 +9,12 @@ import { defineConfig, squooshImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
 
+import symlink from './src/plugins/astro-plugin-symlink';
+import { starlightTypeDoc, typeDocSidebarGroup } from './src/plugins/starlight-typedoc';
+
 const require = module.createRequire(import.meta.dirname);
 
-/** @typedef {NonNullable<import('astro').ViteUserConfig['plugins']>[number]} PluginOption */
-/** @typedef {Extract<PluginOption, {name: string}>} Plugin */
-
-/**
- * Finds the plugin object with the specified name
- * @param {PluginOption[] | null | undefined} plugins
- * @param {string} targetName
- * @returns {Plugin | null}
- */
-function resolveTargetPlugin(plugins, targetName) {
-  for (const plugin of plugins ?? []) {
-    if (!plugin || typeof plugin !== 'object' || plugin instanceof Promise) {
-      continue;
-    } else if (Array.isArray(plugin)) {
-      const target = resolveTargetPlugin(plugin, targetName);
-      if (target) return target;
-    } else if (plugin.name === targetName) {
-      return plugin;
-    }
-  }
-  return null;
-}
-
-/**
- * Attempt to resolve the symbolic link for the real path 'id'
- * @param {Object} options
- * @param {Record<string, string>} options.collections
- * @param {string} options.id
- * @param {string} options.root
- * @returns {Promise<string>}
- */
-async function resolveSymbolicLink({ collections, id, root }) {
-  const contentDir = path.resolve(root, './src/content');
-  for (const [name, relpath] of Object.entries(collections)) {
-    const targetPrefix = path.resolve(root, relpath);
-    if (!id.startsWith(targetPrefix)) {
-      continue;
-    }
-    const resolvedId = path.join(contentDir, name, id.replace(targetPrefix, ''));
-    const resolvedFilepath = url.fileURLToPath(new URL(`file://${resolvedId}`));
-    if (!fs.existsSync(resolvedFilepath)) {
-      throw new Error(`File does not exist: ${resolvedFilepath}`);
-    }
-    return resolvedId;
-  }
-  throw new Error(`Failed to resolve symbolic link for ID: ${id}`);
-}
-
-/**
- * Workaround to allow Astro content collections to work with symlinks and pnpm
-
- * @param {Object} options
- * @param {Record<string, string>} options.collections - a mapping of collection names (or directories in collections) to directories, relative to the root defined in astro.config.js
- * @returns {Plugin}
- */
-export function symlink({ collections }) {
-  return {
-    config: async ({ plugins, root }) => {
-      if (!root) {
-        throw new TypeError('Expected root to be defined in astro config');
-      }
-      const targetName = 'astro:content-imports';
-      const target = resolveTargetPlugin(plugins, targetName);
-      const transform = target?.transform;
-      if (!target) {
-        throw new Error(`Failed to find target plugin: ${targetName}`);
-      } else if (typeof transform !== 'function') {
-        throw new Error(`Unexpected type of transform method: ${typeof transform}`);
-      }
-      target.transform = async function (code, id, options) {
-        /** @type {ReturnType<Extract<Plugin['transform'], Function>>} */
-        let result;
-        try {
-          result = await transform.call(this, code, id, options);
-        } catch (err) {
-          if (!(err instanceof Error && err.name === 'UnknownContentCollectionError')) {
-            throw err;
-          }
-          id = await resolveSymbolicLink({ collections, id, root });
-          result = await transform.call(this, code, id, options);
-        }
-        return result;
-      };
-    },
-    name: 'vite-plugin-symlink'
-  };
-}
+const runtimeCoreRoot = path.dirname(require.resolve('@opendatacapture/runtime-core/package.json'));
 
 // https://astro.build/config
 export default defineConfig({
@@ -144,6 +60,20 @@ export default defineConfig({
           label: 'Français'
         }
       },
+      plugins: [
+        starlightTypeDoc({
+          entryPoints: [path.resolve(runtimeCoreRoot, 'src/index.d.ts')],
+          output: 'runtime-core-docs',
+          sidebar: {
+            collapsed: true,
+            label: 'Runtime Core API'
+          },
+          tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json'),
+          typeDoc: {
+            lang: 'en'
+          }
+        })
+      ],
       sidebar: [
         {
           autogenerate: { directory: 'docs/1-introduction' },
@@ -168,7 +98,12 @@ export default defineConfig({
         {
           autogenerate: { directory: 'docs/6-changelogs' },
           label: 'Changelogs'
-        }
+        },
+        (() => {
+          const group = typeDocSidebarGroup;
+          console.log(group);
+          return group;
+        })()
       ],
       social: {
         github: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'
@@ -190,8 +125,8 @@ export default defineConfig({
         return function (tree, { data }) {
           const textOnPage = toString(tree);
           const readingTime = getReadingTime(textOnPage);
-          // @ts-ignore
-          data.astro.frontmatter.readingTime = readingTime.minutes;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (data.astro as any).frontmatter.readingTime = readingTime.minutes;
         };
       }
     ]

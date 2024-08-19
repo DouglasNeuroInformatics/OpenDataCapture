@@ -25,11 +25,16 @@
     "@astrojs/starlight": "^0.24.4",
     "@astrojs/starlight-tailwind": "^2.0.3",
     "@astrojs/tailwind": "^5.1.0",
+    "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/tailwindcss": "workspace:*",
     "@tailwindcss/typography": "^0.5.13",
     "@types/lodash-es": "^4.17.12",
     "astro": "^4.11.1",
     "sharp": "^0.33.4",
-    "tailwindcss": "^3.4.4"
+    "starlight-typedoc": "^0.15.0",
+    "tailwindcss": "^3.4.4",
+    "typedoc": "^0.26.6",
+    "typedoc-plugin-markdown": "^4.2.5",
+    "type-fest": "workspace:type-fest__4.23.0@*"
   }
 }

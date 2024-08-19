@@ -8,5 +8,5 @@
       "@/*": ["*"]
     }
   },
-  "include": ["src/**/*", "*.js", "*.cjs"]
+  "include": ["astro.config.ts", "src/**/*", "*.js", "*.cjs"]
 }
