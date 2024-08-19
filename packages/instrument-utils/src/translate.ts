@@ -3,10 +3,7 @@ import type {
   AnyMultilingualFormInstrument,
   AnyUnilingualFormInstrument,
   AnyUnilingualInstrument,
-  FormInstrumentFields,
-  FormInstrumentFieldset,
-  FormInstrumentScalarField,
-  FormInstrumentStaticField,
+  FormInstrument,
   FormTypes,
   InstrumentSummary,
   Language,
@@ -51,7 +48,7 @@ function getTargetLanguage(instrument: Pick<AnyInstrument, 'language'>, preferre
  * @returns A translated scalar form field.
  */
 function translateScalarField(
-  field: FormInstrumentScalarField<Language[]>,
+  field: FormInstrument.ScalarField<Language[]>,
   language: Language
 ): FormTypes.ScalarFormField {
   const base = {
@@ -94,17 +91,17 @@ function translateScalarField(
  * @returns A translated record array fieldset.
  */
 function translateRecordArrayFieldset(
-  fieldset: FormInstrumentFieldset<Language[]>,
+  fieldset: FormInstrument.Fieldset<Language[]>,
   language: Language
 ): FormTypes.Fieldset<FormTypes.NonNullableRecord<FormTypes.FieldsetValue>> {
-  const transformedFieldset: FormInstrumentFieldset<Language> = {};
+  const transformedFieldset: FormInstrument.Fieldset<Language> = {};
   for (const key in fieldset) {
     const field = fieldset[key];
     if (field.kind === 'dynamic') {
       transformedFieldset[key] = {
         kind: 'dynamic',
         render: (fieldset: Partial<FormTypes.FieldsetValue>) => {
-          const result: FormInstrumentScalarField<Language[]> | null = field.render(fieldset);
+          const result: FormInstrument.ScalarField<Language[]> | null = field.render(fieldset);
           if (result === null) {
             return null;
           }
@@ -126,7 +123,7 @@ function translateRecordArrayFieldset(
  * @returns A translated static form field.
  */
 function translateStaticField(
-  field: FormInstrumentStaticField<Language[]>,
+  field: FormInstrument.StaticField<Language[]>,
   language: Language
 ): FormTypes.StaticFormField<FormTypes.RequiredFieldValue> {
   return match(field)
@@ -162,7 +159,7 @@ function translateStaticField(
  * @returns Translated form fields.
  */
 function translateFormFields(
-  fields: Partial<FormInstrumentFields<FormTypes.FormDataType, Language[]>>,
+  fields: Partial<FormInstrument.Fields<FormTypes.FormDataType, Language[]>>,
   language: Language
 ): FormTypes.FormFields {
   const translatedFields: FormTypes.FormFields = {};

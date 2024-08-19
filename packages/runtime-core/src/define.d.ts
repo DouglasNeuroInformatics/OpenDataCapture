@@ -2,12 +2,12 @@ import type { z } from 'zod';
 
 import type { Json, Language } from './types/core.d.ts';
 import type { InstrumentKind, InstrumentLanguage } from './types/instrument.base.d.ts';
-import type { FormInstrument, FormTypes } from './types/instrument.form.d.ts';
+import type { FormInstrument } from './types/instrument.form.d.ts';
 import type { InteractiveInstrument } from './types/instrument.interactive.d.ts';
 
 /** @public */
 type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends ['FORM']
-  ? FormTypes.FormDataType
+  ? FormInstrument.Data
   : [TKind] extends ['INTERACTIVE']
     ? Json
     : [TKind] extends ['SERIES']
@@ -20,7 +20,7 @@ type DiscriminatedInstrument<
   TData extends DiscriminatedInstrumentData<TKind>,
   TLanguage extends InstrumentLanguage
 > = [TKind] extends ['FORM']
-  ? TData extends FormTypes.FormDataType
+  ? TData extends FormInstrument.Data
     ? FormInstrument<TData, TLanguage>
     : never
   : [TKind] extends ['INTERACTIVE']
