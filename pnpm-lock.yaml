@@ -6,9 +6,6 @@ settings:
 
 catalogs:
   default:
-    '@microsoft/api-documenter':
-      specifier: ^7.25.11
-      version: 7.25.11
     '@microsoft/api-extractor':
       specifier: ^7.47.6
       version: 7.47.6
@@ -1122,9 +1119,6 @@ importers:
         specifier: workspace:zod__3.23.6@*
         version: link:../../vendor/zod@3.23.6
     devDependencies:
-      '@microsoft/api-documenter':
-        specifier: 'catalog:'
-        version: 7.25.11(@types/node@22.2.0)
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.47.6(@types/node@22.2.0)
@@ -3760,11 +3754,6 @@ packages:
     peerDependencies:
       '@types/react': '>=16'
       react: '>=16'
-
-  '@microsoft/api-documenter@7.25.11':
-    resolution:
-      { integrity: sha512-Ql6AMeKSiBLbc9pM93+oDfNhTHM/ptGsXS3vIs05MoIZANQbYcMhP/UNuXpU2hvice4OhmCvohcmEcQb999Xvg== }
-    hasBin: true
 
   '@microsoft/api-extractor-model@7.29.5':
     resolution:
@@ -9511,11 +9500,6 @@ packages:
   js-tokens@9.0.0:
     resolution:
       { integrity: sha512-WriZw1luRMlmV3LGJaR6QOJjWwgLUTf89OwT2lUOyjX2dJGBwgmIkbcz+7WFZjrZM635JOIR517++e/67CP9dQ== }
-
-  js-yaml@3.13.1:
-    resolution:
-      { integrity: sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw== }
-    hasBin: true
 
   js-yaml@3.14.1:
     resolution:
@@ -15853,18 +15837,6 @@ snapshots:
       '@types/react': 18.3.3
       react: 18.3.1
 
-  '@microsoft/api-documenter@7.25.11(@types/node@22.2.0)':
-    dependencies:
-      '@microsoft/api-extractor-model': 7.29.5(@types/node@22.2.0)
-      '@microsoft/tsdoc': 0.15.0
-      '@rushstack/node-core-library': 5.6.0(@types/node@22.2.0)
-      '@rushstack/terminal': 0.13.4(@types/node@22.2.0)
-      '@rushstack/ts-command-line': 4.22.5(@types/node@22.2.0)
-      js-yaml: 3.13.1
-      resolve: 1.22.8
-    transitivePeerDependencies:
-      - '@types/node'
-
   '@microsoft/api-extractor-model@7.29.5(@types/node@22.2.0)':
     dependencies:
       '@microsoft/tsdoc': 0.15.0
@@ -21420,11 +21392,6 @@ snapshots:
   js-tokens@4.0.0: {}
 
   js-tokens@9.0.0: {}
-
-  js-yaml@3.13.1:
-    dependencies:
-      argparse: 1.0.10
-      esprima: 4.0.1
 
   js-yaml@3.14.1:
     dependencies:

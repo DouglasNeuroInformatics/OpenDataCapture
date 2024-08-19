@@ -12,8 +12,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "rm -rf dist && pnpm build:js && pnpm build:ts && pnpm build:docs",
-    "build:docs": "api-documenter markdown --input-folder temp --output-folder docs && rm -rf temp",
+    "build": "rm -rf dist && pnpm build:js && pnpm build:ts",
     "build:js": "pnpm exec esbuild --bundle --format=esm --outfile=dist/index.js --platform=browser src/index.js",
     "build:ts": "api-extractor run -c config/api-extractor.json",
     "format": "prettier --write src",
@@ -26,7 +25,6 @@
     "zod": "workspace:zod__3.23.6@*"
   },
   "devDependencies": {
-    "@microsoft/api-documenter": "catalog:",
     "@microsoft/api-extractor": "catalog:",
     "esbuild": "catalog:"
   }
