@@ -3,6 +3,7 @@ import type { Exact, Merge, Promisable, SetRequired } from 'type-fest';
 import type { Json, Language } from './core.d.ts';
 import type { InstrumentDetails, ScalarInstrument } from './instrument.base.d.ts';
 
+/** @public */
 declare namespace InteractiveInstrument {
   export type Data = Json;
 }
