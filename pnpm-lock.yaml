@@ -487,6 +487,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.9
+      type-fest:
+        specifier: workspace:type-fest__4.23.0@*
+        version: link:../../vendor/type-fest@4.23.0
       typedoc:
         specifier: ^0.26.6
         version: 0.26.6(typescript@5.4.5)

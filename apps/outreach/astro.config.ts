@@ -8,13 +8,13 @@ import tailwind from '@astrojs/tailwind';
 import { defineConfig, squooshImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
-// import starlightTypeDoc, { typeDocSidebarGroup } from 'starlight-typedoc';
 
 import symlink from './src/plugins/astro-plugin-symlink';
+import { starlightTypeDoc, typeDocSidebarGroup } from './src/plugins/starlight-typedoc';
 
 const require = module.createRequire(import.meta.dirname);
 
-// const runtimeCoreRoot = path.dirname(require.resolve('@opendatacapture/runtime-core/package.json'));
+const runtimeCoreRoot = path.dirname(require.resolve('@opendatacapture/runtime-core/package.json'));
 
 // https://astro.build/config
 export default defineConfig({
@@ -60,17 +60,20 @@ export default defineConfig({
           label: 'Français'
         }
       },
-      // plugins: [
-      //   starlightTypeDoc({
-      //     entryPoints: [path.resolve(runtimeCoreRoot, 'src/index.d.ts')],
-      //     output: 'en/docs/7-runtime-core',
-      //     sidebar: {
-      //       collapsed: true,
-      //       label: 'Runtime Core API'
-      //     },
-      //     tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json')
-      //   })
-      // ],
+      plugins: [
+        starlightTypeDoc({
+          entryPoints: [path.resolve(runtimeCoreRoot, 'src/index.d.ts')],
+          output: 'runtime-core-docs',
+          sidebar: {
+            collapsed: true,
+            label: 'Runtime Core API'
+          },
+          tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json'),
+          typeDoc: {
+            lang: 'en'
+          }
+        })
+      ],
       sidebar: [
         {
           autogenerate: { directory: 'docs/1-introduction' },
@@ -95,8 +98,12 @@ export default defineConfig({
         {
           autogenerate: { directory: 'docs/6-changelogs' },
           label: 'Changelogs'
-        }
-        // typeDocSidebarGroup
+        },
+        (() => {
+          const group = typeDocSidebarGroup;
+          console.log(group);
+          return group;
+        })()
       ],
       social: {
         github: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'
