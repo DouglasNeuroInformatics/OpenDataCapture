@@ -9,8 +9,11 @@ import tailwind from '@astrojs/tailwind';
 import { defineConfig, squooshImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
+import starlightTypeDoc, { typeDocSidebarGroup } from 'starlight-typedoc';
 
 const require = module.createRequire(import.meta.dirname);
+
+const runtimeCoreRoot = path.dirname(require.resolve('@opendatacapture/runtime-core/package.json'));
 
 /** @typedef {NonNullable<import('astro').ViteUserConfig['plugins']>[number]} PluginOption */
 /** @typedef {Extract<PluginOption, {name: string}>} Plugin */
@@ -144,6 +147,17 @@ export default defineConfig({
           label: 'Français'
         }
       },
+      plugins: [
+        starlightTypeDoc({
+          entryPoints: [path.resolve(runtimeCoreRoot, 'src/index.d.ts')],
+          output: 'en/docs/7-runtime-core',
+          sidebar: {
+            collapsed: true,
+            label: 'Runtime Core API'
+          },
+          tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json')
+        })
+      ],
       sidebar: [
         {
           autogenerate: { directory: 'docs/1-introduction' },
@@ -168,7 +182,8 @@ export default defineConfig({
         {
           autogenerate: { directory: 'docs/6-changelogs' },
           label: 'Changelogs'
-        }
+        },
+        typeDocSidebarGroup
       ],
       social: {
         github: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'
