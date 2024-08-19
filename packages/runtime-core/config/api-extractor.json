@@ -6,7 +6,7 @@
     "enabled": false
   },
   "docModel": {
-    "enabled": false
+    "enabled": true
   },
   "dtsRollup": {
     "enabled": true,

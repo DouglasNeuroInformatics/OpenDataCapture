@@ -6,5 +6,6 @@ packages:
   - 'vendor/*'
   - 'vendor/@jspsych/*'
 catalog:
+  '@microsoft/api-documenter': ^7.25.11
   '@microsoft/api-extractor': ^7.47.6
   'esbuild': ^0.23.1
