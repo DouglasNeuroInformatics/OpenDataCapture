@@ -68,10 +68,7 @@ export default defineConfig({
             collapsed: true,
             label: 'Runtime Core API'
           },
-          tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json'),
-          typeDoc: {
-            lang: 'en'
-          }
+          tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json')
         })
       ],
       sidebar: [
