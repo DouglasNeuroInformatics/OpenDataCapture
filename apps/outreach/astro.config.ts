@@ -99,11 +99,7 @@ export default defineConfig({
           autogenerate: { directory: 'docs/6-changelogs' },
           label: 'Changelogs'
         },
-        (() => {
-          const group = typeDocSidebarGroup;
-          console.log(group);
-          return group;
-        })()
+        typeDocSidebarGroup
       ],
       social: {
         github: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'

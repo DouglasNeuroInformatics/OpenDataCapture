@@ -1,10 +1,14 @@
 import type { Exact, Merge, Promisable, SetRequired } from 'type-fest';
 
 import type { Json, Language } from './core.d.ts';
-import type { ScalarInstrument, UnilingualInstrumentDetails } from './instrument.base.d.ts';
+import type { InstrumentDetails, ScalarInstrument } from './instrument.base.d.ts';
+
+declare namespace InteractiveInstrument {
+  export type Data = Json;
+}
 
 /** @public */
-type InteractiveInstrument<TData extends Json = Json> = Merge<
+declare type InteractiveInstrument<TData extends InteractiveInstrument.Data = InteractiveInstrument.Data> = Merge<
   ScalarInstrument<TData, Language>,
   {
     content: {
@@ -15,7 +19,7 @@ type InteractiveInstrument<TData extends Json = Json> = Merge<
       };
       render: (done: <T extends Exact<TData, T>>(data: T) => void) => Promisable<void>;
     };
-    details: SetRequired<UnilingualInstrumentDetails, 'estimatedDuration' | 'instructions'>;
+    details: SetRequired<InstrumentDetails<Language>, 'estimatedDuration' | 'instructions'>;
     kind: 'INTERACTIVE';
   }
 >;

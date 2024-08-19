@@ -8,31 +8,31 @@ import type {
 import type { InteractiveInstrument } from './instrument.interactive.d.ts';
 import type { SeriesInstrument } from './instrument.series.d.ts';
 
-/** @public */
+/** @internal */
 type AnyScalarInstrument = FormInstrument | InteractiveInstrument;
 
-/** @public */
+/** @internal */
 type AnyInstrument = AnyScalarInstrument | SeriesInstrument;
 
-/** @public */
+/** @internal */
 type SomeInstrument<TKind extends InstrumentKind> = Extract<AnyInstrument, { kind: TKind }>;
 
-/** @public */
+/** @internal */
 type AnyUnilingualInstrument = AnyUnilingualFormInstrument | InteractiveInstrument | SeriesInstrument<Language>;
 
-/** @public */
+/** @internal */
 type SomeUnilingualInstrument<TKind extends InstrumentKind> = Extract<AnyUnilingualInstrument, { kind: TKind }>;
 
-/** @public */
+/** @internal */
 type AnyUnilingualScalarInstrument = AnyUnilingualFormInstrument | InteractiveInstrument<Json>;
 
-/** @public */
+/** @internal */
 type SomeUnilingualScalarInstrument<TKind extends InstrumentKind> = Extract<
   AnyUnilingualScalarInstrument,
   { kind: TKind }
 >;
 
-/** @public */
+/** @internal */
 type AnyMultilingualInstrument = AnyMultilingualFormInstrument | SeriesInstrument<Language[]>;
 
 export type {

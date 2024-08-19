@@ -1122,8 +1122,8 @@ importers:
   packages/runtime-core:
     dependencies:
       '@douglasneuroinformatics/libui-form-types':
-        specifier: ^0.10.2
-        version: 0.10.2
+        specifier: ^0.10.3
+        version: 0.10.3
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -2600,6 +2600,10 @@ packages:
   '@douglasneuroinformatics/libui-form-types@0.10.2':
     resolution:
       { integrity: sha512-cl9PvclTSKhzikvW8PSSZAWDtFFBbBTjjgCcgMcZJtbi/R9/HvGoIhJZSuxsBPcfxY6oV3mg9/BO+86oTA+4LA== }
+
+  '@douglasneuroinformatics/libui-form-types@0.10.3':
+    resolution:
+      { integrity: sha512-/N8Uz4vzscM7l2+jAgFmO/RGNtvXurbtnBrnJaRhtR32Qy+Tt602DIp6QfMdWd4iqmJl4LCDLS9eZ/w5wA/hjw== }
 
   '@douglasneuroinformatics/libui@2.10.0':
     resolution:
@@ -15091,6 +15095,10 @@ snapshots:
       typescript: 5.4.5
 
   '@douglasneuroinformatics/libui-form-types@0.10.2':
+    dependencies:
+      type-fest: 4.24.0
+
+  '@douglasneuroinformatics/libui-form-types@0.10.3':
     dependencies:
       type-fest: 4.24.0
 

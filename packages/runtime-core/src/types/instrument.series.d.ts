@@ -3,8 +3,8 @@ import type { Merge } from 'type-fest';
 import type { Language } from './core.d.ts';
 import type { BaseInstrument, InstrumentLanguage, ScalarInstrumentInternal } from './instrument.base.d.ts';
 
-/** @public */
-type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
+/** @beta */
+declare type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
   BaseInstrument<TLanguage>,
   {
     content: ScalarInstrumentInternal[];
@@ -12,10 +12,10 @@ type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage>
   }
 >;
 
-/** @public */
+/** @internal */
 type UnilingualSeriesInstrument = SeriesInstrument<Language>;
 
-/** @public */
+/** @internal */
 type MultilingualSeriesInstrument = SeriesInstrument<Language[]>;
 
 export type { MultilingualSeriesInstrument, SeriesInstrument, UnilingualSeriesInstrument };

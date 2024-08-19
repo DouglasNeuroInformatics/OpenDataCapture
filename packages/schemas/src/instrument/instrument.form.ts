@@ -1,26 +1,4 @@
-import type {
-  FormInstrument,
-  FormInstrumentBooleanField,
-  FormInstrumentCompositeField,
-  FormInstrumentContent,
-  FormInstrumentDateField,
-  FormInstrumentDynamicField,
-  FormInstrumentDynamicFieldsetField,
-  FormInstrumentFieldMixin,
-  FormInstrumentFields,
-  FormInstrumentFieldset,
-  FormInstrumentFieldsGroup,
-  FormInstrumentNumberField,
-  FormInstrumentNumberRecordField,
-  FormInstrumentRecordArrayField,
-  FormInstrumentScalarField,
-  FormInstrumentSetField,
-  FormInstrumentStaticField,
-  FormInstrumentStringField,
-  FormInstrumentUnknownField,
-  FormTypes,
-  InstrumentLanguage
-} from '@opendatacapture/runtime-core';
+import type { FormInstrument, FormTypes, InstrumentLanguage } from '@opendatacapture/runtime-core';
 import { z } from 'zod';
 
 import { $ZodTypeAny } from '../core/core.js';
@@ -41,9 +19,9 @@ const $FormInstrumentBaseField = z.object({
   isRequired: z.boolean().optional(),
   kind: $StaticFieldKind,
   label: $$InstrumentUIOption(z.string().min(1))
-}) satisfies z.ZodType<FormInstrumentFieldMixin<InstrumentLanguage, FormTypes.BaseFormField>>;
+}) satisfies z.ZodType<FormInstrument.FieldMixin<InstrumentLanguage, FormTypes.BaseField>>;
 
-const $FormInstrumentStringField: z.ZodType<FormInstrumentStringField> = z.union([
+const $FormInstrumentStringField: z.ZodType<FormInstrument.StringField> = z.union([
   $FormInstrumentBaseField.extend({
     kind: z.literal('string'),
     options: $$InstrumentUIOption(z.record(z.string().min(1))),
@@ -55,7 +33,7 @@ const $FormInstrumentStringField: z.ZodType<FormInstrumentStringField> = z.union
   })
 ]);
 
-const $FormInstrumentNumberField: z.ZodType<FormInstrumentNumberField> = z.union([
+const $FormInstrumentNumberField: z.ZodType<FormInstrument.NumberField> = z.union([
   $FormInstrumentBaseField.extend({
     kind: z.literal('number'),
     max: z.number().int(),
@@ -75,11 +53,11 @@ const $FormInstrumentNumberField: z.ZodType<FormInstrumentNumberField> = z.union
   })
 ]);
 
-const $FormInstrumentDateField: z.ZodType<FormInstrumentDateField> = $FormInstrumentBaseField.extend({
+const $FormInstrumentDateField: z.ZodType<FormInstrument.DateField> = $FormInstrumentBaseField.extend({
   kind: z.literal('date')
 });
 
-const $FormInstrumentBooleanField: z.ZodType<FormInstrumentBooleanField> = z.union([
+const $FormInstrumentBooleanField: z.ZodType<FormInstrument.BooleanField> = z.union([
   $FormInstrumentBaseField.extend({
     kind: z.literal('boolean'),
     variant: z.literal('checkbox')
@@ -96,13 +74,13 @@ const $FormInstrumentBooleanField: z.ZodType<FormInstrumentBooleanField> = z.uni
   })
 ]);
 
-const $FormInstrumentSetField: z.ZodType<FormInstrumentSetField> = $FormInstrumentBaseField.extend({
+const $FormInstrumentSetField: z.ZodType<FormInstrument.SetField> = $FormInstrumentBaseField.extend({
   kind: z.literal('set'),
   options: $$InstrumentUIOption(z.record(z.string().min(1))),
   variant: z.enum(['listbox', 'select'])
 });
 
-const $FormInstrumentScalarField: z.ZodType<FormInstrumentScalarField> = z.union([
+const $FormInstrumentScalarField: z.ZodType<FormInstrument.ScalarField> = z.union([
   $FormInstrumentDateField,
   $FormInstrumentSetField,
   $FormInstrumentStringField,
@@ -110,21 +88,21 @@ const $FormInstrumentScalarField: z.ZodType<FormInstrumentScalarField> = z.union
   $FormInstrumentBooleanField
 ]);
 
-const $FormInstrumentDynamicFieldsetField: z.ZodType<FormInstrumentDynamicFieldsetField> = z.object({
+const $FormInstrumentDynamicFieldsetField: z.ZodType<FormInstrument.DynamicFieldsetField> = z.object({
   kind: z.literal('dynamic'),
   render: z.function().args(z.any()).returns($FormInstrumentScalarField.nullable())
 });
 
-const $FormInstrumentFieldset: z.ZodType<FormInstrumentFieldset> = z.record(
+const $FormInstrumentFieldset: z.ZodType<FormInstrument.Fieldset> = z.record(
   z.union([$FormInstrumentDynamicFieldsetField, $FormInstrumentScalarField])
 );
 
-const $FormInstrumentRecordArrayField: z.ZodType<FormInstrumentRecordArrayField> = $FormInstrumentBaseField.extend({
+const $FormInstrumentRecordArrayField: z.ZodType<FormInstrument.RecordArrayField> = $FormInstrumentBaseField.extend({
   fieldset: $FormInstrumentFieldset,
   kind: z.literal('record-array')
 });
 
-const $FormInstrumentNumberRecordField: z.ZodType<FormInstrumentNumberRecordField> = $FormInstrumentBaseField.extend({
+const $FormInstrumentNumberRecordField: z.ZodType<FormInstrument.NumberRecordField> = $FormInstrumentBaseField.extend({
   items: z.record(
     z.object({
       description: $$InstrumentUIOption(z.string()).optional(),
@@ -136,39 +114,39 @@ const $FormInstrumentNumberRecordField: z.ZodType<FormInstrumentNumberRecordFiel
   variant: z.literal('likert')
 });
 
-const $FormInstrumentCompositeField: z.ZodType<FormInstrumentCompositeField> = z.union([
+const $FormInstrumentCompositeField: z.ZodType<FormInstrument.CompositeField> = z.union([
   $FormInstrumentRecordArrayField,
   $FormInstrumentNumberRecordField
 ]);
 
-const $FormInstrumentStaticField: z.ZodType<FormInstrumentStaticField> = z.union([
+const $FormInstrumentStaticField: z.ZodType<FormInstrument.StaticField> = z.union([
   $FormInstrumentCompositeField,
   $FormInstrumentScalarField
 ]);
 
-const $FormInstrumentDynamicField: z.ZodType<FormInstrumentDynamicField> = z.object({
+const $FormInstrumentDynamicField: z.ZodType<FormInstrument.DynamicField> = z.object({
   deps: z.array(z.string()),
   kind: z.literal('dynamic'),
   render: z.function().args(z.any()).returns($FormInstrumentStaticField.nullable())
 });
 
-const $FormInstrumentUnknownField: z.ZodType<FormInstrumentUnknownField> = z.union([
+const $FormInstrumentUnknownField: z.ZodType<FormInstrument.UnknownField> = z.union([
   $FormInstrumentDynamicField,
   $FormInstrumentStaticField
 ]);
 
-const $FormInstrumentFields: z.ZodType<FormInstrumentFields> = z.record($FormInstrumentUnknownField);
+const $FormInstrumentFields: z.ZodType<FormInstrument.Fields> = z.record($FormInstrumentUnknownField);
 
 const $FormInstrumentFieldsGroup = z.object({
   description: $$InstrumentUIOption(z.string().min(1)).optional(),
   fields: $FormInstrumentFields,
   title: $$InstrumentUIOption(z.string().min(1)).optional()
-}) satisfies z.ZodType<FormInstrumentFieldsGroup>;
+}) satisfies z.ZodType<FormInstrument.FieldsGroup>;
 
 const $FormInstrumentContent = z.union([
   $FormInstrumentFields,
   $FormInstrumentFieldsGroup.array()
-]) satisfies z.ZodType<FormInstrumentContent>;
+]) satisfies z.ZodType<FormInstrument.Content>;
 
 const $FormInstrument: z.ZodType<FormInstrument> = $ScalarInstrument.extend({
   content: $FormInstrumentContent,

@@ -19,7 +19,7 @@
     "lint": "tsc --noEmit && eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui-form-types": "^0.10.2",
+    "@douglasneuroinformatics/libui-form-types": "^0.10.3",
     "@opendatacapture/licenses": "workspace:*",
     "type-fest": "workspace:type-fest__4.23.0@*",
     "zod": "workspace:zod__3.23.6@*"
