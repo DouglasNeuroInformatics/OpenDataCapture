@@ -4,7 +4,7 @@ import type { Language } from './core.d.ts';
 import type { BaseInstrument, InstrumentLanguage, ScalarInstrumentInternal } from './instrument.base.d.ts';
 
 /** @beta */
-type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
+declare type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
   BaseInstrument<TLanguage>,
   {
     content: ScalarInstrumentInternal[];

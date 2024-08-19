@@ -3,8 +3,12 @@ import type { Exact, Merge, Promisable, SetRequired } from 'type-fest';
 import type { Json, Language } from './core.d.ts';
 import type { InstrumentDetails, ScalarInstrument } from './instrument.base.d.ts';
 
+declare namespace InteractiveInstrument {
+  export type Data = Json;
+}
+
 /** @public */
-type InteractiveInstrument<TData extends Json = Json> = Merge<
+declare type InteractiveInstrument<TData extends InteractiveInstrument.Data = InteractiveInstrument.Data> = Merge<
   ScalarInstrument<TData, Language>,
   {
     content: {
