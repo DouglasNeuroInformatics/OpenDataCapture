@@ -66,10 +66,10 @@ type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage
   title: InstrumentUIOption<TLanguage, string>;
 };
 
-/** @public */
+/** @internal */
 type UnilingualInstrumentDetails = InstrumentDetails<Language>;
 
-/** @public */
+/** @internal */
 type MultilingualInstrumentDetails = InstrumentDetails<Language[]>;
 
 /** @public */
@@ -95,15 +95,16 @@ type InstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage = Instr
           : never
         : never;
     };
+
 /** @public */
 type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   [key: string]: InstrumentMeasure<TData, TLanguage>;
 };
 
-/** @public */
+/** @internal */
 type UnilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language>;
 
-/** @public */
+/** @internal */
 type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language[]>;
 
 /** @public */
@@ -155,16 +156,16 @@ type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage = Instru
  * An object containing the essential data describing an instrument, but omitting the content
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
- * @public
+ * @internal
  */
 type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = {
   id: string;
 } & Omit<T, 'content'>;
 
-/** @public */
+/** @internal */
 type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<Language>>>;
 
-/** @public */
+/** @internal */
 type MultilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<Language[]>>>;
 
 export {

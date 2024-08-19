@@ -318,10 +318,10 @@ type FormInstrument<
   } & Omit<ScalarInstrument<TData, TLanguage>, 'details'>
 >;
 
-/** @public */
+/** @internal */
 type AnyUnilingualFormInstrument = FormInstrument<FormTypes.FormDataType, Language>;
 
-/** @public */
+/** @internal */
 type AnyMultilingualFormInstrument = FormInstrument<FormTypes.FormDataType, Language[]>;
 
 export type {
