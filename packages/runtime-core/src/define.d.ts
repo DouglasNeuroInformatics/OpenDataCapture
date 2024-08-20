@@ -54,4 +54,4 @@ export declare function defineInstrument<
   TKind extends InstrumentKind,
   TLanguage extends InstrumentLanguage,
   TSchema extends z.ZodType<DiscriminatedInstrumentData<TKind>>
->(def: InstrumentDef<TKind, TLanguage, TSchema>): InstrumentDef<TKind, TLanguage, TSchema>;
+>(def: Omit<InstrumentDef<TKind, TLanguage, TSchema>, '__runtimeVersion'>): InstrumentDef<TKind, TLanguage, TSchema>;

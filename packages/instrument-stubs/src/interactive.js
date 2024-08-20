@@ -6,6 +6,7 @@ import { createInstrumentStub } from './utils.js';
 export const interactiveInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {
+    __runtimeVersion: 1,
     kind: 'INTERACTIVE',
     language: 'en',
     tags: ['Example', 'Useless'],
