@@ -481,9 +481,6 @@ importers:
       sharp:
         specifier: ^0.33.4
         version: 0.33.4
-      starlight-typedoc:
-        specifier: ^0.15.0
-        version: 0.15.0(@astrojs/starlight@0.24.5(astro@4.13.3(@types/node@22.2.0)(terser@5.31.6)(typescript@5.4.5)))(astro@4.13.3(@types/node@22.2.0)(terser@5.31.6)(typescript@5.4.5))(typedoc-plugin-markdown@4.2.5(typedoc@0.26.6(typescript@5.4.5)))(typedoc@0.26.6(typescript@5.4.5))
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.9
@@ -12366,16 +12363,6 @@ packages:
       { integrity: sha512-KJP1OCML99+8fhOHxwwzyWrlUuVX5GQ0ZpJTd1DFXhdkrvg1szxfHhawXUZ3g9TkXORQd4/WG68jMlQZ2p8wlg== }
     engines: { node: '>=6' }
 
-  starlight-typedoc@0.15.0:
-    resolution:
-      { integrity: sha512-9xj7Zq8FohFMgGjeGrAZaPSXfVSNaNfEb5E4xbV1Mf/dU5Iau+QdNqJGd3utgLfI7Ire9Fo8AJZMYG+ncJr5Yg== }
-    engines: { node: '>=18.14.1' }
-    peerDependencies:
-      '@astrojs/starlight': '>=0.15.0'
-      astro: '>=4.0.0'
-      typedoc: '>=0.26.5'
-      typedoc-plugin-markdown: '>=4.0.0'
-
   start-server-and-test@2.0.5:
     resolution:
       { integrity: sha512-2CV4pz69NJVJKQmJeSr+O+SPtOreu0yxvhPmSXclzmAKkPREuMabyMh+Txpzemjx0RDzXOcG2XkhiUuxjztSQw== }
@@ -24236,14 +24223,6 @@ snapshots:
   stacktrace-parser@0.1.10:
     dependencies:
       type-fest: 0.7.1
-
-  starlight-typedoc@0.15.0(@astrojs/starlight@0.24.5(astro@4.13.3(@types/node@22.2.0)(terser@5.31.6)(typescript@5.4.5)))(astro@4.13.3(@types/node@22.2.0)(terser@5.31.6)(typescript@5.4.5))(typedoc-plugin-markdown@4.2.5(typedoc@0.26.6(typescript@5.4.5)))(typedoc@0.26.6(typescript@5.4.5)):
-    dependencies:
-      '@astrojs/starlight': 0.24.5(astro@4.13.3(@types/node@22.2.0)(terser@5.31.6)(typescript@5.4.5))
-      astro: 4.13.3(@types/node@22.2.0)(terser@5.31.6)(typescript@5.4.5)
-      github-slugger: 2.0.0
-      typedoc: 0.26.6(typescript@5.4.5)
-      typedoc-plugin-markdown: 4.2.5(typedoc@0.26.6(typescript@5.4.5))
 
   start-server-and-test@2.0.5:
     dependencies:
