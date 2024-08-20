@@ -478,6 +478,9 @@ importers:
       astro:
         specifier: ^4.11.1
         version: 4.13.3(@types/node@22.2.0)(terser@5.31.6)(typescript@5.4.5)
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
       sharp:
         specifier: ^0.33.4
         version: 0.33.4
