@@ -4,6 +4,20 @@ import type { TypeDocOptions } from 'typedoc';
 import { getSidebarFromReflections, getSidebarGroupPlaceholder } from './starlight';
 import { generateTypeDoc, type TypeDocConfig } from './typedoc';
 
+export type StarlightTypeDocSidebarOptions = {
+  /**
+   * Whether the generated documentation sidebar group should be collapsed by default.
+   * Note that nested sidebar groups are always collapsed.
+   * @default false
+   */
+  collapsed?: boolean;
+  /**
+   * The generated documentation sidebar group label.
+   * @default 'API'
+   */
+  label?: string;
+};
+
 export type StarlightTypeDocOptions = {
   /**
    * The path(s) to the entry point(s) to document.
@@ -28,19 +42,7 @@ export type StarlightTypeDocOptions = {
   /**
    * The sidebar configuration for the generated documentation.
    */
-  sidebar?: {
-    /**
-     * Whether the generated documentation sidebar group should be collapsed by default.
-     * Note that nested sidebar groups are always collapsed.
-     * @default false
-     */
-    collapsed?: boolean;
-    /**
-     * The generated documentation sidebar group label.
-     * @default 'API'
-     */
-    label?: string;
-  };
+  sidebar?: StarlightTypeDocSidebarOptions;
   /**
    * The path to the `tsconfig.json` file to use for the documentation generation.
    */
