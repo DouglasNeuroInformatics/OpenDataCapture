@@ -126,3 +126,36 @@ expectTypeOf(
     })
   })
 ).toMatchTypeOf<FormInstrument<{ overallHappiness: number }, ('en' | 'fr')[]>>();
+
+expectTypeOf(
+  defineInstrument({
+    content: {
+      render(done) {
+        const button = document.createElement('button');
+        button.textContent = 'Submit Instrument';
+        document.body.appendChild(button);
+        button.addEventListener('click', () => {
+          done({ message: 'Hello World' });
+        });
+      }
+    },
+    details: {
+      description: '<PLACEHOLDER>',
+      estimatedDuration: 1,
+      instructions: ['<PLACEHOLDER>'],
+      license: 'UNLICENSED',
+      title: '<PLACEHOLDER>'
+    },
+    internal: {
+      edition: 1,
+      name: '<PLACEHOLDER>'
+    },
+    kind: 'INTERACTIVE',
+    language: 'en',
+    measures: {},
+    tags: ['<PLACEHOLDER>'],
+    validationSchema: z.object({
+      message: z.string()
+    })
+  })
+).toMatchTypeOf<InteractiveInstrument<{ message: string }, 'en'>>();
