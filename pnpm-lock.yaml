@@ -1127,6 +1127,9 @@ importers:
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
+      lodash-es:
+        specifier: workspace:lodash-es__4.17.21@*
+        version: link:../../vendor/lodash-es@4.17.21
       type-fest:
         specifier: workspace:type-fest__4.23.0@*
         version: link:../../vendor/type-fest@4.23.0
