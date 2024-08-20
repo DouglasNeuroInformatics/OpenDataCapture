@@ -10,7 +10,7 @@ import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
 
 import symlink from './src/plugins/astro-plugin-symlink';
-import { starlightTypeDoc, typeDocSidebarGroup } from './src/plugins/starlight-typedoc';
+import { starlightTypeDocPlugin, typeDocSidebarGroup } from './src/plugins/starlight-plugin-typedoc';
 
 const require = module.createRequire(import.meta.dirname);
 
@@ -61,17 +61,15 @@ export default defineConfig({
         }
       },
       plugins: [
-        starlightTypeDoc({
+        starlightTypeDocPlugin({
           entryPoints: [path.resolve(runtimeCoreRoot, 'src/index.d.ts')],
+          locale: 'en',
           output: 'runtime-core-docs',
           sidebar: {
             collapsed: true,
             label: 'Runtime Core API'
           },
-          tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json'),
-          typeDoc: {
-            lang: 'en'
-          }
+          tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json')
         })
       ],
       sidebar: [
