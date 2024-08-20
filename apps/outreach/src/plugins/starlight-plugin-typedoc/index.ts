@@ -1,43 +1,8 @@
-import { randomBytes } from 'node:crypto';
-
 import type { StarlightPlugin } from '@astrojs/starlight/types';
 import type { TypeDocOptions } from 'typedoc';
 
-import { getSidebarFromReflections, getSidebarGroupPlaceholder, type SidebarGroup } from './starlight';
+import { getSidebarFromReflections, getSidebarGroupPlaceholder } from './starlight';
 import { generateTypeDoc, type TypeDocConfig } from './typedoc';
-
-export const typeDocSidebarGroup = getSidebarGroupPlaceholder();
-
-export function starlightTypeDocPlugin(options: StarlightTypeDocOptions): StarlightPlugin {
-  return makeStarlightTypeDocPlugin(typeDocSidebarGroup)(options);
-}
-
-export function createStarlightTypeDocPlugin(): [plugin: typeof starlightTypeDocPlugin, sidebarGroup: SidebarGroup] {
-  const sidebarGroup = getSidebarGroupPlaceholder(Symbol(randomBytes(24).toString('base64url')));
-
-  return [makeStarlightTypeDocPlugin(sidebarGroup), sidebarGroup];
-}
-
-function makeStarlightTypeDocPlugin(sidebarGroup: SidebarGroup): (options: StarlightTypeDocOptions) => StarlightPlugin {
-  return function starlightTypeDocPlugin(options: StarlightTypeDocOptions) {
-    return {
-      hooks: {
-        async setup({ astroConfig, config, logger, updateConfig }) {
-          const { baseOutputDirectory, reflections } = await generateTypeDoc(options, astroConfig, logger);
-          const sidebar = getSidebarFromReflections(
-            config.sidebar,
-            sidebarGroup,
-            options.sidebar,
-            reflections,
-            baseOutputDirectory
-          );
-          updateConfig({ sidebar });
-        }
-      },
-      name: 'starlight-plugin-typedoc'
-    };
-  };
-}
 
 export type StarlightTypeDocOptions = {
   /**
@@ -63,7 +28,19 @@ export type StarlightTypeDocOptions = {
   /**
    * The sidebar configuration for the generated documentation.
    */
-  sidebar?: StarlightTypeDocSidebarOptions;
+  sidebar?: {
+    /**
+     * Whether the generated documentation sidebar group should be collapsed by default.
+     * Note that nested sidebar groups are always collapsed.
+     * @default false
+     */
+    collapsed?: boolean;
+    /**
+     * The generated documentation sidebar group label.
+     * @default 'API'
+     */
+    label?: string;
+  };
   /**
    * The path to the `tsconfig.json` file to use for the documentation generation.
    */
@@ -80,16 +57,23 @@ export type StarlightTypeDocOptions = {
   watch?: boolean;
 };
 
-export type StarlightTypeDocSidebarOptions = {
-  /**
-   * Wheter the generated documentation sidebar group should be collapsed by default.
-   * Note that nested sidebar groups are always collapsed.
-   * @default false
-   */
-  collapsed?: boolean;
-  /**
-   * The generated documentation sidebar group label.
-   * @default 'API'
-   */
-  label?: string;
-};
+export const starlightTypeDocSidebarGroup = getSidebarGroupPlaceholder();
+
+export function starlightTypeDocPlugin(options: StarlightTypeDocOptions): StarlightPlugin {
+  return {
+    hooks: {
+      async setup({ astroConfig, config, logger, updateConfig }) {
+        const { baseOutputDirectory, reflections } = await generateTypeDoc(options, astroConfig, logger);
+        const sidebar = getSidebarFromReflections(
+          config.sidebar,
+          starlightTypeDocSidebarGroup,
+          options.sidebar,
+          reflections,
+          baseOutputDirectory
+        );
+        updateConfig({ sidebar });
+      }
+    },
+    name: 'starlight-plugin-typedoc'
+  };
+}
