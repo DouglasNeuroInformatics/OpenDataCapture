@@ -17,8 +17,8 @@ type DiscriminatedInstrumentData<TKind extends InstrumentKind> = [TKind] extends
 /** @public */
 type DiscriminatedInstrument<
   TKind extends InstrumentKind,
-  TData extends DiscriminatedInstrumentData<TKind>,
-  TLanguage extends InstrumentLanguage
+  TLanguage extends InstrumentLanguage,
+  TData extends DiscriminatedInstrumentData<TKind>
 > = [TKind] extends ['FORM']
   ? TData extends FormInstrument.Data
     ? FormInstrument<TData, TLanguage>
@@ -26,7 +26,7 @@ type DiscriminatedInstrument<
   : [TKind] extends ['INTERACTIVE']
     ? TData extends Json
       ? TLanguage extends Language
-        ? InteractiveInstrument<TData>
+        ? InteractiveInstrument<TData, TLanguage>
         : never
       : never
     : never;
@@ -34,9 +34,9 @@ type DiscriminatedInstrument<
 /** @public */
 type InstrumentDiscriminatedProps<
   TKind extends InstrumentKind,
-  TData extends DiscriminatedInstrumentData<TKind>,
-  TLanguage extends InstrumentLanguage
-> = Omit<DiscriminatedInstrument<TKind, TData, TLanguage>, 'kind' | 'language' | 'validationSchema'>;
+  TLanguage extends InstrumentLanguage,
+  TData extends DiscriminatedInstrumentData<TKind>
+> = Omit<DiscriminatedInstrument<TKind, TLanguage, TData>, 'kind' | 'language' | 'validationSchema'>;
 
 /** @public */
 type InstrumentDef<
@@ -45,8 +45,8 @@ type InstrumentDef<
   TSchema extends z.ZodType<DiscriminatedInstrumentData<TKind>>
 > = { kind: TKind; language: TLanguage; validationSchema: TSchema } & InstrumentDiscriminatedProps<
   TKind,
-  z.TypeOf<TSchema>,
-  TLanguage
+  TLanguage,
+  z.TypeOf<TSchema>
 >;
 
 /** @public */
