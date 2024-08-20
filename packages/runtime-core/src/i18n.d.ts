@@ -16,11 +16,11 @@ declare type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T>
 declare type I18N<T extends { [key: string]: unknown }> = {
   readonly resolvedLanguage: Language;
   set onLanguageChange(value: LanguageChangeHandler);
-  readonly t: (key: TranslationKey<T>) => string | undefined;
+  readonly t: (key: TranslationKey<T>) => string;
 };
 
 /** @alpha */
-export declare function createI18NextInstance<const T extends { [key: string]: unknown }>(options?: {
+export declare function createI18Next<const T extends { [key: string]: unknown }>(options?: {
   fallbackLanguage?: Language;
   translations?: T;
 }): I18N<T>;

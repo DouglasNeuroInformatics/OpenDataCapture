@@ -1,6 +1,6 @@
 import { get } from 'lodash-es';
 
-export function createI18NextInstance({ fallbackLanguage = 'en', translations } = {}) {
+export function createI18Next({ fallbackLanguage = 'en', translations } = {}) {
   let resolvedLanguage;
   let handleLanguageChange = null;
 
@@ -36,7 +36,7 @@ export function createI18NextInstance({ fallbackLanguage = 'en', translations } 
       if (typeof value === 'string') {
         return value;
       }
-      return value[resolvedLanguage] ?? value[fallbackLanguage];
+      return value[resolvedLanguage] ?? value[fallbackLanguage] ?? key;
     }
   };
 }

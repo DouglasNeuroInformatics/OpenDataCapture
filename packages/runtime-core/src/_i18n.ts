@@ -15,7 +15,7 @@ type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> = Key e
 type I18N<T extends { [key: string]: unknown }> = {
   readonly resolvedLanguage: Language;
   set onLanguageChange(value: LanguageChangeHandler);
-  readonly t: (key: TranslationKey<T>) => string | undefined;
+  readonly t: (key: TranslationKey<T>) => string;
 };
 
 export function createInstance<const T extends { [key: string]: unknown }>({
@@ -60,7 +60,7 @@ export function createInstance<const T extends { [key: string]: unknown }>({
       if (typeof value === 'string') {
         return value;
       }
-      return value[resolvedLanguage] ?? value[fallbackLanguage];
+      return value[resolvedLanguage] ?? value[fallbackLanguage] ?? key;
     }
   };
 }
