@@ -7,13 +7,12 @@ import type {
   AnyUnilingualInteractiveInstrument,
   FormInstrument,
   FormTypes,
-  InstrumentSummary,
   Language,
   MultilingualInstrumentMeasures,
   SeriesInstrument,
-  UnilingualInstrumentMeasures,
-  UnilingualInstrumentSummary
+  UnilingualInstrumentMeasures
 } from '@opendatacapture/runtime-core';
+import type { InstrumentInfo, UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { mapValues, wrap } from 'lodash-es';
 import { match, P } from 'ts-pattern';
 
@@ -21,10 +20,10 @@ import {
   isFormInstrument,
   isInteractiveInstrument,
   isMultilingualInstrument,
-  isMultilingualInstrumentSummary,
+  isMultilingualInstrumentInfo,
   isSeriesInstrument,
   isUnilingualInstrument,
-  isUnilingualInstrumentSummary
+  isUnilingualInstrumentInfo
 } from './guards.js';
 
 /**
@@ -288,37 +287,34 @@ function translateSeries(series: SeriesInstrument<Language[]>, language: Languag
 }
 
 /**
- * Translate an instrument summary to the user's preferred language.
+ * Translate instrument info to the user's preferred language.
  *
- * If the instrument is a unilingual instrument summary, it will be returned as is. Otherwise, it will
+ * If the instrument is a unilingual instrument info, it will be returned as is. Otherwise, it will
  * be translated to the user's preferred language, or, if that is not available, the first element
  * in an array of languages.
  *
- * @param summary - The instrument to be translated.
+ * @param info - The instrument to be translated.
  * @param preferredLanguage - The user's preferred language.
  * @returns A translated unilingual instrument.
  */
-export function translateInstrumentSummary(
-  summary: InstrumentSummary,
-  preferredLanguage: Language
-): UnilingualInstrumentSummary {
-  if (isUnilingualInstrumentSummary(summary)) {
-    return summary;
-  } else if (!isMultilingualInstrumentSummary(summary)) {
-    throw new Error(`Unexpected value for property 'language': ${JSON.stringify(summary.language)}`);
+export function translateInstrumentInfo(info: InstrumentInfo, preferredLanguage: Language): UnilingualInstrumentInfo {
+  if (isUnilingualInstrumentInfo(info)) {
+    return info;
+  } else if (!isMultilingualInstrumentInfo(info)) {
+    throw new Error(`Unexpected value for property 'language': ${JSON.stringify(info.language)}`);
   }
-  const targetLanguage = getTargetLanguage(summary, preferredLanguage);
+  const targetLanguage = getTargetLanguage(info, preferredLanguage);
   return {
-    ...summary,
+    ...info,
     details: {
-      ...summary.details,
-      description: summary.details.description[targetLanguage],
-      instructions: summary.details.instructions?.[targetLanguage],
-      license: summary.details.license,
-      title: summary.details.title[targetLanguage]
+      ...info.details,
+      description: info.details.description[targetLanguage],
+      instructions: info.details.instructions?.[targetLanguage],
+      license: info.details.license,
+      title: info.details.title[targetLanguage]
     },
     language: targetLanguage,
-    tags: summary.tags[targetLanguage]
+    tags: info.tags[targetLanguage]
   };
 }
 

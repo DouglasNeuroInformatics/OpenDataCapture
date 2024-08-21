@@ -4,7 +4,7 @@ import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
-import type { InstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
@@ -32,14 +32,14 @@ export class InstrumentsController {
   }
 
   @ApiOperation({ summary: 'Summarize Instruments' })
-  @Get('summaries')
+  @Get('info')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findSummaries(
+  async findInfo(
     @CurrentUser('ability') ability: AppAbility,
     @Query('kind') kind?: InstrumentKind,
     @Query('subjectId') subjectId?: string
-  ): Promise<InstrumentSummary[]> {
-    return this.instrumentsService.findSummaries({ kind, subjectId }, { ability });
+  ): Promise<InstrumentInfo[]> {
+    return this.instrumentsService.findInfo({ kind, subjectId }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Instrument' })

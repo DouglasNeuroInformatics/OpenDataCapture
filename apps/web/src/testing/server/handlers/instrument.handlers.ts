@@ -1,11 +1,11 @@
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
-import type { InstrumentBundleContainer, InstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { InstrumentBundleContainer, InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { http, HttpHandler, HttpResponse } from 'msw';
 
 export const instrumentHandlers: HttpHandler[] = [
-  http.get('/v1/instruments/summaries', () => {
-    return HttpResponse.json<InstrumentSummary[]>([
+  http.get('/v1/instruments/info', () => {
+    return HttpResponse.json<InstrumentInfo[]>([
       unilingualFormInstrument.instance,
       bilingualFormInstrument.instance,
       interactiveInstrument.instance

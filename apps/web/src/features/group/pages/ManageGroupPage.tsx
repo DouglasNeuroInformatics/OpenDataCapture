@@ -4,7 +4,7 @@ import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components/PageHeader';
-import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
+import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useAppStore } from '@/store';
 
 import { ManageGroupForm } from '../components/ManageGroupForm';
@@ -12,7 +12,7 @@ import { useUpdateGroup } from '../hooks/useUpdateGroup';
 
 export const ManageGroupPage = () => {
   const { t } = useTranslation('group');
-  const summariesQuery = useInstrumentSummariesQuery();
+  const instrumentInfoQuery = useInstrumentInfoQuery();
   const updateGroupMutation = useUpdateGroup();
   const changeGroup = useAppStore((store) => store.changeGroup);
 
@@ -23,9 +23,9 @@ export const ManageGroupPage = () => {
           {t('manage.pageTitle')}
         </Heading>
       </PageHeader>
-      {summariesQuery.data ? (
+      {instrumentInfoQuery.data ? (
         <ManageGroupForm
-          availableInstruments={summariesQuery.data}
+          availableInstruments={instrumentInfoQuery.data}
           onSubmit={async (data) => {
             const updatedGroup = await updateGroupMutation.mutateAsync(data);
             changeGroup(updatedGroup);

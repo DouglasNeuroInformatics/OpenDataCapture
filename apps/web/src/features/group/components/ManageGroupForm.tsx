@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import type { UpdateGroupData } from '@opendatacapture/schemas/group';
-import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
@@ -19,7 +19,7 @@ type InstrumentOptions = {
 };
 
 export type ManageGroupFormProps = {
-  availableInstruments: UnilingualInstrumentSummary[];
+  availableInstruments: UnilingualInstrumentInfo[];
   onSubmit: (data: UpdateGroupData) => Promisable<any>;
 };
 

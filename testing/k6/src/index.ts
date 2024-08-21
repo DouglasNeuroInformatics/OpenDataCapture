@@ -1,7 +1,7 @@
 import { DEMO_USERS } from '@opendatacapture/demo';
-import type { InstrumentSummary } from '@opendatacapture/runtime-core';
 import type { AuthPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Group } from '@opendatacapture/schemas/group';
+import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { SetupState } from '@opendatacapture/schemas/setup';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import type { Summary } from '@opendatacapture/schemas/summary';
@@ -116,25 +116,25 @@ export default function () {
       sleep(0.5);
     }
 
-    // get summaries
-    const instrumentSummariesResponse = client.get<InstrumentSummary[]>(
-      `/v1/instruments/summaries?subjectId=${selectedSubject.id}`
+    // get info
+    const instrumentInfosResponse = client.get<InstrumentInfo[]>(
+      `/v1/instruments/info?subjectId=${selectedSubject.id}`
     );
-    check(instrumentSummariesResponse, { 'the status code is 200': (res) => res.status === 200 });
-    const instrumentSummaries = instrumentSummariesResponse.json();
+    check(instrumentInfosResponse, { 'the status code is 200': (res) => res.status === 200 });
+    const instrumentInfos = instrumentInfosResponse.json();
 
     sleep(0.5);
 
     // for each summary, get the full instrument and all records for this subject
-    for (const summary of instrumentSummaries) {
-      check(client.get(`/v1/instruments/${summary.id}`), {
+    for (const info of instrumentInfos) {
+      check(client.get(`/v1/instruments/${info.id}`), {
         'the status code is 200': (res) => res.status === 200
       });
       check(
         client.get('/v1/instrument-records', {
           params: {
             groupId: selectedGroup.id,
-            instrumentId: summary.id,
+            instrumentId: info.id,
             subjectId: selectedSubject.id
           }
         }),

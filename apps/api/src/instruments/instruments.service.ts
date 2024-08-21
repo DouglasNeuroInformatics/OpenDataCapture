@@ -6,13 +6,12 @@ import type {
   AnyInstrument,
   AnyScalarInstrument,
   InstrumentKind,
-  InstrumentSummary,
   SeriesInstrument,
   SomeInstrument
 } from '@opendatacapture/runtime-core';
 import { $Error, type WithID } from '@opendatacapture/schemas/core';
 import { $AnyInstrument } from '@opendatacapture/schemas/instrument';
-import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
+import type { InstrumentBundleContainer, InstrumentInfo } from '@opendatacapture/schemas/instrument';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -123,10 +122,10 @@ export class InstrumentsService {
     return { bundle: instrument.bundle, ...(await this.virtualizationService.getInstrumentInstance(instrument)) };
   }
 
-  async findSummaries<TKind extends InstrumentKind>(
+  async findInfo<TKind extends InstrumentKind>(
     query: InstrumentQuery<TKind> = {},
     options: EntityOperationOptions = {}
-  ): Promise<InstrumentSummary[]> {
+  ): Promise<InstrumentInfo[]> {
     const instances = await this.find(query, options);
     return instances.map(({ __runtimeVersion, details, id, kind, language, tags }) => ({
       __runtimeVersion,

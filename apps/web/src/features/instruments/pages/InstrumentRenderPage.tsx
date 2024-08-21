@@ -4,7 +4,7 @@ import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import type { Json } from '@opendatacapture/schemas/core';
-import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -26,8 +26,8 @@ export const InstrumentRenderPage = () => {
 
   const instrumentBundleQuery = useInstrumentBundle(params.id!);
 
-  const locationState = location.state as { summary?: undefined | UnilingualInstrumentSummary } | undefined;
-  const title = locationState?.summary?.details.title;
+  const locationState = location.state as { instrument?: undefined | UnilingualInstrumentInfo } | undefined;
+  const title = locationState?.instrument?.details.title;
 
   useEffect(() => {
     if (!currentSession?.id) {

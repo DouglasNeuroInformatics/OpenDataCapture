@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
 import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
-import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { useTranslation } from 'react-i18next';
 
-import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
+import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 
 export type AssignmentTableProps = {
   assignments: Assignment[];
@@ -15,20 +15,20 @@ export type AssignmentTableProps = {
 
 export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTableProps) => {
   const { t } = useTranslation('datahub');
-  const [instrumentSummaries, setInstrumentSummaries] = useState<{ [key: string]: UnilingualInstrumentSummary }>({});
+  const [instruments, setInstruments] = useState<{ [key: string]: UnilingualInstrumentInfo }>({});
 
-  const instrumentSummariesQuery = useInstrumentSummariesQuery();
+  const instrumentInfoQuery = useInstrumentInfoQuery();
 
   useEffect(() => {
-    setInstrumentSummaries(Object.fromEntries(instrumentSummariesQuery.data.map((summary) => [summary.id, summary])));
-  }, [instrumentSummariesQuery.data]);
+    setInstruments(Object.fromEntries(instrumentInfoQuery.data.map((instrument) => [instrument.id, instrument])));
+  }, [instrumentInfoQuery.data]);
 
   return (
     <ClientTable<Assignment>
       columns={[
         {
           field: (entry) => {
-            return instrumentSummaries[entry.instrumentId]?.details.title ?? entry.instrumentId;
+            return instruments[entry.instrumentId]?.details.title ?? entry.instrumentId;
           },
           label: t('assignments.title')
         },
