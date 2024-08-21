@@ -1,7 +1,7 @@
 import type { Exact, Merge, Promisable, SetRequired } from 'type-fest';
 
 import type { Json, Language } from './core.d.ts';
-import type { InstrumentDetails, ScalarInstrument } from './instrument.base.d.ts';
+import type { InstrumentDetails, InstrumentLanguage, ScalarInstrument } from './instrument.base.d.ts';
 
 /** @public */
 declare namespace InteractiveInstrument {
@@ -11,7 +11,7 @@ declare namespace InteractiveInstrument {
 /** @public */
 declare type InteractiveInstrument<
   TData extends InteractiveInstrument.Data = InteractiveInstrument.Data,
-  TLanguage extends Language = Language
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Merge<
   ScalarInstrument<TData, TLanguage>,
   {
@@ -28,4 +28,10 @@ declare type InteractiveInstrument<
   }
 >;
 
-export type { InteractiveInstrument };
+/** @internal */
+type AnyUnilingualInteractiveInstrument = InteractiveInstrument<InteractiveInstrument.Data, Language>;
+
+/** @internal */
+type AnyMultilingualInteractiveInstrument = InteractiveInstrument<InteractiveInstrument.Data, Language[]>;
+
+export type { AnyMultilingualInteractiveInstrument, AnyUnilingualInteractiveInstrument, InteractiveInstrument };

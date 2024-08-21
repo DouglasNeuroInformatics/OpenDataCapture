@@ -1,8 +1,10 @@
 import type {
   AnyInstrument,
   AnyMultilingualFormInstrument,
+  AnyMultilingualInteractiveInstrument,
   AnyUnilingualFormInstrument,
   AnyUnilingualInstrument,
+  AnyUnilingualInteractiveInstrument,
   FormInstrument,
   FormTypes,
   InstrumentSummary,
@@ -17,6 +19,7 @@ import { match, P } from 'ts-pattern';
 
 import {
   isFormInstrument,
+  isInteractiveInstrument,
   isMultilingualInstrument,
   isMultilingualInstrumentSummary,
   isSeriesInstrument,
@@ -249,6 +252,26 @@ function translateForm(form: AnyMultilingualFormInstrument, language: Language):
   };
 }
 
+function translateInteractive(
+  instrument: AnyMultilingualInteractiveInstrument,
+  language: Language
+): AnyUnilingualInteractiveInstrument {
+  return {
+    ...instrument,
+    details: {
+      description: instrument.details.description[language],
+      estimatedDuration: instrument.details.estimatedDuration,
+      instructions: instrument.details.instructions?.[language],
+      license: instrument.details.license,
+      title: instrument.details.title[language]
+    },
+    language,
+    // Because of the JSON data type, the measures is different since there cannot be a ref, but this is irrelevant for translation
+    measures: translateMeasures(instrument.measures as MultilingualInstrumentMeasures, language),
+    tags: instrument.tags[language]
+  };
+}
+
 function translateSeries(series: SeriesInstrument<Language[]>, language: Language): SeriesInstrument<Language> {
   return {
     ...series,
@@ -321,6 +344,8 @@ export function translateInstrument(instrument: AnyInstrument, preferredLanguage
     return translateForm(instrument, targetLanguage);
   } else if (isSeriesInstrument(instrument)) {
     return translateSeries(instrument, targetLanguage);
+  } else if (isInteractiveInstrument(instrument)) {
+    return translateInteractive(instrument, targetLanguage);
   }
   throw new Error(`Unexpected instrument kind: ${(instrument as AnyInstrument).kind}`);
 }
