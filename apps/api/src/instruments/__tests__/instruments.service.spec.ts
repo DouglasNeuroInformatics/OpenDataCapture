@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Model } from '@/prisma/prisma.types';
 import { getModelToken } from '@/prisma/prisma.utils';
+import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentsService } from '../instruments.service';
 
@@ -17,7 +18,8 @@ describe('InstrumentsService', () => {
       providers: [
         InstrumentsService,
         MockFactory.createForModelToken(getModelToken('Instrument')),
-        MockFactory.createForService(CryptoService)
+        MockFactory.createForService(CryptoService),
+        MockFactory.createForService(VirtualizationService)
       ]
     }).compile();
     instrumentsService = moduleRef.get(InstrumentsService);

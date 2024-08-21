@@ -12,6 +12,7 @@ import { GroupsService } from '../groups.service';
 describe('GroupsService', () => {
   let groupsService: GroupsService;
   let groupModel: MockedInstance<Model<'Group'>>;
+  let instrumentsService: MockedInstance<InstrumentsService>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -23,11 +24,8 @@ describe('GroupsService', () => {
     }).compile();
     groupModel = moduleRef.get(getModelToken('Group'));
     groupsService = moduleRef.get(GroupsService);
-  });
-
-  it('should be defined', () => {
-    expect(groupModel).toBeDefined();
-    expect(groupsService).toBeDefined();
+    instrumentsService = moduleRef.get(InstrumentsService);
+    instrumentsService.find.mockResolvedValue([]);
   });
 
   describe('create', () => {
