@@ -1,11 +1,9 @@
 import { expectTypeOf } from 'expect-type';
 import { z } from 'zod';
 
-// import type { Language } from '../types/core.d.ts';
 import { defineInstrument } from '../define.js';
 
 import type { DiscriminatedInstrument } from '../define.d.ts';
-// import type { InstrumentKind, InstrumentLanguage } from '../types/instrument.base.d.ts';
 import type { FormInstrument } from '../types/instrument.form.d.ts';
 import type { InteractiveInstrument } from '../types/instrument.interactive.d.ts';
 
@@ -15,12 +13,12 @@ expectTypeOf<DiscriminatedInstrument<'FORM', 'en', { foo: string }>>().toMatchTy
 expectTypeOf<DiscriminatedInstrument<'FORM', 'en' | 'fr', { foo: string }>>().toMatchTypeOf<
   FormInstrument<{ foo: string }, 'en' | 'fr'>
 >();
-// expectTypeOf<DiscriminatedInstrument<'FORM', 'en' | 'fr', InteractiveInstrument.Data>>().toBeNever();
+expectTypeOf<DiscriminatedInstrument<'FORM', 'en' | 'fr', InteractiveInstrument.Data>>().toBeNever();
 
 expectTypeOf<DiscriminatedInstrument<'INTERACTIVE', 'en', { foo: string }>>().toMatchTypeOf<
   InteractiveInstrument<{ foo: string }, 'en'>
 >();
-// expectTypeOf<DiscriminatedInstrument<'INTERACTIVE', 'en', undefined>>().toBeNever();
+expectTypeOf<DiscriminatedInstrument<'INTERACTIVE', 'en', undefined>>().toBeNever();
 
 expectTypeOf(
   defineInstrument({
