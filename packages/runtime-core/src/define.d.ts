@@ -1,6 +1,5 @@
 import type { z } from 'zod';
 
-import type { Language } from './types/core.d.ts';
 import type { InstrumentKind, InstrumentLanguage } from './types/instrument.base.d.ts';
 import type { FormInstrument } from './types/instrument.form.d.ts';
 import type { InteractiveInstrument } from './types/instrument.interactive.d.ts';
@@ -17,9 +16,7 @@ type DiscriminatedInstrument<
     : never
   : [TKind] extends ['INTERACTIVE']
     ? TData extends InteractiveInstrument.Data
-      ? TLanguage extends Language
-        ? InteractiveInstrument<TData, TLanguage>
-        : never
+      ? InteractiveInstrument<TData, TLanguage>
       : never
     : never;
 

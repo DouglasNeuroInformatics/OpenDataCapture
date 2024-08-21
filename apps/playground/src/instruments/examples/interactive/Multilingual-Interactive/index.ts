@@ -1,29 +1,17 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import { translations } from './translations.ts';
+
 const { defineInstrument, createI18Next } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
 const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
 
-const translations = {
-  greetings: {
-    hello: {
-      en: 'Hello',
-      fr: 'Bonjour'
-    }
-  },
-  changeLanguage: {
-    en: 'Change Language',
-    fr: 'Changer de langue'
-  },
-  submit: {
-    en: 'Submit',
-    fr: 'Soumettre'
-  }
-};
-
 export default defineInstrument({
   kind: 'INTERACTIVE',
-  language: 'en',
-  tags: ['<PLACEHOLDER>'],
+  language: ['en', 'fr'],
+  tags: {
+    en: ['<PLACEHOLDER>'],
+    fr: ['<PLACEHOLDER>']
+  },
   internal: {
     edition: 1,
     name: '<PLACEHOLDER>'
@@ -56,11 +44,20 @@ export default defineInstrument({
     }
   },
   details: {
-    description: '<PLACEHOLDER>',
+    description: {
+      en: '<PLACEHOLDER>',
+      fr: '<PLACEHOLDER>'
+    },
     estimatedDuration: 1,
-    instructions: ['<PLACEHOLDER>'],
-    license: 'Apache-2.0',
-    title: '<PLACEHOLDER>'
+    instructions: {
+      en: ['<PLACEHOLDER>'],
+      fr: ['<PLACEHOLDER>']
+    },
+    license: 'UNLICENSED',
+    title: {
+      en: '<PLACEHOLDER>',
+      fr: '<PLACEHOLDER>'
+    }
   },
   measures: {},
   validationSchema: z.object({
