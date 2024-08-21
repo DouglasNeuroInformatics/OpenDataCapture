@@ -14,6 +14,7 @@ declare type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T>
 
 /** @alpha */
 declare type I18N<T extends { [key: string]: unknown }> = {
+  changeLanguage: (language: Language) => void;
   readonly resolvedLanguage: Language;
   set onLanguageChange(value: LanguageChangeHandler);
   readonly t: (key: TranslationKey<T>) => string;
