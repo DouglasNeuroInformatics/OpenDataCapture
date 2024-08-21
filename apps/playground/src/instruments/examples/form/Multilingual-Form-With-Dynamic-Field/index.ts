@@ -1,11 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { translations } from './translations.ts';
-
-const { defineInstrument, i18n } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
+const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
 const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
-
-i18n.init();
 
 export default defineInstrument({
   kind: 'FORM',
@@ -76,7 +72,7 @@ export default defineInstrument({
   measures: {},
   validationSchema: z
     .object({
-      hasFavoriteColor: z.boolean({ message: translations.requiredField[i18n.resolvedLanguage] }),
+      hasFavoriteColor: z.boolean({ message: 'This field is required' }),
       favoriteColor: z.enum(['red', 'blue', 'green']).optional()
     })
     .superRefine((data, ctx) => {
@@ -84,7 +80,7 @@ export default defineInstrument({
         ctx.addIssue({
           code: 'custom',
           path: ['favoriteColor'],
-          message: translations.requiredField[i18n.resolvedLanguage]
+          message: 'This field is required'
         });
       }
     })

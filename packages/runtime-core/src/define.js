@@ -1,3 +1,5 @@
 export function defineInstrument(def) {
-  return def;
+  return Object.assign(def, {
+    __runtimeVersion: 1
+  });
 }

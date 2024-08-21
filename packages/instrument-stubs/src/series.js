@@ -5,6 +5,7 @@ import { createInstrumentStub } from './utils.js';
 /** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/runtime-core').SeriesInstrument>} */
 export const seriesInstrument = await createInstrumentStub(async () => {
   return {
+    __runtimeVersion: 1,
     kind: 'SERIES',
     language: 'en',
     tags: ['Example', 'Useless'],

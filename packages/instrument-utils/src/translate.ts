@@ -286,13 +286,14 @@ export function translateInstrumentSummary(
   }
   const targetLanguage = getTargetLanguage(summary, preferredLanguage);
   return {
+    ...summary,
     details: {
+      ...summary.details,
       description: summary.details.description[targetLanguage],
+      instructions: summary.details.instructions?.[targetLanguage],
       license: summary.details.license,
       title: summary.details.title[targetLanguage]
     },
-    id: summary.id,
-    kind: summary.kind,
     language: targetLanguage,
     tags: summary.tags[targetLanguage]
   };

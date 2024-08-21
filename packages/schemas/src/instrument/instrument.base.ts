@@ -118,6 +118,7 @@ const $UnilingualInstrumentMeasures = z.record(
 ) satisfies z.ZodType<UnilingualInstrumentMeasures>;
 
 const $BaseInstrument = z.object({
+  __runtimeVersion: z.literal(1),
   content: z.any(),
   details: $InstrumentDetails,
   id: z.string().optional(),

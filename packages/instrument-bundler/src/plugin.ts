@@ -14,7 +14,7 @@ export const resolvePlugin = (options: {
       const namespaces = { bundle: 'bundle', dynamic: 'dynamic' };
       build.onResolve({ filter: /.*/ }, (args) => {
         if (args.kind === 'dynamic-import') {
-          if (!args.path.startsWith('/')) {
+          if (!(args.path.startsWith('/') || args.path.startsWith('https://'))) {
             return { errors: [{ text: `Invalid dynamic import '${args.path}': must start with '/'` }] };
           }
           return {

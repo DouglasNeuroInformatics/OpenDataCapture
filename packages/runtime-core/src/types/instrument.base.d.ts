@@ -109,6 +109,8 @@ type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Lan
 
 /** @public */
 type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+  /** The runtime version for this instrument, which is set automatically by the `defineInstrument` function */
+  __runtimeVersion: 1;
   /** The content in the instrument to be rendered to the user */
   content?: unknown;
   /** The details of the instrument to be displayed to the user */

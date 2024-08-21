@@ -28,6 +28,9 @@
       },
       "ae-internal-missing-underscore": {
         "logLevel": "none"
+      },
+      "ae-missing-getter": {
+        "logLevel": "none"
       }
     },
     "tsdocMessageReporting": {

@@ -3,6 +3,7 @@
 import type { SeriesInstrument } from '/runtime/v1/@opendatacapture/runtime-core/index.js';
 
 const instrument: SeriesInstrument = {
+  __runtimeVersion: 1,
   kind: 'SERIES',
   language: ['en', 'fr'],
   tags: {

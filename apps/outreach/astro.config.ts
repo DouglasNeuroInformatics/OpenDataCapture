@@ -10,7 +10,7 @@ import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
 
 import symlink from './src/plugins/astro-plugin-symlink';
-import { starlightTypeDocPlugin, typeDocSidebarGroup } from './src/plugins/starlight-plugin-typedoc';
+import { starlightTypeDocPlugin, starlightTypeDocSidebarGroup } from './src/plugins/starlight-plugin-typedoc';
 
 const require = module.createRequire(import.meta.dirname);
 
@@ -97,7 +97,7 @@ export default defineConfig({
           autogenerate: { directory: 'docs/6-changelogs' },
           label: 'Changelogs'
         },
-        typeDocSidebarGroup
+        starlightTypeDocSidebarGroup
       ],
       social: {
         github: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'

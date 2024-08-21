@@ -128,7 +128,14 @@ export class InstrumentsService {
     options: EntityOperationOptions = {}
   ): Promise<InstrumentSummary[]> {
     const instances = await this.find(query, options);
-    return instances.map(({ details, id, kind, language, tags }) => ({ details, id, kind, language, tags }));
+    return instances.map(({ __runtimeVersion, details, id, kind, language, tags }) => ({
+      __runtimeVersion,
+      details,
+      id,
+      kind,
+      language,
+      tags
+    }));
   }
 
   private generateInstrumentId(instrument: AnyInstrument) {

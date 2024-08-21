@@ -11,6 +11,7 @@ import { createInstrumentStub } from './utils.js';
 export const unilingualFormInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {
+    __runtimeVersion: 1,
     content: {
       favoriteNumber: {
         kind: 'number',
@@ -64,6 +65,7 @@ export const unilingualFormInstrument = await createInstrumentStub(async () => {
 export const bilingualFormInstrument = await createInstrumentStub(async () => {
   const { z } = await import('zod');
   return {
+    __runtimeVersion: 1,
     content: {
       favoriteNumber: {
         kind: 'number',
