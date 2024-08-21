@@ -1,8 +1,7 @@
+import { Prisma } from '@prisma/generated-client';
 import type { Replace } from 'type-fest';
 
 import type { ExtendedPrismaClient } from './prisma.factory';
-
-import { Prisma } from '.prisma/client';
 
 export type ModelReferenceName = Uncapitalize<Prisma.ModelName>;
 

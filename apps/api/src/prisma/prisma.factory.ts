@@ -1,6 +1,5 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-
-import { Prisma, PrismaClient } from '.prisma/client';
+import { Prisma, PrismaClient } from '@prisma/generated-client';
 
 export const PRISMA_CLIENT_TOKEN = 'PRISMA_CLIENT';
 

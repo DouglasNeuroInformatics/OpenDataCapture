@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import type { AppAbility } from '@/core/types';
+import type { UserModel } from '@prisma/generated-client';
 
-import type { UserModel } from '.prisma/client';
+import type { AppAbility } from '@/core/types';
 
 declare global {
   namespace Express {

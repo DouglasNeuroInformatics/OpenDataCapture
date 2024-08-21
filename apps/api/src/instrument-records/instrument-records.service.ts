@@ -10,6 +10,7 @@ import type {
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@opendatacapture/schemas/instrument-records';
+import type { InstrumentRecordModel, Prisma } from '@prisma/generated-client';
 import { isNumber, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -23,8 +24,6 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
-
-import type { InstrumentRecordModel, Prisma } from '.prisma/client';
 
 const require = module.createRequire(import.meta.url);
 

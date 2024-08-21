@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma } from '@prisma/generated-client';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -6,8 +7,6 @@ import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model, ModelUpdateData } from '@/prisma/prisma.types';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
-
-import type { Prisma } from '.prisma/client';
 
 @Injectable()
 export class SubjectsService {
