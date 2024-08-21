@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "node scripts/build.js",
+    "db:generate": "prisma generate",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx scripts/dev.js",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
@@ -34,12 +35,12 @@
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/instrument-library": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
-    "@opendatacapture/prisma-client": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/stats": "workspace:*",
     "@opendatacapture/subject-utils": "workspace:*",
+    "@prisma/client": "catalog:",
     "axios": "^1.7.2",
     "express": "^4.19.2",
     "lodash-es": "^4.17.21",
@@ -66,10 +67,15 @@
     "esbuild": "^0.21.5",
     "esbuild-plugin-tsc": "^0.4.0",
     "nodemon": "^3.1.3",
+    "prisma": "catalog:",
+    "prisma-json-types-generator": "^3.0.4",
     "supertest": "^7.0.0",
     "type-fest": "workspace:type-fest__4.23.0@*"
   },
   "imports": {
     "#runtime/*": "./dist/runtime/*"
-  }
+  },
+  "trustedDependencies": [
+    "prisma"
+  ]
 }

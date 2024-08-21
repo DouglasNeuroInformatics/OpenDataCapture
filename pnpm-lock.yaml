@@ -9,9 +9,15 @@ catalogs:
     '@microsoft/api-extractor':
       specifier: ^7.47.6
       version: 7.47.6
+    '@prisma/client':
+      specifier: ^5.18.0
+      version: 5.18.0
     esbuild:
       specifier: ^0.23.1
       version: 0.23.1
+    prisma:
+      specifier: ^5.18.0
+      version: 5.18.0
 
 importers:
   .:
@@ -208,9 +214,6 @@ importers:
       '@opendatacapture/instrument-utils':
         specifier: workspace:*
         version: link:../../packages/instrument-utils
-      '@opendatacapture/prisma-client':
-        specifier: workspace:*
-        version: link:../../packages/prisma-client
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../../packages/runtime-core
@@ -226,6 +229,9 @@ importers:
       '@opendatacapture/subject-utils':
         specifier: workspace:*
         version: link:../../packages/subject-utils
+      '@prisma/client':
+        specifier: 'catalog:'
+        version: 5.18.0(prisma@5.18.0)
       axios:
         specifier: ^1.7.2
         version: 1.7.3(debug@4.3.6)
@@ -299,6 +305,12 @@ importers:
       nodemon:
         specifier: ^3.1.3
         version: 3.1.4
+      prisma:
+        specifier: 'catalog:'
+        version: 5.18.0
+      prisma-json-types-generator:
+        specifier: ^3.0.4
+        version: 3.0.4(prisma@5.18.0)(typescript@5.4.5)
       supertest:
         specifier: ^7.0.0
         version: 7.0.0
@@ -320,9 +332,6 @@ importers:
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
-      '@opendatacapture/prisma-client':
-        specifier: workspace:*
-        version: link:../../packages/prisma-client
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -335,6 +344,9 @@ importers:
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
+      '@prisma/client':
+        specifier: 'catalog:'
+        version: 5.18.0(prisma@5.18.0)
       axios:
         specifier: ^1.7.2
         version: 1.7.3(debug@4.3.6)
@@ -414,6 +426,9 @@ importers:
       postcss:
         specifier: ^8.4.38
         version: 8.4.41
+      prisma:
+        specifier: 'catalog:'
+        version: 5.18.0
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.9
@@ -1039,16 +1054,6 @@ importers:
 
   packages/licenses: {}
 
-  packages/prisma-client:
-    dependencies:
-      '@prisma/client':
-        specifier: ^5.15.0
-        version: 5.18.0(prisma@5.18.0)
-    devDependencies:
-      prisma:
-        specifier: ^5.15.0
-        version: 5.18.0
-
   packages/react-core:
     dependencies:
       '@douglasneuroinformatics/libjs':
@@ -1332,9 +1337,6 @@ importers:
       '@opendatacapture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
-      '@opendatacapture/runtime-core':
-        specifier: workspace:*
-        version: link:../../packages/runtime-core
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -4192,6 +4194,10 @@ packages:
     resolution:
       { integrity: sha512-f+ZvpTLidSo3LMJxQPVgAxdAjzv5OpzAo/eF8qZqbwvgi2F5cTOI9XCpdRzJYA0iGfajjwjOKKrVq64vkxEfUw== }
 
+  '@prisma/debug@5.9.1':
+    resolution:
+      { integrity: sha512-yAHFSFCg8KVoL0oRUno3m60GAjsUKYUDkQ+9BA2X2JfVR3kRVSJFc/GpQ2fSORi4pSHZR9orfM4UC9OVXIFFTA== }
+
   '@prisma/engines-version@5.18.0-25.4c784e32044a8a016d99474bd02a3b6123742169':
     resolution:
       { integrity: sha512-a/+LpJj8vYU3nmtkg+N3X51ddbt35yYrRe8wqHTJtYQt7l1f8kjIBcCs6sHJvodW/EK5XGvboOiwm47fmNrbgg== }
@@ -4203,6 +4209,10 @@ packages:
   '@prisma/fetch-engine@5.18.0':
     resolution:
       { integrity: sha512-I/3u0x2n31rGaAuBRx2YK4eB7R/1zCuayo2DGwSpGyrJWsZesrV7QVw7ND0/Suxeo/vLkJ5OwuBqHoCxvTHpOg== }
+
+  '@prisma/generator-helper@5.9.1':
+    resolution:
+      { integrity: sha512-WMdEUPpPYxUGruRQM6e6IVTWXFjt1hHdF/m2TO7pWxhPo7/ZeoTOF9fH8JsvVSV78DYLOQkx9osjFLXZu447Kw== }
 
   '@prisma/get-platform@5.18.0':
     resolution:
@@ -11341,6 +11351,15 @@ packages:
       { integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ== }
     engines: { node: ^14.15.0 || ^16.10.0 || >=18.0.0 }
 
+  prisma-json-types-generator@3.0.4:
+    resolution:
+      { integrity: sha512-W53OpjBdGZxCsYv7MlUX69d7TPA9lEsQbDf9ddF0J93FX5EvaIRDMexdFPe0KTxiuquGvZTDJgeNXb3gIqEhJw== }
+    engines: { node: '>=14.0' }
+    hasBin: true
+    peerDependencies:
+      prisma: ^5.1
+      typescript: ^5.1
+
   prisma@5.18.0:
     resolution:
       { integrity: sha512-+TrSIxZsh64OPOmaSgVPH7ALL9dfU0jceYaMJXsNrTkFHO7/3RANi5K2ZiPB1De9+KDxCWn7jvRq8y8pvk+o9g== }
@@ -12884,6 +12903,10 @@ packages:
   tslib@1.14.1:
     resolution:
       { integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg== }
+
+  tslib@2.6.2:
+    resolution:
+      { integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q== }
 
   tslib@2.6.3:
     resolution:
@@ -16249,6 +16272,8 @@ snapshots:
 
   '@prisma/debug@5.18.0': {}
 
+  '@prisma/debug@5.9.1': {}
+
   '@prisma/engines-version@5.18.0-25.4c784e32044a8a016d99474bd02a3b6123742169': {}
 
   '@prisma/engines@5.18.0':
@@ -16263,6 +16288,10 @@ snapshots:
       '@prisma/debug': 5.18.0
       '@prisma/engines-version': 5.18.0-25.4c784e32044a8a016d99474bd02a3b6123742169
       '@prisma/get-platform': 5.18.0
+
+  '@prisma/generator-helper@5.9.1':
+    dependencies:
+      '@prisma/debug': 5.9.1
 
   '@prisma/get-platform@5.18.0':
     dependencies:
@@ -23216,6 +23245,13 @@ snapshots:
       ansi-styles: 5.2.0
       react-is: 18.3.1
 
+  prisma-json-types-generator@3.0.4(prisma@5.18.0)(typescript@5.4.5):
+    dependencies:
+      '@prisma/generator-helper': 5.9.1
+      prisma: 5.18.0
+      tslib: 2.6.2
+      typescript: 5.4.5
+
   prisma@5.18.0:
     dependencies:
       '@prisma/engines': 5.18.0
@@ -24728,6 +24764,8 @@ snapshots:
       strip-bom: 3.0.0
 
   tslib@1.14.1: {}
+
+  tslib@2.6.2: {}
 
   tslib@2.6.3: {}
 

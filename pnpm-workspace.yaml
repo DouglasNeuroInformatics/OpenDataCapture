@@ -8,3 +8,5 @@ packages:
 catalog:
   '@microsoft/api-extractor': ^7.47.6
   'esbuild': ^0.23.1
+  'prisma': '^5.18.0'
+  '@prisma/client': '^5.18.0'

@@ -1,6 +1,5 @@
 import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import type { GroupModel, UserModel } from '@opendatacapture/prisma-client/api';
 import type { JwtPayload } from '@opendatacapture/schemas/auth';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -8,6 +7,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AbilityFactory } from '@/ability/ability.factory';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { UsersService } from '@/users/users.service';
+
+import type { GroupModel, UserModel } from '.prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {

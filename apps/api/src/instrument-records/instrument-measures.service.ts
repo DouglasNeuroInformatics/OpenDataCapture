@@ -6,8 +6,9 @@ import type {
   InstrumentMeasureValue,
   Json
 } from '@opendatacapture/runtime-core';
-import type { Prisma } from '@prisma/client';
 import { match } from 'ts-pattern';
+
+import type { Prisma } from '.prisma/client';
 
 @Injectable()
 export class InstrumentMeasuresService {
