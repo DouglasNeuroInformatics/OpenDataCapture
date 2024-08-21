@@ -10,6 +10,10 @@ const translations = {
       fr: 'Bonjour'
     }
   },
+  changeLanguage: {
+    en: 'Change Language',
+    fr: 'Changer de langue'
+  },
   submit: {
     en: 'Submit',
     fr: 'Soumettre'
@@ -27,16 +31,26 @@ export default defineInstrument({
   content: {
     render(done) {
       const i18n = createI18Next({ translations });
-      const button = document.createElement('button');
 
-      button.textContent = i18n.t('submit');
-      document.body.appendChild(button);
+      const changeLanguageButton = document.createElement('button');
+      changeLanguageButton.textContent = i18n.t('changeLanguage');
+      document.body.appendChild(changeLanguageButton);
+
+      changeLanguageButton.addEventListener('click', () => {
+        console.log(i18n.resolvedLanguage);
+        i18n.changeLanguage(i18n.resolvedLanguage === 'en' ? 'fr' : 'en');
+      });
+
+      const submitButton = document.createElement('button');
+      submitButton.textContent = i18n.t('submit');
+      document.body.appendChild(submitButton);
 
       i18n.onLanguageChange = () => {
-        button.textContent = i18n.t('submit');
+        changeLanguageButton.textContent = i18n.t('changeLanguage');
+        submitButton.textContent = i18n.t('submit');
       };
 
-      button.addEventListener('click', () => {
+      submitButton.addEventListener('click', () => {
         done({ message: i18n.t('greetings.hello') });
       });
     }
@@ -45,7 +59,7 @@ export default defineInstrument({
     description: '<PLACEHOLDER>',
     estimatedDuration: 1,
     instructions: ['<PLACEHOLDER>'],
-    license: 'UNLICENSED',
+    license: 'Apache-2.0',
     title: '<PLACEHOLDER>'
   },
   measures: {},

@@ -27,10 +27,15 @@ export function createI18Next({ fallbackLanguage = 'en', translations } = {}) {
   languageAttributeObserver.observe(documentElement, { attributes: true });
 
   return {
+    changeLanguage: (language) => {
+      window.top.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
+    },
     set onLanguageChange(handler) {
       handleLanguageChange = handler;
     },
-    resolvedLanguage,
+    get resolvedLanguage() {
+      return resolvedLanguage;
+    },
     t: (key) => {
       const value = get(translations, key);
       if (typeof value === 'string') {
