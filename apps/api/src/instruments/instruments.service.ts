@@ -119,7 +119,8 @@ export class InstrumentsService {
     if (!instrument) {
       throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
     }
-    return { bundle: instrument.bundle, ...(await this.virtualizationService.getInstrumentInstance(instrument)) };
+    const instance = await this.virtualizationService.getInstrumentInstance(instrument);
+    return { bundle: instrument.bundle, ...instance };
   }
 
   async findInfo<TKind extends InstrumentKind>(
