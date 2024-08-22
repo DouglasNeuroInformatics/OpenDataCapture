@@ -1,7 +1,12 @@
 import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
 import { Injectable } from '@nestjs/common';
-import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
-import { isScalarInstrument } from '@opendatacapture/instrument-utils';
+import {
+  ConflictException,
+  InternalServerErrorException,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common/exceptions';
+import { isScalarInstrument, isSeriesInstrument } from '@opendatacapture/instrument-utils';
 import type {
   AnyInstrument,
   AnyScalarInstrument,
@@ -11,7 +16,11 @@ import type {
 } from '@opendatacapture/runtime-core';
 import { $Error, type WithID } from '@opendatacapture/schemas/core';
 import { $AnyInstrument } from '@opendatacapture/schemas/instrument';
-import type { InstrumentBundleContainer, InstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type {
+  InstrumentBundleContainer,
+  InstrumentInfo,
+  ScalarInstrumentBundleContainer
+} from '@opendatacapture/schemas/instrument';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -109,6 +118,30 @@ export class InstrumentsService {
     return instances.filter((instance) => instance.kind === query.kind) as WithID<SomeInstrument<TKind>>[];
   }
 
+  async findBundleById(id: string, options: EntityOperationOptions = {}): Promise<InstrumentBundleContainer> {
+    const instance = await this.findById(id, options);
+    if (isScalarInstrument(instance)) {
+      return {
+        bundle: instance.bundle,
+        id: instance.id,
+        kind: 'SCALAR'
+      };
+    } else if (isSeriesInstrument(instance)) {
+      return {
+        bundle: instance.bundle,
+        id: instance.id,
+        items: await Promise.all(
+          instance.content.map(async (internal) => {
+            const id = this.generateScalarInstrumentId({ internal });
+            return (await this.findBundleById(id)) as ScalarInstrumentBundleContainer;
+          })
+        ),
+        kind: 'SERIES'
+      };
+    }
+    throw new InternalServerErrorException(`Unexpected instance kind: ${Reflect.get(instance, 'kind')}`);
+  }
+
   async findById(
     id: string,
     { ability }: EntityOperationOptions = {}
@@ -153,7 +186,7 @@ export class InstrumentsService {
     return this.cryptoService.hash(instrument.content.map(({ edition, name }) => `${name}-${edition}`).join('--'));
   }
 
-  private async instantiate(instruments: InstrumentBundleContainer[]) {
+  private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {
     return Promise.all(
       instruments.map((instrument) => {
         return this.virtualizationService.getInstrumentInstance(instrument);

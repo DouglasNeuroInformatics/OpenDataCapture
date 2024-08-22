@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment } from '@opendatacapture/schemas/assignment';

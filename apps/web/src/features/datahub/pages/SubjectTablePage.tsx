@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ActionDropdown, ClientTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';

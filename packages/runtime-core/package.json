@@ -21,12 +21,12 @@
   "dependencies": {
     "@douglasneuroinformatics/libui-form-types": "^0.10.3",
     "@opendatacapture/licenses": "workspace:*",
-    "lodash-es": "workspace:lodash-es__4.17.21@*",
-    "type-fest": "workspace:type-fest__4.23.0@*",
-    "zod": "workspace:zod__3.23.6@*"
+    "lodash-es": "workspace:lodash-es__4.x@*",
+    "type-fest": "workspace:type-fest__4.x@*",
+    "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
-    "esbuild": "catalog:"
+    "esbuild": "catalog:esbuild"
   }
 }

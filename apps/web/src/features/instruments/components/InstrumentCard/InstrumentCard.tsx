@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { InstrumentIcon } from '@opendatacapture/react-core';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';

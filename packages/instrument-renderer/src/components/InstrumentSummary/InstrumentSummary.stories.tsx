@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import type { AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-core';

@@ -1,3 +1,4 @@
+import { sha256 } from '@douglasneuroinformatics/libcrypto';
 import { type BundlerInput, extractInputFileExtension, resolveIndexInput } from '@opendatacapture/instrument-bundler';
 import { match, P } from 'ts-pattern';
 
@@ -55,4 +56,8 @@ export function getImageMIMEType(filename: string) {
     default:
       return null;
   }
+}
+
+export async function hashFiles(files: EditorFile[]) {
+  return sha256(files.map((file) => file.content + file.name).join());
 }

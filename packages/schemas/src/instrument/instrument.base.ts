@@ -169,11 +169,28 @@ const $CreateInstrumentData = z.object({
   bundle: z.string().min(1)
 });
 
-type InstrumentBundleContainer = z.infer<typeof $InstrumentBundleContainer>;
-const $InstrumentBundleContainer = z.object({
-  bundle: z.string(),
+const $BaseInstrumentBundleContainer = z.object({
   id: z.string()
 });
+
+type ScalarInstrumentBundleContainer = z.infer<typeof $ScalarInstrumentBundleContainer>;
+const $ScalarInstrumentBundleContainer = $BaseInstrumentBundleContainer.extend({
+  bundle: z.string(),
+  kind: z.literal('SCALAR')
+});
+
+type SeriesInstrumentBundleContainer = z.infer<typeof $SeriesInstrumentBundleContainer>;
+const $SeriesInstrumentBundleContainer = $BaseInstrumentBundleContainer.extend({
+  bundle: z.string(),
+  items: z.array($ScalarInstrumentBundleContainer),
+  kind: z.literal('SERIES')
+});
+
+type InstrumentBundleContainer = ScalarInstrumentBundleContainer | SeriesInstrumentBundleContainer;
+const $InstrumentBundleContainer: z.ZodType<InstrumentBundleContainer> = z.union([
+  $ScalarInstrumentBundleContainer,
+  $SeriesInstrumentBundleContainer
+]);
 
 export {
   $$InstrumentUIOption,
@@ -196,5 +213,7 @@ export type {
   InstrumentBundleContainer,
   InstrumentInfo,
   MultilingualInstrumentInfo,
+  ScalarInstrumentBundleContainer,
+  SeriesInstrumentBundleContainer,
   UnilingualInstrumentInfo
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 import { isEqual } from 'lodash-es';

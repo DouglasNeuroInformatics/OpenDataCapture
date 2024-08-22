@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { AlertDialog, Button } from '@douglasneuroinformatics/libui/components';
 
 import { useAppStore } from '@/store';

@@ -1,8 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
 const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
-const { mean } = await import('/runtime/v1/lodash-es@4.17.21/index.js');
-const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
+const { mean } = await import('/runtime/v1/lodash-es@4.x/index.js');
+const { z } = await import('/runtime/v1/zod@3.23.x/index.js');
 
 const CURRENT_YEAR = new Date().getFullYear();
 const LAST_YEAR = CURRENT_YEAR - 1;

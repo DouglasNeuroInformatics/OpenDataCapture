@@ -2,8 +2,7 @@
   "extends": "../../jsconfig.json",
   "compilerOptions": {
     "checkJs": false,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "skipLibCheck": false
+    "lib": ["ESNext", "DOM", "DOM.Iterable"]
   },
   "include": ["src/**/*"]
 }

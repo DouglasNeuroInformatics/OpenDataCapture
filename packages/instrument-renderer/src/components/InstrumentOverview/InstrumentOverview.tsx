@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { licenses } from '@opendatacapture/licenses';
 import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Resizable, Tabs } from '@douglasneuroinformatics/libui/components';
 import { useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
 

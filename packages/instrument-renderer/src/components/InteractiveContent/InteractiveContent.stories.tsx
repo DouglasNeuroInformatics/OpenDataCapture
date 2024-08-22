@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
 import type { Meta, StoryObj } from '@storybook/react';
 

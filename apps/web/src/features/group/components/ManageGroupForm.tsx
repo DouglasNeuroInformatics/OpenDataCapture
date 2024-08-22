@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import type { UpdateGroupData } from '@opendatacapture/schemas/group';

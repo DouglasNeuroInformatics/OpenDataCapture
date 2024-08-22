@@ -1,0 +1,17 @@
+{
+  "name": "@jspsych/plugin-survey-html-form__1.x",
+  "type": "module",
+  "version": "1.0.3",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@jspsych/plugin-survey-html-form": "1.0.3",
+    "jspsych__7.x": "workspace:*"
+  }
+}

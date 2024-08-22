@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
@@ -60,9 +60,9 @@ export const InstrumentRenderPage = () => {
       </PageHeader>
       <div className="flex-grow">
         <InstrumentRenderer
-          bundle={instrumentBundleQuery.data.bundle}
           className="mx-auto max-w-3xl"
           subject={currentSession?.subject}
+          target={instrumentBundleQuery.data}
           onSubmit={handleSubmit}
         />
       </div>

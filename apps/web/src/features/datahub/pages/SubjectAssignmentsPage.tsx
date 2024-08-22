@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button, Dialog, Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { PlusIcon } from '@heroicons/react/24/solid';

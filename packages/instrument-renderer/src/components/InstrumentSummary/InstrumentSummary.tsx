@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Separator } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';

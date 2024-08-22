@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
 import { motion } from 'framer-motion';

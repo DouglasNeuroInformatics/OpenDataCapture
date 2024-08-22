@@ -6,7 +6,7 @@ export function useInstrumentBundle(id: null | string) {
   return useQuery({
     enabled: Boolean(id),
     queryFn: async () => {
-      const response = await axios.get(`/v1/instruments/${id}`);
+      const response = await axios.get(`/v1/instruments/bundle/${id}`);
       return $InstrumentBundleContainer.parseAsync(response.data);
     },
     queryKey: ['instrument-bundle', id]

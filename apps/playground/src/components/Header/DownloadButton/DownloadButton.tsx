@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import JSZip from 'jszip';
 import { DownloadIcon } from 'lucide-react';

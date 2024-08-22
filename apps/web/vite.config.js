@@ -1,4 +1,3 @@
-import module from 'module';
 import path from 'path';
 
 import importMetaEnv from '@import-meta-env/unplugin';
@@ -8,8 +7,6 @@ import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
-
-const require = module.createRequire(import.meta.url);
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -26,7 +23,7 @@ export default defineConfig(({ mode }) => ({
     esbuildOptions: {
       target: 'es2022'
     },
-    force: true
+    include: ['react/*', 'react-dom/*']
   },
   plugins: [
     react(),
@@ -40,9 +37,7 @@ export default defineConfig(({ mode }) => ({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(import.meta.dirname, 'src'),
-      react: path.dirname(require.resolve('react/package.json')),
-      'react-dom': path.dirname(require.resolve('react-dom/package.json'))
+      '@': path.resolve(import.meta.dirname, 'src')
     }
   },
   server: {

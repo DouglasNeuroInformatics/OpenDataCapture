@@ -1,7 +1,5 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import React from 'react';
-
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $Sex, $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';

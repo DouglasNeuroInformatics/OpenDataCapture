@@ -1,0 +1,16 @@
+{
+  "name": "dompurify__3.x",
+  "type": "module",
+  "version": "3.1.6",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "dompurify": "3.1.6"
+  }
+}

@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const VimStatusBar = () => {
   return (
     <div id="status">

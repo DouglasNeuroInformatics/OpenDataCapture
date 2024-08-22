@@ -3,7 +3,7 @@
 import { translations } from './translations.ts';
 
 const { defineInstrument, createI18Next } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
-const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
+const { z } = await import('/runtime/v1/zod@3.23.x/index.js');
 
 export default defineInstrument({
   kind: 'INTERACTIVE',

@@ -1,0 +1,16 @@
+{
+  "name": "zod__3.23.x",
+  "type": "module",
+  "version": "3.23.8",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "zod": "3.23.8"
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button, Heading, Input, Popover } from '@douglasneuroinformatics/libui/components';
 import { CopyButton } from '@opendatacapture/react-core';

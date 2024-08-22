@@ -235,6 +235,12 @@
     "en": "Save",
     "fr": "Enregistrer"
   },
+  "seriesInstrumentContent": {
+    "inProgress": {
+      "en": "Series Instrument in Process",
+      "fr": "Série d'instruments en cours"
+    }
+  },
   "somethingWentWrong": {
     "en": "Something Went Wrong",
     "fr": "Quelque chose n'a pas fonctionné"

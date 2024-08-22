@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { ArrowToggle, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import { LogOutIcon, SettingsIcon } from 'lucide-react';
@@ -36,7 +36,7 @@ export const UserDropup = () => {
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
         align="start"
-        className="w-56 border-slate-700 bg-slate-800 text-slate-300 shadow-md "
+        className="w-56 border-slate-700 bg-slate-800 text-slate-300 shadow-md"
         side="top"
       >
         <DropdownMenu.Label className="text-slate-300">{currentUser?.username}</DropdownMenu.Label>

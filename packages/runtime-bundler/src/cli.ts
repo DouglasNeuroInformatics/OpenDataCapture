@@ -32,7 +32,7 @@ if (!parsedConfig.success) {
 
 const bundler = new Bundler({ configFilepath, ...parsedConfig.data });
 try {
-  await bundler.bundle();
+  await bundler.bundle({ minify: parsedConfig.data.minify });
   console.log('Success!');
 } catch (err) {
   if (err instanceof Error) {

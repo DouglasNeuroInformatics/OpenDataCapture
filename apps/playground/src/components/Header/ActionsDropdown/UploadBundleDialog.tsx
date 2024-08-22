@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
-import React, { useEffect, useRef } from 'react';
+
+import { useEffect, useRef } from 'react';
 
 import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';

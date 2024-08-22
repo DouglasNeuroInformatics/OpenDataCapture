@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
 import type { Subject } from '@opendatacapture/schemas/subject';

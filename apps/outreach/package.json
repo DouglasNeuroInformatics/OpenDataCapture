@@ -14,7 +14,7 @@
     "@douglasneuroinformatics/libui": "^2.10.0",
     "@opendatacapture/schemas": "workspace:*",
     "clsx": "^2.1.1",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "workspace:lodash-es__4.x@*",
     "mdast-util-to-string": "^4.0.0",
     "reading-time": "^1.5.0",
     "tailwind-merge": "^2.3.0"
@@ -28,12 +28,11 @@
     "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/tailwindcss": "workspace:*",
     "@tailwindcss/typography": "^0.5.13",
-    "@types/lodash-es": "^4.17.12",
     "astro": "^4.11.1",
     "github-slugger": "^2.0.0",
     "sharp": "^0.33.4",
     "tailwindcss": "^3.4.4",
-    "type-fest": "workspace:type-fest__4.23.0@*",
+    "type-fest": "workspace:type-fest__4.x@*",
     "typedoc": "^0.26.6",
     "typedoc-plugin-markdown": "^4.2.5"
   }

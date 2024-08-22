@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
 import type { AnyUnilingualFormInstrument, FormInstrument } from '@opendatacapture/runtime-core';
 import type { Promisable } from 'type-fest';

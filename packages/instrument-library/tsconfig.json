@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "jsx": "react",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "Node16",
     "moduleResolution": "Node16",

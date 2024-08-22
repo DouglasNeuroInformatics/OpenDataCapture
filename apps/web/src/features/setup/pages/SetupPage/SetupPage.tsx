@@ -1,7 +1,5 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import React from 'react';
-
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { Logo } from '@opendatacapture/react-core';

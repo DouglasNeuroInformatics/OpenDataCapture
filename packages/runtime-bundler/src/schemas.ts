@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const $Config = z.object({
   include: z.array(z.string()),
+  minify: z.boolean().optional(),
   outdir: z.string()
 });
 

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { InstrumentBundlerBuildError } from '@opendatacapture/instrument-bundler';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { type InstrumentBundlerBuildError } from '@opendatacapture/instrument-bundler';
 import { range } from 'lodash-es';

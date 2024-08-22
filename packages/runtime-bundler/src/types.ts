@@ -1,8 +1,9 @@
 import type { Config } from './schemas.js';
 
+type ExportCondition = 'default' | 'import' | 'types';
+
 type PackageExport = {
-  import?: string;
-  types?: string;
+  [K in ExportCondition]?: string;
 };
 
 type ResolvedPackage = {
@@ -21,4 +22,4 @@ type EntryPoint = {
 
 export type BundlerOptions = { configFilepath: string } & Config;
 
-export type { EntryPoint, PackageExport, ResolvedPackage };
+export type { EntryPoint, ExportCondition, PackageExport, ResolvedPackage };

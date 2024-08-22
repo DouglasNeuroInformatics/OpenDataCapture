@@ -12,10 +12,10 @@
   "dependencies": {
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
-    "lodash-es": "workspace:lodash-es__4.17.21@*"
+    "lodash-es": "workspace:lodash-es__4.x@*"
   },
   "devDependencies": {
     "@types/k6": "~0.51.0",
-    "esbuild": "catalog:"
+    "esbuild": "catalog:esbuild"
   }
 }

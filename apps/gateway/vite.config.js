@@ -1,4 +1,3 @@
-// import module from 'module';
 import path from 'path';
 
 import { runtime } from '@opendatacapture/vite-plugin-runtime';
@@ -6,8 +5,6 @@ import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
-
-// const require = module.createRequire(import.meta.dirname);
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -23,7 +20,8 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     esbuildOptions: {
       target: 'es2022'
-    }
+    },
+    include: ['react/*', 'react-dom/*']
   },
   plugins: [
     react(),
@@ -34,8 +32,6 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, 'src')
-      // react: path.dirname(require.resolve('react/package.json')),
-      // 'react-dom': path.dirname(require.resolve('react-dom/package.json'))
     }
   }
 }));
