@@ -1,5 +1,6 @@
-export { InstrumentBundler } from './bundler.js';
-export { InstrumentBundlerBuildError, InstrumentBundlerError, InstrumentBundlerInternalError } from './error.js';
+export { bundle } from './bundle.js';
+export { InstrumentBundlerError } from './error.js';
 export { resolveIndexInput, resolveInput } from './resolve.js';
-export type { BundleOptions, BundlerInput, BundlerInputFileExtension } from './types.js';
+export type { BundleOptions, BundlerInput } from './schemas.js';
+export type * from './types.js';
 export { extractInputFileExtension } from './utils.js';

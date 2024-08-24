@@ -1,8 +1,10 @@
-import type { BundlerInput } from './types.js';
+import { InstrumentBundlerError } from './error.js';
+
+import type { BundlerInput } from './schemas.js';
 
 function resolveIndexInput<T extends BundlerInput>(inputs: T[]): T {
   if (inputs.length === 0) {
-    throw new Error('Failed to resolve index file from empty array');
+    throw new InstrumentBundlerError('Failed to resolve index file from empty array');
   }
   const extensions = ['.tsx', '.jsx', '.ts', '.js'];
   for (const extension of extensions) {
@@ -11,7 +13,7 @@ function resolveIndexInput<T extends BundlerInput>(inputs: T[]): T {
       return match;
     }
   }
-  throw new Error(
+  throw new InstrumentBundlerError(
     `Failed to resolve index file from input filenames: ${inputs.map((file) => `'${file.name}'`).join(', ')}`
   );
 }
@@ -21,7 +23,7 @@ function extractFilenameFromPath(path: string): string {
   if (parts[0] === '.' && parts.length === 2) {
     return parts[1];
   }
-  throw new Error(`Invalid path '${path}': expected relative path to file in same directory`);
+  throw new InstrumentBundlerError(`Invalid path '${path}': expected relative path to file in same directory`);
 }
 
 function resolveInput<T extends BundlerInput>(path: string, inputs: T[]): null | T {

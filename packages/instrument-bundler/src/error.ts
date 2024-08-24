@@ -1,41 +1,40 @@
+import type { Class } from 'type-fest';
+
 import type { BuildFailure } from './vendor/esbuild.js';
 
-export abstract class InstrumentBundlerError extends Error {
-  public abstract name: string;
-}
+type InstrumentBundlerErrorInstance =
+  | {
+      cause: BuildFailure;
+      kind: 'ESBUILD_FAILURE';
+    }
+  | {
+      cause?: unknown;
+      kind?: undefined;
+    };
 
-export abstract class InstrumentBundlerInternalError extends InstrumentBundlerError {
-  public abstract name: string;
-}
+type InstrumentBundlerErrorKind = InstrumentBundlerErrorInstance['kind'];
 
-/**
- * Thrown when the build process fails, likely due to a syntax error
- */
-export class InstrumentBundlerBuildError extends InstrumentBundlerError {
-  public cause: BuildFailure;
-  public name = 'InstrumentBundlerBuildError' as const;
+type InstrumentBundlerErrorOptions = { kind?: InstrumentBundlerErrorKind } & ErrorOptions;
 
-  private constructor(message: string, { cause, ...options }: { cause: BuildFailure } & ErrorOptions) {
+type InstrumentBundlerErrorClass = {
+  isInstance<TKind extends InstrumentBundlerErrorKind>(
+    arg: unknown,
+    kind: TKind
+  ): arg is Extract<InstrumentBundlerErrorInstance, { kind: TKind }>;
+} & Class<Error & InstrumentBundlerErrorInstance, [string, InstrumentBundlerErrorOptions] | [string]>;
+
+export const InstrumentBundlerError: InstrumentBundlerErrorClass = class extends Error {
+  kind: any;
+  constructor(message: string, options?: InstrumentBundlerErrorOptions) {
     super(message, options);
-    this.cause = cause;
+    this.kind = options?.kind;
+    this.name = 'InstrumentBundlerError';
   }
 
-  static fromBuildFailure(buildFailure: BuildFailure) {
-    return new this(buildFailure.message, { cause: buildFailure });
+  static isInstance<TKind extends InstrumentBundlerErrorKind>(
+    arg: unknown,
+    kind: TKind
+  ): arg is Extract<InstrumentBundlerErrorInstance, { kind: TKind }> {
+    return Boolean(arg instanceof this && arg.kind === kind);
   }
-}
-
-export class InstrumentBundlerInputValidationError extends InstrumentBundlerInternalError {
-  public name = 'InstrumentBundlerInputValidationError' as const;
-}
-/**
- * Thrown when the build process is successful, but the result does not match the expected structure,
- * which likely indicates a logic error in our code rather than user-error.
- */
-export class InstrumentBundlerBuildValidationError extends InstrumentBundlerInternalError {
-  public name = 'InstrumentBundlerBuildValidationError' as const;
-}
-
-export class InstrumentBundlerMiscInternalError extends InstrumentBundlerInternalError {
-  public name = 'InstrumentBundlerMiscInternalError' as const;
-}
+};

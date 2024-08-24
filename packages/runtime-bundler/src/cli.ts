@@ -3,7 +3,7 @@
 import path from 'path';
 
 import { Bundler } from './bundler.js';
-import { $Config } from './schemas.js';
+import { $UserConfigs } from './schemas.js';
 
 const cwd = process.cwd();
 const configFilename = 'runtime.config.js';
@@ -23,21 +23,24 @@ if (!exports.default) {
   process.exit(1);
 }
 
-const parsedConfig = await $Config.safeParseAsync(exports.default);
-if (!parsedConfig.success) {
-  console.warn(parsedConfig.error.issues);
+const parseResult = await $UserConfigs.safeParseAsync(exports.default);
+if (!parseResult.success) {
+  console.warn(parseResult.error.issues);
   console.error(`Invalid structure of default export from config file '${configFilepath}'`);
   process.exit(1);
 }
 
-const bundler = new Bundler({ configFilepath, ...parsedConfig.data });
-try {
-  await bundler.bundle({ minify: parsedConfig.data.minify });
-  console.log('Success!');
-} catch (err) {
-  if (err instanceof Error) {
-    console.error(err.message);
-  } else {
-    console.error(err);
+const configs = Array.isArray(parseResult.data) ? parseResult.data : [parseResult.data];
+for (const config of configs) {
+  const bundler = new Bundler({ configFilepath, ...config });
+  try {
+    await bundler.bundle({ mode: config.mode });
+    console.log('Success!');
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(err.message);
+    } else {
+      console.error(err);
+    }
   }
 }

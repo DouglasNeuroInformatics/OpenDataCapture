@@ -40,7 +40,7 @@
     "react-error-boundary": "^4.0.13",
     "react-i18next": "^14.1.2",
     "stacktrace-parser": "^0.1.10",
-    "ts-pattern": "^5.1.2",
+    "ts-pattern": "workspace:ts-pattern__5.x@*",
     "zod": "workspace:zod__3.23.x@*",
     "zod-validation-error": "^3.3.0",
     "zustand": "^4.5.2"

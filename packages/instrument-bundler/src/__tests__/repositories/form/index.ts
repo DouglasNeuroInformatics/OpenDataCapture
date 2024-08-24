@@ -1,24 +1,45 @@
-/* eslint-disable perfectionist/sort-objects */
-
-const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
-const { z } = await import('/runtime/v1/zod@3.23.x/index.js');
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.23.x';
 
 export default defineInstrument({
-  kind: 'FORM',
-  language: 'en',
-  tags: ['<PLACEHOLDER>'],
+  content: {
+    q1: {
+      kind: 'boolean',
+      label: 'Question 1',
+      variant: 'radio'
+    },
+    q2: {
+      deps: ['q1'],
+      kind: 'dynamic',
+      render(data) {
+        if (!data.q1) {
+          return null;
+        }
+        return {
+          kind: 'string',
+          label: 'Question 2',
+          variant: 'input'
+        };
+      }
+    }
+  },
+  details: {
+    description: 'This is a form instrument',
+    estimatedDuration: 1,
+    instructions: ['Please complete the form'],
+    license: 'Apache-2.0',
+    title: 'Form Instrument Stub'
+  },
   internal: {
     edition: 1,
-    name: '<PLACEHOLDER>'
+    name: 'FORM_INSTRUMENT_STUB'
   },
-  content: {},
-  details: {
-    description: '<PLACEHOLDER>',
-    estimatedDuration: 1,
-    instructions: ['<PLACEHOLDER>'],
-    license: 'UNLICENSED',
-    title: '<PLACEHOLDER>'
-  },
+  kind: 'FORM',
+  language: 'en',
   measures: {},
-  validationSchema: z.object({})
+  tags: ['<PLACEHOLDER>'],
+  validationSchema: z.object({
+    q1: z.boolean(),
+    q2: z.string().optional()
+  })
 });

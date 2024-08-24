@@ -36,7 +36,7 @@
     "lodash-es": "workspace:lodash-es__4.x@*",
     "lucide-react": "^0.394.0",
     "react-i18next": "^14.1.2",
-    "ts-pattern": "^5.1.2"
+    "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
     "@opendatacapture/instrument-stubs": "workspace:*",

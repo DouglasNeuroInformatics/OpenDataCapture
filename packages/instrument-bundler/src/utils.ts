@@ -1,6 +1,6 @@
 import { match, P } from 'ts-pattern';
 
-import { InstrumentBundlerMiscInternalError } from './error.js';
+import { InstrumentBundlerError } from './error.js';
 
 import type { BundlerInputFileExtension } from './types.js';
 import type { Loader } from './vendor/esbuild.js';
@@ -20,9 +20,11 @@ export function inferLoader(filename: string): Loader {
     .with('.tsx', () => 'tsx' as const)
     .with(P.union('.jpeg', '.jpg', '.png', '.svg', '.webp'), () => 'dataurl' as const)
     .with(null, () => {
-      throw new InstrumentBundlerMiscInternalError(
-        `Cannot infer loader due to unexpected extension for filename: ${filename}`
-      );
+      throw new InstrumentBundlerError(`Cannot infer loader due to unexpected extension for filename: ${filename}`);
     })
     .exhaustive();
+}
+
+export function isHttpImport(path: string) {
+  return path.startsWith('/') || path.startsWith('http://') || path.startsWith('https://');
 }

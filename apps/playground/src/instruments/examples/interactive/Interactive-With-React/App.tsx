@@ -1,4 +1,4 @@
-const { useState } = await import('react');
+import { useState } from '/runtime/v1/react@18.x';
 
 import reactLogo from './react.svg';
 

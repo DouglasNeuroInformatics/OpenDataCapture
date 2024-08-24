@@ -1,10 +1,8 @@
-let esbuild: typeof import('esbuild');
 if (typeof window === 'undefined') {
-  ({ default: esbuild } = await import('esbuild'));
+  var { build, transform } = await import('esbuild');
 } else {
-  ({ default: esbuild } = await import('esbuild-wasm'));
+  var { build, transform } = await import('esbuild-wasm');
 }
 
-export default esbuild;
-
-export type * from 'esbuild';
+export { build, transform };
+export type { BuildFailure, BuildResult, Loader, Location, Message, Plugin } from 'esbuild';

@@ -207,4 +207,4 @@ declare class ImageButtonResponsePlugin implements JsPsychPlugin<Info> {
   private simulate_visual;
 }
 
-export default ImageButtonResponsePlugin;
+export { ImageButtonResponsePlugin as default, ImageButtonResponsePlugin };

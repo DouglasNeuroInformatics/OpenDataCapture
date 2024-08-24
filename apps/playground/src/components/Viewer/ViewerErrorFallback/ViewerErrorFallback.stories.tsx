@@ -1,4 +1,4 @@
-import { InstrumentBundlerBuildError } from '@opendatacapture/instrument-bundler';
+import { InstrumentBundlerError } from '@opendatacapture/instrument-bundler';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { ViewerErrorFallback } from './ViewerErrorFallback';
@@ -9,11 +9,14 @@ export default { component: ViewerErrorFallback } as Meta<typeof ViewerErrorFall
 
 export const Build: Story = {
   args: {
-    error: InstrumentBundlerBuildError.fromBuildFailure({
-      errors: [],
-      message: '',
-      name: 'InstrumentBundlerBuildError',
-      warnings: []
+    error: new InstrumentBundlerError('Error', {
+      cause: {
+        errors: [],
+        message: '',
+        name: 'InstrumentBundlerBuildError',
+        warnings: []
+      },
+      kind: 'ESBUILD_FAILURE'
     }),
     title: 'Failed to Compile'
   }

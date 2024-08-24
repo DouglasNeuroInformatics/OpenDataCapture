@@ -1,8 +1,4 @@
 {
   "extends": "../../jsconfig.json",
-  "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler"
-  },
   "include": ["scripts/build.js", "src/**/*", "*.js", "*.cjs"]
 }

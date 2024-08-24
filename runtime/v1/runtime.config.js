@@ -29,8 +29,10 @@ export default {
     'react-dom__18.x',
     'react__18.x',
     'simple-statistics__7.x',
+    'ts-pattern__5.x',
     'type-fest__4.x',
     'zod__3.23.x'
   ],
+  mode: 'production',
   outdir: 'dist'
 };

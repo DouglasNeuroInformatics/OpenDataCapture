@@ -2,8 +2,6 @@
   "compilerOptions": {
     "checkJs": false,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     "rootDir": "../.."
   },
   "extends": "../../jsconfig.json",

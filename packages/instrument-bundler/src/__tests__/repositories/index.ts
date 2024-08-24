@@ -1,9 +1,9 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import type { BundlerInput } from './types.js';
+import type { BundlerInput } from '../../schemas.js';
 
-export async function loadDirectory(dirname: string) {
+async function loadDirectory(dirname: string) {
   if (!fs.existsSync(dirname)) {
     throw new Error(`Directory does not exist: '${dirname}'`);
   } else if (!fs.lstatSync(dirname).isDirectory()) {
@@ -22,3 +22,8 @@ export async function loadDirectory(dirname: string) {
   }
   return inputs;
 }
+
+export const repositories = new Map([
+  ['form', await loadDirectory(path.resolve(import.meta.dirname, 'form'))],
+  ['interactive', await loadDirectory(path.resolve(import.meta.dirname, 'interactive'))]
+] as const);

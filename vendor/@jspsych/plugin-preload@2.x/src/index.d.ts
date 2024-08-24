@@ -292,4 +292,4 @@ declare class PreloadPlugin implements JsPsychPlugin<Info> {
   private simulate_visual;
 }
 
-export { PreloadPlugin as default };
+export { PreloadPlugin as default, PreloadPlugin };

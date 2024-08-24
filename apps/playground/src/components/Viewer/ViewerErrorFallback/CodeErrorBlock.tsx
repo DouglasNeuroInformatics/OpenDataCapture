@@ -1,11 +1,11 @@
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import { type InstrumentBundlerBuildError } from '@opendatacapture/instrument-bundler';
+import type { BuildFailure } from 'esbuild-wasm';
 import { range } from 'lodash-es';
 
 import { useAppStore } from '@/store';
 
 export type CodeErrorBlockProps = {
-  error: InstrumentBundlerBuildError;
+  error: { cause: BuildFailure };
 };
 
 export const CodeErrorBlock = ({ error }: CodeErrorBlockProps) => {

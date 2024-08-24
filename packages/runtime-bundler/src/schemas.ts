@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
+type Config = z.infer<typeof $Config>;
 const $Config = z.object({
   include: z.array(z.string()),
-  minify: z.boolean().optional(),
+  mode: z.enum(['development', 'production']).optional(),
   outdir: z.string()
 });
 
-type Config = z.infer<typeof $Config>;
+const $UserConfigs = z.union([$Config, z.array($Config)]);
 
-export { $Config };
+export { $Config, $UserConfigs };
 export type { Config };

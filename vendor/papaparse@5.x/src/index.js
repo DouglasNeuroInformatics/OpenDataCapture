@@ -1,3 +1,20 @@
-export { BAD_DELIMITERS, RECORD_SEP, UNIT_SEP, WORKERS_SUPPORTED } from 'papaparse';
-export { DefaultDelimiter, LocalChunkSize, Parser, RemoteChunkSize } from 'papaparse';
-export { parse, unparse } from 'papaparse';
+export {
+  BAD_DELIMITERS,
+  BYTE_ORDER_MARK,
+  default,
+  DefaultDelimiter,
+  FileStreamer,
+  LocalChunkSize,
+  NetworkStreamer,
+  NODE_STREAM_INPUT,
+  parse,
+  Parser,
+  ParserHandle,
+  ReadableStreamStreamer,
+  RECORD_SEP,
+  RemoteChunkSize,
+  StringStreamer,
+  UNIT_SEP,
+  unparse,
+  WORKERS_SUPPORTED
+} from 'papaparse';

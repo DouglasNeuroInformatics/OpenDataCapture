@@ -15,7 +15,7 @@ export class Bundler {
     this.resolver = new Resolver(options.configFilepath);
   }
 
-  async bundle({ minify = true }: { minify?: boolean } = {}): Promise<void> {
+  async bundle({ mode = 'production' }: Pick<BundlerOptions, 'mode'> = {}): Promise<void> {
     const packages = await this.findPackages();
     const entryPoints = this.getEntryPoints(packages);
 
@@ -25,7 +25,7 @@ export class Bundler {
       entryPoints: entryPoints,
       format: 'esm',
       keepNames: true,
-      minify,
+      minify: mode === 'production',
       outdir: this.options.outdir,
       platform: 'browser',
       plugins: [
@@ -36,6 +36,8 @@ export class Bundler {
           packages
         })
       ],
+      sourcemap: mode === 'development' ? 'inline' : false,
+      sourcesContent: mode === 'development',
       splitting: true,
       target: 'es2022'
     });

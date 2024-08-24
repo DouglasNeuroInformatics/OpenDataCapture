@@ -177,4 +177,4 @@ declare class HtmlKeyboardResponsePlugin implements JsPsychPlugin<Info> {
   private simulate_visual;
 }
 
-export { HtmlKeyboardResponsePlugin as default };
+export { HtmlKeyboardResponsePlugin as default, HtmlKeyboardResponsePlugin };

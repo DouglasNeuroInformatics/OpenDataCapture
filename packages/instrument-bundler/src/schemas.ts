@@ -1,6 +1,19 @@
+import { $Uint8Array } from '@opendatacapture/schemas/core';
 import { z } from 'zod';
 
 import type { BuildFailure, Location, Message } from './vendor/esbuild.js';
+
+export const $BundlerInput = z.object({
+  content: z.union([z.string(), $Uint8Array]),
+  name: z.string()
+});
+export type BundlerInput = z.infer<typeof $BundlerInput>;
+
+export const $BundleOptions = z.object({
+  inputs: z.array($BundlerInput),
+  minify: z.boolean().optional()
+});
+export type BundleOptions = z.infer<typeof $BundleOptions>;
 
 const $Location: z.ZodType<Location> = z.object({
   column: z.number(),

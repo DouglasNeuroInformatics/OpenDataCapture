@@ -222,4 +222,4 @@ declare class SurveyTextPlugin implements JsPsychPlugin<Info> {
   private simulate_visual;
 }
 
-export { SurveyTextPlugin as default };
+export { SurveyTextPlugin as default, SurveyTextPlugin };

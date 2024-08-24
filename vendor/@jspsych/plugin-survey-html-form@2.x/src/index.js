@@ -1,1 +1,1 @@
-export * from '@jspsych/plugin-survey-html-form';
+export { default, default as SurveyHtmlFormPlugin } from '@jspsych/plugin-survey-html-form';

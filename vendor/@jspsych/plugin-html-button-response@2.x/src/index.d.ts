@@ -181,4 +181,4 @@ declare class HtmlButtonResponsePlugin implements JsPsychPlugin<Info> {
   private simulate_visual;
 }
 
-export { HtmlButtonResponsePlugin as default };
+export { HtmlButtonResponsePlugin as default, HtmlButtonResponsePlugin };

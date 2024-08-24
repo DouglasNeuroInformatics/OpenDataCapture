@@ -155,4 +155,4 @@ declare class ImageKeyboardResponsePlugin implements JsPsychPlugin<Info> {
   private create_simulation_data;
 }
 
-export default ImageKeyboardResponsePlugin;
+export { ImageKeyboardResponsePlugin as default, ImageKeyboardResponsePlugin };

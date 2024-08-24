@@ -1,6 +1,6 @@
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import { InstrumentBundlerBuildError } from '@opendatacapture/instrument-bundler';
+import { InstrumentBundlerError } from '@opendatacapture/instrument-bundler';
 
 import { CodeErrorBlock } from './CodeErrorBlock';
 import { ErrorMessage } from './ErrorMessage';
@@ -23,7 +23,7 @@ export const ViewerErrorFallback = ({ className, description, error, title }: Vi
         </Heading>
         {description && <p className="mb-4 text-sm">{description}</p>}
         <ErrorMessage error={error} />
-        {error instanceof InstrumentBundlerBuildError && <CodeErrorBlock error={error} />}
+        {InstrumentBundlerError.isInstance(error, 'ESBUILD_FAILURE') && <CodeErrorBlock error={error} />}
       </div>
       {error.cause instanceof Error && (
         <ToggledContent label="Cause">

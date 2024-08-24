@@ -15,6 +15,6 @@
     "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "ts-pattern": "^5.1.2"
+    "ts-pattern": "workspace:ts-pattern__5.x@*"
   }
 }

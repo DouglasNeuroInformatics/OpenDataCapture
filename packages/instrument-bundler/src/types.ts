@@ -1,19 +1,3 @@
-export type BundlerInput = {
-  content: string | Uint8Array;
-  name: string;
-};
-
-export type BundleOptions = {
-  debug?: boolean;
-  dynamicImport?: 'mapped' | 'preserve';
-  inputs: BundlerInput[];
-};
-
-export type BuildOutput = {
-  css?: string;
-  js: string;
-};
-
 export type BundlerInputFileExtension =
   | '.css'
   | '.html'
@@ -26,3 +10,8 @@ export type BundlerInputFileExtension =
   | '.ts'
   | '.tsx'
   | '.webp';
+
+export type BuildOutput = {
+  css?: string;
+  js: string;
+};

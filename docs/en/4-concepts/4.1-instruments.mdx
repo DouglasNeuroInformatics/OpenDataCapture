@@ -126,10 +126,9 @@ if the index file is `index.js`, then it is passed the following string:
 Our custom plugin assumes responsibility for resolving all imports found. In this case, we resolve the static
 relative import `'./index.js` which exists in the inputs. We then return the content of the index input to
 esbuild for further processing. In this case, esbuild will look for imports in the content of the index,
-and pass any results to our resolver. The resolver marks any dynamic imports starting with `/` as
-external (e.g., import('/runtime/foo.js)'). It looks for any static imports inside the inputs and
-throws an exception if it is not found. If it is found, the content is passed to esbuild and
-the bundling process continues.
+and pass any results to our resolver. The resolver marks any HTTP imports as external (e.g., import React from '/runtime/v1/react@18.x').
+It looks for any static imports inside the inputs and throws an exception if it is not found. If it is found,
+the content is passed to esbuild and the bundling process continues.
 
 Ultimately, this results in one JavaScript virtual file being generated, and one CSS virtual
 file being generated (if CSS is imported). If applicable, the CSS file is a bundle of

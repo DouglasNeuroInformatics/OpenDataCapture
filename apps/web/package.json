@@ -54,7 +54,7 @@
     "react-router-dom": "^6.23.1",
     "recharts": "^2.12.7",
     "tailwind-merge": "^2.3.0",
-    "ts-pattern": "^5.1.2",
+    "ts-pattern": "workspace:ts-pattern__5.x@*",
     "type-fest": "workspace:type-fest__4.x@*",
     "zod": "workspace:zod__3.23.x@*",
     "zustand": "^4.5.2"

@@ -123,4 +123,4 @@ declare class SurveyHtmlFormPlugin implements JsPsychPlugin<Info> {
   trial(display_element: HTMLElement, trial: TrialType<Info>): void;
 }
 
-export { SurveyHtmlFormPlugin as default };
+export { SurveyHtmlFormPlugin as default, SurveyHtmlFormPlugin };

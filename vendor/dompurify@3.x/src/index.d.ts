@@ -113,4 +113,4 @@ export declare interface SanitizeElementHookEvent {
 
 declare const DOMPurify: DOMPurifyI;
 
-export default DOMPurify;
+export { DOMPurify as default, DOMPurify };

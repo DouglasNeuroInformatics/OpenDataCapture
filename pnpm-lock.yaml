@@ -36,8 +36,14 @@ importers:
         specifier: ^19.0.3
         version: 19.0.3
       '@douglasneuroinformatics/eslint-config':
-        specifier: ^5.0.0
-        version: 5.0.0(astro-eslint-parser@1.0.2(typescript@5.4.5))(eslint@9.9.0(jiti@1.21.6))(svelte-eslint-parser@0.41.0)(typescript@5.4.5)
+        specifier: ^5.1.0
+        version: 5.1.0(astro-eslint-parser@1.0.2(typescript@5.4.5))(eslint@9.9.0(jiti@1.21.6))(svelte-eslint-parser@0.41.0)(typescript@5.4.5)
+      '@douglasneuroinformatics/prettier-config':
+        specifier: ^0.0.1
+        version: 0.0.1(husky@9.1.5)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.6.6(prettier-plugin-astro@0.14.1)(prettier@3.3.3))(prettier@3.3.3)
+      '@douglasneuroinformatics/tsconfig':
+        specifier: ^1.0.1
+        version: 1.0.1(typescript@5.4.5)
       '@storybook/addon-essentials':
         specifier: ^8.1.6
         version: 8.2.9(storybook@8.2.9(@babel/preset-env@7.25.3(@babel/core@7.25.2)))
@@ -261,8 +267,8 @@ importers:
         specifier: ^7.8.1
         version: 7.8.1
       ts-pattern:
-        specifier: ^5.1.2
-        version: 5.3.1
+        specifier: workspace:ts-pattern__5.x@*
+        version: link:../../vendor/ts-pattern@5.x
       zod:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
@@ -591,8 +597,8 @@ importers:
         specifier: ^0.1.10
         version: 0.1.10
       ts-pattern:
-        specifier: ^5.1.2
-        version: 5.3.1
+        specifier: workspace:ts-pattern__5.x@*
+        version: link:../../vendor/ts-pattern@5.x
       zod:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
@@ -739,8 +745,8 @@ importers:
         specifier: ^2.3.0
         version: 2.5.2
       ts-pattern:
-        specifier: ^5.1.2
-        version: 5.3.1
+        specifier: workspace:ts-pattern__5.x@*
+        version: link:../../vendor/ts-pattern@5.x
       type-fest:
         specifier: workspace:type-fest__4.x@*
         version: link:../../vendor/type-fest@4.x
@@ -843,9 +849,15 @@ importers:
 
   packages/instrument-bundler:
     dependencies:
+      '@opendatacapture/schemas':
+        specifier: 'workspace:'
+        version: link:../schemas
       commander:
         specifier: ^12.1.0
         version: 12.1.0
+      es-module-lexer:
+        specifier: ^1.5.4
+        version: 1.5.4
       esbuild:
         specifier: catalog:esbuild
         version: 0.23.1
@@ -855,12 +867,18 @@ importers:
       glob:
         specifier: ^10.4.1
         version: 10.4.5
+      slashes:
+        specifier: ^3.0.12
+        version: 3.0.12
       ts-pattern:
-        specifier: ^5.1.2
-        version: 5.3.1
+        specifier: workspace:ts-pattern__5.x@*
+        version: link:../../vendor/ts-pattern@5.x
       tsx:
         specifier: 4.x
         version: 4.8.2
+      type-fest:
+        specifier: workspace:type-fest__4.x@*
+        version: link:../../vendor/type-fest@4.x
       zod:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
@@ -871,6 +889,12 @@ importers:
       '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
+      react:
+        specifier: workspace:react__18.x@*
+        version: link:../../vendor/react@18.x
+      react-dom:
+        specifier: workspace:react-dom__18.x@*
+        version: link:../../vendor/react-dom@18.x
 
   packages/instrument-interpreter:
     dependencies:
@@ -955,8 +979,8 @@ importers:
         specifier: 3.x
         version: 3.4.10
       ts-pattern:
-        specifier: ^5.1.2
-        version: 5.3.1
+        specifier: workspace:ts-pattern__5.x@*
+        version: link:../../vendor/ts-pattern@5.x
       zod:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
@@ -1013,8 +1037,8 @@ importers:
         specifier: workspace:lodash-es__4.x@*
         version: link:../../vendor/lodash-es@4.x
       ts-pattern:
-        specifier: ^5.1.2
-        version: 5.3.1
+        specifier: workspace:ts-pattern__5.x@*
+        version: link:../../vendor/ts-pattern@5.x
 
   packages/licenses: {}
 
@@ -1051,8 +1075,8 @@ importers:
         specifier: 3.x
         version: 3.4.10
       ts-pattern:
-        specifier: ^5.1.2
-        version: 5.3.1
+        specifier: workspace:ts-pattern__5.x@*
+        version: link:../../vendor/ts-pattern@5.x
       zod:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
@@ -1289,6 +1313,9 @@ importers:
       simple-statistics__7.x:
         specifier: workspace:*
         version: link:../../vendor/simple-statistics@7.x
+      ts-pattern__5.x:
+        specifier: workspace:*
+        version: link:../../vendor/ts-pattern@5.x
       type-fest__4.x:
         specifier: workspace:*
         version: link:../../vendor/type-fest@4.x
@@ -1520,6 +1547,12 @@ importers:
       simple-statistics:
         specifier: 7.8.3
         version: 7.8.3
+
+  vendor/ts-pattern@5.x:
+    dependencies:
+      ts-pattern:
+        specifier: 5.3.1
+        version: 5.3.1
 
   vendor/type-fest@4.x: {}
 
@@ -2538,9 +2571,9 @@ packages:
       esbuild: 0.x
       prisma: 5.x
 
-  '@douglasneuroinformatics/eslint-config@5.0.0':
+  '@douglasneuroinformatics/eslint-config@5.1.0':
     resolution:
-      { integrity: sha512-amUZfddzb4xKrOSfEAl9+zgsJNnl76KKE8TXeIIHuO+KW1pHzjqU9z/VLtbpqI9FDIgQBXdvyt4lppIv+FKH1w== }
+      { integrity: sha512-GNULRsApDydCdgc2kWIHFUU13sBf3/UhfnVpch+ljSHuUCD1tI2kTkLlCWH4HPezlGxDjlEY7D0tivsZzqUJOQ== }
     peerDependencies:
       eslint: 9.x
       typescript: 5.x
@@ -2595,6 +2628,32 @@ packages:
       react: ^18.2.0
       react-dom: ^18.2.0
       zod: ^3.23.6
+
+  '@douglasneuroinformatics/prettier-config@0.0.1':
+    resolution:
+      { integrity: sha512-Cml8ilNKjJOMp50lR5isEfc9QkGGgf8PoF9Fk73CmYGGMS8TUmhA59++Zia/12rJ2fkpKFhfI8uA3VTEnv+qKw== }
+    hasBin: true
+    peerDependencies:
+      husky: 9.x
+      prettier: 3.x
+      prettier-plugin-astro: 0.x
+      prettier-plugin-svelte: 3.x
+      prettier-plugin-tailwindcss: 0.x
+    peerDependenciesMeta:
+      husky:
+        optional: true
+      prettier-plugin-astro:
+        optional: true
+      prettier-plugin-svelte:
+        optional: true
+      prettier-plugin-tailwindcss:
+        optional: true
+
+  '@douglasneuroinformatics/tsconfig@1.0.1':
+    resolution:
+      { integrity: sha512-lS49lCenQwEgwKw60DBONp6TCRd6VQWaw3m4UdUEopXbdBx2kfbMdeB0zRkSV+RgghhoBHYpVod2JmjJS37NsA== }
+    peerDependencies:
+      typescript: ^5.4.3
 
   '@emmetio/abbreviation@2.3.3':
     resolution:
@@ -14895,7 +14954,7 @@ snapshots:
       esbuild: 0.23.1
       prisma: 5.18.0
 
-  '@douglasneuroinformatics/eslint-config@5.0.0(astro-eslint-parser@1.0.2(typescript@5.4.5))(eslint@9.9.0(jiti@1.21.6))(svelte-eslint-parser@0.41.0)(typescript@5.4.5)':
+  '@douglasneuroinformatics/eslint-config@5.1.0(astro-eslint-parser@1.0.2(typescript@5.4.5))(eslint@9.9.0(jiti@1.21.6))(svelte-eslint-parser@0.41.0)(typescript@5.4.5)':
     dependencies:
       eslint: 9.9.0(jiti@1.21.6)
       eslint-plugin-astro: 1.2.3(eslint@9.9.0(jiti@1.21.6))(typescript@5.4.5)
@@ -15138,6 +15197,18 @@ snapshots:
       - react-native
       - tailwindcss
       - typescript
+
+  '@douglasneuroinformatics/prettier-config@0.0.1(husky@9.1.5)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.6.6(prettier-plugin-astro@0.14.1)(prettier@3.3.3))(prettier@3.3.3)':
+    dependencies:
+      prettier: 3.3.3
+    optionalDependencies:
+      husky: 9.1.5
+      prettier-plugin-astro: 0.14.1
+      prettier-plugin-tailwindcss: 0.6.6(prettier-plugin-astro@0.14.1)(prettier@3.3.3)
+
+  '@douglasneuroinformatics/tsconfig@1.0.1(typescript@5.4.5)':
+    dependencies:
+      typescript: 5.4.5
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:

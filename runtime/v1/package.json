@@ -58,6 +58,7 @@
     "react-dom__18.x": "workspace:*",
     "react__18.x": "workspace:*",
     "simple-statistics__7.x": "workspace:*",
+    "ts-pattern__5.x": "workspace:*",
     "type-fest__4.x": "workspace:*",
     "zod__3.23.x": "workspace:*"
   }

@@ -1,1 +1,1 @@
-export * from '@jspsych/plugin-survey-text';
+export { default, default as SurveyTextPlugin } from '@jspsych/plugin-survey-text';

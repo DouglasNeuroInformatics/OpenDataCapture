@@ -11,7 +11,7 @@ import type { BundlerOptions, ResolvedPackage } from '../types.js';
 const BUNDLER_OPTIONS: BundlerOptions = {
   configFilepath: '/root/package.json',
   include: ['jquery__1.0.0'],
-  minify: true,
+  mode: 'production',
   outdir: 'dist'
 };
 

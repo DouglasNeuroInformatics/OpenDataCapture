@@ -49,7 +49,7 @@
     "passport-jwt": "4.0.1",
     "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.1",
-    "ts-pattern": "^5.1.2",
+    "ts-pattern": "workspace:ts-pattern__5.x@*",
     "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
