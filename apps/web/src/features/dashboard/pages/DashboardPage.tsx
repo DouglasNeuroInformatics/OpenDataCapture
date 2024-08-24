@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';

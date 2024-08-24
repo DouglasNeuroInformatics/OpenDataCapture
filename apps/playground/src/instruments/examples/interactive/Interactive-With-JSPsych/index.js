@@ -1,14 +1,9 @@
-const { initJsPsych } = await import('/runtime/v1/jspsych@7.3.4/index.js');
-const { default: HtmlKeyboardResponsePlugin } = await import(
-  '/runtime/v1/@jspsych/plugin-html-keyboard-response@1.1.3/index.js'
-);
-const { default: ImageKeyboardResponsePlugin } = await import(
-  '/runtime/v1/@jspsych/plugin-image-keyboard-response@1.1.3/index.js'
-);
-const { default: PreloadPlugin } = await import('/runtime/v1/@jspsych/plugin-preload@1.1.3/index.js');
-
-const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
-const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
+import HtmlKeyboardResponsePlugin from '/runtime/v1/@jspsych/plugin-html-keyboard-response@1.x';
+import ImageKeyboardResponsePlugin from '/runtime/v1/@jspsych/plugin-image-keyboard-response@1.x';
+import PreloadPlugin from '/runtime/v1/@jspsych/plugin-preload@1.x';
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { initJsPsych } from '/runtime/v1/jspsych@7.x';
+import { z } from '/runtime/v1/zod@3.23.x';
 
 // import blue from '../../assets/img/blue.png';
 // import orange from '../../assets/img/orange.png';

@@ -1,0 +1,16 @@
+{
+  "name": "pure-rand__6.x",
+  "type": "module",
+  "version": "6.1.0",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "pure-rand": "6.1.0"
+  }
+}

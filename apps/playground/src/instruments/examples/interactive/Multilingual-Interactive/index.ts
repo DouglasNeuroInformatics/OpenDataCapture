@@ -1,9 +1,9 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { translations } from './translations.ts';
+import { createI18Next, defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.23.x';
 
-const { defineInstrument, createI18Next } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
-const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
+import { translations } from './translations.ts';
 
 export default defineInstrument({
   kind: 'INTERACTIVE',

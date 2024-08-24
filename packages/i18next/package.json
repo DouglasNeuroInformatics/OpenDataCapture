@@ -16,10 +16,10 @@
     "lint": "tsc && eslint --fix src"
   },
   "peerDependencies": {
-    "react": "18.x",
-    "react-dom": "18.x",
+    "react": "workspace:react__18.x@*",
+    "react-dom": "workspace:react-dom__18.x@*",
     "tailwindcss": "3.x",
-    "zod": "workspace:zod__3.23.6@*"
+    "zod": "workspace:zod__3.23.x@*"
   },
   "dependencies": {
     "@douglasneuroinformatics/libui": "^2.10.0",

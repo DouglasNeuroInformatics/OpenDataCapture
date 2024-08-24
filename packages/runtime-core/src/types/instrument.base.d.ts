@@ -1,5 +1,5 @@
 import type { LicenseIdentifier } from '@opendatacapture/licenses';
-import type { ConditionalKeys, Merge, Simplify } from 'type-fest';
+import type { ConditionalKeys, Merge } from 'type-fest';
 import type { z } from 'zod';
 
 import type { Language } from './core.d.ts';
@@ -154,22 +154,6 @@ type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage = Instru
   }
 >;
 
-/**
- * An object containing the essential data describing an instrument, but omitting the content
- * and validation schema required to actually complete the instrument. This may be used for,
- * among other things, displaying available instruments to the user.
- * @internal
- */
-type InstrumentSummary<T extends BaseInstrument = BaseInstrument> = {
-  id: string;
-} & Omit<T, 'content'>;
-
-/** @internal */
-type UnilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<Language>>>;
-
-/** @internal */
-type MultilingualInstrumentSummary = Simplify<InstrumentSummary<BaseInstrument<Language[]>>>;
-
 export {
   BaseInstrument,
   InstrumentDetails,
@@ -178,14 +162,11 @@ export {
   InstrumentMeasure,
   InstrumentMeasures,
   InstrumentMeasureValue,
-  InstrumentSummary,
   InstrumentUIOption,
   MultilingualInstrumentDetails,
   MultilingualInstrumentMeasures,
-  MultilingualInstrumentSummary,
   ScalarInstrument,
   ScalarInstrumentInternal,
   UnilingualInstrumentDetails,
-  UnilingualInstrumentMeasures,
-  UnilingualInstrumentSummary
+  UnilingualInstrumentMeasures
 };

@@ -4,27 +4,29 @@ import type {
   AnyScalarInstrument,
   AnyUnilingualInstrument,
   FormInstrument,
-  InstrumentSummary,
   InteractiveInstrument,
-  MultilingualInstrumentSummary,
-  SeriesInstrument,
-  UnilingualInstrumentSummary
+  SeriesInstrument
 } from '@opendatacapture/runtime-core';
+import type {
+  InstrumentInfo,
+  MultilingualInstrumentInfo,
+  UnilingualInstrumentInfo
+} from '@opendatacapture/schemas/instrument';
 
 export function isUnilingualInstrument(instrument: AnyInstrument): instrument is AnyUnilingualInstrument {
   return typeof instrument.language === 'string';
 }
 
-export function isUnilingualInstrumentSummary(summary: InstrumentSummary): summary is UnilingualInstrumentSummary {
-  return typeof summary.language === 'string';
+export function isUnilingualInstrumentInfo(info: InstrumentInfo): info is UnilingualInstrumentInfo {
+  return typeof info.language === 'string';
 }
 
 export function isMultilingualInstrument(instrument: AnyInstrument): instrument is AnyMultilingualInstrument {
   return Array.isArray(instrument.language);
 }
 
-export function isMultilingualInstrumentSummary(summary: InstrumentSummary): summary is MultilingualInstrumentSummary {
-  return Array.isArray(summary.language);
+export function isMultilingualInstrumentInfo(info: InstrumentInfo): info is MultilingualInstrumentInfo {
+  return Array.isArray(info.language);
 }
 
 export function isFormInstrument(instrument: AnyInstrument): instrument is FormInstrument {

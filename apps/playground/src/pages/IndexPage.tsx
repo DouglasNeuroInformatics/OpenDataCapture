@@ -1,12 +1,18 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { Separator } from '@douglasneuroinformatics/libui/components';
+import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
 import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import { useAppStore } from '@/store';
 import { decodeShareURL } from '@/utils/encode';
+
+const { initialize } = await import('esbuild-wasm');
+await initialize({
+  wasmURL: esbuildWasmUrl
+});
 
 const IndexPage = () => {
   const addInstrument = useAppStore((store) => store.addInstrument);

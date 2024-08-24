@@ -5,5 +5,5 @@
  */
 
 declare module '@prisma/client' {
-  export { Prisma, PrismaClient } from '@opendatacapture/prisma-client/api';
+  export { Prisma, PrismaClient } from '@prisma/generated-client';
 }

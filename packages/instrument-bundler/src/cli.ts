@@ -7,10 +7,10 @@ import { Command, InvalidArgumentError } from 'commander';
 import { glob } from 'glob';
 
 import { name, version } from '../package.json';
-import { InstrumentBundler } from './index.js';
+import { bundle } from './bundle.js';
 import { inferLoader } from './utils.js';
 
-import type { BundleOptions, BundlerInput } from './types.js';
+import type { BundlerInput } from './schemas.js';
 
 const program = new Command();
 program.name(name);
@@ -26,14 +26,9 @@ program.argument('<target>', 'the directory to search for instruments', (path: s
 });
 program.requiredOption('--outdir <path>', 'path to output directory');
 program.option('--clean', 'delete the output directory before build');
-program.option('--debug', 'disable minification');
 program.option('--declaration', 'emit typescript declarations');
-program.option('--dynamic-import <mode>', 'dynamic import mode', (mode) => {
-  if (!(mode === 'mapped' || mode === 'preserve')) {
-    throw new InvalidArgumentError(`Invalid dynamic import mode '${mode}' must 'mapped' or 'preserve`);
-  }
-  return mode satisfies BundleOptions['dynamicImport'];
-});
+program.option('--raw', 'output raw bundle rather than as default export string');
+program.option('--no-minify', 'disable minification');
 program.option('--verbose', 'enable verbose mode');
 program.parse();
 
@@ -67,10 +62,6 @@ const indexFiles = await glob(`${inputBase}/**/*/index.{js,jsx,ts,tsx}`);
 
 const targetDirs = Array.from(new Set(indexFiles.map((filename) => path.dirname(filename))));
 
-const bundler = new InstrumentBundler();
-const debug = Boolean(options.debug);
-const dynamicImport = options.dynamicImport as BundleOptions['dynamicImport'];
-
 for (const targetDir of targetDirs) {
   logger.verbose(`Searching for entry in target directory: ${targetDir}`);
   const inputFiles = await glob(`${targetDir}/*`);
@@ -101,18 +92,15 @@ for (const targetDir of targetDirs) {
   }
 
   logger.verbose('Generating bundle...');
-  const bundle = await bundler.bundle({ debug, dynamicImport, inputs });
+
+  const output = await bundle({ inputs, minify: !options.minify === false });
 
   logger.verbose(`Writing output bundle to file: ${outputBundlePath}`);
 
-  if (options.debug) {
-    await fs.promises.writeFile(
-      outputBundlePath,
-      `export default \`${bundle.replace(/\\|`|\$/g, '\\$&')}\`;\n`,
-      'utf-8'
-    );
+  if (options.raw) {
+    await fs.promises.writeFile(outputBundlePath, output, 'utf-8');
   } else {
-    await fs.promises.writeFile(outputBundlePath, `export default ${JSON.stringify(bundle)}`, 'utf-8');
+    await fs.promises.writeFile(outputBundlePath, `export default ${JSON.stringify(output)}`, 'utf-8');
   }
 
   if (options.declaration) {

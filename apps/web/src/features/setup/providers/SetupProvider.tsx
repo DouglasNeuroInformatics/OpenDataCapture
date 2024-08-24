@@ -6,7 +6,7 @@ import { useCreateSetupState } from '../hooks/useCreateSetupState';
 import { SetupLoadingPage } from '../pages/SetupLoadingPage';
 import { SetupPage } from '../pages/SetupPage';
 
-export const SetupProvider = ({ children }: { children: React.ReactNode }) => {
+export const SetupProvider = ({ children }: { children: React.ReactElement }) => {
   const setupStateQuery = useSetupState();
   const createSetupStateMutation = useCreateSetupState();
 

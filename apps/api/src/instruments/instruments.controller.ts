@@ -1,10 +1,8 @@
-/* eslint-disable perfectionist/sort-classes */
-
 import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
-import type { InstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { InstrumentBundleContainer, InstrumentInfo } from '@opendatacapture/schemas/instrument';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
@@ -24,28 +22,24 @@ export class InstrumentsController {
     return this.instrumentsService.create(data);
   }
 
-  @ApiOperation({ summary: 'Find All Instruments' })
-  @Get()
+  @ApiOperation({ summary: 'Get Instrument Bundle' })
+  @Get('bundle/:id')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async find(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind): Promise<unknown[]> {
-    return this.instrumentsService.find({ kind }, { ability });
+  async findBundleById(
+    @Param('id') id: string,
+    @CurrentUser('ability') ability: AppAbility
+  ): Promise<InstrumentBundleContainer> {
+    return this.instrumentsService.findBundleById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Summarize Instruments' })
-  @Get('summaries')
+  @Get('info')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findSummaries(
+  async findInfo(
     @CurrentUser('ability') ability: AppAbility,
     @Query('kind') kind?: InstrumentKind,
     @Query('subjectId') subjectId?: string
-  ): Promise<InstrumentSummary[]> {
-    return this.instrumentsService.findSummaries({ kind, subjectId }, { ability });
-  }
-
-  @ApiOperation({ summary: 'Get Instrument' })
-  @Get(':id')
-  @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async findById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
-    return this.instrumentsService.findById(id, { ability });
+  ): Promise<InstrumentInfo[]> {
+    return this.instrumentsService.findInfo({ kind, subjectId }, { ability });
   }
 }

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { match, P } from 'ts-pattern';
 

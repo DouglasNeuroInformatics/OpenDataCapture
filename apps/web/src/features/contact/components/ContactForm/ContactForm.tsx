@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';

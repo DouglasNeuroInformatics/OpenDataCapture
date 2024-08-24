@@ -14,10 +14,7 @@
     "@douglasneuroinformatics/libjs": "^0.6.0",
     "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
-    "lodash-es": "^4.17.21",
-    "ts-pattern": "^5.1.2"
-  },
-  "devDependencies": {
-    "@types/lodash-es": "^4.17.12"
+    "lodash-es": "workspace:lodash-es__4.x@*",
+    "ts-pattern": "workspace:ts-pattern__5.x@*"
   }
 }

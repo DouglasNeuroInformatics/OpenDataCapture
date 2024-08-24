@@ -1,0 +1,17 @@
+{
+  "name": "jspsych__8.x",
+  "type": "module",
+  "version": "8.0.1",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "jspsych": "8.0.1",
+    "type-fest__4.x": "workspace:"
+  }
+}

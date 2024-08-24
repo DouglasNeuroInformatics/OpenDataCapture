@@ -1,0 +1,17 @@
+{
+  "name": "@jspsych/plugin-image-button-response__2.x",
+  "type": "module",
+  "version": "2.0.0",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@jspsych/plugin-image-button-response": "2.0.0",
+    "jspsych__8.x": "workspace:*"
+  }
+}

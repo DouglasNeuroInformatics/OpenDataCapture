@@ -16,6 +16,6 @@
     "@opendatacapture/schemas": "workspace:*"
   },
   "devDependencies": {
-    "type-fest": "workspace:type-fest__4.23.0@*"
+    "type-fest": "workspace:type-fest__4.x@*"
   }
 }

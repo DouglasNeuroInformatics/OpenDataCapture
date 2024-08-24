@@ -2,9 +2,6 @@
   "extends": "../../jsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "jsx": "react",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     "paths": {
       "@/*": ["./src/*"],
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]

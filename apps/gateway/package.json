@@ -9,6 +9,8 @@
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:main": "esbuild --bundle --format=esm --outfile=dist/main.js  --platform=node --external:lightningcss src/main.ts",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
+    "db:generate": "prisma generate",
+    "db:push": "env-cmd --silent -f ../../.env prisma db push --skip-generate",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx src/main.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
@@ -18,24 +20,24 @@
     "@douglasneuroinformatics/libui": "^2.10.0",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-renderer": "workspace:*",
-    "@opendatacapture/prisma-client": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
+    "@prisma/client": "catalog:",
     "axios": "^1.7.2",
     "compression": "^1.7.4",
     "express": "^4.19.2",
     "i18next": "^23.11.5",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "workspace:lodash-es__4.x@*",
     "pino-http": "^10.1.0",
     "pino-pretty": "^11.2.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "workspace:react__18.x@*",
+    "react-dom": "workspace:react-dom__18.x@*",
     "react-i18next": "^14.1.2",
     "sirv": "^2.0.4",
     "sqlite3": "^5.1.7",
-    "zod": "workspace:zod__3.23.6@*"
+    "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
     "@douglasneuroinformatics/esbuild-plugin-native-modules": "^0.0.2",
@@ -44,18 +46,19 @@
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
-    "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.7.0",
     "autoprefixer": "^10.4.19",
-    "esbuild": "^0.21.5",
+    "esbuild": "catalog:esbuild",
     "postcss": "^8.4.38",
+    "prisma": "catalog:",
     "tailwindcss": "^3.4.4",
-    "type-fest": "workspace:type-fest__4.23.0@*",
+    "type-fest": "workspace:type-fest__4.x@*",
     "vite": "^5.2.13"
   },
   "trustedDependencies": [
+    "prisma",
     "sqlite3"
   ]
 }

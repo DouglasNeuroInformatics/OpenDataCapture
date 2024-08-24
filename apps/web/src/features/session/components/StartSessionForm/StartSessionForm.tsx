@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { $SessionType, type CreateSessionData } from '@opendatacapture/schemas/session';

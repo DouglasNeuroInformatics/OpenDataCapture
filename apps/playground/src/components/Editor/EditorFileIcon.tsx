@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
 import { FileIcon } from 'lucide-react';
 import { match, P } from 'ts-pattern';

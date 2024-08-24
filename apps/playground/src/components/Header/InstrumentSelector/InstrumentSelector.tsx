@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button, Command, Popover } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';

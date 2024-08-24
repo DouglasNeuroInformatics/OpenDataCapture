@@ -54,7 +54,7 @@ describe('/users', () => {
       firstName: 'Jane',
       groupIds: [],
       lastName: 'Doe',
-      password: 'Password12345678',
+      password: crypto.randomUUID(),
       username: 'user'
     });
 

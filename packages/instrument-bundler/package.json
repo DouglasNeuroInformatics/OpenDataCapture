@@ -21,15 +21,21 @@
     "tsx": "4.x"
   },
   "dependencies": {
+    "@opendatacapture/schemas": "workspace:",
     "commander": "^12.1.0",
-    "esbuild": "^0.21.5",
-    "esbuild-wasm": "^0.21.5",
+    "es-module-lexer": "^1.5.4",
+    "esbuild": "catalog:esbuild",
+    "esbuild-wasm": "catalog:esbuild",
     "glob": "^10.4.1",
-    "ts-pattern": "^5.1.2",
-    "zod": "workspace:zod__3.23.6@*"
+    "slashes": "^3.0.12",
+    "ts-pattern": "workspace:ts-pattern__5.x@*",
+    "type-fest": "workspace:type-fest__4.x@*",
+    "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
     "@opendatacapture/instrument-stubs": "workspace:*",
-    "@opendatacapture/runtime-v1": "workspace:*"
+    "@opendatacapture/runtime-v1": "workspace:*",
+    "react": "workspace:react__18.x@*",
+    "react-dom": "workspace:react-dom__18.x@*"
   }
 }

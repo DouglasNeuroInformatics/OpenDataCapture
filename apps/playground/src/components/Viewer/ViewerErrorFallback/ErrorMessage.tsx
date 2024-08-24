@@ -1,5 +1,3 @@
-import React from 'react';
-
 export type ErrorMessageProps = {
   error: Error;
 };

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ViewerErrorFallback, type ViewerErrorFallbackProps } from './ViewerErrorFallback';
 
 export const CompileErrorFallback = (props: Omit<ViewerErrorFallbackProps, 'title'>) => {

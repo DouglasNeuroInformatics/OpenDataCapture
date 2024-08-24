@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
 import { motion } from 'framer-motion';
@@ -63,13 +63,13 @@ export const Editor = () => {
 
   useEffect(() => {
     if (isEditorMounted) {
-      if (!vimModeRef.current) {
-        vimModeRef.current = new VimMode(editorPaneRef.current!.editor!);
-      }
       if (isVimModeEnabled) {
+        if (!vimModeRef.current) {
+          vimModeRef.current = new VimMode(editorPaneRef.current!.editor!);
+        }
         vimModeRef.current.enable();
       } else {
-        vimModeRef.current.disable();
+        vimModeRef.current?.disable();
       }
     }
   }, [isEditorMounted, isVimModeEnabled]);

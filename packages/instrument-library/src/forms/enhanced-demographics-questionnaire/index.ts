@@ -1,9 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
-const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
-
-type Language = Extract<import('/runtime/v1/@opendatacapture/runtime-core/index.js').InstrumentLanguage, string>;
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import type { Language } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.23.x';
 
 type MultilingualOptions = { [key: string]: { [L in Language]: string } };
 

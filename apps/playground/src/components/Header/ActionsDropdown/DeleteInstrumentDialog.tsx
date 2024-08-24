@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { AlertDialog, Button } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 

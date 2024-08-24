@@ -4,7 +4,7 @@ import path from 'path';
 
 import { isPlainObject } from '@douglasneuroinformatics/libjs';
 
-import type { PackageExport, ResolvedPackage } from './types.js';
+import type { ExportCondition, PackageExport, ResolvedPackage } from './types.js';
 
 class ResolverError extends Error {
   constructor(message: string, options?: ErrorOptions) {
@@ -107,15 +107,20 @@ export class Resolver {
       return { import: this.resolveSourceExport(exp, packageRoot) };
     } else if (isPlainObject(exp)) {
       const exports: PackageExport = {};
-      if (typeof exp.import === 'string') {
-        exports.import = this.resolveSourceExport(exp.import, packageRoot);
-      } else if (typeof exp.import !== 'undefined') {
-        throw new ResolverError("unexpected non-string value for 'import' condition in exports");
-      }
-      if (typeof exp.types === 'string') {
-        exports.types = this.resolveDeclarationExport(exp.types, packageRoot);
-      } else if (typeof exp.types !== 'undefined') {
-        throw new ResolverError("unexpected non-string value for 'types' condition in exports");
+      const conditions: ExportCondition[] = ['default', 'import', 'types'];
+      for (const condition of conditions) {
+        const val = exp[condition];
+        if (typeof val === 'string') {
+          if (condition === 'types') {
+            exports[condition] = this.resolveDeclarationExport(val, packageRoot);
+          } else {
+            exports[condition] = this.resolveSourceExport(val, packageRoot);
+          }
+        } else if (typeof val !== 'undefined') {
+          throw new ResolverError(
+            `unexpected non-string value '${val && typeof val}' for '${condition}' condition in exports`
+          );
+        }
       }
       return exports;
     }

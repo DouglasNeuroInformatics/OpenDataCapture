@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
 

@@ -2,8 +2,7 @@ import module from 'node:module';
 
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import type { InstrumentRecordModel } from '@opendatacapture/prisma-client/api';
-import type { InstrumentMeasures, InstrumentMeasureValue, ScalarInstrument } from '@opendatacapture/runtime-core';
+import type { ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -11,7 +10,7 @@ import type {
   InstrumentRecordsExport,
   LinearRegressionResults
 } from '@opendatacapture/schemas/instrument-records';
-import type { Prisma } from '@prisma/client';
+import type { InstrumentRecordModel, Prisma } from '@prisma/generated-client';
 import { isNumber, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -157,8 +156,7 @@ export class InstrumentRecordsService {
           subjectId: record.subject.id,
           subjectSex: record.subject.sex,
           timestamp: record.date.toISOString(),
-          // Prisma does not allow index signature, so this is typed as "JSON"
-          value: measureValue as InstrumentMeasureValue
+          value: measureValue
         });
       }
     }
@@ -181,7 +179,7 @@ export class InstrumentRecordsService {
       .find({ kind })
       .then((instruments) => instruments.map((instrument) => instrument.id));
 
-    return (await this.instrumentRecordModel.findMany({
+    const records = await this.instrumentRecordModel.findMany({
       include: {
         instrument: {
           select: {
@@ -200,7 +198,9 @@ export class InstrumentRecordsService {
           { subjectId }
         ]
       }
-    })) satisfies Omit<InstrumentRecord, 'computedMeasures'>[] as InstrumentRecord[];
+    });
+
+    return records;
   }
 
   async linearModel(
@@ -229,7 +229,7 @@ export class InstrumentRecordsService {
 
     const data: { [key: string]: [number, number][] } = {};
     for (const record of records) {
-      const numericMeasures = pickBy(record.computedMeasures as InstrumentMeasures, isNumber);
+      const numericMeasures = pickBy(record.computedMeasures, isNumber);
       for (const measure in numericMeasures) {
         const x = record.date.getTime();
         const y = numericMeasures[measure];

@@ -1,4 +1,4 @@
-const { default: React, useState } = await import('/runtime/v1/react@18.3.1/index.js');
+import { useState } from '/runtime/v1/react@18.x';
 
 import reactLogo from './react.svg';
 

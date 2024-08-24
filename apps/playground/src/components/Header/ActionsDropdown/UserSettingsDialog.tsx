@@ -1,5 +1,4 @@
 /* eslint-disable perfectionist/sort-objects */
-import React from 'react';
 
 import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';

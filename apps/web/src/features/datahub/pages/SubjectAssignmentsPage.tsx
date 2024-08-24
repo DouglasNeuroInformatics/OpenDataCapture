@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button, Dialog, Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { PlusIcon } from '@heroicons/react/24/solid';
@@ -11,7 +11,7 @@ import { z } from 'zod';
 
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
-import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
+import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useUpdateAssignment } from '@/hooks/useUpdateAssignment';
 import { useAppStore } from '@/store';
 
@@ -33,10 +33,10 @@ export const SubjectAssignmentsPage = () => {
   const createAssignmentMutation = useCreateAssignment();
   const updateAssignmentMutation = useUpdateAssignment();
 
-  const instrumentSummariesQuery = useInstrumentSummariesQuery();
+  const instrumentInfoQuery = useInstrumentInfoQuery();
 
   const instrumentOptions = Object.fromEntries(
-    instrumentSummariesQuery.data
+    instrumentInfoQuery.data
       .filter((instrument) => {
         return (currentGroup?.accessibleInstrumentIds.includes(instrument.id) ?? true) && instrument.kind !== 'SERIES';
       })

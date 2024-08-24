@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { cn } from '@douglasneuroinformatics/libui/utils';
 
 export type ErrorFallbackProps = {

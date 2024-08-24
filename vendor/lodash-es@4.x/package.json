@@ -1,0 +1,16 @@
+{
+  "name": "lodash-es__4.x",
+  "type": "module",
+  "version": "4.17.21",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "lodash-es": "4.17.21"
+  }
+}

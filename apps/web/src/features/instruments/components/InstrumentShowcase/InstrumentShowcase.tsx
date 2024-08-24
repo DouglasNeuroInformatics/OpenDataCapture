@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
-import type { UnilingualInstrumentSummary } from '@opendatacapture/schemas/instrument';
+import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
+import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useAppStore } from '@/store';
 
 import { InstrumentCard } from '../InstrumentCard';
 
 export const InstrumentsShowcase = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const instrumentSummariesQuery = useInstrumentSummariesQuery();
+  const instrumentInfoQuery = useInstrumentInfoQuery();
   const navigate = useNavigate();
   const { t } = useTranslation(['core', 'instruments']);
-  const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentSummary[]>([]);
+  const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentInfo[]>([]);
   const [tagOptions, setTagOptions] = useState<ListboxDropdownOption[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<ListboxDropdownOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<ListboxDropdownOption[]>([]);
@@ -36,25 +36,19 @@ export const InstrumentsShowcase = () => {
 
   useEffect(() => {
     setFilteredInstruments(
-      instrumentSummariesQuery.data.filter((summary) => {
-        if (currentGroup && !currentGroup?.accessibleInstrumentIds.includes(summary.id)) {
+      instrumentInfoQuery.data.filter((info) => {
+        if (currentGroup && !currentGroup?.accessibleInstrumentIds.includes(info.id)) {
           return false;
         }
-        const matchesSearch = summary.details.title.toUpperCase().includes(searchTerm.toUpperCase());
+        const matchesSearch = info.details.title.toUpperCase().includes(searchTerm.toUpperCase());
         const matchesLanguages =
-          selectedLanguages.length === 0 || selectedLanguages.find(({ key }) => key === summary.language);
+          selectedLanguages.length === 0 || selectedLanguages.find(({ key }) => key === info.language);
         const matchesTags =
-          selectedTags.length === 0 || summary.tags.some((tag) => selectedTags.find(({ key }) => key === tag));
+          selectedTags.length === 0 || info.tags.some((tag) => selectedTags.find(({ key }) => key === tag));
         return matchesSearch && matchesLanguages && matchesTags;
       })
     );
-  }, [
-    currentGroup?.accessibleInstrumentIds,
-    instrumentSummariesQuery.data,
-    searchTerm,
-    selectedLanguages,
-    selectedTags
-  ]);
+  }, [currentGroup?.accessibleInstrumentIds, instrumentInfoQuery.data, searchTerm, selectedLanguages, selectedTags]);
 
   useEffect(() => {
     setTagOptions(
@@ -103,7 +97,7 @@ export const InstrumentsShowcase = () => {
               <InstrumentCard
                 instrument={instrument}
                 onClick={() => {
-                  navigate(`/instruments/render/${instrument.id}`, { state: { summary: instrument } });
+                  navigate(`/instruments/render/${instrument.id}`, { state: { info: instrument } });
                 }}
               />
             </motion.div>

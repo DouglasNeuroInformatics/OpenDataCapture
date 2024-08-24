@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
-const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.23.x';
 
 import logoSrc from './logo.png';
 

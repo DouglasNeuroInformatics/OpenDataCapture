@@ -6,8 +6,8 @@ import { omit } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 
 import { useInstrument } from '@/hooks/useInstrument';
+import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
-import { useInstrumentSummariesQuery } from '@/hooks/useInstrumentSummariesQuery';
 import { useAppStore } from '@/store';
 
 export type InstrumentVisualizationRecord = {
@@ -37,7 +37,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
 
-  const instrumentSummariesQuery = useInstrumentSummariesQuery({
+  const instrumentInfoQuery = useInstrumentInfoQuery({
     params: { kind: params.kind, subjectId: params.subjectId }
   });
   const recordsQuery = useInstrumentRecords({
@@ -103,11 +103,11 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
     const options: { [key: string]: string } = {};
-    for (const summary of instrumentSummariesQuery.data) {
-      options[summary.id] = summary.details.title;
+    for (const instrument of instrumentInfoQuery.data) {
+      options[instrument.id] = instrument.details.title;
     }
     return options;
-  }, [instrumentSummariesQuery.data]);
+  }, [instrumentInfoQuery.data]);
 
   return { dl, instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate };
 }

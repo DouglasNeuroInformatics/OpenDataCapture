@@ -6,7 +6,7 @@ import esbuild from 'esbuild';
 import { dtsPlugin } from './plugin.js';
 import { Resolver } from './resolver.js';
 
-import type { BundlerOptions, EntryPoint, ResolvedPackage } from './types.js';
+import type { BundlerOptions, EntryPoint, ExportCondition, ResolvedPackage } from './types.js';
 
 export class Bundler {
   private resolver: Resolver;
@@ -15,7 +15,7 @@ export class Bundler {
     this.resolver = new Resolver(options.configFilepath);
   }
 
-  async bundle(): Promise<void> {
+  async bundle({ mode = 'production' }: Pick<BundlerOptions, 'mode'> = {}): Promise<void> {
     const packages = await this.findPackages();
     const entryPoints = this.getEntryPoints(packages);
 
@@ -25,7 +25,7 @@ export class Bundler {
       entryPoints: entryPoints,
       format: 'esm',
       keepNames: true,
-      minify: true,
+      minify: mode === 'production',
       outdir: this.options.outdir,
       platform: 'browser',
       plugins: [
@@ -36,6 +36,8 @@ export class Bundler {
           packages
         })
       ],
+      sourcemap: mode === 'development' ? 'inline' : false,
+      sourcesContent: mode === 'development',
       splitting: true,
       target: 'es2022'
     });
@@ -60,11 +62,14 @@ export class Bundler {
         const conditions = pkg.exports[key];
         const runtimePackageName = pkg.name.split('__').join('@');
         const out = path.join(runtimePackageName, key === '.' ? 'index' : key);
-        if (conditions.import) {
-          entryPoints.push({
-            in: conditions.import,
-            out
-          });
+        for (const condition of ['import', 'default'] satisfies ExportCondition[]) {
+          if (conditions[condition]) {
+            entryPoints.push({
+              in: conditions[condition]!,
+              out
+            });
+            break;
+          }
         }
         if (conditions.types) {
           entryPoints.push({

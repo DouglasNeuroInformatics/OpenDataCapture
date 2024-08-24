@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { NotificationHub } from '@douglasneuroinformatics/libui/components';
 import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
@@ -60,7 +60,7 @@ export const Root = ({ bundle, id, token }: RootProps) => {
         </div>
       </header>
       <main className="container flex min-h-0 max-w-3xl flex-grow flex-col pb-16 pt-32 xl:max-w-5xl">
-        <InstrumentRenderer bundle={bundle} className="min-h-full w-full" onSubmit={handleSubmit} />
+        <InstrumentRenderer className="min-h-full w-full" target={{ bundle, kind: 'SCALAR' }} onSubmit={handleSubmit} />
       </main>
       <NotificationHub />
     </div>

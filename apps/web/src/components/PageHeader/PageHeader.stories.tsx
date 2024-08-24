@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import type { Meta, StoryObj } from '@storybook/react';
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { motion, useSpring, useTransform } from 'framer-motion';

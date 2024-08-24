@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 export type ErrorPageProps = {
   error: {
@@ -12,7 +12,7 @@ export const ErrorPage = ({ error }: ErrorPageProps) => {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen  flex-col items-center justify-center gap-1 p-3 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-1 p-3 text-center">
       <h1 className="text-muted-foreground text-sm font-semibold uppercase tracking-wide">Unexpected Error</h1>
       <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">Something Went Wrong</h3>
       <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">

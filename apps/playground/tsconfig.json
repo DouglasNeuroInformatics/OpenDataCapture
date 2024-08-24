@@ -5,9 +5,6 @@
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "jsx": "react",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     "paths": {
       "@/*": ["./src/*"],
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]

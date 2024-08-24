@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { AlertDialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { Branding } from '@opendatacapture/react-core';

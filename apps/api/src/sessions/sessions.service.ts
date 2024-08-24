@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
-import type { SubjectModel } from '@opendatacapture/prisma-client/api';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
+import type { SubjectModel } from '@prisma/generated-client';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';

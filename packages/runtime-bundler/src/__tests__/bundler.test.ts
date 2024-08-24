@@ -11,6 +11,7 @@ import type { BundlerOptions, ResolvedPackage } from '../types.js';
 const BUNDLER_OPTIONS: BundlerOptions = {
   configFilepath: '/root/package.json',
   include: ['jquery__1.0.0'],
+  mode: 'production',
   outdir: 'dist'
 };
 
@@ -18,7 +19,7 @@ const RESOLVED_PACKAGE: ResolvedPackage = {
   exports: {
     '.': {
       import: './dist/index.js',
-      types: './dist/index.d.st'
+      types: './dist/index.d.ts'
     }
   },
   name: 'jquery',

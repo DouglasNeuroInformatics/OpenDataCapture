@@ -5,8 +5,8 @@
   "license": "MIT",
   "exports": {
     ".": {
-      "import": "./src/index.js",
-      "types": "./src/index.d.ts"
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
     },
     "./package.json": "./package.json"
   },

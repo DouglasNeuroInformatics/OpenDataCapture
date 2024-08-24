@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { Branding } from '@opendatacapture/react-core';

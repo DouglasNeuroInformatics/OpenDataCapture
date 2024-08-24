@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@douglasneuroinformatics/libui/components';
 import type { Meta, StoryObj } from '@storybook/react';

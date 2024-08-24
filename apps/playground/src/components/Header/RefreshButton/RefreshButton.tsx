@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { RefreshCwIcon } from 'lucide-react';
 
 import { useAppStore } from '@/store';

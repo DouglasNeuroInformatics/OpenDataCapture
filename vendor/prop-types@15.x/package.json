@@ -1,0 +1,16 @@
+{
+  "name": "prop-types__15.x",
+  "type": "module",
+  "version": "15.8.1",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "prop-types": "15.8.1"
+  }
+}

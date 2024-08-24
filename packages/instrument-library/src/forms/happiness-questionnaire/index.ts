@@ -1,8 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
-const { pick, sum } = await import('/runtime/v1/lodash-es@4.17.21/index.js');
-const { defineInstrument } = await import('/runtime/v1/@opendatacapture/runtime-core/index.js');
-const { z } = await import('/runtime/v1/zod@3.23.6/index.js');
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { pick, sum } from '/runtime/v1/lodash-es@4.x';
+import { z } from '/runtime/v1/zod@3.23.x';
 
 export default defineInstrument({
   kind: 'FORM',

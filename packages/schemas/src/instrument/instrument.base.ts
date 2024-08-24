@@ -6,13 +6,12 @@ import type {
   InstrumentLanguage,
   InstrumentMeasures,
   InstrumentMeasureValue,
-  InstrumentSummary,
   InstrumentUIOption,
   ScalarInstrument,
   UnilingualInstrumentDetails,
   UnilingualInstrumentMeasures
 } from '@opendatacapture/runtime-core';
-import type { ValueOf } from 'type-fest';
+import type { Simplify, ValueOf } from 'type-fest';
 import { z } from 'zod';
 
 import { $Language, $LicenseIdentifier, $ZodTypeAny, type Language } from '../core/core.js';
@@ -145,22 +144,53 @@ const $UnilingualScalarInstrument = $ScalarInstrument.extend({
   tags: z.array(z.string().min(1))
 }) satisfies z.ZodType<ScalarInstrument<any, Language>>;
 
-const $InstrumentSummary = $BaseInstrument
+/**
+ * An object containing the essential data describing an instrument, but omitting the content
+ * and validation schema required to actually complete the instrument. This may be used for,
+ * among other things, displaying available instruments to the user.
+ */
+type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = {
+  id: string;
+} & Omit<T, 'content'>;
+const $InstrumentInfo = $BaseInstrument
   .omit({
     content: true
   })
-  .extend({ id: z.string() }) satisfies z.ZodType<InstrumentSummary>;
+  .extend({ id: z.string() }) satisfies z.ZodType<InstrumentInfo>;
+
+/** @internal */
+type UnilingualInstrumentInfo = Simplify<InstrumentInfo<BaseInstrument<Language>>>;
+
+/** @internal */
+type MultilingualInstrumentInfo = Simplify<InstrumentInfo<BaseInstrument<Language[]>>>;
 
 type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 const $CreateInstrumentData = z.object({
   bundle: z.string().min(1)
 });
 
-type InstrumentBundleContainer = z.infer<typeof $InstrumentBundleContainer>;
-const $InstrumentBundleContainer = z.object({
-  bundle: z.string(),
+const $BaseInstrumentBundleContainer = z.object({
   id: z.string()
 });
+
+type ScalarInstrumentBundleContainer = z.infer<typeof $ScalarInstrumentBundleContainer>;
+const $ScalarInstrumentBundleContainer = $BaseInstrumentBundleContainer.extend({
+  bundle: z.string(),
+  kind: z.literal('SCALAR')
+});
+
+type SeriesInstrumentBundleContainer = z.infer<typeof $SeriesInstrumentBundleContainer>;
+const $SeriesInstrumentBundleContainer = $BaseInstrumentBundleContainer.extend({
+  bundle: z.string(),
+  items: z.array($ScalarInstrumentBundleContainer),
+  kind: z.literal('SERIES')
+});
+
+type InstrumentBundleContainer = ScalarInstrumentBundleContainer | SeriesInstrumentBundleContainer;
+const $InstrumentBundleContainer: z.ZodType<InstrumentBundleContainer> = z.union([
+  $ScalarInstrumentBundleContainer,
+  $SeriesInstrumentBundleContainer
+]);
 
 export {
   $$InstrumentUIOption,
@@ -168,17 +198,22 @@ export {
   $CreateInstrumentData,
   $InstrumentBundleContainer,
   $InstrumentDetails,
+  $InstrumentInfo,
   $InstrumentKind,
   $InstrumentLanguage,
   $InstrumentMeasureValue,
-  $InstrumentSummary,
   $ScalarInstrument,
   $ScalarInstrumentInternal,
   $UnilingualInstrumentDetails,
   $UnilingualScalarInstrument
 };
 
-export type { CreateInstrumentData, InstrumentBundleContainer };
-
-export type { InstrumentSummary };
-export type { MultilingualInstrumentSummary, UnilingualInstrumentSummary } from '@opendatacapture/runtime-core';
+export type {
+  CreateInstrumentData,
+  InstrumentBundleContainer,
+  InstrumentInfo,
+  MultilingualInstrumentInfo,
+  ScalarInstrumentBundleContainer,
+  SeriesInstrumentBundleContainer,
+  UnilingualInstrumentInfo
+};

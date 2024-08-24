@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
@@ -28,24 +26,37 @@ export default {
 
 export const UnilingualForm: Story = {
   args: {
-    bundle: unilingualFormInstrument.bundle
+    target: {
+      bundle: unilingualFormInstrument.bundle,
+      kind: 'SCALAR'
+    }
   }
 };
 
 export const BilingualForm: Story = {
   args: {
-    bundle: bilingualFormInstrument.bundle
+    target: {
+      bundle: bilingualFormInstrument.bundle,
+      kind: 'SCALAR'
+    }
   }
 };
 
 export const Interactive: Story = {
   args: {
-    bundle: interactiveInstrument.bundle
+    target: {
+      bundle: interactiveInstrument.bundle,
+      kind: 'SCALAR'
+    }
   }
 };
 
 export const Series: Story = {
   args: {
-    bundle: seriesInstrument.bundle
+    target: {
+      bundle: seriesInstrument.bundle,
+      items: [],
+      kind: 'SERIES'
+    }
   }
 };
