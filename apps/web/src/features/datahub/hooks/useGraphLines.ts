@@ -26,7 +26,7 @@ export function useGraphLines({ selectedMeasures }: UseGraphLinesOptions) {
   useEffect(() => {
     const lines: LineGraphLine[] = [];
     for (let i = 0; i < selectedMeasures.length; i++) {
-      const measure = selectedMeasures[i];
+      const measure = selectedMeasures[i]!;
       lines.push({
         name: measure.label,
         stroke: COLOR_PALETTE[i],

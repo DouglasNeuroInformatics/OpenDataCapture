@@ -107,7 +107,6 @@ enum InstrumentKind {
   FORM
   INTERACTIVE
   SERIES
-  UNKNOWN
 }
 
 type InstrumentInternal {

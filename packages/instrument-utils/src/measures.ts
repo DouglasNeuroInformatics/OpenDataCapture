@@ -15,7 +15,7 @@ export function computeInstrumentMeasures(instrument: AnyUnilingualScalarInstrum
     return computedMeasures;
   }
   for (const key in instrument.measures) {
-    const result = match(instrument.measures[key])
+    const result = match(instrument.measures[key]!)
       .with({ kind: 'computed' }, (measure) => {
         // @ts-expect-error - this is ignored because it is safer than the previous (any) solution
         return { label: measure.label, value: measure.value(data) };

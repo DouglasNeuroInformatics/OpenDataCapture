@@ -5,7 +5,7 @@ import path from 'path';
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
 import tailwind from '@astrojs/tailwind';
-import { defineConfig, squooshImageService } from 'astro/config';
+import { defineConfig, sharpImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
 
@@ -23,7 +23,7 @@ export default defineConfig({
   },
   compressHTML: true,
   image: {
-    service: squooshImageService()
+    service: sharpImageService()
   },
   integrations: [
     sitemap({

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/prefer-optional-chain */
 
 import { defineAction } from './actions';
@@ -245,7 +246,7 @@ export class VimApi {
         return false;
       }
       const context: Context = vim.visualMode ? 'visual' : 'normal';
-      let mainKey = keysMatcher[2] || keysMatcher[1];
+      let mainKey = keysMatcher[2] || keysMatcher[1]!;
       if (vim.inputState.operatorShortcut && vim.inputState.operatorShortcut.slice(-1) == mainKey) {
         // multikey operators act linewise by repeating only the last character
         mainKey = vim.inputState.operatorShortcut;
@@ -333,7 +334,7 @@ export class VimApi {
       // If a specific context is being cleared, we need to keep mappings
       // from all other contexts.
       for (let i = userKeymap.length - 1; i >= 0; i--) {
-        const mapping = userKeymap[i];
+        const mapping = userKeymap[i]!;
         if (ctx !== mapping.context) {
           if (mapping.context) {
             this._mapCommand(mapping);
@@ -368,7 +369,7 @@ export class VimApi {
     const actualLength = defaultKeymap.length;
     const origLength = defaultKeymapLength;
     for (let i = actualLength - origLength; i < actualLength && ctxsToMap.length; i++) {
-      const mapping = defaultKeymap[i];
+      const mapping = defaultKeymap[i]!;
       // Omit mappings that operate in the wrong context(s) and those of invalid type.
       if (
         mapping.keys == rhs &&

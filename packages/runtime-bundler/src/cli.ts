@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import path from 'path';
+import * as path from 'path';
 
 import { Bundler } from './bundler.js';
 import { $UserConfigs } from './schemas.js';

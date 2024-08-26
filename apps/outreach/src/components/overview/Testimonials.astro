@@ -109,7 +109,7 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
 
   const slide = (index: number) => {
     setButtonsDisabled(true);
-    testimonials[index].scrollIntoView({ block: 'nearest' });
+    testimonials[index]!.scrollIntoView({ block: 'nearest' });
   };
 
   slider.addEventListener('scrollend', () => {

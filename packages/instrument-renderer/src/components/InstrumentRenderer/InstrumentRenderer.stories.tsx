@@ -2,11 +2,24 @@ import { Card } from '@douglasneuroinformatics/libui/components';
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
 import { seriesInstrument } from '@opendatacapture/instrument-stubs/series';
+import type { ScalarInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { InstrumentRenderer } from './InstrumentRenderer';
 
 type Story = StoryObj<typeof InstrumentRenderer>;
+
+const unilingualFormTarget: ScalarInstrumentBundleContainer = {
+  bundle: unilingualFormInstrument.bundle,
+  id: crypto.randomUUID(),
+  kind: 'FORM'
+};
+
+const unilingualInteractiveTarget: ScalarInstrumentBundleContainer = {
+  bundle: interactiveInstrument.bundle,
+  id: crypto.randomUUID(),
+  kind: 'INTERACTIVE'
+};
 
 export default {
   component: InstrumentRenderer,
@@ -26,10 +39,7 @@ export default {
 
 export const UnilingualForm: Story = {
   args: {
-    target: {
-      bundle: unilingualFormInstrument.bundle,
-      kind: 'SCALAR'
-    }
+    target: unilingualFormTarget
   }
 };
 
@@ -37,16 +47,24 @@ export const BilingualForm: Story = {
   args: {
     target: {
       bundle: bilingualFormInstrument.bundle,
-      kind: 'SCALAR'
+      id: crypto.randomUUID(),
+      kind: 'FORM'
     }
   }
 };
 
-export const Interactive: Story = {
+export const UnilingualInteractive: Story = {
+  args: {
+    target: unilingualInteractiveTarget
+  }
+};
+
+export const InteractiveWithError: Story = {
   args: {
     target: {
-      bundle: interactiveInstrument.bundle,
-      kind: 'SCALAR'
+      bundle: 'throw new Error("BAD CODE!")',
+      id: crypto.randomUUID(),
+      kind: 'INTERACTIVE'
     }
   }
 };
@@ -55,7 +73,8 @@ export const Series: Story = {
   args: {
     target: {
       bundle: seriesInstrument.bundle,
-      items: [],
+      id: crypto.randomUUID(),
+      items: [unilingualFormTarget, unilingualInteractiveTarget],
       kind: 'SERIES'
     }
   }

@@ -87,7 +87,7 @@ export const stopEvent = (evt: Event | IKeyboardEvent) => {
 export const getEventKeyName = (e: IKeyboardEvent | KeyboardEvent, skip = false) => {
   const KeyCode = monaco.KeyCode;
   let addQuotes = true;
-  let keyName = KeyCode[e.keyCode];
+  let keyName = KeyCode[e.keyCode]!;
 
   if ((e as any).key) {
     keyName = (e as any).key as string;
@@ -114,7 +114,7 @@ export const getEventKeyName = (e: IKeyboardEvent | KeyboardEvent, skip = false)
 
   // `Key` check for monaco >= 0.30.0
   if (keyName.startsWith('Key') || keyName.startsWith('KEY_')) {
-    key = keyName[keyName.length - 1].toLowerCase();
+    key = keyName[keyName.length - 1]!.toLowerCase();
   } else if (keyName.startsWith('Digit')) {
     key = keyName.slice(5, 6);
   } else if (keyName.startsWith('Numpad')) {

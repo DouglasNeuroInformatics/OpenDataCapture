@@ -72,7 +72,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         break;
       case 'TSV':
         void download(`${baseFilename}.tsv`, () => {
-          const columnNames = Object.keys(exportRecords[0]).join('\t');
+          const columnNames = Object.keys(exportRecords[0]!).join('\t');
           const rows = exportRecords
             .map((item) =>
               Object.values(item)

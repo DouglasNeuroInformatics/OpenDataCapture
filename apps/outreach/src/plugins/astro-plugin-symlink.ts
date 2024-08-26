@@ -69,8 +69,7 @@ function symlink({ collections }: { collections: { [key: string]: string } }): P
         throw new Error(`Unexpected type of transform method: ${typeof transform}`);
       }
       target.transform = async function (code, id, options) {
-        /** @type {ReturnType<Extract<Plugin['transform'], Function>>} */
-        let result;
+        let result: ReturnType<Extract<Plugin['transform'], (...args: any[]) => any>>;
         try {
           result = await transform.call(this, code, id, options);
         } catch (err) {

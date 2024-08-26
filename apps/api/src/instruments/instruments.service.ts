@@ -124,7 +124,7 @@ export class InstrumentsService {
       return {
         bundle: instance.bundle,
         id: instance.id,
-        kind: 'SCALAR'
+        kind: instance.kind
       };
     } else if (isSeriesInstrument(instance)) {
       return {

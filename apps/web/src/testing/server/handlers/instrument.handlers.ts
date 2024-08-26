@@ -15,21 +15,21 @@ export const instrumentHandlers: HttpHandler[] = [
     return HttpResponse.json<InstrumentBundleContainer>({
       bundle: unilingualFormInstrument.bundle,
       id: unilingualFormInstrument.instance.id,
-      kind: 'SCALAR'
+      kind: 'FORM'
     });
   }),
   http.get(`/v1/instruments/${bilingualFormInstrument.instance.id}`, () => {
     return HttpResponse.json<InstrumentBundleContainer>({
       bundle: bilingualFormInstrument.bundle,
       id: bilingualFormInstrument.instance.id,
-      kind: 'SCALAR'
+      kind: 'FORM'
     });
   }),
   http.get(`/v1/instruments/${interactiveInstrument.instance.id}`, () => {
     return HttpResponse.json<InstrumentBundleContainer>({
       bundle: interactiveInstrument.bundle,
       id: interactiveInstrument.instance.id,
-      kind: 'SCALAR'
+      kind: 'INTERACTIVE'
     });
   })
 ];

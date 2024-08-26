@@ -21,7 +21,7 @@ export class DevelopmentServer extends BaseServer {
     this.app.use(this.vite.middlewares);
   }
 
-  protected fixStacktrace(err: Error) {
+  protected override fixStacktrace(err: Error) {
     return this.vite.ssrFixStacktrace(err);
   }
 

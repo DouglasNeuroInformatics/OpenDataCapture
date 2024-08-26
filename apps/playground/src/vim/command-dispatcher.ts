@@ -78,7 +78,7 @@ export class CommandDispatcher {
     motionArgs.repeat = repeat;
     clearInputState(adapter);
     if (motion) {
-      const motionResult = motions[motion](adapter, origHead, motionArgs, vim, inputState);
+      const motionResult = motions[motion]!(adapter, origHead, motionArgs, vim, inputState);
       vim.lastMotion = motions[motion];
       if (!motionResult) {
         return;
@@ -172,11 +172,11 @@ export class CommandDispatcher {
           if (mode == 'block') {
             // Linewise operators in visual block mode extend to end of line
             for (let i = 0; i < ranges.length; i++) {
-              ranges[i].head.ch = lineLength(adapter, ranges[i].head.line);
+              ranges[i]!.head.ch = lineLength(adapter, ranges[i]!.head.line);
             }
           } else if (mode == 'line') {
-            ranges[0].head.line = ranges[0].head.line + 1;
-            ranges[0].head.ch = 0;
+            ranges[0]!.head.line = ranges[0]!.head.line + 1;
+            ranges[0]!.head.ch = 0;
           }
         }
       } else {
@@ -206,7 +206,7 @@ export class CommandDispatcher {
       operatorArgs.registerName = registerName;
       // Keep track of linewise as it affects how paste and change behave.
       operatorArgs.linewise = linewise;
-      const operatorMoveTo = operators[operator](adapter, operatorArgs, cmSel.ranges, oldAnchor, newHead!);
+      const operatorMoveTo = operators[operator]!(adapter, operatorArgs, cmSel.ranges, oldAnchor, newHead!);
       if (vim.visualMode) {
         exitVisualMode(adapter, !!operatorMoveTo);
       }
@@ -224,7 +224,7 @@ export class CommandDispatcher {
       return { type: 'partial' };
     }
 
-    const bestMatch = matches.full![0];
+    const bestMatch = matches.full![0]!;
 
     if (bestMatch.keys.endsWith('<character>')) {
       const character = lastChar(keys);
@@ -260,7 +260,7 @@ export class CommandDispatcher {
     if (command.isEdit) {
       this.recordLastEdit(vim, inputState, command);
     }
-    actions[command.action!](adapter, actionArgs, vim);
+    actions[command.action!]!(adapter, actionArgs, vim);
   }
 
   processCommand(adapter: EditorAdapter, vim: VimState, command: KeyMapping) {

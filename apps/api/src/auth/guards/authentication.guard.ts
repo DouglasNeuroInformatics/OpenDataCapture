@@ -15,7 +15,7 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
     super();
   }
 
-  canActivate(context: ExecutionContext): boolean | Observable<boolean> | Promise<boolean> {
+  override canActivate(context: ExecutionContext): boolean | Observable<boolean> | Promise<boolean> {
     this.logger.verbose(`Request URL: ${context.switchToHttp().getRequest<Request>().url}`);
     return this.isPublicRoute(context) || super.canActivate(context);
   }

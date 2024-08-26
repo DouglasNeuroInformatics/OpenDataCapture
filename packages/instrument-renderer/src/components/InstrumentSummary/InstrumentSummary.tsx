@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 
 import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
-import type { SubjectDisplayInfo } from '../InstrumentRenderer';
+import type { SubjectDisplayInfo } from '../../types';
 
 export type InstrumentSummaryProps = {
   data: any;
@@ -29,7 +29,7 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
   }
 
   const computedMeasures = filter(computeInstrumentMeasures(instrument, data), (_, key) => {
-    return !instrument.measures?.[key].hidden;
+    return !instrument.measures?.[key]!.hidden;
   });
 
   const handleDownload = () => {

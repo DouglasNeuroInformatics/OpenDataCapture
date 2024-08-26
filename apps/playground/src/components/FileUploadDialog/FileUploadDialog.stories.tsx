@@ -27,7 +27,7 @@ export const Default: Story = {
               },
               isOpen,
               onSubmit(files) {
-                alert(`Submitted: ${files[0].name}`);
+                alert(`Submitted: ${files[0]!.name}`);
                 setIsOpen(false);
               },
               onValidate() {
@@ -59,7 +59,7 @@ export const WithError: Story = {
               },
               isOpen,
               onValidate(files) {
-                return { message: `Invalid file: ${files[0].name}`, result: 'error' };
+                return { message: `Invalid file: ${files[0]!.name}`, result: 'error' };
               },
               setIsOpen,
               title: 'Upload Files'

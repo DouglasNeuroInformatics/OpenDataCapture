@@ -40,7 +40,7 @@ export default defineInstrument({
       for (let i = 0; i < brickColumnCount; i++) {
         bricks[i] = [];
         for (let j = 0; j < brickRowCount; j++) {
-          bricks[i][j] = { status: 1, x: 0, y: 0 };
+          bricks[i]![j] = { status: 1, x: 0, y: 0 };
         }
       }
 
@@ -72,7 +72,7 @@ export default defineInstrument({
       function collisionDetection() {
         for (let i = 0; i < brickColumnCount; i++) {
           for (let j = 0; j < brickRowCount; j++) {
-            const b = bricks[i][j];
+            const b = bricks[i]![j]!;
             if (b.status === 1) {
               if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
                 dy = -dy;
@@ -107,11 +107,11 @@ export default defineInstrument({
       function drawBricks() {
         for (let i = 0; i < brickColumnCount; i++) {
           for (let j = 0; j < brickRowCount; j++) {
-            if (bricks[i][j].status === 1) {
+            if (bricks[i]![j]!.status === 1) {
               const brickX = j * (brickWidth + brickPadding) + brickOffsetLeft;
               const brickY = i * (brickHeight + brickPadding) + brickOffsetTop;
-              bricks[i][j].x = brickX;
-              bricks[i][j].y = brickY;
+              bricks[i]![j]!.x = brickX;
+              bricks[i]![j]!.y = brickY;
               ctx.beginPath();
               ctx.rect(brickX, brickY, brickWidth, brickHeight);
               ctx.fillStyle = '#0095DD';

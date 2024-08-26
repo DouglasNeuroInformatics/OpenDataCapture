@@ -122,7 +122,7 @@ export class ExCommandDispatcher {
       // Key to Ex or key to key mapping
       const keys = lhs;
       for (let i = 0; i < defaultKeymap.length; i++) {
-        if (keys == defaultKeymap[i].keys && defaultKeymap[i].context === ctx) {
+        if (keys == defaultKeymap[i]!.keys && defaultKeymap[i]!.context === ctx) {
           defaultKeymap.splice(i, 1);
           return true;
         }
@@ -167,7 +167,7 @@ export class ExCommandDispatcher {
         if (command.type == 'exToKey') {
           // Handle Ex to Key mapping.
           for (let i = 0; i < command.toKeys!.length; i++) {
-            vimApi.handleKey(adapter, command.toKeys![i], 'mapping');
+            vimApi.handleKey(adapter, command.toKeys![i]!, 'mapping');
           }
           return;
         } else if (command.type == 'exToEx') {
@@ -182,7 +182,7 @@ export class ExCommandDispatcher {
       return;
     }
     try {
-      exCommands[commandName](adapter, { input: '', ...params });
+      exCommands[commandName]!(adapter, { input: '', ...params });
       // Possibly asynchronous commands (e.g. substitute, which might have a
       // user confirmation), are responsible for calling the callback when
       // done. All others have it taken care of for them here.
@@ -262,7 +262,7 @@ export class ExCommandDispatcher {
     if (numberMatch) {
       // Absolute line number plus offset (N+M or N-M) is probably a typo,
       // not something the user actually wanted. (NB: vim does allow this.)
-      return parseInt(numberMatch[1], 10) - 1;
+      return parseInt(numberMatch[1]!, 10) - 1;
     }
     switch (inputStream.next()) {
       case '.':
@@ -292,7 +292,7 @@ export class ExCommandDispatcher {
   private parseLineSpecOffset_(inputStream: StringStream, line: number) {
     const offsetMatch = inputStream.match(/^([+-])?(\d+)/);
     if (offsetMatch) {
-      const offset = parseInt(offsetMatch[2], 10);
+      const offset = parseInt(offsetMatch[2]!, 10);
       if (offsetMatch[1] == '-') {
         line -= offset;
       } else {

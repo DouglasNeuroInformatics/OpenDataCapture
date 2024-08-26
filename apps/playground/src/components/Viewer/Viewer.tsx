@@ -4,7 +4,7 @@ import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 import { bundle } from '@opendatacapture/instrument-bundler';
-import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import { ScalarInstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import { ErrorBoundary } from 'react-error-boundary';
 import { match, P } from 'ts-pattern';
 
@@ -59,11 +59,11 @@ export const Viewer = () => {
       {match(state)
         .with({ status: 'built' }, ({ bundle }) => (
           <ErrorBoundary FallbackComponent={RuntimeErrorFallback}>
-            <InstrumentRenderer
+            <ScalarInstrumentRenderer
               options={{ validate: true }}
-              target={{ bundle, kind: 'SCALAR' }}
+              target={{ bundle, id: null! }}
               onCompileError={(error) => setState({ error, status: 'error' })}
-              onSubmit={(data) => {
+              onSubmit={({ data }) => {
                 // eslint-disable-next-line no-alert
                 alert(JSON.stringify({ _message: 'The following data will be submitted', data }, null, 2));
               }}

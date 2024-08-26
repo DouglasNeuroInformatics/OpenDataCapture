@@ -11,7 +11,7 @@ export const $InstrumentRepository = z.object({
   category: $InstrumentCategory,
   files: z.array($EditorFile),
   id: z.string(),
-  kind: $InstrumentKind,
+  kind: $InstrumentKind.nullable(),
   label: z.string()
 });
 export type InstrumentRepository = z.infer<typeof $InstrumentRepository>;

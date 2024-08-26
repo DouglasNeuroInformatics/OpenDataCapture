@@ -15,7 +15,6 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
             ? { external: true }
             : { errors: [{ text: `Invalid dynamic import '${args.path}': must be http import` }] };
         } else if (/\/runtime\/v1\/(@.*\/)?[^/]+$/.test(args.path)) {
-          console.log(args.path);
           return { external: true, path: `${args.path}/index.js` };
         } else if (args.path.startsWith('/runtime/v1/')) {
           return { external: true, path: args.path.endsWith('.js') ? args.path : `${args.path}.js` };

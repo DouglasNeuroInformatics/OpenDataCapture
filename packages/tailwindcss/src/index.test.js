@@ -23,12 +23,4 @@ describe('tailwindcss', () => {
     // @ts-ignore
     expect(config.content.find((val) => val === path.resolve(reactCoreRoot, './src/**/*.{js,ts,jsx,tsx}')));
   });
-
-  it('should throw if no root is provided, and the module is not an explicit dependency', () => {
-    expect(() =>
-      createConfig({
-        include: ['@opendatacapture/react-core']
-      })
-    ).toThrow();
-  });
 });

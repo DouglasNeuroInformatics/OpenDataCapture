@@ -11,13 +11,13 @@ export function useMeasureOptions(instrument: AnyUnilingualFormInstrument | null
     if (instrument) {
       const formFields = getFormFields(instrument.content);
       for (const key in instrument.measures) {
-        const label = match(instrument.measures[key])
+        const label = match(instrument.measures[key]!)
           .with({ kind: 'computed' }, (measure) => measure.label)
           .with({ kind: 'const' }, (measure) => {
             if (measure.label) {
               return measure.label;
             }
-            const field = formFields[key];
+            const field = formFields[key]!;
             if (field.kind === 'dynamic') {
               return field.render({})?.label;
             }

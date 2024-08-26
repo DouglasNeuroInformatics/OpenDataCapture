@@ -41,7 +41,7 @@ logger.verbose = (message: string) => {
   }
 };
 
-let inputBase = program.args[0];
+let inputBase = program.args[0]!;
 if (!path.isAbsolute(inputBase)) {
   inputBase = path.resolve(process.cwd(), inputBase);
 }

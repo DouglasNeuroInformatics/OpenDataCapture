@@ -1,7 +1,6 @@
 {
   "extends": "../../jsconfig.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
@@ -9,8 +8,7 @@
       "@/*": ["./src/*"],
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     },
-    "resolveJsonModule": true,
     "types": ["@opendatacapture/runtime-v1/env", "vite/client"]
   },
-  "include": ["src/**/*", "*.js", "*.cjs"]
+  "include": ["src/**/*"]
 }

@@ -1,5 +1,5 @@
-import fs from 'fs/promises';
-import path from 'path';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 import esbuild from 'esbuild';
 
@@ -59,13 +59,13 @@ export class Bundler {
         if (key === './package.json') {
           continue;
         }
-        const conditions = pkg.exports[key];
+        const conditions = pkg.exports[key]!;
         const runtimePackageName = pkg.name.split('__').join('@');
         const out = path.join(runtimePackageName, key === '.' ? 'index' : key);
         for (const condition of ['import', 'default'] satisfies ExportCondition[]) {
           if (conditions[condition]) {
             entryPoints.push({
-              in: conditions[condition]!,
+              in: conditions[condition],
               out
             });
             break;

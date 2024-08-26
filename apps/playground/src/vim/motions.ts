@@ -174,7 +174,7 @@ export const motions: { [key: string]: MotionFunc } = {
         if (!isLowerCase(key)) {
           continue;
         }
-        const mark = vim.marks[key].find();
+        const mark = vim.marks[key]!.find();
         const isWrongDirection = motionArgs.forward ? cursorIsBefore(mark, cursor) : cursorIsBefore(cursor, mark);
 
         if (isWrongDirection) {
@@ -266,7 +266,7 @@ export const motions: { [key: string]: MotionFunc } = {
     // Vim go to line begin or line end when cursor at first/last line and
     // move to previous/next line is triggered.
     if (line < first && cur.line == first) {
-      return this.moveToStartOfLine(adapter, head, motionArgs, vim, prevInputState);
+      return this.moveToStartOfLine!(adapter, head, motionArgs, vim, prevInputState);
     } else if (line > last && cur.line == last) {
       return moveToEol(adapter, head, motionArgs, vim, true);
     }
@@ -297,7 +297,7 @@ export const motions: { [key: string]: MotionFunc } = {
     }
     const orig = adapter.charCoords(head, 'local');
     motionArgs.repeat = repeat;
-    const curEnd = motions.moveByDisplayLines(adapter, head, motionArgs, vim, prevInputState);
+    const curEnd = motions.moveByDisplayLines!(adapter, head, motionArgs, vim, prevInputState);
     if (!curEnd) {
       return;
     }
@@ -606,7 +606,7 @@ function moveToWord(
     cur = makePos(word.line, forward ? word.to - 1 : word.from);
   }
   const shortCircuit = words.length != repeat;
-  const firstWord = words[0];
+  const firstWord = words[0]!;
   let lastWord = words.pop()!;
   if (forward && !wordEnd) {
     // w
@@ -805,9 +805,9 @@ function findSentence(adapter: EditorAdapter, cur: Pos, repeat: number, dir: -1 
       } else if (stop && curr.line && !isWhiteSpaceString(curr.line[curr.pos])) {
         return { ln: curr.ln, pos: curr.pos };
       } else if (
-        isEndOfSentenceSymbol(curr.line![curr.pos]) &&
+        isEndOfSentenceSymbol(curr.line![curr.pos]!) &&
         !stop &&
-        (curr.pos === curr.line!.length - 1 || isWhiteSpaceString(curr.line![curr.pos + 1]))
+        (curr.pos === curr.line!.length - 1 || isWhiteSpaceString(curr.line![curr.pos + 1]!))
       ) {
         stop = true;
       }
@@ -822,7 +822,7 @@ function findSentence(adapter: EditorAdapter, cur: Pos, repeat: number, dir: -1 
     line = adapter.getLine(last_valid.ln!);
     last_valid.pos = 0;
     for (let i = line.length - 1; i >= 0; --i) {
-      if (!isWhiteSpaceString(line[i])) {
+      if (!isWhiteSpaceString(line[i]!)) {
         last_valid.pos = i;
         break;
       }
@@ -863,12 +863,12 @@ function findSentence(adapter: EditorAdapter, cur: Pos, repeat: number, dir: -1 
           return { ln: curr.ln, pos: curr.pos };
         }
       } else if (
-        isEndOfSentenceSymbol(curr.line[curr.pos]) &&
+        isEndOfSentenceSymbol(curr.line[curr.pos]!) &&
         last_valid.pos !== undefined &&
         !(curr.ln === last_valid.ln && curr.pos + 1 === last_valid.pos)
       ) {
         return last_valid;
-      } else if (curr.line !== '' && !isWhiteSpaceString(curr.line[curr.pos])) {
+      } else if (curr.line !== '' && !isWhiteSpaceString(curr.line[curr.pos]!)) {
         skip_empty_lines = false;
         last_valid = { ln: curr.ln, pos: curr.pos };
       }
@@ -883,7 +883,7 @@ function findSentence(adapter: EditorAdapter, cur: Pos, repeat: number, dir: -1 
     line = adapter.getLine(last_valid.ln!);
     last_valid.pos = 0;
     for (let i = 0; i < line.length; ++i) {
-      if (!isWhiteSpaceString(line[i])) {
+      if (!isWhiteSpaceString(line[i]!)) {
         last_valid.pos = i;
         break;
       }
@@ -923,7 +923,7 @@ function selectCompanionObject(adapter: EditorAdapter, head: Pos, symb: string, 
     '{': /[{}]/,
     '}': /[{}]/
   };
-  const bracketRegexp = bracketRegexpMatcher[symb];
+  const bracketRegexp = bracketRegexpMatcher[symb]!;
   const openSymMatcher: { [key: string]: string } = {
     '(': '(',
     ')': '(',
@@ -1080,7 +1080,7 @@ function findSymbol(adapter: EditorAdapter, repeat: number, forward: boolean, sy
     lastCh: '',
     lineText: lineText,
     nextCh: lineText.charAt(curCh),
-    reverseSymb: (forward ? ForwardSymbolPairs : ReverseSymbolPairs)[symb],
+    reverseSymb: (forward ? ForwardSymbolPairs : ReverseSymbolPairs)[symb]!,
     symb: symb
   };
   const mode = symbolToMode[symb];
@@ -1259,10 +1259,10 @@ function findWord(adapter: EditorAdapter, cur: Pos, forward: boolean, bigWord: b
     while (pos != stop) {
       let foundWord = false;
       for (let i = 0; i < charTests.length && !foundWord; ++i) {
-        if (charTests[i](line.charAt(pos))) {
+        if (charTests[i]!(line.charAt(pos))) {
           wordStart = pos;
           // Advance to end of word.
-          while (pos != stop && charTests[i](line.charAt(pos))) {
+          while (pos != stop && charTests[i]!(line.charAt(pos))) {
             pos += dir;
           }
           wordEnd = pos;

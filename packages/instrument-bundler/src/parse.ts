@@ -133,14 +133,14 @@ export type Import = {
 const separatorRegex = /^(?:\s+|,)$/u;
 
 function skipSeparators(imported: string, i: number) {
-  while (i < imported.length && separatorRegex.test(imported[i])) {
+  while (i < imported.length && separatorRegex.test(imported[i]!)) {
     i++;
   }
   return i;
 }
 
 function skipNonSeparators(imported: string, i: number) {
-  while (i < imported.length && !separatorRegex.test(imported[i])) {
+  while (i < imported.length && !separatorRegex.test(imported[i]!)) {
     i++;
   }
   return i;
@@ -168,7 +168,7 @@ function parseNamedImports(importClauseString: string, i: number) {
         const components = namedImport.split(` `);
         return {
           binding: components.at(-1)!,
-          specifier: components[0]
+          specifier: components[0]!
         };
       }
       return { binding: namedImport, specifier: namedImport };
@@ -200,7 +200,7 @@ function parseImportClause(importClauseString: string) {
   const namedImports = [];
 
   for (let i = 0; i < importClauseString.length; i++) {
-    if (separatorRegex.test(importClauseString[i])) {
+    if (separatorRegex.test(importClauseString[i]!)) {
       continue;
     }
 

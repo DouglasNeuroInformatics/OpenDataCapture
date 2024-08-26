@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { $BaseModel, $Json, $Uint8Array } from '../core/core.js';
+import { $ScalarInstrumentBundleContainer } from '../instrument/instrument.base.js';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -21,9 +22,9 @@ export const $Assignment = $BaseModel.extend({
 });
 
 export type RemoteAssignment = z.infer<typeof $RemoteAssignment>;
-export const $RemoteAssignment = $Assignment.omit({ updatedAt: true }).extend({
+export const $RemoteAssignment = $Assignment.omit({ instrumentId: true, updatedAt: true }).extend({
   encryptedData: $Uint8Array.nullable(),
-  instrumentBundle: z.string(),
+  instrumentContainer: $ScalarInstrumentBundleContainer,
   symmetricKey: $Uint8Array.nullable()
 });
 

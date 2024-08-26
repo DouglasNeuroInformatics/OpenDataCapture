@@ -19,6 +19,7 @@ model RemoteAssignmentModel {
   expiresAt        DateTime
   groupId          String?
   instrumentBundle String
+  instrumentKind   String
   instrumentId     String
   rawPublicKey     Bytes
   symmetricKey     Bytes?

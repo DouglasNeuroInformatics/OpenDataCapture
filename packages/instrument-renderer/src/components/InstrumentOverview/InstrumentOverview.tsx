@@ -60,12 +60,16 @@ export const InstrumentOverview = ({ instrument, onNext }: InstrumentOverviewPro
           </div>
         </div>
         <div>
-          <Heading variant="h5">{t('estimatedDuration')}</Heading>
-          <p className="text-muted-foreground text-sm">
-            {t('minutes', {
-              minutes: instrument.details.estimatedDuration
-            })}
-          </p>
+          {instrument.details.estimatedDuration && (
+            <>
+              <Heading variant="h5">{t('estimatedDuration')}</Heading>
+              <p className="text-muted-foreground text-sm">
+                {t('minutes', {
+                  minutes: instrument.details.estimatedDuration
+                })}
+              </p>
+            </>
+          )}
         </div>
         {Boolean(instrument.details.instructions?.length) && (
           <div>

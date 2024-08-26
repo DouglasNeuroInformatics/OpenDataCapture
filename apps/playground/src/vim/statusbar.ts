@@ -242,7 +242,7 @@ export class StatusBar implements IStatusBar {
   setInnerHtml_(element: Node, htmlContents: Node) {
     // Clear out previous contents first.
     while (element.childNodes.length) {
-      element.removeChild(element.childNodes[0]);
+      element.removeChild(element.childNodes[0]!);
     }
     element.appendChild(htmlContents);
   }

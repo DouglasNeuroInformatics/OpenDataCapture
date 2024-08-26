@@ -54,8 +54,8 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
     Object.keys(libs).forEach((filename) => {
       const uri = monaco.Uri.parse(filename);
       if (!monaco.editor.getModel(uri)) {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(libs[filename], filename);
-        monaco.editor.createModel(libs[filename], 'typescript', uri);
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(libs[filename]!, filename);
+        monaco.editor.createModel(libs[filename]!, 'typescript', uri);
       }
     });
   }, [isMounted, libs]);
