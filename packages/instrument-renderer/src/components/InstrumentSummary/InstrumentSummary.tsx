@@ -29,7 +29,7 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
   }
 
   const computedMeasures = filter(computeInstrumentMeasures(instrument, data), (_, key) => {
-    return !instrument.measures?.[key].hidden;
+    return !instrument.measures?.[key]!.hidden;
   });
 
   const handleDownload = () => {

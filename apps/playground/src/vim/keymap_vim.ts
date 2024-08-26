@@ -161,8 +161,8 @@ function cmKeyToVimKey(key: string) {
     return false;
   }
   const pieces = key.split(/-(?!$)/);
-  const lastPiece = pieces[pieces.length - 1];
-  if (pieces.length == 1 && pieces[0].length == 1) {
+  const lastPiece = pieces[pieces.length - 1]!;
+  if (pieces.length == 1 && pieces[0]!.length == 1) {
     // No-modifier bindings use literal character bindings above. Skip.
     return false;
   } else if (pieces.length == 2 && pieces[0] == 'Shift' && lastPiece.length == 1) {
@@ -171,14 +171,14 @@ function cmKeyToVimKey(key: string) {
   }
   let hasCharacter = false;
   for (let i = 0; i < pieces.length; i++) {
-    const piece = pieces[i];
+    const piece = pieces[i]!;
     if (piece in modifiers) {
-      pieces[i] = modifiers[piece];
+      pieces[i] = modifiers[piece]!;
     } else {
       hasCharacter = true;
     }
     if (piece in specialKeys) {
-      pieces[i] = specialKeys[piece];
+      pieces[i] = specialKeys[piece]!;
     }
   }
   if (!hasCharacter) {
@@ -387,7 +387,7 @@ function commandMatch(pressed: string, mapped: string) {
 
 export function lastChar(keys: string): string {
   const match = /^.*(<[^>]+>)$/.exec(keys);
-  let selectedCharacter = match ? match[1] : keys.slice(-1);
+  let selectedCharacter = match ? match[1]! : keys.slice(-1);
   if (selectedCharacter.length > 1) {
     switch (selectedCharacter) {
       case '<CR>':
@@ -606,7 +606,7 @@ export function expandWordUnderCursor(
 
   // Seek to first word or non-whitespace character, depending on if
   // noSymbol is true.
-  let test: (ch: string) => boolean = noSymbol ? keywordCharTest[0] : bigWordCharTest[0];
+  let test: (ch: string) => boolean = noSymbol ? keywordCharTest[0]! : bigWordCharTest[0]!;
   while (!test(line.charAt(idx))) {
     idx++;
     if (idx >= line.length) {
@@ -615,11 +615,11 @@ export function expandWordUnderCursor(
   }
 
   if (bigWord) {
-    test = bigWordCharTest[0];
+    test = bigWordCharTest[0]!;
   } else {
     test = isKeywordTest;
     if (!test(line.charAt(idx))) {
-      test = keywordCharTest[1];
+      test = keywordCharTest[1]!;
     }
   }
 
@@ -748,7 +748,7 @@ function translateRegexReplace(str: string) {
     const c = str.charAt(i) || '';
     const n = str.charAt(i + 1) || '';
     if (charUnescapes[c + n]) {
-      out.push(charUnescapes[c + n]);
+      out.push(charUnescapes[c + n]!);
       i++;
     } else if (escapeNextChar) {
       // At any point in the loop, escapeNextChar is true if the previous
@@ -798,7 +798,7 @@ function unescapeRegexReplace(str: string) {
     for (const matcher in unescapes) {
       if (stream.match(matcher, true)) {
         matched = true;
-        output.push(unescapes[matcher]);
+        output.push(unescapes[matcher]!);
         break;
       }
     }
@@ -840,7 +840,7 @@ function parseQuery(query: RegExp | string, ignoreCase: boolean, smartCase: bool
   } else {
     // Query looks like 'regexp/...'
     regexPart = query.substring(0, slashes[0]);
-    const flagsPart = query.substring(slashes[0]);
+    const flagsPart = query.substring(slashes[0]!);
     forceIgnoreCase = flagsPart.includes('i');
   }
   if (!regexPart) {
@@ -1022,7 +1022,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
       showConfirm(adapter, adapter.getOption('theme'));
       return;
     }
-    adapter.setOption('theme', params.args[0]);
+    adapter.setOption('theme', params.args[0]!);
   },
   delmarks: function (adapter, params) {
     if (!params.argString || !trim(params.argString)) {
@@ -1111,7 +1111,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
     let regexPart = argString;
     let cmd: string | undefined;
     if (tokens?.length) {
-      regexPart = tokens[0];
+      regexPart = tokens[0]!;
       cmd = tokens.slice(1, tokens.length).join('/');
     }
     if (regexPart) {
@@ -1143,7 +1143,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
     let index = 0;
     const nextCommand = () => {
       if (index < matchedLines.length) {
-        const line = matchedLines[index++];
+        const line = matchedLines[index++]!;
         const command = `${line.line + 1}${cmd}`;
         exCommandDispatcher.processCommand(adapter, command, {
           callback: nextCommand
@@ -1153,7 +1153,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
     nextCommand();
   },
   imap: function (adapter, params) {
-    this.map(adapter, params, 'insert');
+    this.map!(adapter, params, 'insert');
   },
   map: function (adapter, params, ctx) {
     const mapArgs = params.args;
@@ -1163,7 +1163,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
       }
       return;
     }
-    exCommandDispatcher.map(mapArgs[0], mapArgs[1], ctx);
+    exCommandDispatcher.map(mapArgs[0]!, mapArgs[1]!, ctx);
   },
   move: function (adapter, params) {
     commandDispatcher.processCommand(adapter, adapter.state.vim, {
@@ -1175,19 +1175,19 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
     });
   },
   nmap: function (adapter, params) {
-    this.map(adapter, params, 'normal');
+    this.map!(adapter, params, 'normal');
   },
   nohlsearch: function (adapter) {
     clearSearchHighlight(adapter);
   },
-  redo: EditorAdapter.commands.redo,
+  redo: EditorAdapter.commands.redo!,
   registers: function (adapter, params) {
     const regArgs = params.args;
     const registers = vimGlobalState.registerController.registers;
     const regInfo = ['----------Registers----------', ''];
     if (!regArgs) {
       for (const registerName in registers) {
-        const text = registers[registerName].toString();
+        const text = registers[registerName]!.toString();
         if (text.length) {
           regInfo.push(`"${registerName}"     ${text}`);
         }
@@ -1228,9 +1228,9 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
       }
       return;
     }
-    const expr = setArgs[0].split('=');
-    let optionName = expr[0];
-    let value: boolean | string = expr[1];
+    const expr = setArgs[0]!.split('=');
+    let optionName = expr[0]!;
+    let value: boolean | string = expr[1]!;
     let forceGet = false;
 
     if (optionName.endsWith('?')) {
@@ -1279,12 +1279,12 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
   setglobal: function (adapter, params) {
     // setCfg is passed through to setOption
     params.setCfg = { scope: 'global' };
-    this.set(adapter, params);
+    this.set!(adapter, params);
   },
   setlocal: function (adapter, params) {
     // setCfg is passed through to setOption
     params.setCfg = { scope: 'local' };
-    this.set(adapter, params);
+    this.set!(adapter, params);
   },
   sort: function (adapter, params) {
     let reverse: boolean | undefined;
@@ -1350,13 +1350,13 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
     const textPart: string[] = [];
     if (number || pattern) {
       for (let i = 0; i < text.length; i++) {
-        const matchPart = pattern ? text[i].match(pattern) : null;
+        const matchPart = pattern ? text[i]!.match(pattern) : null;
         if (matchPart && matchPart[0] != '') {
           numPart.push(matchPart);
-        } else if (!pattern && numberRegex.exec(text[i])) {
-          numPart.push(text[i]);
+        } else if (!pattern && numberRegex.exec(text[i]!)) {
+          numPart.push(text[i]!);
         } else {
-          textPart.push(text[i]);
+          textPart.push(text[i]!);
         }
       }
     } else {
@@ -1377,7 +1377,9 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
       if (!anum || !bnum) {
         return a < b ? -1 : 1;
       }
-      return parseInt((anum[1] + anum[2]).toLowerCase(), radix) - parseInt((bnum[1] + bnum[2]).toLowerCase(), radix);
+      return (
+        parseInt((anum[1]! + anum[2]!).toLowerCase(), radix) - parseInt((bnum[1]! + bnum[2]!).toLowerCase(), radix)
+      );
     };
     const comparePatternFn = (a: string, b: string) => {
       if (reverse) {
@@ -1386,15 +1388,15 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
         b = tmp;
       }
       if (ignoreCase) {
-        return a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1;
+        return a[0]!.toLowerCase() < b[0]!.toLowerCase() ? -1 : 1;
       } else {
-        return a[0] < b[0] ? -1 : 1;
+        return a[0]! < b[0]! ? -1 : 1;
       }
     };
     (numPart as string[]).sort(pattern ? comparePatternFn : compareFn);
     if (pattern) {
       for (let i = 0; i < numPart.length; i++) {
-        const np = numPart[i];
+        const np = numPart[i]!;
         if (typeof np !== 'string') {
           numPart[i] = np.input!;
         }
@@ -1417,7 +1419,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
         if (text[i] == lastLine) {
           text.splice(i, 1);
         } else {
-          lastLine = text[i];
+          lastLine = text[i]!;
         }
       }
     }
@@ -1430,7 +1432,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
       );
     }
     const argString = params.argString;
-    const tokens = argString ? splitBySeparator(argString, argString[0]) : [];
+    const tokens = argString ? splitBySeparator(argString, argString[0]!) : [];
     let regexPart: string | undefined;
     let replacePart: string | undefined = '';
     let trailing: string[] | undefined;
@@ -1440,7 +1442,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
     if (tokens?.length) {
       regexPart = tokens[0];
       if (getOption('pcre') && regexPart !== '') {
-        regexPart = new RegExp(regexPart).source; //normalize not escaped characters
+        regexPart = new RegExp(regexPart!).source; //normalize not escaped characters
       }
       replacePart = tokens[1];
       if (replacePart !== undefined) {
@@ -1465,7 +1467,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
     // by count.
     if (trailing) {
       const flagsPart = trailing[0];
-      count = parseInt(trailing[1]);
+      count = parseInt(trailing[1]!);
       if (flagsPart) {
         if (flagsPart.includes('c')) {
           confirm = true;
@@ -1511,10 +1513,10 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
     adapter.pushUndoStop();
     doReplace(adapter, confirm, global, lineStart, lineEnd, cursor, query, replacePart, params.callback);
   },
-  undo: EditorAdapter.commands.undo,
+  undo: EditorAdapter.commands.undo!,
   unmap: function (adapter, params, ctx) {
     const mapArgs = params.args;
-    if (!mapArgs || mapArgs.length < 1 || !exCommandDispatcher.unmap(mapArgs[0], ctx)) {
+    if (!mapArgs || mapArgs.length < 1 || !exCommandDispatcher.unmap(mapArgs[0]!, ctx)) {
       if (adapter) {
         showConfirm(adapter, 'No such mapping: ' + params.input);
       }
@@ -1522,10 +1524,10 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
   },
   vglobal: function (adapter, params) {
     // global inspects params.commandName
-    this.global(adapter, params);
+    this.global!(adapter, params);
   },
   vmap: function (adapter, params) {
-    this.map(adapter, params, 'visual');
+    this.map!(adapter, params, 'visual');
   },
   write: function (adapter, params) {
     if (EditorAdapter.commands.save) {
@@ -1944,7 +1946,7 @@ export function repeatLastEdit(adapter: EditorAdapter, vim: VimState, repeat: nu
 export function repeatInsertModeChanges(adapter: EditorAdapter, changes: (InsertModeKey | string)[], repeat: number) {
   const keyHandler = (binding: BindingFunction | string | string[]): boolean => {
     if (typeof binding == 'string') {
-      EditorAdapter.commands[binding](adapter, {});
+      EditorAdapter.commands[binding]!(adapter, {});
     } else if (Array.isArray(binding)) {
       /* empty */
     } else {

@@ -21,7 +21,7 @@ function parseBuildResult(result: BuildResult): BuildOutput {
       `Unexpected number of output files: expected '${expectedOutputFiles}', found '${actualOutputFiles}'`
     );
   }
-  const exportsCount = result.metafile!.outputs['bundle.js'].exports.length;
+  const exportsCount = result.metafile!.outputs['bundle.js']!.exports.length;
   if (exportsCount !== 0) {
     throw new InstrumentBundlerError(
       `Unexpected number of exports in output file: expected '0', found '${exportsCount}'`

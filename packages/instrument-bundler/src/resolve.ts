@@ -21,7 +21,7 @@ function resolveIndexInput<T extends BundlerInput>(inputs: T[]): T {
 function extractFilenameFromPath(path: string): string {
   const parts = path.split('/');
   if (parts[0] === '.' && parts.length === 2) {
-    return parts[1];
+    return parts[1]!;
   }
   throw new InstrumentBundlerError(`Invalid path '${path}': expected relative path to file in same directory`);
 }

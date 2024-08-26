@@ -12,7 +12,7 @@ export class HistoryController {
     }
     let i = 0;
     for (i = this.iterator + dir; up ? i >= 0 : i < this.historyBuffer.length; i += dir) {
-      const element = this.historyBuffer[i];
+      const element = this.historyBuffer[i]!;
       for (let j = 0; j <= element.length; j++) {
         if (this.initialPrefix == element.substring(0, j)) {
           this.iterator = i;

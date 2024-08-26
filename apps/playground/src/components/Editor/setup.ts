@@ -14,7 +14,7 @@ import prettier from 'prettier/standalone';
 import type { CompletionItemProvider } from './types';
 
 class TypeScriptSuggestAdapter extends SuggestAdapter implements CompletionItemProvider {
-  triggerCharacters = ['.', '"', "'"];
+  override triggerCharacters = ['.', '"', "'"];
 }
 
 self.MonacoEnvironment = {

@@ -26,8 +26,8 @@ export type OperatorFunc = (
 export const operators: { [key: string]: OperatorFunc } = {
   change: function (adapter, args, ranges) {
     const vim = adapter.state.vim as VimState;
-    const anchor = ranges[0].anchor;
-    let head = ranges[0].head;
+    const anchor = ranges[0]!.anchor;
+    let head = ranges[0]!.head;
     let finalHead: Pos;
     let text: string;
     if (!vim.visualMode) {
@@ -52,7 +52,7 @@ export const operators: { [key: string]: OperatorFunc } = {
         // Push the next line back down, if there is a next line.
         if (!wasLastLine) {
           adapter.setCursor(prevLineEnd);
-          EditorAdapter.commands.newlineAndIndent(adapter, {});
+          EditorAdapter.commands.newlineAndIndent!(adapter, {});
         }
         // make sure cursor ends up at the end of the line.
         anchor.ch = Number.MAX_VALUE;
@@ -69,10 +69,10 @@ export const operators: { [key: string]: OperatorFunc } = {
       text = adapter.getSelection();
       const replacement = new Array<string>(ranges.length).fill('');
       adapter.replaceSelections(replacement);
-      finalHead = cursorMin(ranges[0].head, ranges[0].anchor);
+      finalHead = cursorMin(ranges[0]!.head, ranges[0]!.anchor);
     }
     vimGlobalState.registerController.pushText(args.registerName!, 'change', text, args.linewise, ranges.length > 1);
-    actions.enterInsertMode(adapter, { head: finalHead }, adapter.state.vim);
+    actions.enterInsertMode!(adapter, { head: finalHead }, adapter.state.vim);
   },
   changeCase: function (adapter, args, ranges, oldAnchor, newHead) {
     const selections = adapter.getSelections();
@@ -92,14 +92,14 @@ export const operators: { [key: string]: OperatorFunc } = {
     adapter.replaceSelections(swapped);
     if (args.shouldMoveCursor) {
       return newHead;
-    } else if (!adapter.state.vim.visualMode && args.linewise && ranges[0].anchor.line + 1 == ranges[0].head.line) {
+    } else if (!adapter.state.vim.visualMode && args.linewise && ranges[0]!.anchor.line + 1 == ranges[0]!.head.line) {
       const vim = adapter.state.vim as VimState;
-      const res = motions.moveToFirstNonWhiteSpaceCharacter(adapter, oldAnchor, {}, vim, vim.inputState);
+      const res = motions.moveToFirstNonWhiteSpaceCharacter!(adapter, oldAnchor, {}, vim, vim.inputState);
       return Array.isArray(res) ? res[0] : res;
     } else if (args.linewise) {
       return oldAnchor;
     } else {
-      return cursorMin(ranges[0].anchor, ranges[0].head);
+      return cursorMin(ranges[0]!.anchor, ranges[0]!.head);
     }
   },
   // delete is a javascript keyword.
@@ -111,8 +111,8 @@ export const operators: { [key: string]: OperatorFunc } = {
     let text: string;
     const vim = adapter.state.vim as VimState;
     if (!vim.visualBlock) {
-      let anchor = ranges[0].anchor,
-        head = ranges[0].head;
+      let anchor = ranges[0]!.anchor,
+        head = ranges[0]!.head;
       if (
         args.linewise &&
         head.line != adapter.firstLine() &&
@@ -131,22 +131,22 @@ export const operators: { [key: string]: OperatorFunc } = {
       finalHead = anchor;
       if (args.linewise) {
         const vim = adapter.state.vim as VimState;
-        const res = motions.moveToFirstNonWhiteSpaceCharacter(adapter, anchor, {}, vim, vim.inputState)!;
+        const res = motions.moveToFirstNonWhiteSpaceCharacter!(adapter, anchor, {}, vim, vim.inputState)!;
         finalHead = Array.isArray(res) ? res[0] : res;
       }
     } else {
       text = adapter.getSelection();
       const replacement = new Array<string>(ranges.length).fill('');
       adapter.replaceSelections(replacement);
-      finalHead = cursorMin(ranges[0].head, ranges[0].anchor);
+      finalHead = cursorMin(ranges[0]!.head, ranges[0]!.anchor);
     }
     vimGlobalState.registerController.pushText(args.registerName!, 'delete', text, args.linewise, vim.visualBlock);
     return clipCursorToContent(adapter, finalHead);
   },
   indent: function (adapter, args, ranges) {
     const vim = adapter.state.vim as VimState;
-    const startLine = ranges[0].anchor.line;
-    let endLine = vim.visualBlock ? ranges[ranges.length - 1].anchor.line : ranges[0].head.line;
+    const startLine = ranges[0]!.anchor.line;
+    let endLine = vim.visualBlock ? ranges[ranges.length - 1]!.anchor.line : ranges[0]!.head.line;
     // In visual mode, n> shifts the selection right n times, instead of
     // shifting n lines right once.
     let repeat = vim.visualMode ? args.repeat || 0 : 1;
@@ -163,20 +163,20 @@ export const operators: { [key: string]: OperatorFunc } = {
       }
     }
     adapter.pushUndoStop();
-    const res = motions.moveToFirstNonWhiteSpaceCharacter(adapter, ranges[0].anchor, {}, vim, vim.inputState);
+    const res = motions.moveToFirstNonWhiteSpaceCharacter!(adapter, ranges[0]!.anchor, {}, vim, vim.inputState);
     return Array.isArray(res) ? res[0] : res;
   },
   indentAuto: function (adapter, _args, ranges) {
     adapter.execCommand('indentAuto');
     const vim = adapter.state.vim as VimState;
-    const res = motions.moveToFirstNonWhiteSpaceCharacter(adapter, ranges[0].anchor, {}, vim, vim.inputState);
+    const res = motions.moveToFirstNonWhiteSpaceCharacter!(adapter, ranges[0]!.anchor, {}, vim, vim.inputState);
     return Array.isArray(res) ? res[0] : res;
   },
   yank: function (adapter, args, ranges, oldAnchor) {
     const vim = adapter.state.vim as VimState;
     const text = adapter.getSelection();
     const endPos = vim.visualMode
-      ? cursorMin(vim.sel.anchor, vim.sel.head, ranges[0].head, ranges[0].anchor)
+      ? cursorMin(vim.sel.anchor, vim.sel.head, ranges[0]!.head, ranges[0]!.anchor)
       : oldAnchor;
     vimGlobalState.registerController.pushText(args.registerName!, 'yank', text, args.linewise, vim.visualBlock);
     return endPos;

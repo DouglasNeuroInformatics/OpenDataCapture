@@ -33,15 +33,15 @@ export function validatePackageName(name: string): { issue: string; success: fal
     return { issue: 'cannot contain capital letters', success: false };
   }
 
-  if (/[~'!()*]/.test(name.split('/').slice(-1)[0])) {
+  if (/[~'!()*]/.test(name.split('/').slice(-1)[0]!)) {
     return { issue: 'cannot contain special characters ("~\'!()*")', success: false };
   }
 
   if (encodeURIComponent(name) !== name) {
     const scopedPackageMatch = /^(?:@([^/]+?)[/])?([^/]+?)$/.exec(name);
     if (scopedPackageMatch) {
-      const user = scopedPackageMatch[1];
-      const pkg = scopedPackageMatch[2];
+      const user = scopedPackageMatch[1]!;
+      const pkg = scopedPackageMatch[2]!;
       if (encodeURIComponent(user) === user && encodeURIComponent(pkg) === pkg) {
         return { success: true };
       }

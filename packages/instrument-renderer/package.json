@@ -32,20 +32,20 @@
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/subject-utils": "workspace:*",
-    "i18next": "^23.11.5",
+    "i18next": "catalog:",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "lucide-react": "^0.394.0",
-    "react-i18next": "^14.1.2",
+    "lucide-react": "^0.436.0",
+    "react-i18next": "catalog:",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
     "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/tailwindcss": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
-    "autoprefixer": "^10.4.19",
+    "autoprefixer": "^10.4.20",
     "esbuild-wasm": "catalog:esbuild",
-    "postcss": "^8.4.38",
+    "postcss": "^8.4.41",
     "type-fest": "workspace:type-fest__4.x@*",
-    "vite": "^5.2.13"
+    "vite": "^5.4.2"
   }
 }

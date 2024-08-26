@@ -166,7 +166,7 @@ export default class EditorAdapter {
     handle?: (binding: Binding) => boolean
   ): 'handled' | 'multi' | 'nothing' | undefined {
     if (typeof map === 'string') {
-      map = EditorAdapter.keyMap[map];
+      map = EditorAdapter.keyMap[map]!;
     }
 
     const found = map.find ? map.find(key) : map.keys ? map.keys[key] : undefined;
@@ -448,12 +448,11 @@ export default class EditorAdapter {
 
   getScrollInfo() {
     const [range] = this.editor.getVisibleRanges();
-
     return {
-      clientHeight: range.endLineNumber - range.startLineNumber + 1,
+      clientHeight: range!.endLineNumber - range!.startLineNumber + 1,
       height: this.getModel_().getLineCount(),
       left: 0,
-      top: range.startLineNumber - 1
+      top: range!.startLineNumber - 1
     };
   }
 
@@ -524,7 +523,7 @@ export default class EditorAdapter {
         if (!matches?.length) {
           return false;
         }
-        const match = matches[index];
+        const match = matches[index]!;
         lastSearch = match.range;
         context.highlightRanges([lastSearch], 'currentFindMatch');
         context.highlightRanges(matches.map((m) => m.range).filter((r) => !r.equalsRange(lastSearch)));
@@ -543,7 +542,7 @@ export default class EditorAdapter {
               }
             ],
             (edits: monaco.editor.IValidEditOperation[]) => {
-              const { endColumn, endLineNumber } = edits[0].range;
+              const { endColumn, endLineNumber } = edits[0]!.range;
               lastSearch = liftRange(lastSearch).setEndPosition(endLineNumber, endColumn);
               return null;
             }
@@ -662,7 +661,7 @@ export default class EditorAdapter {
 
     const keymap = this.state.keyMap as string;
     if (EditorAdapter.keyMap[keymap]?.call) {
-      const cmd = EditorAdapter.keyMap[keymap].call!(key, this);
+      const cmd = EditorAdapter.keyMap[keymap].call(key, this);
       if (cmd) {
         e.preventDefault();
         e.stopPropagation();
@@ -684,7 +683,7 @@ export default class EditorAdapter {
     let forceMoveMarkers = true;
 
     if (key.startsWith("'")) {
-      char = key[1];
+      char = key[1]!;
     } else if (char === 'Enter') {
       char = '\n';
     } else if (char === 'Backspace') {
@@ -978,7 +977,7 @@ export default class EditorAdapter {
         {
           forceMoveMarkers: false,
           range: sel,
-          text: texts[index]
+          text: texts[index]!
         }
       ]);
     });
@@ -1008,7 +1007,7 @@ export default class EditorAdapter {
         return undefined;
       }
 
-      const thisBracket = match.matches![0];
+      const thisBracket = match.matches![0]!;
 
       const matchingBracket = kMatchingBrackets[thisBracket];
 
@@ -1122,14 +1121,14 @@ export default class EditorAdapter {
     if (!primIndex) {
       /* empty */
     } else if (sels[primIndex]) {
-      sels.push(sels.splice(primIndex, 1)[0]);
+      sels.push(sels.splice(primIndex, 1)[0]!);
     }
 
     if (!sels.length) {
       return;
     }
 
-    const sel = liftSelection(sels[0]);
+    const sel = liftSelection(sels[0]!);
     let posToReveal;
 
     if (sel.getDirection() === monaco.SelectionDirection.LTR) {

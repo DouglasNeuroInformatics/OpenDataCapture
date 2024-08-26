@@ -21,7 +21,7 @@ export const UploadButton = () => {
 
   const handleSubmit = async (files: File[]) => {
     const zip = new JSZip() as { comment?: unknown } & JSZip;
-    await zip.loadAsync(files[0]);
+    await zip.loadAsync(files[0]!);
     let label: string;
     try {
       const comment = JSON.parse(String(zip.comment)) as unknown;

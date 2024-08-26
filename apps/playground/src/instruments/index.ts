@@ -20,15 +20,15 @@ const binaryFiles: { [key: string]: string } = import.meta.glob('./**/*.{jpg,jpe
 });
 
 for (const filepath in binaryFiles) {
-  binaryFiles[filepath] = await loadAssetAsBase64(binaryFiles[filepath]);
+  binaryFiles[filepath] = await loadAssetAsBase64(binaryFiles[filepath]!);
 }
 
 const defaultInstruments: InstrumentRepository[] = [];
 for (const [filename, content] of Object.entries({ ...binaryFiles, ...textFiles })) {
   const segments = filename.split('/').filter(Boolean);
   const category = await $InstrumentCategory.parseAsync(capitalize(segments[1]));
-  const kind = await $InstrumentKind.parseAsync(segments[2].toUpperCase());
-  const label = segments[3].replaceAll('-', ' ');
+  const kind = await $InstrumentKind.parseAsync(segments[2]!.toUpperCase());
+  const label = segments[3]!.replaceAll('-', ' ');
   const name = segments.slice(4, segments.length).join('/');
 
   if (EXCLUDED_LABELS.includes(label)) {

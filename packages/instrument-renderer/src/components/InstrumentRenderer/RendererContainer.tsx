@@ -38,8 +38,8 @@ export const RendererContainer = ({ children, className, index }: InstrumentRend
   useEffect(() => {
     const styles: React.CSSProperties[] = [];
     for (let i = 0; i < steps.length - 1; i++) {
-      const current = icons.current[i];
-      const next = icons.current[i + 1];
+      const current = icons.current[i]!;
+      const next = icons.current[i + 1]!;
       const left = current.offsetLeft + current.offsetWidth;
       styles.push({
         left,

@@ -232,7 +232,7 @@ export class InstrumentRecordsService {
       const numericMeasures = pickBy(record.computedMeasures, isNumber);
       for (const measure in numericMeasures) {
         const x = record.date.getTime();
-        const y = numericMeasures[measure];
+        const y = numericMeasures[measure]!;
         if (Array.isArray(data[measure])) {
           data[measure].push([x, y]);
         } else {
@@ -243,7 +243,7 @@ export class InstrumentRecordsService {
 
     const results: LinearRegressionResults = {};
     for (const measure in data) {
-      results[measure] = linearRegression(data[measure]);
+      results[measure] = linearRegression(data[measure]!);
     }
     return results;
   }

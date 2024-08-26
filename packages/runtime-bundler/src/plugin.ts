@@ -1,6 +1,6 @@
-import fs from 'fs/promises';
-import module from 'module';
-import path from 'path';
+import * as fs from 'fs/promises';
+import * as module from 'module';
+import * as path from 'path';
 
 import type { Plugin } from 'esbuild';
 import ts from 'typescript';
@@ -116,7 +116,7 @@ export function dtsPlugin(options: DtsPluginOptions): Plugin {
             ]
           };
         }
-        const contents = printer.printFile(transformationResult.transformed[0]);
+        const contents = printer.printFile(transformationResult.transformed[0]!);
         return {
           contents,
           loader: 'copy'

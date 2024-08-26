@@ -60,9 +60,9 @@ export const FileUploadDialog = ({ accept, isOpen, onSubmit, onValidate, setIsOp
 
   let dropzoneText: string;
   if (files.length > 1) {
-    dropzoneText = `${files[0].name} + ${files.length - 1}`;
+    dropzoneText = `${files[0]!.name} + ${files.length - 1}`;
   } else if (files.length === 1) {
-    dropzoneText = files[0].name;
+    dropzoneText = files[0]!.name;
   } else if (isDragActive) {
     dropzoneText = 'Release your cursor to upload file(s)';
   } else {

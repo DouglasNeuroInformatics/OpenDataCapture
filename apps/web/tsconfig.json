@@ -1,12 +1,10 @@
 {
   "extends": "../../jsconfig.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "resolveJsonModule": true
+    }
   },
   "include": ["config/**/*", "src/**/*", "*.js", "*.cjs"]
 }

@@ -15,7 +15,7 @@
     "lodash-es": "workspace:lodash-es__4.x@*"
   },
   "devDependencies": {
-    "@types/k6": "~0.51.0",
+    "@types/k6": "~0.53.1",
     "esbuild": "catalog:esbuild"
   }
 }

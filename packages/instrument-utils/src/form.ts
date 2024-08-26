@@ -9,7 +9,7 @@ export function getFormFields<TData extends FormInstrument.Data>(
   }
   return content.reduce(
     (prev, current) => ({ ...prev, ...current.fields }),
-    content[0].fields
+    content[0]!.fields
   ) as FormInstrument.Fields<TData, Language>;
 }
 
@@ -18,7 +18,7 @@ export function extractFieldLabel<TData extends FormInstrument.Data>(
   key: string,
   data: null | TData = null
 ) {
-  const field = getFormFields(form.content)[key];
+  const field = getFormFields(form.content)[key]!;
   if (field.kind === 'dynamic') {
     return field.render(data as FormInstrument.PartialData<TData>)?.label;
   }

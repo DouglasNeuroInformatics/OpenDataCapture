@@ -39,7 +39,7 @@ function getTargetLanguage(instrument: Pick<AnyInstrument, 'language'>, preferre
   } else if (instrument.language.includes(preferredLanguage)) {
     return preferredLanguage;
   }
-  return instrument.language[0];
+  return instrument.language[0]!;
 }
 
 /**
@@ -98,7 +98,7 @@ function translateRecordArrayFieldset(
 ): FormInstrument.Fieldset<Language> {
   const transformedFieldset: FormInstrument.Fieldset<Language> = {};
   for (const key in fieldset) {
-    const field = fieldset[key];
+    const field = fieldset[key]!;
     if (field.kind === 'dynamic') {
       transformedFieldset[key] = {
         kind: 'dynamic',

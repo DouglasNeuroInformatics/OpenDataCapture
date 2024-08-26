@@ -33,7 +33,7 @@ export function encodeScopedSubjectId(id: number | string, options: { groupName:
 
 export function removeSubjectIdScope(id: string) {
   if (id.includes('$')) {
-    return id.split('$')[1];
+    return id.split('$')[1]!;
   }
   return id;
 }

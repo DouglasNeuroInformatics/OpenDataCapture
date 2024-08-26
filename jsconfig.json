@@ -1,27 +1,10 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": ["@douglasneuroinformatics/tsconfig"],
   "compilerOptions": {
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "checkJs": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": ["ESNext"],
-    "maxNodeModuleJsDepth": 0,
     "module": "ESNext",
-    "moduleDetection": "force",
     "moduleResolution": "Bundler",
-    "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "ESNext",
-    "verbatimModuleSyntax": true
+    "resolveJsonModule": true
   },
   "exclude": ["docs/*", "**/dist", "**/node_modules", "**/vendor", "vendor/**/*"]
 }

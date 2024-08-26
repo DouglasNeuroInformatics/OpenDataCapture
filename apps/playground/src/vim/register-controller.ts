@@ -143,7 +143,7 @@ export class RegisterController {
     if (!this.registers[name]) {
       this.registers[name] = new Register();
     }
-    return this.registers[name];
+    return this.registers[name]!;
   }
 
   // Gets the register named @name.  If one of @name doesn't already exist,

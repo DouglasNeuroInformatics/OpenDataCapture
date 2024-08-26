@@ -24,6 +24,6 @@
   "dependencies": {
     "@douglasneuroinformatics/libui": "^2.10.0",
     "@opendatacapture/schemas": "workspace:*",
-    "i18next": "^23.11.5"
+    "i18next": "catalog:"
   }
 }

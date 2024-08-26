@@ -58,8 +58,8 @@ export const actions: { [key: string]: ActionFunc } = {
     } else if (insertAt == 'charAfter') {
       head = offsetCursor(head, 0, 1);
     } else if (insertAt == 'firstNonBlank') {
-      const res = motions.moveToFirstNonWhiteSpaceCharacter(adapter, head, {}, vim, vim.inputState)!;
-      head = Array.isArray(res) ? res[0] : res;
+      const res = motions.moveToFirstNonWhiteSpaceCharacter!(adapter, head, {}, vim, vim.inputState);
+      head = Array.isArray(res) ? res[0] : res!;
     } else if (insertAt == 'startOfSelectedArea') {
       if (!vim.visualMode) return;
       if (!vim.visualBlock) {
@@ -142,13 +142,13 @@ export const actions: { [key: string]: ActionFunc } = {
       return;
     }
     if (!actionArgs.backtrack && end <= cur.ch) return;
-    const baseStr = match[2] || match[4];
-    const digits = match[3] || match[5];
+    const baseStr = match[2]! || match[4]!;
+    const digits = match[3]! || match[5]!;
     const increment = actionArgs.increase ? 1 : -1;
     const base = bases[baseStr.toLowerCase()] || 10;
     const number = parseInt(match[1] + digits, base) + increment * actionArgs.repeat!;
     let numberStr = number.toString(base);
-    const zeroPadding = baseStr ? new Array(digits.length - numberStr.length + 1 + match[1].length).join('0') : '';
+    const zeroPadding = baseStr ? new Array(digits.length - numberStr.length + 1 + match[1]!.length).join('0') : '';
     if (numberStr.startsWith('-')) {
       numberStr = '-' + baseStr + zeroPadding + numberStr.substr(1);
     } else {
@@ -223,9 +223,9 @@ export const actions: { [key: string]: ActionFunc } = {
       adapter.setCursor(insertAt);
       const newlineFn =
         EditorAdapter.commands.newlineAndIndentContinueComment || EditorAdapter.commands.newlineAndIndent;
-      newlineFn(adapter, {});
+      newlineFn!(adapter, {});
     }
-    this.enterInsertMode(adapter, { repeat: actionArgs.repeat }, vim);
+    this.enterInsertMode!(adapter, { repeat: actionArgs.repeat }, vim);
   },
   paste: function (adapter, actionArgs, vim) {
     const cur = copyCursor(adapter.getCursor());
@@ -371,7 +371,7 @@ export const actions: { [key: string]: ActionFunc } = {
     adapter.setCursor(curPosFinal);
   },
   redo: function (adapter, actionArgs) {
-    repeatFn(() => EditorAdapter.commands.redo(adapter, {}), actionArgs.repeat!)();
+    repeatFn(() => EditorAdapter.commands.redo!(adapter, {}), actionArgs.repeat!)();
   },
   repeatLastEdit: function (adapter, actionArgs, vim) {
     const lastEditInputState = vim.lastEditInputState;
@@ -406,7 +406,7 @@ export const actions: { [key: string]: ActionFunc } = {
     if (replaceWith == '\n') {
       if (!vim.visualMode) adapter.replaceRange('', curStart, curEnd);
       // special case, where vim help says to replace by just one line-break
-      (EditorAdapter.commands.newlineAndIndentContinueComment || EditorAdapter.commands.newlineAndIndent)(adapter, {});
+      (EditorAdapter.commands.newlineAndIndentContinueComment || EditorAdapter.commands.newlineAndIndent)!(adapter, {});
     } else {
       if (vim.visualBlock) {
         // Tabs are split in visua block before replacing
@@ -419,7 +419,9 @@ export const actions: { [key: string]: ActionFunc } = {
         adapter.replaceRange(replaceWithStr, curStart, curEnd);
       }
       if (vim.visualMode) {
-        curStart = cursorIsBefore(selections[0].anchor, selections[0].head) ? selections[0].anchor : selections[0].head;
+        curStart = cursorIsBefore(selections[0]!.anchor, selections[0]!.head)
+          ? selections[0]!.anchor
+          : selections[0]!.head;
         adapter.setCursor(curStart);
         exitVisualMode(adapter, false);
       } else {
@@ -572,7 +574,7 @@ export const actions: { [key: string]: ActionFunc } = {
     }
   },
   undo: function (adapter, actionArgs) {
-    repeatFn(() => EditorAdapter.commands.undo(adapter, {}), actionArgs.repeat!)();
+    repeatFn(() => EditorAdapter.commands.undo!(adapter, {}), actionArgs.repeat!)();
     adapter.setCursor(adapter.getCursor('anchor'));
   }
 };
@@ -610,7 +612,7 @@ function executeMacroRegister(
       text = text.substring(match.index + key.length);
       vimApi.handleKey(adapter, key, 'macro');
       if (vim.insertMode) {
-        const changes = register.insertModeChanges[imc++].changes;
+        const changes = register.insertModeChanges[imc++]!.changes;
         vimGlobalState.macroModeState.lastInsertModeChanges.changes = changes;
         repeatInsertModeChanges(adapter, changes, 1);
         exitInsertMode(adapter);
@@ -624,8 +626,8 @@ function getSelectedAreaRange(adapter: EditorAdapter, vim: VimState): [Pos, Pos]
   const lastSelection = vim.lastSelection!;
   const getCurrentSelectedAreaRange = (): [Pos, Pos] => {
     const selections = adapter.listSelections();
-    const start = selections[0];
-    const end = selections[selections.length - 1];
+    const start = selections[0]!;
+    const end = selections[selections.length - 1]!;
     const selectionStart = cursorIsBefore(start.anchor, start.head) ? start.anchor : start.head;
     const selectionEnd = cursorIsBefore(end.anchor, end.head) ? end.head : end.anchor;
     return [selectionStart, selectionEnd];
@@ -688,17 +690,17 @@ function selectBlock(adapter: EditorAdapter, selectionEnd: Pos) {
   const isClipped = !cursorEqual(selectionEnd, head);
   const curHead = adapter.getCursor('head');
   const primIndex = getIndex(ranges, curHead);
-  const wasClipped = cursorEqual(ranges[primIndex].head, ranges[primIndex].anchor);
+  const wasClipped = cursorEqual(ranges[primIndex]!.head, ranges[primIndex]!.anchor);
   const max = ranges.length - 1;
   const index = max - primIndex > primIndex ? max : 0;
-  const base = ranges[index].anchor;
+  const base = ranges[index]!.anchor;
 
   const firstLine = Math.min(base.line, head.line);
   const lastLine = Math.max(base.line, head.line);
   let baseCh = base.ch;
   let headCh = head.ch;
 
-  const dir = ranges[index].head.ch - baseCh;
+  const dir = ranges[index]!.head.ch - baseCh;
   const newDir = headCh - baseCh;
   if (dir > 0 && newDir <= 0) {
     baseCh++;

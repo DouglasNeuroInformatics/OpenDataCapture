@@ -11,7 +11,7 @@ export type CodeErrorBlockProps = {
 export const CodeErrorBlock = ({ error }: CodeErrorBlockProps) => {
   const files = useAppStore((store) => store.files);
   const indexFilename = useAppStore((store) => store.indexFilename);
-  const location = error.cause.errors[0].location;
+  const location = error.cause.errors[0]?.location;
 
   const indexFile = files.find((file) => file.name === indexFilename);
 
@@ -34,8 +34,8 @@ export const CodeErrorBlock = ({ error }: CodeErrorBlockProps) => {
   return (
     <code className="bg-card mt-2 flex flex-col rounded-md border p-3 text-xs">
       {range(startIndex, endIndex).map((index) => {
-        let textContent = lines[index].trimStart();
-        const leftPadding = ' '.repeat(lines[index].length - textContent.length);
+        let textContent = lines[index]!.trimStart();
+        const leftPadding = ' '.repeat(lines[index]!.length - textContent.length);
         textContent = textContent.trimEnd();
         return (
           <div className="text-muted-foreground flex" key={index}>

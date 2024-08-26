@@ -16,7 +16,7 @@ export class InstrumentMeasuresService {
   computeMeasures(measures: InstrumentMeasures, data: FormInstrument.Data | Json | Prisma.JsonValue) {
     const computedMeasures: { [key: string]: InstrumentMeasureValue } = {};
     for (const key in measures) {
-      computedMeasures[key] = this.computeMeasure(measures[key], data);
+      computedMeasures[key] = this.computeMeasure(measures[key]!, data);
     }
     return computedMeasures;
   }

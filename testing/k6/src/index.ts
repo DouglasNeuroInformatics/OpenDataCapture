@@ -23,7 +23,7 @@ export const options = new Config(__CONFIG_PARAMS);
 
 export default function () {
   const client = new Client(__CLIENT_PARAMS);
-  const user = GROUP_MANAGERS[random(GROUP_MANAGERS.length - 1)];
+  const user = GROUP_MANAGERS[random(GROUP_MANAGERS.length - 1)]!;
 
   // check single page app
   // this is currently disabled since we need to test the API alone locally
@@ -67,7 +67,7 @@ export default function () {
   check(groupsResponse, { 'the status code is 200': (res) => res.status === 200 });
   const groups = groupsResponse.json();
   check(groups, { 'the number of groups is the expected value': (groups) => groups.length === user.groupNames.length });
-  const selectedGroup = groups[random(groups.length - 1)];
+  const selectedGroup = groups[random(groups.length - 1)]!;
 
   sleep(0.5);
 
@@ -106,7 +106,7 @@ export default function () {
 
   // view a random subject (x3)
   for (let i = 0; i < 3; i++) {
-    const selectedSubject = subjects[random(subjects.length - 1)];
+    const selectedSubject = subjects[random(subjects.length - 1)]!;
 
     // view assignments (if gateway enabled)
     if (isGatewayEnabled) {

@@ -7,6 +7,6 @@ import { CreateGroupDto } from './create-group.dto';
 @ValidationSchema($UpdateGroupData)
 export class UpdateGroupDto extends PartialType(CreateGroupDto) {
   accessibleInstrumentIds?: string[];
-  name?: string;
+  override name?: string;
   settings?: GroupSettings;
 }
