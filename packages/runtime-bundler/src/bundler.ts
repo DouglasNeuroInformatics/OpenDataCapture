@@ -36,8 +36,8 @@ export class Bundler {
           packages
         })
       ],
-      sourcemap: mode === 'development' ? 'inline' : false,
-      sourcesContent: mode === 'development',
+      sourcemap: 'linked',
+      sourcesContent: true,
       splitting: true,
       target: 'es2022'
     });
