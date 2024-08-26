@@ -11,3 +11,5 @@ declare global {
 }
 
 export { InstrumentRenderer, type InstrumentRendererProps } from './components/InstrumentRenderer';
+export { ScalarInstrumentRenderer, type ScalarInstrumentRendererProps } from './components/InstrumentRenderer';
+export * from './types';

@@ -23,6 +23,7 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.6.0",
     "@douglasneuroinformatics/libui": "^2.10.0",
+    "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",

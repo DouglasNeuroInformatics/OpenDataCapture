@@ -2,8 +2,7 @@ import { useEffect } from 'react';
 
 import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
-import type { Json } from '@opendatacapture/schemas/core';
+import { InstrumentRenderer, type InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
@@ -35,12 +34,12 @@ export const InstrumentRenderPage = () => {
     }
   }, [currentSession?.id]);
 
-  const handleSubmit = async (data: Json) => {
+  const handleSubmit: InstrumentSubmitHandler = async ({ data, instrumentId }) => {
     await axios.post('/v1/instrument-records', {
       data,
       date: new Date(),
       groupId: currentGroup?.id,
-      instrumentId: instrumentBundleQuery.data!.id,
+      instrumentId,
       sessionId: currentSession!.id,
       subjectId: currentSession!.subject.id
     } satisfies CreateInstrumentRecordData);

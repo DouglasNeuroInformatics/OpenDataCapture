@@ -3,11 +3,10 @@ import { useEffect, useRef } from 'react';
 import { NotificationHub } from '@douglasneuroinformatics/libui/components';
 import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import { InstrumentRenderer, type InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
 import { Branding } from '@opendatacapture/react-core';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
-import type { Json } from '@opendatacapture/schemas/core';
 import axios from 'axios';
 
 import './services/axios';
@@ -28,7 +27,7 @@ export const Root = ({ bundle, id, kind, token }: RootProps) => {
     ref.current!.style.display = 'flex';
   }, []);
 
-  const handleSubmit = async (data: Json) => {
+  const handleSubmit: InstrumentSubmitHandler = async ({ data }) => {
     await axios.patch(
       `/api/assignments/${id}`,
       {
@@ -62,7 +61,7 @@ export const Root = ({ bundle, id, kind, token }: RootProps) => {
         </div>
       </header>
       <main className="container flex min-h-0 max-w-3xl flex-grow flex-col pb-16 pt-32 xl:max-w-5xl">
-        <InstrumentRenderer className="min-h-full w-full" target={{ bundle, kind }} onSubmit={handleSubmit} />
+        <InstrumentRenderer className="min-h-full w-full" target={{ bundle, id, kind }} onSubmit={handleSubmit} />
       </main>
       <NotificationHub />
     </div>

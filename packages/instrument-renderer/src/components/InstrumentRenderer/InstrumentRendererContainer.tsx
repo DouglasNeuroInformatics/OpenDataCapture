@@ -5,13 +5,13 @@ import { cn } from '@douglasneuroinformatics/libui/utils';
 import { FileCheckIcon, MonitorIcon, PrinterIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export type InstrumentRendererProps = {
+export type InstrumentRendererContainerProps = {
   children: React.ReactNode;
   className?: string;
   index: 0 | 1 | 2;
 };
 
-export const RendererContainer = ({ children, className, index }: InstrumentRendererProps) => {
+export const InstrumentRendererContainer = ({ children, className, index }: InstrumentRendererContainerProps) => {
   const { height, width } = useWindowSize();
   const { i18n, t } = useTranslation();
   const icons = useRef<HTMLDivElement[]>([]);

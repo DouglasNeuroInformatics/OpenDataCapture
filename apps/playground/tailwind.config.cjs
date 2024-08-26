@@ -7,5 +7,3 @@ module.exports = createConfig({
   include: ['@opendatacapture/instrument-renderer', '@opendatacapture/react-core'],
   root: __dirname
 });
-
-console.log(module.exports);

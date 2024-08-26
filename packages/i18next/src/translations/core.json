@@ -79,6 +79,10 @@
     "en": "Failed to Load Instrument",
     "fr": "Échec du chargement de l'instrument"
   },
+  "failedToLoadInstrumentDesc": {
+    "en": "An unexpected error occurred while loading this instrument. Please contact the platform administrator for further assistance.",
+    "fr": "Une erreur inattendue s'est produite lors du chargement de cet instrument. Veuillez contacter l'administrateur de la plateforme pour obtenir de l'aide."
+  },
   "form": {
     "requiredField": {
       "en": "This field is required",
@@ -155,6 +159,10 @@
     "en": "Instrument",
     "fr": "Instrument"
   },
+  "instrumentComplete": {
+    "en": "Instrument Complete",
+    "fr": "Instrument complet"
+  },
   "instrumentName": {
     "en": "Instrument Name",
     "fr": "Nom de l'instrument"
@@ -199,6 +207,10 @@
     "en": "Network Error",
     "fr": "Erreur de réseau"
   },
+  "nextInstrument": {
+    "en": "Next Instrument: {{title}}",
+    "fr": "Next Instrument: {{title}}"
+  },
   "no": {
     "en": "No",
     "fr": "Non"
@@ -239,6 +251,10 @@
     "inProgress": {
       "en": "Series Instrument in Process",
       "fr": "Série d'instruments en cours"
+    },
+    "instrumentsCompleted": {
+      "en": "Instruments Completed: {{completed}}/{{total}}",
+      "fr": "Nombre d'instruments complétés : {{completed}}/{{total}}"
     }
   },
   "somethingWentWrong": {

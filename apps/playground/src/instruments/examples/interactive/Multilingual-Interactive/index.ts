@@ -25,7 +25,6 @@ export default defineInstrument({
       document.body.appendChild(changeLanguageButton);
 
       changeLanguageButton.addEventListener('click', () => {
-        console.log(i18n.resolvedLanguage);
         i18n.changeLanguage(i18n.resolvedLanguage === 'en' ? 'fr' : 'en');
       });
 
