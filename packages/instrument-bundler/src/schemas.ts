@@ -1,10 +1,9 @@
-import { $Uint8Array } from '@opendatacapture/schemas/core';
 import { z } from 'zod';
 
 import type { BuildFailure, Location, Message } from './vendor/esbuild.js';
 
 export const $BundlerInput = z.object({
-  content: z.union([z.string(), $Uint8Array]),
+  content: z.union([z.string(), z.instanceof(Uint8Array)]),
   name: z.string()
 });
 export type BundlerInput = z.infer<typeof $BundlerInput>;

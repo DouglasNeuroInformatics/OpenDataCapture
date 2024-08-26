@@ -21,7 +21,6 @@
     "tsx": "4.x"
   },
   "dependencies": {
-    "@opendatacapture/schemas": "workspace:",
     "commander": "^12.1.0",
     "es-module-lexer": "^1.5.4",
     "esbuild": "catalog:esbuild",
