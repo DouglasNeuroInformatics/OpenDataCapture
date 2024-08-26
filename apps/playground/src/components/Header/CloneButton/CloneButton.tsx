@@ -23,7 +23,7 @@ export const CloneButton = () => {
       category: 'Saved',
       files,
       id: crypto.randomUUID(),
-      kind: 'UNKNOWN',
+      kind: null,
       label
     };
     addInstrument(item);

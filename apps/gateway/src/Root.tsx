@@ -5,6 +5,7 @@ import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/comp
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
 import { Branding } from '@opendatacapture/react-core';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { Json } from '@opendatacapture/schemas/core';
 import axios from 'axios';
@@ -15,10 +16,11 @@ import './services/i18n';
 export type RootProps = {
   bundle: string;
   id: string;
+  kind: Exclude<InstrumentKind, 'SERIES'>;
   token: string;
 };
 
-export const Root = ({ bundle, id, token }: RootProps) => {
+export const Root = ({ bundle, id, kind, token }: RootProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const notifications = useNotificationsStore();
 
@@ -60,7 +62,7 @@ export const Root = ({ bundle, id, token }: RootProps) => {
         </div>
       </header>
       <main className="container flex min-h-0 max-w-3xl flex-grow flex-col pb-16 pt-32 xl:max-w-5xl">
-        <InstrumentRenderer className="min-h-full w-full" target={{ bundle, kind: 'SCALAR' }} onSubmit={handleSubmit} />
+        <InstrumentRenderer className="min-h-full w-full" target={{ bundle, kind }} onSubmit={handleSubmit} />
       </main>
       <NotificationHub />
     </div>

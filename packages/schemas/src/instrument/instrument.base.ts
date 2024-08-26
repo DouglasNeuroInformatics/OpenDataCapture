@@ -16,7 +16,7 @@ import { z } from 'zod';
 
 import { $Language, $LicenseIdentifier, $ZodTypeAny, type Language } from '../core/core.js';
 
-const $InstrumentKind: z.ZodType<InstrumentKind> = z.enum(['FORM', 'INTERACTIVE', 'SERIES', 'UNKNOWN']);
+const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'SERIES']) satisfies z.ZodType<InstrumentKind>;
 
 const $InstrumentLanguage = z.union([
   $Language,
@@ -176,7 +176,7 @@ const $BaseInstrumentBundleContainer = z.object({
 type ScalarInstrumentBundleContainer = z.infer<typeof $ScalarInstrumentBundleContainer>;
 const $ScalarInstrumentBundleContainer = $BaseInstrumentBundleContainer.extend({
   bundle: z.string(),
-  kind: z.literal('SCALAR')
+  kind: z.enum(['FORM', 'INTERACTIVE'])
 });
 
 type SeriesInstrumentBundleContainer = z.infer<typeof $SeriesInstrumentBundleContainer>;
@@ -203,6 +203,7 @@ export {
   $InstrumentLanguage,
   $InstrumentMeasureValue,
   $ScalarInstrument,
+  $ScalarInstrumentBundleContainer,
   $ScalarInstrumentInternal,
   $UnilingualInstrumentDetails,
   $UnilingualScalarInstrument

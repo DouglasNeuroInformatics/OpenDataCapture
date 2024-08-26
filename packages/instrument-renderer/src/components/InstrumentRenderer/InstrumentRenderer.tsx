@@ -9,7 +9,7 @@ import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrum
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
-import type { DistributedOmit, Promisable } from 'type-fest';
+import type { DistributedOmit, Promisable, SetOptional } from 'type-fest';
 
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
 import { FormContent } from '../FormContent';
@@ -27,7 +27,7 @@ export type InstrumentRendererProps = {
   onSubmit: (data: Json) => Promisable<void>;
   options?: InterpretOptions;
   subject?: SubjectDisplayInfo;
-  target: DistributedOmit<InstrumentBundleContainer, 'id'>;
+  target: SetOptional<DistributedOmit<InstrumentBundleContainer, 'id'>, 'kind'>;
 };
 
 export const InstrumentRenderer = ({

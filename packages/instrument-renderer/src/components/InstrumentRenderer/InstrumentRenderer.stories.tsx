@@ -28,7 +28,7 @@ export const UnilingualForm: Story = {
   args: {
     target: {
       bundle: unilingualFormInstrument.bundle,
-      kind: 'SCALAR'
+      kind: 'FORM'
     }
   }
 };
@@ -37,7 +37,7 @@ export const BilingualForm: Story = {
   args: {
     target: {
       bundle: bilingualFormInstrument.bundle,
-      kind: 'SCALAR'
+      kind: 'FORM'
     }
   }
 };
@@ -46,7 +46,7 @@ export const Interactive: Story = {
   args: {
     target: {
       bundle: interactiveInstrument.bundle,
-      kind: 'SCALAR'
+      kind: 'INTERACTIVE'
     }
   }
 };

@@ -41,10 +41,13 @@ router.post(
     if (!result.success) {
       throw new HttpException(400, 'Bad Request');
     }
-    const { publicKey, ...assignment } = result.data;
+    const { instrumentContainer, publicKey, ...assignment } = result.data;
     await prisma.remoteAssignmentModel.create({
       data: {
         ...assignment,
+        instrumentBundle: instrumentContainer.bundle,
+        instrumentId: instrumentContainer.id,
+        instrumentKind: instrumentContainer.kind,
         rawPublicKey: Buffer.from(publicKey)
       }
     });

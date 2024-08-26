@@ -63,7 +63,7 @@ const IndexPage = () => {
         category: 'Saved',
         files: decodedInstrument.files,
         id,
-        kind: 'UNKNOWN',
+        kind: null,
         label: uniqueLabel
       });
       setSelectedInstrument(id);

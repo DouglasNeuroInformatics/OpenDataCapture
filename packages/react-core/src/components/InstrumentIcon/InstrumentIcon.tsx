@@ -1,10 +1,11 @@
 import React from 'react';
 
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
-import { ClipboardCheckIcon, FileQuestionIcon, ListChecksIcon, type LucideIcon, MonitorCheckIcon } from 'lucide-react';
+import { ClipboardCheckIcon, FileQuestionIcon, ListChecksIcon, MonitorCheckIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export type InstrumentIconProps = {
-  kind: InstrumentKind;
+  kind: InstrumentKind | null;
 } & React.ComponentPropsWithoutRef<LucideIcon>;
 
 export const InstrumentIcon = ({ kind, ...props }: InstrumentIconProps) => {
@@ -13,10 +14,10 @@ export const InstrumentIcon = ({ kind, ...props }: InstrumentIconProps) => {
       return <ClipboardCheckIcon {...props} />;
     case 'INTERACTIVE':
       return <MonitorCheckIcon {...props} />;
+    case null:
+      return <FileQuestionIcon {...props} />;
     case 'SERIES':
       return <ListChecksIcon {...props} />;
-    case 'UNKNOWN':
-      return <FileQuestionIcon {...props} />;
     default:
       console.error(`ERROR: Unhandled instrument kind: ${kind}`);
       return null;

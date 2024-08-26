@@ -43,7 +43,7 @@ export const UploadButton = () => {
       category: 'Saved',
       files: await loadEditorFilesFromZip(zip),
       id: crypto.randomUUID(),
-      kind: 'UNKNOWN',
+      kind: null,
       label: uniqueLabel
     };
     addInstrument(item);

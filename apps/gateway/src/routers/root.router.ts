@@ -21,8 +21,26 @@ router.get(
         .set({ 'Content-Type': 'application/json' })
         .json({ error: 'Conflict', message: 'Assignment already completed', statusCode: 409 });
     }
+
+    const kind = assignment.instrumentKind;
+    if (!(kind === 'FORM' || kind === 'INTERACTIVE')) {
+      return res
+        .status(501)
+        .set({ 'Content-Type': 'application/json' })
+        .json({
+          error: 'Not Implemented',
+          message: `Cannot render instrument kind '${kind}' on remote gateway`,
+          statusCode: 501
+        });
+    }
+
     const token = generateToken(assignment.id);
-    const html = res.locals.loadRoot({ bundle: assignment.instrumentBundle, id, token });
+    const html = res.locals.loadRoot({
+      bundle: assignment.instrumentBundle,
+      id,
+      kind,
+      token
+    });
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
   })
 );

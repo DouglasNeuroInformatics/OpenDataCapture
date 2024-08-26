@@ -61,7 +61,7 @@ export const Viewer = () => {
           <ErrorBoundary FallbackComponent={RuntimeErrorFallback}>
             <InstrumentRenderer
               options={{ validate: true }}
-              target={{ bundle, kind: 'SCALAR' }}
+              target={{ bundle }}
               onCompileError={(error) => setState({ error, status: 'error' })}
               onSubmit={(data) => {
                 // eslint-disable-next-line no-alert
