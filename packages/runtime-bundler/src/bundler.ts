@@ -9,15 +9,24 @@ import { Resolver } from './resolver.js';
 import type { BundlerOptions, EntryPoint, ExportCondition, ResolvedPackage } from './types.js';
 
 export class Bundler {
+  private logger = {
+    verbose: (message: string) => {
+      if (this.options.verbose) {
+        console.log(message);
+      }
+    }
+  };
   private resolver: Resolver;
 
   constructor(private options: BundlerOptions) {
     this.resolver = new Resolver(options.configFilepath);
   }
 
-  async bundle({ mode = 'production' }: Pick<BundlerOptions, 'mode'> = {}): Promise<void> {
+  async bundle(): Promise<void> {
     const packages = await this.findPackages();
+    this.logger.verbose(`Found packages: ${JSON.stringify(packages, null, 2)}`);
     const entryPoints = this.getEntryPoints(packages);
+    this.logger.verbose(`Found entry points: ${JSON.stringify(entryPoints, null, 2)}`);
 
     await fs.rm(this.options.outdir, { force: true, recursive: true });
     await esbuild.build({
@@ -25,7 +34,7 @@ export class Bundler {
       entryPoints: entryPoints,
       format: 'esm',
       keepNames: true,
-      minify: mode === 'production',
+      minify: this.options.mode === 'production',
       outdir: this.options.outdir,
       platform: 'browser',
       plugins: [
