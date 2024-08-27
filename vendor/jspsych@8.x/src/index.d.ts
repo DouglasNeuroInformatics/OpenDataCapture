@@ -84,7 +84,6 @@ interface JsPsychPlugin<I extends PluginInfo> {
   ): void | Promise<TrialResult | void>;
 }
 type TrialType<I extends PluginInfo> = InferredParameters<I['parameters']> & TrialDescription;
-
 interface JsPsychExtensionInfo {
   name: string;
   version?: string;
@@ -109,7 +108,6 @@ interface JsPsychExtension {
    */
   on_finish(params?: Record<string, any>): Record<string, any> | Promise<Record<string, any>>;
 }
-
 type GetParameterValueOptions = {
   /**
    * If true, and the retrieved parameter value is a function, invoke the function and return its
@@ -794,11 +792,11 @@ type PluginAPI = ReturnType<typeof createJointPluginAPIObject>;
  */
 declare function setSeed(seed?: string): string;
 declare function repeat(array: any, repetitions: any, unpack?: boolean): any;
-declare function shuffle(array: Array<any>): any[];
-declare function shuffleNoRepeats(arr: Array<any>, equalityTest: (a: any, b: any) => boolean): any[];
-declare function shuffleAlternateGroups(arr_groups: any, random_group_order?: boolean): any[];
-declare function sampleWithoutReplacement(arr: any, size: any): any[];
-declare function sampleWithReplacement(arr: any, size: any, weights?: any): any[];
+declare function shuffle<T>(array: Array<T>): T[];
+declare function shuffleNoRepeats<T>(arr: Array<T>, equalityTest: (a: T, b: T) => boolean): T[];
+declare function shuffleAlternateGroups<T extends any[]>(arr_groups: Array<T>, random_group_order?: boolean): any[];
+declare function sampleWithoutReplacement<T>(arr: Array<T>, size: number): T[];
+declare function sampleWithReplacement<T>(arr: Array<T>, size: number, weights?: number[]): any[];
 declare function factorial(factors: Record<string, any>, repetitions?: number, unpack?: boolean): any;
 declare function randomID(length?: number): string;
 /**
@@ -817,6 +815,21 @@ declare function sampleBernoulli(p: number): 0 | 1;
 declare function sampleNormal(mean: number, standard_deviation: number): number;
 declare function sampleExponential(rate: number): number;
 declare function sampleExGaussian(mean: number, standard_deviation: number, rate: number, positive?: boolean): number;
+type RandomWordsOptions = {
+  min?: number;
+  max?: number;
+  exactly?: number;
+  maxLength?: number;
+  wordsPerString?: number;
+  seperator?: string;
+  formatter?: (word: string, index: number) => string;
+  join?: string;
+};
+type RandomWordsResult<T extends RandomWordsOptions> = T extends {
+  join: string;
+}
+  ? string
+  : string[];
 /**
  * Generate one or more random words.
  *
@@ -827,7 +840,7 @@ declare function sampleExGaussian(mean: number, standard_deviation: number, rate
  *
  * @returns An array of words or a single string, depending on parameter choices.
  */
-declare function randomWords(opts: any): string[];
+declare function randomWords<T extends RandomWordsOptions>(opts: T): RandomWordsResult<T>;
 
 declare const randomization_setSeed: typeof setSeed;
 declare const randomization_repeat: typeof repeat;
