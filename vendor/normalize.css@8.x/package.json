@@ -1,0 +1,13 @@
+{
+  "name": "normalize.css__8.x",
+  "type": "module",
+  "version": "8.0.1",
+  "license": "MIT",
+  "exports": {
+    "./normalize.css": "./src/index.css",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "normalize.css": "8.0.1"
+  }
+}

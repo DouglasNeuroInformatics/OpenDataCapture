@@ -23,6 +23,7 @@ export default {
     'jspsych__7.x',
     'jspsych__8.x',
     'lodash-es__4.x',
+    'normalize.css__8.x',
     'papaparse__5.x',
     'prop-types__15.x',
     'pure-rand__6.x',

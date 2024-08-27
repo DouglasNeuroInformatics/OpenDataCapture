@@ -1289,6 +1289,9 @@ importers:
       lodash-es__4.x:
         specifier: workspace:*
         version: link:../../vendor/lodash-es@4.x
+      normalize.css__8.x:
+        specifier: workspace:*
+        version: link:../../vendor/normalize.css@8.x
       papaparse__5.x:
         specifier: workspace:*
         version: link:../../vendor/papaparse@5.x
@@ -1496,6 +1499,12 @@ importers:
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
+
+  vendor/normalize.css@8.x:
+    dependencies:
+      normalize.css:
+        specifier: 8.0.1
+        version: 8.0.1
 
   vendor/papaparse@5.x:
     dependencies:
@@ -10558,6 +10567,10 @@ packages:
     resolution:
       { integrity: sha512-IO9QvjUMWxPQQhs60oOu10CRkWCiZzSUkzbXGGV9pviYl1fXYcvkzQ5jV9z8Y6un8ARoVRl4EtC6v6jNqbaJ/w== }
     engines: { node: '>=14.16' }
+
+  normalize.css@8.0.1:
+    resolution:
+      { integrity: sha512-qizSNPO93t1YUuUhP22btGOo3chcvDFqFaj2TRybP0DMxkHOCTYwp3n34fel4a31ORXy4m1Xq0Gyqpb5m33qIg== }
 
   not@0.1.0:
     resolution:
@@ -23465,6 +23478,8 @@ snapshots:
 
   normalize-url@8.0.1:
     optional: true
+
+  normalize.css@8.0.1: {}
 
   not@0.1.0: {}
 

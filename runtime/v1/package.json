@@ -52,6 +52,7 @@
     "jspsych__7.x": "workspace:*",
     "jspsych__8.x": "workspace:*",
     "lodash-es__4.x": "workspace:*",
+    "normalize.css__8.x": "workspace:*",
     "papaparse__5.x": "workspace:*",
     "prop-types__15.x": "workspace:*",
     "pure-rand__6.x": "workspace:*",
