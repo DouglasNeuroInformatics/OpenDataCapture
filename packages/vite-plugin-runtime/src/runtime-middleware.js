@@ -1,3 +1,5 @@
+// @ts-check
+
 import { loadResource } from './load-resource.js';
 
 /** @type {import('vite').Connect.NextHandleFunction} */
