@@ -70,7 +70,8 @@ export class Bundler {
         }
         const conditions = pkg.exports[key]!;
         const runtimePackageName = pkg.name.split('__').join('@');
-        const out = path.join(runtimePackageName, key === '.' ? 'index' : key);
+        const parsedOutPath = path.parse(key === '.' ? 'index' : key);
+        const out = path.join(runtimePackageName, parsedOutPath.dir, parsedOutPath.name);
         for (const condition of ['import', 'default'] satisfies ExportCondition[]) {
           if (conditions[condition]) {
             entryPoints.push({
