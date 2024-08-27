@@ -8,6 +8,7 @@
       "types": "./src/index.d.ts",
       "import": "./src/index.js"
     },
+    "./css/jspsych.css": "./src/index.css",
     "./package.json": "./package.json"
   },
   "dependencies": {
