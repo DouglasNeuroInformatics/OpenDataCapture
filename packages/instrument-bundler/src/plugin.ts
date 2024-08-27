@@ -10,7 +10,10 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
     setup(build) {
       const namespaces = { bundle: 'bundle' };
       build.onResolve({ filter: /.*/ }, (args) => {
-        if (args.kind === 'dynamic-import') {
+        // css @import statement
+        if (args.kind === 'import-rule') {
+          return { external: true, path: args.path };
+        } else if (args.kind === 'dynamic-import') {
           return isHttpImport(args.path)
             ? { external: true }
             : { errors: [{ text: `Invalid dynamic import '${args.path}': must be http import` }] };
