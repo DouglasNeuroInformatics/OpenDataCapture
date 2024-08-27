@@ -1,3 +1,5 @@
+// @ts-check
+
 import fs from 'fs';
 import path from 'path';
 
@@ -22,6 +24,7 @@ const RUNTIME_DIST_DIRNAME = 'dist';
 /**
  * @typedef  {Object}    RuntimeManifest
  * @property {string[]}  declarations
+ * @property {string[]}  styles
  * @property {string[]}  sources
  */
 
@@ -48,8 +51,8 @@ const isDirectory = async (path) => fs.existsSync(path) && fs.promises.lstat(pat
  * @returns {Promise<RuntimeManifest>}
  */
 async function resolveManifest(baseDir) {
-  /** @type {{ declarations: string[], sources: string[] }} */
-  const results = { declarations: [], sources: [] };
+  /** @type {{ declarations: string[], sources: string[], styles: string[] }} */
+  const results = { declarations: [], sources: [], styles: [] };
   /** @param {string} dir */
   await (async function resolveDir(dir) {
     const files = await fs.promises.readdir(dir, 'utf-8');
@@ -57,6 +60,8 @@ async function resolveManifest(baseDir) {
       const abspath = path.join(dir, file);
       if (await isDirectory(abspath)) {
         await resolveDir(abspath);
+      } else if (abspath.endsWith('.css')) {
+        results.styles.push(abspath.replace(`${baseDir}/`, ''));
       } else if (abspath.endsWith('.js')) {
         results.sources.push(abspath.replace(`${baseDir}/`, ''));
       } else if (abspath.endsWith('.d.ts')) {
@@ -77,13 +82,14 @@ export async function resolveVersion(version) {
   if (!(await isDirectory(baseDir))) {
     throw new Error(`Not a directory: ${baseDir}`);
   }
-  const { declarations, sources } = await resolveManifest(baseDir);
+  const { declarations, sources, styles } = await resolveManifest(baseDir);
   return {
     baseDir,
     importPaths: sources.map((filename) => `/runtime/${version}/${filename}`),
     manifest: {
       declarations,
-      sources
+      sources,
+      styles
     },
     version
   };

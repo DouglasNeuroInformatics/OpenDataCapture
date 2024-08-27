@@ -34,7 +34,7 @@ const configs = Array.isArray(parseResult.data) ? parseResult.data : [parseResul
 for (const config of configs) {
   const bundler = new Bundler({ configFilepath, ...config });
   try {
-    await bundler.bundle({ mode: config.mode });
+    await bundler.bundle();
     console.log('Success!');
   } catch (err) {
     if (err instanceof Error) {

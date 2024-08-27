@@ -10,10 +10,15 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
     setup(build) {
       const namespaces = { bundle: 'bundle' };
       build.onResolve({ filter: /.*/ }, (args) => {
-        if (args.kind === 'dynamic-import') {
+        // css @import statement
+        if (args.kind === 'import-rule') {
+          return { external: true, path: args.path };
+        } else if (args.kind === 'dynamic-import') {
           return isHttpImport(args.path)
             ? { external: true }
             : { errors: [{ text: `Invalid dynamic import '${args.path}': must be http import` }] };
+        } else if (/^\/runtime\/v1\/.*.css$/.test(args.path)) {
+          return { namespace: namespaces.bundle, path: args.path };
         } else if (/\/runtime\/v1\/(@.*\/)?[^/]+$/.test(args.path)) {
           return { external: true, path: `${args.path}/index.js` };
         } else if (args.path.startsWith('/runtime/v1/')) {
@@ -23,6 +28,9 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
           namespace: namespaces.bundle,
           path: args.path
         };
+      });
+      build.onLoad({ filter: /^\/runtime\/v1\/.*.css$/, namespace: namespaces.bundle }, (args) => {
+        return { contents: `@import "${args.path}";`, loader: 'css' };
       });
       build.onLoad({ filter: /.*/, namespace: namespaces.bundle }, (args) => {
         const input = resolveInput(args.path, options.inputs);

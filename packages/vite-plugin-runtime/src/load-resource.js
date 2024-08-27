@@ -1,3 +1,5 @@
+// @ts-check
+
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -20,6 +22,11 @@ export const loadResource = async (version, filename) => {
     return {
       content: await fs.readFile(path.resolve(baseDir, filename), 'utf-8'),
       contentType: 'text/plain'
+    };
+  } else if (manifest.styles.includes(filename)) {
+    return {
+      content: await fs.readFile(path.resolve(baseDir, filename), 'utf-8'),
+      contentType: 'text/css'
     };
   } else if (manifest.sources.includes(filename)) {
     return {

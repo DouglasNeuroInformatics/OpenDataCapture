@@ -1,47 +1,39 @@
-import HtmlKeyboardResponsePlugin from '/runtime/v1/@jspsych/plugin-html-keyboard-response@1.x';
-import ImageKeyboardResponsePlugin from '/runtime/v1/@jspsych/plugin-image-keyboard-response@1.x';
-import PreloadPlugin from '/runtime/v1/@jspsych/plugin-preload@1.x';
+import HtmlKeyboardResponsePlugin from '/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x';
+import ImageKeyboardResponsePlugin from '/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x';
+import PreloadPlugin from '/runtime/v1/@jspsych/plugin-preload@2.x';
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { initJsPsych } from '/runtime/v1/jspsych@7.x';
+import { initJsPsych } from '/runtime/v1/jspsych@8.x';
+import '/runtime/v1/jspsych@8.x/css/jspsych.css';
 import { z } from '/runtime/v1/zod@3.23.x';
 
-// import blue from '../../assets/img/blue.png';
-// import orange from '../../assets/img/orange.png';
-
-const blue = '';
-const orange = '';
+import blue from './blue.png';
+import orange from './orange.png';
 
 export default defineInstrument({
   content: {
-    render() {
-      // First we have to initialize jsPsych
+    async render() {
       const jsPsych = initJsPsych({
-        on_finish: function () {
+        on_finish: () => {
           jsPsych.data.displayData();
         }
       });
-
-      /**
-       * All jsPsych experiments are defined by a timeline. The timeline is an
-       * array that contains the set of trials we want to run in the experiment.
-       * @type {Record<string, any>[]} */
       const timeline = [];
 
-      // Preload images
+      /* preload images */
       const preload = {
         images: [blue, orange],
         type: PreloadPlugin
       };
       timeline.push(preload);
 
-      // Define welcome message trial
+      /* define welcome message trial */
       const welcome = {
         stimulus: 'Welcome to the experiment. Press any key to begin.',
         type: HtmlKeyboardResponsePlugin
       };
       timeline.push(welcome);
 
-      // Define instructions trial
+      /* define instructions trial */
       const instructions = {
         post_trial_gap: 2000,
         stimulus: `
@@ -51,9 +43,9 @@ export default defineInstrument({
         <p>If the circle is <strong>orange</strong>, press the letter J 
         as fast as you can.</p>
         <div style='width: 700px;'>
-        <div style='float: left;'><img src='${blue}'></img>
+        <div style='float: left;'><img src='blue.png'></img>
         <p class='small'><strong>Press the F key</strong></p></div>
-        <div style='float: right;'><img src='${orange}'></img>
+        <div style='float: right;'><img src='orange.png'></img>
         <p class='small'><strong>Press the J key</strong></p></div>
         </div>
         <p>Press any key to begin.</p>
@@ -62,13 +54,13 @@ export default defineInstrument({
       };
       timeline.push(instructions);
 
-      // Define trial stimuli array for timeline variables
+      /* define trial stimuli array for timeline variables */
       const test_stimuli = [
         { correct_response: 'f', stimulus: blue },
         { correct_response: 'j', stimulus: orange }
       ];
 
-      // Define fixation and test trials
+      /* define fixation and test trials */
       const fixation = {
         choices: 'NO_KEYS',
         data: {
@@ -87,15 +79,14 @@ export default defineInstrument({
           correct_response: jsPsych.timelineVariable('correct_response'),
           task: 'response'
         },
-        /** @type {(data: Record<string, any>) => any} */
-        on_finish: function (data) {
+        on_finish: function (data: { correct: boolean; correct_response: string; response: string }) {
           data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
         },
         stimulus: jsPsych.timelineVariable('stimulus'),
         type: ImageKeyboardResponsePlugin
       };
 
-      // Define test procedure
+      /* define test procedure */
       const test_procedure = {
         randomize_order: true,
         repetitions: 5,
@@ -104,24 +95,23 @@ export default defineInstrument({
       };
       timeline.push(test_procedure);
 
-      // Define debrief
+      /* define debrief */
       const debrief_block = {
         stimulus: function () {
           const trials = jsPsych.data.get().filter({ task: 'response' });
           const correct_trials = trials.filter({ correct: true });
           const accuracy = Math.round((correct_trials.count() / trials.count()) * 100);
           const rt = Math.round(correct_trials.select('rt').mean());
-
           return `<p>You responded correctly on ${accuracy}% of the trials.</p>
           <p>Your average response time was ${rt}ms.</p>
           <p>Press any key to complete the experiment. Thank you!</p>`;
         },
         type: HtmlKeyboardResponsePlugin
       };
-
       timeline.push(debrief_block);
 
-      jsPsych.run(timeline);
+      /* start the experiment */
+      await jsPsych.run(timeline);
     }
   },
   details: {
