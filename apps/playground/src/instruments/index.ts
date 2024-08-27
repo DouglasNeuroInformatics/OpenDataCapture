@@ -5,7 +5,7 @@ import { $InstrumentCategory, type InstrumentRepository } from '@/models/instrum
 import { loadAssetAsBase64 } from '@/utils/load';
 
 // Instruments in development
-const EXCLUDED_LABELS = ['Interactive With JSPsych'];
+const EXCLUDED_LABELS: string[] = [];
 
 const textFiles: { [key: string]: string } = import.meta.glob('./**/*.{css,js,jsx,ts,tsx,svg}', {
   eager: true,
