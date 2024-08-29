@@ -10,6 +10,7 @@ import { datahubRoute } from './features/datahub';
 import { groupRoute } from './features/group';
 import { instrumentsRoute } from './features/instruments';
 import { sessionRoute } from './features/session';
+import { uploadRoute } from './features/upload';
 import { userRoute } from './features/user';
 import { useAppStore } from './store';
 
@@ -25,7 +26,16 @@ const protectedRoutes: RouteObject[] = [
   authRoutes,
   {
     element: <Layout />,
-    children: [contactRoute, datahubRoute, dashboardRoute, groupRoute, instrumentsRoute, sessionRoute, userRoute]
+    children: [
+      contactRoute,
+      datahubRoute,
+      dashboardRoute,
+      groupRoute,
+      instrumentsRoute,
+      sessionRoute,
+      userRoute,
+      uploadRoute
+    ]
   }
 ];
 
