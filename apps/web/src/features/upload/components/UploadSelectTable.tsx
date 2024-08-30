@@ -1,5 +1,6 @@
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
+import { ClientTable } from '@douglasneuroinformatics/libui/components';
 
 export type UploadSelectTableProps = {
   data: InstrumentInfo[];
@@ -8,5 +9,15 @@ export type UploadSelectTableProps = {
 
 export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) => {
   const insturmentList = useInstrumentInfoQuery();
-  return <></>;
+  return (
+    <>
+      <ClientTable<InstrumentInfo>
+        columns={[]}
+        data={data}
+        entriesPerPage={15}
+        minRows={15}
+        onEntryClick={onSelect}
+      ></ClientTable>
+    </>
+  );
 };
