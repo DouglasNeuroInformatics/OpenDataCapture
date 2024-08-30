@@ -1,3 +1,4 @@
+import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 
 export type UploadSelectTableProps = {
@@ -6,5 +7,6 @@ export type UploadSelectTableProps = {
 };
 
 export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) => {
+  const insturmentList = useInstrumentInfoQuery();
   return <></>;
 };
