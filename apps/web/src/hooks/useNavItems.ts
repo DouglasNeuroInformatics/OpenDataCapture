@@ -44,6 +44,14 @@ export function useNavItems() {
         label: t('layout.navLinks.datahub')
       });
     }
+    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
+      globalItems.push({
+        'data-cy': 'upload',
+        icon: DatabaseIcon,
+        id: '/upload',
+        label: t(`navLinks.upload`)
+      });
+    }
     if (currentGroup && currentUser?.ability.can('manage', 'Group')) {
       globalItems.push({
         'data-cy': 'manage-group',
