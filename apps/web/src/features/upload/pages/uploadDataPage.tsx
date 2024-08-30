@@ -1,8 +1,7 @@
-import { IdentificationForm } from '@/components/IdentificationForm';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
 import { Heading } from '@douglasneuroinformatics/libui/components';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 export const UploadPage = () => {
@@ -21,7 +20,3 @@ export const UploadPage = () => {
     </React.Fragment>
   );
 };
-
-function useTranslation(arg0: string[]): { t: any } {
-  throw new Error('Function not implemented.');
-}
