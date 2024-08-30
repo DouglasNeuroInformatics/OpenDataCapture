@@ -1,6 +1,7 @@
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from 'react-i18next';
 
 export type UploadSelectTableProps = {
   data: InstrumentInfo[];
@@ -8,11 +9,17 @@ export type UploadSelectTableProps = {
 };
 
 export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) => {
+  const { t } = useTranslation(['upload', 'core']);
   const insturmentList = useInstrumentInfoQuery();
   return (
     <>
       <ClientTable<InstrumentInfo>
-        columns={[]}
+        columns={[
+          {
+            field: (insturmentList) => (insturmentList.details ? insturmentList.details.title.toString() : 'N/A'),
+            label: t('title')
+          }
+        ]}
         data={data}
         entriesPerPage={15}
         minRows={15}
