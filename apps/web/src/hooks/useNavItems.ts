@@ -1,15 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import {
-  BarChartBigIcon,
-  CirclePlayIcon,
-  ComputerIcon,
-  DatabaseIcon,
-  EyeIcon,
-  UserCogIcon,
-  UsersIcon
-} from 'lucide-react';
+import { BarChartBigIcon, CirclePlayIcon, ComputerIcon, DatabaseIcon, EyeIcon, UploadIcon, UserCogIcon, UsersIcon } from 'lucide-react';
 
 import { useAppStore } from '@/store';
 
@@ -51,10 +43,9 @@ export function useNavItems() {
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
-        'data-cy': 'upload',
-        icon: DatabaseIcon,
-        id: '/upload',
-        label: t(`navLinks.upload`)
+        icon: UploadIcon,
+        label: t(`layout.navLinks.upload`),
+        url: '/upload'
       });
     }
     if (currentGroup && currentUser?.ability.can('manage', 'Group')) {
