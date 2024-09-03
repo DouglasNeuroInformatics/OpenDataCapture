@@ -1,5 +1,6 @@
 import { type RouteObject } from 'react-router-dom';
 
+import { UploadPage } from './pages/UploadPage';
 import { UploadSelectPage } from './pages/UploadSelectPage';
 
 export const uploadRoute: RouteObject = {
@@ -9,8 +10,8 @@ export const uploadRoute: RouteObject = {
       index: true
     },
     {
+      element: <UploadPage />,
       path: ':id' //instrument id
-      // element: <UploadDataPage/>
     }
   ],
   path: 'upload'
