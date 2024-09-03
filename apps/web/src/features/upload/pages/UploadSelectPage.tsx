@@ -32,7 +32,7 @@ export const UploadSelectPage = () => {
           <UploadSelectTable
             data={data}
             onSelect={(instrument) => {
-              navigate(`${instrument.id}/assignments`);
+              navigate(`${instrument.id}`);
             }}
           />
         </div>
