@@ -6,3 +6,4 @@ export type * from './types/instrument.core.d.ts';
 export type * from './types/instrument.form.d.ts';
 export type * from './types/instrument.interactive.d.ts';
 export type * from './types/instrument.series.d.ts';
+export type * from './utils.d.ts';

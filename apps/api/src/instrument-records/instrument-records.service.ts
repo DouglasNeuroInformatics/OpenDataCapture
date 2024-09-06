@@ -1,6 +1,5 @@
-import module from 'node:module';
-
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
+import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import type { ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
@@ -24,10 +23,6 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
-
-const require = module.createRequire(import.meta.url);
-
-const { linearRegression } = require('@opendatacapture/stats') as typeof import('@opendatacapture/stats');
 
 @Injectable()
 export class InstrumentRecordsService {

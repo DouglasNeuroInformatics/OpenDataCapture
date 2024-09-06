@@ -1,4 +1,4 @@
-import type { Exact, Merge, Promisable, SetRequired } from 'type-fest';
+import type { Merge, Promisable, SetRequired } from 'type-fest';
 
 import type { Json, Language } from './core.d.ts';
 import type { InstrumentDetails, InstrumentLanguage, ScalarInstrument } from './instrument.base.d.ts';
@@ -21,7 +21,7 @@ declare type InteractiveInstrument<
         /** base64 encoded css */
         readonly style: string;
       };
-      render: (done: <T extends Exact<TData, T>>(data: T) => void) => Promisable<void>;
+      render: (done: (data: TData) => void) => Promisable<void>;
     };
     details: SetRequired<InstrumentDetails<TLanguage>, 'estimatedDuration' | 'instructions'>;
     kind: 'INTERACTIVE';

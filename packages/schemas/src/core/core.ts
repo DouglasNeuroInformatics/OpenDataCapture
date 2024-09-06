@@ -46,6 +46,11 @@ export function isZodType(arg: unknown): arg is z.ZodTypeAny {
   return Boolean(prototype && Reflect.get(prototype, 'name') === 'ZodType');
 }
 
+export function isZodObjectType(arg: z.ZodTypeAny): arg is z.AnyZodObject {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  return arg?._def?.typeName === 'ZodObject';
+}
+
 export const $ZodTypeAny = z.custom<z.ZodTypeAny>((arg) => isZodType(arg));
 
 export const $BooleanString = z.preprocess((arg) => {

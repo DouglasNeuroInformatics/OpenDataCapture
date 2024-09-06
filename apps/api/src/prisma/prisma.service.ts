@@ -10,20 +10,20 @@ export class PrismaService implements OnModuleInit {
 
   async dropDatabase() {
     this.logger.debug('Attempting to drop database...');
-    const result = await this.client.$runCommandRaw<{ ok: number }>({
+    const result = await this.client.$runCommandRaw({
       dropDatabase: 1
     });
     if (result.ok !== 1) {
       throw new InternalServerErrorException('Failed to drop database: raw mongodb command returned unexpected value', {
         cause: result
-      })
+      });
     }
     this.logger.debug('Successfully dropped database');
   }
 
   async getDbName() {
     this.logger.debug('Attempting to get database name...');
-    const dbName = await this.client.$runCommandRaw<{ db: string }>({ dbStats: 1 }).then((stats) => stats.db);
+    const dbName = await this.client.$runCommandRaw({ dbStats: 1 }).then((stats) => stats.db as string);
     this.logger.debug(`Resolved database name: ${dbName}`);
     return dbName;
   }

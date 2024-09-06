@@ -1,3 +1,0 @@
-[workspace]
-members = ["packages/stats"]
-resolver = "2"

@@ -3,38 +3,39 @@ import ImageKeyboardResponsePlugin from '/runtime/v1/@jspsych/plugin-image-keybo
 import PreloadPlugin from '/runtime/v1/@jspsych/plugin-preload@2.x';
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { initJsPsych } from '/runtime/v1/jspsych@8.x';
-import '/runtime/v1/jspsych@8.x/css/jspsych.css';
+import type { TimelineArray } from '/runtime/v1/jspsych@8.x';
 import { z } from '/runtime/v1/zod@3.23.x';
 
 import blue from './blue.png';
 import orange from './orange.png';
 
+import '/runtime/v1/jspsych@8.x/css/jspsych.css';
+
 export default defineInstrument({
   content: {
-    async render() {
+    async render(done) {
       const jsPsych = initJsPsych({
         on_finish: () => {
-          jsPsych.data.displayData();
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          done(jsPsych.data.get() as any);
         }
       });
-      const timeline = [];
+      const timeline: TimelineArray = [];
 
       /* preload images */
-      const preload = {
+      timeline.push({
         images: [blue, orange],
         type: PreloadPlugin
-      };
-      timeline.push(preload);
+      });
 
       /* define welcome message trial */
-      const welcome = {
+      timeline.push({
         stimulus: 'Welcome to the experiment. Press any key to begin.',
         type: HtmlKeyboardResponsePlugin
-      };
-      timeline.push(welcome);
+      });
 
       /* define instructions trial */
-      const instructions = {
+      timeline.push({
         post_trial_gap: 2000,
         stimulus: `
         <p>In this experiment, a circle will appear in the center 
@@ -43,16 +44,15 @@ export default defineInstrument({
         <p>If the circle is <strong>orange</strong>, press the letter J 
         as fast as you can.</p>
         <div style='width: 700px;'>
-        <div style='float: left;'><img src='blue.png'></img>
+        <div style='float: left;'><img src='${blue}'></img>
         <p class='small'><strong>Press the F key</strong></p></div>
-        <div style='float: right;'><img src='orange.png'></img>
+        <div style='float: right;'><img src='${orange}'></img>
         <p class='small'><strong>Press the J key</strong></p></div>
         </div>
         <p>Press any key to begin.</p>
       `,
         type: HtmlKeyboardResponsePlugin
-      };
-      timeline.push(instructions);
+      });
 
       /* define trial stimuli array for timeline variables */
       const test_stimuli = [
@@ -129,5 +129,19 @@ export default defineInstrument({
   language: 'en',
   measures: {},
   tags: ['Interactive'],
-  validationSchema: z.any()
+  validationSchema: z.array(
+    z
+      .object({
+        failed_audio: z.array(z.any()),
+        failed_images: z.array(z.any()),
+        failed_video: z.array(z.any()),
+        plugin_version: z.string(),
+        success: z.boolean(),
+        time_elapsed: z.number(),
+        timeout: z.boolean(),
+        trial_index: z.number(),
+        trial_type: z.string()
+      })
+      .partial()
+  )
 });
