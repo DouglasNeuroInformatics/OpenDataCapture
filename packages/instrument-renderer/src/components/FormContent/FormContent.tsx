@@ -15,6 +15,7 @@ export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
         preventResetValuesOnReset
         content={instrument.content}
         data-cy="form-content"
+        initialValues={instrument.initialValues}
         validationSchema={instrument.validationSchema}
         onSubmit={(data) => void onSubmit(data)}
       />

@@ -1,9 +1,9 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import '/runtime/v1/normalize.css@8.x/normalize.css';
 import { createRoot } from '/runtime/v1/react-dom@18.x/client';
 import { z } from '/runtime/v1/zod@3.23.x';
 
 import './styles.css';
+import '/runtime/v1/normalize.css@8.x/normalize.css';
 
 export default defineInstrument({
   content: {

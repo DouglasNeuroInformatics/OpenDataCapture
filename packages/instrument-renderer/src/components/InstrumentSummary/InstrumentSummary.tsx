@@ -1,4 +1,4 @@
-import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
+import { replacer, toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Separator } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
@@ -34,7 +34,7 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
 
   const handleDownload = () => {
     const filename = `${instrument.internal.name}_${instrument.internal.edition}_${new Date(timeCollected).toISOString()}.json`;
-    void download(filename, () => JSON.stringify(data, null, 2));
+    void download(filename, () => JSON.stringify(data, replacer, 2));
   };
 
   let language: string;

@@ -1056,3 +1056,5 @@ export {
   TrialType,
   initJsPsych
 };
+
+export type { TimelineArray };

@@ -15,7 +15,7 @@
   "dependencies": {
     "@douglasneuroinformatics/libcrypto": "^0.0.2",
     "@douglasneuroinformatics/libjs": "^0.6.0",
-    "@douglasneuroinformatics/libui": "^2.10.0",
+    "@douglasneuroinformatics/libui": "catalog:",
     "@monaco-editor/react": "^4.6.0",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-bundler": "workspace:*",

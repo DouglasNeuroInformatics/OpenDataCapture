@@ -15,6 +15,6 @@
     "zod": "workspace:zod__3.23.x@*"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "^2.10.0"
+    "@douglasneuroinformatics/libui": "catalog:"
   }
 }

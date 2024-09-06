@@ -1,7 +1,7 @@
 import type { FormInstrument, FormTypes, InstrumentLanguage } from '@opendatacapture/runtime-core';
 import { z } from 'zod';
 
-import { $ZodTypeAny } from '../core/core.js';
+import { $ZodTypeAny, isZodObjectType } from '../core/core.js';
 import { $$InstrumentUIOption, $InstrumentDetails, $ScalarInstrument } from './instrument.base.js';
 
 const $StaticFieldKind: z.ZodType<FormTypes.StaticFieldKind> = z.enum([
@@ -16,7 +16,7 @@ const $StaticFieldKind: z.ZodType<FormTypes.StaticFieldKind> = z.enum([
 
 const $FormInstrumentBaseField = z.object({
   description: $$InstrumentUIOption(z.string().min(1)).optional(),
-  isRequired: z.boolean().optional(),
+  disabled: z.boolean().optional(),
   kind: $StaticFieldKind,
   label: $$InstrumentUIOption(z.string().min(1))
 }) satisfies z.ZodType<FormInstrument.FieldMixin<InstrumentLanguage, FormTypes.BaseField>>;
@@ -148,14 +148,41 @@ const $FormInstrumentContent = z.union([
   $FormInstrumentFieldsGroup.array()
 ]) satisfies z.ZodType<FormInstrument.Content>;
 
-const $FormInstrument: z.ZodType<FormInstrument> = $ScalarInstrument.extend({
-  content: $FormInstrumentContent,
-  details: $InstrumentDetails.required({
-    estimatedDuration: true
-  }),
-  kind: z.literal('FORM'),
-  validationSchema: $ZodTypeAny
-});
+const $FormInstrument: z.ZodType<FormInstrument> = $ScalarInstrument
+  .extend({
+    content: $FormInstrumentContent,
+    details: $InstrumentDetails.required({
+      estimatedDuration: true
+    }),
+    initialValues: z.any(),
+    kind: z.literal('FORM'),
+    validationSchema: $ZodTypeAny
+  })
+  .superRefine((instrument, ctx) => {
+    if (!instrument.initialValues) {
+      return;
+    } else if (!isZodObjectType(instrument.validationSchema)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        fatal: true,
+        message: "Expected validationSchema._def._type to be 'ZodObject'",
+        path: ['validationSchema']
+      });
+      return;
+    }
+    const result = instrument.validationSchema.deepPartial().safeParse(instrument.initialValues);
+    if (result.success) {
+      return;
+    }
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Initial values must conform to validation schema',
+      params: {
+        issues: result.error.issues
+      },
+      path: ['initialValues']
+    });
+  });
 
 export {
   $FormInstrument,

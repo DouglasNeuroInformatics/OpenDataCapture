@@ -1,3 +1,4 @@
+/** @type {import('@opendatacapture/runtime-bundler').Config} */
 export default {
   include: [
     '@opendatacapture/evaluate-instrument',
