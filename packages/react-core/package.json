@@ -25,15 +25,15 @@
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
-    "framer-motion": "^11.3.30",
-    "lucide-react": "^0.436.0",
+    "framer-motion": "^11.5.4",
+    "lucide-react": "^0.439.0",
     "react-i18next": "catalog:",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
     "@opendatacapture/tailwindcss": "workspace:*",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.41",
-    "vite": "^5.4.2"
+    "postcss": "^8.4.45",
+    "vite": "^5.4.3"
   }
 }
