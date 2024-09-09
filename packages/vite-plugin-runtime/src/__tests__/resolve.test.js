@@ -5,7 +5,7 @@ import path from 'path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resolvePackages, resolveVersion, RUNTIME_DIR, RUNTIME_DIST_DIRNAME } from './index.js';
+import { resolvePackages, resolveVersion, RUNTIME_DIR, RUNTIME_DIST_DIRNAME } from '../resolve.js';
 
 describe('resolveVersion', () => {
   beforeEach(() => {

@@ -1125,12 +1125,6 @@ importers:
         specifier: catalog:esbuild
         version: 0.23.1
 
-  packages/runtime-resolve:
-    dependencies:
-      '@opendatacapture/runtime-v1':
-        specifier: workspace:*
-        version: link:../../runtime/v1
-
   packages/schemas:
     dependencies:
       '@casl/ability':
@@ -1195,9 +1189,6 @@ importers:
 
   packages/vite-plugin-runtime:
     dependencies:
-      '@opendatacapture/runtime-resolve':
-        specifier: workspace:*
-        version: link:../runtime-resolve
       '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1

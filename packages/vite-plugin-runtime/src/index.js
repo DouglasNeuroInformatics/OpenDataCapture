@@ -1,8 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { MANIFEST_FILENAME, resolvePackages } from '@opendatacapture/runtime-resolve';
-
+import { MANIFEST_FILENAME, resolvePackages } from './resolve.js';
 import { runtimeMiddleware } from './runtime-middleware.js';
 
 /**

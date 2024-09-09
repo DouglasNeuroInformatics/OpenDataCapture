@@ -1,11 +1,11 @@
 import fs from 'fs/promises';
 
 import { deepFreeze } from '@douglasneuroinformatics/libjs';
-import * as runtimeResolve from '@opendatacapture/runtime-resolve';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
 
 import { loadResource } from '../load-resource.js';
+import * as runtimeResolve from '../resolve.js';
 
 /** @type {runtimeResolve.RuntimeVersionInfo} */
 const runtimeVersionInfoStub = deepFreeze(
