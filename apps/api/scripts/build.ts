@@ -6,7 +6,6 @@ import path from 'path';
 
 import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-native-modules';
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
-import { runtimePlugin } from '@opendatacapture/esbuild-plugin-runtime';
 import esbuild from 'esbuild';
 import type { BuildOptions } from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
@@ -35,6 +34,8 @@ const { __dirname, __filename, require } = await (async () => {
 
 const outfile = path.resolve(outdir, 'app.mjs');
 
+const runtimeV1Dir = path.dirname(require.resolve('@opendatacapture/runtime-v1/package.json'));
+
 const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> } & BuildOptions = {
   banner: {
     js: cjsShims
@@ -50,7 +51,6 @@ const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> }
     esbuildPluginTsc({
       tsconfigPath: tsconfig
     }),
-    runtimePlugin({ outdir }),
     prismaPlugin({ outdir: path.join(outdir, 'api') }),
     nativeModulesPlugin()
   ],
@@ -72,6 +72,7 @@ async function clean() {
 async function build() {
   await clean();
   await copyEsbuild();
+  await fs.cp(path.join(runtimeV1Dir, 'dist'), path.join(outdir, 'runtime', 'v1'), { recursive: true });
   await esbuild.build(options);
   console.log('Done!');
 }
