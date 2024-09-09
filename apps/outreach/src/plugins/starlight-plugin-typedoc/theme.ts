@@ -1,8 +1,8 @@
 import path from 'node:path';
 
 import { Reflection } from 'typedoc';
-import type { Comment, CommentDisplayPart, CommentTag, Options, PageEvent } from 'typedoc';
-import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
+import type { Comment, CommentDisplayPart, CommentTag, Options } from 'typedoc';
+import { MarkdownPageEvent, MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 
 import { getAsideMarkdown, getRelativeURL } from './starlight';
 
@@ -10,7 +10,7 @@ const customBlockTagTypes = ['@deprecated'] as const;
 const customModifiersTagTypes = ['@alpha', '@beta', '@experimental'] as const;
 
 export class StarlightTypeDocTheme extends MarkdownTheme {
-  override getRenderContext(event: PageEvent<Reflection>): StarlightTypeDocThemeRenderContext {
+  override getRenderContext(event: MarkdownPageEvent<Reflection>): StarlightTypeDocThemeRenderContext {
     return new StarlightTypeDocThemeRenderContext(this, event, this.application.options);
   }
 }
@@ -104,9 +104,8 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
     return part;
   };
 
-  constructor(theme: MarkdownTheme, event: PageEvent<Reflection>, options: Options) {
+  constructor(theme: MarkdownTheme, event: MarkdownPageEvent<Reflection>, options: Options) {
     super(theme, event, options);
-
     this.#markdownThemeContext = new MarkdownThemeContext(theme, event, options);
   }
 
