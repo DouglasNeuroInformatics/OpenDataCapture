@@ -16,7 +16,7 @@ RUN pnpm dlx turbo prune @opendatacapture/web --docker
 FROM base AS installer
 RUN apk add --no-cache libc6-compat
 RUN apk update
-COPY .gitignore jsconfig.json ./
+COPY .gitignore tsconfig.base.json ./
 COPY --from=builder /app/out/json/ .
 RUN pnpm install --frozen-lockfile 
 

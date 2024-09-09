@@ -3,7 +3,12 @@
   "type": "module",
   "version": "0.0.0",
   "license": "Apache-2.0",
-  "main": "./src/index.cjs",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.cts",
+      "require": "./src/index.cjs"
+    }
+  },
   "scripts": {
     "format": "prettier --write src",
     "lint": "eslint --fix src"

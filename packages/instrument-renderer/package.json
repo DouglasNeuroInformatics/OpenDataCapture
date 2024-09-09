@@ -35,7 +35,7 @@
     "@opendatacapture/subject-utils": "workspace:*",
     "i18next": "catalog:",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "lucide-react": "^0.436.0",
+    "lucide-react": "^0.439.0",
     "react-i18next": "catalog:",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
@@ -45,8 +45,8 @@
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "autoprefixer": "^10.4.20",
     "esbuild-wasm": "catalog:esbuild",
-    "postcss": "^8.4.41",
+    "postcss": "^8.4.45",
     "type-fest": "workspace:type-fest__4.x@*",
-    "vite": "^5.4.2"
+    "vite": "^5.4.3"
   }
 }

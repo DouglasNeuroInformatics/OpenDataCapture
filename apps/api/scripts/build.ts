@@ -1,5 +1,4 @@
-#!/usr/bin/env node
-/* eslint-disable no-console */
+#!/usr/bin/env tsx
 
 import fs from 'fs/promises';
 import module from 'module';
@@ -9,6 +8,7 @@ import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-nat
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
 import { runtimePlugin } from '@opendatacapture/esbuild-plugin-runtime';
 import esbuild from 'esbuild';
+import type { BuildOptions } from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
 
 const require = module.createRequire(import.meta.url);
@@ -35,8 +35,7 @@ const { __dirname, __filename, require } = await (async () => {
 
 const outfile = path.resolve(outdir, 'app.mjs');
 
-/** @type {import('esbuild').BuildOptions & { external: NonNullable<unknown>, plugins: NonNullable<unknown> }} */
-const options = {
+const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> } & BuildOptions = {
   banner: {
     js: cjsShims
   },
@@ -98,18 +97,18 @@ async function watch() {
         sourcemap: true
       })
       .then((ctx) => {
-        ctx.watch();
+        void ctx.watch();
         console.log('Watching...');
       })
       .catch((err) => {
-        reject(err);
+        reject(err as Error);
       });
   });
 }
 
 const isEntry = process.argv[1] === import.meta.filename;
 if (isEntry) {
-  build();
+  await build();
 }
 
 export { clean, outfile, watch };

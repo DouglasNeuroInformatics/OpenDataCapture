@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [".env", "eslint.config.js", "jsconfig.json", "prettier.config.js"],
+  "globalDependencies": [".env", "eslint.config.js", "tsconfig.base.json", "prettier.config.js"],
   "globalEnv": ["NODE_ENV", "NODE_OPTIONS"],
   "tasks": {
     "gateway#build": {

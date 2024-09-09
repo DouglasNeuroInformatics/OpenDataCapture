@@ -13,7 +13,6 @@ await esbuild.initialize({
 /** @type {import('@storybook/react').Preview} */
 const preview = {
   decorators: [
-    // @ts-ignore
     withThemeByDataAttribute({
       attributeName: 'data-mode',
       defaultTheme: 'light',

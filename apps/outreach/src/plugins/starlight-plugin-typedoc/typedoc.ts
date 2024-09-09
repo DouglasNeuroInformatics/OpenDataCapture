@@ -90,11 +90,14 @@ async function bootstrapApp(
   });
   app.logger = new StarlightTypeDocLogger(logger);
   app.options.addReader(new TSConfigReader());
+  // @ts-expect-error - inherited code
   app.renderer.defineTheme('starlight-typedoc', StarlightTypeDocTheme);
   app.renderer.on(PageEvent.BEGIN, (event: PageEvent<Reflection>) => {
+    // @ts-expect-error - inherited code
     onRendererPageBegin(event, pagination);
   });
   app.renderer.on(PageEvent.END, (event: PageEvent<Reflection>) => {
+    // @ts-expect-error - inherited code
     const shouldRemovePage = onRendererPageEnd(event, pagination);
     if (shouldRemovePage) {
       pagesToRemove.push(event.filename);

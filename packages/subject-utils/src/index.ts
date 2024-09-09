@@ -1,8 +1,8 @@
 import { sha256 } from '@douglasneuroinformatics/libcrypto';
 import { $ClinicalSubjectIdentificationData } from '@opendatacapture/schemas/subject';
 import type { ClinicalSubjectIdentificationData, Subject } from '@opendatacapture/schemas/subject';
+import { transliterate } from 'transliteration';
 import type { SetNonNullable } from 'type-fest';
-import unidecode from 'unidecode';
 
 type SubjectPersonalInfo = Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 
@@ -11,7 +11,7 @@ export async function generateSubjectHash(data: ClinicalSubjectIdentificationDat
   const { dateOfBirth, firstName, lastName, sex } = await $ClinicalSubjectIdentificationData.parseAsync(data);
   const shortDateOfBirth = dateOfBirth.toISOString().split('T')[0];
   const info = firstName + lastName + shortDateOfBirth + sex;
-  const source = unidecode(info.toUpperCase().replaceAll('-', ''));
+  const source = transliterate(info.toUpperCase().replaceAll('-', ''));
   return sha256(source);
 }
 

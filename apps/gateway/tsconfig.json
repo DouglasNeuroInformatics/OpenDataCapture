@@ -1,5 +1,5 @@
 {
-  "extends": "../../jsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -7,5 +7,5 @@
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     }
   },
-  "include": ["scripts/*", "src/**/*", "*.js", "*.cjs"]
+  "include": ["scripts/*", "src/**/*", "vite.config.ts"]
 }

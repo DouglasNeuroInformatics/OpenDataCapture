@@ -1,14 +1,13 @@
 import { i18n } from '@opendatacapture/i18next';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import type { Preview } from '@storybook/react';
 
 import '@douglasneuroinformatics/libui/styles/globals.css';
 
 await i18n.init();
 
-/** @type {import('@storybook/react').Preview} */
-const preview = {
+const preview: Preview = {
   decorators: [
-    // @ts-ignore
     withThemeByDataAttribute({
       attributeName: 'data-mode',
       defaultTheme: 'light',
