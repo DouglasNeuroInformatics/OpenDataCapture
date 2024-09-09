@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./src/index.cts"
+    ".": {
+      "types": "./src/index.d.cts",
+      "require": "./src/index.cjs"
+    }
   },
   "scripts": {
     "format": "prettier --write src",
