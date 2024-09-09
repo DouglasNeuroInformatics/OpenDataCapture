@@ -4,6 +4,6 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "rootDir": "../.."
   },
-  "extends": "../../jsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "include": ["build.ts", "src/**/*", "*.js", "*.cjs", "env.d.ts"]
 }

@@ -1,5 +1,5 @@
 {
-  "extends": "../../jsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "emitDecoratorMetadata": true,
@@ -10,5 +10,5 @@
     },
     "strictPropertyInitialization": false
   },
-  "include": ["scripts/*", "src/**/*", "*.js", "*.cjs"]
+  "include": ["scripts/*", "src/**/*", "vitest.config.ts"]
 }

@@ -1,10 +1,10 @@
 {
-  "extends": "../../jsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["config/**/*", "src/**/*", "*.js", "*.cjs"]
+  "include": [".storybook/*", "config/**/*", "src/**/*", "vite.config.ts"]
 }

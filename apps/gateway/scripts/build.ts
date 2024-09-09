@@ -1,3 +1,5 @@
+#!/usr/bin/env tsx
+
 import { existsSync } from 'fs';
 import fs from 'fs/promises';
 import path from 'path';

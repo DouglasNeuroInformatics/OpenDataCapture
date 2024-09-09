@@ -1,5 +1,5 @@
 {
-  "extends": "../../jsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
@@ -10,5 +10,5 @@
     },
     "types": ["@opendatacapture/runtime-v1/env", "vite/client"]
   },
-  "include": ["src/**/*"]
+  "include": [".storybook/*", "src/**/*", "vite.config.ts"]
 }

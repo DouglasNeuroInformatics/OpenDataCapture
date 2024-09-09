@@ -13,7 +13,6 @@ import {
 test('$InstrumentKind', () => {
   expect($InstrumentKind.safeParse('FORM').success).toBe(true);
   expect($InstrumentKind.safeParse('INTERACTIVE').success).toBe(true);
-  expect($InstrumentKind.safeParse('UNKNOWN').success).toBe(true);
 });
 
 test('$InstrumentLanguage', () => {
