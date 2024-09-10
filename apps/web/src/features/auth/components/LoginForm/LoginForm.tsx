@@ -1,8 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { LoginCredentials } from '@opendatacapture/schemas/auth';
-import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 export type LoginFormProps = {

@@ -1,5 +1,5 @@
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { LoadingPage } from '@opendatacapture/react-core';
-import { useTranslation } from 'react-i18next';
 
 export const SetupLoadingPage = () => {
   const { t } = useTranslation('setup');

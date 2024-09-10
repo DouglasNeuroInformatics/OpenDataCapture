@@ -1,5 +1,5 @@
 import { Select } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 export type SelectInstrumentProps = {
   onSelect: (id: string) => void;
@@ -7,7 +7,7 @@ export type SelectInstrumentProps = {
 };
 
 export const SelectInstrument = ({ onSelect, options }: SelectInstrumentProps) => {
-  const { t } = useTranslation(['datahub', 'core']);
+  const { t } = useTranslation();
   return (
     <Select
       onValueChange={(id) => {
@@ -15,7 +15,7 @@ export const SelectInstrument = ({ onSelect, options }: SelectInstrumentProps) =
       }}
     >
       <Select.Trigger className="min-w-72">
-        <Select.Value placeholder={t('visualization.selectInstrument')} />
+        <Select.Value placeholder={t('datahub.visualization.selectInstrument')} />
       </Select.Trigger>
       <Select.Content>
         <Select.Group>

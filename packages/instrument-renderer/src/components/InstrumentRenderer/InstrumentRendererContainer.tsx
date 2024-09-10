@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useWindowSize } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation, useWindowSize } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { FileCheckIcon, MonitorIcon, PrinterIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 export type InstrumentRendererContainerProps = {
   children: React.ReactNode;
@@ -13,7 +12,7 @@ export type InstrumentRendererContainerProps = {
 
 export const InstrumentRendererContainer = ({ children, className, index }: InstrumentRendererContainerProps) => {
   const { height, width } = useWindowSize();
-  const { i18n, t } = useTranslation();
+  const { resolvedLanguage, t } = useTranslation();
   const icons = useRef<HTMLDivElement[]>([]);
   const [divideStyles, setDivideStyles] = useState<React.CSSProperties[]>([]);
 
@@ -21,18 +20,27 @@ export const InstrumentRendererContainer = ({ children, className, index }: Inst
     () => [
       {
         icon: <FileCheckIcon />,
-        label: t('steps.overview')
+        label: t({
+          en: 'Overview',
+          fr: 'Aperçu'
+        })
       },
       {
         icon: <MonitorIcon />,
-        label: t('steps.questions')
+        label: t({
+          en: 'Content',
+          fr: 'Contenu'
+        })
       },
       {
         icon: <PrinterIcon />,
-        label: t('steps.summary')
+        label: t({
+          en: 'Summary',
+          fr: 'Résumé'
+        })
       }
     ],
-    [i18n.resolvedLanguage]
+    [resolvedLanguage]
   );
 
   useEffect(() => {

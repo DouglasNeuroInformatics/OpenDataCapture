@@ -1,5 +1,5 @@
 import { Select } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 export type TimeDropdownProps = {
   disabled?: boolean;

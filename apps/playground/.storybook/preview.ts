@@ -1,10 +1,10 @@
-import { i18n } from '@opendatacapture/i18next';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Preview } from '@storybook/react';
 
-import '@douglasneuroinformatics/libui/styles/globals.css';
+import '@douglasneuroinformatics/libui/tailwind/globals.css';
 
-await i18n.init();
+i18n.init();
 
 const preview: Preview = {
   decorators: [
@@ -31,8 +31,7 @@ const preview: Preview = {
         color: /(background|color)$/i,
         date: /Date$/
       }
-    },
-    i18n
+    }
   }
 };
 

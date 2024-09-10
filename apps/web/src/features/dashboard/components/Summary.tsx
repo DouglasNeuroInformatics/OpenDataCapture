@@ -1,5 +1,5 @@
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
-import { useTranslation } from 'react-i18next';
 
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { useAppStore } from '@/store';

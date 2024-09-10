@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';

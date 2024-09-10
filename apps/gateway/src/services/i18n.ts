@@ -1,5 +1,3 @@
-import { i18n } from '@opendatacapture/i18next';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
 
-await i18n.init();
-
-export default i18n;
+i18n.init();

@@ -8,9 +8,9 @@ import {
   type ListboxDropdownOption
 } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import html2canvas from 'html2canvas';
-import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 import { useAppStore } from '@/store';
@@ -34,7 +34,7 @@ export const SubjectGraphPage = () => {
         subjectId: params.subjectId!
       }
     });
-  const { t } = useTranslation(['datahub', 'common', 'core']);
+  const { t } = useTranslation();
   const measureOptions = useMeasureOptions(instrument as AnyUnilingualFormInstrument);
   const [selectedMeasures, setSelectedMeasures] = useState<ListboxDropdownOption[]>([]);
 
@@ -65,17 +65,14 @@ export const SubjectGraphPage = () => {
         const formType = instrument.details.title;
         const subjectId = params.subjectId!.slice(0, 7);
 
-        graphDesc.innerText = t('downloadInfo.subjectText', {
-          form: formType ?? '',
-          id: subjectId ?? ''
-        });
+        graphDesc.innerText = t('datahub.downloadInfo.subjectText', formType ?? '', subjectId ?? '');
 
         graphDesc.className = 'p-2 font-semibold text-center';
         element.prepend(graphDesc);
 
         if (selectedMeasures) {
           const graphMeasure = document.createElement('p');
-          graphMeasure.innerText = t('downloadInfo.measurement');
+          graphMeasure.innerText = t('datahub.downloadInfo.measurement');
           selectedMeasures.map((measure) => measure.label).join(', ');
           graphMeasure.innerText += selectedMeasures.map((measure) => measure.label).join(', ');
           graphMeasure.className = 'p-2 font-semibold';
@@ -84,13 +81,13 @@ export const SubjectGraphPage = () => {
 
         const graphTime = document.createElement('p');
         if (minDate) {
-          graphTime.innerText = t('downloadInfo.time');
+          graphTime.innerText = t('datahub.downloadInfo.time');
           graphTime.innerText += toBasicISOString(minDate) + ' - ' + toBasicISOString(new Date());
 
           graphTime.className = 'p-2 font-semibold';
           element.append(graphTime);
         } else {
-          graphTime.innerText = t('downloadInfo.allTime');
+          graphTime.innerText = t('datahub.downloadInfo.allTime');
 
           graphTime.className = 'p-2 font-semibold';
           element.append(graphTime);
@@ -132,7 +129,7 @@ export const SubjectGraphPage = () => {
                 options={measureOptions}
                 selected={selectedMeasures}
                 setSelected={setSelectedMeasures}
-                title={t('visualization.measures')}
+                title={t('datahub.visualization.measures')}
                 variant="secondary"
               />
             </div>
@@ -146,7 +143,7 @@ export const SubjectGraphPage = () => {
                 options={{
                   png: 'PNG'
                 }}
-                title={t('downloadInfo.download')}
+                title={t('datahub.downloadInfo.download')}
                 onSelection={() => {
                   void handleGraphDownload();
                 }}
@@ -164,7 +161,7 @@ export const SubjectGraphPage = () => {
           lines={lines}
           xAxis={{
             key: '__time__',
-            label: t('visualization.xLabel')
+            label: t('datahub.visualization.xLabel')
           }}
         />
       </div>

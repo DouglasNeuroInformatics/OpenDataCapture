@@ -7,5 +7,5 @@
     },
     "types": ["vite/client"]
   },
-  "include": [".storybook/*", "src/**/*", "*.js", "*.cjs"]
+  "include": [".storybook/*", "src/**/*", "tailwind.config.cjs"]
 }

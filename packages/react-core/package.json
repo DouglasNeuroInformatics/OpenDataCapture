@@ -6,8 +6,7 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./src/index.ts",
-    "./package.json": "./package.json",
-    "./tailwind.config": "./tailwind.config.js"
+    "./package.json": "./package.json"
   },
   "scripts": {
     "format": "prettier --write src",
@@ -23,15 +22,12 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.6.0",
     "@douglasneuroinformatics/libui": "catalog:",
-    "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.439.0",
-    "react-i18next": "catalog:",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
-    "@opendatacapture/tailwindcss": "workspace:*",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.45",
     "vite": "^5.4.3"

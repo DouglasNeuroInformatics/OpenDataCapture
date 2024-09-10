@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
-import { useTranslation } from 'react-i18next';
 
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 

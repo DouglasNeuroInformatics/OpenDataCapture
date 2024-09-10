@@ -11,8 +11,7 @@ const config: StorybookConfig = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
-    '@storybook/addon-themes',
-    'storybook-react-i18next'
+    '@storybook/addon-themes'
   ],
   docs: {
     autodocs: 'tag'

@@ -106,7 +106,7 @@ function attachVimMap(
   this: {
     attach: (adapter: EditorAdapter, prev?: KeyMapEntry) => void;
     call: (key: string, adapter: EditorAdapter) => (() => boolean) | false | undefined;
-    detach: (adapter: EditorAdapter, next?: KeyMapEntry | undefined) => void;
+    detach: (adapter: EditorAdapter, next?: KeyMapEntry) => void;
     fallthrough?: string[];
     keys?: { Backspace: string };
   },

@@ -1,22 +1,19 @@
-/// @ts-check
-/// <reference types="vite/client" />
-
-import { i18n } from '@opendatacapture/i18next';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import type { Preview } from '@storybook/react';
 import * as esbuild from 'esbuild-wasm';
 import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
-import '@douglasneuroinformatics/libui/styles/globals.css';
+import '@douglasneuroinformatics/libui/tailwind/globals.css';
 
-await i18n.init();
+i18n.init();
+
 await esbuild.initialize({
   wasmURL: esbuildWasmUrl
 });
 
-/** @type {import('@storybook/react').Preview} */
-const preview = {
+const preview: Preview = {
   decorators: [
-    // @ts-ignore
     withThemeByDataAttribute({
       attributeName: 'data-mode',
       defaultTheme: 'light',
@@ -41,7 +38,6 @@ const preview = {
         date: /Date$/
       }
     },
-    i18n,
     layout: 'fullscreen'
   }
 };

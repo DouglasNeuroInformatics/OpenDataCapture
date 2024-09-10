@@ -2,9 +2,8 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import esbuild from 'esbuild-wasm';
 import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
-import i18n from '../src/services/i18n';
-
-import '@douglasneuroinformatics/libui/styles/globals.css';
+import '@douglasneuroinformatics/libui/tailwind/globals.css';
+import '../src/services/i18n';
 
 await esbuild.initialize({
   wasmURL: esbuildWasmUrl
@@ -36,8 +35,7 @@ const preview = {
         color: /(background|color)$/i,
         date: /Date$/
       }
-    },
-    i18n
+    }
   }
 };
 

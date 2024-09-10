@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 import { ArrowToggle, DropdownMenu } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { LogOutIcon, SettingsIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppStore } from '@/store';

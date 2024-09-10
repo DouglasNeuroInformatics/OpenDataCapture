@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 
 import { LoadingFallback } from '@/components/LoadingFallback';
@@ -21,7 +21,13 @@ export const SubjectLayout = () => {
     <React.Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t('layout.title', { id: removeSubjectIdScope(subjectId).slice(0, 7) })}
+          {t(
+            {
+              en: 'Instrument Records for Subject {}',
+              fr: "Dossiers d'instruments pour le client {}"
+            },
+            removeSubjectIdScope(subjectId).slice(0, 7)
+          )}
         </Heading>
       </PageHeader>
       <div className="mb-5 flex">

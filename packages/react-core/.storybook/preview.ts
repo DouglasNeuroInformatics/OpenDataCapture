@@ -1,16 +1,13 @@
-// @ts-check
-
-import { i18n } from '@opendatacapture/i18next';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import type { Preview } from '@storybook/react';
 
-import '@douglasneuroinformatics/libui/styles/globals.css';
+import '@douglasneuroinformatics/libui/tailwind/globals.css';
 
-await i18n.init();
+i18n.init();
 
-/** @type {import('@storybook/react').Preview} */
-const preview = {
+const preview: Preview = {
   decorators: [
-    // @ts-ignore
     withThemeByDataAttribute({
       attributeName: 'data-mode',
       defaultTheme: 'light',
@@ -34,8 +31,7 @@ const preview = {
         color: /(background|color)$/i,
         date: /Date$/
       }
-    },
-    i18n
+    }
   }
 };
 

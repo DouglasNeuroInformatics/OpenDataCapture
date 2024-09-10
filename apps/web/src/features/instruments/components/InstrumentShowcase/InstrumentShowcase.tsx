@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 
 import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
@@ -16,7 +16,7 @@ export const InstrumentsShowcase = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const navigate = useNavigate();
-  const { t } = useTranslation(['core', 'instruments']);
+  const { t } = useTranslation();
   const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentInfo[]>([]);
   const [tagOptions, setTagOptions] = useState<ListboxDropdownOption[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<ListboxDropdownOption[]>([]);
@@ -26,11 +26,11 @@ export const InstrumentsShowcase = () => {
   const languageOptions = [
     {
       key: 'en',
-      label: t('languages.english')
+      label: t('core.languages.english')
     },
     {
       key: 'fr',
-      label: t('languages.french')
+      label: t('core.languages.french')
     }
   ];
 
@@ -70,7 +70,7 @@ export const InstrumentsShowcase = () => {
               options={tagOptions}
               selected={selectedTags}
               setSelected={setSelectedTags}
-              title={t('tags')}
+              title={t('core.tags')}
             />
           </div>
           <div className="flex w-full" data-cy="language-btn-dropdown">
@@ -79,7 +79,7 @@ export const InstrumentsShowcase = () => {
               options={languageOptions}
               selected={selectedLanguages}
               setSelected={setSelectedLanguages}
-              title={t('language')}
+              title={t('core.language')}
             />
           </div>
         </div>

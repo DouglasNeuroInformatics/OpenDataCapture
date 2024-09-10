@@ -1,8 +1,12 @@
-import { i18n } from '@opendatacapture/i18next';
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/no-namespace */
+
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
 
 import auth from '../translations/auth.json';
 import common from '../translations/common.json';
 import contact from '../translations/contact.json';
+import core from '../translations/core.json';
 import dashboard from '../translations/dashboard.json';
 import datahub from '../translations/datahub.json';
 import group from '../translations/group.json';
@@ -12,20 +16,44 @@ import session from '../translations/session.json';
 import setup from '../translations/setup.json';
 import user from '../translations/user.json';
 
-i18n.addPreInitTranslations({
-  auth,
-  common,
-  contact,
-  dashboard,
-  datahub,
-  group,
-  instruments,
-  layout,
-  session,
-  setup,
-  user
-});
+declare module '@douglasneuroinformatics/libui/i18n' {
+  export namespace UserConfig {
+    export interface LanguageOptions {
+      en: true;
+      fr: true;
+    }
+    export interface Translations {
+      auth: typeof auth;
+      common: typeof common;
+      contact: typeof contact;
+      core: typeof core;
+      dashboard: typeof dashboard;
+      datahub: typeof datahub;
+      group: typeof group;
+      instruments: typeof instruments;
+      layout: typeof layout;
+      session: typeof session;
+      setup: typeof setup;
+      user: typeof user;
+    }
+  }
+}
 
-await i18n.init();
+i18n.init({
+  translations: {
+    auth,
+    common,
+    contact,
+    core,
+    dashboard,
+    datahub,
+    group,
+    instruments,
+    layout,
+    session,
+    setup,
+    user
+  }
+});
 
 export default i18n;

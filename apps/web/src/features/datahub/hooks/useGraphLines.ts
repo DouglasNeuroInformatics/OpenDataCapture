@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import type { LineGraphLine, ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 const COLOR_PALETTE: readonly string[] = [
   '#D81B60',
@@ -20,7 +20,7 @@ export type UseGraphLinesOptions = {
 };
 
 export function useGraphLines({ selectedMeasures }: UseGraphLinesOptions) {
-  const { i18n, t } = useTranslation('common');
+  const { resolvedLanguage, t } = useTranslation('common');
   const [lines, setLines] = useState<LineGraphLine[]>([]);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function useGraphLines({ selectedMeasures }: UseGraphLinesOptions) {
       });
     }
     setLines(lines);
-  }, [i18n.resolvedLanguage, selectedMeasures]);
+  }, [resolvedLanguage, selectedMeasures]);
 
   return lines;
 }

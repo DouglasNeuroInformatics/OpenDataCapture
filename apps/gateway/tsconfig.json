@@ -7,5 +7,5 @@
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     }
   },
-  "include": ["scripts/*", "src/**/*", "vite.config.ts"]
+  "include": ["scripts/*", "src/**/*", "tailwind.config.cjs", "vite.config.ts"]
 }

@@ -1,7 +1,7 @@
 import { Card } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentIcon } from '@opendatacapture/react-core';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
-import { useTranslation } from 'react-i18next';
 
 export type InstrumentCardProps = {
   instrument: UnilingualInstrumentInfo;
@@ -27,7 +27,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
           {instrument.details.title}
         </h3>
         <h5 className="mb-2 text-sm text-slate-700 dark:text-slate-300" data-cy="instrument-card">
-          {`${t('tags')}: ${instrument.tags.join(', ')}`}
+          {`${t('core.tags')}: ${instrument.tags.join(', ')}`}
         </h5>
         <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{instrument.details.description}</p>
       </div>

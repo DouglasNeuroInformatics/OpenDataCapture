@@ -21,10 +21,7 @@
       "fr": "Avis"
     }
   },
-  "pageTitle": {
-    "en": "Dashboard",
-    "fr": "Tableau de bord"
-  },
+
   "summary": {
     "en": "Summary of Available Data",
     "fr": "Résumé des données disponibles"
@@ -44,17 +41,5 @@
   "totalUsers": {
     "en": "Total Users",
     "fr": "Nombre d'utilisateurs"
-  },
-  "welcome": {
-    "en": "Summary of Application State",
-    "fr": "La cliente actuelle"
-  },
-  "welcome_CLINICAL": {
-    "en": "Overview of Your Clinic",
-    "fr": "Vue d'ensemble de votre clinique"
-  },
-  "welcome_RESEARCH": {
-    "en": "Overview of Your Research Group",
-    "fr": "Vue d'ensemble de votre groupe de recherche"
   }
 }

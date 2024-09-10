@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Button, Heading } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createPortal } from 'react-dom';
-import { useTranslation } from 'react-i18next';
 
 import type { ScalarInstrumentRendererProps } from './ScalarInstrumentRenderer';
 
@@ -32,17 +32,23 @@ export const SeriesInstrumentContent = ({ status }: SeriesInstrumentContentProps
   return (
     <div className="flex flex-grow flex-col items-center justify-center space-y-1 py-32 text-center">
       <Heading className="font-medium" variant="h5">
-        {t('seriesInstrumentContent.inProgress')}
+        {t({
+          en: 'Series Instrument in Process',
+          fr: "Série d'instruments en cours"
+        })}
       </Heading>
       <p className="text-muted-foreground text-sm">
-        {t('seriesInstrumentContent.instrumentsCompleted', {
-          completed: status.completedInstruments,
-          total: status.totalInstruments
+        {t({
+          en: `Instruments Completed: ${status.completedInstruments}/{${status.totalInstruments}}`,
+          fr: `Nombre d'instruments complétés : ${status.completedInstruments}/{${status.totalInstruments}}`
         })}
       </p>
       <div className="pt-2">
         <Button disabled={isOpen} type="button" onClick={() => setIsOpen(true)}>
-          {t('begin')}
+          {t({
+            en: 'Begin',
+            fr: 'Commencer'
+          })}
         </Button>
       </div>
       {createPortal(<div ref={container} />, document.body)}

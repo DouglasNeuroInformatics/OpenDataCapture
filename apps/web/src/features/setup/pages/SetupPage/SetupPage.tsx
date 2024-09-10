@@ -2,8 +2,8 @@
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Logo } from '@opendatacapture/react-core';
-import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 type SetupData = {
@@ -21,33 +21,33 @@ export type SetupPageProps = {
 };
 
 export const SetupPage = ({ onSubmit }: SetupPageProps) => {
-  const { t } = useTranslation(['core', 'common', 'setup']);
+  const { t } = useTranslation();
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <Card className="w-full grow px-4 sm:m-8 sm:max-w-xl sm:grow-0 md:max-w-2xl">
         <Card.Header className="flex items-center justify-center">
           <Logo className="m-2 h-auto w-16" variant="auto" />
-          <Heading variant="h2">{t('setup:pageTitle')}</Heading>
+          <Heading variant="h2">{t('setup.pageTitle')}</Heading>
         </Card.Header>
         <Card.Content>
           <Form
             content={[
               {
-                description: t('setup:admin.description'),
+                description: t('setup.admin.description'),
                 fields: {
                   firstName: {
                     kind: 'string',
-                    label: t('identificationData.firstName.label'),
+                    label: t('core.identificationData.firstName.label'),
                     variant: 'input'
                   },
                   lastName: {
                     kind: 'string',
-                    label: t('identificationData.lastName.label'),
+                    label: t('core.identificationData.lastName.label'),
                     variant: 'input'
                   },
                   username: {
                     kind: 'string',
-                    label: t('setup:admin.username'),
+                    label: t('setup.admin.username'),
                     variant: 'input'
                   },
                   password: {
@@ -55,21 +55,21 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                       return estimatePasswordStrength(password).score;
                     },
                     kind: 'string',
-                    label: t('setup:admin.password'),
+                    label: t('setup.admin.password'),
                     variant: 'password'
                   }
                 },
-                title: t('setup:admin.title')
+                title: t('setup.admin.title')
               },
               {
-                description: t('setup:demo.description'),
+                description: t('setup.demo.description'),
                 fields: {
                   initDemo: {
                     kind: 'boolean',
-                    label: t('setup:demo.init'),
+                    label: t('setup.demo.init'),
                     options: {
-                      false: t('no'),
-                      true: t('yes')
+                      false: t('core.no'),
+                      true: t('core.yes')
                     },
                     variant: 'radio'
                   },
@@ -81,7 +81,7 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                       }
                       return {
                         kind: 'number',
-                        label: t('setup:demo.dummySubjectCount'),
+                        label: t('setup.demo.dummySubjectCount'),
                         variant: 'input'
                       };
                     },
@@ -95,17 +95,17 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                       }
                       return {
                         kind: 'number',
-                        label: t('setup:demo.recordsPerSubject'),
+                        label: t('setup.demo.recordsPerSubject'),
                         variant: 'input'
                       };
                     },
                     deps: ['initDemo']
                   }
                 },
-                title: t('setup:demo.title')
+                title: t('setup.demo.title')
               }
             ]}
-            submitBtnLabel={t('submit')}
+            submitBtnLabel={t('core.submit')}
             validationSchema={z.object({
               firstName: z.string().min(1),
               lastName: z.string().min(1),
@@ -113,7 +113,7 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
               password: z
                 .string()
                 .min(1)
-                .refine((val) => estimatePasswordStrength(val).success, t('common:insufficientPasswordStrength')),
+                .refine((val) => estimatePasswordStrength(val).success, t('common.insufficientPasswordStrength')),
               initDemo: z.boolean(),
               recordsPerSubject: z.number().int().nonnegative().optional(),
               dummySubjectCount: z.number().int().nonnegative().optional()

@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Link } from 'react-router-dom';
 
 import { config } from '@/config';

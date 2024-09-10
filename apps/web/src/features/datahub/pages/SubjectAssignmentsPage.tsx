@@ -3,9 +3,9 @@
 import { useState } from 'react';
 
 import { Button, Dialog, Form, Heading } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import type { Assignment, CreateAssignmentData } from '@opendatacapture/schemas/assignment';
-import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 
@@ -22,7 +22,7 @@ const ONE_YEAR = 31556952000;
 
 export const SubjectAssignmentsPage = () => {
   const params = useParams();
-  const { t } = useTranslation(['datahub', 'core']);
+  const { t } = useTranslation();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
   const currentGroup = useAppStore((store) => store.currentGroup);
@@ -47,10 +47,10 @@ export const SubjectAssignmentsPage = () => {
     <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
       <div>
         <div className="mb-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
-          <Heading variant="h4">{t('assignments.assignedInstruments')}</Heading>
+          <Heading variant="h4">{t('datahub.assignments.assignedInstruments')}</Heading>
           <Dialog.Trigger asChild>
             <Button variant="outline">
-              {t('assignments.addAssignment')}
+              {t('datahub.assignments.addAssignment')}
               <PlusIcon />
             </Button>
           </Dialog.Trigger>
@@ -73,20 +73,20 @@ export const SubjectAssignmentsPage = () => {
         />
         <Dialog.Content>
           <Dialog.Header>
-            <Dialog.Title>{t('assignments.addAssignment')}</Dialog.Title>
-            <Dialog.Description>{t('assignments.addAssignmentDesc')}</Dialog.Description>
+            <Dialog.Title>{t('datahub.assignments.addAssignment')}</Dialog.Title>
+            <Dialog.Description>{t('datahub.assignments.addAssignmentDesc')}</Dialog.Description>
           </Dialog.Header>
           <Form
             content={{
               instrumentId: {
                 kind: 'string',
-                label: t('core:instrument'),
+                label: t('core.instrument'),
                 options: instrumentOptions,
                 variant: 'select'
               },
               expiresAt: {
                 kind: 'date',
-                label: t('assignments.expiresAt')
+                label: t('datahub.assignments.expiresAt')
               }
             }}
             initialValues={{
@@ -94,7 +94,7 @@ export const SubjectAssignmentsPage = () => {
             }}
             validationSchema={
               z.object({
-                expiresAt: z.coerce.date().min(new Date(), { message: t('errors.expiryMustBeInFuture') }),
+                expiresAt: z.coerce.date().min(new Date(), { message: t('datahub.errors.expiryMustBeInFuture') }),
                 instrumentId: z.string()
               }) satisfies z.ZodType<Omit<CreateAssignmentData, 'subjectId'>>
             }

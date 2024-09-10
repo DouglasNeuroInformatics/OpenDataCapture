@@ -1,6 +1,6 @@
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ActionDropdown, ClientTable } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { useParams } from 'react-router-dom';
 
 import { SelectInstrument } from '../components/SelectInstrument';
@@ -13,7 +13,7 @@ export const SubjectTablePage = () => {
     params: { subjectId: params.subjectId! }
   });
 
-  const { t } = useTranslation(['datahub', 'core']);
+  const { t } = useTranslation();
 
   const fields: { field: string; label: string }[] = [];
   for (const subItem in records[0]) {
@@ -41,7 +41,7 @@ export const SubjectTablePage = () => {
                 widthFull
                 disabled={!instrumentId}
                 options={['TSV', 'JSON']}
-                title={t('core:download')}
+                title={t('core.download')}
                 triggerClassName="min-w-32"
                 onSelection={dl}
               />

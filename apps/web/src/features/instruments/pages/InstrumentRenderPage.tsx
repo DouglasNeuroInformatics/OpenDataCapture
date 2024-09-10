@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 
 import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer, type InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -54,7 +54,7 @@ export const InstrumentRenderPage = () => {
     <div className="flex flex-grow flex-col">
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {title ?? t('instrument')}
+          {title ?? t('core.instrument')}
         </Heading>
       </PageHeader>
       <div className="flex-grow">

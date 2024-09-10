@@ -1,16 +1,16 @@
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Card, Dialog, Table, Tooltip } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { DEMO_USERS } from '@opendatacapture/demo';
 import type { LoginCredentials } from '@opendatacapture/schemas/auth';
 import { InfoIcon, LogInIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 export type DemoBannerProps = {
   onLogin: (credentials: LoginCredentials) => void;
 };
 
 export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
-  const { t } = useTranslation(['auth', 'common']);
+  const { t } = useTranslation();
   return (
     <Dialog>
       <div className="flex w-full items-center justify-center bg-sky-700 leading-tight text-white">
@@ -18,14 +18,14 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
           <div className="flex flex-col items-center justify-between lg:flex-row">
             <div className="my-1 flex items-center gap-3">
               <InfoIcon className="hidden h-5 w-5 lg:block" />
-              <p className="text-center text-sm font-medium lg:text-left">{t('demo.welcome')}</p>
+              <p className="text-center text-sm font-medium lg:text-left">{t('auth.demo.welcome')}</p>
             </div>
             <Dialog.Trigger asChild>
               <button
                 className="my-1.5 w-full max-w-md rounded-md border border-sky-400 px-2.5 py-1.5 text-sm font-medium hover:bg-sky-600 hover:shadow-lg lg:w-auto"
                 type="button"
               >
-                {t('demo.learnMore')}
+                {t('auth.demo.learnMore')}
               </button>
             </Dialog.Trigger>
           </div>
@@ -38,9 +38,9 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
         }}
       >
         <Dialog.Header className="w-full whitespace-break-spaces px-1">
-          <Dialog.Title className="mb-2">{t('demo.info')}</Dialog.Title>
+          <Dialog.Title className="mb-2">{t('auth.demo.info')}</Dialog.Title>
           <Dialog.Description className="text-pretty text-left text-xs sm:text-sm">
-            {t('demo.summary')}
+            {t('auth.demo.summary')}
           </Dialog.Description>
         </Dialog.Header>
         <Card className="text-muted-foreground w-full overflow-hidden rounded-md text-xs tracking-tighter sm:tracking-tight">
@@ -48,13 +48,13 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
             <Table.Header>
               <Table.Row>
                 <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
-                  {t('auth:demo.username')}
+                  {t('auth.demo.username')}
                 </Table.Head>
                 <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
-                  {t('auth:demo.groups')}
+                  {t('auth.demo.groups')}
                 </Table.Head>
                 <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
-                  {t('auth:demo.role')}
+                  {t('auth.demo.role')}
                 </Table.Head>
                 <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm"></Table.Head>
               </Table.Row>
@@ -71,7 +71,7 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
                     ))}
                   </Table.Cell>
                   <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
-                    {t(`common:basePermissionLevel.${snakeToCamelCase(user.basePermissionLevel!)}`)}
+                    {t(`common.basePermissionLevel.${snakeToCamelCase(user.basePermissionLevel!)}`)}
                   </Table.Cell>
                   <Table.Cell className="p-3 px-2.5 sm:px-3.5">
                     <Tooltip delayDuration={500}>
@@ -85,7 +85,7 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
                         <LogInIcon />
                       </Tooltip.Trigger>
                       <Tooltip.Content side="bottom">
-                        <p>{t('demo.useCredentials')}</p>
+                        <p>{t('auth.demo.useCredentials')}</p>
                       </Tooltip.Content>
                     </Tooltip>
                   </Table.Cell>

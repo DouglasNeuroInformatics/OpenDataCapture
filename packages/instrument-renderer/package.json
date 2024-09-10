@@ -24,7 +24,6 @@
     "@douglasneuroinformatics/libjs": "^0.6.0",
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/evaluate-instrument": "workspace:*",
-    "@opendatacapture/i18next": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",
@@ -33,15 +32,12 @@
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/subject-utils": "workspace:*",
-    "i18next": "catalog:",
     "lodash-es": "workspace:lodash-es__4.x@*",
     "lucide-react": "^0.439.0",
-    "react-i18next": "catalog:",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
     "@opendatacapture/instrument-stubs": "workspace:*",
-    "@opendatacapture/tailwindcss": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "autoprefixer": "^10.4.20",
     "esbuild-wasm": "catalog:esbuild",

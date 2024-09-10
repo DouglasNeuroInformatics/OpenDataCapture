@@ -2,10 +2,10 @@ import { useState } from 'react';
 
 import { replacer } from '@douglasneuroinformatics/libjs';
 import { Spinner } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import type { Json } from '@opendatacapture/schemas/core';
 import type { ScalarInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
-import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
@@ -59,7 +59,18 @@ export const ScalarInstrumentRenderer = ({
           if (onCompileError) {
             onCompileError(error);
           }
-          return <ContentPlaceholder message={t('failedToLoadInstrumentDesc')} title={t('failedToLoadInstrument')} />;
+          return (
+            <ContentPlaceholder
+              message={t({
+                en: 'An unexpected error occurred while loading this instrument. Please contact the platform administrator for further assistance.',
+                fr: "Une erreur inattendue s'est produite lors du chargement de cet instrument. Veuillez contacter l'administrateur de la plateforme pour obtenir de l'aide."
+              })}
+              title={t({
+                en: 'Failed to Load Instrument',
+                fr: "Échec du chargement de l'instrument"
+              })}
+            />
+          );
         })
         .with({ status: 'DONE' }, ({ instrument }) =>
           match({ index, instrument })
