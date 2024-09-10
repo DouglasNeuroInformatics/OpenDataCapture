@@ -1,6 +1,6 @@
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
-import { useTranslation } from 'react-i18next';
 
 export type UploadSelectTableProps = {
   data: InstrumentInfo[];
@@ -8,7 +8,7 @@ export type UploadSelectTableProps = {
 };
 
 export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) => {
-  const { t } = useTranslation(['upload', 'core']);
+  const { t } = useTranslation();
 
   return (
     <>
@@ -16,7 +16,10 @@ export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) =>
         columns={[
           {
             field: (instrument) => (instrument.details ? (instrument.details.title as string) : 'N/A'),
-            label: t('index.title')
+            label: t({
+              en: 'Select an instrument',
+              fr: 'Selectionnez un instrument'
+            })
           }
         ]}
         data={data}
