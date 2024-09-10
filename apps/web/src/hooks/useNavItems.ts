@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { BarChartBigIcon, CirclePlayIcon, ComputerIcon, DatabaseIcon, EyeIcon, UploadIcon, UserCogIcon, UsersIcon } from 'lucide-react';
+import {
+  BarChartBigIcon,
+  CirclePlayIcon,
+  ComputerIcon,
+  DatabaseIcon,
+  EyeIcon,
+  UploadIcon,
+  UserCogIcon,
+  UsersIcon
+} from 'lucide-react';
 
 import { useAppStore } from '@/store';
 
