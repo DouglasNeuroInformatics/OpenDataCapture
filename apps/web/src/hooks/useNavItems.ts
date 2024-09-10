@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { BarChartBigIcon, CirclePlayIcon, ComputerIcon, DatabaseIcon, EyeIcon, UploadIcon, UsersIcon } from 'lucide-react';
+import {
+  BarChartBigIcon,
+  CirclePlayIcon,
+  ComputerIcon,
+  DatabaseIcon,
+  EyeIcon,
+  UploadIcon,
+  UsersIcon
+} from 'lucide-react';
 
 import { useAppStore } from '@/store';
 
@@ -49,7 +57,7 @@ export function useNavItems() {
         'data-cy': 'upload',
         icon: UploadIcon,
         id: '/upload',
-        label: t(`navLinks.upload`)
+        label: t('layout.navLinks.upload')
       });
     }
     if (currentGroup && currentUser?.ability.can('manage', 'Group')) {
