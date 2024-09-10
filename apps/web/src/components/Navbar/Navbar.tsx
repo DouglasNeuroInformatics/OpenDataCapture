@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 
 import { Button, LanguageToggle, Separator, Sheet, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { MenuIcon, StopCircle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useNavItems } from '@/hooks/useNavItems';

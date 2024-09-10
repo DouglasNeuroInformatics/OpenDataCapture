@@ -3,7 +3,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { MANIFEST_FILENAME, resolveVersion } from '@opendatacapture/runtime-resolve';
+import { MANIFEST_FILENAME, resolveVersion } from './resolve.js';
 
 /**
  * Returns the content and MIME type for a file in a given version

@@ -73,8 +73,8 @@
       "fr": "Mesures : "
     },
     "subjectText": {
-      "en": "{{form}} of Subject: {{id}}",
-      "fr": "{{form}} du client : {{id}}"
+      "en": "{} of Subject: {}",
+      "fr": "{} du client : {}"
     },
     "time": {
       "en": "Timeframe: ",

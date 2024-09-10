@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { BarChartBigIcon, CirclePlayIcon, ComputerIcon, DatabaseIcon, EyeIcon, UsersIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 import { useAppStore } from '@/store';
 
@@ -24,7 +24,7 @@ export function useNavItems() {
   const currentSession = useAppStore((store) => store.currentSession);
   const currentUser = useAppStore((store) => store.currentUser);
   const [navItems, setNavItems] = useState<[NavItem[], NavItem[]]>([[], []]);
-  const { i18n, t } = useTranslation(['layout', 'core']);
+  const { resolvedLanguage, t } = useTranslation();
 
   useEffect(() => {
     const globalItems: NavItem[] = [];
@@ -33,7 +33,7 @@ export function useNavItems() {
         'data-cy': 'dashboard',
         icon: BarChartBigIcon,
         id: '/dashboard',
-        label: t('navLinks.dashboard')
+        label: t('layout.navLinks.dashboard')
       });
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
@@ -41,7 +41,7 @@ export function useNavItems() {
         'data-cy': 'datahub',
         icon: DatabaseIcon,
         id: '/datahub',
-        label: t(`navLinks.datahub`)
+        label: t('layout.navLinks.datahub')
       });
     }
     if (currentGroup && currentUser?.ability.can('manage', 'Group')) {
@@ -49,7 +49,7 @@ export function useNavItems() {
         'data-cy': 'manage-group',
         icon: UsersIcon,
         id: '/group/manage',
-        label: t('navLinks.manageGroup')
+        label: t('layout.navLinks.manageGroup')
       });
     }
 
@@ -60,7 +60,7 @@ export function useNavItems() {
         disabled: currentSession !== null,
         icon: CirclePlayIcon,
         id: '/session/start-session',
-        label: t('navLinks.startSession')
+        label: t('layout.navLinks.startSession')
       });
     }
     if (currentUser?.ability.can('create', 'InstrumentRecord')) {
@@ -69,7 +69,7 @@ export function useNavItems() {
         disabled: currentSession === null,
         icon: ComputerIcon,
         id: '/instruments/accessible-instruments',
-        label: t('navLinks.accessibleInstruments')
+        label: t('layout.navLinks.accessibleInstruments')
       });
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
@@ -77,11 +77,11 @@ export function useNavItems() {
         disabled: currentSession === null,
         icon: EyeIcon,
         id: `/datahub/${currentSession?.subjectId}/table`,
-        label: t('navLinks.viewCurrentSubject')
+        label: t('layout.navLinks.viewCurrentSubject')
       });
     }
     setNavItems([globalItems, sessionItems]);
-  }, [currentSession, currentUser, i18n.resolvedLanguage]);
+  }, [currentSession, currentUser, resolvedLanguage]);
 
   return navItems;
 }

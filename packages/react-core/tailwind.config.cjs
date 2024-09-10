@@ -1,8 +1,5 @@
-// @ts-check
+const config = require('@douglasneuroinformatics/libui/tailwind/config');
 
-const { createConfig } = require('@opendatacapture/tailwindcss');
-
-module.exports = createConfig({
-  content: ['./src/**/*.{js,ts,jsx,tsx}'],
-  root: __dirname
+module.exports = config({
+  content: ['./src/**/*.{js,ts,jsx,tsx}']
 });

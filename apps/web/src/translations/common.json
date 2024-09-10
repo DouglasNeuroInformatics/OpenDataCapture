@@ -55,10 +55,7 @@
     "en": "Identifier",
     "fr": "Identifiant"
   },
-  "illegalCharacter": {
-    "en": "Illegal character: {{char}}",
-    "fr": "Caractère illégal : {{char}}"
-  },
+
   "method": {
     "en": "Method",
     "fr": "Méthode"

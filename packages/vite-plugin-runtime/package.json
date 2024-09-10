@@ -14,9 +14,6 @@
     "@opendatacapture/runtime-v1": "workspace:*",
     "vite": "5.x"
   },
-  "dependencies": {
-    "@opendatacapture/runtime-resolve": "workspace:*"
-  },
   "devDependencies": {
     "@douglasneuroinformatics/libjs": "^0.6.0"
   }

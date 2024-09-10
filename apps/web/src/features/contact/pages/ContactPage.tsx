@@ -1,5 +1,5 @@
 import { Heading } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';

@@ -1,7 +1,7 @@
 import { Button, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
-import { useTranslation } from 'react-i18next';
 
 import { useInstrument } from '@/hooks/useInstrument';
 
@@ -14,7 +14,7 @@ export type AssignmentSliderProps = {
 
 /** Component for modifying an existing assignment */
 export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: AssignmentSliderProps) => {
-  const { t } = useTranslation(['core', 'datahub']);
+  const { t } = useTranslation();
   const instrument = useInstrument(assignment?.instrumentId ?? null);
 
   return (
@@ -22,14 +22,14 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
       <Sheet.Content className="flex h-full flex-col">
         <Sheet.Header>
           <Sheet.Title>{instrument?.details.title}</Sheet.Title>
-          <Sheet.Description>{t('datahub:assignments.assignmentSliderDesc')}</Sheet.Description>
+          <Sheet.Description>{t('datahub.assignments.assignmentSliderDesc')}</Sheet.Description>
         </Sheet.Header>
         <Sheet.Body className="flex-grow">
           {instrument && (
             <div className="flex flex-col gap-3">
               <Label asChild>
                 <a className="hover:underline" href={assignment!.url} rel="noreferrer" target="_blank">
-                  {t('datahub:assignments.link')}
+                  {t('datahub.assignments.link')}
                 </a>
               </Label>
               <div className="flex gap-2">
@@ -43,14 +43,14 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
           <Button
             className="w-full text-sm"
             disabled={assignment?.status !== 'OUTSTANDING'}
-            label={t('cancel')}
+            label={t('core.cancel')}
             variant="danger"
             onClick={() => onCancel(assignment!)}
           />
           <Button
             disabled
             className="w-full whitespace-nowrap text-sm"
-            label={t('datahub:assignments.resendNotification')}
+            label={t('datahub.assignments.resendNotification')}
             variant="secondary"
           />
         </Sheet.Footer>

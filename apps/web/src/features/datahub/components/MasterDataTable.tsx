@@ -1,8 +1,8 @@
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { useTranslation } from 'react-i18next';
 
 export type MasterDataTableProps = {
   data: Subject[];
@@ -10,30 +10,30 @@ export type MasterDataTableProps = {
 };
 
 export const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
-  const { t } = useTranslation(['datahub', 'core']);
+  const { t } = useTranslation();
   return (
     <ClientTable<Subject>
       columns={[
         {
           field: (subject) => removeSubjectIdScope(subject.id).slice(0, 7),
-          label: t('index.table.subject')
+          label: t('datahub.index.table.subject')
         },
         {
           field: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
-          label: t('core:identificationData.dateOfBirth.label')
+          label: t('core.identificationData.dateOfBirth.label')
         },
         {
           field: (subject) => {
             switch (subject.sex) {
               case 'FEMALE':
-                return t('core:identificationData.sex.female');
+                return t('core.identificationData.sex.female');
               case 'MALE':
-                return t('core:identificationData.sex.male');
+                return t('core.identificationData.sex.male');
               default:
                 return 'NULL';
             }
           },
-          label: t('core:identificationData.sex.label')
+          label: t('core.identificationData.sex.label')
         }
       ]}
       data={data}

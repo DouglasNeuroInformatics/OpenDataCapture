@@ -1,9 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client"]
   },
-  "include": [".storybook/*", "src/**/*", "*.js", "*.cjs"]
+  "include": [".storybook/*", "src/**/*", "tailwind.config.cjs"]
 }

@@ -26,7 +26,6 @@
     "@astrojs/starlight-tailwind": "^2.0.3",
     "@astrojs/tailwind": "^5.1.0",
     "@opendatacapture/runtime-core": "workspace:*",
-    "@opendatacapture/tailwindcss": "workspace:*",
     "@tailwindcss/typography": "^0.5.15",
     "astro": "^4.15.4",
     "github-slugger": "^2.0.0",

@@ -4,6 +4,7 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "checkJs": true,
     "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "Bundler",

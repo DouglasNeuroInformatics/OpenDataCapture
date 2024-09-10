@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@douglasneuroinformatics/libui/components';
-import { type Theme, useTheme } from '@douglasneuroinformatics/libui/hooks';
+import { type Theme, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/runtime-core';
 import { $Json, type Json } from '@opendatacapture/schemas/core';
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 
 import bootstrapScript from './bootstrap?raw';
@@ -19,14 +18,14 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
   bundle,
   onSubmit
 }) {
-  const { i18n } = useTranslation();
+  const { changeLanguage } = useTranslation();
   const [_, updateTheme] = useTheme();
   const [scale, setScale] = useState(100);
 
   const handleChangeLanguageEvent = useCallback(
     (event: CustomEvent<Language>) => {
       if (event.detail === 'en' || event.detail === 'fr') {
-        void i18n.changeLanguage(event.detail);
+        void changeLanguage(event.detail);
       } else {
         console.error(`Cannot change language: invalid language '${event.detail}', expected 'en' or 'fr'`);
       }

@@ -1,5 +1,5 @@
 import { AlertDialog } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 import { useAppStore } from '@/store';
 

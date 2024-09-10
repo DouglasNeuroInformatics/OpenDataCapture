@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 
 import { replacer } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Json } from '@opendatacapture/runtime-core';
 import type { SeriesInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
-import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
@@ -56,7 +56,16 @@ export const SeriesInstrumentRenderer = ({ className, onSubmit, target }: Series
       {match(rootState)
         .with({ status: 'LOADING' }, () => <Spinner />)
         .with({ status: 'ERROR' }, () => (
-          <ContentPlaceholder message={t('failedToLoadInstrumentDesc')} title={t('failedToLoadInstrument')} />
+          <ContentPlaceholder
+            message={t({
+              en: 'An unexpected error occurred while loading this instrument. Please contact the platform administrator for further assistance.',
+              fr: "Une erreur inattendue s'est produite lors du chargement de cet instrument. Veuillez contacter l'administrateur de la plateforme pour obtenir de l'aide."
+            })}
+            title={t({
+              en: 'Failed to Load Instrument',
+              fr: "Échec du chargement de l'instrument"
+            })}
+          />
         ))
         .with({ status: 'DONE' }, ({ instrument }) =>
           match({ index, instrument, isInstrumentInProgress })
@@ -64,12 +73,15 @@ export const SeriesInstrumentRenderer = ({ className, onSubmit, target }: Series
             .with({ index: 1, isInstrumentInProgress: false }, () => (
               <div className="flex flex-grow flex-col items-center justify-center space-y-1 py-32 text-center">
                 <Heading className="font-medium" variant="h5">
-                  {t('seriesInstrumentContent.inProgress')}
+                  {t({
+                    en: 'Series Instrument in Process',
+                    fr: "Série d'instruments en cours"
+                  })}
                 </Heading>
                 <p className="text-muted-foreground text-sm">
-                  {t('seriesInstrumentContent.instrumentsCompleted', {
-                    completed: currentItemIndex,
-                    total: target.items.length
+                  {t({
+                    en: `Instruments Completed: ${currentItemIndex}/${target.items.length}`,
+                    fr: `Nombre d'instruments complétés : ${currentItemIndex}/${target.items.length}`
                   })}
                 </p>
                 <div className="pt-2">
@@ -78,7 +90,7 @@ export const SeriesInstrumentRenderer = ({ className, onSubmit, target }: Series
                     type="button"
                     onClick={() => setIsInstrumentInProgress(true)}
                   >
-                    {t('begin')}
+                    {t({ en: 'Begin', fr: 'Commencer' })}
                   </Button>
                 </div>
               </div>
@@ -86,7 +98,16 @@ export const SeriesInstrumentRenderer = ({ className, onSubmit, target }: Series
             .with({ index: 1, isInstrumentInProgress: true }, () =>
               match(scalarState)
                 .with({ status: 'ERROR' }, () => (
-                  <ContentPlaceholder message={t('failedToLoadInstrumentDesc')} title={t('failedToLoadInstrument')} />
+                  <ContentPlaceholder
+                    message={t({
+                      en: 'An unexpected error occurred while loading this instrument. Please contact the platform administrator for further assistance.',
+                      fr: "Une erreur inattendue s'est produite lors du chargement de cet instrument. Veuillez contacter l'administrateur de la plateforme pour obtenir de l'aide."
+                    })}
+                    title={t({
+                      en: 'Failed to Load Instrument',
+                      fr: "Échec du chargement de l'instrument"
+                    })}
+                  />
                 ))
                 .with({ status: 'LOADING' }, () => <Spinner />)
                 .with({ status: 'DONE' }, () =>
@@ -101,7 +122,14 @@ export const SeriesInstrumentRenderer = ({ className, onSubmit, target }: Series
                 )
                 .otherwise(() => null)
             )
-            .with({ index: 2 }, () => <ContentPlaceholder title={t('instrumentComplete')} />)
+            .with({ index: 2 }, () => (
+              <ContentPlaceholder
+                title={t({
+                  en: 'Instrument Complete',
+                  fr: 'Instrument complet'
+                })}
+              />
+            ))
             .otherwise(() => null)
         )
         .exhaustive()}

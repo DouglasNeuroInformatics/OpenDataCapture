@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 
 import { ActionDropdown, Dialog, Heading, SearchBar } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { IdentificationForm } from '@/components/IdentificationForm';
@@ -24,7 +24,7 @@ export const DataHubPage = () => {
 
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const { t } = useTranslation(['datahub', 'core']);
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
@@ -42,7 +42,7 @@ export const DataHubPage = () => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'CSV':
-        void download('README.txt', () => Promise.resolve(t('index.table.exportHelpText')));
+        void download('README.txt', () => Promise.resolve(t('datahub.index.table.exportHelpText')));
         void download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
           const columnNames = Object.keys(data[0]!).join(',');
@@ -64,7 +64,7 @@ export const DataHubPage = () => {
       validateStatus: (status) => status === 200 || status === 404
     });
     if (response.status === 404) {
-      addNotification({ message: t('core:notFound'), type: 'warning' });
+      addNotification({ message: t('core.notFound'), type: 'warning' });
       setIsLookupOpen(false);
     } else {
       addNotification({ type: 'success' });
@@ -76,7 +76,7 @@ export const DataHubPage = () => {
     <React.Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t('index.title')}
+          {t('datahub.index.title')}
         </Heading>
       </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
@@ -88,7 +88,7 @@ export const DataHubPage = () => {
               </Dialog.Trigger>
               <Dialog.Content>
                 <Dialog.Header>
-                  <Dialog.Title>{t('index.lookup.title')}</Dialog.Title>
+                  <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
                 </Dialog.Header>
                 <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
               </Dialog.Content>
@@ -97,7 +97,7 @@ export const DataHubPage = () => {
               <ActionDropdown
                 widthFull
                 options={['CSV', 'JSON']}
-                title={t('index.table.export')}
+                title={t('datahub.index.table.export')}
                 onSelection={handleExportSelection}
               />
             </div>

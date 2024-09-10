@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 
 import { Form } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
-import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
@@ -25,8 +25,8 @@ export type ManageGroupFormProps = {
 
 export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const { i18n } = useTranslation();
-  const { t } = useTranslation(['group', 'common']);
+  const { resolvedLanguage } = useTranslation();
+  const { t } = useTranslation();
   const setupState = useSetupState();
 
   const { initialValues, options } = useMemo(() => {
@@ -55,13 +55,13 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
       }
     }
     return { initialValues, options };
-  }, [availableInstruments, currentGroup, i18n.resolvedLanguage]);
+  }, [availableInstruments, currentGroup, resolvedLanguage]);
 
   const isDisabled = Boolean(setupState.data?.isDemo && import.meta.env.PROD);
 
-  let description = t('manage.accessibleInstrumentsDesc');
+  let description = t('group.manage.accessibleInstrumentsDesc');
   if (isDisabled) {
-    description += ` ${t('manage.accessibleInstrumentDemoNote')}`;
+    description += ` ${t('group.manage.accessibleInstrumentDemoNote')}`;
   }
 
   return (
@@ -73,32 +73,32 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
           fields: {
             accessibleFormInstrumentIds: {
               kind: 'set',
-              label: t('manage.forms'),
+              label: t('group.manage.forms'),
               options: options.form,
               variant: 'listbox'
             },
             accessibleInteractiveInstrumentIds: {
               kind: 'set',
-              label: t('manage.interactive'),
+              label: t('group.manage.interactive'),
               options: options.interactive,
               variant: 'listbox'
             }
           },
-          title: t('manage.accessibleInstruments')
+          title: t('group.manage.accessibleInstruments')
         },
         {
           fields: {
             defaultIdentificationMethod: {
               kind: 'string',
-              label: t('manage.defaultSubjectIdMethod'),
+              label: t('group.manage.defaultSubjectIdMethod'),
               options: {
-                CUSTOM_ID: t('common:customIdentifier'),
-                PERSONAL_INFO: t('common:personalInfo')
+                CUSTOM_ID: t('common.customIdentifier'),
+                PERSONAL_INFO: t('common.personalInfo')
               },
               variant: 'select'
             }
           },
-          title: t('manage.groupSettings')
+          title: t('group.manage.groupSettings')
         }
       ]}
       initialValues={initialValues}

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useDownload, useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import { omit } from 'lodash-es';
-import { useTranslation } from 'react-i18next';
 
 import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';

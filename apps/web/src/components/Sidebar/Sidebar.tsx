@@ -1,10 +1,10 @@
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { AlertDialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { StopCircle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useNavItems } from '@/hooks/useNavItems';
@@ -20,7 +20,7 @@ export const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { t } = useTranslation(['core', 'common', 'layout']);
+  const { t } = useTranslation();
   return (
     <div className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700">
       <div>
@@ -47,13 +47,13 @@ export const Sidebar = () => {
                     icon={StopCircle}
                     id="#"
                     isActive={false}
-                    label={t('layout:navLinks.endSession')}
+                    label={t('layout.navLinks.endSession')}
                   />
                 </AlertDialog.Trigger>
                 <AlertDialog.Content>
                   <AlertDialog.Header>
-                    <AlertDialog.Title>{t('layout:endSessionModal.title')}</AlertDialog.Title>
-                    <AlertDialog.Description>{t('layout:endSessionModal.message')}</AlertDialog.Description>
+                    <AlertDialog.Title>{t('layout.endSessionModal.title')}</AlertDialog.Title>
+                    <AlertDialog.Description>{t('layout.endSessionModal.message')}</AlertDialog.Description>
                   </AlertDialog.Header>
                   <AlertDialog.Footer>
                     <AlertDialog.Action
@@ -63,9 +63,9 @@ export const Sidebar = () => {
                         navigate('/session/start-session');
                       }}
                     >
-                      {t('core:yes')}
+                      {t('core.yes')}
                     </AlertDialog.Action>
-                    <AlertDialog.Cancel className="min-w-24">{t('core:no')}</AlertDialog.Cancel>
+                    <AlertDialog.Cancel className="min-w-24">{t('core.no')}</AlertDialog.Cancel>
                   </AlertDialog.Footer>
                 </AlertDialog.Content>
               </AlertDialog>
@@ -82,16 +82,16 @@ export const Sidebar = () => {
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
           >
-            <h5 className="text-sm font-medium">{t('common:sessionInProgress')}</h5>
+            <h5 className="text-sm font-medium">{t('common.sessionInProgress')}</h5>
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
             {isSubjectWithPersonalInfo(currentSession.subject) ? (
               <div>
-                <p>{`${t('fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
+                <p>{`${t('core.fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
                 <p>
-                  {`${t('identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
+                  {`${t('core.identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
                 </p>
                 <p>
-                  {`${t('identificationData.sex.label')}: ${t(`core:identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)}`}
+                  {`${t('core.identificationData.sex.label')}: ${t(`core.identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)}`}
                 </p>
               </div>
             ) : (

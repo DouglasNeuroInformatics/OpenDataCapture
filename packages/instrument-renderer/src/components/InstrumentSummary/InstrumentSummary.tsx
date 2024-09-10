@@ -1,13 +1,12 @@
-import { replacer, toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
+import { replacer, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Separator } from '@douglasneuroinformatics/libui/components';
-import { useDownload } from '@douglasneuroinformatics/libui/hooks';
+import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { filter } from 'lodash-es';
 import { DownloadIcon, PrinterIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 import { InstrumentSummaryGroup } from './InstrumentSummaryGroup';
 
@@ -22,7 +21,7 @@ export type InstrumentSummaryProps = {
 
 export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: InstrumentSummaryProps) => {
   const download = useDownload();
-  const { i18n, t } = useTranslation('core');
+  const { resolvedLanguage, t } = useTranslation();
 
   if (instrument.kind === 'SERIES') {
     return null;
@@ -39,9 +38,15 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
 
   let language: string;
   if (instrument.language === 'en') {
-    language = t('languages.english');
+    language = t({
+      en: 'English',
+      fr: 'Anglais'
+    });
   } else if (instrument.language === 'fr') {
-    language = t('languages.french');
+    language = t({
+      en: 'French',
+      fr: 'Français'
+    });
   } else {
     language = instrument.language;
   }
@@ -52,21 +57,30 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
 
   const results = Object.values(computedMeasures);
 
+  const dateCompleted = new Date().toLocaleString(resolvedLanguage, {
+    dateStyle: 'long',
+    timeStyle: 'long'
+  });
+
   return (
     <div className="print:bg-primary-foreground space-y-6 print:fixed print:left-0 print:top-0 print:z-50 print:h-screen print:w-screen">
       <div className="flex">
         <div className="flex-grow">
           <Heading variant="h4">
             {instrument.details.title.trim()
-              ? t('summary.title', { title: instrument.details.title })
-              : t('summary.titleFallback')}
+              ? t({
+                  en: `Summary of Results for the ${instrument.details.title}`,
+                  fr: `${instrument.details.title} : résumé des résultats`
+                })
+              : t({
+                  en: 'Summary of Results',
+                  fr: 'Résumé des résultats'
+                })}
           </Heading>
           <p className="text-muted-foreground text-sm">
-            {t('summary.subtitle', {
-              dateCompleted: new Date().toLocaleString(i18n.resolvedLanguage, {
-                dateStyle: 'long',
-                timeStyle: 'long'
-              })
+            {t({
+              en: `Completed on ${dateCompleted}`,
+              fr: `Remplie le ${dateCompleted}`
             })}
           </p>
         </div>
@@ -91,19 +105,42 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
                     value: subject.id
                   },
                   {
-                    label: t('fullName'),
+                    label: t({
+                      en: 'Full Name',
+                      fr: 'Nom et prénom'
+                    }),
                     value:
                       subject?.firstName && subject.lastName
                         ? `${subject.firstName} ${subject.lastName}`
-                        : t('anonymous')
+                        : t({
+                            en: 'Anonymous',
+                            fr: 'Anonyme'
+                          })
                   },
                   {
-                    label: t('identificationData.dateOfBirth.label'),
+                    label: t({
+                      en: 'Date of Birth',
+                      fr: 'Date de naissance'
+                    }),
                     value: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : null
                   },
                   {
-                    label: t('identificationData.sex.label'),
-                    value: subject.sex ? t(`identificationData.sex.${toLowerCase(subject.sex)}`) : null
+                    label: t({
+                      en: 'Sex at Birth',
+                      fr: 'Sexe à la naissance'
+                    }),
+                    value:
+                      subject.sex === 'MALE'
+                        ? t({
+                            en: 'Male',
+                            fr: 'Masculin'
+                          })
+                        : subject.sex === 'FEMALE'
+                          ? t({
+                              en: 'Female',
+                              fr: 'Féminin'
+                            })
+                          : null
                   }
                 ]
               : [
@@ -113,27 +150,50 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
                   }
                 ]
           }
-          title={t('subject')}
+          title={t({
+            en: 'Subject',
+            fr: 'Client'
+          })}
         />
       )}
       <InstrumentSummaryGroup
         items={[
           {
-            label: t('title'),
+            label: t({
+              en: 'Title',
+              fr: 'Titre'
+            }),
             value: instrument.details.title
           },
           {
-            label: t('language'),
+            label: t({
+              en: 'Language',
+              fr: 'Langue'
+            }),
             value: language
           },
           {
-            label: t('edition'),
+            label: t({
+              en: 'Edition',
+              fr: 'Édition'
+            }),
             value: instrument.internal.edition
           }
         ]}
-        title={t('instrument')}
+        title={t({
+          en: 'Instrument',
+          fr: 'Instrument'
+        })}
       />
-      {results.length > 0 && <InstrumentSummaryGroup items={results} title={t('results')} />}
+      {results.length > 0 && (
+        <InstrumentSummaryGroup
+          items={results}
+          title={t({
+            en: 'Results',
+            fr: 'Résultats'
+          })}
+        />
+      )}
     </div>
   );
 };

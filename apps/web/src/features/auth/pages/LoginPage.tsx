@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 
 import { Card, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Logo } from '@opendatacapture/react-core';
 import type { AuthPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { config } from '@/config';

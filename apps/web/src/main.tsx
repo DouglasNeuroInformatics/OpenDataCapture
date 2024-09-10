@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 
 import { App } from './App';
 
-import '@douglasneuroinformatics/libui/styles/globals.css';
+import '@douglasneuroinformatics/libui/tailwind/globals.css';
 
 const root = document.getElementById('root')!;
 

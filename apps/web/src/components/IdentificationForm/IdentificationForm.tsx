@@ -1,9 +1,9 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { Form } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $Sex, $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
-import { useTranslation } from 'react-i18next';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
@@ -15,28 +15,28 @@ export type IdentificationFormProps = {
 
 export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const { t } = useTranslation(['common', 'core']);
+  const { t } = useTranslation();
 
   return (
     <Form
       preventResetValuesOnReset
       content={[
         {
-          title: t('identificationMethod'),
+          title: t('common.identificationMethod'),
           fields: {
             identificationMethod: {
               kind: 'string',
               label: 'Method',
               options: {
-                CUSTOM_ID: t('customIdentifier'),
-                PERSONAL_INFO: t('personalInfo')
+                CUSTOM_ID: t('common.customIdentifier'),
+                PERSONAL_INFO: t('common.personalInfo')
               },
               variant: 'select'
             }
           }
         },
         {
-          title: t('subjectIdentification.title'),
+          title: t('common.subjectIdentification.title'),
           fields: {
             id: {
               kind: 'dynamic',
@@ -45,7 +45,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
                 return identificationMethod === 'CUSTOM_ID'
                   ? {
                       kind: 'string',
-                      label: t('identifier'),
+                      label: t('common.identifier'),
                       variant: 'input'
                     }
                   : null;
@@ -57,9 +57,9 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
               render({ identificationMethod }) {
                 return identificationMethod === 'PERSONAL_INFO'
                   ? {
-                      description: t('subjectIdentification.firstName.description'),
+                      description: t('common.subjectIdentification.firstName.description'),
                       kind: 'string',
-                      label: t('subjectIdentification.firstName.label'),
+                      label: t('common.subjectIdentification.firstName.label'),
                       variant: 'input'
                     }
                   : null;
@@ -71,9 +71,9 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
               render({ identificationMethod }) {
                 return identificationMethod === 'PERSONAL_INFO'
                   ? {
-                      description: t('subjectIdentification.lastName.description'),
+                      description: t('common.subjectIdentification.lastName.description'),
                       kind: 'string',
-                      label: t('subjectIdentification.lastName.label'),
+                      label: t('common.subjectIdentification.lastName.label'),
                       variant: 'input'
                     }
                   : null;
@@ -86,7 +86,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
                 return identificationMethod === 'PERSONAL_INFO'
                   ? {
                       kind: 'date',
-                      label: t('core:identificationData.dateOfBirth.label')
+                      label: t('core.identificationData.dateOfBirth.label')
                     }
                   : null;
               }
@@ -97,12 +97,12 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
               render({ identificationMethod }) {
                 return identificationMethod === 'PERSONAL_INFO'
                   ? {
-                      description: t('core:identificationData.sex.description'),
+                      description: t('core.identificationData.sex.description'),
                       kind: 'string',
-                      label: t('core:identificationData.sex.label'),
+                      label: t('core.identificationData.sex.label'),
                       options: {
-                        FEMALE: t('core:identificationData.sex.female'),
-                        MALE: t('core:identificationData.sex.male')
+                        FEMALE: t('core.identificationData.sex.female'),
+                        MALE: t('core.identificationData.sex.male')
                       },
                       variant: 'select'
                     }
@@ -115,7 +115,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
       initialValues={{
         identificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO'
       }}
-      submitBtnLabel={t('core:submit')}
+      submitBtnLabel={t('core.submit')}
       validationSchema={z
         .object({
           firstName: z.string().min(1).optional(),
@@ -130,7 +130,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
             if (!val.id) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: t('core:form.requiredField'),
+                message: t('core.form.requiredField'),
                 path: ['id']
               });
             }
@@ -140,7 +140,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
               if (!val[key]) {
                 ctx.addIssue({
                   code: z.ZodIssueCode.custom,
-                  message: t('core:form.requiredField'),
+                  message: t('core.form.requiredField'),
                   path: [key]
                 });
               }
