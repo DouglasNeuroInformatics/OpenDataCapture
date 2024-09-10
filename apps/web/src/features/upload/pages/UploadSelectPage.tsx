@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { useNavigate } from 'react-router-dom';
 
 import { LoadingFallback } from '@/components/LoadingFallback';
@@ -11,7 +11,7 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { UploadSelectTable } from '../components/UploadSelectTable';
 
 export const UploadSelectPage = () => {
-  const { t } = useTranslation(['upload', 'core']);
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { data } = useInstrumentInfoQuery({
@@ -24,7 +24,10 @@ export const UploadSelectPage = () => {
     <React.Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t('index.title')}
+          {t({
+            en: 'Select Instrument',
+            fr: 'Selectionnez un instrument'
+          })}
         </Heading>
       </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
