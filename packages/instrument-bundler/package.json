@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "bin": {
-    "instrument-bundler": "src/cli.ts"
+    "instrument-bundler": "./src/cli.ts"
   },
   "files": [
     "!/src/__tests__",
