@@ -45,6 +45,7 @@
     "@vitejs/plugin-react-swc": "^3.7.0",
     "autoprefixer": "^10.4.20",
     "esbuild": "catalog:esbuild",
+    "nodemon": "catalog:",
     "postcss": "^8.4.45",
     "prisma": "catalog:",
     "tailwindcss": "^3.4.10",
