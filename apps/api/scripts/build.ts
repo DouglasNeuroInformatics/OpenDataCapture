@@ -6,10 +6,10 @@ import path from 'path';
 
 import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-native-modules';
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
+import { __getNativePackageName } from '@douglasneuroinformatics/libstats';
 import esbuild from 'esbuild';
 import type { BuildOptions } from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
-
 const require = module.createRequire(import.meta.url);
 
 const entryFile = path.resolve(import.meta.dirname, '../src/main.ts');
@@ -21,6 +21,9 @@ const binDir = path.resolve(outdir, 'bin');
 const outfile = path.resolve(outdir, 'app.js');
 
 const runtimeV1Dir = path.dirname(require.resolve('@opendatacapture/runtime-v1/package.json'));
+
+const nativeStatsPackageName = __getNativePackageName();
+const nativeStatsPackageDir = path.dirname(require.resolve(`${nativeStatsPackageName}/package.json`));
 
 const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> } & BuildOptions = {
   banner: {
@@ -37,7 +40,7 @@ const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> }
     esbuildPluginTsc({
       tsconfigPath: tsconfig
     }),
-    prismaPlugin({ outdir: path.join(outdir, 'api') }),
+    prismaPlugin({ outdir: path.join(outdir, 'prisma/client') }),
     nativeModulesPlugin()
   ],
   target: ['node18', 'es2022'],
@@ -59,6 +62,7 @@ async function build() {
   await clean();
   await copyEsbuild();
   await fs.cp(path.join(runtimeV1Dir, 'dist'), path.join(outdir, 'runtime', 'v1'), { recursive: true });
+  await fs.cp(nativeStatsPackageDir, path.join(outdir, 'node_modules', nativeStatsPackageName), { recursive: true });
   await esbuild.build(options);
   console.log('Done!');
 }

@@ -25,7 +25,7 @@ await esbuild.build({
   keepNames: true,
   outfile: path.resolve(outdir, 'main.js'),
   platform: 'node',
-  plugins: [nativeModulesPlugin(), prismaPlugin({ outdir: path.join(outdir, 'gateway') })],
+  plugins: [nativeModulesPlugin(), prismaPlugin({ outdir: path.join(outdir, 'prisma/client') })],
   sourcemap: true,
   target: ['node18', 'es2022'],
   tsconfig
