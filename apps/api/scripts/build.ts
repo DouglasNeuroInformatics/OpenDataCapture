@@ -18,7 +18,7 @@ const tsconfig = path.resolve(import.meta.dirname, '../tsconfig.json');
 
 const binDir = path.resolve(outdir, 'bin');
 
-const outfile = path.resolve(outdir, 'app.mjs');
+const outfile = path.resolve(outdir, 'app.js');
 
 const runtimeV1Dir = path.dirname(require.resolve('@opendatacapture/runtime-v1/package.json'));
 

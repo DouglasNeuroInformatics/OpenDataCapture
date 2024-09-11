@@ -34,4 +34,4 @@ COPY --from=installer /app/apps/api/dist/runtime/ /runtime/
 RUN echo '{ "type": "module" }' > package.json
 RUN echo '{ "type": "module" }' > /runtime/package.json
 USER node
-CMD [ "node", "./dist/app.mjs" ]
+CMD [ "node", "./dist/app.js" ]
