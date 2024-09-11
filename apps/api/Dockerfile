@@ -1,4 +1,4 @@
-FROM node:lts-alpine as base
+FROM node:lts-alpine AS base
 WORKDIR /app
 ENV GATEWAY_DATABASE_URL="file:/dev/null"
 ENV PNPM_HOME="/pnpm"
