@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "bin": {
-    "runtime-bundler": "./src/cli.ts"
+    "runtime-bundler": "src/cli.ts"
   },
   "scripts": {
     "format": "prettier --write src",
