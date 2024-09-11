@@ -4,29 +4,24 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN corepack enable
+RUN pnpm install -g turbo@latest
 
 # PRUNE WORKSPACE
+# Note: Here we cannot use --docker, as is recomended, since the generated
+# json directory does not allow linking package.json executable files
 FROM base AS builder
 COPY . .
-RUN apk add --no-cache libc6-compat
-RUN apk update
-RUN pnpm dlx turbo prune @opendatacapture/web --docker
+RUN turbo prune @opendatacapture/web
 
-# INSTALL DEPENDENCIES
+# INSTALL DEPENDENCIES AND BUILD
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
-RUN apk update
-COPY .gitignore tsconfig.base.json ./
-COPY --from=builder /app/out/json/ .
+COPY tsconfig.base.json tsconfig.base.json
+COPY --from=builder /app/out/ .
 RUN pnpm install --frozen-lockfile 
-
-# BUILD THE APP
-COPY --from=builder /app/out/full/ .
-COPY turbo.json turbo.json
-RUN pnpm dlx turbo build --filter=@opendatacapture/web
+RUN turbo build --filter=@opendatacapture/web
 
 # RUN SERVER
 FROM base AS runner
-RUN pnpm add -g @import-meta-env/cli@0.6.8 http-server@14.1.1
+RUN pnpm install -g @import-meta-env/cli@0.6.8 http-server@14.1.1
 COPY --from=installer /app/apps/web/.env.public /app/apps/web/dist/ ./
 CMD [ "sh", "-c", "import-meta-env -x .env.public -p index.html && http-server -s -p 80 -P http://localhost:80? --gzip ." ]

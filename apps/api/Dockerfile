@@ -5,26 +5,21 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN corepack enable
+RUN pnpm install -g turbo@latest
 
 # PRUNE WORKSPACE
-FROM base AS builder
+# Note: Here we cannot use --docker, as is recomended, since the generated
+# json directory does not allow linking package.json executable files
+FROM base AS pruner
 COPY . .
-RUN apk add --no-cache libc6-compat
-RUN apk update
-RUN pnpm dlx turbo prune @opendatacapture/api --docker
+RUN turbo prune @opendatacapture/api
 
-# INSTALL DEPENDENCIES
+# INSTALL DEPENDENCIES AND BUILD
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
-RUN apk update
-COPY .gitignore tsconfig.base.json ./
-COPY --from=builder /app/out/json/ .
+COPY tsconfig.base.json tsconfig.base.json
+COPY --from=pruner /app/out/ .
 RUN pnpm install --frozen-lockfile 
-
-# BUILD THE APP
-COPY --from=builder /app/out/full/ .
-COPY turbo.json turbo.json
-RUN pnpm dlx turbo build --filter=@opendatacapture/api
+RUN turbo build --filter=@opendatacapture/api
 
 # RUN SERVER
 FROM base AS runner
