@@ -10,9 +10,9 @@
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx scripts/dev.ts",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "start": "NODE_ENV=production env-cmd -f ../../.env node dist/app.mjs",
-    "start:inspect": "NODE_ENV=production env-cmd -f ../../.env node --inspect dist/app.mjs",
-    "start:profile": "NODE_ENV=production env-cmd -f ../../.env node --prof dist/app.mjs",
+    "start": "NODE_ENV=production env-cmd -f ../../.env node dist/app.js",
+    "start:inspect": "NODE_ENV=production env-cmd -f ../../.env node --inspect dist/app.js",
+    "start:profile": "NODE_ENV=production env-cmd -f ../../.env node --prof dist/app.js",
     "test": "env-cmd -f ../../.env vitest"
   },
   "dependencies": {
@@ -65,7 +65,7 @@
     "concurrently": "^9.0.0",
     "esbuild": "catalog:esbuild",
     "esbuild-plugin-tsc": "^0.4.0",
-    "nodemon": "^3.1.4",
+    "nodemon": "catalog:",
     "prisma": "catalog:",
     "prisma-json-types-generator": "^3.0.4",
     "supertest": "^7.0.0",

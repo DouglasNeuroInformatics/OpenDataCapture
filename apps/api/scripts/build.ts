@@ -6,10 +6,10 @@ import path from 'path';
 
 import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-native-modules';
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
+import { __getNativePackageName } from '@douglasneuroinformatics/libstats';
 import esbuild from 'esbuild';
 import type { BuildOptions } from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
-
 const require = module.createRequire(import.meta.url);
 
 const entryFile = path.resolve(import.meta.dirname, '../src/main.ts');
@@ -18,27 +18,16 @@ const tsconfig = path.resolve(import.meta.dirname, '../tsconfig.json');
 
 const binDir = path.resolve(outdir, 'bin');
 
-const cjsShims = `
-const { __dirname, __filename, require } = await (async () => {
-  const module = (await import('module')).default;
-  const path = (await import('path')).default;
-  const url = (await import('url')).default;
-
-  const __filename = url.fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const require = module.createRequire(__dirname);
-
-  return { __dirname, __filename, require };
-})();
-`;
-
-const outfile = path.resolve(outdir, 'app.mjs');
+const outfile = path.resolve(outdir, 'app.js');
 
 const runtimeV1Dir = path.dirname(require.resolve('@opendatacapture/runtime-v1/package.json'));
 
+const nativeStatsPackageName = __getNativePackageName();
+const nativeStatsPackageDir = path.dirname(require.resolve(`${nativeStatsPackageName}/package.json`));
+
 const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> } & BuildOptions = {
   banner: {
-    js: cjsShims
+    js: "Object.defineProperties(globalThis, { __dirname: { value: import.meta.dirname, writable: false }, __filename: { value: import.meta.filename, writable: false }, require: { value: (await import('module')).createRequire(import.meta.url), writable: false } });"
   },
   bundle: true,
   entryPoints: [entryFile],
@@ -51,7 +40,7 @@ const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> }
     esbuildPluginTsc({
       tsconfigPath: tsconfig
     }),
-    prismaPlugin({ outdir: path.join(outdir, 'api') }),
+    prismaPlugin({ outdir: path.join(outdir, 'prisma/client') }),
     nativeModulesPlugin()
   ],
   target: ['node18', 'es2022'],
@@ -73,6 +62,7 @@ async function build() {
   await clean();
   await copyEsbuild();
   await fs.cp(path.join(runtimeV1Dir, 'dist'), path.join(outdir, 'runtime', 'v1'), { recursive: true });
+  await fs.cp(nativeStatsPackageDir, path.join(outdir, 'node_modules', nativeStatsPackageName), { recursive: true });
   await esbuild.build(options);
   console.log('Done!');
 }

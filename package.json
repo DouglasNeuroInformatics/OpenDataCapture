@@ -30,7 +30,7 @@
     "@commitlint/cli": "^19.4.1",
     "@commitlint/config-conventional": "^19.4.1",
     "@commitlint/types": "^19.0.3",
-    "@douglasneuroinformatics/eslint-config": "^5.1.6",
+    "@douglasneuroinformatics/eslint-config": "^5.1.8",
     "@douglasneuroinformatics/prettier-config": "^0.0.1",
     "@douglasneuroinformatics/tsconfig": "^1.0.2",
     "@storybook/addon-essentials": "^8.2.9",
@@ -78,11 +78,9 @@
     "x64",
     "arm64"
   ],
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "eslint": "9.x"
-      }
-    }
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }

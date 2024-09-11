@@ -3,7 +3,7 @@ import PinoHttp from 'pino-http';
 import PinoPretty from 'pino-pretty';
 import type { Promisable } from 'type-fest';
 
-import { CONFIG } from '@/config';
+import { config } from '@/config';
 import type { RenderFunction } from '@/entry-server';
 import { apiKeyMiddleware } from '@/middleware/api-key.middleware';
 import { errorHandlerMiddleware } from '@/middleware/error-handler.middleware';
@@ -73,7 +73,7 @@ export abstract class BaseServer {
 
   protected fixStacktrace?(err: Error): void;
 
-  listen(port = CONFIG.port) {
+  listen(port = config.port) {
     return this.app.listen(port, () => {
       console.log(`Server started at http://localhost:${port}`);
     });
