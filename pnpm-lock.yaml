@@ -21,6 +21,9 @@ catalogs:
     '@prisma/client':
       specifier: ^5.18.0
       version: 5.19.1
+    nodemon:
+      specifier: ^3.1.4
+      version: 3.1.4
     prisma:
       specifier: ^5.18.0
       version: 5.19.1
@@ -48,8 +51,8 @@ importers:
         specifier: ^19.0.3
         version: 19.0.3
       '@douglasneuroinformatics/eslint-config':
-        specifier: ^5.1.6
-        version: 5.1.7(astro-eslint-parser@1.0.2(typescript@5.5.4))(eslint@9.10.0(jiti@1.21.6))(svelte-eslint-parser@0.41.0)(typescript@5.5.4)
+        specifier: ^5.1.8
+        version: 5.1.8(astro-eslint-parser@1.0.2(typescript@5.5.4))(eslint@9.10.0(jiti@1.21.6))(svelte-eslint-parser@0.41.0)(typescript@5.5.4)
       '@douglasneuroinformatics/prettier-config':
         specifier: ^0.0.1
         version: 0.0.1(husky@9.1.5)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.6.6(prettier-plugin-astro@0.14.1)(prettier@3.3.3))(prettier@3.3.3)
@@ -310,7 +313,7 @@ importers:
         specifier: ^0.4.0
         version: 0.4.0(typescript@5.5.4)
       nodemon:
-        specifier: ^3.1.4
+        specifier: 'catalog:'
         version: 3.1.4
       prisma:
         specifier: 'catalog:'
@@ -409,6 +412,9 @@ importers:
       esbuild:
         specifier: catalog:esbuild
         version: 0.23.1
+      nodemon:
+        specifier: 'catalog:'
+        version: 3.1.4
       postcss:
         specifier: ^8.4.45
         version: 8.4.45
@@ -2448,9 +2454,9 @@ packages:
       esbuild: 0.x
       prisma: 5.x
 
-  '@douglasneuroinformatics/eslint-config@5.1.7':
+  '@douglasneuroinformatics/eslint-config@5.1.8':
     resolution:
-      { integrity: sha512-6EO6pdrzFeWbO7WOLgcjsaG+UcjIB01t0wW68DJAGyL3iYe2jtCpoPQoixRgXR15Bmza08UynHSqtk/+uG1Dng== }
+      { integrity: sha512-pAQZG4Xbzp8nTyAzyuKD8Du+d61whCYE+HnZgOB3/nKp0Me8lzTZy78T8ATTZwdygDzQzRVTWGCN1WSdHL9sIQ== }
     peerDependencies:
       eslint: 9.x
       typescript: 5.x
@@ -14355,7 +14361,7 @@ snapshots:
       esbuild: 0.23.1
       prisma: 5.19.1
 
-  '@douglasneuroinformatics/eslint-config@5.1.7(astro-eslint-parser@1.0.2(typescript@5.5.4))(eslint@9.10.0(jiti@1.21.6))(svelte-eslint-parser@0.41.0)(typescript@5.5.4)':
+  '@douglasneuroinformatics/eslint-config@5.1.8(astro-eslint-parser@1.0.2(typescript@5.5.4))(eslint@9.10.0(jiti@1.21.6))(svelte-eslint-parser@0.41.0)(typescript@5.5.4)':
     dependencies:
       eslint: 9.10.0(jiti@1.21.6)
       eslint-plugin-astro: 1.2.3(eslint@9.10.0(jiti@1.21.6))(typescript@5.5.4)
