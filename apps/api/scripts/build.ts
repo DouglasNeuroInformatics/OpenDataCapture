@@ -18,27 +18,13 @@ const tsconfig = path.resolve(import.meta.dirname, '../tsconfig.json');
 
 const binDir = path.resolve(outdir, 'bin');
 
-const cjsShims = `
-const { __dirname, __filename, require } = await (async () => {
-  const module = (await import('module')).default;
-  const path = (await import('path')).default;
-  const url = (await import('url')).default;
-
-  const __filename = url.fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const require = module.createRequire(__dirname);
-
-  return { __dirname, __filename, require };
-})();
-`;
-
 const outfile = path.resolve(outdir, 'app.mjs');
 
 const runtimeV1Dir = path.dirname(require.resolve('@opendatacapture/runtime-v1/package.json'));
 
 const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> } & BuildOptions = {
   banner: {
-    js: cjsShims
+    js: "Object.defineProperties(globalThis, { __dirname: { value: import.meta.dirname, writable: false }, __filename: { value: import.meta.filename, writable: false }, require: { value: (await import('module')).createRequire(import.meta.url), writable: false } });"
   },
   bundle: true,
   entryPoints: [entryFile],
