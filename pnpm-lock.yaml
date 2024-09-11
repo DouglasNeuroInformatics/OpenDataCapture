@@ -1142,6 +1142,9 @@ importers:
       '@jspsych/plugin-survey-text__2.x':
         specifier: workspace:*
         version: link:../../vendor/@jspsych/plugin-survey-text@2.x
+      '@opendatacapture/evaluate-instrument':
+        specifier: workspace:*
+        version: link:../../packages/evaluate-instrument
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../../packages/licenses

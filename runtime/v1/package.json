@@ -17,9 +17,9 @@
     "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues"
   },
   "exports": {
+    "./*": "./dist/*",
     "./env": "./env.d.ts",
-    "./package.json": "./package.json",
-    "./*": "./dist/*"
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -43,6 +43,7 @@
     "@jspsych/plugin-survey-html-form__2.x": "workspace:*",
     "@jspsych/plugin-survey-text__1.x": "workspace:*",
     "@jspsych/plugin-survey-text__2.x": "workspace:*",
+    "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/runtime-bundler": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
