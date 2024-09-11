@@ -7,7 +7,7 @@ settings:
 catalogs:
   default:
     '@douglasneuroinformatics/libstats':
-      specifier: 0.0.5
+      specifier: latest
       version: 0.0.5
     '@douglasneuroinformatics/libui':
       specifier: latest
