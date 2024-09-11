@@ -1,12 +1,12 @@
 import type { RequestHandler } from 'express';
 
-import { CONFIG } from '@/config';
+import { config } from '@/config';
 import { generateToken } from '@/utils/auth';
 import { HttpException } from '@/utils/http-exception';
 
 export const apiKeyMiddleware: RequestHandler = (req, _, next) => {
   const key = req.headers.authorization?.match(/^Bearer (.+)$/i)?.at(1);
-  if (key !== CONFIG.apiKey) {
+  if (key !== config.apiKey) {
     const assignmentId = /\/api\/assignments\/(.*)/.exec(req.originalUrl)?.at(1);
     const isAssignmentUpdate = assignmentId && req.method === 'PATCH';
     if (!isAssignmentUpdate) {
