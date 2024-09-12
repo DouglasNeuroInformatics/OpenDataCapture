@@ -5,7 +5,6 @@ import { Button } from '@douglasneuroinformatics/libui/components';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { useInstrument } from '@/hooks/useInstrument';
-import { InstrumentSummaryGroup } from 'node_modules/@opendatacapture/instrument-renderer/src/components/InstrumentSummary/InstrumentSummaryGroup';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -17,7 +16,13 @@ export const UploadPage = () => {
     if (!instrument) {
       return;
     }
-
+    const parsedInstrument = JSON.parse(JSON.stringify(instrument.content));
+    let kindsArray: string[] = [];
+    console.log(parsedInstrument['beddingType']['kind']);
+    for (let key in parsedInstrument) {
+      kindsArray.push(parsedInstrument[key]['kind']);
+    }
+    console.log(kindsArray);
     return;
   };
 
