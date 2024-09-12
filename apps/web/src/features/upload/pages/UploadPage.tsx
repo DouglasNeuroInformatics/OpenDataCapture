@@ -20,8 +20,6 @@ export const UploadPage = () => {
   const instrument = useInstrument(selectedInstrumentId);
 
   const handleTemplateDownload = () => {
-    console.log(instrument);
-    alert(params.id);
     return;
   };
 
