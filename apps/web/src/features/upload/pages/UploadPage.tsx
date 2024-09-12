@@ -4,22 +4,20 @@ import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrument } from '@/hooks/useInstrument';
+import { InstrumentSummaryGroup } from 'node_modules/@opendatacapture/instrument-renderer/src/components/InstrumentSummary/InstrumentSummaryGroup';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [selectedInstrumentId, setSelectedInstrumentId] = useState<string | null>(null);
 
   const params = useParams();
-
-  if (typeof params.id === 'string') {
-    setSelectedInstrumentId(params.id);
-  }
-
-  const instrument = useInstrument(selectedInstrumentId);
+  const instrument = useInstrument(params.id as string);
 
   const handleTemplateDownload = () => {
+    if (!instrument) {
+      return;
+    }
+
     return;
   };
 
