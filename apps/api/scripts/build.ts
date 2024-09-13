@@ -41,7 +41,9 @@ const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> }
       tsconfigPath: tsconfig
     }),
     prismaPlugin({ outdir: path.join(outdir, 'prisma/client') }),
-    nativeModulesPlugin()
+    nativeModulesPlugin({
+      resolveFailure: 'warn'
+    })
   ],
   target: ['node18', 'es2022'],
   tsconfig
