@@ -18,11 +18,9 @@ export const UploadPage = () => {
     }
     const parsedInstrument = JSON.parse(JSON.stringify(instrument.content));
     let kindsArray: string[] = [];
-    console.log(parsedInstrument['beddingType']['kind']);
     for (let key in parsedInstrument) {
       kindsArray.push(parsedInstrument[key]['kind']);
     }
-    console.log(kindsArray);
     return;
   };
 
