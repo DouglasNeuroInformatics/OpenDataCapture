@@ -5,22 +5,27 @@ import { Button } from '@douglasneuroinformatics/libui/components';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { useInstrument } from '@/hooks/useInstrument';
+import type { AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-core';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
 
   const params = useParams();
-  const instrument = useInstrument(params.id as string);
+  const instrument = useInstrument(params.id as string) as AnyUnilingualScalarInstrument | null;
 
   const handleTemplateDownload = () => {
     if (!instrument) {
       return;
     }
-    const parsedInstrument = JSON.parse(JSON.stringify(instrument.content));
-    let kindsArray: string[] = [];
-    for (let key in parsedInstrument) {
-      kindsArray.push(parsedInstrument[key]['kind']);
-    }
+
+    const instrumentSchema = instrument.validationSchema;
+
+    //to do
+    //make sure the first two columns of the csv file are id and date
+    //convert the given csv files as a json object
+    //parse the json object through the instrument validation schema
+    // if succcess full send the data to the backend to be stored
+
     return;
   };
 
@@ -28,6 +33,11 @@ export const UploadPage = () => {
     if (!file) {
       return;
     }
+    //to do
+    //take validation schema types and title to use as column titles
+    //make the first two columns of the template csv id and date
+    //add the validation schema/content variables as column headers for csv
+    //add the first line of the csv to be the data type (string, number, boolean, etc), also say if its optional or not
   };
 
   return (
