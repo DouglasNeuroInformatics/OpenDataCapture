@@ -1,18 +1,19 @@
-packages:
-  - 'apps/*'
-  - 'packages/*'
-  - 'runtime/*'
-  - 'testing/*'
-  - 'vendor/**/*'
 catalog:
+  '@douglasneuroinformatics/libstats': latest
   '@douglasneuroinformatics/libui': latest
   '@douglasneuroinformatics/libui-form-types': latest
-  '@douglasneuroinformatics/libstats': latest
   '@microsoft/api-extractor': ^7.47.6
-  '@prisma/client': '^5.18.0'
-  'prisma': '^5.18.0'
-  'tsx': '4.8.2'
+  '@prisma/client': ^5.18.0
+  nodemon: ^3.1.4
+  prisma: ^5.18.0
+  tsx: 4.8.2
 catalogs:
-  'esbuild':
+  esbuild:
     esbuild: 0.23.x
     esbuild-wasm: 0.23.x
+packages:
+  - apps/*
+  - packages/*
+  - runtime/*
+  - testing/*
+  - vendor/**/*

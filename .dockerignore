@@ -1,1 +1,10 @@
-node_modules
+**/.astro
+**/.turbo
+**/dist
+**/node_modules
+.git
+.gitignore
+blog
+docs
+misc
+mongo

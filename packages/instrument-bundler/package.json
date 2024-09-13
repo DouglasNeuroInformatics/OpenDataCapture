@@ -18,7 +18,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "peerDependencies": {
-    "tsx": "4.x"
+    "tsx": "catalog:"
   },
   "dependencies": {
     "commander": "^12.1.0",
