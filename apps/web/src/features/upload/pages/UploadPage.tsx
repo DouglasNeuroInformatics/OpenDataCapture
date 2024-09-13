@@ -34,7 +34,9 @@ export const UploadPage = () => {
     <div className="align-center items-center justify-center">
       <FileDropzone file={file} setFile={setFile} />
       <div className="mt-4 flex justify-between space-x-2">
-        <Button variant={'primary'}>Submit</Button>
+        <Button variant={'primary'} onClick={processInstrumentCSV}>
+          Submit
+        </Button>
         <Button variant={'primary'} onClick={handleTemplateDownload}>
           <DownloadIcon />
           Download Template
