@@ -1,0 +1,22 @@
+{
+  "rustc": 1209780893969736014,
+  "features": "[\"default\", \"getrandom\", \"napi-1\", \"napi-2\", \"napi-3\", \"napi-4\", \"napi-5\", \"napi-6\", \"napi-7\", \"napi-8\"]",
+  "declared_features": "[\"aquamarine\", \"default\", \"doc-comment\", \"doc-dependencies\", \"easy-cast\", \"external-buffers\", \"futures\", \"getrandom\", \"napi-1\", \"napi-2\", \"napi-3\", \"napi-4\", \"napi-5\", \"napi-6\", \"napi-7\", \"napi-8\", \"napi-experimental\", \"napi-latest\", \"napi-runtime\", \"sys\", \"tokio\"]",
+  "target": 12269826890185844608,
+  "profile": 16690480377348987070,
+  "path": 2014132151383469823,
+  "deps": [
+    [4254328441789853856, "once_cell", false, 5474138400072001831],
+    [9859671985150161633, "libloading", false, 5887017567322564113],
+    [10391258677947610665, "semver", false, 16577229992124346499],
+    [11228387426131597774, "getrandom", false, 10417559325023723294],
+    [11408960814196729819, "neon_macros", false, 14492572839884958353],
+    [12160221301385064308, "smallvec", false, 5215341162729688095],
+    [12405918789403144940, "send_wrapper", false, 342468225128137088]
+  ],
+  "local": [{ "CheckDepInfo": { "dep_info": "debug/.fingerprint/neon-9cb4e434b40a967c/dep-lib-neon" } }],
+  "rustflags": [],
+  "metadata": 9026775017703801291,
+  "config": 2202906307356721367,
+  "compile_kind": 0
+}

@@ -1,0 +1,18 @@
+{
+  "rustc": 1209780893969736014,
+  "features": "[]",
+  "declared_features": "[\"clone-impls\"]",
+  "target": 10992142566288707309,
+  "profile": 8861558584828204938,
+  "path": 15634562030414859135,
+  "deps": [
+    [5247968963080504553, "proc_macro2", false, 15990929394161834639],
+    [8759338746953132833, "syn", false, 4578144368472950501],
+    [14268468010440576439, "quote", false, 15267201267150352062]
+  ],
+  "local": [{ "CheckDepInfo": { "dep_info": "debug/.fingerprint/syn-mid-c67a53430166c549/dep-lib-syn_mid" } }],
+  "rustflags": [],
+  "metadata": 9209537541402544974,
+  "config": 2202906307356721367,
+  "compile_kind": 0
+}
