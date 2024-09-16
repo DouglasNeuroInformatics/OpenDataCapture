@@ -21,7 +21,7 @@
     "@casl/ability": "^6.7.1",
     "@douglasneuroinformatics/libjs": "^0.6.0",
     "@douglasneuroinformatics/libpasswd": "^0.0.3",
-    "@douglasneuroinformatics/libui": "/home/davidroper/projects/forks/libui",
+    "@douglasneuroinformatics/libui": "file:/scratch/ropdav/projects/forks/libui",
     "@heroicons/react": "^2.1.5",
     "@import-meta-env/cli": "^0.7.0",
     "@import-meta-env/unplugin": "^0.6.0",
