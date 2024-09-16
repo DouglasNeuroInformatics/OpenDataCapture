@@ -2066,14 +2066,6 @@ packages:
       tailwindcss: ^3.4.10
       zod: ^3.23.6
 
-  '@douglasneuroinformatics/libui@file:../libui':
-    resolution: { directory: ../libui, type: directory }
-    peerDependencies:
-      react: ^18.2.0
-      react-dom: ^18.2.0
-      tailwindcss: ^3.4.10
-      zod: ^3.23.6
-
   '@douglasneuroinformatics/prettier-config@0.0.1':
     resolution:
       { integrity: sha512-Cml8ilNKjJOMp50lR5isEfc9QkGGgf8PoF9Fk73CmYGGMS8TUmhA59++Zia/12rJ2fkpKFhfI8uA3VTEnv+qKw== }
@@ -8836,12 +8828,6 @@ packages:
     resolution:
       { integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA== }
     engines: { node: '>=10' }
-
-  lucide-react@0.390.0:
-    resolution:
-      { integrity: sha512-APqbfEcVuHnZbiy3E97gYWLeBdkE4e6NbY6AuVETZDZVn/bQCHYUoHyxcUHyvRopfPOHhFUEvDyyQzHwM+S9/w== }
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0
 
   lucide-react@0.438.0:
     resolution:
@@ -19789,10 +19775,6 @@ snapshots:
   lru-cache@6.0.0:
     dependencies:
       yallist: 4.0.0
-
-  lucide-react@0.390.0(react@vendor+react@18.x):
-    dependencies:
-      react: link:vendor/react@18.x
 
   lucide-react@0.438.0(react@18.3.1):
     dependencies:
