@@ -222,23 +222,24 @@ export class InstrumentRecordsService {
       where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), { groupId }, { instrumentId }] }
     });
 
-    const data: { [key: string]: [number, number][] } = {};
+    const data: { [key: string]: [x: number[], y: number[]] } = {};
     for (const record of records) {
       const numericMeasures = pickBy(record.computedMeasures, isNumber);
       for (const measure in numericMeasures) {
         const x = record.date.getTime();
         const y = numericMeasures[measure]!;
         if (Array.isArray(data[measure])) {
-          data[measure].push([x, y]);
+          data[measure][0].push(x);
+          data[measure][1].push(y);
         } else {
-          data[measure] = [[x, y]];
+          data[measure] = [[x], [y]];
         }
       }
     }
 
     const results: LinearRegressionResults = {};
     for (const measure in data) {
-      results[measure] = linearRegression(data[measure]!);
+      results[measure] = linearRegression(new Float64Array(data[measure]![0]), new Float64Array(data[measure]![1]));
     }
     return results;
   }

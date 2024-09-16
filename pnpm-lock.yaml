@@ -8,7 +8,7 @@ catalogs:
   default:
     '@douglasneuroinformatics/libstats':
       specifier: latest
-      version: 0.0.5
+      version: 0.1.0
     '@douglasneuroinformatics/libui':
       specifier: latest
       version: 3.1.0
@@ -190,7 +190,7 @@ importers:
         version: 0.0.3(typescript@5.5.4)
       '@douglasneuroinformatics/libstats':
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.1.0
       '@faker-js/faker':
         specifier: ^9.0.0
         version: 9.0.0
@@ -279,9 +279,6 @@ importers:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
     devDependencies:
-      '@douglasneuroinformatics/esbuild-plugin-native-modules':
-        specifier: ^1.0.0
-        version: 1.0.0(esbuild@0.23.1)
       '@douglasneuroinformatics/esbuild-plugin-prisma':
         specifier: ^1.0.0
         version: 1.0.0(@prisma/client@5.19.1(prisma@5.19.1))(@prisma/engines@5.19.1)(esbuild@0.23.1)(prisma@5.19.1)
@@ -388,9 +385,6 @@ importers:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
     devDependencies:
-      '@douglasneuroinformatics/esbuild-plugin-native-modules':
-        specifier: ^1.0.0
-        version: 1.0.0(esbuild@0.23.1)
       '@douglasneuroinformatics/esbuild-plugin-prisma':
         specifier: ^1.0.0
         version: 1.0.0(@prisma/client@5.19.1(prisma@5.19.1))(@prisma/engines@5.19.1)(esbuild@0.23.1)(prisma@5.19.1)
@@ -2442,12 +2436,6 @@ packages:
     resolution:
       { integrity: sha512-skbBzPggOVYCbnGgV+0dmBdW/s77ZkAOXIC1knS8NagwDjBrNC1LuXtQJeiN6l+m7lzmHtaoUw/ctJKdqkG57Q== }
 
-  '@douglasneuroinformatics/esbuild-plugin-native-modules@1.0.0':
-    resolution:
-      { integrity: sha512-2HE7ACCRijY+N+mKpmM4FRajSZiSdIJVAqRmaLVYqEvrM9Sr80C9kS3ObfFA7EZC6GQVrn7sILxZCgfhdE2lsw== }
-    peerDependencies:
-      esbuild: 0.x
-
   '@douglasneuroinformatics/esbuild-plugin-prisma@1.0.0':
     resolution:
       { integrity: sha512-Lz15P00SGqNBJiPN4StZOXbGt/VzD97izbcHpLa/HSDOnRkdey3dv2n3JA1FUBtQwwbcinAPRbAVQsB38si+zw== }
@@ -2503,51 +2491,65 @@ packages:
     peerDependencies:
       typescript: ^5.1.0
 
-  '@douglasneuroinformatics/libstats-aarch64-apple-darwin@0.0.4':
+  '@douglasneuroinformatics/libstats-darwin-arm64@0.1.0':
     resolution:
-      { integrity: sha512-vmcugYnIWqhivjpdRkQvXzf+6bpQ8hxjm9RFNKG9lYGWPDk67dwLt0/R+2XmLdqjWTqpI0DmIpkvcRsIXcg9EQ== }
+      { integrity: sha512-vycjIGi+29EqmGRtj09or1MvoYq/dQx9KDTfNjZrP/l24kbFs/Os9mi0n6ZDFevyEVP5353s3lO7GGa/XmlAqg== }
     engines: { node: 20.x }
     cpu: [arm64]
     os: [darwin]
 
-  '@douglasneuroinformatics/libstats-aarch64-pc-windows-msvc@0.0.4':
+  '@douglasneuroinformatics/libstats-darwin-x64@0.1.0':
     resolution:
-      { integrity: sha512-o3ntPW0Hr7lrp/y5qYvGafc9e0Jkm4ORAwkZ8kp/ofvbKztBKIJbJoe5Ut753f92kT5ktEvIKpX3xFWrt588dw== }
-    engines: { node: 20.x }
-    cpu: [arm64]
-    os: [windows]
-
-  '@douglasneuroinformatics/libstats-aarch64-unknown-linux-musl@0.0.4':
-    resolution:
-      { integrity: sha512-j4JOc98kHc/f9b5br9aIjv56qRUdyMkYm5G1PE3zsuMlSmD5Q1wEJICwfC8rMd4wUJ2RwqEybFflkGGcroBDRw== }
-    engines: { node: 20.x }
-    cpu: [arm64]
-    os: [linux]
-
-  '@douglasneuroinformatics/libstats-x86_64-apple-darwin@0.0.4':
-    resolution:
-      { integrity: sha512-ElJSr370vudpA7/7mgwcdzqGRaANz+e3o3VB1QE4zfmWCbnooKCymLxqymPj6e8YdJDCd9s5DwsKS+qZprGalg== }
+      { integrity: sha512-V+HiUobD4w/F/ZR80rorQJI9Lhc9Gleh/EHUhSo5SUCT8hk2K/PVSwfuqt2Jfspj9/UmoCzYaIZWKNcKrvVZIw== }
     engines: { node: 20.x }
     cpu: [x64]
     os: [darwin]
 
-  '@douglasneuroinformatics/libstats-x86_64-pc-windows-msvc@0.0.4':
+  '@douglasneuroinformatics/libstats-linux-arm64-gnu@0.1.0':
     resolution:
-      { integrity: sha512-gpsuA9awp2Z86b6d+Oz2kUbgjIMAsgyt9Kyvu2P+xOIQqjNbXbex9ov+7/TSXtA5SRAxhABj6AjbUgS7v2wAgg== }
+      { integrity: sha512-DT5KIFuE3K6CBPfejTRBJlMbbeKGKgEEtnQUW6yWAJl/3j8St0I2qKws9JI9PQDFV4535A5mRSf4ZX22RA9YVw== }
     engines: { node: 20.x }
-    cpu: [x64]
-    os: [windows]
+    cpu: [arm64]
+    os: [linux]
 
-  '@douglasneuroinformatics/libstats-x86_64-unknown-linux-musl@0.0.4':
+  '@douglasneuroinformatics/libstats-linux-arm64-musl@0.1.0':
     resolution:
-      { integrity: sha512-QN9ZvUOzYRWSN3MQvZTg4HZ/heNEFkCNVOLouQWIqS6ODh7Ns2h33/sC4xeGrweyItR7TG3wDD3IoQbyDbPkBg== }
+      { integrity: sha512-OmHsgoAPDnogO+1ObHfvvA+uTZfOzAgbk7f37qc0HRSwFqwGeLTeZs6KsQ6wowQISzSZgTUxPsCW8jrPl5I0Ww== }
+    engines: { node: 20.x }
+    cpu: [arm64]
+    os: [linux]
+
+  '@douglasneuroinformatics/libstats-linux-x64-gnu@0.1.0':
+    resolution:
+      { integrity: sha512-scoMXadBxepbQLXZHSEhSU394ipajlV0lhW7Gb/THMWClFJ01D69CAEeX6X+4k1hsVpPLd3FIWmthh7wUMcYLw== }
     engines: { node: 20.x }
     cpu: [x64]
     os: [linux]
 
-  '@douglasneuroinformatics/libstats@0.0.5':
+  '@douglasneuroinformatics/libstats-linux-x64-musl@0.1.0':
     resolution:
-      { integrity: sha512-1Kv2aLLHVuN4clhwIqoqNE//uowhooTQBb3OGit/A/Vgb+aVc377bMh01kyov8owEssaHM9U0OXLVMLs+8XAQQ== }
+      { integrity: sha512-8owSnVeagw5HR0LX2vB2A1wbK5HBKM9/03ZW81M/IAkqHzgWkFhb3Geui85MD037Jwayl/JdYGNzVk71urtZAw== }
+    engines: { node: 20.x }
+    cpu: [x64]
+    os: [linux]
+
+  '@douglasneuroinformatics/libstats-win32-arm64-msvc@0.1.0':
+    resolution:
+      { integrity: sha512-o6zs8LY3dSK6WHv5+xqDngRioKJtVseoqBNRwcZeud8fs31nSJDj5Wvgu7LGkR6qvtxhfKVk+sgPJQRcTgQRWQ== }
+    engines: { node: 20.x }
+    cpu: [arm64]
+    os: [win32]
+
+  '@douglasneuroinformatics/libstats-win32-x64-msvc@0.1.0':
+    resolution:
+      { integrity: sha512-9gIWZrNtJ+ZuAA+9Sip1cyJ9fh4HmYPsoHizVvZEnA/QBoLkyDNsxiSzm4Wa3vDiJVXLsaWZZQ+hzL9NwUIAIQ== }
+    engines: { node: 20.x }
+    cpu: [x64]
+    os: [win32]
+
+  '@douglasneuroinformatics/libstats@0.1.0':
+    resolution:
+      { integrity: sha512-rWzfGg16NT7g2irQw4XpXwPKbGQhvxrlctNkYfrytjlLoW5/0kyEJreVw5UpeguSBCUxV6g97qv03VOs0SOaXQ== }
     engines: { node: 20.x }
 
   '@douglasneuroinformatics/libui-form-types@0.11.0':
@@ -14346,10 +14348,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@douglasneuroinformatics/esbuild-plugin-native-modules@1.0.0(esbuild@0.23.1)':
-    dependencies:
-      esbuild: 0.23.1
-
   '@douglasneuroinformatics/esbuild-plugin-prisma@1.0.0(@prisma/client@5.19.1(prisma@5.19.1))(@prisma/engines@5.19.1)(esbuild@0.23.1)(prisma@5.19.1)':
     dependencies:
       '@prisma/client': 5.19.1(prisma@5.19.1)
@@ -14421,32 +14419,40 @@ snapshots:
       type-fest: 4.26.1
       typescript: 5.5.4
 
-  '@douglasneuroinformatics/libstats-aarch64-apple-darwin@0.0.4':
+  '@douglasneuroinformatics/libstats-darwin-arm64@0.1.0':
     optional: true
 
-  '@douglasneuroinformatics/libstats-aarch64-pc-windows-msvc@0.0.4':
+  '@douglasneuroinformatics/libstats-darwin-x64@0.1.0':
     optional: true
 
-  '@douglasneuroinformatics/libstats-aarch64-unknown-linux-musl@0.0.4':
+  '@douglasneuroinformatics/libstats-linux-arm64-gnu@0.1.0':
     optional: true
 
-  '@douglasneuroinformatics/libstats-x86_64-apple-darwin@0.0.4':
+  '@douglasneuroinformatics/libstats-linux-arm64-musl@0.1.0':
     optional: true
 
-  '@douglasneuroinformatics/libstats-x86_64-pc-windows-msvc@0.0.4':
+  '@douglasneuroinformatics/libstats-linux-x64-gnu@0.1.0':
     optional: true
 
-  '@douglasneuroinformatics/libstats-x86_64-unknown-linux-musl@0.0.4':
+  '@douglasneuroinformatics/libstats-linux-x64-musl@0.1.0':
     optional: true
 
-  '@douglasneuroinformatics/libstats@0.0.5':
+  '@douglasneuroinformatics/libstats-win32-arm64-msvc@0.1.0':
+    optional: true
+
+  '@douglasneuroinformatics/libstats-win32-x64-msvc@0.1.0':
+    optional: true
+
+  '@douglasneuroinformatics/libstats@0.1.0':
     optionalDependencies:
-      '@douglasneuroinformatics/libstats-aarch64-apple-darwin': 0.0.4
-      '@douglasneuroinformatics/libstats-aarch64-pc-windows-msvc': 0.0.4
-      '@douglasneuroinformatics/libstats-aarch64-unknown-linux-musl': 0.0.4
-      '@douglasneuroinformatics/libstats-x86_64-apple-darwin': 0.0.4
-      '@douglasneuroinformatics/libstats-x86_64-pc-windows-msvc': 0.0.4
-      '@douglasneuroinformatics/libstats-x86_64-unknown-linux-musl': 0.0.4
+      '@douglasneuroinformatics/libstats-darwin-arm64': 0.1.0
+      '@douglasneuroinformatics/libstats-darwin-x64': 0.1.0
+      '@douglasneuroinformatics/libstats-linux-arm64-gnu': 0.1.0
+      '@douglasneuroinformatics/libstats-linux-arm64-musl': 0.1.0
+      '@douglasneuroinformatics/libstats-linux-x64-gnu': 0.1.0
+      '@douglasneuroinformatics/libstats-linux-x64-musl': 0.1.0
+      '@douglasneuroinformatics/libstats-win32-arm64-msvc': 0.1.0
+      '@douglasneuroinformatics/libstats-win32-x64-msvc': 0.1.0
 
   '@douglasneuroinformatics/libui-form-types@0.11.0':
     dependencies:
