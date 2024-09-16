@@ -622,8 +622,8 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
-        specifier: file:/scratch/ropdav/projects/forks/libui
-        version: file:../libui(@types/react@18.3.5)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.10)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        specifier: 'catalog:'
+        version: 3.1.0(@types/react@18.3.5)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.10)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@heroicons/react':
         specifier: ^2.1.5
         version: 2.1.5(react@vendor+react@18.x)
@@ -856,8 +856,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
-        specifier: file:/scratch/ropdav/projects/forks/libui
-        version: file:../libui(@types/react@18.3.5)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.10)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        specifier: 'catalog:'
+        version: 3.1.0(@types/react@18.3.5)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.10)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -2557,14 +2557,6 @@ packages:
   '@douglasneuroinformatics/libui@3.1.0':
     resolution:
       { integrity: sha512-dgxo2FBwhu+TJwpVwwemVeMKfa8DM9lakEl2cCBlwGevWBxByIcpKOhZqdrLIlOMiJTR67D5P2qjV9uNQhlHWw== }
-    peerDependencies:
-      react: ^18.2.0
-      react-dom: ^18.2.0
-      tailwindcss: ^3.4.10
-      zod: ^3.23.6
-
-  '@douglasneuroinformatics/libui@file:../libui':
-    resolution: { directory: ../libui, type: directory }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -9404,12 +9396,6 @@ packages:
       { integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA== }
     engines: { node: '>=10' }
 
-  lucide-react@0.390.0:
-    resolution:
-      { integrity: sha512-APqbfEcVuHnZbiy3E97gYWLeBdkE4e6NbY6AuVETZDZVn/bQCHYUoHyxcUHyvRopfPOHhFUEvDyyQzHwM+S9/w== }
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0
-
   lucide-react@0.438.0:
     resolution:
       { integrity: sha512-uq6yCB+IzVfgIPMK8ibkecXSWTTSOMs9UjUgZigfrDCVqgdwkpIgYg1fSYnf0XXF2AoSyCJZhoZXQwzoai7VGw== }
@@ -14558,62 +14544,6 @@ snapshots:
       lucide-react: 0.438.0(react@vendor+react@18.x)
       react: link:vendor/react@18.x
       react-dom: link:vendor/react-dom@18.x
-      react-error-boundary: 4.0.13(react@vendor+react@18.x)
-      react-resizable-panels: 2.1.2(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      recharts: 2.12.7(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      tailwind-merge: 2.5.2
-      tailwindcss: 3.4.10
-      tailwindcss-animate: 1.0.7(tailwindcss@3.4.10)
-      ts-pattern: 5.3.1
-      type-fest: 4.26.1
-      vaul: 0.9.2(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      zod: link:vendor/zod@3.23.x
-      zustand: 4.5.5(@types/react@18.3.5)(immer@10.1.1)(react@vendor+react@18.x)
-    transitivePeerDependencies:
-      - '@emotion/is-prop-valid'
-      - '@types/react'
-      - '@types/react-dom'
-      - immer
-      - typescript
-
-  '@douglasneuroinformatics/libui@file:../libui(@types/react@18.3.5)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.10)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
-    dependencies:
-      '@douglasneuroinformatics/libjs': 0.7.0(typescript@5.5.4)
-      '@douglasneuroinformatics/libui-form-types': 0.11.0
-      '@headlessui/tailwindcss': 0.2.1(tailwindcss@3.4.10)
-      '@heroicons/react': 2.1.5(react@vendor+react@18.x)
-      '@radix-ui/react-accordion': 1.2.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-alert-dialog': 1.1.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-avatar': 1.1.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-checkbox': 1.1.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-collapsible': 1.1.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-context-menu': 2.2.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-dialog': 1.1.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-dropdown-menu': 2.1.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-hover-card': 1.1.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-label': 2.1.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-menubar': 1.1.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-popover': 1.1.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-progress': 1.1.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-radio-group': 1.2.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-scroll-area': 1.1.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-select': 2.1.1(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-separator': 1.1.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-slider': 1.2.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-slot': 1.1.0(@types/react@18.3.5)(react@vendor+react@18.x)
-      '@radix-ui/react-switch': 1.1.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-tabs': 1.1.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@radix-ui/react-tooltip': 1.1.2(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      '@tailwindcss/container-queries': 0.1.1(tailwindcss@3.4.10)
-      class-variance-authority: 0.7.0
-      clsx: 2.1.1
-      cmdk: 1.0.0(@types/react@18.3.5)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      framer-motion: 11.5.4(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      lodash-es: 4.17.21
-      lucide-react: 0.390.0(react@vendor+react@18.x)
-      react: link:vendor/react@18.x
-      react-dom: link:vendor/react-dom@18.x
-      react-dropzone: 14.2.3(react@vendor+react@18.x)
       react-error-boundary: 4.0.13(react@vendor+react@18.x)
       react-resizable-panels: 2.1.2(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       recharts: 2.12.7(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
@@ -21528,10 +21458,6 @@ snapshots:
   lru-cache@6.0.0:
     dependencies:
       yallist: 4.0.0
-
-  lucide-react@0.390.0(react@vendor+react@18.x):
-    dependencies:
-      react: link:vendor/react@18.x
 
   lucide-react@0.438.0(react@18.3.1):
     dependencies:

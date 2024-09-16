@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "^0.6.0",
-    "@douglasneuroinformatics/libui": "file:/scratch/ropdav/projects/forks/libui",
+    "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
