@@ -7,7 +7,7 @@ settings:
 catalogs:
   default:
     '@douglasneuroinformatics/libstats':
-      specifier: 0.1.0
+      specifier: latest
       version: 0.1.0
     '@douglasneuroinformatics/libui':
       specifier: latest
@@ -279,9 +279,6 @@ importers:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
     devDependencies:
-      '@douglasneuroinformatics/esbuild-plugin-native-modules':
-        specifier: ^1.0.0
-        version: 1.0.0(esbuild@0.23.1)
       '@douglasneuroinformatics/esbuild-plugin-prisma':
         specifier: ^1.0.0
         version: 1.0.0(@prisma/client@5.19.1(prisma@5.19.1))(@prisma/engines@5.19.1)(esbuild@0.23.1)(prisma@5.19.1)
@@ -388,9 +385,6 @@ importers:
         specifier: workspace:zod__3.23.x@*
         version: link:../../vendor/zod@3.23.x
     devDependencies:
-      '@douglasneuroinformatics/esbuild-plugin-native-modules':
-        specifier: ^1.0.0
-        version: 1.0.0(esbuild@0.23.1)
       '@douglasneuroinformatics/esbuild-plugin-prisma':
         specifier: ^1.0.0
         version: 1.0.0(@prisma/client@5.19.1(prisma@5.19.1))(@prisma/engines@5.19.1)(esbuild@0.23.1)(prisma@5.19.1)
@@ -2441,12 +2435,6 @@ packages:
   '@cypress/xvfb@1.2.4':
     resolution:
       { integrity: sha512-skbBzPggOVYCbnGgV+0dmBdW/s77ZkAOXIC1knS8NagwDjBrNC1LuXtQJeiN6l+m7lzmHtaoUw/ctJKdqkG57Q== }
-
-  '@douglasneuroinformatics/esbuild-plugin-native-modules@1.0.0':
-    resolution:
-      { integrity: sha512-2HE7ACCRijY+N+mKpmM4FRajSZiSdIJVAqRmaLVYqEvrM9Sr80C9kS3ObfFA7EZC6GQVrn7sILxZCgfhdE2lsw== }
-    peerDependencies:
-      esbuild: 0.x
 
   '@douglasneuroinformatics/esbuild-plugin-prisma@1.0.0':
     resolution:
@@ -14359,10 +14347,6 @@ snapshots:
       lodash.once: 4.1.1
     transitivePeerDependencies:
       - supports-color
-
-  '@douglasneuroinformatics/esbuild-plugin-native-modules@1.0.0(esbuild@0.23.1)':
-    dependencies:
-      esbuild: 0.23.1
 
   '@douglasneuroinformatics/esbuild-plugin-prisma@1.0.0(@prisma/client@5.19.1(prisma@5.19.1))(@prisma/engines@5.19.1)(esbuild@0.23.1)(prisma@5.19.1)':
     dependencies:

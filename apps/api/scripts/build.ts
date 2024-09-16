@@ -4,9 +4,7 @@ import fs from 'fs/promises';
 import module from 'module';
 import path from 'path';
 
-import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-native-modules';
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
-// import { __getNativePackageName } from '@douglasneuroinformatics/libstats';
 import esbuild from 'esbuild';
 import type { BuildOptions } from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
@@ -22,9 +20,6 @@ const outfile = path.resolve(outdir, 'app.js');
 
 const runtimeV1Dir = path.dirname(require.resolve('@opendatacapture/runtime-v1/package.json'));
 
-// const nativeStatsPackageName = __getNativePackageName();
-// const nativeStatsPackageDir = path.dirname(require.resolve(`${nativeStatsPackageName}/package.json`));
-
 const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> } & BuildOptions = {
   banner: {
     js: "Object.defineProperties(globalThis, { __dirname: { value: import.meta.dirname, writable: false }, __filename: { value: import.meta.filename, writable: false }, require: { value: (await import('module')).createRequire(import.meta.url), writable: false } });"
@@ -34,16 +29,16 @@ const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> }
   external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],
   format: 'esm',
   keepNames: true,
+  loader: {
+    '.node': 'copy'
+  },
   outfile,
   platform: 'node',
   plugins: [
     esbuildPluginTsc({
       tsconfigPath: tsconfig
     }),
-    prismaPlugin({ outdir: path.join(outdir, 'prisma/client') }),
-    nativeModulesPlugin({
-      resolveFailure: 'warn'
-    })
+    prismaPlugin({ outdir: path.join(outdir, 'prisma/client') })
   ],
   target: ['node18', 'es2022'],
   tsconfig
@@ -64,7 +59,6 @@ async function build() {
   await clean();
   await copyEsbuild();
   await fs.cp(path.join(runtimeV1Dir, 'dist'), path.join(outdir, 'runtime', 'v1'), { recursive: true });
-  //await fs.cp(nativeStatsPackageDir, path.join(outdir, 'node_modules', nativeStatsPackageName), { recursive: true });
   await esbuild.build(options);
   console.log('Done!');
 }

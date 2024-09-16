@@ -54,7 +54,6 @@
     "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/esbuild-plugin-native-modules": "^1.0.0",
     "@douglasneuroinformatics/esbuild-plugin-prisma": "^1.0.0",
     "@nestjs/testing": "^10.4.1",
     "@opendatacapture/instrument-stubs": "workspace:*",

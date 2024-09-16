@@ -36,7 +36,6 @@
     "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/esbuild-plugin-native-modules": "^1.0.0",
     "@douglasneuroinformatics/esbuild-plugin-prisma": "^1.0.0",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@types/compression": "^1.7.5",
