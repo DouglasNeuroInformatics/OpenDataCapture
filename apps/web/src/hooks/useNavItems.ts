@@ -65,7 +65,7 @@ export function useNavItems() {
     }
     if (currentUser?.ability.can('create', 'InstrumentRecord')) {
       sessionItems.push({
-        'data-cy': 'view-instrument',
+        'data-cy': 'accessible-instruments',
         disabled: currentSession === null,
         icon: ComputerIcon,
         id: '/instruments/accessible-instruments',

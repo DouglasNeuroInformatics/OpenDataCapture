@@ -22,14 +22,20 @@ export const TimeDropdown = ({ disabled, setMinTime }: TimeDropdownProps) => {
         }
       }}
     >
-      <Select.Trigger className="min-w-32" disabled={disabled}>
+      <Select.Trigger className="min-w-32" data-cy="time-dropdown-trigger" disabled={disabled}>
         <Select.Value placeholder={t('visualization.timeframe')} />
       </Select.Trigger>
       <Select.Content>
         <Select.Group>
-          <Select.Item value="all">{t('visualization.timeframeOptions.all')}</Select.Item>
-          <Select.Item value="pastMonth">{t('visualization.timeframeOptions.month')}</Select.Item>
-          <Select.Item value="pastYear">{t('visualization.timeframeOptions.year')}</Select.Item>
+          <Select.Item data-cy="time-dropdown-item" value="all">
+            {t('visualization.timeframeOptions.all')}
+          </Select.Item>
+          <Select.Item data-cy="time-dropdown-item" value="pastMonth">
+            {t('visualization.timeframeOptions.month')}
+          </Select.Item>
+          <Select.Item data-cy="time-dropdown-item" value="pastYear">
+            {t('visualization.timeframeOptions.year')}
+          </Select.Item>
         </Select.Group>
       </Select.Content>
     </Select>

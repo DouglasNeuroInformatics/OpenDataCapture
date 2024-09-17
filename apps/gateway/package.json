@@ -11,6 +11,7 @@
     "db:generate": "prisma generate",
     "db:push": "env-cmd --silent -f ../../.env prisma db push --skip-generate",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx scripts/dev.ts && env-cmd -f ../../.env node dist/main.js",
+    "dev:test": "NODE_ENV=test env-cmd -f ../../.env tsx scripts/dev.ts && env-cmd -f ../../.env node dist/main.js",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
@@ -42,7 +43,7 @@
     "@types/express": "^4.17.21",
     "@vitejs/plugin-react-swc": "^3.7.0",
     "autoprefixer": "^10.4.20",
-    "esbuild": "catalog:esbuild",
+    "esbuild": "catalog:",
     "nodemon": "catalog:",
     "postcss": "^8.4.45",
     "prisma": "catalog:",

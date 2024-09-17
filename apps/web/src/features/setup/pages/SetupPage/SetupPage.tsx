@@ -105,6 +105,7 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                 title: t('setup.demo.title')
               }
             ]}
+            data-cy="setup-form"
             submitBtnLabel={t('core.submit')}
             validationSchema={z.object({
               firstName: z.string().min(1),
