@@ -23,8 +23,8 @@
   "dependencies": {
     "commander": "^12.1.0",
     "es-module-lexer": "^1.5.4",
-    "esbuild": "catalog:esbuild",
-    "esbuild-wasm": "catalog:esbuild",
+    "esbuild": "catalog:",
+    "esbuild-wasm": "catalog:",
     "glob": "^11.0.0",
     "slashes": "^3.0.12",
     "ts-pattern": "workspace:ts-pattern__5.x@*",

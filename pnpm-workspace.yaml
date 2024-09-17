@@ -1,16 +1,17 @@
 catalog:
+  '@casl/ability': ^6.7.1
+  '@casl/prisma': ^1.4.1
+  '@douglasneuroinformatics/libjs': latest
   '@douglasneuroinformatics/libstats': latest
   '@douglasneuroinformatics/libui': latest
   '@douglasneuroinformatics/libui-form-types': latest
   '@microsoft/api-extractor': ^7.47.6
   '@prisma/client': ^5.18.0
+  esbuild: 0.23.x
+  esbuild-wasm: 0.23.x
   nodemon: ^3.1.4
   prisma: ^5.18.0
   tsx: 4.8.2
-catalogs:
-  esbuild:
-    esbuild: 0.23.x
-    esbuild-wasm: 0.23.x
 packages:
   - apps/*
   - packages/*

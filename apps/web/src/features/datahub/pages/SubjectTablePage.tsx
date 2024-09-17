@@ -29,14 +29,14 @@ export const SubjectTablePage = () => {
     <div>
       <div className="mb-2">
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
-          <div className="flex flex-col gap-2 lg:flex-row" data-cy="select-instrument-dropdown-container">
+          <div className="flex flex-col gap-2 lg:flex-row">
             <SelectInstrument options={instrumentOptions} onSelect={setInstrumentId} />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <div data-cy="time-dropdown-container">
+            <div>
               <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
             </div>
-            <div data-cy="download-dropdown-container">
+            <div>
               <ActionDropdown
                 widthFull
                 disabled={!instrumentId}
@@ -60,6 +60,7 @@ export const SubjectTablePage = () => {
           ...fields
         ]}
         data={records}
+        data-cy="subject-table"
         entriesPerPage={15}
         minRows={15}
       />

@@ -1,0 +1,25 @@
+{
+  "name": "@opendatacapture/cypress",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "cy:install": "cypress install",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "format": "prettier --write .",
+    "lint": "tsc && eslint --fix .",
+    "test": "pnpm cy:run"
+  },
+  "dependencies": {
+    "@casl/ability": "catalog:",
+    "@douglasneuroinformatics/libjs": "catalog:",
+    "@faker-js/faker": "^9.0.0",
+    "@opendatacapture/schemas": "workspace:",
+    "cypress": "^13.14.2"
+  },
+  "devDependencies": {
+    "type-fest": "workspace:type-fest__4.x@*"
+  }
+}

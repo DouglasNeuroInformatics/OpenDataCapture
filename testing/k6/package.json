@@ -16,6 +16,6 @@
   },
   "devDependencies": {
     "@types/k6": "~0.53.1",
-    "esbuild": "catalog:esbuild"
+    "esbuild": "catalog:"
   }
 }

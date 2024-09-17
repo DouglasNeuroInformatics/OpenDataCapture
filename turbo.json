@@ -20,7 +20,10 @@
       "dependsOn": ["db:generate"]
     },
     "dev": {
-      "cache": false,
+      "dependsOn": ["^build", "^db:generate", "db:push"],
+      "persistent": true
+    },
+    "dev:test": {
       "dependsOn": ["^build", "^db:generate", "db:push"],
       "persistent": true
     },

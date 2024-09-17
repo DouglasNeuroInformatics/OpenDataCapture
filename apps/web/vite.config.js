@@ -8,7 +8,7 @@ import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
@@ -31,9 +31,7 @@ export default defineConfig(({ mode }) => ({
     importMetaEnv.vite({
       example: path.resolve(import.meta.dirname, '.env.public')
     }),
-    runtime({
-      disabled: mode === 'test'
-    })
+    runtime()
   ],
   resolve: {
     alias: {

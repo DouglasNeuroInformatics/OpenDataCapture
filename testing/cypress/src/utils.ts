@@ -1,9 +1,9 @@
 export const createDownloadsFolder = () => {
   const downloadsFolder = Cypress.config('downloadsFolder');
-  cy.task('createFolder', downloadsFolder);
+  cy.task('mkdir', downloadsFolder);
 };
 
 export const deleteDownloadsFolder = () => {
   const downloadsFolder = Cypress.config('downloadsFolder');
-  cy.task('deleteFolder', downloadsFolder);
+  cy.task('rmdir', downloadsFolder);
 };

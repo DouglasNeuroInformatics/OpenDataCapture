@@ -1,0 +1,9 @@
+{
+  "extends": "@douglasneuroinformatics/tsconfig",
+  "compilerOptions": {
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "types": ["cypress", "node"]
+  },
+  "include": ["cypress.config.ts", "src/**/*"]
+}

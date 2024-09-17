@@ -13,7 +13,7 @@ export type NavButtonProps = {
 } & NavItem;
 
 export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(function NavButton(
-  { activeClassName, className, disabled, icon: Icon, id, isActive, label, onClick },
+  { activeClassName, className, disabled, icon: Icon, id, isActive, label, onClick, ...props },
   ref
 ) {
   const navigate = useNavigate();
@@ -35,6 +35,7 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
           navigate(id);
         }
       }}
+      {...props}
     >
       <Icon className="mr-2" />
       {label}
