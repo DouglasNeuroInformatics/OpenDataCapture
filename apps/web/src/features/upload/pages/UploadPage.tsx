@@ -49,34 +49,57 @@ export const UploadPage = () => {
     if (!file) {
       return;
     }
+    if (!instrument) {
+      return;
+    }
+    const input = file;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      let text = reader.result as string;
+
+      let lines = text.split('\n');
+      if (!lines) {
+        return;
+      }
+
+      let result = [];
+
+      let headers: string[] = lines[0]!.split('\n');
+
+      if (!headers) {
+        return;
+      }
+
+      for (const line of lines) {
+        let elements = line.split(',');
+        let jsonLine = {};
+
+        for (let j = 0; j < headers?.length; j++) {
+          if (!headers) {
+            return;
+          } else {
+            jsonLine[headers[j]] = elements[j];
+          }
+        }
+        result.push(jsonLine);
+      }
+
+      const zodCheck = instrument.validationSchema.safeParse(result);
+
+      if (!zodCheck.success) {
+        console.log(zodCheck.error);
+      } else {
+        console.log(zodCheck.success);
+      }
+    };
+    reader.readAsText(input);
+
     //to do
     //take validation schema types and title to use as column titles
     //make the first two columns of the template csv id and date
     //add the validation schema/content variables as column headers for csv
     //add the first line of the csv to be the data type (string, number, boolean, etc), also say if its optional or not
-  };
-
-  const csvToJson = (csvFilePath: string): Promise<any[]> => {
-    return new Promise((resolve, reject) => {
-      // Read the CSV file
-      fs.readFile(csvFilePath, 'utf8', (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-
-        // Parse the CSV data using PapaParse
-        Papa.parse(data, {
-          complete: (result) => {
-            resolve(result.data);
-          },
-          error: (parseError) => {
-            reject(parseError);
-          },
-          header: true, // Use the first row as headers
-          skipEmptyLines: true // Skip empty lines
-        });
-      });
-    });
   };
 
   return (
