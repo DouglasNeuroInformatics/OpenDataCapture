@@ -54,7 +54,16 @@ export const UploadPage = () => {
       case 'ZodNumber':
         if (isNumberLike(entry)) {
           return parseNumber(entry);
+        } else {
+          return null;
         }
+      case 'ZodBoolean':
+        if (entry) {
+          return entry.toLowerCase() === 'true';
+        }
+        return null;
+      default:
+        return null;
     }
   };
   const processInstrumentCSV = () => {
