@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { isNumberLike, parseNumber } from '@douglasneuroinformatics/libjs';
 import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
@@ -9,6 +10,8 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 
 import { useInstrument } from '@/hooks/useInstrument';
+
+import { getZodTypeName } from '../utils';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -41,7 +44,19 @@ export const UploadPage = () => {
 
     return;
   };
-
+  const valueInterpreter = (entry: null | string, zType: string) => {
+    if (!entry) {
+      return;
+    }
+    switch (zType) {
+      case 'ZodString':
+        return entry;
+      case 'ZodNumber':
+        if (isNumberLike(entry)) {
+          return parseNumber(entry);
+        }
+    }
+  };
   const processInstrumentCSV = () => {
     if (!file) {
       return;
@@ -50,44 +65,70 @@ export const UploadPage = () => {
       return;
     }
     const input = file;
+    const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
+    const shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
+
+    // console.log("instrument def",schema.shape)
 
     const reader = new FileReader();
     reader.onload = () => {
       let text = reader.result as string;
 
       let lines = text.split('\n');
+
+      let data = lines.slice(1);
+
+      // console.log("this is data", data)
+
       if (!lines) {
         return;
       }
 
       let result = [];
 
-      let headers: string[] = lines[0]!.split('\n');
+      let headers: string[] = lines[0]!.split(',');
+
+      // console.log(headers)
+
+      //let identifiers: string[] = headers.slice(0,2)
+
+      headers = headers.slice(2); //remove mouse id and date
 
       if (!headers) {
         return;
       }
-
-      for (const line of lines) {
-        let elements = line.split(',');
+      // console.log("these are the headers", headers)
+      for (const line of data) {
+        let elements = line.split(',').slice(2);
+        //console.log('elements to be inputed', elements)
         let jsonLine = {};
 
         for (let j = 0; j < headers?.length; j++) {
           if (!headers) {
             return;
           } else {
-            jsonLine[headers[j]] = elements[j];
+            const key = headers[j]!;
+            const typeName = getZodTypeName(shape[key]!);
+            console.log(typeName);
+            console.log(key);
+            jsonLine[headers[j]] = valueInterpreter(elements[j], typeName);
           }
         }
         result.push(jsonLine);
       }
+      result.pop();
 
-      const zodCheck = instrument.validationSchema.safeParse(result);
+      console.log('this is result', result);
 
-      if (!zodCheck.success) {
-        console.log(zodCheck.error);
-      } else {
-        console.log(zodCheck.success);
+      for (const entry of result) {
+        //console.log(instrument.validationSchema.array())
+        const zodCheck = instrument.validationSchema.safeParse(entry);
+
+        if (!zodCheck.success) {
+          console.log(zodCheck.error);
+        } else {
+          console.log(zodCheck.success);
+        }
       }
     };
     reader.readAsText(input);
