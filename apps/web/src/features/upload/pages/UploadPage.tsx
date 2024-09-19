@@ -1,13 +1,10 @@
 import { useState } from 'react';
 
-import fs from 'fs';
-
 import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-core';
 import { DownloadIcon } from 'lucide-react';
-import Papa from 'papaparse';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 
