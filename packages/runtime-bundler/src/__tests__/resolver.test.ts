@@ -120,7 +120,7 @@ describe('Resolver', () => {
         );
         await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
           message: expect.stringContaining(
-            `file '${abspath}' does not have one of the expected extensions: .json, .js, .mjs`
+            `file '${abspath}' does not have one of the expected extensions: .css, .json, .js, .mjs`
           )
         });
       });
@@ -130,7 +130,7 @@ describe('Resolver', () => {
         );
         await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
           message: expect.stringContaining(
-            `file '${abspath}' does not have one of the expected extensions: .json, .js, .mjs`
+            `file '${abspath}' does not have one of the expected extensions: .css, .json, .js, .mjs`
           )
         });
       });
