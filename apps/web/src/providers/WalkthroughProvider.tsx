@@ -20,7 +20,8 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   const isWalkthroughComplete = useAppStore((store) => store.isWalkthroughComplete);
   const setIsWalkthroughComplete = useAppStore((store) => store.setIsWalkthroughComplete);
   const { resolvedLanguage, t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+  const isWalkthroughOpen = useAppStore((store) => store.isWalkthroughOpen);
+  const setIsWalkthroughOpen = useAppStore((store) => store.setIsWalkthroughOpen);
   const [index, setIndex] = useState(0);
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const targetRef = useRef<HTMLDivElement | null>(null);
@@ -101,13 +102,13 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   };
 
   const close = () => {
-    setIsOpen(false);
+    setIsWalkthroughOpen(false);
     removeSpotlight();
   };
 
   useEffect(() => {
     if (isDisclaimerAccepted && !isWalkthroughComplete) {
-      setIsOpen(true);
+      setIsWalkthroughOpen(true);
     } else if (isWalkthroughComplete) {
       close();
     }
@@ -132,7 +133,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
     <React.Fragment>
       {children}
       <AnimatePresence>
-        {isOpen && (
+        {isWalkthroughOpen && (
           <>
             <motion.div
               animate={{ opacity: 1 }}

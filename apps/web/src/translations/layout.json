@@ -72,15 +72,5 @@
       "en": "Douglas Neuroinformatics Platform",
       "fr": "Douglas Neuroinformatics Platform"
     }
-  },
-  "userDropup": {
-    "logout": {
-      "en": "Logout",
-      "fr": "Se déconnecter"
-    },
-    "preferences": {
-      "en": "Preferences",
-      "fr": "Préférences"
-    }
   }
 }
