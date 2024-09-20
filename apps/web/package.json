@@ -44,6 +44,7 @@
     "jwt-decode": "^4.0.0",
     "lodash-es": "workspace:lodash-es__4.x@*",
     "lucide-react": "^0.439.0",
+    "papaparse": "workspace:papaparse__5.x@*",
     "react": "workspace:react__18.x@*",
     "react-dom": "workspace:react-dom__18.x@*",
     "react-error-boundary": "^4.0.13",

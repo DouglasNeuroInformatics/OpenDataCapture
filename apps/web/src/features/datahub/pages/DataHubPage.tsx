@@ -6,6 +6,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import axios from 'axios';
+import { unparse } from 'papaparse';
 import { useNavigate } from 'react-router-dom';
 
 import { IdentificationForm } from '@/components/IdentificationForm';
@@ -43,12 +44,10 @@ export const DataHubPage = () => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'CSV':
-        void download('README.txt', () => Promise.resolve(t('datahub.index.table.exportHelpText')));
+        void download('README.txt', () => t('datahub.index.table.exportHelpText'));
         void download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
-          const columnNames = Object.keys(data[0]!).join(',');
-          const rows = data.map((record) => Object.values(record).join(',')).join('\n');
-          return columnNames + '\n' + rows;
+          return unparse(data);
         });
         break;
       case 'JSON':
