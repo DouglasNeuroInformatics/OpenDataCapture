@@ -8,7 +8,8 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix src",
+    "test": "vitest"
   },
   "peerDependencies": {
     "@opendatacapture/runtime-v1": "workspace:*",
