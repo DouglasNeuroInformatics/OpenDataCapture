@@ -9,6 +9,7 @@ catalog:
   '@prisma/client': ^5.18.0
   esbuild: 0.23.x
   esbuild-wasm: 0.23.x
+  happy-dom: ^15.7.4
   nodemon: ^3.1.4
   prisma: ^5.18.0
   tsx: 4.8.2

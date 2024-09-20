@@ -36,6 +36,9 @@ catalogs:
     esbuild-wasm:
       specifier: 0.23.x
       version: 0.23.1
+    happy-dom:
+      specifier: ^15.7.4
+      version: 15.7.4
     nodemon:
       specifier: ^3.1.4
       version: 3.1.4
@@ -129,7 +132,7 @@ importers:
         version: 2.1.1(@vitest/spy@2.1.1)(typescript@5.5.4)(vite@5.4.5(@types/node@20.16.5))(vitest@2.1.1)
       '@vitest/coverage-v8':
         specifier: ^2.0.5
-        version: 2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(typescript@5.5.4)(vite@5.4.5(@types/node@20.16.5))(vitest@2.1.1))(vitest@2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(msw@2.4.7(typescript@5.5.4)))
+        version: 2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(typescript@5.5.4)(vite@5.4.5(@types/node@20.16.5))(vitest@2.1.1))(vitest@2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(happy-dom@15.7.4)(msw@2.4.7(typescript@5.5.4)))
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -177,7 +180,7 @@ importers:
         version: 1.5.1(@swc/core@1.7.26(@swc/helpers@0.5.13))(rollup@4.21.3)
       vitest:
         specifier: ^2.0.5
-        version: 2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(msw@2.4.7(typescript@5.5.4))
+        version: 2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(happy-dom@15.7.4)(msw@2.4.7(typescript@5.5.4))
 
   apps/api:
     dependencies:
@@ -747,6 +750,9 @@ importers:
       esbuild-wasm:
         specifier: 'catalog:'
         version: 0.23.1
+      happy-dom:
+        specifier: 'catalog:'
+        version: 15.7.4
       postcss:
         specifier: ^8.4.45
         version: 8.4.47
@@ -7527,6 +7533,11 @@ packages:
       { integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q== }
     engines: { node: '>=6.0' }
 
+  happy-dom@15.7.4:
+    resolution:
+      { integrity: sha512-r1vadDYGMtsHAAsqhDuk4IpPvr6N8MGKy5ntBo7tSdim+pWDxus2PNqOcOt8LuDZ4t3KJHE+gCuzupcx/GKnyQ== }
+    engines: { node: '>=18.0.0' }
+
   has-bigints@1.0.2:
     resolution:
       { integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ== }
@@ -11858,6 +11869,11 @@ packages:
     resolution:
       { integrity: sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ== }
 
+  whatwg-mimetype@3.0.0:
+    resolution:
+      { integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q== }
+    engines: { node: '>=12' }
+
   whatwg-url@13.0.0:
     resolution:
       { integrity: sha512-9WWbymnqj57+XEuqADHrCJ2eSXzn8WXIW/YSGaZtb2WKAInQ6CHfaUUcTyyver0p8BDg5StLQq8h1vtZuwmOig== }
@@ -16160,7 +16176,7 @@ snapshots:
       msw: 2.4.7(typescript@5.5.4)
       sirv: 2.0.4
       tinyrainbow: 1.2.0
-      vitest: 2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(msw@2.4.7(typescript@5.5.4))
+      vitest: 2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(happy-dom@15.7.4)(msw@2.4.7(typescript@5.5.4))
       ws: 8.18.0
     transitivePeerDependencies:
       - '@vitest/spy'
@@ -16169,7 +16185,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/coverage-v8@2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(typescript@5.5.4)(vite@5.4.5(@types/node@20.16.5))(vitest@2.1.1))(vitest@2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(msw@2.4.7(typescript@5.5.4)))':
+  '@vitest/coverage-v8@2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(typescript@5.5.4)(vite@5.4.5(@types/node@20.16.5))(vitest@2.1.1))(vitest@2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(happy-dom@15.7.4)(msw@2.4.7(typescript@5.5.4)))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -16183,7 +16199,7 @@ snapshots:
       std-env: 3.7.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(msw@2.4.7(typescript@5.5.4))
+      vitest: 2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(happy-dom@15.7.4)(msw@2.4.7(typescript@5.5.4))
     optionalDependencies:
       '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(typescript@5.5.4)(vite@5.4.5(@types/node@20.16.5))(vitest@2.1.1)
     transitivePeerDependencies:
@@ -18533,6 +18549,12 @@ snapshots:
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
+
+  happy-dom@15.7.4:
+    dependencies:
+      entities: 4.5.0
+      webidl-conversions: 7.0.0
+      whatwg-mimetype: 3.0.0
 
   has-bigints@1.0.2: {}
 
@@ -22555,7 +22577,7 @@ snapshots:
     optionalDependencies:
       vite: 5.4.5(@types/node@22.5.5)
 
-  vitest@2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(msw@2.4.7(typescript@5.5.4)):
+  vitest@2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(happy-dom@15.7.4)(msw@2.4.7(typescript@5.5.4)):
     dependencies:
       '@vitest/expect': 2.1.1
       '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(msw@2.4.7(typescript@5.5.4))(vite@5.4.5(@types/node@20.16.5))
@@ -22579,6 +22601,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.16.5
       '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(typescript@5.5.4)(vite@5.4.5(@types/node@20.16.5))(vitest@2.1.1)
+      happy-dom: 15.7.4
     transitivePeerDependencies:
       - less
       - lightningcss
@@ -22719,6 +22742,8 @@ snapshots:
   webidl-conversions@7.0.0: {}
 
   webpack-virtual-modules@0.6.2: {}
+
+  whatwg-mimetype@3.0.0: {}
 
   whatwg-url@13.0.0:
     dependencies:
