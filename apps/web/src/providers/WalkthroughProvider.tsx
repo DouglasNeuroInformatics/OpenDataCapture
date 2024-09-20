@@ -5,11 +5,13 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import type { Promisable } from 'type-fest';
 
 import { useAppStore } from '@/store';
 
 type WalkthroughStep = {
   content: React.ReactNode;
+  onBeforeQuery?: () => Promisable<void>;
   target: string;
   title: string;
   url: `/${string}`;
@@ -90,6 +92,20 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
         target: '#subject-lookup-search-bar',
         title: 'Subject Lookup',
         url: '/datahub'
+      },
+      {
+        content: (
+          <p>
+            {t({
+              en: '',
+              fr: ''
+            })}
+          </p>
+        ),
+        onBeforeQuery: () => targetRef.current!.click(),
+        target: '[data-spotlight-type="subject-lookup-modal"]',
+        title: 'Subject Lookup',
+        url: '/datahub'
       }
     ];
   }, [resolvedLanguage]);
@@ -117,14 +133,17 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
     if (isWalkthroughOpen && window.location.pathname !== currentStep.url) {
       navigate(currentStep.url);
     }
-    targetRef.current = document.querySelector(currentStep.target);
-    if (targetRef.current) {
-      targetRef.current.setAttribute('data-spotlight', 'true');
-      const rect = targetRef.current.getBoundingClientRect();
-      setPopoverPosition({ x: rect.x, y: rect.bottom + 20 });
-    } else {
-      console.error(`Failed to find element with query: ${currentStep.target}`);
-    }
+    void (async function () {
+      await currentStep.onBeforeQuery?.();
+      targetRef.current = document.querySelector(currentStep.target);
+      if (targetRef.current) {
+        targetRef.current.setAttribute('data-spotlight', 'true');
+        const rect = targetRef.current.getBoundingClientRect();
+        setPopoverPosition({ x: rect.x, y: rect.bottom + 20 });
+      } else {
+        console.error(`Failed to find element with query: ${currentStep.target}`);
+      }
+    })();
     return removeSpotlight;
   }, [index]);
 
@@ -142,7 +161,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             />
             <motion.div
               animate={{ opacity: 100, x: popoverPosition.x, y: popoverPosition.y }}
-              className="absolute z-50"
+              className="absolute z-[60]"
               exit={{ opacity: 0 }}
               initial={{ opacity: 0, x: popoverPosition.x, y: popoverPosition.y }}
             >

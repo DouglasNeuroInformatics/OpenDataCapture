@@ -90,7 +90,7 @@ export const DataHubPage = () => {
                   readOnly={true}
                 />
               </Dialog.Trigger>
-              <Dialog.Content>
+              <Dialog.Content data-spotlight-type="subject-lookup-modal">
                 <Dialog.Header>
                   <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
                 </Dialog.Header>
