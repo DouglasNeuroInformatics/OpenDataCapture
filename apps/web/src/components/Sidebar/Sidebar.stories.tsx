@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 
 import { useAppStore } from '@/store';
-import { currentSession, currentUser } from '@/testing/server/stubs';
+import { currentSession, currentUser } from '@/testing/stubs';
 
 import { Sidebar } from './Sidebar';
 
