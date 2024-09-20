@@ -2,20 +2,22 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import { deepFreeze, range } from '@douglasneuroinformatics/libjs';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, type MockInstance } from 'vitest';
 import { vi } from 'vitest';
 
 import { runtime } from '../index.js';
-import * as runtimeResolve from '../resolve.js';
+import * as resolve from '../resolve.js';
 
-/** @type {runtimeResolve.RuntimeVersionInfo} */
-const runtimeVersionInfoStub = deepFreeze(
+import type { RuntimeVersionInfo } from '../index.d.ts';
+
+const runtimeVersionInfoStub: RuntimeVersionInfo = deepFreeze(
   {
     baseDir: '',
     importPaths: [],
     manifest: {
       declarations: [],
-      sources: []
+      sources: [],
+      styles: []
     },
     version: ''
   },
@@ -25,30 +27,31 @@ const runtimeVersionInfoStub = deepFreeze(
 );
 
 describe('runtime', () => {
-  /** @type {import('vitest').MockInstance<any[], Promise<runtimeResolve.RuntimeVersionInfo[]>>} */
-  let resolvePackages;
+  let resolvePackages: MockInstance<() => Promise<RuntimeVersionInfo[]>>;
 
   beforeEach(() => {
-    resolvePackages = vi.spyOn(runtimeResolve, 'resolvePackages').mockResolvedValue([runtimeVersionInfoStub]);
+    resolvePackages = vi.spyOn(resolve, 'resolvePackages').mockResolvedValue([runtimeVersionInfoStub]);
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
+
   it('should return false if disabled', () => {
     expect(runtime({ disabled: true })).toBe(false);
   });
+
   it('should return an object by default', () => {
     expect(runtime()).not.toBeNull();
     expect(runtime()).toBeTypeOf('object');
   });
-  describe('buildStart', async () => {
+
+  describe('buildStart', () => {
     it('should invoke fs.cp and fs.writeFile for each item returned by resolvePackages', async () => {
       vi.spyOn(fs, 'cp').mockImplementation(vi.fn());
       vi.spyOn(fs, 'writeFile').mockImplementation(vi.fn());
       resolvePackages.mockResolvedValueOnce(range(3).map(() => structuredClone(runtimeVersionInfoStub)));
-      /** @type {any} */
-      const plugin = runtime();
+      const plugin: any = runtime();
       await plugin.buildStart();
       expect(fs.cp).toHaveBeenCalledTimes(3);
       expect(fs.writeFile).toHaveBeenCalledTimes(3);
@@ -60,43 +63,38 @@ describe('runtime', () => {
       resolvePackages.mockResolvedValueOnce(
         range(3).map(() => ({ ...structuredClone(runtimeVersionInfoStub), version: 'v0' }))
       );
-      /** @type {any} */
-      const plugin = runtime({
-        packageRoot: '/home/dev/test'
-      });
+      const plugin: any = runtime({ packageRoot: '/home/dev/test' });
       await plugin.buildStart();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(path.resolve).toHaveBeenCalledWith('/home/dev/test', 'dist/runtime/v0');
     });
   });
   describe('config', () => {
-    it('should exclude the import paths resolved', () => {
+    it('should exclude the import paths resolved', async () => {
       resolvePackages.mockResolvedValueOnce([
         { ...structuredClone(runtimeVersionInfoStub), importPaths: ['/path1', '/path2'] },
         { ...structuredClone(runtimeVersionInfoStub), importPaths: ['/path3', '/path4'] }
       ]);
-      /** @type {any} */
-      const plugin = runtime();
-      expect(plugin.config()).resolves.toMatchObject({
+      const plugin: any = runtime();
+      await expect(plugin.config()).resolves.toMatchObject({
         optimizeDeps: {
           exclude: ['/path1', '/path2', '/path3', '/path4']
         }
       });
     });
   });
-  describe('configureServer', async () => {
-    /** @type {{ middlewares: { use: import('vitest').Mock }; }} */
-    let server;
+  describe('configureServer', () => {
+    let server: { middlewares: { use: Mock } };
 
     beforeEach(() => {
       server = { middlewares: { use: vi.fn() } };
     });
 
     it('should call the server.middlewares.use method', () => {
-      /** @type {any} */
-      const plugin = runtime();
+      const plugin: any = runtime();
       plugin.configureServer(server);
       expect(server.middlewares.use).toHaveBeenCalledOnce();
-      const [route, handler] = server.middlewares.use.mock.lastCall;
+      const [route, handler] = server.middlewares.use.mock.lastCall!;
       expect(route).toBeTypeOf('string');
       expect(handler).toBeTypeOf('function');
     });
