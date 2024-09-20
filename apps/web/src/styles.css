@@ -2,7 +2,7 @@
 
 @layer components {
   .spotlight {
-    @apply z-40 shadow-2xl;
+    @apply pointer-events-none z-40 shadow-2xl;
   }
 }
 

@@ -6,12 +6,14 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import axios from 'axios';
+import { unparse } from 'papaparse';
 import { useNavigate } from 'react-router-dom';
 
 import { IdentificationForm } from '@/components/IdentificationForm';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppStore } from '@/store';
+import { downloadExcel } from '@/utils/excel';
 
 import { MasterDataTable } from '../components/MasterDataTable';
 import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
@@ -38,16 +40,14 @@ export const DataHubPage = () => {
     return response.data;
   };
 
-  const handleExportSelection = (option: 'CSV' | 'JSON') => {
+  const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'CSV':
-        void download('README.txt', () => Promise.resolve(t('datahub.index.table.exportHelpText')));
+        void download('README.txt', () => t('datahub.index.table.exportHelpText'));
         void download(`${baseFilename}.csv`, async () => {
           const data = await getExportRecords();
-          const columnNames = Object.keys(data[0]!).join(',');
-          const rows = data.map((record) => Object.values(record).join(',')).join('\n');
-          return columnNames + '\n' + rows;
+          return unparse(data);
         });
         break;
       case 'JSON':
@@ -56,6 +56,10 @@ export const DataHubPage = () => {
           return JSON.stringify(data, null, 2);
         });
         break;
+      case 'Excel':
+        getExportRecords()
+          .then((records) => downloadExcel(`${baseFilename}.xlsx`, records))
+          .catch(console.error);
     }
   };
 
@@ -87,10 +91,14 @@ export const DataHubPage = () => {
                 <SearchBar
                   className="[&>input]:text-foreground [&>input]:placeholder-foreground"
                   id="subject-lookup-search-bar"
+                  placeholder={t({
+                    en: 'Click to Search',
+                    fr: 'Cliquer pour rechercher'
+                  })}
                   readOnly={true}
                 />
               </Dialog.Trigger>
-              <Dialog.Content>
+              <Dialog.Content data-spotlight-type="subject-lookup-modal">
                 <Dialog.Header>
                   <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
                 </Dialog.Header>
@@ -100,7 +108,8 @@ export const DataHubPage = () => {
             <div className="flex min-w-60 gap-2 lg:flex-shrink">
               <ActionDropdown
                 widthFull
-                options={['CSV', 'JSON']}
+                data-spotlight-type="export-data-dropdown"
+                options={['CSV', 'JSON', 'Excel']}
                 title={t('datahub.index.table.export')}
                 onSelection={handleExportSelection}
               />

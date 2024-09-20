@@ -1,15 +1,19 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Button, Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { match } from 'ts-pattern';
+import type { Promisable } from 'type-fest';
 
 import { useAppStore } from '@/store';
 
 type WalkthroughStep = {
   content: React.ReactNode;
+  onBeforeQuery?: () => Promisable<void>;
+  position: 'bottom-left' | 'bottom-right';
   target: string;
   title: string;
   url: `/${string}`;
@@ -20,10 +24,12 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   const isWalkthroughComplete = useAppStore((store) => store.isWalkthroughComplete);
   const setIsWalkthroughComplete = useAppStore((store) => store.setIsWalkthroughComplete);
   const { resolvedLanguage, t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+  const isWalkthroughOpen = useAppStore((store) => store.isWalkthroughOpen);
+  const setIsWalkthroughOpen = useAppStore((store) => store.setIsWalkthroughOpen);
   const [index, setIndex] = useState(0);
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const targetRef = useRef<HTMLDivElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   const steps = useMemo<WalkthroughStep[]>(() => {
@@ -47,6 +53,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             })}
           </p>
         ),
+        position: 'bottom-left',
         target: '#sidebar-branding-container',
         title: 'Welcome to Open Data Capture 👋',
         url: '/dashboard'
@@ -60,6 +67,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             })}
           </p>
         ),
+        position: 'bottom-left',
         target: 'button[data-nav-url="/dashboard"]',
         title: 'Dashboard',
         url: '/dashboard'
@@ -73,6 +81,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             })}
           </p>
         ),
+        position: 'bottom-left',
         target: 'button[data-nav-url="/datahub"]',
         title: 'Data Hub',
         url: '/datahub'
@@ -86,9 +95,30 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             })}
           </p>
         ),
+        position: 'bottom-left',
         target: '#subject-lookup-search-bar',
         title: 'Subject Lookup',
         url: '/datahub'
+      },
+      {
+        content: t({
+          en: 'Here, you can export all your data in various formats.',
+          fr: 'Ici, vous pouvez exporter toutes vos données dans différents formats.'
+        }),
+        position: 'bottom-right',
+        target: '[data-spotlight-type="export-data-dropdown"]',
+        title: 'Bulk Data Export',
+        url: '/datahub'
+      },
+      {
+        content: t({
+          en: 'On this page, you can start a new session for a subject. Various options are available based on the identification method you choose and the type of session.',
+          fr: "Sur cette page, vous pouvez démarrer une nouvelle session pour un client. Différentes options sont disponibles en fonction de la méthode d'identification choisie et du type de session."
+        }),
+        position: 'bottom-left',
+        target: 'button[data-nav-url="/session/start-session"]',
+        title: 'Start Session',
+        url: '/session/start-session'
       }
     ];
   }, [resolvedLanguage]);
@@ -101,30 +131,40 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   };
 
   const close = () => {
-    setIsOpen(false);
+    setIsWalkthroughOpen(false);
     removeSpotlight();
+    setIndex(0);
   };
 
   useEffect(() => {
     if (isDisclaimerAccepted && !isWalkthroughComplete) {
-      setIsOpen(true);
-    } else if (isWalkthroughComplete) {
-      close();
+      setIsWalkthroughOpen(true);
     }
   }, [isDisclaimerAccepted, isWalkthroughComplete]);
 
-  useEffect(() => {
-    if (window.location.pathname !== currentStep.url) {
+  useLayoutEffect(() => {
+    if (isWalkthroughOpen && window.location.pathname !== currentStep.url) {
       navigate(currentStep.url);
     }
-    targetRef.current = document.querySelector(currentStep.target);
-    if (targetRef.current) {
-      targetRef.current.setAttribute('data-spotlight', 'true');
-      const rect = targetRef.current.getBoundingClientRect();
-      setPopoverPosition({ x: rect.x, y: rect.bottom + 20 });
-    } else {
-      console.error(`Failed to find element with query: ${currentStep.target}`);
-    }
+    void (async function () {
+      await currentStep.onBeforeQuery?.();
+      targetRef.current = document.querySelector(currentStep.target);
+      if (targetRef.current) {
+        targetRef.current.setAttribute('data-spotlight', 'true');
+        const rect = targetRef.current.getBoundingClientRect();
+        const popoverWidth = popoverRef.current?.clientWidth ?? 0;
+        match(currentStep.position)
+          .with('bottom-left', () => {
+            setPopoverPosition({ x: rect.left, y: rect.bottom + 20 });
+          })
+          .with('bottom-right', () => {
+            setPopoverPosition({ x: rect.right - popoverWidth, y: rect.bottom + 20 });
+          })
+          .exhaustive();
+      } else {
+        console.error(`Failed to find element with query: ${currentStep.target}`);
+      }
+    })();
     return removeSpotlight;
   }, [index]);
 
@@ -132,19 +172,19 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
     <React.Fragment>
       {children}
       <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              animate={{ opacity: 1 }}
-              className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px]"
-              exit={{ opacity: 0 }}
-              initial={{ opacity: 0 }}
-            />
+        {isWalkthroughOpen && (
+          <motion.div
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px]"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+          >
             <motion.div
               animate={{ opacity: 100, x: popoverPosition.x, y: popoverPosition.y }}
-              className="absolute z-50"
+              className="absolute"
               exit={{ opacity: 0 }}
               initial={{ opacity: 0, x: popoverPosition.x, y: popoverPosition.y }}
+              ref={popoverRef}
             >
               <Card className="max-w-md">
                 <Card.Header className="pb-4">
@@ -168,6 +208,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
                     onClick={() => {
                       if (isLastStep) {
                         setIsWalkthroughComplete(true);
+                        close();
                       } else {
                         setIndex(index + 1);
                       }
@@ -186,7 +227,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
                 </Card.Footer>
               </Card>
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
     </React.Fragment>

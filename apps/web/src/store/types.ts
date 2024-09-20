@@ -31,7 +31,9 @@ export type SessionSlice = {
 
 export type WalkthroughSlice = {
   isWalkthroughComplete: boolean;
+  isWalkthroughOpen: boolean;
   setIsWalkthroughComplete: (isWalkthroughComplete: boolean) => void;
+  setIsWalkthroughOpen: (isWalkthroughOpen: boolean) => void;
 };
 
 export type AppStore = Simplify<AuthSlice & DisclaimerSlice & SessionSlice & WalkthroughSlice>;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { ArrowToggle, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { LogOutIcon, SettingsIcon } from 'lucide-react';
+import { LogOutIcon, SchoolIcon, SettingsIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppStore } from '@/store';
@@ -12,6 +12,7 @@ import { UserIcon } from '../UserIcon';
 export const UserDropup = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const logout = useAppStore((store) => store.logout);
+  const setIsWalkthroughOpen = useAppStore((store) => store.setIsWalkthroughOpen);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -47,7 +48,10 @@ export const UserDropup = () => {
             onClick={logout}
           >
             <LogOutIcon />
-            {t('userDropup.logout')}
+            {t({
+              en: 'Logout',
+              fr: 'Se déconnecter'
+            })}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
@@ -56,7 +60,22 @@ export const UserDropup = () => {
             }}
           >
             <SettingsIcon />
-            {t('userDropup.preferences')}
+            {t({
+              en: 'Preferences',
+              fr: 'Préférences'
+            })}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
+            onClick={() => {
+              setIsWalkthroughOpen(true);
+            }}
+          >
+            <SchoolIcon />
+            {t({
+              en: 'Tutorial',
+              fr: 'Tutoriel'
+            })}
           </DropdownMenu.Item>
         </DropdownMenu.Group>
       </DropdownMenu.Content>
