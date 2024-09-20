@@ -31,12 +31,30 @@ export const UploadPage = () => {
     }
 
     const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
+    const shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
 
     const columnNames = Object.keys(instrumentSchema.shape as z.AnyZodObject);
 
-    const csvColumns = 'Mouse ID,Date,' + columnNames.join(',') + '\n';
+    console.log(columnNames);
+
+    let csvColumns = 'Mouse ID,Date,' + columnNames.join(',') + '\n';
+
+    let sampleData = '';
+
+    for (const col of columnNames) {
+      console.log(col);
+      const typeName = getZodTypeName(shape[col]!);
+      console.log('type name', typeName);
+      const sampleColData = sampleDataGenerator(typeName);
+
+      sampleData += ',' + sampleColData;
+    }
+
+    console.log(sampleData);
 
     const fileName = instrument.details.title + ' template';
+
+    csvColumns += 'mouseNumber-LabHead-ProjectLead,yyyy-mm-dd' + sampleData + '\n';
 
     void download(`${fileName}.csv`, () => {
       return csvColumns;
@@ -44,6 +62,7 @@ export const UploadPage = () => {
 
     return;
   };
+
   const valueInterpreter = (entry: null | string, zType: string) => {
     if (!entry) {
       return;
@@ -66,6 +85,20 @@ export const UploadPage = () => {
         return null;
     }
   };
+
+  const sampleDataGenerator = (zType: string | null) => {
+    switch (zType) {
+      case 'ZodString':
+        return 'string';
+      case 'ZodNumber':
+        return 'number';
+      case 'ZodBoolean':
+        return 'true/false';
+      default:
+        return '';
+    }
+  };
+
   const processInstrumentCSV = () => {
     if (!file) {
       return;
@@ -118,16 +151,12 @@ export const UploadPage = () => {
           } else {
             const key = headers[j]!;
             const typeName = getZodTypeName(shape[key]!);
-            console.log(typeName);
-            console.log(key);
             jsonLine[headers[j]] = valueInterpreter(elements[j], typeName);
           }
         }
         result.push(jsonLine);
       }
       result.pop();
-
-      console.log('this is result', result);
 
       for (const entry of result) {
         //console.log(instrument.validationSchema.array())
