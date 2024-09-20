@@ -152,16 +152,15 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
       {children}
       <AnimatePresence>
         {isWalkthroughOpen && (
-          <>
-            <motion.div
-              animate={{ opacity: 1 }}
-              className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px]"
-              exit={{ opacity: 0 }}
-              initial={{ opacity: 0 }}
-            />
+          <motion.div
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px]"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+          >
             <motion.div
               animate={{ opacity: 100, x: popoverPosition.x, y: popoverPosition.y }}
-              className="absolute z-[60]"
+              className="absolute"
               exit={{ opacity: 0 }}
               initial={{ opacity: 0, x: popoverPosition.x, y: popoverPosition.y }}
             >
@@ -206,7 +205,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
                 </Card.Footer>
               </Card>
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
     </React.Fragment>
