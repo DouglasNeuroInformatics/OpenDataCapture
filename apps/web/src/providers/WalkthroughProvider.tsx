@@ -109,8 +109,6 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   useEffect(() => {
     if (isDisclaimerAccepted && !isWalkthroughComplete) {
       setIsWalkthroughOpen(true);
-    } else if (isWalkthroughComplete) {
-      close();
     }
   }, [isDisclaimerAccepted, isWalkthroughComplete]);
 
@@ -169,6 +167,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
                     onClick={() => {
                       if (isLastStep) {
                         setIsWalkthroughComplete(true);
+                        close();
                       } else {
                         setIndex(index + 1);
                       }
