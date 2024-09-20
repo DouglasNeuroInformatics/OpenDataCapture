@@ -12,6 +12,7 @@ import { IdentificationForm } from '@/components/IdentificationForm';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppStore } from '@/store';
+import { downloadExcel } from '@/utils/excel';
 
 import { MasterDataTable } from '../components/MasterDataTable';
 import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
@@ -38,7 +39,7 @@ export const DataHubPage = () => {
     return response.data;
   };
 
-  const handleExportSelection = (option: 'CSV' | 'JSON') => {
+  const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     switch (option) {
       case 'CSV':
@@ -56,6 +57,10 @@ export const DataHubPage = () => {
           return JSON.stringify(data, null, 2);
         });
         break;
+      case 'Excel':
+        getExportRecords()
+          .then((records) => downloadExcel(`${baseFilename}.xlsx`, records))
+          .catch(console.error);
     }
   };
 
@@ -105,7 +110,7 @@ export const DataHubPage = () => {
               <ActionDropdown
                 widthFull
                 data-spotlight-type="export-data-dropdown"
-                options={['CSV', 'JSON']}
+                options={['CSV', 'JSON', 'Excel']}
                 title={t('datahub.index.table.export')}
                 onSelection={handleExportSelection}
               />
