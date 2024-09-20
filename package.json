@@ -5,6 +5,9 @@
   "private": true,
   "packageManager": "pnpm@9.10.0",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=v20.17.0"
+  },
   "scripts": {
     "build": "NODE_ENV=production env-cmd turbo run build",
     "clean": "find . -type d '(' -name '.turbo' -o -name 'dist' -o -name 'node_modules' ')' -prune -exec rm -rf {} \\;",
