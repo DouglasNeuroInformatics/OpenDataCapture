@@ -179,7 +179,7 @@ importers:
         specifier: ^1.5.1
         version: 1.5.1(@swc/core@1.7.26(@swc/helpers@0.5.13))(rollup@4.21.3)
       vitest:
-        specifier: ^2.0.5
+        specifier: ^2.1.1
         version: 2.1.1(@types/node@20.16.5)(@vitest/browser@2.1.1)(happy-dom@15.7.4)(msw@2.4.7(typescript@5.5.4))
 
   apps/api:
