@@ -8,7 +8,7 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "eslint --fix src",
+    "lint": "tsc && eslint --fix src",
     "test": "vitest"
   },
   "peerDependencies": {
