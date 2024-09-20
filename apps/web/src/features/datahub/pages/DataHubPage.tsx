@@ -87,6 +87,10 @@ export const DataHubPage = () => {
                 <SearchBar
                   className="[&>input]:text-foreground [&>input]:placeholder-foreground"
                   id="subject-lookup-search-bar"
+                  placeholder={t({
+                    en: 'Click to Search',
+                    fr: 'Cliquer pour rechercher'
+                  })}
                   readOnly={true}
                 />
               </Dialog.Trigger>
