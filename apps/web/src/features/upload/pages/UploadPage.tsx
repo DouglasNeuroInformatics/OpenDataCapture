@@ -76,6 +76,9 @@ export const UploadPage = () => {
           return entry.toLowerCase() === 'true';
         }
         return null;
+      case 'ZodSet':
+        return 'SET(a,b,c)';
+
       default:
         return null;
     }
