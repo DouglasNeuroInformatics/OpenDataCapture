@@ -3,10 +3,6 @@
 /// <reference lib="dom.iterable" />
 /// <reference types="vite/client" />
 
-declare const __TAILWIND_THEME__: {
-  colors: Pick<import('tailwindcss/types/generated/colors').DefaultColors, 'slate'>;
-};
-
 // All of these should be undefined in production
 interface ImportMetaDevEnv {
   readonly VITE_DEV_BYPASS_AUTH?: string;
