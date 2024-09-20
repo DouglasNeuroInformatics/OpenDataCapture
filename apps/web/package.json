@@ -52,6 +52,7 @@
     "tailwind-merge": "^2.5.2",
     "ts-pattern": "workspace:ts-pattern__5.x@*",
     "type-fest": "workspace:type-fest__4.x@*",
+    "xlsx": "^0.18.5",
     "zod": "workspace:zod__3.23.x@*",
     "zustand": "^4.5.5"
   },
