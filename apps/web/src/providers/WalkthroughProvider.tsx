@@ -104,6 +104,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   const close = () => {
     setIsWalkthroughOpen(false);
     removeSpotlight();
+    setIndex(0);
   };
 
   useEffect(() => {
@@ -113,7 +114,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   }, [isDisclaimerAccepted, isWalkthroughComplete]);
 
   useEffect(() => {
-    if (window.location.pathname !== currentStep.url) {
+    if (isWalkthroughOpen && window.location.pathname !== currentStep.url) {
       navigate(currentStep.url);
     }
     targetRef.current = document.querySelector(currentStep.target);
