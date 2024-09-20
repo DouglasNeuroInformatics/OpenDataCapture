@@ -109,6 +109,16 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
         target: '[data-spotlight-type="export-data-dropdown"]',
         title: 'Bulk Data Export',
         url: '/datahub'
+      },
+      {
+        content: t({
+          en: 'On this page, you can start a new session for a subject. Various options are available based on the identification method you choose and the type of session.',
+          fr: "Sur cette page, vous pouvez démarrer une nouvelle session pour un client. Différentes options sont disponibles en fonction de la méthode d'identification choisie et du type de session."
+        }),
+        position: 'bottom-left',
+        target: 'button[data-nav-url="/session/start-session"]',
+        title: 'Start Session',
+        url: '/session/start-session'
       }
     ];
   }, [resolvedLanguage]);
