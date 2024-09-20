@@ -27,6 +27,7 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
       state.accessToken = null;
       state.currentGroup = null;
       state.currentUser = null;
+      state.isDisclaimerAccepted = false;
     });
   }
 });

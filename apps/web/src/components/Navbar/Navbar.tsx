@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
 import { Button, LanguageToggle, Separator, Sheet, ThemeToggle } from '@douglasneuroinformatics/libui/components';
-import { useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { MenuIcon, StopCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
@@ -20,7 +20,7 @@ export const Navbar = () => {
   const navigate = useNavigate();
 
   // This is to prevent ugly styling when resizing the viewport
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useIsDesktop();
 
   useEffect(() => {
     if (isDesktop) {
@@ -55,17 +55,17 @@ export const Navbar = () => {
         <nav className="flex w-full flex-grow flex-col divide-y divide-slate-200 dark:divide-slate-700">
           {navItems.map((items, i) => (
             <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-              {items.map(({ disabled, id, ...props }) => (
+              {items.map(({ disabled, url, ...props }) => (
                 <NavButton
                   activeClassName="bg-slate-200 text-slate-900 dark:text-slate-100 dark:bg-slate-800"
                   className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
-                  disabled={disabled && location.pathname !== id}
-                  id={id}
-                  isActive={location.pathname === id}
-                  key={id}
+                  disabled={disabled && location.pathname !== url}
+                  isActive={location.pathname === url}
+                  key={url}
+                  url={url}
                   onClick={() => {
                     setIsOpen(false);
-                    navigate(id);
+                    navigate(url);
                   }}
                   {...props}
                 />
@@ -76,9 +76,9 @@ export const Navbar = () => {
                   className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
                   disabled={currentSession === null}
                   icon={StopCircle}
-                  id="#"
                   isActive={false}
                   label={t('navLinks.endSession')}
+                  url="#"
                 />
               )}
             </div>

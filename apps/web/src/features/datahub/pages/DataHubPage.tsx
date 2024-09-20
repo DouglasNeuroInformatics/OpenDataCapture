@@ -84,7 +84,11 @@ export const DataHubPage = () => {
           <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
             <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
               <Dialog.Trigger className="flex-grow">
-                <SearchBar className="[&>input]:text-foreground [&>input]:placeholder-foreground" readOnly={true} />
+                <SearchBar
+                  className="[&>input]:text-foreground [&>input]:placeholder-foreground"
+                  id="subject-lookup-search-bar"
+                  readOnly={true}
+                />
               </Dialog.Trigger>
               <Dialog.Content>
                 <Dialog.Header>

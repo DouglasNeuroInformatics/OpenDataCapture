@@ -42,8 +42,7 @@ describe('e2e', () => {
   it('should allow starting a session with a custom id', () => {
     cy.visit('/auth/login');
     cy.completeLoginForm(admin);
-    cy.clickNavLink('start-session');
-    cy.url().should('include', '/session/start-session');
+    cy.clickNavLink('/session/start-session');
     cy.completeStartSessionForm({ identifier: '123', method: 'CUSTOM_ID', type: 'IN_PERSON' });
     cy.get('div[data-cy="current-session-info"]').contains('ID: ').should('have.text', 'ID: 123');
   });
@@ -52,8 +51,7 @@ describe('e2e', () => {
     const subject = createSubjectIdentificationData();
     cy.visit('/auth/login');
     cy.completeLoginForm(admin);
-    cy.clickNavLink('start-session');
-    cy.url().should('include', '/session/start-session');
+    cy.clickNavLink('/session/start-session');
     cy.completeStartSessionForm({
       ...subject,
       method: 'PERSONAL_INFO',
@@ -70,8 +68,7 @@ describe('e2e', () => {
   it('should allow viewing a subject', () => {
     cy.visit('/auth/login');
     cy.completeLoginForm(admin);
-    cy.clickNavLink('datahub');
-    cy.url().should('include', '/datahub');
+    cy.clickNavLink('/datahub');
 
     // select first user
     cy.get('div[data-cy="master-data-table"] table').find('td').first().click();
@@ -129,11 +126,9 @@ describe('e2e', () => {
   it('should allow the user to administer a unilingual instrument', () => {
     cy.visit('/auth/login');
     cy.completeLoginForm(admin);
-    cy.clickNavLink('start-session');
-    cy.url().should('include', '/session/start-session');
+    cy.clickNavLink('/session/start-session');
     cy.completeStartSessionForm({ identifier: '123', method: 'CUSTOM_ID', type: 'IN_PERSON' });
-    cy.clickNavLink('accessible-instruments');
-    cy.url().should('include', '/instruments/accessible-instruments');
+    cy.clickNavLink('/instruments/accessible-instruments');
     cy.get('button').contains('Tags').click();
     cy.get('div[data-testid="select-dropdown-option"]').contains('Well-Being').click();
     cy.get('h5[data-cy="instrument-card-tags"]').each(($h5) => {

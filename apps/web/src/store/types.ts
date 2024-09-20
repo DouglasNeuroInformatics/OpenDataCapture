@@ -18,13 +18,23 @@ export type AuthSlice = {
   logout: () => void;
 };
 
+export type DisclaimerSlice = {
+  isDisclaimerAccepted: boolean;
+  setIsDisclaimerAccepted: (isDisclaimerAccepted: boolean) => void;
+};
+
 export type SessionSlice = {
   currentSession: null | Session;
   endSession: () => void;
   startSession: (session: Session) => void;
 };
 
-export type AppStore = Simplify<AuthSlice & SessionSlice>;
+export type WalkthroughSlice = {
+  isWalkthroughComplete: boolean;
+  setIsWalkthroughComplete: (isWalkthroughComplete: boolean) => void;
+};
+
+export type AppStore = Simplify<AuthSlice & DisclaimerSlice & SessionSlice & WalkthroughSlice>;
 
 export type SliceCreator<T extends { [key: string]: unknown }> = StateCreator<
   AppStore,

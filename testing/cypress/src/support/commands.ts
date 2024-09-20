@@ -10,7 +10,7 @@ import type { Sex } from '@opendatacapture/schemas/subject';
 declare global {
   namespace Cypress {
     interface Chainable {
-      clickNavLink(name: 'accessible-instruments' | 'datahub' | 'start-session'): Chainable<void>;
+      clickNavLink(url: string): Chainable<void>;
       completeLoginForm(user: { password: string; username: string }): Chainable<void>;
       completeSetupForm(admin: {
         firstName: string;
@@ -37,8 +37,9 @@ declare global {
   }
 }
 
-Cypress.Commands.add('clickNavLink', (name) => {
-  cy.get(`nav button[data-cy="${name}"]`).click();
+Cypress.Commands.add('clickNavLink', (url) => {
+  cy.get(`nav button[data-nav-url="${url}"]`).click();
+  cy.url().should('include', url);
 });
 
 Cypress.Commands.add('completeLoginForm', ({ password, username }) => {

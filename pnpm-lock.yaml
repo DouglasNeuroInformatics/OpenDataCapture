@@ -13,14 +13,14 @@ catalogs:
       specifier: ^1.4.1
       version: 1.4.1
     '@douglasneuroinformatics/libjs':
-      specifier: 0.7.1
+      specifier: latest
       version: 0.7.1
     '@douglasneuroinformatics/libstats':
       specifier: latest
       version: 0.1.0
     '@douglasneuroinformatics/libui':
-      specifier: 3.1.5
-      version: 3.1.5
+      specifier: 3.3.0
+      version: 3.3.0
     '@douglasneuroinformatics/libui-form-types':
       specifier: latest
       version: 0.11.0
@@ -117,7 +117,7 @@ importers:
         version: 14.5.2(@testing-library/dom@10.4.0)
       '@types/github-script':
         specifier: github:actions/github-script
-        version: github-script@https://codeload.github.com/actions/github-script/tar.gz/58d7008c60bc638cd07845c89db844ed32ee7014
+        version: github-script@https://codeload.github.com/actions/github-script/tar.gz/660ec11d825b714d112a6bb9727086bc2cc500b2
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -343,7 +343,7 @@ importers:
         version: 0.0.2
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.1.5(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.3.0(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
@@ -440,7 +440,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.1.5(@types/react@18.3.6)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@3.23.8)
+        version: 3.3.0(@types/react@18.3.6)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@3.23.8)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -513,7 +513,7 @@ importers:
         version: 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.1.5(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.3.0(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.51.0)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
@@ -628,7 +628,7 @@ importers:
         version: 0.0.3(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.1.5(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.3.0(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@heroicons/react':
         specifier: ^2.1.5
         version: 2.1.5(react@vendor+react@18.x)
@@ -853,7 +853,7 @@ importers:
         version: 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.1.5(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.3.0(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -964,7 +964,7 @@ importers:
         version: 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.1.5(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.3.0(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -1859,12 +1859,6 @@ packages:
     resolution:
       { integrity: sha512-dtJE///InYVMLF5av/RTCNAxUXFY2KEt+DElRiXiUM0FfNcLcz1+sB76BfGsD6AGv09p+WLdHFmcS6FDHOTneQ== }
 
-  '@douglasneuroinformatics/libjs@0.7.0':
-    resolution:
-      { integrity: sha512-zFyydv9nwLbqx2yABELL5eTyYMNqIts2W5yMlqTLF82IFH6inQBfSuVDhX7PjZWekeVmNHoiNdK9Pm1rFE7pew== }
-    peerDependencies:
-      typescript: ^5.1.0
-
   '@douglasneuroinformatics/libjs@0.7.1':
     resolution:
       { integrity: sha512-qL7qmvW4dcHYcjZR/iAVPFPQxHoFKeDZ50LnhbZA+wY6IYHc3d7SXkD/Gef1b3oaWwMZtC8Xkd5q/b8oWlWI0w== }
@@ -1956,9 +1950,9 @@ packages:
     resolution:
       { integrity: sha512-erds8oNXFrWSJfCglR8S7I3Yfkgx2Vz6RIQTa5OFtVAVx8DTSFf5FbnHpp49l6BcQ4FCU5w/PLO5NWdx08cNUg== }
 
-  '@douglasneuroinformatics/libui@3.1.5':
+  '@douglasneuroinformatics/libui@3.3.0':
     resolution:
-      { integrity: sha512-MohQ6F3vf5OxuZkdwY2/UqcH983fQNxENGKEr6qHf6j7mvjTipyvKmKxtW8CBNSQ5BShVSaQHTAv/Aim8sdxBg== }
+      { integrity: sha512-ecFoYn+vt6aCpgy8sehFhqIJhDchvS3CUmRyATvx15TKVFebcEWwIeRJx9Ni3agGlkUJDQdm/5ubr7iqaF5RmQ== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -7391,9 +7385,9 @@ packages:
     resolution:
       { integrity: sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw== }
 
-  github-script@https://codeload.github.com/actions/github-script/tar.gz/58d7008c60bc638cd07845c89db844ed32ee7014:
+  github-script@https://codeload.github.com/actions/github-script/tar.gz/660ec11d825b714d112a6bb9727086bc2cc500b2:
     resolution:
-      { tarball: https://codeload.github.com/actions/github-script/tar.gz/58d7008c60bc638cd07845c89db844ed32ee7014 }
+      { tarball: https://codeload.github.com/actions/github-script/tar.gz/660ec11d825b714d112a6bb9727086bc2cc500b2 }
     version: 7.0.1
     engines: { node: '>=20.0.0 <21.0.0' }
 
@@ -12584,11 +12578,6 @@ snapshots:
     dependencies:
       '@hpke/core': 1.3.1
 
-  '@douglasneuroinformatics/libjs@0.7.0(typescript@5.5.4)':
-    dependencies:
-      type-fest: 4.26.1
-      typescript: 5.5.4
-
   '@douglasneuroinformatics/libjs@0.7.1(typescript@5.5.4)':
     dependencies:
       type-fest: 4.26.1
@@ -12660,9 +12649,9 @@ snapshots:
     dependencies:
       type-fest: 4.26.1
 
-  '@douglasneuroinformatics/libui@3.1.5(@types/react@18.3.6)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@3.23.8)':
+  '@douglasneuroinformatics/libui@3.3.0(@types/react@18.3.6)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@3.23.8)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 0.7.0(typescript@5.5.4)
+      '@douglasneuroinformatics/libjs': 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@headlessui/tailwindcss': 0.2.1(tailwindcss@3.4.11)
       '@heroicons/react': 2.1.5(react@18.3.1)
@@ -12715,9 +12704,9 @@ snapshots:
       - immer
       - typescript
 
-  '@douglasneuroinformatics/libui@3.1.5(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libui@3.3.0(@types/react@18.3.6)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.11)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 0.7.0(typescript@5.5.4)
+      '@douglasneuroinformatics/libjs': 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@headlessui/tailwindcss': 0.2.1(tailwindcss@3.4.11)
       '@heroicons/react': 2.1.5(react@vendor+react@18.x)
@@ -18355,7 +18344,7 @@ snapshots:
 
   github-from-package@0.0.0: {}
 
-  github-script@https://codeload.github.com/actions/github-script/tar.gz/58d7008c60bc638cd07845c89db844ed32ee7014:
+  github-script@https://codeload.github.com/actions/github-script/tar.gz/660ec11d825b714d112a6bb9727086bc2cc500b2:
     dependencies:
       '@actions/core': 1.10.1
       '@actions/exec': 1.1.1

@@ -1,6 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { BrowserRouter, Navigate, type RouteObject, useRoutes } from 'react-router-dom';
+import { Navigate, useRoutes } from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
 
 import { Layout } from './components/Layout';
 import { authRoutes } from './features/auth';
@@ -11,6 +12,8 @@ import { groupRoute } from './features/group';
 import { instrumentsRoute } from './features/instruments';
 import { sessionRoute } from './features/session';
 import { userRoute } from './features/user';
+import { DisclaimerProvider } from './providers/DisclaimerProvider';
+import { WalkthroughProvider } from './providers/WalkthroughProvider';
 import { useAppStore } from './store';
 
 const publicRoutes: RouteObject[] = [
@@ -24,20 +27,18 @@ const publicRoutes: RouteObject[] = [
 const protectedRoutes: RouteObject[] = [
   authRoutes,
   {
-    element: <Layout />,
+    element: (
+      <DisclaimerProvider>
+        <WalkthroughProvider>
+          <Layout />
+        </WalkthroughProvider>
+      </DisclaimerProvider>
+    ),
     children: [contactRoute, datahubRoute, dashboardRoute, groupRoute, instrumentsRoute, sessionRoute, userRoute]
   }
 ];
 
-export const AppRoutes = () => {
+export const Routes = () => {
   const accessToken = useAppStore((store) => store.accessToken);
   return useRoutes(accessToken ? protectedRoutes : publicRoutes);
-};
-
-export const Router = () => {
-  return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  );
 };
