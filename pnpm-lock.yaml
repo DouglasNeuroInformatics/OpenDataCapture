@@ -30,6 +30,18 @@ catalogs:
     '@prisma/client':
       specifier: ^5.18.0
       version: 5.19.1
+    '@testing-library/dom':
+      specifier: ^10.4.0
+      version: 10.4.0
+    '@testing-library/jest-dom':
+      specifier: ^6.5.0
+      version: 6.5.0
+    '@testing-library/react':
+      specifier: ^16.0.1
+      version: 16.0.1
+    '@testing-library/user-event':
+      specifier: ^14.5.2
+      version: 14.5.2
     esbuild:
       specifier: 0.23.x
       version: 0.23.1
@@ -106,18 +118,6 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.13
         version: 0.5.13
-      '@testing-library/dom':
-        specifier: ^10.4.0
-        version: 10.4.0
-      '@testing-library/jest-dom':
-        specifier: ^6.5.0
-        version: 6.5.0
-      '@testing-library/react':
-        specifier: ^16.0.1
-        version: 16.0.1(@testing-library/dom@10.4.0)(@types/react@18.3.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@testing-library/user-event':
-        specifier: ^14.5.2
-        version: 14.5.2(@testing-library/dom@10.4.0)
       '@types/github-script':
         specifier: github:actions/github-script
         version: github-script@https://codeload.github.com/actions/github-script/tar.gz/660ec11d825b714d112a6bb9727086bc2cc500b2
@@ -741,6 +741,18 @@ importers:
       '@opendatacapture/vite-plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/vite-plugin-runtime
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.0
+      '@testing-library/jest-dom':
+        specifier: 'catalog:'
+        version: 6.5.0
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.0.1(@testing-library/dom@10.4.0)(@types/react@18.3.6)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
+      '@testing-library/user-event':
+        specifier: 'catalog:'
+        version: 14.5.2(@testing-library/dom@10.4.0)
       '@vitejs/plugin-react-swc':
         specifier: ^3.7.0
         version: 3.7.0(@swc/helpers@0.5.13)(vite@5.4.5(@types/node@22.5.5))
@@ -15772,12 +15784,12 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
 
-  '@testing-library/react@16.0.1(@testing-library/dom@10.4.0)(@types/react@18.3.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@testing-library/react@16.0.1(@testing-library/dom@10.4.0)(@types/react@18.3.6)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)':
     dependencies:
       '@babel/runtime': 7.25.6
       '@testing-library/dom': 10.4.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
+      react: link:vendor/react@18.x
+      react-dom: link:vendor/react-dom@18.x
     optionalDependencies:
       '@types/react': 18.3.6
 
