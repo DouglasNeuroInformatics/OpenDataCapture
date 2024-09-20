@@ -1,5 +1,3 @@
-// @ts-check
-
 import fs from 'fs';
 import path from 'path';
 
@@ -21,34 +19,14 @@ const RUNTIME_DIR = path.resolve(dirname, '../../../runtime');
 /** @private */
 const RUNTIME_DIST_DIRNAME = 'dist';
 
-/**
- * @typedef  {Object}    RuntimeManifest
- * @property {string[]}  declarations
- * @property {string[]}  styles
- * @property {string[]}  sources
- */
-
-/**
- * @typedef {object} RuntimeVersionInfo
- * @property {string} baseDir
- * @property {RuntimeManifest} manifest
- * @property {string[]} importPaths
- * @property {string} version
- */
-
-/**
- * Return whether the path is a directory
- * @private
- * @param {string} path
- * @returns {Promise<boolean>}
- */
+/** @type {(path: string) => Promise<boolean>} */
 const isDirectory = async (path) => fs.existsSync(path) && fs.promises.lstat(path).then((stat) => stat.isDirectory());
 
 /**
  * Recursively get a list of files relative to the base directory
  * @private
  * @param {string} baseDir
- * @returns {Promise<RuntimeManifest>}
+ * @returns {Promise<import('./index.d.ts').RuntimeManifest>}
  */
 async function resolveManifest(baseDir) {
   /** @type {{ declarations: string[], sources: string[], styles: string[] }} */
@@ -75,7 +53,7 @@ async function resolveManifest(baseDir) {
 /**
  * Returns the manifest for a given version of the runtime
  * @param {string} version
- * @returns {Promise<RuntimeVersionInfo>}
+ * @returns {Promise<import('./index.d.ts').RuntimeVersionInfo>}
  */
 export async function resolveVersion(version) {
   const baseDir = path.resolve(RUNTIME_DIR, version, RUNTIME_DIST_DIRNAME);
@@ -95,7 +73,7 @@ export async function resolveVersion(version) {
   };
 }
 
-/** @returns {Promise<RuntimeVersionInfo[]>} */
+/** @returns {Promise<import('./index.d.ts').RuntimeVersionInfo[]>} */
 export async function resolvePackages() {
   const versions = await fs.promises.readdir(RUNTIME_DIR, 'utf-8');
   return await Promise.all(versions.map((version) => resolveVersion(version)));

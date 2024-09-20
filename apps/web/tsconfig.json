@@ -6,5 +6,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [".storybook/*", "src/**/*", "tailwind.config.cjs", "vite.config.ts"]
+  "include": [".storybook/*", "src/**/*", "tailwind.config.cjs", "vite.config.ts", "vitest.config.ts"]
 }

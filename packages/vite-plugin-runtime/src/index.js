@@ -4,12 +4,7 @@ import path from 'path';
 import { MANIFEST_FILENAME, resolvePackages } from './resolve.js';
 import { runtimeMiddleware } from './runtime-middleware.js';
 
-/**
- * @param {Object} [options]
- * @param {boolean} [options.disabled]
- * @param {string} [options.packageRoot]
- * @returns {import('vite').PluginOption}
- */
+/** @type {import('./index.d.ts').runtime} */
 export const runtime = (options) => {
   if (options?.disabled) {
     return false;
