@@ -76,8 +76,6 @@ export const UploadPage = () => {
           return entry.toLowerCase() === 'true';
         }
         return null;
-      case 'ZodSet':
-        return 'SET(a,b,c)';
 
       default:
         return null;
@@ -92,6 +90,8 @@ export const UploadPage = () => {
         return 'number';
       case 'ZodBoolean':
         return 'true/false';
+      case 'ZodSet':
+        return 'SET(a,b,c)';
       default:
         return '';
     }
