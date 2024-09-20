@@ -5,6 +5,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
 import { useAppStore } from '@/store';
@@ -12,6 +13,7 @@ import { useAppStore } from '@/store';
 type WalkthroughStep = {
   content: React.ReactNode;
   onBeforeQuery?: () => Promisable<void>;
+  position: 'bottom-left' | 'bottom-right';
   target: string;
   title: string;
   url: `/${string}`;
@@ -27,6 +29,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   const [index, setIndex] = useState(0);
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const targetRef = useRef<HTMLDivElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   const steps = useMemo<WalkthroughStep[]>(() => {
@@ -50,6 +53,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             })}
           </p>
         ),
+        position: 'bottom-left',
         target: '#sidebar-branding-container',
         title: 'Welcome to Open Data Capture 👋',
         url: '/dashboard'
@@ -63,6 +67,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             })}
           </p>
         ),
+        position: 'bottom-left',
         target: 'button[data-nav-url="/dashboard"]',
         title: 'Dashboard',
         url: '/dashboard'
@@ -76,6 +81,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             })}
           </p>
         ),
+        position: 'bottom-left',
         target: 'button[data-nav-url="/datahub"]',
         title: 'Data Hub',
         url: '/datahub'
@@ -89,22 +95,19 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
             })}
           </p>
         ),
+        position: 'bottom-left',
         target: '#subject-lookup-search-bar',
         title: 'Subject Lookup',
         url: '/datahub'
       },
       {
-        content: (
-          <p>
-            {t({
-              en: '',
-              fr: ''
-            })}
-          </p>
-        ),
-        onBeforeQuery: () => targetRef.current!.click(),
-        target: '[data-spotlight-type="subject-lookup-modal"]',
-        title: 'Subject Lookup',
+        content: t({
+          en: 'Here, you can export all your data in various formats.',
+          fr: 'Ici, vous pouvez exporter toutes vos données dans différents formats.'
+        }),
+        position: 'bottom-right',
+        target: '[data-spotlight-type="export-data-dropdown"]',
+        title: 'Bulk Data Export',
         url: '/datahub'
       }
     ];
@@ -139,7 +142,15 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
       if (targetRef.current) {
         targetRef.current.setAttribute('data-spotlight', 'true');
         const rect = targetRef.current.getBoundingClientRect();
-        setPopoverPosition({ x: rect.x, y: rect.bottom + 20 });
+        const popoverWidth = popoverRef.current?.clientWidth ?? 0;
+        match(currentStep.position)
+          .with('bottom-left', () => {
+            setPopoverPosition({ x: rect.left, y: rect.bottom + 20 });
+          })
+          .with('bottom-right', () => {
+            setPopoverPosition({ x: rect.right - popoverWidth, y: rect.bottom + 20 });
+          })
+          .exhaustive();
       } else {
         console.error(`Failed to find element with query: ${currentStep.target}`);
       }
@@ -163,6 +174,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
               className="absolute"
               exit={{ opacity: 0 }}
               initial={{ opacity: 0, x: popoverPosition.x, y: popoverPosition.y }}
+              ref={popoverRef}
             >
               <Card className="max-w-md">
                 <Card.Header className="pb-4">

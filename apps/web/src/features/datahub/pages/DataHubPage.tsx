@@ -100,6 +100,7 @@ export const DataHubPage = () => {
             <div className="flex min-w-60 gap-2 lg:flex-shrink">
               <ActionDropdown
                 widthFull
+                data-spotlight-type="export-data-dropdown"
                 options={['CSV', 'JSON']}
                 title={t('datahub.index.table.export')}
                 onSelection={handleExportSelection}
