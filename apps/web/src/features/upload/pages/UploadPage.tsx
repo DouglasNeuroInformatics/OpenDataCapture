@@ -35,22 +35,17 @@ export const UploadPage = () => {
 
     const columnNames = Object.keys(instrumentSchema.shape as z.AnyZodObject);
 
-    console.log(columnNames);
-
     let csvColumns = 'Mouse ID,Date,' + columnNames.join(',') + '\n';
 
     let sampleData = '';
 
     for (const col of columnNames) {
-      console.log(col);
       const typeName = getZodTypeName(shape[col]!);
-      console.log('type name', typeName);
+
       const sampleColData = sampleDataGenerator(typeName);
 
       sampleData += ',' + sampleColData;
     }
-
-    console.log(sampleData);
 
     const fileName = instrument.details.title + ' template';
 
