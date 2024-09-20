@@ -8,7 +8,8 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest"
   },
   "dependencies": {
     "@douglasneuroinformatics/libcrypto": "^0.0.2",
