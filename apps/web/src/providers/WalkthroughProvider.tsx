@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Button, Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -142,7 +142,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
     }
   }, [isDisclaimerAccepted, isWalkthroughComplete]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isWalkthroughOpen && window.location.pathname !== currentStep.url) {
       navigate(currentStep.url);
     }
