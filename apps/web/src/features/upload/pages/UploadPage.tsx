@@ -76,6 +76,17 @@ export const UploadPage = () => {
           return entry.toLowerCase() === 'true';
         }
         return null;
+      case 'ZodSet':
+        if (entry.includes('SET(')) {
+          let setData = entry.slice(3, -1);
+          let setDataList = setData.split(',');
+          let setLine = {};
+
+          setLine['value'] = new Set(setDataList);
+
+          return setLine;
+        }
+        return null;
 
       default:
         return null;
