@@ -4,7 +4,9 @@ import importMetaEnv from '@import-meta-env/unplugin';
 import { runtime } from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
+import { pick } from 'lodash-es';
 import tailwindcss from 'tailwindcss';
+import colors from 'tailwindcss/colors';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
@@ -17,6 +19,11 @@ export default defineConfig(() => ({
   css: {
     postcss: {
       plugins: [autoprefixer(), tailwindcss()]
+    }
+  },
+  define: {
+    __TAILWIND_THEME__: {
+      colors: pick(colors, 'slate')
     }
   },
   optimizeDeps: {

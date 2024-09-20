@@ -24,7 +24,8 @@ const $Config = z.object({
   setup: z.object({
     apiBaseUrl: z.string().min(1),
     isGatewayEnabled: $BooleanString
-  })
+  }),
+  theme: z.custom<typeof __TAILWIND_THEME__>()
 });
 
 export const config = await $Config
@@ -51,6 +52,7 @@ export const config = await $Config
     setup: {
       apiBaseUrl: import.meta.env.API_BASE_URL,
       isGatewayEnabled: import.meta.env.GATEWAY_ENABLED
-    }
+    },
+    theme: __TAILWIND_THEME__
   })
   .then(deepFreeze);

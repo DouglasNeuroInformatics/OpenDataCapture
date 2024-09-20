@@ -23,19 +23,19 @@ export const Sidebar = () => {
   const { t } = useTranslation();
   return (
     <div className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700">
-      <div>
+      <div id="sidebar-branding-container">
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
       <hr className="my-2 h-[1px] border-none bg-slate-700" />
       <nav className="flex w-full flex-col divide-y divide-slate-700">
         {navItems.map((items, i) => (
           <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-            {items.map(({ disabled, id, ...props }) => (
+            {items.map(({ disabled, url, ...props }) => (
               <NavButton
-                disabled={disabled && location.pathname !== id}
-                id={id}
-                isActive={location.pathname === id}
-                key={id}
+                disabled={disabled && location.pathname !== url}
+                isActive={location.pathname === url}
+                key={url}
+                url={url}
                 {...props}
               />
             ))}
@@ -45,9 +45,9 @@ export const Sidebar = () => {
                   <NavButton
                     disabled={currentSession === null}
                     icon={StopCircle}
-                    id="#"
                     isActive={false}
                     label={t('layout.navLinks.endSession')}
+                    url="#"
                   />
                 </AlertDialog.Trigger>
                 <AlertDialog.Content>

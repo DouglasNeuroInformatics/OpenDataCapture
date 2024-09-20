@@ -6,11 +6,10 @@ import { BarChartBigIcon, CirclePlayIcon, ComputerIcon, DatabaseIcon, EyeIcon, U
 import { useAppStore } from '@/store';
 
 export type NavItem = {
-  [key: `data-${string}`]: unknown;
   disabled?: boolean;
   icon: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
-  id: string;
   label: string;
+  url: string;
 };
 
 /**
@@ -30,54 +29,49 @@ export function useNavItems() {
     const globalItems: NavItem[] = [];
     if (currentUser?.ability.can('read', 'Summary')) {
       globalItems.push({
-        'data-cy': 'dashboard',
         icon: BarChartBigIcon,
-        id: '/dashboard',
-        label: t('layout.navLinks.dashboard')
+        label: t('layout.navLinks.dashboard'),
+        url: '/dashboard'
       });
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
-        'data-cy': 'datahub',
         icon: DatabaseIcon,
-        id: '/datahub',
-        label: t('layout.navLinks.datahub')
+        label: t('layout.navLinks.datahub'),
+        url: '/datahub'
       });
     }
     if (currentGroup && currentUser?.ability.can('manage', 'Group')) {
       globalItems.push({
-        'data-cy': 'manage-group',
         icon: UsersIcon,
-        id: '/group/manage',
-        label: t('layout.navLinks.manageGroup')
+        label: t('layout.navLinks.manageGroup'),
+        url: '/group/manage'
       });
     }
 
     const sessionItems: NavItem[] = [];
     if (currentUser?.ability.can('create', 'Session')) {
       sessionItems.push({
-        'data-cy': 'start-session',
         disabled: currentSession !== null,
         icon: CirclePlayIcon,
-        id: '/session/start-session',
-        label: t('layout.navLinks.startSession')
+        label: t('layout.navLinks.startSession'),
+        url: '/session/start-session'
       });
     }
     if (currentUser?.ability.can('create', 'InstrumentRecord')) {
       sessionItems.push({
-        'data-cy': 'accessible-instruments',
         disabled: currentSession === null,
         icon: ComputerIcon,
-        id: '/instruments/accessible-instruments',
-        label: t('layout.navLinks.accessibleInstruments')
+        label: t('layout.navLinks.accessibleInstruments'),
+        url: '/instruments/accessible-instruments'
       });
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       sessionItems.push({
         disabled: currentSession === null,
         icon: EyeIcon,
-        id: `/datahub/${currentSession?.subjectId}/table`,
-        label: t('layout.navLinks.viewCurrentSubject')
+        label: t('layout.navLinks.viewCurrentSubject'),
+        url: `/datahub/${currentSession?.subjectId}/table`
       });
     }
     setNavItems([globalItems, sessionItems]);

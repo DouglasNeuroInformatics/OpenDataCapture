@@ -9,7 +9,7 @@ import { useSummaryQuery } from '../hooks/useSummaryQuery';
 
 export const Summary = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const { t } = useTranslation('dashboard');
+  const { t } = useTranslation();
 
   const summaryQuery = useSummaryQuery({
     params: {
@@ -26,22 +26,34 @@ export const Summary = () => {
       <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
         <StatisticCard
           icon={<UsersIcon className="h-12 w-12" />}
-          label={t('totalUsers')}
+          label={t({
+            en: 'Total Users',
+            fr: "Nombre d'utilisateurs"
+          })}
           value={summaryQuery.data.counts.users}
         />
         <StatisticCard
           icon={<UserIcon className="h-12 w-12" />}
-          label={t('totalSubjects')}
+          label={t({
+            en: 'Total Subjects',
+            fr: 'Nombre de clients'
+          })}
           value={summaryQuery.data.counts.subjects}
         />
         <StatisticCard
           icon={<ClipboardDocumentIcon className="h-12 w-12" />}
-          label={t('totalInstruments')}
+          label={t({
+            en: 'Total Instruments',
+            fr: "Nombre d'instruments"
+          })}
           value={summaryQuery.data.counts.instruments}
         />
         <StatisticCard
           icon={<DocumentTextIcon className="h-12 w-12" />}
-          label={t('totalRecords')}
+          label={t({
+            en: 'Total Records',
+            fr: "Nombre d'enregistrements"
+          })}
           value={summaryQuery.data.counts.records}
         />
       </div>

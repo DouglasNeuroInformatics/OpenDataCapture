@@ -1,0 +1,19 @@
+@import '@douglasneuroinformatics/libui/tailwind/globals.css';
+
+@layer components {
+  .spotlight {
+    @apply z-40 shadow-2xl;
+  }
+}
+
+[data-spotlight='true'] {
+  @apply spotlight;
+}
+
+[data-spotlight-type='nav-button'][data-spotlight='true'] {
+  @apply pointer-events-none my-1 ring-1 ring-slate-700;
+}
+
+#subject-lookup-search-bar[data-spotlight='true'] > input {
+  @apply bg-slate-100 placeholder:text-slate-900 dark:bg-slate-900 dark:placeholder:text-slate-100;
+}
