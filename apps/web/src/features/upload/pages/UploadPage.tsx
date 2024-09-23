@@ -129,6 +129,11 @@ export const UploadPage = () => {
 
       let data = lines.slice(1);
 
+      if (data[0]?.includes('mouseNumber-LabHead-ProjectLead,yyyy-mm-dd')) {
+        data = data.slice(1);
+        console.log('data', data);
+      }
+
       // console.log("this is data", data)
 
       if (!lines) {
