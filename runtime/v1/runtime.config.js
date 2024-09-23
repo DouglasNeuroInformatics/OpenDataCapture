@@ -20,6 +20,7 @@ export default {
     '@jspsych/plugin-survey-text__2.x',
     'csstype__3.x',
     'dompurify__3.x',
+    'psychojs__2023.1.3',
     'jquery__1.12.4',
     'jspsych__7.x',
     'jspsych__8.x',
