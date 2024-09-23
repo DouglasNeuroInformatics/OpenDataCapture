@@ -13,7 +13,6 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { useInstrument } from '@/hooks/useInstrument';
 
 import { getZodTypeName } from '../utils';
-import { add } from 'lodash-es';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -81,13 +80,14 @@ export const UploadPage = () => {
         return null;
       case 'ZodSet':
         if (entry.includes('SET(')) {
-          let setData = entry.slice(3, -1);
-          let setDataList = setData.split(',');
-          let setLine = {};
+          let setData = entry.slice(4, -1);
 
-          setLine['value'] = new Set(setDataList);
+          let setDataList = setData.split('+');
 
-          return setLine;
+          //Captitalize the first letter of the word
+          setDataList = setDataList.map((word) => word.charAt(0).toUpperCase() + word.slice(1));
+
+          return new Set(setDataList);
         }
         return null;
 
@@ -105,7 +105,7 @@ export const UploadPage = () => {
       case 'ZodBoolean':
         return 'true/false';
       case 'ZodSet':
-        return 'SET(a,b,c)';
+        return 'SET(a+b+c)';
       default:
         return '';
     }
