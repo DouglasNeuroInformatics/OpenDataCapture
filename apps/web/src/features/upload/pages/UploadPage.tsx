@@ -8,14 +8,17 @@ import type { AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-cor
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 
 import { useInstrument } from '@/hooks/useInstrument';
 
 import { getZodTypeName } from '../utils';
+import { add } from 'lodash-es';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
   const download = useDownload();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
 
   const params = useParams();
   const instrument = useInstrument(params.id!) as AnyUnilingualScalarInstrument | null;
@@ -178,8 +181,10 @@ export const UploadPage = () => {
 
         if (!zodCheck.success) {
           console.log(zodCheck.error);
+          addNotification({ type: 'error' });
         } else {
           console.log(zodCheck.success);
+          addNotification({ type: 'success' });
         }
       }
     };
