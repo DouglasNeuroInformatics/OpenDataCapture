@@ -1180,9 +1180,15 @@ importers:
       dompurify__3.x:
         specifier: workspace:*
         version: link:../../vendor/dompurify@3.x
+      jquery-ui__1.x:
+        specifier: workspace:*
+        version: link:../../vendor/jquery-ui@1.x
       jquery__1.12.4:
         specifier: workspace:*
         version: link:../../vendor/jquery@1.12.4
+      jquery__3.x:
+        specifier: workspace:*
+        version: link:../../vendor/jquery@3.x
       jspsych__7.x:
         specifier: workspace:*
         version: link:../../vendor/jspsych@7.x
@@ -1401,11 +1407,26 @@ importers:
         specifier: 3.1.6
         version: 3.1.6
 
+  vendor/jquery-ui@1.x:
+    dependencies:
+      jquery-ui:
+        specifier: 1.14.0
+        version: 1.14.0
+      jquery__3.x:
+        specifier: 'workspace:'
+        version: link:../jquery@3.x
+
   vendor/jquery@1.12.4:
     dependencies:
       jquery:
         specifier: 1.12.4
         version: 1.12.4
+
+  vendor/jquery@3.x:
+    dependencies:
+      jquery:
+        specifier: 3.7.1
+        version: 3.7.1
 
   vendor/jspsych@7.x:
     dependencies:
@@ -8380,9 +8401,17 @@ packages:
       { integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw== }
     engines: { node: '>=10' }
 
+  jquery-ui@1.14.0:
+    resolution:
+      { integrity: sha512-mPfYKBoRCf0MzaT2cyW5i3IuZ7PfTITaasO5OFLAQxrHuI+ZxruPa+4/K1OMNT8oElLWGtIxc9aRbyw20BKr8g== }
+
   jquery@1.12.4:
     resolution:
       { integrity: sha512-UEVp7PPK9xXYSk8xqXCJrkXnKZtlgWkd2GsAQbMRFK6S/ePU2JN5G2Zum8hIVjzR3CpdfSqdqAzId/xd4TJHeg== }
+
+  jquery@3.7.1:
+    resolution:
+      { integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg== }
 
   js-tokens@4.0.0:
     resolution:
@@ -19401,7 +19430,13 @@ snapshots:
 
   joycon@3.1.1: {}
 
+  jquery-ui@1.14.0:
+    dependencies:
+      jquery: 3.7.1
+
   jquery@1.12.4: {}
+
+  jquery@3.7.1: {}
 
   js-tokens@4.0.0: {}
 
