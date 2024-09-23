@@ -105,7 +105,7 @@ export const UploadPage = () => {
       case 'ZodBoolean':
         return 'true/false';
       case 'ZodSet':
-        return 'SET(a+b+c)';
+        return 'SET(a,b,c)';
       default:
         return '';
     }
@@ -137,8 +137,6 @@ export const UploadPage = () => {
         data = data.slice(1);
       }
 
-      // console.log("this is data", data)
-
       if (!lines) {
         return;
       }
@@ -157,7 +155,19 @@ export const UploadPage = () => {
         return;
       }
       // console.log("these are the headers", headers)
-      for (const line of data) {
+      for (let line of data) {
+        //find SET() data and replace the commas with plus signs
+        if (line.includes('SET(')) {
+          for (let i = line.indexOf('SET(') + 4; i < line.length; i++) {
+            if (line.charAt(i) === ')') {
+              break;
+            }
+            if (line.charAt(i) === ',') {
+              line.charAt(i).replace(',', '+');
+            }
+          }
+        }
+
         let elements = line.split(',').slice(2);
         //console.log('elements to be inputed', elements)
         let jsonLine = {};
