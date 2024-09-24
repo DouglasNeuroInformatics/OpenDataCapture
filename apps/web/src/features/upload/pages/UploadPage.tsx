@@ -24,13 +24,13 @@ export const UploadPage = () => {
   const params = useParams();
   const instrument = useInstrument(params.id!) as AnyUnilingualScalarInstrument | null;
 
-  const sendInstrumentData = async (data: Json, instrumentId: string, mouseId: string, date: Date) => {
+  const sendInstrumentData = async (data: Json, instrumentId: string, subjectId: string, date: Date) => {
     await axios.post('/v1/instrument-records', {
       data,
       date: date,
       instrumentId,
       sessionId: currentSession!.id,
-      subjectId: mouseId
+      subjectId: subjectId
     } satisfies CreateInstrumentRecordData);
     addNotification({ type: 'success' });
   };
@@ -217,9 +217,12 @@ export const UploadPage = () => {
 
         if (!zodCheck.success) {
           console.log(zodCheck.error);
+          //create error message with zodcheck error messsage + zodcheck error path
+          //addNotification({ message: zodCheck.error.issues[0]?.message, type: 'error' });
           addNotification({ type: 'error' });
         } else {
           console.log(zodCheck.success);
+          addNotification({ type: 'success' });
           //void sendInstrumentData(entry,params.id!,mouseId,entryDate)
         }
       }
