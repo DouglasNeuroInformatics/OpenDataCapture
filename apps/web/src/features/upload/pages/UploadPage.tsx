@@ -5,7 +5,9 @@ import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-core';
+import type { AnyUnilingualScalarInstrument, Json } from '@opendatacapture/runtime-core';
+import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
+import axios from 'axios';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
@@ -22,6 +24,17 @@ export const UploadPage = () => {
   const params = useParams();
   const instrument = useInstrument(params.id!) as AnyUnilingualScalarInstrument | null;
 
+  const sendInstrumentData = async (data: Json, instrumentId: string, mouseId: string, date: Date) => {
+    await axios.post('/v1/instrument-records', {
+      data,
+      date: date,
+      instrumentId,
+      sessionId: currentSession!.id,
+      subjectId: mouseId
+    } satisfies CreateInstrumentRecordData);
+    addNotification({ type: 'success' });
+  };
+
   const handleTemplateDownload = () => {
     //to do
     //make sure the first two columns of the csv file are id and date
@@ -37,7 +50,7 @@ export const UploadPage = () => {
 
     const columnNames = Object.keys(instrumentSchema.shape as z.AnyZodObject);
 
-    let csvColumns = 'Mouse ID,Date,' + columnNames.join(',') + '\n';
+    let csvColumns = 'MouseID,Date,' + columnNames.join(',') + '\n';
 
     let sampleData = '';
 
@@ -145,11 +158,10 @@ export const UploadPage = () => {
 
       let headers: string[] = lines[0]!.split(',');
 
-      // console.log(headers)
-
       //let identifiers: string[] = headers.slice(0,2)
-
-      headers = headers.slice(2); //remove mouse id and date
+      // let mouseInfo = headers.slice(0,2)
+      // console.log(mouseInfo)
+      //headers = headers.slice(2); //remove mouse id and date
 
       if (!headers) {
         return;
@@ -168,7 +180,7 @@ export const UploadPage = () => {
           }
         }
 
-        let elements = line.split(',').slice(2);
+        let elements = line.split(','); //.slice(2);
         //console.log('elements to be inputed', elements)
         let jsonLine = {};
 
@@ -177,8 +189,12 @@ export const UploadPage = () => {
             return;
           } else {
             const key = headers[j]!;
-            const typeName = getZodTypeName(shape[key]!);
-            jsonLine[headers[j]] = valueInterpreter(elements[j], typeName);
+            if (key !== 'MouseID' && key !== 'Date') {
+              const typeName = getZodTypeName(shape[key]!);
+              jsonLine[headers[j]] = valueInterpreter(elements[j], typeName);
+            } else {
+              jsonLine[headers[j]] = elements[j];
+            }
           }
         }
         result.push(jsonLine);
@@ -187,6 +203,16 @@ export const UploadPage = () => {
 
       for (const entry of result) {
         //console.log(instrument.validationSchema.array())
+        let keys = Object.keys(entry);
+
+        let mouseId = entry[keys[0]] as string;
+        let entryDate = entry[keys[1]] as Date;
+
+        console.log('removed stuff', mouseId, entryDate);
+
+        delete entry[keys[0]];
+        delete entry[keys[1]];
+
         const zodCheck = instrument.validationSchema.safeParse(entry);
 
         if (!zodCheck.success) {
@@ -194,7 +220,7 @@ export const UploadPage = () => {
           addNotification({ type: 'error' });
         } else {
           console.log(zodCheck.success);
-          addNotification({ type: 'success' });
+          //void sendInstrumentData(entry,params.id!,mouseId,entryDate)
         }
       }
     };
