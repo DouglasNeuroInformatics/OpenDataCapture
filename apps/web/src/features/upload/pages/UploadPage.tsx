@@ -4,11 +4,11 @@ import { isNumberLike, parseNumber } from '@douglasneuroinformatics/libjs';
 import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-core';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 
 import { useInstrument } from '@/hooks/useInstrument';
 
@@ -96,16 +96,16 @@ export const UploadPage = () => {
     }
   };
 
-  const sampleDataGenerator = (zType: string | null) => {
+  const sampleDataGenerator = (zType: null | string) => {
     switch (zType) {
-      case 'ZodString':
-        return 'string';
-      case 'ZodNumber':
-        return 'number';
       case 'ZodBoolean':
         return 'true/false';
+      case 'ZodNumber':
+        return 'number';
       case 'ZodSet':
         return 'SET(a,b,c)';
+      case 'ZodString':
+        return 'string';
       default:
         return '';
     }
