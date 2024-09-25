@@ -4,7 +4,11 @@ import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualScalarInstrument, FormTypes } from '@opendatacapture/runtime-core';
+import type {
+  AnyUnilingualFormInstrument,
+  AnyUnilingualScalarInstrument,
+  FormTypes
+} from '@opendatacapture/runtime-core';
 import type { UploadInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
 import { DownloadIcon } from 'lucide-react';
@@ -13,9 +17,7 @@ import { z } from 'zod';
 
 import { useInstrument } from '@/hooks/useInstrument';
 
-import { applyRawValueTransforms, getZodTypeName, isSetSyntax, valueInterpreter } from '../utils';
-
-const INTERNAL_HEADERS = ['SubjectID', 'Date'];
+import { applyLineTransforms, createUploadTemplateCSV, getZodTypeName, valueInterpreter } from '../utils';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -23,7 +25,7 @@ export const UploadPage = () => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
 
   const params = useParams();
-  const instrument = useInstrument(params.id!) as AnyUnilingualScalarInstrument | null;
+  const instrument = useInstrument(params.id!) as AnyUnilingualFormInstrument | null;
 
   const sendInstrumentData = async (data: UploadInstrumentRecordData) => {
     await axios.post('/v1/instrument-records/upload', data);
@@ -36,62 +38,13 @@ export const UploadPage = () => {
     //convert the given csv files as a json object
     //parse the json object through the instrument validation schema
     // if succcess full send the data to the backend to be stored
-    if (!instrument) {
-      return;
-    }
-
-    const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
-    const shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
-
-    const columnNames = Object.keys(instrumentSchema.shape as z.AnyZodObject);
-
-    let csvColumns = 'MouseID,Date,' + columnNames.join(',') + '\n';
-
-    let sampleData = '';
-
-    for (const col of columnNames) {
-      const typeName = getZodTypeName(shape[col]!);
-
-      const sampleColData = sampleDataGenerator(typeName);
-
-      sampleData += ',' + sampleColData;
-    }
-
-    const fileName = instrument.details.title + ' template';
-
-    csvColumns += 'mouseNumber-LabHead-ProjectLead,yyyy-mm-dd' + sampleData + '\n';
-
-    void download(`${fileName}.csv`, () => {
-      return csvColumns;
-    });
-
-    return;
-  };
-
-  const sampleDataGenerator = (zType: null | string) => {
-    switch (zType) {
-      case 'ZodBoolean':
-        return 'true/false';
-      case 'ZodNumber':
-        return 'number';
-      case 'ZodSet':
-        return 'SET(a,b,c)';
-      case 'ZodString':
-        return 'string';
-      default:
-        return '';
-    }
+    const { content, fileName } = createUploadTemplateCSV(instrument!);
+    void download(fileName, content);
   };
 
   const processInstrumentCSV = () => {
-    if (!file) {
-      return;
-    }
-    if (!instrument) {
-      return;
-    }
-    const input = file;
-    const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
+    const input = file!;
+    const instrumentSchema = instrument!.validationSchema as z.AnyZodObject;
     const shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
 
     // console.log("instrument def",schema.shape)
@@ -127,7 +80,7 @@ export const UploadPage = () => {
       }
       // console.log("these are the headers", headers)
       for (let line of data) {
-        line = applyRawValueTransforms(line);
+        line = applyLineTransforms(line);
 
         let elements = line.split(',').map;
 
@@ -210,10 +163,10 @@ export const UploadPage = () => {
     <div className="align-center items-center justify-center">
       <FileDropzone file={file} setFile={setFile} />
       <div className="mt-4 flex justify-between space-x-2">
-        <Button variant={'primary'} onClick={processInstrumentCSV}>
+        <Button disabled={!(file && instrument)} variant={'primary'} onClick={processInstrumentCSV}>
           Submit
         </Button>
-        <Button variant={'primary'} onClick={handleTemplateDownload}>
+        <Button disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
           <DownloadIcon />
           Download Template
         </Button>
