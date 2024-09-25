@@ -75,3 +75,11 @@ export function valueInterpreter(
       return { message: `Invalid ZodType: ${zType satisfies never}`, success: false };
   }
 }
+
+export function applyRawValueTransforms(value: string) {
+  const setSyntaxResult = /^SET\((.*)\)$/.exec(value);
+  if (!setSyntaxResult) {
+    return value;
+  }
+  return setSyntaxResult[1]!.replaceAll(',', '\\,');
+}
