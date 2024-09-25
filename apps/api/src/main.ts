@@ -13,6 +13,7 @@ import { setupDocs } from './docs';
 async function bootstrap() {
   // This hacky type assertion is needed due to issue with linked dependency
   const app = (await NestFactory.create(AppModule)) as any as NestExpressApplication;
+  app.enableShutdownHooks();
 
   const configurationService = app.get(ConfigurationService);
   const logLevels: LogLevel[] = ['error', 'fatal', 'log', 'warn'];

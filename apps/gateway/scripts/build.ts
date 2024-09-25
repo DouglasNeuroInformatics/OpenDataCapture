@@ -2,7 +2,6 @@
 
 import path from 'path';
 
-import { nativeModulesPlugin } from '@douglasneuroinformatics/esbuild-plugin-native-modules';
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
 import esbuild from 'esbuild';
 
@@ -23,9 +22,12 @@ await esbuild.build({
   external: ['lightningcss'],
   format: 'esm',
   keepNames: true,
+  loader: {
+    '.node': 'copy'
+  },
   outfile: path.resolve(outdir, 'main.js'),
   platform: 'node',
-  plugins: [nativeModulesPlugin(), prismaPlugin({ outdir: path.join(outdir, 'prisma/client') })],
+  plugins: [prismaPlugin({ outdir: path.join(outdir, 'prisma/client') })],
   sourcemap: true,
   target: ['node18', 'es2022'],
   tsconfig

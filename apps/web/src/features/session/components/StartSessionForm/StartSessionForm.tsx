@@ -160,6 +160,7 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
           }
         }
       ]}
+      data-cy="start-session-form"
       initialValues={{
         sessionType: 'IN_PERSON',
         subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO'

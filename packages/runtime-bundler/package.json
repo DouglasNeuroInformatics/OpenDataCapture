@@ -11,11 +11,12 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^0.6.0",
-    "esbuild": "catalog:esbuild",
+    "@douglasneuroinformatics/libjs": "catalog:",
+    "esbuild": "catalog:",
     "zod": "workspace:zod__3.23.x@*"
   }
 }

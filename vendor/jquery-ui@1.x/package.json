@@ -1,0 +1,17 @@
+{
+  "name": "jquery-ui__1.x",
+  "type": "module",
+  "version": "1.14.0",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "jquery-ui": "1.14.0",
+    "jquery__3.x": "workspace:"
+  }
+}

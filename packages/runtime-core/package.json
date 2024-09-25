@@ -27,6 +27,6 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
-    "esbuild": "catalog:esbuild"
+    "esbuild": "catalog:"
   }
 }

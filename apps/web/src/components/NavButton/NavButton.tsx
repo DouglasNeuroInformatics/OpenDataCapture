@@ -9,11 +9,11 @@ export type NavButtonProps = {
   activeClassName?: string;
   className?: string;
   isActive: boolean;
-  onClick?: (id: string) => void;
+  onClick?: (path: string) => void;
 } & NavItem;
 
 export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(function NavButton(
-  { activeClassName, className, disabled, icon: Icon, id, isActive, label, onClick },
+  { activeClassName, className, disabled, icon: Icon, isActive, label, onClick, url, ...props },
   ref
 ) {
   const navigate = useNavigate();
@@ -25,16 +25,19 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
         isActive && activeClassName,
         className
       )}
+      data-nav-url={url}
+      data-spotlight-type="nav-button"
       disabled={disabled}
       ref={ref}
       type="button"
       onClick={() => {
         if (onClick) {
-          onClick(id);
+          onClick(url);
         } else {
-          navigate(id);
+          navigate(url);
         }
       }}
+      {...props}
     >
       <Icon className="mr-2" />
       {label}

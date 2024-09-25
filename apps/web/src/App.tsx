@@ -5,10 +5,11 @@ import { ErrorPage } from '@opendatacapture/react-core';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from 'react-error-boundary';
+import { BrowserRouter } from 'react-router-dom';
 
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { SetupProvider } from '@/features/setup';
-import { Router } from '@/Router';
+import { Routes } from '@/Routes';
 import { queryClient } from '@/services/react-query';
 
 import './services/axios';
@@ -22,7 +23,9 @@ export const App = () => {
         <QueryClientProvider client={queryClient}>
           <NotificationHub />
           <SetupProvider>
-            <Router />
+            <BrowserRouter>
+              <Routes />
+            </BrowserRouter>
           </SetupProvider>
           <ReactQueryDevtools />
         </QueryClientProvider>

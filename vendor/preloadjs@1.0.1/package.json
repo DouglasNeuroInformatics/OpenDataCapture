@@ -1,0 +1,13 @@
+{
+  "name": "preloadjs__1.0.1",
+  "type": "module",
+  "version": "1.0.1",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  }
+}

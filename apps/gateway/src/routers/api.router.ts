@@ -114,4 +114,11 @@ router.delete(
   })
 );
 
+router.get('/healthcheck', (_, res) => {
+  res.status(200).json({
+    message: 'OK',
+    uptime: process.uptime()
+  });
+});
+
 export { router as apiRouter };

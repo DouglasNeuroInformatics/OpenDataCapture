@@ -23,19 +23,19 @@ export const Sidebar = () => {
   const { t } = useTranslation();
   return (
     <div className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700">
-      <div>
+      <div id="sidebar-branding-container">
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
       <hr className="my-2 h-[1px] border-none bg-slate-700" />
       <nav className="flex w-full flex-col divide-y divide-slate-700">
         {navItems.map((items, i) => (
           <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-            {items.map(({ disabled, id, ...props }) => (
+            {items.map(({ disabled, url, ...props }) => (
               <NavButton
-                disabled={disabled && location.pathname !== id}
-                id={id}
-                isActive={location.pathname === id}
-                key={id}
+                disabled={disabled && location.pathname !== url}
+                isActive={location.pathname === url}
+                key={url}
+                url={url}
                 {...props}
               />
             ))}
@@ -45,9 +45,9 @@ export const Sidebar = () => {
                   <NavButton
                     disabled={currentSession === null}
                     icon={StopCircle}
-                    id="#"
                     isActive={false}
                     label={t('layout.navLinks.endSession')}
+                    url="#"
                   />
                 </AlertDialog.Trigger>
                 <AlertDialog.Content>
@@ -85,7 +85,7 @@ export const Sidebar = () => {
             <h5 className="text-sm font-medium">{t('common.sessionInProgress')}</h5>
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
             {isSubjectWithPersonalInfo(currentSession.subject) ? (
-              <div>
+              <div data-cy="current-session-info">
                 <p>{`${t('core.fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
                 <p>
                   {`${t('core.identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
@@ -95,7 +95,7 @@ export const Sidebar = () => {
                 </p>
               </div>
             ) : (
-              <div>
+              <div data-cy="current-session-info">
                 <p>ID: {removeSubjectIdScope(currentSession.subject.id)}</p>
               </div>
             )}

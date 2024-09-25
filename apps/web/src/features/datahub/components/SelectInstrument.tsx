@@ -14,13 +14,13 @@ export const SelectInstrument = ({ onSelect, options }: SelectInstrumentProps) =
         onSelect(id);
       }}
     >
-      <Select.Trigger className="min-w-72">
+      <Select.Trigger className="min-w-72" data-cy="select-instrument-dropdown-trigger">
         <Select.Value placeholder={t('datahub.visualization.selectInstrument')} />
       </Select.Trigger>
       <Select.Content>
         <Select.Group>
           {Object.entries(options).map(([id, label]) => (
-            <Select.Item key={id} value={id}>
+            <Select.Item data-cy="select-instrument-dropdown-item" key={id} value={id}>
               {label}
             </Select.Item>
           ))}

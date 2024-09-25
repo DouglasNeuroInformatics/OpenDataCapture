@@ -1,0 +1,16 @@
+{
+  "name": "jquery__3.x",
+  "type": "module",
+  "version": "3.7.1",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "jquery": "3.7.1"
+  }
+}

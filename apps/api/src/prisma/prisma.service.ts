@@ -1,12 +1,24 @@
-import { Inject, Injectable, InternalServerErrorException, Logger, type OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  type OnApplicationShutdown,
+  type OnModuleInit
+} from '@nestjs/common';
+
+import { ConfigurationService } from '@/configuration/configuration.service';
 
 import { type ExtendedPrismaClient, PRISMA_CLIENT_TOKEN } from './prisma.factory';
 
 @Injectable()
-export class PrismaService implements OnModuleInit {
+export class PrismaService implements OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor(@Inject(PRISMA_CLIENT_TOKEN) public readonly client: ExtendedPrismaClient) {}
+  constructor(
+    @Inject(PRISMA_CLIENT_TOKEN) public readonly client: ExtendedPrismaClient,
+    private readonly configurationService: ConfigurationService
+  ) {}
 
   async dropDatabase() {
     this.logger.debug('Attempting to drop database...');
@@ -26,6 +38,13 @@ export class PrismaService implements OnModuleInit {
     const dbName = await this.client.$runCommandRaw({ dbStats: 1 }).then((stats) => stats.db as string);
     this.logger.debug(`Resolved database name: ${dbName}`);
     return dbName;
+  }
+
+  async onApplicationShutdown() {
+    await this.client.$disconnect();
+    if (this.configurationService.get('NODE_ENV') === 'test') {
+      await this.dropDatabase();
+    }
   }
 
   async onModuleInit() {
