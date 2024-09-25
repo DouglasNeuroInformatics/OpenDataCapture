@@ -76,10 +76,8 @@ export function valueInterpreter(
   }
 }
 
-export function applyRawValueTransforms(value: string) {
-  const setSyntaxResult = /^SET\((.*)\)$/.exec(value);
-  if (!setSyntaxResult) {
-    return value;
-  }
-  return setSyntaxResult[1]!.replaceAll(',', '\\,');
+export function applyLineTransforms(line: string) {
+  return line.replaceAll(/SET\((.*?)\)/g, (match) => {
+    return match.replaceAll(',', '\\,');
+  });
 }
