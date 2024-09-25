@@ -10,6 +10,8 @@ import type {
   LinearRegressionResults,
   UploadInstrumentRecordData
 } from '@opendatacapture/schemas/instrument-records';
+import type { SessionType } from '@opendatacapture/schemas/session';
+import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { InstrumentRecordModel, Prisma } from '@prisma/generated-client';
 import { isNumber, pickBy } from 'lodash-es';
 
@@ -245,13 +247,7 @@ export class InstrumentRecordsService {
     return results;
   }
 
-  async upload({
-    data,
-    date,
-    groupId,
-    instrumentId,
-    subjectId
-  }: UploadInstrumentRecordData): Promise<InstrumentRecordModel> {
+  async upload({ data, date, instrumentId, subjectId }: UploadInstrumentRecordData): Promise<InstrumentRecordModel> {
     await this.subjectsService.findById(subjectId);
 
     const instrument = await this.instrumentsService.findById(instrumentId);
@@ -260,6 +256,21 @@ export class InstrumentRecordsService {
         `Cannot create instrument record for series instrument '${instrument.id}'`
       );
     }
+
+    let subjectInfo: CreateSubjectData = {
+      dateOfBirth: null,
+      firstName: null,
+      id: subjectId,
+      lastName: null,
+      sex: null
+    };
+
+    let groupId = null;
+    let sessionType = 'RETROSPECTIVE' as SessionType;
+
+    let sessionId = (
+      await this.sessionsService.create({ date: date, groupId: groupId, subjectData: subjectInfo, type: sessionType })
+    ).id;
 
     return this.instrumentRecordModel.create({
       data: {
