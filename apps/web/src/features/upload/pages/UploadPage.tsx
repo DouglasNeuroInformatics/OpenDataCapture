@@ -1,11 +1,10 @@
 import { useState } from 'react';
 
-import { isNumberLike, parseNumber } from '@douglasneuroinformatics/libjs';
 import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualScalarInstrument, Json } from '@opendatacapture/runtime-core';
+import type { AnyUnilingualScalarInstrument, FormTypes } from '@opendatacapture/runtime-core';
 import type { UploadInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
 import { DownloadIcon } from 'lucide-react';
@@ -14,7 +13,9 @@ import { z } from 'zod';
 
 import { useInstrument } from '@/hooks/useInstrument';
 
-import { getZodTypeName } from '../utils';
+import { applyRawValueTransforms, getZodTypeName, isSetSyntax, valueInterpreter } from '../utils';
+
+const INTERNAL_HEADERS = ['SubjectID', 'Date'];
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -24,14 +25,8 @@ export const UploadPage = () => {
   const params = useParams();
   const instrument = useInstrument(params.id!) as AnyUnilingualScalarInstrument | null;
 
-  const sendInstrumentData = async (data: Json, instrumentId: string, subjectId: string, date: Date) => {
-    await axios.post('/v1/instrument-records/upload', {
-      data,
-      date: date,
-      groupId: undefined,
-      instrumentId,
-      subjectId: subjectId
-    } satisfies UploadInstrumentRecordData);
+  const sendInstrumentData = async (data: UploadInstrumentRecordData) => {
+    await axios.post('/v1/instrument-records/upload', data);
     addNotification({ type: 'success' });
   };
 
@@ -71,42 +66,6 @@ export const UploadPage = () => {
     });
 
     return;
-  };
-
-  const valueInterpreter = (entry: null | string, zType: string) => {
-    if (!entry) {
-      return;
-    }
-    switch (zType) {
-      case 'ZodString':
-        return entry;
-      case 'ZodNumber':
-        if (isNumberLike(entry)) {
-          return parseNumber(entry);
-        } else {
-          return null;
-        }
-      case 'ZodBoolean':
-        if (entry) {
-          return entry.toLowerCase() === 'true';
-        }
-        return null;
-      case 'ZodSet':
-        if (entry.includes('SET(')) {
-          let setData = entry.slice(4, -1);
-
-          let setDataList = setData.split('+');
-
-          //Captitalize the first letter of the word
-          setDataList = setDataList.map((word) => word.charAt(0).toUpperCase() + word.slice(1));
-
-          return new Set(setDataList);
-        }
-        return null;
-
-      default:
-        return null;
-    }
   };
 
   const sampleDataGenerator = (zType: null | string) => {
@@ -154,7 +113,7 @@ export const UploadPage = () => {
         return;
       }
 
-      let result = [];
+      let result: UploadInstrumentRecordData = [];
 
       let headers: string[] = lines[0]!.split(',');
 
@@ -168,38 +127,46 @@ export const UploadPage = () => {
       }
       // console.log("these are the headers", headers)
       for (let line of data) {
-        //find SET() data and replace the commas with plus signs
-        if (line.includes('SET(')) {
-          for (let i = line.indexOf('SET(') + 4; i < line.length; i++) {
-            if (line.charAt(i) === ')') {
-              break;
-            }
-            if (line.charAt(i) === ',') {
-              line.charAt(i).replace(',', '+');
-            }
-          }
-        }
+        line = applyRawValueTransforms(line);
 
-        let elements = line.split(','); //.slice(2);
-        //console.log('elements to be inputed', elements)
-        let jsonLine = {};
+        let elements = line.split(',').map;
 
-        for (let j = 0; j < headers?.length; j++) {
-          if (!headers) {
+        const jsonLine: { [key: string]: unknown } = {};
+        for (let j = 0; j < headers.length; j++) {
+          const key = headers[j]!;
+          if (INTERNAL_HEADERS[j]) {
+            const expectedKey = INTERNAL_HEADERS[j];
+            if (key === expectedKey) {
+              jsonLine[headers[j]!] = key;
+              continue;
+            }
+            addNotification({
+              message: `Expected header at index '${j}' to be '${expectedKey}', got '${key}'`,
+              type: 'error'
+            });
             return;
-          } else {
-            const key = headers[j]!;
-            if (key !== 'MouseID' && key !== 'Date') {
-              const typeName = getZodTypeName(shape[key]!);
-              jsonLine[headers[j]] = valueInterpreter(elements[j], typeName);
-            } else {
-              jsonLine[headers[j]] = elements[j];
-            }
           }
+          const typeNameResult = getZodTypeName(shape[key]!);
+          if (!typeNameResult.success) {
+            addNotification({ message: typeNameResult.message, type: 'error' });
+            return;
+          }
+          const valueInterpreterResult = valueInterpreter(
+            elements[j]!,
+            typeNameResult.typeName,
+            typeNameResult.isOptional
+          );
+          if (!valueInterpreterResult.success) {
+            addNotification({ message: valueInterpreterResult.message, type: 'error' });
+            return;
+          }
+          jsonLine[headers[j]!] = valueInterpreterResult.value;
         }
         result.push(jsonLine);
       }
       result.pop();
+
+      let submissions = result;
 
       for (const entry of result) {
         //console.log(instrument.validationSchema.array())
@@ -220,12 +187,15 @@ export const UploadPage = () => {
           //create error message with zodcheck error messsage + zodcheck error path
           //addNotification({ message: zodCheck.error.issues[0]?.message, type: 'error' });
           addNotification({ type: 'error' });
+          return;
         } else {
           console.log(zodCheck.success);
           addNotification({ type: 'success' });
           //void sendInstrumentData(entry,params.id!,mouseId,entryDate)
         }
       }
+
+      void sendInstrumentData(result);
     };
     reader.readAsText(input);
 
