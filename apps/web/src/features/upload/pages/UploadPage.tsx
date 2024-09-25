@@ -6,7 +6,7 @@ import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, Json } from '@opendatacapture/runtime-core';
-import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
+import type { UploadInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
@@ -25,13 +25,12 @@ export const UploadPage = () => {
   const instrument = useInstrument(params.id!) as AnyUnilingualScalarInstrument | null;
 
   const sendInstrumentData = async (data: Json, instrumentId: string, subjectId: string, date: Date) => {
-    await axios.post('/v1/instrument-records', {
+    await axios.post('/v1/instrument-records/upload', {
       data,
       date: date,
       instrumentId,
-      sessionId: currentSession!.id,
       subjectId: subjectId
-    } satisfies CreateInstrumentRecordData);
+    } satisfies UploadInstrumentRecordData);
     addNotification({ type: 'success' });
   };
 
