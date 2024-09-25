@@ -21,6 +21,7 @@ export default {
     'csstype__3.x',
     'dompurify__3.x',
     'psychojs__2023.1.3',
+    'preloadjs__1.0.1',
     'jquery-ui__1.x',
     'jquery__1.12.4',
     'jquery__3.x',
