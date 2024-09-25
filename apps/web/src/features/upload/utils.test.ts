@@ -1,11 +1,10 @@
-// @vitest-environment node
-
 //pnpm exec vitest --dir src/features/upload/ -c /dev/null --run
 
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { applyLineTransforms, getZodTypeName } from './utils';
+import { applyLineTransforms, getZodTypeName, processInstrumentCSV } from './utils';
 
 describe('getZodTypeName', () => {
   it('should parse a z.string()', () => {
@@ -38,5 +37,23 @@ describe('applyLineTransforms', () => {
   });
   it('should return the line unchanged, if the line does not contain a set', () => {
     expect(applyLineTransforms('1, 2, 3')).toBe('1, 2, 3');
+  });
+});
+
+describe('processInstrumentCSV', () => {
+  const mockInstrument = { validationSchema: z.object({ foo: z.string() }) } satisfies Pick<
+    AnyUnilingualFormInstrument,
+    'validationSchema'
+  > as any;
+
+  it('should fail to process an empty csv', async () => {
+    const file = new File([''], 'data.csv', { type: 'text/csv' });
+    await expect(processInstrumentCSV(file, mockInstrument)).resolves.toMatchObject({ success: false });
+  });
+
+  it('should process a valid csv', async () => {
+    const file = new File(['subjectID,date,foo\n1,2024-01-01,bar'], 'data.csv', { type: 'text/csv' });
+    console.log(await processInstrumentCSV(file, mockInstrument));
+    await expect(processInstrumentCSV(file, mockInstrument)).resolves.toMatchObject({ success: true });
   });
 });
