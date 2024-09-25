@@ -1,0 +1,161 @@
+html {
+  height: 100%;
+}
+body {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  margin: 0;
+}
+#root:after {
+  content: 'initialising...';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#root.is-ready:after {
+  content: '';
+}
+.dialog-container label,
+.dialog-container input,
+.dialog-container select {
+  box-sizing: border-box;
+  display: block;
+  padding-bottom: 0.5em;
+}
+.dialog-container input.text,
+.dialog-container select.text {
+  margin-bottom: 1em;
+  padding: 0.5em;
+  width: 100%;
+}
+.dialog-container fieldset {
+  border: 0;
+  margin-top: 1em;
+  padding: 0;
+}
+.dialog-container,
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.dialog-container {
+  z-index: 2;
+  display: flex;
+}
+.dialog-container[aria-hidden='true'] {
+  display: none;
+}
+.dialog-overlay {
+  background-color: #0003;
+}
+.dialog-content {
+  margin: auto;
+  z-index: 2;
+  position: relative;
+  width: 500px;
+  max-width: 88vw;
+  padding: 0.5em;
+  border-radius: 2px;
+  font-family: 'Open Sans', sans-serif;
+  color: #333;
+  background-color: #eee;
+  border-color: #ccc;
+  box-shadow: 1px 1px 3px #555;
+}
+.dialog-title {
+  padding: 0.5em;
+  margin-bottom: 1em;
+  background-color: #090;
+  border-radius: 2px;
+}
+.dialog-warning {
+  background-color: #f90 !important;
+}
+.dialog-error {
+  background-color: red !important;
+}
+.dialog-title p {
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+}
+.dialog-close {
+  position: absolute;
+  top: 0.7em;
+  right: 0.7em;
+  border: 0;
+  padding: 0;
+  border-radius: 2px;
+  width: 1.1em;
+  height: 1.1em;
+  color: #333;
+  background-color: #fff;
+  font-weight: bold;
+  font-size: 1.25em;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.progress-msg {
+  box-sizing: border-box;
+  padding: 0.5em 0;
+}
+.progress-container {
+  padding: 0.2em;
+  border: 1px solid #555555;
+  border-radius: 2px;
+  background-color: #fff;
+}
+.progress-bar {
+  width: 0;
+  height: 1.5em;
+  background-color: #ccc;
+}
+.dialog-button {
+  padding: 0.5em 1em;
+  margin: 0.5em 0.5em 0.5em 0;
+  border: 1px solid #555555;
+  border-radius: 2px;
+  font-size: 0.9em;
+  color: #000;
+  background-color: #fff;
+  cursor: pointer;
+}
+.dialog-button:hover {
+  background-color: #eee;
+}
+.dialog-button:active {
+  background-color: #ccc;
+}
+.dialog-button:focus {
+  border: 1px solid #000000;
+}
+.disabled {
+  border: 1px solid #aaaaaa;
+  color: #aaa;
+  background-color: #eee;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.logo {
+  display: block;
+  margin: 0 auto 1em;
+  max-height: 20vh;
+  max-width: 100%;
+}
+a,
+a:active,
+a:focus,
+a:visited {
+  color: #007eb7;
+  outline: 0;
+}
+a:hover {
+  color: #000;
+}

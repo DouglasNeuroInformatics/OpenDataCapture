@@ -1,226 +1,632 @@
-declare const A11yDialog: any;
-declare const log4javascript: any;
-declare const PIXI: any;
-declare const Tone: any;
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 
-declare function addInfoFromUrl(info: any): any;
+/// <reference lib="DOM" />
+
+import type { Class } from 'type-fest__4.x';
+
+declare class A11yDialog {
+  constructor(node: Element, targets?: any);
+  create(targets: any): A11yDialog;
+  destroy(): A11yDialog;
+  hide(event?: any): A11yDialog;
+  off(type: any, handler: any): A11yDialog;
+  on(type: any, handler: any): A11yDialog;
+  show(event?: Event): A11yDialog;
+}
+
+declare namespace log4javascript {
+  class Logger {
+    [key: string]: any;
+  }
+}
+
+declare namespace Tone {
+  class Synth {
+    [key: string]: any;
+  }
+  class Volume {
+    [key: string]: any;
+  }
+}
+
+declare namespace PIXI {
+  abstract class AbstractRenderer {
+    protected _backgroundColor: number;
+    _backgroundColorRgba: number[];
+    protected _backgroundColorString: string;
+    _lastObjectRendered: any;
+    readonly autoDensity: boolean;
+    clearBeforeRender?: boolean;
+    readonly options: { [key: string]: any };
+    readonly plugins: { [key: string]: any };
+    readonly preserveDrawingBuffer: boolean;
+    resolution: number;
+    readonly screen: Rectangle;
+    readonly type: any;
+    readonly useContextAlpha: 'notMultiplied' | boolean;
+    readonly view: HTMLCanvasElement;
+    constructor(type?: any, options?: { [key: string]: any });
+    get backgroundAlpha(): number;
+    set backgroundAlpha(value: number);
+    get backgroundColor(): number;
+    set backgroundColor(value: number);
+    get height(): number;
+    get width(): number;
+    destroy(removeView?: boolean): void;
+    generateTexture(
+      displayObject: { [key: string]: any },
+      scaleMode?: any,
+      resolution?: number,
+      region?: Rectangle
+    ): any;
+    initPlugins(staticMap: { [key: string]: any }): void;
+    abstract render(displayObject: { [key: string]: any }, options?: { [key: string]: any }): void;
+    resize(screenWidth: number, screenHeight: number): void;
+  }
+  class Container {
+    [key: string]: any;
+  }
+  class Graphics extends Container {
+    [key: string]: any;
+  }
+  class Matrix {
+    a: number;
+    array: Float32Array | null;
+    b: number;
+    c: number;
+    d: number;
+    tx: number;
+    ty: number;
+    constructor(a?: number, b?: number, c?: number, d?: number, tx?: number, ty?: number);
+    static get IDENTITY(): Matrix;
+    static get TEMP_MATRIX(): Matrix;
+    append(matrix: Matrix): this;
+    apply(pos: { [key: string]: any }, newPos?: { [key: string]: any }): { [key: string]: any };
+    applyInverse(pos: { [key: string]: any }, newPos?: { [key: string]: any }): { [key: string]: any };
+    clone(): Matrix;
+    copyFrom(matrix: Matrix): this;
+    copyTo(matrix: Matrix): Matrix;
+    decompose(transform: any): any;
+    fromArray(array: number[]): void;
+    identity(): this;
+    invert(): this;
+    prepend(matrix: Matrix): this;
+    rotate(angle: number): this;
+    scale(x: number, y: number): this;
+    set(a: number, b: number, c: number, d: number, tx: number, ty: number): this;
+    setTransform(
+      x: number,
+      y: number,
+      pivotX: number,
+      pivotY: number,
+      scaleX: number,
+      scaleY: number,
+      rotation: number,
+      skewX: number,
+      skewY: number
+    ): this;
+    toArray(transpose: boolean, out?: Float32Array): Float32Array;
+    toString(): string;
+    translate(x: number, y: number): this;
+  }
+  class Mesh {
+    [key: string]: any;
+  }
+  class ObservablePoint<T = any> {
+    cb: (this: T) => any;
+    scope: any;
+    constructor(cb: (this: T) => any, scope: T, x?: number, y?: number);
+    get x(): number;
+    set x(value: number);
+    get y(): number;
+    set y(value: number);
+    clone(cb?: (this: T) => any, scope?: any): ObservablePoint;
+    copyFrom(p: { [key: string]: any }): this;
+    copyTo(p: { [key: string]: any }): { [key: string]: any };
+    equals(p: { [key: string]: any }): boolean;
+    set(x?: number, y?: number): this;
+    toString(): string;
+  }
+  class Point {
+    x: number;
+    y: number;
+    constructor(x?: number, y?: number);
+    clone(): Point;
+    copyFrom(p: { [key: string]: any }): this;
+    copyTo(p: { [key: string]: any }): { [key: string]: any };
+    equals(p: { [key: string]: any }): boolean;
+    set(x?: number, y?: number): this;
+    toString(): string;
+  }
+  class Polygon {
+    closeStroke: boolean;
+    points: number[];
+    readonly type: any;
+    constructor(points: { [key: string]: any }[] | number[]);
+    constructor(...points: { [key: string]: any }[] | number[]);
+    clone(): Polygon;
+    contains(x: number, y: number): boolean;
+    toString(): string;
+  }
+  class Rectangle {
+    height: number;
+    readonly type: any;
+    width: number;
+    x: number;
+    y: number;
+    constructor(x?: number, y?: number, width?: number, height?: number);
+    get bottom(): number;
+    static get EMPTY(): Rectangle;
+    get left(): number;
+    get right(): number;
+    get top(): number;
+    ceil(resolution?: number, eps?: number): this;
+    clone(): Rectangle;
+    contains(x: number, y: number): boolean;
+    copyFrom(rectangle: Rectangle): Rectangle;
+    copyTo(rectangle: Rectangle): Rectangle;
+    enlarge(rectangle: Rectangle): this;
+    fit(rectangle: Rectangle): this;
+    pad(paddingX?: number, paddingY?: number): this;
+    toString(): string;
+  }
+  abstract class Resource {
+    protected _height: number;
+    protected _width: number;
+    destroyed: boolean;
+    internal: boolean;
+    protected onError: any;
+    protected onResize: any;
+    protected onUpdate: any;
+    constructor(width?: number, height?: number);
+    static test(_source: unknown, _extension?: string): boolean;
+    get height(): number;
+    get valid(): boolean;
+    get width(): number;
+    bind(baseTexture: any): void;
+    destroy(): void;
+    dispose(): void;
+    load(): Promise<Resource>;
+    resize(width: number, height: number): void;
+    style(_renderer: any, _baseTexture: any, _glTexture: any): boolean;
+    unbind(baseTexture: any): void;
+    update(): void;
+    abstract upload(renderer: any, baseTexture: any, glTexture: any): boolean;
+  }
+  class Sprite extends Container {
+    _tintedCanvas: HTMLCanvasElement | HTMLImageElement;
+    _renderCanvas(renderer: any): void;
+  }
+  class Text extends Sprite {
+    static nextLineHeightBehavior: boolean;
+    _autoResolution: boolean;
+    protected _font: string;
+    _resolution: number;
+    protected _style: TextStyle;
+    protected _styleListener: () => void;
+    protected _text: string;
+    canvas: HTMLCanvasElement;
+    context: CanvasRenderingContext2D;
+    dirty: boolean;
+    localStyleID: number;
+    constructor(text: string, style?: { [key: string]: any }, canvas?: HTMLCanvasElement);
+    get height(): number;
+    set height(value: number);
+    get resolution(): number;
+    set resolution(value: number);
+    get style(): { [key: string]: any };
+    set style(style: { [key: string]: any });
+    get text(): string;
+    set text(text: string);
+    get width(): number;
+    set width(value: number);
+    protected _calculateBounds(): void;
+    protected _render(renderer: any): void;
+    destroy(options?: { [key: string]: any } | boolean): void;
+    getLocalBounds(rect: Rectangle): Rectangle;
+    updateText(respectDirty: boolean): void;
+  }
+  class TextMetrics {
+    static _breakingSpaces: number[];
+    static _canvas: HTMLCanvasElement | OffscreenCanvas;
+    static _context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+    static _fonts: {
+      [font: string]: any;
+    };
+    static _newlines: number[];
+    static BASELINE_MULTIPLIER: number;
+    static BASELINE_SYMBOL: string;
+    static HEIGHT_MULTIPLIER: number;
+    static METRICS_STRING: string;
+    fontProperties: { [key: string]: any };
+    height: number;
+    lineHeight: number;
+    lines: string[];
+    lineWidths: number[];
+    maxLineWidth: number;
+    style: TextStyle;
+    text: string;
+    width: number;
+    constructor(
+      text: string,
+      style: TextStyle,
+      width: number,
+      height: number,
+      lines: string[],
+      lineWidths: number[],
+      lineHeight: number,
+      maxLineWidth: number,
+      fontProperties: { [key: string]: any }
+    );
+    static canBreakChars(
+      _char: string,
+      _nextChar: string,
+      _token: string,
+      _index: number,
+      _breakWords: boolean
+    ): boolean;
+    static canBreakWords(_token: string, breakWords: boolean): boolean;
+    static clearMetrics(font?: string): void;
+    static isBreakingSpace(char: string, _nextChar?: string): boolean;
+    static measureFont(font: string): { [key: string]: any };
+    static measureText(
+      text: string,
+      style: TextStyle,
+      wordWrap?: boolean,
+      canvas?: HTMLCanvasElement | OffscreenCanvas
+    ): TextMetrics;
+    static wordWrapSplit(token: string): string[];
+  }
+  type ITextStyle = {
+    align: string;
+    breakWords: boolean;
+    dropShadow: boolean;
+    dropShadowAlpha: number;
+    dropShadowAngle: number;
+    dropShadowBlur: number;
+    dropShadowColor: number | string;
+    dropShadowDistance: number;
+    fill: any;
+    fillGradientStops: number[];
+    fillGradientType: any;
+    fontFamily: string | string[];
+    fontSize: number | string;
+    fontStyle: string;
+    fontVariant: string;
+    fontWeight: string;
+    leading: number;
+    letterSpacing: number;
+    lineHeight: number;
+    lineJoin: string;
+    miterLimit: number;
+    padding: number;
+    stroke: number | string;
+    strokeThickness: number;
+    textBaseline: string;
+    trim: boolean;
+    whiteSpace: string;
+    wordWrap: boolean;
+    wordWrapWidth: number;
+  };
+
+  class TextStyle implements ITextStyle {
+    protected _align: string;
+    protected _breakWords: boolean;
+    protected _dropShadow: boolean;
+    protected _dropShadowAlpha: number;
+    protected _dropShadowAngle: number;
+    protected _dropShadowBlur: number;
+    protected _dropShadowColor: number | string;
+    protected _dropShadowDistance: number;
+    protected _fill: any;
+    protected _fillGradientStops: number[];
+    protected _fillGradientType: any;
+    protected _fontFamily: string | string[];
+    protected _fontSize: number | string;
+    protected _fontStyle: string;
+    protected _fontVariant: string;
+    protected _fontWeight: string;
+    protected _leading: number;
+    protected _letterSpacing: number;
+    protected _lineHeight: number;
+    protected _lineJoin: string;
+    protected _miterLimit: number;
+    protected _padding: number;
+    protected _stroke: number | string;
+    protected _strokeThickness: number;
+    protected _textBaseline: string;
+    protected _trim: boolean;
+    protected _whiteSpace: string;
+    protected _wordWrap: boolean;
+    protected _wordWrapWidth: number;
+    styleID: number;
+    constructor(style?: Partial<ITextStyle>);
+    get align(): string;
+    set align(align: string);
+    get breakWords(): boolean;
+    set breakWords(breakWords: boolean);
+    get dropShadow(): boolean;
+    set dropShadow(dropShadow: boolean);
+    get dropShadowAlpha(): number;
+    set dropShadowAlpha(dropShadowAlpha: number);
+    get dropShadowAngle(): number;
+    set dropShadowAngle(dropShadowAngle: number);
+    get dropShadowBlur(): number;
+    set dropShadowBlur(dropShadowBlur: number);
+    get dropShadowColor(): number | string;
+    set dropShadowColor(dropShadowColor: number | string);
+    get dropShadowDistance(): number;
+    set dropShadowDistance(dropShadowDistance: number);
+    get fill(): any;
+    set fill(fill: any);
+    get fillGradientStops(): number[];
+    set fillGradientStops(fillGradientStops: number[]);
+    get fillGradientType(): any;
+    set fillGradientType(fillGradientType: any);
+    get fontFamily(): string | string[];
+    set fontFamily(fontFamily: string | string[]);
+    get fontSize(): number | string;
+    set fontSize(fontSize: number | string);
+    get fontStyle(): string;
+    set fontStyle(fontStyle: string);
+    get fontVariant(): string;
+    set fontVariant(fontVariant: string);
+    get fontWeight(): string;
+    set fontWeight(fontWeight: string);
+    get leading(): number;
+    set leading(leading: number);
+    get letterSpacing(): number;
+    set letterSpacing(letterSpacing: number);
+    get lineHeight(): number;
+    set lineHeight(lineHeight: number);
+    get lineJoin(): string;
+    set lineJoin(lineJoin: string);
+    get miterLimit(): number;
+    set miterLimit(miterLimit: number);
+    get padding(): number;
+    set padding(padding: number);
+    get stroke(): number | string;
+    set stroke(stroke: number | string);
+    get strokeThickness(): number;
+    set strokeThickness(strokeThickness: number);
+    get textBaseline(): string;
+    set textBaseline(textBaseline: string);
+    get trim(): boolean;
+    set trim(trim: boolean);
+    get whiteSpace(): string;
+    set whiteSpace(whiteSpace: string);
+    get wordWrap(): boolean;
+    set wordWrap(wordWrap: boolean);
+    get wordWrapWidth(): number;
+    set wordWrapWidth(wordWrapWidth: number);
+    clone(): TextStyle;
+    reset(): void;
+    toFontString(): string;
+  }
+  class Texture<_T> {
+    [key: string]: any;
+  }
+  enum BLEND_MODES {
+    ADD = 1,
+    ADD_NPM = 18,
+    COLOR = 15,
+    COLOR_BURN = 8,
+    COLOR_DODGE = 7,
+    DARKEN = 5,
+    DIFFERENCE = 11,
+    DST_ATOP = 27,
+    DST_IN = 25,
+    DST_OUT = 26,
+    DST_OVER = 24,
+    ERASE = 26,
+    EXCLUSION = 12,
+    HARD_LIGHT = 9,
+    HUE = 13,
+    LIGHTEN = 6,
+    LUMINOSITY = 16,
+    MULTIPLY = 2,
+    NONE = 20,
+    NORMAL = 0,
+    NORMAL_NPM = 17,
+    OVERLAY = 4,
+    SATURATION = 14,
+    SCREEN = 3,
+    SCREEN_NPM = 19,
+    SOFT_LIGHT = 10,
+    SRC_ATOP = 23,
+    SRC_IN = 21,
+    SRC_OUT = 22,
+    SRC_OVER = 0,
+    SUBTRACT = 28,
+    XOR = 29
+  }
+}
+
+declare function addInfoFromUrl(info: { [key: string]: any }): any;
+
+declare type AudioClipOptions = {
+  autoLog?: boolean;
+  data: Blob;
+  format: string;
+  name?: string;
+  psychoJS: PsychoJS;
+  sampleRateHz: number;
+};
 
 declare class AudioClip extends PsychObject {
-  constructor({
-    psychoJS,
-    name,
-    sampleRateHz,
-    format,
-    data,
-    autoLog
-  }?: {
-    psychoJS: PsychoJS;
-    name?: string;
-    format: string;
-    sampleRateHz: number;
-    data: Blob;
-    autoLog?: boolean;
-  });
-  setVolume(volume: number): void;
+  _audioBuffer: AudioBuffer;
+  _audioContext: AudioContext;
+  _audioData: Float32Array | null;
+  _decodingCallbacks: ((...args: any[]) => any)[];
+  _gainNode: GainNode;
+  _source: AudioBufferSourceNode;
+  _status: AudioClip.Status;
   _volume: number;
-  public startPlayback(): Promise<void>;
-  _source: any;
-  _gainNode: any;
-  stopPlayback(fadeDuration?: number): Promise<void>;
-  getDuration(): Promise<number>;
-  public upload(): void | Promise<any>;
-  download(filename?: string): void;
-  transcribe({ engine, languageCode }?: { engine: Symbol; languageCode: string }): Promise<any>;
-  protected _GoogleTranscribe(transcriptionKey: string, languageCode: string): Promise<any>;
+  constructor(options?: AudioClipOptions);
+  protected _base64ArrayBuffer(arrayBuffer: ArrayBuffer): string;
   protected _decodeAudio(): any;
-  _status: any;
-  _audioData: any;
-  _decodingCallbacks: any[];
-  _audioContext: any;
-  _audioBuffer: any;
-  protected _base64ArrayBuffer(arrayBuffer: any): string;
+  protected _GoogleTranscribe(transcriptionKey: string, languageCode: string): Promise<any>;
+  download(filename?: string): void;
+  getDuration(): Promise<number>;
+  setVolume(volume: number): void;
+  startPlayback(): Promise<void>;
+  stopPlayback(fadeDuration?: number): Promise<void>;
+  transcribe(options?: { engine: AudioClip.Engine; languageCode: string }): Promise<any>;
+  upload(): Promise<any> | void;
 }
 
 declare namespace AudioClip {
+  type Engine = symbol;
   namespace Engine {
-    let GOOGLE: any;
+    let GOOGLE: symbol;
   }
-  type Engine = Symbol;
+  type Status = symbol;
   namespace Status {
-    let CREATED: any;
-    let DECODING: any;
-    let READY: any;
+    let CREATED: symbol;
+    let DECODING: symbol;
+    let READY: symbol;
   }
-  type Status = Symbol;
 }
 
+declare type AudioClipPlayerOptions = {
+  audioClip: AudioClip;
+  loops?: number;
+  psychoJS: PsychoJS;
+  startTime?: number;
+  stereo?: boolean;
+  stopTime?: number;
+  volume?: number;
+};
+
 declare class AudioClipPlayer extends SoundPlayer {
-  static accept(psychoJS: PsychoJS, value: string): any | boolean;
-  constructor({
-    psychoJS,
-    audioClip,
-    startTime,
-    stopTime,
-    stereo,
-    volume,
-    loops
-  }?: {
-    psychoJS: PsychoJS;
-    audioClip: any;
-    startTime?: number;
-    stopTime?: number;
-    stereo?: boolean;
-    volume?: number;
-    loops?: number;
-  });
+  _audioClip: AudioClip;
   _currentLoopIndex: number;
+  _loops: number;
+  _volume: number;
+  constructor(options?: AudioClipPlayerOptions);
+  static accept(psychoJS: PsychoJS, value: string): any;
   getDuration(): number;
+  play(loops: number, fadeDuration?: number): void;
+  setAudioClip(audioClip: AudioClip): void;
   setDuration(duration_s: number): void;
   setVolume(volume: number, mute?: boolean): void;
-  _volume: number;
-  _loops: number;
-  setAudioClip(audioClip: any): void;
-  _audioClip: AudioClip;
-  play(loops: number, fadeDuration?: number): void;
   stop(fadeDuration?: number): void;
 }
 
-declare function average(input?: any[]): number;
+declare function average(input?: (number | string)[]): number;
 
 declare class BuilderKeyResponse {
-  constructor(psychoJS: any);
-  _psychoJS: any;
-  status: any;
-  keys: any[];
-  corr: number;
-  rt: any[];
+  _psychoJS: PsychoJS;
   clock: Clock;
+  corr: number;
+  keys: any[];
+  rt: any[];
+  status: any;
+  constructor(psychoJS: PsychoJS);
 }
+
+declare type ButtonStimOptions = {
+  anchor?: string;
+  autoDraw?: boolean;
+  autoLog?: boolean;
+  bold?: boolean;
+  borderColor?: Color;
+  borderWidth?: Color;
+  color?: Color;
+  fillColor?: Color;
+  font?: string;
+  italic?: boolean;
+  letterHeight?: number;
+  name: string;
+  opacity?: number;
+  padding?: any;
+  pos?: number[];
+  size?: any;
+  text?: string;
+  units?: string;
+  win: Window_2;
+};
 
 declare class ButtonStim extends TextBox {
-  constructor({
-    win,
-    name,
-    text,
-    font,
-    pos,
-    size,
-    padding,
-    anchor,
-    units,
-    color,
-    fillColor,
-    borderColor,
-    borderWidth,
-    opacity,
-    letterHeight,
-    bold,
-    italic,
-    autoDraw,
-    autoLog
-  }?: {
-    win: Window_2;
-    name: string;
-    text?: string;
-    font?: string;
-    pos?: number[];
-    anchor?: string;
-    units?: string;
-    color?: Color;
-    fillColor?: Color;
-    borderColor?: Color;
-    size?: any;
-    padding?: any;
-    borderWidth?: Color;
-    opacity?: number;
-    letterHeight?: number;
-    bold?: boolean;
-    italic?: boolean;
-    autoDraw?: boolean;
-    autoLog?: boolean;
-  });
   listener: Mouse;
-  get numClicks(): number;
+  constructor(options?: ButtonStimOptions);
   get isClicked(): boolean;
+  get numClicks(): number;
 }
 
+declare type CameraOptions = {
+  autoLog?: any;
+  clock?: any;
+  format?: any;
+  name?: any;
+  win?: any;
+};
+
 declare class Camera extends PsychObject {
-  constructor({
-    win,
-    name,
-    format,
-    clock,
-    autoLog
-  }?: {
-    win?: any;
-    name?: any;
-    format?: any;
-    clock?: any;
-    autoLog?: any;
-  });
-  _stream: MediaStream;
+  _audioBuffer: any[];
   _recorder: MediaRecorder;
-  public authorize(showDialog?: boolean, dialogMsg?: string): boolean;
   _status: any;
+  _stream: MediaStream;
+  _streamSettings: MediaTrackSettings;
+  _videoBuffer: any[];
+  _videos: any[];
+  constructor(options?: CameraOptions);
   public get isReady(): boolean;
+  protected _onChange(): void;
+  protected _prepareRecording(): void;
+  public authorize(showDialog?: boolean, dialogMsg?: string): boolean;
+  public close(): Promise<void>;
+  public flush(): Promise<any>;
+  public getRecording(...args: any[]): Promise<any>;
   public getStream(): MediaStream;
   public getVideo(): HTMLVideoElement;
   public open(): void;
-  public record(): Promise<any>;
-  public stop(): Promise<any>;
   public pause(): Promise<any>;
-  resume({ clear }?: { clear?: boolean }): Promise<any>;
-  _audioBuffer: any[];
-  public flush(): Promise<any>;
-  public getRecording(...args: any[]): Promise<any>;
+  public record(): Promise<any>;
+  resume(options?: { clear?: boolean }): Promise<any>;
   protected save(...args: any[]): Promise<any>;
-  public close(): Promise<void>;
-  _videos: any[];
-  protected _onChange(): void;
-  protected _prepareRecording(): void;
-  _videoBuffer: any[];
-  _streamSettings: MediaTrackSettings;
+  public stop(): Promise<any>;
 }
 
 declare class Clock extends MonotonicClock {
   constructor();
-  reset(newTime?: number): void;
   add(deltaTime?: number): void;
+  reset(newTime?: number): void;
 }
 
 declare class Color {
-  static hexToRgb255(hex: string): number[];
-  static hexToRgb(hex: string): number[];
-  static rgb255ToHex(rgb255: number[]): string;
-  static rgbToHex(rgb: number[]): string;
-  static rgbToInt(rgb: number[]): number;
-  static rgb255ToInt(rgb255: number[]): number;
-  protected static _rgb255ToHex(rgb255: number[]): string;
-  protected static _rgbToHex(rgb: number[]): string;
-  protected static _rgbToInt(rgb: number[]): number;
-  protected static _rgb255ToInt(rgb255: number[]): number;
-  protected static _intToRgb255(hex: number): number[];
-  protected static _intToRgb(hex: number): number[];
-  protected static _checkTypeAndRange(arg: any, range?: number[]): boolean;
-  constructor(obj?: string | number | number[] | undefined, colorspace?: any);
   _hex: any;
+  _int: number;
   _rgb: any;
   _rgbFull: any;
-  get rgb(): number[];
-  get rgbFull(): number[];
-  get rgb255(): number[];
+  constructor(obj?: number | number[] | string, colorspace?: Color.COLOR_SPACE);
+  protected static _checkTypeAndRange(arg: any, range?: number[]): boolean;
+  protected static _intToRgb(hex: number): number[];
+  protected static _intToRgb255(hex: number): number[];
+  protected static _rgb255ToHex(rgb255: number[]): string;
+  protected static _rgb255ToInt(rgb255: number[]): number;
+  protected static _rgbToHex(rgb: number[]): string;
+  protected static _rgbToInt(rgb: number[]): number;
+  static hexToRgb(hex: string): number[];
+  static hexToRgb255(hex: string): number[];
+  static rgb255ToHex(rgb255: number[]): string;
+  static rgb255ToInt(rgb255: number[]): number;
+  static rgbToHex(rgb: number[]): string;
+  static rgbToInt(rgb: number[]): number;
   get hex(): string;
   get int(): number;
-  _int: number;
+  get rgb(): number[];
+  get rgb255(): number[];
+  get rgbFull(): number[];
   toString(): string;
 }
 
 declare namespace Color {
   namespace COLOR_SPACE {
-    let RGB: any;
-    let RGB255: any;
+    let RGB: symbol;
+    let RGB255: symbol;
   }
-  type COLOR_SPACE = Symbol;
+  type COLOR_SPACE = symbol;
   namespace NAMED_COLORS {
     let aliceblue: string;
     let antiquewhite: string;
@@ -373,25 +779,23 @@ declare namespace Color {
   type NAMED_COLORS = string;
 }
 
-declare function ColorMixin(superclass: any): {
-  new (args: any): {
-    [x: string]: any;
-    setColor(color: Color, log?: boolean): void;
-    _needUpdate: boolean;
-    _needPixiUpdate: boolean;
-    setContrast(contrast: number, log?: boolean): void;
-    getContrastedColor(color: string | number | number[], contrast: number): Color;
-  };
-  [x: string]: any;
-};
+declare type WithColor<T extends { [key: string]: any }> = {
+  _needPixiUpdate: boolean;
+  _needUpdate: boolean;
+  getContrastedColor(color: number | number[] | string, contrast: number): Color;
+  setColor(color: Color, log?: boolean): void;
+  setContrast(contrast: number, log?: boolean): void;
+} & T;
+
+declare function ColorMixin<T extends { [key: string]: any }>(superclass: Class<T>): Class<WithColor<T>>;
 
 export declare namespace core {
   export {
-    EventManager,
     BuilderKeyResponse,
+    EventManager,
     GUI,
-    KeyPress,
     Keyboard,
+    KeyPress,
     Logger,
     MinimalStim,
     Mouse,
@@ -402,116 +806,118 @@ export declare namespace core {
   };
 }
 
-declare function count(input: any[], value: number | string | object | null): number;
+declare function count(input: any[], value: null | number | object | string): number;
 
 declare class CountdownTimer extends Clock {
-  constructor(startTime?: number);
   _countdown_duration: number;
+  constructor(startTime?: number);
 }
 
 export declare namespace data {
-  export { ExperimentHandler, TrialHandler, Snapshot, QuestHandler, MultiStairHandler, Shelf };
+  export { ExperimentHandler, MultiStairHandler, QuestHandler, Shelf, Snapshot, TrialHandler };
 }
 
 declare function detectBrowser(): string;
 
 declare class EventEmitter {
-  _listeners: any;
-  _onceUuids: any;
-  on(name: string, listener: any): string;
-  once(name: string, listener: any): string;
-  off(name: string, uuid: any): boolean;
+  /**
+   * Emit an event with a given name and associated data.
+   * @param name the name of the event
+   * @param data the data of the event
+   * @return `true` if at least one listener has been registered for that event, and `false` otherwise
+   */
   emit(name: string, data: object): boolean;
+  /**
+   * Remove the listener with the given uuid associated to the given event name.
+   * @param name the name of the event
+   * @param uuid the uuid of the listener
+   * @return `true` if the listener has been removed, and `false` otherwise
+   */
+  off(name: string, uuid: string): boolean;
+  /**
+   * Register a new listener for events with the given name emitted by this instance.
+   * @param name the name of the event
+   * @param listener a listener called upon emission of the event
+   * @return the unique identifier associated with that (event, listener) pair (useful to remove the listener)
+   */
+  on(name: string, listener: (data: object) => any): string;
+  /**
+   * Register a new listener for the given event name, and remove it as soon as the event has been emitted.
+   * @param name the name of the event
+   * @param listener a listener called upon emission of the event
+   * @return the unique identifier associated with that (event, listener) pair (useful to remove the listener)
+   */
+  once(name: string, listener: (data: object) => any): string;
 }
 
 declare class EventManager {
-  static pyglet2w3c(pygletKeyList: string[]): string[];
-  static w3c2pyglet(code: string): string;
-  static keycode2w3c(keycode: number): string;
-  constructor(psychoJS: any);
-  _psychoJS: any;
   _keyBuffer: any[];
   _mouseInfo: {
-    pos: number[];
-    wheelRel: number[];
     buttons: {
-      pressed: number[];
       clocks: Clock[];
+      pressed: number[];
       times: number[];
     };
     moveClock: Clock;
+    pos: number[];
+    wheelRel: number[];
   };
-  getKeys({ keyList, timeStamped }?: { keyList?: string[]; timeStamped?: boolean }): string[];
-  getMouseInfo(): EventManager.MouseInfo;
+  _psychoJS: PsychoJS;
+  constructor(psychoJS: PsychoJS);
+  static keycode2w3c(keycode: number): string;
+  static pyglet2w3c(pygletKeyList: string[]): string[];
+  static w3c2pyglet(code: string): string;
+  protected _addKeyListeners(): void;
+  addMouseListeners(renderer: any): void;
   clearEvents(attribs: any): void;
   clearKeys(): void;
+  getKeys(options?: { keyList?: string[]; timeStamped?: boolean }): string[];
+  getMouseInfo(): EventManager.MouseInfo;
+  resetMoveClock(): void;
   startMoveClock(): void;
   stopMoveClock(): void;
-  resetMoveClock(): void;
-  addMouseListeners(renderer: any): void;
-  protected _addKeyListeners(): void;
 }
 
 declare namespace EventManager {
-  let _keycodeMap: Record<number, string>;
-  let _pygletMap: Record<string, string>;
-  let _reversePygletMap: Record<string, string>;
+  let _keycodeMap: { [key: number]: string };
+  let _pygletMap: { [key: string]: string };
+  let _reversePygletMap: { [key: string]: string };
   type ButtonInfo = {
-    pressed: number[];
     clocks: Clock[];
+    pressed: number[];
     times: number[];
   };
   type MouseInfo = {
-    pos: number[];
-    wheelRel: number[];
     buttons: EventManager.ButtonInfo;
     moveClock: Clock;
+    pos: number[];
+    wheelRel: number[];
   };
 }
 
 declare class ExperimentHandler extends PsychObject {
-  protected static _getLoopAttributes(loop: any): {};
-  constructor({
-    psychoJS,
-    name,
-    extraInfo,
-    dataFileName
-  }?: {
-    psychoJS: PsychoJS;
-    name: string;
-    extraInfo: any;
-    dataFileName?: any;
-  });
-  set experimentEnded(ended: boolean);
-  get experimentEnded(): boolean;
+  _currentTrialData: { [key: string]: any };
+  _datetime: any;
   _experimentEnded: boolean;
-  get _thisEntry(): {};
-  get _entries(): any[];
   _experimentName: any;
+  _loops: any[];
   _participant: any;
   _session: any;
-  _datetime: any;
-  _loops: any[];
-  _unfinishedLoops: any[];
-  _trialsKeys: any[];
   _trialsData: any[];
-  _currentTrialData: {};
-  isEntryEmpty(): boolean;
-  addLoop(loop: any): void;
-  removeLoop(loop: any): void;
+  _trialsKeys: any[];
+  _unfinishedLoops: any[];
+  constructor(options?: { dataFileName?: any; extraInfo: any; name: string; psychoJS: PsychoJS });
+  protected static _getLoopAttributes(loop: any): { [key: string]: any };
+  get _entries(): any[];
+  get _thisEntry(): { [key: string]: any };
+  set experimentEnded(ended: boolean);
+  get experimentEnded(): boolean;
   addData(key: any, value: any): void;
-  nextEntry(snapshots: any | any[] | undefined): void;
-  save({
-    attributes,
-    sync,
-    tag,
-    clear
-  }?: {
-    attributes?: Array<any>;
-    sync?: boolean;
-    tag?: string;
-    clear?: boolean;
-  }): Promise<any>;
+  addLoop(loop: any): void;
+  isEntryEmpty(): boolean;
+  nextEntry(snapshots?: any): void;
+  removeLoop(loop: any): void;
+  save(options?: { attributes?: any[]; clear?: boolean; sync?: boolean; tag?: string }): Promise<any>;
 }
 
 declare namespace ExperimentHandler {
@@ -519,151 +925,116 @@ declare namespace ExperimentHandler {
     let CSV: any;
     let DATABASE: any;
   }
-  type SaveFormat = Symbol;
+  type SaveFormat = symbol;
   namespace Environment {
     let SERVER: any;
     let LOCAL: any;
   }
-  type Environment = Symbol;
+  type Environment = symbol;
 }
 
 declare function extensionFromMimeType(mimeType: string): string;
 
 declare class FaceDetector extends VisualStim {
-  constructor({
-    name,
-    win,
-    input,
-    modelDir,
-    faceApiUrl,
-    units,
-    ori,
-    opacity,
-    pos,
-    size,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window_2;
-    input?: any;
-    modelDir?: any;
-    faceApiUrl?: any;
-    units?: any;
-    ori?: any;
-    opacity?: any;
-    pos?: any;
-    size?: any;
+  _body: PIXI.Graphics;
+  _detectionId: number;
+  _detections: any;
+  _modelsLoaded: boolean;
+  constructor(options?: {
     autoDraw?: any;
     autoLog?: any;
+    faceApiUrl?: any;
+    input?: any;
+    modelDir?: any;
+    name: string;
+    opacity?: any;
+    ori?: any;
+    pos?: any;
+    size?: any;
+    units?: any;
+    win: Window_2;
   });
+  protected _initFaceApi(): Promise<void>;
   isReady(): boolean;
   setInput(input: any, log?: boolean): void;
   start(period: number, detectionCallback: any, log?: boolean): void;
-  _detectionId: number;
-  _detections: any;
   stop(log?: boolean): void;
-  protected _initFaceApi(): Promise<void>;
-  _modelsLoaded: boolean;
-  _body: any;
 }
 
-declare function flattenArray(array: Array<any>): Array<any>;
+declare function flattenArray(array: any[]): any[];
 
-declare class Form {
-  constructor({
-    name,
-    win,
-    pos,
-    size,
-    units,
-    borderColor,
-    fillColor,
-    itemColor,
-    markerColor,
-    responseColor,
-    color,
-    contrast,
-    opacity,
-    depth,
-    items,
-    randomize,
-    itemPadding,
-    font,
-    fontFamily,
-    bold,
-    italic,
-    fontSize,
-    clipMask,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window_2;
-    pos?: number[];
-    size: number[];
-    units?: string;
-    color?: Color;
-    contrast?: number;
-    opacity?: number;
-    depth?: number;
-    items?: number[];
-    itemPadding?: number;
-    font?: string;
-    fontFamily?: string;
-    bold?: boolean;
-    italic?: boolean;
-    fontSize?: number;
-    clipMask?: any;
-    autoDraw?: boolean;
-    autoLog?: boolean;
-    borderColor?: any;
-    fillColor?: any;
-    itemColor?: any;
-    markerColor?: any;
-    responseColor?: any;
-    randomize?: any;
-  });
-  _scrollbarWidth: number;
-  _responseTextHeightRatio: number;
-  refresh(): void;
-  draw(): void;
-  _prevScrollbarMarkerPos: any;
-  _needUpdate: boolean;
-  hide(): void;
-  reset(): void;
-  getData(): object;
-  formComplete(): boolean;
-  addDataToExp(experiment: any, format?: string): void;
-  protected _processItems(): void;
-  protected _importItems(): void;
-  _items: any;
-  protected _sanitizeItems(): void;
-  protected _estimateBoundingBox(): void;
-  _boundingBox: any;
-  protected _setupStimuli(): void;
-  _visual: {
-    rowHeights: any[];
-    textStims: any[];
-    responseStims: any[];
-    visibles: any[];
-    stimuliTotalHeight: number;
-  };
-  _stimuliClipMask: any;
-  _scrollbar: Slider;
-  protected _updateIfNeeded(): void;
-  _leftEdge: number;
-  _rightEdge: any;
-  _topEdge: any;
+declare class Form extends VisualStim implements WithColor<VisualStim> {
   _bottomEdge: number;
+  _boundingBox: PIXI.Rectangle;
+  _decorations: PIXI.Graphics;
   _itemPadding_px: any;
+  _items: any;
+  _leftEdge: number;
+  _needPixiUpdate: boolean;
+  _needUpdate: boolean;
+  _pixi: any;
+  _prevScrollbarMarkerPos: any;
+  _responseTextHeightRatio: number;
+  _rightEdge: any;
+  _scrollbar: Slider;
+  _scrollbarOffset: number;
+  _scrollbarWidth: number;
   _scrollbarWidth_px: any;
   _size_px: number[];
-  _scrollbarOffset: number;
-  protected _updateVisibleStimuli(): void;
+  _stimuliClipMask: PIXI.Graphics;
+  _topEdge: any;
+  _visual: {
+    responseStims: any[];
+    rowHeights: any[];
+    stimuliTotalHeight: number;
+    textStims: any[];
+    visibles: any[];
+  };
+  constructor(options?: {
+    autoDraw?: boolean;
+    autoLog?: boolean;
+    bold?: boolean;
+    borderColor?: any;
+    clipMask?: PIXI.Graphics;
+    color?: Color;
+    contrast?: number;
+    depth?: number;
+    fillColor?: any;
+    font?: string;
+    fontFamily?: string;
+    fontSize?: number;
+    italic?: boolean;
+    itemColor?: any;
+    itemPadding?: number;
+    items?: number[];
+    markerColor?: any;
+    name: string;
+    opacity?: number;
+    pos?: number[];
+    randomize?: any;
+    responseColor?: any;
+    size: number[];
+    units?: string;
+    win: Window_2;
+  });
+  protected _estimateBoundingBox(): void;
+  protected _importItems(): void;
+  protected _processItems(): void;
+  protected _sanitizeItems(): void;
+  protected _setupStimuli(): void;
   protected _updateDecorations(): void;
-  _pixi: any;
-  _decorations: any;
+  protected _updateIfNeeded(): void;
+  protected _updateVisibleStimuli(): void;
+  addDataToExp(experiment: any, format?: string): void;
+  draw(): void;
+  formComplete(): boolean;
+  getContrastedColor(color: number | number[] | string, contrast: number): Color;
+  getData(): object;
+  hide(): void;
+  refresh(): void;
+  reset(): void;
+  setColor(color: Color, log?: boolean): void;
+  setContrast(contrast: number, log?: boolean): void;
 }
 
 declare namespace Form {
@@ -676,12 +1047,12 @@ declare namespace Form {
     let CHOICE: any;
     let RADIO: any;
   }
-  type Types = Symbol;
+  type Types = symbol;
   namespace Layout {
     let HORIZONTAL: any;
     let VERTICAL: any;
   }
-  type Layout = Symbol;
+  type Layout = symbol;
   namespace _defaultItems {
     let itemText: string;
     let type: string;
@@ -707,196 +1078,174 @@ declare function getRequestError(jqXHR: any, textStatus: any, errorThrown: any):
 declare function getUrlParameters(): URLSearchParams;
 
 declare class GratingStim extends VisualStim {
+  static '__#2@#BLEND_MODES_MAP': {
+    add: PIXI.BLEND_MODES;
+    avg: PIXI.BLEND_MODES;
+    mul: PIXI.BLEND_MODES;
+    screen: PIXI.BLEND_MODES;
+  };
+  static '__#2@#DEFAULT_STIM_SIZE_PX': any[];
   static '__#2@#SHADERS': any;
   static '__#2@#SHADERSWGL1': {
-    imageShader: {
-      shader: any;
-      uniforms: {
-        uFreq: number;
-        uPhase: number;
-        uColor: number[];
-        uAlpha: number;
-      };
-    };
-    sin: {
-      shader: any;
-      uniforms: {
-        uFreq: number;
-        uPhase: number;
-        uColor: number[];
-        uAlpha: number;
-      };
-    };
-    sqr: {
-      shader: any;
-      uniforms: {
-        uFreq: number;
-        uPhase: number;
-        uColor: number[];
-        uAlpha: number;
-      };
-    };
-    saw: {
-      shader: any;
-      uniforms: {
-        uFreq: number;
-        uPhase: number;
-        uColor: number[];
-        uAlpha: number;
-      };
-    };
-    tri: {
-      shader: any;
-      uniforms: {
-        uFreq: number;
-        uPhase: number;
-        uPeriod: number;
-        uColor: number[];
-        uAlpha: number;
-      };
-    };
-    sinXsin: {
-      shader: any;
-      uniforms: {
-        uFreq: number;
-        uPhase: number;
-        uColor: number[];
-        uAlpha: number;
-      };
-    };
-    sqrXsqr: {
-      shader: any;
-      uniforms: {
-        uFreq: number;
-        uPhase: number;
-        uColor: number[];
-        uAlpha: number;
-      };
-    };
     circle: {
       shader: any;
       uniforms: {
-        uRadius: number;
-        uColor: number[];
         uAlpha: number;
+        uColor: number[];
+        uRadius: number;
+      };
+    };
+    cross: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uColor: number[];
+        uThickness: number;
       };
     };
     gauss: {
       shader: any;
       uniforms: {
         uA: number;
+        uAlpha: number;
         uB: number;
         uC: number;
         uColor: number[];
-        uAlpha: number;
       };
     };
-    cross: {
+    imageShader: {
       shader: any;
       uniforms: {
-        uThickness: number;
-        uColor: number[];
         uAlpha: number;
-      };
-    };
-    radRamp: {
-      shader: any;
-      uniforms: {
-        uSqueeze: number;
         uColor: number[];
-        uAlpha: number;
-      };
-    };
-    raisedCos: {
-      shader: any;
-      uniforms: {
-        uBeta: number;
-        uPeriod: number;
-        uColor: number[];
-        uAlpha: number;
+        uFreq: number;
+        uPhase: number;
       };
     };
     radialStim: {
       shader: any;
       uniforms: {
-        uFreq: number;
-        uStep: number;
-        uDX: number;
-        uPhase: number;
-        uColor: number[];
         uAlpha: number;
+        uColor: number[];
+        uDX: number;
+        uFreq: number;
+        uPhase: number;
+        uStep: number;
+      };
+    };
+    radRamp: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uColor: number[];
+        uSqueeze: number;
+      };
+    };
+    raisedCos: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uBeta: number;
+        uColor: number[];
+        uPeriod: number;
+      };
+    };
+    saw: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uColor: number[];
+        uFreq: number;
+        uPhase: number;
+      };
+    };
+    sin: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uColor: number[];
+        uFreq: number;
+        uPhase: number;
+      };
+    };
+    sinXsin: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uColor: number[];
+        uFreq: number;
+        uPhase: number;
+      };
+    };
+    sqr: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uColor: number[];
+        uFreq: number;
+        uPhase: number;
+      };
+    };
+    sqrXsqr: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uColor: number[];
+        uFreq: number;
+        uPhase: number;
+      };
+    };
+    tri: {
+      shader: any;
+      uniforms: {
+        uAlpha: number;
+        uColor: number[];
+        uFreq: number;
+        uPeriod: number;
+        uPhase: number;
       };
     };
   };
-  static '__#2@#DEFAULT_STIM_SIZE_PX': any[];
-  static '__#2@#BLEND_MODES_MAP': {
-    avg: any;
-    add: any;
-    mul: any;
-    screen: any;
-  };
-  constructor({
-    name,
-    tex,
-    win,
-    mask,
-    pos,
-    anchor,
-    units,
-    sf,
-    ori,
-    phase,
-    size,
-    color,
-    colorSpace,
-    opacity,
-    contrast,
-    depth,
-    interpolate,
-    blendmode,
-    autoDraw,
-    autoLog,
-    maskParams
-  }?: {
-    name: string;
-    win: Window;
-    tex?: string | HTMLImageElement;
-    colorSpace?: any;
-    maskParams?: any;
-    mask?: string | HTMLImageElement;
-    units?: string;
-    sf?: number;
-    phase?: number;
-    pos?: number[];
+  _adjustmentFilter: any;
+  _boundingBox: PIXI.Rectangle;
+  _size_px: number[];
+  anchor: any;
+  opacity: any;
+  size: number[];
+  constructor(options?: {
     anchor?: string;
-    ori?: number;
-    size?: number;
+    autoDraw?: boolean;
+    autoLog?: boolean;
+    blendmode?: string;
     color?: Color;
-    opacity?: number;
+    colorSpace?: any;
     contrast?: number;
     depth?: number;
     interpolate?: boolean;
-    blendmode?: string;
-    autoDraw?: boolean;
-    autoLog?: boolean;
+    mask?: HTMLImageElement | string;
+    maskParams?: any;
+    name: string;
+    opacity?: number;
+    ori?: number;
+    phase?: number;
+    pos?: number[];
+    sf?: number;
+    size?: number;
+    tex?: HTMLImageElement | string;
+    units?: string;
+    win: Window;
   });
-  _adjustmentFilter: any;
-  size: number[];
-  _size_px: number[];
-  setTex(tex: HTMLImageElement | string, log?: boolean): void;
-  setMask(mask: HTMLImageElement | string, log?: boolean): void;
   protected _getDisplaySize(): number[];
-  _boundingBox: any;
-  protected _getPixiMeshFromPredefinedShaders(shaderName?: string, uniforms?: any): any;
-  setPhase(phase: number, log?: boolean): void;
-  setColorSpace(colorSpaceVal?: string, log?: boolean): void;
-  setColor(colorVal?: Color, log?: boolean): void;
-  setOpacity(opacity?: number, log?: boolean): void;
-  setSF(sf: number, log?: boolean): void;
+  protected _getPixiMeshFromPredefinedShaders(shaderName?: string, uniforms?: any): PIXI.Mesh;
   setBlendmode(blendMode?: string, log?: boolean): void;
+  setColor(colorVal?: Color, log?: boolean): void;
+  setColorSpace(colorSpaceVal?: string, log?: boolean): void;
   setInterpolate(interpolate?: boolean, log?: boolean): void;
-  opacity: any;
-  anchor: any;
+  setMask(mask: HTMLImageElement | string, log?: boolean): void;
+  setOpacity(opacity?: number, log?: boolean): void;
+  setPhase(phase: number, log?: boolean): void;
+  setSF(sf: number, log?: boolean): void;
+  setTex(tex: HTMLImageElement | string, log?: boolean): void;
 }
 
 declare class GUI {
@@ -905,126 +1254,97 @@ declare class GUI {
       requireParticipantClick: boolean;
     };
   };
-  protected static _onKeyChange(gui: GUI, event: Event): void;
-  constructor(psychoJS: PsychoJS);
-  get dialogComponent(): {};
-  _psychoJS: PsychoJS;
-  DlgFromDict({
-    logoUrl,
-    text,
-    dictionary,
-    title,
-    requireParticipantClick
-  }: {
-    logoUrl?: string;
-    text?: string;
-    dictionary: any;
-    title: string;
-    requireParticipantClick?: boolean;
-  }): () => any;
-  _progressBarMax: any;
   _allResourcesDownloaded: boolean;
-  _requiredKeys: any[];
-  _setRequiredKeys: any;
-  _progressMessage: string;
-  _requireParticipantClick: boolean;
-  _dictionary: any;
-  _dialogComponent: {};
-  dialog({
-    message,
-    warning,
-    error,
-    showOK,
-    onOK,
-    showCancel,
-    onCancel
-  }?: {
-    message: string;
-    error: Record<string, any>;
-    warning: string;
-    showOK?: boolean;
-    onOK?: (...args: any[]) => any;
-    showCancel?: boolean;
-    onCancel?: (...args: any[]) => any;
-  }): void;
-  _dialog: any;
-  _okButton: HTMLElement;
   _cancelButton: HTMLElement;
-  finishDialog({ text, nbSteps }: { [key: string]: any; text?: string }): void;
-  _progressMsg: HTMLElement;
+  _dialog: A11yDialog;
+  _dialogComponent: { [key: string]: any };
+  _dictionary: any;
+  _okButton: HTMLElement;
   _progressBar: HTMLElement;
   _progressBarCurrentValue: number;
-  finishDialogNextStep(text: any): void;
-  closeDialog(): void;
-  protected _setProgressMessage(message: string): void;
-  protected _updateProgressBar(): void;
+  _progressBarMax: any;
+  _progressMessage: string;
+  _progressMsg: HTMLElement;
+  _psychoJS: PsychoJS;
+  _requiredKeys: any[];
+  _requireParticipantClick: boolean;
+  _setRequiredKeys: any;
+  constructor(psychoJS: PsychoJS);
+  protected static _onKeyChange(gui: GUI, event: Event): void;
+  get dialogComponent(): { [key: string]: any };
   protected _onCancelExperiment(): void;
+  protected _onResourceEvents(signal: { [x: string]: string | symbol }): void;
   protected _onStartExperiment(): void;
-  protected _onResourceEvents(signal: { [x: string]: string | Symbol }): void;
+  protected _setProgressMessage(message: string): void;
   protected _updateDialog(changeOKButtonFocus?: boolean): void;
+  protected _updateProgressBar(): void;
   protected _userFriendlyError(errorCode: number): {
     class: string;
-    title: string;
     text: string;
+    title: string;
   };
+  closeDialog(): void;
+  dialog(options?: {
+    error: { [key: string]: any };
+    message: string;
+    onCancel?: (...args: any[]) => any;
+    onOK?: (...args: any[]) => any;
+    showCancel?: boolean;
+    showOK?: boolean;
+    warning: string;
+  }): void;
+  DlgFromDict(options: {
+    dictionary: any;
+    logoUrl?: string;
+    requireParticipantClick?: boolean;
+    text?: string;
+    title: string;
+  }): () => any;
+  finishDialog(options: { [key: string]: any; text?: string }): void;
+  finishDialogNextStep(text: any): void;
 }
 
 export declare namespace hardware {
   export { Camera };
 }
 
-declare class ImageStim extends VisualStim {
-  constructor({
-    name,
-    win,
-    image,
-    mask,
-    pos,
-    anchor,
-    units,
-    ori,
-    size,
-    color,
-    opacity,
-    contrast,
-    texRes,
-    depth,
-    interpolate,
-    flipHoriz,
-    flipVert,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window;
-    image: string | HTMLImageElement;
-    mask: string | HTMLImageElement;
-    pos?: number[];
+declare class ImageStim extends VisualStim implements WithColor<VisualStim> {
+  _boundingBox: PIXI.Rectangle;
+  _needPixiUpdate: boolean;
+  _needUpdate: boolean;
+  _texture: PIXI.Texture<PIXI.Resource>;
+  anchor: any;
+  constructor(options?: {
     anchor?: string;
-    units?: string;
-    ori?: number;
-    size?: number;
-    color?: Color;
-    opacity?: number;
-    contrast?: number;
-    depth?: number;
-    texRes?: number;
-    interpolate?: boolean;
-    flipHoriz?: boolean;
-    flipVert?: boolean;
     autoDraw?: boolean;
     autoLog?: boolean;
+    color?: Color;
+    contrast?: number;
+    depth?: number;
+    flipHoriz?: boolean;
+    flipVert?: boolean;
+    image: HTMLImageElement | string;
+    interpolate?: boolean;
+    mask: HTMLImageElement | string;
+    name: string;
+    opacity?: number;
+    ori?: number;
+    pos?: number[];
+    size?: number;
+    texRes?: number;
+    units?: string;
+    win: Window;
   });
-  setImage(image: HTMLImageElement | string, log?: boolean): void;
-  setMask(mask: HTMLImageElement | string, log?: boolean): void;
-  setInterpolate(interpolate?: boolean, log?: boolean): void;
-  _boundingBox: any;
-  _texture: any;
-  anchor: any;
   protected _getDisplaySize(): number[];
+  getContrastedColor(color: number | number[] | string, contrast: number): Color;
+  setColor(color: Color, log?: boolean): void;
+  setContrast(contrast: number, log?: boolean): void;
+  setImage(image: HTMLImageElement | string, log?: boolean): void;
+  setInterpolate(interpolate?: boolean, log?: boolean): void;
+  setMask(mask: HTMLImageElement | string, log?: boolean): void;
 }
 
-declare function index(input: any[], value: number | string | object | null): any;
+declare function index(input: any[], value: null | number | object | string): any;
 
 declare function isEmpty(x: any): boolean;
 
@@ -1035,32 +1355,26 @@ declare function isNumeric(input: any): boolean;
 declare function IsPointInsidePolygon(point: number[], vertices: any): boolean;
 
 declare class Keyboard extends PsychObject {
-  static includes(keypressList: KeyPress[], keyName: string): boolean;
-  constructor({
-    psychoJS,
-    bufferSize,
-    waitForStart,
-    clock,
-    autoLog
-  }?: {
-    psychoJS: PsychoJS;
-    bufferSize?: number;
-    waitForStart?: boolean;
-    clock?: Clock;
-    autoLog?: boolean;
-  });
-  start(): void;
-  _status: any;
-  stop(): void;
-  getEvents(): Keyboard.KeyEvent[];
-  getKeys({ keyList, waitRelease, clear }?: { keyList?: string[]; waitRelease?: boolean; clear?: boolean }): KeyPress[];
-  clearEvents(): void;
-  _circularBuffer: any[];
-  _bufferLength: number;
   _bufferIndex: number;
+  _bufferLength: number;
+  _circularBuffer: any[];
   _previousKeydownKey: any;
+  _status: any;
   _unmatchedKeydownMap: any;
+  constructor(options?: {
+    autoLog?: boolean;
+    bufferSize?: number;
+    clock?: Clock;
+    psychoJS: PsychoJS;
+    waitForStart?: boolean;
+  });
+  static includes(keypressList: KeyPress[], keyName: string): boolean;
   protected _addKeyListeners(): void;
+  clearEvents(): void;
+  getEvents(): Keyboard.KeyEvent[];
+  getKeys(options?: { clear?: boolean; keyList?: string[]; waitRelease?: boolean }): KeyPress[];
+  start(): void;
+  stop(): void;
 }
 
 declare namespace Keyboard {
@@ -1068,51 +1382,51 @@ declare namespace Keyboard {
     let KEY_DOWN: any;
     let KEY_UP: any;
   }
-  type KeyStatus = Symbol;
+  type KeyStatus = symbol;
   type KeyEvent = {
-    W3C: string;
-    pyglet: string;
     '#KeyStatus': Keyboard;
+    pyglet: string;
     timestamp: number;
+    W3C: string;
   };
 }
 
 declare class KeyPress {
-  constructor(code: string, tDown: number, name: string | undefined);
   code: string;
-  tDown: number;
-  name: string;
   duration: any;
+  name: string;
   rt: any;
+  tDown: number;
+  constructor(code: string, tDown: number, name: string | undefined);
 }
 
 declare function loadCss(cssId: string, cssPath: string): void;
 
 declare class Logger {
-  constructor(psychoJS: PsychoJS, threshold: any);
   _psychoJS: PsychoJS;
-  consoleLogger: any;
-  _serverLogs: any[];
   _serverLevel: any;
   _serverLevelValue: number;
+  _serverLogs: any[];
   _throttling: {
-    window: number;
-    threshold: number;
+    designerWasWarned: boolean;
     factor: number;
+    index: number;
+    isThrottling: boolean;
     minimumDuration: number;
     startOfThrottling: number;
-    isThrottling: boolean;
-    index: number;
-    designerWasWarned: boolean;
+    threshold: number;
+    window: number;
   };
-  setLevel(serverLevel: Logger.ServerLevel): void;
-  exp(msg: string, time?: number, obj?: object): void;
-  data(msg: string, time?: number, obj?: object): void;
-  log(msg: string, level: Logger.ServerLevel, time?: number, obj?: object): void;
-  protected _throttle(time: number): boolean;
-  flush(): Promise<any>;
+  consoleLogger: log4javascript.Logger;
+  constructor(psychoJS: PsychoJS, threshold: any);
   protected _customConsoleLayout(): any;
   protected _getValue(level: Logger.ServerLevel): number;
+  protected _throttle(time: number): boolean;
+  data(msg: string, time?: number, obj?: object): void;
+  exp(msg: string, time?: number, obj?: object): void;
+  flush(): Promise<any>;
+  log(msg: string, level: Logger.ServerLevel, time?: number, obj?: object): void;
+  setLevel(serverLevel: Logger.ServerLevel): void;
 }
 
 declare namespace Logger {
@@ -1126,7 +1440,7 @@ declare namespace Logger {
     let DEBUG: any;
     let NOTSET: any;
   }
-  type ServerLevel = Symbol;
+  type ServerLevel = symbol;
   namespace _ServerLevelValue {
     let CRITICAL_1: number;
 
@@ -1150,78 +1464,61 @@ declare namespace Logger {
 declare function makeUuid(root?: string): string;
 
 declare class Microphone extends PsychObject {
-  constructor({
-    win,
-    name,
-    format,
-    sampleRateHz,
-    clock,
-    autoLog
-  }?: {
-    win: Window_2;
-    name: string;
-    format?: string;
-    sampleRateHz?: number;
-    clock?: Clock;
-    autoLog?: boolean;
-  });
-  start(): Promise<any>;
+  _audioBuffer: any[];
+  _recorder: MediaRecorder;
   _status: any;
-  stop({ filename }?: { filename?: string }): Promise<any>;
   _stopOptions: {
     filename: string;
   };
-  pause(): Promise<any>;
-  resume({ clear }?: { clear?: boolean }): Promise<any>;
-  _audioBuffer: any[];
-  flush(): Promise<any>;
-  download(filename?: string): void;
-  upload(...args: any[]): Promise<any>;
-  getRecording(...args: any[]): Promise<AudioClip>;
+  constructor(options?: {
+    autoLog?: boolean;
+    clock?: Clock;
+    format?: string;
+    name: string;
+    sampleRateHz?: number;
+    win: Window_2;
+  });
   protected _onChange(): void;
   protected _prepareRecording(): Promise<void>;
-  _recorder: MediaRecorder;
+  download(filename?: string): void;
+  flush(): Promise<any>;
+  getRecording(...args: any[]): Promise<AudioClip>;
+  pause(): Promise<any>;
+  resume(options?: { clear?: boolean }): Promise<any>;
+  start(): Promise<any>;
+  stop(options?: { filename?: string }): Promise<any>;
+  upload(...args: any[]): Promise<any>;
 }
 
 declare class MinimalStim extends PsychObject {
-  constructor({
-    name,
-    win,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window_2;
-    autoDraw?: boolean;
-    autoLog?: boolean;
-  });
-  _pixi: any;
   _needUpdate: boolean;
+  _pixi: any;
   status: any;
-  setAutoDraw(autoDraw: boolean, log?: boolean): void;
+  constructor(options?: { autoDraw?: boolean; autoLog?: boolean; name: string; win: Window_2 });
+  protected _updateIfNeeded(): void;
+  contains(object: any, units: string): void;
   draw(): void;
   hide(): void;
-  contains(object: any, units: string): void;
   release(log?: boolean): void;
-  protected _updateIfNeeded(): void;
+  setAutoDraw(autoDraw: boolean, log?: boolean): void;
 }
 
 declare function mix(superclass: any): MixinBuilder;
 
 declare class MixinBuilder {
-  constructor(superclass: any);
   superclass: any;
+  constructor(superclass: any);
   with(...mixins: any[]): any;
 }
 
 declare class MonotonicClock {
-  static getReferenceTime(): number;
+  _timeAtLastReset: number;
+  constructor(startTime?: number);
   static getDate(locales?: string | string[], options?: object): string;
   static getDateStr(): string;
-  constructor(startTime?: number);
-  _timeAtLastReset: number;
-  getTime(): number;
+  static getReferenceTime(): number;
   getLastResetTime(): number;
+  getTime(): number;
 }
 
 declare namespace MonotonicClock {
@@ -1229,110 +1526,79 @@ declare namespace MonotonicClock {
 }
 
 declare class Mouse extends PsychObject {
-  constructor({ name, win, autoLog }?: { name: string; win: Window; autoLog?: boolean });
   _lastPos: number[];
-  _prevPos: any;
   _movedistance: number;
+  _prevPos: any;
   status: any;
+  constructor(options?: { autoLog?: boolean; name: string; win: Window });
+  clickReset(buttons?: number[]): void;
   getPos(): number[];
+  getPressed(getTime?: boolean): number[] | number[][];
   getRel(): number[];
   getWheelRel(): number[];
-  getPressed(getTime?: boolean): number[] | Array<number[]>;
   isPressedIn(...args: any[]): boolean;
-  mouseMoved(distance?: undefined | number | number[], reset?: boolean | string | number[]): boolean;
+  mouseMoved(distance?: number | number[], reset?: boolean | number[] | string): boolean;
   mouseMoveTime(): number;
-  clickReset(buttons?: number[]): void;
 }
 
 declare class MovieStim extends VisualStim {
-  constructor({
-    name,
-    win,
-    movie,
-    pos,
-    anchor,
-    units,
-    ori,
-    size,
-    color,
-    opacity,
-    contrast,
-    interpolate,
-    flipHoriz,
-    flipVert,
-    loop,
-    volume,
-    noAudio,
-    autoPlay,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window_2;
-    movie?: any;
-    pos?: any;
+  _boundingBox: PIXI.Rectangle;
+  _hasFastSeek: boolean;
+  _texture: PIXI.Texture<PIXI.Resource>;
+  anchor: any;
+  constructor(options?: {
     anchor?: any;
-    units?: any;
-    ori?: any;
-    size?: any;
-    color?: any;
-    opacity?: any;
-    contrast?: any;
-    interpolate?: any;
-    flipHoriz?: any;
-    flipVert?: any;
-    loop?: any;
-    volume?: any;
-    noAudio?: any;
-    autoPlay?: any;
     autoDraw?: any;
     autoLog?: any;
+    autoPlay?: any;
+    color?: any;
+    contrast?: any;
+    flipHoriz?: any;
+    flipVert?: any;
+    interpolate?: any;
+    loop?: any;
+    movie?: any;
+    name: string;
+    noAudio?: any;
+    opacity?: any;
+    ori?: any;
+    pos?: any;
+    size?: any;
+    units?: any;
+    volume?: any;
+    win: Window_2;
   });
-  _hasFastSeek: boolean;
-  setMovie(movie: any, log?: boolean): void;
-  reset(log?: boolean): void;
-  play(log?: boolean): void;
-  pause(log?: boolean): void;
-  stop(log?: boolean): void;
-  seek(timePoint: number, log?: boolean): void;
-  _boundingBox: any;
-  _texture: any;
-  anchor: any;
   protected _getDisplaySize(): number[];
+  pause(log?: boolean): void;
+  play(log?: boolean): void;
+  reset(log?: boolean): void;
+  seek(timePoint: number, log?: boolean): void;
+  setMovie(movie: any, log?: boolean): void;
+  stop(log?: boolean): void;
 }
 
 declare class MultiStairHandler extends TrialHandler {
-  constructor({
-    psychoJS,
-    varName,
-    stairType,
-    conditions,
-    method,
-    nTrials,
-    randomSeed,
-    name,
-    autoLog
-  }?: {
-    psychoJS: PsychoJS;
-    varName: string;
-    stairType?: MultiStairHandler.StaircaseType;
-    conditions?: Array<any> | string;
-    method: any;
-    nTrials?: number;
-    randomSeed: number;
-    name: string;
-    autoLog?: boolean;
-  });
-  _multiMethod: any;
-  get currentStaircase(): TrialHandler;
-  get intensity(): number;
-  addResponse(response: number, value?: number | undefined): void;
-  protected _validateConditions(): void;
-  protected _prepareStaircases(): void;
-  _staircases: any[];
   _currentPass: any;
   _currentStaircase: any;
+  _multiMethod: any;
+  _staircases: any[];
+  constructor(options?: {
+    autoLog?: boolean;
+    conditions?: any[] | string;
+    method: any;
+    name: string;
+    nTrials?: number;
+    psychoJS: PsychoJS;
+    randomSeed: number;
+    stairType?: MultiStairHandler.StaircaseType;
+    varName: string;
+  });
+  get currentStaircase(): TrialHandler;
+  get intensity(): number;
   protected _nextTrial(): void;
+  protected _prepareStaircases(): void;
+  protected _validateConditions(): void;
+  addResponse(response: number, value?: number): void;
 }
 
 declare namespace MultiStairHandler {
@@ -1340,12 +1606,12 @@ declare namespace MultiStairHandler {
     let SIMPLE: any;
     let QUEST: any;
   }
-  type StaircaseType = Symbol;
+  type StaircaseType = symbol;
   namespace StaircaseStatus {
     let RUNNING: any;
     let FINISHED: any;
   }
-  type StaircaseStatus = Symbol;
+  type StaircaseStatus = symbol;
 }
 
 declare function offerDataForDownload(filename: string, data: any, type: string): void;
@@ -1353,56 +1619,39 @@ declare function offerDataForDownload(filename: string, data: any, type: string)
 declare function pad(n: any, width?: number): string;
 
 declare class Polygon extends ShapeStim {
-  constructor({
-    name,
-    win,
-    lineWidth,
-    lineColor,
-    fillColor,
-    opacity,
-    edges,
-    radius,
-    pos,
-    size,
-    ori,
-    units,
-    contrast,
-    depth,
-    interpolate,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window;
-    lineWidth?: number;
-    lineColor?: Color;
-    fillColor: Color;
-    opacity?: number;
-    edges?: number;
-    radius?: number;
-    pos?: number[];
-    size?: number;
-    ori?: number;
-    units: string;
-    contrast?: number;
-    depth?: number;
-    interpolate?: boolean;
+  constructor(options?: {
     autoDraw?: boolean;
     autoLog?: boolean;
+    contrast?: number;
+    depth?: number;
+    edges?: number;
+    fillColor: Color;
+    interpolate?: boolean;
+    lineColor?: Color;
+    lineWidth?: number;
+    name: string;
+    opacity?: number;
+    ori?: number;
+    pos?: number[];
+    radius?: number;
+    size?: number;
+    units: string;
+    win: Window;
   });
-  setRadius(radius: number, log?: boolean): void;
-  setEdges(edges: number, log?: boolean): void;
   protected _updateVertices(): void;
+  setEdges(edges: number, log?: boolean): void;
+  setRadius(radius: number, log?: boolean): void;
 }
 
 declare function promiseToTupple(promise: Promise<any>): any[];
 
 declare class PsychObject extends EventEmitter {
-  constructor(psychoJS: PsychoJS, name: string);
   _psychoJS: PsychoJS;
   _userAttributes: any;
+  constructor(psychoJS: PsychoJS, name: string);
   set psychoJS(psychoJS: PsychoJS);
   get psychoJS(): PsychoJS;
+  protected _addAttribute(name: string, value: object, defaultValue?: object, onChange?: (...args: any[]) => any): void;
   protected _setAttribute(
     attributeName: string,
     attributeValue: object,
@@ -1410,206 +1659,171 @@ declare class PsychObject extends EventEmitter {
     operation?: string,
     stealth?: boolean
   ): boolean;
-  protected _addAttribute(name: string, value: object, defaultValue?: object, onChange?: Function): void;
 }
 
 declare class PsychoJS {
-  constructor({
-    debug,
-    collectIP,
-    hosts,
-    topLevelStatus,
-    autoStartScheduler,
-    saveResults,
-    captureErrors,
-    checkWebGLSupport
-  }?: {
-    hosts?: any;
-    topLevelStatus?: any;
-    autoStartScheduler?: any;
-    saveResults?: any;
-    captureErrors?: any;
-    checkWebGLSupport?: any;
-    debug?: boolean;
-    collectIP?: boolean;
-  });
-  set status(status: any);
-  get status(): any;
-  _status: any;
-  get config():
-    | Record<string, any>
+  _autoStartScheduler: any;
+  _browser: string;
+  _cancellationUrl: string;
+  _checkWebGLSupport: any;
+  _collectIP: boolean;
+  _completionUrl: string;
+  _config:
     | {
         environment: any;
         experiment: {
+          keys: any[];
           name: string;
           saveFormat: any;
           saveIncompleteResults: boolean;
-          keys: any[];
         };
+      }
+    | { [key: string]: any };
+  _eventManager: EventManager;
+  _experiment: ExperimentHandler;
+  _gui: GUI;
+  _hosts: any;
+  _IP:
+    | {
+        city: string;
+        country: string;
+        hostname: string;
+        IP: string;
+        latitude?: undefined;
+        location: string;
+        longitude?: undefined;
+        region: string;
+      }
+    | {
+        city?: undefined;
+        country: any;
+        hostname?: undefined;
+        IP: any;
+        latitude: any;
+        location?: undefined;
+        longitude: any;
+        region?: undefined;
+      }
+    | {
+        city?: undefined;
+        country?: undefined;
+        hostname?: undefined;
+        IP?: undefined;
+        latitude?: undefined;
+        location?: undefined;
+        longitude?: undefined;
+        region?: undefined;
       };
-  get window(): Window_2;
-  get serverManager(): ServerManager;
-  get experiment(): ExperimentHandler;
-  get scheduler(): Scheduler;
-  get monotonicClock(): MonotonicClock;
-  get logger(): any;
-  get experimentLogger(): Logger;
+  _logger: Logger;
+  _monotonicClock: MonotonicClock;
+  _saveResults: any;
+  _scheduler: Scheduler;
+  _serverManager: ServerManager;
+  _serverMsg: any;
+  _shelf: Shelf;
+  _status: any;
+  _window: Window_2;
+  beforeunloadCallback: (event: any) => void;
+  constructor(options?: {
+    autoStartScheduler?: any;
+    captureErrors?: any;
+    checkWebGLSupport?: any;
+    collectIP?: boolean;
+    debug?: boolean;
+    hosts?: any;
+    saveResults?: any;
+    topLevelStatus?: any;
+  });
+  get browser(): string;
+  get config():
+    | {
+        environment: any;
+        experiment: {
+          keys: any[];
+          name: string;
+          saveFormat: any;
+          saveIncompleteResults: boolean;
+        };
+      }
+    | { [key: string]: any };
   get eventManager(): EventManager;
+  get experiment(): ExperimentHandler;
+  get experimentLogger(): Logger;
   get gui(): GUI;
   get IP():
     | {
-        IP: string;
-        hostname: string;
         city: string;
-        region: string;
         country: string;
+        hostname: string;
+        IP: string;
+        latitude?: undefined;
         location: string;
-        latitude?: undefined;
         longitude?: undefined;
+        region: string;
       }
     | {
-        IP?: undefined;
-        hostname?: undefined;
         city?: undefined;
-        region?: undefined;
-        country?: undefined;
-        location?: undefined;
-        latitude?: undefined;
-        longitude?: undefined;
-      }
-    | {
-        IP: any;
         country: any;
-        latitude: any;
-        longitude: any;
         hostname?: undefined;
-        city?: undefined;
-        region?: undefined;
+        IP: any;
+        latitude: any;
         location?: undefined;
+        longitude: any;
+        region?: undefined;
+      }
+    | {
+        city?: undefined;
+        country?: undefined;
+        hostname?: undefined;
+        IP?: undefined;
+        latitude?: undefined;
+        location?: undefined;
+        longitude?: undefined;
+        region?: undefined;
       };
+  get logger(): log4javascript.Logger;
+  get monotonicClock(): MonotonicClock;
+  get scheduler(): Scheduler;
+  get serverManager(): ServerManager;
   get serverMsg(): any;
-  get browser(): string;
   get shelf(): Shelf;
-  _logger: Logger;
-  _browser: string;
-  _monotonicClock: MonotonicClock;
-  _eventManager: EventManager;
-  _serverManager: ServerManager;
-  _hosts: any;
-  _gui: GUI;
-  _collectIP: boolean;
-  _scheduler: Scheduler;
-  _window: Window_2;
-  _shelf: Shelf;
-  _cancellationUrl: string;
-  _completionUrl: string;
-  _autoStartScheduler: any;
-  _checkWebGLSupport: any;
-  _saveResults: any;
+  set status(status: any);
+  get status(): any;
+  get window(): Window_2;
+  protected _captureErrors(): void;
+  protected _configure(configURL: string, name: string): Promise<void>;
+  protected _getParticipantIPInfo(): Promise<void>;
+  protected _makeStatusTopLevel(): void;
   getEnvironment(): ExperimentHandler.Environment | undefined;
-  openWindow({
-    name,
-    fullscr,
-    color,
-    gamma,
-    units,
-    waitBlanking,
-    autoLog
-  }?: {
-    name?: string;
+  importAttributes(obj: { [key: string]: any }): void;
+  openWindow(options?: {
+    autoLog?: boolean;
+    color?: Color;
     fullscr?: boolean;
     gamma?: any;
-    color?: Color;
+    name?: string;
     units?: string;
-    autoLog?: boolean;
     waitBlanking?: boolean;
   }): void;
-  setRedirectUrls(completionUrl: string, cancellationUrl: string): void;
+  quit(options?: { closeWindow?: any; isCompleted?: boolean; message?: string; showOK?: any }): Promise<void>;
   schedule(task: any, args?: any): void;
   scheduleCondition(condition: any, thenScheduler: Scheduler, elseScheduler: Scheduler): void;
-  start({
-    configURL,
-    expName,
-    expInfo,
-    resources,
-    dataFileName,
-    surveyId
-  }?: {
-    resources?: any;
-    dataFileName?: any;
-    surveyIdL?: any;
+  setRedirectUrls(completionUrl: string, cancellationUrl: string): void;
+  start(options?: {
     configURL?: string;
-    surveyId?: any;
+    dataFileName?: any;
+    expInfo?: { [key: string]: any };
     expName?: string;
-    expInfo?: Record<string, any>;
+    resources?: any;
+    surveyId?: any;
+    surveyIdL?: any;
   }): Promise<void>;
-  _IP:
-    | {
-        IP: string;
-        hostname: string;
-        city: string;
-        region: string;
-        country: string;
-        location: string;
-        latitude?: undefined;
-        longitude?: undefined;
-      }
-    | {
-        IP?: undefined;
-        hostname?: undefined;
-        city?: undefined;
-        region?: undefined;
-        country?: undefined;
-        location?: undefined;
-        latitude?: undefined;
-        longitude?: undefined;
-      }
-    | {
-        IP: any;
-        country: any;
-        latitude: any;
-        longitude: any;
-        hostname?: undefined;
-        city?: undefined;
-        region?: undefined;
-        location?: undefined;
-      };
-  _experiment: ExperimentHandler;
-  beforeunloadCallback: (event: any) => void;
   waitForResources(
-    resources?: Array<{
+    resources?: {
       name: string;
       path: string;
-    }>
+    }[]
   ): () => Promise<any>;
-  importAttributes(obj: Record<string, any>): void;
-  quit({
-    message,
-    isCompleted,
-    closeWindow,
-    showOK
-  }?: {
-    closeWindow?: any;
-    showOK?: any;
-    message?: string;
-    isCompleted?: boolean;
-  }): Promise<void>;
-  protected _configure(configURL: string, name: string): Promise<void>;
-  _config:
-    | Record<string, any>
-    | {
-        environment: any;
-        experiment: {
-          name: string;
-          saveFormat: any;
-          saveIncompleteResults: boolean;
-          keys: any[];
-        };
-      };
-  _serverMsg: any;
-  protected _getParticipantIPInfo(): Promise<void>;
-  protected _captureErrors(): void;
-  protected _makeStatusTopLevel(): void;
 }
 
 declare namespace PsychoJS {
@@ -1624,59 +1838,42 @@ declare namespace PsychoJS {
     let STOPPED: any;
     let ERROR: any;
   }
-  type Status = Symbol;
+  type Status = symbol;
 }
 
 declare class QuestHandler extends TrialHandler {
-  constructor({
-    psychoJS,
-    varName,
-    startVal,
-    startValSd,
-    minVal,
-    maxVal,
-    pThreshold,
-    nTrials,
-    stopInterval,
-    method,
-    beta,
-    delta,
-    gamma,
-    grain,
-    name,
-    autoLog
-  }?: {
-    psychoJS: PsychoJS;
-    varName: string;
-    startVal: number;
-    startValSd: number;
-    minVal: number;
-    maxVal: number;
-    pThreshold?: number;
-    nTrials: number;
-    stopInterval: number;
-    method: QuestHandler.Method;
+  _jsQuest: any;
+  _questValue: any;
+  constructor(options?: {
+    autoLog?: boolean;
     beta?: number;
     delta?: number;
     gamma?: number;
     grain?: number;
+    maxVal: number;
+    method: QuestHandler.Method;
+    minVal: number;
     name: string;
-    autoLog?: boolean;
+    nTrials: number;
+    psychoJS: PsychoJS;
+    pThreshold?: number;
+    startVal: number;
+    startValSd: number;
+    stopInterval: number;
+    varName: string;
   });
-  setMethod(method: any, log: boolean): void;
+  get intensity(): number;
+  protected _estimateQuestValue(): void;
+  protected _setupJsQuest(): void;
   addResponse(response: number, value: number | undefined, doAddData?: boolean): void;
-  _jsQuest: any;
-  simulate(trueValue: number): number;
-  _questValue: any;
+  confInterval(getDifference?: boolean): number | number[];
+  getQuestValue(): number;
   mean(): number;
-  sd(): number;
   mode(): number;
   quantile(quantileOrder: number): number;
-  getQuestValue(): number;
-  get intensity(): number;
-  confInterval(getDifference?: boolean): number[] | number;
-  protected _setupJsQuest(): void;
-  protected _estimateQuestValue(): void;
+  sd(): number;
+  setMethod(method: any, log: boolean): void;
+  simulate(trueValue: number): number;
 }
 
 declare namespace QuestHandler {
@@ -1689,78 +1886,58 @@ declare namespace QuestHandler {
     let MEAN: any;
     let MODE: any;
   }
-  type Method = Symbol;
+  type Method = symbol;
 }
 
-declare function randchoice(array: any[], randomNumberGenerator?: Function): any[];
+declare function randchoice(array: any[], randomNumberGenerator?: (...args: any[]) => any): any[];
 
 declare function randint(min?: number, max?: number): number;
 
 declare function range(...args: any[]): number[];
 
 declare class Rect extends ShapeStim {
-  constructor({
-    name,
-    win,
-    lineWidth,
-    lineColor,
-    fillColor,
-    opacity,
-    width,
-    height,
-    pos,
-    anchor,
-    size,
-    ori,
-    units,
-    contrast,
-    depth,
-    interpolate,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window_2;
-    lineWidth?: number;
-    lineColor?: Color;
-    fillColor?: Color;
-    opacity?: number;
-    width?: number;
-    height?: number;
-    pos?: number[];
+  constructor(options?: {
     anchor?: string;
-    size?: number;
-    ori?: number;
-    units?: string;
-    contrast?: number;
-    depth?: number;
-    interpolate?: boolean;
     autoDraw?: boolean;
     autoLog?: boolean;
+    contrast?: number;
+    depth?: number;
+    fillColor?: Color;
+    height?: number;
+    interpolate?: boolean;
+    lineColor?: Color;
+    lineWidth?: number;
+    name: string;
+    opacity?: number;
+    ori?: number;
+    pos?: number[];
+    size?: number;
+    units?: string;
+    width?: number;
+    win: Window_2;
   });
-  setWidth(width: number, log?: boolean): void;
-  setHeight(height: number, log?: boolean): void;
   protected _updateVertices(): void;
+  setHeight(height: number, log?: boolean): void;
+  setWidth(width: number, log?: boolean): void;
 }
 
 declare function round(input: number, places?: number): number;
 
 declare class Scheduler {
-  constructor(psychoJS: PsychoJS);
-  _psychoJS: PsychoJS;
-  _taskList: any[];
-  _currentTask: any;
   _argsList: any[];
   _currentArgs: any;
-  _stopAtNextUpdate: boolean;
-  _stopAtNextTask: boolean;
+  _currentTask: any;
+  _psychoJS: PsychoJS;
   _status: any;
+  _stopAtNextTask: boolean;
+  _stopAtNextUpdate: boolean;
+  _taskList: any[];
+  constructor(psychoJS: PsychoJS);
   get status(): (args?: any) => any;
   add(task: any, ...args: any[]): void;
   addConditional(condition: any, thenScheduler: (args?: any) => any, elseScheduler: (args?: any) => any): void;
   start(): void;
   stop(): void;
-  private _runNextTasks;
 }
 
 declare namespace Scheduler {
@@ -1770,77 +1947,71 @@ declare namespace Scheduler {
     let FLIP_NEXT: any;
     let QUIT: any;
   }
-  type Event = Symbol;
+  type Event = symbol;
   namespace Status {
     let RUNNING: any;
     let STOPPED: any;
   }
-  type Status = Symbol;
+  type Status = symbol;
 }
 
-declare function selectFromArray(array: Array<any>, selection: number | number[] | string): any | Array<any>;
+declare function selectFromArray(array: any[], selection: number | number[] | string): any;
 
 declare class ServerManager extends PsychObject {
-  public static readonly ALL_RESOURCES: Symbol;
-  constructor({ psychoJS, autoLog }?: { psychoJS: PsychoJS; autoLog?: boolean });
-  _session: {};
-  _resources: any;
+  public static readonly ALL_RESOURCES: symbol;
   _nbLoadedResources: number;
-  getConfiguration(configURL: string): Promise<ServerManager.GetConfigurationPromise>;
-  openSession(params?: any): Promise<ServerManager.OpenSessionPromise>;
-  closeSession(isCompleted?: boolean, sync?: boolean): Promise<any> | void;
-  getResource(name: string, errorIfNotDownloaded?: boolean): any;
-  releaseResource(name: string): boolean;
-  getResourceStatus(names: string | string[]): ServerManager.ResourceStatus;
-  setStatus(status: any): any;
+  _preloadQueue: any;
+  _resources: any;
+  _session: { [key: string]: any };
   _status: any;
-  resetStatus(): typeof ServerManager.Status.READY;
-  prepareResources(
-    resources?:
-      | string
-      | Array<
-          | {
-              name: string;
-              path: string;
-              download: boolean;
-            }
-          | string
-          | Symbol
-        >
-  ): Promise<any>;
-  waitForResources(
-    resources?: Array<{
-      name: string;
-      path: string;
-    }>
-  ): () => Promise<any>;
   _waitForDownloadComponent: {
-    status: any;
     clock: Clock;
     resources: any;
+    status: any;
   };
-  uploadData(key: string, value: string, sync?: boolean): Promise<any>;
-  uploadLog(logs: string, compressed?: boolean): Promise<any>;
-  uploadAudioVideo({
-    mediaBlob,
-    tag,
-    waitForCompletion,
-    showDialog,
-    dialogMsg
-  }: {
+  constructor(options?: { autoLog?: boolean; psychoJS: PsychoJS });
+  protected _downloadResources(resources: any): Promise<void>;
+  protected _listResources(): any;
+  protected _queryServerAPI(method: any, path: any, data: any, contentType?: string): Promise<Response>;
+  protected _setupPreloadQueue(): void;
+  closeSession(isCompleted?: boolean, sync?: boolean): Promise<any> | void;
+  getConfiguration(configURL: string): Promise<ServerManager.GetConfigurationPromise>;
+  getResource(name: string, errorIfNotDownloaded?: boolean): any;
+  getResourceStatus(names: string | string[]): ServerManager.ResourceStatus;
+  getSurveyExperimentParameters(surveyId: any, experimentInfo: any): Promise<any>;
+  openSession(params?: any): Promise<ServerManager.OpenSessionPromise>;
+  prepareResources(
+    resources?:
+      | (
+          | {
+              download: boolean;
+              name: string;
+              path: string;
+            }
+          | string
+          | symbol
+        )[]
+      | string
+  ): Promise<any>;
+  releaseResource(name: string): boolean;
+  resetStatus(): typeof ServerManager.Status.READY;
+  setStatus(status: any): any;
+  uploadAudioVideo(options: {
+    dialogMsg?: string;
     mediaBlob: any;
+    showDialog?: boolean;
     tag: any;
     waitForCompletion?: boolean;
-    showDialog?: boolean;
-    dialogMsg?: string;
   }): Promise<any>;
+  uploadData(key: string, value: string, sync?: boolean): Promise<any>;
+  uploadLog(logs: string, compressed?: boolean): Promise<any>;
   uploadSurveyResponse(surveyId: any, surveyResponse: any, isComplete: any): Promise<any>;
-  getSurveyExperimentParameters(surveyId: any, experimentInfo: any): Promise<any>;
-  protected _listResources(): any;
-  protected _downloadResources(resources: any): Promise<void>;
-  protected _setupPreloadQueue(): void;
-  _preloadQueue: any;
-  protected _queryServerAPI(method: any, path: any, data: any, contentType?: string): Promise<Response>;
+  waitForResources(
+    resources?: {
+      name: string;
+      path: string;
+    }[]
+  ): () => Promise<any>;
 }
 
 declare namespace ServerManager {
@@ -1852,82 +2023,72 @@ declare namespace ServerManager {
     let DOWNLOAD_COMPLETED: any;
     let STATUS: any;
   }
-  type Event = Symbol;
+  type Event = symbol;
   namespace Status {
     let READY: any;
     let BUSY: any;
     let ERROR: any;
   }
-  type Status = Symbol;
+  type Status = symbol;
   namespace ResourceStatus {
     let ERROR_1: any;
     let REGISTERED: any;
     let DOWNLOADING: any;
     let DOWNLOADED: any;
   }
-  type ResourceStatus = Symbol;
+  type ResourceStatus = symbol;
   type GetConfigurationPromise = {
-    origin: string;
+    config?: { [key: string]: any };
     context: string;
-    config?: Record<string, any>;
-    error?: Record<string, any>;
+    error?: { [key: string]: any };
+    origin: string;
   };
   type OpenSessionPromise = {
-    origin: string;
     context: string;
+    error?: { [key: string]: any };
+    origin: string;
     token?: string;
-    error?: Record<string, any>;
   };
 }
 
-declare class ShapeStim extends VisualStim {
-  constructor({
-    name,
-    win,
-    lineWidth,
-    lineColor,
-    fillColor,
-    opacity,
-    vertices,
-    closeShape,
-    pos,
-    anchor,
-    size,
-    ori,
-    units,
-    contrast,
-    depth,
-    interpolate,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window_2;
-    lineWidth: number;
-    lineColor?: Color;
-    fillColor: Color;
-    opacity?: number;
-    vertices?: Array<number[]>;
-    closeShape?: boolean;
-    pos?: number[];
+declare class ShapeStim extends VisualStim implements WithWindow<WithColor<VisualStim>> {
+  _boundingBox: PIXI.Rectangle;
+  _needPixiUpdate: boolean;
+  _needUpdate: boolean;
+  _pixiPolygon_px: PIXI.Polygon;
+  _vertices_px: any;
+  anchor: any;
+  size: number[];
+  constructor(options?: {
     anchor?: string;
-    size?: number;
-    ori?: number;
-    units: string;
-    contrast?: number;
-    depth?: number;
-    interpolate?: boolean;
     autoDraw?: boolean;
     autoLog?: boolean;
+    closeShape?: boolean;
+    contrast?: number;
+    depth?: number;
+    fillColor: Color;
+    interpolate?: boolean;
+    lineColor?: Color;
+    lineWidth: number;
+    name: string;
+    opacity?: number;
+    ori?: number;
+    pos?: number[];
+    size?: number;
+    units: string;
+    vertices?: number[][];
+    win: Window_2;
   });
-  _pixiPolygon_px: any;
-  _vertices_px: any;
-  size: number[];
-  setVertices(vertices: Array<number[]>, log?: boolean): void;
-  _boundingBox: any;
-  anchor: any;
+  _getHorLengthPix(length: number): number;
+  _getLengthPix(length: number, integerCoordinates?: boolean): number;
+  _getLengthUnits(length_px: number): number;
   protected _getPixiPolygon(): any;
-  protected _getVertices_px(): Array<number[]>;
+  _getVerLengthPix(length: number): number;
+  protected _getVertices_px(): number[][];
+  getContrastedColor(color: number | number[] | string, contrast: number): Color;
+  setColor(color: Color, log?: boolean): void;
+  setContrast(contrast: number, log?: boolean): void;
+  setVertices(vertices: number[][], log?: boolean): void;
 }
 
 declare namespace ShapeStim {
@@ -1939,69 +2100,46 @@ declare namespace ShapeStim {
 
 declare class Shelf extends PsychObject {
   static '__#1@#MAX_KEY_LENGTH': number;
-  constructor({ psychoJS, autoLog }?: { psychoJS: PsychoJS; autoLog?: boolean });
-  _throttlingPeriod_ms: number;
   _lastCallTimestamp: number;
   _lastScheduledCallTimestamp: number;
-  getBooleanValue({ key, defaultValue }?: { key: string[]; defaultValue: boolean }): Promise<boolean>;
-  setBooleanValue({ key, value }?: { key: string[]; value: boolean }): Promise<boolean>;
-  flipBooleanValue({ key }?: { key: string[] }): Promise<boolean>;
-  getIntegerValue({ key, defaultValue }?: { key: string[]; defaultValue: number }): Promise<number>;
-  setIntegerValue({ key, value }?: { key: string[]; value: number }): Promise<number>;
-  addIntegerValue({ key, delta }?: { key: string[]; delta: number }): Promise<number>;
-  getTextValue({ key, defaultValue }?: { key: string[]; defaultValue: string }): Promise<string>;
-  setTextValue({ key, value }?: { key: string[]; value: string }): Promise<string>;
-  getListValue({ key, defaultValue }?: { key: string[]; defaultValue: Array<any> }): Promise<Array<any>>;
-  setListValue({ key, value }?: { key: string[]; value: Array<any> }): Promise<Array<any>>;
-  appendListValue({ key, elements }?: { key: string[]; elements: any }): Promise<Array<any>>;
-  popListValue({ key, index }?: { key: string[]; index?: number }): Promise<any>;
-  clearListValue({ key }?: { key: string[] }): Promise<Array<any>>;
-  shuffleListValue({ key }?: { key: string[] }): Promise<Array<any>>;
-  getDictionaryFieldNames({ key }?: { key: string[] }): Promise<string[]>;
-  getDictionaryFieldValue({
-    key,
-    fieldName,
-    defaultValue
-  }?: {
-    key: string[];
-    fieldName: string;
-    defaultValue: boolean;
-  }): Promise<any>;
-  setDictionaryFieldValue({
-    key,
-    fieldName,
-    fieldValue
-  }?: {
-    key: string[];
-    fieldName: string;
-    fieldValue: any;
-  }): Promise<Record<string, any>>;
-  getDictionaryValue({
-    key,
-    defaultValue
-  }?: {
-    key: string[];
-    defaultValue: Record<string, any>;
-  }): Promise<Record<string, any>>;
-  setDictionaryValue({ key, value }?: { key: string[]; value: Record<string, any> }): Promise<Record<string, any>>;
-  incrementComponent(key: any[], increment: number, callback: any): () => any;
   _status: any;
-  counterBalanceSelect({
-    key,
-    groups,
-    groupSizes
-  }?: {
-    key: string[];
-    groups: string[];
-    groupSizes: number[];
-  }): Promise<{
-    string: any;
-    boolean: any;
-  }>;
-  _updateValue(key: string[], type: Shelf.Type, update: any): Promise<any>;
-  _getValue(key: string[], type: Shelf.Type, options?: any): Promise<any>;
+  _throttlingPeriod_ms: number;
+  constructor(options?: { autoLog?: boolean; psychoJS: PsychoJS });
   _checkAvailability(methodName?: string): any;
   _checkKey(key: object): void;
+  _getValue(key: string[], type: Shelf.Type, options?: any): Promise<any>;
+  _updateValue(key: string[], type: Shelf.Type, update: any): Promise<any>;
+  addIntegerValue(options?: { delta: number; key: string[] }): Promise<number>;
+  appendListValue(options?: { elements: any; key: string[] }): Promise<any[]>;
+  clearListValue(options?: { key: string[] }): Promise<any[]>;
+  counterBalanceSelect(options?: { groups: string[]; groupSizes: number[]; key: string[] }): Promise<{
+    boolean: any;
+    string: any;
+  }>;
+  flipBooleanValue(options?: { key: string[] }): Promise<boolean>;
+  getBooleanValue(options?: { defaultValue: boolean; key: string[] }): Promise<boolean>;
+  getDictionaryFieldNames(options?: { key: string[] }): Promise<string[]>;
+  getDictionaryFieldValue(options?: { defaultValue: boolean; fieldName: string; key: string[] }): Promise<any>;
+  getDictionaryValue(options?: {
+    defaultValue: { [key: string]: any };
+    key: string[];
+  }): Promise<{ [key: string]: any }>;
+  getIntegerValue(options?: { defaultValue: number; key: string[] }): Promise<number>;
+  getListValue(options?: { defaultValue: any[]; key: string[] }): Promise<any[]>;
+  getTextValue(options?: { defaultValue: string; key: string[] }): Promise<string>;
+  incrementComponent(key: any[], increment: number, callback: any): () => any;
+  popListValue(options?: { index?: number; key: string[] }): Promise<any>;
+  setBooleanValue(options?: { key: string[]; value: boolean }): Promise<boolean>;
+  setDictionaryFieldValue(options?: {
+    fieldName: string;
+    fieldValue: any;
+    key: string[];
+  }): Promise<{ [key: string]: any }>;
+  setDictionaryValue(options?: { key: string[]; value: { [key: string]: any } }): Promise<{ [key: string]: any }>;
+  setIntegerValue(options?: { key: string[]; value: number }): Promise<number>;
+  setListValue(options?: { key: string[]; value: any[] }): Promise<any[]>;
+  setTextValue(options?: { key: string[]; value: string }): Promise<string>;
+  shuffleListValue(options?: { key: string[] }): Promise<any[]>;
 }
 
 declare namespace Shelf {
@@ -2010,7 +2148,7 @@ declare namespace Shelf {
     let BUSY: any;
     let ERROR: any;
   }
-  type Status = Symbol;
+  type Status = symbol;
   namespace Type {
     let INTEGER: any;
     let TEXT: any;
@@ -2018,159 +2156,142 @@ declare namespace Shelf {
     let BOOLEAN: any;
     let LIST: any;
   }
-  type Type = Symbol;
+  type Type = symbol;
 }
 
-declare function shuffle(array: any[], randomNumberGenerator?: Function, startIndex?: any, endIndex?: any): any[];
+declare function shuffle(
+  array: any[],
+  randomNumberGenerator?: (...args: any[]) => any,
+  startIndex?: any,
+  endIndex?: any
+): any[];
 
-declare function sliceArray(array: Array<any>, from?: number, to?: number, step?: number): Array<any>;
+declare function sliceArray(array: any[], from?: number, to?: number, step?: number): any[];
 
-declare class Slider {
-  constructor({
-    name,
-    win,
-    pos,
-    size,
-    ori,
-    units,
-    color,
-    markerColor,
-    lineColor,
-    contrast,
-    opacity,
-    depth,
-    style,
-    ticks,
-    labels,
-    startValue,
-    granularity,
-    flip,
-    readOnly,
-    font,
-    bold,
-    italic,
-    fontSize,
-    compact,
-    clipMask,
-    autoDraw,
-    autoLog,
-    dependentStims
-  }?: {
-    name: string;
-    win: Window_2;
-    pos?: number[];
-    size: number[];
-    markerColor?: any;
-    lineColor?: any;
-    depth?: any;
-    ori?: number;
-    units?: string;
-    color?: Color;
-    startValue?: any;
-    contrast?: number;
-    opacity?: number;
-    style?: string;
-    ticks?: number[];
-    labels?: number[];
-    granularity?: number;
-    flip?: boolean;
-    readOnly?: boolean;
-    font?: string;
-    bold?: boolean;
-    italic?: boolean;
-    fontSize?: number;
-    compact?: boolean;
-    clipMask: any;
-    autoDraw?: boolean;
-    autoLog?: boolean;
-    dependentStims?: MinimalStim[];
-  });
-  _needMarkerUpdate: boolean;
-  _skin: {};
-  _responseClock: Clock;
-  _pixiLabels: any[];
-  _handlePointerDownBinded: any;
-  _handlePointerUpBinded: any;
-  _handlePointerMoveBinded: any;
-  refresh(): void;
-  reset(): void;
-  _markerPos: number;
-  _history: any[];
-  _rating: any;
-  status: any;
-  _needPixiUpdate: boolean;
-  _needUpdate: boolean;
-  isMarkerDragging(): boolean;
-  getRating(): number | undefined;
-  getRT(): number | undefined;
-  setReadOnly(readOnly?: boolean, log?: boolean): void;
-  setMarkerPos(displayedRating: number, log?: boolean): void;
-  setRating(rating: number, log?: boolean): void;
-  setOri(ori?: number, log?: boolean): void;
-  setAnchor(anchor?: string, log?: boolean): void;
-  set borderColor(color: any);
-  get borderColor(): any;
-  lineColor: any;
-  setBorderColor(color: any): void;
-  getBorderColor(): any;
-  set fillColor(color: any);
-  get fillColor(): any;
-  markerColor: any;
-  setFillColor(color: any): void;
-  getFillColor(): any;
-  protected _estimateBoundingBox(): void;
-  _tickSize_px: number[];
-  _fontSize_px: any;
-  _barSize_px: number[];
-  _markerSize_px: number[];
-  _tickPositions_px: number[][];
-  _labelPositions_px: any[];
-  _boundingBox: any;
-  protected _sanitizeAttributes(): void;
-  _isSliderStyle: boolean;
-  _frozenMarker: boolean;
-  _ticks: any;
-  _isCategorical: boolean;
-  _granularity: number;
-  recordRating(rating: number, responseTime?: number, log?: boolean): void;
-  release(log?: boolean): void;
-  protected _updateIfNeeded(): void;
-  anchor: any;
-  protected _getPosition_px(): number[];
-  protected _updateMarker(): void;
-  protected _handlePointerDown(e: any): void;
-  _markerDragging: boolean;
-  protected _handlePointerMove(e: any): void;
-  protected _handlePointerUp(e: any): void;
-  protected _addEventListeners(): void;
-  protected _removeEventListeners(): void;
-  protected _setupSlider(): void;
-  _pixi: any;
-  _body: any;
-  protected _setupBar(): void;
-  protected _setupMarker(): void;
-  _marker: any;
-  protected _setupTicks(): void;
-  protected _getTextStyle(): any;
-  protected _setupLabels(): void;
-  protected _setupStyle(): void;
-  _barSize: any[];
-  _tickSize: any[];
-  _labelAnchor: any;
-  _barLineWidth_px: number;
-  _barLineColor: any;
+declare class Slider extends VisualStim implements WithWindow<WithColor<VisualStim>> {
   _barFillColor: any;
-  _tickType: any;
-  _tickColor: any;
-  _markerType: any;
-  _markerSize: any;
+  _barLineColor: any;
+  _barLineWidth_px: number;
+  _barSize: any[];
+  _barSize_px: number[];
+  _body: PIXI.Graphics;
+  _boundingBox: PIXI.Rectangle;
+  _fontSize_px: any;
+  _frozenMarker: boolean;
+  _granularity: number;
+  _handlePointerDownBinded: any;
+  _handlePointerMoveBinded: any;
+  _handlePointerUpBinded: any;
+  _history: any[];
+  _isCategorical: boolean;
+  _isSliderStyle: boolean;
+  _labelAnchor: PIXI.Point;
   _labelColor: any;
   _labelOri: number;
+  _labelPositions_px: any[];
+  _marker: PIXI.Graphics;
+  _markerDragging: boolean;
+  _markerPos: number;
+  _markerSize: any;
+  _markerSize_px: number[];
+  _markerType: any;
+  _needMarkerUpdate: boolean;
+  _needPixiUpdate: boolean;
+  _needUpdate: boolean;
+  _pixi: PIXI.Container;
+  _pixiLabels: any[];
+  _rating: any;
+  _responseClock: Clock;
+  _skin: { [key: string]: any };
+  _tickColor: any;
+  _tickPositions_px: number[][];
+  _ticks: any;
+  _tickSize: any[];
+  _tickSize_px: number[];
+  _tickType: any;
+  anchor: any;
   granularity: number;
-  protected _ratingToPos(ratings: number[]): Array<number[]>;
-  protected _posToRating(pos_px: number[]): number;
-  protected _isHorizontal(): boolean;
+  lineColor: any;
+  markerColor: any;
+  status: any;
+  constructor(options?: {
+    autoDraw?: boolean;
+    autoLog?: boolean;
+    bold?: boolean;
+    clipMask: PIXI.Graphics;
+    color?: Color;
+    compact?: boolean;
+    contrast?: number;
+    dependentStims?: MinimalStim[];
+    depth?: any;
+    flip?: boolean;
+    font?: string;
+    fontSize?: number;
+    granularity?: number;
+    italic?: boolean;
+    labels?: number[];
+    lineColor?: any;
+    markerColor?: any;
+    name: string;
+    opacity?: number;
+    ori?: number;
+    pos?: number[];
+    readOnly?: boolean;
+    size: number[];
+    startValue?: any;
+    style?: string;
+    ticks?: number[];
+    units?: string;
+    win: Window_2;
+  });
+  set borderColor(color: any);
+  get borderColor(): any;
+  set fillColor(color: any);
+  get fillColor(): any;
+  protected _addEventListeners(): void;
+  protected _estimateBoundingBox(): void;
+  _getHorLengthPix(length: number): number;
+  _getLengthPix(length: number, integerCoordinates?: boolean): number;
+  _getLengthUnits(length_px: number): number;
+  protected _getPosition_px(): number[];
+  protected _getTextStyle(): PIXI.TextStyle;
+  _getVerLengthPix(length: number): number;
   protected _granularise(rating: number): number;
+  protected _handlePointerDown(e: any): void;
+  protected _handlePointerMove(e: any): void;
+  protected _handlePointerUp(e: any): void;
+  protected _isHorizontal(): boolean;
+  protected _posToRating(pos_px: number[]): number;
+  protected _ratingToPos(ratings: number[]): number[][];
+  protected _removeEventListeners(): void;
+  protected _sanitizeAttributes(): void;
+  protected _setupBar(): void;
+  protected _setupLabels(): void;
+  protected _setupMarker(): void;
+  protected _setupSlider(): void;
+  protected _setupStyle(): void;
+  protected _setupTicks(): void;
+  protected _updateIfNeeded(): void;
+  protected _updateMarker(): void;
+  getBorderColor(): any;
+  getContrastedColor(color: number | number[] | string, contrast: number): Color;
+  getFillColor(): any;
+  getRating(): number | undefined;
+  getRT(): number | undefined;
+  isMarkerDragging(): boolean;
+  recordRating(rating: number, responseTime?: number, log?: boolean): void;
+  refresh(): void;
+  release(log?: boolean): void;
+  reset(): void;
+  setAnchor(anchor?: string, log?: boolean): void;
+  setBorderColor(color: any): void;
+  setColor(color: Color, log?: boolean): void;
+  setContrast(contrast: number, log?: boolean): void;
+  setFillColor(color: any): void;
+  setMarkerPos(displayedRating: number, log?: boolean): void;
+  setOri(ori?: number, log?: boolean): void;
+  setRating(rating: number, log?: boolean): void;
+  setReadOnly(readOnly?: boolean, log?: boolean): void;
 }
 
 declare namespace Slider {
@@ -2180,7 +2301,7 @@ declare namespace Slider {
     let LINE: any;
     let BOX: any;
   }
-  type Shape = Symbol;
+  type Shape = symbol;
   namespace Style {
     let RATING: any;
     let TRIANGLE_MARKER: any;
@@ -2189,7 +2310,7 @@ declare namespace Slider {
     let LABELS_45: any;
     let RADIO: any;
   }
-  type Style = Symbol;
+  type Style = symbol;
   namespace Skin {
     let MARKER_SIZE: any;
     namespace STANDARD {
@@ -2209,204 +2330,162 @@ declare namespace Slider {
 }
 
 declare type Snapshot = {
+  finished: number;
   handler: TrialHandler;
   name: string;
+  nRemaining: number;
   nStim: number;
   nTotal: number;
-  nRemaining: number;
+  ran: number;
+  thisIndex: number;
+  thisN: number;
   thisRepN: number;
   thisTrialN: number;
-  thisN: number;
-  thisIndex: number;
-  ran: number;
-  finished: number;
   trialAttributes: any;
 };
 
 declare function sort(input: any[]): any[];
 
 declare class Sound extends PsychObject {
-  constructor({
-    name,
-    win,
-    value,
-    octave,
-    secs,
-    startTime,
-    stopTime,
-    stereo,
-    volume,
-    loops,
-    autoLog
-  }?: {
+  _player: any;
+  status: any;
+  constructor(options?: {
+    autoLog?: boolean;
+    loops?: number;
     name: string;
-    win: Window_2;
-    value?: number | string;
     octave?: number;
     secs?: number;
     startTime?: number;
-    stopTime?: number;
     stereo?: boolean;
+    stopTime?: number;
+    value?: number | string;
     volume?: number;
-    loops?: number;
-    autoLog?: boolean;
+    win: Window_2;
   });
-  _player: any;
-  status: any;
-  play(loops: number, log?: boolean): void;
-  stop({ log }?: { log?: boolean }): void;
+  protected _getPlayer(): SoundPlayer;
   getDuration(): number;
-  setVolume(volume: number, mute?: boolean, log?: boolean): void;
-  setSound(sound: object, log?: boolean): this;
-  setValue(value?: number | string, octave?: number, log?: boolean): void;
+  play(loops: number, log?: boolean): void;
   setLoops(loops?: number, log?: boolean): void;
   setSecs(secs?: number, log?: boolean): void;
-  protected _getPlayer(): SoundPlayer;
+  setSound(sound: object, log?: boolean): this;
+  setValue(value?: number | string, octave?: number, log?: boolean): void;
+  setVolume(volume: number, mute?: boolean, log?: boolean): void;
+  stop(options?: { log?: boolean }): void;
 }
 
 export declare namespace sound {
   export {
-    Sound,
-    SoundPlayer,
-    TonePlayer,
-    TrackPlayer,
     AudioClip,
     AudioClipPlayer,
     Microphone,
-    Transcript,
-    SpeechRecognition
+    Sound,
+    SoundPlayer,
+    SpeechRecognition,
+    TonePlayer,
+    TrackPlayer,
+    Transcript
   };
 }
 
 declare class SoundPlayer extends PsychObject {
   constructor(psychoJS: PsychoJS);
-  play(loops?: number): void;
-  stop(): void;
   getDuration(): void;
+  play(loops?: number): void;
   setDuration(duration_s: any): void;
   setLoops(loops: number): void;
   setVolume(volume: number, mute?: boolean): void;
+  stop(): void;
 }
 
 declare class SpeechRecognition extends PsychObject {
-  constructor({
-    psychoJS,
-    name,
-    bufferSize,
-    continuous,
-    lang,
-    interimResults,
-    maxAlternatives,
-    tokens,
-    clock,
-    autoLog
-  }?: {
-    psychoJS: PsychoJS;
-    name: string;
-    bufferSize?: number;
-    continuous?: string[];
-    lang?: string[];
-    interimResults?: string[];
-    maxAlternatives?: string[];
-    tokens?: string[];
-    clock?: Clock;
-    autoLog?: boolean;
-  });
-  start(): Promise<any>;
-  _status: any;
-  stop(): Promise<any>;
-  getTranscripts({ transcriptList, clear }?: { transcriptList?: string[]; clear?: boolean }): Transcript[];
-  clearTranscripts(): void;
-  _circularBuffer: any[];
-  _bufferLength: number;
   _bufferIndex: number;
+  _bufferLength: number;
+  _circularBuffer: any[];
+  _currentSpeechEnd: any;
+  _currentSpeechStart: any;
+  _recognition: any;
+  _recognitionTime: any;
+  _status: any;
+  constructor(options?: {
+    autoLog?: boolean;
+    bufferSize?: number;
+    clock?: Clock;
+    continuous?: string[];
+    interimResults?: string[];
+    lang?: string[];
+    maxAlternatives?: string[];
+    name: string;
+    psychoJS: PsychoJS;
+    tokens?: string[];
+  });
   protected _onChange(): void;
   protected _prepareRecognition(): void;
-  _recognition: any;
-  _currentSpeechStart: any;
-  _currentSpeechEnd: any;
-  _recognitionTime: any;
+  clearTranscripts(): void;
+  getTranscripts(options?: { clear?: boolean; transcriptList?: string[] }): Transcript[];
+  start(): Promise<any>;
+  stop(): Promise<any>;
 }
 
 declare function sum(input?: any[], start?: number): number;
 
 declare class Survey extends VisualStim {
-  static SURVEY_EXPERIMENT_PARAMETERS: string[];
-  static SURVEY_FLOW_PLAYBACK_TYPES: {
-    DIRECT: string;
-    CONDITIONAL: string;
-    EMBEDDED_DATA: string;
-    RANDOMIZER: string;
-    SEQUENTIAL: string;
-    ENDSURVEY: string;
-  };
   static CAPTIONS: {
     NEXT: string;
+  };
+  static NODE_EXIT_CODES: {
+    BREAK_FLOW: number;
+    NORMAL: number;
   };
   static SURVEY_COMPLETION_CODES: {
     NORMAL: number;
     SKIP_TO_END_OF_BLOCK: number;
     SKIP_TO_END_OF_SURVEY: number;
   };
-  static NODE_EXIT_CODES: {
-    NORMAL: number;
-    BREAK_FLOW: number;
+  static SURVEY_EXPERIMENT_PARAMETERS: string[];
+  static SURVEY_FLOW_PLAYBACK_TYPES: {
+    CONDITIONAL: string;
+    DIRECT: string;
+    EMBEDDED_DATA: string;
+    ENDSURVEY: string;
+    RANDOMIZER: string;
+    SEQUENTIAL: string;
   };
-  constructor({
-    name,
-    win,
-    model,
-    surveyId,
-    pos,
-    units,
-    ori,
-    size,
-    depth,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window;
-    surveyId?: string;
-    model?: any | string;
-    units?: string;
-    pos?: number[];
-    ori?: number;
-    size?: number;
-    depth?: number;
+  _boundingBox: PIXI.Rectangle;
+  _expressionsRunner: any;
+  _hasSelfGeneratedSurveyId: boolean;
+  _isCompletedAll: boolean;
+  _lastPageSwitchHandledIdx: number;
+  _onFinishedCallback: () => void;
+  _overallSurveyResults: { [key: string]: any };
+  _questionAnswerTimestampClock: Clock;
+  _questionAnswerTimestamps: { [key: string]: any };
+  _signaturePadRO: ResizeObserver;
+  _surveyData: any;
+  _surveyDivId: string;
+  _surveyModel: any;
+  _surveyRunningPromise: any;
+  _surveyRunningPromiseReject: any;
+  _surveyRunningPromiseResolve: any;
+  _variables: { [key: string]: any };
+  isFinished: boolean;
+  size: number[];
+  constructor(options?: {
     autoDraw?: boolean;
     autoLog?: boolean;
+    depth?: number;
+    model?: string;
+    name: string;
+    ori?: number;
+    pos?: number[];
+    size?: number;
+    surveyId?: string;
+    units?: string;
+    win: Window;
   });
-  isFinished: boolean;
-  _isCompletedAll: boolean;
-  _questionAnswerTimestamps: {};
-  _questionAnswerTimestampClock: Clock;
-  _overallSurveyResults: {};
-  _surveyData: any;
-  _surveyModel: any;
-  _expressionsRunner: any;
-  _lastPageSwitchHandledIdx: number;
-  _variables: {};
-  _surveyRunningPromise: any;
-  _surveyRunningPromiseResolve: any;
-  _surveyRunningPromiseReject: any;
-  _onFinishedCallback: () => void;
-  size: number[];
-  _hasSelfGeneratedSurveyId: boolean;
   get isCompleted(): boolean;
-  setModel(model: any | string, log?: boolean): void;
-  setSurveyId(surveyId: string, log?: boolean): void;
-  setVariables(variables: any, excludedNames?: string[]): void;
-  evaluateExpression(expression: string): any;
-  onFinished(callback: any): void;
-  getResponse(): {};
-  save(): Promise<any>;
-  _boundingBox: any;
-  protected _registerCustomExpressionFunctions(Survey: any, customFuncs?: any[]): void;
-  protected _registerWidgets(Survey: any): void;
-  protected _registerCustomSurveyProperties(Survey: any): void;
-  _registerCustomComponentCallbacks(surveyModel: any): void;
-  protected _onQuestionValueChanged(survey: any, questionData: any): void;
+  _addEventListeners(): void;
+  _applyInQuestionRandomization(questionData: any, inQuestionRandomizationSettings: any, surveyData: any): void;
+  protected _beginSurvey(surveyData: any, surveyFlowBlock: any): void;
   _composeModelWithRandomizedQuestions(
     surveyModel: any,
     inBlockRandomizationSettings: any
@@ -2415,22 +2494,29 @@ declare class Survey extends VisualStim {
       elements: any[];
     }[];
   };
-  _applyInQuestionRandomization(questionData: any, inQuestionRandomizationSettings: any, surveyData: any): void;
-  _processSurveyData(surveyData: any, surveyIdx: any): any;
-  protected _onCurrentPageChanging(surveyModel: any, options: any): void;
-  protected _onSurveyComplete(surveyModel: any, options: any): void;
-  _onFlowComplete(): void;
-  _onTextMarkdown(survey: any, options: any): void;
-  protected _beginSurvey(surveyData: any, surveyFlowBlock: any): void;
-  _runSurveyFlow(surveyBlock: any, surveyData: any, prevBlockResults?: {}): Promise<number>;
-  _resetState(): void;
-  _handleSignaturePadResize(entries: any): void;
-  _addEventListeners(): void;
-  _signaturePadRO: ResizeObserver;
-  _handleAfterQuestionRender(sender: any, options: any): void;
   _detachResizeObservers(): void;
+  _handleAfterQuestionRender(sender: any, options: any): void;
+  _handleSignaturePadResize(entries: any): void;
   protected _initSurveyJS(): void;
-  _surveyDivId: string;
+  protected _onCurrentPageChanging(surveyModel: any, options: any): void;
+  _onFlowComplete(): void;
+  protected _onQuestionValueChanged(survey: any, questionData: any): void;
+  protected _onSurveyComplete(surveyModel: any, options: any): void;
+  _onTextMarkdown(survey: any, options: any): void;
+  _processSurveyData(surveyData: any, surveyIdx: any): any;
+  _registerCustomComponentCallbacks(surveyModel: any): void;
+  protected _registerCustomExpressionFunctions(Survey: any, customFuncs?: any[]): void;
+  protected _registerCustomSurveyProperties(Survey: any): void;
+  protected _registerWidgets(Survey: any): void;
+  _resetState(): void;
+  _runSurveyFlow(surveyBlock: any, surveyData: any, prevBlockResults?: { [key: string]: any }): Promise<number>;
+  evaluateExpression(expression: string): any;
+  getResponse(): { [key: string]: any };
+  onFinished(callback: any): void;
+  save(): Promise<any>;
+  setModel(model: string, log?: boolean): void;
+  setSurveyId(surveyId: string, log?: boolean): void;
+  setVariables(variables: any, excludedNames?: string[]): void;
 }
 
 declare type TEXT_DIRECTION = any;
@@ -2441,127 +2527,98 @@ declare namespace TEXT_DIRECTION {
   let Arabic: string;
 }
 
-declare class TextBox extends VisualStim {
-  constructor({
-    name,
-    win,
-    pos,
-    anchor,
-    size,
-    units,
-    ori,
-    opacity,
-    depth,
-    text,
-    placeholder,
-    font,
-    letterHeight,
-    bold,
-    italic,
-    alignment,
-    color,
-    contrast,
-    flipHoriz,
-    flipVert,
-    fillColor,
-    languageStyle,
-    borderColor,
-    borderWidth,
-    padding,
-    editable,
-    multiline,
-    autofocus,
-    clipMask,
-    autoDraw,
-    autoLog,
-    fitToContent
-  }?: {
-    name: string;
-    win: Window_2;
-    text?: string;
-    font?: string;
-    pos?: number[];
-    color?: Color;
-    opacity?: number;
-    depth?: number;
-    contrast?: number;
-    units?: string;
-    ori?: number;
-    letterHeight?: number;
-    bold?: any;
-    italic?: any;
-    anchor?: any;
-    size?: any;
-    placeholder?: any;
+declare class TextBox extends VisualStim implements WithColor<VisualStim> {
+  _boundingBox: PIXI.Rectangle;
+  _needPixiUpdate: boolean;
+  _needUpdate: boolean;
+  _text: any;
+  anchor: any;
+  fitToContent: boolean;
+  text: string;
+  constructor(options?: {
     alignment?: any;
-    flipHoriz?: any;
-    flipVert?: any;
-    fillColor?: any;
-    languageStyle?: any;
+    anchor?: any;
+    autoDraw?: any;
+    autofocus?: any;
+    autoLog?: any;
+    bold?: any;
     borderColor?: any;
     borderWidth?: any;
-    padding?: any;
+    clipMask?: PIXI.Graphics;
+    color?: Color;
+    contrast?: number;
+    depth?: number;
     editable?: any;
-    multiline?: any;
-    autofocus?: any;
-    clipMask?: any;
-    autoDraw?: any;
-    autoLog?: any;
+    fillColor?: any;
     fitToContent?: any;
+    flipHoriz?: any;
+    flipVert?: any;
+    font?: string;
+    italic?: any;
+    languageStyle?: any;
+    letterHeight?: number;
+    multiline?: any;
+    name: string;
+    opacity?: number;
+    ori?: number;
+    padding?: any;
+    placeholder?: any;
+    pos?: number[];
+    size?: any;
+    text?: string;
+    units?: string;
+    win: Window_2;
   });
-  reset(): void;
-  clear(): void;
-  setAlignment(alignment?: boolean, log?: boolean): void;
-  setLanguageStyle(languageStyle?: string, log?: boolean): void;
-  setText(text?: string): void;
-  _text: any;
-  setFont(font?: string, log?: boolean): void;
-  setLetterHeight(fontSize?: string, log?: boolean): void;
-  getText(): string;
-  setColor(color: boolean, log?: boolean): void;
-  setFillColor(fillColor: boolean, log?: boolean): void;
-  setBorderColor(borderColor: Color, log?: boolean): void;
-  setFitToContent(fitToContent: boolean, log?: boolean): void;
-  setSize(...args: any[]): void;
-  fitToContent: boolean;
   protected _addEventListeners(): void;
   protected _getDefaultLetterHeight(): number;
   protected _getTextInputOptions(): {
+    box: {
+      alpha: number;
+      fill: number;
+      rounded: number;
+      stroke: {
+        alpha: number;
+        color: number;
+        width: number;
+      };
+    };
     input: {
+      color: string;
+      direction: any;
       display: string;
       flexDirection: string;
       fontFamily: any;
       fontSize: string;
-      color: string;
-      fontWeight: string;
       fontStyle: string;
-      direction: any;
-      justifyContent: any;
-      textAlign: any;
-      padding: string;
-      multiline: any;
-      text: any;
+      fontWeight: string;
       height: string;
-      width: string;
-      maxWidth: string;
+      justifyContent: any;
       maxHeight: string;
+      maxWidth: string;
+      multiline: any;
       overflow: string;
+      padding: string;
       pointerEvents: string;
-    };
-    box: {
-      fill: number;
-      alpha: number;
-      rounded: number;
-      stroke: {
-        color: number;
-        width: number;
-        alpha: number;
-      };
+      text: any;
+      textAlign: any;
+      width: string;
     };
   };
-  _boundingBox: any;
-  text: string;
-  anchor: any;
+  clear(): void;
+  getContrastedColor(color: number | number[] | string, contrast: number): Color;
+  getText(): string;
+  reset(): void;
+  setAlignment(alignment?: boolean, log?: boolean): void;
+  setBorderColor(borderColor: Color, log?: boolean): void;
+  setColor(color: Color, log?: boolean): void;
+  setContrast(contrast: number, log?: boolean): void;
+  setFillColor(fillColor: boolean, log?: boolean): void;
+  setFitToContent(fitToContent: boolean, log?: boolean): void;
+  setFont(font?: string, log?: boolean): void;
+  setLanguageStyle(languageStyle?: string, log?: boolean): void;
+  setLetterHeight(fontSize?: string, log?: boolean): void;
+  setSize(...args: any[]): void;
+  setText(text?: string): void;
 }
 
 declare namespace TextBox {
@@ -2571,170 +2628,150 @@ declare namespace TextBox {
 }
 
 declare class TextInput extends PIXI.Container {
-  constructor(styles: any);
-  _input_style: any;
+  _anchor: PIXI.ObservablePoint<Window>;
+  _box: any;
+  _box_cache: { [key: string]: any };
   _box_generator: any;
-  _multiline: boolean;
-  _anchor: any;
-  _box_cache: {};
-  _previous: {};
+  _canvas_bounds: {
+    height: any;
+    left: any;
+    top: any;
+    width: any;
+  };
+  _disabled: any;
   _dom_added: boolean;
+  _dom_input: HTMLDivElement | HTMLInputElement;
   _dom_visible: boolean;
+  _font_metrics: any;
+  _input_style: any;
+  _last_renderer: any;
+  _max_length: any;
+  _multiline: boolean;
   _placeholder: string;
   _placeholderColor: number;
-  _selection: number[];
+  _previous: { [key: string]: any };
+  _resolution: any;
+  _restrict_regex: any;
   _restrict_value: string;
-  set substituteText(substitute: any);
-  get substituteText(): any;
+  _selection: number[];
   _substituted: any;
-  set placeholder(text: string);
-  get placeholder(): string;
+  _surrogate: PIXI.Text;
+  _surrogate_hitbox: PIXI.Graphics;
+  _surrogate_mask: PIXI.Graphics;
+  state: any;
+  constructor(styles: any);
+  set anchor(v: PIXI.ObservablePoint<Window>);
+  get anchor(): PIXI.ObservablePoint<Window>;
   set disabled(disabled: any);
   get disabled(): any;
-  _disabled: any;
+  get htmlInput(): HTMLDivElement | HTMLInputElement;
   set maxLength(length: any);
   get maxLength(): any;
-  _max_length: any;
+  set placeholder(text: string);
+  get placeholder(): string;
   set restrict(regex: any);
   get restrict(): any;
-  _restrict_regex: any;
+  set substituteText(substitute: any);
+  get substituteText(): any;
   set text(text: any);
   get text(): any;
-  get htmlInput(): HTMLDivElement | HTMLInputElement;
-  set anchor(v: any);
-  get anchor(): any;
-  focus(options?: { preventScroll: boolean }): void;
-  blur(): void;
-  select(): void;
-  setInputStyle(key: any, value: any): void;
-  getInputStyle(key: any): string;
-  destroy(options: any): void;
-  _createDOMInput(): void;
-  _dom_input: HTMLDivElement | HTMLInputElement;
   _addListeners(): void;
-  _onAnchorUpdate(): void;
-  _onInputKeyDown(e: any): void;
-  _onInputInput(e: any): void;
-  _onInputKeyUp(e: any): void;
-  _onFocused(): void;
-  _onBlurred(): void;
-  _onAdded(): void;
-  _onRemoved(): void;
-  _setState(state: any): void;
-  state: any;
-  renderWebGL(renderer: any): void;
-  renderCanvas(renderer: any): void;
-  render(renderer: any): void;
-  _renderInternal(renderer: any): void;
-  _resolution: any;
-  _last_renderer: any;
-  _canvas_bounds: {
-    top: any;
-    left: any;
-    width: any;
+  _applyRestriction(): void;
+  _buildBoxCache(): void;
+  _compareClientRects(r1: any, r2: any): boolean;
+  _comparePixiMatrices(m1: any, m2: any): boolean;
+  _createDOMInput(): void;
+  _createSurrogate(): void;
+  _deriveSurrogatePadding(): any;
+  _deriveSurrogateStyle(): PIXI.TextStyle;
+  _deriveSurrogateText(): any;
+  _destroyBoxCache(): void;
+  _destroySurrogate(): void;
+  _ensureFocus(): void;
+  _getCanvasBounds(): {
     height: any;
+    left: any;
+    top: any;
+    width: any;
   };
+  _getDOMInputBounds(): DOMRect;
+  _getDOMRelativeWorldTransform(): PIXI.Matrix;
+  _hasFocus(): boolean;
+  _needsNewBoxCache(): boolean;
+  _needsUpdate(): boolean;
+  _onAdded(): void;
+  _onAnchorUpdate(): void;
+  _onBlurred(): void;
+  _onFocused(): void;
+  _onInputInput(e: any): void;
+  _onInputKeyDown(e: any): void;
+  _onInputKeyUp(e: any): void;
+  _onRemoved(): void;
+  _onSurrogateFocus(): void;
+  _pixiMatrixToCSS(m: PIXI.Matrix): string;
+  _renderInternal(renderer: any): void;
+  _setDOMInputVisible(visible: any): void;
+  _setState(state: any): void;
   _update(): void;
   _updateBox(): void;
-  _box: any;
-  _updateSubstitution(): void;
   _updateDOMInput(): void;
-  _applyRestriction(): void;
-  _needsUpdate(): boolean;
-  _needsNewBoxCache(): boolean;
-  _createSurrogate(): void;
-  _surrogate_hitbox: any;
-  _surrogate_mask: any;
-  _surrogate: any;
+  _updateFontMetrics(): void;
+  _updateSubstitution(): void;
   _updateSurrogate(): void;
   _updateSurrogateHitbox(bounds: any): void;
   _updateSurrogateMask(bounds: any, padding: any): void;
-  _destroySurrogate(): void;
-  _onSurrogateFocus(): void;
-  _ensureFocus(): void;
-  _deriveSurrogateStyle(): any;
-  _deriveSurrogatePadding(): any;
-  _deriveSurrogateText(): any;
-  _updateFontMetrics(): void;
-  _font_metrics: any;
-  _buildBoxCache(): void;
-  _destroyBoxCache(): void;
-  _hasFocus(): boolean;
-  _setDOMInputVisible(visible: any): void;
-  _getCanvasBounds(): {
-    top: any;
-    left: any;
-    width: any;
-    height: any;
-  };
-  _getDOMInputBounds(): DOMRect;
-  _getDOMRelativeWorldTransform(): any;
-  _pixiMatrixToCSS(m: any): string;
-  _comparePixiMatrices(m1: any, m2: any): boolean;
-  _compareClientRects(r1: any, r2: any): boolean;
+  blur(): void;
+  destroy(options: any): void;
+  focus(options?: { preventScroll: boolean }): void;
+  getInputStyle(key: any): string;
+  render(renderer: any): void;
+  renderCanvas(renderer: any): void;
+  renderWebGL(renderer: any): void;
+  select(): void;
+  setInputStyle(key: any, value: any): void;
 }
 
-declare class TextStim extends VisualStim {
-  constructor({
-    name,
-    win,
-    text,
-    font,
-    pos,
-    anchor,
-    color,
-    opacity,
-    depth,
-    contrast,
-    units,
-    ori,
-    height,
-    bold,
-    italic,
-    alignHoriz,
-    alignVert,
-    wrapWidth,
-    flipHoriz,
-    flipVert,
-    clipMask,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window_2;
-    text?: string;
-    font?: string;
-    pos?: number[];
-    anchor?: string;
-    color?: Color;
-    opacity?: number;
-    depth?: number;
-    contrast?: number;
-    units?: string;
-    ori: number;
-    height?: number;
-    bold?: boolean;
-    italic?: boolean;
+declare class TextStim extends VisualStim implements WithColor<VisualStim> {
+  _boundingBox: PIXI.Rectangle;
+  _needPixiUpdate: boolean;
+  _needUpdate: boolean;
+  _size: number[];
+  _textMetrics: PIXI.TextMetrics;
+  anchor: string;
+  constructor(options?: {
     alignHoriz?: string;
     alignVert?: string;
-    wrapWidth: boolean;
-    flipHoriz?: boolean;
-    flipVert?: boolean;
-    clipMask?: any;
+    anchor?: string;
     autoDraw?: boolean;
     autoLog?: boolean;
+    bold?: boolean;
+    clipMask?: PIXI.Graphics;
+    color?: Color;
+    contrast?: number;
+    depth?: number;
+    flipHoriz?: boolean;
+    flipVert?: boolean;
+    font?: string;
+    height?: number;
+    italic?: boolean;
+    name: string;
+    opacity?: number;
+    ori: number;
+    pos?: number[];
+    text?: string;
+    units?: string;
+    win: Window_2;
+    wrapWidth: boolean;
   });
-  _textMetrics: any;
-  anchor: string;
-  getTextMetrics(): any;
+  protected _getAnchor(): number[];
   protected _getDefaultLetterHeight(): any;
   protected _getDefaultWrapWidth(): any;
+  protected _getTextStyle(): PIXI.TextStyle;
   protected getBoundingBox(tight?: boolean): number[];
-  _boundingBox: any;
-  protected _getTextStyle(): any;
-  setColor(color: undefined | null | number, log?: boolean): void;
-  _size: number[];
-  protected _getAnchor(): number[];
+  getContrastedColor(color: number | number[] | string, contrast: number): Color;
+  getTextMetrics(): PIXI.TextMetrics;
+  setColor(color: Color, log?: boolean): void;
+  setContrast(contrast: number, log?: boolean): void;
 }
 
 declare namespace TextStim {
@@ -2755,55 +2792,47 @@ declare function to_unit(pos: number[], posUnit: string, win: Window, targetUnit
 declare function to_win(pos: number[], posUnit: string, win: Window): number[];
 
 declare class TonePlayer extends SoundPlayer {
-  static accept(value: string | number, octave: number): any | boolean;
-  constructor({
-    psychoJS,
-    note,
-    secs,
-    volume,
-    loops,
-    soundLibrary,
-    autoLog
-  }?: {
-    psychoJS: PsychoJS;
-    secs?: number;
-    note?: string | number;
-    volume?: number;
-    loops?: number;
-    soundLibrary?: any;
-    autoLog?: any;
-  });
-  _toneLoop: any;
-  getDuration(): number;
-  setDuration(secs: number): void;
-  duration_s: number;
-  _loops: number | boolean;
-  _volume: number;
-  setTone(value?: string | number, octave?: number): void;
+  _audioContext: any;
+  _loops: boolean | number;
   _note: any;
-  play(loops?: any): void;
-  _toneId: number;
-  protected _initSoundLibrary(): void;
+  _synth: Tone.Synth;
   _synthOtions: {
-    oscillator: {
-      type: string;
-    };
     envelope: {
       attack: number;
       decay: number;
-      sustain: number;
       release: number;
+      sustain: number;
+    };
+    oscillator: {
+      type: string;
     };
   };
-  _synth: any;
-  _volumeNode: any;
-  _audioContext: any;
+  _toneId: number;
+  _toneLoop: any;
+  _volume: number;
+  _volumeNode: Tone.Synth;
+  duration_s: number;
+  constructor(options?: {
+    autoLog?: any;
+    loops?: number;
+    note?: number | string;
+    psychoJS: PsychoJS;
+    secs?: number;
+    soundLibrary?: any;
+    volume?: number;
+  });
+  static accept(value: number | string, octave: number): any;
+  protected _initSoundLibrary(): void;
+  getDuration(): number;
+  play(loops?: any): void;
+  setDuration(secs: number): void;
+  setTone(value?: number | string, octave?: number): void;
 }
 
 declare namespace TonePlayer {
   let SoundLibrary: {
-    TONE_JS: any;
     AUDIO_CONTEXT: any;
+    TONE_JS: any;
   };
 }
 
@@ -2812,102 +2841,85 @@ declare function toNumerical(obj: any): number | number[];
 declare function toString_2(object: any): string;
 
 declare class TrackPlayer extends SoundPlayer {
-  static checkValueSupport(value: string): boolean;
-  static accept(psychoJS: PsychoJS, value: string): any | boolean;
-  constructor({
-    psychoJS,
-    howl,
-    startTime,
-    stopTime,
-    stereo,
-    volume,
-    loops
-  }?: {
-    psychoJS: PsychoJS;
-    howl: any;
-    startTime?: number;
-    stopTime?: number;
-    stereo?: boolean;
-    volume?: number;
-    loops?: number;
-  });
   _currentLoopIndex: number;
-  getDuration(): number;
-  setDuration(duration_s: number): void;
-  _volume: number;
-  _loops: number;
-  setTrack(track: any | string): void;
   _howl: any;
-  play(loops: number, fadeDuration?: number): void;
   _id: any;
+  _loops: number;
+  _volume: number;
+  constructor(options?: {
+    howl: any;
+    loops?: number;
+    psychoJS: PsychoJS;
+    startTime?: number;
+    stereo?: boolean;
+    stopTime?: number;
+    volume?: number;
+  });
+  static accept(psychoJS: PsychoJS, value: string): any;
+  static checkValueSupport(value: string): boolean;
+  getDuration(): number;
+  play(loops: number, fadeDuration?: number): void;
+  setDuration(duration_s: number): void;
+  setTrack(track: any): void;
   stop(fadeDuration?: number): void;
 }
 
 declare class Transcript {
-  constructor(transcriber: SpeechRecognition, text?: string, confidence?: number);
-  text: string;
   confidence: number;
-  speechStart: any;
   speechEnd: any;
+  speechStart: any;
+  text: string;
   time: any;
+  constructor(transcriber: SpeechRecognition, text?: string, confidence?: number);
 }
 
 declare class TrialHandler extends PsychObject {
-  static fromSnapshot(snapshot: Snapshot): void;
-  static importConditions(serverManager: ServerManager, resourceName: string, selection?: any): any;
-  constructor({
-    psychoJS,
-    trialList,
-    nReps,
-    method,
-    extraInfo,
-    seed,
-    name,
-    autoLog
-  }?: {
-    psychoJS: PsychoJS;
-    trialList?: Array<any> | string;
-    nReps: number;
-    method: any;
-    extraInfo: any;
-    name?: any;
-    seed: number;
-    autoLog?: boolean;
-  });
-  set experimentHandler(exp: any);
-  get experimentHandler(): any;
   _experimentHandler: any;
+  _finished: boolean;
+  _randomNumberGenerator: any;
+  _snapshots: any[];
+  _trialSequence: any;
+  nRemaining: number;
   nStim: any;
   nTotal: number;
-  nRemaining: number;
-  thisRepN: number;
-  thisTrialN: number;
-  thisN: number;
-  thisIndex: number;
-  ran: number;
   order: number;
-  _snapshots: any[];
+  ran: number;
+  thisIndex: number;
+  thisN: number;
+  thisRepN: number;
   thisTrial: any;
-  _finished: boolean;
-  next(): any;
-  forEach(callback: any): void;
-  getSnapshot(): Snapshot;
-  setSeed(seed: boolean, log: boolean): void;
-  _randomNumberGenerator: any;
+  thisTrialN: number;
+  trialList: any;
+  constructor(options?: {
+    autoLog?: boolean;
+    extraInfo: any;
+    method: any;
+    name?: any;
+    nReps: number;
+    psychoJS: PsychoJS;
+    seed: number;
+    trialList?: any[] | string;
+  });
+  static fromSnapshot(snapshot: Snapshot): void;
+  static importConditions(serverManager: ServerManager, resourceName: string, selection?: any): any;
+  set experimentHandler(exp: any);
+  get experimentHandler(): any;
   set finished(isFinished: boolean);
   get finished(): boolean;
-  getTrialIndex(): number;
-  setTrialIndex(index: number): void;
+  protected _prepareSequence(): any;
+  protected _prepareTrialList(): void;
+  addData(key: any, value: any): void;
+  forEach(callback: any): void;
   getAttributes(): string[];
   getCurrentTrial(): any;
-  getTrial(index?: number): any | undefined;
-  getFutureTrial(n?: number): any | undefined;
-  getEarlierTrial(n?: number): any | undefined;
-  addData(key: any, value: any): void;
-  protected _prepareTrialList(): void;
-  trialList: any;
-  protected _prepareSequence(): any;
-  _trialSequence: any;
+  getEarlierTrial(n?: number): any;
+  getFutureTrial(n?: number): any;
+  getSnapshot(): Snapshot;
+  getTrial(index?: number): any;
+  getTrialIndex(): number;
+  next(): any;
+  setSeed(seed: boolean, log: boolean): void;
+  setTrialIndex(index: number): void;
 }
 
 declare namespace TrialHandler {
@@ -2917,188 +2929,167 @@ declare namespace TrialHandler {
     let FULL_RANDOM: any;
     let FULLRANDOM: any;
   }
-  type Method = Symbol;
+  type Method = symbol;
 }
 
 declare function turnSquareBracketsIntoArrays(input: string, max?: string): any[];
 
 export declare namespace util {
   export {
-    MonotonicClock,
+    addInfoFromUrl,
+    average,
     Clock,
-    CountdownTimer,
     Color,
     ColorMixin,
-    EventEmitter,
-    to_pixiPoint,
-    PsychObject,
-    Scheduler,
-    promiseToTupple,
-    makeUuid,
-    getErrorStack,
-    isEmpty,
+    count,
+    CountdownTimer,
     detectBrowser,
-    toNumerical,
+    EventEmitter,
+    extensionFromMimeType,
+    flattenArray,
+    getDownloadSpeed,
+    getErrorStack,
+    getPositionFromObject,
+    getRequestError,
+    getUrlParameters,
+    index,
+    isEmpty,
+    isInt,
     isNumeric,
     IsPointInsidePolygon,
-    shuffle,
-    randchoice,
-    getPositionFromObject,
-    to_px,
-    to_norm,
-    to_height,
-    to_win,
-    to_unit,
-    toString_2 as toString,
-    getRequestError,
-    isInt,
-    getUrlParameters,
-    addInfoFromUrl,
-    selectFromArray,
-    flattenArray,
-    sliceArray,
-    offerDataForDownload,
-    turnSquareBracketsIntoArrays,
-    randint,
-    round,
-    sum,
-    average,
-    sort,
-    range,
-    count,
-    pad,
-    index,
-    extensionFromMimeType,
-    getDownloadSpeed,
     loadCss,
+    makeUuid,
     mix,
-    TEXT_DIRECTION
+    MonotonicClock,
+    offerDataForDownload,
+    pad,
+    promiseToTupple,
+    PsychObject,
+    randchoice,
+    randint,
+    range,
+    round,
+    Scheduler,
+    selectFromArray,
+    shuffle,
+    sliceArray,
+    sort,
+    sum,
+    TEXT_DIRECTION,
+    to_height,
+    to_norm,
+    to_pixiPoint,
+    to_px,
+    to_unit,
+    to_win,
+    toNumerical,
+    toString_2 as toString,
+    turnSquareBracketsIntoArrays
   };
 }
 
 export declare namespace visual {
   export {
     ButtonStim,
+    FaceDetector,
     Form,
-    ImageStim,
     GratingStim,
+    ImageStim,
     MovieStim,
     Polygon,
     Rect,
     ShapeStim,
     Slider,
+    Survey,
     TextBox,
     TextInput,
     TextStim,
-    VisualStim,
-    FaceDetector,
-    Survey
+    VisualStim
   };
 }
 
-declare class VisualStim extends MinimalStim {
-  constructor({
-    name,
-    win,
-    units,
-    ori,
-    opacity,
-    depth,
-    pos,
-    anchor,
-    size,
-    clipMask,
-    autoDraw,
-    autoLog
-  }?: {
-    name: string;
-    win: Window_2;
-    units?: string;
-    ori?: number;
-    opacity?: number;
-    depth?: number;
-    pos?: number[];
+declare class VisualStim extends MinimalStim implements WithWindow<MinimalStim> {
+  _needPixiUpdate: boolean;
+  _rotationMatrix: number[][];
+  constructor(options?: {
     anchor?: string;
-    size?: number;
-    clipMask?: any;
     autoDraw?: boolean;
     autoLog?: boolean;
+    clipMask?: PIXI.Graphics;
+    depth?: number;
+    name: string;
+    opacity?: number;
+    ori?: number;
+    pos?: number[];
+    size?: number;
+    units?: string;
+    win: Window_2;
   });
-  _needPixiUpdate: boolean;
-  refresh(): void;
-  setSize(size: undefined | null | number | number[], log?: boolean): void;
-  setOri(ori: number, log?: boolean): void;
-  _rotationMatrix: number[][];
-  setPos(pos: number[], log?: boolean): void;
-  setDepth(depth?: number[], log?: boolean): void;
-  contains(object: any, units: string): boolean;
-  setAnchor(anchor?: string, log?: boolean): void;
   protected _anchorTextToNum(anchorText?: string): number[];
   protected _estimateBoundingBox(): void;
-  protected _getBoundingBox_px(): any;
-  protected _onChange(withPixi?: boolean, withBoundingBox?: boolean): Function;
+  protected _getBoundingBox_px(): PIXI.Rectangle;
+  _getHorLengthPix(length: number): number;
+  _getLengthPix(length: number, integerCoordinates?: boolean): number;
+  _getLengthUnits(length_px: number): number;
+  _getVerLengthPix(length: number): number;
+  protected _onChange(withPixi?: boolean, withBoundingBox?: boolean): (...args: any[]) => any;
+  contains(object: any, units: string): boolean;
+  refresh(): void;
+  setAnchor(anchor?: string, log?: boolean): void;
+  setDepth(depth?: number[], log?: boolean): void;
+  setOri(ori: number, log?: boolean): void;
+  setPos(pos: number[], log?: boolean): void;
+  setSize(size: null | number | number[] | undefined, log?: boolean): void;
 }
 
 declare class Window_2 extends PsychObject {
-  static checkWebGLSupport(): boolean;
-  protected static _resizePixiRenderer(pjsWindow: Window_2, event: any): void;
-  constructor({
-    psychoJS,
-    name,
-    fullscr,
-    color,
-    gamma,
-    contrast,
-    units,
-    waitBlanking,
-    autoLog
-  }?: {
-    psychoJS: PsychoJS;
-    name?: string;
-    fullscr?: boolean;
+  _adjustmentFilter: any;
+  _backgroundSprite: PIXI.Sprite;
+  _drawList: any[];
+  _flipCallbacks: any[];
+  _frameCount: number;
+  _msgToBeLogged: any[];
+  _needUpdate: boolean;
+  _renderer: PIXI.AbstractRenderer;
+  _resizeCallback: (e: any) => void;
+  _rootContainer: any;
+  _stimsContainer: PIXI.Container;
+  _windowAlreadyInFullScreen: boolean;
+  constructor(options?: {
+    autoLog?: boolean;
     color?: Color;
-    gamma?: number;
     contrast?: number;
+    fullscr?: boolean;
+    gamma?: number;
+    name?: string;
+    psychoJS: PsychoJS;
     units?: string;
     waitBlanking?: boolean;
-    autoLog?: boolean;
   });
+  protected static _resizePixiRenderer(pjsWindow: Window_2, event: any): void;
+  static checkWebGLSupport(): boolean;
   get monitorFramePeriod(): number;
-  _msgToBeLogged: any[];
-  _adjustmentFilter: any;
-  _drawList: any[];
-  _frameCount: number;
-  _flipCallbacks: any[];
-  _windowAlreadyInFullScreen: boolean;
-  close(): void;
-  _renderer: any;
-  getActualFrameRate(): number;
-  adjustScreenSize(): void;
-  closeFullScreen(): void;
-  logOnFlip({ msg, level, obj }?: { level?: any; obj?: any; msg: string }): void;
-  callOnFlip(flipCallback: any, ...flipCallbackArgs: any[]): void;
+  protected _fullRefresh(): void;
+  protected _refresh(): void;
+  protected _setupPixi(): void;
+  protected _updateIfNeeded(): void;
+  protected _writeLogOnFlip(): void;
   addPixiObject(pixiObject: any): void;
+  adjustScreenSize(): void;
+  callOnFlip(flipCallback: any, ...flipCallbackArgs: any[]): void;
+  close(): void;
+  closeFullScreen(): void;
+  getActualFrameRate(): number;
+  logOnFlip(options?: { level?: any; msg: string; obj?: any }): void;
   removePixiObject(pixiObject: any): void;
   render(): void;
-  protected _updateIfNeeded(): void;
-  _needUpdate: boolean;
-  protected _refresh(): void;
-  protected _fullRefresh(): void;
-  protected _setupPixi(): void;
-  _backgroundSprite: any;
-  _stimsContainer: any;
-  _rootContainer: any;
-  _resizeCallback: (e: any) => void;
-  protected _writeLogOnFlip(): void;
 }
 
-declare function WindowMixin(superclass: any): {
-  new (args: any): {
-    [x: string]: any;
-    _getLengthPix(length: number, integerCoordinates?: boolean): number;
-    _getLengthUnits(length_px: number): number;
-    _getHorLengthPix(length: number): number;
-    _getVerLengthPix(length: number): number;
-  };
-  [x: string]: any;
-};
+declare type WithWindow<T extends { [key: string]: any }> = {
+  _getHorLengthPix(length: number): number;
+  _getLengthPix(length: number, integerCoordinates?: boolean): number;
+  _getLengthUnits(length_px: number): number;
+  _getVerLengthPix(length: number): number;
+} & T;
+
+declare function WindowMixin<T extends { [key: string]: any }>(superclass: Class<T>): Class<WithColor<T>>;

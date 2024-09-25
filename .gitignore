@@ -40,7 +40,8 @@ yarn-error.log*
 .astro
 
 # docker dev
-data/
+/data/
+/apps/gateway/data/
 
 # k6
 testing/k6/results
