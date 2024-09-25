@@ -7,7 +7,8 @@ import type {
   InstrumentRecord,
   InstrumentRecordQueryParams,
   InstrumentRecordsExport,
-  LinearRegressionResults
+  LinearRegressionResults,
+  UploadInstrumentRecordData
 } from '@opendatacapture/schemas/instrument-records';
 import type { InstrumentRecordModel, Prisma } from '@prisma/generated-client';
 import { isNumber, pickBy } from 'lodash-es';
@@ -242,5 +243,52 @@ export class InstrumentRecordsService {
       results[measure] = linearRegression(new Float64Array(data[measure]![0]), new Float64Array(data[measure]![1]));
     }
     return results;
+  }
+
+  async upload({
+    data,
+    date,
+    groupId,
+    instrumentId,
+    subjectId
+  }: UploadInstrumentRecordData): Promise<InstrumentRecordModel> {
+    await this.subjectsService.findById(subjectId);
+
+    const instrument = await this.instrumentsService.findById(instrumentId);
+    if (instrument.kind === 'SERIES') {
+      throw new UnprocessableEntityException(
+        `Cannot create instrument record for series instrument '${instrument.id}'`
+      );
+    }
+
+    return this.instrumentRecordModel.create({
+      data: {
+        computedMeasures: instrument.measures
+          ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
+          : null,
+        data,
+        date,
+        group: groupId
+          ? {
+              connect: { id: groupId }
+            }
+          : undefined,
+        instrument: {
+          connect: {
+            id: instrumentId
+          }
+        },
+        session: {
+          connect: {
+            id: sessionId
+          }
+        },
+        subject: {
+          connect: {
+            id: subjectId
+          }
+        }
+      }
+    });
   }
 }
