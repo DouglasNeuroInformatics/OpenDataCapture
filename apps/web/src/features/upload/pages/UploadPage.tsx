@@ -28,6 +28,7 @@ export const UploadPage = () => {
     await axios.post('/v1/instrument-records/upload', {
       data,
       date: date,
+      groupId: undefined,
       instrumentId,
       subjectId: subjectId
     } satisfies UploadInstrumentRecordData);
