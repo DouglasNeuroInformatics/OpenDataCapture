@@ -4,26 +4,14 @@ import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type {
-  AnyUnilingualFormInstrument,
-  AnyUnilingualScalarInstrument,
-  FormTypes
-} from '@opendatacapture/runtime-core';
-import type { UploadInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
+import type { AnyUnilingualFormInstrument, FormTypes } from '@opendatacapture/runtime-core';
 import axios from 'axios';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { z } from 'zod';
 
 import { useInstrument } from '@/hooks/useInstrument';
 
-import {
-  applyLineTransforms,
-  createUploadTemplateCSV,
-  getZodTypeName,
-  processInstrumentCSV,
-  valueInterpreter
-} from '../utils';
+import { createUploadTemplateCSV, processInstrumentCSV } from '../utils';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
