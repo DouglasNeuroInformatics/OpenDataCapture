@@ -16,15 +16,17 @@ export const $CreateInstrumentRecordData = z.object({
   subjectId: z.string()
 });
 
-export const $UploadInstrumentRecordData = z.array(
-  z.object({
-    data: $Json,
-    date: z.coerce.date(),
-    groupId: z.string().optional(),
-    instrumentId: z.string(),
-    subjectId: z.string()
-  })
-);
+export const $UploadInstrumentRecordData = z.object({
+  groupId: z.string().optional(),
+  instrumentId: z.string(),
+  records: z.array(
+    z.object({
+      data: $Json,
+      date: z.coerce.date(),
+      subjectId: z.string()
+    })
+  )
+});
 
 export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;
 

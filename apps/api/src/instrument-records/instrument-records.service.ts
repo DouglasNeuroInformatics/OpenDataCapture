@@ -247,9 +247,7 @@ export class InstrumentRecordsService {
     return results;
   }
 
-  async upload({ data, date, instrumentId, subjectId }: UploadInstrumentRecordData): Promise<InstrumentRecordModel> {
-    await this.subjectsService.findById(subjectId);
-
+  async upload({ groupId, instrumentId, records }: UploadInstrumentRecordData): Promise<InstrumentRecordModel> {
     const instrument = await this.instrumentsService.findById(instrumentId);
     if (instrument.kind === 'SERIES') {
       throw new UnprocessableEntityException(
@@ -257,20 +255,59 @@ export class InstrumentRecordsService {
       );
     }
 
-    let subjectInfo: CreateSubjectData = {
-      dateOfBirth: null,
-      firstName: null,
-      id: subjectId,
-      lastName: null,
-      sex: null
-    };
+    for (const record of records) {
+      const { data, date, subjectId } = record;
 
-    let groupId = null;
-    let sessionType = 'RETROSPECTIVE' as SessionType;
+      await this.subjectsService.findById(subjectId);
+      let subjectInfo: CreateSubjectData = {
+        dateOfBirth: null,
+        firstName: null,
+        id: subjectId,
+        lastName: null,
+        sex: null
+      };
 
-    let sessionId = (
-      await this.sessionsService.create({ date: date, groupId: groupId, subjectData: subjectInfo, type: sessionType })
-    ).id;
+      let sessionType = 'RETROSPECTIVE' as SessionType;
+
+      let sessionId = (
+        await this.sessionsService.create({
+          date: date,
+          groupId: groupId ? groupId : null,
+          subjectData: subjectInfo,
+          type: sessionType
+        })
+      ).id;
+
+      await this.instrumentRecordModel.create({
+        data: {
+          computedMeasures: instrument.measures
+            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
+            : null,
+          data,
+          date,
+          group: groupId
+            ? {
+                connect: { id: groupId }
+              }
+            : undefined,
+          instrument: {
+            connect: {
+              id: instrumentId
+            }
+          },
+          session: {
+            connect: {
+              id: sessionId
+            }
+          },
+          subject: {
+            connect: {
+              id: subjectId
+            }
+          }
+        }
+      });
+    }
 
     return this.instrumentRecordModel.create({
       data: {
