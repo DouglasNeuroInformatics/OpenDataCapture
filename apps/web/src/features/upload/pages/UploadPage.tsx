@@ -4,7 +4,8 @@ import { FileDropzone } from '@douglasneuroinformatics/libui/components';
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualFormInstrument, FormTypes } from '@opendatacapture/runtime-core';
+import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
+import type { UploadInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
@@ -21,8 +22,30 @@ export const UploadPage = () => {
   const params = useParams();
   const instrument = useInstrument(params.id!) as AnyUnilingualFormInstrument;
 
-  const sendInstrumentData = async (data: FormTypes.Data[]) => {
-    await axios.post('/v1/instrument-records/upload', data);
+  const sendInstrumentData = /*async*/ (data: FormTypes.Data[]) => {
+    const recordsList = [];
+
+    for (const dataInfo of data) {
+      const { dataDate, dataSubjectId, ...dataInstrument } = dataInfo;
+
+      const createdRecord = {
+        data: dataInstrument as Json,
+        date: dataDate as Date,
+        subjectId: dataSubjectId as string
+      };
+      recordsList.push(createdRecord);
+    }
+
+    const reformatForSending: UploadInstrumentRecordData = {
+      groupId: undefined,
+      instrumentId: instrument.id!,
+      records: recordsList
+    };
+
+    console.log('request in UploadInstrumentRecordData format', reformatForSending);
+
+    //await axios.post('/v1/instrument-records/upload',
+    //   data satisfies UploadInstrumentRecordData);
     addNotification({ type: 'success' });
   };
 
@@ -42,7 +65,7 @@ export const UploadPage = () => {
     const processedData = await processInstrumentCSV(input, instrument);
 
     if (processedData.success) {
-      await sendInstrumentData(processedData.value);
+      /*await*/ sendInstrumentData(processedData.value);
     }
   };
 
