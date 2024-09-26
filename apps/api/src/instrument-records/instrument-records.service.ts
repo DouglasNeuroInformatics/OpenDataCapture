@@ -247,8 +247,9 @@ export class InstrumentRecordsService {
     return results;
   }
 
-  async upload({ groupId, instrumentId, records }: UploadInstrumentRecordData): Promise<InstrumentRecordModel> {
+  async upload({ groupId, instrumentId, records }: UploadInstrumentRecordData): Promise<InstrumentRecordModel[]> {
     const instrument = await this.instrumentsService.findById(instrumentId);
+    const createdModelsArray: InstrumentRecordModel[] = [];
     if (instrument.kind === 'SERIES') {
       throw new UnprocessableEntityException(
         `Cannot create instrument record for series instrument '${instrument.id}'`
@@ -278,7 +279,7 @@ export class InstrumentRecordsService {
         })
       ).id;
 
-      await this.instrumentRecordModel.create({
+      const createdModel = await this.instrumentRecordModel.create({
         data: {
           computedMeasures: instrument.measures
             ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
@@ -307,36 +308,10 @@ export class InstrumentRecordsService {
           }
         }
       });
+
+      createdModelsArray.push(createdModel);
     }
 
-    return this.instrumentRecordModel.create({
-      data: {
-        computedMeasures: instrument.measures
-          ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
-          : null,
-        data,
-        date,
-        group: groupId
-          ? {
-              connect: { id: groupId }
-            }
-          : undefined,
-        instrument: {
-          connect: {
-            id: instrumentId
-          }
-        },
-        session: {
-          connect: {
-            id: sessionId
-          }
-        },
-        subject: {
-          connect: {
-            id: subjectId
-          }
-        }
-      }
-    });
+    return createdModelsArray;
   }
 }
