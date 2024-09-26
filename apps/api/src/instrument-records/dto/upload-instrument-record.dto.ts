@@ -4,9 +4,11 @@ import { $UploadInstrumentRecordData } from '@opendatacapture/schemas/instrument
 
 @ValidationSchema($UploadInstrumentRecordData)
 export class UploadInstrumentRecordDto {
-  data: Json;
-  date: Date;
   groupId?: string;
   instrumentId: string;
-  subjectId: string;
+  records: {
+    data: Json;
+    date: Date;
+    subjectId: string;
+  }[];
 }
