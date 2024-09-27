@@ -1,16 +1,18 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { useEffect, useState } from 'react';
-
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { FormTypes } from '@opendatacapture/runtime-core';
+import type { Group } from '@opendatacapture/schemas/group';
 import { $SessionType, type CreateSessionData } from '@opendatacapture/schemas/session';
-import { $SubjectIdentificationMethod, type SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
+import {
+  $SubjectIdentificationMethod,
+  type Sex,
+  type SubjectIdentificationMethod
+} from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
-
-import { useAppStore } from '@/store';
 
 const currentDate = new Date();
 
@@ -18,29 +20,26 @@ const EIGHTEEN_YEARS = 568025136000; // milliseconds
 
 const MIN_DATE_OF_BIRTH = new Date(currentDate.getTime() - EIGHTEEN_YEARS);
 
-export type StartSessionFormProps = {
-  defaultIdentificationMethod?: SubjectIdentificationMethod;
-  onSubmit: (data: CreateSessionData) => Promisable<void>;
+export type StartSessionFormData = {
+  sessionDate: Date;
+  sessionType: 'IN_PERSON' | 'RETROSPECTIVE';
+  subjectDateOfBirth?: Date;
+  subjectFirstName?: string;
+  subjectId?: string;
+  subjectIdentificationMethod: SubjectIdentificationMethod;
+  subjectLastName?: string;
+  subjectSex?: Sex;
 };
 
-export const StartSessionForm = ({ defaultIdentificationMethod, onSubmit }: StartSessionFormProps) => {
-  const currentGroup = useAppStore((store) => store.currentGroup);
-  const currentSession = useAppStore((store) => store.currentSession);
+export type StartSessionFormProps = {
+  currentGroup: Group | null;
+  initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
+  onSubmit: (data: CreateSessionData) => Promisable<void>;
+  readOnly: boolean;
+};
+
+export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubmit }: StartSessionFormProps) => {
   const { t } = useTranslation();
-
-  // this is to force reset the form when the session changes, if on the same page
-  const [key, setKey] = useState(0);
-
-  useEffect(() => {
-    if (currentSession === null) {
-      setKey(key + 1);
-    }
-  }, [currentSession]);
-
-  if (!defaultIdentificationMethod) {
-    defaultIdentificationMethod = currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO';
-  }
-
   return (
     <Form
       preventResetValuesOnReset
@@ -166,12 +165,8 @@ export const StartSessionForm = ({ defaultIdentificationMethod, onSubmit }: Star
         }
       ]}
       data-cy="start-session-form"
-      initialValues={{
-        sessionType: 'IN_PERSON',
-        subjectIdentificationMethod: defaultIdentificationMethod
-      }}
-      key={key}
-      readOnly={currentSession !== null}
+      initialValues={initialValues}
+      readOnly={readOnly}
       submitBtnLabel={t('core.submit')}
       validationSchema={z
         .object({
