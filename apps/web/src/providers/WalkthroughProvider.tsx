@@ -2,17 +2,21 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 
 import { Button, Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { FormTypes } from '@opendatacapture/runtime-core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import type { NavigateOptions } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
+import type { StartSessionFormData } from '@/features/session/components/StartSessionForm';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useAppStore } from '@/store';
 
 type WalkthroughStep = {
   content: React.ReactNode;
+  navigateOptions?: NavigateOptions;
   onBeforeQuery?: () => Promisable<void>;
   position: 'bottom-left' | 'bottom-right';
   target: string;
@@ -131,6 +135,15 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
           en: 'On this page, you can start a new session for a subject. Various options are available based on the identification method you choose and the type of session.',
           fr: "Sur cette page, vous pouvez démarrer une nouvelle session pour un client. Différentes options sont disponibles en fonction de la méthode d'identification choisie et du type de session."
         }),
+        navigateOptions: {
+          state: {
+            initialValues: {
+              sessionType: 'IN_PERSON',
+              subjectId: '123',
+              subjectIdentificationMethod: 'CUSTOM_ID'
+            } satisfies FormTypes.PartialNullableData<StartSessionFormData>
+          }
+        },
         position: 'bottom-left',
         target: 'button[data-nav-url="/session/start-session"]',
         title: t({
@@ -177,7 +190,7 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
 
   useLayoutEffect(() => {
     if (isWalkthroughOpen && window.location.pathname !== currentStep.url) {
-      navigate(currentStep.url);
+      navigate(currentStep.url, currentStep.navigateOptions);
     }
     void (async function () {
       await currentStep.onBeforeQuery?.();
