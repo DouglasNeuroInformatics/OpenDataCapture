@@ -18,7 +18,7 @@ type WalkthroughStep = {
   content: React.ReactNode;
   navigateOptions?: NavigateOptions;
   onBeforeQuery?: () => Promisable<void>;
-  position: 'bottom-left' | 'bottom-right';
+  position: 'bottom-left' | 'bottom-right' | 'top-left';
   target: string;
   title: string;
   url: `/${string}`;
@@ -183,7 +183,7 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
           en: 'You can choose either an in-person session (the default) or a retrospective session to enter data previously collected using a different system.',
           fr: "Vous pouvez choisir une session en personne (par défaut) ou une session rétrospective pour saisir des données précédemment collectées à l'aide d'un autre système."
         }),
-        position: 'bottom-left',
+        position: 'top-left',
         target: 'div[data-field-group="sessionType"]',
         title: t({
           en: 'Type of Assessment',
@@ -224,6 +224,7 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
       if (targetRef.current) {
         targetRef.current.setAttribute('data-spotlight', 'true');
         const rect = targetRef.current.getBoundingClientRect();
+        const popoverHeight = popoverRef.current?.clientHeight ?? 0;
         const popoverWidth = popoverRef.current?.clientWidth ?? 0;
         match(currentStep.position)
           .with('bottom-left', () => {
@@ -231,6 +232,9 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
           })
           .with('bottom-right', () => {
             setPopoverPosition({ x: rect.right - popoverWidth, y: rect.bottom + 20 });
+          })
+          .with('top-left', () => {
+            setPopoverPosition({ x: rect.left, y: rect.top - popoverHeight - 20 });
           })
           .exhaustive();
       } else {
