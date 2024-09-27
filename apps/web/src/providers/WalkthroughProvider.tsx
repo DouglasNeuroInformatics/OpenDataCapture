@@ -156,7 +156,8 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
   };
 
   useEffect(() => {
-    if (isDisclaimerAccepted && !isWalkthroughComplete) {
+    // !isWalkthroughComplete
+    if (isDisclaimerAccepted) {
       setIsWalkthroughOpen(true);
     }
   }, [isDisclaimerAccepted, isWalkthroughComplete]);
