@@ -138,6 +138,19 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
           fr: 'Commencer une session'
         }),
         url: '/session/start-session'
+      },
+      {
+        content: t({
+          en: "You can start a session with a custom ID or let the system create one using the subject's personal information. If you choose the auto-generate option, the ID is created in your browser, so the subject's first and last names are never sent to our server.",
+          fr: "Vous pouvez démarrer une session avec un identifiant personnalisé ou laisser le système en créer un à l'aide des informations personnelles du client. Si vous choisissez l'option de génération automatique, l'identifiant est créé dans votre navigateur, de sorte que les nom et prénom du client ne sont jamais envoyés à notre serveur."
+        }),
+        position: 'bottom-left',
+        target: 'div[data-field-group="subjectIdentificationMethod"]',
+        title: t({
+          en: 'Identification Methods',
+          fr: "Méthodes d'identification"
+        }),
+        url: '/session/start-session'
       }
     ];
   }, [resolvedLanguage]);
