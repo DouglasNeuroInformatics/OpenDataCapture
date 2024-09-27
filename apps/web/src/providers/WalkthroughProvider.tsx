@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useAppStore } from '@/store';
 
 type WalkthroughStep = {
@@ -19,7 +20,7 @@ type WalkthroughStep = {
   url: `/${string}`;
 };
 
-export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) => {
   const isDisclaimerAccepted = useAppStore((store) => store.isDisclaimerAccepted);
   const isWalkthroughComplete = useAppStore((store) => store.isWalkthroughComplete);
   const setIsWalkthroughComplete = useAppStore((store) => store.setIsWalkthroughComplete);
@@ -250,4 +251,12 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
       </AnimatePresence>
     </React.Fragment>
   );
+};
+
+export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const isDesktop = useIsDesktop();
+  if (!isDesktop) {
+    return children;
+  }
+  return <Walkthrough>{children}</Walkthrough>;
 };
