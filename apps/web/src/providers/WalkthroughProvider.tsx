@@ -53,6 +53,7 @@ const Walkthrough = () => {
   const isWalkthroughComplete = useAppStore((store) => store.isWalkthroughComplete);
   const setIsWalkthroughComplete = useAppStore((store) => store.setIsWalkthroughComplete);
   const startSession = useAppStore((store) => store.startSession);
+  const endSession = useAppStore((store) => store.endSession);
   const { resolvedLanguage, t } = useTranslation();
   const setIsWalkthroughOpen = useAppStore((store) => store.setIsWalkthroughOpen);
   const [index, setIndex] = useState(0);
@@ -258,9 +259,10 @@ const Walkthrough = () => {
   };
 
   const close = () => {
-    setIsWalkthroughOpen(false);
+    endSession();
     removeSpotlight();
     setIndex(0);
+    setIsWalkthroughOpen(false);
   };
 
   useEffect(() => {
