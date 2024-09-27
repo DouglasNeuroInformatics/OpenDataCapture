@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { Button, Card } from '@douglasneuroinformatics/libui/components';
 import { useEventListener, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
+import type { Session } from '@opendatacapture/schemas/session';
 import { AnimatePresence, motion } from 'framer-motion';
 import { XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +12,31 @@ import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
 import type { StartSessionFormData } from '@/features/session/components/StartSessionForm';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useAppStore } from '@/store';
+
+const CURRENT_DATE = new Date();
+const START_SESSION_DATA: FormTypes.PartialNullableData<StartSessionFormData> = {
+  sessionType: 'IN_PERSON',
+  subjectId: '123',
+  subjectIdentificationMethod: 'CUSTOM_ID'
+};
+
+const SESSION_DATA: Session = {
+  createdAt: CURRENT_DATE,
+  date: CURRENT_DATE,
+  groupId: null,
+  id: '123',
+  subject: {
+    createdAt: CURRENT_DATE,
+    groupIds: [],
+    id: '123',
+    updatedAt: CURRENT_DATE
+  },
+  subjectId: '123',
+  type: 'IN_PERSON',
+  updatedAt: CURRENT_DATE
+};
 
 type WalkthroughStep = {
   content: React.ReactNode;
@@ -27,6 +52,7 @@ const Walkthrough = () => {
   const isDisclaimerAccepted = useAppStore((store) => store.isDisclaimerAccepted);
   const isWalkthroughComplete = useAppStore((store) => store.isWalkthroughComplete);
   const setIsWalkthroughComplete = useAppStore((store) => store.setIsWalkthroughComplete);
+  const startSession = useAppStore((store) => store.startSession);
   const { resolvedLanguage, t } = useTranslation();
   const setIsWalkthroughOpen = useAppStore((store) => store.setIsWalkthroughOpen);
   const [index, setIndex] = useState(0);
@@ -137,11 +163,7 @@ const Walkthrough = () => {
         }),
         navigateOptions: {
           state: {
-            initialValues: {
-              sessionType: 'IN_PERSON',
-              subjectId: '123',
-              subjectIdentificationMethod: 'CUSTOM_ID'
-            } satisfies FormTypes.PartialNullableData<StartSessionFormData>
+            initialValues: START_SESSION_DATA
           }
         },
         position: 'bottom-left',
@@ -188,6 +210,22 @@ const Walkthrough = () => {
         title: t({
           en: 'Type of Assessment',
           fr: "Type d'évaluation"
+        }),
+        url: '/session/start-session'
+      },
+      {
+        content: t({
+          en: 'Here, you can see the current session in progress.',
+          fr: 'Ici, vous pouvez voir la session en cours.'
+        }),
+        onBeforeQuery() {
+          startSession(SESSION_DATA);
+        },
+        position: 'top-left',
+        target: '#current-session-card',
+        title: t({
+          en: 'Session in Progress',
+          fr: 'Session en cours'
         }),
         url: '/session/start-session'
       }
@@ -304,6 +342,10 @@ const Walkthrough = () => {
 
 export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = ({ children }) => {
   const isWalkthroughOpen = useAppStore((store) => store.isWalkthroughOpen);
+  const isDesktop = useIsDesktop();
+  if (!isDesktop) {
+    return children;
+  }
   return (
     <React.Fragment>
       {children}
