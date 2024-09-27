@@ -5,6 +5,8 @@ import path from 'path';
 
 import type { AnyInstrument, InstrumentKind } from '@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js';
 
+const shouldPrintTitleOnly = process.argv.includes('--title');
+
 const distDir = path.resolve(import.meta.dirname, '../dist');
 
 const results: { [K in InstrumentKind as Lowercase<K>]: { title: string }[] } = {
@@ -29,4 +31,8 @@ for (const kindDir of await fs.readdir(distDir, 'utf-8')) {
   }
 }
 
-console.log(JSON.stringify(results, null, 2));
+if (shouldPrintTitleOnly) {
+  console.log(Object.values(results).flatMap((items) => items.map(({ title }) => title)));
+} else {
+  console.log(JSON.stringify(results, null, 2));
+}
