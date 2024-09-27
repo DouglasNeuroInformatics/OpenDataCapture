@@ -29,7 +29,7 @@ export class InstrumentRecordsController {
   @ApiOperation({ summary: 'Upload multiple instruments' })
   @Post('upload')
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
-  upload(@Body() data: UploadInstrumentRecordDto) {
+  upload(@Body() data: UploadInstrumentRecordDto, @CurrentUser('ability') ability: AppAbility) {
     return this.instrumentRecordsService.upload(data);
   }
 

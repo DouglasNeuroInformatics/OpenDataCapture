@@ -247,7 +247,14 @@ export class InstrumentRecordsService {
     return results;
   }
 
-  async upload({ groupId, instrumentId, records }: UploadInstrumentRecordData): Promise<InstrumentRecordModel[]> {
+  async upload(
+    { groupId, instrumentId, records }: UploadInstrumentRecordData,
+    options?: EntityOperationOptions
+  ): Promise<InstrumentRecordModel[]> {
+    if (groupId) {
+      await this.groupsService.findById(groupId, options);
+    }
+
     const instrument = await this.instrumentsService.findById(instrumentId);
 
     const createdModelsArray: InstrumentRecordModel[] = [];
