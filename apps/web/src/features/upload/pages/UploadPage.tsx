@@ -22,7 +22,7 @@ export const UploadPage = () => {
   const params = useParams();
   const instrument = useInstrument(params.id!) as AnyUnilingualFormInstrument;
 
-  const sendInstrumentData = /*async*/ (data: FormTypes.Data[]) => {
+  const sendInstrumentData = async (data: FormTypes.Data[]) => {
     const recordsList = [];
 
     for (const dataInfo of data) {
@@ -44,8 +44,7 @@ export const UploadPage = () => {
 
     console.log('request in UploadInstrumentRecordData format', reformatForSending);
 
-    // await axios.post('/v1/instrument-records/upload',
-    //    reformatForSending satisfies UploadInstrumentRecordData);
+    await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
     addNotification({ type: 'success' });
   };
 
@@ -64,10 +63,10 @@ export const UploadPage = () => {
 
     const processedData = await processInstrumentCSV(input, instrument);
 
-    console.log('here');
-    console.log(processedData);
+    //console.log('here');
+    //console.log(processedData);
     if (processedData.success) {
-      /*await*/ sendInstrumentData(processedData.value);
+      await sendInstrumentData(processedData.value);
     }
   };
 
