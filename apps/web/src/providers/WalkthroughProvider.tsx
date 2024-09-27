@@ -160,8 +160,34 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
         position: 'bottom-left',
         target: 'div[data-field-group="subjectIdentificationMethod"]',
         title: t({
-          en: 'Identification Methods',
-          fr: "Méthodes d'identification"
+          en: 'Identification Method',
+          fr: "Méthode d'identification"
+        }),
+        url: '/session/start-session'
+      },
+      {
+        content: t({
+          en: 'You can use any ID you like; your group name will automatically be appended to ensure it is unique.',
+          fr: "Vous pouvez utiliser l'identifiant de votre choix ; le nom de votre groupe sera automatiquement ajouté pour garantir son unicité."
+        }),
+        position: 'bottom-left',
+        target: 'div[data-field-group="subjectId"]',
+        title: t({
+          en: 'Identifier',
+          fr: 'Identification du client'
+        }),
+        url: '/session/start-session'
+      },
+      {
+        content: t({
+          en: 'You can choose either an in-person session (the default) or a retrospective session to enter data previously collected using a different system.',
+          fr: "Vous pouvez choisir une session en personne (par défaut) ou une session rétrospective pour saisir des données précédemment collectées à l'aide d'un autre système."
+        }),
+        position: 'bottom-left',
+        target: 'div[data-field-group="sessionType"]',
+        title: t({
+          en: 'Type of Assessment',
+          fr: "Type d'évaluation"
         }),
         url: '/session/start-session'
       }
