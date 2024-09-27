@@ -228,6 +228,24 @@ const Walkthrough = () => {
           fr: 'Session en cours'
         }),
         url: '/session/start-session'
+      },
+      {
+        content: t({
+          en: 'On this page, you can select the instrument you want to administer.',
+          fr: "Sur cette page, vous pouvez sélectionner l'instrument que vous souhaitez administrer."
+        }),
+        navigateOptions: {
+          state: {
+            initialValues: START_SESSION_DATA
+          }
+        },
+        position: 'bottom-left',
+        target: 'button[data-nav-url="/instruments/accessible-instruments"]',
+        title: t({
+          en: 'Administer Instrument',
+          fr: 'Administrer un instrument'
+        }),
+        url: '/instruments/accessible-instruments'
       }
     ];
   }, [resolvedLanguage]);
