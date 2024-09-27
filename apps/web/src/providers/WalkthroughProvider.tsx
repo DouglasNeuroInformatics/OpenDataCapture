@@ -55,7 +55,10 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
         ),
         position: 'bottom-left',
         target: '#sidebar-branding-container',
-        title: 'Welcome to Open Data Capture 👋',
+        title: t({
+          en: 'Welcome to Open Data Capture 👋',
+          fr: 'Bienvenue à Open Data Capture 👋'
+        }),
         url: '/dashboard'
       },
       {
@@ -69,7 +72,10 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
         ),
         position: 'bottom-left',
         target: 'button[data-nav-url="/dashboard"]',
-        title: 'Dashboard',
+        title: t({
+          en: 'Dashboard',
+          fr: 'Tableau de bord'
+        }),
         url: '/dashboard'
       },
       {
@@ -83,7 +89,10 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
         ),
         position: 'bottom-left',
         target: 'button[data-nav-url="/datahub"]',
-        title: 'Data Hub',
+        title: t({
+          en: 'Data Hub',
+          fr: 'Centre de données'
+        }),
         url: '/datahub'
       },
       {
@@ -97,7 +106,10 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
         ),
         position: 'bottom-left',
         target: '#subject-lookup-search-bar',
-        title: 'Subject Lookup',
+        title: t({
+          en: 'Subject Lookup',
+          fr: 'Recherche de client'
+        }),
         url: '/datahub'
       },
       {
@@ -107,7 +119,10 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
         }),
         position: 'bottom-right',
         target: '[data-spotlight-type="export-data-dropdown"]',
-        title: 'Bulk Data Export',
+        title: t({
+          en: 'Bulk Data Export',
+          fr: 'Exportation de données'
+        }),
         url: '/datahub'
       },
       {
@@ -117,7 +132,10 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
         }),
         position: 'bottom-left',
         target: 'button[data-nav-url="/session/start-session"]',
-        title: 'Start Session',
+        title: t({
+          en: 'Start Session',
+          fr: 'Commencer une session'
+        }),
         url: '/session/start-session'
       }
     ];
