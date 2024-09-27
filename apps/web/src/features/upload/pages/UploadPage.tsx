@@ -44,8 +44,8 @@ export const UploadPage = () => {
 
     console.log('request in UploadInstrumentRecordData format', reformatForSending);
 
-    //await axios.post('/v1/instrument-records/upload',
-    //   data satisfies UploadInstrumentRecordData);
+    // await axios.post('/v1/instrument-records/upload',
+    //    reformatForSending satisfies UploadInstrumentRecordData);
     addNotification({ type: 'success' });
   };
 
@@ -64,6 +64,8 @@ export const UploadPage = () => {
 
     const processedData = await processInstrumentCSV(input, instrument);
 
+    console.log('here');
+    console.log(processedData);
     if (processedData.success) {
       /*await*/ sendInstrumentData(processedData.value);
     }
