@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Button, Card } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useEventListener, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { XIcon } from 'lucide-react';
@@ -11,7 +11,6 @@ import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
 import type { StartSessionFormData } from '@/features/session/components/StartSessionForm';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useAppStore } from '@/store';
 
 type WalkthroughStep = {
@@ -24,18 +23,19 @@ type WalkthroughStep = {
   url: `/${string}`;
 };
 
-const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+const Walkthrough = () => {
   const isDisclaimerAccepted = useAppStore((store) => store.isDisclaimerAccepted);
   const isWalkthroughComplete = useAppStore((store) => store.isWalkthroughComplete);
   const setIsWalkthroughComplete = useAppStore((store) => store.setIsWalkthroughComplete);
   const { resolvedLanguage, t } = useTranslation();
-  const isWalkthroughOpen = useAppStore((store) => store.isWalkthroughOpen);
   const setIsWalkthroughOpen = useAppStore((store) => store.setIsWalkthroughOpen);
   const [index, setIndex] = useState(0);
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const targetRef = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+
+  useEventListener('resize', () => setIsWalkthroughOpen(false), undefined, { once: true });
 
   const steps = useMemo<WalkthroughStep[]>(() => {
     return [
@@ -208,14 +208,13 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
   };
 
   useEffect(() => {
-    // !isWalkthroughComplete
-    if (isDisclaimerAccepted) {
+    if (isDisclaimerAccepted && !isWalkthroughComplete) {
       setIsWalkthroughOpen(true);
     }
   }, [isDisclaimerAccepted, isWalkthroughComplete]);
 
   useLayoutEffect(() => {
-    if (isWalkthroughOpen && window.location.pathname !== currentStep.url) {
+    if (window.location.pathname !== currentStep.url) {
       navigate(currentStep.url, currentStep.navigateOptions);
     }
     void (async function () {
@@ -245,75 +244,70 @@ const Walkthrough: React.FC<{ children: React.ReactElement }> = ({ children }) =
   }, [index]);
 
   return (
-    <React.Fragment>
-      {children}
-      <AnimatePresence>
-        {isWalkthroughOpen && (
-          <motion.div
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px]"
-            exit={{ opacity: 0 }}
-            initial={{ opacity: 0 }}
-          >
-            <motion.div
-              animate={{ opacity: 100, x: popoverPosition.x, y: popoverPosition.y }}
-              className="absolute"
-              exit={{ opacity: 0 }}
-              initial={{ opacity: 0, x: popoverPosition.x, y: popoverPosition.y }}
-              ref={popoverRef}
+    <motion.div
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px]"
+      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }}
+    >
+      <motion.div
+        animate={{ opacity: 100, x: popoverPosition.x, y: popoverPosition.y }}
+        className="absolute"
+        exit={{ opacity: 0 }}
+        initial={{ opacity: 0, x: popoverPosition.x, y: popoverPosition.y }}
+        ref={popoverRef}
+      >
+        <Card className="max-w-md">
+          <Card.Header className="pb-4">
+            <Card.Title className="mr-4">{currentStep.title}</Card.Title>
+            <Button className="absolute right-2 top-2" size="icon" type="button" variant="ghost" onClick={close}>
+              <XIcon className="h-4 w-4" />
+            </Button>
+          </Card.Header>
+          <Card.Content className="text-muted-foreground text-sm">{currentStep.content}</Card.Content>
+          <Card.Footer className="flex justify-end gap-3">
+            {index > 0 && (
+              <Button type="button" variant="outline" onClick={() => setIndex(index - 1)}>
+                {t({
+                  en: 'Back',
+                  fr: 'Retour'
+                })}
+              </Button>
+            )}
+            <Button
+              type="button"
+              onClick={() => {
+                if (isLastStep) {
+                  setIsWalkthroughComplete(true);
+                  close();
+                } else {
+                  setIndex(index + 1);
+                }
+              }}
             >
-              <Card className="max-w-md">
-                <Card.Header className="pb-4">
-                  <Card.Title className="mr-4">{currentStep.title}</Card.Title>
-                  <Button className="absolute right-2 top-2" size="icon" type="button" variant="ghost" onClick={close}>
-                    <XIcon className="h-4 w-4" />
-                  </Button>
-                </Card.Header>
-                <Card.Content className="text-muted-foreground text-sm">{currentStep.content}</Card.Content>
-                <Card.Footer className="flex justify-end gap-3">
-                  {index > 0 && (
-                    <Button type="button" variant="outline" onClick={() => setIndex(index - 1)}>
-                      {t({
-                        en: 'Back',
-                        fr: 'Retour'
-                      })}
-                    </Button>
-                  )}
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      if (isLastStep) {
-                        setIsWalkthroughComplete(true);
-                        close();
-                      } else {
-                        setIndex(index + 1);
-                      }
-                    }}
-                  >
-                    {isLastStep
-                      ? t({
-                          en: 'Done',
-                          fr: 'Fin'
-                        })
-                      : t({
-                          en: 'Next',
-                          fr: 'Suivant'
-                        })}
-                  </Button>
-                </Card.Footer>
-              </Card>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </React.Fragment>
+              {isLastStep
+                ? t({
+                    en: 'Done',
+                    fr: 'Fin'
+                  })
+                : t({
+                    en: 'Next',
+                    fr: 'Suivant'
+                  })}
+            </Button>
+          </Card.Footer>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 };
 
 export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-  const isDesktop = useIsDesktop();
-  if (!isDesktop) {
-    return children;
-  }
-  return <Walkthrough>{children}</Walkthrough>;
+  const isWalkthroughOpen = useAppStore((store) => store.isWalkthroughOpen);
+  return (
+    <React.Fragment>
+      {children}
+      <AnimatePresence>{isWalkthroughOpen && <Walkthrough />}</AnimatePresence>
+    </React.Fragment>
+  );
 };
