@@ -249,6 +249,7 @@ export class InstrumentRecordsService {
 
   async upload({ groupId, instrumentId, records }: UploadInstrumentRecordData): Promise<InstrumentRecordModel[]> {
     const instrument = await this.instrumentsService.findById(instrumentId);
+
     const createdModelsArray: InstrumentRecordModel[] = [];
     if (instrument.kind === 'SERIES') {
       throw new UnprocessableEntityException(
@@ -258,8 +259,8 @@ export class InstrumentRecordsService {
 
     for (const record of records) {
       const { data, date, subjectId } = record;
-
       await this.subjectsService.findById(subjectId);
+
       let subjectInfo: CreateSubjectData = {
         dateOfBirth: null,
         firstName: null,

@@ -26,10 +26,10 @@ export const UploadPage = () => {
     const recordsList = [];
 
     for (const dataInfo of data) {
-      const { dataDate, dataSubjectId, ...dataInstrument } = dataInfo;
+      const { date: dataDate, subjectID: dataSubjectId, ...restOfData } = dataInfo; // Destructure and extract the rest of the data
 
       const createdRecord = {
-        data: dataInstrument as Json,
+        data: restOfData as Json,
         date: dataDate as Date,
         subjectId: dataSubjectId as string
       };
