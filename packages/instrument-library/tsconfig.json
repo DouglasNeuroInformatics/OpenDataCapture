@@ -1,12 +1,12 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "paths": {
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     },
-    "types": ["@opendatacapture/runtime-v1/env"]
+    "types": ["@opendatacapture/runtime-v1/env", "node"]
   },
-  "extends": "../../tsconfig.base.json",
-  "include": ["src/**/*", "*.js", "*.cjs"]
+  "include": ["scripts/*", "src/**/*"]
 }
