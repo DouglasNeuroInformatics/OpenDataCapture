@@ -60,7 +60,7 @@ export function valueInterpreter(
       } else if (entry.toLowerCase() === 'false') {
         return { success: true, value: false };
       }
-      return { message: '', success: false };
+      return { message: 'Undecipherable Boolean Type', success: false };
     case 'ZodDate':
       try {
         return { success: true, value: new Date(entry) };
@@ -72,14 +72,14 @@ export function valueInterpreter(
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
       }
-      return { message: '', success: false };
+      return { message: 'Invalid number type', success: false };
     case 'ZodSet':
       if (entry.includes('SET(')) {
         let setData = entry.slice(4, -1);
         let setDataList = setData.split('\\,');
         return { success: true, value: new Set(setDataList) };
       }
-      return { message: '', success: false };
+      return { message: 'Invalid ZodSet', success: false };
     case 'ZodString':
       return { success: true, value: entry };
     default:
@@ -166,6 +166,8 @@ export async function processInstrumentCSV(
         dataLines = dataLines.slice(1);
       }
 
+      dataLines = dataLines.filter((str) => str !== '');
+
       if (dataLines.length === 0) {
         return resolve({ message: 'data lines is empty array', success: false });
       }
@@ -197,6 +199,7 @@ export async function processInstrumentCSV(
             return resolve({ message: typeNameResult.message, success: false });
           }
           const valueInterpreterResult = valueInterpreter(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
+
           if (!valueInterpreterResult.success) {
             return resolve({ message: valueInterpreterResult.message, success: false });
           }
