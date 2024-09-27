@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $SessionType, type CreateSessionData } from '@opendatacapture/schemas/session';
-import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
+import { $SubjectIdentificationMethod, type SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
@@ -19,10 +19,11 @@ const EIGHTEEN_YEARS = 568025136000; // milliseconds
 const MIN_DATE_OF_BIRTH = new Date(currentDate.getTime() - EIGHTEEN_YEARS);
 
 export type StartSessionFormProps = {
+  defaultIdentificationMethod?: SubjectIdentificationMethod;
   onSubmit: (data: CreateSessionData) => Promisable<void>;
 };
 
-export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
+export const StartSessionForm = ({ defaultIdentificationMethod, onSubmit }: StartSessionFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentSession = useAppStore((store) => store.currentSession);
   const { t } = useTranslation();
@@ -35,6 +36,10 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
       setKey(key + 1);
     }
   }, [currentSession]);
+
+  if (!defaultIdentificationMethod) {
+    defaultIdentificationMethod = currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO';
+  }
 
   return (
     <Form
@@ -163,7 +168,7 @@ export const StartSessionForm = ({ onSubmit }: StartSessionFormProps) => {
       data-cy="start-session-form"
       initialValues={{
         sessionType: 'IN_PERSON',
-        subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO'
+        subjectIdentificationMethod: defaultIdentificationMethod
       }}
       key={key}
       readOnly={currentSession !== null}
