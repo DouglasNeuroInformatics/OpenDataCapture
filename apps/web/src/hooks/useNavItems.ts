@@ -51,9 +51,8 @@ export function useNavItems() {
     }
     if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
-        'data-cy': 'upload',
         icon: UploadIcon,
-        id: '/upload',
+        url: '/upload',
         label: t('layout.navLinks.upload')
       });
     }
