@@ -39,6 +39,7 @@ export const SubjectTablePage = () => {
             <div>
               <ActionDropdown
                 widthFull
+                data-spotlight-type="export-data-dropdown"
                 disabled={!instrumentId}
                 options={['TSV', 'JSON']}
                 title={t('core.download')}

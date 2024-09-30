@@ -274,6 +274,32 @@ const Walkthrough = () => {
           fr: 'Tableau'
         }),
         url: '/datahub/123/table'
+      },
+      {
+        content: t({
+          en: 'Here, you can export the data in the table to CSV or JSON format.',
+          fr: 'Ici, vous pouvez exporter les données du tableau au format CSV ou JSON.'
+        }),
+        position: 'bottom-right',
+        target: 'div[data-spotlight-type="export-data-dropdown"]',
+        title: t({
+          en: 'Data Export',
+          fr: 'Exportation de données'
+        }),
+        url: '/datahub/123/table'
+      },
+      {
+        content: t({
+          en: 'Here, you can create custom graphs to visualize longitudinal data for a given subject.',
+          fr: "Ici, vous pouvez créer des graphiques personnalisés pour visualiser les données longitudinales d'un client donné."
+        }),
+        position: 'bottom-center',
+        target: 'a[data-nav-url="/datahub/123/graph"]',
+        title: t({
+          en: 'Graph',
+          fr: 'Graphique'
+        }),
+        url: '/datahub/123/graph'
       }
     ];
   }, [resolvedLanguage]);
