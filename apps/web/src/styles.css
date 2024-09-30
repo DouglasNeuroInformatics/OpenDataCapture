@@ -23,5 +23,9 @@
 }
 
 [data-field-group][data-spotlight='true'] {
-  @apply box-content bg-slate-100 p-2 dark:bg-slate-900;
+  @apply bg-slate-100 p-3 dark:bg-slate-900;
+}
+
+[data-spotlight-type='tab-link'][data-spotlight='true'] {
+  @apply border bg-slate-100 dark:bg-slate-900;
 }
