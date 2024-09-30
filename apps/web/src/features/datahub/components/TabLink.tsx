@@ -12,6 +12,7 @@ export const TabLink = ({ dataCy, label, pathname }: { dataCy?: string; label: s
     }
     data-cy={dataCy}
     data-nav-url={pathname}
+    data-spotlight-type="tab-link"
     to={pathname}
   >
     {label}
