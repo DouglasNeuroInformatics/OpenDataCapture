@@ -12,7 +12,7 @@ import type { AppAbility } from '@/core/types';
 import { CreateInstrumentRecordDto } from './dto/create-instrument-record.dto';
 import { InstrumentRecordsService } from './instrument-records.service';
 
-import type { UploadInstrumentRecordDto } from './dto/upload-instrument-record.dto';
+import { UploadInstrumentRecordDto } from './dto/upload-instrument-record.dto';
 
 @ApiTags('Instrument Records')
 @Controller('instrument-records')
