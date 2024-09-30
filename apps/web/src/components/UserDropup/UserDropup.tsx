@@ -11,6 +11,7 @@ import { UserIcon } from '../UserIcon';
 
 export const UserDropup = () => {
   const currentUser = useAppStore((store) => store.currentUser);
+  const currentSession = useAppStore((store) => store.currentSession);
   const logout = useAppStore((store) => store.logout);
   const setIsWalkthroughOpen = useAppStore((store) => store.setIsWalkthroughOpen);
   const navigate = useNavigate();
@@ -67,6 +68,7 @@ export const UserDropup = () => {
           </DropdownMenu.Item>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
+            disabled={currentSession !== null}
             onClick={() => {
               setIsWalkthroughOpen(true);
             }}

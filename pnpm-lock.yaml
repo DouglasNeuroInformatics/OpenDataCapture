@@ -19,8 +19,8 @@ catalogs:
       specifier: latest
       version: 0.1.0
     '@douglasneuroinformatics/libui':
-      specifier: latest
-      version: 3.3.0
+      specifier: 3.4.2
+      version: 3.4.2
     '@douglasneuroinformatics/libui-form-types':
       specifier: latest
       version: 0.11.0
@@ -346,7 +346,7 @@ importers:
         version: 0.0.2
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.3.0(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
@@ -443,7 +443,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.3.0(@types/react@18.3.8)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@3.23.8)
+        version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@3.23.8)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -516,7 +516,7 @@ importers:
         version: 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.3.0(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.51.0)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
@@ -631,7 +631,7 @@ importers:
         version: 0.0.3(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.3.0(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@heroicons/react':
         specifier: ^2.1.5
         version: 2.1.5(react@vendor+react@18.x)
@@ -877,7 +877,7 @@ importers:
         version: 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.3.0(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -988,7 +988,7 @@ importers:
         version: 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.3.0(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -2009,9 +2009,9 @@ packages:
     resolution:
       { integrity: sha512-erds8oNXFrWSJfCglR8S7I3Yfkgx2Vz6RIQTa5OFtVAVx8DTSFf5FbnHpp49l6BcQ4FCU5w/PLO5NWdx08cNUg== }
 
-  '@douglasneuroinformatics/libui@3.3.0':
+  '@douglasneuroinformatics/libui@3.4.2':
     resolution:
-      { integrity: sha512-ecFoYn+vt6aCpgy8sehFhqIJhDchvS3CUmRyATvx15TKVFebcEWwIeRJx9Ni3agGlkUJDQdm/5ubr7iqaF5RmQ== }
+      { integrity: sha512-eqxi1wqlmBOe7F7QdJZb2gMiswlq2xTnxASWkBtUm3BexOMFJcO2YoDou3gMI9zKXF7Wk3v9Gze8Vsm4aTqZ8Q== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -3704,7 +3704,7 @@ packages:
     resolution:
       { integrity: sha512-b4inOtiaOnYf9KWyO3jAeeCG6FeyfY6ldiEPanbUjWd+xIk5wZeHa8yVwmrJ2vderhu/BQvzCrJI0lHd+wIiqw== }
     peerDependencies:
-      '@types/react': '*'
+      '@types/react': npm:types-react@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -3738,7 +3738,7 @@ packages:
     resolution:
       { integrity: sha512-OKrckBy+sMEgYM/sMmqmErVn0kZqrHPJze+Ql3DzYsDDp0hl0L62nx/2122/Bvps1qz645jlcu2tD9lrRSdf8A== }
     peerDependencies:
-      '@types/react': '*'
+      '@types/react': npm:types-react@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -3800,8 +3800,8 @@ packages:
     resolution:
       { integrity: sha512-/UovfmmXGptwGcBQawLzvn2jOfM0t4z3/uKffoBlj724+n3FvBbZ7M0aaBOmkp6pqFYpO4yx8tSVJjx3Fl2jig== }
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': npm:types-react@rc
+      '@types/react-dom': npm:types-react-dom@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -3838,7 +3838,7 @@ packages:
     resolution:
       { integrity: sha512-w6XZNUPVv6xCpZUqb/yN9DL6auvpGX3C/ee6Hdi16v2UUy25HV2Q5bcflsiDyT/g5RwbPQ/GIT1vLkeRb+ITBw== }
     peerDependencies:
-      '@types/react': '*'
+      '@types/react': npm:types-react@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -3862,8 +3862,8 @@ packages:
     resolution:
       { integrity: sha512-200UD8zylvEyL8Bx+z76RJnASR2gRMuxlgFCPAe/Q/679a/r0eK3MBVYMb7vZODZcffZBdob1EGnky78xmVvcA== }
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': npm:types-react@rc
+      '@types/react-dom': npm:types-react-dom@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -3900,7 +3900,7 @@ packages:
     resolution:
       { integrity: sha512-EJUrI8yYh7WOjNOqpoJaf1jlFIH2LvtgAl+YcFqNCa+4hj64ZXmPkAKOFs/ukjz3byN6bdb/AVUqHkI8/uWWMA== }
     peerDependencies:
-      '@types/react': '*'
+      '@types/react': npm:types-react@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -3924,8 +3924,8 @@ packages:
     resolution:
       { integrity: sha512-oa3mXRRVjHi6DZu/ghuzdylyjaMXLymx83irM7hTxutQbD+7IhPKdMdRHD26Rm+kHRrWcrUkkRPv5pd47a2xFQ== }
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': npm:types-react@rc
+      '@types/react-dom': npm:types-react-dom@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -3966,8 +3966,8 @@ packages:
     resolution:
       { integrity: sha512-ZnRMshKF43aBxVWPWvbj21+7TQCvhuULWJ4gNIKYpRlQt5xGRhLx66tMp8pya2UkGHTSlhpXwmjqltDYHhw7Vg== }
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': npm:types-react@rc
+      '@types/react-dom': npm:types-react-dom@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -4022,8 +4022,8 @@ packages:
     resolution:
       { integrity: sha512-Gq6wuRN/asf9H/E/VzdKoUtT8GC9PQc9z40/vEr0VCJ4u5XvvhWIrSsCB6vD2/cH7ugTdSfYq9fLJCcM00acrQ== }
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': npm:types-react@rc
+      '@types/react-dom': npm:types-react-dom@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -4050,8 +4050,8 @@ packages:
     resolution:
       { integrity: sha512-ZSpFm0/uHa8zTvKBDjLFWLo8dkr4MBsiDLz0g3gMUwqgLHz9rTaRRGYDgvZPtBJgYCBKXkS9fzmoySgr8CO6Cw== }
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': npm:types-react@rc
+      '@types/react-dom': npm:types-react-dom@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -4092,8 +4092,8 @@ packages:
     resolution:
       { integrity: sha512-EA6AMGeq9AEeQDeSH0aZgG198qkfHSbvWTf1HvoDmOB5bBG/qTxjYMWUKMnYiV6J/iP/J8MEFSuB2zRU2n7ODA== }
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': npm:types-react@rc
+      '@types/react-dom': npm:types-react-dom@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -4234,7 +4234,7 @@ packages:
     resolution:
       { integrity: sha512-CasTfvsy+frcFkbXtSJ2Zu9JHpN8TYKxkgJGWbjiZhFivxaeW7rMeZt7QELGVLaYVfFMsKHjb7Ak0nMEe+2Vfw== }
     peerDependencies:
-      '@types/react': '*'
+      '@types/react': npm:types-react@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -4254,7 +4254,7 @@ packages:
     resolution:
       { integrity: sha512-MtfMVJiSr2NjzS0Aa90NPTnvTSg6C/JLCV7ma0W6+OMV78vd8OyRpID+Ng9LxzsPbLeuBnWBA1Nq30AtBIDChw== }
     peerDependencies:
-      '@types/react': '*'
+      '@types/react': npm:types-react@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -4294,7 +4294,7 @@ packages:
     resolution:
       { integrity: sha512-+FPE0rOdziWSrH9athwI1R0HDVbWlEhd+FR+aSDk4uWGmSJ9Z54sdZVDQPZAinJhJXwfT+qnj969mCsT2gfm5w== }
     peerDependencies:
-      '@types/react': '*'
+      '@types/react': npm:types-react@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -4304,7 +4304,7 @@ packages:
     resolution:
       { integrity: sha512-Z/e78qg2YFnnXcW88A4JmTtm4ADckLno6F7OXotmkQfeuCVaKuYzqAATPhVzl3delXE7CxIV8shofPn3jPc5Og== }
     peerDependencies:
-      '@types/react': '*'
+      '@types/react': npm:types-react@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -4334,8 +4334,8 @@ packages:
     resolution:
       { integrity: sha512-N8MDZqtgCgG5S3aV60INAB475osJousYpZ4cTJ2cFbMpdHS5Y6loLTH8LPtkj2QN0x93J30HT/M3qJXM0+lyeQ== }
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': npm:types-react@rc
+      '@types/react-dom': npm:types-react-dom@rc
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -12906,7 +12906,7 @@ snapshots:
     dependencies:
       type-fest: 4.26.1
 
-  '@douglasneuroinformatics/libui@3.3.0(@types/react@18.3.8)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@3.23.8)':
+  '@douglasneuroinformatics/libui@3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@3.23.8)':
     dependencies:
       '@douglasneuroinformatics/libjs': 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
@@ -12961,7 +12961,7 @@ snapshots:
       - immer
       - typescript
 
-  '@douglasneuroinformatics/libui@3.3.0(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libui@3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 0.7.1(typescript@5.5.4)
       '@douglasneuroinformatics/libui-form-types': 0.11.0

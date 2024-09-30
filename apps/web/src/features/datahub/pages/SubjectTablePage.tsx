@@ -29,23 +29,20 @@ export const SubjectTablePage = () => {
     <div>
       <div className="mb-2">
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
-          <div className="flex flex-col gap-2 lg:flex-row">
+          <div className="flex">
             <SelectInstrument options={instrumentOptions} onSelect={setInstrumentId} />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <div>
-              <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
-            </div>
-            <div>
-              <ActionDropdown
-                widthFull
-                disabled={!instrumentId}
-                options={['TSV', 'JSON']}
-                title={t('core.download')}
-                triggerClassName="min-w-32"
-                onSelection={dl}
-              />
-            </div>
+            <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
+            <ActionDropdown
+              widthFull
+              data-spotlight-type="export-data-dropdown"
+              disabled={!instrumentId}
+              options={['TSV', 'JSON']}
+              title={t('core.download')}
+              triggerClassName="min-w-32"
+              onSelection={dl}
+            />
           </div>
         </div>
       </div>

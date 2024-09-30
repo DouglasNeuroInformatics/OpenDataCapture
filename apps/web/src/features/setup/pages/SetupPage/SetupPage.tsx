@@ -23,7 +23,7 @@ export type SetupPageProps = {
 export const SetupPage = ({ onSubmit }: SetupPageProps) => {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
+    <div className="flex h-screen flex-col items-center justify-center overflow-y-scroll">
       <Card className="w-full grow px-4 sm:m-8 sm:max-w-xl sm:grow-0 md:max-w-2xl">
         <Card.Header className="flex items-center justify-center">
           <Logo className="m-2 h-auto w-16" variant="auto" />

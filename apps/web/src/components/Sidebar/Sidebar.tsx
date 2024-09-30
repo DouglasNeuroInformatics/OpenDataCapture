@@ -80,6 +80,7 @@ export const Sidebar = () => {
             animate={{ opacity: 1 }}
             className="my-2 rounded-md border border-slate-700 bg-slate-800 p-2 text-sm tracking-tight text-slate-300"
             exit={{ opacity: 0 }}
+            id="current-session-card"
             initial={{ opacity: 0 }}
           >
             <h5 className="text-sm font-medium">{t('common.sessionInProgress')}</h5>
