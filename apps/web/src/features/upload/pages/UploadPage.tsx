@@ -42,18 +42,11 @@ export const UploadPage = () => {
       records: recordsList
     };
 
-    console.log('request in UploadInstrumentRecordData format', reformatForSending);
-
     await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
     addNotification({ type: 'success' });
   };
 
   const handleTemplateDownload = () => {
-    //to do
-    //make sure the first two columns of the csv file are id and date
-    //convert the given csv files as a json object
-    //parse the json object through the instrument validation schema
-    // if succcess full send the data to the backend to be stored
     const { content, fileName } = createUploadTemplateCSV(instrument);
     void download(fileName, content);
   };
@@ -63,8 +56,6 @@ export const UploadPage = () => {
 
     const processedData = await processInstrumentCSV(input, instrument);
 
-    //console.log('here');
-    //console.log(processedData);
     if (processedData.success) {
       await sendInstrumentData(processedData.value);
     }
