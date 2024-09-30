@@ -20,5 +20,5 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { getLatestVersion } = await import('./.github/scripts/issues.cjs');
+            const { getLatestVersion } = await import('${{ github.workspace }}/.github/scripts/lib.js');
             await getLatestVersion();
