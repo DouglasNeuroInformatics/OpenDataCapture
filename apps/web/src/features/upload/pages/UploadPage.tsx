@@ -41,9 +41,12 @@ export const UploadPage = () => {
       instrumentId: instrument.id!,
       records: recordsList
     };
-
-    await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
-    addNotification({ type: 'success' });
+    try {
+      await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
+      addNotification({ type: 'success' });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleTemplateDownload = () => {
