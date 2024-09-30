@@ -20,6 +20,9 @@
 
 [data-spotlight-type='export-data-dropdown'][data-spotlight='true'] {
   @apply bg-slate-100 dark:bg-slate-900;
+  & > button {
+    @apply disabled:opacity-100;
+  }
 }
 
 [data-field-group][data-spotlight='true'] {
