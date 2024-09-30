@@ -2,7 +2,7 @@
 
 @layer components {
   .spotlight {
-    @apply pointer-events-none z-40 shadow-2xl;
+    @apply pointer-events-none z-40 rounded-md shadow-2xl;
   }
 }
 
@@ -16,4 +16,12 @@
 
 #subject-lookup-search-bar[data-spotlight='true'] > input {
   @apply bg-slate-100 placeholder:text-slate-900 dark:bg-slate-900 dark:placeholder:text-slate-100;
+}
+
+[data-spotlight-type='export-data-dropdown'][data-spotlight='true'] {
+  @apply bg-slate-100 dark:bg-slate-900;
+}
+
+[data-field-group][data-spotlight='true'] {
+  @apply box-content bg-slate-100 p-2 dark:bg-slate-900;
 }
