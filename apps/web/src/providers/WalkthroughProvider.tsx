@@ -5,6 +5,7 @@ import { useEventListener, useTranslation } from '@douglasneuroinformatics/libui
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import type { Session } from '@opendatacapture/schemas/session';
 import { AnimatePresence, motion } from 'framer-motion';
+import { mean } from 'lodash-es';
 import { XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { NavigateOptions } from 'react-router-dom';
@@ -42,7 +43,7 @@ type WalkthroughStep = {
   content: React.ReactNode;
   navigateOptions?: NavigateOptions;
   onBeforeQuery?: () => Promisable<void>;
-  position: 'bottom-left' | 'bottom-right' | 'top-left';
+  position: 'bottom-center' | 'bottom-left' | 'bottom-right' | 'top-left';
   target: string;
   title: string;
   url: `/${string}`;
@@ -260,6 +261,19 @@ const Walkthrough = () => {
           fr: 'Voir le client'
         }),
         url: '/datahub/123/table'
+      },
+      {
+        content: t({
+          en: 'Here, you can view the records this subject has completed for a given instrument.',
+          fr: 'Ici, vous pouvez voir les enregistrements que ce client a complétés pour un instrument donné'
+        }),
+        position: 'bottom-center',
+        target: 'a[data-nav-url="/datahub/123/table"]',
+        title: t({
+          en: 'Table',
+          fr: 'Tableau'
+        }),
+        url: '/datahub/123/table'
       }
     ];
   }, [resolvedLanguage]);
@@ -302,6 +316,9 @@ const Walkthrough = () => {
           })
           .with('bottom-right', () => {
             setPopoverPosition({ x: rect.right - popoverWidth, y: rect.bottom + 20 });
+          })
+          .with('bottom-center', () => {
+            setPopoverPosition({ x: mean([rect.left, rect.right]) - popoverWidth / 2, y: rect.bottom + 20 });
           })
           .with('top-left', () => {
             setPopoverPosition({ x: rect.left, y: rect.top - popoverHeight - 20 });
