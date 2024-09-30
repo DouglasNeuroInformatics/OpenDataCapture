@@ -247,6 +247,19 @@ const Walkthrough = () => {
           fr: 'Administrer un instrument'
         }),
         url: '/instruments/accessible-instruments'
+      },
+      {
+        content: t({
+          en: 'On this page, you can view the data for the subject of the current session. To access data for other subjects, use the lookup button on the Data Hub page.',
+          fr: "Sur cette page, vous pouvez consulter les données du client pour lequel la session est en cours. Pour accéder aux données d'autres clients, utilisez le bouton de recherche sur la page du centre de données."
+        }),
+        position: 'bottom-left',
+        target: 'button[data-nav-url="/datahub/123/table"]',
+        title: t({
+          en: 'View Subject',
+          fr: 'Voir le client'
+        }),
+        url: '/datahub/123/table'
       }
     ];
   }, [resolvedLanguage]);
