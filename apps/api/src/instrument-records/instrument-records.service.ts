@@ -276,7 +276,7 @@ export class InstrumentRecordsService {
         sex: null
       };
 
-      let sessionType = 'RETROSPECTIVE' as SessionType;
+      let sessionType: SessionType = 'RETROSPECTIVE';
 
       let sessionId = (
         await this.sessionsService.create({
