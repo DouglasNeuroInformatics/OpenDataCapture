@@ -26,7 +26,7 @@ export class InstrumentRecordsController {
     return this.instrumentRecordsService.create(data, { ability });
   }
 
-  @ApiOperation({ summary: 'Upload multiple instruments' })
+  @ApiOperation({ summary: 'Upload multiple instrument records' })
   @Post('upload')
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
   upload(@Body() data: UploadInstrumentRecordDto, @CurrentUser('ability') ability: AppAbility) {
