@@ -38,5 +38,6 @@ export async function getLatestPublishedVersion({ github }) {
       );
     }
   }
+  console.log(`Found latest published version: ${packageVersion}`);
   return packageVersion;
 }
