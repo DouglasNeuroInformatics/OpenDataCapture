@@ -1,6 +1,6 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
@@ -26,6 +26,7 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
+import type { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -266,7 +267,18 @@ export class InstrumentRecordsService {
 
     for (const record of records) {
       const { data, date, subjectId } = record;
-      await this.subjectsService.findById(subjectId);
+
+      //create a new subject id in subjects service if they dont exist
+      try {
+        await this.subjectsService.findById(subjectId);
+      } catch (exception) {
+        if (exception instanceof NotFoundException) {
+          const addedSubject: CreateSubjectDto = {
+            id: subjectId
+          };
+          await this.subjectsService.create(addedSubject);
+        }
+      }
 
       let subjectInfo: CreateSubjectData = {
         dateOfBirth: null,
