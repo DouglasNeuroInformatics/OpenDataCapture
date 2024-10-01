@@ -28,7 +28,7 @@
 
 ![license](https://img.shields.io/github/license/DouglasNeuroInformatics/OpenDataCapture)
 ![version](https://img.shields.io/github/package-json/v/DouglasNeuroInformatics/OpenDataCapture)
-![build](https://github.com/DouglasNeuroInformatics/OpenDataCapture/actions/workflows/build.yaml/badge.svg)
+![build](https://github.com/DouglasNeuroInformatics/OpenDataCapture/actions/workflows/ci.yaml/badge.svg)
 
 </div>
 <hr />
