@@ -9,6 +9,7 @@ import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
+console.log(await getReleaseInfo());
 export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1000,
@@ -22,7 +23,7 @@ export default defineConfig({
     }
   },
   define: {
-    __RELEASE_INFO__: JSON.stringify(await getReleaseInfo())
+    'import.meta.release': JSON.stringify(await getReleaseInfo())
   },
   optimizeDeps: {
     esbuildOptions: {

@@ -28,7 +28,7 @@ const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> }
   },
   bundle: true,
   define: {
-    __RELEASE_INFO__: JSON.stringify(await getReleaseInfo())
+    'import.meta.release': JSON.stringify(await getReleaseInfo())
   },
   entryPoints: [entryFile],
   external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],

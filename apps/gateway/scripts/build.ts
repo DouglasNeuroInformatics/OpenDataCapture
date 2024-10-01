@@ -18,7 +18,7 @@ await esbuild.build({
   define: {
     'import.meta.env.DEV': 'false',
     'import.meta.env.PROD': 'true',
-    'import.meta.env.RELEASE_INFO': JSON.stringify(await getReleaseInfo())
+    'import.meta.release': JSON.stringify(await getReleaseInfo())
   },
   entryPoints: [entryFile],
   external: ['lightningcss'],

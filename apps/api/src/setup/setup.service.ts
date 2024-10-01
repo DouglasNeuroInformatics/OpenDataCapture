@@ -29,7 +29,7 @@ export class SetupService {
       isDemo: Boolean(savedOptions?.isDemo),
       isGatewayEnabled: this.configurationService.get('GATEWAY_ENABLED'),
       isSetup: Boolean(savedOptions?.isSetup),
-      releaseInfo: __RELEASE_INFO__,
+      release: import.meta.release,
       uptime: Math.round(process.uptime())
     } satisfies SetupState;
   }
