@@ -45,7 +45,7 @@ export const UploadPage = () => {
       await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
       addNotification({ type: 'success' });
     } catch (error) {
-      console.log(error);
+      addNotification({ message: error as string, type: 'error' });
     }
   };
 
