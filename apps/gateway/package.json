@@ -5,7 +5,7 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "build": "rm -rf dist && pnpm build:client && pnpm build:server && tsx scripts/build.ts",
+    "build": "rm -rf dist && pnpm build:client && pnpm build:server && NODE_ENV=production tsx scripts/build.ts",
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
     "db:generate": "prisma generate",
