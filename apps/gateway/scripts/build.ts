@@ -3,6 +3,7 @@
 import path from 'path';
 
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
+import { getReleaseInfo } from '@opendatacapture/release-info';
 import esbuild from 'esbuild';
 
 const entryFile = path.resolve(import.meta.dirname, '../src/main.ts');
@@ -16,7 +17,8 @@ await esbuild.build({
   bundle: true,
   define: {
     'import.meta.env.DEV': 'false',
-    'import.meta.env.PROD': 'true'
+    'import.meta.env.PROD': 'true',
+    'import.meta.env.RELEASE_INFO': JSON.stringify(await getReleaseInfo())
   },
   entryPoints: [entryFile],
   external: ['lightningcss'],

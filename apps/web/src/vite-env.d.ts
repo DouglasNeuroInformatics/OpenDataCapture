@@ -25,3 +25,7 @@ interface ImportMetaEnv extends ImportMetaDevEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+interface Window {
+  __RELEASE_INFO__: import('@opendatacapture/schemas/setup').ReleaseInfo;
+}

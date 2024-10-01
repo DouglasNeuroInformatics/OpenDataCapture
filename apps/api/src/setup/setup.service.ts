@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { type CreateAdminData } from '@opendatacapture/schemas/setup';
-import type { InitAppOptions } from '@opendatacapture/schemas/setup';
+import type { InitAppOptions, SetupState } from '@opendatacapture/schemas/setup';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { DemoService } from '@/demo/demo.service';
@@ -28,8 +28,10 @@ export class SetupService {
     return {
       isDemo: Boolean(savedOptions?.isDemo),
       isGatewayEnabled: this.configurationService.get('GATEWAY_ENABLED'),
-      isSetup: Boolean(savedOptions?.isSetup)
-    };
+      isSetup: Boolean(savedOptions?.isSetup),
+      releaseInfo: __RELEASE_INFO__,
+      uptime: Math.round(process.uptime())
+    } satisfies SetupState;
   }
 
   async initApp({ admin, dummySubjectCount, initDemo, recordsPerSubject }: InitAppOptions) {

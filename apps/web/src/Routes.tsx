@@ -4,6 +4,7 @@ import { Navigate, useRoutes } from 'react-router-dom';
 import type { RouteObject } from 'react-router-dom';
 
 import { Layout } from './components/Layout';
+import { aboutRoute } from './features/about';
 import { authRoutes } from './features/auth';
 import { contactRoute } from './features/contact';
 import { dashboardRoute } from './features/dashboard';
@@ -34,7 +35,16 @@ const protectedRoutes: RouteObject[] = [
         </WalkthroughProvider>
       </DisclaimerProvider>
     ),
-    children: [contactRoute, datahubRoute, dashboardRoute, groupRoute, instrumentsRoute, sessionRoute, userRoute]
+    children: [
+      aboutRoute,
+      contactRoute,
+      datahubRoute,
+      dashboardRoute,
+      groupRoute,
+      instrumentsRoute,
+      sessionRoute,
+      userRoute
+    ]
   }
 ];
 

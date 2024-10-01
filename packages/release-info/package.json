@@ -1,0 +1,19 @@
+{
+  "name": "@opendatacapture/release-info",
+  "type": "module",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@opendatacapture/schemas": "workspace:*",
+    "type-fest": "workspace:type-fest__4.x@*",
+    "zod": "workspace:zod__3.23.x@*"
+  }
+}

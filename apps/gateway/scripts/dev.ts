@@ -4,8 +4,8 @@ import fs from 'fs';
 import module from 'module';
 import path from 'path';
 
+import { getReleaseInfo } from '@opendatacapture/release-info';
 import esbuild from 'esbuild';
-// import nodemon from 'nodemon';
 import type { BuildResult } from 'esbuild';
 
 const outdir = path.resolve(import.meta.dirname, '../dist');
@@ -19,6 +19,8 @@ if (fs.existsSync(outdir)) {
 
 await fs.promises.mkdir(outdir);
 
+const releaseInfo = await getReleaseInfo();
+
 await new Promise<BuildResult>((resolve, reject) => {
   esbuild
     .context({
@@ -28,7 +30,8 @@ await new Promise<BuildResult>((resolve, reject) => {
       bundle: true,
       define: {
         'import.meta.env.DEV': 'true',
-        'import.meta.env.PROD': 'false'
+        'import.meta.env.PROD': 'false',
+        'import.meta.env.RELEASE_INFO': JSON.stringify(releaseInfo)
       },
       entryPoints: [
         path.resolve(import.meta.dirname, '../src/main.ts'),

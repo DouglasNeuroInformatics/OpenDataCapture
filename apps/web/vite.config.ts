@@ -1,6 +1,7 @@
 import path from 'path';
 
 import importMetaEnv from '@import-meta-env/unplugin';
+import { getReleaseInfo } from '@opendatacapture/release-info';
 import { runtime } from '@opendatacapture/vite-plugin-runtime';
 import react from '@vitejs/plugin-react-swc';
 import autoprefixer from 'autoprefixer';
@@ -8,7 +9,7 @@ import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
-export default defineConfig(() => ({
+export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
@@ -18,6 +19,9 @@ export default defineConfig(() => ({
     postcss: {
       plugins: [autoprefixer(), tailwindcss()]
     }
+  },
+  define: {
+    __RELEASE_INFO__: JSON.stringify(await getReleaseInfo())
   },
   optimizeDeps: {
     esbuildOptions: {
@@ -50,4 +54,4 @@ export default defineConfig(() => ({
       }
     }
   }
-}));
+});

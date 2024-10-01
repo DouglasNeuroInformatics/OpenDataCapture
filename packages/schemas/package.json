@@ -7,6 +7,7 @@
     "./assignment": "./src/assignment/assignment.ts",
     "./auth": "./src/auth/auth.ts",
     "./core": "./src/core/core.ts",
+    "./gateway": "./src/gateway/gateway.ts",
     "./group": "./src/group/group.ts",
     "./instrument": "./src/instrument/instrument.ts",
     "./instrument-records": "./src/instrument-records/instrument-records.ts",

@@ -5,7 +5,7 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsx scripts/build.ts",
+    "build": "NODE_ENV=production tsx scripts/build.ts",
     "db:generate": "prisma generate",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx scripts/dev.ts",
     "dev:test": "NODE_ENV=test env-cmd -f ../../.env tsx scripts/dev.ts",
@@ -38,6 +38,7 @@
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/instrument-library": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
+    "@opendatacapture/release-info": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",

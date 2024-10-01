@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { ArrowToggle, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { LogOutIcon, SchoolIcon, SettingsIcon } from 'lucide-react';
+import { Info, LogOutIcon, SchoolIcon, SettingsIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppStore } from '@/store';
@@ -46,12 +46,14 @@ export const UserDropup = () => {
         <DropdownMenu.Group>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100 focus:ring-0"
-            onClick={logout}
+            onClick={() => {
+              navigate('/about');
+            }}
           >
-            <LogOutIcon />
+            <Info />
             {t({
-              en: 'Logout',
-              fr: 'Se déconnecter'
+              en: 'About',
+              fr: 'Information'
             })}
           </DropdownMenu.Item>
           <DropdownMenu.Item
@@ -77,6 +79,16 @@ export const UserDropup = () => {
             {t({
               en: 'Tutorial',
               fr: 'Tutoriel'
+            })}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100 focus:ring-0"
+            onClick={logout}
+          >
+            <LogOutIcon />
+            {t({
+              en: 'Logout',
+              fr: 'Se déconnecter'
             })}
           </DropdownMenu.Item>
         </DropdownMenu.Group>
