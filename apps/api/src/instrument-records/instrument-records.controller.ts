@@ -12,6 +12,8 @@ import type { AppAbility } from '@/core/types';
 import { CreateInstrumentRecordDto } from './dto/create-instrument-record.dto';
 import { InstrumentRecordsService } from './instrument-records.service';
 
+import { UploadInstrumentRecordDto } from './dto/upload-instrument-record.dto';
+
 @ApiTags('Instrument Records')
 @Controller('instrument-records')
 export class InstrumentRecordsController {
@@ -22,6 +24,13 @@ export class InstrumentRecordsController {
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
   create(@Body() data: CreateInstrumentRecordDto, @CurrentUser('ability') ability: AppAbility) {
     return this.instrumentRecordsService.create(data, { ability });
+  }
+
+  @ApiOperation({ summary: 'Upload multiple instrument records' })
+  @Post('upload')
+  @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
+  upload(@Body() data: UploadInstrumentRecordDto, @CurrentUser('ability') ability: AppAbility) {
+    return this.instrumentRecordsService.upload(data, { ability });
   }
 
   @ApiOperation({ summary: 'Get Records for Instrument ' })

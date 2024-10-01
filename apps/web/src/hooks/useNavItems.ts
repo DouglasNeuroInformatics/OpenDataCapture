@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { BarChartBigIcon, CirclePlayIcon, ComputerIcon, DatabaseIcon, EyeIcon, UsersIcon } from 'lucide-react';
+import {
+  BarChartBigIcon,
+  CirclePlayIcon,
+  ComputerIcon,
+  DatabaseIcon,
+  EyeIcon,
+  UploadIcon,
+  UsersIcon
+} from 'lucide-react';
 
 import { useAppStore } from '@/store';
 
@@ -39,6 +47,13 @@ export function useNavItems() {
         icon: DatabaseIcon,
         label: t('layout.navLinks.datahub'),
         url: '/datahub'
+      });
+    }
+    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
+      globalItems.push({
+        icon: UploadIcon,
+        url: '/upload',
+        label: t('layout.navLinks.upload')
       });
     }
     if (currentGroup && currentUser?.ability.can('manage', 'Group')) {

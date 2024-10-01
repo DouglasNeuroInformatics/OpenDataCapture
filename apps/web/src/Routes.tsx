@@ -11,6 +11,7 @@ import { datahubRoute } from './features/datahub';
 import { groupRoute } from './features/group';
 import { instrumentsRoute } from './features/instruments';
 import { sessionRoute } from './features/session';
+import { uploadRoute } from './features/upload';
 import { userRoute } from './features/user';
 import { DisclaimerProvider } from './providers/DisclaimerProvider';
 import { WalkthroughProvider } from './providers/WalkthroughProvider';
@@ -34,7 +35,16 @@ const protectedRoutes: RouteObject[] = [
         </WalkthroughProvider>
       </DisclaimerProvider>
     ),
-    children: [contactRoute, datahubRoute, dashboardRoute, groupRoute, instrumentsRoute, sessionRoute, userRoute]
+    children: [
+      contactRoute,
+      datahubRoute,
+      dashboardRoute,
+      groupRoute,
+      instrumentsRoute,
+      sessionRoute,
+      userRoute,
+      uploadRoute
+    ]
   }
 ];
 

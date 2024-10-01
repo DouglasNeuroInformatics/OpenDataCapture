@@ -21,7 +21,7 @@
     "@casl/ability": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libpasswd": "^0.0.3",
-    "@douglasneuroinformatics/libui": "catalog:",
+    "@douglasneuroinformatics/libui": "^3.5.0",
     "@heroicons/react": "^2.1.5",
     "@import-meta-env/cli": "^0.7.0",
     "@import-meta-env/unplugin": "^0.6.0",
