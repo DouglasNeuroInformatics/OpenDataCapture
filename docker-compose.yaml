@@ -46,6 +46,8 @@ services:
   gateway:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway:${RELEASE_CHANNEL}
     build:
+      args:
+        - RELEASE_VERSION
       context: .
       dockerfile: ./apps/gateway/Dockerfile
     ports:
@@ -59,6 +61,8 @@ services:
   web:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-web:${RELEASE_CHANNEL}
     build:
+      args:
+        - RELEASE_VERSION
       context: .
       dockerfile: ./apps/web/Dockerfile
     environment:

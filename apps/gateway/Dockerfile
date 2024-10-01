@@ -1,5 +1,6 @@
 FROM node:lts-alpine AS base
 WORKDIR /app
+ARG RELEASE_VERSION
 ENV GATEWAY_DATABASE_URL=file:/app/gateway.db
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
