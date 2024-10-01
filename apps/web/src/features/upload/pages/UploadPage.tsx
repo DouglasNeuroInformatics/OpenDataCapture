@@ -13,6 +13,8 @@ import { useParams } from 'react-router-dom';
 import { useInstrument } from '@/hooks/useInstrument';
 
 import { createUploadTemplateCSV, processInstrumentCSV } from '../utils';
+import { useAppStore } from '@/store';
+import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -21,6 +23,7 @@ export const UploadPage = () => {
   const acceptedFiles = {
     'text/csv': ['.csv']
   };
+  const currentGroup = useAppStore((store) => store.currentGroup);
 
   const params = useParams();
   const instrument = useInstrument(params.id!) as AnyUnilingualFormInstrument;
@@ -34,7 +37,9 @@ export const UploadPage = () => {
       const createdRecord = {
         data: restOfData as Json,
         date: dataDate as Date,
-        subjectId: dataSubjectId as string
+        subjectId: encodeScopedSubjectId(dataSubjectId as string, {
+          groupName: currentGroup?.name ?? 'root'
+        })
       };
       recordsList.push(createdRecord);
     }
