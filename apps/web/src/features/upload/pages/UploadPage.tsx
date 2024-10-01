@@ -18,6 +18,9 @@ export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
+  const acceptedFiles = {
+    'text/csv': ['.csv']
+  };
 
   const params = useParams();
   const instrument = useInstrument(params.id!) as AnyUnilingualFormInstrument;
@@ -45,7 +48,7 @@ export const UploadPage = () => {
       await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
       addNotification({ type: 'success' });
     } catch (error) {
-      addNotification({ message: error as string, type: 'error' });
+      console.error(error);
     }
   };
 
@@ -66,7 +69,7 @@ export const UploadPage = () => {
 
   return (
     <div className="align-center items-center justify-center">
-      <FileDropzone file={file} setFile={setFile} />
+      <FileDropzone acceptedFileTypes={acceptedFiles} file={file} setFile={setFile} />
       <div className="mt-4 flex justify-between space-x-2">
         <Button disabled={!(file && instrument)} variant={'primary'} onClick={handleInstrumentCSV}>
           Submit
