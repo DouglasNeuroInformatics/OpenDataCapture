@@ -1,6 +1,7 @@
 import { type EncryptResult, HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { AssignmentStatus, MutateAssignmentResponseBody } from '@opendatacapture/schemas/assignment';
+import type { GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gateway';
 import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';
@@ -116,9 +117,11 @@ router.delete(
 
 router.get('/healthcheck', (_, res) => {
   res.status(200).json({
-    message: 'OK',
-    uptime: process.uptime()
-  });
+    ok: true,
+    releaseInfo: import.meta.env.RELEASE_INFO,
+    status: 200,
+    uptime: Math.round(process.uptime())
+  } satisfies GatewayHealthcheckSuccessResult);
 });
 
 export { router as apiRouter };

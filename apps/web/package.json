@@ -6,10 +6,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "tsc && NODE_ENV=production NODE_OPTIONS='--import=tsx' pnpm exec vite build",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run",
-    "dev": "NODE_ENV=development env-cmd -f ../../.env pnpm exec vite",
-    "dev:test": "NODE_ENV=test env-cmd -f ../../.env pnpm exec vite",
+    "dev": "NODE_ENV=development NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env pnpm exec vite",
+    "dev:test": "NODE_ENV=test NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env pnpm exec vite",
     "format": "prettier --write src",
     "format:translations": "find src/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "inject": "pnpm exec import-meta-env -x .env.public -p dist/index.html",
@@ -59,6 +57,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@opendatacapture/release-info": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",

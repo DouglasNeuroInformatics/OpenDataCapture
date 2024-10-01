@@ -74,6 +74,8 @@ jobs:
       - name: Build and Push Docker Images
         uses: docker/build-push-action@v6
         with:
+          build-args: |
+            RELEASE_VERSION=${{ needs.configure.outputs.current_version }}
           context: .
           file: ${{ matrix.dockerfile }}
           push: ${{ needs.configure.outputs.is_release }}

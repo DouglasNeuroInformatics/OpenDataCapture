@@ -8,10 +8,12 @@ import { InstrumentsModule } from '@/instruments/instruments.module';
 import { SessionsModule } from '@/sessions/sessions.module';
 import { SetupModule } from '@/setup/setup.module';
 
+import { GatewayController } from './gateway.controller';
 import { GatewayService } from './gateway.service';
 import { GatewaySynchronizer } from './gateway.synchronizer';
 
 @Module({
+  controllers: [GatewayController],
   exports: [GatewayService],
   imports: [
     forwardRef(() => AssignmentsModule),

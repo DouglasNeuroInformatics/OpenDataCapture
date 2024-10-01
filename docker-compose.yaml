@@ -19,6 +19,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
+      args:
+        - RELEASE_VERSION
     depends_on:
       - mongo
     restart: unless-stopped

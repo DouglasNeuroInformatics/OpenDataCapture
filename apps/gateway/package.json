@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@douglasneuroinformatics/esbuild-plugin-prisma": "^1.0.0",
+    "@opendatacapture/release-info": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",

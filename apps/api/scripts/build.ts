@@ -10,6 +10,8 @@ import type { BuildOptions } from 'esbuild';
 import esbuildPluginTsc from 'esbuild-plugin-tsc';
 const require = module.createRequire(import.meta.url);
 
+import { getReleaseInfo } from '@opendatacapture/release-info';
+
 const entryFile = path.resolve(import.meta.dirname, '../src/main.ts');
 const outdir = path.resolve(import.meta.dirname, '../dist');
 const tsconfig = path.resolve(import.meta.dirname, '../tsconfig.json');
@@ -25,6 +27,9 @@ const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> }
     js: "Object.defineProperties(globalThis, { __dirname: { value: import.meta.dirname, writable: false }, __filename: { value: import.meta.filename, writable: false }, require: { value: (await import('module')).createRequire(import.meta.url), writable: false } });"
   },
   bundle: true,
+  define: {
+    __RELEASE_INFO__: JSON.stringify(await getReleaseInfo())
+  },
   entryPoints: [entryFile],
   external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],
   format: 'esm',
