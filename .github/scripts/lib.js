@@ -1,7 +1,7 @@
 // @ts-check
 
 const PACKAGE_NAMES = ['open-data-capture-api', 'open-data-capture-gateway', 'open-data-capture-web'];
-const VERSION_TAG_REGEX = /v([0-9]+.[0-9]+.[0-9]+)/;
+const VERSION_TAG_REGEX = /v?([0-9]+.[0-9]+.[0-9]+)/;
 
 /**
  * Get the latest published container version from GitHub. If the latest version is not the same
