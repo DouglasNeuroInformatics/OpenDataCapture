@@ -6,15 +6,15 @@ import { useDownload } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
 import type { UploadInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
+import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import axios from 'axios';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 import { useInstrument } from '@/hooks/useInstrument';
+import { useAppStore } from '@/store';
 
 import { createUploadTemplateCSV, processInstrumentCSV } from '../utils';
-import { useAppStore } from '@/store';
-import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
