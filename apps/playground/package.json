@@ -13,7 +13,7 @@
     "storybook": "env-cmd -f ../../.env storybook dev -p 6006"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libcrypto": "^0.0.2",
+    "@douglasneuroinformatics/libcrypto": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libui": "catalog:",
     "@monaco-editor/react": "^4.6.0",

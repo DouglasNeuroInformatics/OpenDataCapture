@@ -18,7 +18,7 @@
   "dependencies": {
     "@casl/ability": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
-    "@douglasneuroinformatics/libpasswd": "^0.0.3",
+    "@douglasneuroinformatics/libpasswd": "catalog:",
     "@douglasneuroinformatics/libui": "catalog:",
     "@heroicons/react": "^2.1.5",
     "@import-meta-env/cli": "^0.7.0",
