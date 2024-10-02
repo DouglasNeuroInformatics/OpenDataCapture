@@ -116,10 +116,7 @@ export const AboutPage = () => {
           </Card.Description>
         </Card.Header>
         <Card.Content className="flex flex-col gap-6 p-6 text-sm">
-          <InfoBlock
-            items={translateReleaseInfo(import.meta.release)}
-            label={t({ en: 'Web Client', fr: 'Client Web' })}
-          />
+          <InfoBlock items={translateReleaseInfo(__RELEASE__)} label={t({ en: 'Web Client', fr: 'Client Web' })} />
           <InfoBlock
             items={{
               ...translateReleaseInfo(setupStateQuery.data.release),

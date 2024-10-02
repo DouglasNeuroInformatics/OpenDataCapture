@@ -22,7 +22,7 @@ export default defineConfig({
     }
   },
   define: {
-    'import.meta.release': JSON.stringify(await getReleaseInfo())
+    __RELEASE__: JSON.stringify(await getReleaseInfo())
   },
   optimizeDeps: {
     esbuildOptions: {
