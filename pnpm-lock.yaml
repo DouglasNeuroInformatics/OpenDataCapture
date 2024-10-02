@@ -12,9 +12,24 @@ catalogs:
     '@casl/prisma':
       specifier: ^1.4.1
       version: 1.4.1
+    '@douglasneuroinformatics/esbuild-plugin-prisma':
+      specifier: latest
+      version: 1.0.0
+    '@douglasneuroinformatics/eslint-config':
+      specifier: latest
+      version: 5.1.9
+    '@douglasneuroinformatics/libcrypto':
+      specifier: latest
+      version: 0.0.2
     '@douglasneuroinformatics/libjs':
       specifier: latest
-      version: 0.7.1
+      version: 0.8.0
+    '@douglasneuroinformatics/libnest':
+      specifier: latest
+      version: 0.1.1
+    '@douglasneuroinformatics/libpasswd':
+      specifier: latest
+      version: 0.0.3
     '@douglasneuroinformatics/libstats':
       specifier: latest
       version: 0.1.0
@@ -24,6 +39,12 @@ catalogs:
     '@douglasneuroinformatics/libui-form-types':
       specifier: latest
       version: 0.11.0
+    '@douglasneuroinformatics/prettier-config':
+      specifier: latest
+      version: 0.0.1
+    '@douglasneuroinformatics/tsconfig':
+      specifier: latest
+      version: 1.0.2
     '@microsoft/api-extractor':
       specifier: ^7.47.6
       version: 7.47.9
@@ -74,13 +95,13 @@ importers:
         specifier: ^19.0.3
         version: 19.5.0
       '@douglasneuroinformatics/eslint-config':
-        specifier: ^5.1.8
-        version: 5.1.8(astro-eslint-parser@1.0.3(typescript@5.5.4))(eslint@9.11.0(jiti@1.21.6))(svelte-eslint-parser@0.41.1)(typescript@5.5.4)
+        specifier: 'catalog:'
+        version: 5.1.9(astro-eslint-parser@1.0.3(typescript@5.5.4))(eslint@9.11.0(jiti@1.21.6))(svelte-eslint-parser@0.41.1)(typescript@5.5.4)
       '@douglasneuroinformatics/prettier-config':
-        specifier: ^0.0.1
+        specifier: 'catalog:'
         version: 0.0.1(husky@9.1.6)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.6.6(prettier-plugin-astro@0.14.1)(prettier@3.3.3))(prettier@3.3.3)
       '@douglasneuroinformatics/tsconfig':
-        specifier: ^1.0.2
+        specifier: 'catalog:'
         version: 1.0.2(typescript@5.5.4)
       '@storybook/addon-essentials':
         specifier: ^8.2.9
@@ -191,16 +212,16 @@ importers:
         specifier: 'catalog:'
         version: 1.4.1(@casl/ability@6.7.1)(@prisma/client@5.19.1(prisma@5.19.1))
       '@douglasneuroinformatics/libcrypto':
-        specifier: ^0.0.2
+        specifier: 'catalog:'
         version: 0.0.2
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@douglasneuroinformatics/libnest':
-        specifier: ^0.1.1
+        specifier: 'catalog:'
         version: 0.1.1(@nestjs/common@10.4.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.3(@nestjs/common@10.4.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.3)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.3(@nestjs/common@10.4.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.3))(@nestjs/testing@10.4.3(@nestjs/common@10.4.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.3(@nestjs/common@10.4.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.3)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.3(@nestjs/common@10.4.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.3)))(express@4.21.0)(mongodb@6.9.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(zod@vendor+zod@3.23.x)
       '@douglasneuroinformatics/libpasswd':
-        specifier: ^0.0.3
+        specifier: 'catalog:'
         version: 0.0.3(typescript@5.5.4)
       '@douglasneuroinformatics/libstats':
         specifier: 'catalog:'
@@ -297,7 +318,7 @@ importers:
         version: link:../../vendor/zod@3.23.x
     devDependencies:
       '@douglasneuroinformatics/esbuild-plugin-prisma':
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0(@prisma/client@5.19.1(prisma@5.19.1))(@prisma/engines@5.19.1)(esbuild@0.23.1)(prisma@5.19.1)
       '@nestjs/testing':
         specifier: ^10.4.1
@@ -345,7 +366,7 @@ importers:
   apps/gateway:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
-        specifier: ^0.0.2
+        specifier: 'catalog:'
         version: 0.0.2
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
@@ -403,7 +424,7 @@ importers:
         version: link:../../vendor/zod@3.23.x
     devDependencies:
       '@douglasneuroinformatics/esbuild-plugin-prisma':
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0(@prisma/client@5.19.1(prisma@5.19.1))(@prisma/engines@5.19.1)(esbuild@0.23.1)(prisma@5.19.1)
       '@opendatacapture/release-info':
         specifier: workspace:*
@@ -515,11 +536,11 @@ importers:
   apps/playground:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
-        specifier: ^0.0.2
+        specifier: 'catalog:'
         version: 0.0.2
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
@@ -631,9 +652,9 @@ importers:
         version: 6.7.1
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@douglasneuroinformatics/libpasswd':
-        specifier: ^0.0.3
+        specifier: 'catalog:'
         version: 0.0.3(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
@@ -800,7 +821,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -883,7 +904,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
@@ -962,7 +983,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -974,7 +995,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -994,7 +1015,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 3.4.2(@types/react@18.3.8)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.12)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
@@ -1049,7 +1070,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       esbuild:
         specifier: 'catalog:'
         version: 0.23.1
@@ -1089,7 +1110,7 @@ importers:
         version: 6.7.1
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -1113,7 +1134,7 @@ importers:
   packages/subject-utils:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
-        specifier: ^0.0.2
+        specifier: 'catalog:'
         version: 0.0.2
       '@opendatacapture/schemas':
         specifier: workspace:*
@@ -1137,7 +1158,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
 
   runtime/v1:
     devDependencies:
@@ -1263,7 +1284,7 @@ importers:
         version: 6.7.1
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 0.7.1(typescript@5.5.4)
+        version: 0.8.0(typescript@5.5.4)
       '@faker-js/faker':
         specifier: ^9.0.0
         version: 9.0.1
@@ -1925,9 +1946,9 @@ packages:
       esbuild: 0.x
       prisma: 5.x
 
-  '@douglasneuroinformatics/eslint-config@5.1.8':
+  '@douglasneuroinformatics/eslint-config@5.1.9':
     resolution:
-      { integrity: sha512-pAQZG4Xbzp8nTyAzyuKD8Du+d61whCYE+HnZgOB3/nKp0Me8lzTZy78T8ATTZwdygDzQzRVTWGCN1WSdHL9sIQ== }
+      { integrity: sha512-RjQ68gTg3/P3JBHHsAR7BlUXrWTmr/sPprnarzfm7GaHdaH+HlgeulPqN43KivGezHTmyXbmhr+c70CELMvNCw== }
     peerDependencies:
       eslint: 9.x
       typescript: 5.x
@@ -1942,6 +1963,12 @@ packages:
   '@douglasneuroinformatics/libjs@0.7.1':
     resolution:
       { integrity: sha512-qL7qmvW4dcHYcjZR/iAVPFPQxHoFKeDZ50LnhbZA+wY6IYHc3d7SXkD/Gef1b3oaWwMZtC8Xkd5q/b8oWlWI0w== }
+    peerDependencies:
+      typescript: ^5.1.0
+
+  '@douglasneuroinformatics/libjs@0.8.0':
+    resolution:
+      { integrity: sha512-UyBnaeoJLaEqWi1whgAjgVdB4Ckkl2yVxP9wNHa/2o1ARyGQg/gwDepGYUkWCoQ6C+QUeEBg7GaX894HHK4mjg== }
     peerDependencies:
       typescript: ^5.1.0
 
@@ -12830,7 +12857,7 @@ snapshots:
       esbuild: 0.23.1
       prisma: 5.19.1
 
-  '@douglasneuroinformatics/eslint-config@5.1.8(astro-eslint-parser@1.0.3(typescript@5.5.4))(eslint@9.11.0(jiti@1.21.6))(svelte-eslint-parser@0.41.1)(typescript@5.5.4)':
+  '@douglasneuroinformatics/eslint-config@5.1.9(astro-eslint-parser@1.0.3(typescript@5.5.4))(eslint@9.11.0(jiti@1.21.6))(svelte-eslint-parser@0.41.1)(typescript@5.5.4)':
     dependencies:
       eslint: 9.11.0(jiti@1.21.6)
       eslint-plugin-astro: 1.2.4(eslint@9.11.0(jiti@1.21.6))(typescript@5.5.4)
@@ -12857,6 +12884,11 @@ snapshots:
       '@hpke/core': 1.3.1
 
   '@douglasneuroinformatics/libjs@0.7.1(typescript@5.5.4)':
+    dependencies:
+      type-fest: 4.26.1
+      typescript: 5.5.4
+
+  '@douglasneuroinformatics/libjs@0.8.0(typescript@5.5.4)':
     dependencies:
       type-fest: 4.26.1
       typescript: 5.5.4

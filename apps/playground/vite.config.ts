@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
+    sourcemap: true,
     target: 'es2022'
   },
   css: {

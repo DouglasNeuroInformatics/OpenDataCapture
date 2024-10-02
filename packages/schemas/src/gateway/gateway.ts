@@ -5,7 +5,7 @@ import { $ReleaseInfo } from '../setup/setup';
 export type GatewayHealthcheckSuccessResult = z.infer<typeof $GatewayHealthcheckSuccessResult>;
 export const $GatewayHealthcheckSuccessResult = z.object({
   ok: z.literal(true),
-  releaseInfo: $ReleaseInfo,
+  release: $ReleaseInfo,
   status: z.literal(200),
   uptime: z.number()
 });

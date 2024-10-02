@@ -26,7 +26,7 @@ export const $SetupState = z.object({
   isDemo: z.boolean(),
   isGatewayEnabled: z.boolean(),
   isSetup: z.boolean().nullable(),
-  releaseInfo: $ReleaseInfo,
+  release: $ReleaseInfo,
   uptime: z.number()
 });
 

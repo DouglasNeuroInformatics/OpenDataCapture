@@ -12,6 +12,7 @@ export class Bundler {
   private logger = {
     verbose: (message: string) => {
       if (this.options.verbose) {
+        // eslint-disable-next-line no-console
         console.log(message);
       }
     }

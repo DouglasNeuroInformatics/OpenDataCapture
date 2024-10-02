@@ -13,6 +13,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
+    sourcemap: true,
     target: 'es2022'
   },
   css: {
@@ -21,7 +22,7 @@ export default defineConfig({
     }
   },
   define: {
-    __RELEASE_INFO__: JSON.stringify(await getReleaseInfo())
+    __RELEASE__: JSON.stringify(await getReleaseInfo())
   },
   optimizeDeps: {
     esbuildOptions: {

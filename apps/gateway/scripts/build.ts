@@ -16,9 +16,9 @@ await esbuild.build({
   },
   bundle: true,
   define: {
+    __RELEASE__: JSON.stringify(await getReleaseInfo()),
     'import.meta.env.DEV': 'false',
-    'import.meta.env.PROD': 'true',
-    'import.meta.env.RELEASE_INFO': JSON.stringify(await getReleaseInfo())
+    'import.meta.env.PROD': 'true'
   },
   entryPoints: [entryFile],
   external: ['lightningcss'],
@@ -35,4 +35,5 @@ await esbuild.build({
   tsconfig
 });
 
+// eslint-disable-next-line no-console
 console.log('Done!');

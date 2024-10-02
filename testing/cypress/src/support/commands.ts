@@ -50,7 +50,6 @@ Cypress.Commands.add('completeLoginForm', ({ password, username }) => {
 });
 
 Cypress.Commands.add('completeSetupForm', ({ firstName, lastName, password, username }) => {
-  console.log(cy.location());
   cy.get(`form[data-cy="setup-form"]`).as('setupForm');
   cy.get('@setupForm').find('input[name="firstName"]').type(firstName);
   cy.get('@setupForm').find('input[name="lastName"]').type(lastName);

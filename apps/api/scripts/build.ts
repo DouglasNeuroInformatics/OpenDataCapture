@@ -1,5 +1,7 @@
 #!/usr/bin/env tsx
 
+/* eslint-disable no-console */
+
 import fs from 'fs/promises';
 import module from 'module';
 import path from 'path';
@@ -28,7 +30,7 @@ const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> }
   },
   bundle: true,
   define: {
-    __RELEASE_INFO__: JSON.stringify(await getReleaseInfo())
+    __RELEASE__: JSON.stringify(await getReleaseInfo())
   },
   entryPoints: [entryFile],
   external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],

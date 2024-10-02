@@ -118,7 +118,7 @@ router.delete(
 router.get('/healthcheck', (_, res) => {
   res.status(200).json({
     ok: true,
-    releaseInfo: import.meta.env.RELEASE_INFO,
+    release: __RELEASE__,
     status: 200,
     uptime: Math.round(process.uptime())
   } satisfies GatewayHealthcheckSuccessResult);

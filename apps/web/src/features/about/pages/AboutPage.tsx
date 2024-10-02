@@ -63,14 +63,14 @@ export const AboutPage = () => {
 
   const { isGatewayEnabled } = setupStateQuery.data;
 
-  const translateReleaseInfo = (releaseInfo: ReleaseInfo) => {
+  const translateReleaseInfo = (release: ReleaseInfo) => {
     const translatedReleaseInfo = {
-      [t(translations.buildType)]: t(translations.buildTypes[releaseInfo.type]),
-      [t(translations.version)]: releaseInfo.version
+      [t(translations.buildType)]: t(translations.buildTypes[release.type]),
+      [t(translations.version)]: release.version
     };
-    if (releaseInfo.type !== 'production') {
-      translatedReleaseInfo[t(translations.branch)] = releaseInfo.branch;
-      translatedReleaseInfo.Commit = releaseInfo.commit;
+    if (release.type !== 'production') {
+      translatedReleaseInfo[t(translations.branch)] = release.branch;
+      translatedReleaseInfo.Commit = release.commit;
     }
     return translatedReleaseInfo;
   };
@@ -84,8 +84,8 @@ export const AboutPage = () => {
     const gatewayHealthData = gatewayHealthcheckQuery.data!;
     gatewayInfo[t(translations.status)] = gatewayHealthData.status.toString();
     if (gatewayHealthData.ok) {
-      Object.assign(gatewayInfo, translateReleaseInfo(gatewayHealthData.releaseInfo), {
-        [t(translations.uptime)]: gatewayHealthData.uptime
+      Object.assign(gatewayInfo, translateReleaseInfo(gatewayHealthData.release), {
+        [t(translations.uptime)]: `Uptime=${gatewayHealthData.uptime}`
       });
     }
     return gatewayInfo;
@@ -116,14 +116,11 @@ export const AboutPage = () => {
           </Card.Description>
         </Card.Header>
         <Card.Content className="flex flex-col gap-6 p-6 text-sm">
-          <InfoBlock
-            items={translateReleaseInfo(window.__RELEASE_INFO__)}
-            label={t({ en: 'Web Client', fr: 'Client Web' })}
-          />
+          <InfoBlock items={translateReleaseInfo(__RELEASE__)} label={t({ en: 'Web Client', fr: 'Client Web' })} />
           <InfoBlock
             items={{
-              ...translateReleaseInfo(setupStateQuery.data.releaseInfo),
-              [t(translations.uptime)]: setupStateQuery.data.uptime.toString()
+              ...translateReleaseInfo(setupStateQuery.data.release),
+              [t(translations.uptime)]: `Uptime=${setupStateQuery.data.uptime}`
             }}
             label={t({
               en: 'Core API',

@@ -16,7 +16,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libcrypto": "^0.0.2",
+    "@douglasneuroinformatics/libcrypto": "catalog:",
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/instrument-renderer": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
@@ -37,7 +37,7 @@
     "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/esbuild-plugin-prisma": "^1.0.0",
+    "@douglasneuroinformatics/esbuild-plugin-prisma": "catalog:",
     "@opendatacapture/release-info": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@types/compression": "^1.7.5",

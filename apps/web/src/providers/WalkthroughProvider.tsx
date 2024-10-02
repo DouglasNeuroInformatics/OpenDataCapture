@@ -50,8 +50,6 @@ type WalkthroughStep = {
 };
 
 const Walkthrough = () => {
-  const isDisclaimerAccepted = useAppStore((store) => store.isDisclaimerAccepted);
-  const isWalkthroughComplete = useAppStore((store) => store.isWalkthroughComplete);
   const setIsWalkthroughComplete = useAppStore((store) => store.setIsWalkthroughComplete);
   const startSession = useAppStore((store) => store.startSession);
   const endSession = useAppStore((store) => store.endSession);
@@ -331,12 +329,6 @@ const Walkthrough = () => {
     setIsWalkthroughOpen(false);
   };
 
-  useEffect(() => {
-    if (isDisclaimerAccepted && !isWalkthroughComplete) {
-      setIsWalkthroughOpen(true);
-    }
-  }, [isDisclaimerAccepted, isWalkthroughComplete]);
-
   useLayoutEffect(() => {
     if (window.location.pathname !== currentStep.url) {
       navigate(currentStep.url, currentStep.navigateOptions);
@@ -430,11 +422,22 @@ const Walkthrough = () => {
 };
 
 export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const isDisclaimerAccepted = useAppStore((store) => store.isDisclaimerAccepted);
   const isWalkthroughOpen = useAppStore((store) => store.isWalkthroughOpen);
+  const isWalkthroughComplete = useAppStore((store) => store.isWalkthroughComplete);
+  const setIsWalkthroughOpen = useAppStore((store) => store.setIsWalkthroughOpen);
   const isDesktop = useIsDesktop();
+
+  useEffect(() => {
+    if (isDisclaimerAccepted && !isWalkthroughComplete) {
+      setIsWalkthroughOpen(true);
+    }
+  }, [isDisclaimerAccepted, isWalkthroughComplete]);
+
   if (!isDesktop) {
     return children;
   }
+
   return (
     <React.Fragment>
       {children}

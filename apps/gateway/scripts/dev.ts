@@ -1,5 +1,7 @@
 #!/usr/bin/env tsx
 
+/* eslint-disable no-console */
+
 import fs from 'fs';
 import module from 'module';
 import path from 'path';
@@ -19,7 +21,7 @@ if (fs.existsSync(outdir)) {
 
 await fs.promises.mkdir(outdir);
 
-const releaseInfo = await getReleaseInfo();
+const release = await getReleaseInfo();
 
 await new Promise<BuildResult>((resolve, reject) => {
   esbuild
@@ -29,9 +31,9 @@ await new Promise<BuildResult>((resolve, reject) => {
       },
       bundle: true,
       define: {
+        __RELEASE__: JSON.stringify(release),
         'import.meta.env.DEV': 'true',
-        'import.meta.env.PROD': 'false',
-        'import.meta.env.RELEASE_INFO': JSON.stringify(releaseInfo)
+        'import.meta.env.PROD': 'false'
       },
       entryPoints: [
         path.resolve(import.meta.dirname, '../src/main.ts'),

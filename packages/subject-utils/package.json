@@ -12,7 +12,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libcrypto": "^0.0.2",
+    "@douglasneuroinformatics/libcrypto": "catalog:",
     "@opendatacapture/schemas": "workspace:*",
     "transliteration": "^2.3.5"
   },
