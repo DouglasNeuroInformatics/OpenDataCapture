@@ -115,12 +115,6 @@ function sampleDataGenerator({ isOptional, typeName }: Extract<ZodTypeNameResult
 }
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
-  //to do
-  //make sure the first two columns of the csv file are id and date
-  //convert the given csv files as a json object
-  //parse the json object through the instrument validation schema
-  // if succcess full send the data to the backend to be stored
-
   const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
   const shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
 
@@ -219,10 +213,4 @@ export async function processInstrumentCSV(
     };
     reader.readAsText(input);
   });
-
-  //to do
-  //take validation schema types and title to use as column titles
-  //make the first two columns of the template csv id and date
-  //add the validation schema/content variables as column headers for csv
-  //add the first line of the csv to be the data type (string, number, boolean, etc), also say if its optional or not
 }
