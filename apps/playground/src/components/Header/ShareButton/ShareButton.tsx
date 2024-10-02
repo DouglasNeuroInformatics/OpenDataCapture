@@ -25,7 +25,6 @@ export const ShareButton = () => {
 
   return (
     <Tooltip
-      delayDuration={700}
       open={isTooltipOpen}
       onOpenChange={(open) => {
         if (!isPopoverOpen) {
@@ -52,10 +51,10 @@ export const ShareButton = () => {
             <CopyButton size="sm" text={shareURL.href} />
           </div>
         </Popover.Content>
-        <Tooltip.Content side="bottom">
-          <p>Share</p>
-        </Tooltip.Content>
       </Popover>
+      <Tooltip.Content side="bottom">
+        <p>Share</p>
+      </Tooltip.Content>
     </Tooltip>
   );
 };
