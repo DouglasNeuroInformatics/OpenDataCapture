@@ -11,7 +11,7 @@ export type ActionButtonProps = {
 
 export const ActionButton = ({ disabled, icon, onClick, tooltip }: ActionButtonProps) => (
   <div className="relative">
-    <Tooltip delayDuration={700}>
+    <Tooltip>
       <Tooltip.Trigger
         className="h-9 w-9"
         disabled={disabled}
