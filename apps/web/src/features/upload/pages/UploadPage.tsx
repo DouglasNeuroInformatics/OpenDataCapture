@@ -29,6 +29,17 @@ export const UploadPage = () => {
   const instrument = useInstrument(params.id!) as AnyUnilingualFormInstrument;
 
   const sendInstrumentData = async (data: FormTypes.Data[]) => {
+    const reformatForSending = reformatInstrumentData(data);
+
+    try {
+      await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
+      addNotification({ type: 'success' });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const reformatInstrumentData = (data: FormTypes.Data[]): UploadInstrumentRecordData => {
     const recordsList = [];
 
     for (const dataInfo of data) {
@@ -49,12 +60,8 @@ export const UploadPage = () => {
       instrumentId: instrument.id!,
       records: recordsList
     };
-    try {
-      await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
-      addNotification({ type: 'success' });
-    } catch (error) {
-      console.error(error);
-    }
+
+    return reformatForSending;
   };
 
   const handleTemplateDownload = () => {
