@@ -14,6 +14,10 @@ const translations = {
     en: 'Branch',
     fr: 'Branche'
   },
+  buildDate: {
+    en: 'Build Date',
+    fr: 'Date de construction'
+  },
   buildType: {
     en: 'Build Type',
     fr: 'Type de construction'
@@ -65,6 +69,9 @@ export const AboutPage = () => {
 
   const translateReleaseInfo = (release: ReleaseInfo) => {
     const translatedReleaseInfo = {
+      [t(translations.buildDate)]: new Date(release.buildTime).toLocaleDateString(resolvedLanguage, {
+        dateStyle: 'long'
+      }),
       [t(translations.buildType)]: t(translations.buildTypes[release.type]),
       [t(translations.version)]: release.version
     };

@@ -2953,7 +2953,6 @@ createjs.indexOf = function (array, searchElement) {
       case 'webm':
         return createjs.Types.SOUND;
       case 'mp4':
-      case 'webm':
       case 'ts':
         return createjs.Types.VIDEO;
       case 'json':

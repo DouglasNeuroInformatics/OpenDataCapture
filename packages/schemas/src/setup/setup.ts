@@ -7,6 +7,7 @@ export const $ReleaseVersion = z.string().regex(/[0-9]+.[0-9]+.[0-9]+/);
 export type DevelopmentReleaseInfo = z.infer<typeof $DevelopmentReleaseInfo>;
 export const $DevelopmentReleaseInfo = z.object({
   branch: z.string().min(1),
+  buildTime: z.number(),
   commit: z.string().length(8),
   type: z.enum(['development', 'test']),
   version: $ReleaseVersion
@@ -14,6 +15,7 @@ export const $DevelopmentReleaseInfo = z.object({
 
 export type ProductionReleaseInfo = z.infer<typeof $ProductionReleaseInfo>;
 export const $ProductionReleaseInfo = z.object({
+  buildTime: z.number(),
   type: z.literal('production'),
   version: $ReleaseVersion
 });

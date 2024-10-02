@@ -33,6 +33,7 @@ export async function getReleaseInfo(): Promise<ReleaseInfo> {
     if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
       return $DevelopmentReleaseInfo.parseAsync({
         branch: await getGitBranch(),
+        buildTime: Date.now(),
         commit: await getGitCommit(),
         type: process.env.NODE_ENV,
         version: await fs
@@ -42,6 +43,7 @@ export async function getReleaseInfo(): Promise<ReleaseInfo> {
       } satisfies DevelopmentReleaseInfo);
     } else if (process.env.NODE_ENV === 'production') {
       return $ProductionReleaseInfo.parseAsync({
+        buildTime: Date.now(),
         type: 'production',
         version: process.env.RELEASE_VERSION!
       } satisfies ProductionReleaseInfo);
