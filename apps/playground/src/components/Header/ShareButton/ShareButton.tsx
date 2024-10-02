@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Button, Heading, Input, Popover } from '@douglasneuroinformatics/libui/components';
 import { CopyButton } from '@opendatacapture/react-core';
-import { ShareIcon } from 'lucide-react';
+import { Share2Icon } from 'lucide-react';
 
 import { useFilesRef } from '@/hooks/useFilesRef';
 import { useAppStore } from '@/store';
@@ -26,7 +26,7 @@ export const ShareButton = () => {
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <Popover.Trigger asChild>
         <Button className="h-9 w-9" size="icon" variant="outline">
-          <ShareIcon />
+          <Share2Icon />
         </Button>
       </Popover.Trigger>
       <Popover.Content align="end" className="w-[520px] p-4">
