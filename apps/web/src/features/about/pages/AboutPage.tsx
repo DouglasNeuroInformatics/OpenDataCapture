@@ -1,3 +1,4 @@
+import { parseDuration } from '@douglasneuroinformatics/libjs';
 import { Card, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { ReleaseInfo } from '@opendatacapture/schemas/setup';
@@ -63,6 +64,12 @@ export const AboutPage = () => {
 
   const { isGatewayEnabled } = setupStateQuery.data;
 
+  const translateUptime = (uptime: number) => {
+    let { days, hours, minutes, seconds } = parseDuration(uptime * 1000);
+    hours += days * 24;
+    return [hours, minutes, seconds].map((value) => (value < 10 ? '0' + value : value)).join(':');
+  };
+
   const translateReleaseInfo = (release: ReleaseInfo) => {
     const translatedReleaseInfo = {
       [t(translations.buildType)]: t(translations.buildTypes[release.type]),
@@ -85,7 +92,7 @@ export const AboutPage = () => {
     gatewayInfo[t(translations.status)] = gatewayHealthData.status.toString();
     if (gatewayHealthData.ok) {
       Object.assign(gatewayInfo, translateReleaseInfo(gatewayHealthData.release), {
-        [t(translations.uptime)]: gatewayHealthData.uptime
+        [t(translations.uptime)]: translateUptime(gatewayHealthData.uptime)
       });
     }
     return gatewayInfo;
@@ -120,7 +127,7 @@ export const AboutPage = () => {
           <InfoBlock
             items={{
               ...translateReleaseInfo(setupStateQuery.data.release),
-              [t(translations.uptime)]: setupStateQuery.data.uptime.toString()
+              [t(translations.uptime)]: translateUptime(setupStateQuery.data.uptime)
             }}
             label={t({
               en: 'Core API',
