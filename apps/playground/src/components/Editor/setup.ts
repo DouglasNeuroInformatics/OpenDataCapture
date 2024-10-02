@@ -17,11 +17,6 @@ class TypeScriptSuggestAdapter extends SuggestAdapter implements CompletionItemP
   override triggerCharacters = ['.', '"', "'"];
 }
 
-const customEnv = `
-declare module 'react/jsx-runtime' {
-  export * from '/runtime/v1/react@18.x/jsx-runtime'
-}`;
-
 self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'typescript' || label === 'javascript') {
@@ -156,6 +151,6 @@ loader.config({ monaco });
 
   const uri = monaco.Uri.parse('globals.d.ts');
 
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(envTypes + customEnv, 'globals.d.ts');
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(envTypes, 'globals.d.ts');
   monaco.editor.createModel(envTypes, 'typescript', uri);
 }
