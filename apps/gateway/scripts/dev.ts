@@ -31,9 +31,9 @@ await new Promise<BuildResult>((resolve, reject) => {
       },
       bundle: true,
       define: {
+        __RELEASE__: JSON.stringify(release),
         'import.meta.env.DEV': 'true',
-        'import.meta.env.PROD': 'false',
-        'import.meta.release': JSON.stringify(release)
+        'import.meta.env.PROD': 'false'
       },
       entryPoints: [
         path.resolve(import.meta.dirname, '../src/main.ts'),

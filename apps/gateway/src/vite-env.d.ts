@@ -18,6 +18,7 @@ declare global {
 
   interface ImportMeta {
     readonly env: ImportMetaEnv;
-    readonly release: ReleaseInfo;
   }
+
+  const __RELEASE__: ReleaseInfo;
 }
