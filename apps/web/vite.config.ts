@@ -9,7 +9,6 @@ import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
-console.log(await getReleaseInfo());
 export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1000,

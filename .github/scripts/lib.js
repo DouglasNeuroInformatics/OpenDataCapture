@@ -38,6 +38,7 @@ export async function getLatestPublishedVersion({ github }) {
       );
     }
   }
+  // eslint-disable-next-line no-console
   console.log(`Found latest published version: ${packageVersion}`);
   return packageVersion;
 }

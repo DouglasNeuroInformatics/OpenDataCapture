@@ -1,5 +1,7 @@
 #!/usr/bin/env tsx
 
+/* eslint-disable no-console */
+
 import fs from 'fs/promises';
 import module from 'module';
 import path from 'path';

@@ -1,5 +1,7 @@
 #!/usr/bin/env tsx
 
+/* eslint-disable no-console */
+
 import * as path from 'path';
 
 import { Bundler } from './bundler.js';
