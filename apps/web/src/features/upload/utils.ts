@@ -2,7 +2,7 @@ import { isNumberLike, isPlainObject, parseNumber } from '@douglasneuroinformati
 import type { AnyUnilingualFormInstrument, FormTypes } from '@opendatacapture/runtime-core';
 import { z } from 'zod';
 
-const ZOD_TYPE_NAMES = ['ZodNumber', 'ZodString', 'ZodBoolean', 'ZodOptional', 'ZodSet', 'ZodDate'] as const;
+const ZOD_TYPE_NAMES = ['ZodNumber', 'ZodString', 'ZodBoolean', 'ZodOptional', 'ZodSet', 'ZodDate', 'ZodEnum'] as const;
 const INTERNAL_HEADERS = ['subjectID', 'date'];
 const MONGOLIAN_VOWEL_SEPARATOR = String.fromCharCode(32, 6158);
 const INTERNAL_HEADERS_SAMPLE_DATA = [MONGOLIAN_VOWEL_SEPARATOR + 'string', MONGOLIAN_VOWEL_SEPARATOR + 'yyyy-mm-dd'];
@@ -17,6 +17,7 @@ type ZodTypeNameResult =
       isOptional: boolean;
       success: true;
       typeName: RequiredZodTypeName;
+      enumValues?: any[] | unknown | undefined;
     }
   | {
       message: string;
@@ -38,6 +39,14 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
   if (isPlainObject(def) && ZOD_TYPE_NAMES.includes(def.typeName as ZodTypeName)) {
     if (def.typeName === 'ZodOptional') {
       return getZodTypeName(def.innerType as z.ZodTypeAny, true);
+    }
+    if (def.typeName === 'ZodEnum') {
+      return {
+        isOptional: Boolean(isOptional),
+        success: true,
+        typeName: def.typeName as RequiredZodTypeName,
+        enumValues: def.values as any[]
+      };
     }
     return { isOptional: Boolean(isOptional), success: true, typeName: def.typeName as RequiredZodTypeName };
   }
@@ -82,6 +91,17 @@ export function valueInterpreter(
       return { message: 'Invalid ZodSet', success: false };
     case 'ZodString':
       return { success: true, value: entry };
+    case 'ZodEnum':
+      if (entry.toLowerCase() === 'true' || entry.toLowerCase() === 'false') {
+        return valueInterpreter(entry, 'ZodBoolean', isOptional);
+      } else if (isNumberLike(entry)) {
+        return { success: true, value: parseNumber(entry) };
+      } else if (Date.parse(entry)) {
+        return valueInterpreter(entry, 'ZodDate', isOptional);
+      } else {
+        return valueInterpreter(entry, 'ZodString', isOptional);
+      }
+
     default:
       return { message: `Invalid ZodType: ${zType satisfies never}`, success: false };
   }
@@ -97,7 +117,7 @@ function formatTypeInfo(s: string, isOptional: boolean) {
   return isOptional ? `${s} (optional)` : s;
 }
 
-function sampleDataGenerator({ isOptional, typeName }: Extract<ZodTypeNameResult, { success: true }>) {
+function sampleDataGenerator({ isOptional, typeName, enumValues }: Extract<ZodTypeNameResult, { success: true }>) {
   switch (typeName) {
     case 'ZodBoolean':
       return formatTypeInfo('true/false', isOptional);
@@ -109,9 +129,25 @@ function sampleDataGenerator({ isOptional, typeName }: Extract<ZodTypeNameResult
       return formatTypeInfo('SET(a,b,c)', isOptional);
     case 'ZodString':
       return formatTypeInfo('string', isOptional);
+    case 'ZodEnum':
+      try {
+        let possibleEnumOutputs = '';
+        for (const val of enumValues as any[]) {
+          possibleEnumOutputs += val + '/';
+        }
+        return formatTypeInfo(possibleEnumOutputs, isOptional);
+      } catch {
+        throw new Error('Invalid Enum error');
+      }
+
     default:
       throw new Error(`Invalid zod schema: unexpected type name '${typeName satisfies never}'`);
   }
+}
+
+export function enumGenerator(instrument: AnyUnilingualFormInstrument) {
+  const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
+  const shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
 }
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
