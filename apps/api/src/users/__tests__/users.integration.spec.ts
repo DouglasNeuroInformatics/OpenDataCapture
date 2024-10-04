@@ -51,6 +51,7 @@ describe('/users', () => {
   describe('POST /users', () => {
     const mockCreateUserData: CreateUserData = Object.freeze({
       basePermissionLevel: null,
+      email: 'foo@gmail.com',
       firstName: 'Jane',
       groupIds: [],
       lastName: 'Doe',

@@ -27,6 +27,7 @@ export const SetupProvider = ({ children }: { children: React.ReactElement }) =>
       onSubmit={({ dummySubjectCount, firstName, initDemo, lastName, password, recordsPerSubject, username }) => {
         createSetupStateMutation.mutate({
           admin: {
+            email: 'admin@opendatacapture.org',
             firstName,
             lastName,
             password,

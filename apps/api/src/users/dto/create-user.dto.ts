@@ -28,6 +28,9 @@ export class CreateUserDto {
   })
   basePermissionLevel: BasePermissionLevel | null;
 
+  @ApiProperty()
+  email: string;
+
   @ApiProperty({ description: 'First Name' })
   firstName: string;
 

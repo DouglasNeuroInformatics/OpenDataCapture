@@ -9,6 +9,7 @@ import type { CurrentUser } from '@/store/types';
 export const adminUser: User = Object.freeze({
   basePermissionLevel: 'ADMIN',
   createdAt: new Date(),
+  email: 'admin@opendatacapture.org',
   firstName: 'David',
   groupIds: [],
   groups: [],

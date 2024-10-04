@@ -164,6 +164,7 @@ model UserModel {
   lastName            String
   password            String
   username            String
+  email               String
 }
 
 enum SessionType {

@@ -83,6 +83,7 @@ export class DemoService {
       for (const user of DEMO_USERS) {
         await this.usersService.create({
           ...user,
+          email: 'foo@gmail.com',
           groupIds: user.groupNames.map((name) => groups.find((group) => group.name === name)!.id)
         });
       }

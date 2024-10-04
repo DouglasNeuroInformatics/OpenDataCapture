@@ -10,6 +10,7 @@ export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
 export type User = z.infer<typeof $User>;
 export const $User = $BaseModel.extend({
   basePermissionLevel: $BasePermissionLevel.nullable(),
+  email: z.string().email(),
   firstName: z.string().min(1),
   groupIds: z.array(z.string()),
   groups: z.array($Group),
@@ -21,6 +22,7 @@ export const $User = $BaseModel.extend({
 export type CreateUserData = z.infer<typeof $CreateUserData>;
 export const $CreateUserData = $User.pick({
   basePermissionLevel: true,
+  email: true,
   firstName: true,
   groupIds: true,
   lastName: true,
