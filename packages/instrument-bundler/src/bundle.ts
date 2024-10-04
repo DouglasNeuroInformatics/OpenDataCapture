@@ -21,6 +21,19 @@ export async function createBundle(output: BuildOutput, options: { minify: boole
   const bundle = `(async () => {
     ${output.js}
     ${inject}
+    if (!Object.hasOwn(__exports, '__runtimeVersion')) {
+      __exports.runtimeVersion = -1
+    }
+    if (__exports.kind === 'interactive' && typeof window === 'undefined') {
+      __exports.content = new Proxy(__exports.content, {
+        get(target, prop, receiver) {
+          if (prop === 'render') {
+            return {};
+          }
+          return Reflect.get(target, prop, receiver);
+        }
+      });
+    }
     return __exports;
   } )()`;
   const result = await esbuild.transform(bundle, {
