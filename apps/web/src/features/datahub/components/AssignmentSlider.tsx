@@ -55,7 +55,6 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
           />
         </Sheet.Footer>
       </Sheet.Content>
-      <Sheet.Overlay />
     </Sheet>
   );
 };

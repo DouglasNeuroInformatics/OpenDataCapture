@@ -1,17 +1,19 @@
 {
+  "admin": {
+    "en": "Admin",
+    "fr": "Administrateur"
+  },
   "basePermissionLevel": {
-    "admin": {
-      "en": "Admin",
-      "fr": "Administrateur"
-    },
-    "groupManager": {
-      "en": "Group Manager",
-      "fr": "Responsable de groupe"
-    },
-    "standard": {
-      "en": "Standard User",
-      "fr": "Utilisateur standard"
-    }
+    "en": "Base Permission Level",
+    "fr": "Niveau de permission de base"
+  },
+  "clinical": {
+    "en": "Clinical",
+    "fr": "Clinique"
+  },
+  "confirmPassword": {
+    "en": "Confirm Password",
+    "fr": "Confirmer le mot de passe"
   },
   "currentSession": {
     "en": "Current Session",
@@ -39,9 +41,25 @@
     "en": "Graph",
     "fr": "Graphique"
   },
+  "groupManager": {
+    "en": "Group Manager",
+    "fr": "Responsable de groupe"
+  },
+  "groupName": {
+    "en": "Group Name",
+    "fr": "Nom du groupe"
+  },
   "groupTrend": {
     "en": "Group Trend",
     "fr": "Tendance du groupe"
+  },
+  "groupType": {
+    "en": "Group Type",
+    "fr": "Type de groupe"
+  },
+  "groups": {
+    "en": "Groups",
+    "fr": "Groupes"
   },
   "identificationMethod": {
     "en": "Identification Method",
@@ -55,18 +73,37 @@
     "en": "Identifier",
     "fr": "Identifiant"
   },
-
+  "insufficientPasswordStrength": {
+    "en": "Insufficient password strength",
+    "fr": "Mot de passe trop faible"
+  },
   "method": {
     "en": "Method",
     "fr": "Méthode"
+  },
+  "password": {
+    "en": "Password",
+    "fr": "Mot de passe"
   },
   "personalInfo": {
     "en": "Personal Information",
     "fr": "Renseignements personnels"
   },
+  "research": {
+    "en": "Research",
+    "fr": "Recherche"
+  },
   "sessionInProgress": {
     "en": "Session in Progress",
     "fr": "Session en cours"
+  },
+  "standard": {
+    "en": "Standard",
+    "fr": "Standard"
+  },
+  "passwordsMustMatch": {
+    "en": "Passwords Must Match",
+    "fr": "Les mots de passe doivent correspondre"
   },
   "subjectIdentification": {
     "description": {
@@ -110,8 +147,8 @@
     "en": "Upload Successful",
     "fr": "Téléchargement réussi"
   },
-  "insufficientPasswordStrength": {
-    "en": "Insufficient password strength",
-    "fr": "Mot de passe trop faible"
+  "username": {
+    "en": "Username",
+    "fr": "Nom d'utilisateur"
   }
 }

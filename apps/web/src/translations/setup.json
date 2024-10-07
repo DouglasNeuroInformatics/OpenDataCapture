@@ -26,13 +26,13 @@
       "en": "Number of Dummy Subjects",
       "fr": "Nombre de clients fictifs"
     },
-    "recordsPerSubject": {
-      "en": "Records Per Subject",
-      "fr": "Enregistrements par sujet"
-    },
     "init": {
       "en": "Initialize Demo",
       "fr": "Initialiser la démonstration"
+    },
+    "recordsPerSubject": {
+      "en": "Records Per Subject",
+      "fr": "Enregistrements par sujet"
     },
     "title": {
       "en": "Demo",

@@ -97,7 +97,6 @@ export const Navbar = () => {
           </div>
         </Sheet.Footer>
       </Sheet.Content>
-      <Sheet.Overlay />
     </Sheet>
   );
 };

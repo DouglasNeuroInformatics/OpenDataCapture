@@ -85,7 +85,7 @@ export const DataHubPage = () => {
       </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
         <div>
-          <div className="my-3 flex flex-col justify-between gap-3 lg:flex-row">
+          <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
             <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
               <Dialog.Trigger className="flex-grow">
                 <SearchBar
