@@ -93,10 +93,6 @@ export default defineConfig({
           autogenerate: { directory: 'docs/5-reference' },
           label: 'Reference'
         },
-        {
-          autogenerate: { directory: 'docs/6-changelogs' },
-          label: 'Changelogs'
-        },
         starlightTypeDocSidebarGroup
       ],
       social: {

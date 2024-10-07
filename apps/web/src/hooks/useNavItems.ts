@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { BarChartBigIcon, CirclePlayIcon, ComputerIcon, DatabaseIcon, EyeIcon, UsersIcon } from 'lucide-react';
+import {
+  BarChartBigIcon,
+  CirclePlayIcon,
+  ComputerIcon,
+  DatabaseIcon,
+  EyeIcon,
+  UserCogIcon,
+  UsersIcon
+} from 'lucide-react';
 
 import { useAppStore } from '@/store';
 
@@ -22,7 +30,7 @@ export function useNavItems() {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentSession = useAppStore((store) => store.currentSession);
   const currentUser = useAppStore((store) => store.currentUser);
-  const [navItems, setNavItems] = useState<[NavItem[], NavItem[]]>([[], []]);
+  const [navItems, setNavItems] = useState<NavItem[][]>([[], []]);
   const { resolvedLanguage, t } = useTranslation();
 
   useEffect(() => {
@@ -46,6 +54,26 @@ export function useNavItems() {
         icon: UsersIcon,
         label: t('layout.navLinks.manageGroup'),
         url: '/group/manage'
+      });
+    }
+
+    const adminItems: NavItem[] = [];
+    if (currentUser?.ability.can('manage', 'all')) {
+      adminItems.push({
+        icon: UsersIcon,
+        label: t({
+          en: 'Manage Groups',
+          fr: 'Gérer les groupes'
+        }),
+        url: '/admin/groups'
+      });
+      adminItems.push({
+        icon: UserCogIcon,
+        label: t({
+          en: 'Manage Users',
+          fr: 'Gérer les utilisateurs'
+        }),
+        url: '/admin/users'
       });
     }
 
@@ -74,7 +102,7 @@ export function useNavItems() {
         url: `/datahub/${currentSession?.subjectId}/table`
       });
     }
-    setNavItems([globalItems, sessionItems]);
+    setNavItems([globalItems, adminItems, sessionItems].filter((arr) => arr.length));
   }, [currentSession, currentUser, resolvedLanguage]);
 
   return navItems;

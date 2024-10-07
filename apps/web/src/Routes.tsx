@@ -5,6 +5,7 @@ import type { RouteObject } from 'react-router-dom';
 
 import { Layout } from './components/Layout';
 import { aboutRoute } from './features/about';
+import { adminRoute } from './features/admin';
 import { authRoutes } from './features/auth';
 import { contactRoute } from './features/contact';
 import { dashboardRoute } from './features/dashboard';
@@ -36,6 +37,7 @@ const protectedRoutes: RouteObject[] = [
       </DisclaimerProvider>
     ),
     children: [
+      adminRoute,
       aboutRoute,
       contactRoute,
       datahubRoute,

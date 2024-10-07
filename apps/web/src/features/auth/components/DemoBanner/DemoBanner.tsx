@@ -71,7 +71,7 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
                     ))}
                   </Table.Cell>
                   <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
-                    {t(`common.basePermissionLevel.${snakeToCamelCase(user.basePermissionLevel!)}`)}
+                    {t(`common.${snakeToCamelCase(user.basePermissionLevel!)}`)}
                   </Table.Cell>
                   <Table.Cell className="p-3 px-2.5 sm:px-3.5">
                     <Tooltip delayDuration={500}>
