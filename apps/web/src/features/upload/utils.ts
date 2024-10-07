@@ -39,8 +39,7 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
   if (isPlainObject(def) && ZOD_TYPE_NAMES.includes(def.typeName as ZodTypeName)) {
     if (def.typeName === 'ZodOptional') {
       return getZodTypeName(def.innerType as z.ZodTypeAny, true);
-    }
-    if (def.typeName === 'ZodEnum') {
+    } else if (def.typeName === 'ZodEnum') {
       return {
         isOptional: Boolean(isOptional),
         success: true,
