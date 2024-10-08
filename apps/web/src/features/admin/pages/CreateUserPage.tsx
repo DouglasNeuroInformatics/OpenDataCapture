@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '../hooks/useCreateUserMutation';
 import { useGroupsQuery } from '../hooks/useGroupsQuery';
 
+// eslint-disable-next-line max-lines-per-function
 export const CreateUserPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();

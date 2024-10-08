@@ -49,6 +49,7 @@ type WalkthroughStep = {
   url: `/${string}`;
 };
 
+// eslint-disable-next-line max-lines-per-function
 const Walkthrough = () => {
   const setIsWalkthroughComplete = useAppStore((store) => store.setIsWalkthroughComplete);
   const startSession = useAppStore((store) => store.startSession);
@@ -63,6 +64,7 @@ const Walkthrough = () => {
 
   useEventListener('resize', () => setIsWalkthroughOpen(false), undefined, { once: true });
 
+  // eslint-disable-next-line max-lines-per-function
   const steps = useMemo<WalkthroughStep[]>(() => {
     return [
       {
