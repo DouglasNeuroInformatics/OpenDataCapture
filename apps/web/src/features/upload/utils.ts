@@ -2,7 +2,17 @@ import { isNumberLike, isPlainObject, parseNumber } from '@douglasneuroinformati
 import type { AnyUnilingualFormInstrument, FormTypes } from '@opendatacapture/runtime-core';
 import { z } from 'zod';
 
-const ZOD_TYPE_NAMES = ['ZodNumber', 'ZodString', 'ZodBoolean', 'ZodOptional', 'ZodSet', 'ZodDate', 'ZodEnum'] as const;
+const ZOD_TYPE_NAMES = [
+  'ZodNumber',
+  'ZodString',
+  'ZodBoolean',
+  'ZodOptional',
+  'ZodSet',
+  'ZodDate',
+  'ZodEnum',
+  'ZodArray',
+  'ZodObject'
+] as const;
 const INTERNAL_HEADERS = ['subjectID', 'date'];
 const MONGOLIAN_VOWEL_SEPARATOR = String.fromCharCode(32, 6158);
 const INTERNAL_HEADERS_SAMPLE_DATA = [MONGOLIAN_VOWEL_SEPARATOR + 'string', MONGOLIAN_VOWEL_SEPARATOR + 'yyyy-mm-dd'];
@@ -14,10 +24,10 @@ type RequiredZodTypeName = Exclude<ZodTypeName, 'ZodOptional'>;
 
 type ZodTypeNameResult =
   | {
+      enumValues?: any[] | undefined;
       isOptional: boolean;
       success: true;
       typeName: RequiredZodTypeName;
-      enumValues?: any[] | unknown | undefined;
     }
   | {
       message: string;
@@ -41,10 +51,10 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
       return getZodTypeName(def.innerType as z.ZodTypeAny, true);
     } else if (def.typeName === 'ZodEnum') {
       return {
+        enumValues: def.values as any[],
         isOptional: Boolean(isOptional),
         success: true,
-        typeName: def.typeName as RequiredZodTypeName,
-        enumValues: def.values as any[]
+        typeName: def.typeName as RequiredZodTypeName
       };
     }
     return { isOptional: Boolean(isOptional), success: true, typeName: def.typeName as RequiredZodTypeName };
@@ -116,7 +126,7 @@ function formatTypeInfo(s: string, isOptional: boolean) {
   return isOptional ? `${s} (optional)` : s;
 }
 
-function sampleDataGenerator({ isOptional, typeName, enumValues }: Extract<ZodTypeNameResult, { success: true }>) {
+function sampleDataGenerator({ enumValues, isOptional, typeName }: Extract<ZodTypeNameResult, { success: true }>) {
   switch (typeName) {
     case 'ZodBoolean':
       return formatTypeInfo('true/false', isOptional);
@@ -131,7 +141,7 @@ function sampleDataGenerator({ isOptional, typeName, enumValues }: Extract<ZodTy
     case 'ZodEnum':
       try {
         let possibleEnumOutputs = '';
-        for (const val of enumValues as any[]) {
+        for (const val of enumValues!) {
           possibleEnumOutputs += val + '/';
         }
         return formatTypeInfo(possibleEnumOutputs, isOptional);
@@ -142,11 +152,6 @@ function sampleDataGenerator({ isOptional, typeName, enumValues }: Extract<ZodTy
     default:
       throw new Error(`Invalid zod schema: unexpected type name '${typeName satisfies never}'`);
   }
-}
-
-export function enumGenerator(instrument: AnyUnilingualFormInstrument) {
-  const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
-  const shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
 }
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
