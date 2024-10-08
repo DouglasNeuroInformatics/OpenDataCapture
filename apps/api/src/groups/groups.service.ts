@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -61,6 +62,15 @@ export class GroupsService {
     { accessibleInstrumentIds, ...data }: UpdateGroupDto,
     { ability }: EntityOperationOptions = {}
   ) {
+    const where: Prisma.GroupModelWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };
+    const group = await this.groupModel.findFirst({ where });
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with ID: ${id}`);
+    }
+    const exists = typeof data.name === 'string' && (await this.groupModel.exists({ name: group.name }));
+    if (exists) {
+      throw new ConflictException(`Group with name '${group.name}' already exists!`);
+    }
     return this.groupModel.update({
       data: {
         accessibleInstruments: accessibleInstrumentIds
