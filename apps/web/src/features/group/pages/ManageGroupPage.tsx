@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -23,19 +23,13 @@ export const ManageGroupPage = () => {
           {t('manage.pageTitle')}
         </Heading>
       </PageHeader>
-      {instrumentInfoQuery.data ? (
-        <ManageGroupForm
-          availableInstruments={instrumentInfoQuery.data}
-          onSubmit={async (data) => {
-            const updatedGroup = await updateGroupMutation.mutateAsync(data);
-            changeGroup(updatedGroup);
-          }}
-        />
-      ) : (
-        <div className="flex-grow">
-          <Spinner />
-        </div>
-      )}
+      <ManageGroupForm
+        availableInstruments={instrumentInfoQuery.data ?? []}
+        onSubmit={async (data) => {
+          const updatedGroup = await updateGroupMutation.mutateAsync(data);
+          changeGroup(updatedGroup);
+        }}
+      />
     </React.Fragment>
   );
 };

@@ -20,7 +20,9 @@ export const AssignmentsTable = ({ assignments, onSelection }: AssignmentTablePr
   const instrumentInfoQuery = useInstrumentInfoQuery();
 
   useEffect(() => {
-    setInstruments(Object.fromEntries(instrumentInfoQuery.data.map((instrument) => [instrument.id, instrument])));
+    setInstruments(
+      Object.fromEntries((instrumentInfoQuery.data ?? []).map((instrument) => [instrument.id, instrument]))
+    );
   }, [instrumentInfoQuery.data]);
 
   return (

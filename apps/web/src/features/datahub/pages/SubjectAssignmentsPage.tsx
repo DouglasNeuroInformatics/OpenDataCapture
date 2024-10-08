@@ -36,7 +36,7 @@ export const SubjectAssignmentsPage = () => {
   const instrumentInfoQuery = useInstrumentInfoQuery();
 
   const instrumentOptions = Object.fromEntries(
-    instrumentInfoQuery.data
+    (instrumentInfoQuery.data ?? [])
       .filter((instrument) => {
         return (currentGroup?.accessibleInstrumentIds.includes(instrument.id) ?? true) && instrument.kind !== 'SERIES';
       })
@@ -56,7 +56,7 @@ export const SubjectAssignmentsPage = () => {
           </Dialog.Trigger>
         </div>
         <AssignmentsTable
-          assignments={assignmentsQuery.data}
+          assignments={assignmentsQuery.data ?? []}
           onSelection={(assignment) => {
             setSelectedAssignment(assignment);
             setIsEditSliderOpen(true);

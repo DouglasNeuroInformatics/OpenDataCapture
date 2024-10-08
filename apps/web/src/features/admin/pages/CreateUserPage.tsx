@@ -77,7 +77,7 @@ export const CreateUserPage = () => {
               groupIds: {
                 kind: 'set',
                 label: t('common.groups'),
-                options: Object.fromEntries(groupsQuery.data.map((group) => [group.id, group.name])),
+                options: Object.fromEntries((groupsQuery.data ?? []).map((group) => [group.id, group.name])),
                 variant: 'listbox'
               }
             }

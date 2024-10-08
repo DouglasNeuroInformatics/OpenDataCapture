@@ -116,7 +116,7 @@ export const DataHubPage = () => {
             </div>
           </div>
           <MasterDataTable
-            data={data}
+            data={data ?? []}
             onSelect={(subject) => {
               navigate(`${subject.id}/assignments`);
             }}

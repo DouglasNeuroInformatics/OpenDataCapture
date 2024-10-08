@@ -17,12 +17,12 @@ export const ManageUsersPage = () => {
   const { t } = useTranslation();
   const usersQuery = useUsersQuery();
   const deleteUserMutation = useDeleteUserMutation();
-  const [users, setUsers] = useState<User[]>(usersQuery.data);
+  const [users, setUsers] = useState<User[]>(usersQuery.data ?? []);
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    setUsers(usersQuery.data.filter((user) => user.username.toLowerCase().includes(searchTerm.toLowerCase())));
+    setUsers((usersQuery.data ?? []).filter((user) => user.username.toLowerCase().includes(searchTerm.toLowerCase())));
   }, [usersQuery.data, searchTerm]);
 
   const currentUserIsSelected = selectedUser?.username === currentUser?.username;
