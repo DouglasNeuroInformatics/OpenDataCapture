@@ -103,7 +103,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
     const options: { [key: string]: string } = {};
-    for (const instrument of instrumentInfoQuery.data) {
+    for (const instrument of instrumentInfoQuery.data ?? []) {
       options[instrument.id] = instrument.details.title;
     }
     return options;

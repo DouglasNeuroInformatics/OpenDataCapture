@@ -36,7 +36,7 @@ export const InstrumentsShowcase = () => {
 
   useEffect(() => {
     setFilteredInstruments(
-      instrumentInfoQuery.data.filter((info) => {
+      (instrumentInfoQuery.data ?? []).filter((info) => {
         if (currentGroup && !currentGroup?.accessibleInstrumentIds.includes(info.id)) {
           return false;
         }

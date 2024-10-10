@@ -2,7 +2,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { translateInstrumentInfo } from '@opendatacapture/instrument-utils';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { $InstrumentInfo } from '@opendatacapture/schemas/instrument';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 type UseInstrumentInfoQueryOptions<TKind extends InstrumentKind> = {
@@ -16,7 +16,7 @@ export function useInstrumentInfoQuery<TKind extends InstrumentKind>({
   params
 }: UseInstrumentInfoQueryOptions<TKind> = {}) {
   const { resolvedLanguage } = useTranslation();
-  return useSuspenseQuery({
+  return useQuery({
     queryFn: async () => {
       const response = await axios.get('/v1/instruments/info', {
         params

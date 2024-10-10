@@ -1,9 +1,9 @@
 import { $Assignment } from '@opendatacapture/schemas/assignment';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 export function useAssignmentsQuery({ params }: { params?: { subjectId?: string } }) {
-  return useSuspenseQuery({
+  return useQuery({
     queryFn: async () => {
       const response = await axios.get('/v1/assignments', {
         params: {

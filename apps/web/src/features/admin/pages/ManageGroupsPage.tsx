@@ -15,11 +15,11 @@ export const ManageGroupsPage = () => {
   const groupsQuery = useGroupsQuery();
   const deleteGroupMutation = useDeleteGroupMutation();
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [groups, setGroups] = useState<Group[]>(groupsQuery.data);
+  const [groups, setGroups] = useState<Group[]>(groupsQuery.data ?? []);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    setGroups(groupsQuery.data.filter((group) => group.name.toLowerCase().includes(searchTerm.toLowerCase())));
+    setGroups((groupsQuery.data ?? []).filter((group) => group.name.toLowerCase().includes(searchTerm.toLowerCase())));
   }, [groupsQuery.data, searchTerm]);
 
   return (

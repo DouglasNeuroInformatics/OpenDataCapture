@@ -28,10 +28,12 @@ export const $CreateGroupData = z.object({
 });
 
 export type UpdateGroupData = z.infer<typeof $UpdateGroupData>;
-export const $UpdateGroupData = z
-  .object({
-    accessibleInstrumentIds: z.array(z.string()),
-    name: z.string().min(1),
+export const $UpdateGroupData = $Group
+  .omit({
+    subjectIds: true,
+    userIds: true
+  })
+  .extend({
     settings: $GroupSettings.partial()
   })
   .partial();

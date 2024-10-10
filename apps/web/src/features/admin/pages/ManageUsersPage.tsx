@@ -12,17 +12,18 @@ import { useAppStore } from '@/store';
 import { useDeleteUserMutation } from '../hooks/useDeleteUserMutation';
 import { useUsersQuery } from '../hooks/useUsersQuery';
 
+// eslint-disable-next-line max-lines-per-function
 export const ManageUsersPage = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
   const usersQuery = useUsersQuery();
   const deleteUserMutation = useDeleteUserMutation();
-  const [users, setUsers] = useState<User[]>(usersQuery.data);
+  const [users, setUsers] = useState<User[]>(usersQuery.data ?? []);
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    setUsers(usersQuery.data.filter((user) => user.username.toLowerCase().includes(searchTerm.toLowerCase())));
+    setUsers((usersQuery.data ?? []).filter((user) => user.username.toLowerCase().includes(searchTerm.toLowerCase())));
   }, [usersQuery.data, searchTerm]);
 
   const currentUserIsSelected = selectedUser?.username === currentUser?.username;

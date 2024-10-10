@@ -164,6 +164,8 @@ model UserModel {
   lastName            String
   password            String
   username            String
+  sex                 Sex?
+  dateOfBirth         DateTime?            @db.Date
 }
 
 enum SessionType {

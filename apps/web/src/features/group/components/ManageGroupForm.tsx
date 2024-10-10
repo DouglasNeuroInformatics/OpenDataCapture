@@ -20,7 +20,7 @@ type InstrumentOptions = {
 
 export type ManageGroupFormProps = {
   availableInstruments: UnilingualInstrumentInfo[];
-  onSubmit: (data: UpdateGroupData) => Promisable<any>;
+  onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
 };
 
 export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupFormProps) => {

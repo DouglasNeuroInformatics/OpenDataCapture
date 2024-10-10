@@ -1,9 +1,9 @@
 import { $Group } from '@opendatacapture/schemas/group';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 export function useGroupsQuery() {
-  return useSuspenseQuery({
+  return useQuery({
     queryFn: async () => {
       const response = await axios.get('/v1/groups');
       return $Group.array().parse(response.data);

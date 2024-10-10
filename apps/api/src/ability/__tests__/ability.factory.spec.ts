@@ -17,11 +17,13 @@ describe('AbilityFactory', () => {
     userModelStub = {
       basePermissionLevel: null,
       createdAt: new Date(),
+      dateOfBirth: null,
       firstName: 'Jane',
       groupIds: [],
       id: '12345',
       lastName: 'Doe',
       password: 'Password123',
+      sex: null,
       updatedAt: new Date(),
       username: 'user'
     };

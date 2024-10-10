@@ -30,7 +30,7 @@ export class UsersService {
 
   /** Adds a new user to the database with default permissions, verifying the provided groups exist */
   async create(
-    { basePermissionLevel, firstName, groupIds, lastName, password, username }: CreateUserDto,
+    { basePermissionLevel, dateOfBirth, firstName, groupIds, lastName, password, sex, username }: CreateUserDto,
     options?: EntityOperationOptions
   ) {
     if (await this.userModel.exists({ username })) {
@@ -50,12 +50,14 @@ export class UsersService {
     return this.userModel.create({
       data: {
         basePermissionLevel,
+        dateOfBirth,
         firstName,
         groups: {
           connect: groupIds.map((id) => ({ id }))
         },
         lastName,
         password: hashedPassword,
+        sex,
         username: username
       }
     });

@@ -18,6 +18,7 @@ import { downloadExcel } from '@/utils/excel';
 import { MasterDataTable } from '../components/MasterDataTable';
 import { useSubjectsQuery } from '../hooks/useSubjectsQuery';
 
+// eslint-disable-next-line max-lines-per-function
 export const DataHubPage = () => {
   const [isLookupOpen, setIsLookupOpen] = useState(false);
 
@@ -116,7 +117,7 @@ export const DataHubPage = () => {
             </div>
           </div>
           <MasterDataTable
-            data={data}
+            data={data ?? []}
             onSelect={(subject) => {
               navigate(`${subject.id}/assignments`);
             }}

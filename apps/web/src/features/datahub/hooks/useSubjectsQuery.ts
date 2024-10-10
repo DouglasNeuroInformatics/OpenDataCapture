@@ -1,5 +1,5 @@
 import { $Subject } from '@opendatacapture/schemas/subject';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 type UseSubjectsQueryOptions = {
@@ -9,7 +9,7 @@ type UseSubjectsQueryOptions = {
 };
 
 export function useSubjectsQuery({ params }: UseSubjectsQueryOptions) {
-  return useSuspenseQuery({
+  return useQuery({
     queryFn: async () => {
       const response = await axios.get('/v1/subjects', { params });
       return $Subject.array().parse(response.data);

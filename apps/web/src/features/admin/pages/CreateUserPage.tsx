@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '../hooks/useCreateUserMutation';
 import { useGroupsQuery } from '../hooks/useGroupsQuery';
 
+// eslint-disable-next-line max-lines-per-function
 export const CreateUserPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ export const CreateUserPage = () => {
               groupIds: {
                 kind: 'set',
                 label: t('common.groups'),
-                options: Object.fromEntries(groupsQuery.data.map((group) => [group.id, group.name])),
+                options: Object.fromEntries((groupsQuery.data ?? []).map((group) => [group.id, group.name])),
                 variant: 'listbox'
               }
             }
@@ -93,6 +94,19 @@ export const CreateUserPage = () => {
                 kind: 'string',
                 label: t('core.identificationData.lastName.label'),
                 variant: 'input'
+              },
+              sex: {
+                kind: 'string',
+                label: t('core.identificationData.sex.label'),
+                options: {
+                  MALE: t('core.identificationData.sex.male'),
+                  FEMALE: t('core.identificationData.sex.female')
+                },
+                variant: 'select'
+              },
+              dateOfBirth: {
+                kind: 'date',
+                label: t('core.identificationData.dateOfBirth.label')
               }
             },
             title: t({
