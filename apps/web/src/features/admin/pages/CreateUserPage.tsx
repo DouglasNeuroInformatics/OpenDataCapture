@@ -94,6 +94,19 @@ export const CreateUserPage = () => {
                 kind: 'string',
                 label: t('core.identificationData.lastName.label'),
                 variant: 'input'
+              },
+              sex: {
+                kind: 'string',
+                label: t('core.identificationData.sex.label'),
+                options: {
+                  MALE: t('core.identificationData.sex.male'),
+                  FEMALE: t('core.identificationData.sex.female')
+                },
+                variant: 'select'
+              },
+              dateOfBirth: {
+                kind: 'date',
+                label: t('core.identificationData.dateOfBirth.label')
               }
             },
             title: t({
