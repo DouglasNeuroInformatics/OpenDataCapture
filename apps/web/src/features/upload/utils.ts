@@ -173,11 +173,28 @@ export function ObjectValueInterpreter(
     }
 
     for (const listData of recordArrayDataList) {
-      let recordArrayObject = {};
+      let recordArrayObject: { [key: string]: any } = {};
       let record = listData.split('++');
       for (let i = 0; i < record.length; i++) {
-        let recordValue = record[i].split(':')[1];
-        recordArrayObject[zKeys[i]] = valueInterpreter(recordValue, zList[i].typeName, zList[i].isOptional).value;
+        let recordValue = record[i]!.split(':')[1]!;
+        const zListResult = zList[i]!;
+        if (zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject') {
+          const valueInterpreterResult: UploadOperationResult<FormTypes.FieldValue> = valueInterpreter(
+            recordValue,
+            zListResult.typeName,
+            zListResult.isOptional
+          );
+          if (valueInterpreterResult.success) {
+            recordArrayObject[zKeys[i]!] = valueInterpreterResult.value;
+          } else {
+            return {
+              message: `failed to interpret value at entry ${i} in record array row ${listData}`,
+              success: false
+            };
+          }
+        } else {
+          return { message: `Failed to interpret field '${i}'`, success: false };
+        }
       }
       recordArray.push(recordArrayObject);
     }
@@ -340,7 +357,10 @@ export async function processInstrumentCSV(
             return resolve({ message: typeNameResult.message, success: false });
           }
 
-          let valueInterpreterResult = undefined;
+          let valueInterpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
+            message: 'Could not interpret a correct value',
+            success: false
+          };
 
           if (typeNameResult.typeName === 'ZodArray' || typeNameResult.typeName === 'ZodObject') {
             if (typeNameResult.multiKeys && typeNameResult.multiValues)
