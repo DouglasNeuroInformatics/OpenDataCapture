@@ -76,6 +76,11 @@ export const UploadPage = () => {
 
     if (processedData.success) {
       await sendInstrumentData(processedData.value);
+    } else {
+      addNotification({
+        message: processedData.message,
+        type: 'error'
+      });
     }
   };
 
