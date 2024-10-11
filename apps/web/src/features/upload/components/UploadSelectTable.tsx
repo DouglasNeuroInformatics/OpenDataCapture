@@ -15,7 +15,7 @@ export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) =>
     <ClientTable<InstrumentInfo>
       columns={[
         {
-          field: (instrument) => instrument.details?.title ?? 'N/A',
+          field: (instrument) => (instrument.details?.title as string) ?? 'N/A',
           label: t({
             en: 'Select an instrument',
             fr: 'Selectionnez un instrument'
