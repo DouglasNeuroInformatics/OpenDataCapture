@@ -60,7 +60,7 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
         typeName: def.typeName as RequiredZodTypeName
       };
     } else if (def.typeName === 'ZodArray' || def.typeName === 'ZodObject') {
-      return ZodObjectInterpreter(schema, def.typeName, isOptional);
+      return zodObjectInterpreter(schema, def.typeName, isOptional);
     }
 
     return { isOptional: Boolean(isOptional), success: true, typeName: def.typeName as RequiredZodTypeName };
@@ -69,7 +69,7 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
   return { message: 'Unexpected Error', success: false };
 }
 
-export function ZodObjectInterpreter(
+export function zodObjectInterpreter(
   schema: z.ZodTypeAny,
   originalName: RequiredZodTypeName,
   isOptional?: boolean
@@ -116,13 +116,13 @@ export function valueInterpreter(
       }
       return { message: 'Undecipherable Boolean Type', success: false };
     case 'ZodDate':
-      case 'ZodDate':
-        const date = new Date(entry);
-        if (isNaN(date.getTime())) {
-          return { message: `Failed to parse date: ${entry}`, success: false };
-        }
-        return { success: true, value: date };
-      case 'ZodNumber':
+    case 'ZodDate':
+      const date = new Date(entry);
+      if (isNaN(date.getTime())) {
+        return { message: `Failed to parse date: ${entry}`, success: false };
+      }
+      return { success: true, value: date };
+    case 'ZodNumber':
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
       }
