@@ -10,23 +10,21 @@ export type UploadSelectTableProps = {
 export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) => {
   const { t } = useTranslation();
 
+  // Renders a table for selecting an instrument to upload data for
   return (
-    <>
-      <ClientTable<InstrumentInfo>
-        columns={[
-          {
-            field: (instrument) => (instrument.details ? (instrument.details.title as string) : 'N/A'),
-            label: t({
-              en: 'Select an instrument',
-              fr: 'Selectionnez un instrument'
-            })
-          }
-        ]}
-        data={data}
-        entriesPerPage={15}
-        minRows={15}
-        onEntryClick={onSelect}
-      ></ClientTable>
-    </>
+    <ClientTable<InstrumentInfo>
+      columns={[
+        {
+          field: (instrument) => instrument.details?.title ?? 'N/A',
+          label: t({
+            en: 'Select an instrument',
+            fr: 'Selectionnez un instrument'
+          })
+        }
+      ]}
+      data={data}
+      entriesPerPage={15}
+      onEntryClick={onSelect}
+    />
   );
 };
