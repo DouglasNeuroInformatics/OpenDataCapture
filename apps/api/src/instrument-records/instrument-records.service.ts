@@ -277,6 +277,8 @@ export class InstrumentRecordsService {
             id: subjectId
           };
           await this.subjectsService.create(addedSubject);
+        } else {
+          throw exception;
         }
       }
 
