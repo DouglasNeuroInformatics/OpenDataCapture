@@ -116,13 +116,13 @@ export function valueInterpreter(
       }
       return { message: 'Undecipherable Boolean Type', success: false };
     case 'ZodDate':
-      try {
-        return { success: true, value: new Date(entry) };
-      } catch (err) {
-        console.error(err);
-      }
-      return { message: `Failed to parse date: ${entry}`, success: false };
-    case 'ZodNumber':
+      case 'ZodDate':
+        const date = new Date(entry);
+        if (isNaN(date.getTime())) {
+          return { message: `Failed to parse date: ${entry}`, success: false };
+        }
+        return { success: true, value: date };
+      case 'ZodNumber':
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
       }
