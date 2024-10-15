@@ -22,11 +22,11 @@ import { InstrumentsService } from '@/instruments/instruments.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
 import { SessionsService } from '@/sessions/sessions.service';
+import type { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
-import type { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 
 @Injectable()
 export class InstrumentRecordsService {
