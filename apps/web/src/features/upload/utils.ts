@@ -184,6 +184,7 @@ export function ObjectValueInterpreter(
             zListResult.typeName,
             zListResult.isOptional
           );
+          // eslint-disable-next-line max-depth
           if (valueInterpreterResult.success) {
             recordArrayObject[zKeys[i]!] = valueInterpreterResult.value;
           } else {

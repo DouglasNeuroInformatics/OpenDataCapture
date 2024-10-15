@@ -4,7 +4,7 @@ import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core'
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { applyLineTransformsSet, getZodTypeName, processInstrumentCSV } from './utils';
+import { applyLineTransformsSet, getZodTypeName, processInstrumentCSV, applyLineTransformsArray } from './utils';
 
 describe('getZodTypeName', () => {
   it('should parse a z.string()', () => {
@@ -37,6 +37,20 @@ describe('applyLineTransformsSet', () => {
   });
   it('should return the line unchanged, if the line does not contain a set', () => {
     expect(applyLineTransformsSet('1, 2, 3')).toBe('1, 2, 3');
+  });
+});
+
+describe('applyLineTransformsArray', () => {
+  it('should parse a line with a single set', () => {
+    expect(applyLineTransformsArray('recordArray(test1:1,test2:2;)')).toBe('recordArray(test1:1++test2:2;)');
+  });
+  it('should parse a line with a several sets and a number', () => {
+    expect(applyLineTransformsArray('recordArray(test1:1,test2:2;), 3, recordArray(test3:3,test4:4;)')).toBe(
+      'recordArray(test1:1++test2:2;), 3, recordArray(test3:3++test4:4;)'
+    );
+  });
+  it('should return the line unchanged, if the line does not contain a set', () => {
+    expect(applyLineTransformsArray('1, 2, 3')).toBe('1, 2, 3');
   });
 });
 
