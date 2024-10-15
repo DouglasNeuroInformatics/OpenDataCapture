@@ -33,7 +33,7 @@ export const UploadSelectPage = () => {
       <React.Suspense fallback={<LoadingFallback />}>
         <div>
           <UploadSelectTable
-            data={data}
+            data={data ?? []}
             onSelect={(instrument) => {
               navigate(`${instrument.id}`);
             }}
