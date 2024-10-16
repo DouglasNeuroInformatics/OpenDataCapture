@@ -208,18 +208,6 @@ export function ObjectValueInterpreter(
   return { message: `Invalid ZodType`, success: false };
 }
 
-export function applyLineTransformsSet(line: string) {
-  return line.replaceAll(/SET\((.*?)\)/g, (match) => {
-    return match.replaceAll(',', '~~');
-  });
-}
-
-export function applyLineTransformsArray(line: string) {
-  return line.replaceAll(/RECORD_ARRAY\((.*?)\)/g, (match) => {
-    return match.replaceAll(',', '++');
-  });
-}
-
 function formatTypeInfo(s: string, isOptional: boolean) {
   return isOptional ? `${s} (optional)` : s;
 }
