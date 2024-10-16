@@ -65,7 +65,11 @@ export class InstrumentRecordsService {
 
     await this.subjectsService.findById(subjectId);
     await this.sessionsService.findById(sessionId);
-
+    if (!instrument.validationSchema.safeParse(data).success) {
+      throw new UnprocessableEntityException(
+        `Data received does not pass validation schema of instrument '${instrument.id}'`
+      );
+    }
     return this.instrumentRecordModel.create({
       data: {
         computedMeasures: instrument.measures
