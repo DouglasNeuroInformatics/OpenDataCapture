@@ -4,7 +4,13 @@ import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core'
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { applyLineTransformsArray, applyLineTransformsSet, getZodTypeName, processInstrumentCSV } from './utils';
+import {
+  applyLineTransformsArray,
+  applyLineTransformsSet,
+  getZodTypeName,
+  processInstrumentCSV,
+  zodObjectInterpreter
+} from './utils';
 
 describe('getZodTypeName', () => {
   it('should parse a z.string()', () => {
@@ -24,6 +30,123 @@ describe('getZodTypeName', () => {
       isOptional: true,
       success: true,
       typeName: 'ZodString'
+    });
+  });
+  it('Should parse z.enum()', () => {
+    expect(getZodTypeName(z.enum(['test1', 'test2']))).toMatchObject({
+      enumValues: ['test1', 'test2'],
+      isOptional: false,
+      success: true,
+      typeName: 'ZodEnum'
+    });
+  });
+  it('should parse z.array(z.object({foo: z.string()})', () => {
+    expect(getZodTypeName(z.array(z.object({ foo: z.string() })))).toMatchObject({
+      isOptional: false,
+      multiKeys: ['foo'],
+      multiValues: [
+        {
+          isOptional: false,
+          success: true,
+          typeName: 'ZodString'
+        }
+      ],
+      success: true,
+      typeName: 'ZodArray'
+    });
+  });
+  it('should parse z.array(z.object({foo: z.string()}).optional()', () => {
+    expect(getZodTypeName(z.array(z.object({ foo: z.string() })).optional())).toMatchObject({
+      isOptional: true,
+      multiKeys: ['foo'],
+      multiValues: [
+        {
+          isOptional: false,
+          success: true,
+          typeName: 'ZodString'
+        }
+      ],
+      success: true,
+      typeName: 'ZodArray'
+    });
+  });
+  it('should parse z.array(z.object({foo: z.string()}).optional()', () => {
+    expect(getZodTypeName(z.array(z.object({ foo: z.string().optional() })))).toMatchObject({
+      isOptional: false,
+      multiKeys: ['foo'],
+      multiValues: [
+        {
+          isOptional: true,
+          success: true,
+          typeName: 'ZodString'
+        }
+      ],
+      success: true,
+      typeName: 'ZodArray'
+    });
+  });
+  it('should parse z.array(z.object({foo: z.enum()})', () => {
+    expect(getZodTypeName(z.array(z.object({ foo: z.enum(['test1', 'test2']) })))).toMatchObject({
+      isOptional: false,
+      multiKeys: ['foo'],
+      multiValues: [
+        {
+          enumValues: ['test1', 'test2'],
+          isOptional: false,
+          success: true,
+          typeName: 'ZodEnum'
+        }
+      ],
+      success: true,
+      typeName: 'ZodArray'
+    });
+  });
+});
+
+describe('zodObjectInterpreter', () => {
+  it('Should parse array', () => {
+    expect(zodObjectInterpreter(z.array(z.object({ foo: z.string() })), 'ZodArray', false)).toMatchObject({
+      isOptional: false,
+      multiKeys: ['foo'],
+      multiValues: [
+        {
+          isOptional: false,
+          success: true,
+          typeName: 'ZodString'
+        }
+      ],
+      success: true,
+      typeName: 'ZodArray'
+    });
+  });
+  it('Should parse optional array', () => {
+    expect(zodObjectInterpreter(z.array(z.object({ foo: z.string() })), 'ZodArray', true)).toMatchObject({
+      isOptional: true,
+      multiKeys: ['foo'],
+      multiValues: [
+        {
+          isOptional: false,
+          success: true,
+          typeName: 'ZodString'
+        }
+      ],
+      success: true,
+      typeName: 'ZodArray'
+    });
+  });
+  it('Should parse array with optional field', () => {
+    expect(zodObjectInterpreter(z.array(z.object({ foo: z.string().optional() })), 'ZodArray', false)).toMatchObject({
+      isOptional: false,
+      multiKeys: ['foo'],
+      multiValues: [
+        {
+          isOptional: true,
+          success: true,
+          typeName: 'ZodString'
+        }
+      ],
+      success: true,
+      typeName: 'ZodArray'
     });
   });
 });
