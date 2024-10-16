@@ -1,6 +1,6 @@
 import { isNumberLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { AnyUnilingualFormInstrument, FormTypes } from '@opendatacapture/runtime-core';
-import { unparse } from 'papaparse';
+import { parse, unparse } from 'papaparse';
 import { z } from 'zod';
 
 const ZOD_TYPE_NAMES = [
@@ -130,7 +130,7 @@ export function valueInterpreter(
     case 'ZodSet':
       if (entry.includes('SET(')) {
         let setData = entry.slice(4, -1);
-        let setDataList = setData.split('~~');
+        let setDataList = setData.split(',');
         return { success: true, value: new Set(setDataList) };
       }
       return { message: `Invalid ZodSet: ${entry}`, success: false };
@@ -161,8 +161,9 @@ export function ObjectValueInterpreter(
   if (entry === '' && isOptional) {
     return { success: true, value: undefined };
   }
-  if (entry.includes('recordArray(') && zList && zKeys) {
+  if (entry.includes('RECORD_ARRAY(') && zList && zKeys) {
     let recordArray = [];
+
     let recordArrayDataEntry = entry.slice(13, -2);
 
     let recordArrayDataList = recordArrayDataEntry.split(';');
@@ -174,7 +175,8 @@ export function ObjectValueInterpreter(
 
     for (const listData of recordArrayDataList) {
       let recordArrayObject: { [key: string]: any } = {};
-      let record = listData.split('++');
+      let record = listData.split(',');
+
       for (let i = 0; i < record.length; i++) {
         let recordValue = record[i]!.split(':')[1]!;
         const zListResult = zList[i]!;
@@ -213,7 +215,7 @@ export function applyLineTransformsSet(line: string) {
 }
 
 export function applyLineTransformsArray(line: string) {
-  return line.replaceAll(/recordArray\((.*?)\)/g, (match) => {
+  return line.replaceAll(/RECORD_ARRAY\((.*?)\)/g, (match) => {
     return match.replaceAll(',', '++');
   });
 }
@@ -253,7 +255,7 @@ function sampleDataGenerator({
     case 'ZodArray':
     case 'ZodObject':
       try {
-        let multiString = 'recordArray( ';
+        let multiString = 'RECORD_ARRAY( ';
         if (multiValues && multiKeys) {
           for (let i = 0; i < multiValues.length; i++) {
             // eslint-disable-next-line max-depth
@@ -317,14 +319,17 @@ export async function processInstrumentCSV(
     const reader = new FileReader();
     reader.onload = () => {
       const text = reader.result as string;
-      let [headerLine, ...dataLines] = text.split('\n');
+      const parseResultCsv = parse<string[]>(text, {
+        header: false,
+        skipEmptyLines: true
+      });
+
+      let [headers, ...dataLines] = parseResultCsv.data;
 
       //remove sample data if included
-      if (dataLines[0]?.includes(INTERNAL_HEADERS_SAMPLE_DATA.join(','))) {
-        dataLines = dataLines.slice(1);
+      if (dataLines[0]?.[0]?.startsWith(MONGOLIAN_VOWEL_SEPARATOR)) {
+        dataLines.shift();
       }
-
-      dataLines = dataLines.filter((str) => str !== '');
 
       if (dataLines.length === 0) {
         return resolve({ message: 'data lines is empty array', success: false });
@@ -332,20 +337,14 @@ export async function processInstrumentCSV(
 
       const result: FormTypes.Data[] = [];
 
-      const headers: string[] = headerLine!.split(',');
-
-      if (headers.length === 0) {
+      if (headers?.length === 0) {
         return resolve({ message: 'headers is empty array', success: false });
       }
 
-      for (let line of dataLines) {
-        line = applyLineTransformsSet(line);
-        line = applyLineTransformsArray(line);
-
-        let elements = line.split(',');
+      for (let elements of dataLines) {
         const jsonLine: { [key: string]: unknown } = {};
-        for (let j = 0; j < headers.length; j++) {
-          const key = headers[j]!;
+        for (let j = 0; j < headers!.length; j++) {
+          const key = headers![j]!;
           const rawValue = elements[j]!;
 
           if (rawValue === '\n') {
@@ -379,7 +378,7 @@ export async function processInstrumentCSV(
           if (!interpreterResult.success) {
             return resolve({ message: interpreterResult.message, success: false });
           }
-          jsonLine[headers[j]!] = interpreterResult.value;
+          jsonLine[headers![j]!] = interpreterResult.value;
         }
         const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
         if (!zodCheck.success) {
