@@ -40,7 +40,7 @@ describe('getZodTypeName', () => {
       typeName: 'ZodEnum'
     });
   });
-  it('should parse z.array(z.object({foo: z.string()})', () => {
+  it('should parse z.array(z.object({foo: z.string()}))', () => {
     expect(getZodTypeName(z.array(z.object({ foo: z.string() })))).toMatchObject({
       isOptional: false,
       multiKeys: ['foo'],
