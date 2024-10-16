@@ -11,6 +11,7 @@ import {
   processInstrumentCSV,
   zodObjectInterpreter
 } from './utils';
+import { unparse } from 'papaparse';
 
 describe('getZodTypeName', () => {
   it('should parse a z.string()', () => {
@@ -165,11 +166,11 @@ describe('applyLineTransformsSet', () => {
 
 describe('applyLineTransformsArray', () => {
   it('should parse a line with a single set', () => {
-    expect(applyLineTransformsArray('recordArray(test1:1,test2:2;)')).toBe('recordArray(test1:1++test2:2;)');
+    expect(applyLineTransformsArray('RECORD_ARRAY(test1:1,test2:2;)')).toBe('RECORD_ARRAY(test1:1++test2:2;)');
   });
   it('should parse a line with a several sets and a number', () => {
-    expect(applyLineTransformsArray('recordArray(test1:1,test2:2;), 3, recordArray(test3:3,test4:4;)')).toBe(
-      'recordArray(test1:1++test2:2;), 3, recordArray(test3:3++test4:4;)'
+    expect(applyLineTransformsArray('RECORD_ARRAY(test1:1,test2:2;), 3, RECORD_ARRAY(test3:3,test4:4;)')).toBe(
+      'RECORD_ARRAY(test1:1++test2:2;), 3, RECORD_ARRAY(test3:3++test4:4;)'
     );
   });
   it('should return the line unchanged, if the line does not contain a set', () => {
@@ -193,7 +194,7 @@ describe('processInstrumentCSV', () => {
       foo: z.array(
         z.object({
           bar: z.string(),
-          foo: z.string()
+          foo2: z.string()
         })
       )
     })
@@ -216,8 +217,12 @@ describe('processInstrumentCSV', () => {
     await expect(processInstrumentCSV(file, mockInstrument)).resolves.toMatchObject({ success: true });
   });
 
-  it('should process a valid csv with a set', async () => {
-    const file = new File(['subjectID,date,foo\n1,2024-01-01,recordArray(bar:test1,foo:test2;)'], 'data.csv', {
+  it('should process a valid csv with a record array', async () => {
+    const papaString = unparse([
+      ['subjectID', 'date', 'foo'],
+      ['1', '2024-01-01', 'RECORD_ARRAY(bar:test1,foo2:test2;)']
+    ]);
+    const file = new File([papaString], 'data.csv', {
       type: 'text/csv'
     });
     console.log(await processInstrumentCSV(file, mockInstrumentArray));
