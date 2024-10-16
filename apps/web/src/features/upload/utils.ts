@@ -114,7 +114,7 @@ export function valueInterpreter(
       } else if (entry.toLowerCase() === 'false') {
         return { success: true, value: false };
       }
-      return { message: 'Undecipherable Boolean Type', success: false };
+      return { message: `Undecipherable Boolean Type: ${entry}`, success: false };
     case 'ZodDate': {
       const date = new Date(entry);
       if (isNaN(date.getTime())) {
@@ -126,14 +126,14 @@ export function valueInterpreter(
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
       }
-      return { message: 'Invalid number type', success: false };
+      return { message: `Invalid number type: ${entry}`, success: false };
     case 'ZodSet':
       if (entry.includes('SET(')) {
         let setData = entry.slice(4, -1);
         let setDataList = setData.split('~~');
         return { success: true, value: new Set(setDataList) };
       }
-      return { message: 'Invalid ZodSet', success: false };
+      return { message: `Invalid ZodSet: ${entry}`, success: false };
     case 'ZodString':
       return { success: true, value: entry };
     case 'ZodEnum':
