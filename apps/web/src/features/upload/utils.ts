@@ -115,13 +115,13 @@ export function valueInterpreter(
         return { success: true, value: false };
       }
       return { message: 'Undecipherable Boolean Type', success: false };
-    case 'ZodDate':
-    case 'ZodDate':
+    case 'ZodDate': {
       const date = new Date(entry);
       if (isNaN(date.getTime())) {
         return { message: `Failed to parse date: ${entry}`, success: false };
       }
       return { success: true, value: date };
+    }
     case 'ZodNumber':
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
@@ -256,7 +256,8 @@ function sampleDataGenerator({
         let multiString = 'recordArray( ';
         if (multiValues && multiKeys) {
           for (let i = 0; i < multiValues.length; i++) {
-            if (i === multiValues.length - 1) {
+            // eslint-disable-next-line max-depth
+            if (i === multiValues.length - 1 && multiValues[i] !== undefined) {
               multiString += multiKeys[i] + ':' + sampleDataGenerator(multiValues[i]);
             } else {
               multiString += multiKeys[i] + ':' + sampleDataGenerator(multiValues[i]) + ',';
@@ -358,27 +359,27 @@ export async function processInstrumentCSV(
             return resolve({ message: typeNameResult.message, success: false });
           }
 
-          let valueInterpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
+          let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
             message: 'Could not interpret a correct value',
             success: false
           };
 
           if (typeNameResult.typeName === 'ZodArray' || typeNameResult.typeName === 'ZodObject') {
             if (typeNameResult.multiKeys && typeNameResult.multiValues)
-              valueInterpreterResult = ObjectValueInterpreter(
+              interpreterResult = ObjectValueInterpreter(
                 rawValue,
                 typeNameResult.isOptional,
                 typeNameResult.multiValues,
                 typeNameResult.multiKeys
               );
           } else {
-            valueInterpreterResult = valueInterpreter(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
+            interpreterResult = valueInterpreter(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
           }
 
-          if (!valueInterpreterResult.success) {
-            return resolve({ message: valueInterpreterResult.message, success: false });
+          if (!interpreterResult.success) {
+            return resolve({ message: interpreterResult.message, success: false });
           }
-          jsonLine[headers[j]!] = valueInterpreterResult.value;
+          jsonLine[headers[j]!] = interpreterResult.value;
         }
         const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
         if (!zodCheck.success) {
