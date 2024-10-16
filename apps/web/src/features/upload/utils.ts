@@ -130,7 +130,7 @@ export function valueInterpreter(
     case 'ZodSet':
       if (entry.includes('SET(')) {
         let setData = entry.slice(4, -1);
-        let setDataList = setData.split('\\,');
+        let setDataList = setData.split('~~');
         return { success: true, value: new Set(setDataList) };
       }
       return { message: 'Invalid ZodSet', success: false };
@@ -208,7 +208,7 @@ export function ObjectValueInterpreter(
 
 export function applyLineTransformsSet(line: string) {
   return line.replaceAll(/SET\((.*?)\)/g, (match) => {
-    return match.replaceAll(',', '\\,');
+    return match.replaceAll(',', '~~');
   });
 }
 
