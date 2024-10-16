@@ -180,9 +180,13 @@ describe('processInstrumentCSV', () => {
   });
 
   it('should process a valid csv with a set', async () => {
-    const file = new File(['subjectID,date,foo\n1,2024-01-01,SET(foo,bar)'], 'data.csv', { type: 'text/csv' });
+    const papaString = unparse([
+      ['subjectID', 'date', 'foo'],
+      ['1', '2024-01-01', 'SET(foo,bar)']
+    ]);
+    const file = new File([papaString], 'data.csv', { type: 'text/csv' });
     console.log(await processInstrumentCSV(file, mockInstrumentSet));
-    await expect(processInstrumentCSV(file, mockInstrument)).resolves.toMatchObject({ success: true });
+    await expect(processInstrumentCSV(file, mockInstrumentSet)).resolves.toMatchObject({ success: true });
   });
 
   it('should process a valid csv with a record array', async () => {
