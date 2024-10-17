@@ -8,11 +8,9 @@ import type {
   InstrumentRecordQueryParams,
   InstrumentRecordsExport,
   LinearRegressionResults,
-  UploadInstrumentRecordData
+  UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
-import type { SessionType } from '@opendatacapture/schemas/session';
-import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { InstrumentRecordModel, Prisma } from '@prisma/generated-client';
+import type { InstrumentRecordModel, Prisma, SessionModel } from '@prisma/generated-client';
 import { isNumber, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -253,7 +251,7 @@ export class InstrumentRecordsService {
   }
 
   async upload(
-    { groupId, instrumentId, records }: UploadInstrumentRecordData,
+    { groupId, instrumentId, records }: UploadInstrumentRecordsData,
     options?: EntityOperationOptions
   ): Promise<InstrumentRecordModel[]> {
     if (groupId) {
@@ -261,83 +259,98 @@ export class InstrumentRecordsService {
     }
 
     const instrument = await this.instrumentsService.findById(instrumentId);
-
-    const createdModelsArray: InstrumentRecordModel[] = [];
     if (instrument.kind === 'SERIES') {
       throw new UnprocessableEntityException(
         `Cannot create instrument record for series instrument '${instrument.id}'`
       );
     }
 
-    for (const record of records) {
-      const { data, date, subjectId } = record;
+    const createdRecordsArray: InstrumentRecordModel[] = [];
+    const createdSessionsArray: SessionModel[] = [];
 
-      //create a new subject id in subjects service if they dont exist
-      try {
-        await this.subjectsService.findById(subjectId);
-      } catch (exception) {
-        if (exception instanceof NotFoundException) {
-          const addedSubject: CreateSubjectDto = {
-            id: subjectId
-          };
-          await this.subjectsService.create(addedSubject);
-        } else {
-          throw exception;
-        }
-      }
+    try {
+      for (let i = 0; i < records.length; i++) {
+        const { data, date, subjectId } = records[i]!;
+        await this.createSubjectIfNotFound(subjectId);
 
-      let subjectInfo: CreateSubjectData = {
-        dateOfBirth: null,
-        firstName: null,
-        id: subjectId,
-        lastName: null,
-        sex: null
-      };
-
-      let sessionType: SessionType = 'RETROSPECTIVE';
-
-      let sessionId = (
-        await this.sessionsService.create({
+        const session = await this.sessionsService.create({
           date: date,
           groupId: groupId ? groupId : null,
-          subjectData: subjectInfo,
-          type: sessionType
-        })
-      ).id;
+          subjectData: {
+            id: subjectId
+          },
+          type: 'RETROSPECTIVE'
+        });
 
-      const createdModel = await this.instrumentRecordModel.create({
-        data: {
-          computedMeasures: instrument.measures
-            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
-            : null,
-          data,
-          date,
-          group: groupId
-            ? {
-                connect: { id: groupId }
+        createdSessionsArray.push(session);
+
+        const sessionId = session.id;
+
+        if (!instrument.validationSchema.safeParse(data).success) {
+          throw new UnprocessableEntityException(
+            `Data received for record at index '${i}' does not pass validation schema of instrument '${instrument.id}'`
+          );
+        }
+
+        const createdRecord = await this.instrumentRecordModel.create({
+          data: {
+            computedMeasures: instrument.measures
+              ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
+              : null,
+            data,
+            date,
+            group: groupId
+              ? {
+                  connect: { id: groupId }
+                }
+              : undefined,
+            instrument: {
+              connect: {
+                id: instrumentId
               }
-            : undefined,
-          instrument: {
-            connect: {
-              id: instrumentId
+            },
+            session: {
+              connect: {
+                id: sessionId
+              }
+            },
+            subject: {
+              connect: {
+                id: subjectId
+              }
             }
-          },
-          session: {
-            connect: {
-              id: sessionId
-            }
-          },
-          subject: {
-            connect: {
-              id: subjectId
-            }
+          }
+        });
+
+        createdRecordsArray.push(createdRecord);
+      }
+    } catch (err) {
+      await this.instrumentRecordModel.deleteMany({
+        where: {
+          id: {
+            in: createdRecordsArray.map((record) => record.id)
           }
         }
       });
-
-      createdModelsArray.push(createdModel);
+      await this.sessionsService.deleteByIds(createdSessionsArray.map((session) => session.id));
+      throw err;
     }
 
-    return createdModelsArray;
+    return createdRecordsArray;
+  }
+
+  private async createSubjectIfNotFound(subjectId: string) {
+    try {
+      await this.subjectsService.findById(subjectId);
+    } catch (exception) {
+      if (exception instanceof NotFoundException) {
+        const addedSubject: CreateSubjectDto = {
+          id: subjectId
+        };
+        await this.subjectsService.create(addedSubject);
+      } else {
+        throw exception;
+      }
+    }
   }
 }

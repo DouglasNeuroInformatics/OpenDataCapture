@@ -1,101 +1,88 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-import { FileDropzone } from '@douglasneuroinformatics/libui/components';
-import { Button } from '@douglasneuroinformatics/libui/components';
-import { useDownload } from '@douglasneuroinformatics/libui/hooks';
+import { Button, FileDropzone, Heading } from '@douglasneuroinformatics/libui/components';
+import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
-import type { UploadInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
-import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
-import axios from 'axios';
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
+import { PageHeader } from '@/components/PageHeader';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useAppStore } from '@/store';
 
-import { createUploadTemplateCSV, processInstrumentCSV } from '../utils';
+import { useUploadInstrumentRecords } from '../hooks/useUploadInstrumentRecords';
+import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData } from '../utils';
 
 export const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const acceptedFiles = {
-    'text/csv': ['.csv']
-  };
   const currentGroup = useAppStore((store) => store.currentGroup);
+  const uploadInstrumentRecordsMutation = useUploadInstrumentRecords();
 
   const params = useParams();
-  const instrument = useInstrument(params.id!) as AnyUnilingualFormInstrument;
-
-  const sendInstrumentData = async (data: FormTypes.Data[]) => {
-    const reformatForSending = reformatInstrumentData(data);
-
-    try {
-      await axios.post('/v1/instrument-records/upload', reformatForSending satisfies UploadInstrumentRecordData);
-      addNotification({ type: 'success' });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const reformatInstrumentData = (data: FormTypes.Data[]): UploadInstrumentRecordData => {
-    const recordsList = [];
-
-    for (const dataInfo of data) {
-      const { date: dataDate, subjectID: dataSubjectId, ...restOfData } = dataInfo; // Destructure and extract the rest of the data
-
-      const createdRecord = {
-        data: restOfData as Json,
-        date: dataDate as Date,
-        subjectId: encodeScopedSubjectId(dataSubjectId as string, {
-          groupName: currentGroup?.name ?? 'root'
-        })
-      };
-      recordsList.push(createdRecord);
-    }
-
-    const reformatForSending: UploadInstrumentRecordData = {
-      groupId: undefined,
-      instrumentId: instrument.id!,
-      records: recordsList
-    };
-
-    return reformatForSending;
-  };
+  const instrument = useInstrument(params.id!) as ({ id: string } & AnyUnilingualFormInstrument) | null;
+  const { t } = useTranslation();
 
   const handleTemplateDownload = () => {
-    const { content, fileName } = createUploadTemplateCSV(instrument);
+    const { content, fileName } = createUploadTemplateCSV(instrument!);
     void download(fileName, content);
   };
 
   const handleInstrumentCSV = async () => {
-    const input = file!;
-
-    const processedData = await processInstrumentCSV(input, instrument);
-
-    if (processedData.success) {
-      await sendInstrumentData(processedData.value);
+    const processedDataResult = await processInstrumentCSV(file!, instrument!);
+    if (processedDataResult.success) {
+      const reformattedData = reformatInstrumentData({
+        currentGroup,
+        data: processedDataResult.value,
+        instrument: instrument!
+      });
+      uploadInstrumentRecordsMutation.mutate(reformattedData);
     } else {
       addNotification({
-        message: processedData.message,
+        message: processedDataResult.message,
         type: 'error'
       });
     }
   };
 
+  if (!instrument) {
+    return null;
+  }
+
   return (
-    <div className="align-center items-center justify-center">
-      <FileDropzone acceptedFileTypes={acceptedFiles} file={file} setFile={setFile} />
-      <div className="mt-4 flex justify-between space-x-2">
-        <Button disabled={!(file && instrument)} variant={'primary'} onClick={handleInstrumentCSV}>
-          Submit
-        </Button>
-        <Button disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
-          <DownloadIcon />
-          Download Template
-        </Button>
+    <React.Fragment>
+      <PageHeader>
+        <Heading className="text-center" variant="h2">
+          {t({
+            en: `Upload Data For ${instrument.details.title}`,
+            fr: `Téléverser les données pour l'instrument : ${instrument.details.title}`
+          })}
+        </Heading>
+      </PageHeader>
+      <div className="mx-auto flex w-full max-w-3xl flex-grow flex-col justify-center">
+        <FileDropzone
+          acceptedFileTypes={{
+            'text/csv': ['.csv']
+          }}
+          className="flex h-80 w-full flex-col"
+          file={file}
+          setFile={setFile}
+        />
+        <div className="mt-4 flex justify-between space-x-2">
+          <Button disabled={!(file && instrument)} variant={'primary'} onClick={handleInstrumentCSV}>
+            {t('core.submit')}
+          </Button>
+          <Button className="gap-1.5" disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
+            <DownloadIcon />
+            {t({
+              en: 'Download Template',
+              fr: 'Télécharger le modèle'
+            })}
+          </Button>
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 };

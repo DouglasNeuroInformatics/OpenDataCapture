@@ -1,10 +1,10 @@
 import { ClientTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 
 export type UploadSelectTableProps = {
-  data: InstrumentInfo[];
-  onSelect: (instrument: InstrumentInfo) => void;
+  data: UnilingualInstrumentInfo[];
+  onSelect: (instrument: UnilingualInstrumentInfo) => void;
 };
 
 export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) => {
@@ -12,18 +12,26 @@ export const UploadSelectTable = ({ data, onSelect }: UploadSelectTableProps) =>
 
   // Renders a table for selecting an instrument to upload data for
   return (
-    <ClientTable<InstrumentInfo>
+    <ClientTable<UnilingualInstrumentInfo>
       columns={[
         {
-          field: (instrument) => (instrument.details?.title as string) ?? 'N/A',
+          field: (instrument) => instrument.details.title,
           label: t({
-            en: 'Select an instrument',
-            fr: 'Selectionnez un instrument'
+            en: 'Title',
+            fr: 'Titre'
+          })
+        },
+        {
+          field: (instrument) => instrument.kind,
+          label: t({
+            en: 'Kind',
+            fr: 'Genre'
           })
         }
       ]}
       data={data}
       entriesPerPage={15}
+      minRows={15}
       onEntryClick={onSelect}
     />
   );

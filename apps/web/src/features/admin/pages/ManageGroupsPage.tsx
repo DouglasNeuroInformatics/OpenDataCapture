@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Button, ClientTable, Heading, SearchBar, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -6,6 +6,7 @@ import type { Group } from '@opendatacapture/schemas/group';
 import { Link } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
+import { useSearch } from '@/hooks/useSearch';
 
 import { useDeleteGroupMutation } from '../hooks/useDeleteGroupMutation';
 import { useGroupsQuery } from '../hooks/useGroupsQuery';
@@ -15,12 +16,7 @@ export const ManageGroupsPage = () => {
   const groupsQuery = useGroupsQuery();
   const deleteGroupMutation = useDeleteGroupMutation();
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [groups, setGroups] = useState<Group[]>(groupsQuery.data ?? []);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    setGroups((groupsQuery.data ?? []).filter((group) => group.name.toLowerCase().includes(searchTerm.toLowerCase())));
-  }, [groupsQuery.data, searchTerm]);
+  const { filteredData, searchTerm, setSearchTerm } = useSearch(groupsQuery.data ?? [], 'name');
 
   return (
     <Sheet open={Boolean(selectedGroup)} onOpenChange={() => setSelectedGroup(null)}>
@@ -69,7 +65,7 @@ export const ManageGroupsPage = () => {
             label: t('common.groupType')
           }
         ]}
-        data={groups}
+        data={filteredData}
         entriesPerPage={15}
         minRows={15}
         onEntryClick={setSelectedGroup}

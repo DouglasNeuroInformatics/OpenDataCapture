@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Button, ClientTable, Heading, SearchBar, Sheet } from '@douglasneuroinformatics/libui/components';
@@ -7,24 +7,19 @@ import type { User } from '@opendatacapture/schemas/user';
 import { Link } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
+import { useSearch } from '@/hooks/useSearch';
 import { useAppStore } from '@/store';
 
 import { useDeleteUserMutation } from '../hooks/useDeleteUserMutation';
 import { useUsersQuery } from '../hooks/useUsersQuery';
 
-// eslint-disable-next-line max-lines-per-function
 export const ManageUsersPage = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
   const usersQuery = useUsersQuery();
   const deleteUserMutation = useDeleteUserMutation();
-  const [users, setUsers] = useState<User[]>(usersQuery.data ?? []);
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    setUsers((usersQuery.data ?? []).filter((user) => user.username.toLowerCase().includes(searchTerm.toLowerCase())));
-  }, [usersQuery.data, searchTerm]);
+  const { filteredData, searchTerm, setSearchTerm } = useSearch(usersQuery.data ?? [], 'username');
 
   const currentUserIsSelected = selectedUser?.username === currentUser?.username;
 
@@ -76,7 +71,7 @@ export const ManageUsersPage = () => {
             label: t('common.basePermissionLevel')
           }
         ]}
-        data={users}
+        data={filteredData}
         entriesPerPage={15}
         minRows={15}
         onEntryClick={setSelectedUser}

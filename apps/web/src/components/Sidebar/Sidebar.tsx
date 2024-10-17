@@ -13,7 +13,6 @@ import { useAppStore } from '@/store';
 import { NavButton } from '../NavButton';
 import { UserDropup } from '../UserDropup';
 
-// eslint-disable-next-line max-lines-per-function
 export const Sidebar = () => {
   const navItems = useNavItems();
   const currentSession = useAppStore((store) => store.currentSession);

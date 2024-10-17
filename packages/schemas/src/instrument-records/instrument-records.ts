@@ -16,7 +16,7 @@ export const $CreateInstrumentRecordData = z.object({
   subjectId: z.string()
 });
 
-export const $UploadInstrumentRecordData = z.object({
+export const $UploadInstrumentRecordsData = z.object({
   groupId: z.string().optional(),
   instrumentId: z.string(),
   records: z.array(
@@ -30,7 +30,7 @@ export const $UploadInstrumentRecordData = z.object({
 
 export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;
 
-export type UploadInstrumentRecordData = z.infer<typeof $UploadInstrumentRecordData>;
+export type UploadInstrumentRecordsData = z.infer<typeof $UploadInstrumentRecordsData>;
 
 export const $InstrumentRecord = $BaseModel.extend({
   assignmentId: z.string().nullish(),

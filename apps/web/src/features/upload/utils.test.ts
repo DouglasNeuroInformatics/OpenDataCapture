@@ -5,7 +5,7 @@ import { unparse } from 'papaparse';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { getZodTypeName, processInstrumentCSV, zodObjectInterpreter } from './utils';
+import { getZodTypeName, interpretZodArray, processInstrumentCSV } from './utils';
 
 describe('getZodTypeName', () => {
   it('should parse a z.string()', () => {
@@ -98,9 +98,11 @@ describe('getZodTypeName', () => {
   });
 });
 
-describe('zodObjectInterpreter', () => {
+describe('interpretZodArray', () => {
   it('Should parse array', () => {
-    expect(zodObjectInterpreter(z.array(z.object({ foo: z.string() })), 'ZodArray', false)).toMatchObject({
+    expect(
+      interpretZodArray(z.array(z.object({ foo: z.string() })), z.ZodFirstPartyTypeKind.ZodArray, false)
+    ).toMatchObject({
       isOptional: false,
       multiKeys: ['foo'],
       multiValues: [
@@ -115,7 +117,9 @@ describe('zodObjectInterpreter', () => {
     });
   });
   it('Should parse optional array', () => {
-    expect(zodObjectInterpreter(z.array(z.object({ foo: z.string() })), 'ZodArray', true)).toMatchObject({
+    expect(
+      interpretZodArray(z.array(z.object({ foo: z.string() })), z.ZodFirstPartyTypeKind.ZodArray, true)
+    ).toMatchObject({
       isOptional: true,
       multiKeys: ['foo'],
       multiValues: [
@@ -130,7 +134,9 @@ describe('zodObjectInterpreter', () => {
     });
   });
   it('Should parse array with optional field', () => {
-    expect(zodObjectInterpreter(z.array(z.object({ foo: z.string().optional() })), 'ZodArray', false)).toMatchObject({
+    expect(
+      interpretZodArray(z.array(z.object({ foo: z.string().optional() })), z.ZodFirstPartyTypeKind.ZodArray, false)
+    ).toMatchObject({
       isOptional: false,
       multiKeys: ['foo'],
       multiValues: [
@@ -175,7 +181,6 @@ describe('processInstrumentCSV', () => {
 
   it('should process a valid csv', async () => {
     const file = new File(['subjectID,date,foo\n1,2024-01-01,bar'], 'data.csv', { type: 'text/csv' });
-    console.log(await processInstrumentCSV(file, mockInstrument));
     await expect(processInstrumentCSV(file, mockInstrument)).resolves.toMatchObject({ success: true });
   });
 
@@ -185,7 +190,6 @@ describe('processInstrumentCSV', () => {
       ['1', '2024-01-01', 'SET(foo,bar)']
     ]);
     const file = new File([papaString], 'data.csv', { type: 'text/csv' });
-    console.log(await processInstrumentCSV(file, mockInstrumentSet));
     await expect(processInstrumentCSV(file, mockInstrumentSet)).resolves.toMatchObject({ success: true });
   });
 
@@ -197,7 +201,6 @@ describe('processInstrumentCSV', () => {
     const file = new File([papaString], 'data.csv', {
       type: 'text/csv'
     });
-    console.log(await processInstrumentCSV(file, mockInstrumentArray));
     await expect(processInstrumentCSV(file, mockInstrumentArray)).resolves.toMatchObject({ success: true });
   });
 });

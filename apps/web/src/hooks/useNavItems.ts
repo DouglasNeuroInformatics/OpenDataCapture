@@ -50,7 +50,7 @@ export function useNavItems() {
         url: '/datahub'
       });
     }
-    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
+    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('create', 'InstrumentRecord')) {
       globalItems.push({
         icon: UploadIcon,
         label: t(`layout.navLinks.upload`),
