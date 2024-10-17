@@ -251,6 +251,9 @@ export function interpretZodObjectValue(
     const recordArrayObject: { [key: string]: any } = {};
 
     const record = listData.split(',');
+    if (record.some((str) => str === '')) {
+      return { message: `One or more of the record array fields was left empty`, success: false };
+    }
     if (!(zList.length === zKeys.length && zList.length === record.length)) {
       return { message: `Incorrect number of entries for record array`, success: false };
     }
