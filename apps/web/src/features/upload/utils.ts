@@ -260,7 +260,7 @@ export function interpretZodObjectValue(
     for (let i = 0; i < record.length; i++) {
       // TODO - make sure this is defined
       const recordValue = record[i]!.split(':')[1]!;
-      // TODO - how do we know that `zList` is the same length as record? What if the user forgets to add a element
+
       const zListResult = zList[i]!;
       if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
         return { message: `Failed to interpret field '${i}'`, success: false };
