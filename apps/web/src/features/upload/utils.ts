@@ -308,6 +308,7 @@ function generateSampleData({
         for (const val of enumValues!) {
           possibleEnumOutputs += val + '/';
         }
+        possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
         return formatTypeInfo(possibleEnumOutputs, isOptional);
       } catch {
         throw new Error('Invalid Enum error');
