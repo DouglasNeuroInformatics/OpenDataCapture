@@ -1,4 +1,4 @@
-{$SITE_ADDRESS} {
+:80 {
 	redir /api /api/
 
 	handle_path /api/* {
