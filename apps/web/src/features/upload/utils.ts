@@ -251,7 +251,9 @@ export function interpretZodObjectValue(
     const recordArrayObject: { [key: string]: any } = {};
 
     const record = listData.split(',');
-
+    if (!(zList.length === zKeys.length && zList.length === record.length)) {
+      return { message: `Incorrect number of entries for record array`, success: false };
+    }
     for (let i = 0; i < record.length; i++) {
       // TODO - make sure this is defined
       const recordValue = record[i]!.split(':')[1]!;
