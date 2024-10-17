@@ -1,14 +1,17 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
   InstrumentRecordQueryParams,
   InstrumentRecordsExport,
-  LinearRegressionResults
+  LinearRegressionResults,
+  UploadInstrumentRecordData
 } from '@opendatacapture/schemas/instrument-records';
+import type { SessionType } from '@opendatacapture/schemas/session';
+import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { InstrumentRecordModel, Prisma } from '@prisma/generated-client';
 import { isNumber, pickBy } from 'lodash-es';
 
@@ -19,6 +22,7 @@ import { InstrumentsService } from '@/instruments/instruments.service';
 import { InjectModel } from '@/prisma/prisma.decorators';
 import type { Model } from '@/prisma/prisma.types';
 import { SessionsService } from '@/sessions/sessions.service';
+import type { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { VirtualizationService } from '@/virtualization/virtualization.service';
 
@@ -61,7 +65,11 @@ export class InstrumentRecordsService {
 
     await this.subjectsService.findById(subjectId);
     await this.sessionsService.findById(sessionId);
-
+    if (!instrument.validationSchema.safeParse(data).success) {
+      throw new UnprocessableEntityException(
+        `Data received does not pass validation schema of instrument '${instrument.id}'`
+      );
+    }
     return this.instrumentRecordModel.create({
       data: {
         computedMeasures: instrument.measures
@@ -242,5 +250,94 @@ export class InstrumentRecordsService {
       results[measure] = linearRegression(new Float64Array(data[measure]![0]), new Float64Array(data[measure]![1]));
     }
     return results;
+  }
+
+  async upload(
+    { groupId, instrumentId, records }: UploadInstrumentRecordData,
+    options?: EntityOperationOptions
+  ): Promise<InstrumentRecordModel[]> {
+    if (groupId) {
+      await this.groupsService.findById(groupId, options);
+    }
+
+    const instrument = await this.instrumentsService.findById(instrumentId);
+
+    const createdModelsArray: InstrumentRecordModel[] = [];
+    if (instrument.kind === 'SERIES') {
+      throw new UnprocessableEntityException(
+        `Cannot create instrument record for series instrument '${instrument.id}'`
+      );
+    }
+
+    for (const record of records) {
+      const { data, date, subjectId } = record;
+
+      //create a new subject id in subjects service if they dont exist
+      try {
+        await this.subjectsService.findById(subjectId);
+      } catch (exception) {
+        if (exception instanceof NotFoundException) {
+          const addedSubject: CreateSubjectDto = {
+            id: subjectId
+          };
+          await this.subjectsService.create(addedSubject);
+        } else {
+          throw exception;
+        }
+      }
+
+      let subjectInfo: CreateSubjectData = {
+        dateOfBirth: null,
+        firstName: null,
+        id: subjectId,
+        lastName: null,
+        sex: null
+      };
+
+      let sessionType: SessionType = 'RETROSPECTIVE';
+
+      let sessionId = (
+        await this.sessionsService.create({
+          date: date,
+          groupId: groupId ? groupId : null,
+          subjectData: subjectInfo,
+          type: sessionType
+        })
+      ).id;
+
+      const createdModel = await this.instrumentRecordModel.create({
+        data: {
+          computedMeasures: instrument.measures
+            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
+            : null,
+          data,
+          date,
+          group: groupId
+            ? {
+                connect: { id: groupId }
+              }
+            : undefined,
+          instrument: {
+            connect: {
+              id: instrumentId
+            }
+          },
+          session: {
+            connect: {
+              id: sessionId
+            }
+          },
+          subject: {
+            connect: {
+              id: subjectId
+            }
+          }
+        }
+      });
+
+      createdModelsArray.push(createdModel);
+    }
+
+    return createdModelsArray;
   }
 }

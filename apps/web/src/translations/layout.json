@@ -50,6 +50,10 @@
       "en": "Data Hub",
       "fr": "Centre de données"
     },
+    "upload": {
+      "en": "Upload",
+      "fr": "Téléverser"
+    },
     "endSession": {
       "en": "End Current Session",
       "fr": "Terminer la session en cours"
