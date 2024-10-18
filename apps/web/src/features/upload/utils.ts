@@ -78,14 +78,19 @@ function isZodArrayDef(def: AnyZodTypeDef): def is z.ZodArrayDef {
 // TODO - fix extract set and record array functions to handle whitespace and trailing semicolon (present or included)
 
 function extractSetEntry(entry: string) {
-  return entry.slice(4, -1); // 'SET('
+  const result = /SET\(\s*(.*?)\s*\)/.exec(entry);
+  if (!result?.[1]) {
+    throw new Error(`Failed to extract set value from entry: '${entry}'`);
+  }
+  return result[1];
 }
 
 function extractRecordArrayEntry(entry: string) {
-  if (entry.lastIndexOf(';') === entry.length - 2) {
-    return entry.slice(13, -2);
+  const result = /RECORD_ARRAY\(\s*(.*?)[\s;]*\)/.exec(entry);
+  if (!result?.[1]) {
+    throw new Error(`Failed to extract record array value from entry: '${entry}'`);
   }
-  return entry.slice(13, -1);
+  return result[1];
 }
 
 export function reformatInstrumentData({
