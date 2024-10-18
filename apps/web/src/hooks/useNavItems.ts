@@ -7,6 +7,7 @@ import {
   ComputerIcon,
   DatabaseIcon,
   EyeIcon,
+  UploadIcon,
   UserCogIcon,
   UsersIcon
 } from 'lucide-react';
@@ -47,6 +48,13 @@ export function useNavItems() {
         icon: DatabaseIcon,
         label: t('layout.navLinks.datahub'),
         url: '/datahub'
+      });
+    }
+    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('create', 'InstrumentRecord')) {
+      globalItems.push({
+        icon: UploadIcon,
+        label: t(`layout.navLinks.upload`),
+        url: '/upload'
       });
     }
     if (currentGroup && currentUser?.ability.can('manage', 'Group')) {

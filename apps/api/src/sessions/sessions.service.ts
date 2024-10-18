@@ -56,6 +56,23 @@ export class SessionsService {
     }))!;
   }
 
+  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
+    return this.sessionModel.delete({
+      where: { AND: [accessibleQuery(ability, 'delete', 'Session')], id }
+    });
+  }
+
+  async deleteByIds(ids: string[], { ability }: EntityOperationOptions = {}) {
+    return this.sessionModel.deleteMany({
+      where: {
+        AND: [accessibleQuery(ability, 'delete', 'Session')],
+        id: {
+          in: ids
+        }
+      }
+    });
+  }
+
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
     const session = await this.sessionModel.findFirst({
       where: { AND: [accessibleQuery(ability, 'read', 'Session')], id }

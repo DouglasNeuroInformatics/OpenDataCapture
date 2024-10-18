@@ -10,6 +10,7 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import type { AppAbility } from '@/core/types';
 
 import { CreateInstrumentRecordDto } from './dto/create-instrument-record.dto';
+import { UploadInstrumentRecordsDto } from './dto/upload-instrument-record.dto';
 import { InstrumentRecordsService } from './instrument-records.service';
 
 @ApiTags('Instrument Records')
@@ -22,6 +23,13 @@ export class InstrumentRecordsController {
   @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
   create(@Body() data: CreateInstrumentRecordDto, @CurrentUser('ability') ability: AppAbility) {
     return this.instrumentRecordsService.create(data, { ability });
+  }
+
+  @ApiOperation({ summary: 'Upload Multiple Instrument Records' })
+  @Post('upload')
+  @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
+  upload(@Body() data: UploadInstrumentRecordsDto, @CurrentUser('ability') ability: AppAbility) {
+    return this.instrumentRecordsService.upload(data, { ability });
   }
 
   @ApiOperation({ summary: 'Get Records for Instrument ' })
