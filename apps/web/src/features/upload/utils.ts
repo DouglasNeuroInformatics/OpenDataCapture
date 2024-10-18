@@ -215,6 +215,7 @@ export function interpretZodValue(
         return { success: true, value: parseNumber(entry) };
       }
       return { message: `Invalid number type: ${entry}`, success: false };
+    //TODO if ZodSet has a enum see if those values can be shown in template data if possible
     case 'ZodSet':
       if (entry.startsWith('SET(')) {
         const setData = extractSetEntry(entry);
