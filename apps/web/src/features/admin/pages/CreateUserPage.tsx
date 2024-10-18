@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $BasePermissionLevel, $CreateUserData, type CreateUserData } from '@opendatacapture/schemas/user';
@@ -44,6 +45,9 @@ export const CreateUserPage = () => {
                 variant: 'input'
               },
               password: {
+                calculateStrength: (password) => {
+                  return estimatePasswordStrength(password).score;
+                },
                 kind: 'string',
                 label: t('common.password'),
                 variant: 'password'
@@ -125,6 +129,15 @@ export const CreateUserPage = () => {
             confirmPassword: z.string().min(1)
           })
           .superRefine((arg, ctx) => {
+            if (!estimatePasswordStrength(arg.password).success) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                fatal: true,
+                message: t('common.insufficientPasswordStrength'),
+                path: ['password']
+              });
+              return z.NEVER;
+            }
             if (arg.confirmPassword !== arg.password) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
