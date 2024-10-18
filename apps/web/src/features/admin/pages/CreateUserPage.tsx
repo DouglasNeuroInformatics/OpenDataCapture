@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $BasePermissionLevel, $CreateUserData, type CreateUserData } from '@opendatacapture/schemas/user';
@@ -44,6 +45,9 @@ export const CreateUserPage = () => {
                 variant: 'input'
               },
               password: {
+                calculateStrength: (password) => {
+                  return estimatePasswordStrength(password).score;
+                },
                 kind: 'string',
                 label: t('common.password'),
                 variant: 'password'
@@ -76,10 +80,19 @@ export const CreateUserPage = () => {
                 variant: 'select'
               },
               groupIds: {
-                kind: 'set',
-                label: t('common.groups'),
-                options: Object.fromEntries((groupsQuery.data ?? []).map((group) => [group.id, group.name])),
-                variant: 'listbox'
+                kind: 'dynamic',
+                deps: ['basePermissionLevel'],
+                render({ basePermissionLevel }) {
+                  if (!basePermissionLevel || basePermissionLevel === 'ADMIN') {
+                    return null;
+                  }
+                  return {
+                    kind: 'set',
+                    label: t('common.groups'),
+                    options: Object.fromEntries((groupsQuery.data ?? []).map((group) => [group.id, group.name])),
+                    variant: 'listbox'
+                  };
+                }
               }
             }
           },
@@ -121,10 +134,19 @@ export const CreateUserPage = () => {
           })
           .extend({
             basePermissionLevel: $BasePermissionLevel,
-            groupIds: z.set(z.string()),
+            groupIds: z.set(z.string()).optional(),
             confirmPassword: z.string().min(1)
           })
           .superRefine((arg, ctx) => {
+            if (!estimatePasswordStrength(arg.password).success) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                fatal: true,
+                message: t('common.insufficientPasswordStrength'),
+                path: ['password']
+              });
+              return z.NEVER;
+            }
             if (arg.confirmPassword !== arg.password) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
@@ -133,7 +155,7 @@ export const CreateUserPage = () => {
               });
             }
           })}
-        onSubmit={(data) => handleSubmit({ ...data, groupIds: Array.from(data.groupIds) })}
+        onSubmit={(data) => handleSubmit({ ...data, groupIds: Array.from(data.groupIds ?? []) })}
       />
     </div>
   );
