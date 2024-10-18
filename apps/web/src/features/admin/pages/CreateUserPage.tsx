@@ -80,10 +80,19 @@ export const CreateUserPage = () => {
                 variant: 'select'
               },
               groupIds: {
-                kind: 'set',
-                label: t('common.groups'),
-                options: Object.fromEntries((groupsQuery.data ?? []).map((group) => [group.id, group.name])),
-                variant: 'listbox'
+                kind: 'dynamic',
+                deps: ['basePermissionLevel'],
+                render({ basePermissionLevel }) {
+                  if (!basePermissionLevel || basePermissionLevel === 'ADMIN') {
+                    return null;
+                  }
+                  return {
+                    kind: 'set',
+                    label: t('common.groups'),
+                    options: Object.fromEntries((groupsQuery.data ?? []).map((group) => [group.id, group.name])),
+                    variant: 'listbox'
+                  };
+                }
               }
             }
           },
@@ -125,7 +134,7 @@ export const CreateUserPage = () => {
           })
           .extend({
             basePermissionLevel: $BasePermissionLevel,
-            groupIds: z.set(z.string()),
+            groupIds: z.set(z.string()).optional(),
             confirmPassword: z.string().min(1)
           })
           .superRefine((arg, ctx) => {
@@ -146,7 +155,7 @@ export const CreateUserPage = () => {
               });
             }
           })}
-        onSubmit={(data) => handleSubmit({ ...data, groupIds: Array.from(data.groupIds) })}
+        onSubmit={(data) => handleSubmit({ ...data, groupIds: Array.from(data.groupIds ?? []) })}
       />
     </div>
   );
