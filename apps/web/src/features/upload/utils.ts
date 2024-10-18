@@ -82,7 +82,10 @@ function extractSetEntry(entry: string) {
 }
 
 function extractRecordArrayEntry(entry: string) {
-  return entry.slice(13, -2); // 'RECORD_ARRAY(' - why -2?
+  if (entry.lastIndexOf(';') === entry.length - 2) {
+    return entry.slice(13, -2);
+  }
+  return entry.slice(13, -1);
 }
 
 export function reformatInstrumentData({
@@ -212,6 +215,7 @@ export function interpretZodValue(
         return { success: true, value: parseNumber(entry) };
       }
       return { message: `Invalid number type: ${entry}`, success: false };
+    //TODO if ZodSet has a enum see if those values can be shown in template data if possible
     case 'ZodSet':
       if (entry.startsWith('SET(')) {
         const setData = extractSetEntry(entry);
@@ -251,11 +255,16 @@ export function interpretZodObjectValue(
     const recordArrayObject: { [key: string]: any } = {};
 
     const record = listData.split(',');
-
+    if (record.some((str) => str === '')) {
+      return { message: `One or more of the record array fields was left empty`, success: false };
+    }
+    if (!(zList.length === zKeys.length && zList.length === record.length)) {
+      return { message: `Incorrect number of entries for record array`, success: false };
+    }
     for (let i = 0; i < record.length; i++) {
       // TODO - make sure this is defined
       const recordValue = record[i]!.split(':')[1]!;
-      // TODO - how do we know that `zList` is the same length as record? What if the user forgets to add a element
+
       const zListResult = zList[i]!;
       if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
         return { message: `Failed to interpret field '${i}'`, success: false };
@@ -308,6 +317,7 @@ function generateSampleData({
         for (const val of enumValues!) {
           possibleEnumOutputs += val + '/';
         }
+        possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
         return formatTypeInfo(possibleEnumOutputs, isOptional);
       } catch {
         throw new Error('Invalid Enum error');
