@@ -82,7 +82,11 @@ function extractSetEntry(entry: string) {
 }
 
 function extractRecordArrayEntry(entry: string) {
-  return entry.slice(13, -2); // 'RECORD_ARRAY(' - why -2?
+  if (entry.lastIndexOf(';') === entry.length - 2) {
+    console.log(entry.slice(13, -2));
+    return entry.slice(13, -2);
+  }
+  return entry.slice(13, -1);
 }
 
 export function reformatInstrumentData({
