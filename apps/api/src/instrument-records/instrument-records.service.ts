@@ -1,7 +1,7 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import type { ScalarInstrument } from '@opendatacapture/runtime-core';
+import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -25,6 +25,7 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
+import { reviver } from '@douglasneuroinformatics/libjs';
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -286,7 +287,9 @@ export class InstrumentRecordsService {
 
         const sessionId = session.id;
 
-        if (!instrument.validationSchema.safeParse(data).success) {
+        const revivedData: Json = JSON.parse(JSON.stringify(data), reviver);
+
+        if (!instrument.validationSchema.safeParse(revivedData).success) {
           throw new UnprocessableEntityException(
             `Data received for record at index '${i}' does not pass validation schema of instrument '${instrument.id}'`
           );
@@ -295,7 +298,7 @@ export class InstrumentRecordsService {
         const createdRecord = await this.instrumentRecordModel.create({
           data: {
             computedMeasures: instrument.measures
-              ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
+              ? this.instrumentMeasuresService.computeMeasures(instrument.measures, revivedData)
               : null,
             data,
             date,
