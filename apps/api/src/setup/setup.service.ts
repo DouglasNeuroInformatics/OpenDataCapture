@@ -1,6 +1,6 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { type CreateAdminData } from '@opendatacapture/schemas/setup';
-import type { InitAppOptions, SetupState } from '@opendatacapture/schemas/setup';
+import type { InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { DemoService } from '@/demo/demo.service';
@@ -53,6 +53,19 @@ export class SetupService {
       data: { isDemo: initDemo, isExperimentalFeaturesEnabled: enableExperimentalFeatures, isSetup: true }
     });
     return { success: true };
+  }
+
+  async updateState(data: UpdateSetupStateData): Promise<Partial<SetupState>> {
+    const setupState = await this.getSavedOptions();
+    if (!setupState?.isSetup) {
+      throw new ServiceUnavailableException('Cannot update state before setup');
+    }
+    return this.setupStateModel.update({
+      data,
+      where: {
+        id: setupState.id
+      }
+    });
   }
 
   private async getSavedOptions() {
