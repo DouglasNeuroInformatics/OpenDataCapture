@@ -80,7 +80,7 @@ export const createEditorSlice: SliceCreator<EditorSlice> = (set, get) => ({
   },
   updateFile: (name, update) => {
     set((state) => {
-      let index = state.files.findIndex((file) => file.name === name);
+      const index = state.files.findIndex((file) => file.name === name);
       if (index === -1) {
         console.error(`Cannot update file '${name}': file does not exist`);
         return;

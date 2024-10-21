@@ -1,1 +1,1 @@
-declare var message: 'hello';
+declare let message: 'hello';

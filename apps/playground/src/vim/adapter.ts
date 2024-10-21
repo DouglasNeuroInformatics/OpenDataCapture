@@ -680,7 +680,7 @@ export default class EditorAdapter {
     let char = key;
     const pos = this.getPos_();
     let range = makeRange(pos.lineNumber, pos.column, pos.lineNumber, pos.column + 1);
-    let forceMoveMarkers = true;
+    const forceMoveMarkers = true;
 
     if (key.startsWith("'")) {
       char = key[1]!;

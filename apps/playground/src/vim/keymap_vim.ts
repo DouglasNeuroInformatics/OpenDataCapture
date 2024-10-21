@@ -1037,7 +1037,7 @@ export const exCommands: { [key: string]: ExCommandFunc } = {
 
       // Record the streams position at the beginning of the loop for use
       // in error messages.
-      let count = stream.pos;
+      const count = stream.pos;
 
       if (!stream.match(/[a-zA-Z]/, false)) {
         showConfirm(adapter, 'Invalid argument: ' + params.argString.substring(count));
