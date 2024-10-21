@@ -4,6 +4,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import {
   BarChartBigIcon,
   CirclePlayIcon,
+  CogIcon,
   ComputerIcon,
   DatabaseIcon,
   EyeIcon,
@@ -67,6 +68,14 @@ export function useNavItems() {
 
     const adminItems: NavItem[] = [];
     if (currentUser?.ability.can('manage', 'all')) {
+      adminItems.push({
+        icon: CogIcon,
+        label: t({
+          en: 'App Settings',
+          fr: "Paramètres de l'application"
+        }),
+        url: '/admin/settings'
+      });
       adminItems.push({
         icon: UsersIcon,
         label: t({

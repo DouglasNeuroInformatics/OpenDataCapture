@@ -2,6 +2,7 @@
 
 import type { RouteObject } from 'react-router-dom';
 
+import { AdminSettingsPage } from './pages/AdminSettingsPage';
 import { CreateGroupPage } from './pages/CreateGroupPage';
 import { CreateUserPage } from './pages/CreateUserPage';
 import { ManageGroupsPage } from './pages/ManageGroupsPage';
@@ -35,6 +36,10 @@ export const adminRoute: RouteObject = {
           element: <CreateUserPage />
         }
       ]
+    },
+    {
+      path: 'settings',
+      element: <AdminSettingsPage />
     }
   ]
 };
