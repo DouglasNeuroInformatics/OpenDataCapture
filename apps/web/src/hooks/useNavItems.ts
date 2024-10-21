@@ -15,6 +15,8 @@ import {
 
 import { useAppStore } from '@/store';
 
+import { useSetupState } from './useSetupState';
+
 export type NavItem = {
   disabled?: boolean;
   icon: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
@@ -34,6 +36,7 @@ export function useNavItems() {
   const currentUser = useAppStore((store) => store.currentUser);
   const [navItems, setNavItems] = useState<NavItem[][]>([[], []]);
   const { resolvedLanguage, t } = useTranslation();
+  const setupState = useSetupState();
 
   useEffect(() => {
     const globalItems: NavItem[] = [];
@@ -51,7 +54,11 @@ export function useNavItems() {
         url: '/datahub'
       });
     }
-    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('create', 'InstrumentRecord')) {
+    if (
+      currentUser?.ability.can('read', 'Subject') &&
+      currentUser.ability.can('create', 'InstrumentRecord') &&
+      setupState.data?.isExperimentalFeaturesEnabled
+    ) {
       globalItems.push({
         icon: UploadIcon,
         label: t(`layout.navLinks.upload`),
