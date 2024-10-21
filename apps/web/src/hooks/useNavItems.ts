@@ -4,6 +4,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import {
   BarChartBigIcon,
   CirclePlayIcon,
+  CogIcon,
   ComputerIcon,
   DatabaseIcon,
   EyeIcon,
@@ -13,6 +14,8 @@ import {
 } from 'lucide-react';
 
 import { useAppStore } from '@/store';
+
+import { useSetupState } from './useSetupState';
 
 export type NavItem = {
   disabled?: boolean;
@@ -33,6 +36,7 @@ export function useNavItems() {
   const currentUser = useAppStore((store) => store.currentUser);
   const [navItems, setNavItems] = useState<NavItem[][]>([[], []]);
   const { resolvedLanguage, t } = useTranslation();
+  const setupState = useSetupState();
 
   useEffect(() => {
     const globalItems: NavItem[] = [];
@@ -50,7 +54,11 @@ export function useNavItems() {
         url: '/datahub'
       });
     }
-    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('create', 'InstrumentRecord')) {
+    if (
+      currentUser?.ability.can('read', 'Subject') &&
+      currentUser.ability.can('create', 'InstrumentRecord') &&
+      setupState.data?.isExperimentalFeaturesEnabled
+    ) {
       globalItems.push({
         icon: UploadIcon,
         label: t(`layout.navLinks.upload`),
@@ -67,6 +75,14 @@ export function useNavItems() {
 
     const adminItems: NavItem[] = [];
     if (currentUser?.ability.can('manage', 'all')) {
+      adminItems.push({
+        icon: CogIcon,
+        label: t({
+          en: 'App Settings',
+          fr: "Paramètres de l'application"
+        }),
+        url: '/admin/settings'
+      });
       adminItems.push({
         icon: UsersIcon,
         label: t({
@@ -111,7 +127,7 @@ export function useNavItems() {
       });
     }
     setNavItems([globalItems, adminItems, sessionItems].filter((arr) => arr.length));
-  }, [currentSession, currentUser, resolvedLanguage]);
+  }, [currentSession, currentUser, resolvedLanguage, setupState.data?.isExperimentalFeaturesEnabled]);
 
   return navItems;
 }

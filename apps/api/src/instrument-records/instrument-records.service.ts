@@ -1,4 +1,5 @@
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
+import { reviver } from '@douglasneuroinformatics/libjs';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
@@ -25,7 +26,6 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
-import { reviver } from '@douglasneuroinformatics/libjs';
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -287,7 +287,7 @@ export class InstrumentRecordsService {
 
         const sessionId = session.id;
 
-        const revivedData: Json = JSON.parse(JSON.stringify(data), reviver);
+        const revivedData = JSON.parse(JSON.stringify(data), reviver) as Json;
 
         if (!instrument.validationSchema.safeParse(revivedData).success) {
           throw new UnprocessableEntityException(

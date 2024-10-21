@@ -313,9 +313,11 @@ export function parseImports(code: string): Iterable<Import> {
   return {
     *[Symbol.iterator]() {
       for (let {
+        // eslint-disable-next-line prefer-const
         dynamicImportStartIndex,
         moduleSpecifierEndIndexExclusive,
         moduleSpecifierStartIndex,
+        // eslint-disable-next-line prefer-const
         statementStartIndex
       } of imports) {
         const isImportMeta = dynamicImportStartIndex === -2;

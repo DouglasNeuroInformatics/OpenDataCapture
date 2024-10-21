@@ -169,7 +169,7 @@ export const motions: { [key: string]: MotionFunc } = {
     }
     let best = head;
     for (let i = 0; i < motionArgs.repeat!; i++) {
-      let cursor = best;
+      const cursor = best;
       for (const key in vim.marks) {
         if (!isLowerCase(key)) {
           continue;
@@ -220,7 +220,7 @@ export const motions: { [key: string]: MotionFunc } = {
         vim.lastHSPos = adapter.charCoords(cur, 'div').left;
     }
     const repeat = motionArgs.repeat || 0;
-    let res = adapter.findPosV(
+    const res = adapter.findPosV(
       cur,
       motionArgs.forward ? repeat : -repeat,
       'line'
@@ -672,8 +672,8 @@ function findParagraph(
   inclusive?: boolean
 ): [Pos, Pos] | Pos {
   let line = head.line;
-  let min = adapter.firstLine();
-  let max = adapter.lastLine();
+  const min = adapter.firstLine();
+  const max = adapter.lastLine();
   let i = line;
   const isEmpty = (i: number) => {
     return !adapter.getLine(i);

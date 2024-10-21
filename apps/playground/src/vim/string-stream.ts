@@ -40,7 +40,7 @@ export class StringStream {
   }
 
   eatSpace() {
-    var start = this.pos;
+    const start = this.pos;
     while (/[\s\u00a0]/.test(this.str.charAt(this.pos))) {
       ++this.pos;
     }
@@ -48,7 +48,7 @@ export class StringStream {
   }
 
   eatWhile(match: ((ch: string) => boolean) | RegExp | string) {
-    var start = this.pos;
+    const start = this.pos;
     while (this.eat(match)) {
       /* empty */
     }
@@ -94,7 +94,7 @@ export class StringStream {
       }
       return null;
     } else {
-      var match = this.str.slice(this.pos).match(pattern);
+      const match = this.str.slice(this.pos).match(pattern);
       if (match?.index && match.index > 0) {
         return null;
       }
@@ -117,7 +117,7 @@ export class StringStream {
   }
 
   skipTo(ch: string) {
-    var found = this.str.indexOf(ch, this.pos);
+    const found = this.str.indexOf(ch, this.pos);
     if (found > -1) {
       this.pos = found;
       return true;

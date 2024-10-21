@@ -12,6 +12,9 @@ export class InitAppDto implements InitAppOptions {
   dummySubjectCount?: number;
 
   @ApiProperty()
+  enableExperimentalFeatures: boolean;
+
+  @ApiProperty()
   initDemo: boolean;
 
   @ApiProperty()

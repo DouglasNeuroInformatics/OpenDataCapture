@@ -27,8 +27,8 @@ export const UploadSelectPage = () => {
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {t({
-            en: 'Select Instrument (Feature in Beta)',
-            fr: 'Selectionnez un instrument (Fonctionnalité en bêta)'
+            en: 'Select Instrument (Experimental Feature)',
+            fr: 'Selectionnez un instrument (Fonctionnalité expérimentale)'
           })}
         </Heading>
       </PageHeader>

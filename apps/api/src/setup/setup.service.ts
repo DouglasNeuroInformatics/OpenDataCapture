@@ -1,6 +1,6 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { type CreateAdminData } from '@opendatacapture/schemas/setup';
-import type { InitAppOptions, SetupState } from '@opendatacapture/schemas/setup';
+import type { InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { DemoService } from '@/demo/demo.service';
@@ -27,6 +27,7 @@ export class SetupService {
     const savedOptions = await this.getSavedOptions();
     return {
       isDemo: Boolean(savedOptions?.isDemo),
+      isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),
       isGatewayEnabled: this.configurationService.get('GATEWAY_ENABLED'),
       isSetup: Boolean(savedOptions?.isSetup),
       release: __RELEASE__,
@@ -34,7 +35,7 @@ export class SetupService {
     } satisfies SetupState;
   }
 
-  async initApp({ admin, dummySubjectCount, initDemo, recordsPerSubject }: InitAppOptions) {
+  async initApp({ admin, dummySubjectCount, enableExperimentalFeatures, initDemo, recordsPerSubject }: InitAppOptions) {
     const isDev = this.configurationService.get('NODE_ENV') === 'development';
     const savedOptions = await this.getSavedOptions();
     if (savedOptions?.isSetup && !isDev) {
@@ -48,8 +49,23 @@ export class SetupService {
         recordsPerSubject: recordsPerSubject ?? 0
       });
     }
-    await this.setupStateModel.create({ data: { isDemo: initDemo, isSetup: true } });
+    await this.setupStateModel.create({
+      data: { isDemo: initDemo, isExperimentalFeaturesEnabled: enableExperimentalFeatures, isSetup: true }
+    });
     return { success: true };
+  }
+
+  async updateState(data: UpdateSetupStateData): Promise<Partial<SetupState>> {
+    const setupState = await this.getSavedOptions();
+    if (!setupState?.isSetup) {
+      throw new ServiceUnavailableException('Cannot update state before setup');
+    }
+    return this.setupStateModel.update({
+      data,
+      where: {
+        id: setupState.id
+      }
+    });
   }
 
   private async getSavedOptions() {

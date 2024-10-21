@@ -39,6 +39,10 @@
       "fr": "Démonstration"
     }
   },
+  "enableExperimentalFeatures": {
+    "en": "Enable Experimental Features (Not Recommended)",
+    "fr": "Activer les fonctionnalités expérimentales (Non recommandé)"
+  },
   "loadingSubtitle": {
     "en": "Please be patient, this may take a while...",
     "fr": "Veuillez patienter, cela peut prendre un certain temps..."

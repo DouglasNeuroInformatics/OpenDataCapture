@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { SetupState } from '@opendatacapture/schemas/setup';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { InitAppDto } from './dto/init-app.dto';
+import { UpdateSetupStateDto } from './dto/update-setup-state.dto';
 import { SetupService } from './setup.service';
 
 @ApiTags('Setup')
@@ -33,5 +34,15 @@ export class SetupController {
   @RouteAccess('public')
   initApp(@Body() initAppDto: InitAppDto): Promise<{ success: boolean }> {
     return this.setupService.initApp(initAppDto);
+  }
+
+  @ApiOperation({
+    description: 'Update the setup state',
+    summary: 'Update State'
+  })
+  @Patch()
+  @RouteAccess({ action: 'manage', subject: 'all' })
+  updateState(@Body() data: UpdateSetupStateDto): Promise<Partial<SetupState>> {
+    return this.setupService.updateState(data);
   }
 }

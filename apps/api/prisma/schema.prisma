@@ -190,9 +190,10 @@ model SessionModel {
 // Setup
 
 model SetupStateModel {
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  isDemo    Boolean
-  isSetup   Boolean
+  createdAt                     DateTime @default(now()) @db.Date
+  updatedAt                     DateTime @updatedAt @db.Date
+  id                            String   @id @default(auto()) @map("_id") @db.ObjectId
+  isDemo                        Boolean
+  isExperimentalFeaturesEnabled Boolean?
+  isSetup                       Boolean
 }

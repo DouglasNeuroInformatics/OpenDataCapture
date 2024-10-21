@@ -112,6 +112,7 @@ export const operators: { [key: string]: OperatorFunc } = {
     const vim = adapter.state.vim as VimState;
     if (!vim.visualBlock) {
       let anchor = ranges[0]!.anchor,
+        // eslint-disable-next-line prefer-const
         head = ranges[0]!.head;
       if (
         args.linewise &&
@@ -149,7 +150,7 @@ export const operators: { [key: string]: OperatorFunc } = {
     let endLine = vim.visualBlock ? ranges[ranges.length - 1]!.anchor.line : ranges[0]!.head.line;
     // In visual mode, n> shifts the selection right n times, instead of
     // shifting n lines right once.
-    let repeat = vim.visualMode ? args.repeat || 0 : 1;
+    const repeat = vim.visualMode ? args.repeat || 0 : 1;
     if (args.linewise) {
       // The only way to delete a newline is to delete until the start of
       // the next line, so in linewise mode evalInput will include the next

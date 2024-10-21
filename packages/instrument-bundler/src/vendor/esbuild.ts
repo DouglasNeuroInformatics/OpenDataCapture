@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+
 if (typeof window === 'undefined') {
   var { build, transform } = await import('esbuild');
 } else {
