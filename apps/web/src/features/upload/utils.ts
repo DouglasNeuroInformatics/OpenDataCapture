@@ -398,11 +398,26 @@ export async function processInstrumentCSV(
   instrument: AnyUnilingualFormInstrument
 ): Promise<UploadOperationResult<FormTypes.Data[]>> {
   const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
-  const instrumentSchemaWithInternal = instrumentSchema.extend({
-    date: z.coerce.date(),
-    subjectID: z.string()
-  });
-  const shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
+  let shape: { [key: string]: z.ZodTypeAny } = {};
+  let instrumentSchemaWithInternal: z.AnyZodObject;
+
+  if ((instrumentSchema._def.typeName as string) === 'ZodEffects') {
+    // TODO - find a type safe way to call this
+
+    instrumentSchemaWithInternal = instrumentSchema._def.schema.extend({
+      date: z.coerce.date(),
+      subjectID: z.string()
+    }) as z.AnyZodObject;
+
+    shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
+  } else {
+    //const shape2 = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
+    instrumentSchemaWithInternal = instrumentSchema.extend({
+      date: z.coerce.date(),
+      subjectID: z.string()
+    });
+    shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
+  }
 
   return new Promise<UploadOperationResult<FormTypes.Data[]>>((resolve) => {
     const reader = new FileReader();
