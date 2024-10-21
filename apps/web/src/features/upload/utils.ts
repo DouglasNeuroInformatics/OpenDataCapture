@@ -362,9 +362,15 @@ function generateSampleData({
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
   // TODO - type validationSchema as object
   const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
-  const shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
 
-  const columnNames = Object.keys(instrumentSchema.shape as z.AnyZodObject);
+  let shape: { [key: string]: z.ZodTypeAny } = {};
+  if ((instrumentSchema._def.typeName as string) === 'ZodEffects') {
+    shape = instrumentSchema._def.schema._def.shape() as { [key: string]: z.ZodTypeAny };
+  } else {
+    shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
+  }
+
+  const columnNames = Object.keys(shape);
 
   const csvColumns = INTERNAL_HEADERS.concat(columnNames);
 
