@@ -127,7 +127,7 @@ export function useNavItems() {
       });
     }
     setNavItems([globalItems, adminItems, sessionItems].filter((arr) => arr.length));
-  }, [currentSession, currentUser, resolvedLanguage]);
+  }, [currentSession, currentUser, resolvedLanguage, setupState.data?.isExperimentalFeaturesEnabled]);
 
   return navItems;
 }
