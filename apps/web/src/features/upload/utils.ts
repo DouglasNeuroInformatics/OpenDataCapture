@@ -364,9 +364,9 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
   const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
 
   let shape: { [key: string]: z.ZodTypeAny } = {};
-  //Todo include ZodEffect as a typename like our other types
+  // TODO - include ZodEffect as a typename like our other types
   if ((instrumentSchema._def.typeName as string) === 'ZodEffects') {
-    //find a type safe way to call this
+    // TODO - find a type safe way to call this
     shape = instrumentSchema._def.schema._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
     shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
