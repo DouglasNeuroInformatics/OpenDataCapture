@@ -26,6 +26,7 @@ export const $ReleaseInfo = z.union([$DevelopmentReleaseInfo, $ProductionRelease
 export type SetupState = z.infer<typeof $SetupState>;
 export const $SetupState = z.object({
   isDemo: z.boolean(),
+  isExperimentalFeaturesEnabled: z.boolean(),
   isGatewayEnabled: z.boolean(),
   isSetup: z.boolean().nullable(),
   release: $ReleaseInfo,
@@ -42,6 +43,7 @@ export type InitAppOptions = z.infer<typeof $InitAppOptions>;
 export const $InitAppOptions = z.object({
   admin: $CreateAdminData,
   dummySubjectCount: z.number().int().nonnegative().optional(),
+  enableExperimentalFeatures: z.boolean(),
   initDemo: z.boolean(),
   recordsPerSubject: z.number().int().nonnegative().optional()
 });

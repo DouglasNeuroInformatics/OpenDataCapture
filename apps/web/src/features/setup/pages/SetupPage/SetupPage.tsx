@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 type SetupData = {
   dummySubjectCount?: number | undefined;
+  enableExperimentalFeatures: boolean;
   firstName: string;
   initDemo: boolean;
   lastName: string;
@@ -65,6 +66,14 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
               {
                 description: t('setup.demo.description'),
                 fields: {
+                  enableExperimentalFeatures: {
+                    kind: 'boolean',
+                    label: t({
+                      en: 'Enable Experimental Features',
+                      fr: 'Activer les fonctionnalités expérimentales'
+                    }),
+                    variant: 'radio'
+                  },
                   initDemo: {
                     kind: 'boolean',
                     label: t('setup.demo.init'),
@@ -117,6 +126,7 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                 .min(1)
                 .refine((val) => estimatePasswordStrength(val).success, t('common.insufficientPasswordStrength')),
               initDemo: z.boolean(),
+              enableExperimentalFeatures: z.boolean(),
               recordsPerSubject: z.number().int().nonnegative().optional(),
               dummySubjectCount: z.number().int().nonnegative().optional()
             })}
