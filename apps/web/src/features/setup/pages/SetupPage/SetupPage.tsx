@@ -68,10 +68,7 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                 fields: {
                   enableExperimentalFeatures: {
                     kind: 'boolean',
-                    label: t({
-                      en: 'Enable Experimental Features',
-                      fr: 'Activer les fonctionnalités expérimentales'
-                    }),
+                    label: t('setup.enableExperimentalFeatures'),
                     variant: 'radio'
                   },
                   initDemo: {
@@ -116,6 +113,9 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
               }
             ]}
             data-cy="setup-form"
+            initialValues={{
+              enableExperimentalFeatures: false
+            }}
             submitBtnLabel={t('core.submit')}
             validationSchema={z.object({
               firstName: z.string().min(1),

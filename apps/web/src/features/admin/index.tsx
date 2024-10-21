@@ -2,7 +2,7 @@
 
 import type { RouteObject } from 'react-router-dom';
 
-import { AdminSettingsPage } from './pages/AdminSettingsPage';
+import { AppSettingsPage } from './pages/AppSettingsPage';
 import { CreateGroupPage } from './pages/CreateGroupPage';
 import { CreateUserPage } from './pages/CreateUserPage';
 import { ManageGroupsPage } from './pages/ManageGroupsPage';
@@ -39,7 +39,7 @@ export const adminRoute: RouteObject = {
     },
     {
       path: 'settings',
-      element: <AdminSettingsPage />
+      element: <AppSettingsPage />
     }
   ]
 };
