@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+
 import { isNumberLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
 import type { Group } from '@opendatacapture/schemas/group';
@@ -366,7 +368,8 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
   let shape: { [key: string]: z.ZodTypeAny } = {};
   // TODO - include ZodEffect as a typename like our other types
   if ((instrumentSchema._def.typeName as string) === 'ZodEffects') {
-    // TODO - find a type safe way to call this
+    // @ts-expect-error - TODO - find a type safe way to call this
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     shape = instrumentSchema._def.schema._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
     shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
@@ -402,8 +405,8 @@ export async function processInstrumentCSV(
   let instrumentSchemaWithInternal: z.AnyZodObject;
 
   if ((instrumentSchema._def.typeName as string) === 'ZodEffects') {
-    // TODO - find a type safe way to call this
-
+    // @ts-expect-error - TODO - find a type safe way to call this
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     instrumentSchemaWithInternal = instrumentSchema._def.schema.extend({
       date: z.coerce.date(),
       subjectID: z.string()
