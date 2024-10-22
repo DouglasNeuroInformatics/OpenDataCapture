@@ -98,10 +98,10 @@ export const getEventKeyName = (e: IKeyboardEvent | KeyboardEvent, skip = false)
   let skipOnlyShiftCheck = skip;
 
   switch (e.keyCode) {
-    case KeyCode.Shift:
-    case KeyCode.Meta:
     case KeyCode.Alt:
     case KeyCode.Ctrl:
+    case KeyCode.Meta:
+    case KeyCode.Shift:
       return key;
     case KeyCode.Escape:
       skipOnlyShiftCheck = true;

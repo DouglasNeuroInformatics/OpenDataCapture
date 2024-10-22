@@ -1,8 +1,8 @@
-import { yearsPassed } from '@douglasneuroinformatics/libjs';
+import { replacer, yearsPassed } from '@douglasneuroinformatics/libjs';
 import { reviver } from '@douglasneuroinformatics/libjs';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
+import type { ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -49,7 +49,7 @@ export class InstrumentRecordsService {
   }
 
   async create(
-    { data, date, groupId, instrumentId, sessionId, subjectId }: CreateInstrumentRecordData,
+    { data: rawData, date, groupId, instrumentId, sessionId, subjectId }: CreateInstrumentRecordData,
     options?: EntityOperationOptions
   ): Promise<InstrumentRecordModel> {
     if (groupId) {
@@ -64,17 +64,21 @@ export class InstrumentRecordsService {
 
     await this.subjectsService.findById(subjectId);
     await this.sessionsService.findById(sessionId);
-    if (!instrument.validationSchema.safeParse(data).success) {
+
+    const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
+    if (!parseResult.success) {
+      console.error(parseResult.error.issues);
       throw new UnprocessableEntityException(
-        `Data received does not pass validation schema of instrument '${instrument.id}'`
+        `Data received for record does not pass validation schema of instrument '${instrument.id}'`
       );
     }
+
     return this.instrumentRecordModel.create({
       data: {
         computedMeasures: instrument.measures
-          ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
+          ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
           : null,
-        data,
+        data: this.serializeData(parseResult.data),
         date,
         group: groupId
           ? {
@@ -271,7 +275,7 @@ export class InstrumentRecordsService {
 
     try {
       for (let i = 0; i < records.length; i++) {
-        const { data, date, subjectId } = records[i]!;
+        const { data: rawData, date, subjectId } = records[i]!;
         await this.createSubjectIfNotFound(subjectId);
 
         const session = await this.sessionsService.create({
@@ -287,9 +291,9 @@ export class InstrumentRecordsService {
 
         const sessionId = session.id;
 
-        const revivedData = JSON.parse(JSON.stringify(data), reviver) as Json;
-
-        if (!instrument.validationSchema.safeParse(revivedData).success) {
+        const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
+        if (!parseResult.success) {
+          console.error(parseResult.error.issues);
           throw new UnprocessableEntityException(
             `Data received for record at index '${i}' does not pass validation schema of instrument '${instrument.id}'`
           );
@@ -298,9 +302,9 @@ export class InstrumentRecordsService {
         const createdRecord = await this.instrumentRecordModel.create({
           data: {
             computedMeasures: instrument.measures
-              ? this.instrumentMeasuresService.computeMeasures(instrument.measures, revivedData)
+              ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
               : null,
-            data,
+            data: this.serializeData(parseResult.data),
             date,
             group: groupId
               ? {
@@ -355,5 +359,13 @@ export class InstrumentRecordsService {
         throw exception;
       }
     }
+  }
+
+  private parseJson(data: unknown) {
+    return JSON.parse(JSON.stringify(data), reviver) as unknown;
+  }
+
+  private serializeData(data: unknown) {
+    return JSON.parse(JSON.stringify(data, replacer)) as unknown;
   }
 }

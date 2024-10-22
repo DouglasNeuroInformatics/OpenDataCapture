@@ -22,12 +22,12 @@ export class StarlightTypeDocLogger extends Logger {
         this.#logger.error(message);
         break;
       }
-      case LogLevel.Warn: {
-        this.#logger.warn(message);
-        break;
-      }
       case LogLevel.Verbose: {
         this.#logger.debug(message);
+        break;
+      }
+      case LogLevel.Warn: {
+        this.#logger.warn(message);
         break;
       }
       default: {

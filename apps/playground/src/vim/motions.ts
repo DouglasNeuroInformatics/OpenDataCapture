@@ -211,8 +211,8 @@ export const motions: { [key: string]: MotionFunc } = {
     const cur = head;
     switch (vim.lastMotion) {
       case this.moveByDisplayLines:
-      case this.moveByScroll:
       case this.moveByLines:
+      case this.moveByScroll:
       case this.moveToColumn:
       case this.moveToEol:
         break;
@@ -238,8 +238,8 @@ export const motions: { [key: string]: MotionFunc } = {
     // was going to the end of a line, moving vertically we should go to
     // the end of the line, etc.
     switch (vim.lastMotion) {
-      case this.moveByLines:
       case this.moveByDisplayLines:
+      case this.moveByLines:
       case this.moveByScroll:
       case this.moveToColumn:
       case this.moveToEol:
