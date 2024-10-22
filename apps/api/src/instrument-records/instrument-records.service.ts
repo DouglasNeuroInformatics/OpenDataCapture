@@ -1,4 +1,4 @@
-import { yearsPassed } from '@douglasneuroinformatics/libjs';
+import { replacer, yearsPassed } from '@douglasneuroinformatics/libjs';
 import { reviver } from '@douglasneuroinformatics/libjs';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
@@ -78,7 +78,7 @@ export class InstrumentRecordsService {
         computedMeasures: instrument.measures
           ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
           : null,
-        data: parseResult.data,
+        data: this.serializeData(parseResult.data),
         date,
         group: groupId
           ? {
@@ -304,7 +304,7 @@ export class InstrumentRecordsService {
             computedMeasures: instrument.measures
               ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
               : null,
-            data: parseResult.data,
+            data: this.serializeData(parseResult.data),
             date,
             group: groupId
               ? {
@@ -363,5 +363,9 @@ export class InstrumentRecordsService {
 
   private parseJson(data: unknown) {
     return JSON.parse(JSON.stringify(data), reviver) as unknown;
+  }
+
+  private serializeData(data: unknown) {
+    return JSON.parse(JSON.stringify(data, replacer)) as unknown;
   }
 }
