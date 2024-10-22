@@ -291,7 +291,7 @@ export class InstrumentRecordsService {
 
         const sessionId = session.id;
 
-        const parseResult = instrument.validationSchema.safeParse(this.parseJson(data));
+        const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
         if (!parseResult.success) {
           console.error(parseResult.error.issues);
           throw new UnprocessableEntityException(
