@@ -48,8 +48,8 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen }: UploadBundleDialogProp
     }
 
     const bundle = state.bundle;
-    const loginPath = new URL('/v1/auth/login', apiBaseUrl).href;
-    const createInstrumentPath = new URL('/v1/instruments', apiBaseUrl).href;
+    const loginPath = `${apiBaseUrl}/v1/auth/login`;
+    const createInstrumentPath = `${apiBaseUrl}/v1/instruments`;
 
     let loginResponse: AxiosResponse<AuthPayload>;
     try {
