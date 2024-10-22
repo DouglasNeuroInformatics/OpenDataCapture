@@ -22,8 +22,8 @@ catalogs:
       specifier: latest
       version: 0.0.2
     '@douglasneuroinformatics/libjs':
-      specifier: 1.0.1
-      version: 1.0.1
+      specifier: latest
+      version: 1.0.2
     '@douglasneuroinformatics/libnest':
       specifier: latest
       version: 0.1.1
@@ -216,7 +216,7 @@ importers:
         version: 0.0.2
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@douglasneuroinformatics/libnest':
         specifier: 'catalog:'
         version: 0.1.1(@nestjs/common@10.4.5(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.5(@nestjs/common@10.4.5(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.5)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.5(@nestjs/common@10.4.5(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.5))(@nestjs/testing@10.4.5(@nestjs/common@10.4.5(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.5(@nestjs/common@10.4.5(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.5)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.5(@nestjs/common@10.4.5(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.5)))(express@4.21.1)(mongodb@6.10.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(zod@vendor+zod@3.23.x)
@@ -540,7 +540,7 @@ importers:
         version: 0.0.2
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 3.6.6(@types/react@18.3.11)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
@@ -652,7 +652,7 @@ importers:
         version: 6.7.1
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
         version: 0.0.3(typescript@5.5.4)
@@ -821,7 +821,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -904,7 +904,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 3.6.6(@types/react@18.3.11)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
@@ -983,7 +983,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -995,7 +995,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -1015,7 +1015,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 3.6.6(@types/react@18.3.11)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
@@ -1070,7 +1070,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       esbuild:
         specifier: 'catalog:'
         version: 0.23.1
@@ -1110,7 +1110,7 @@ importers:
         version: 6.7.1
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -1158,7 +1158,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
 
   runtime/v1:
     devDependencies:
@@ -1284,7 +1284,7 @@ importers:
         version: 6.7.1
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 1.0.1(typescript@5.5.4)
+        version: 1.0.2(typescript@5.5.4)
       '@faker-js/faker':
         specifier: ^9.0.0
         version: 9.0.3
@@ -1966,9 +1966,9 @@ packages:
     peerDependencies:
       typescript: ^5.1.0
 
-  '@douglasneuroinformatics/libjs@1.0.1':
+  '@douglasneuroinformatics/libjs@1.0.2':
     resolution:
-      { integrity: sha512-holhBM6hPANZU7J2s/VS01AHSsfrq3FHdJImpq3Kn054Q3FSgKewuHozZ/eMhjEA1uwLdSYff0MsE4lop4Fw1w== }
+      { integrity: sha512-MyUx0ty8KMZH0ra59TPmzjQH5jtqPuMcGZN7CpzLgZedzcgoIWZCOPbdnjonqyB0q1JaxN8CPIacIFw9NvFS7w== }
     peerDependencies:
       typescript: ^5.1.0
 
@@ -12935,7 +12935,7 @@ snapshots:
       type-fest: 4.26.1
       typescript: 5.5.4
 
-  '@douglasneuroinformatics/libjs@1.0.1(typescript@5.5.4)':
+  '@douglasneuroinformatics/libjs@1.0.2(typescript@5.5.4)':
     dependencies:
       type-fest: 4.26.1
       typescript: 5.5.4
