@@ -1077,13 +1077,6 @@ export default class EditorAdapter {
     this.state[key] = value;
 
     switch (key) {
-      // @ts-expect-error - maintain behavior of legacy code
-      case 'theme': {
-        this.theme = value as string;
-        this.editor.updateOptions({
-          theme: this.theme
-        });
-      }
       case 'indentWithTabs': {
         const model = this.editor.getModel()!;
         model.updateOptions({ insertSpaces: !value });
@@ -1097,6 +1090,13 @@ export default class EditorAdapter {
         const model = this.editor.getModel()!;
         model.updateOptions({ tabSize: tabSize });
         break;
+      }
+      // @ts-expect-error - maintain behavior of legacy code
+      case 'theme': {
+        this.theme = value as string;
+        this.editor.updateOptions({
+          theme: this.theme
+        });
       }
     }
   }

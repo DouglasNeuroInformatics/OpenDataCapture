@@ -266,6 +266,13 @@ export class CommandDispatcher {
   processCommand(adapter: EditorAdapter, vim: VimState, command: KeyMapping) {
     vim.inputState.repeatOverride = command.repeatOverride;
     switch (command.type) {
+      case 'action':
+        this.processAction(adapter, vim, command);
+        break;
+      case 'ex':
+      case 'keyToEx':
+        this.processEx(adapter, vim, command);
+        break;
       case 'motion':
         this.processMotion(adapter, vim, command);
         break;
@@ -275,15 +282,8 @@ export class CommandDispatcher {
       case 'operatorMotion':
         this.processOperatorMotion(adapter, vim, command);
         break;
-      case 'action':
-        this.processAction(adapter, vim, command);
-        break;
       case 'search':
         this.processSearch(adapter, vim, command);
-        break;
-      case 'ex':
-      case 'keyToEx':
-        this.processEx(adapter, vim, command);
         break;
       default:
         break;

@@ -265,8 +265,6 @@ export class ExCommandDispatcher {
       return parseInt(numberMatch[1]!, 10) - 1;
     }
     switch (inputStream.next()) {
-      case '.':
-        return this.parseLineSpecOffset_(inputStream, adapter.getCursor().line);
       case '$':
         return this.parseLineSpecOffset_(inputStream, adapter.lastLine());
       case "'":
@@ -278,10 +276,12 @@ export class ExCommandDispatcher {
         const markPos = getMarkPos(adapter, adapter.state.vim, markName);
         if (!markPos) throw new Error('Mark not set');
         return this.parseLineSpecOffset_(inputStream, markPos.line);
-      case '-':
       case '+':
+      case '-':
         inputStream.backUp(1);
         // Offset is relative to current line if not otherwise specified.
+        return this.parseLineSpecOffset_(inputStream, adapter.getCursor().line);
+      case '.':
         return this.parseLineSpecOffset_(inputStream, adapter.getCursor().line);
       default:
         inputStream.backUp(1);

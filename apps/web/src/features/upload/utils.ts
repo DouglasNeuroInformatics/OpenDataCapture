@@ -217,6 +217,8 @@ export function interpretZodValue(
       }
       return { success: true, value: date };
     }
+    case 'ZodEnum':
+      return interpretZodValue(entry, 'ZodString', isOptional);
     case 'ZodNumber':
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
@@ -231,8 +233,6 @@ export function interpretZodValue(
       return { message: `Invalid ZodSet: ${entry}`, success: false };
     case 'ZodString':
       return { success: true, value: entry };
-    case 'ZodEnum':
-      return interpretZodValue(entry, 'ZodString', isOptional);
     default:
       return { message: `Invalid ZodType: ${zType satisfies never}`, success: false };
   }
