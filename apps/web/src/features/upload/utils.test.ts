@@ -17,8 +17,12 @@ describe('getZodTypeName', () => {
   it('should parse a z.boolean()', () => {
     expect(getZodTypeName(z.boolean())).toMatchObject({ isOptional: false, success: true, typeName: 'ZodBoolean' });
   });
-  it('should parse a z.set(z.string())', () => {
-    expect(getZodTypeName(z.set(z.string()))).toMatchObject({ isOptional: false, success: true, typeName: 'ZodSet' });
+  it('should parse a z.set(z.enum([]))', () => {
+    expect(getZodTypeName(z.set(z.enum(['a', 'b', 'c'])))).toMatchObject({
+      isOptional: false,
+      success: true,
+      typeName: 'ZodSet'
+    });
   });
   it('should parse a z.string().optional()', () => {
     expect(getZodTypeName(z.string().optional())).toMatchObject({
