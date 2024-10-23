@@ -335,15 +335,14 @@ function generateSampleData({
       return formatTypeInfo('number', isOptional);
     case 'ZodSet':
       try {
-        let possibleEnumOutputs = 'SET(';
-        for (const val of enumValues!) {
-          possibleEnumOutputs += val + '/';
+        if (!enumValues) {
+          throw new Error('Missing enumValues for ZodSet');
         }
-        possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
-        possibleEnumOutputs += ', ...)';
+        const enumString = enumValues.join('/');
+        const possibleEnumOutputs = `SET(${enumString}, ...)`;
         return formatTypeInfo(possibleEnumOutputs, isOptional);
-      } catch {
-        throw new Error('Invalid Enum error');
+      } catch (error) {
+        throw new Error(`Failed to generate sample data for ZodSet: ${error.message}`);
       }
 
     case 'ZodString':
