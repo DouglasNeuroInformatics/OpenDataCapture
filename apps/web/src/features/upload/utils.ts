@@ -128,7 +128,6 @@ export function reformatInstrumentData({
 
 export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   const def: unknown = schema._def;
-  console.log('zod def', def);
   if (isZodTypeDef(def)) {
     if (isZodOptionalDef(def)) {
       return getZodTypeName(def.innerType, true);
