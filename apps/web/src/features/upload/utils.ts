@@ -71,6 +71,10 @@ function isZodEnumDef(def: AnyZodTypeDef): def is z.ZodEnumDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodEnum;
 }
 
+function isZodSetDef(def: AnyZodTypeDef): def is z.ZodSetDef {
+  return def.typeName === z.ZodFirstPartyTypeKind.ZodSet;
+}
+
 function isZodArrayDef(def: AnyZodTypeDef): def is z.ZodArrayDef {
   return def.typeName === 'ZodArray';
 }
@@ -124,6 +128,7 @@ export function reformatInstrumentData({
 
 export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   const def: unknown = schema._def;
+  console.log('zod def', def);
   if (isZodTypeDef(def)) {
     if (isZodOptionalDef(def)) {
       return getZodTypeName(def.innerType, true);
@@ -136,7 +141,24 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
       };
     } else if (isZodArrayDef(def)) {
       return interpretZodArray(schema, def.typeName, isOptional);
+    } else if (isZodSetDef(def)) {
+      const innerDef: unknown = def.valueType._def;
+
+      if (isZodTypeDef(innerDef) && isZodEnumDef(innerDef)) {
+        return {
+          enumValues: innerDef.values,
+          isOptional: Boolean(isOptional),
+          success: true,
+          typeName: def.typeName
+        };
+      } else {
+        return {
+          message: 'Invalid types with set definition',
+          success: false
+        };
+      }
     }
+
     return {
       isOptional: Boolean(isOptional),
       success: true,
@@ -313,7 +335,18 @@ function generateSampleData({
     case 'ZodNumber':
       return formatTypeInfo('number', isOptional);
     case 'ZodSet':
-      return formatTypeInfo('SET(a,b,c)', isOptional);
+      try {
+        let possibleEnumOutputs = 'SET(';
+        for (const val of enumValues!) {
+          possibleEnumOutputs += val + '/';
+        }
+        possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
+        possibleEnumOutputs += ', ...)';
+        return formatTypeInfo(possibleEnumOutputs, isOptional);
+      } catch {
+        throw new Error('Invalid Enum error');
+      }
+
     case 'ZodString':
       return formatTypeInfo('string', isOptional);
     case 'ZodEnum':
