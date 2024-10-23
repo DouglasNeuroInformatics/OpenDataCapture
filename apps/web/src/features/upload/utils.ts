@@ -142,21 +142,21 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
       return interpretZodArray(schema, def.typeName, isOptional);
     } else if (isZodSetDef(def)) {
       const innerDef = def.valueType._def as AnyZodTypeDef;
-      
+
       if (!isZodTypeDef(innerDef)) {
         return {
           message: 'Invalid inner type: ZodSet value type must have a valid type definition',
           success: false
         };
       }
-      
+
       if (!isZodEnumDef(innerDef)) {
         return {
           message: 'Invalid inner type: ZodSet value type must be a ZodEnum',
           success: false
         };
       }
-      
+
       return {
         enumValues: innerDef.values,
         isOptional: Boolean(isOptional),
@@ -348,8 +348,8 @@ function generateSampleData({
         const enumString = enumValues.join('/');
         const possibleEnumOutputs = `SET(${enumString}, ...)`;
         return formatTypeInfo(possibleEnumOutputs, isOptional);
-      } catch (error) {
-        throw new Error(`Failed to generate sample data for ZodSet: ${error.message}`);
+      } catch {
+        throw new Error(`Failed to generate sample data for ZodSet`);
       }
 
     case 'ZodString':
