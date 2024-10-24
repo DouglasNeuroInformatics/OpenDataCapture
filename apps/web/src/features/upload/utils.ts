@@ -254,7 +254,7 @@ export function interpretZodValue(
     case 'ZodSet':
       if (entry.startsWith('SET(')) {
         const setData = extractSetEntry(entry);
-        return { success: true, value: new Set(setData.split(',')) };
+        return { success: true, value: new Set(setData.split(',').map((s) => s.trim())) };
       }
       return { message: `Invalid ZodSet: ${entry}`, success: false };
     case 'ZodString':
