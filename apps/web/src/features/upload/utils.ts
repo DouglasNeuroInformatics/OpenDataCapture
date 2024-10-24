@@ -337,11 +337,7 @@ function generateSampleData({
       return formatTypeInfo('number', isOptional);
     case 'ZodSet':
       try {
-        if (enumValues) {
-          const enumString = enumValues.join('/');
-          const possibleEnumOutputs = `SET(${enumString}, ...)`;
-          return formatTypeInfo(possibleEnumOutputs, isOptional);
-        }
+        if (enumValues) return formatTypeInfo(`SET(${enumValues.join('/')}, ...)`, isOptional);
 
         return formatTypeInfo('SET(a,b,c)', isOptional);
       } catch {
