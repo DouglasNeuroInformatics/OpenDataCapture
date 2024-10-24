@@ -450,7 +450,6 @@ export async function processInstrumentCSV(
 
     shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
-    //const shape2 = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
     instrumentSchemaWithInternal = instrumentSchema.extend({
       date: z.coerce.date(),
       subjectID: z.string()
