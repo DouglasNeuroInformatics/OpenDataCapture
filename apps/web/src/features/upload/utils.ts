@@ -141,7 +141,7 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
     } else if (isZodArrayDef(def)) {
       return interpretZodArray(schema, def.typeName, isOptional);
     } else if (isZodSetDef(def)) {
-      const innerDef = def.valueType._def as AnyZodTypeDef;
+      const innerDef: unknown = def.valueType._def;
 
       if (!isZodTypeDef(innerDef)) {
         return {
@@ -150,19 +150,14 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
         };
       }
 
-      if (!isZodEnumDef(innerDef)) {
+      if (isZodEnumDef(innerDef)) {
         return {
-          message: 'Invalid inner type: ZodSet value type must be a ZodEnum',
-          success: false
+          enumValues: innerDef.values,
+          isOptional: Boolean(isOptional),
+          success: true,
+          typeName: def.typeName
         };
       }
-
-      return {
-        enumValues: innerDef.values,
-        isOptional: Boolean(isOptional),
-        success: true,
-        typeName: def.typeName
-      };
     }
 
     return {
