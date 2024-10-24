@@ -342,12 +342,13 @@ function generateSampleData({
       return formatTypeInfo('number', isOptional);
     case 'ZodSet':
       try {
-        if (!enumValues) {
-          throw new Error('Missing enumValues for ZodSet');
+        if (enumValues) {
+          const enumString = enumValues.join('/');
+          const possibleEnumOutputs = `SET(${enumString}, ...)`;
+          return formatTypeInfo(possibleEnumOutputs, isOptional);
         }
-        const enumString = enumValues.join('/');
-        const possibleEnumOutputs = `SET(${enumString}, ...)`;
-        return formatTypeInfo(possibleEnumOutputs, isOptional);
+
+        return formatTypeInfo('SET(a,b,c)', isOptional);
       } catch {
         throw new Error(`Failed to generate sample data for ZodSet`);
       }
