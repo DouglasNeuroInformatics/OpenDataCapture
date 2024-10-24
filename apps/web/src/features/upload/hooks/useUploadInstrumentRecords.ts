@@ -8,9 +8,11 @@ import axios from 'axios';
 export function useUploadInstrumentRecords() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    mutationFn: async (data: UploadInstrumentRecordsData) => {
-      const replacedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
-      await axios.post('/v1/instrument-records/upload', replacedData);
+    mutationFn: async (uploadData: UploadInstrumentRecordsData) => {
+      uploadData.records.forEach((item) => {
+        item.data = JSON.parse(JSON.stringify(item.data, replacer)) as Json;
+      });
+      await axios.post('/v1/instrument-records/upload', uploadData);
     },
     onSuccess() {
       addNotification({ type: 'success' });

@@ -73,8 +73,12 @@ function isZodEnumDef(def: AnyZodTypeDef): def is z.ZodEnumDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodEnum;
 }
 
+function isZodSetDef(def: AnyZodTypeDef): def is z.ZodSetDef {
+  return def.typeName === z.ZodFirstPartyTypeKind.ZodSet;
+}
+
 function isZodArrayDef(def: AnyZodTypeDef): def is z.ZodArrayDef {
-  return def.typeName === 'ZodArray';
+  return def.typeName === z.ZodFirstPartyTypeKind.ZodArray;
 }
 
 // TODO - fix extract set and record array functions to handle whitespace and trailing semicolon (present or included)
@@ -138,7 +142,26 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
       };
     } else if (isZodArrayDef(def)) {
       return interpretZodArray(schema, def.typeName, isOptional);
+    } else if (isZodSetDef(def)) {
+      const innerDef: unknown = def.valueType._def;
+
+      if (!isZodTypeDef(innerDef)) {
+        return {
+          message: 'Invalid inner type: ZodSet value type must have a valid type definition',
+          success: false
+        };
+      }
+
+      if (isZodEnumDef(innerDef)) {
+        return {
+          enumValues: innerDef.values,
+          isOptional: Boolean(isOptional),
+          success: true,
+          typeName: def.typeName
+        };
+      }
     }
+
     return {
       isOptional: Boolean(isOptional),
       success: true,
@@ -228,7 +251,7 @@ export function interpretZodValue(
     case 'ZodSet':
       if (entry.startsWith('SET(')) {
         const setData = extractSetEntry(entry);
-        return { success: true, value: new Set(setData.split(',')) };
+        return { success: true, value: new Set(setData.split(',').map((s) => s.trim())) };
       }
       return { message: `Invalid ZodSet: ${entry}`, success: false };
     case 'ZodString':
@@ -270,7 +293,7 @@ export function interpretZodObjectValue(
     }
     for (let i = 0; i < record.length; i++) {
       // TODO - make sure this is defined
-      const recordValue = record[i]!.split(':')[1]!;
+      const recordValue = record[i]!.split(':')[1]!.trim();
 
       const zListResult = zList[i]!;
       if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
@@ -287,7 +310,7 @@ export function interpretZodObjectValue(
           success: false
         };
       }
-      // TODO - how do we know that `zKeys` is the same length as record? What if the user forgets to add a element
+
       recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
     }
     recordArray.push(recordArrayObject);
@@ -315,7 +338,14 @@ function generateSampleData({
     case 'ZodNumber':
       return formatTypeInfo('number', isOptional);
     case 'ZodSet':
-      return formatTypeInfo('SET(a,b,c)', isOptional);
+      try {
+        if (enumValues) return formatTypeInfo(`SET(${enumValues.join('/')}, ...)`, isOptional);
+
+        return formatTypeInfo('SET(a,b,c)', isOptional);
+      } catch {
+        throw new Error(`Failed to generate sample data for ZodSet`);
+      }
+
     case 'ZodString':
       return formatTypeInfo('string', isOptional);
     case 'ZodEnum':
@@ -414,7 +444,6 @@ export async function processInstrumentCSV(
 
     shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
-    //const shape2 = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
     instrumentSchemaWithInternal = instrumentSchema.extend({
       date: z.coerce.date(),
       subjectID: z.string()
