@@ -76,7 +76,7 @@ function isZodSetDef(def: AnyZodTypeDef): def is z.ZodSetDef {
 }
 
 function isZodArrayDef(def: AnyZodTypeDef): def is z.ZodArrayDef {
-  return def.typeName === 'ZodArray';
+  return def.typeName === z.ZodFirstPartyTypeKind.ZodArray;
 }
 
 // TODO - fix extract set and record array functions to handle whitespace and trailing semicolon (present or included)
