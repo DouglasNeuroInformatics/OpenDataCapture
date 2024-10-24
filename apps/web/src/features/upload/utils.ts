@@ -313,7 +313,7 @@ export function interpretZodObjectValue(
           success: false
         };
       }
-      // TODO - how do we know that `zKeys` is the same length as record? What if the user forgets to add a element
+
       recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
     }
     recordArray.push(recordArrayObject);
