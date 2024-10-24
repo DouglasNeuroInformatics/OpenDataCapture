@@ -296,7 +296,7 @@ export function interpretZodObjectValue(
     }
     for (let i = 0; i < record.length; i++) {
       // TODO - make sure this is defined
-      const recordValue = record[i]!.split(':')[1]!;
+      const recordValue = record[i]!.split(':')[1]!.trim();
 
       const zListResult = zList[i]!;
       if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
