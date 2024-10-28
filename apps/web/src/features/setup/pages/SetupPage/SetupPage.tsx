@@ -59,6 +59,11 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                     kind: 'string',
                     label: t('setup.admin.password'),
                     variant: 'password'
+                  },
+                  confirmPassword: {
+                    kind: 'string',
+                    label: t('common.confirmPassword'),
+                    variant: 'password'
                   }
                 },
                 title: t('setup.admin.title')
@@ -117,19 +122,30 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
               enableExperimentalFeatures: false
             }}
             submitBtnLabel={t('core.submit')}
-            validationSchema={z.object({
-              firstName: z.string().min(1),
-              lastName: z.string().min(1),
-              username: z.string().min(1),
-              password: z
-                .string()
-                .min(1)
-                .refine((val) => estimatePasswordStrength(val).success, t('common.insufficientPasswordStrength')),
-              initDemo: z.boolean(),
-              enableExperimentalFeatures: z.boolean(),
-              recordsPerSubject: z.number().int().nonnegative().optional(),
-              dummySubjectCount: z.number().int().nonnegative().optional()
-            })}
+            validationSchema={z
+              .object({
+                firstName: z.string().min(1),
+                lastName: z.string().min(1),
+                username: z.string().min(1),
+                password: z
+                  .string()
+                  .min(1)
+                  .refine((val) => estimatePasswordStrength(val).success, t('common.insufficientPasswordStrength')),
+                confirmPassword: z.string().min(1),
+                initDemo: z.boolean(),
+                enableExperimentalFeatures: z.boolean(),
+                recordsPerSubject: z.number().int().nonnegative().optional(),
+                dummySubjectCount: z.number().int().nonnegative().optional()
+              })
+              .superRefine((arg, ctx) => {
+                if (arg.confirmPassword !== arg.password) {
+                  ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: t('common.passwordsMustMatch'),
+                    path: ['confirmPassword']
+                  });
+                }
+              })}
             onSubmit={onSubmit}
           />
         </Card.Content>

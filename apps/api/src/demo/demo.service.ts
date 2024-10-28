@@ -74,9 +74,11 @@ export class DemoService {
       await this.instrumentsService.create({ bundle: happinessQuestionnaireWithConsent });
       this.logger.debug('Done creating series instruments');
 
-      const groups: Group[] = [];
+      const groups: ({ dummyIdPrefix?: string } & Group)[] = [];
       for (const group of DEMO_GROUPS) {
-        groups.push(await this.groupsService.create(group));
+        const { dummyIdPrefix, ...createGroupData } = group;
+        const groupModel = await this.groupsService.create(createGroupData);
+        groups.push({ ...groupModel, dummyIdPrefix });
       }
       this.logger.debug('Done creating groups');
 
@@ -100,10 +102,10 @@ export class DemoService {
         };
 
         let subjectId: string;
-        if (group.type === 'CLINICAL') {
+        if (group.settings.defaultIdentificationMethod === 'PERSONAL_INFO') {
           subjectId = await generateSubjectHash(subjectIdData);
         } else {
-          subjectId = encodeScopedSubjectId(researchId, { groupName: group.name });
+          subjectId = encodeScopedSubjectId((group.dummyIdPrefix ?? '') + researchId, { groupName: group.name });
           researchId++;
         }
 

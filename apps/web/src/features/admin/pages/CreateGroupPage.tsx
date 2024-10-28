@@ -45,7 +45,7 @@ export const CreateGroupPage = () => {
             variant: 'select'
           }
         }}
-        validationSchema={$CreateGroupData}
+        validationSchema={$CreateGroupData.omit({ settings: true })}
         onSubmit={handleSubmit}
       />
     </div>
