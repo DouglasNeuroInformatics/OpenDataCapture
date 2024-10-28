@@ -91,4 +91,16 @@ export const $Error: z.ZodType<Error> = z.object({
   stack: z.string().optional()
 });
 
+export const $RegexString = z.string().refine(
+  (arg) => {
+    try {
+      new RegExp(arg);
+    } catch {
+      return false;
+    }
+    return true;
+  },
+  { message: 'Invalid regular expression' }
+);
+
 export type { Json, Language };

@@ -17,20 +17,23 @@ export class GroupsService {
     private readonly instrumentsService: InstrumentsService
   ) {}
 
-  async create(group: CreateGroupDto) {
-    const exists = await this.groupModel.exists({ name: group.name });
+  async create({ name, settings, type, ...data }: CreateGroupDto) {
+    const exists = await this.groupModel.exists({ name });
     if (exists) {
-      throw new ConflictException(`Group with name '${group.name}' already exists!`);
+      throw new ConflictException(`Group with name '${name}' already exists!`);
     }
     return this.groupModel.create({
       data: {
         accessibleInstruments: {
           connect: (await this.instrumentsService.find()).map(({ id }) => ({ id }))
         },
+        name,
         settings: {
-          defaultIdentificationMethod: group.type === 'CLINICAL' ? 'PERSONAL_INFO' : 'CUSTOM_ID'
+          defaultIdentificationMethod: type === 'CLINICAL' ? 'PERSONAL_INFO' : 'CUSTOM_ID',
+          ...settings
         },
-        ...group
+        type,
+        ...data
       }
     });
   }
@@ -59,7 +62,7 @@ export class GroupsService {
 
   async updateById(
     id: string,
-    { accessibleInstrumentIds, ...data }: UpdateGroupDto,
+    { accessibleInstrumentIds, settings, ...data }: UpdateGroupDto,
     { ability }: EntityOperationOptions = {}
   ) {
     const where: Prisma.GroupModelWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };
@@ -78,6 +81,10 @@ export class GroupsService {
               set: accessibleInstrumentIds.map((id) => ({ id }))
             }
           : undefined,
+        settings: {
+          ...group.settings,
+          ...settings
+        },
         ...data
       },
       where: { AND: [accessibleQuery(ability, 'update', 'Group')], id }

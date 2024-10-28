@@ -40,7 +40,7 @@ export type StartSessionFormProps = {
 
 // eslint-disable-next-line max-lines-per-function
 export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubmit }: StartSessionFormProps) => {
-  const { t } = useTranslation();
+  const { resolvedLanguage, t } = useTranslation();
   return (
     <Form
       preventResetValuesOnReset
@@ -204,6 +204,25 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
                 message: t('core.form.requiredField'),
                 path: ['subjectId']
               });
+            } else if (currentGroup?.settings.idValidationRegex) {
+              try {
+                const regex = new RegExp(currentGroup?.settings.idValidationRegex);
+                if (!regex.test(val.subjectId)) {
+                  ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message:
+                      currentGroup.settings.idValidationRegexErrorMessage?.[resolvedLanguage] ??
+                      t({
+                        en: `Must match regular expression: ${regex.source}`,
+                        fr: `Doit correspondre à l'expression régulière : ${regex.source}`
+                      }),
+                    path: ['subjectId']
+                  });
+                }
+              } catch (err) {
+                // this should be checked already on the backend
+                console.error(err);
+              }
             }
           } else if (val.subjectIdentificationMethod === 'PERSONAL_INFO') {
             const requiredKeys = ['subjectFirstName', 'subjectLastName', 'subjectSex', 'subjectDateOfBirth'] as const;

@@ -1,13 +1,11 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
-import { PartialType } from '@nestjs/swagger';
-import { $UpdateGroupData, type GroupSettings, type GroupType } from '@opendatacapture/schemas/group';
-
-import { CreateGroupDto } from './create-group.dto';
+import { $UpdateGroupData } from '@opendatacapture/schemas/group';
+import type { GroupSettings, GroupType, UpdateGroupData } from '@opendatacapture/schemas/group';
 
 @ValidationSchema($UpdateGroupData)
-export class UpdateGroupDto extends PartialType(CreateGroupDto) {
+export class UpdateGroupDto implements UpdateGroupData {
   accessibleInstrumentIds?: string[];
-  override name?: string;
-  settings?: GroupSettings;
-  override type?: GroupType;
+  name?: string;
+  settings?: Partial<GroupSettings>;
+  type?: GroupType;
 }

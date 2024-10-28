@@ -1,17 +1,13 @@
-import { useMemo } from 'react';
-
+/* eslint-disable max-lines-per-function */
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { $RegexString } from '@opendatacapture/schemas/core';
 import type { UpdateGroupData } from '@opendatacapture/schemas/group';
-import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
-import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
+import { $SubjectIdentificationMethod, type SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
-import { useSetupState } from '@/hooks/useSetupState';
-import { useAppStore } from '@/store';
-
-type InstrumentOptions = {
+export type AvailableInstrumentOptions = {
   form: { [key: string]: string };
   interactive: { [key: string]: string };
   series: { [key: string]: string };
@@ -19,48 +15,27 @@ type InstrumentOptions = {
 };
 
 export type ManageGroupFormProps = {
-  availableInstruments: UnilingualInstrumentInfo[];
+  availableInstrumentOptions: AvailableInstrumentOptions;
+  initialValues: {
+    accessibleFormInstrumentIds: Set<string>;
+    accessibleInteractiveInstrumentIds: Set<string>;
+    defaultIdentificationMethod?: SubjectIdentificationMethod;
+    idValidationRegex?: null | string;
+  };
   onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
+  readOnly: boolean;
 };
 
-export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupFormProps) => {
-  const currentGroup = useAppStore((store) => store.currentGroup);
-  const { resolvedLanguage } = useTranslation();
+export const ManageGroupForm = ({
+  availableInstrumentOptions,
+  initialValues,
+  onSubmit,
+  readOnly
+}: ManageGroupFormProps) => {
   const { t } = useTranslation();
-  const setupState = useSetupState();
-
-  const { initialValues, options } = useMemo(() => {
-    const options: InstrumentOptions = {
-      form: {},
-      interactive: {},
-      series: {},
-      unknown: {}
-    };
-    const initialValues = {
-      accessibleFormInstrumentIds: new Set<string>(),
-      accessibleInteractiveInstrumentIds: new Set<string>(),
-      defaultIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod
-    };
-    for (const instrument of availableInstruments) {
-      if (instrument.kind === 'FORM') {
-        options.form[instrument.id] = instrument.details.title;
-        if (currentGroup?.accessibleInstrumentIds.includes(instrument.id)) {
-          initialValues.accessibleFormInstrumentIds.add(instrument.id);
-        }
-      } else if (instrument.kind === 'INTERACTIVE') {
-        options.interactive[instrument.id] = instrument.details.title;
-        if (currentGroup?.accessibleInstrumentIds.includes(instrument.id)) {
-          initialValues.accessibleInteractiveInstrumentIds.add(instrument.id);
-        }
-      }
-    }
-    return { initialValues, options };
-  }, [availableInstruments, currentGroup, resolvedLanguage]);
-
-  const isDisabled = Boolean(setupState.data?.isDemo && import.meta.env.PROD);
 
   let description = t('group.manage.accessibleInstrumentsDesc');
-  if (isDisabled) {
+  if (readOnly) {
     description += ` ${t('group.manage.accessibleInstrumentDemoNote')}`;
   }
 
@@ -74,13 +49,13 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
             accessibleFormInstrumentIds: {
               kind: 'set',
               label: t('group.manage.forms'),
-              options: options.form,
+              options: availableInstrumentOptions.form,
               variant: 'listbox'
             },
             accessibleInteractiveInstrumentIds: {
               kind: 'set',
               label: t('group.manage.interactive'),
-              options: options.interactive,
+              options: availableInstrumentOptions.interactive,
               variant: 'listbox'
             }
           },
@@ -96,6 +71,52 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
                 PERSONAL_INFO: t('common.personalInfo')
               },
               variant: 'select'
+            },
+            idValidationRegex: {
+              description: t({
+                en: 'Define a custom regular expression to validate subject IDs (see https://regexr.com for help designing your regular expression).',
+                fr: "Définir une expression régulière pour valider les identifiants des sujets (voir https://regexr.com pour obtenir de l'aide dans la conception de votre expression régulière)."
+              }),
+              kind: 'string',
+              label: t({
+                en: 'ID Validation Pattern',
+                fr: 'TBD'
+              }),
+              variant: 'input'
+            },
+            idValidationRegexErrorMessageEn: {
+              deps: ['idValidationRegex'],
+              kind: 'dynamic',
+              render: (data) => {
+                if (!data.idValidationRegex) {
+                  return null;
+                }
+                return {
+                  kind: 'string',
+                  label: t({
+                    en: 'Custom ID Validation Message (English)',
+                    fr: 'Message de validation spécifique (en anglais)'
+                  }),
+                  variant: 'input'
+                };
+              }
+            },
+            idValidationRegexErrorMessageFr: {
+              deps: ['idValidationRegex'],
+              kind: 'dynamic',
+              render: (data) => {
+                if (!data.idValidationRegex) {
+                  return null;
+                }
+                return {
+                  kind: 'string',
+                  label: t({
+                    en: 'Custom ID Validation Message (French)',
+                    fr: 'Message de validation spécifique (en français)'
+                  }),
+                  variant: 'input'
+                };
+              }
             }
           },
           title: t('group.manage.groupSettings')
@@ -103,20 +124,28 @@ export const ManageGroupForm = ({ availableInstruments, onSubmit }: ManageGroupF
       ]}
       initialValues={initialValues}
       preventResetValuesOnReset={true}
-      readOnly={isDisabled}
+      readOnly={readOnly}
       validationSchema={z.object({
         accessibleFormInstrumentIds: z.set(z.string()),
         accessibleInteractiveInstrumentIds: z.set(z.string()),
-        defaultIdentificationMethod: $SubjectIdentificationMethod.optional()
+        defaultIdentificationMethod: $SubjectIdentificationMethod.optional(),
+        idValidationRegex: $RegexString.optional(),
+        idValidationRegexErrorMessageEn: z.string().optional(),
+        idValidationRegexErrorMessageFr: z.string().optional()
       })}
-      onSubmit={(data) =>
+      onSubmit={(data) => {
         void onSubmit({
           accessibleInstrumentIds: [...data.accessibleFormInstrumentIds, ...data.accessibleInteractiveInstrumentIds],
           settings: {
-            defaultIdentificationMethod: data.defaultIdentificationMethod
+            defaultIdentificationMethod: data.defaultIdentificationMethod,
+            idValidationRegex: data.idValidationRegex,
+            idValidationRegexErrorMessage: {
+              en: data.idValidationRegexErrorMessageEn,
+              fr: data.idValidationRegexErrorMessageFr
+            }
           }
-        })
-      }
+        });
+      }}
     />
   );
 };

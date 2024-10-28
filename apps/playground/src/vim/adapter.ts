@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable no-fallthrough */
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -1091,7 +1092,6 @@ export default class EditorAdapter {
         model.updateOptions({ tabSize: tabSize });
         break;
       }
-      // @ts-expect-error - maintain behavior of legacy code
       case 'theme': {
         this.theme = value as string;
         this.editor.updateOptions({

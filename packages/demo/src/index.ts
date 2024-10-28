@@ -1,12 +1,12 @@
 import { deepFreeze } from '@douglasneuroinformatics/libjs';
-import type { Group } from '@opendatacapture/schemas/group';
+import type { CreateGroupData } from '@opendatacapture/schemas/group';
 import type { User } from '@opendatacapture/schemas/user';
 
 type DemoUser = {
   groupNames: readonly string[];
 } & Pick<User, 'basePermissionLevel' | 'firstName' | 'lastName' | 'password' | 'username'>;
 
-type DemoGroup = Pick<Group, 'name' | 'type'>;
+type DemoGroup = { dummyIdPrefix?: string } & CreateGroupData;
 
 export const DEMO_GROUPS: readonly DemoGroup[] = deepFreeze([
   {
@@ -14,7 +14,16 @@ export const DEMO_GROUPS: readonly DemoGroup[] = deepFreeze([
     type: 'CLINICAL'
   },
   {
+    dummyIdPrefix: 'ex_',
     name: 'Psychosis Lab',
+    settings: {
+      defaultIdentificationMethod: 'CUSTOM_ID',
+      idValidationRegex: String.raw`^ex_\d+$`,
+      idValidationRegexErrorMessage: {
+        en: "Must start with 'ex_' followed by one or more digits",
+        fr: "Doit commencer par « ex_ » suivi d'un ou plusieurs chiffres"
+      }
+    },
     type: 'RESEARCH'
   }
 ]);

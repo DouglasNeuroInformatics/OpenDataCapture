@@ -1,11 +1,18 @@
 import { z } from 'zod';
 
-import { $BaseModel } from '../core/core.js';
+import { $BaseModel, $RegexString } from '../core/core.js';
 import { $SubjectIdentificationMethod } from '../subject/subject.js';
 
 export type GroupSettings = z.infer<typeof $GroupSettings>;
 export const $GroupSettings = z.object({
-  defaultIdentificationMethod: $SubjectIdentificationMethod
+  defaultIdentificationMethod: $SubjectIdentificationMethod,
+  idValidationRegex: $RegexString.nullish(),
+  idValidationRegexErrorMessage: z
+    .object({
+      en: z.string().nullish(),
+      fr: z.string().nullish()
+    })
+    .nullish()
 });
 
 export type GroupType = z.infer<typeof $GroupType>;
@@ -24,6 +31,7 @@ export const $Group = $BaseModel.extend({
 export type CreateGroupData = z.infer<typeof $CreateGroupData>;
 export const $CreateGroupData = z.object({
   name: z.string().min(1),
+  settings: $GroupSettings.optional(),
   type: $GroupType
 });
 
