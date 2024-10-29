@@ -1,14 +1,22 @@
 import { z } from 'zod';
 
-import { $BaseModel } from '../core/core.js';
+import { $AppAction, $AppSubjectName, $BaseModel } from '../core/core.js';
 import { $Sex } from '../subject/subject.js';
 
 export const $BasePermissionLevel = z.enum(['ADMIN', 'GROUP_MANAGER', 'STANDARD']);
 
 export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
 
+const $AdditionalPermissions = z.array(
+  z.object({
+    action: $AppAction,
+    subject: $AppSubjectName
+  })
+);
+
 export type User = z.infer<typeof $User>;
 export const $User = $BaseModel.extend({
+  additionalPermissions: $AdditionalPermissions,
   basePermissionLevel: $BasePermissionLevel.nullable(),
   dateOfBirth: z.coerce.date().nullish(),
   firstName: z.string().min(1),
@@ -35,4 +43,6 @@ export const $CreateUserData = $User
   });
 
 export type UpdateUserData = z.infer<typeof $UpdateUserData>;
-export const $UpdateUserData = $CreateUserData.partial();
+export const $UpdateUserData = $CreateUserData.partial().extend({
+  additionalPermissions: $AdditionalPermissions.optional()
+});

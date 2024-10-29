@@ -40,7 +40,10 @@ export class AbilityFactory {
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groupIds: { hasSome: user.groupIds } });
     }
-    return ability.build({
+    user.additionalPermissions.forEach(({ action, subject }) => {
+      ability.can(action, subject);
+    });
+    const appAbility = ability.build({
       detectSubjectType: (object: { [key: string]: any }) => {
         if (object.__model__) {
           return object.__model__ as AppSubjectName;
@@ -48,5 +51,6 @@ export class AbilityFactory {
         return detectSubjectType(object) as AppSubjectName;
       }
     });
+    return appAbility;
   }
 }

@@ -160,19 +160,45 @@ enum BasePermissionLevel {
   STANDARD
 }
 
+enum AppSubject {
+  all
+  Assignment
+  Group
+  Instrument
+  InstrumentRecord
+  Session
+  Subject
+  Summary
+  User
+}
+
+enum AppAction {
+  create
+  delete
+  manage
+  read
+  update
+}
+
+type AuthRule {
+  action  AppAction
+  subject AppSubject
+}
+
 model UserModel {
-  createdAt           DateTime             @default(now()) @db.Date
-  updatedAt           DateTime             @updatedAt @db.Date
-  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
-  basePermissionLevel BasePermissionLevel?
-  firstName           String
-  groupIds            String[]             @db.ObjectId
-  groups              GroupModel[]         @relation(fields: [groupIds], references: [id])
-  lastName            String
-  password            String
-  username            String
-  sex                 Sex?
-  dateOfBirth         DateTime?            @db.Date
+  createdAt             DateTime             @default(now()) @db.Date
+  updatedAt             DateTime             @updatedAt @db.Date
+  id                    String               @id @default(auto()) @map("_id") @db.ObjectId
+  basePermissionLevel   BasePermissionLevel?
+  additionalPermissions AuthRule[]
+  firstName             String
+  groupIds              String[]             @db.ObjectId
+  groups                GroupModel[]         @relation(fields: [groupIds], references: [id])
+  lastName              String
+  password              String
+  username              String
+  sex                   Sex?
+  dateOfBirth           DateTime?            @db.Date
 }
 
 enum SessionType {
