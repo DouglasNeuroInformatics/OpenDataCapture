@@ -7,6 +7,7 @@ import type { User } from '@opendatacapture/schemas/user';
 import type { CurrentUser } from '@/store/types';
 
 export const adminUser: User = Object.freeze({
+  additionalPermissions: [],
   basePermissionLevel: 'ADMIN',
   createdAt: new Date(),
   firstName: 'David',

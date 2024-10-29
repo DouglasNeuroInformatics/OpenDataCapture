@@ -5,18 +5,21 @@ import type { Json, JsonLiteral, Language } from '@opendatacapture/runtime-core'
 import type { Simplify } from 'type-fest';
 import { z } from 'zod';
 
-export type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
+export type AppAction = z.infer<typeof $AppAction>;
+export const $AppAction = z.enum(['create', 'delete', 'manage', 'read', 'update']);
 
-export type AppSubjectName =
-  | 'all'
-  | 'Assignment'
-  | 'Group'
-  | 'Instrument'
-  | 'InstrumentRecord'
-  | 'Session'
-  | 'Subject'
-  | 'Summary'
-  | 'User';
+export type AppSubjectName = z.infer<typeof $AppSubjectName>;
+export const $AppSubjectName = z.enum([
+  'all',
+  'Assignment',
+  'Group',
+  'Instrument',
+  'InstrumentRecord',
+  'Session',
+  'Subject',
+  'Summary',
+  'User'
+]);
 
 export type BaseAppAbility = PureAbility<[AppAction, AppSubjectName]>;
 

@@ -49,6 +49,7 @@ export class UsersService {
 
     return this.userModel.create({
       data: {
+        additionalPermissions: [],
         basePermissionLevel,
         dateOfBirth,
         firstName,

@@ -15,6 +15,7 @@ describe('AbilityFactory', () => {
 
     abilityFactory = module.get(AbilityFactory);
     userModelStub = {
+      additionalPermissions: [],
       basePermissionLevel: null,
       createdAt: new Date(),
       dateOfBirth: null,
