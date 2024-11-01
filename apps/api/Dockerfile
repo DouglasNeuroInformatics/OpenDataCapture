@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS base
+FROM node:iron-alpine AS base
 WORKDIR /app
 ARG RELEASE_VERSION
 ENV GATEWAY_DATABASE_URL="file:/dev/null"

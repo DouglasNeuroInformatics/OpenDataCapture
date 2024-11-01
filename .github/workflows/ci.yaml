@@ -23,10 +23,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/iron'
       - name: Get Package Version
         id: current_version
         run: echo "result=$(cat package.json | jq -r .version)" | sudo tee -a "$GITHUB_OUTPUT"
