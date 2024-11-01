@@ -9,8 +9,13 @@ export function useUploadInstrumentRecords() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
     mutationFn: async (data: UploadInstrumentRecordsData) => {
-      const replacedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
-      await axios.post('/v1/instrument-records/upload', replacedData);
+      await axios.post('/v1/instrument-records/upload', {
+        ...data,
+        records: data.records.map((record) => ({
+          ...record,
+          data: JSON.parse(JSON.stringify(record.data, replacer)) as Json
+        }))
+      } satisfies UploadInstrumentRecordsData);
     },
     onSuccess() {
       addNotification({ type: 'success' });
