@@ -168,7 +168,6 @@ enum AppSubject {
   InstrumentRecord
   Session
   Subject
-  Summary
   User
 }
 

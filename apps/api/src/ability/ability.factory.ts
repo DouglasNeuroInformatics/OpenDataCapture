@@ -27,18 +27,17 @@ export class AbilityFactory {
         ability.can('read', 'Session', { groupId: { in: user.groupIds } });
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groupIds: { hasSome: user.groupIds } });
-        ability.can('read', 'Summary');
         ability.can('read', 'User', { groupIds: { hasSome: user.groupIds } });
-
         break;
       case 'STANDARD':
         ability.can('read', 'Group', { id: { in: user.groupIds } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
-        ability.can('read', 'Session');
+        ability.can('read', 'Session', { groupId: { in: user.groupIds } });
         ability.can('create', 'Session');
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groupIds: { hasSome: user.groupIds } });
+        break;
     }
     user.additionalPermissions.forEach(({ action, subject }) => {
       ability.can(action, subject);

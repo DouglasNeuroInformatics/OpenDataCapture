@@ -17,7 +17,6 @@ export const $AppSubjectName = z.enum([
   'InstrumentRecord',
   'Session',
   'Subject',
-  'Summary',
   'User'
 ]);
 
