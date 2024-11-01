@@ -257,7 +257,11 @@ export function interpretZodValue(
     case 'ZodSet':
       if (entry.startsWith('SET(')) {
         const setData = extractSetEntry(entry);
-        return { success: true, value: new Set(setData.split(',').map((s) => s.trim())) };
+        const values = setData.split(',').map((s) => s.trim()).filter(Boolean);
+        if (values.length === 0) {
+          return { message: 'Empty set is not allowed', success: false };
+        }
+        return { success: true, value: new Set(values) };
       }
       return { message: `Invalid ZodSet: ${entry}`, success: false };
     case 'ZodString':
