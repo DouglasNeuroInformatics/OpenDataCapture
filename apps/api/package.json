@@ -44,7 +44,7 @@
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/subject-utils": "workspace:*",
     "@prisma/client": "catalog:",
-    "axios": "^1.7.7",
+    "axios": "catalog:",
     "express": "^4.19.2",
     "lodash-es": "workspace:lodash-es__4.x@*",
     "mongodb": "^6.8.1",

@@ -24,7 +24,7 @@
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@prisma/client": "catalog:",
-    "axios": "^1.7.7",
+    "axios": "catalog:",
     "compression": "^1.7.4",
     "express": "^4.19.2",
     "lodash-es": "workspace:lodash-es__4.x@*",
