@@ -14,6 +14,7 @@
     "storybook": "storybook dev -p 6006"
   },
   "peerDependencies": {
+    "axios": "catalog:",
     "react": "workspace:react__18.x@*",
     "react-dom": "workspace:react-dom__18.x@*",
     "tailwindcss": "3.x",
@@ -24,7 +25,9 @@
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/runtime-core": "workspace:*",
     "framer-motion": "^11.5.4",
+    "http-status-codes": "^2.3.0",
     "lucide-react": "^0.439.0",
+    "serialize-error": "^11.0.3",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {

@@ -35,7 +35,7 @@
     "@opendatacapture/subject-utils": "workspace:*",
     "@tanstack/react-query": "^5.55.4",
     "@tanstack/react-query-devtools": "^5.55.4",
-    "axios": "^1.7.7",
+    "axios": "catalog:",
     "clsx": "^2.1.1",
     "framer-motion": "^11.5.4",
     "html2canvas": "^1.4.1",
