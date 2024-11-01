@@ -178,10 +178,6 @@ export const ManageUsersPage = () => {
                           en: 'Subject',
                           fr: 'Client'
                         }),
-                        Summary: t({
-                          en: 'Summary',
-                          fr: 'Résumé'
-                        }),
                         User: t({
                           en: 'User',
                           fr: 'Utilisateur'

@@ -1,5 +1,6 @@
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { AppSubjectName } from '@opendatacapture/schemas/core';
 import { Navigate } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -13,7 +14,11 @@ export const DashboardPage = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
 
-  if (!currentUser?.ability.can('read', 'Summary')) {
+  const ability = currentUser?.ability;
+  const subjects: AppSubjectName[] = ['Instrument', 'InstrumentRecord', 'Subject', 'User'];
+  const isAuthorized = subjects.every((subject) => ability?.can('read', subject));
+
+  if (!isAuthorized) {
     return <Navigate to="/session/start-session" />;
   }
 

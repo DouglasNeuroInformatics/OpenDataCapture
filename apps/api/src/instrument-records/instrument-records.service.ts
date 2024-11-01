@@ -233,6 +233,10 @@ export class InstrumentRecordsService {
       where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), { groupId }, { instrumentId }] }
     });
 
+    if (3 > records.length) {
+      return {};
+    }
+
     const data: { [key: string]: [x: number[], y: number[]] } = {};
     for (const record of records) {
       const numericMeasures = pickBy(record.computedMeasures, isNumber);

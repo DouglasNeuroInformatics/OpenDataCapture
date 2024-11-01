@@ -39,15 +39,21 @@ export function useNavItems() {
   const setupState = useSetupState();
 
   useEffect(() => {
+    const ability = currentUser?.ability;
     const globalItems: NavItem[] = [];
-    if (currentUser?.ability.can('read', 'Summary')) {
+    if (
+      ability?.can('read', 'Instrument') &&
+      ability.can('read', 'InstrumentRecord') &&
+      ability.can('read', 'Subject') &&
+      ability.can('read', 'User')
+    ) {
       globalItems.push({
         icon: BarChartBigIcon,
         label: t('layout.navLinks.dashboard'),
         url: '/dashboard'
       });
     }
-    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
+    if (ability?.can('read', 'Subject') && ability.can('read', 'InstrumentRecord')) {
       globalItems.push({
         icon: DatabaseIcon,
         label: t('layout.navLinks.datahub'),
@@ -55,8 +61,8 @@ export function useNavItems() {
       });
     }
     if (
-      currentUser?.ability.can('read', 'Subject') &&
-      currentUser.ability.can('create', 'InstrumentRecord') &&
+      ability?.can('read', 'Subject') &&
+      ability.can('create', 'InstrumentRecord') &&
       setupState.data?.isExperimentalFeaturesEnabled
     ) {
       globalItems.push({
@@ -65,7 +71,7 @@ export function useNavItems() {
         url: '/upload'
       });
     }
-    if (currentGroup && currentUser?.ability.can('manage', 'Group')) {
+    if (currentGroup && ability?.can('manage', 'Group')) {
       globalItems.push({
         icon: UsersIcon,
         label: t('layout.navLinks.manageGroup'),
@@ -74,7 +80,7 @@ export function useNavItems() {
     }
 
     const adminItems: NavItem[] = [];
-    if (currentUser?.ability.can('manage', 'all')) {
+    if (ability?.can('manage', 'all')) {
       adminItems.push({
         icon: CogIcon,
         label: t({
@@ -102,7 +108,7 @@ export function useNavItems() {
     }
 
     const sessionItems: NavItem[] = [];
-    if (currentUser?.ability.can('create', 'Session')) {
+    if (ability?.can('create', 'Session')) {
       sessionItems.push({
         disabled: currentSession !== null,
         icon: CirclePlayIcon,
@@ -110,7 +116,7 @@ export function useNavItems() {
         url: '/session/start-session'
       });
     }
-    if (currentUser?.ability.can('create', 'InstrumentRecord')) {
+    if (ability?.can('create', 'InstrumentRecord')) {
       sessionItems.push({
         disabled: currentSession === null,
         icon: ComputerIcon,
@@ -118,7 +124,7 @@ export function useNavItems() {
         url: '/instruments/accessible-instruments'
       });
     }
-    if (currentUser?.ability.can('read', 'Subject') && currentUser.ability.can('read', 'InstrumentRecord')) {
+    if (ability?.can('read', 'Subject') && ability.can('read', 'InstrumentRecord')) {
       sessionItems.push({
         disabled: currentSession === null,
         icon: EyeIcon,
