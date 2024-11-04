@@ -859,11 +859,11 @@ export function showConfirm(adapter: EditorAdapter, template: string) {
   adapter.openNotification(template);
 }
 
-type PromptOptions = {
+type PromptOptions = StatusBarInputOptions & {
   desc?: string;
   onClose: (value: string) => void;
   prefix: string;
-} & StatusBarInputOptions;
+};
 
 export function showPrompt(adapter: EditorAdapter, options: PromptOptions) {
   adapter.openPrompt(options.prefix, options.desc || '', {
@@ -1009,10 +1009,10 @@ export type ExCommandOptionalParameters = {
   lineEnd?: number;
 };
 
-type ExCommandParams = {
+type ExCommandParams = ExCommandOptionalParameters & {
   input: string;
   setCfg?: OptionConfig;
-} & ExCommandOptionalParameters;
+};
 
 export type ExCommandFunc = (adapter: EditorAdapter, params: ExCommandParams, ctx?: Context) => void;
 
@@ -1817,6 +1817,7 @@ export function onChange(adapter: EditorAdapter, change: Change): void {
           lastChange.maybeReset = false;
         }
         if (text) {
+          // eslint-disable-next-line max-depth
           if (adapter.state.overwrite && !text.includes('\n')) {
             lastChange.changes.push(text);
           } else {

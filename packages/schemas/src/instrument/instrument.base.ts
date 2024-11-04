@@ -149,9 +149,9 @@ const $UnilingualScalarInstrument = $ScalarInstrument.extend({
  * and validation schema required to actually complete the instrument. This may be used for,
  * among other things, displaying available instruments to the user.
  */
-type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = {
+type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content'> & {
   id: string;
-} & Omit<T, 'content'>;
+};
 const $InstrumentInfo = $BaseInstrument
   .omit({
     content: true

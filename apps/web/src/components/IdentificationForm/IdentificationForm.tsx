@@ -13,7 +13,6 @@ export type IdentificationFormProps = {
   onSubmit: (data: { id: string }) => Promisable<void>;
 };
 
-// eslint-disable-next-line max-lines-per-function
 export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { t } = useTranslation();

@@ -15,7 +15,6 @@ import { useDeleteUserMutation } from '../hooks/useDeleteUserMutation';
 import { useUpdateUserMutation } from '../hooks/useUpdateUserMutation';
 import { useUsersQuery } from '../hooks/useUsersQuery';
 
-// eslint-disable-next-line max-lines-per-function
 export const ManageUsersPage = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();

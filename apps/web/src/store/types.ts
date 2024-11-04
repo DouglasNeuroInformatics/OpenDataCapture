@@ -5,9 +5,9 @@ import type { Session } from '@opendatacapture/schemas/session';
 import type { Simplify } from 'type-fest';
 import type { StateCreator } from 'zustand';
 
-export type CurrentUser = {
+export type CurrentUser = Omit<JwtPayload, 'permissions'> & {
   ability: BaseAppAbility;
-} & Omit<JwtPayload, 'permissions'>;
+};
 
 export type AuthSlice = {
   accessToken: null | string;

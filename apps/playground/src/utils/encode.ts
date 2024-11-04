@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { $EditorFile, type EditorFile } from '@/models/editor-file.model';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 
-type ShareURL = { size: number } & URL;
+type ShareURL = URL & { size: number };
 
 const $EditorFiles = z.array($EditorFile);
 

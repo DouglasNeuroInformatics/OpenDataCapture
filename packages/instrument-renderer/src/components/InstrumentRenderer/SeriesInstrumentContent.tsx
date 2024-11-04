@@ -6,12 +6,12 @@ import { createPortal } from 'react-dom';
 
 import type { ScalarInstrumentRendererProps } from './ScalarInstrumentRenderer';
 
-export type SeriesInstrumentContentProps = {
+export type SeriesInstrumentContentProps = ScalarInstrumentRendererProps & {
   status: {
     completedInstruments: number;
     totalInstruments: number;
   };
-} & ScalarInstrumentRendererProps;
+};
 
 export const SeriesInstrumentContent = ({ status }: SeriesInstrumentContentProps) => {
   const { t } = useTranslation();

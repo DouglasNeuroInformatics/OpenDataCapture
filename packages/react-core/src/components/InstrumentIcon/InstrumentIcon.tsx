@@ -4,9 +4,9 @@ import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { ClipboardCheckIcon, FileQuestionIcon, ListChecksIcon, MonitorCheckIcon } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-export type InstrumentIconProps = {
+export type InstrumentIconProps = React.ComponentPropsWithoutRef<LucideIcon> & {
   kind: InstrumentKind | null;
-} & React.ComponentPropsWithoutRef<LucideIcon>;
+};
 
 export const InstrumentIcon = ({ kind, ...props }: InstrumentIconProps) => {
   switch (kind) {

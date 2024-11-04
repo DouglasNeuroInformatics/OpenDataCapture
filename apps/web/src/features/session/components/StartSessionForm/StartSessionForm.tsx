@@ -38,7 +38,6 @@ export type StartSessionFormProps = {
   readOnly: boolean;
 };
 
-// eslint-disable-next-line max-lines-per-function
 export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubmit }: StartSessionFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
   return (

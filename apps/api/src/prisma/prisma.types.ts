@@ -5,7 +5,7 @@ import type { ExtendedPrismaClient } from './prisma.factory';
 
 export type ModelReferenceName = Uncapitalize<Prisma.ModelName>;
 
-export type ModelName<T extends ModelEntityName> = `${T}Model` & Prisma.ModelName;
+export type ModelName<T extends ModelEntityName> = Prisma.ModelName & `${T}Model`;
 
 export type ModelEntityName = Replace<Prisma.ModelName, 'Model', ''>;
 

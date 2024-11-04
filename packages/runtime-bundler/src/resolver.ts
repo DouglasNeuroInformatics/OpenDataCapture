@@ -11,7 +11,7 @@ class ResolverError extends Error {
     super(message, options);
     this.name = ResolverError.name;
   }
-  static forPackage(id: string, { explanation, ...options }: { explanation: string } & ErrorOptions) {
+  static forPackage(id: string, { explanation, ...options }: ErrorOptions & { explanation: string }) {
     return new this(`Failed to resolve exports for package '${id}': ${explanation}`, options);
   }
 }

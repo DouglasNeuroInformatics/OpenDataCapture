@@ -29,15 +29,15 @@ declare namespace FormInstrument {
   > = Simplify<
     TBase extends any
       ? Extract<keyof TField, string> extends Extract<keyof TBase, string>
-        ? {
+        ? Omit<TBase, 'description' | 'label' | keyof TField> &
+            TField & {
+              description?: InstrumentUIOption<TLanguage, string>;
+              label: InstrumentUIOption<TLanguage, string>;
+            }
+        : Omit<TBase, 'description' | 'label'> & {
             description?: InstrumentUIOption<TLanguage, string>;
             label: InstrumentUIOption<TLanguage, string>;
-          } & Omit<TBase, 'description' | 'label' | keyof TField> &
-            TField
-        : {
-            description?: InstrumentUIOption<TLanguage, string>;
-            label: InstrumentUIOption<TLanguage, string>;
-          } & Omit<TBase, 'description' | 'label'>
+          }
       : never
   >;
 
@@ -283,13 +283,13 @@ declare type FormInstrument<
   TData extends FormInstrument.Data = FormInstrument.Data,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Simplify<
-  {
+  Omit<ScalarInstrument<TData, TLanguage>, 'details'> & {
     content: FormInstrument.Content<TData, TLanguage>;
     details: SetRequired<InstrumentDetails<TLanguage>, 'estimatedDuration'>;
     initialValues?: PartialDeep<TData>;
     kind: 'FORM';
     measures: InstrumentMeasures<TData, TLanguage> | null;
-  } & Omit<ScalarInstrument<TData, TLanguage>, 'details'>
+  }
 >;
 
 /** @internal */

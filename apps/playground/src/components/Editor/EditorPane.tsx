@@ -34,7 +34,7 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
   const editorRef = useRef<MonacoEditorType | null>(null);
   const monacoRef = useRef<MonacoType | null>(null);
 
-  const [defaultFile, setDefaultFile] = useState<({ id: string } & EditorFile) | null>(null);
+  const [defaultFile, setDefaultFile] = useState<(EditorFile & { id: string }) | null>(null);
   const filesRef = useFilesRef();
 
   useImperativeHandle(

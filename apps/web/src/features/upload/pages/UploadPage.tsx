@@ -22,7 +22,7 @@ export const UploadPage = () => {
   const uploadInstrumentRecordsMutation = useUploadInstrumentRecords();
 
   const params = useParams();
-  const instrument = useInstrument(params.id!) as ({ id: string } & AnyUnilingualFormInstrument) | null;
+  const instrument = useInstrument(params.id!) as (AnyUnilingualFormInstrument & { id: string }) | null;
   const { t } = useTranslation();
 
   const handleTemplateDownload = () => {

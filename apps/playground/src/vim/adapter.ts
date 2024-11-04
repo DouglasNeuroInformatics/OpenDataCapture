@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /* eslint-disable no-fallthrough */
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */

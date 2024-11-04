@@ -1262,11 +1262,13 @@ function findWord(adapter: EditorAdapter, cur: Pos, forward: boolean, bigWord: b
         if (charTests[i]!(line.charAt(pos))) {
           wordStart = pos;
           // Advance to end of word.
+          // eslint-disable-next-line max-depth
           while (pos != stop && charTests[i]!(line.charAt(pos))) {
             pos += dir;
           }
           wordEnd = pos;
           foundWord = wordStart != wordEnd;
+          // eslint-disable-next-line max-depth
           if (wordStart == cur.ch && lineNum == cur.line && wordEnd == wordStart + dir) {
             // We started at the end of a word. Find the next one.
             continue;

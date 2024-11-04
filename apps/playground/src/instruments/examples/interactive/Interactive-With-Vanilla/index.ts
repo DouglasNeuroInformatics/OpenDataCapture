@@ -78,6 +78,7 @@ export default defineInstrument({
                 dy = -dy;
                 b.status = 0;
                 score++;
+                // eslint-disable-next-line max-depth
                 if (score === brickRowCount * brickColumnCount) {
                   done({
                     livesRemaining: lives,

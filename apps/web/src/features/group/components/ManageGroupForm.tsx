@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $RegexString } from '@opendatacapture/schemas/core';

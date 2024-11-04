@@ -14,14 +14,17 @@ type InstrumentBundlerErrorInstance =
 
 type InstrumentBundlerErrorKind = InstrumentBundlerErrorInstance['kind'];
 
-type InstrumentBundlerErrorOptions = { kind?: InstrumentBundlerErrorKind } & ErrorOptions;
+type InstrumentBundlerErrorOptions = ErrorOptions & { kind?: InstrumentBundlerErrorKind };
 
-type InstrumentBundlerErrorClass = {
+type InstrumentBundlerErrorClass = Class<
+  Error & InstrumentBundlerErrorInstance,
+  [string, InstrumentBundlerErrorOptions] | [string]
+> & {
   isInstance<TKind extends InstrumentBundlerErrorKind>(
     arg: unknown,
     kind: TKind
   ): arg is Extract<InstrumentBundlerErrorInstance, { kind: TKind }>;
-} & Class<Error & InstrumentBundlerErrorInstance, [string, InstrumentBundlerErrorOptions] | [string]>;
+};
 
 export const InstrumentBundlerError: InstrumentBundlerErrorClass = class extends Error {
   kind: any;
