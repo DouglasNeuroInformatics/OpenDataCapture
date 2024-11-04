@@ -117,7 +117,7 @@ export function reformatInstrumentData({
     recordsList.push(createdRecord);
   }
   const reformatForSending: UploadInstrumentRecordsData = {
-    groupId: undefined,
+    groupId: currentGroup?.id,
     instrumentId: instrument.id,
     records: recordsList
   };
