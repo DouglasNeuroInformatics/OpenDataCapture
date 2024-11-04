@@ -20,7 +20,7 @@ export const UploadButton = () => {
   const instruments = useAppStore((store) => store.instruments);
 
   const handleSubmit = async (files: File[]) => {
-    const zip = new JSZip() as { comment?: unknown } & JSZip;
+    const zip = new JSZip() as JSZip & { comment?: unknown };
     await zip.loadAsync(files[0]!);
     let label: string;
     try {

@@ -21,7 +21,6 @@ export type SetupPageProps = {
   onSubmit: (data: SetupData) => void;
 };
 
-// eslint-disable-next-line max-lines-per-function
 export const SetupPage = ({ onSubmit }: SetupPageProps) => {
   const { t } = useTranslation();
   return (

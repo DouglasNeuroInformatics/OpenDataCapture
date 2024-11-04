@@ -20,6 +20,6 @@ type EntryPoint = {
   out: string;
 };
 
-export type BundlerOptions = { configFilepath: string } & Config;
+export type BundlerOptions = Config & { configFilepath: string };
 
 export type { EntryPoint, ExportCondition, PackageExport, ResolvedPackage };

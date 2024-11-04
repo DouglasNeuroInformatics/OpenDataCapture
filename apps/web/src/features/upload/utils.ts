@@ -1,5 +1,3 @@
-/* eslint-disable max-lines */
-
 import { isNumberLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
 import type { Group } from '@opendatacapture/schemas/group';
@@ -59,7 +57,7 @@ type UploadOperationResult<T> =
       value: T;
     };
 
-type AnyZodTypeDef = { typeName: ZodTypeName } & z.ZodTypeDef;
+type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
 function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
   return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);

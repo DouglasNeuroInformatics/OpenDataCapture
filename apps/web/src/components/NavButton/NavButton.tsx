@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 
 import type { NavItem } from '@/hooks/useNavItems';
 
-export type NavButtonProps = {
+export type NavButtonProps = NavItem & {
   activeClassName?: string;
   className?: string;
   isActive: boolean;
   onClick?: (path: string) => void;
-} & NavItem;
+};
 
 export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(function NavButton(
   { activeClassName, className, disabled, icon: Icon, isActive, label, onClick, url, ...props },

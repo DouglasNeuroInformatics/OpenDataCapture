@@ -145,7 +145,7 @@ export class InstrumentsService {
   async findById(
     id: string,
     { ability }: EntityOperationOptions = {}
-  ): Promise<{ bundle: string; id: string } & AnyInstrument> {
+  ): Promise<AnyInstrument & { bundle: string; id: string }> {
     const instrument = await this.instrumentModel.findFirst({
       where: { AND: [accessibleQuery(ability, 'read', 'Instrument')], id }
     });

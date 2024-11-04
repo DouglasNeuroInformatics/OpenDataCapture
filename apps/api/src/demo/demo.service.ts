@@ -74,7 +74,7 @@ export class DemoService {
       await this.instrumentsService.create({ bundle: happinessQuestionnaireWithConsent });
       this.logger.debug('Done creating series instruments');
 
-      const groups: ({ dummyIdPrefix?: string } & Group)[] = [];
+      const groups: (Group & { dummyIdPrefix?: string })[] = [];
       for (const group of DEMO_GROUPS) {
         const { dummyIdPrefix, ...createGroupData } = group;
         const groupModel = await this.groupsService.create(createGroupData);

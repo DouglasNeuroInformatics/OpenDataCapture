@@ -22,17 +22,17 @@ type RequestOptions = {
   headers?: RequestHeaders;
 };
 
-type GetRequestOptions = {
+type GetRequestOptions = RequestOptions & {
   params?: {
     [key: string]: string;
   };
-} & RequestOptions;
+};
 
-type ClientResponse<TData extends JSONValue> = {
+type ClientResponse<TData extends JSONValue> = Omit<RefinedResponse<'text'>, 'json'> & {
   json<K extends Extract<keyof TData, string> | undefined = undefined>(
     selector?: K
   ): K extends string ? TData[K] : TData;
-} & Omit<RefinedResponse<'text'>, 'json'>;
+};
 
 export class Client {
   public defaultHeaders: DefaultHeaders = {

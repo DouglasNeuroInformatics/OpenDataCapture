@@ -21,14 +21,18 @@ type DiscriminatedInstrument<
     : never;
 
 /** @public */
-type InstrumentDef<TKind extends InstrumentKind, TLanguage extends InstrumentLanguage, TSchema extends z.ZodTypeAny> = {
+type InstrumentDef<
+  TKind extends InstrumentKind,
+  TLanguage extends InstrumentLanguage,
+  TSchema extends z.ZodTypeAny
+> = Omit<
+  DiscriminatedInstrument<TKind, TLanguage, z.TypeOf<TSchema>>,
+  '__runtimeVersion' | 'kind' | 'language' | 'validationSchema'
+> & {
   kind: TKind;
   language: TLanguage;
   validationSchema: TSchema;
-} & Omit<
-  DiscriminatedInstrument<TKind, TLanguage, z.TypeOf<TSchema>>,
-  '__runtimeVersion' | 'kind' | 'language' | 'validationSchema'
->;
+};
 
 /** @public */
 export declare function defineInstrument<

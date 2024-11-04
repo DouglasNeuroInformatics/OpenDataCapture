@@ -23,7 +23,6 @@ import { useInstrumentVisualization } from '../hooks/useInstrumentVisualization'
 import { useLinearModelQuery } from '../hooks/useLinearModelQuery';
 import { useMeasureOptions } from '../hooks/useMeasureOptions';
 
-// eslint-disable-next-line max-lines-per-function
 export const SubjectGraphPage = () => {
   const downloadCanvas = useDownload();
   const currentGroup = useAppStore((store) => store.currentGroup);
