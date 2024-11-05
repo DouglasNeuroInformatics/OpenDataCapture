@@ -1198,6 +1198,9 @@ importers:
       '@jspsych/plugin-image-keyboard-response__2.x':
         specifier: workspace:*
         version: link:../../vendor/@jspsych/plugin-image-keyboard-response@2.x
+      '@jspsych/plugin-instructions__2.x':
+        specifier: workspace:*
+        version: link:../../vendor/@jspsych/plugin-instructions@2.x
       '@jspsych/plugin-preload__1.x':
         specifier: workspace:*
         version: link:../../vendor/@jspsych/plugin-preload@1.x
@@ -1396,6 +1399,15 @@ importers:
   vendor/@jspsych/plugin-image-keyboard-response@2.x:
     dependencies:
       '@jspsych/plugin-image-keyboard-response':
+        specifier: 2.0.0
+        version: 2.0.0(jspsych@8.0.1)
+      jspsych__8.x:
+        specifier: workspace:*
+        version: link:../../jspsych@8.x
+
+  vendor/@jspsych/plugin-instructions@2.x:
+    dependencies:
+      '@jspsych/plugin-instructions':
         specifier: 2.0.0
         version: 2.0.0(jspsych@8.0.1)
       jspsych__8.x:
@@ -3196,6 +3208,12 @@ packages:
   '@jspsych/plugin-image-keyboard-response@2.0.0':
     resolution:
       { integrity: sha512-eTmOz2fH7KNKTEJuEK1iGhjTwPqwVaPcPeW0IbWNg6mLuwLWgTGnZNA+WUoyi1VS6usW2uZHn2oBs0NRgk5pJg== }
+    peerDependencies:
+      jspsych: '>=7.1.0'
+
+  '@jspsych/plugin-instructions@2.0.0':
+    resolution:
+      { integrity: sha512-vipRke3azBTA0qHRa4z+QXAIo+fGy3gzcKhfEO7JTcV0XgdVxIVqdhFKK//v/j49Wom4KkwJouEs5mhdD+YuRg== }
     peerDependencies:
       jspsych: '>=7.1.0'
 
@@ -13649,6 +13667,10 @@ snapshots:
       jspsych: 8.0.1
 
   '@jspsych/plugin-image-keyboard-response@2.0.0(jspsych@8.0.1)':
+    dependencies:
+      jspsych: 8.0.1
+
+  '@jspsych/plugin-instructions@2.0.0(jspsych@8.0.1)':
     dependencies:
       jspsych: 8.0.1
 
