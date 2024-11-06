@@ -1,15 +1,17 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { sum } from '/runtime/v1/lodash-es@4.x';
+import { omit, sum } from '/runtime/v1/lodash-es@4.x';
 import { z } from '/runtime/v1/zod@3.23.x';
+
+const $Response = z.number().int().min(0).max(3);
 
 export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
   tags: {
-    en: ['Health'],
-    fr: ['Santé']
+    en: ['Health', 'Depression'],
+    fr: ['Santé', 'Dépression']
   },
   internal: {
     edition: 1,
@@ -90,16 +92,16 @@ export default defineInstrument({
           },
           options: {
             en: {
-              0: 'Not at all',
-              1: 'Several days',
-              2: 'More than half of days',
+              0: 'Not at All',
+              1: 'Several Days',
+              2: 'More than half the days',
               3: 'Nearly every day'
             },
             fr: {
-              0: 'Not at all',
-              1: 'Several days',
-              2: 'More than half of days',
-              3: 'Nearly every day'
+              0: 'Jamais',
+              1: 'Plusieurs jours',
+              2: 'Plus de la moitié des jours',
+              3: 'Presque tous les jours'
             }
           },
           variant: 'likert'
@@ -216,21 +218,33 @@ export default defineInstrument({
     totalScore: {
       kind: 'computed',
       label: { en: 'Total Score', fr: 'Score total' },
-      value: ({ questions }) => sum(Object.values(questions))
+      value: ({ questions }) => sum(Object.values(omit(questions, 'impactOnFunctioning')))
     }
   },
-  validationSchema: z.object({
-    questions: z.object({
-      interestPleasure: z.number().int().min(0).max(3),
-      feelingDown: z.number().int().min(0).max(3),
-      sleepIssues: z.number().int().min(0).max(3),
-      energyLevel: z.number().int().min(0).max(3),
-      appetiteChanges: z.number().int().min(0).max(3),
-      selfWorth: z.number().int().min(0).max(3),
-      concentrationIssues: z.number().int().min(0).max(3),
-      psychomotorChanges: z.number().int().min(0).max(3),
-      suicidalThoughts: z.number().int().min(0).max(3)
-    }),
-    impactOnFunctioning: z.number().int().min(0).max(3).optional()
-  })
+  validationSchema: z
+    .object({
+      questions: z.object({
+        interestPleasure: $Response,
+        feelingDown: $Response,
+        sleepIssues: $Response,
+        energyLevel: $Response,
+        appetiteChanges: $Response,
+        selfWorth: $Response,
+        concentrationIssues: $Response,
+        psychomotorChanges: $Response,
+        suicidalThoughts: $Response
+      }),
+      impactOnFunctioning: $Response.optional()
+    })
+    .superRefine(({ impactOnFunctioning, questions }, ctx) => {
+      const isAnyNonZero = sum(Object.values(questions)) > 0;
+      // If any response is not zero, then impactOnFunctioning is required
+      if (isAnyNonZero && impactOnFunctioning === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'This question is required / Cette question est obligatoire',
+          path: ['impactOnFunctioning']
+        });
+      }
+    })
 });
