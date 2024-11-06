@@ -37,6 +37,7 @@
     "@jspsych/plugin-image-button-response__2.x": "workspace:*",
     "@jspsych/plugin-image-keyboard-response__1.x": "workspace:*",
     "@jspsych/plugin-image-keyboard-response__2.x": "workspace:*",
+    "@jspsych/plugin-instructions__2.x": "workspace:*",
     "@jspsych/plugin-preload__1.x": "workspace:*",
     "@jspsych/plugin-preload__2.x": "workspace:*",
     "@jspsych/plugin-survey-html-form__1.x": "workspace:*",

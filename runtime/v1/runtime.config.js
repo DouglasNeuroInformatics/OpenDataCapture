@@ -14,6 +14,7 @@ export default {
     '@jspsych/plugin-image-keyboard-response__2.x',
     '@jspsych/plugin-preload__1.x',
     '@jspsych/plugin-preload__2.x',
+    '@jspsych/plugin-instructions__2.x',
     '@jspsych/plugin-survey-html-form__1.x',
     '@jspsych/plugin-survey-html-form__2.x',
     '@jspsych/plugin-survey-text__1.x',
