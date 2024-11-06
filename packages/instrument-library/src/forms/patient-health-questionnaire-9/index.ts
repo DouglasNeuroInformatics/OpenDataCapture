@@ -10,8 +10,8 @@ export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
   tags: {
-    en: ['Health'],
-    fr: ['Santé']
+    en: ['Health', 'Depression'],
+    fr: ['Santé', 'Dépression']
   },
   internal: {
     edition: 1,
@@ -92,16 +92,16 @@ export default defineInstrument({
           },
           options: {
             en: {
-              0: 'Not at all',
-              1: 'Several days',
-              2: 'More than half of days',
+              0: 'Not at All',
+              1: 'Several Days',
+              2: 'More than half the days',
               3: 'Nearly every day'
             },
             fr: {
-              0: 'Not at all',
-              1: 'Several days',
-              2: 'More than half of days',
-              3: 'Nearly every day'
+              0: 'Jamais',
+              1: 'Plusieurs jours',
+              2: 'Plus de la moitié des jours',
+              3: 'Presque tous les jours'
             }
           },
           variant: 'likert'
