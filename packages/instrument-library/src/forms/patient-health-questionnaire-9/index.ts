@@ -221,18 +221,30 @@ export default defineInstrument({
       value: ({ questions }) => sum(Object.values(omit(questions, 'impactOnFunctioning')))
     }
   },
-  validationSchema: z.object({
-    questions: z.object({
-      interestPleasure: $Response,
-      feelingDown: $Response,
-      sleepIssues: $Response,
-      energyLevel: $Response,
-      appetiteChanges: $Response,
-      selfWorth: $Response,
-      concentrationIssues: $Response,
-      psychomotorChanges: $Response,
-      suicidalThoughts: $Response
-    }),
-    impactOnFunctioning: $Response.optional()
-  })
+  validationSchema: z
+    .object({
+      questions: z.object({
+        interestPleasure: $Response,
+        feelingDown: $Response,
+        sleepIssues: $Response,
+        energyLevel: $Response,
+        appetiteChanges: $Response,
+        selfWorth: $Response,
+        concentrationIssues: $Response,
+        psychomotorChanges: $Response,
+        suicidalThoughts: $Response
+      }),
+      impactOnFunctioning: $Response.optional()
+    })
+    .superRefine(({ impactOnFunctioning, questions }, ctx) => {
+      const isAnyNonZero = sum(Object.values(questions)) > 0;
+      // If any response is not zero, then impactOnFunctioning is required
+      if (isAnyNonZero && impactOnFunctioning === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'This question is required / Cette question est obligatoire',
+          path: ['impactOnFunctioning']
+        });
+      }
+    })
 });
