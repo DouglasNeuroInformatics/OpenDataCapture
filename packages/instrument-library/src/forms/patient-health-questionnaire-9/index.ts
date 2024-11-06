@@ -1,8 +1,10 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { sum } from '/runtime/v1/lodash-es@4.x';
+import { omit, sum } from '/runtime/v1/lodash-es@4.x';
 import { z } from '/runtime/v1/zod@3.23.x';
+
+const $Response = z.number().int().min(0).max(3);
 
 export default defineInstrument({
   kind: 'FORM',
@@ -216,21 +218,21 @@ export default defineInstrument({
     totalScore: {
       kind: 'computed',
       label: { en: 'Total Score', fr: 'Score total' },
-      value: ({ questions }) => sum(Object.values(questions))
+      value: ({ questions }) => sum(Object.values(omit(questions, 'impactOnFunctioning')))
     }
   },
   validationSchema: z.object({
     questions: z.object({
-      interestPleasure: z.number().int().min(0).max(3),
-      feelingDown: z.number().int().min(0).max(3),
-      sleepIssues: z.number().int().min(0).max(3),
-      energyLevel: z.number().int().min(0).max(3),
-      appetiteChanges: z.number().int().min(0).max(3),
-      selfWorth: z.number().int().min(0).max(3),
-      concentrationIssues: z.number().int().min(0).max(3),
-      psychomotorChanges: z.number().int().min(0).max(3),
-      suicidalThoughts: z.number().int().min(0).max(3)
+      interestPleasure: $Response,
+      feelingDown: $Response,
+      sleepIssues: $Response,
+      energyLevel: $Response,
+      appetiteChanges: $Response,
+      selfWorth: $Response,
+      concentrationIssues: $Response,
+      psychomotorChanges: $Response,
+      suicidalThoughts: $Response
     }),
-    impactOnFunctioning: z.number().int().min(0).max(3).optional()
+    impactOnFunctioning: $Response.optional()
   })
 });
