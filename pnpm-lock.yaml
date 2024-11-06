@@ -157,7 +157,7 @@ importers:
         version: 2.1.4(@types/node@20.17.6)(typescript@5.5.4)(vite@5.4.10(@types/node@20.17.6))(vitest@2.1.4)
       '@vitest/coverage-v8':
         specifier: ^2.0.5
-        version: 2.1.4(@vitest/browser@2.1.4(@types/node@20.17.6)(typescript@5.5.4)(vite@5.4.10(@types/node@20.17.6))(vitest@2.1.4))(vitest@2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.1)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4)))
+        version: 2.1.4(@vitest/browser@2.1.4(@types/node@20.17.6)(typescript@5.5.4)(vite@5.4.10(@types/node@20.17.6))(vitest@2.1.4))(vitest@2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.2)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4)))
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -205,7 +205,7 @@ importers:
         version: 1.5.1(@swc/core@1.8.0(@swc/helpers@0.5.13))(rollup@4.24.4)
       vitest:
         specifier: ^2.1.1
-        version: 2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.1)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4))
+        version: 2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.2)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4))
 
   apps/api:
     dependencies:
@@ -6673,8 +6673,8 @@ packages:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
     engines: {node: '>=6.0'}
 
-  happy-dom@15.10.1:
-    resolution: {integrity: sha512-FuGnj/qIB4QnBL6fWmD7Wnh6STxevLgOVWB6+nopDGgWG1+t9CXkNB2ldZ+iqwD2UKxD2D0SU8el8A6AX6Q1+g==}
+  happy-dom@15.10.2:
+    resolution: {integrity: sha512-NbA5XrSovenJIIcfixCREX3ZnV7yHP4phhbfuxxf4CPn+LZpz/jIM9EqJ2DrPwgVDSMoAKH3pZwQvkbsSiCrUw==}
     engines: {node: '>=18.0.0'}
 
   happy-dom@15.8.4:
@@ -14216,7 +14216,7 @@ snapshots:
       msw: 2.6.0(@types/node@20.17.6)(typescript@5.5.4)
       sirv: 3.0.0
       tinyrainbow: 1.2.0
-      vitest: 2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.1)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4))
+      vitest: 2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.2)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4))
       ws: 8.18.0
     transitivePeerDependencies:
       - '@types/node'
@@ -14225,7 +14225,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/coverage-v8@2.1.4(@vitest/browser@2.1.4(@types/node@20.17.6)(typescript@5.5.4)(vite@5.4.10(@types/node@20.17.6))(vitest@2.1.4))(vitest@2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.1)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4)))':
+  '@vitest/coverage-v8@2.1.4(@vitest/browser@2.1.4(@types/node@20.17.6)(typescript@5.5.4)(vite@5.4.10(@types/node@20.17.6))(vitest@2.1.4))(vitest@2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.2)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4)))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -14239,7 +14239,7 @@ snapshots:
       std-env: 3.7.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.1)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4))
+      vitest: 2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.2)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4))
     optionalDependencies:
       '@vitest/browser': 2.1.4(@types/node@20.17.6)(typescript@5.5.4)(vite@5.4.10(@types/node@20.17.6))(vitest@2.1.4)
     transitivePeerDependencies:
@@ -16564,7 +16564,7 @@ snapshots:
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
 
-  happy-dom@15.10.1:
+  happy-dom@15.10.2:
     dependencies:
       entities: 4.5.0
       webidl-conversions: 7.0.0
@@ -20583,7 +20583,7 @@ snapshots:
     optionalDependencies:
       vite: 5.4.10(@types/node@20.17.6)
 
-  vitest@2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.1)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4)):
+  vitest@2.1.4(@types/node@20.17.6)(@vitest/browser@2.1.4)(happy-dom@15.10.2)(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4)):
     dependencies:
       '@vitest/expect': 2.1.4
       '@vitest/mocker': 2.1.4(msw@2.6.0(@types/node@20.17.6)(typescript@5.5.4))(vite@5.4.10(@types/node@20.17.6))
@@ -20608,7 +20608,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.17.6
       '@vitest/browser': 2.1.4(@types/node@20.17.6)(typescript@5.5.4)(vite@5.4.10(@types/node@20.17.6))(vitest@2.1.4)
-      happy-dom: 15.10.1
+      happy-dom: 15.10.2
     transitivePeerDependencies:
       - less
       - lightningcss
