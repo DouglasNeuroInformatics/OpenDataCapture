@@ -205,12 +205,29 @@ export default defineInstrument({
     numberSelect: z.union([z.literal(1), z.literal(2), z.literal(3)]),
     numberSlider: z.number(),
     stringInput: z.string(),
-    stringPassword: z
-      .string()
-      .regex(
-        /"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"/,
-        'Password must contain eight or more characters and at least one letter and one number'
-      ),
+    stringPassword: z.string().superRefine((arg, ctx) => {
+      if (arg.length < 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Password must contain at least 8 characters'
+        });
+      } else if (!/\d+/.test(arg)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Password must contain at least 1 number'
+        });
+      } else if (!/[a-z]+/.test(arg)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Password must contain at least 1 lower case letter'
+        });
+      } else if (!/[A-Z]+/.test(arg)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Password must contain at least 1 upper case letter'
+        });
+      }
+    }),
     stringRadio: z.enum(['a', 'b', 'c']),
     stringSelect: z.enum(['a', 'b', 'c']),
     stringTextArea: z.string(),
