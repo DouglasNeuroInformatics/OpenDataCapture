@@ -45,6 +45,7 @@ export const UploadPage = () => {
         type: 'error'
       });
     }
+    setFile(null);
   };
 
   if (!instrument) {
