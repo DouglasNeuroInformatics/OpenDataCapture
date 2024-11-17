@@ -14,6 +14,9 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
+    profiles:
+      - '' #load by default without having to specify docker compose --profile
+      - gateway
   api:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-api:${RELEASE_CHANNEL}
     build:
@@ -43,6 +46,8 @@ services:
       - VERBOSE
     expose:
       - 80
+    profiles:
+      - '' #load by default without having to specify docker compose --profile
   gateway:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway:${RELEASE_CHANNEL}
     build:
@@ -54,6 +59,9 @@ services:
       - ${GATEWAY_PORT}:80
     expose:
       - 80
+    profiles:
+      - '' #load by default without having to specify docker compose --profile
+      - gateway
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -76,6 +84,8 @@ services:
       - PLAUSIBLE_WEB_DATA_DOMAIN
     expose:
       - 80
+    profiles:
+      - '' #load by default without having to specify docker compose --profile
     restart: unless-stopped
   mongo:
     image: mongo:${MONGODB_VERSION}
@@ -93,3 +103,5 @@ services:
     volumes:
       - ./mongo/config:/data/configdb
       - ./mongo/data:/data/db
+    profiles:
+      - '' #load by default without having to specify docker compose --profile
