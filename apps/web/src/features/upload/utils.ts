@@ -20,7 +20,8 @@ const ZOD_TYPE_NAMES = [
   'ZodDate',
   'ZodEnum',
   'ZodArray',
-  'ZodObject'
+  'ZodObject',
+  'ZodEffects'
 ] as const;
 
 const INTERNAL_HEADERS = ['subjectID', 'date'];
@@ -31,7 +32,7 @@ const INTERNAL_HEADERS_SAMPLE_DATA = [MONGOLIAN_VOWEL_SEPARATOR + 'string', MONG
 
 type ZodTypeName = Extract<`${z.ZodFirstPartyTypeKind}`, (typeof ZOD_TYPE_NAMES)[number]>;
 
-type RequiredZodTypeName = Exclude<ZodTypeName, 'ZodOptional'>;
+type RequiredZodTypeName = Exclude<ZodTypeName, 'ZodEffects' | 'ZodOptional'>;
 
 type ZodTypeNameResult =
   | {
@@ -71,8 +72,20 @@ function isZodEnumDef(def: AnyZodTypeDef): def is z.ZodEnumDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodEnum;
 }
 
+function isZodSetDef(def: AnyZodTypeDef): def is z.ZodSetDef {
+  return def.typeName === z.ZodFirstPartyTypeKind.ZodSet;
+}
+
 function isZodArrayDef(def: AnyZodTypeDef): def is z.ZodArrayDef {
-  return def.typeName === 'ZodArray';
+  return def.typeName === z.ZodFirstPartyTypeKind.ZodArray;
+}
+
+function isZodEffectsDef(def: AnyZodTypeDef): def is z.ZodEffectsDef {
+  return def.typeName === z.ZodFirstPartyTypeKind.ZodEffects;
+}
+
+function isZodObjectDef(def: AnyZodTypeDef): def is z.ZodObjectDef {
+  return def.typeName === z.ZodFirstPartyTypeKind.ZodObject;
 }
 
 // TODO - fix extract set and record array functions to handle whitespace and trailing semicolon (present or included)
@@ -136,7 +149,26 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
       };
     } else if (isZodArrayDef(def)) {
       return interpretZodArray(schema, def.typeName, isOptional);
+    } else if (isZodSetDef(def)) {
+      const innerDef: unknown = def.valueType._def;
+
+      if (!isZodTypeDef(innerDef)) {
+        return {
+          message: 'Invalid inner type: ZodSet value type must have a valid type definition',
+          success: false
+        };
+      }
+
+      if (isZodEnumDef(innerDef)) {
+        return {
+          enumValues: innerDef.values,
+          isOptional: Boolean(isOptional),
+          success: true,
+          typeName: def.typeName
+        };
+      }
     }
+
     return {
       isOptional: Boolean(isOptional),
       success: true,
@@ -194,7 +226,7 @@ export function interpretZodArray(
 
 export function interpretZodValue(
   entry: string,
-  zType: Exclude<ZodTypeName, 'ZodArray' | 'ZodObject' | 'ZodOptional'>,
+  zType: Exclude<ZodTypeName, 'ZodArray' | 'ZodEffects' | 'ZodObject' | 'ZodOptional'>,
   isOptional: boolean
 ): UploadOperationResult<FormTypes.FieldValue> {
   if (entry === '' && isOptional) {
@@ -222,11 +254,14 @@ export function interpretZodValue(
         return { success: true, value: parseNumber(entry) };
       }
       return { message: `Invalid number type: ${entry}`, success: false };
-    //TODO if ZodSet has a enum see if those values can be shown in template data if possible
     case 'ZodSet':
       if (entry.startsWith('SET(')) {
         const setData = extractSetEntry(entry);
-        return { success: true, value: new Set(setData.split(',')) };
+        const values = setData.split(',').map((s) => s.trim()).filter(Boolean);
+        if (values.length === 0) {
+          return { message: 'Empty set is not allowed', success: false };
+        }
+        return { success: true, value: new Set(values) };
       }
       return { message: `Invalid ZodSet: ${entry}`, success: false };
     case 'ZodString':
@@ -268,7 +303,7 @@ export function interpretZodObjectValue(
     }
     for (let i = 0; i < record.length; i++) {
       // TODO - make sure this is defined
-      const recordValue = record[i]!.split(':')[1]!;
+      const recordValue = record[i]!.split(':')[1]!.trim();
 
       const zListResult = zList[i]!;
       if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
@@ -285,7 +320,7 @@ export function interpretZodObjectValue(
           success: false
         };
       }
-      // TODO - how do we know that `zKeys` is the same length as record? What if the user forgets to add a element
+
       recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
     }
     recordArray.push(recordArrayObject);
@@ -304,7 +339,7 @@ function generateSampleData({
   multiKeys,
   multiValues,
   typeName
-}: Extract<ZodTypeNameResult, { success: true }>) {
+}: Extract<Exclude<ZodTypeNameResult, 'ZodEffects'>, { success: true }>) {
   switch (typeName) {
     case 'ZodBoolean':
       return formatTypeInfo('true/false', isOptional);
@@ -313,7 +348,14 @@ function generateSampleData({
     case 'ZodNumber':
       return formatTypeInfo('number', isOptional);
     case 'ZodSet':
-      return formatTypeInfo('SET(a,b,c)', isOptional);
+      try {
+        if (enumValues) return formatTypeInfo(`SET(${enumValues.join('/')}, ...)`, isOptional);
+
+        return formatTypeInfo('SET(a,b,c)', isOptional);
+      } catch {
+        throw new Error(`Failed to generate sample data for ZodSet`);
+      }
+
     case 'ZodString':
       return formatTypeInfo('string', isOptional);
     case 'ZodEnum':
@@ -353,7 +395,6 @@ function generateSampleData({
       } catch {
         throw new Error('Invalid Record Array Error');
       }
-
     default:
       throw new Error(`Invalid zod schema: unexpected type name '${typeName satisfies never}'`);
   }
@@ -363,12 +404,15 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
   // TODO - type validationSchema as object
   const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
 
+  const instrumentSchemaDef: unknown = instrument.validationSchema._def;
+
   let shape: { [key: string]: z.ZodTypeAny } = {};
-  // TODO - include ZodEffect as a typename like our other types
-  if ((instrumentSchema._def.typeName as string) === 'ZodEffects') {
-    // @ts-expect-error - TODO - find a type safe way to call this
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    shape = instrumentSchema._def.schema._def.shape() as { [key: string]: z.ZodTypeAny };
+
+  if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
+    const innerSchema: unknown = instrumentSchemaDef.schema._def;
+    if (isZodTypeDef(innerSchema) && isZodObjectDef(innerSchema)) {
+      shape = innerSchema.shape() as { [key: string]: z.ZodTypeAny };
+    }
   } else {
     shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
   }
@@ -402,17 +446,17 @@ export async function processInstrumentCSV(
   let shape: { [key: string]: z.ZodTypeAny } = {};
   let instrumentSchemaWithInternal: z.AnyZodObject;
 
-  if ((instrumentSchema._def.typeName as string) === 'ZodEffects') {
-    // @ts-expect-error - TODO - find a type safe way to call this
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    instrumentSchemaWithInternal = instrumentSchema._def.schema.extend({
+  const instrumentSchemaDef: unknown = instrumentSchema._def;
+
+  if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
+    //TODO make this type safe without having to cast z.AnyZodObject
+    instrumentSchemaWithInternal = (instrumentSchemaDef.schema as z.AnyZodObject).extend({
       date: z.coerce.date(),
       subjectID: z.string()
-    }) as z.AnyZodObject;
+    });
 
     shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
-    //const shape2 = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
     instrumentSchemaWithInternal = instrumentSchema.extend({
       date: z.coerce.date(),
       subjectID: z.string()
