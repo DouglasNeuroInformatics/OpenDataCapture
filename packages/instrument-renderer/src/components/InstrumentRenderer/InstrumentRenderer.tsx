@@ -7,6 +7,7 @@ import type { InstrumentSubmitHandler, SubjectDisplayInfo } from '../../types';
 
 export type InstrumentRendererProps = {
   className?: string;
+  initialSeriesIndex?: number;
   onSubmit: InstrumentSubmitHandler;
   subject?: SubjectDisplayInfo;
   target: InstrumentBundleContainer;

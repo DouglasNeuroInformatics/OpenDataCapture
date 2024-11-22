@@ -1,6 +1,6 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { HttpService } from '@nestjs/axios';
-import { BadGatewayException, HttpStatus, Injectable, Logger, NotImplementedException } from '@nestjs/common';
+import { BadGatewayException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import type {
   Assignment,
@@ -27,10 +27,6 @@ export class GatewayService {
 
   async createRemoteAssignment(assignment: Assignment, publicKey: CryptoKey): Promise<MutateAssignmentResponseBody> {
     const instrument = await this.instrumentsService.findBundleById(assignment.instrumentId);
-    if (instrument.kind === 'SERIES') {
-      throw new NotImplementedException('Cannot create remote assignment for series instrument');
-    }
-
     const response = await this.httpService.axiosRef.post(`/api/assignments`, {
       ...assignment,
       instrumentContainer: instrument,

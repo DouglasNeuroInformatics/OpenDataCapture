@@ -38,7 +38,7 @@ export const SubjectAssignmentsPage = () => {
   const instrumentOptions = Object.fromEntries(
     (instrumentInfoQuery.data ?? [])
       .filter((instrument) => {
-        return (currentGroup?.accessibleInstrumentIds.includes(instrument.id) ?? true) && instrument.kind !== 'SERIES';
+        return currentGroup?.accessibleInstrumentIds.includes(instrument.id) ?? true;
       })
       .map((instrument) => [instrument.id, instrument.details.title])
   );

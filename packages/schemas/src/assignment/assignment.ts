@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { $BaseModel, $Json, $Uint8Array } from '../core/core.js';
-import { $ScalarInstrumentBundleContainer } from '../instrument/instrument.base.js';
+import { $InstrumentBundleContainer } from '../instrument/instrument.base.js';
 
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -23,8 +23,8 @@ export const $Assignment = $BaseModel.extend({
 
 export type RemoteAssignment = z.infer<typeof $RemoteAssignment>;
 export const $RemoteAssignment = $Assignment.omit({ instrumentId: true, updatedAt: true }).extend({
-  encryptedData: $Uint8Array.nullable(),
-  symmetricKey: $Uint8Array.nullable()
+  encryptedData: z.string().nullable(),
+  symmetricKey: z.string().nullable()
 });
 
 /** The DTO transferred from the web client to the core API when creating an assignment */
@@ -39,7 +39,7 @@ export const $CreateAssignmentData = z.object({
 /** The DTO transferred from the core API to the external gateway when creating an assignment */
 export type CreateRemoteAssignmentInputData = z.input<typeof $CreateRemoteAssignmentData>;
 export const $CreateRemoteAssignmentData = $RemoteAssignment.omit({ encryptedData: true, symmetricKey: true }).extend({
-  instrumentContainer: $ScalarInstrumentBundleContainer,
+  instrumentContainer: $InstrumentBundleContainer,
   publicKey: $Uint8Array
 });
 
@@ -48,18 +48,14 @@ export const $MutateAssignmentResponseBody = z.object({
   success: z.boolean()
 });
 
-/**
- * The DTO transferred when updating an assignment. Note that this does not include
- * submitting a record, which is a distinct entity.
- */
 export type UpdateAssignmentData = z.infer<typeof $UpdateAssignmentData>;
-export const $UpdateAssignmentData = z
-  .object({
-    data: $Json,
-    expiresAt: z.coerce.date(),
-    status: $AssignmentStatus
-  })
-  .partial()
-  .refine((arg) => !(arg.data && arg.status !== 'COMPLETE'), {
-    message: 'Status must be complete if data is defined'
-  });
+export const $UpdateAssignmentData = z.object({
+  status: $AssignmentStatus
+});
+
+export type UpdateRemoteAssignmentData = z.infer<typeof $UpdateRemoteAssignmentData>;
+export const $UpdateRemoteAssignmentData = z.object({
+  data: $Json.optional(),
+  kind: z.enum(['SERIES', 'SCALAR']),
+  status: z.literal('COMPLETE').optional()
+});
