@@ -5,6 +5,7 @@ import { Button, Heading, Spinner } from '@douglasneuroinformatics/libui/compone
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Json } from '@opendatacapture/runtime-core';
 import type { SeriesInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
+import { CircleCheckIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
@@ -140,12 +141,24 @@ export const SeriesInstrumentRenderer = ({
                 .otherwise(() => null)
             )
             .with({ index: 2 }, () => (
-              <ContentPlaceholder
-                title={t({
-                  en: 'Instrument Complete',
-                  fr: 'Instrument complet'
-                })}
-              />
+              <div className="mx-auto flex max-w-prose flex-grow flex-col items-center justify-center space-y-1 py-32 text-center">
+                <CircleCheckIcon
+                  className="fill-green-600 [&>circle]:stroke-transparent"
+                  style={{ height: '36px', width: '36px' }}
+                />
+                <Heading variant="h4">
+                  {t({
+                    en: 'Thank You!',
+                    fr: 'Merci'
+                  })}
+                </Heading>
+                <p className="text-muted-foreground text-sm">
+                  {t({
+                    en: 'You have successfully completed all steps of this instrument.',
+                    fr: 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
+                  })}
+                </p>
+              </div>
             ))
             .otherwise(() => null)
         )
