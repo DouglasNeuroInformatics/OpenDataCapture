@@ -20,7 +20,7 @@
       "outputs": ["dist/**"]
     },
     "db:generate": {
-      "outputs": ["dist/**"]
+      "outputs": ["node_modules/@prisma/generated-client/**"]
     },
     "db:push": {
       "cache": false,
