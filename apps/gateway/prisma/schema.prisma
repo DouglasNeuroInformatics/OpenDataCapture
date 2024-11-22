@@ -13,18 +13,16 @@ datasource db {
 }
 
 model RemoteAssignmentModel {
-  id               String    @id
-  createdAt        DateTime  @default(now())
-  completedAt      DateTime?
-  expiresAt        DateTime
-  groupId          String?
-  instrumentBundle String
-  instrumentKind   String
-  instrumentId     String
-  rawPublicKey     Bytes
-  symmetricKey     Bytes?
-  encryptedData    Bytes?
-  status           String
-  subjectId        String
-  url              String
+  id                String    @id
+  createdAt         DateTime  @default(now())
+  completedAt       DateTime?
+  expiresAt         DateTime
+  groupId           String?
+  rawPublicKey      Bytes
+  symmetricKey      String?
+  encryptedData     String?
+  targetStringified String
+  status            String
+  subjectId         String
+  url               String
 }

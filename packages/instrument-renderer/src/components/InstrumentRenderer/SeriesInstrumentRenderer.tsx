@@ -18,14 +18,29 @@ import type { InstrumentSubmitHandler, SubjectDisplayInfo } from '../../types';
 
 export type SeriesInstrumentRendererProps = {
   className?: string;
+  initialSeriesIndex?: number;
   onSubmit: InstrumentSubmitHandler;
   subject?: SubjectDisplayInfo;
   target: SeriesInstrumentBundleContainer;
 };
 
-export const SeriesInstrumentRenderer = ({ className, onSubmit, target }: SeriesInstrumentRendererProps) => {
+export const SeriesInstrumentRenderer = ({
+  className,
+  initialSeriesIndex,
+  onSubmit,
+  target
+}: SeriesInstrumentRendererProps) => {
   const [index, setIndex] = useState<0 | 1 | 2>(0);
-  const [currentItemIndex, setCurrentItemIndex] = useState(0);
+  const [currentItemIndex, setCurrentItemIndex] = useState(() => {
+    if (!initialSeriesIndex) {
+      return 0;
+    } else if (initialSeriesIndex >= target.items.length) {
+      throw new Error(
+        `Initial series index '${initialSeriesIndex}' must be less than length of items '${target.items.length}'`
+      );
+    }
+    return initialSeriesIndex;
+  });
   const { t } = useTranslation();
 
   const scalarBundle = target.items[currentItemIndex]?.bundle;
@@ -39,7 +54,9 @@ export const SeriesInstrumentRenderer = ({ className, onSubmit, target }: Series
   const handleSubmit = async (data: unknown) => {
     await onSubmit({
       data: JSON.parse(JSON.stringify(data, replacer)) as Json,
-      instrumentId: scalarId!
+      index,
+      instrumentId: scalarId!,
+      kind: 'SERIES'
     });
     setCurrentItemIndex(currentItemIndex + 1);
     setIsInstrumentInProgress(false);

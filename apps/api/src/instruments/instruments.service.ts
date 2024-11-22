@@ -171,18 +171,18 @@ export class InstrumentsService {
     }));
   }
 
-  private generateInstrumentId(instrument: AnyInstrument) {
+  generateInstrumentId(instrument: AnyInstrument) {
     if (isScalarInstrument(instrument)) {
       return this.generateScalarInstrumentId(instrument);
     }
     return this.generateSeriesInstrumentId(instrument);
   }
 
-  private generateScalarInstrumentId({ internal: { edition, name } }: Pick<AnyScalarInstrument, 'internal'>) {
+  generateScalarInstrumentId({ internal: { edition, name } }: Pick<AnyScalarInstrument, 'internal'>) {
     return this.cryptoService.hash(`${name}-${edition}`);
   }
 
-  private generateSeriesInstrumentId(instrument: SeriesInstrument) {
+  generateSeriesInstrumentId(instrument: SeriesInstrument) {
     return this.cryptoService.hash(instrument.content.map(({ edition, name }) => `${name}-${edition}`).join('--'));
   }
 

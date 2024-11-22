@@ -9,4 +9,8 @@ export type InterpretedInstrumentState<T extends AnyUnilingualInstrument = AnyUn
 
 export type SubjectDisplayInfo = Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 
-export type InstrumentSubmitHandler = (arg0: { data: Json; instrumentId: string }) => Promisable<void>;
+export type InstrumentSubmitHandler = (
+  arg0:
+    | { data: Json; index: number; instrumentId: string; kind: 'SERIES' }
+    | { data: Json; instrumentId: string; kind?: 'SCALAR' }
+) => Promisable<void>;

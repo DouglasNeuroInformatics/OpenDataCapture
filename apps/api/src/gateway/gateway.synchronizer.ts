@@ -6,8 +6,10 @@ import { $Json } from '@opendatacapture/schemas/core';
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { SetupService } from '@/setup/setup.service';
+import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { GatewayService } from './gateway.service';
 
@@ -20,9 +22,11 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     configurationService: ConfigurationService,
     private readonly assignmentsService: AssignmentsService,
     private readonly gatewayService: GatewayService,
+    private readonly instrumentsService: InstrumentsService,
     private readonly instrumentRecordsService: InstrumentRecordsService,
     private readonly sessionsService: SessionsService,
-    private readonly setupService: SetupService
+    private readonly setupService: SetupService,
+    private readonly virtualizationService: VirtualizationService
   ) {
     this.refreshInterval = configurationService.get('GATEWAY_REFRESH_INTERVAL');
   }
@@ -37,28 +41,18 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     }
     const assignment = await this.assignmentsService.findById(remoteAssignment.id);
 
-    const completedAt = remoteAssignment.completedAt;
-    const symmetricKey = remoteAssignment.symmetricKey;
-    if (!completedAt) {
+    if (!remoteAssignment.completedAt) {
       this.logger.error(`Field 'completedAt' is null for assignment '${assignment.id}'`);
       return;
-    } else if (!symmetricKey) {
+    } else if (!remoteAssignment.symmetricKey) {
       this.logger.error(`Field 'symmetricKey' is null for assignment '${assignment.id}'`);
       return;
     }
 
-    const data = await $Json.parseAsync(
-      JSON.parse(
-        await HybridCrypto.decrypt({
-          cipherText: remoteAssignment.encryptedData,
-          privateKey: await HybridCrypto.deserializePrivateKey(assignment.encryptionKeyPair.privateKey),
-          symmetricKey
-        })
-      )
-    );
+    const instrument = await this.instrumentsService.findById(assignment.instrumentId);
 
     const session = await this.sessionsService.create({
-      date: completedAt,
+      date: remoteAssignment.completedAt,
       groupId: remoteAssignment.groupId ?? null,
       subjectData: {
         id: assignment.subjectId
@@ -66,25 +60,79 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       type: 'REMOTE'
     });
 
-    const record = await this.instrumentRecordsService.create({
-      assignmentId: assignment.id,
-      data,
-      date: completedAt,
-      groupId: assignment.groupId ?? undefined,
-      instrumentId: assignment.instrumentId,
-      sessionId: session.id,
-      subjectId: assignment.subjectId
-    });
+    const cipherTexts: string[] = [];
+    const symmetricKeys: string[] = [];
 
-    this.logger.log(`Created record with ID: ${record.id}`);
+    if (instrument.kind === 'SERIES') {
+      if (!(remoteAssignment.encryptedData.startsWith('$') && remoteAssignment.symmetricKey.startsWith('$'))) {
+        this.logger.error({ remoteAssignment });
+        throw new InternalServerErrorException('Malformed remote assignment for series instrument');
+      }
+      cipherTexts.push(...remoteAssignment.encryptedData.slice(1).split('$'));
+      symmetricKeys.push(...remoteAssignment.symmetricKey.slice(1).split('$'));
+      if (cipherTexts.length !== instrument.content.length) {
+        throw new InternalServerErrorException(
+          `Expected length of cypher texts '${cipherTexts.length}' to match length of series instrument content '${symmetricKeys.length}'`
+        );
+      } else if (symmetricKeys.length !== instrument.content.length) {
+        throw new InternalServerErrorException(
+          `Expected length of symmetric keys '${cipherTexts.length}' to match length of series instrument content '${symmetricKeys.length}'`
+        );
+      }
+    } else if (remoteAssignment.encryptedData.includes('$') || remoteAssignment.symmetricKey.includes('$')) {
+      this.logger.error({ remoteAssignment });
+      throw new InternalServerErrorException('Malformed remote assignment for scalar instrument');
+    } else {
+      cipherTexts.push(remoteAssignment.encryptedData);
+      symmetricKeys.push(remoteAssignment.symmetricKey);
+    }
+
+    const createdRecordIds: string[] = [];
     try {
+      for (let i = 0; i < cipherTexts.length; i++) {
+        const cipherText = cipherTexts[i]!;
+        const symmetricKey = symmetricKeys[i]!;
+        const data = await $Json.parseAsync(
+          JSON.parse(
+            await HybridCrypto.decrypt({
+              cipherText: Buffer.from(cipherText, 'base64'),
+              privateKey: await HybridCrypto.deserializePrivateKey(assignment.encryptionKeyPair.privateKey),
+              symmetricKey: Buffer.from(symmetricKey, 'base64')
+            })
+          )
+        );
+        const record = await this.instrumentRecordsService.create({
+          assignmentId: assignment.id,
+          data,
+          date: remoteAssignment.completedAt,
+          groupId: assignment.groupId ?? undefined,
+          instrumentId:
+            instrument.kind === 'SERIES'
+              ? this.instrumentsService.generateScalarInstrumentId({ internal: instrument.content[i]! })
+              : instrument.id,
+          sessionId: session.id,
+          subjectId: assignment.subjectId
+        });
+        this.logger.log(`Created record with ID: ${record.id}`);
+        createdRecordIds.push(record.id);
+      }
       await this.gatewayService.deleteRemoteAssignment(assignment.id);
     } catch (err) {
-      await this.instrumentRecordsService.deleteById(record.id);
-      this.logger.log(`Deleted Record with ID: ${record.id}`);
-      throw new InternalServerErrorException('Failed to Delete Remote Assignments', {
-        cause: err
+      this.logger.error({
+        data: {
+          assignment,
+          cipherTexts,
+          remoteAssignment,
+          symmetricKeys
+        },
+        message: 'Failed to Process Data'
       });
+      this.logger.error(err);
+      for (const id of createdRecordIds) {
+        await this.instrumentRecordsService.deleteById(id);
+        this.logger.log(`Deleted Record with ID: ${id}`);
+      }
+      throw err;
     }
   }
 

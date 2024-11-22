@@ -94,6 +94,9 @@ export class AssignmentsService {
   }
 
   async updateById(id: string, data: UpdateAssignmentData, { ability }: EntityOperationOptions = {}) {
+    if (data.status === 'CANCELED') {
+      await this.gatewayService.deleteRemoteAssignment(id);
+    }
     return this.assignmentModel.update({
       data,
       where: { AND: [accessibleQuery(ability, 'update', 'Assignment')], id }

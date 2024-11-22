@@ -5,21 +5,21 @@ import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/comp
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer, type InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
 import { Branding } from '@opendatacapture/react-core';
-import type { InstrumentKind } from '@opendatacapture/runtime-core';
-import type { UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { UpdateRemoteAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import axios from 'axios';
 
 import './services/axios';
 import './services/i18n';
 
 export type RootProps = {
-  bundle: string;
   id: string;
-  kind: Exclude<InstrumentKind, 'SERIES'>;
+  initialSeriesIndex?: number;
+  target: InstrumentBundleContainer;
   token: string;
 };
 
-export const Root = ({ bundle, id, kind, token }: RootProps) => {
+export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const notifications = useNotificationsStore();
 
@@ -27,19 +27,28 @@ export const Root = ({ bundle, id, kind, token }: RootProps) => {
     ref.current!.style.display = 'flex';
   }, []);
 
-  const handleSubmit: InstrumentSubmitHandler = async ({ data }) => {
-    await axios.patch(
-      `/api/assignments/${id}`,
-      {
-        data,
+  const handleSubmit: InstrumentSubmitHandler = async (result) => {
+    let updateData: UpdateRemoteAssignmentData;
+    if (target.kind === 'SERIES' && result.kind === 'SERIES') {
+      updateData = {
+        ...result,
+        status: result.instrumentId === target.items.at(-1)?.id ? 'COMPLETE' : undefined
+      };
+    } else if (target.kind !== 'SERIES') {
+      updateData = {
+        data: result.data,
+        kind: 'SCALAR',
         status: 'COMPLETE'
-      } satisfies UpdateAssignmentData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      };
+    } else {
+      notifications.addNotification({ message: 'Internal Server Error', type: 'error' });
+      return;
+    }
+    await axios.patch(`/api/assignments/${id}`, updateData, {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    );
+    });
     notifications.addNotification({ type: 'success' });
   };
 
@@ -61,7 +70,12 @@ export const Root = ({ bundle, id, kind, token }: RootProps) => {
         </div>
       </header>
       <main className="container flex min-h-0 max-w-3xl flex-grow flex-col pb-16 pt-32 xl:max-w-5xl">
-        <InstrumentRenderer className="min-h-full w-full" target={{ bundle, id, kind }} onSubmit={handleSubmit} />
+        <InstrumentRenderer
+          className="min-h-full w-full"
+          initialSeriesIndex={initialSeriesIndex}
+          target={target}
+          onSubmit={handleSubmit}
+        />
       </main>
       <NotificationHub />
     </div>

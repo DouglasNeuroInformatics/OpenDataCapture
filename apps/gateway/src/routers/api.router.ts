@@ -1,5 +1,9 @@
-import { type EncryptResult, HybridCrypto } from '@douglasneuroinformatics/libcrypto';
-import { $CreateRemoteAssignmentData, $UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
+import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
+import {
+  $CreateRemoteAssignmentData,
+  $UpdateRemoteAssignmentData,
+  type RemoteAssignment
+} from '@opendatacapture/schemas/assignment';
 import type { AssignmentStatus, MutateAssignmentResponseBody } from '@opendatacapture/schemas/assignment';
 import type { GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gateway';
 import { Router } from 'express';
@@ -23,14 +27,12 @@ router.get(
       }
     });
     return res.status(200).json(
-      assignments.map(({ encryptedData, symmetricKey, ...assignment }) => {
+      assignments.map((assignment) => {
         return {
           ...assignment,
-          encryptedData: encryptedData ? Array.from(encryptedData) : null,
-          status: assignment.status as AssignmentStatus,
-          symmetricKey: symmetricKey ? Array.from(symmetricKey) : null
+          status: assignment.status as AssignmentStatus
         };
-      })
+      }) satisfies RemoteAssignment[]
     );
   })
 );
@@ -40,16 +42,16 @@ router.post(
   ah(async (req, res) => {
     const result = await $CreateRemoteAssignmentData.safeParseAsync(req.body);
     if (!result.success) {
+      console.error(result.error.issues);
       throw new HttpException(400, 'Bad Request');
     }
     const { instrumentContainer, publicKey, ...assignment } = result.data;
+
     await prisma.remoteAssignmentModel.create({
       data: {
         ...assignment,
-        instrumentBundle: instrumentContainer.bundle,
-        instrumentId: instrumentContainer.id,
-        instrumentKind: instrumentContainer.kind,
-        rawPublicKey: Buffer.from(publicKey)
+        rawPublicKey: Buffer.from(publicKey),
+        targetStringified: JSON.stringify(instrumentContainer)
       }
     });
     res.status(201).send({ success: true } satisfies MutateAssignmentResponseBody);
@@ -66,29 +68,40 @@ router.patch(
     if (!assignment) {
       throw new HttpException(404, `Failed to Find Assignment with ID: ${id}`);
     }
-    const result = await $UpdateAssignmentData.safeParseAsync(req.body);
+    const result = await $UpdateRemoteAssignmentData.safeParseAsync(req.body);
     if (!result.success) {
-      console.error(result.error);
+      console.error(result.error.issues);
       throw new HttpException(400, 'Bad Request');
     }
-    const { data, expiresAt, status } = result.data;
+    const { data, kind, status } = result.data;
     const publicKey = await assignment.getPublicKey();
 
-    let encryptResult: EncryptResult | null = null;
-    if (!encryptResult) {
-      encryptResult = await HybridCrypto.encrypt({
-        plainText: JSON.stringify(data),
-        publicKey
-      });
+    const encryptResult = await HybridCrypto.encrypt({
+      plainText: JSON.stringify(data),
+      publicKey
+    });
+
+    let encryptedData: string, symmetricKey: string;
+    if (kind === 'SCALAR') {
+      encryptedData = Buffer.from(encryptResult.cipherText).toString('base64');
+      symmetricKey = Buffer.from(encryptResult.symmetricKey).toString('base64');
+    } else {
+      encryptedData = (assignment.encryptedData ?? '').concat(
+        '$',
+        Buffer.from(encryptResult.cipherText).toString('base64')
+      );
+      symmetricKey = (assignment.symmetricKey ?? '').concat(
+        '$',
+        Buffer.from(encryptResult.symmetricKey).toString('base64')
+      );
     }
 
     await prisma.remoteAssignmentModel.update({
       data: {
-        completedAt: result.data.data ? new Date() : undefined,
-        encryptedData: encryptResult ? Buffer.from(encryptResult.cipherText) : null,
-        expiresAt,
-        status: data ? ('COMPLETE' satisfies AssignmentStatus) : status,
-        symmetricKey: encryptResult ? Buffer.from(encryptResult.symmetricKey) : null
+        completedAt: status === 'COMPLETE' ? new Date() : undefined,
+        encryptedData,
+        status,
+        symmetricKey
       },
       where: {
         id: assignment.id

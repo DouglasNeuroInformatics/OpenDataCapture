@@ -7,6 +7,7 @@ import { InstrumentRecordsModule } from '@/instrument-records/instrument-records
 import { InstrumentsModule } from '@/instruments/instruments.module';
 import { SessionsModule } from '@/sessions/sessions.module';
 import { SetupModule } from '@/setup/setup.module';
+import { VirtualizationModule } from '@/virtualization/virtualization.module';
 
 import { GatewayController } from './gateway.controller';
 import { GatewayService } from './gateway.service';
@@ -44,7 +45,8 @@ import { GatewaySynchronizer } from './gateway.synchronizer';
     InstrumentRecordsModule,
     InstrumentsModule,
     SessionsModule,
-    SetupModule
+    SetupModule,
+    VirtualizationModule
   ],
   providers: [GatewayService, GatewaySynchronizer]
 })

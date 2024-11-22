@@ -1,6 +1,8 @@
+import { $InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';
+import type { RootProps } from '@/Root';
 import { ah } from '@/utils/async-handler';
 import { generateToken } from '@/utils/auth';
 
@@ -22,25 +24,28 @@ router.get(
         .json({ error: 'Conflict', message: 'Assignment already completed', statusCode: 409 });
     }
 
-    const kind = assignment.instrumentKind;
-    if (!(kind === 'FORM' || kind === 'INTERACTIVE')) {
-      return res
-        .status(501)
-        .set({ 'Content-Type': 'application/json' })
-        .json({
-          error: 'Not Implemented',
-          message: `Cannot render instrument kind '${kind}' on remote gateway`,
-          statusCode: 501
-        });
+    const targetParseResult = await $InstrumentBundleContainer.safeParseAsync(JSON.parse(assignment.targetStringified));
+    if (!targetParseResult.success) {
+      console.error(targetParseResult.error.issues);
+      return res.status(500).set({ 'Content-Type': 'application/json' }).json({
+        error: 'Internal Server Error',
+        message: 'Failed to parse target instrument from database',
+        statusCode: 500
+      });
+    }
+
+    let initialSeriesIndex: number | undefined;
+    if (assignment.encryptedData?.startsWith('$')) {
+      initialSeriesIndex = assignment.encryptedData.slice(1).split('$').length;
     }
 
     const token = generateToken(assignment.id);
     const html = res.locals.loadRoot({
-      bundle: assignment.instrumentBundle,
       id,
-      kind,
+      initialSeriesIndex,
+      target: targetParseResult.data,
       token
-    });
+    } satisfies RootProps);
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
   })
 );
