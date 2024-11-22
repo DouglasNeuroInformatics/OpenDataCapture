@@ -143,8 +143,8 @@ importers:
         specifier: ^0.5.13
         version: 0.5.15
       '@types/github-script':
-        specifier: github:actions/github-script
-        version: github-script@https://codeload.github.com/actions/github-script/tar.gz/4020e461acd7a80762cdfff123a1fde368246fa4
+        specifier: https://github.com/actions/github-script/archive/refs/tags/v7.0.1.tar.gz
+        version: github-script@https://github.com/actions/github-script/archive/refs/tags/v7.0.1.tar.gz
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -7636,9 +7636,8 @@ packages:
     resolution:
       { integrity: sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw== }
 
-  github-script@https://codeload.github.com/actions/github-script/tar.gz/4020e461acd7a80762cdfff123a1fde368246fa4:
-    resolution:
-      { tarball: https://codeload.github.com/actions/github-script/tar.gz/4020e461acd7a80762cdfff123a1fde368246fa4 }
+  github-script@https://github.com/actions/github-script/archive/refs/tags/v7.0.1.tar.gz:
+    resolution: { tarball: https://github.com/actions/github-script/archive/refs/tags/v7.0.1.tar.gz }
     version: 7.0.1
     engines: { node: '>=20.0.0 <21.0.0' }
 
@@ -18434,7 +18433,7 @@ snapshots:
 
   github-from-package@0.0.0: {}
 
-  github-script@https://codeload.github.com/actions/github-script/tar.gz/4020e461acd7a80762cdfff123a1fde368246fa4:
+  github-script@https://github.com/actions/github-script/archive/refs/tags/v7.0.1.tar.gz:
     dependencies:
       '@actions/core': 1.11.1
       '@actions/exec': 1.1.1
