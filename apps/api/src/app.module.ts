@@ -1,4 +1,5 @@
-import { CryptoModule, LoggingModule } from '@douglasneuroinformatics/libnest/modules';
+import { CryptoModule } from '@douglasneuroinformatics/libnest/crypto';
+import { LoggingModule } from '@douglasneuroinformatics/libnest/logging';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';

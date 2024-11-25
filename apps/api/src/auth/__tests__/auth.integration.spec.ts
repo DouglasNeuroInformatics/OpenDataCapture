@@ -1,5 +1,5 @@
 import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
-import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import { HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';

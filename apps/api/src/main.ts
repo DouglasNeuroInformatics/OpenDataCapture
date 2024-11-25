@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import path from 'node:path';
 
 import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
@@ -18,15 +20,16 @@ async function bootstrap() {
   const configurationService = app.get(ConfigurationService);
   const logLevels: LogLevel[] = ['error', 'fatal', 'log', 'warn'];
   if (configurationService.get('DEBUG')) {
-    // eslint-disable-next-line no-console
     console.log("Enabled 'debug' logs");
     logLevels.push('debug');
   }
   if (configurationService.get('VERBOSE')) {
-    // eslint-disable-next-line no-console
     console.log("Enabled 'verbose' logs");
     logLevels.push('verbose');
   }
+
+  console.log({ debug: configurationService.get('DEBUG') });
+
   app.useLogger(logLevels);
 
   app.enableCors();
@@ -45,7 +48,6 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  // eslint-disable-next-line no-console
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 

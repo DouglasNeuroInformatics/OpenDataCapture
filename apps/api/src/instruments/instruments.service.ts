@@ -1,4 +1,4 @@
-import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
 import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
