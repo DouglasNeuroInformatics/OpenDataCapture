@@ -5,7 +5,7 @@ export default {
     '@opendatacapture/runtime-core',
     '@opendatacapture/licenses',
     '@jspsych/plugin-html-button-response__1.x',
-    '@jspsych/plugin-html-button-response__1.x',
+    '@jspsych/plugin-html-button-response__2.x',
     '@jspsych/plugin-html-keyboard-response__1.x',
     '@jspsych/plugin-html-keyboard-response__2.x',
     '@jspsych/plugin-image-button-response__1.x',
