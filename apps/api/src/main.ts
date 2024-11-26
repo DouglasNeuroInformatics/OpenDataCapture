@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import path from 'node:path';
 
 import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
@@ -21,12 +19,12 @@ async function bootstrap() {
 
   const configurationService = app.get(ConfigurationService);
 
-  app.useLogger(
-    new JSONLogger(null, {
-      debug: configurationService.get('DEBUG'),
-      verbose: configurationService.get('VERBOSE')
-    })
-  );
+  const logger = new JSONLogger(null, {
+    debug: configurationService.get('DEBUG'),
+    verbose: configurationService.get('VERBOSE')
+  });
+
+  app.useLogger(logger);
 
   app.enableCors();
   app.enableVersioning({
@@ -44,7 +42,7 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 
 void bootstrap();
