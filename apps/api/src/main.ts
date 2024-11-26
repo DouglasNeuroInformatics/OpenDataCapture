@@ -3,9 +3,10 @@
 import path from 'node:path';
 
 import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
-import { type LogLevel, VersioningType } from '@nestjs/common';
+import { JSONLogger } from '@douglasneuroinformatics/libnest/logging';
+import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { type NestExpressApplication } from '@nestjs/platform-express';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'express';
 
 import { AppModule } from './app.module';
@@ -13,24 +14,19 @@ import { ConfigurationService } from './configuration/configuration.service';
 import { setupDocs } from './docs';
 
 async function bootstrap() {
-  // This hacky type assertion is needed due to issue with linked dependency
-  const app = (await NestFactory.create(AppModule)) as any as NestExpressApplication;
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: false
+  });
   app.enableShutdownHooks();
 
   const configurationService = app.get(ConfigurationService);
-  const logLevels: LogLevel[] = ['error', 'fatal', 'log', 'warn'];
-  if (configurationService.get('DEBUG')) {
-    console.log("Enabled 'debug' logs");
-    logLevels.push('debug');
-  }
-  if (configurationService.get('VERBOSE')) {
-    console.log("Enabled 'verbose' logs");
-    logLevels.push('verbose');
-  }
 
-  console.log({ debug: configurationService.get('DEBUG') });
-
-  app.useLogger(logLevels);
+  app.useLogger(
+    new JSONLogger(null, {
+      debug: configurationService.get('DEBUG'),
+      verbose: configurationService.get('VERBOSE')
+    })
+  );
 
   app.enableCors();
   app.enableVersioning({
