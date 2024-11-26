@@ -1,6 +1,7 @@
 import { AbilityBuilder, detectSubjectType } from '@casl/ability';
 import { createPrismaAbility } from '@casl/prisma';
-import { Injectable, Logger } from '@nestjs/common';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { Injectable } from '@nestjs/common';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
 import { type UserModel } from '@prisma/generated-client';
 
@@ -8,10 +9,10 @@ import type { AppAbility } from '@/core/types';
 
 @Injectable()
 export class AbilityFactory {
-  private readonly logger = new Logger(AbilityFactory.name);
+  constructor(private readonly loggingService: LoggingService) {}
 
   createForUser(user: UserModel): AppAbility {
-    this.logger.verbose('Creating ability for user: ' + user.username);
+    this.loggingService.verbose('Creating ability for user: ' + user.username);
     const ability = new AbilityBuilder<AppAbility>(createPrismaAbility);
     switch (user.basePermissionLevel) {
       case 'ADMIN':

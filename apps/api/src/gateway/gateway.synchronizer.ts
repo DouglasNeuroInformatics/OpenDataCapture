@@ -1,5 +1,6 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
-import { Injectable, InternalServerErrorException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { Injectable, InternalServerErrorException, type OnApplicationBootstrap } from '@nestjs/common';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import { $Json } from '@opendatacapture/schemas/core';
 
@@ -9,13 +10,11 @@ import { InstrumentRecordsService } from '@/instrument-records/instrument-record
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { SetupService } from '@/setup/setup.service';
-import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { GatewayService } from './gateway.service';
 
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap {
-  private readonly logger = new Logger(GatewaySynchronizer.name);
   private readonly refreshInterval: number;
 
   constructor(
@@ -24,9 +23,9 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     private readonly gatewayService: GatewayService,
     private readonly instrumentsService: InstrumentsService,
     private readonly instrumentRecordsService: InstrumentRecordsService,
+    private readonly loggingService: LoggingService,
     private readonly sessionsService: SessionsService,
-    private readonly setupService: SetupService,
-    private readonly virtualizationService: VirtualizationService
+    private readonly setupService: SetupService
   ) {
     this.refreshInterval = configurationService.get('GATEWAY_REFRESH_INTERVAL');
   }
@@ -42,10 +41,10 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     const assignment = await this.assignmentsService.findById(remoteAssignment.id);
 
     if (!remoteAssignment.completedAt) {
-      this.logger.error(`Field 'completedAt' is null for assignment '${assignment.id}'`);
+      this.loggingService.error(`Field 'completedAt' is null for assignment '${assignment.id}'`);
       return;
     } else if (!remoteAssignment.symmetricKey) {
-      this.logger.error(`Field 'symmetricKey' is null for assignment '${assignment.id}'`);
+      this.loggingService.error(`Field 'symmetricKey' is null for assignment '${assignment.id}'`);
       return;
     }
 
@@ -65,7 +64,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     if (instrument.kind === 'SERIES') {
       if (!(remoteAssignment.encryptedData.startsWith('$') && remoteAssignment.symmetricKey.startsWith('$'))) {
-        this.logger.error({ remoteAssignment });
+        this.loggingService.error({ remoteAssignment });
         throw new InternalServerErrorException('Malformed remote assignment for series instrument');
       }
       cipherTexts.push(...remoteAssignment.encryptedData.slice(1).split('$'));
@@ -80,7 +79,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         );
       }
     } else if (remoteAssignment.encryptedData.includes('$') || remoteAssignment.symmetricKey.includes('$')) {
-      this.logger.error({ remoteAssignment });
+      this.loggingService.error({ remoteAssignment });
       throw new InternalServerErrorException('Malformed remote assignment for scalar instrument');
     } else {
       cipherTexts.push(remoteAssignment.encryptedData);
@@ -113,12 +112,12 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
           sessionId: session.id,
           subjectId: assignment.subjectId
         });
-        this.logger.log(`Created record with ID: ${record.id}`);
+        this.loggingService.log(`Created record with ID: ${record.id}`);
         createdRecordIds.push(record.id);
       }
       await this.gatewayService.deleteRemoteAssignment(assignment.id);
     } catch (err) {
-      this.logger.error({
+      this.loggingService.error({
         data: {
           assignment,
           cipherTexts,
@@ -127,10 +126,10 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         },
         message: 'Failed to Process Data'
       });
-      this.logger.error(err);
+      this.loggingService.error(err);
       for (const id of createdRecordIds) {
         await this.instrumentRecordsService.deleteById(id);
-        this.logger.log(`Deleted Record with ID: ${id}`);
+        this.loggingService.log(`Deleted Record with ID: ${id}`);
       }
       throw err;
     }
@@ -139,16 +138,19 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   private async sync() {
     const setupState = await this.setupService.getState();
     if (!setupState.isSetup) {
-      this.logger.log('Will not attempt synchronizing with gateway: app is not setup');
+      this.loggingService.log('Will not attempt synchronizing with gateway: app is not setup');
       return;
     }
 
-    this.logger.log('Synchronizing with gateway...');
+    this.loggingService.log('Synchronizing with gateway...');
     let remoteAssignments: RemoteAssignment[];
     try {
       remoteAssignments = await this.gatewayService.fetchRemoteAssignments();
     } catch (err) {
-      this.logger.error('Failed to Fetch Remote Assignments', err);
+      this.loggingService.error({
+        cause: err,
+        error: 'Failed to Fetch Remote Assignments'
+      });
       return;
     }
 
@@ -164,6 +166,6 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         status: assignment.status
       });
     }
-    this.logger.log('Done synchronizing with gateway');
+    this.loggingService.log('Done synchronizing with gateway');
   }
 }

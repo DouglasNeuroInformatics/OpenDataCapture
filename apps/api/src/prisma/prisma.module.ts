@@ -1,4 +1,5 @@
-import { type DynamicModule, Logger, Module } from '@nestjs/common';
+import { JSONLogger } from '@douglasneuroinformatics/libnest/logging';
+import { type DynamicModule, Module } from '@nestjs/common';
 
 import { ConfigurationService } from '@/configuration/configuration.service';
 
@@ -10,7 +11,10 @@ import type { ModelEntityName } from './prisma.types';
 
 @Module({})
 export class PrismaModule {
-  private static logger = new Logger(PrismaModule.name);
+  private static logger = new JSONLogger(PrismaModule.name, {
+    debug: false,
+    verbose: false
+  });
 
   static forFeature<T extends ModelEntityName>(modelName: T): DynamicModule {
     const modelToken = getModelToken(modelName);
@@ -22,7 +26,7 @@ export class PrismaModule {
           inject: [PRISMA_CLIENT_TOKEN],
           provide: modelToken,
           useFactory: (client: ExtendedPrismaClient) => {
-            this.logger.debug(`Injecting model for resolved token: '${modelToken}'`);
+            this.logger.log(`Injecting model for resolved token: '${modelToken}'`);
             return client[getModelReferenceName(modelName)];
           }
         }
@@ -53,7 +57,7 @@ export class PrismaModule {
                 url.searchParams.append(key, value);
               }
             }
-            this.logger.debug(`Attempting to create client with data source: '${url.href}'`);
+            this.logger.log(`Attempting to create client with data source: '${url.href}'`);
             return PrismaFactory.createClient({ datasourceUrl: url.href });
           }
         },

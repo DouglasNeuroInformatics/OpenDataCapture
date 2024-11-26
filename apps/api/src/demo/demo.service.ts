@@ -1,7 +1,8 @@
 import { randomValue } from '@douglasneuroinformatics/libjs';
 import { toUpperCase } from '@douglasneuroinformatics/libjs';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
 import { faker } from '@faker-js/faker';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
 import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/enhanced-demographics-questionnaire.js';
 import generalConsentForm from '@opendatacapture/instrument-library/forms/general-consent-form.js';
@@ -33,12 +34,11 @@ faker.seed(123);
 
 @Injectable()
 export class DemoService {
-  private readonly logger = new Logger(DemoService.name);
-
   constructor(
     private readonly groupsService: GroupsService,
     private readonly instrumentRecordsService: InstrumentRecordsService,
     private readonly instrumentsService: InstrumentsService,
+    private readonly loggingService: LoggingService,
     private readonly prismaService: PrismaService,
     private readonly sessionsService: SessionsService,
     private readonly subjectsService: SubjectsService,
@@ -54,7 +54,7 @@ export class DemoService {
   }): Promise<void> {
     try {
       const dbName = await this.prismaService.getDbName();
-      this.logger.log(`Initializing demo for database: '${dbName}'`);
+      this.loggingService.log(`Initializing demo for database: '${dbName}'`);
 
       const hq = (await this.instrumentsService.create({ bundle: happinessQuestionnaire })) as WithID<
         FormInstrument<HappinessQuestionnaireData, Language[]>
@@ -66,13 +66,13 @@ export class DemoService {
         this.instrumentsService.create({ bundle: patientHealthQuestionnaire9 })
       ]);
 
-      this.logger.debug('Done creating forms');
+      this.loggingService.debug('Done creating forms');
 
       await this.instrumentsService.create({ bundle: breakoutTask });
-      this.logger.debug('Done creating interactive instruments');
+      this.loggingService.debug('Done creating interactive instruments');
 
       await this.instrumentsService.create({ bundle: happinessQuestionnaireWithConsent });
-      this.logger.debug('Done creating series instruments');
+      this.loggingService.debug('Done creating series instruments');
 
       const groups: (Group & { dummyIdPrefix?: string })[] = [];
       for (const group of DEMO_GROUPS) {
@@ -80,7 +80,7 @@ export class DemoService {
         const groupModel = await this.groupsService.create(createGroupData);
         groups.push({ ...groupModel, dummyIdPrefix });
       }
-      this.logger.debug('Done creating groups');
+      this.loggingService.debug('Done creating groups');
 
       for (const user of DEMO_USERS) {
         await this.usersService.create({
@@ -88,11 +88,11 @@ export class DemoService {
           groupIds: user.groupNames.map((name) => groups.find((group) => group.name === name)!.id)
         });
       }
-      this.logger.debug('Done creating users');
+      this.loggingService.debug('Done creating users');
 
       let researchId = 1;
       for (let i = 0; i < dummySubjectCount; i++) {
-        this.logger.debug(`Creating dummy subject ${i + 1}/${dummySubjectCount}`);
+        this.loggingService.debug(`Creating dummy subject ${i + 1}/${dummySubjectCount}`);
         const group = randomValue(groups)!;
         const subjectIdData = {
           dateOfBirth: faker.date.birthdate(),
@@ -141,12 +141,12 @@ export class DemoService {
             subjectId: subject.id
           });
         }
-        this.logger.debug(`Done creating dummy subject ${i + 1}`);
+        this.loggingService.debug(`Done creating dummy subject ${i + 1}`);
       }
     } catch (err) {
       if (err instanceof Error) {
-        this.logger.error(err.cause);
-        this.logger.error(err);
+        this.loggingService.error(err.cause);
+        this.loggingService.error(err);
       }
       throw err;
     }

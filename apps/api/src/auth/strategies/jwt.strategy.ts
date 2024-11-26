@@ -1,4 +1,5 @@
-import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import type { JwtPayload } from '@opendatacapture/schemas/auth';
 import type { GroupModel, UserModel } from '@prisma/generated-client';
@@ -11,11 +12,10 @@ import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  private readonly logger = new Logger(JwtStrategy.name);
-
   constructor(
     config: ConfigurationService,
     private readonly abilityFactory: AbilityFactory,
+    private readonly loggingService: LoggingService,
     private readonly usersService: UsersService
   ) {
     super({
@@ -29,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate({ username }: JwtPayload): Promise<Request['user']> {
     const user = await this.getUser(username);
     const ability = this.abilityFactory.createForUser(user);
-    this.logger.verbose(`Validated Token for User: ${username}`);
+    this.loggingService.verbose(`Validated Token for User: ${username}`);
     return { ...user, ability };
   }
 
