@@ -30,7 +30,6 @@ export class PrismaModule {
     };
   }
   static forRoot(): DynamicModule {
-    this.logger.debug('Applying root configuration...');
     return {
       exports: [PRISMA_CLIENT_TOKEN, PrismaService],
       global: true,
