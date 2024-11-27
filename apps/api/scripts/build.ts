@@ -24,13 +24,13 @@ const outfile = path.resolve(outdir, 'app.js');
 
 const runtimeV1Dir = path.dirname(require.resolve('@opendatacapture/runtime-v1/package.json'));
 
-const options: { external: NonNullable<unknown>; plugins: NonNullable<unknown> } & BuildOptions = {
+const options: BuildOptions & { external: NonNullable<unknown>; plugins: NonNullable<unknown> } = {
   banner: {
     js: "Object.defineProperties(globalThis, { __dirname: { value: import.meta.dirname, writable: false }, __filename: { value: import.meta.filename, writable: false }, require: { value: (await import('module')).createRequire(import.meta.url), writable: false } });"
   },
   bundle: true,
   define: {
-    __RELEASE__: JSON.stringify(await getReleaseInfo())
+    'import.meta.release': JSON.stringify(await getReleaseInfo())
   },
   entryPoints: [entryFile],
   external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],
