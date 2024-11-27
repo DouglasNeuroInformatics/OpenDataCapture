@@ -12,18 +12,17 @@ import { ConfigurationService } from './configuration/configuration.service';
 import { setupDocs } from './docs';
 
 async function bootstrap() {
-  const logger = new JSONLogger(null, { debug: true, verbose: true });
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { logger });
-
-  app.enableShutdownHooks();
-
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true
+  });
   const configurationService = app.get(ConfigurationService);
-  logger.setOptions({
+  const logger = new JSONLogger(null, {
     debug: configurationService.get('DEBUG'),
     verbose: configurationService.get('VERBOSE')
   });
-
+  app.useLogger(logger);
   app.enableCors();
+  app.enableShutdownHooks();
   app.enableVersioning({
     defaultVersion: '1',
     type: VersioningType.URI
