@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Button } from '@douglasneuroinformatics/libui/components';
+import { Button, Separator } from '@douglasneuroinformatics/libui/components';
 import { type Theme, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/runtime-core';
 import { $Json, type Json } from '@opendatacapture/schemas/core';
-import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
+import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 
 import bootstrapScript from './bootstrap?raw';
@@ -54,6 +54,14 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
     [onSubmit]
   );
 
+  const handleToggleFullScreen = async () => {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+      await document.exitFullscreen();
+    }
+  };
+
   useEffect(() => {
     document.addEventListener('changeLanguage', handleChangeLanguageEvent, false);
     return () => document.removeEventListener('changeLanguage', handleChangeLanguageEvent, false);
@@ -89,6 +97,10 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
         </Button>
         <Button size="icon" type="button" variant="outline" onClick={() => setScale(scale + 25)}>
           <ZoomInIcon />
+        </Button>
+        <Separator className="mx-1 h-6" orientation="vertical" />
+        <Button size="icon" type="button" variant="outline" onClick={() => void handleToggleFullScreen()}>
+          <FullscreenIcon />
         </Button>
       </div>
       <div className="h-full w-full overflow-hidden rounded-md border border-slate-300 dark:border-slate-700">
