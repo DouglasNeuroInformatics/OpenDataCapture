@@ -70,39 +70,4 @@ async function build() {
   console.log('Done!');
 }
 
-async function watch() {
-  return new Promise((resolve, reject) => {
-    esbuild
-      .context({
-        ...options,
-        external: [...options.external, 'esbuild'],
-        plugins: [
-          ...options.plugins,
-          {
-            name: 'rebuild',
-            setup(build) {
-              build.onEnd((result) => {
-                console.log(`Done! Build completed with ${result.errors.length} errors`);
-                resolve(result);
-              });
-            }
-          }
-        ],
-        sourcemap: true
-      })
-      .then((ctx) => {
-        void ctx.watch();
-        console.log('Watching...');
-      })
-      .catch((err) => {
-        reject(err as Error);
-      });
-  });
-}
-
-const isEntry = process.argv[1] === import.meta.filename;
-if (isEntry) {
-  await build();
-}
-
-export { clean, outfile, watch };
+await build();
