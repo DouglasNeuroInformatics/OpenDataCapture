@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { Injectable } from '@nestjs/common';
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
@@ -8,13 +9,14 @@ import type { RouteAccessType } from '@/core/decorators/route-access.decorator';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
-  private readonly logger = new Logger(AuthorizationGuard.name);
-
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly loggingService: LoggingService,
+    private readonly reflector: Reflector
+  ) {}
 
   canActivate(context: ExecutionContext): boolean | Observable<boolean> | Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    this.logger.verbose(`Request URL: ${request.url}`);
+    this.loggingService.verbose(`Request URL: ${request.url}`);
 
     const routeAccess = this.reflector.getAllAndOverride<RouteAccessType | undefined>('RouteAccess', [
       context.getHandler(),

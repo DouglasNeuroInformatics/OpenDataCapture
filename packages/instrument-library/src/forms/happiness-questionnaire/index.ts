@@ -113,15 +113,21 @@ export default defineInstrument({
       }
     }
   },
-  details: {
-    description: {
-      en: 'The Happiness Questionnaire is a questionnaire about happiness.',
-      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
-    },
+  clientDetails: {
     estimatedDuration: 1,
     instructions: {
       en: ['Please answer the questions based on your current feelings.'],
       fr: ['Veuillez répondre àux questions en fonction de vos sentiments actuels.']
+    },
+    title: {
+      en: 'Questionnaire on Happiness',
+      fr: 'Questionnaire relatif au bonheur'
+    }
+  },
+  details: {
+    description: {
+      en: 'The Happiness Questionnaire is a questionnaire about happiness.',
+      fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
     },
     license: 'Apache-2.0',
     title: {

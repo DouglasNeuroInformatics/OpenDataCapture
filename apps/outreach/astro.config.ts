@@ -93,6 +93,10 @@ export default defineConfig({
           autogenerate: { directory: 'docs/5-reference' },
           label: 'Reference'
         },
+        {
+          autogenerate: { directory: 'docs/6-updating' },
+          label: 'Updating'
+        },
         starlightTypeDocSidebarGroup
       ],
       social: {

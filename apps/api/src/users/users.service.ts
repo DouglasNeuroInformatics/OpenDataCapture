@@ -1,4 +1,4 @@
-import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { accessibleQuery } from '@/ability/ability.utils';

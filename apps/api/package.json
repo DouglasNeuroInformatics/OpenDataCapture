@@ -5,6 +5,8 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
+    "_dev": "NODE_ENV=development env-cmd -f ../../.env node --enable-source-maps --import @swc-node/register/esm-register --watch src/main.ts",
+    "_dev:test": "NODE_ENV=test env-cmd -f ../../.env node --enable-source-maps --import @swc-node/register/esm-register --watch src/main.ts",
     "build": "NODE_ENV=production tsx scripts/build.ts",
     "db:generate": "prisma generate",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx scripts/dev.ts",

@@ -1,5 +1,5 @@
 import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
-import { CryptoService } from '@douglasneuroinformatics/libnest/modules';
+import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
 import { type MockedInstance, MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';

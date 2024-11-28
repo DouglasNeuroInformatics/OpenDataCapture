@@ -1,7 +1,7 @@
-import type { Merge, Promisable, SetRequired } from 'type-fest';
+import type { Merge, Promisable } from 'type-fest';
 
 import type { Json, Language } from './core.d.ts';
-import type { InstrumentDetails, InstrumentLanguage, ScalarInstrument } from './instrument.base.d.ts';
+import type { InstrumentLanguage, ScalarInstrument } from './instrument.base.d.ts';
 
 /** @public */
 declare namespace InteractiveInstrument {
@@ -23,7 +23,6 @@ declare type InteractiveInstrument<
       };
       render: (done: (data: TData) => void) => Promisable<void>;
     };
-    details: SetRequired<InstrumentDetails<TLanguage>, 'estimatedDuration' | 'instructions'>;
     kind: 'INTERACTIVE';
   }
 >;

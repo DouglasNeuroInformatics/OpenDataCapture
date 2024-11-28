@@ -34,7 +34,25 @@ type InstrumentUIOption<TLanguage extends InstrumentLanguage, TValue> = TLanguag
     : never;
 
 /**
- * An object containing the base details of any instrument to be displayed to the user. This may be
+ * An object containing the base details of any instrument to be displayed to the client. This may be
+ * augmented in specific kinds of instruments, if applicable.
+ * @public
+ *
+ * @typeParam TLanguage - the language(s) of the instrument
+ */
+type ClientInstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
+  /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
+  estimatedDuration?: number;
+
+  /** Brief sequential instructions for how the subject should complete the instrument. */
+  instructions?: InstrumentUIOption<TLanguage, string[]>;
+
+  /** The title of the instrument to show the client. If not specified, defaults to `details.title` */
+  title?: InstrumentUIOption<TLanguage, string>;
+};
+
+/**
+ * An object containing the base details of any instrument to be displayed to the clinician/researcher. This may be
  * augmented in specific kinds of instruments, if applicable.
  * @public
  *
@@ -47,10 +65,16 @@ type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage
   /** A brief description of the instrument, such as the purpose and history of the instrument */
   description: InstrumentUIOption<TLanguage, string>;
 
-  /** An integer representing the estimated number of minutes for the average target subject to complete the instrument */
+  /**
+   * An integer representing the estimated number of minutes for the average target subject to complete the instrument.
+   * @deprecated use `clientDetails.estimatedDuration`
+   */
   estimatedDuration?: number;
 
-  /** Brief sequential instructions for how the subject should complete the instrument. */
+  /**
+   * Brief sequential instructions for how the subject should complete the instrument.
+   * @deprecated use `clientDetails.instructions`
+   */
   instructions?: InstrumentUIOption<TLanguage, string[]>;
 
   /** An identifier corresponding to the SPDX license list version d2709ad (released on 2024-01-30) */
@@ -62,7 +86,7 @@ type InstrumentDetails<TLanguage extends InstrumentLanguage = InstrumentLanguage
   /** A URL where the user can find the source code for the instrument */
   sourceUrl?: null | string;
 
-  /** The title of the instrument in the language it is written, omitting the definite article */
+  /** The title of the instrument in the language it is written, omitting the definite article. */
   title: InstrumentUIOption<TLanguage, string>;
 };
 
@@ -71,6 +95,12 @@ type UnilingualInstrumentDetails = InstrumentDetails<Language>;
 
 /** @internal */
 type MultilingualInstrumentDetails = InstrumentDetails<Language[]>;
+
+/** @internal */
+type UnilingualClientInstrumentDetails = ClientInstrumentDetails<Language>;
+
+/** @internal */
+type MultilingualClientInstrumentDetails = ClientInstrumentDetails<Language[]>;
 
 /** @public */
 type InstrumentMeasureValue = boolean | Date | number | string | undefined;
@@ -111,7 +141,9 @@ type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Lan
 type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The runtime version for this instrument, which is set automatically by the `defineInstrument` function */
   __runtimeVersion: 1;
-  /** The content in the instrument to be rendered to the user */
+  /** The content in the instrument to be rendered to the client */
+  clientDetails?: ClientInstrumentDetails<TLanguage>;
+  /** The content in the instrument to be rendered to the clinician/researcher */
   content?: unknown;
   /** The details of the instrument to be displayed to the user */
   details: InstrumentDetails<TLanguage>;
@@ -156,6 +188,7 @@ type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage = Instru
 
 export {
   BaseInstrument,
+  ClientInstrumentDetails,
   InstrumentDetails,
   InstrumentKind,
   InstrumentLanguage,
@@ -163,10 +196,12 @@ export {
   InstrumentMeasures,
   InstrumentMeasureValue,
   InstrumentUIOption,
+  MultilingualClientInstrumentDetails,
   MultilingualInstrumentDetails,
   MultilingualInstrumentMeasures,
   ScalarInstrument,
   ScalarInstrumentInternal,
+  UnilingualClientInstrumentDetails,
   UnilingualInstrumentDetails,
   UnilingualInstrumentMeasures
 };

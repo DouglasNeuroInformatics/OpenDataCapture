@@ -1,6 +1,7 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
 import { HttpService } from '@nestjs/axios';
-import { BadGatewayException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { BadGatewayException, HttpStatus, Injectable } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import type {
   Assignment,
@@ -18,11 +19,10 @@ import { InstrumentsService } from '@/instruments/instruments.service';
 
 @Injectable()
 export class GatewayService {
-  private readonly logger = new Logger(GatewayService.name);
-
   constructor(
     private readonly httpService: HttpService,
-    private readonly instrumentsService: InstrumentsService
+    private readonly instrumentsService: InstrumentsService,
+    private readonly loggingService: LoggingService
   ) {}
 
   async createRemoteAssignment(assignment: Assignment, publicKey: CryptoKey): Promise<MutateAssignmentResponseBody> {
@@ -63,7 +63,7 @@ export class GatewayService {
     }
     const result = await $RemoteAssignment.array().safeParseAsync(response.data);
     if (!result.success) {
-      this.logger.error({
+      this.loggingService.error({
         data: response.data as unknown,
         error: result.error.format(),
         message: 'ERROR: Remote assignments received from gateway do not match expected structure'
@@ -85,7 +85,7 @@ export class GatewayService {
     const result = await $GatewayHealthcheckSuccessResult.safeParseAsync(response.data);
     if (!result.success) {
       const statusText = 'Healthcheck data received from gateway do not match expected structure';
-      this.logger.error({
+      this.loggingService.error({
         data: response.data as unknown,
         error: result.error.format(),
         message: `ERROR: ${statusText}`

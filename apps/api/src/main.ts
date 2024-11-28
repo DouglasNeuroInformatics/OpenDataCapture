@@ -1,9 +1,10 @@
 import path from 'node:path';
 
 import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
-import { type LogLevel, VersioningType } from '@nestjs/common';
+import { JSONLogger } from '@douglasneuroinformatics/libnest/logging';
+import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { type NestExpressApplication } from '@nestjs/platform-express';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'express';
 
 import { AppModule } from './app.module';
@@ -11,25 +12,17 @@ import { ConfigurationService } from './configuration/configuration.service';
 import { setupDocs } from './docs';
 
 async function bootstrap() {
-  // This hacky type assertion is needed due to issue with linked dependency
-  const app = (await NestFactory.create(AppModule)) as any as NestExpressApplication;
-  app.enableShutdownHooks();
-
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true
+  });
   const configurationService = app.get(ConfigurationService);
-  const logLevels: LogLevel[] = ['error', 'fatal', 'log', 'warn'];
-  if (configurationService.get('DEBUG')) {
-    // eslint-disable-next-line no-console
-    console.log("Enabled 'debug' logs");
-    logLevels.push('debug');
-  }
-  if (configurationService.get('VERBOSE')) {
-    // eslint-disable-next-line no-console
-    console.log("Enabled 'verbose' logs");
-    logLevels.push('verbose');
-  }
-  app.useLogger(logLevels);
-
+  const logger = new JSONLogger(null, {
+    debug: configurationService.get('DEBUG'),
+    verbose: configurationService.get('VERBOSE')
+  });
+  app.useLogger(logger);
   app.enableCors();
+  app.enableShutdownHooks();
   app.enableVersioning({
     defaultVersion: '1',
     type: VersioningType.URI
@@ -45,8 +38,7 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  // eslint-disable-next-line no-console
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 
 void bootstrap();

@@ -8,8 +8,11 @@ import type {
   FormInstrument,
   FormTypes,
   Language,
+  MultilingualClientInstrumentDetails,
+  MultilingualInstrumentDetails,
   MultilingualInstrumentMeasures,
   SeriesInstrument,
+  UnilingualClientInstrumentDetails,
   UnilingualInstrumentMeasures
 } from '@opendatacapture/runtime-core';
 import type { InstrumentInfo, UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
@@ -227,6 +230,30 @@ function translateMeasures(
   });
 }
 
+function translateDetails<TDetails extends MultilingualInstrumentDetails>(details: TDetails, language: Language) {
+  return {
+    ...details,
+    description: details.description[language],
+    instructions: details.instructions?.[language],
+    license: details.license,
+    title: details.title[language]
+  };
+}
+
+function translateClientDetails(
+  details: MultilingualClientInstrumentDetails | undefined,
+  language: Language
+): undefined | UnilingualClientInstrumentDetails {
+  if (!details) {
+    return undefined;
+  }
+  return {
+    ...details,
+    instructions: details.instructions?.[language],
+    title: details.title?.[language]
+  };
+}
+
 /**
  * Translate a multilingual form instrument to the user's preferred language.
  *
@@ -237,14 +264,9 @@ function translateMeasures(
 function translateForm(form: AnyMultilingualFormInstrument, language: Language): AnyUnilingualFormInstrument {
   return {
     ...form,
+    clientDetails: translateClientDetails(form.clientDetails, language),
     content: translateFormContent(form.content, language),
-    details: {
-      description: form.details.description[language],
-      estimatedDuration: form.details.estimatedDuration,
-      instructions: form.details.instructions?.[language],
-      license: form.details.license,
-      title: form.details.title[language]
-    },
+    details: translateDetails(form.details, language),
     language,
     measures: translateMeasures(form.measures, language),
     tags: form.tags[language]
@@ -257,13 +279,8 @@ function translateInteractive(
 ): AnyUnilingualInteractiveInstrument {
   return {
     ...instrument,
-    details: {
-      description: instrument.details.description[language],
-      estimatedDuration: instrument.details.estimatedDuration,
-      instructions: instrument.details.instructions?.[language],
-      license: instrument.details.license,
-      title: instrument.details.title[language]
-    },
+    clientDetails: translateClientDetails(instrument.clientDetails, language),
+    details: translateDetails(instrument.details, language),
     language,
     // Because of the JSON data type, the measures is different since there cannot be a ref, but this is irrelevant for translation
     measures: translateMeasures(instrument.measures as MultilingualInstrumentMeasures, language),
@@ -274,13 +291,8 @@ function translateInteractive(
 function translateSeries(series: SeriesInstrument<Language[]>, language: Language): SeriesInstrument<Language> {
   return {
     ...series,
-    details: {
-      description: series.details.description[language],
-      estimatedDuration: series.details.estimatedDuration,
-      instructions: series.details.instructions?.[language],
-      license: series.details.license,
-      title: series.details.title[language]
-    },
+    clientDetails: translateClientDetails(series.clientDetails, language),
+    details: translateDetails(series.details, language),
     language,
     tags: series.tags[language]
   };
@@ -306,13 +318,8 @@ export function translateInstrumentInfo(info: InstrumentInfo, preferredLanguage:
   const targetLanguage = getTargetLanguage(info, preferredLanguage);
   return {
     ...info,
-    details: {
-      ...info.details,
-      description: info.details.description[targetLanguage],
-      instructions: info.details.instructions?.[targetLanguage],
-      license: info.details.license,
-      title: info.details.title[targetLanguage]
-    },
+    clientDetails: translateClientDetails(info.clientDetails, targetLanguage),
+    details: translateDetails(info.details, targetLanguage),
     language: targetLanguage,
     tags: info.tags[targetLanguage]
   };

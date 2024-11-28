@@ -1,4 +1,5 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import type {
   FormInstrument,
   InstrumentMeasure,
@@ -11,7 +12,7 @@ import { match } from 'ts-pattern';
 
 @Injectable()
 export class InstrumentMeasuresService {
-  private readonly logger = new Logger(InstrumentMeasuresService.name);
+  constructor(private readonly loggingService: LoggingService) {}
 
   computeMeasures(measures: InstrumentMeasures, data: FormInstrument.Data | Json | Prisma.JsonValue) {
     const computedMeasures: { [key: string]: InstrumentMeasureValue } = {};
@@ -28,7 +29,7 @@ export class InstrumentMeasuresService {
       })
       .with({ kind: 'const' }, (measure) => {
         if (!(data && typeof data === 'object')) {
-          this.logger.error({ data, message: 'Invalid Data' });
+          this.loggingService.error({ data, message: 'Invalid Data' });
           const label = typeof measure.label === 'string' ? measure.label : (measure.label?.en ?? measure.label?.fr)!;
           throw new InternalServerErrorException(`Failed to compute measure '${label}': data must be object'`);
         }

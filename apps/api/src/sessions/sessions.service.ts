@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
@@ -14,16 +15,15 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
 export class SessionsService {
-  private readonly logger = new Logger(SessionsService.name);
-
   constructor(
     @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
+    private readonly loggingService: LoggingService,
     private readonly subjectsService: SubjectsService
   ) {}
 
   async create({ date, groupId, subjectData, type }: CreateSessionData): Promise<Session> {
-    this.logger.debug({ message: 'Attempting to create session' });
+    this.loggingService.debug({ message: 'Attempting to create session' });
     const subject = await this.resolveSubject(subjectData);
 
     // If the subject is not yet associated with the group, check it exists then append it
@@ -85,7 +85,7 @@ export class SessionsService {
 
   /** Get the subject if they exist, otherwise create them */
   private async resolveSubject(subjectData: CreateSubjectData) {
-    this.logger.debug({ message: 'Attempting to resolve subject', subjectData });
+    this.loggingService.debug({ message: 'Attempting to resolve subject', subjectData });
     let subject: SubjectModel;
     try {
       subject = await this.subjectsService.findById(subjectData.id);

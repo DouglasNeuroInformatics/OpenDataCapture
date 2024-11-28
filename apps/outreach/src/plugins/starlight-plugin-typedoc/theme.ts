@@ -120,16 +120,8 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
     return `${markdown}\n\n${getAsideMarkdown(...args)}`;
   }
 
-  #addDeprecatedAside(markdown: string, blockTag: CommentTag) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const content =
-      blockTag.content.length > 0
-        ? // @ts-expect-error - inherited code from https://github.com/HiDeoo/starlight-typedoc
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          this.partials.commentParts(blockTag.content)
-        : 'This API is no longer supported and may be removed in a future release.';
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  #addDeprecatedAside(markdown: string, _blockTag: CommentTag) {
+    const content = 'This API is no longer supported and may be removed in a future release.';
     return this.#addAside(markdown, 'caution', 'Deprecated', content);
   }
 

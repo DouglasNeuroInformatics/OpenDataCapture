@@ -1,17 +1,18 @@
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { JSONLogger } from '@douglasneuroinformatics/libnest/logging';
+import { InternalServerErrorException } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/generated-client';
 
 export const PRISMA_CLIENT_TOKEN = 'PRISMA_CLIENT';
 
 export class PrismaFactory {
-  private static logger = new Logger(PrismaFactory.name);
+  private static logger = new JSONLogger(PrismaFactory.name, {
+    debug: false,
+    verbose: false
+  });
 
   static createClient(options: Prisma.PrismaClientOptions) {
-    this.logger.debug(`Attempting to create PrismaClient...`);
+    this.logger.log('Creating PrismaClient...');
     const baseClient = new PrismaClient(options);
-    this.logger.debug('Finished creating PrismaClient');
-
-    this.logger.debug('Attempting to apply client extensions...');
     const extendedClient = baseClient.$extends({
       model: {
         $allModels: {
@@ -85,7 +86,7 @@ export class PrismaFactory {
         }
       }
     });
-    this.logger.debug('Finished applying client extensions');
+    this.logger.log('Finished creating PrismaClient');
     return extendedClient;
   }
 }
