@@ -30,7 +30,7 @@ const options: BuildOptions & { external: NonNullable<unknown>; plugins: NonNull
   },
   bundle: true,
   define: {
-    'import.meta.release': JSON.stringify(await getReleaseInfo())
+    __RELEASE__: JSON.stringify(await getReleaseInfo())
   },
   entryPoints: [entryFile],
   external: ['@nestjs/microservices', '@nestjs/websockets/socket-module', 'class-transformer', 'class-validator'],
@@ -70,4 +70,39 @@ async function build() {
   console.log('Done!');
 }
 
-await build();
+async function watch() {
+  return new Promise((resolve, reject) => {
+    esbuild
+      .context({
+        ...options,
+        external: [...options.external, 'esbuild'],
+        plugins: [
+          ...options.plugins,
+          {
+            name: 'rebuild',
+            setup(build) {
+              build.onEnd((result) => {
+                console.log(`Done! Build completed with ${result.errors.length} errors`);
+                resolve(result);
+              });
+            }
+          }
+        ],
+        sourcemap: true
+      })
+      .then((ctx) => {
+        void ctx.watch();
+        console.log('Watching...');
+      })
+      .catch((err) => {
+        reject(err as Error);
+      });
+  });
+}
+
+const isEntry = process.argv[1] === import.meta.filename;
+if (isEntry) {
+  await build();
+}
+
+export { clean, outfile, watch };

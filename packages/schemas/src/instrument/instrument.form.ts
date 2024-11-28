@@ -2,7 +2,7 @@ import type { FormInstrument, FormTypes, InstrumentLanguage } from '@opendatacap
 import { z } from 'zod';
 
 import { $ZodTypeAny, isZodObjectType } from '../core/core.js';
-import { $$InstrumentUIOption, $InstrumentDetails, $ScalarInstrument } from './instrument.base.js';
+import { $$InstrumentUIOption, $ScalarInstrument } from './instrument.base.js';
 
 const $StaticFieldKind: z.ZodType<FormTypes.StaticFieldKind> = z.enum([
   'string',
@@ -151,9 +151,6 @@ const $FormInstrumentContent = z.union([
 const $FormInstrument: z.ZodType<FormInstrument> = $ScalarInstrument
   .extend({
     content: $FormInstrumentContent,
-    details: $InstrumentDetails.required({
-      estimatedDuration: true
-    }),
     initialValues: z.any(),
     kind: z.literal('FORM'),
     validationSchema: $ZodTypeAny

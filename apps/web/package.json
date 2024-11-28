@@ -28,6 +28,7 @@
     "@opendatacapture/instrument-renderer": "workspace:*",
     "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
+    "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",

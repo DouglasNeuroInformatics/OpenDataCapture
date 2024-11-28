@@ -1,6 +1,7 @@
 import { isUnique } from '@douglasneuroinformatics/libjs';
 import type {
   BaseInstrument,
+  ClientInstrumentDetails,
   InstrumentDetails,
   InstrumentKind,
   InstrumentLanguage,
@@ -8,6 +9,7 @@ import type {
   InstrumentMeasureValue,
   InstrumentUIOption,
   ScalarInstrument,
+  UnilingualClientInstrumentDetails,
   UnilingualInstrumentDetails,
   UnilingualInstrumentMeasures
 } from '@opendatacapture/runtime-core';
@@ -53,15 +55,23 @@ const $$InstrumentUIOption = <TSchema extends z.ZodTypeAny, TLanguage extends In
   return resolvedSchema as z.ZodType<InstrumentUIOption<TLanguage, z.output<TSchema>>>;
 };
 
-const $InstrumentDetails = z.object({
-  authors: z.array(z.string()).nullish(),
-  description: $$InstrumentUIOption(z.string().min(1)),
+const $ClientInstrumentDetails = z.object({
   estimatedDuration: z.number().int().nonnegative().optional(),
   instructions: $$InstrumentUIOption(z.array(z.string().min(1))).optional(),
+  title: $$InstrumentUIOption(z.string().min(1)).optional()
+}) satisfies z.ZodType<ClientInstrumentDetails>;
+
+const $UnilingualClientInstrumentDetails = $ClientInstrumentDetails.extend({
+  instructions: z.array(z.string().min(1)).optional(),
+  title: z.string().min(1).optional()
+}) satisfies z.ZodType<UnilingualClientInstrumentDetails>;
+
+const $InstrumentDetails = $ClientInstrumentDetails.required({ title: true }).extend({
+  authors: z.array(z.string()).nullish(),
+  description: $$InstrumentUIOption(z.string().min(1)),
   license: $LicenseIdentifier,
   referenceUrl: z.string().url().nullish(),
-  sourceUrl: z.string().url().nullish(),
-  title: $$InstrumentUIOption(z.string().min(1))
+  sourceUrl: z.string().url().nullish()
 }) satisfies z.ZodType<InstrumentDetails>;
 
 const $UnilingualInstrumentDetails = $InstrumentDetails.extend({
@@ -118,6 +128,7 @@ const $UnilingualInstrumentMeasures = z.record(
 
 const $BaseInstrument = z.object({
   __runtimeVersion: z.literal(1),
+  clientDetails: $ClientInstrumentDetails.optional(),
   content: z.any(),
   details: $InstrumentDetails,
   id: z.string().optional(),
@@ -138,6 +149,7 @@ const $ScalarInstrument = $BaseInstrument.extend({
 }) satisfies z.ZodType<ScalarInstrument>;
 
 const $UnilingualScalarInstrument = $ScalarInstrument.extend({
+  clientDetails: $UnilingualClientInstrumentDetails.optional(),
   details: $UnilingualInstrumentDetails,
   language: $Language,
   measures: $UnilingualInstrumentMeasures.nullable(),
@@ -195,6 +207,7 @@ const $InstrumentBundleContainer: z.ZodType<InstrumentBundleContainer> = z.union
 export {
   $$InstrumentUIOption,
   $BaseInstrument,
+  $ClientInstrumentDetails,
   $CreateInstrumentData,
   $InstrumentBundleContainer,
   $InstrumentDetails,

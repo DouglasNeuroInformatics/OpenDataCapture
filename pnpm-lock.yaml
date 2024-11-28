@@ -683,6 +683,9 @@ importers:
       '@opendatacapture/instrument-utils':
         specifier: workspace:*
         version: link:../../packages/instrument-utils
+      '@opendatacapture/licenses':
+        specifier: workspace:*
+        version: link:../../packages/licenses
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core

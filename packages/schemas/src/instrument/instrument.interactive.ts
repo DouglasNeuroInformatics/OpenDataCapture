@@ -13,10 +13,7 @@ const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $ScalarInstrume
       .readonly(),
     render: z.function().args(z.any()).returns(z.any())
   }),
-  details: $InstrumentDetails.required({
-    estimatedDuration: true,
-    instructions: true
-  }),
+  details: $InstrumentDetails,
   kind: z.literal('INTERACTIVE')
 });
 

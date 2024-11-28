@@ -1,9 +1,8 @@
 import type FormTypes from '@douglasneuroinformatics/libui-form-types';
-import type { PartialDeep, SetRequired, Simplify } from 'type-fest';
+import type { PartialDeep, Simplify } from 'type-fest';
 
 import type { Language } from './core.d.ts';
 import type {
-  InstrumentDetails,
   InstrumentLanguage,
   InstrumentMeasures,
   InstrumentUIOption,
@@ -283,9 +282,8 @@ declare type FormInstrument<
   TData extends FormInstrument.Data = FormInstrument.Data,
   TLanguage extends InstrumentLanguage = InstrumentLanguage
 > = Simplify<
-  Omit<ScalarInstrument<TData, TLanguage>, 'details'> & {
+  ScalarInstrument<TData, TLanguage> & {
     content: FormInstrument.Content<TData, TLanguage>;
-    details: SetRequired<InstrumentDetails<TLanguage>, 'estimatedDuration'>;
     initialValues?: PartialDeep<TData>;
     kind: 'FORM';
     measures: InstrumentMeasures<TData, TLanguage> | null;

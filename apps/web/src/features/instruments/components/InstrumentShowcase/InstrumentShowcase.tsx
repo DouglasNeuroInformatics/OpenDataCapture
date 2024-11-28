@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +18,9 @@ export const InstrumentsShowcase = () => {
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [filteredInstruments, setFilteredInstruments] = useState<UnilingualInstrumentInfo[]>([]);
+  const [filteredInstruments, setFilteredInstruments] = useState<
+    (UnilingualInstrumentInfo & { supportedLanguages: Language[] })[]
+  >([]);
   const [tagOptions, setTagOptions] = useState<ListboxDropdownOption[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<ListboxDropdownOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<ListboxDropdownOption[]>([]);

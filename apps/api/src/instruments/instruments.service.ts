@@ -1,4 +1,5 @@
 import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
+import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
 import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
@@ -40,6 +41,7 @@ export class InstrumentsService {
   constructor(
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     private readonly cryptoService: CryptoService,
+    private readonly loggingService: LoggingService,
     private readonly virtualizationService: VirtualizationService
   ) {}
 
@@ -55,6 +57,7 @@ export class InstrumentsService {
     try {
       bundleReturn = await this.virtualizationService.runInContext(bundle);
     } catch (err) {
+      this.loggingService.error(err);
       let cause: unknown;
       const parsed = await $Error.safeParseAsync(err);
       if (parsed.success) {
