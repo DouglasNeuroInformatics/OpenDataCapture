@@ -23,7 +23,7 @@
     "@casl/prisma": "catalog:",
     "@douglasneuroinformatics/libcrypto": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
-    "@douglasneuroinformatics/libnest": "file:/Users/joshua/Developer/libnest",
+    "@douglasneuroinformatics/libnest": "catalog:",
     "@douglasneuroinformatics/libpasswd": "catalog:",
     "@douglasneuroinformatics/libstats": "catalog:",
     "@faker-js/faker": "^9.0.0",

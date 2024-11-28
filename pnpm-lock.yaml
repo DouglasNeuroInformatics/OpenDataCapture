@@ -24,6 +24,9 @@ catalogs:
     '@douglasneuroinformatics/libjs':
       specifier: latest
       version: 1.0.2
+    '@douglasneuroinformatics/libnest':
+      specifier: latest
+      version: 0.5.0
     '@douglasneuroinformatics/libpasswd':
       specifier: latest
       version: 0.0.3
@@ -218,8 +221,8 @@ importers:
         specifier: 'catalog:'
         version: 1.0.2(typescript@5.5.4)
       '@douglasneuroinformatics/libnest':
-        specifier: file:/Users/joshua/Developer/libnest
-        version: file:../libnest(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.1)(mongodb@6.10.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        specifier: 'catalog:'
+        version: 0.5.0(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.1)(mongodb@6.10.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
         version: 0.0.3(typescript@5.5.4)
@@ -1982,8 +1985,9 @@ packages:
     peerDependencies:
       typescript: ^5.1.0
 
-  '@douglasneuroinformatics/libnest@file:../libnest':
-    resolution: { directory: ../libnest, type: directory }
+  '@douglasneuroinformatics/libnest@0.5.0':
+    resolution:
+      { integrity: sha512-8o2PPOTu7zTo4ESeu80Wz09Gxn4I05XntimBlpxP2/jTTw154YPXVrfHVvMyJQGCodT+sRU4MzUK/Mq5EmXrAg== }
     peerDependencies:
       '@nestjs/common': ^10.2.3
       '@nestjs/core': ^10.2.3
@@ -12805,7 +12809,7 @@ snapshots:
       type-fest: 4.26.1
       typescript: 5.5.4
 
-  '@douglasneuroinformatics/libnest@file:../libnest(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.1)(mongodb@6.10.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libnest@0.5.0(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.1)(mongodb@6.10.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 1.0.2(typescript@5.5.4)
       '@nestjs/common': 10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1)
