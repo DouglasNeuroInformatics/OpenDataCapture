@@ -38,6 +38,15 @@ export const UploadPage = () => {
         data: processedDataResult.value,
         instrument: instrument!
       });
+      if (reformattedData.records.length > 1000) {
+        addNotification({
+          message: t({
+            en: 'Lots of entries, please wait...',
+            fr: 'Plusieur de donnee, attendue si vous plait'
+          }),
+          type: 'info'
+        });
+      }
       uploadInstrumentRecordsMutation.mutate(reformattedData);
     } else {
       addNotification({
