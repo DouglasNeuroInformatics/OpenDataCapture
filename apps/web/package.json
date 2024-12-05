@@ -12,7 +12,7 @@
     "format:translations": "find src/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "inject": "pnpm exec import-meta-env -x .env.public -p dist/index.html",
     "lint": "tsc && eslint --fix src",
-    "storybook": "env-cmd -f ../../.env storybook dev -p 6006",
+    "storybook": "NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env storybook dev -p 6006",
     "test": "env-cmd -f ../../.env vitest"
   },
   "dependencies": {
