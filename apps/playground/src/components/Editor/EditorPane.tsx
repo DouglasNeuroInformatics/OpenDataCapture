@@ -142,6 +142,7 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
       options={{
         automaticLayout: true,
         codeLens: false,
+        colorDecorators: true,
         contextmenu: false,
         fixedOverflowWidgets: true,
         minimap: {
@@ -150,8 +151,12 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
         quickSuggestions: true,
         quickSuggestionsDelay: 10,
         scrollBeyondLastLine: false,
+        showDeprecated: true,
         stickyScroll: {
           enabled: false
+        },
+        suggest: {
+          showDeprecated: false
         },
         suggestOnTriggerCharacters: true,
         tabCompletion: 'on',
