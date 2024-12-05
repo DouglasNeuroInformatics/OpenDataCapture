@@ -10,6 +10,16 @@ const instrument: SeriesInstrument = {
     en: ['Well-Being'],
     fr: ['Bien-être']
   },
+  clientDetails: {
+    instructions: {
+      en: [
+        'This instrument consists of two parts: a general consent form and a questionnaire to assess your happiness. Please complete both in a timely manner.'
+      ],
+      fr: [
+        'Cet instrument se compose de deux parties : un formulaire de consentement général et un questionnaire pour évaluer votre bonheur. Veuillez remplir les deux en temps opportun.'
+      ]
+    }
+  },
   details: {
     description: {
       en: 'The Happiness Questionnaire is a questionnaire about happiness.',

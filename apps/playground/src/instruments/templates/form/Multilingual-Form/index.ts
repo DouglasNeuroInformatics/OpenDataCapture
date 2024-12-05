@@ -15,16 +15,18 @@ export default defineInstrument({
     edition: 1,
     name: '<PLACEHOLDER>'
   },
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: {
+      en: ['<PLACEHOLDER>'],
+      fr: ['<PLACEHOLDER>']
+    }
+  },
   content: {},
   details: {
     description: {
       en: '<PLACEHOLDER>',
       fr: '<PLACEHOLDER>'
-    },
-    estimatedDuration: 1,
-    instructions: {
-      en: ['<PLACEHOLDER>'],
-      fr: ['<PLACEHOLDER>']
     },
     license: 'UNLICENSED',
     title: {

@@ -36,12 +36,14 @@ export default defineInstrument({
       }
     }
   ],
+  clientDetails: {
+    estimatedDuration: 1
+  },
   details: {
     description: {
       en: 'The general consent form asks participants if they consent to their data being used for any purpose. This is intended for demo purposes and is not recommended for real-world research projects.',
       fr: "Le formulaire de consentement général demande aux participants s'ils acceptent que leurs données soient utilisées à quelque fin que ce soit. Ce formulaire est destiné à des fins de démonstration et n'est pas recommandé pour des projets de recherche réels."
     },
-    estimatedDuration: 1,
     license: 'Apache-2.0',
     title: {
       en: 'General Consent Form',

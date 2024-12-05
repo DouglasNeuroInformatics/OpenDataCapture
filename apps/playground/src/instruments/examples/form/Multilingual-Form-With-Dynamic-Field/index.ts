@@ -53,15 +53,17 @@ export default defineInstrument({
       }
     }
   },
-  details: {
-    description: {
-      en: 'This is an example of a simple form with conditional rendering and validation logic',
-      fr: 'Voici un exemple de formulaire simple avec un rendu conditionnel et une logique de validation'
-    },
+  clientDetails: {
     estimatedDuration: 1,
     instructions: {
       en: ['Please respond to all questions'],
       fr: ['Veuillez répondre à toutes les questions']
+    }
+  },
+  details: {
+    description: {
+      en: 'This is an example of a simple form with conditional rendering and validation logic',
+      fr: 'Voici un exemple de formulaire simple avec un rendu conditionnel et une logique de validation'
     },
     license: 'Apache-2.0',
     title: {

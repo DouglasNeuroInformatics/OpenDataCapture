@@ -12,6 +12,10 @@ import orange from './orange.png';
 import '/runtime/v1/jspsych@8.x/css/jspsych.css';
 
 export default defineInstrument({
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['The user will be displayed instructions on the screen']
+  },
   content: {
     async render(done) {
       const jsPsych = initJsPsych({
@@ -116,8 +120,6 @@ export default defineInstrument({
   },
   details: {
     description: 'This reaction time task is a non-trivial proof of concept with jspsych.',
-    estimatedDuration: 1,
-    instructions: ['The user will be displayed instructions on the screen'],
     license: 'MIT',
     title: 'Reaction Time Task'
   },

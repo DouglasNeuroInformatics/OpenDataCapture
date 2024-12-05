@@ -31,10 +31,12 @@ export default defineInstrument({
       });
     }
   },
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['<PLACEHOLDER>']
+  },
   details: {
     description: '<PLACEHOLDER>',
-    estimatedDuration: 1,
-    instructions: ['<PLACEHOLDER>'],
     license: 'UNLICENSED',
     title: '<PLACEHOLDER>'
   },

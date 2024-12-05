@@ -1,5 +1,5 @@
 import type { LicenseIdentifier } from '@opendatacapture/licenses';
-import type { ConditionalKeys, Merge } from 'type-fest';
+import type { ConditionalKeys, Merge, SetRequired } from 'type-fest';
 import type { z } from 'zod';
 
 import type { Language } from './core.d.ts';
@@ -106,25 +106,44 @@ type MultilingualClientInstrumentDetails = ClientInstrumentDetails<Language[]>;
 type InstrumentMeasureValue = boolean | Date | number | string | undefined;
 
 /** @public */
+type InstrumentMeasureVisibility = 'hidden' | 'visible';
+
+/** @public */
+type BaseInstrumentMeasure<TLanguage extends InstrumentLanguage> = {
+  /** @deprecated use `visibility` */
+  hidden?: boolean;
+  label?: InstrumentUIOption<TLanguage, string>;
+  visibility?: InstrumentMeasureVisibility;
+};
+
+/** @public */
+type ComputedInstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = SetRequired<
+  BaseInstrumentMeasure<TLanguage>,
+  'label'
+> & {
+  kind: 'computed';
+  value: (data: TData) => InstrumentMeasureValue;
+};
+
+/** @public */
+type ConstantInstrumentMeasure<
+  TData = any,
+  TLanguage extends InstrumentLanguage = InstrumentLanguage
+> = BaseInstrumentMeasure<TLanguage> & {
+  kind: 'const';
+  ref: TData extends { [key: string]: any }
+    ? ConditionalKeys<TData, InstrumentMeasureValue> extends infer K
+      ? [K] extends [never]
+        ? string
+        : K
+      : never
+    : never;
+};
+
+/** @public */
 type InstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> =
-  | {
-      hidden?: boolean;
-      kind: 'computed';
-      label: InstrumentUIOption<TLanguage, string>;
-      value: (data: TData) => InstrumentMeasureValue;
-    }
-  | {
-      hidden?: boolean;
-      kind: 'const';
-      label?: InstrumentUIOption<TLanguage, string>;
-      ref: TData extends { [key: string]: any }
-        ? ConditionalKeys<TData, InstrumentMeasureValue> extends infer K
-          ? [K] extends [never]
-            ? string
-            : K
-          : never
-        : never;
-    };
+  | ComputedInstrumentMeasure<TData, TLanguage>
+  | ConstantInstrumentMeasure<TData, TLanguage>;
 
 /** @public */
 type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
@@ -176,6 +195,8 @@ type ScalarInstrumentInternal = {
 type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = Merge<
   BaseInstrument<TLanguage>,
   {
+    defaultMeasureVisibility?: InstrumentMeasureVisibility;
+
     internal: ScalarInstrumentInternal;
 
     /** Arbitrary measures derived from the data */
@@ -188,13 +209,17 @@ type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage = Instru
 
 export {
   BaseInstrument,
+  BaseInstrumentMeasure,
   ClientInstrumentDetails,
+  ComputedInstrumentMeasure,
+  ConstantInstrumentMeasure,
   InstrumentDetails,
   InstrumentKind,
   InstrumentLanguage,
   InstrumentMeasure,
   InstrumentMeasures,
   InstrumentMeasureValue,
+  InstrumentMeasureVisibility,
   InstrumentUIOption,
   MultilingualClientInstrumentDetails,
   MultilingualInstrumentDetails,
