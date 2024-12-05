@@ -274,80 +274,64 @@ export class InstrumentRecordsService {
       );
     }
 
-    const createdRecordsArray: InstrumentRecordModel[] = [];
     const createdSessionsArray: SessionModel[] = [];
 
     try {
-      for (let i = 0; i < records.length; i++) {
-        const { data: rawData, date, subjectId } = records[i]!;
-        await this.createSubjectIfNotFound(subjectId);
+      const preProcessedRecords = await Promise.all(
+        records.map(async (record) => {
+          const { data: rawData, date, subjectId } = record;
 
-        const session = await this.sessionsService.create({
-          date: date,
-          groupId: groupId ? groupId : null,
-          subjectData: {
-            id: subjectId
-          },
-          type: 'RETROSPECTIVE'
-        });
+          // Validate data
+          const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
+          if (!parseResult.success) {
+            console.error(parseResult.error.issues);
+            throw new UnprocessableEntityException(
+              `Data received for record does not pass validation schema of instrument '${instrument.id}'`
+            );
+          }
 
-        createdSessionsArray.push(session);
+          // Ensure subject exists
+          await this.createSubjectIfNotFound(subjectId);
 
-        const sessionId = session.id;
+          const session = await this.sessionsService.create({
+            date: date,
+            groupId: groupId ?? null,
+            subjectData: { id: subjectId },
+            type: 'RETROSPECTIVE'
+          });
 
-        const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
-        if (!parseResult.success) {
-          console.error(parseResult.error.issues);
-          throw new UnprocessableEntityException(
-            `Data received for record at index '${i}' does not pass validation schema of instrument '${instrument.id}'`
-          );
-        }
+          createdSessionsArray.push(session);
 
-        const createdRecord = await this.instrumentRecordModel.create({
-          data: {
-            computedMeasures: instrument.measures
-              ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
-              : null,
+          const computedMeasures = instrument.measures
+            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
+            : null;
+
+          return {
+            computedMeasures,
             data: this.serializeData(parseResult.data),
             date,
-            group: groupId
-              ? {
-                  connect: { id: groupId }
-                }
-              : undefined,
-            instrument: {
-              connect: {
-                id: instrumentId
-              }
-            },
-            session: {
-              connect: {
-                id: sessionId
-              }
-            },
-            subject: {
-              connect: {
-                id: subjectId
-              }
-            }
-          }
-        });
+            groupId,
+            instrumentId,
+            sessionId: session.id,
+            subjectId
+          };
+        })
+      );
 
-        createdRecordsArray.push(createdRecord);
-      }
-    } catch (err) {
-      await this.instrumentRecordModel.deleteMany({
+      await this.instrumentRecordModel.createMany({
+        data: preProcessedRecords
+      });
+
+      return this.instrumentRecordModel.findMany({
         where: {
-          id: {
-            in: createdRecordsArray.map((record) => record.id)
-          }
+          groupId,
+          instrumentId
         }
       });
+    } catch (err) {
       await this.sessionsService.deleteByIds(createdSessionsArray.map((session) => session.id));
       throw err;
     }
-
-    return createdRecordsArray;
   }
 
   private async createSubjectIfNotFound(subjectId: string) {
