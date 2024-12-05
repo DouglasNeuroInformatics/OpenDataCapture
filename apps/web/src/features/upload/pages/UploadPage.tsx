@@ -41,8 +41,8 @@ export const UploadPage = () => {
       if (reformattedData.records.length > 1000) {
         addNotification({
           message: t({
-            en: 'Lots of entries, please wait...',
-            fr: 'Plusieur de donnee, attendue si vous plait'
+            en: 'Lots of entries loading, please wait...',
+            fr: 'Beaucoup de données, veuillez patienter...'
           }),
           type: 'info'
         });
