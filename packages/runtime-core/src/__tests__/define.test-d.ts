@@ -22,6 +22,10 @@ expectTypeOf<DiscriminatedInstrument<'INTERACTIVE', 'en', undefined>>().toBeNeve
 
 expectTypeOf(
   defineInstrument({
+    clientDetails: {
+      estimatedDuration: 1,
+      instructions: ['Please answer the questions based on your current feelings.']
+    },
     content: {
       overallHappiness: {
         kind: 'number',
@@ -31,8 +35,6 @@ expectTypeOf(
     },
     details: {
       description: 'The Happiness Questionnaire is a questionnaire about happiness.',
-      estimatedDuration: 1,
-      instructions: ['Please answer the questions based on your current feelings.'],
       license: 'Apache-2.0',
       title: 'Happiness Questionnaire'
     },
@@ -52,6 +54,10 @@ expectTypeOf(
 
 expectTypeOf(
   defineInstrument({
+    clientDetails: {
+      estimatedDuration: 1,
+      instructions: ['Please answer the questions based on your current feelings.']
+    },
     content: {
       overallHappiness: {
         kind: 'number',
@@ -61,8 +67,7 @@ expectTypeOf(
     },
     details: {
       description: 'The Happiness Questionnaire is a questionnaire about happiness.',
-      estimatedDuration: 1,
-      instructions: ['Please answer the questions based on your current feelings.'],
+
       license: 'Apache-2.0',
       title: 'Happiness Questionnaire'
     },
@@ -82,6 +87,13 @@ expectTypeOf(
 
 expectTypeOf(
   defineInstrument({
+    clientDetails: {
+      estimatedDuration: 1,
+      instructions: {
+        en: ['Please answer the questions based on your current feelings.'],
+        fr: ['Veuillez répondre àux questions en fonction de vos sentiments actuels.']
+      }
+    },
     content: {
       overallHappiness: {
         kind: 'number',
@@ -97,11 +109,7 @@ expectTypeOf(
         en: 'The Happiness Questionnaire is a questionnaire about happiness.',
         fr: 'Le questionnaire sur le bonheur est un questionnaire sur le bonheur.'
       },
-      estimatedDuration: 1,
-      instructions: {
-        en: ['Please answer the questions based on your current feelings.'],
-        fr: ['Veuillez répondre àux questions en fonction de vos sentiments actuels.']
-      },
+
       license: 'Apache-2.0',
       title: {
         en: 'Happiness Questionnaire',
@@ -127,6 +135,10 @@ expectTypeOf(
 
 expectTypeOf(
   defineInstrument({
+    clientDetails: {
+      estimatedDuration: 1,
+      instructions: ['<PLACEHOLDER>']
+    },
     content: {
       render(done) {
         const button = document.createElement('button');
@@ -139,8 +151,6 @@ expectTypeOf(
     },
     details: {
       description: '<PLACEHOLDER>',
-      estimatedDuration: 1,
-      instructions: ['<PLACEHOLDER>'],
       license: 'UNLICENSED',
       title: '<PLACEHOLDER>'
     },

@@ -6,7 +6,6 @@ import { z } from '/runtime/v1/zod@3.23.x';
 export default defineInstrument({
   kind: 'INTERACTIVE',
   language: 'en',
-
   tags: ['<PLACEHOLDER>'],
   internal: {
     edition: 1,
@@ -22,10 +21,12 @@ export default defineInstrument({
       });
     }
   },
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['<PLACEHOLDER>']
+  },
   details: {
     description: '<PLACEHOLDER>',
-    estimatedDuration: 1,
-    instructions: ['<PLACEHOLDER>'],
     license: 'UNLICENSED',
     title: '<PLACEHOLDER>'
   },

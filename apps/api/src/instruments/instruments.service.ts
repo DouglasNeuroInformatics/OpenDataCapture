@@ -164,8 +164,9 @@ export class InstrumentsService {
     options: EntityOperationOptions = {}
   ): Promise<InstrumentInfo[]> {
     const instances = await this.find(query, options);
-    return instances.map(({ __runtimeVersion, details, id, kind, language, tags }) => ({
+    return instances.map(({ __runtimeVersion, clientDetails, details, id, kind, language, tags }) => ({
       __runtimeVersion,
+      clientDetails,
       details,
       id,
       kind,

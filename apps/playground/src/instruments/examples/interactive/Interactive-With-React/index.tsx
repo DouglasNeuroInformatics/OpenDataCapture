@@ -7,6 +7,10 @@ import { App } from './App.tsx';
 import './index.css';
 
 export default defineInstrument({
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please submit whatever count you want!']
+  },
   content: {
     render(done) {
       const rootElement = document.createElement('div');
@@ -17,8 +21,6 @@ export default defineInstrument({
   },
   details: {
     description: 'This task is completely useless. It is a proof of concept for an interactive instrument.',
-    estimatedDuration: 1,
-    instructions: ['Please submit whatever count you want!'],
     license: 'Apache-2.0',
     title: 'React Click Task'
   },

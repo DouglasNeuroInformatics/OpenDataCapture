@@ -33,10 +33,12 @@ export default defineInstrument({
       variant: 'slider'
     }
   },
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please respond to all questions']
+  },
   details: {
     description: 'This is an example of a form with computed measures',
-    estimatedDuration: 1,
-    instructions: ['Please respond to all questions'],
     license: 'Apache-2.0',
     title: 'Happiness Questionnaire'
   },

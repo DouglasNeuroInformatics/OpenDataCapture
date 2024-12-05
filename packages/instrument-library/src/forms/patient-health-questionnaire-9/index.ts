@@ -141,11 +141,7 @@ export default defineInstrument({
       }
     }
   ],
-  details: {
-    description: {
-      en: 'The Patient Health Questionnaire (PHQ) is a diagnostic tool for mental health disorders used by health care professionals that is quick and easy for patients to complete. In the mid-1990s, Robert L. Spitzer, MD, Janet B.W. Williams, DSW, and Kurt Kroenke, MD, and colleagues at Columbia University developed the Primary Care Evaluation of Mental Disorders (PRIME-MD), a diagnostic tool containing modules on 12 different mental health disorders. They worked in collaboration with researchers at the Regenstrief Institute at Indiana University and with the support of an educational grant from Pfizer Inc. During the development of PRIME-MD, Drs. Spitzer, Williams and Kroenke, created the PHQ and GAD-7 screeners. The PHQ-9, a tool specific to depression, simply scores each of the 9 DSM-IV criteria based on the mood module from the original PRIME-MD.',
-      fr: "Le questionnaire sur la santé du patient (PHQ) est un outil de diagnostic des troubles mentaux utilisé par les professionnels de la santé, rapide et facile à remplir par les patients. Au milieu des années 1990, Robert L. Spitzer, MD, Janet B.W. Williams, DSW, et Kurt Kroenke, MD, et leurs collègues de Columbia University ont mis au point le Primary Care Evaluation of Mental Disorders (PRIME-MD), un outil de diagnostic contenant des modules sur 12 troubles mentaux différents. Ils ont travaillé en collaboration avec des chercheurs de l'Institut Regenstrief d'Indiana University et avec le soutien d'une bourse éducative de Pfizer Inc. Au cours du développement de PRIME-MD, les docteurs Spitzer, Williams et Kroenke ont créé les screeners PHQ et GAD-7. Le PHQ-9, un outil spécifique à la dépression, évalue simplement chacun des 9 critères du DSM-IV en se basant sur le module de l'humeur de PRIME-MD."
-    },
+  clientDetails: {
     estimatedDuration: 1,
     instructions: {
       en: [
@@ -154,7 +150,14 @@ export default defineInstrument({
       fr: [
         "Avant de commencer ce test, assurez-vous d'être dans un endroit calme où vous pourrez vous concentrer sans distraction. Vous allez répondre à 9 questions sur ce que vous avez ressenti au cours des deux dernières semaines. Répondez à chaque question le plus honnêtement possible, en vous basant sur vos sentiments et vos expériences."
       ]
+    }
+  },
+  details: {
+    description: {
+      en: 'The Patient Health Questionnaire (PHQ) is a diagnostic tool for mental health disorders used by health care professionals that is quick and easy for patients to complete. In the mid-1990s, Robert L. Spitzer, MD, Janet B.W. Williams, DSW, and Kurt Kroenke, MD, and colleagues at Columbia University developed the Primary Care Evaluation of Mental Disorders (PRIME-MD), a diagnostic tool containing modules on 12 different mental health disorders. They worked in collaboration with researchers at the Regenstrief Institute at Indiana University and with the support of an educational grant from Pfizer Inc. During the development of PRIME-MD, Drs. Spitzer, Williams and Kroenke, created the PHQ and GAD-7 screeners. The PHQ-9, a tool specific to depression, simply scores each of the 9 DSM-IV criteria based on the mood module from the original PRIME-MD.',
+      fr: "Le questionnaire sur la santé du patient (PHQ) est un outil de diagnostic des troubles mentaux utilisé par les professionnels de la santé, rapide et facile à remplir par les patients. Au milieu des années 1990, Robert L. Spitzer, MD, Janet B.W. Williams, DSW, et Kurt Kroenke, MD, et leurs collègues de Columbia University ont mis au point le Primary Care Evaluation of Mental Disorders (PRIME-MD), un outil de diagnostic contenant des modules sur 12 troubles mentaux différents. Ils ont travaillé en collaboration avec des chercheurs de l'Institut Regenstrief d'Indiana University et avec le soutien d'une bourse éducative de Pfizer Inc. Au cours du développement de PRIME-MD, les docteurs Spitzer, Williams et Kroenke ont créé les screeners PHQ et GAD-7. Le PHQ-9, un outil spécifique à la dépression, évalue simplement chacun des 9 critères du DSM-IV en se basant sur le module de l'humeur de PRIME-MD."
     },
+
     license: 'PUBLIC-DOMAIN',
     title: {
       en: 'Patient Health Questionnaire (PHQ-9)',

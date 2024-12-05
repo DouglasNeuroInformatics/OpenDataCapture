@@ -31,9 +31,9 @@ export const SeriesInstrumentContent = ({ status }: SeriesInstrumentContentProps
 
   return (
     <div className="flex flex-grow flex-col items-center justify-center space-y-1 py-32 text-center">
-      <Heading className="font-medium" variant="h5">
+      <Heading variant="h4">
         {t({
-          en: 'Series Instrument in Process',
+          en: 'Series Instrument in Progress',
           fr: "Série d'instruments en cours"
         })}
       </Heading>

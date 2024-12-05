@@ -6,6 +6,10 @@ import './styles.css';
 import '/runtime/v1/normalize.css@8.x/normalize.css';
 
 export default defineInstrument({
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please complete the task']
+  },
   content: {
     render(done) {
       const rootElement = document.createElement('div');
@@ -21,8 +25,6 @@ export default defineInstrument({
   },
   details: {
     description: 'This is an interactive instrument',
-    estimatedDuration: 1,
-    instructions: ['Please complete the task'],
     license: 'Apache-2.0',
     title: 'Interactive Instrument Stub'
   },

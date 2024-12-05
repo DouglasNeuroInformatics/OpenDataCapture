@@ -23,10 +23,12 @@ export default defineInstrument({
       });
     }
   },
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please complete the task.']
+  },
   details: {
     description: 'This is an example of how ancient scripts, that fail in strict mode, can be used in an instrument.',
-    estimatedDuration: 1,
-    instructions: ['Please complete the task.'],
     license: 'Apache-2.0',
     title: 'Interactive Instrument With Legacy Script'
   },

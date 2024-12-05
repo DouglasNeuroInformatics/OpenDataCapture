@@ -789,11 +789,7 @@ export default defineInstrument({
       }
     }
   ],
-  details: {
-    description: {
-      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
-      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
-    },
+  clientDetails: {
     estimatedDuration: 5,
     instructions: {
       en: [
@@ -802,7 +798,14 @@ export default defineInstrument({
       fr: [
         "Veuillez fournir la réponse la plus précise aux questions suivantes. S'il y a plusieurs réponses correctes, choisissez celle qui s'applique le mieux."
       ]
+    }
+  },
+  details: {
+    description: {
+      en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
+      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
     },
+
     license: 'Apache-2.0',
     title: {
       en: 'Enhanced Demographics Questionnaire',

@@ -91,15 +91,17 @@ export default defineInstrument({
       }
     }
   ],
-  details: {
-    description: {
-      en: 'This is an example of a multilingual grouped form',
-      fr: 'Voici un exemple de formulaire groupé multilingue'
-    },
+  clientDetails: {
     estimatedDuration: 1,
     instructions: {
       en: ['Please respond to all questions'],
       fr: ['Veuillez répondre à toutes les questions']
+    }
+  },
+  details: {
+    description: {
+      en: 'This is an example of a multilingual grouped form',
+      fr: 'Voici un exemple de formulaire groupé multilingue'
     },
     license: 'Apache-2.0',
     title: {

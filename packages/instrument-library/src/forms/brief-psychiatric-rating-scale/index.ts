@@ -172,17 +172,19 @@ export default defineInstrument({
       variant: 'slider'
     }
   },
+  clientDetails: {
+    estimatedDuration: 30,
+    instructions: [
+      "Please enter the score for the term which best describes the patient's condition.",
+      '0 = not assessed, 1 = not present, 2 = very mild, 3 = mild, 4 = moderate, 5 = moderately severe, 6 = severe, 7 = extremely severe.'
+    ]
+  },
   details: {
     description: `
       The Brief Psychiatric Rating Scale is a rating scale which a clinician or researcher may use to
       measure psychiatric symptoms such as depression, anxiety, hallucinations and unusual behavior.
       The scale is one of the oldest, most widely used scales to measure psychotic symptoms and was
       first published in 1962.`,
-    estimatedDuration: 30,
-    instructions: [
-      "Please enter the score for the term which best describes the patient's condition.",
-      '0 = not assessed, 1 = not present, 2 = very mild, 3 = mild, 4 = moderate, 5 = moderately severe, 6 = severe, 7 = extremely severe.'
-    ],
     license: 'UNLICENSED',
     title: 'Brief Psychiatric Rating Scale'
   },
