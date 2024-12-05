@@ -28,7 +28,13 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
   }
 
   const computedMeasures = filter(computeInstrumentMeasures(instrument, data), (_, key) => {
-    return !instrument.measures?.[key]!.hidden;
+    const measure = instrument.measures?.[key];
+    if (measure?.visibility === 'hidden' || measure?.hidden === true) {
+      return false;
+    } else if (measure?.visibility === 'visible' || measure?.visibility === false) {
+      return true;
+    }
+    return instrument.defaultMeasureVisibility === 'visible';
   });
 
   const handleDownload = () => {
@@ -62,15 +68,17 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
     timeStyle: 'long'
   });
 
+  const title = (instrument.clientDetails?.title ?? instrument.details.title).trim();
+
   return (
     <div className="print:bg-primary-foreground space-y-6 print:fixed print:left-0 print:top-0 print:z-50 print:h-screen print:w-screen">
       <div className="flex">
         <div className="flex-grow">
           <Heading variant="h4">
-            {instrument.details.title.trim()
+            {title
               ? t({
-                  en: `Summary of Results for the ${instrument.details.title}`,
-                  fr: `${instrument.details.title} : résumé des résultats`
+                  en: `Summary of Results for the ${title}`,
+                  fr: `${title} : résumé des résultats`
                 })
               : t({
                   en: 'Summary of Results',
@@ -163,7 +171,7 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
               en: 'Title',
               fr: 'Titre'
             }),
-            value: instrument.details.title
+            value: title
           },
           {
             label: t({
