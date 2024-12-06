@@ -1,7 +1,7 @@
 {
   "name": "opendatacapture",
   "type": "module",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "private": true,
   "packageManager": "pnpm@9.14.2",
   "license": "Apache-2.0",
