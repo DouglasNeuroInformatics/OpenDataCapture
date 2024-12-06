@@ -1,8 +1,6 @@
 name: open-data-capture
 volumes:
   caddy_data:
-  mongo_config:
-  mongo_data:
 services:
   caddy:
     image: caddy:2.7-alpine
@@ -66,6 +64,8 @@ services:
     environment:
       - NODE_ENV=production
       - GATEWAY_API_KEY
+    volumes:
+      - ./sqlite:/app/sqlite
   web:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-web:${RELEASE_CHANNEL}
     build:
