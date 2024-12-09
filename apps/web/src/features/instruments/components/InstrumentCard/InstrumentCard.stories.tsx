@@ -10,7 +10,7 @@ export default { component: InstrumentCard } as Meta<typeof InstrumentCard>;
 
 export const Default: Story = {
   args: {
-    instrument: { ...unilingualFormInstrument.instance, supportedLanguages: [] },
+    instrument: { ...unilingualFormInstrument.instance, supportedLanguages: ['en', 'fr'] },
     onClick: () => alert('Click!')
   }
 };

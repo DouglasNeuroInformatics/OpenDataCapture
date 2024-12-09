@@ -42,15 +42,17 @@ export default defineInstrument({
       });
     }
   },
-  details: {
-    description: {
-      en: '<PLACEHOLDER>',
-      fr: '<PLACEHOLDER>'
-    },
+  clientDetails: {
     estimatedDuration: 1,
     instructions: {
       en: ['<PLACEHOLDER>'],
       fr: ['<PLACEHOLDER>']
+    }
+  },
+  details: {
+    description: {
+      en: '<PLACEHOLDER>',
+      fr: '<PLACEHOLDER>'
     },
     license: 'UNLICENSED',
     title: {

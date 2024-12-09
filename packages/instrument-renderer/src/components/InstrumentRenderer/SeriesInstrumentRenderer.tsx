@@ -90,9 +90,9 @@ export const SeriesInstrumentRenderer = ({
             .with({ index: 0 }, () => <InstrumentOverview instrument={instrument} onNext={() => setIndex(1)} />)
             .with({ index: 1, isInstrumentInProgress: false }, () => (
               <div className="flex flex-grow flex-col items-center justify-center space-y-1 py-32 text-center">
-                <Heading className="font-medium" variant="h5">
+                <Heading variant="h4">
                   {t({
-                    en: 'Series Instrument in Process',
+                    en: 'Series Instrument in Progress',
                     fr: "Série d'instruments en cours"
                   })}
                 </Heading>
@@ -143,10 +143,10 @@ export const SeriesInstrumentRenderer = ({
             .with({ index: 2 }, () => (
               <div className="mx-auto flex max-w-prose flex-grow flex-col items-center justify-center space-y-1 py-32 text-center">
                 <CircleCheckIcon
-                  className="fill-green-600 [&>circle]:stroke-transparent"
+                  className="fill-green-600 stroke-white [&>circle]:stroke-transparent"
                   style={{ height: '36px', width: '36px' }}
                 />
-                <Heading variant="h4">
+                <Heading variant="h3">
                   {t({
                     en: 'Thank You!',
                     fr: 'Merci'

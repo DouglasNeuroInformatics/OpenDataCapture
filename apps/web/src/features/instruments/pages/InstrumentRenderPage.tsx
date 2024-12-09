@@ -7,7 +7,7 @@ import { InstrumentRenderer, type InstrumentSubmitHandler } from '@opendatacaptu
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { type Location, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
@@ -20,13 +20,12 @@ export const InstrumentRenderPage = () => {
   const params = useParams();
   const navigate = useNavigate();
   const notifications = useNotificationsStore();
-  const location = useLocation();
+  const location = useLocation() as Location<{ info?: UnilingualInstrumentInfo }>;
   const { t } = useTranslation();
 
   const instrumentBundleQuery = useInstrumentBundle(params.id!);
 
-  const locationState = location.state as { instrument?: undefined | UnilingualInstrumentInfo } | undefined;
-  const title = locationState?.instrument?.details.title;
+  const title = location.state?.info?.clientDetails?.title ?? location.state.info?.details.title;
 
   useEffect(() => {
     if (!currentSession?.id) {

@@ -4,6 +4,10 @@ import { z } from '/runtime/v1/zod@3.23.x';
 import './styles.css';
 
 export default defineInstrument({
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please attempt to win the game as quickly as possible.']
+  },
   content: {
     render(done) {
       const startTime = Date.now();
@@ -185,8 +189,6 @@ export default defineInstrument({
     authors: ['Andrzej Mazur', 'Mozilla Contributors', 'Joshua Unrau'],
     description:
       'This is a very simple interactive instrument, adapted from a 2D breakout game in the Mozilla documentation.',
-    estimatedDuration: 1,
-    instructions: ['Please attempt to win the game as quickly as possible.'],
     license: 'CC0-1.0',
     referenceUrl: 'https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript',
     sourceUrl: 'https://github.com/end3r/Gamedev-Canvas-workshop/tree/gh-pages',

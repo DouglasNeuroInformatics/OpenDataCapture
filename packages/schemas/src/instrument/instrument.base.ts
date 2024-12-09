@@ -2,18 +2,21 @@ import { isUnique } from '@douglasneuroinformatics/libjs';
 import type {
   BaseInstrument,
   ClientInstrumentDetails,
+  ComputedInstrumentMeasure,
+  ConstantInstrumentMeasure,
   InstrumentDetails,
   InstrumentKind,
   InstrumentLanguage,
   InstrumentMeasures,
   InstrumentMeasureValue,
+  InstrumentMeasureVisibility,
   InstrumentUIOption,
   ScalarInstrument,
   UnilingualClientInstrumentDetails,
   UnilingualInstrumentDetails,
   UnilingualInstrumentMeasures
 } from '@opendatacapture/runtime-core';
-import type { Simplify, ValueOf } from 'type-fest';
+import type { Simplify } from 'type-fest';
 import { z } from 'zod';
 
 import { $Language, $LicenseIdentifier, $ZodTypeAny, type Language } from '../core/core.js';
@@ -80,6 +83,8 @@ const $UnilingualInstrumentDetails = $InstrumentDetails.extend({
   title: z.string().min(1)
 }) satisfies z.ZodType<UnilingualInstrumentDetails>;
 
+const $InstrumentMeasureVisibility: z.ZodType<InstrumentMeasureVisibility> = z.enum(['hidden', 'visible']);
+
 const $InstrumentMeasureValue: z.ZodType<InstrumentMeasureValue> = z.union([
   z.string(),
   z.boolean(),
@@ -95,28 +100,31 @@ const $ComputedInstrumentMeasure = z.object({
   kind: z.literal('computed'),
   label: $$InstrumentUIOption(z.string()),
   value: $ComputeMeasureFunction
-}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind: 'computed' }>>;
+}) satisfies z.ZodType<ComputedInstrumentMeasure>;
 
 const $UnilingualComputedInstrumentMeasure = z.object({
   hidden: z.boolean().optional(),
   kind: z.literal('computed'),
   label: z.string(),
-  value: $ComputeMeasureFunction
-}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures<any, Language>>, { kind?: 'computed' }>>;
+  value: $ComputeMeasureFunction,
+  visibility: $InstrumentMeasureVisibility.optional()
+}) satisfies z.ZodType<ComputedInstrumentMeasure<any, Language>>;
 
 const $ConstantInstrumentMeasure = z.object({
   hidden: z.boolean().optional(),
   kind: z.literal('const'),
   label: $$InstrumentUIOption(z.string()).optional(),
-  ref: z.string()
-}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures>, { kind?: 'const' }>>;
+  ref: z.string(),
+  visibility: $InstrumentMeasureVisibility.optional()
+}) satisfies z.ZodType<ConstantInstrumentMeasure>;
 
 const $UnilingualConstantInstrumentMeasure = z.object({
   hidden: z.boolean().optional(),
   kind: z.literal('const'),
   label: z.string().optional(),
-  ref: z.string()
-}) satisfies z.ZodType<Extract<ValueOf<InstrumentMeasures<any, Language>>, { kind?: 'const' }>>;
+  ref: z.string(),
+  visibility: $InstrumentMeasureVisibility.optional()
+}) satisfies z.ZodType<ConstantInstrumentMeasure<any, Language>>;
 
 const $InstrumentMeasures = z.record(
   z.union([$ComputedInstrumentMeasure, $ConstantInstrumentMeasure])
@@ -143,6 +151,7 @@ const $ScalarInstrumentInternal = z.object({
 });
 
 const $ScalarInstrument = $BaseInstrument.extend({
+  defaultMeasureVisibility: $InstrumentMeasureVisibility.optional(),
   internal: $ScalarInstrumentInternal,
   measures: $InstrumentMeasures.nullable(),
   validationSchema: $ZodTypeAny

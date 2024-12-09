@@ -11,11 +11,13 @@ export default defineInstrument({
     edition: 1,
     name: '<PLACEHOLDER>'
   },
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['<PLACEHOLDER>']
+  },
   content: {},
   details: {
     description: '<PLACEHOLDER>',
-    estimatedDuration: 1,
-    instructions: ['<PLACEHOLDER>'],
     license: 'UNLICENSED',
     title: '<PLACEHOLDER>'
   },

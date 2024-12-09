@@ -1,5 +1,4 @@
 import { ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
-import { getReleaseInfo } from '@opendatacapture/release-info';
 import { type CreateAdminData } from '@opendatacapture/schemas/setup';
 import type { InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
@@ -31,7 +30,7 @@ export class SetupService {
       isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),
       isGatewayEnabled: this.configurationService.get('GATEWAY_ENABLED'),
       isSetup: Boolean(savedOptions?.isSetup),
-      release: import.meta.release ?? (await getReleaseInfo()),
+      release: __RELEASE__,
       uptime: Math.round(process.uptime())
     } satisfies SetupState;
   }

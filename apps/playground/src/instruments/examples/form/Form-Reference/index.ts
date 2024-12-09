@@ -188,11 +188,13 @@ export default defineInstrument({
       }
     }
   ],
+  clientDetails: {
+    estimatedDuration: 5,
+    instructions: ['Please complete all questions']
+  },
   details: {
     description: 'This example includes all possible static field variants',
     title: 'Reference Instrument',
-    estimatedDuration: 5,
-    instructions: ['Please complete all questions'],
     license: 'Apache-2.0'
   },
   measures: {},

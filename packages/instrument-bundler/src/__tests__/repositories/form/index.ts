@@ -2,6 +2,10 @@ import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { z } from '/runtime/v1/zod@3.23.x';
 
 export default defineInstrument({
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please complete the form']
+  },
   content: {
     q1: {
       kind: 'boolean',
@@ -25,8 +29,6 @@ export default defineInstrument({
   },
   details: {
     description: 'This is a form instrument',
-    estimatedDuration: 1,
-    instructions: ['Please complete the form'],
     license: 'Apache-2.0',
     title: 'Form Instrument Stub'
   },

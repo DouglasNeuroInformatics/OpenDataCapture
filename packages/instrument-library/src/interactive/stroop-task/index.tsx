@@ -7,6 +7,10 @@ import { StroopTask } from './StroopTask.tsx';
 import './styles.css';
 
 export default defineInstrument({
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please follow the instructions on the screen.']
+  },
   content: {
     render(done) {
       const rootElement = document.createElement('div');
@@ -17,8 +21,6 @@ export default defineInstrument({
   },
   details: {
     description: 'The Stroop Task is a psychological test designed to measure cognitive flexibility and attention.',
-    estimatedDuration: 1,
-    instructions: ['Please follow the instructions on the screen.'],
     license: 'Apache-2.0',
     title: 'Stroop Task'
   },
