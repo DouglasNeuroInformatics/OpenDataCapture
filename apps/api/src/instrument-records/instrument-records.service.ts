@@ -11,7 +11,7 @@ import type {
   LinearRegressionResults,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
-import type { InstrumentRecordModel, Prisma, SessionModel } from '@prisma/generated-client';
+import { type InstrumentRecordModel, Prisma, type SessionModel } from '@prisma/generated-client';
 import { isNumber, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/ability/ability.utils';
@@ -342,7 +342,18 @@ export class InstrumentRecordsService {
         const addedSubject: CreateSubjectDto = {
           id: subjectId
         };
-        await this.subjectsService.create(addedSubject);
+        try {
+          await this.subjectsService.create(addedSubject);
+        } catch (prismaError) {
+          if (prismaError instanceof Prisma.PrismaClientKnownRequestError) {
+            // The .code property can be accessed in a type-safe manner
+            // eslint-disable-next-line max-depth
+            if (prismaError.code === 'P2002') {
+              console.error(prismaError);
+            }
+          }
+          throw prismaError;
+        }
       } else {
         throw exception;
       }
