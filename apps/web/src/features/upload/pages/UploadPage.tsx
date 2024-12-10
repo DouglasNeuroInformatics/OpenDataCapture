@@ -59,13 +59,14 @@ export const UploadPage = () => {
       }
       setFile(null);
     } catch (error) {
-      addNotification({
-        message: t({
-          en: 'An error has happended within the request',
-          fr: "Une erreur s'est produite lors du téléversement."
-        }),
-        type: 'error'
-      });
+      if (error instanceof Error)
+        addNotification({
+          message: t({
+            en: `An error has happended within the request \n '${error.message}'`,
+            fr: `Une erreur s'est produite lors du téléversement '${error.message}'.`
+          }),
+          type: 'error'
+        });
     } finally {
       setIsLoading(false);
     }
