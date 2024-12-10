@@ -63,7 +63,7 @@ export const UploadPage = () => {
         addNotification({
           message: t({
             en: `An error has happended within the request \n '${error.message}'`,
-            fr: `Une erreur s'est produite lors du téléversement '${error.message}'.`
+            fr: `Une erreur s'est produite lors du téléversement \n '${error.message}'.`
           }),
           type: 'error'
         });
