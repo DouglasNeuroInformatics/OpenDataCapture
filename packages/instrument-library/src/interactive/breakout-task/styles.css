@@ -9,7 +9,7 @@ canvas {
   margin: 0 auto;
 }
 
-.canvas-wrapper {
+#root {
   display: flex;
   justify-content: center;
   align-items: center;

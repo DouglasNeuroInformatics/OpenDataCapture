@@ -25,13 +25,10 @@ function getScale() {
   return ratios.at(-1)!;
 }
 
-function runTask(onComplete: (data: Data) => void) {
+function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
   const startTime = Date.now();
   const ratio = window.devicePixelRatio * 3;
   const scale = getScale();
-
-  const wrapper = document.createElement('div');
-  wrapper.classList.add('canvas-wrapper');
 
   const canvas = document.createElement('canvas');
 
@@ -43,8 +40,7 @@ function runTask(onComplete: (data: Data) => void) {
   canvas.style.width = width + 'px';
   canvas.style.height = height + 'px';
 
-  wrapper.appendChild(canvas);
-  document.body.appendChild(wrapper);
+  root.appendChild(canvas);
 
   const ctx = canvas.getContext('2d')!;
   ctx.scale(ratio, ratio);
@@ -229,7 +225,10 @@ export default defineInstrument({
   },
   content: {
     render(done) {
-      runTask(done);
+      const root = document.createElement('div');
+      root.id = 'root';
+      document.body.appendChild(root);
+      runTask(root, done);
     }
   },
   details: {
