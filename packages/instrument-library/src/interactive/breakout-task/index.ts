@@ -228,7 +228,25 @@ export default defineInstrument({
       const root = document.createElement('div');
       root.id = 'root';
       document.body.appendChild(root);
-      runTask(root, done);
+
+      const initialContent = document.createElement('div');
+      initialContent.classList.add('initial-content');
+
+      const title = document.createElement('h3');
+      title.innerText = 'Welcome to the Breakout Task';
+      const startButton = document.createElement('button');
+      startButton.type = 'button';
+      startButton.innerText = 'Start';
+
+      initialContent.appendChild(title);
+      initialContent.appendChild(startButton);
+
+      root.appendChild(initialContent);
+
+      startButton.addEventListener('click', () => {
+        root.removeChild(initialContent);
+        runTask(root, done);
+      });
     }
   },
   details: {
