@@ -3,14 +3,14 @@ import { z } from '/runtime/v1/zod@3.23.x';
 
 import './styles.css';
 
-const baseHeight = 320;
-const baseWidth = 480;
+const BASE_HEIGHT = 320;
+const BASE_WIDTH = 480;
 
 function getScale() {
   const ratios = [1, 1.25, 1.5, 2];
   for (let i = 1; i < ratios.length; i++) {
     const multiplier = ratios[i]! + 0.25;
-    const [heightThreshold, widthThreshold] = [baseHeight * multiplier, baseWidth * multiplier];
+    const [heightThreshold, widthThreshold] = [BASE_HEIGHT * multiplier, BASE_WIDTH * multiplier];
     if (window.innerHeight < heightThreshold || window.innerWidth < widthThreshold) {
       return ratios[i - 1]!;
     }
@@ -34,8 +34,8 @@ export default defineInstrument({
 
       const canvas = document.createElement('canvas');
 
-      const height = baseHeight * scale;
-      const width = baseWidth * scale;
+      const height = BASE_HEIGHT * scale;
+      const width = BASE_WIDTH * scale;
 
       canvas.width = width * ratio;
       canvas.height = height * ratio;
