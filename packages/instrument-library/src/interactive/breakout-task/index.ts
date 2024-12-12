@@ -16,13 +16,21 @@ export default defineInstrument({
       wrapper.classList.add('canvas-wrapper');
 
       const canvas = document.createElement('canvas');
-      canvas.height = 320;
-      canvas.width = 480;
+
+      const ratio = window.devicePixelRatio * 3;
+      const height = 320;
+      const width = 480;
+
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
 
       wrapper.appendChild(canvas);
       document.body.appendChild(wrapper);
 
       const ctx = canvas.getContext('2d')!;
+      ctx.scale(ratio, ratio);
       const ballRadius = 10;
       const brickRowCount = 5;
       const brickColumnCount = 3;
@@ -34,11 +42,11 @@ export default defineInstrument({
       const paddleHeight = 10;
       const paddleWidth = 75;
 
-      let x = canvas.width / 2;
-      let y = canvas.height - 30;
+      let x = width / 2;
+      let y = height - 30;
       let dx = 2;
       let dy = -2;
-      let paddleX = (canvas.width - paddleWidth) / 2;
+      let paddleX = (width - paddleWidth) / 2;
       let score = 0;
       let lives = 3;
 
@@ -73,7 +81,7 @@ export default defineInstrument({
       }
       function mouseMoveHandler(e: MouseEvent) {
         const relativeX = e.clientX - canvas.offsetLeft;
-        if (relativeX > 0 && relativeX < canvas.width) {
+        if (relativeX > 0 && relativeX < width) {
           paddleX = relativeX - paddleWidth / 2;
         }
       }
@@ -109,7 +117,7 @@ export default defineInstrument({
       }
       function drawPaddle() {
         ctx.beginPath();
-        ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+        ctx.rect(paddleX, height - paddleHeight, paddleWidth, paddleHeight);
         ctx.fillStyle = '#0095DD';
         ctx.fill();
         ctx.closePath();
@@ -139,11 +147,11 @@ export default defineInstrument({
       function drawLives() {
         ctx.font = '16px Arial';
         ctx.fillStyle = '#0095DD';
-        ctx.fillText('Lives: ' + lives, canvas.width - 65, 20);
+        ctx.fillText('Lives: ' + lives, width - 65, 20);
       }
 
       function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, width, height);
         drawBricks();
         drawBall();
         drawPaddle();
@@ -151,12 +159,12 @@ export default defineInstrument({
         drawLives();
         collisionDetection();
 
-        if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+        if (x + dx > width - ballRadius || x + dx < ballRadius) {
           dx = -dx;
         }
         if (y + dy < ballRadius) {
           dy = -dy;
-        } else if (y + dy > canvas.height - ballRadius) {
+        } else if (y + dy > height - ballRadius) {
           if (x > paddleX && x < paddleX + paddleWidth) {
             dy = -dy;
           } else {
@@ -167,16 +175,16 @@ export default defineInstrument({
                 timeElapsed: Date.now() - startTime
               });
             } else {
-              x = canvas.width / 2;
-              y = canvas.height - 30;
+              x = width / 2;
+              y = height - 30;
               dx = 2;
               dy = -2;
-              paddleX = (canvas.width - paddleWidth) / 2;
+              paddleX = (width - paddleWidth) / 2;
             }
           }
         }
 
-        if (rightPressed && paddleX < canvas.width - paddleWidth) {
+        if (rightPressed && paddleX < width - paddleWidth) {
           paddleX += 7;
         } else if (leftPressed && paddleX > 0) {
           paddleX -= 7;
