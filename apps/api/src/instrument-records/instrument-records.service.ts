@@ -336,23 +336,21 @@ export class InstrumentRecordsService {
 
   private async createSubjectIfNotFound(subjectId: string) {
     try {
-      await this.subjectsService.findById(subjectId);
+      return await this.subjectsService.findById(subjectId);
     } catch (exception) {
       if (exception instanceof NotFoundException) {
         const addedSubject: CreateSubjectDto = {
           id: subjectId
         };
         try {
-          await this.subjectsService.create(addedSubject);
+          return await this.subjectsService.create(addedSubject);
         } catch (prismaError) {
-          if (prismaError instanceof Prisma.PrismaClientKnownRequestError) {
-            // The .code property can be accessed in a type-safe manner
-            // eslint-disable-next-line max-depth
-            if (prismaError.code === 'P2002') {
-              console.error(prismaError);
-            }
+          if (prismaError instanceof Prisma.PrismaClientKnownRequestError && prismaError.code === 'P2002') {
+            console.error(prismaError);
+            return await this.subjectsService.findById(subjectId);
+          } else {
+            throw prismaError;
           }
-          throw prismaError;
         }
       } else {
         throw exception;
