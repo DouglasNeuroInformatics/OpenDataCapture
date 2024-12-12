@@ -12,10 +12,15 @@ export default defineInstrument({
     render(done) {
       const startTime = Date.now();
 
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('canvas-wrapper');
+
       const canvas = document.createElement('canvas');
       canvas.height = 320;
       canvas.width = 480;
-      document.body.appendChild(canvas);
+
+      wrapper.appendChild(canvas);
+      document.body.appendChild(wrapper);
 
       const ctx = canvas.getContext('2d')!;
       const ballRadius = 10;
