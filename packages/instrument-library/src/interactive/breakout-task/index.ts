@@ -3,6 +3,21 @@ import { z } from '/runtime/v1/zod@3.23.x';
 
 import './styles.css';
 
+const baseHeight = 320;
+const baseWidth = 480;
+
+function getScale() {
+  const ratios = [1, 1.25, 1.5, 2];
+  for (let i = 1; i < ratios.length; i++) {
+    const multiplier = ratios[i]! + 0.25;
+    const [heightThreshold, widthThreshold] = [baseHeight * multiplier, baseWidth * multiplier];
+    if (window.innerHeight < heightThreshold || window.innerWidth < widthThreshold) {
+      return ratios[i - 1]!;
+    }
+  }
+  return ratios.at(-1)!;
+}
+
 export default defineInstrument({
   clientDetails: {
     estimatedDuration: 1,
@@ -11,15 +26,16 @@ export default defineInstrument({
   content: {
     render(done) {
       const startTime = Date.now();
+      const ratio = window.devicePixelRatio * 3;
+      const scale = getScale();
 
       const wrapper = document.createElement('div');
       wrapper.classList.add('canvas-wrapper');
 
       const canvas = document.createElement('canvas');
 
-      const ratio = window.devicePixelRatio * 3;
-      const height = 320;
-      const width = 480;
+      const height = baseHeight * scale;
+      const width = baseWidth * scale;
 
       canvas.width = width * ratio;
       canvas.height = height * ratio;
@@ -31,21 +47,22 @@ export default defineInstrument({
 
       const ctx = canvas.getContext('2d')!;
       ctx.scale(ratio, ratio);
-      const ballRadius = 10;
+
+      const ballRadius = 10 * scale;
       const brickRowCount = 5;
       const brickColumnCount = 3;
-      const brickWidth = 75;
-      const brickHeight = 20;
-      const brickPadding = 10;
-      const brickOffsetTop = 30;
-      const brickOffsetLeft = 30;
-      const paddleHeight = 10;
-      const paddleWidth = 75;
+      const brickWidth = 75 * scale;
+      const brickHeight = 20 * scale;
+      const brickPadding = 10 * scale;
+      const brickOffsetTop = 30 * scale;
+      const brickOffsetLeft = 30 * scale;
+      const paddleHeight = 10 * scale;
+      const paddleWidth = 75 * scale;
 
       let x = width / 2;
       let y = height - 30;
-      let dx = 2;
-      let dy = -2;
+      let dx = 2 * scale;
+      let dy = -2 * scale;
       let paddleX = (width - paddleWidth) / 2;
       let score = 0;
       let lives = 3;
@@ -177,8 +194,8 @@ export default defineInstrument({
             } else {
               x = width / 2;
               y = height - 30;
-              dx = 2;
-              dy = -2;
+              dx = 2 * scale;
+              dy = -2 * scale;
               paddleX = (width - paddleWidth) / 2;
             }
           }
