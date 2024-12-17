@@ -84,7 +84,7 @@ loader.config({ monaco });
     module: monaco.languages.typescript.ModuleKind.ESNext,
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
     newLine: monaco.languages.typescript.NewLineKind.LineFeed,
-    strict: true,
+    strict: false,
     target: monaco.languages.typescript.ScriptTarget.ES2020
   };
 
@@ -92,8 +92,7 @@ loader.config({ monaco });
   monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
     ...baseTypeScriptOptions,
     allowImportingTsExtensions: true,
-    checkJs: true,
-    strict: false
+    strict: true
   });
 
   /**

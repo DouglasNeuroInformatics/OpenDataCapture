@@ -75,7 +75,9 @@ export async function resolveVersion(version) {
 
 /** @returns {Promise<import('./index.d.ts').RuntimeVersionInfo[]>} */
 export async function resolvePackages() {
-  const versions = await fs.promises.readdir(RUNTIME_DIR, 'utf-8');
+  const versions = await fs.promises
+    .readdir(RUNTIME_DIR, 'utf-8')
+    .then((entries) => entries.filter((entry) => entry.match(/^v\d/)));
   return await Promise.all(versions.map((version) => resolveVersion(version)));
 }
 

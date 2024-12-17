@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, Separator } from '@douglasneuroinformatics/libui/components';
 import { type Theme, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -21,6 +21,7 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
   const { changeLanguage } = useTranslation();
   const [_, updateTheme] = useTheme();
   const [scale, setScale] = useState(100);
+  const iFrameRef = useRef<HTMLIFrameElement>(null);
 
   const handleChangeLanguageEvent = useCallback(
     (event: CustomEvent<Language>) => {
@@ -56,8 +57,8 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
 
   const handleToggleFullScreen = async () => {
     if (!document.fullscreenElement) {
-      await document.documentElement.requestFullscreen();
-    } else if (document.exitFullscreen) {
+      await iFrameRef.current?.requestFullscreen();
+    } else {
       await document.exitFullscreen();
     }
   };
@@ -109,6 +110,7 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
           className="origin-top-left"
           data-bundle={bundle}
           name="interactive-instrument"
+          ref={iFrameRef}
           srcDoc={`<script type="module">${bootstrapScript}</script>`}
           style={{ height: dimensions, scale: `${scale}%`, width: dimensions }}
           title="Open Data Capture - Interactive Instrument"
