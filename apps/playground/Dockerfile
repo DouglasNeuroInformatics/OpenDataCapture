@@ -1,7 +1,7 @@
 #The following Dockerfile uses a two stage build which first builds the playground and then copies it into the another caddy image to serve it
 
 #use the apline contianer to build odc
-FROM alpine:latest AS builder
+FROM alpine:3.19 AS builder
 
 #install nodejs and required dependencies
 #RUN apk add --no-cache curl git build-base python3 nodejs-current npm bash openssl
