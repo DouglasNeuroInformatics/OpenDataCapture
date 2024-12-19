@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { LoadingFallback } from './LoadingFallback';
 
-const MIN_DELAY = 300; // ms
+const MIN_DELAY = 500; // ms
 
 function isDataReady<TProps extends { data: unknown }>(
   props: TProps
