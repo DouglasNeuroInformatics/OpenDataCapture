@@ -1,20 +1,10 @@
-import { useEffect } from 'react';
-
-import { Outlet, useLocation } from 'react-router-dom';
-
-import { queryClient } from '@/services/react-query';
+import { Outlet } from 'react-router-dom';
 
 import { Footer } from '../Footer';
 import { Navbar } from '../Navbar';
 import { Sidebar } from '../Sidebar';
 
 export const Layout = () => {
-  // const location = useLocation();
-
-  // useEffect(() => {
-  //   queryClient.clear();
-  // }, [location.pathname]);
-
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">
       <div className="absolute md:hidden">
