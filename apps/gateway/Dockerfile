@@ -1,5 +1,4 @@
-FROM node:iron-alpine AS base
-RUN apk add --update --no-cache openssl1.1-compat
+FROM node:iron AS base
 WORKDIR /app
 ARG RELEASE_VERSION
 ENV GATEWAY_DATABASE_URL=file:/app/sqlite/gateway.db
