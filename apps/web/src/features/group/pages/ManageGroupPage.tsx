@@ -4,6 +4,7 @@ import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 import { PageHeader } from '@/components/PageHeader';
+import { WithFallback } from '@/components/WithFallback';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupState } from '@/hooks/useSetupState';
 import { useAppStore } from '@/store';
@@ -19,12 +20,15 @@ export const ManageGroupPage = () => {
   const changeGroup = useAppStore((store) => store.changeGroup);
   const setupState = useSetupState();
 
-  const availableInstruments = instrumentInfoQuery.data ?? [];
+  const availableInstruments = instrumentInfoQuery.data;
 
   const accessibleInstrumentIds = currentGroup?.accessibleInstrumentIds;
   const defaultIdentificationMethod = currentGroup?.settings.defaultIdentificationMethod;
 
-  const { availableInstrumentOptions, initialValues } = useMemo(() => {
+  const data = useMemo(() => {
+    if (!availableInstruments) {
+      return null;
+    }
     const availableInstrumentOptions: AvailableInstrumentOptions = {
       form: {},
       interactive: {},
@@ -69,14 +73,15 @@ export const ManageGroupPage = () => {
           {t('manage.pageTitle')}
         </Heading>
       </PageHeader>
-
-      <ManageGroupForm
-        availableInstrumentOptions={availableInstrumentOptions}
-        initialValues={initialValues}
-        readOnly={Boolean(setupState.data?.isDemo && import.meta.env.PROD)}
-        onSubmit={async (data) => {
-          const updatedGroup = await updateGroupMutation.mutateAsync(data);
-          changeGroup(updatedGroup);
+      <WithFallback
+        Component={ManageGroupForm}
+        props={{
+          data,
+          onSubmit: async (data) => {
+            const updatedGroup = await updateGroupMutation.mutateAsync(data);
+            changeGroup(updatedGroup);
+          },
+          readOnly: Boolean(setupState.data?.isDemo && import.meta.env.PROD)
         }}
       />
     </React.Fragment>

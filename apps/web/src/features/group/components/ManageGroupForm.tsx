@@ -14,23 +14,21 @@ export type AvailableInstrumentOptions = {
 };
 
 export type ManageGroupFormProps = {
-  availableInstrumentOptions: AvailableInstrumentOptions;
-  initialValues: {
-    accessibleFormInstrumentIds: Set<string>;
-    accessibleInteractiveInstrumentIds: Set<string>;
-    defaultIdentificationMethod?: SubjectIdentificationMethod;
-    idValidationRegex?: null | string;
+  data: {
+    availableInstrumentOptions: AvailableInstrumentOptions;
+    initialValues: {
+      accessibleFormInstrumentIds: Set<string>;
+      accessibleInteractiveInstrumentIds: Set<string>;
+      defaultIdentificationMethod?: SubjectIdentificationMethod;
+      idValidationRegex?: null | string;
+    };
   };
   onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
   readOnly: boolean;
 };
 
-export const ManageGroupForm = ({
-  availableInstrumentOptions,
-  initialValues,
-  onSubmit,
-  readOnly
-}: ManageGroupFormProps) => {
+export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => {
+  const { availableInstrumentOptions, initialValues } = data;
   const { t } = useTranslation();
 
   let description = t('group.manage.accessibleInstrumentsDesc');

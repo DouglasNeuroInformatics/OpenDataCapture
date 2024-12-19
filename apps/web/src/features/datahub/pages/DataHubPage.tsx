@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { IdentificationForm } from '@/components/IdentificationForm';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
+import { WithFallback } from '@/components/WithFallback';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
 
@@ -84,7 +85,7 @@ export const DataHubPage = () => {
         </Heading>
       </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
-        <div>
+        <div className="flex flex-grow flex-col">
           <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
             <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
               <Dialog.Trigger className="flex-grow">
@@ -115,10 +116,13 @@ export const DataHubPage = () => {
               />
             </div>
           </div>
-          <MasterDataTable
-            data={data ?? []}
-            onSelect={(subject) => {
-              navigate(`${subject.id}/assignments`);
+          <WithFallback
+            Component={MasterDataTable}
+            props={{
+              data,
+              onSelect: (subject) => {
+                navigate(`${subject.id}/assignments`);
+              }
             }}
           />
         </div>
