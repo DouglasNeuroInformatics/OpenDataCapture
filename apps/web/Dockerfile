@@ -1,4 +1,5 @@
-FROM node:20-alpine3.16 AS base
+FROM node:iron-alpine AS base
+RUN apk add --update --no-cache openssl1.1-compat
 ARG RELEASE_VERSION
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
