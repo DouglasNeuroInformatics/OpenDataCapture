@@ -71,8 +71,10 @@ export const ManageGroupPage = () => {
       </PageHeader>
 
       <ManageGroupForm
-        availableInstrumentOptions={availableInstrumentOptions}
-        initialValues={initialValues}
+        data={{
+          availableInstrumentOptions,
+          initialValues
+        }}
         readOnly={Boolean(setupState.data?.isDemo && import.meta.env.PROD)}
         onSubmit={async (data) => {
           const updatedGroup = await updateGroupMutation.mutateAsync(data);
