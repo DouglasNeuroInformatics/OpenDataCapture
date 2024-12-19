@@ -1,6 +1,7 @@
 import { CryptoModule } from '@douglasneuroinformatics/libnest/crypto';
 import { LoggingModule } from '@douglasneuroinformatics/libnest/logging';
 import { Module } from '@nestjs/common';
+import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
@@ -10,6 +11,7 @@ import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { ConfigurationService } from './configuration/configuration.service';
+import { DelayMiddleware } from './core/middleware/delay.middleware';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentsModule } from './instruments/instruments.module';
@@ -93,4 +95,13 @@ import { UsersModule } from './users/users.module';
     }
   ]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  constructor(private readonly configurationService: ConfigurationService) {}
+
+  configure(consumer: MiddlewareConsumer) {
+    const isDev = this.configurationService.get('NODE_ENV') === 'development';
+    if (isDev) {
+      consumer.apply(DelayMiddleware).forRoutes('*');
+    }
+  }
+}
