@@ -9,12 +9,17 @@ const $UpdateUserFormData = $UpdateUserData.pick({ additionalPermissions: true }
 
 type UpdateUserFormData = z.infer<typeof $UpdateUserFormData>;
 
-export const UpdateUserForm: React.FC<{
+export type UpdateUserFormInputData = {
   disableDelete: boolean;
   initialValues?: FormTypes.PartialNullableData<UpdateUserFormData>;
+};
+
+export const UpdateUserForm: React.FC<{
+  data: UpdateUserFormInputData;
   onDelete: () => void;
   onSubmit: (data: UpdateUserFormData) => Promisable<void>;
-}> = ({ disableDelete, initialValues, onDelete, onSubmit }) => {
+}> = ({ data, onDelete, onSubmit }) => {
+  const { disableDelete, initialValues } = data;
   const { t } = useTranslation();
   return (
     <Form

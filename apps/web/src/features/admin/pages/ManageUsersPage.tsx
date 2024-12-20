@@ -13,7 +13,7 @@ import { useAppStore } from '@/store';
 import { useDeleteUserMutation } from '../hooks/useDeleteUserMutation';
 import { useUpdateUserMutation } from '../hooks/useUpdateUserMutation';
 import { useUsersQuery } from '../hooks/useUsersQuery';
-import { UpdateUserForm } from './UpdateUserForm';
+import { UpdateUserForm, type UpdateUserFormInputData } from './UpdateUserForm';
 
 export const ManageUsersPage = () => {
   const currentUser = useAppStore((store) => store.currentUser);
@@ -24,7 +24,14 @@ export const ManageUsersPage = () => {
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
   const { filteredData, searchTerm, setSearchTerm } = useSearch(usersQuery.data ?? [], 'username');
 
-  const currentUserIsSelected = selectedUser?.username === currentUser?.username;
+  const data: UpdateUserFormInputData = {
+    disableDelete: selectedUser?.username === currentUser?.username,
+    initialValues: selectedUser?.additionalPermissions.length
+      ? {
+          additionalPermissions: selectedUser.additionalPermissions
+        }
+      : undefined
+  };
 
   return (
     <Sheet open={Boolean(selectedUser)} onOpenChange={() => setSelectedUser(null)}>
@@ -91,14 +98,7 @@ export const ManageUsersPage = () => {
         </Sheet.Header>
         <Sheet.Body className="grid gap-4">
           <UpdateUserForm
-            disableDelete={currentUserIsSelected}
-            initialValues={
-              selectedUser?.additionalPermissions.length
-                ? {
-                    additionalPermissions: selectedUser.additionalPermissions
-                  }
-                : undefined
-            }
+            data={data}
             onDelete={() => {
               deleteUserMutation.mutate({ id: selectedUser!.id });
               setSelectedUser(null);
