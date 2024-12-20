@@ -99,8 +99,8 @@ export const ManageUsersPage = () => {
         minRows={15}
         onEntryClick={setSelectedUser}
       />
-      <Sheet.Content>
-        <Sheet.Header>
+      <Sheet.Content className="flex flex-col p-0">
+        <Sheet.Header className="px-6 pt-6">
           <Sheet.Title>{selectedUser?.username}</Sheet.Title>
           <Sheet.Description>
             {t({
@@ -109,7 +109,7 @@ export const ManageUsersPage = () => {
             })}
           </Sheet.Description>
         </Sheet.Header>
-        <Sheet.Body className="grid h-full gap-4">
+        <Sheet.Body className="flex-grow overflow-y-scroll px-6 pb-6">
           <WithFallback
             Component={UpdateUserForm}
             minDelay={1000}
