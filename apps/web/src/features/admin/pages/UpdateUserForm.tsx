@@ -133,7 +133,6 @@ export const UpdateUserForm: React.FC<{
           })
         },
         {
-          description: '',
           fields: {
             groupIds: {
               kind: 'set',
