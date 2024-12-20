@@ -109,89 +109,101 @@ export const ManageUsersPage = () => {
                   </Button>
                 )
               }}
-              content={{
-                additionalPermissions: {
-                  fieldset: {
-                    action: {
-                      kind: 'string',
-                      label: t({
-                        en: 'Action',
-                        fr: 'Action'
-                      }),
-                      options: {
-                        create: t({
-                          en: 'Create',
-                          fr: 'Créer'
-                        }),
-                        delete: t({
-                          en: 'Delete',
-                          fr: 'Effacer'
-                        }),
-                        manage: t({
-                          en: 'Manage (All)',
-                          fr: 'Gérer (Tout)'
-                        }),
-                        read: t({
-                          en: 'Read',
-                          fr: 'Lire'
-                        }),
-                        update: t({
-                          en: 'Update',
-                          fr: 'Mettre à jour'
-                        })
+              content={[
+                {
+                  description: t({
+                    en: 'Important: These permissions are not specific to any group. To manage granular permissions, please use the API.',
+                    fr: "Important : Ces autorisations ne sont pas spécifiques à un groupe. Pour gérer des autorisations granulaires, veuillez utiliser l'API."
+                  }),
+                  fields: {
+                    additionalPermissions: {
+                      fieldset: {
+                        action: {
+                          kind: 'string',
+                          label: t({
+                            en: 'Action',
+                            fr: 'Action'
+                          }),
+                          options: {
+                            create: t({
+                              en: 'Create',
+                              fr: 'Créer'
+                            }),
+                            delete: t({
+                              en: 'Delete',
+                              fr: 'Effacer'
+                            }),
+                            manage: t({
+                              en: 'Manage (All)',
+                              fr: 'Gérer (Tout)'
+                            }),
+                            read: t({
+                              en: 'Read',
+                              fr: 'Lire'
+                            }),
+                            update: t({
+                              en: 'Update',
+                              fr: 'Mettre à jour'
+                            })
+                          },
+                          variant: 'select'
+                        },
+                        subject: {
+                          kind: 'string',
+                          label: t({
+                            en: 'Resource',
+                            fr: 'Resource'
+                          }),
+                          options: {
+                            all: t({
+                              en: 'All',
+                              fr: 'Tous'
+                            }),
+                            Assignment: t({
+                              en: 'Assignment',
+                              fr: 'Devoir'
+                            }),
+                            Group: t({
+                              en: 'Group',
+                              fr: 'Groupe'
+                            }),
+                            Instrument: t({
+                              en: 'Instrument',
+                              fr: 'Instrument'
+                            }),
+                            InstrumentRecord: t({
+                              en: 'Instrument Record',
+                              fr: "Enregistrement de l'instrument"
+                            }),
+                            Session: t({
+                              en: 'Session',
+                              fr: 'Session'
+                            }),
+                            Subject: t({
+                              en: 'Subject',
+                              fr: 'Client'
+                            }),
+                            User: t({
+                              en: 'User',
+                              fr: 'Utilisateur'
+                            })
+                          },
+                          variant: 'select'
+                        }
                       },
-                      variant: 'select'
-                    },
-                    subject: {
-                      kind: 'string',
+                      kind: 'record-array',
                       label: t({
-                        en: 'Resource',
-                        fr: 'Resource'
-                      }),
-                      options: {
-                        all: t({
-                          en: 'All',
-                          fr: 'Tous'
-                        }),
-                        Assignment: t({
-                          en: 'Assignment',
-                          fr: 'Devoir'
-                        }),
-                        Group: t({
-                          en: 'Group',
-                          fr: 'Groupe'
-                        }),
-                        Instrument: t({
-                          en: 'Instrument',
-                          fr: 'Instrument'
-                        }),
-                        InstrumentRecord: t({
-                          en: 'Instrument Record',
-                          fr: "Enregistrement de l'instrument"
-                        }),
-                        Session: t({
-                          en: 'Session',
-                          fr: 'Session'
-                        }),
-                        Subject: t({
-                          en: 'Subject',
-                          fr: 'Client'
-                        }),
-                        User: t({
-                          en: 'User',
-                          fr: 'Utilisateur'
-                        })
-                      },
-                      variant: 'select'
+                        en: 'Permission',
+                        fr: 'Autorisations supplémentaires'
+                      })
                     }
                   },
-                  kind: 'record-array',
-                  label: t({
-                    en: 'Permission',
-                    fr: 'Autorisations supplémentaires'
+                  title: t({
+                    en: 'Authorization',
+                    fr: 'Autorisation'
                   })
                 }
-              }}
+              ]}
               initialValues={
                 selectedUser?.additionalPermissions.length
                   ? {
