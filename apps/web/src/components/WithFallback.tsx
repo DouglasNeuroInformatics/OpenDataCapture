@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 
 import { LoadingFallback } from './LoadingFallback';
 
-const MIN_DELAY = 300; // ms
-
 function isDataReady<TProps extends { data: unknown }>(
   props: TProps
 ): props is TProps & { data: NonNullable<TProps['data']> } {
@@ -14,9 +12,12 @@ function isDataReady<TProps extends { data: unknown }>(
 
 export function WithFallback<TProps extends { [key: string]: unknown }>({
   Component,
+  minDelay = 300, // ms
   props
 }: {
   Component: React.FC<TProps>;
+  /** the minimum duration to suspend in ms */
+  minDelay?: number;
   props: TProps extends { data: infer TData extends NonNullable<unknown> }
     ? Omit<TProps, 'data'> & { data: null | TData | undefined }
     : never;
@@ -29,7 +30,7 @@ export function WithFallback<TProps extends { [key: string]: unknown }>({
     if (!isMinDelayComplete) {
       timeout = setTimeout(() => {
         setIsMinDelayComplete(true);
-      }, MIN_DELAY);
+      }, minDelay);
     }
     return () => clearTimeout(timeout);
   }, []);

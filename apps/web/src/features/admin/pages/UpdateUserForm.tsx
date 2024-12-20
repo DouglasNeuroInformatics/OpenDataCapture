@@ -3,14 +3,22 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import { $UpdateUserData } from '@opendatacapture/schemas/user';
 import type { Promisable } from 'type-fest';
-import type { z } from 'zod';
+import { z } from 'zod';
 
-const $UpdateUserFormData = $UpdateUserData.pick({ additionalPermissions: true }).required();
+const $UpdateUserFormData = $UpdateUserData
+  .pick({ additionalPermissions: true })
+  .required()
+  .extend({
+    groupIds: z.set(z.string())
+  });
 
 type UpdateUserFormData = z.infer<typeof $UpdateUserFormData>;
 
 export type UpdateUserFormInputData = {
   disableDelete: boolean;
+  groupOptions: {
+    [id: string]: string;
+  };
   initialValues?: FormTypes.PartialNullableData<UpdateUserFormData>;
 };
 
@@ -19,7 +27,7 @@ export const UpdateUserForm: React.FC<{
   onDelete: () => void;
   onSubmit: (data: UpdateUserFormData) => Promisable<void>;
 }> = ({ data, onDelete, onSubmit }) => {
-  const { disableDelete, initialValues } = data;
+  const { disableDelete, groupOptions, initialValues } = data;
   const { t } = useTranslation();
   return (
     <Form
@@ -122,6 +130,21 @@ export const UpdateUserForm: React.FC<{
           title: t({
             en: 'Authorization',
             fr: 'Autorisation'
+          })
+        },
+        {
+          description: '',
+          fields: {
+            groupIds: {
+              kind: 'set',
+              label: 'Group IDs',
+              options: groupOptions,
+              variant: 'listbox'
+            }
+          },
+          title: t({
+            en: 'Groups',
+            fr: 'Groupes'
           })
         }
       ]}

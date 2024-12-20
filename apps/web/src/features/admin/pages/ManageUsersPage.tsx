@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Button, ClientTable, Heading, SearchBar, Sheet } from '@douglasneuroinformatics/libui/components';
@@ -7,10 +7,12 @@ import type { User } from '@opendatacapture/schemas/user';
 import { Link } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
+import { WithFallback } from '@/components/WithFallback';
 import { useSearch } from '@/hooks/useSearch';
 import { useAppStore } from '@/store';
 
 import { useDeleteUserMutation } from '../hooks/useDeleteUserMutation';
+import { useGroupsQuery } from '../hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '../hooks/useUpdateUserMutation';
 import { useUsersQuery } from '../hooks/useUsersQuery';
 import { UpdateUserForm, type UpdateUserFormInputData } from './UpdateUserForm';
@@ -18,20 +20,31 @@ import { UpdateUserForm, type UpdateUserFormInputData } from './UpdateUserForm';
 export const ManageUsersPage = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
+  const groupsQuery = useGroupsQuery();
   const usersQuery = useUsersQuery();
   const deleteUserMutation = useDeleteUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
   const { filteredData, searchTerm, setSearchTerm } = useSearch(usersQuery.data ?? [], 'username');
 
-  const data: UpdateUserFormInputData = {
-    disableDelete: selectedUser?.username === currentUser?.username,
-    initialValues: selectedUser?.additionalPermissions.length
-      ? {
-          additionalPermissions: selectedUser.additionalPermissions
-        }
-      : undefined
-  };
+  const [data, setData] = useState<null | UpdateUserFormInputData>(null);
+
+  useEffect(() => {
+    const groups = groupsQuery.data;
+    if (!selectedUser || !groups) {
+      setData(null);
+    } else {
+      setData({
+        disableDelete: selectedUser?.username === currentUser?.username,
+        groupOptions: Object.fromEntries(groups.map((group) => [group.id, group.name])),
+        initialValues: selectedUser?.additionalPermissions.length
+          ? {
+              additionalPermissions: selectedUser.additionalPermissions
+            }
+          : undefined
+      });
+    }
+  }, [groupsQuery.data, selectedUser]);
 
   return (
     <Sheet open={Boolean(selectedUser)} onOpenChange={() => setSelectedUser(null)}>
@@ -96,17 +109,23 @@ export const ManageUsersPage = () => {
             })}
           </Sheet.Description>
         </Sheet.Header>
-        <Sheet.Body className="grid gap-4">
-          <UpdateUserForm
-            data={data}
-            onDelete={() => {
-              deleteUserMutation.mutate({ id: selectedUser!.id });
-              setSelectedUser(null);
-            }}
-            onSubmit={(data) => {
-              void updateUserMutation.mutateAsync({ data, id: selectedUser!.id }).then(() => {
+        <Sheet.Body className="grid h-full gap-4">
+          <WithFallback
+            Component={UpdateUserForm}
+            minDelay={1000}
+            props={{
+              data,
+              onDelete: () => {
+                deleteUserMutation.mutate({ id: selectedUser!.id });
                 setSelectedUser(null);
-              });
+              },
+              onSubmit: ({ groupIds, ...data }) => {
+                void updateUserMutation
+                  .mutateAsync({ data: { groupIds: Array.from(groupIds), ...data }, id: selectedUser!.id })
+                  .then(() => {
+                    setSelectedUser(null);
+                  });
+              }
             }}
           />
         </Sheet.Body>
