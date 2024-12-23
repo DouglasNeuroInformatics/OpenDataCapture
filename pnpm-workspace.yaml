@@ -8,7 +8,7 @@ catalog:
   '@douglasneuroinformatics/libnest': latest
   '@douglasneuroinformatics/libpasswd': latest
   '@douglasneuroinformatics/libstats': latest
-  '@douglasneuroinformatics/libui': ^3.7.4
+  '@douglasneuroinformatics/libui': ^3.7.5
   '@douglasneuroinformatics/libui-form-types': latest
   '@douglasneuroinformatics/prettier-config': latest
   '@douglasneuroinformatics/tsconfig': latest
