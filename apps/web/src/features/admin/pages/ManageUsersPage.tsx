@@ -11,11 +11,11 @@ import { WithFallback } from '@/components/WithFallback';
 import { useSearch } from '@/hooks/useSearch';
 import { useAppStore } from '@/store';
 
+import { UpdateUserForm, type UpdateUserFormInputData } from '../components/UpdateUserForm';
 import { useDeleteUserMutation } from '../hooks/useDeleteUserMutation';
 import { useGroupsQuery } from '../hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '../hooks/useUpdateUserMutation';
 import { useUsersQuery } from '../hooks/useUsersQuery';
-import { UpdateUserForm, type UpdateUserFormInputData } from './UpdateUserForm';
 
 export const ManageUsersPage = () => {
   const currentUser = useAppStore((store) => store.currentUser);
