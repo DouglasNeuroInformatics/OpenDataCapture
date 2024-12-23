@@ -1,15 +1,36 @@
+import { isAllUndefined } from '@douglasneuroinformatics/libjs';
 import { Button, Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
-import { $UpdateUserData } from '@opendatacapture/schemas/user';
+import { $UserPermission } from '@opendatacapture/schemas/user';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
-const $UpdateUserFormData = $UpdateUserData
-  .pick({ additionalPermissions: true })
-  .required()
-  .extend({
+const $UpdateUserFormData = z
+  .object({
+    additionalPermissions: z.array($UserPermission.partial()).optional(),
     groupIds: z.set(z.string())
+  })
+  .transform((arg) => {
+    const firstPermission = arg.additionalPermissions?.[0];
+    if (firstPermission && isAllUndefined(firstPermission)) {
+      arg.additionalPermissions?.pop();
+    }
+    return arg;
+  })
+  .superRefine((arg, ctx) => {
+    arg.additionalPermissions?.forEach((permission, i) => {
+      Object.entries(permission).forEach(([key, val]) => {
+        if ((val satisfies string) === undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_type,
+            expected: 'string',
+            path: ['additionalPermissions', i, key],
+            received: 'undefined'
+          });
+        }
+      });
+    });
   });
 
 type UpdateUserFormData = z.infer<typeof $UpdateUserFormData>;
@@ -29,6 +50,7 @@ export const UpdateUserForm: React.FC<{
 }> = ({ data, onDelete, onSubmit }) => {
   const { disableDelete, groupOptions, initialValues } = data;
   const { t } = useTranslation();
+
   return (
     <Form
       additionalButtons={{
