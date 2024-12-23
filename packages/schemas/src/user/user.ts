@@ -7,12 +7,12 @@ export const $BasePermissionLevel = z.enum(['ADMIN', 'GROUP_MANAGER', 'STANDARD'
 
 export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
 
-export const $AdditionalUserPermissions = z.array(
-  z.object({
-    action: $AppAction,
-    subject: $AppSubjectName
-  })
-);
+export const $UserPermission = z.object({
+  action: $AppAction,
+  subject: $AppSubjectName
+});
+
+export const $AdditionalUserPermissions = z.array($UserPermission);
 
 export type User = z.infer<typeof $User>;
 export const $User = $BaseModel.extend({
