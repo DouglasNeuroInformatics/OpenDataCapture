@@ -40,7 +40,7 @@ export type UpdateUserFormInputData = {
   groupOptions: {
     [id: string]: string;
   };
-  initialValues?: FormTypes.PartialNullableData<UpdateUserFormData>;
+  initialValues: FormTypes.PartialNullableData<UpdateUserFormData>;
 };
 
 export const UpdateUserForm: React.FC<{
@@ -170,6 +170,7 @@ export const UpdateUserForm: React.FC<{
         }
       ]}
       initialValues={initialValues}
+      key={JSON.stringify(initialValues)}
       submitBtnLabel={t('core.save')}
       validationSchema={$UpdateUserFormData}
       onSubmit={onSubmit}
