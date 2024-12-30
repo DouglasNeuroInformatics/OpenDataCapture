@@ -27,6 +27,11 @@ const config: StorybookConfig = {
       titlePrefix: 'Components'
     },
     {
+      directory: '../src/features/admin/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Admin'
+    },
+    {
       directory: '../src/features/auth/components',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
       titlePrefix: 'Auth'
