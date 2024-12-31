@@ -34,8 +34,8 @@ catalogs:
       specifier: latest
       version: 0.2.0
     '@douglasneuroinformatics/libui':
-      specifier: ^3.7.6
-      version: 3.7.6
+      specifier: ^3.8.1
+      version: 3.8.1
     '@douglasneuroinformatics/libui-form-types':
       specifier: latest
       version: 0.11.0
@@ -373,7 +373,7 @@ importers:
         version: 0.0.2
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.1(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
@@ -473,7 +473,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@3.23.8)
+        version: 3.8.1(@types/react@18.3.12)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@3.23.8)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -546,7 +546,7 @@ importers:
         version: 1.1.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.1(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.51.0)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
@@ -661,7 +661,7 @@ importers:
         version: 0.0.3(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.1(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@heroicons/react':
         specifier: ^2.1.5
         version: 2.1.5(react@vendor+react@18.x)
@@ -913,7 +913,7 @@ importers:
         version: 1.1.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.1(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -1024,7 +1024,7 @@ importers:
         version: 1.1.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.1(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -2065,9 +2065,9 @@ packages:
     resolution:
       { integrity: sha512-erds8oNXFrWSJfCglR8S7I3Yfkgx2Vz6RIQTa5OFtVAVx8DTSFf5FbnHpp49l6BcQ4FCU5w/PLO5NWdx08cNUg== }
 
-  '@douglasneuroinformatics/libui@3.7.6':
+  '@douglasneuroinformatics/libui@3.8.1':
     resolution:
-      { integrity: sha512-mTQOge1h8u82nUXooK0Rf1lt5J46oYRR6HXYxpWzUsX0k5Y7Yk09YI9fgC76EmIN01e0EifkXgpnT79Ly2mpmg== }
+      { integrity: sha512-Dtd0mrQpa3sHbqFWuk8Naxur/fB96wqN9RbjrXq7uWWk20FbayAl+HSiUqgTrAFoKTgS/LPPb10Df0XhfGkNGQ== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -5828,8 +5828,9 @@ packages:
       astro: ^4.0.0-beta || ^3.3.0
 
   astro@4.16.18:
-    resolution: {integrity: sha512-G7zfwJt9BDHEZwlaLNvjbInIw2hPryyD654314KV/XT34pJU6SfN1S+mWa8RAkALcZNJnJXCJmT3JXLQStD3Lw==}
-    engines: {node: ^18.17.1 || ^20.3.0 || >=21.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
+    resolution:
+      { integrity: sha512-G7zfwJt9BDHEZwlaLNvjbInIw2hPryyD654314KV/XT34pJU6SfN1S+mWa8RAkALcZNJnJXCJmT3JXLQStD3Lw== }
+    engines: { node: ^18.17.1 || ^20.3.0 || >=21.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0' }
     hasBin: true
 
   astrojs-compiler-sync@1.0.1:
@@ -12901,7 +12902,7 @@ snapshots:
     dependencies:
       type-fest: 4.26.1
 
-  '@douglasneuroinformatics/libui@3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@3.23.8)':
+  '@douglasneuroinformatics/libui@3.8.1(@types/react@18.3.12)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@3.23.8)':
     dependencies:
       '@douglasneuroinformatics/libjs': 1.1.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
@@ -12955,7 +12956,7 @@ snapshots:
       - immer
       - typescript
 
-  '@douglasneuroinformatics/libui@3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libui@3.8.1(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 1.1.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
