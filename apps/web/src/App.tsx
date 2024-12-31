@@ -11,6 +11,8 @@ import { LoadingFallback } from '@/components/LoadingFallback';
 import { Routes } from '@/Routes';
 import { queryClient } from '@/services/react-query';
 
+import { SetupProvider } from './features/setup';
+
 import './services/axios';
 import './services/i18n';
 import './services/zod';
@@ -21,9 +23,11 @@ export const App = () => {
       <ErrorBoundary FallbackComponent={ErrorPage}>
         <QueryClientProvider client={queryClient}>
           <NotificationHub />
-          <BrowserRouter>
-            <Routes />
-          </BrowserRouter>
+          <SetupProvider>
+            <BrowserRouter>
+              <Routes />
+            </BrowserRouter>
+          </SetupProvider>
           <ReactQueryDevtools />
         </QueryClientProvider>
       </ErrorBoundary>
