@@ -45,7 +45,7 @@ export const StartSessionPage = () => {
       <StartSessionForm
         currentGroup={currentGroup}
         initialValues={initialValues}
-        readOnly={currentSession !== null}
+        readOnly={currentSession !== null || createSessionMutation.isPending}
         onSubmit={async (formData) => {
           const session = await createSessionMutation.mutateAsync(formData);
           startSession({ ...session, type: formData.type });
