@@ -40,7 +40,7 @@ export type UpdateUserFormInputData = {
   groupOptions: {
     [id: string]: string;
   };
-  initialValues: FormTypes.PartialNullableData<UpdateUserFormData>;
+  initialValues?: FormTypes.PartialNullableData<UpdateUserFormData>;
 };
 
 export const UpdateUserForm: React.FC<{
