@@ -7,6 +7,7 @@ export const $BasePermissionLevel = z.enum(['ADMIN', 'GROUP_MANAGER', 'STANDARD'
 
 export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
 
+export type UserPermission = z.infer<typeof $UserPermission>;
 export const $UserPermission = z.object({
   action: $AppAction,
   subject: $AppSubjectName
