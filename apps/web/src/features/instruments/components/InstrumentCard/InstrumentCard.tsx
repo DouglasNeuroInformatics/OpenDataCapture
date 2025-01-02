@@ -14,10 +14,12 @@ type TextCardItem = BaseCardItem & { kind: 'text'; text?: string };
 
 type CardItem = LinkCardItem | TextCardItem;
 
+export type InstrumentCardInfo = UnilingualInstrumentInfo & {
+  supportedLanguages: Language[];
+};
+
 export type InstrumentCardProps = {
-  instrument: UnilingualInstrumentInfo & {
-    supportedLanguages: Language[];
-  };
+  instrument: InstrumentCardInfo;
   onClick: () => void;
 };
 
