@@ -43,25 +43,20 @@ export const DataHubPage = () => {
 
   const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
-    switch (option) {
-      case 'CSV':
-        void download('README.txt', () => t('datahub.index.table.exportHelpText'));
-        void download(`${baseFilename}.csv`, async () => {
-          const data = await getExportRecords();
-          return unparse(data);
-        });
-        break;
-      case 'JSON':
-        void download(`${baseFilename}.json`, async () => {
-          const data = await getExportRecords();
-          return JSON.stringify(data, null, 2);
-        });
-        break;
-      case 'Excel':
-        getExportRecords()
-          .then((records) => downloadExcel(`${baseFilename}.xlsx`, records))
-          .catch(console.error);
-    }
+    getExportRecords()
+      .then((data): any => {
+        switch (option) {
+          case 'CSV':
+            void download('README.txt', t('datahub.index.table.exportHelpText'));
+            void download(`${baseFilename}.csv`, unparse(data));
+            break;
+          case 'Excel':
+            return downloadExcel(`${baseFilename}.xlsx`, data);
+          case 'JSON':
+            return download(`${baseFilename}.json`, JSON.stringify(data, null, 2));
+        }
+      })
+      .catch(console.error);
   };
 
   const lookupSubject = async ({ id }: { id: string }) => {
