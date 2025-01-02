@@ -2,7 +2,7 @@ import { isAllUndefined } from '@douglasneuroinformatics/libjs';
 import { Button, Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
-import { $UserPermission } from '@opendatacapture/schemas/user';
+import { $UserPermission, type UserPermission } from '@opendatacapture/schemas/user';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
@@ -46,7 +46,7 @@ export type UpdateUserFormInputData = {
 export const UpdateUserForm: React.FC<{
   data: UpdateUserFormInputData;
   onDelete: () => void;
-  onSubmit: (data: UpdateUserFormData) => Promisable<void>;
+  onSubmit: (data: UpdateUserFormData & { additionalPermissions?: UserPermission[] }) => Promisable<void>;
 }> = ({ data, onDelete, onSubmit }) => {
   const { disableDelete, groupOptions, initialValues } = data;
   const { t } = useTranslation();
@@ -173,7 +173,9 @@ export const UpdateUserForm: React.FC<{
       key={JSON.stringify(initialValues)}
       submitBtnLabel={t('core.save')}
       validationSchema={$UpdateUserFormData}
-      onSubmit={onSubmit}
+      onSubmit={({ additionalPermissions, ...data }) =>
+        onSubmit({ additionalPermissions: additionalPermissions as undefined | UserPermission[], ...data })
+      }
     />
   );
 };

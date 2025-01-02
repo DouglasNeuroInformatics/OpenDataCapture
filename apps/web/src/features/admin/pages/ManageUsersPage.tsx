@@ -120,7 +120,6 @@ export const ManageUsersPage = () => {
                 setSelectedUser(null);
               },
               onSubmit: ({ groupIds, ...data }) => {
-                console.log({ groupIds, ...data });
                 void updateUserMutation
                   .mutateAsync({ data: { groupIds: Array.from(groupIds), ...data }, id: selectedUser!.id })
                   .then(() => {
