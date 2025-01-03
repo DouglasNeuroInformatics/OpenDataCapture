@@ -16,6 +16,7 @@ import { sessionRoute } from './features/session';
 import { uploadRoute } from './features/upload';
 import { userRoute } from './features/user';
 import { DisclaimerProvider } from './providers/DisclaimerProvider';
+import { ForceClearQueryCacheProvider } from './providers/ForceClearQueryCacheProvider';
 import { WalkthroughProvider } from './providers/WalkthroughProvider';
 import { useAppStore } from './store';
 
@@ -33,7 +34,9 @@ const protectedRoutes: RouteObject[] = [
     element: (
       <DisclaimerProvider>
         <WalkthroughProvider>
-          <Layout />
+          <ForceClearQueryCacheProvider>
+            <Layout />
+          </ForceClearQueryCacheProvider>
         </WalkthroughProvider>
       </DisclaimerProvider>
     ),
