@@ -34,8 +34,8 @@ catalogs:
       specifier: latest
       version: 0.2.0
     '@douglasneuroinformatics/libui':
-      specifier: ^3.7.6
-      version: 3.7.6
+      specifier: ^3.8.6
+      version: 3.8.6
     '@douglasneuroinformatics/libui-form-types':
       specifier: latest
       version: 0.11.0
@@ -373,7 +373,7 @@ importers:
         version: 0.0.2
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/instrument-renderer':
         specifier: workspace:*
         version: link:../../packages/instrument-renderer
@@ -473,7 +473,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@3.23.8)
+        version: 3.8.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@3.23.8)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -546,7 +546,7 @@ importers:
         version: 1.1.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.51.0)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
@@ -574,9 +574,6 @@ importers:
       esbuild-wasm:
         specifier: 'catalog:'
         version: 0.23.1
-      framer-motion:
-        specifier: ^11.5.4
-        version: 11.11.15(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       immer:
         specifier: ^10.1.1
         version: 10.1.1
@@ -595,6 +592,9 @@ importers:
       monaco-editor:
         specifier: ^0.51.0
         version: 0.51.0
+      motion:
+        specifier: ^11.15.0
+        version: 11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
@@ -661,7 +661,7 @@ importers:
         version: 0.0.3(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@heroicons/react':
         specifier: ^2.1.5
         version: 2.1.5(react@vendor+react@18.x)
@@ -716,9 +716,6 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-      framer-motion:
-        specifier: ^11.5.4
-        version: 11.11.15(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1
@@ -734,6 +731,9 @@ importers:
       lucide-react:
         specifier: ^0.439.0
         version: 0.439.0(react@vendor+react@18.x)
+      motion:
+        specifier: ^11.15.0
+        version: 11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       papaparse:
         specifier: workspace:papaparse__5.x@*
         version: link:../../vendor/papaparse@5.x
@@ -913,7 +913,7 @@ importers:
         version: 1.1.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -1024,22 +1024,22 @@ importers:
         version: 1.1.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
+        version: 3.8.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
       axios:
         specifier: 'catalog:'
         version: 1.7.7(debug@4.3.7)
-      framer-motion:
-        specifier: ^11.5.4
-        version: 11.11.15(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
       lucide-react:
         specifier: ^0.439.0
         version: 0.439.0(react@vendor+react@18.x)
+      motion:
+        specifier: ^11.15.0
+        version: 11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       react:
         specifier: workspace:react__18.x@*
         version: link:../../vendor/react@18.x
@@ -1979,6 +1979,12 @@ packages:
     peerDependencies:
       typescript: ^5.5.0
 
+  '@douglasneuroinformatics/libjs@1.2.0':
+    resolution:
+      { integrity: sha512-oK5HgwsFiHFGwT0TeHH9QnTqYoXgg+PvTrxt5LWylo2500/a87XpWzGseLyqbwATjUW44/27EAYUElrE2adoIA== }
+    peerDependencies:
+      typescript: ^5.5.0
+
   '@douglasneuroinformatics/libnest@0.5.0':
     resolution:
       { integrity: sha512-8o2PPOTu7zTo4ESeu80Wz09Gxn4I05XntimBlpxP2/jTTw154YPXVrfHVvMyJQGCodT+sRU4MzUK/Mq5EmXrAg== }
@@ -2065,9 +2071,9 @@ packages:
     resolution:
       { integrity: sha512-erds8oNXFrWSJfCglR8S7I3Yfkgx2Vz6RIQTa5OFtVAVx8DTSFf5FbnHpp49l6BcQ4FCU5w/PLO5NWdx08cNUg== }
 
-  '@douglasneuroinformatics/libui@3.7.6':
+  '@douglasneuroinformatics/libui@3.8.6':
     resolution:
-      { integrity: sha512-mTQOge1h8u82nUXooK0Rf1lt5J46oYRR6HXYxpWzUsX0k5Y7Yk09YI9fgC76EmIN01e0EifkXgpnT79Ly2mpmg== }
+      { integrity: sha512-3610m3+1gPaGS5OMA1hKIqlTjMtGK5ZXpBEvZ8DRMCt1H4h3x0YAvi3XM8sK+zZX6v7LcQ/w7wz1xrhOtLAT8Q== }
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -5828,8 +5834,9 @@ packages:
       astro: ^4.0.0-beta || ^3.3.0
 
   astro@4.16.18:
-    resolution: {integrity: sha512-G7zfwJt9BDHEZwlaLNvjbInIw2hPryyD654314KV/XT34pJU6SfN1S+mWa8RAkALcZNJnJXCJmT3JXLQStD3Lw==}
-    engines: {node: ^18.17.1 || ^20.3.0 || >=21.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
+    resolution:
+      { integrity: sha512-G7zfwJt9BDHEZwlaLNvjbInIw2hPryyD654314KV/XT34pJU6SfN1S+mWa8RAkALcZNJnJXCJmT3JXLQStD3Lw== }
+    engines: { node: ^18.17.1 || ^20.3.0 || >=21.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0' }
     hasBin: true
 
   astrojs-compiler-sync@1.0.1:
@@ -7494,13 +7501,13 @@ packages:
     resolution:
       { integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew== }
 
-  framer-motion@11.11.15:
+  framer-motion@11.15.0:
     resolution:
-      { integrity: sha512-fib+OpUe4nap4W1vhaDohnPU+42B5s1q+jNkNkb6TfzmDYtRhDyvn4mkRCAD5a2cQKOI3nJZP7yqGYtxnlmleg== }
+      { integrity: sha512-MLk8IvZntxOMg7lDBLw2qgTHHv664bYoYmnFTmE0Gm/FW67aOJk0WM3ctMcG+Xhcv+vh5uyyXwxvxhSeJzSe+w== }
     peerDependencies:
       '@emotion/is-prop-valid': '*'
-      react: ^18.0.0
-      react-dom: ^18.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@emotion/is-prop-valid':
         optional: true
@@ -9298,6 +9305,29 @@ packages:
       snappy:
         optional: true
       socks:
+        optional: true
+
+  motion-dom@11.14.3:
+    resolution:
+      { integrity: sha512-lW+D2wBy5vxLJi6aCP0xyxTxlTfiu+b+zcpVbGVFUxotwThqhdpPRSmX8xztAgtZMPMeU0WGVn/k1w4I+TbPqA== }
+
+  motion-utils@11.14.3:
+    resolution:
+      { integrity: sha512-Xg+8xnqIJTpr0L/cidfTTBFkvRw26ZtGGuIhA94J9PQ2p4mEa06Xx7QVYZH0BP+EpMSaDlu+q0I0mmvwADPsaQ== }
+
+  motion@11.15.0:
+    resolution:
+      { integrity: sha512-iZ7dwADQJWGsqsSkBhNHdI2LyYWU+hA1Nhy357wCLZq1yHxGImgt3l7Yv0HT/WOskcYDq9nxdedyl4zUv7UFFw== }
+    peerDependencies:
+      '@emotion/is-prop-valid': '*'
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@emotion/is-prop-valid':
+        optional: true
+      react:
+        optional: true
+      react-dom:
         optional: true
 
   mrmime@2.0.0:
@@ -12834,6 +12864,11 @@ snapshots:
       type-fest: 4.30.2
       typescript: 5.5.4
 
+  '@douglasneuroinformatics/libjs@1.2.0(typescript@5.5.4)':
+    dependencies:
+      type-fest: 4.30.2
+      typescript: 5.5.4
+
   '@douglasneuroinformatics/libnest@0.5.0(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.1)(mongodb@6.10.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 1.1.0(typescript@5.5.4)
@@ -12901,9 +12936,9 @@ snapshots:
     dependencies:
       type-fest: 4.26.1
 
-  '@douglasneuroinformatics/libui@3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@3.23.8)':
+  '@douglasneuroinformatics/libui@3.8.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@3.23.8)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 1.1.0(typescript@5.5.4)
+      '@douglasneuroinformatics/libjs': 1.2.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@radix-ui/react-accordion': 1.2.1(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-alert-dialog': 1.1.2(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -12931,9 +12966,9 @@ snapshots:
       class-variance-authority: 0.7.0
       clsx: 2.1.1
       cmdk: 1.0.4(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      framer-motion: 11.11.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       lodash-es: 4.17.21
       lucide-react: 0.451.0(react@18.3.1)
+      motion: 11.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-dropzone: 14.3.5(react@18.3.1)
@@ -12955,9 +12990,9 @@ snapshots:
       - immer
       - typescript
 
-  '@douglasneuroinformatics/libui@3.7.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libui@3.8.6(@types/react@18.3.12)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.14)(typescript@5.5.4)(zod@vendor+zod@3.23.x)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 1.1.0(typescript@5.5.4)
+      '@douglasneuroinformatics/libjs': 1.2.0(typescript@5.5.4)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@radix-ui/react-accordion': 1.2.1(@types/react@18.3.12)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       '@radix-ui/react-alert-dialog': 1.1.2(@types/react@18.3.12)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
@@ -12985,9 +13020,9 @@ snapshots:
       class-variance-authority: 0.7.0
       clsx: 2.1.1
       cmdk: 1.0.4(@types/react@18.3.12)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
-      framer-motion: 11.11.15(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       lodash-es: 4.17.21
       lucide-react: 0.451.0(react@vendor+react@18.x)
+      motion: 11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       react: link:vendor/react@18.x
       react-dom: link:vendor/react-dom@18.x
       react-dropzone: 14.3.5(react@vendor+react@18.x)
@@ -18322,15 +18357,19 @@ snapshots:
 
   fraction.js@4.3.7: {}
 
-  framer-motion@11.11.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  framer-motion@11.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
+      motion-dom: 11.14.3
+      motion-utils: 11.14.3
       tslib: 2.8.1
     optionalDependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  framer-motion@11.11.15(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x):
+  framer-motion@11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x):
     dependencies:
+      motion-dom: 11.14.3
+      motion-utils: 11.14.3
       tslib: 2.8.1
     optionalDependencies:
       react: link:vendor/react@18.x
@@ -20123,6 +20162,26 @@ snapshots:
       mongodb-connection-string-url: 3.0.1
     optionalDependencies:
       socks: 2.8.3
+
+  motion-dom@11.14.3: {}
+
+  motion-utils@11.14.3: {}
+
+  motion@11.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      framer-motion: 11.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tslib: 2.8.1
+    optionalDependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  motion@11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x):
+    dependencies:
+      framer-motion: 11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
+      tslib: 2.8.1
+    optionalDependencies:
+      react: link:vendor/react@18.x
+      react-dom: link:vendor/react-dom@18.x
 
   mrmime@2.0.0: {}
 

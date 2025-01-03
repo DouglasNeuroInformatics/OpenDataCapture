@@ -1,9 +1,8 @@
 import { Card, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import { licenses } from '@opendatacapture/licenses';
 import { InstrumentIcon } from '@opendatacapture/react-core';
-import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { BadgeAlertIcon, BadgeCheckIcon } from 'lucide-react';
 
 type BaseCardItem = { label: string; tooltip?: React.ReactNode };
@@ -15,9 +14,7 @@ type TextCardItem = BaseCardItem & { kind: 'text'; text?: string };
 type CardItem = LinkCardItem | TextCardItem;
 
 export type InstrumentCardProps = {
-  instrument: UnilingualInstrumentInfo & {
-    supportedLanguages: Language[];
-  };
+  instrument: TranslatedInstrumentInfo;
   onClick: () => void;
 };
 
@@ -129,9 +126,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
         </div>
       </div>
       <div className="col-span-6 flex flex-grow flex-col gap-2">
-        <Heading className="text-primary" variant="h4">
-          {instrument.details.title}
-        </Heading>
+        <Heading variant="h4">{instrument.details.title}</Heading>
         <div className="flex flex-col gap-2 text-sm tracking-tight">
           {content.map((item) => {
             if (item.kind === 'link' && !item.href) {

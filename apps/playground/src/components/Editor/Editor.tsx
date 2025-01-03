@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
-import { motion } from 'framer-motion';
 import { Columns3Icon, FilePlusIcon, FileUpIcon } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useAppStore } from '@/store';

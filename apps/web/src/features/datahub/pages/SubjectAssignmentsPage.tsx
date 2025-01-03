@@ -77,6 +77,7 @@ export const SubjectAssignmentsPage = () => {
             <Dialog.Description>{t('datahub.assignments.addAssignmentDesc')}</Dialog.Description>
           </Dialog.Header>
           <Form
+            suspendWhileSubmitting
             content={{
               instrumentId: {
                 kind: 'string',
@@ -98,8 +99,8 @@ export const SubjectAssignmentsPage = () => {
                 instrumentId: z.string()
               }) satisfies z.ZodType<Omit<CreateAssignmentData, 'subjectId'>>
             }
-            onSubmit={(data) => {
-              createAssignmentMutation.mutate({
+            onSubmit={async (data) => {
+              await createAssignmentMutation.mutateAsync({
                 data: { ...data, groupId: currentGroup?.id, subjectId: params.subjectId! }
               });
               setIsCreateModalOpen(false);

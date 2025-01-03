@@ -43,6 +43,7 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
   return (
     <Form
       preventResetValuesOnReset
+      suspendWhileSubmitting
       className="mx-auto max-w-3xl"
       content={[
         {

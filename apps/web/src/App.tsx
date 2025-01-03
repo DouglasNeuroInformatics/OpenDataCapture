@@ -8,9 +8,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter } from 'react-router-dom';
 
 import { LoadingFallback } from '@/components/LoadingFallback';
-import { SetupProvider } from '@/features/setup';
 import { Routes } from '@/Routes';
 import { queryClient } from '@/services/react-query';
+
+import { SetupProvider } from './features/setup';
 
 import './services/axios';
 import './services/i18n';

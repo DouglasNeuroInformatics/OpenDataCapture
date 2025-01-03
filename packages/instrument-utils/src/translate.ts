@@ -15,7 +15,7 @@ import type {
   UnilingualClientInstrumentDetails,
   UnilingualInstrumentMeasures
 } from '@opendatacapture/runtime-core';
-import type { InstrumentInfo, UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { InstrumentInfo, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { mapValues, wrap } from 'lodash-es';
 import { match, P } from 'ts-pattern';
 
@@ -309,9 +309,9 @@ function translateSeries(series: SeriesInstrument<Language[]>, language: Languag
  * @param preferredLanguage - The user's preferred language.
  * @returns A translated unilingual instrument.
  */
-export function translateInstrumentInfo(info: InstrumentInfo, preferredLanguage: Language): UnilingualInstrumentInfo {
+export function translateInstrumentInfo(info: InstrumentInfo, preferredLanguage: Language): TranslatedInstrumentInfo {
   if (isUnilingualInstrumentInfo(info)) {
-    return info;
+    return { ...info, supportedLanguages: [info.language] };
   } else if (!isMultilingualInstrumentInfo(info)) {
     throw new Error(`Unexpected value for property 'language': ${JSON.stringify(info.language)}`);
   }
@@ -321,6 +321,7 @@ export function translateInstrumentInfo(info: InstrumentInfo, preferredLanguage:
     clientDetails: translateClientDetails(info.clientDetails, targetLanguage),
     details: translateDetails(info.details, targetLanguage),
     language: targetLanguage,
+    supportedLanguages: info.language,
     tags: info.tags[targetLanguage]
   };
 }

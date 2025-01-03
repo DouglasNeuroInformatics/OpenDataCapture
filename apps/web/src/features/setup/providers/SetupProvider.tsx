@@ -1,14 +1,25 @@
 import React, { useEffect } from 'react';
 
+import { useTheme } from '@douglasneuroinformatics/libui/hooks';
+import type { SetupState } from '@opendatacapture/schemas/setup';
+
+import { WithFallback } from '@/components/WithFallback';
 import { useSetupState } from '@/hooks/useSetupState';
 
-import { useCreateSetupState } from '../hooks/useCreateSetupState';
-import { SetupLoadingPage } from '../pages/SetupLoadingPage';
 import { SetupPage } from '../pages/SetupPage';
+
+const Child: React.FC<{ children: React.ReactElement; data: SetupState }> = ({ children, data }) => {
+  if (data.isSetup !== false) {
+    return children;
+  }
+  return <SetupPage />;
+};
 
 export const SetupProvider = ({ children }: { children: React.ReactElement }) => {
   const setupStateQuery = useSetupState();
-  const createSetupStateMutation = useCreateSetupState();
+
+  // since there is no theme toggle on the page, this is required to set the document attribute
+  useTheme();
 
   useEffect(() => {
     if (setupStateQuery.data?.isSetup === false) {
@@ -16,36 +27,12 @@ export const SetupProvider = ({ children }: { children: React.ReactElement }) =>
     }
   }, [setupStateQuery.data]);
 
-  if (setupStateQuery.data?.isSetup !== false) {
-    return children;
-  } else if (createSetupStateMutation.isPending) {
-    return <SetupLoadingPage />;
-  }
-
   return (
-    <SetupPage
-      onSubmit={({
-        dummySubjectCount,
-        enableExperimentalFeatures,
-        firstName,
-        initDemo,
-        lastName,
-        password,
-        recordsPerSubject,
-        username
-      }) => {
-        createSetupStateMutation.mutate({
-          admin: {
-            firstName,
-            lastName,
-            password,
-            username
-          },
-          dummySubjectCount,
-          enableExperimentalFeatures,
-          initDemo,
-          recordsPerSubject
-        });
+    <WithFallback
+      Component={Child}
+      props={{
+        children,
+        data: setupStateQuery.data
       }}
     />
   );
