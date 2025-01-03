@@ -20,11 +20,13 @@ export const InstrumentShowcase: React.FC<{
   useEffect(() => {
     setFilteredInstruments(
       availableInstruments.filter((instrument) => {
-        const matchesSearch = instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
-        return matchesSearch;
+        if (selectedKinds.length && !selectedKinds.find(({ key }) => key === instrument.kind)) {
+          return false;
+        }
+        return instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
       })
     );
-  }, [availableInstruments, searchTerm]);
+  }, [availableInstruments, selectedKinds, searchTerm]);
 
   return (
     <div className="flex flex-col gap-5">
