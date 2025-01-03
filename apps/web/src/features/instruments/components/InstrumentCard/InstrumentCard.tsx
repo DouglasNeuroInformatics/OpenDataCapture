@@ -126,9 +126,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
         </div>
       </div>
       <div className="col-span-6 flex flex-grow flex-col gap-2">
-        <Heading className="text-primary" variant="h4">
-          {instrument.details.title}
-        </Heading>
+        <Heading variant="h4">{instrument.details.title}</Heading>
         <div className="flex flex-col gap-2 text-sm tracking-tight">
           {content.map((item) => {
             if (item.kind === 'link' && !item.href) {
