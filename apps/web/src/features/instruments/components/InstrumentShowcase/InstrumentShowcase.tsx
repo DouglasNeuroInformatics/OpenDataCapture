@@ -5,12 +5,16 @@ import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrume
 import { AnimatePresence, motion } from 'motion/react';
 
 import { InstrumentCard } from '../InstrumentCard';
+import { InstrumentKindDropdown } from './InstrumentKindDropdown';
+
+import type { InstrumentShowcaseKindOption } from './InstrumentKindDropdown';
 
 export const InstrumentShowcase: React.FC<{
   data: TranslatedInstrumentInfo[];
   onSelect: (instrument: TranslatedInstrumentInfo) => void;
 }> = ({ data: availableInstruments, onSelect }) => {
   const [filteredInstruments, setFilteredInstruments] = useState<TranslatedInstrumentInfo[]>(availableInstruments);
+  const [selectedKinds, setSelectedKinds] = useState<InstrumentShowcaseKindOption[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -24,8 +28,11 @@ export const InstrumentShowcase: React.FC<{
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
+      <div className="flex items-center gap-5">
         <SearchBar className="flex-grow" value={searchTerm} onValueChange={setSearchTerm} />
+        <div className="flex items-center">
+          <InstrumentKindDropdown selected={selectedKinds} setSelected={setSelectedKinds} />
+        </div>
       </div>
       <ul className="flex flex-col gap-5">
         <AnimatePresence mode="popLayout">
