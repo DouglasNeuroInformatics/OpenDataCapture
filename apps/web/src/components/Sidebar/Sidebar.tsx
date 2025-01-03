@@ -3,8 +3,8 @@ import { AlertDialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformati
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { AnimatePresence, motion } from 'framer-motion';
 import { StopCircle } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useNavItems } from '@/hooks/useNavItems';
