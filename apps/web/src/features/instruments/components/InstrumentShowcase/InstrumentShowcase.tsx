@@ -25,16 +25,18 @@ export const InstrumentShowcase: React.FC<{
 
   useEffect(() => {
     setFilteredInstruments(
-      availableInstruments.filter((instrument) => {
-        if (selectedKinds.length && !selectedKinds.some(({ key }) => key === instrument.kind)) {
+      availableInstruments.filter(({ details, kind, supportedLanguages, tags }) => {
+        if (selectedKinds.length && !selectedKinds.some(({ key }) => key === kind)) {
           return false;
-        } else if (selectedTags.length && !selectedTags.some(({ key }) => instrument.tags.includes(key))) {
+        } else if (selectedLanguages.length && !selectedLanguages.some(({ key }) => supportedLanguages.includes(key))) {
+          return false;
+        } else if (selectedTags.length && !selectedTags.some(({ key }) => tags.includes(key))) {
           return false;
         }
-        return instrument.details.title.toUpperCase().includes(searchTerm.toUpperCase());
+        return details.title.toUpperCase().includes(searchTerm.toUpperCase());
       })
     );
-  }, [availableInstruments, selectedKinds, selectedTags, searchTerm]);
+  }, [availableInstruments, selectedKinds, selectedLanguages, selectedTags, searchTerm]);
 
   useEffect(() => {
     setTagOptions(
