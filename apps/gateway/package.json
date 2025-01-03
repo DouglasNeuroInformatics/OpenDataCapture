@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libcrypto": "catalog:",
-    "@douglasneuroinformatics/libui": "file:/Users/joshua/Developer/DouglasNeuroinformatics/libui",
+    "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/instrument-renderer": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",

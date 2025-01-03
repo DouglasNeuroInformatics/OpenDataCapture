@@ -11,7 +11,7 @@
     "lint": "astro check && eslint --fix src"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libui": "file:/Users/joshua/Developer/DouglasNeuroinformatics/libui",
+    "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/schemas": "workspace:*",
     "clsx": "^2.1.1",
     "lodash-es": "workspace:lodash-es__4.x@*",
