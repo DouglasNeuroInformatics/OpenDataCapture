@@ -1,9 +1,8 @@
 import { Card, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import { licenses } from '@opendatacapture/licenses';
 import { InstrumentIcon } from '@opendatacapture/react-core';
-import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { BadgeAlertIcon, BadgeCheckIcon } from 'lucide-react';
 
 type BaseCardItem = { label: string; tooltip?: React.ReactNode };
@@ -14,12 +13,8 @@ type TextCardItem = BaseCardItem & { kind: 'text'; text?: string };
 
 type CardItem = LinkCardItem | TextCardItem;
 
-export type InstrumentCardInfo = UnilingualInstrumentInfo & {
-  supportedLanguages: Language[];
-};
-
 export type InstrumentCardProps = {
-  instrument: InstrumentCardInfo;
+  instrument: TranslatedInstrumentInfo;
   onClick: () => void;
 };
 
