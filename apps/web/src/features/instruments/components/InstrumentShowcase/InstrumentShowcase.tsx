@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'motion/react';
 
 import { InstrumentCard } from '../InstrumentCard';
 import { InstrumentKindDropdown } from './InstrumentKindDropdown';
+import { InstrumentLanguageDropdown, type InstrumentShowcaseLanguageOption } from './InstrumentLanguageDropdown';
 
 import type { InstrumentShowcaseKindOption } from './InstrumentKindDropdown';
 
@@ -18,6 +19,7 @@ export const InstrumentShowcase: React.FC<{
   const [filteredInstruments, setFilteredInstruments] = useState<TranslatedInstrumentInfo[]>(availableInstruments);
   const [tagOptions, setTagOptions] = useState<ListboxDropdownOption[]>([]);
   const [selectedKinds, setSelectedKinds] = useState<InstrumentShowcaseKindOption[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<InstrumentShowcaseLanguageOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<ListboxDropdownOption[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -56,6 +58,7 @@ export const InstrumentShowcase: React.FC<{
             setSelected={setSelectedTags}
             title={t('core.tags')}
           />
+          <InstrumentLanguageDropdown selected={selectedLanguages} setSelected={setSelectedLanguages} />
         </div>
       </div>
       <ul className="flex flex-col gap-5">
