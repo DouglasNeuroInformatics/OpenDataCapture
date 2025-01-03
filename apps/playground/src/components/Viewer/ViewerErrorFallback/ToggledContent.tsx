@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import { motion } from 'framer-motion';
 import { ChevronUpIcon } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export const ToggledContent: React.FC<{ children: React.ReactNode; label: string }> = ({ children, label }) => {
   const [isOpen, setIsOpen] = useState(false);
