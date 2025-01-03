@@ -22,10 +22,7 @@ export function useInstrumentInfoQuery<TKind extends InstrumentKind>({
         params
       });
       const infos = await $InstrumentInfo.array().parseAsync(response.data);
-      return infos.map((instrument) => ({
-        ...translateInstrumentInfo(instrument, resolvedLanguage ?? 'en'),
-        supportedLanguages: typeof instrument.language === 'string' ? [instrument.language] : instrument.language
-      }));
+      return infos.map((instrument) => translateInstrumentInfo(instrument, resolvedLanguage ?? 'en'));
     },
     queryKey: ['instrument-info', params?.kind, params?.subjectId, resolvedLanguage]
   });
