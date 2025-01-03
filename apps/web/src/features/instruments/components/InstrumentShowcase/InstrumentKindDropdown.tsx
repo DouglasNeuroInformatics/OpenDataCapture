@@ -1,7 +1,11 @@
 import { ListboxDropdown } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 
-import type { InstrumentShowcaseKindOption } from './types';
+export type InstrumentShowcaseKindOption = {
+  key: InstrumentKind;
+  label: string;
+};
 
 export const InstrumentKindDropdown: React.FC<{
   selected: InstrumentShowcaseKindOption[];
