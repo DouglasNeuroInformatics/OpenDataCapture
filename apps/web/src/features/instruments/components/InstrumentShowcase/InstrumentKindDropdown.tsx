@@ -21,7 +21,7 @@ export const InstrumentKindDropdown: React.FC<{
             })
           },
           {
-            key: 'FORM',
+            key: 'INTERACTIVE',
             label: t({
               en: 'Interactive',
               fr: 'Interactif'
