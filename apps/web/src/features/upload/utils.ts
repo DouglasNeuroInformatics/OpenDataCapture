@@ -299,6 +299,10 @@ export function interpretZodObjectValue(
     const recordArrayObject: { [key: string]: any } = {};
 
     const record = listData.split(',');
+
+    if (!record) {
+      return { message: `Record in the record array was left undefined`, success: false };
+    }
     if (record.some((str) => str === '')) {
       return { message: `One or more of the record array fields was left empty`, success: false };
     }
@@ -306,7 +310,6 @@ export function interpretZodObjectValue(
       return { message: `Incorrect number of entries for record array`, success: false };
     }
     for (let i = 0; i < record.length; i++) {
-      // TODO - make sure this is defined
       if (!record[i]) {
         return { message: `Failed to interpret field '${i}'`, success: false };
       }
