@@ -60,6 +60,8 @@ type UploadOperationResult<T> =
 
 type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
+type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
+
 function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
   return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
 }
@@ -76,7 +78,7 @@ function isZodSetDef(def: AnyZodTypeDef): def is z.ZodSetDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodSet;
 }
 
-function isZodArrayDef(def: AnyZodTypeDef): def is z.ZodArrayDef {
+function isZodArrayDef(def: AnyZodTypeDef): def is AnyZodArrayDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodArray;
 }
 
@@ -196,8 +198,7 @@ export function interpretZodArray(
     );
   }
 
-  // TODO - check zod array inner type is object
-  const shape = (def.type as z.AnyZodObject).shape as { [key: string]: z.ZodTypeAny };
+  const shape = def.type.shape as { [key: string]: z.ZodTypeAny };
 
   for (const [key, insideType] of Object.entries(shape)) {
     const def: unknown = insideType._def;
@@ -257,7 +258,10 @@ export function interpretZodValue(
     case 'ZodSet':
       if (entry.startsWith('SET(')) {
         const setData = extractSetEntry(entry);
-        const values = setData.split(',').map((s) => s.trim()).filter(Boolean);
+        const values = setData
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
         if (values.length === 0) {
           return { message: 'Empty set is not allowed', success: false };
         }
@@ -303,6 +307,10 @@ export function interpretZodObjectValue(
     }
     for (let i = 0; i < record.length; i++) {
       // TODO - make sure this is defined
+      if (!record[i]) {
+        return { message: `Failed to interpret field '${i}'`, success: false };
+      }
+
       const recordValue = record[i]!.split(':')[1]!.trim();
 
       const zListResult = zList[i]!;
