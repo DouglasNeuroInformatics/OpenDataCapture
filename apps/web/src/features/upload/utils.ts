@@ -90,8 +90,6 @@ function isZodObjectDef(def: AnyZodTypeDef): def is z.ZodObjectDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodObject;
 }
 
-// TODO - fix extract set and record array functions to handle whitespace and trailing semicolon (present or included)
-
 function extractSetEntry(entry: string) {
   const result = /SET\(\s*(.*?)\s*\)/.exec(entry);
   if (!result?.[1]) {
