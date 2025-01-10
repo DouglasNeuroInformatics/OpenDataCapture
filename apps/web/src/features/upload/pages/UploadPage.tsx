@@ -27,8 +27,18 @@ export const UploadPage = () => {
   const { t } = useTranslation();
 
   const handleTemplateDownload = () => {
-    const { content, fileName } = createUploadTemplateCSV(instrument!);
-    void download(fileName, content);
+    try {
+      const { content, fileName } = createUploadTemplateCSV(instrument!);
+      void download(fileName, content);
+    } catch (error) {
+      addNotification({
+        message: t({
+          en: 'Error occurred downloading sample template',
+          fr: "Un occurence d'un erreur quand le csv document est telecharger"
+        }),
+        type: 'error'
+      });
+    }
   };
 
   const handleInstrumentCSV = async () => {

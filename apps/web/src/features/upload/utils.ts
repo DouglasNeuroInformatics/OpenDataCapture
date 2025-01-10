@@ -411,40 +411,44 @@ function generateSampleData({
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
   // TODO - type validationSchema as object
-  const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
+  try {
+    const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
 
-  const instrumentSchemaDef: unknown = instrument.validationSchema._def;
+    const instrumentSchemaDef: unknown = instrument.validationSchema._def;
 
-  let shape: { [key: string]: z.ZodTypeAny } = {};
+    let shape: { [key: string]: z.ZodTypeAny } = {};
 
-  if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
-    const innerSchema: unknown = instrumentSchemaDef.schema._def;
-    if (isZodTypeDef(innerSchema) && isZodObjectDef(innerSchema)) {
-      shape = innerSchema.shape() as { [key: string]: z.ZodTypeAny };
+    if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
+      const innerSchema: unknown = instrumentSchemaDef.schema._def;
+      if (isZodTypeDef(innerSchema) && isZodObjectDef(innerSchema)) {
+        shape = innerSchema.shape() as { [key: string]: z.ZodTypeAny };
+      }
+    } else {
+      shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
     }
-  } else {
-    shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
-  }
 
-  const columnNames = Object.keys(shape);
+    const columnNames = Object.keys(shape);
 
-  const csvColumns = INTERNAL_HEADERS.concat(columnNames);
+    const csvColumns = INTERNAL_HEADERS.concat(columnNames);
 
-  const sampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
-  for (const col of columnNames) {
-    const typeNameResult = getZodTypeName(shape[col]!);
-    if (!typeNameResult.success) {
-      throw new Error(typeNameResult.message);
+    const sampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
+    for (const col of columnNames) {
+      const typeNameResult = getZodTypeName(shape[col]!);
+      if (!typeNameResult.success) {
+        throw new Error(typeNameResult.message);
+      }
+      sampleData.push(generateSampleData(typeNameResult));
     }
-    sampleData.push(generateSampleData(typeNameResult));
+
+    unparse([csvColumns, sampleData]);
+
+    return {
+      content: unparse([csvColumns, sampleData]),
+      fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
+    };
+  } catch {
+    throw new Error('Error generating Sample CSV template');
   }
-
-  unparse([csvColumns, sampleData]);
-
-  return {
-    content: unparse([csvColumns, sampleData]),
-    fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
-  };
 }
 
 export async function processInstrumentCSV(
