@@ -254,17 +254,22 @@ export function interpretZodValue(
       }
       return { message: `Invalid number type: ${entry}`, success: false };
     case 'ZodSet':
-      if (entry.startsWith('SET(')) {
-        const setData = extractSetEntry(entry);
-        const values = setData
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean);
-        if (values.length === 0) {
-          return { message: 'Empty set is not allowed', success: false };
+      try {
+        if (entry.startsWith('SET(')) {
+          const setData = extractSetEntry(entry);
+          const values = setData
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+          if (values.length === 0) {
+            return { message: 'Empty set is not allowed', success: false };
+          }
+          return { success: true, value: new Set(values) };
         }
-        return { success: true, value: new Set(values) };
+      } catch {
+        return { message: 'Error occurred interpreting set entry', success: false };
       }
+
       return { message: `Invalid ZodSet: ${entry}`, success: false };
     case 'ZodString':
       return { success: true, value: entry };
@@ -279,63 +284,70 @@ export function interpretZodObjectValue(
   zList: ZodTypeNameResult[],
   zKeys: string[]
 ): UploadOperationResult<FormTypes.FieldValue> {
-  if (entry === '' && isOptional) {
-    return { success: true, value: undefined };
-  } else if (!entry.startsWith('RECORD_ARRAY(')) {
-    return { message: `Invalid ZodType`, success: false };
-  }
-
-  const recordArray: { [key: string]: any }[] = [];
-  const recordArrayDataEntry = extractRecordArrayEntry(entry);
-  const recordArrayDataList = recordArrayDataEntry.split(';');
-
-  if (recordArrayDataList.at(-1) === '') {
-    recordArrayDataList.pop();
-  }
-
-  for (const listData of recordArrayDataList) {
-    const recordArrayObject: { [key: string]: any } = {};
-
-    const record = listData.split(',');
-
-    if (!record) {
-      return { message: `Record in the record array was left undefined`, success: false };
+  try {
+    if (entry === '' && isOptional) {
+      return { success: true, value: undefined };
+    } else if (!entry.startsWith('RECORD_ARRAY(')) {
+      return { message: `Invalid ZodType`, success: false };
     }
-    if (record.some((str) => str === '')) {
-      return { message: `One or more of the record array fields was left empty`, success: false };
+
+    const recordArray: { [key: string]: any }[] = [];
+    const recordArrayDataEntry = extractRecordArrayEntry(entry);
+    const recordArrayDataList = recordArrayDataEntry.split(';');
+
+    if (recordArrayDataList.at(-1) === '') {
+      recordArrayDataList.pop();
     }
-    if (!(zList.length === zKeys.length && zList.length === record.length)) {
-      return { message: `Incorrect number of entries for record array`, success: false };
-    }
-    for (let i = 0; i < record.length; i++) {
-      if (!record[i]) {
-        return { message: `Failed to interpret field '${i}'`, success: false };
+
+    for (const listData of recordArrayDataList) {
+      const recordArrayObject: { [key: string]: any } = {};
+
+      const record = listData.split(',');
+
+      if (!record) {
+        return { message: `Record in the record array was left undefined`, success: false };
       }
-
-      const recordValue = record[i]!.split(':')[1]!.trim();
-
-      const zListResult = zList[i]!;
-      if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
-        return { message: `Failed to interpret field '${i}'`, success: false };
+      if (record.some((str) => str === '')) {
+        return { message: `One or more of the record array fields was left empty`, success: false };
       }
-      const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
-        recordValue,
-        zListResult.typeName,
-        zListResult.isOptional
-      );
-      if (!interpretZodValueResult.success) {
-        return {
-          message: `failed to interpret value at entry ${i} in record array row ${listData}`,
-          success: false
-        };
+      if (!(zList.length === zKeys.length && zList.length === record.length)) {
+        return { message: `Incorrect number of entries for record array`, success: false };
       }
+      for (let i = 0; i < record.length; i++) {
+        if (!record[i]) {
+          return { message: `Failed to interpret field '${i}'`, success: false };
+        }
 
-      recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
+        const recordValue = record[i]!.split(':')[1]!.trim();
+
+        const zListResult = zList[i]!;
+        if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
+          return { message: `Failed to interpret field '${i}'`, success: false };
+        }
+        const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
+          recordValue,
+          zListResult.typeName,
+          zListResult.isOptional
+        );
+        if (!interpretZodValueResult.success) {
+          return {
+            message: `failed to interpret value at entry ${i} in record array row ${listData}`,
+            success: false
+          };
+        }
+
+        recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
+      }
+      recordArray.push(recordArrayObject);
     }
-    recordArray.push(recordArrayObject);
-  }
 
-  return { success: true, value: recordArray };
+    return { success: true, value: recordArray };
+  } catch {
+    return {
+      message: `failed to interpret record array entries`,
+      success: false
+    };
+  }
 }
 
 function formatTypeInfo(s: string, isOptional: boolean) {
