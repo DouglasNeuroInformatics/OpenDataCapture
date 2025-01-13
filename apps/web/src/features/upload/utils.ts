@@ -62,6 +62,10 @@ type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
 type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
 
+function isZodObject(value: unknown): value is z.AnyZodObject {
+  return isPlainObject(value);
+}
+
 function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
   return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
 }
@@ -424,7 +428,11 @@ function generateSampleData({
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
   // TODO - type validationSchema as object
   try {
-    const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
+    //This needs to be tested!!!
+    if (!isZodObject(instrument.validationSchema)) {
+      throw new Error('Error in validation schema type');
+    }
+    const instrumentSchema = instrument.validationSchema;
 
     const instrumentSchemaDef: unknown = instrument.validationSchema._def;
 
