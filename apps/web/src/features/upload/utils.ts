@@ -404,7 +404,7 @@ function generateSampleData({
             // eslint-disable-next-line max-depth
             if (!inputData?.success) {
               console.error({ inputData });
-              throw new Error(`TODO - handle this case where input data is undefined or not a success`);
+              throw new Error(`input data is undefined or unsuccessful`);
             }
             // eslint-disable-next-line max-depth
             if (i === multiValues.length - 1 && multiValues[i] !== undefined) {
@@ -415,9 +415,12 @@ function generateSampleData({
           }
           multiString += ';)';
         }
-
         return multiString;
-      } catch {
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === 'input data is undefined or unsuccessful') {
+          throw new Error('Unsuccessful input data transfer or undefined data');
+        }
+
         throw new Error('Invalid Record Array Error');
       }
     default:
@@ -466,7 +469,10 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
       content: unparse([csvColumns, sampleData]),
       fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
     };
-  } catch {
+  } catch (e: unknown) {
+    if (e instanceof Error && e.message === 'Unsuccessful input data transfer or undefined data') {
+      throw e;
+    }
     throw new Error('Error generating Sample CSV template');
   }
 }
