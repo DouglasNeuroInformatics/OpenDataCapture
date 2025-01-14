@@ -62,10 +62,6 @@ type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
 type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
 
-function isZodObject(value: unknown): value is z.AnyZodObject {
-  return isPlainObject(value);
-}
-
 function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
   return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
 }
@@ -431,20 +427,16 @@ function generateSampleData({
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
   // TODO - type validationSchema as object
   try {
-    //This needs to be tested!!!
-    if (!isZodObject(instrument.validationSchema)) {
-      throw new Error('Error in validation schema type');
-    }
-    const instrumentSchema = instrument.validationSchema;
+    const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
 
     const instrumentSchemaDef: unknown = instrument.validationSchema._def;
 
     let shape: { [key: string]: z.ZodTypeAny } = {};
 
     if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
-      const innerSchema: unknown = instrumentSchemaDef.schema._def;
-      if (isZodTypeDef(innerSchema) && isZodObjectDef(innerSchema)) {
-        shape = innerSchema.shape() as { [key: string]: z.ZodTypeAny };
+      const innerSchemaDef: unknown = instrumentSchemaDef.schema._def;
+      if (isZodTypeDef(innerSchemaDef) && isZodObjectDef(innerSchemaDef)) {
+        shape = innerSchemaDef.shape() as { [key: string]: z.ZodTypeAny };
       }
     } else {
       shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
@@ -471,6 +463,9 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
     };
   } catch (e: unknown) {
     if (e instanceof Error && e.message === 'Unsuccessful input data transfer or undefined data') {
+      throw e;
+    }
+    if (e instanceof Error && e.message === 'Error in validation schema type') {
       throw e;
     }
     throw new Error('Error generating Sample CSV template');
