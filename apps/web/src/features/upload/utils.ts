@@ -486,14 +486,14 @@ export async function processInstrumentCSV(
     //TODO make this type safe without having to cast z.AnyZodObject
     instrumentSchemaWithInternal = (instrumentSchemaDef.schema as z.AnyZodObject).extend({
       date: z.coerce.date(),
-      subjectID: z.string()
+      subjectID: z.string().regex(/^[^$]+$/, 'Subject ID has to be at least 1 character long and without a $')
     });
 
     shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
     instrumentSchemaWithInternal = instrumentSchema.extend({
       date: z.coerce.date(),
-      subjectID: z.string()
+      subjectID: z.string().regex(/^[^$]+$/, 'Subject ID has to be at least 1 character long and without a $')
     });
     shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
   }
@@ -571,8 +571,11 @@ export async function processInstrumentCSV(
           //create error message with zodcheck error messsage + zodcheck error path
           //addNotification({ message: zodCheck.error.issues[0]?.message, type: 'error' });
           console.error(zodCheck.error.issues);
+          const zodIssues = zodCheck.error.issues.map((issue) => {
+            return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}"`;
+          });
           console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
-          return resolve({ message: zodCheck.error.message, success: false });
+          return resolve({ message: zodIssues.join(), success: false });
         }
         result.push(zodCheck.data);
       }
