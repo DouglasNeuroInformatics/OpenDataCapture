@@ -6,7 +6,7 @@ import { z } from '/runtime/v1/zod@3.23.x';
 import catVideo from './cat-video.mp4';
 
 const Task: React.FC<{ done: (data: { success: boolean }) => void }> = ({ done }) => {
-  const [secondsRemaining, setSecondsRemaining] = useState(5);
+  const [secondsRemaining, setSecondsRemaining] = useState(15);
   const [value, setValue] = useState('');
 
   useEffect(() => {
