@@ -9,8 +9,6 @@ import { z } from 'zod';
 
 // TODO - refine ZodTypeNameResult to reflect specific ZodType variants (i.e., object)
 
-// TODO - last thing, convert all errors thrown to result to be handled in the UploadPage component
-
 const ZOD_TYPE_NAMES = [
   'ZodNumber',
   'ZodString',
@@ -554,10 +552,11 @@ export async function processInstrumentCSV(
                 typeNameResult.multiValues,
                 typeNameResult.multiKeys
               );
+              // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
+              //Dealt with via else statement for now
             } else {
               interpreterResult.message = 'Record Array keys do not exist';
             }
-            // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
           } else {
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
           }
@@ -568,8 +567,6 @@ export async function processInstrumentCSV(
         }
         const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
         if (!zodCheck.success) {
-          //create error message with zodcheck error messsage + zodcheck error path
-          //addNotification({ message: zodCheck.error.issues[0]?.message, type: 'error' });
           console.error(zodCheck.error.issues);
           const zodIssues = zodCheck.error.issues.map((issue) => {
             return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}"`;
