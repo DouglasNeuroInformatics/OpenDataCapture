@@ -50,9 +50,22 @@ export async function loadEditorFilesFromNative(files: File[]) {
 
 export async function loadEditorFilesFromZip(zip: JSZip) {
   const editorFiles: EditorFile[] = [];
+
+  const dirs = zip.filter((_, file) => file.dir);
+
+  if (dirs.length > 1) {
+    throw new Error(`Archive contains more than one directory: ${dirs.map(({ name }) => name).join(', ')}`);
+  }
+
+  const basename = dirs.length ? dirs[0]!.name : '';
+
   for (const file of Object.values(zip.files)) {
+    if (file.dir) {
+      continue;
+    }
+    const filename = file.name.slice(basename.length, file.name.length);
     let content: string;
-    const isBase64 = isBase64EncodedFileType(file.name);
+    const isBase64 = isBase64EncodedFileType(filename);
     if (isBase64) {
       content = await file.async('base64');
     } else {
@@ -60,7 +73,7 @@ export async function loadEditorFilesFromZip(zip: JSZip) {
     }
     editorFiles.push({
       content,
-      name: file.name
+      name: filename
     });
   }
   return editorFiles;
