@@ -547,13 +547,16 @@ export async function processInstrumentCSV(
           };
 
           if (typeNameResult.typeName === 'ZodArray' || typeNameResult.typeName === 'ZodObject') {
-            if (typeNameResult.multiKeys && typeNameResult.multiValues)
+            if (typeNameResult.multiKeys && typeNameResult.multiValues) {
               interpreterResult = interpretZodObjectValue(
                 rawValue,
                 typeNameResult.isOptional,
                 typeNameResult.multiValues,
                 typeNameResult.multiKeys
               );
+            } else {
+              interpreterResult.message = 'Record Array keys do not exist';
+            }
             // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
           } else {
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
