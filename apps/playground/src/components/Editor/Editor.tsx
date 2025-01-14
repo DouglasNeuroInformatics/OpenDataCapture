@@ -150,7 +150,8 @@ export const Editor = () => {
           'image/webp': ['.webp'],
           'text/css': ['.css'],
           'text/html': ['.html'],
-          'text/plain': ['.js', '.jsx', '.ts', '.tsx']
+          'text/plain': ['.js', '.jsx', '.ts', '.tsx'],
+          'video/mp4': ['.mp4']
         }}
         isOpen={isFileUploadDialogOpen}
         setIsOpen={setIsFileUploadDialogOpen}

@@ -5,6 +5,7 @@ export type BundlerInputFileExtension =
   | '.jpg'
   | '.js'
   | '.jsx'
+  | '.mp4'
   | '.png'
   | '.svg'
   | '.ts'
