@@ -30,14 +30,27 @@ export const UploadPage = () => {
     try {
       const { content, fileName } = createUploadTemplateCSV(instrument!);
       void download(fileName, content);
-    } catch (error) {
-      addNotification({
-        message: t({
-          en: 'Error occurred downloading sample template',
-          fr: "Un occurence d'un erreur quand le csv document est telecharger"
-        }),
-        type: 'error'
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        addNotification({
+          message: t({
+            en: `Error occurred downloading sample template with the following message:  ${error.message}
+            `,
+            fr: `Un occurence d'un erreur quand le csv document est telecharger avec la message suivant: ${error.message}`
+          }),
+          type: 'error'
+        });
+      } else {
+        addNotification({
+          message: t({
+            en: `Error occurred downloading sample template.
+            `,
+            fr: `Un occurence d'un erreur quand le csv est telecharger. `
+          }),
+          type: 'error'
+        });
+      }
+      console.error(error);
     }
   };
 
