@@ -27,6 +27,22 @@ export const useAppStore = create(
         }))
       ),
       {
+        merge: (_persistedState, currentState) => {
+          const persistedState = _persistedState as
+            | Partial<Pick<AppStore, 'instruments' | 'selectedInstrument' | 'settings'>>
+            | undefined;
+          const instruments = [
+            ...currentState.instruments,
+            ...(persistedState?.instruments ?? []).filter((instrument) => {
+              return instrument.category === 'Saved';
+            })
+          ];
+          const selectedInstrument =
+            instruments.find(({ id }) => id === persistedState?.selectedInstrument?.id) ??
+            currentState.selectedInstrument;
+          const settings = persistedState?.settings ?? currentState.settings;
+          return { ...currentState, instruments, selectedInstrument, settings };
+        },
         name: 'app',
         partialize: (state) => pick(state, ['instruments', 'selectedInstrument', 'settings']),
         storage: createJSONStorage(() => localStorage),
