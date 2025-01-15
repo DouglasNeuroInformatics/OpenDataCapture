@@ -71,7 +71,7 @@ export default defineInstrument({
     authors: ['Joshua Unrau'],
     description: 'This test assesses whether a person knows what a cat is',
     license: 'Apache-2.0',
-    title: 'Breakout Task'
+    title: 'Interactive With Embedded Video'
   },
   internal: {
     edition: 1,
