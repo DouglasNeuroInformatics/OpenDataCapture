@@ -145,6 +145,7 @@ export const Editor = () => {
       />
       <FileUploadDialog
         accept={{
+          'application/json': ['.json'],
           'image/jpeg': ['.jpg', '.jpeg'],
           'image/png': ['.png'],
           'image/webp': ['.webp'],

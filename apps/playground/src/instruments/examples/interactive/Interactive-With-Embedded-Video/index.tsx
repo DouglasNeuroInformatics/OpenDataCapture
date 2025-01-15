@@ -4,9 +4,10 @@ import { createRoot } from '/runtime/v1/react-dom@18.x/client.js';
 import { z } from '/runtime/v1/zod@3.23.x';
 
 import catVideo from './cat-video.mp4';
+import config from './config.json';
 
 const Task: React.FC<{ done: (data: { success: boolean }) => void }> = ({ done }) => {
-  const [secondsRemaining, setSecondsRemaining] = useState(15);
+  const [secondsRemaining, setSecondsRemaining] = useState<number>(config.timeLimit);
   const [value, setValue] = useState('');
 
   useEffect(() => {

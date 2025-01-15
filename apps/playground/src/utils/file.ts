@@ -4,7 +4,7 @@ import { match, P } from 'ts-pattern';
 
 import type { EditorFile } from '@/models/editor-file.model';
 
-export type FileType = 'asset' | 'css' | 'html' | 'javascript' | 'typescript';
+export type FileType = 'asset' | 'css' | 'html' | 'javascript' | 'json' | 'typescript';
 
 export function inferFileType(filename: string): FileType | null {
   return match(extractInputFileExtension(filename))
@@ -13,6 +13,7 @@ export function inferFileType(filename: string): FileType | null {
     .with(P.union('.ts', '.tsx'), () => 'typescript' as const)
     .with(P.union('.jpeg', '.jpg', '.png', '.webp', '.mp4'), () => 'asset' as const)
     .with(P.union('.html', '.svg'), () => 'html' as const)
+    .with('.json', () => 'json' as const)
     .with(null, () => null)
     .exhaustive();
 }
