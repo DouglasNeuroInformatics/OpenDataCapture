@@ -236,11 +236,11 @@ export function interpretZodValue(
       } else if (entry.toLowerCase() === 'false') {
         return { success: true, value: false };
       }
-      return { message: `Undecipherable Boolean Type: ${entry}`, success: false };
+      return { message: `Undecipherable Boolean Type: '${entry}'`, success: false };
     case 'ZodDate': {
       const date = new Date(entry);
       if (isNaN(date.getTime())) {
-        return { message: `Failed to parse date: ${entry}`, success: false };
+        return { message: `Failed to parse date: '${entry}'`, success: false };
       }
       return { success: true, value: date };
     }
@@ -250,7 +250,7 @@ export function interpretZodValue(
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
       }
-      return { message: `Invalid number type: ${entry}`, success: false };
+      return { message: `Invalid number type: '${entry}'`, success: false };
     case 'ZodSet':
       try {
         if (entry.startsWith('SET(')) {
@@ -268,7 +268,7 @@ export function interpretZodValue(
         return { message: 'Error occurred interpreting set entry', success: false };
       }
 
-      return { message: `Invalid ZodSet: ${entry}`, success: false };
+      return { message: `Invalid ZodSet: '${entry}'`, success: false };
     case 'ZodString':
       return { success: true, value: entry };
     default:
@@ -479,21 +479,22 @@ export async function processInstrumentCSV(
   let instrumentSchemaWithInternal: z.AnyZodObject;
 
   const instrumentSchemaDef: unknown = instrumentSchema._def;
+  const $SubjectIdValidation = z
+    .string()
+    .regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long, without a $ and no whitespaces');
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
     //TODO make this type safe without having to cast z.AnyZodObject
     instrumentSchemaWithInternal = (instrumentSchemaDef.schema as z.AnyZodObject).extend({
       date: z.coerce.date(),
-      subjectID: z
-        .string()
-        .regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long, without a $ and no whitespaces')
+      subjectID: $SubjectIdValidation
     });
 
     shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
     instrumentSchemaWithInternal = instrumentSchema.extend({
       date: z.coerce.date(),
-      subjectID: z.string().regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long and without a $')
+      subjectID: $SubjectIdValidation
     });
     shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
   }
@@ -563,7 +564,7 @@ export async function processInstrumentCSV(
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
           }
           if (!interpreterResult.success) {
-            return resolve({ message: interpreterResult.message, success: false });
+            return resolve({ message: `${interpreterResult.message} at column name: '${key}'`, success: false });
           }
           jsonLine[headers[j]!] = interpreterResult.value;
         }
@@ -571,7 +572,7 @@ export async function processInstrumentCSV(
         if (!zodCheck.success) {
           console.error(zodCheck.error.issues);
           const zodIssues = zodCheck.error.issues.map((issue) => {
-            return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}"`;
+            return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}`;
           });
           console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
           return resolve({ message: zodIssues.join(), success: false });
