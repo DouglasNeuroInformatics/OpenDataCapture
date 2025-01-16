@@ -484,14 +484,16 @@ export async function processInstrumentCSV(
     //TODO make this type safe without having to cast z.AnyZodObject
     instrumentSchemaWithInternal = (instrumentSchemaDef.schema as z.AnyZodObject).extend({
       date: z.coerce.date(),
-      subjectID: z.string().regex(/^[^$]+$/, 'Subject ID has to be at least 1 character long and without a $')
+      subjectID: z
+        .string()
+        .regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long, without a $ and no whitespaces')
     });
 
     shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
     instrumentSchemaWithInternal = instrumentSchema.extend({
       date: z.coerce.date(),
-      subjectID: z.string().regex(/^[^$]+$/, 'Subject ID has to be at least 1 character long and without a $')
+      subjectID: z.string().regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long and without a $')
     });
     shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
   }
@@ -526,7 +528,7 @@ export async function processInstrumentCSV(
         const jsonLine: { [key: string]: unknown } = {};
         for (let j = 0; j < headers.length; j++) {
           const key = headers[j]!;
-          const rawValue = elements[j]!;
+          const rawValue = elements[j]!.trim();
 
           if (rawValue === '\n') {
             continue;
