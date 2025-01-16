@@ -1,4 +1,4 @@
-import { isNumberLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
+import { isNumberLike, isObjectLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
@@ -59,6 +59,11 @@ type UploadOperationResult<T> =
 type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
 type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
+
+//check for edge cases since the were using reversed hierachical logic (if object has _def then object is AnyZodObject)
+function isZodObject(value: unknown): value is z.AnyZodObject {
+  return isObjectLike(value) && isZodTypeDef((value as { [key: string]: unknown })._def);
+}
 
 function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
   return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
@@ -423,9 +428,12 @@ function generateSampleData({
 }
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
-  // TODO - type validationSchema as object
   try {
-    const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
+    const instrumentSchema = instrument.validationSchema;
+
+    if (!isZodObject(instrumentSchema)) {
+      throw new Error('Validation schema for this instrument is invalid');
+    }
 
     const instrumentSchemaDef: unknown = instrument.validationSchema._def;
 
@@ -460,12 +468,10 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
       fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
     };
   } catch (e: unknown) {
-    if (e instanceof Error && e.message === 'Unsuccessful input data transfer or undefined data') {
+    if (e instanceof Error && e.message) {
       throw e;
     }
-    if (e instanceof Error && e.message === 'Error in validation schema type') {
-      throw e;
-    }
+
     throw new Error('Error generating Sample CSV template');
   }
 }
@@ -484,8 +490,10 @@ export async function processInstrumentCSV(
     .regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long, without a $ and no whitespaces');
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
-    //TODO make this type safe without having to cast z.AnyZodObject
-    instrumentSchemaWithInternal = (instrumentSchemaDef.schema as z.AnyZodObject).extend({
+    if (!isZodObject(instrumentSchemaDef.schema)) {
+      return { message: 'Invalid instrument schema', success: false };
+    }
+    instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
       date: z.coerce.date(),
       subjectID: $SubjectIdValidation
     });
