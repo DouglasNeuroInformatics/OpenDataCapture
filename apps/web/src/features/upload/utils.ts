@@ -60,7 +60,7 @@ type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
 type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
 
-//check for edge cases since the were using reversed hierachical logic (if object has _def then object is AnyZodObject)
+//check for edge cases since the were using reversed hierachical logic (if object has a _def that AnyZodTypeDef then object is AnyZodObject)
 function isZodObject(value: unknown): value is z.AnyZodObject {
   return isObjectLike(value) && isZodTypeDef((value as { [key: string]: unknown })._def);
 }
