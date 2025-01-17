@@ -136,7 +136,7 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
   return (
     <MonacoEditor
       className="h-full min-h-[576px]"
-      defaultLanguage={fileType satisfies 'css' | 'html' | 'javascript' | 'typescript'}
+      defaultLanguage={fileType satisfies 'css' | 'html' | 'javascript' | 'json' | 'typescript'}
       defaultValue={defaultFile.content}
       keepCurrentModel={true}
       key={defaultFile.id}

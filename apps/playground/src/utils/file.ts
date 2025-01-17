@@ -4,15 +4,16 @@ import { match, P } from 'ts-pattern';
 
 import type { EditorFile } from '@/models/editor-file.model';
 
-export type FileType = 'asset' | 'css' | 'html' | 'javascript' | 'typescript';
+export type FileType = 'asset' | 'css' | 'html' | 'javascript' | 'json' | 'typescript';
 
 export function inferFileType(filename: string): FileType | null {
   return match(extractInputFileExtension(filename))
     .with('.css', () => 'css' as const)
     .with(P.union('.js', '.jsx'), () => 'javascript' as const)
     .with(P.union('.ts', '.tsx'), () => 'typescript' as const)
-    .with(P.union('.jpeg', '.jpg', '.png', '.webp'), () => 'asset' as const)
+    .with(P.union('.jpeg', '.jpg', '.png', '.webp', '.mp4'), () => 'asset' as const)
     .with(P.union('.html', '.svg'), () => 'html' as const)
+    .with('.json', () => 'json' as const)
     .with(null, () => null)
     .exhaustive();
 }
@@ -30,7 +31,7 @@ export function editorFileToInput(file: EditorFile): BundlerInput {
 }
 
 export function isBase64EncodedFileType(filename: string) {
-  return ['.jpeg', '.jpg', '.png', '.webp'].includes(extractInputFileExtension(filename)!);
+  return ['.jpeg', '.jpg', '.mp4', '.png', '.webp'].includes(extractInputFileExtension(filename)!);
 }
 
 export function resolveIndexFile(files: EditorFile[]) {

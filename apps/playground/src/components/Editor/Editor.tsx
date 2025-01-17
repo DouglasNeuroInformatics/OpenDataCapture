@@ -145,12 +145,14 @@ export const Editor = () => {
       />
       <FileUploadDialog
         accept={{
+          'application/json': ['.json'],
           'image/jpeg': ['.jpg', '.jpeg'],
           'image/png': ['.png'],
           'image/webp': ['.webp'],
           'text/css': ['.css'],
           'text/html': ['.html'],
-          'text/plain': ['.js', '.jsx', '.ts', '.tsx']
+          'text/plain': ['.js', '.jsx', '.ts', '.tsx'],
+          'video/mp4': ['.mp4']
         }}
         isOpen={isFileUploadDialogOpen}
         setIsOpen={setIsFileUploadDialogOpen}
