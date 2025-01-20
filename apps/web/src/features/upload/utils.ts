@@ -244,7 +244,7 @@ export function interpretZodValue(
       return { message: `Undecipherable Boolean Type: '${entry}'`, success: false };
     case 'ZodDate': {
       const date = new Date(entry);
-      if (isNaN(date.getTime())) {
+      if (Number.isNaN(date.getTime())) {
         return { message: `Failed to parse date: '${entry}'`, success: false };
       }
       return { success: true, value: date };
