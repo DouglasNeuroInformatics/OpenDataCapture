@@ -42,8 +42,7 @@ export const UploadPage = () => {
       } else {
         addNotification({
           message: t({
-            en: `Error occurred downloading sample template.
-            `,
+            en: `Error occurred downloading sample template.`,
             fr: `Un occurence d'un erreur quand le csv est telecharger. `
           }),
           type: 'error'
