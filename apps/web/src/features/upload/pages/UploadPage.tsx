@@ -30,7 +30,7 @@ export const UploadPage = () => {
     try {
       const { content, fileName } = createUploadTemplateCSV(instrument!);
       void download(fileName, content);
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         addNotification({
           message: t({
