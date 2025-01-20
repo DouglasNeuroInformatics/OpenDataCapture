@@ -415,7 +415,7 @@ function generateSampleData({
           multiString += ';)';
         }
         return multiString;
-      } catch (e: unknown) {
+      } catch (e) {
         if (e instanceof Error && e.message === 'input data is undefined or unsuccessful') {
           throw new Error('Unsuccessful input data transfer or undefined data');
         }
@@ -467,7 +467,7 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
       content: unparse([csvColumns, sampleData]),
       fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
     };
-  } catch (e: unknown) {
+  } catch (e) {
     if (e instanceof Error && e.message) {
       throw e;
     }
