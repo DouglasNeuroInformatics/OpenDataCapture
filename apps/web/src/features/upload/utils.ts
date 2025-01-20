@@ -472,7 +472,9 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
       throw e;
     }
 
-    throw new Error('Error generating Sample CSV template');
+    throw new Error('Error generating Sample CSV template', {
+      cause: e
+    });
   }
 }
 
