@@ -1,4 +1,4 @@
-import { isNumberLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
+import { isNumberLike, isObjectLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
@@ -8,8 +8,6 @@ import { parse, unparse } from 'papaparse';
 import { z } from 'zod';
 
 // TODO - refine ZodTypeNameResult to reflect specific ZodType variants (i.e., object)
-
-// TODO - last thing, convert all errors thrown to result to be handled in the UploadPage component
 
 const ZOD_TYPE_NAMES = [
   'ZodNumber',
@@ -60,6 +58,13 @@ type UploadOperationResult<T> =
 
 type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
+type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
+
+//check for edge cases since the were using reversed hierachical logic (if object has a _def that AnyZodTypeDef then object is AnyZodObject)
+function isZodObject(value: unknown): value is z.AnyZodObject {
+  return isObjectLike(value) && isZodTypeDef((value as { [key: string]: unknown })._def);
+}
+
 function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
   return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
 }
@@ -76,7 +81,7 @@ function isZodSetDef(def: AnyZodTypeDef): def is z.ZodSetDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodSet;
 }
 
-function isZodArrayDef(def: AnyZodTypeDef): def is z.ZodArrayDef {
+function isZodArrayDef(def: AnyZodTypeDef): def is AnyZodArrayDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodArray;
 }
 
@@ -87,8 +92,6 @@ function isZodEffectsDef(def: AnyZodTypeDef): def is z.ZodEffectsDef {
 function isZodObjectDef(def: AnyZodTypeDef): def is z.ZodObjectDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodObject;
 }
-
-// TODO - fix extract set and record array functions to handle whitespace and trailing semicolon (present or included)
 
 function extractSetEntry(entry: string) {
   const result = /SET\(\s*(.*?)\s*\)/.exec(entry);
@@ -196,8 +199,7 @@ export function interpretZodArray(
     );
   }
 
-  // TODO - check zod array inner type is object
-  const shape = (def.type as z.AnyZodObject).shape as { [key: string]: z.ZodTypeAny };
+  const shape = def.type.shape as { [key: string]: z.ZodTypeAny };
 
   for (const [key, insideType] of Object.entries(shape)) {
     const def: unknown = insideType._def;
@@ -239,11 +241,11 @@ export function interpretZodValue(
       } else if (entry.toLowerCase() === 'false') {
         return { success: true, value: false };
       }
-      return { message: `Undecipherable Boolean Type: ${entry}`, success: false };
+      return { message: `Undecipherable Boolean Type: '${entry}'`, success: false };
     case 'ZodDate': {
       const date = new Date(entry);
-      if (isNaN(date.getTime())) {
-        return { message: `Failed to parse date: ${entry}`, success: false };
+      if (Number.isNaN(date.getTime())) {
+        return { message: `Failed to parse date: '${entry}'`, success: false };
       }
       return { success: true, value: date };
     }
@@ -253,17 +255,25 @@ export function interpretZodValue(
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
       }
-      return { message: `Invalid number type: ${entry}`, success: false };
+      return { message: `Invalid number type: '${entry}'`, success: false };
     case 'ZodSet':
-      if (entry.startsWith('SET(')) {
-        const setData = extractSetEntry(entry);
-        const values = setData.split(',').map((s) => s.trim()).filter(Boolean);
-        if (values.length === 0) {
-          return { message: 'Empty set is not allowed', success: false };
+      try {
+        if (entry.startsWith('SET(')) {
+          const setData = extractSetEntry(entry);
+          const values = setData
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+          if (values.length === 0) {
+            return { message: 'Empty set is not allowed', success: false };
+          }
+          return { success: true, value: new Set(values) };
         }
-        return { success: true, value: new Set(values) };
+      } catch {
+        return { message: 'Error occurred interpreting set entry', success: false };
       }
-      return { message: `Invalid ZodSet: ${entry}`, success: false };
+
+      return { message: `Invalid ZodSet: '${entry}'`, success: false };
     case 'ZodString':
       return { success: true, value: entry };
     default:
@@ -277,56 +287,70 @@ export function interpretZodObjectValue(
   zList: ZodTypeNameResult[],
   zKeys: string[]
 ): UploadOperationResult<FormTypes.FieldValue> {
-  if (entry === '' && isOptional) {
-    return { success: true, value: undefined };
-  } else if (!entry.startsWith('RECORD_ARRAY(')) {
-    return { message: `Invalid ZodType`, success: false };
-  }
-
-  const recordArray: { [key: string]: any }[] = [];
-  const recordArrayDataEntry = extractRecordArrayEntry(entry);
-  const recordArrayDataList = recordArrayDataEntry.split(';');
-
-  if (recordArrayDataList.at(-1) === '') {
-    recordArrayDataList.pop();
-  }
-
-  for (const listData of recordArrayDataList) {
-    const recordArrayObject: { [key: string]: any } = {};
-
-    const record = listData.split(',');
-    if (record.some((str) => str === '')) {
-      return { message: `One or more of the record array fields was left empty`, success: false };
+  try {
+    if (entry === '' && isOptional) {
+      return { success: true, value: undefined };
+    } else if (!entry.startsWith('RECORD_ARRAY(')) {
+      return { message: `Invalid ZodType`, success: false };
     }
-    if (!(zList.length === zKeys.length && zList.length === record.length)) {
-      return { message: `Incorrect number of entries for record array`, success: false };
-    }
-    for (let i = 0; i < record.length; i++) {
-      // TODO - make sure this is defined
-      const recordValue = record[i]!.split(':')[1]!.trim();
 
-      const zListResult = zList[i]!;
-      if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
-        return { message: `Failed to interpret field '${i}'`, success: false };
+    const recordArray: { [key: string]: any }[] = [];
+    const recordArrayDataEntry = extractRecordArrayEntry(entry);
+    const recordArrayDataList = recordArrayDataEntry.split(';');
+
+    if (recordArrayDataList.at(-1) === '') {
+      recordArrayDataList.pop();
+    }
+
+    for (const listData of recordArrayDataList) {
+      const recordArrayObject: { [key: string]: any } = {};
+
+      const record = listData.split(',');
+
+      if (!record) {
+        return { message: `Record in the record array was left undefined`, success: false };
       }
-      const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
-        recordValue,
-        zListResult.typeName,
-        zListResult.isOptional
-      );
-      if (!interpretZodValueResult.success) {
-        return {
-          message: `failed to interpret value at entry ${i} in record array row ${listData}`,
-          success: false
-        };
+      if (record.some((str) => str === '')) {
+        return { message: `One or more of the record array fields was left empty`, success: false };
       }
+      if (!(zList.length === zKeys.length && zList.length === record.length)) {
+        return { message: `Incorrect number of entries for record array`, success: false };
+      }
+      for (let i = 0; i < record.length; i++) {
+        if (!record[i]) {
+          return { message: `Failed to interpret field '${i}'`, success: false };
+        }
 
-      recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
+        const recordValue = record[i]!.split(':')[1]!.trim();
+
+        const zListResult = zList[i]!;
+        if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
+          return { message: `Failed to interpret field '${i}'`, success: false };
+        }
+        const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
+          recordValue,
+          zListResult.typeName,
+          zListResult.isOptional
+        );
+        if (!interpretZodValueResult.success) {
+          return {
+            message: `failed to interpret value at entry ${i} in record array row ${listData}`,
+            success: false
+          };
+        }
+
+        recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
+      }
+      recordArray.push(recordArrayObject);
     }
-    recordArray.push(recordArrayObject);
-  }
 
-  return { success: true, value: recordArray };
+    return { success: true, value: recordArray };
+  } catch {
+    return {
+      message: `failed to interpret record array entries`,
+      success: false
+    };
+  }
 }
 
 function formatTypeInfo(s: string, isOptional: boolean) {
@@ -379,7 +403,7 @@ function generateSampleData({
             // eslint-disable-next-line max-depth
             if (!inputData?.success) {
               console.error({ inputData });
-              throw new Error(`TODO - handle this case where input data is undefined or not a success`);
+              throw new Error(`input data is undefined or unsuccessful`);
             }
             // eslint-disable-next-line max-depth
             if (i === multiValues.length - 1 && multiValues[i] !== undefined) {
@@ -390,9 +414,12 @@ function generateSampleData({
           }
           multiString += ';)';
         }
-
         return multiString;
-      } catch {
+      } catch (e) {
+        if (e instanceof Error && e.message === 'input data is undefined or unsuccessful') {
+          throw new Error('Unsuccessful input data transfer or undefined data');
+        }
+
         throw new Error('Invalid Record Array Error');
       }
     default:
@@ -401,41 +428,54 @@ function generateSampleData({
 }
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
-  // TODO - type validationSchema as object
-  const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
+  try {
+    const instrumentSchema = instrument.validationSchema;
 
-  const instrumentSchemaDef: unknown = instrument.validationSchema._def;
-
-  let shape: { [key: string]: z.ZodTypeAny } = {};
-
-  if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
-    const innerSchema: unknown = instrumentSchemaDef.schema._def;
-    if (isZodTypeDef(innerSchema) && isZodObjectDef(innerSchema)) {
-      shape = innerSchema.shape() as { [key: string]: z.ZodTypeAny };
+    if (!isZodObject(instrumentSchema)) {
+      throw new Error('Validation schema for this instrument is invalid');
     }
-  } else {
-    shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
-  }
 
-  const columnNames = Object.keys(shape);
+    const instrumentSchemaDef: unknown = instrument.validationSchema._def;
 
-  const csvColumns = INTERNAL_HEADERS.concat(columnNames);
+    let shape: { [key: string]: z.ZodTypeAny } = {};
 
-  const sampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
-  for (const col of columnNames) {
-    const typeNameResult = getZodTypeName(shape[col]!);
-    if (!typeNameResult.success) {
-      throw new Error(typeNameResult.message);
+    if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
+      const innerSchemaDef: unknown = instrumentSchemaDef.schema._def;
+      if (isZodTypeDef(innerSchemaDef) && isZodObjectDef(innerSchemaDef)) {
+        shape = innerSchemaDef.shape() as { [key: string]: z.ZodTypeAny };
+      }
+    } else {
+      shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
     }
-    sampleData.push(generateSampleData(typeNameResult));
+
+    const columnNames = Object.keys(shape);
+
+    const csvColumns = INTERNAL_HEADERS.concat(columnNames);
+
+    const sampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
+    for (const col of columnNames) {
+      const typeNameResult = getZodTypeName(shape[col]!);
+      if (!typeNameResult.success) {
+        throw new Error(typeNameResult.message);
+      }
+      sampleData.push(generateSampleData(typeNameResult));
+    }
+
+    unparse([csvColumns, sampleData]);
+
+    return {
+      content: unparse([csvColumns, sampleData]),
+      fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
+    };
+  } catch (e) {
+    if (e instanceof Error && e.message) {
+      throw e;
+    }
+
+    throw new Error('Error generating Sample CSV template', {
+      cause: e
+    });
   }
-
-  unparse([csvColumns, sampleData]);
-
-  return {
-    content: unparse([csvColumns, sampleData]),
-    fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
-  };
 }
 
 export async function processInstrumentCSV(
@@ -447,19 +487,24 @@ export async function processInstrumentCSV(
   let instrumentSchemaWithInternal: z.AnyZodObject;
 
   const instrumentSchemaDef: unknown = instrumentSchema._def;
+  const $SubjectIdValidation = z
+    .string()
+    .regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long, without a $ and no whitespaces');
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
-    //TODO make this type safe without having to cast z.AnyZodObject
-    instrumentSchemaWithInternal = (instrumentSchemaDef.schema as z.AnyZodObject).extend({
+    if (!isZodObject(instrumentSchemaDef.schema)) {
+      return { message: 'Invalid instrument schema', success: false };
+    }
+    instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
       date: z.coerce.date(),
-      subjectID: z.string()
+      subjectID: $SubjectIdValidation
     });
 
     shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
   } else {
     instrumentSchemaWithInternal = instrumentSchema.extend({
       date: z.coerce.date(),
-      subjectID: z.string()
+      subjectID: $SubjectIdValidation
     });
     shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
   }
@@ -493,14 +538,17 @@ export async function processInstrumentCSV(
       for (const elements of dataLines) {
         const jsonLine: { [key: string]: unknown } = {};
         for (let j = 0; j < headers.length; j++) {
-          const key = headers[j]!;
-          const rawValue = elements[j]!;
+          const key = headers[j]!.trim();
+          const rawValue = elements[j]!.trim();
 
           if (rawValue === '\n') {
             continue;
           }
           if (shape[key] === undefined) {
-            return resolve({ message: `Schema at '${key}' is not defined!`, success: false });
+            return resolve({
+              message: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+              success: false
+            });
           }
           const typeNameResult = getZodTypeName(shape[key]);
           if (!typeNameResult.success) {
@@ -513,29 +561,34 @@ export async function processInstrumentCSV(
           };
 
           if (typeNameResult.typeName === 'ZodArray' || typeNameResult.typeName === 'ZodObject') {
-            if (typeNameResult.multiKeys && typeNameResult.multiValues)
+            if (typeNameResult.multiKeys && typeNameResult.multiValues) {
               interpreterResult = interpretZodObjectValue(
                 rawValue,
                 typeNameResult.isOptional,
                 typeNameResult.multiValues,
                 typeNameResult.multiKeys
               );
-            // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
+              // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
+              //Dealt with via else statement for now
+            } else {
+              interpreterResult.message = 'Record Array keys do not exist';
+            }
           } else {
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
           }
           if (!interpreterResult.success) {
-            return resolve({ message: interpreterResult.message, success: false });
+            return resolve({ message: `${interpreterResult.message} at column name: '${key}'`, success: false });
           }
           jsonLine[headers[j]!] = interpreterResult.value;
         }
         const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
         if (!zodCheck.success) {
-          //create error message with zodcheck error messsage + zodcheck error path
-          //addNotification({ message: zodCheck.error.issues[0]?.message, type: 'error' });
           console.error(zodCheck.error.issues);
+          const zodIssues = zodCheck.error.issues.map((issue) => {
+            return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}`;
+          });
           console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
-          return resolve({ message: zodCheck.error.message, success: false });
+          return resolve({ message: zodIssues.join(), success: false });
         }
         result.push(zodCheck.data);
       }
