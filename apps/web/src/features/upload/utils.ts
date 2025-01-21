@@ -538,14 +538,17 @@ export async function processInstrumentCSV(
       for (const elements of dataLines) {
         const jsonLine: { [key: string]: unknown } = {};
         for (let j = 0; j < headers.length; j++) {
-          const key = headers[j]!;
+          const key = headers[j]!.trim();
           const rawValue = elements[j]!.trim();
 
           if (rawValue === '\n') {
             continue;
           }
           if (shape[key] === undefined) {
-            return resolve({ message: `Schema at '${key}' is not defined!`, success: false });
+            return resolve({
+              message: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+              success: false
+            });
           }
           const typeNameResult = getZodTypeName(shape[key]);
           if (!typeNameResult.success) {
