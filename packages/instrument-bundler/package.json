@@ -23,10 +23,10 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
-    "es-module-lexer": "^1.5.4",
+    "es-module-lexer": "^1.6.0",
     "esbuild": "catalog:",
     "esbuild-wasm": "catalog:",
-    "glob": "^11.0.0",
+    "glob": "^11.0.1",
     "slashes": "^3.0.12",
     "ts-pattern": "workspace:ts-pattern__5.x@*",
     "type-fest": "workspace:type-fest__4.x@*",

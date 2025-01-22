@@ -28,28 +28,28 @@
     "immer": "^10.1.1",
     "jszip": "^3.10.1",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "lucide-react": "^0.439.0",
+    "lucide-react": "^0.473.0",
     "lz-string": "^1.5.0",
-    "monaco-editor": "^0.51.0",
+    "monaco-editor": "^0.52.2",
     "motion": "^11.15.0",
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.2",
     "react": "workspace:react__18.x@*",
     "react-dom": "workspace:react-dom__18.x@*",
-    "react-dropzone": "^14.2.3",
+    "react-dropzone": "^14.3.5",
     "react-error-boundary": "^4.0.13",
     "stacktrace-parser": "^0.1.10",
     "ts-pattern": "workspace:ts-pattern__5.x@*",
     "zod": "workspace:zod__3.23.x@*",
-    "zod-validation-error": "^3.3.1",
+    "zod-validation-error": "^3.4.0",
     "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
-    "@vitejs/plugin-react-swc": "^3.7.0",
+    "@vitejs/plugin-react-swc": "^3.7.2",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.45",
-    "tailwindcss": "^3.4.10",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
     "type-fest": "workspace:type-fest__4.x@*",
-    "vite": "^5.4.12"
+    "vite": "catalog:"
   }
 }

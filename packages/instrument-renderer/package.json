@@ -17,7 +17,7 @@
     "react": "workspace:react__18.x@*",
     "react-dom": "workspace:react-dom__18.x@*",
     "tailwindcss": "3.x",
-    "vite": "5.x",
+    "vite": "catalog:",
     "zod": "workspace:zod__3.23.x@*"
   },
   "dependencies": {
@@ -33,7 +33,7 @@
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/subject-utils": "workspace:*",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "lucide-react": "^0.439.0",
+    "lucide-react": "^0.473.0",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
@@ -41,8 +41,8 @@
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "autoprefixer": "^10.4.20",
     "esbuild-wasm": "catalog:",
-    "postcss": "^8.4.45",
+    "postcss": "^8.5.1",
     "type-fest": "workspace:type-fest__4.x@*",
-    "vite": "^5.4.12"
+    "vite": "catalog:"
   }
 }

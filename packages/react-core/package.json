@@ -25,14 +25,14 @@
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/runtime-core": "workspace:*",
     "http-status-codes": "^2.3.0",
-    "lucide-react": "^0.439.0",
+    "lucide-react": "^0.473.0",
     "motion": "^11.15.0",
     "serialize-error": "^11.0.3",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.45",
-    "vite": "^5.4.12"
+    "postcss": "^8.5.1",
+    "vite": "catalog:"
   }
 }
