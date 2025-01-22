@@ -6,6 +6,22 @@ import * as esbuild from './vendor/esbuild.js';
 import type { BundleOptions } from './schemas.js';
 import type { BuildOutput } from './types.js';
 
+const GLOBAL_PROXY_SHIM = `
+  const createProxy = (name) => {
+    return new Proxy({ name }, {
+      get(target, property) {
+        throw new Error("Cannot get property '" + property.toString() + "' of object '" + target.name + "' in global scope");
+      },
+      set(target, property) {
+        throw new Error("Cannot set property '" + property.toString() + "' of object '" + target.name + "' in global scope");
+      }
+    });
+  };
+  const document = globalThis.document ?? createProxy('document');
+  const self = globalThis.self ?? createProxy('self');
+  const window = globalThis.window ??  createProxy('window');
+`;
+
 /**
  * Converts the bundle into an an immediately invoked function expression (IIFE) that returns the value of
  * a top-level variable '__exports'. The result is subject to tree shaking and minification.
@@ -19,6 +35,7 @@ export async function createBundle(output: BuildOutput, options: { minify: boole
     inject = `Object.defineProperty(__exports.content, '__injectHead', { value: Object.freeze({ style: "${btoa(output.css)}" }), writable: false });`;
   }
   const bundle = `(async () => {
+    ${GLOBAL_PROXY_SHIM}
     ${output.js}
     ${inject}
     return __exports;
