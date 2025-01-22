@@ -17,7 +17,7 @@
     "react": "workspace:react__18.x@*",
     "react-dom": "workspace:react-dom__18.x@*",
     "tailwindcss": "3.x",
-    "vite": "5.x",
+    "vite": "catalog:",
     "zod": "workspace:zod__3.23.x@*"
   },
   "dependencies": {
@@ -43,6 +43,6 @@
     "esbuild-wasm": "catalog:",
     "postcss": "^8.5.1",
     "type-fest": "workspace:type-fest__4.x@*",
-    "vite": "^5.4.12"
+    "vite": "catalog:"
   }
 }

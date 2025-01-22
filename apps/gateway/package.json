@@ -50,7 +50,7 @@
     "prisma": "catalog:",
     "tailwindcss": "^3.4.17",
     "type-fest": "workspace:type-fest__4.x@*",
-    "vite": "^5.4.12"
+    "vite": "catalog:"
   },
   "trustedDependencies": [
     "prisma",
