@@ -7,11 +7,10 @@ import type { BundleOptions } from './schemas.js';
 import type { BuildOutput } from './types.js';
 
 const GLOBAL_PROXY_SHIM = `
-  let __ODC_BUNDLER_ERROR_CONTEXT;
   const __createProxy = (name) => {
     const formatErrorMessage = (method, propertyName, targetName) => {
-      const contextName = __ODC_BUNDLER_ERROR_CONTEXT ?? 'UNKNOWN'
-      return "Cannot " + method + " property '" + propertyName + "' of object '" + targetName + "' in global scope of context '" + contextName + "'" 
+      const contextName = globalThis.__ODC_BUNDLER_ERROR_CONTEXT ?? 'UNKNOWN'
+      return "Cannot " + method + " property '" + propertyName + "' of object '" + targetName + "' in global scope of file '" + contextName + "'" 
     }
     return new Proxy({ name }, {
       get(target, property) {

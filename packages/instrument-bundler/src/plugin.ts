@@ -47,7 +47,7 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
         let contents: typeof input.content;
         const loader = inferLoader(input.name);
         if (loader === 'js' || loader === 'jsx' || loader === 'ts' || loader == 'tsx') {
-          contents = [`__ODC_BUNDLER_ERROR_CONTEXT = "${input.name}";`, input.content as string].join('\n');
+          contents = [`globalThis.__ODC_BUNDLER_ERROR_CONTEXT = "${input.name}";`, input.content as string].join('\n');
         } else {
           contents = input.content;
         }
