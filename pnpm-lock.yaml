@@ -25,8 +25,8 @@ catalogs:
       specifier: latest
       version: 1.2.0
     '@douglasneuroinformatics/libnest':
-      specifier: latest
-      version: 0.5.0
+      specifier: ^0.5.1
+      version: 0.5.1
     '@douglasneuroinformatics/libpasswd':
       specifier: latest
       version: 0.0.3
@@ -225,7 +225,7 @@ importers:
         version: 1.2.0(typescript@5.6.3)
       '@douglasneuroinformatics/libnest':
         specifier: 'catalog:'
-        version: 0.5.0(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.2)(mongodb@6.12.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.6.3)(zod@vendor+zod@3.23.x)
+        version: 0.5.1(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.2)(mongodb@6.12.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.6.3)(zod@vendor+zod@3.23.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
         version: 0.0.3(typescript@5.6.3)
@@ -1965,9 +1965,9 @@ packages:
     peerDependencies:
       typescript: ^5.5.0
 
-  '@douglasneuroinformatics/libnest@0.5.0':
+  '@douglasneuroinformatics/libnest@0.5.1':
     resolution:
-      { integrity: sha512-8o2PPOTu7zTo4ESeu80Wz09Gxn4I05XntimBlpxP2/jTTw154YPXVrfHVvMyJQGCodT+sRU4MzUK/Mq5EmXrAg== }
+      { integrity: sha512-ZxVDWJJqUGovldla8fs8sI4MQlRbMlIbwup4EKZVoAz1xtloZxzP4ccO8fohZl7tCofdvpx6HQCREQh7K9ANqA== }
     peerDependencies:
       '@nestjs/common': ^10.2.3
       '@nestjs/core': ^10.2.3
@@ -10806,6 +10806,11 @@ packages:
       { integrity: sha512-2G2y++21dhj2R7iHAdd0FIzjGwuKZld+7Pl/bTU6YIkrC2ZMbVUjm+luj6A6V34Rv9XfKJDKpTWu9W4Gse1D9g== }
     engines: { node: '>=14.16' }
 
+  serialize-error@12.0.0:
+    resolution:
+      { integrity: sha512-ZYkZLAvKTKQXWuh5XpBw7CdbSzagarX39WyZ2H07CDLC5/KfsRGlIXV8d4+tfqX1M7916mRqR1QfNHSij+c9Pw== }
+    engines: { node: '>=18' }
+
   serialize-javascript@6.0.2:
     resolution:
       { integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g== }
@@ -11617,14 +11622,14 @@ packages:
       { integrity: sha512-yOGpmOAL7CkKe/91I5O3gPICmJNLJ1G4zFYVAsRHg7M64biSnPtRj0WNQt++bRkjYOqjWXrhnUw1utzmVErAdg== }
     engines: { node: '>=16' }
 
-  type-fest@4.28.0:
-    resolution:
-      { integrity: sha512-jXMwges/FVbFRe5lTMJZVEZCrO9kI9c8k0PA/z7nF3bo0JSCCLysvokFjNPIUK/itEMas10MQM+AiHoHt/T/XA== }
-    engines: { node: '>=16' }
-
   type-fest@4.30.2:
     resolution:
       { integrity: sha512-UJShLPYi1aWqCdq9HycOL/gwsuqda1OISdBO3t8RlXQC4QvtuIz4b5FCfe2dQIWEpmlRExKmcTBfP1r9bhY7ig== }
+    engines: { node: '>=16' }
+
+  type-fest@4.33.0:
+    resolution:
+      { integrity: sha512-s6zVrxuyKbbAsSAD5ZPTB77q4YIdRctkTbJ2/Dqlinwz+8ooH2gd+YA7VA6Pa93KML9GockVvoxjZ2vHP+mu8g== }
     engines: { node: '>=16' }
 
   type-is@1.6.18:
@@ -13065,7 +13070,7 @@ snapshots:
       type-fest: 4.30.2
       typescript: 5.6.3
 
-  '@douglasneuroinformatics/libnest@0.5.0(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.2)(mongodb@6.12.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.6.3)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libnest@0.5.1(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7)(@nestjs/testing@10.4.7(@nestjs/common@10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.7)(@nestjs/platform-express@10.4.7))(@prisma/client@5.22.0(prisma@5.22.0))(express@4.21.2)(mongodb@6.12.0(socks@2.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)(typescript@5.6.3)(zod@vendor+zod@3.23.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 1.2.0(typescript@5.6.3)
       '@nestjs/common': 10.4.7(reflect-metadata@0.1.14)(rxjs@7.8.1)
@@ -13079,7 +13084,8 @@ snapshots:
       mongodb: 6.12.0(socks@2.8.3)
       reflect-metadata: 0.1.14
       rxjs: 7.8.1
-      type-fest: 4.28.0
+      serialize-error: 12.0.0
+      type-fest: 4.30.2
       zod: link:vendor/zod@3.23.x
     transitivePeerDependencies:
       - typescript
@@ -21901,6 +21907,10 @@ snapshots:
     dependencies:
       type-fest: 2.19.0
 
+  serialize-error@12.0.0:
+    dependencies:
+      type-fest: 4.33.0
+
   serialize-javascript@6.0.2:
     dependencies:
       randombytes: 2.1.0
@@ -22671,9 +22681,9 @@ snapshots:
 
   type-fest@4.26.1: {}
 
-  type-fest@4.28.0: {}
-
   type-fest@4.30.2: {}
+
+  type-fest@4.33.0: {}
 
   type-is@1.6.18:
     dependencies:
