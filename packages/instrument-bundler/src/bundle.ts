@@ -7,19 +7,24 @@ import type { BundleOptions } from './schemas.js';
 import type { BuildOutput } from './types.js';
 
 const GLOBAL_PROXY_SHIM = `
-  const createProxy = (name) => {
+  let __ODC_BUNDLER_ERROR_CONTEXT;
+  const __createProxy = (name) => {
+    const formatErrorMessage = (method, propertyName, targetName) => {
+      const contextName = __ODC_BUNDLER_ERROR_CONTEXT ?? 'UNKNOWN'
+      return "Cannot " + method + " property '" + propertyName + "' of object '" + targetName + "' in global scope of context '" + contextName + "'" 
+    }
     return new Proxy({ name }, {
       get(target, property) {
-        throw new Error("Cannot get property '" + property.toString() + "' of object '" + target.name + "' in global scope");
+        throw new Error(formatErrorMessage('get', property.toString(), target.name))
       },
       set(target, property) {
-        throw new Error("Cannot set property '" + property.toString() + "' of object '" + target.name + "' in global scope");
+        throw new Error(formatErrorMessage('set', property.toString(), target.name))
       }
     });
   };
-  const document = globalThis.document ?? createProxy('document');
-  const self = globalThis.self ?? createProxy('self');
-  const window = globalThis.window ??  createProxy('window');
+  const document = globalThis.document ?? __createProxy('document');
+  const self = globalThis.self ?? __createProxy('self');
+  const window = globalThis.window ?? __createProxy('window');
 `;
 
 /**
@@ -43,7 +48,9 @@ export async function createBundle(output: BuildOutput, options: { minify: boole
   const result = await esbuild.transform(bundle, {
     charset: 'ascii',
     format: 'esm',
-    minify: options.minify,
+    minifyIdentifiers: false,
+    minifySyntax: options.minify,
+    minifyWhitespace: options.minify,
     platform: 'browser',
     target: 'es2022',
     treeShaking: true
