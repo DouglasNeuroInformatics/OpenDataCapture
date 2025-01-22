@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 
-import type { ViteUserConfig } from 'astro/config';
+import type { ViteUserConfig } from 'astro';
 
 type PluginOption = NonNullable<ViteUserConfig['plugins']>[number];
 type Plugin = Extract<PluginOption, { name: string }>;
