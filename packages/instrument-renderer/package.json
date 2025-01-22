@@ -33,7 +33,7 @@
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/subject-utils": "workspace:*",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "lucide-react": "^0.439.0",
+    "lucide-react": "^0.473.0",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
@@ -41,7 +41,7 @@
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "autoprefixer": "^10.4.20",
     "esbuild-wasm": "catalog:",
-    "postcss": "^8.4.45",
+    "postcss": "^8.5.1",
     "type-fest": "workspace:type-fest__4.x@*",
     "vite": "^5.4.12"
   }

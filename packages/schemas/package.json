@@ -30,7 +30,7 @@
     "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
-    "@casl/prisma": "^1.4.1",
+    "@casl/prisma": "^1.5.1",
     "@opendatacapture/instrument-stubs": "workspace:*",
     "type-fest": "workspace:type-fest__4.x@*"
   }
