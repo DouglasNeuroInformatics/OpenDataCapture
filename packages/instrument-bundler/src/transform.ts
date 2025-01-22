@@ -18,7 +18,7 @@ function transformImportClause(importClause: ImportClause) {
   return `{ ${names.join(', ')} }`;
 }
 
-export function transformStaticImports(code: string) {
+export function transformImports(code: string) {
   let indexDiff = 0;
   for (const {
     endIndex: _endIndex,

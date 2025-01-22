@@ -1,6 +1,6 @@
 import { build } from './build.js';
 import { preprocess } from './preprocess.js';
-import { transformStaticImports } from './transform.js';
+import { transformImports } from './transform.js';
 import * as esbuild from './vendor/esbuild.js';
 
 import type { BundleOptions } from './schemas.js';
@@ -60,6 +60,6 @@ export async function createBundle(output: BuildOutput, options: { minify: boole
 export async function bundle({ inputs, minify = true }: BundleOptions): Promise<string> {
   preprocess(inputs);
   const result = await build({ inputs });
-  result.js = transformStaticImports(result.js);
+  result.js = transformImports(result.js);
   return createBundle(result, { minify });
 }
