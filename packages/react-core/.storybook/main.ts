@@ -1,10 +1,7 @@
 import type { StorybookConfig } from '@storybook/react-vite';
-
-import path from 'node:path';
-
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
-import vite from 'vite';
+import { mergeConfig } from 'vite';
 
 const config: StorybookConfig = {
   addons: [
@@ -21,16 +18,19 @@ const config: StorybookConfig = {
     options: {}
   },
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
-  viteFinal(config) {
-    return vite.mergeConfig(config, {
+  viteFinal(config: { [key: string]: any }) {
+    return mergeConfig(config, {
+      build: {
+        target: 'es2022'
+      },
       css: {
         postcss: {
           plugins: [autoprefixer(), tailwindcss()]
         }
       },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '..', 'src')
+      optimizeDeps: {
+        esbuildOptions: {
+          target: 'es2022'
         }
       }
     });
