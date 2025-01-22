@@ -1,12 +1,19 @@
 import { build } from './build.js';
 import { preprocess } from './preprocess.js';
-import { transformStaticImports } from './transform.js';
+import { transformImports } from './transform.js';
 import * as esbuild from './vendor/esbuild.js';
 
 import type { BundleOptions } from './schemas.js';
 import type { BuildOutput } from './types.js';
 
-const GLOBAL_PROXY_SHIM = `
+const GLOBALS = `
+  globalThis.__import = async (moduleName) => {
+    try {
+      return import(moduleName);
+    } catch (err) {
+      throw new Error('Failed to import module: ' + moduleName, { cause: err });
+    }
+  };
   const __createProxy = (name) => {
     const formatErrorMessage = (method, propertyName, targetName) => {
       const contextName = globalThis.__ODC_BUNDLER_ERROR_CONTEXT ?? 'UNKNOWN'
@@ -39,7 +46,7 @@ export async function createBundle(output: BuildOutput, options: { minify: boole
     inject = `Object.defineProperty(__exports.content, '__injectHead', { value: Object.freeze({ style: "${btoa(output.css)}" }), writable: false });`;
   }
   const bundle = `(async () => {
-    ${GLOBAL_PROXY_SHIM}
+    ${GLOBALS}
     ${output.js}
     ${inject}
     return __exports;
@@ -60,6 +67,6 @@ export async function createBundle(output: BuildOutput, options: { minify: boole
 export async function bundle({ inputs, minify = true }: BundleOptions): Promise<string> {
   preprocess(inputs);
   const result = await build({ inputs });
-  result.js = transformStaticImports(result.js);
+  result.js = transformImports(result.js);
   return createBundle(result, { minify });
 }
