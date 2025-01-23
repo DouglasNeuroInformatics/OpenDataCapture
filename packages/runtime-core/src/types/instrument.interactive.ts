@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+
 import type { Merge, Promisable } from 'type-fest';
 
-import type { Json, Language } from './core.d.ts';
-import type { InstrumentLanguage, ScalarInstrument } from './instrument.base.d.ts';
+import type { Json, Language } from './core.js';
+import type { InstrumentLanguage, ScalarInstrument } from './instrument.base.js';
 
 /** @public */
 declare namespace InteractiveInstrument {

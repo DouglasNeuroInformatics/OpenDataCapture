@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 import { defineInstrument } from '../define.js';
 
-import type { DiscriminatedInstrument } from '../define.d.ts';
-import type { FormInstrument } from '../types/instrument.form.d.ts';
-import type { InteractiveInstrument } from '../types/instrument.interactive.d.ts';
+import type { DiscriminatedInstrument } from '../define.js';
+import type { FormInstrument } from '../types/instrument.form.js';
+import type { InteractiveInstrument } from '../types/instrument.interactive.js';
 
 expectTypeOf<DiscriminatedInstrument<'FORM', 'en', { foo: string }>>().toMatchTypeOf<
   FormInstrument<{ foo: string }, 'en'>
