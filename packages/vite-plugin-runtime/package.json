@@ -16,7 +16,7 @@
   },
   "peerDependencies": {
     "@opendatacapture/runtime-v1": "workspace:*",
-    "vite": "5.x"
+    "vite": "catalog:"
   },
   "devDependencies": {
     "@douglasneuroinformatics/libjs": "catalog:"

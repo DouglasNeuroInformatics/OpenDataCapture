@@ -18,7 +18,7 @@ function transformImportClause(importClause: ImportClause) {
   return `{ ${names.join(', ')} }`;
 }
 
-export function transformStaticImports(code: string) {
+export function transformImports(code: string) {
   let indexDiff = 0;
   for (const {
     endIndex: _endIndex,
@@ -27,13 +27,16 @@ export function transformStaticImports(code: string) {
     moduleSpecifier,
     startIndex: _startIndex
   } of parseImports(code)) {
-    if (isDynamicImport) {
-      continue;
-    }
     const endIndex = _endIndex + indexDiff;
     const startIndex = _startIndex + indexDiff;
     const source = code.slice(startIndex, endIndex);
-    const replacement = `const ${transformImportClause(importClause!)} = await import(${moduleSpecifier.code})`;
+
+    let replacement: string;
+    if (isDynamicImport) {
+      replacement = source.replace(/^import\(/, '__import(');
+    } else {
+      replacement = `const ${transformImportClause(importClause!)} = await __import(${moduleSpecifier.code})`;
+    }
     indexDiff += replacement.length - source.length;
     code = code.slice(0, startIndex) + replacement + code.slice(endIndex, code.length);
   }

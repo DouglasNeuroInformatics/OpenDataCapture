@@ -11,6 +11,7 @@ const $Config = z.object({
     .optional(),
   dev: z.object({
     isBypassAuthEnabled: $BooleanString.optional(),
+    isForceClearQueryCacheEnabled: $BooleanString.optional(),
     networkLatency: z.coerce.number().int().nonnegative().optional(),
     password: z.string().min(1).optional(),
     username: z.string().min(1).optional()
@@ -38,6 +39,7 @@ export const config = await $Config
         : undefined,
     dev: {
       isBypassAuthEnabled: import.meta.env.VITE_DEV_BYPASS_AUTH,
+      isForceClearQueryCacheEnabled: import.meta.env.VITE_DEV_FORCE_CLEAR_QUERY_CACHE,
       networkLatency: import.meta.env.VITE_DEV_NETWORK_LATENCY,
       password: import.meta.env.VITE_DEV_PASSWORD,
       username: import.meta.env.VITE_DEV_USERNAME

@@ -7,16 +7,17 @@ export const $BasePermissionLevel = z.enum(['ADMIN', 'GROUP_MANAGER', 'STANDARD'
 
 export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
 
-const $AdditionalPermissions = z.array(
-  z.object({
-    action: $AppAction,
-    subject: $AppSubjectName
-  })
-);
+export type UserPermission = z.infer<typeof $UserPermission>;
+export const $UserPermission = z.object({
+  action: $AppAction,
+  subject: $AppSubjectName
+});
+
+export const $AdditionalUserPermissions = z.array($UserPermission);
 
 export type User = z.infer<typeof $User>;
 export const $User = $BaseModel.extend({
-  additionalPermissions: $AdditionalPermissions,
+  additionalPermissions: $AdditionalUserPermissions,
   basePermissionLevel: $BasePermissionLevel.nullable(),
   dateOfBirth: z.coerce.date().nullish(),
   firstName: z.string().min(1),
@@ -44,5 +45,5 @@ export const $CreateUserData = $User
 
 export type UpdateUserData = z.infer<typeof $UpdateUserData>;
 export const $UpdateUserData = $CreateUserData.partial().extend({
-  additionalPermissions: $AdditionalPermissions.optional()
+  additionalPermissions: $AdditionalUserPermissions.optional()
 });

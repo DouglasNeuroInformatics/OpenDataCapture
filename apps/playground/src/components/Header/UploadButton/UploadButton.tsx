@@ -20,36 +20,46 @@ export const UploadButton = () => {
   const instruments = useAppStore((store) => store.instruments);
 
   const handleSubmit = async (files: File[]) => {
-    const zip = new JSZip() as JSZip & { comment?: unknown };
-    await zip.loadAsync(files[0]!);
-    let label: string;
     try {
-      const comment = JSON.parse(String(zip.comment)) as unknown;
-      if (isPlainObject(comment) && typeof comment.label === 'string') {
-        label = comment.label;
-      } else {
+      const zip = new JSZip() as JSZip & { comment?: unknown };
+      await zip.loadAsync(files[0]!);
+      let label: string;
+      try {
+        const comment = JSON.parse(String(zip.comment)) as unknown;
+        if (isPlainObject(comment) && typeof comment.label === 'string') {
+          label = comment.label;
+        } else {
+          label = 'Unlabeled';
+        }
+      } catch {
         label = 'Unlabeled';
       }
-    } catch {
-      label = 'Unlabeled';
+      let suffixNumber = 1;
+      let uniqueLabel = label;
+      while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
+        uniqueLabel = `${label} (${suffixNumber})`;
+        suffixNumber++;
+      }
+      const item: InstrumentRepository = {
+        category: 'Saved',
+        files: await loadEditorFilesFromZip(zip),
+        id: crypto.randomUUID(),
+        kind: null,
+        label: uniqueLabel
+      };
+      addInstrument(item);
+      setSelectedInstrument(item.id);
+      addNotification({ type: 'success' });
+    } catch (err) {
+      console.error(err);
+      addNotification({
+        message: 'Please refer to browser console for details',
+        title: 'Upload Failed',
+        type: 'error'
+      });
+    } finally {
+      setIsDialogOpen(false);
     }
-    let suffixNumber = 1;
-    let uniqueLabel = label;
-    while (instruments.find((instrument) => instrument.label === uniqueLabel)) {
-      uniqueLabel = `${label} (${suffixNumber})`;
-      suffixNumber++;
-    }
-    const item: InstrumentRepository = {
-      category: 'Saved',
-      files: await loadEditorFilesFromZip(zip),
-      id: crypto.randomUUID(),
-      kind: null,
-      label: uniqueLabel
-    };
-    addInstrument(item);
-    setSelectedInstrument(item.id);
-    setIsDialogOpen(false);
-    addNotification({ type: 'success' });
   };
 
   return (

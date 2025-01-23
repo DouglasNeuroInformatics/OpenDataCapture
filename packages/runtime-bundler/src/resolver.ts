@@ -65,7 +65,7 @@ export class Resolver {
       });
     } else if (!isPlainObject(packageJson.exports)) {
       throw ResolverError.forPackage(id, {
-        explanation: `invalid value '${String(packageJson.exports)}' for property 'exports' in file '${packageJsonPath}'`
+        explanation: `invalid value '${JSON.stringify(packageJson.exports)}' for property 'exports' in file '${packageJsonPath}'`
       });
     } else if (Object.keys(packageJson.exports).length === 0) {
       throw ResolverError.forPackage(id, {

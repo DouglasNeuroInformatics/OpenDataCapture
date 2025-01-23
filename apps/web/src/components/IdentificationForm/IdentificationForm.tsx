@@ -20,6 +20,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
   return (
     <Form
       preventResetValuesOnReset
+      suspendWhileSubmitting
       content={[
         {
           title: t('common.identificationMethod'),

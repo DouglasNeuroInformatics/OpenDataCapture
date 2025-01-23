@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 import { Button, type ButtonProps } from '@douglasneuroinformatics/libui/components';
-import { AnimatePresence, motion } from 'framer-motion';
 import { ClipboardCheckIcon, ClipboardListIcon } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { match } from 'ts-pattern';
 
 export const CopyButton: React.FC<{ size?: ButtonProps['size']; text: string; variant?: ButtonProps['variant'] }> = ({

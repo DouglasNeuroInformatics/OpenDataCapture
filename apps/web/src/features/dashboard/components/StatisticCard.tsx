@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { Card } from '@douglasneuroinformatics/libui/components';
-import { motion, useSpring, useTransform } from 'framer-motion';
+import { motion, useSpring, useTransform } from 'motion/react';
 
 type StatisticCardProps = {
   icon?: JSX.Element;

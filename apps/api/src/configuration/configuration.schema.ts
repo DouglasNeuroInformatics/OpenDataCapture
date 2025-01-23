@@ -1,3 +1,4 @@
+import { isNumberLike, parseNumber } from '@douglasneuroinformatics/libjs';
 import { $BooleanString } from '@opendatacapture/schemas/core';
 import { z } from 'zod';
 
@@ -10,17 +11,27 @@ const $OptionalURL = z.preprocess(
     .transform((arg) => (arg ? new URL(arg) : undefined))
 );
 
+const $ParsedNumber = <TSchema extends z.ZodTypeAny>(schema: TSchema) => {
+  return z.preprocess((arg) => {
+    if (!isNumberLike(arg)) {
+      return undefined;
+    }
+    return parseNumber(arg);
+  }, schema);
+};
+
 export const $Configuration = z
   .object({
-    API_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),
-    API_PROD_SERVER_PORT: z.coerce.number().positive().int().default(80),
+    API_DEV_SERVER_PORT: $ParsedNumber(z.number().positive().int().optional()),
+    API_PROD_SERVER_PORT: $ParsedNumber(z.number().positive().int().default(80)),
+    API_RESPONSE_DELAY: $ParsedNumber(z.number().positive().int().optional()),
     DANGEROUSLY_DISABLE_PBKDF2_ITERATION: $BooleanString.default(false),
     DEBUG: $BooleanString,
     GATEWAY_API_KEY: z.string().min(32),
-    GATEWAY_DEV_SERVER_PORT: z.coerce.number().positive().int().optional(),
+    GATEWAY_DEV_SERVER_PORT: $ParsedNumber(z.number().positive().int().optional()),
     GATEWAY_ENABLED: $BooleanString,
     GATEWAY_INTERNAL_NETWORK_URL: $OptionalURL,
-    GATEWAY_REFRESH_INTERVAL: z.coerce.number().positive().int(),
+    GATEWAY_REFRESH_INTERVAL: $ParsedNumber(z.number().positive().int()),
     GATEWAY_SITE_ADDRESS: $OptionalURL,
     MONGO_DIRECT_CONNECTION: z.string().optional(),
     MONGO_REPLICA_SET: z.string().optional(),

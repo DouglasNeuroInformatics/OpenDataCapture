@@ -6,6 +6,9 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Logo } from '@opendatacapture/react-core';
 import { z } from 'zod';
 
+import { useCreateSetupState } from '../../hooks/useCreateSetupState';
+import { SetupLoadingPage } from '../SetupLoadingPage';
+
 type SetupData = {
   dummySubjectCount?: number | undefined;
   enableExperimentalFeatures: boolean;
@@ -21,8 +24,14 @@ export type SetupPageProps = {
   onSubmit: (data: SetupData) => void;
 };
 
-export const SetupPage = ({ onSubmit }: SetupPageProps) => {
+export const SetupPage = () => {
+  const createSetupStateMutation = useCreateSetupState();
   const { t } = useTranslation();
+
+  if (createSetupStateMutation.isPending) {
+    return <SetupLoadingPage />;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center">
       <Card className="w-full grow px-4 sm:m-8 sm:max-w-xl sm:grow-0 md:max-w-2xl">
@@ -145,7 +154,29 @@ export const SetupPage = ({ onSubmit }: SetupPageProps) => {
                   });
                 }
               })}
-            onSubmit={onSubmit}
+            onSubmit={({
+              dummySubjectCount,
+              enableExperimentalFeatures,
+              firstName,
+              initDemo,
+              lastName,
+              password,
+              recordsPerSubject,
+              username
+            }) => {
+              createSetupStateMutation.mutate({
+                admin: {
+                  firstName,
+                  lastName,
+                  password,
+                  username
+                },
+                dummySubjectCount,
+                enableExperimentalFeatures,
+                initDemo,
+                recordsPerSubject
+              });
+            }}
           />
         </Card.Content>
         <Card.Footer className="text-muted-foreground flex justify-between gap-3">

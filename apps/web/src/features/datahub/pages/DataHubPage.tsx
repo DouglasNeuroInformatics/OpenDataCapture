@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { IdentificationForm } from '@/components/IdentificationForm';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
+import { WithFallback } from '@/components/WithFallback';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
 
@@ -42,25 +43,20 @@ export const DataHubPage = () => {
 
   const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
-    switch (option) {
-      case 'CSV':
-        void download('README.txt', () => t('datahub.index.table.exportHelpText'));
-        void download(`${baseFilename}.csv`, async () => {
-          const data = await getExportRecords();
-          return unparse(data);
-        });
-        break;
-      case 'JSON':
-        void download(`${baseFilename}.json`, async () => {
-          const data = await getExportRecords();
-          return JSON.stringify(data, null, 2);
-        });
-        break;
-      case 'Excel':
-        getExportRecords()
-          .then((records) => downloadExcel(`${baseFilename}.xlsx`, records))
-          .catch(console.error);
-    }
+    getExportRecords()
+      .then((data): any => {
+        switch (option) {
+          case 'CSV':
+            void download('README.txt', t('datahub.index.table.exportHelpText'));
+            void download(`${baseFilename}.csv`, unparse(data));
+            break;
+          case 'Excel':
+            return downloadExcel(`${baseFilename}.xlsx`, data);
+          case 'JSON':
+            return download(`${baseFilename}.json`, JSON.stringify(data, null, 2));
+        }
+      })
+      .catch(console.error);
   };
 
   const lookupSubject = async ({ id }: { id: string }) => {
@@ -84,7 +80,7 @@ export const DataHubPage = () => {
         </Heading>
       </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
-        <div>
+        <div className="flex flex-grow flex-col">
           <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
             <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
               <Dialog.Trigger className="flex-grow">
@@ -115,10 +111,13 @@ export const DataHubPage = () => {
               />
             </div>
           </div>
-          <MasterDataTable
-            data={data ?? []}
-            onSelect={(subject) => {
-              navigate(`${subject.id}/assignments`);
+          <WithFallback
+            Component={MasterDataTable}
+            props={{
+              data,
+              onSelect: (subject) => {
+                navigate(`${subject.id}/assignments`);
+              }
             }}
           />
         </div>

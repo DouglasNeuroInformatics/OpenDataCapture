@@ -1,10 +1,9 @@
-import type { StorybookConfig } from '@storybook/react-vite';
-
 import path from 'node:path';
 
+import type { StorybookConfig } from '@storybook/react-vite';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
-import vite from 'vite';
+import { mergeConfig } from 'vite';
 
 const config: StorybookConfig = {
   addons: [
@@ -25,6 +24,11 @@ const config: StorybookConfig = {
       directory: '../src/components',
       files: '**/*.stories.@(js|jsx|ts|tsx)',
       titlePrefix: 'Components'
+    },
+    {
+      directory: '../src/features/admin/components',
+      files: '**/*.stories.@(js|jsx|ts|tsx)',
+      titlePrefix: 'Admin'
     },
     {
       directory: '../src/features/auth/components',
@@ -68,7 +72,7 @@ const config: StorybookConfig = {
     }
   ],
   viteFinal(config) {
-    return vite.mergeConfig(config, {
+    return mergeConfig(config, {
       css: {
         postcss: {
           plugins: [autoprefixer(), tailwindcss()]

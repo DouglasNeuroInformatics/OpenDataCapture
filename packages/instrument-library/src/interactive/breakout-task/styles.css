@@ -8,3 +8,38 @@ canvas {
   display: block;
   margin: 0 auto;
 }
+
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.initial-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.initial-content h3 {
+  font-size: 1.25rem;
+}
+
+.initial-content button {
+  background-color: blue;
+  border: none;
+  border-radius: 0.25rem;
+  color: white;
+  padding: 6px 12px;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.initial-content button:hover {
+  opacity: 60%;
+}

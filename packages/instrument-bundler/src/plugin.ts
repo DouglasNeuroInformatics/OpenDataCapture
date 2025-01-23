@@ -44,10 +44,14 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
             ]
           };
         }
-        return {
-          contents: input.content,
-          loader: inferLoader(input.name)
-        };
+        let contents: typeof input.content;
+        const loader = inferLoader(input.name);
+        if (loader === 'js' || loader === 'jsx' || loader === 'ts' || loader == 'tsx') {
+          contents = [`globalThis.__ODC_BUNDLER_ERROR_CONTEXT = "${input.name}";`, input.content as string].join('\n');
+        } else {
+          contents = input.content;
+        }
+        return { contents, loader };
       });
     }
   };

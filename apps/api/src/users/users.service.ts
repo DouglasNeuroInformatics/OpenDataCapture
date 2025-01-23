@@ -107,9 +107,14 @@ export class UsersService {
     return user;
   }
 
-  async updateById(id: string, data: UpdateUserDto, { ability }: EntityOperationOptions = {}) {
+  async updateById(id: string, { groupIds, ...data }: UpdateUserDto, { ability }: EntityOperationOptions = {}) {
     return this.userModel.update({
-      data,
+      data: {
+        ...data,
+        groups: {
+          connect: groupIds?.map((id) => ({ id }))
+        }
+      },
       where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
     });
   }

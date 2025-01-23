@@ -1,31 +1,50 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
-import { Button, ClientTable, Form, Heading, SearchBar, Sheet } from '@douglasneuroinformatics/libui/components';
+import { Button, ClientTable, Heading, SearchBar, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $UpdateUserData, type User } from '@opendatacapture/schemas/user';
+import type { User } from '@opendatacapture/schemas/user';
 import { Link } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
+import { WithFallback } from '@/components/WithFallback';
 import { useSearch } from '@/hooks/useSearch';
-import { useSetupState } from '@/hooks/useSetupState';
 import { useAppStore } from '@/store';
 
+import { UpdateUserForm, type UpdateUserFormInputData } from '../components/UpdateUserForm';
 import { useDeleteUserMutation } from '../hooks/useDeleteUserMutation';
+import { useGroupsQuery } from '../hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '../hooks/useUpdateUserMutation';
 import { useUsersQuery } from '../hooks/useUsersQuery';
 
 export const ManageUsersPage = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
+  const groupsQuery = useGroupsQuery();
   const usersQuery = useUsersQuery();
   const deleteUserMutation = useDeleteUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
   const { filteredData, searchTerm, setSearchTerm } = useSearch(usersQuery.data ?? [], 'username');
-  const setupStateQuery = useSetupState();
 
-  const currentUserIsSelected = selectedUser?.username === currentUser?.username;
+  const [data, setData] = useState<null | UpdateUserFormInputData>(null);
+
+  useEffect(() => {
+    const groups = groupsQuery.data;
+    if (!selectedUser || !groups) {
+      setData(null);
+    } else {
+      setData({
+        disableDelete: selectedUser?.username === currentUser?.username,
+        groupOptions: Object.fromEntries(groups.map((group) => [group.id, group.name])),
+        initialValues: selectedUser?.additionalPermissions.length
+          ? {
+              additionalPermissions: selectedUser.additionalPermissions
+            }
+          : undefined
+      });
+    }
+  }, [groupsQuery.data, selectedUser]);
 
   return (
     <Sheet open={Boolean(selectedUser)} onOpenChange={() => setSelectedUser(null)}>
@@ -80,8 +99,8 @@ export const ManageUsersPage = () => {
         minRows={15}
         onEntryClick={setSelectedUser}
       />
-      <Sheet.Content>
-        <Sheet.Header>
+      <Sheet.Content className="flex flex-col p-0">
+        <Sheet.Header className="px-6 pt-6">
           <Sheet.Title>{selectedUser?.username}</Sheet.Title>
           <Sheet.Description>
             {t({
@@ -90,124 +109,25 @@ export const ManageUsersPage = () => {
             })}
           </Sheet.Description>
         </Sheet.Header>
-        <Sheet.Body className="grid gap-4">
-          {setupStateQuery.data?.isExperimentalFeaturesEnabled && (
-            <Form
-              additionalButtons={{
-                left: (
-                  <Button
-                    className="w-full"
-                    disabled={currentUserIsSelected}
-                    type="button"
-                    variant="danger"
-                    onClick={() => {
-                      deleteUserMutation.mutate({ id: selectedUser!.id });
-                      setSelectedUser(null);
-                    }}
-                  >
-                    {t('core.delete')}
-                  </Button>
-                )
-              }}
-              content={{
-                additionalPermissions: {
-                  fieldset: {
-                    action: {
-                      kind: 'string',
-                      label: t({
-                        en: 'Action',
-                        fr: 'Action'
-                      }),
-                      options: {
-                        create: t({
-                          en: 'Create',
-                          fr: 'Créer'
-                        }),
-                        delete: t({
-                          en: 'Delete',
-                          fr: 'Effacer'
-                        }),
-                        manage: t({
-                          en: 'Manage (All)',
-                          fr: 'Gérer (Tout)'
-                        }),
-                        read: t({
-                          en: 'Read',
-                          fr: 'Lire'
-                        }),
-                        update: t({
-                          en: 'Update',
-                          fr: 'Mettre à jour'
-                        })
-                      },
-                      variant: 'select'
-                    },
-                    subject: {
-                      kind: 'string',
-                      label: t({
-                        en: 'Resource',
-                        fr: 'Resource'
-                      }),
-                      options: {
-                        all: t({
-                          en: 'All',
-                          fr: 'Tous'
-                        }),
-                        Assignment: t({
-                          en: 'Assignment',
-                          fr: 'Devoir'
-                        }),
-                        Group: t({
-                          en: 'Group',
-                          fr: 'Groupe'
-                        }),
-                        Instrument: t({
-                          en: 'Instrument',
-                          fr: 'Instrument'
-                        }),
-                        InstrumentRecord: t({
-                          en: 'Instrument Record',
-                          fr: "Enregistrement de l'instrument"
-                        }),
-                        Session: t({
-                          en: 'Session',
-                          fr: 'Session'
-                        }),
-                        Subject: t({
-                          en: 'Subject',
-                          fr: 'Client'
-                        }),
-                        User: t({
-                          en: 'User',
-                          fr: 'Utilisateur'
-                        })
-                      },
-                      variant: 'select'
-                    }
-                  },
-                  kind: 'record-array',
-                  label: t({
-                    en: 'Permission',
-                    fr: 'Autorisations supplémentaires'
-                  })
-                }
-              }}
-              initialValues={
-                selectedUser?.additionalPermissions.length
-                  ? {
-                      additionalPermissions: selectedUser.additionalPermissions
-                    }
-                  : undefined
+        <Sheet.Body className="flex-grow overflow-y-scroll px-6 pb-6">
+          <WithFallback
+            Component={UpdateUserForm}
+            minDelay={1000}
+            props={{
+              data,
+              onDelete: () => {
+                deleteUserMutation.mutate({ id: selectedUser!.id });
+                setSelectedUser(null);
+              },
+              onSubmit: ({ groupIds, ...data }) => {
+                void updateUserMutation
+                  .mutateAsync({ data: { groupIds: Array.from(groupIds), ...data }, id: selectedUser!.id })
+                  .then(() => {
+                    setSelectedUser(null);
+                  });
               }
-              submitBtnLabel={t('core.save')}
-              validationSchema={$UpdateUserData.pick({ additionalPermissions: true }).required()}
-              onSubmit={(data) => {
-                void updateUserMutation.mutateAsync({ data, id: selectedUser!.id }).then(() => {
-                  setSelectedUser(null);
-                });
-              }}
-            />
-          )}
+            }}
+          />
         </Sheet.Body>
       </Sheet.Content>
     </Sheet>

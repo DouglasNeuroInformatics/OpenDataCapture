@@ -15,18 +15,23 @@ export const StartSessionPage = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentSession = useAppStore((store) => store.currentSession);
   const startSession = useAppStore((store) => store.startSession);
-  const [key, setKey] = useState(0);
   const location = useLocation() as Location<{
     initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   } | null>;
+  const defaultInitialValues = {
+    sessionType: 'IN_PERSON',
+    subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'CUSTOM_ID'
+  } as const;
+  const [initialValues, setInitialValues] = useState<FormTypes.PartialNullableData<StartSessionFormData>>(
+    location.state?.initialValues ?? defaultInitialValues
+  );
 
   const { t } = useTranslation('session');
   const createSessionMutation = useCreateSession();
 
-  // this is to force reset the form when the session changes, if on the same page
   useEffect(() => {
     if (currentSession === null) {
-      setKey(key + 1);
+      setInitialValues(defaultInitialValues);
     }
   }, [currentSession]);
 
@@ -39,17 +44,11 @@ export const StartSessionPage = () => {
       </PageHeader>
       <StartSessionForm
         currentGroup={currentGroup}
-        initialValues={
-          location.state?.initialValues ?? {
-            sessionType: 'IN_PERSON',
-            subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'CUSTOM_ID'
-          }
-        }
-        key={key}
-        readOnly={currentSession !== null}
-        onSubmit={async (data) => {
-          const session = await createSessionMutation.mutateAsync(data);
-          startSession(session);
+        initialValues={initialValues}
+        readOnly={currentSession !== null || createSessionMutation.isPending}
+        onSubmit={async (formData) => {
+          const session = await createSessionMutation.mutateAsync(formData);
+          startSession({ ...session, type: formData.type });
         }}
       />
     </React.Fragment>

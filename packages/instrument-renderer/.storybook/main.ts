@@ -1,8 +1,8 @@
+import { runtime } from '@opendatacapture/vite-plugin-runtime';
+import type { StorybookConfig } from '@storybook/react-vite';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { mergeConfig } from 'vite';
-
-import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
   addons: [
@@ -19,7 +19,7 @@ const config: StorybookConfig = {
     options: {}
   },
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
-  viteFinal(config: { [key: string]: any }) {
+  viteFinal(config) {
     return mergeConfig(config, {
       build: {
         target: 'es2022'
@@ -33,7 +33,8 @@ const config: StorybookConfig = {
         esbuildOptions: {
           target: 'es2022'
         }
-      }
+      },
+      plugins: [runtime()]
     });
   }
 };

@@ -1,4 +1,4 @@
-FROM node:iron-alpine AS base
+FROM node:iron AS base
 ARG RELEASE_VERSION
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
