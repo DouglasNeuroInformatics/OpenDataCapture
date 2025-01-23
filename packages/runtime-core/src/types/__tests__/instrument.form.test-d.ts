@@ -1,9 +1,9 @@
 import type FormTypes from '@douglasneuroinformatics/libui-form-types';
 import { expectTypeOf } from 'expect-type';
 
-import type { Language } from '../core.d.ts';
-import type { InstrumentLanguage } from '../instrument.base.d.ts';
-import type { FormInstrument } from '../instrument.form.d.ts';
+import type { Language } from '../core.js';
+import type { InstrumentLanguage } from '../instrument.base.js';
+import type { FormInstrument } from '../instrument.form.js';
 
 /** FormInstrument.ScalarField */
 {

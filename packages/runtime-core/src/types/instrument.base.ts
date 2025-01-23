@@ -2,7 +2,7 @@ import type { LicenseIdentifier } from '@opendatacapture/licenses';
 import type { ConditionalKeys, Merge, SetRequired } from 'type-fest';
 import type { z } from 'zod';
 
-import type { Language } from './core.d.ts';
+import type { Language } from './core.js';
 
 /**
  * The kind of an instrument. This serves as the discriminator key.
@@ -207,7 +207,7 @@ type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage = Instru
   }
 >;
 
-export {
+export type {
   BaseInstrument,
   BaseInstrumentMeasure,
   ClientInstrumentDetails,

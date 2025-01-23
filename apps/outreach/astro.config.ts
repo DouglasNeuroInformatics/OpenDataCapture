@@ -62,7 +62,7 @@ export default defineConfig({
       },
       plugins: [
         starlightTypeDocPlugin({
-          entryPoints: [path.resolve(runtimeCoreRoot, 'src/index.d.ts')],
+          entryPoints: [path.resolve(runtimeCoreRoot, 'lib/index.d.ts')],
           locale: 'en',
           output: 'runtime-core-docs',
           sidebar: {

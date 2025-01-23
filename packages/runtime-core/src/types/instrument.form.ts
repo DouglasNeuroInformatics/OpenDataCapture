@@ -1,13 +1,15 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+
 import type FormTypes from '@douglasneuroinformatics/libui-form-types';
 import type { PartialDeep, Simplify } from 'type-fest';
 
-import type { Language } from './core.d.ts';
+import type { Language } from './core.js';
 import type {
   InstrumentLanguage,
   InstrumentMeasures,
   InstrumentUIOption,
   ScalarInstrument
-} from './instrument.base.d.ts';
+} from './instrument.base.js';
 
 /** @public */
 declare namespace FormInstrument {
