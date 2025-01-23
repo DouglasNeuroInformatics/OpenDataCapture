@@ -8,7 +8,7 @@ RUN corepack enable
 RUN pnpm install -g turbo@latest
 
 # PRUNE WORKSPACE
-# Note: Here we cannot use --docker, as is recomended, since the generated
+# Note: Here we cannot use --docker, as is recommended, since the generated
 # json directory does not allow linking package.json executable files
 FROM base AS builder
 COPY . .

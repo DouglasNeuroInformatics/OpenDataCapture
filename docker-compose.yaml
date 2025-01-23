@@ -111,15 +111,14 @@ services:
       - '' #load by default without having to specify docker compose --profile
       - fullstack
   playground:
-    image: caddy:2.7-alpine
     build:
       context: .
       dockerfile: ./apps/playground/Dockerfile
     environment:
       - NODE_ENV=production
-      - PLAYGROUND_URL=http://localhost:3000
     ports:
-      - "3000:3000"
+      - '3750:80'
     restart: unless-stopped
     profiles:
       - fullstack
+      - playground
