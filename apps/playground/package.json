@@ -5,12 +5,12 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc && env-cmd -f ../../.env pnpm exec vite build",
+    "build": "tsc && pnpm exec vite build",
     "deploy": "rsync -r dist/* unrjos@cloud1.douglasneuroinformatics.ca:/home/unrjos/www/playground.opendatacapture.org",
-    "dev": "NODE_ENV=development env-cmd -f ../../.env pnpm exec vite",
+    "dev": "NODE_ENV=development pnpm exec vite",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "storybook": "env-cmd -f ../../.env storybook dev -p 6006"
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "@douglasneuroinformatics/libcrypto": "catalog:",
