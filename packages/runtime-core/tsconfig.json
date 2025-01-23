@@ -1,10 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "incremental": false,
+    "checkJs": false,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "Node16",
     "moduleResolution": "Node16"
   },
-  "include": ["src/**/*"]
+  "include": ["lib/**/*", "src/**/*"]
 }
