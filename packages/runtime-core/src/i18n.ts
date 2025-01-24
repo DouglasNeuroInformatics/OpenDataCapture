@@ -1,10 +1,12 @@
 import { get } from 'lodash-es';
 
-import type { Language } from './types/core.d.ts';
+import type { Language } from './types/core.js';
 
-type LanguageChangeHandler = (this: void, language: Language) => void;
+/** @alpha */
+export type LanguageChangeHandler = (this: void, language: Language) => void;
 
-type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> = Key extends string
+/** @alpha */
+export type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> = Key extends string
   ? T[Key] extends { [key: string]: unknown }
     ? T[Key] extends { [K in Language]: string }
       ? Key
@@ -12,13 +14,16 @@ type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> = Key e
     : `${Key}`
   : never;
 
-type I18N<T extends { [key: string]: unknown }> = {
+/** @alpha */
+export type I18N<T extends { [key: string]: unknown }> = {
+  changeLanguage: (language: Language) => void;
   readonly resolvedLanguage: Language;
   set onLanguageChange(value: LanguageChangeHandler);
   readonly t: (key: TranslationKey<T>) => string;
 };
 
-export function createInstance<const T extends { [key: string]: unknown }>({
+/** @alpha */
+export function createI18Next<const T extends { [key: string]: unknown }>({
   fallbackLanguage = 'en',
   translations
 }: {
@@ -28,8 +33,12 @@ export function createInstance<const T extends { [key: string]: unknown }>({
   let resolvedLanguage: Language;
   let handleLanguageChange: LanguageChangeHandler | null = null;
 
+  if (!window) {
+    throw new Error('Window is not defined');
+  }
+
   const documentElement = window.top!.document.documentElement;
-  const extractLanguageProperty = (element: HTMLElement): Language => {
+  const extractLanguageProperty = (element: HTMLElement) => {
     if (element.lang === 'en' || element.lang === 'fr') {
       return element.lang;
     }
@@ -51,16 +60,21 @@ export function createInstance<const T extends { [key: string]: unknown }>({
   languageAttributeObserver.observe(documentElement, { attributes: true });
 
   return {
+    changeLanguage: (language) => {
+      window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
+    },
     set onLanguageChange(handler: LanguageChangeHandler) {
       handleLanguageChange = handler;
     },
-    resolvedLanguage,
+    get resolvedLanguage() {
+      return resolvedLanguage;
+    },
     t: (key) => {
-      const value = get(translations, key) as { [K in Language]?: string } | string;
+      const value = get(translations, key) as { [key: string]: string } | string | undefined;
       if (typeof value === 'string') {
         return value;
       }
-      return value[resolvedLanguage] ?? value[fallbackLanguage] ?? key;
+      return value?.[resolvedLanguage] ?? value?.[fallbackLanguage] ?? key;
     }
   };
 }
