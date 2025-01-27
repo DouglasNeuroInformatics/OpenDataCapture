@@ -130,12 +130,7 @@ export const UploadPage = () => {
                 })}
               </Button>
               <a href="https://opendatacapture.org/en/docs/guides/how-to-upload-data/" rel="noreferrer" target="_blank">
-                <Button
-                  className="gap-1"
-                  disabled={!instrument}
-                  formAction={'https://opendatacapture.org/en/docs/guides/how-to-upload-data/'}
-                  variant={'primary'}
-                >
+                <Button className="gap-1" disabled={!instrument} variant={'primary'}>
                   <BadgeHelpIcon />
                   {t({
                     en: 'Help',
