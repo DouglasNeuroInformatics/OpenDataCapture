@@ -15,6 +15,7 @@ services:
     profiles:
       - '' #load by default without having to specify docker compose --profile
       - gateway
+      - fullstack
   api:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-api:${RELEASE_CHANNEL}
     build:
@@ -46,6 +47,7 @@ services:
       - 80
     profiles:
       - '' #load by default without having to specify docker compose --profile
+      - fullstack
   gateway:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway:${RELEASE_CHANNEL}
     build:
@@ -60,6 +62,7 @@ services:
     profiles:
       - '' #load by default without having to specify docker compose --profile
       - gateway
+      - fullstack
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -86,6 +89,7 @@ services:
       - 80
     profiles:
       - '' #load by default without having to specify docker compose --profile
+      - fullstack
     restart: unless-stopped
   mongo:
     image: mongo:${MONGODB_VERSION}
@@ -105,3 +109,16 @@ services:
       - ./mongo/data:/data/db
     profiles:
       - '' #load by default without having to specify docker compose --profile
+      - fullstack
+  playground:
+    build:
+      context: .
+      dockerfile: ./apps/playground/Dockerfile
+    environment:
+      - NODE_ENV=production
+    ports:
+      - '3750:80'
+    restart: unless-stopped
+    profiles:
+      - fullstack
+      - playground
