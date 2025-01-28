@@ -129,15 +129,20 @@ export const UploadPage = () => {
                   fr: 'Télécharger le modèle'
                 })}
               </Button>
-              <a href="https://opendatacapture.org/en/docs/guides/how-to-upload-data/" rel="noreferrer" target="_blank">
-                <Button className="gap-1" disabled={!instrument} variant={'primary'}>
-                  <BadgeHelpIcon />
-                  {t({
-                    en: 'Help',
-                    fr: 'Aide'
-                  })}
-                </Button>
-              </a>
+              <Button
+                className="gap-1"
+                disabled={!instrument}
+                variant={'primary'}
+                onClick={() => {
+                  window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/');
+                }}
+              >
+                <BadgeHelpIcon />
+                {t({
+                  en: 'Help',
+                  fr: 'Aide'
+                })}
+              </Button>
             </div>
           </div>
         </div>
