@@ -4,7 +4,7 @@ import { Button, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics
 import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
-import { DownloadIcon } from 'lucide-react';
+import { BadgeHelpIcon, DownloadIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -121,13 +121,29 @@ export const UploadPage = () => {
             <Button disabled={!(file && instrument)} variant={'primary'} onClick={handleInstrumentCSV}>
               {t('core.submit')}
             </Button>
-            <Button className="gap-1.5" disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
-              <DownloadIcon />
-              {t({
-                en: 'Download Template',
-                fr: 'Télécharger le modèle'
-              })}
-            </Button>
+            <div className="flex justify-between space-x-1">
+              <Button className="gap-1" disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
+                <DownloadIcon />
+                {t({
+                  en: 'Download Template',
+                  fr: 'Télécharger le modèle'
+                })}
+              </Button>
+              <Button
+                className="gap-1"
+                disabled={!instrument}
+                variant={'primary'}
+                onClick={() => {
+                  window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/');
+                }}
+              >
+                <BadgeHelpIcon />
+                {t({
+                  en: 'Help',
+                  fr: 'Aide'
+                })}
+              </Button>
+            </div>
           </div>
         </div>
       ) : (
