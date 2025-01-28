@@ -12,9 +12,9 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "rm -rf dist && pnpm build:js && pnpm build:ts",
-    "build:js": "pnpm exec esbuild --bundle --format=esm --outfile=dist/index.js --platform=browser src/index.js",
-    "build:ts": "api-extractor run -c config/api-extractor.json",
+    "build": "rm -rf dist lib && pnpm build:lib && pnpm build:dist",
+    "build:dist": "pnpm exec esbuild --bundle --format=esm --outfile=dist/index.js --platform=browser lib/index.js && api-extractor run -c config/api-extractor.json",
+    "build:lib": "tsc -b tsconfig.build.json",
     "format": "prettier --write src",
     "lint": "tsc --noEmit && eslint --fix src"
   },

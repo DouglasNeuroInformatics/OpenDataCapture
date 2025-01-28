@@ -1,16 +1,12 @@
-import type { Language } from './core.d.ts';
-import type { InstrumentKind } from './instrument.base.d.ts';
-import type {
-  AnyMultilingualFormInstrument,
-  AnyUnilingualFormInstrument,
-  FormInstrument
-} from './instrument.form.d.ts';
+import type { Language } from './core.js';
+import type { InstrumentKind } from './instrument.base.js';
+import type { AnyMultilingualFormInstrument, AnyUnilingualFormInstrument, FormInstrument } from './instrument.form.js';
 import type {
   AnyMultilingualInteractiveInstrument,
   AnyUnilingualInteractiveInstrument,
   InteractiveInstrument
-} from './instrument.interactive.d.ts';
-import type { SeriesInstrument } from './instrument.series.d.ts';
+} from './instrument.interactive.js';
+import type { SeriesInstrument } from './instrument.series.js';
 
 /** @internal */
 type AnyScalarInstrument = FormInstrument | InteractiveInstrument;

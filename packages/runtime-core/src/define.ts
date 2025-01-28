@@ -1,12 +1,12 @@
 import type { z } from 'zod';
 
-import type { InstrumentKind, InstrumentLanguage } from './types/instrument.base.d.ts';
-import type { FormInstrument } from './types/instrument.form.d.ts';
-import type { InteractiveInstrument } from './types/instrument.interactive.d.ts';
+import type { InstrumentKind, InstrumentLanguage } from './types/instrument.base.js';
+import type { FormInstrument } from './types/instrument.form.js';
+import type { InteractiveInstrument } from './types/instrument.interactive.js';
 
 /** @public */
 // prettier-ignore
-type DiscriminatedInstrument<
+export type DiscriminatedInstrument<
   TKind extends InstrumentKind,
   TLanguage extends InstrumentLanguage,
   TData
@@ -21,7 +21,7 @@ type DiscriminatedInstrument<
     : never;
 
 /** @public */
-type InstrumentDef<
+export type InstrumentDef<
   TKind extends InstrumentKind,
   TLanguage extends InstrumentLanguage,
   TSchema extends z.ZodTypeAny
@@ -35,8 +35,12 @@ type InstrumentDef<
 };
 
 /** @public */
-export declare function defineInstrument<
+export function defineInstrument<
   TKind extends InstrumentKind,
   TLanguage extends InstrumentLanguage,
   TSchema extends z.ZodTypeAny
->(def: InstrumentDef<TKind, TLanguage, TSchema>): DiscriminatedInstrument<TKind, TLanguage, z.TypeOf<TSchema>>;
+>(def: InstrumentDef<TKind, TLanguage, TSchema>) {
+  return Object.assign(def, {
+    __runtimeVersion: 1
+  }) as unknown as DiscriminatedInstrument<TKind, TLanguage, z.TypeOf<TSchema>>;
+}

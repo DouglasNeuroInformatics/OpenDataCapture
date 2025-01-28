@@ -534,7 +534,7 @@ export async function processInstrumentCSV(
       if (!headers?.length) {
         return resolve({ message: 'headers is undefined or empty array', success: false });
       }
-
+      let rowNumber = 1;
       for (const elements of dataLines) {
         const jsonLine: { [key: string]: unknown } = {};
         for (let j = 0; j < headers.length; j++) {
@@ -577,7 +577,10 @@ export async function processInstrumentCSV(
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
           }
           if (!interpreterResult.success) {
-            return resolve({ message: `${interpreterResult.message} at column name: '${key}'`, success: false });
+            return resolve({
+              message: `${interpreterResult.message} at column name: '${key}' and row number ${rowNumber}`,
+              success: false
+            });
           }
           jsonLine[headers[j]!] = interpreterResult.value;
         }
@@ -591,6 +594,7 @@ export async function processInstrumentCSV(
           return resolve({ message: zodIssues.join(), success: false });
         }
         result.push(zodCheck.data);
+        rowNumber++;
       }
       resolve({ success: true, value: result });
     };

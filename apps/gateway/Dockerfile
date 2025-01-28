@@ -1,4 +1,4 @@
-FROM node:iron AS base
+FROM node:lts-jod AS base
 WORKDIR /app
 ARG RELEASE_VERSION
 ENV GATEWAY_DATABASE_URL=file:/app/sqlite/gateway.db
