@@ -67,10 +67,12 @@ export class InstrumentRecordsService {
 
     const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
     if (!parseResult.success) {
-      console.error(parseResult.error.issues);
-      throw new UnprocessableEntityException(
-        `Data received for record does not pass validation schema of instrument '${instrument.id}'`
-      );
+      throw new UnprocessableEntityException({
+        error: 'Unprocessable Entity',
+        issues: parseResult.error.issues,
+        message: `Data received for record does not pass validation schema of instrument '${instrument.id}'`,
+        statusCode: 422
+      });
     }
 
     return this.instrumentRecordModel.create({
