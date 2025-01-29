@@ -13,7 +13,7 @@ const textFiles: { [key: string]: string } = import.meta.glob('./**/*.{css,js,js
   query: '?raw'
 });
 
-const binaryFiles: { [key: string]: string } = import.meta.glob('./**/*.{jpg,jpeg,png,webp,mp4}', {
+const binaryFiles: { [key: string]: string } = import.meta.glob('./**/*.{jpg,jpeg,png,webp,mp4,mp3}', {
   eager: true,
   import: 'default',
   query: '?url'
