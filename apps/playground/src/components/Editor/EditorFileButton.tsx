@@ -33,6 +33,7 @@ export const EditorFileButton = ({ filename, isActive, onDelete }: EditorFileBut
     if (filename !== displayFilename) {
       rename();
     }
+    setIsRenaming(false);
   });
 
   useEffect(() => {

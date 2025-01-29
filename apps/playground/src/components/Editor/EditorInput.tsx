@@ -9,7 +9,7 @@ export const EditorInput = React.forwardRef<
   return (
     <input
       className={cn(
-        'focus:ring-ring focus-visible:ring-ring -my-1 h-full w-full cursor-pointer truncate bg-inherit p-1 transition-colors read-only:focus:ring-0 focus-visible:outline-none focus-visible:ring-1 read-only:focus-visible:ring-0',
+        'focus:ring-ring focus-visible:ring-ring -my-1 h-full w-full cursor-pointer truncate bg-inherit p-1 ring-1 transition-colors read-only:pointer-events-none read-only:ring-0',
         className
       )}
       ref={ref}
