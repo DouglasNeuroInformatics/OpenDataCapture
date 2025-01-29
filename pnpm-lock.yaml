@@ -92,6 +92,7 @@ catalogs:
       version: 5.4.14
 
 overrides:
+  framer-motion: 11.15.0
   typescript: 5.6.x
 
 importers:
@@ -7584,9 +7585,9 @@ packages:
     resolution:
       { integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew== }
 
-  framer-motion@11.18.2:
+  framer-motion@11.15.0:
     resolution:
-      { integrity: sha512-5F5Och7wrvtLVElIpclDT0CBzMVg3dL22B64aZwHtsIY8RB4mXICLrkajK4G9R+ieSAGcgrLeae2SeUTg2pr6w== }
+      { integrity: sha512-MLk8IvZntxOMg7lDBLw2qgTHHv664bYoYmnFTmE0Gm/FW67aOJk0WM3ctMcG+Xhcv+vh5uyyXwxvxhSeJzSe+w== }
     peerDependencies:
       '@emotion/is-prop-valid': '*'
       react: ^18.0.0 || ^19.0.0
@@ -18560,7 +18561,7 @@ snapshots:
 
   fraction.js@4.3.7: {}
 
-  framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  framer-motion@11.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       motion-dom: 11.18.1
       motion-utils: 11.18.1
@@ -18569,7 +18570,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  framer-motion@11.18.2(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x):
+  framer-motion@11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x):
     dependencies:
       motion-dom: 11.18.1
       motion-utils: 11.18.1
@@ -20376,7 +20377,7 @@ snapshots:
 
   motion@11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x):
     dependencies:
-      framer-motion: 11.18.2(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
+      framer-motion: 11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       tslib: 2.8.1
     optionalDependencies:
       react: link:vendor/react@18.x
@@ -20384,7 +20385,7 @@ snapshots:
 
   motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      framer-motion: 11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      framer-motion: 11.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tslib: 2.8.1
     optionalDependencies:
       react: 18.3.1
@@ -20392,7 +20393,7 @@ snapshots:
 
   motion@11.18.2(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x):
     dependencies:
-      framer-motion: 11.18.2(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
+      framer-motion: 11.15.0(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)
       tslib: 2.8.1
     optionalDependencies:
       react: link:vendor/react@18.x
