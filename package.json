@@ -88,8 +88,14 @@
   },
   "pnpm": {
     "overrides": {
+      "@mdx-js/react>@types/react": "18.x",
       "framer-motion": "11.15.0",
       "typescript": "5.6.x"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@mdx-js/react>@types/react": "18.x"
+      }
     }
   }
 }
