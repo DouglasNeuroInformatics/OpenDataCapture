@@ -31,7 +31,7 @@
     "lucide-react": "^0.473.0",
     "lz-string": "^1.5.0",
     "monaco-editor": "^0.52.2",
-    "motion": "^11.15.0",
+    "motion": "catalog:",
     "prettier": "^3.4.2",
     "react": "workspace:react__18.x@*",
     "react-dom": "workspace:react-dom__18.x@*",
