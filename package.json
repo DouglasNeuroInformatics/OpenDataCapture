@@ -85,5 +85,10 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "5.6.x"
+    }
   }
 }
