@@ -26,5 +26,11 @@ export default config(
       'vitest.config.ts',
       'vitest.workspace.ts'
     ]
+  },
+  {
+    files: ['**/*.tsx'],
+    rules: {
+      'jsx-a11y/media-has-caption': 'off'
+    }
   }
 );

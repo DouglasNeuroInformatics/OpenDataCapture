@@ -2,10 +2,21 @@ import { get } from 'lodash-es';
 
 import type { Language } from './types/core.js';
 
-/** @alpha */
-export type LanguageChangeHandler = (this: void, language: Language) => void;
+function InitializedOnly<T extends Translator, TArgs extends any[], TReturn>(
+  target: (this: T, ...args: TArgs) => TReturn,
+  context: ClassGetterDecoratorContext<T> | ClassMethodDecoratorContext<T> | ClassSetterDecoratorContext<T>
+) {
+  const name = context.name.toString();
+  function replacementMethod(this: T, ...args: TArgs): TReturn {
+    if (!this.isInitialized) {
+      throw new Error(`Cannot access ${context.kind} '${name}' of Translator before initialization in browser`);
+    }
+    return target.call(this, ...args);
+  }
+  return replacementMethod;
+}
 
-/** @alpha */
+/** @public */
 export type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> = Key extends string
   ? T[Key] extends { [key: string]: unknown }
     ? T[Key] extends { [K in Language]: string }
@@ -14,67 +25,82 @@ export type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> 
     : `${Key}`
   : never;
 
-/** @alpha */
-export type I18N<T extends { [key: string]: unknown }> = {
-  changeLanguage: (language: Language) => void;
-  readonly resolvedLanguage: Language;
-  set onLanguageChange(value: LanguageChangeHandler);
-  readonly t: (key: TranslationKey<T>) => string;
-};
+/** @public */
+export type LanguageChangeHandler = (this: void, language: Language) => void;
 
-/** @alpha */
-export function createI18Next<const T extends { [key: string]: unknown }>({
-  fallbackLanguage = 'en',
-  translations
-}: {
-  fallbackLanguage?: Language;
-  translations?: T;
-} = {}): I18N<T> {
-  let resolvedLanguage: Language;
-  let handleLanguageChange: LanguageChangeHandler | null = null;
+/** @public */
+export class Translator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
+  isInitialized: boolean;
+  #fallbackLanguage: Language;
+  #handleLanguageChange: LanguageChangeHandler | null;
+  #resolvedLanguage: Language;
+  #translations: T;
 
-  if (!window) {
-    throw new Error('Window is not defined');
+  constructor(options: { fallbackLanguage?: Language; translations: T }) {
+    this.isInitialized = false;
+    this.#fallbackLanguage = options.fallbackLanguage ?? 'en';
+    this.#handleLanguageChange = null;
+    this.#resolvedLanguage = this.#fallbackLanguage;
+    this.#translations = options.translations;
   }
 
-  const documentElement = window.top!.document.documentElement;
-  const extractLanguageProperty = (element: HTMLElement) => {
-    if (element.lang === 'en' || element.lang === 'fr') {
-      return element.lang;
-    }
-    console.error(`Unexpected value for HTMLElement 'lang' attribute: '${element.lang}'`);
-    return fallbackLanguage;
-  };
+  @InitializedOnly
+  set onLanguageChange(handler: LanguageChangeHandler) {
+    this.#handleLanguageChange = handler;
+  }
 
-  const languageAttributeObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.attributeName === 'lang') {
-        resolvedLanguage = extractLanguageProperty(mutation.target as HTMLElement);
-        handleLanguageChange?.(resolvedLanguage);
-        handleLanguageChange?.(resolvedLanguage);
-      }
+  @InitializedOnly
+  get resolvedLanguage() {
+    return this.#resolvedLanguage;
+  }
+
+  @InitializedOnly
+  changeLanguage(language: Language) {
+    window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
+  }
+
+  init(options?: { onLanguageChange?: LanguageChangeHandler | null }) {
+    if (typeof window === 'undefined') {
+      throw new Error('Cannot initialize Translator outside of browser');
+    } else if (!window.frameElement) {
+      throw new Error('Cannot initialize Translator in context where window.frameElement is null');
+    }
+
+    this.isInitialized = true;
+    this.#resolvedLanguage = this.extractLanguageProperty(window.frameElement);
+
+    if (options?.onLanguageChange) {
+      this.onLanguageChange = options.onLanguageChange;
+    }
+
+    const languageAttributeObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'lang') {
+          this.#resolvedLanguage = this.extractLanguageProperty(mutation.target as Element);
+          this.#handleLanguageChange?.(this.#resolvedLanguage);
+        }
+      });
     });
-  });
 
-  resolvedLanguage = extractLanguageProperty(documentElement);
-  languageAttributeObserver.observe(documentElement, { attributes: true });
+    languageAttributeObserver.observe(window.frameElement, { attributes: true });
+  }
 
-  return {
-    changeLanguage: (language) => {
-      window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
-    },
-    set onLanguageChange(handler: LanguageChangeHandler) {
-      handleLanguageChange = handler;
-    },
-    get resolvedLanguage() {
-      return resolvedLanguage;
-    },
-    t: (key) => {
-      const value = get(translations, key) as { [key: string]: string } | string | undefined;
-      if (typeof value === 'string') {
-        return value;
-      }
-      return value?.[resolvedLanguage] ?? value?.[fallbackLanguage] ?? key;
+  @InitializedOnly
+  t(key: TranslationKey<T>) {
+    const value = get(this.#translations, key) as { [key: string]: string } | string | undefined;
+    if (typeof value === 'string') {
+      return value;
     }
-  };
+    return value?.[this.resolvedLanguage] ?? value?.[this.#fallbackLanguage] ?? key;
+  }
+
+  @InitializedOnly
+  private extractLanguageProperty(element: Element) {
+    const lang = element.getAttribute('lang');
+    if (lang === 'en' || lang === 'fr') {
+      return lang;
+    }
+    console.error(`Unexpected value for 'lang' attribute: '${lang}'`);
+    return this.#fallbackLanguage;
+  }
 }
