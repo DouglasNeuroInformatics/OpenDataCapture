@@ -3,7 +3,7 @@ catalog:
   '@casl/prisma': ^1.4.1
   '@douglasneuroinformatics/esbuild-plugin-prisma': latest
   '@douglasneuroinformatics/eslint-config': latest
-  '@douglasneuroinformatics/libcrypto': ^0.0.3
+  '@douglasneuroinformatics/libcrypto': ^0.0.4
   '@douglasneuroinformatics/libjs': latest
   '@douglasneuroinformatics/libnest': ^0.5.1
   '@douglasneuroinformatics/libpasswd': latest

@@ -19,8 +19,8 @@ catalogs:
       specifier: latest
       version: 5.2.4
     '@douglasneuroinformatics/libcrypto':
-      specifier: ^0.0.3
-      version: 0.0.3
+      specifier: ^0.0.4
+      version: 0.0.4
     '@douglasneuroinformatics/libjs':
       specifier: latest
       version: 1.2.1
@@ -227,7 +227,7 @@ importers:
         version: 1.5.1(@casl/ability@6.7.3)(@prisma/client@5.22.0(prisma@5.22.0))
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
-        version: 0.0.3
+        version: 0.0.4
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
         version: 1.2.1
@@ -381,7 +381,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
-        version: 0.0.3
+        version: 0.0.4
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 3.8.7(@types/react@18.3.18)(immer@10.1.1)(react-dom@vendor+react-dom@18.x)(react@vendor+react@18.x)(tailwindcss@3.4.17)(zod@vendor+zod@3.23.x)
@@ -551,7 +551,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
-        version: 0.0.3
+        version: 0.0.4
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
         version: 1.2.1
@@ -1161,7 +1161,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
-        version: 0.0.3
+        version: 0.0.4
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -1956,9 +1956,9 @@ packages:
       typescript:
         optional: true
 
-  '@douglasneuroinformatics/libcrypto@0.0.3':
+  '@douglasneuroinformatics/libcrypto@0.0.4':
     resolution:
-      { integrity: sha512-BEp+MFjTmGhgQMf6ii25xBdbFc0gDy9RcJhLpVe7V4qED0z7saASvwil1cg4HlFwCyxCk5fpxlCLggRV/0CtdA== }
+      { integrity: sha512-tiI4ThtlBUXGEVN3hZBcX/Ul4gdHBLdfMza/KwmGdE0tjG1u556Yn4HQhwnZyDn/c1/q7j4sL+XZc+yZy8TCOQ== }
 
   '@douglasneuroinformatics/libjs@1.2.1':
     resolution:
@@ -13014,7 +13014,7 @@ snapshots:
       - ts-node
       - vue-eslint-parser
 
-  '@douglasneuroinformatics/libcrypto@0.0.3':
+  '@douglasneuroinformatics/libcrypto@0.0.4':
     dependencies:
       '@hpke/core': 1.7.1
 
