@@ -18,7 +18,7 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
   bundle,
   onSubmit
 }) {
-  const { changeLanguage } = useTranslation();
+  const { changeLanguage, resolvedLanguage } = useTranslation();
   const [_, updateTheme] = useTheme();
   const [scale, setScale] = useState(100);
   const iFrameRef = useRef<HTMLIFrameElement>(null);
@@ -109,6 +109,7 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
           allow="fullscreen"
           className="origin-top-left"
           data-bundle={bundle}
+          lang={resolvedLanguage}
           name="interactive-instrument"
           ref={iFrameRef}
           srcDoc={`<script type="module">${bootstrapScript}</script>`}
