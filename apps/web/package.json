@@ -43,7 +43,7 @@
     "jwt-decode": "^4.0.0",
     "lodash-es": "workspace:lodash-es__4.x@*",
     "lucide-react": "^0.473.0",
-    "motion": "^11.15.0",
+    "motion": "catalog:",
     "papaparse": "workspace:papaparse__5.x@*",
     "react": "workspace:react__18.x@*",
     "react-dom": "workspace:react-dom__18.x@*",

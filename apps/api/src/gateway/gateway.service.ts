@@ -1,3 +1,5 @@
+import type { webcrypto } from 'node:crypto';
+
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
 import { HttpService } from '@nestjs/axios';
@@ -9,11 +11,8 @@ import type {
   MutateAssignmentResponseBody,
   RemoteAssignment
 } from '@opendatacapture/schemas/assignment';
-import {
-  $GatewayHealthcheckSuccessResult,
-  type GatewayHealthcheckFailureResult,
-  type GatewayHealthcheckResult
-} from '@opendatacapture/schemas/gateway';
+import { $GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gateway';
+import type { GatewayHealthcheckFailureResult, GatewayHealthcheckResult } from '@opendatacapture/schemas/gateway';
 
 import { InstrumentsService } from '@/instruments/instruments.service';
 
@@ -25,7 +24,10 @@ export class GatewayService {
     private readonly loggingService: LoggingService
   ) {}
 
-  async createRemoteAssignment(assignment: Assignment, publicKey: CryptoKey): Promise<MutateAssignmentResponseBody> {
+  async createRemoteAssignment(
+    assignment: Assignment,
+    publicKey: webcrypto.CryptoKey
+  ): Promise<MutateAssignmentResponseBody> {
     const instrument = await this.instrumentsService.findBundleById(assignment.instrumentId);
     const response = await this.httpService.axiosRef.post(`/api/assignments`, {
       ...assignment,

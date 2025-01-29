@@ -1,7 +1,7 @@
 {
   "name": "opendatacapture",
   "type": "module",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "private": true,
   "packageManager": "pnpm@9.15.4",
   "license": "Apache-2.0",
@@ -85,5 +85,17 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "@mdx-js/react>@types/react": "18.x",
+      "framer-motion": "11.15.0",
+      "typescript": "5.6.x"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@mdx-js/react>@types/react": "18.x"
+      }
+    }
   }
 }

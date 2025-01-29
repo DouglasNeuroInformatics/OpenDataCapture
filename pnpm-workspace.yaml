@@ -3,7 +3,7 @@ catalog:
   '@casl/prisma': ^1.4.1
   '@douglasneuroinformatics/esbuild-plugin-prisma': latest
   '@douglasneuroinformatics/eslint-config': latest
-  '@douglasneuroinformatics/libcrypto': latest
+  '@douglasneuroinformatics/libcrypto': ^0.0.4
   '@douglasneuroinformatics/libjs': latest
   '@douglasneuroinformatics/libnest': ^0.5.1
   '@douglasneuroinformatics/libpasswd': latest
@@ -22,7 +22,8 @@ catalog:
   esbuild: 0.23.x
   esbuild-wasm: 0.23.x
   happy-dom: ^15.7.4
-  nodemon: ^3.1.4
+  motion: 11.15.0
+  nodemon: ^3.1.9
   prisma: ^5.18.0
   tsx: 4.8.2
   vite: ^5.4.12
