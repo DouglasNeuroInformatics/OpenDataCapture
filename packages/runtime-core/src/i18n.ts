@@ -138,6 +138,7 @@ export class SynchronizedTranslator<T extends { [key: string]: unknown }> extend
   }
 }
 
+/** @public */
 export class StandaloneTranslator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
   @InitializedOnly
   changeLanguage(language: Language) {
@@ -153,4 +154,11 @@ export class StandaloneTranslator<T extends { [key: string]: unknown }> extends 
 }
 
 /** @public */
-export class Translator<T extends { [key: string]: unknown }> extends StandaloneTranslator<T> {}
+let Translator: typeof BaseTranslator;
+if (typeof window === 'undefined' || window.self !== window.top) {
+  Translator = SynchronizedTranslator;
+} else {
+  Translator = StandaloneTranslator;
+}
+
+export { Translator };
