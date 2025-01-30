@@ -122,11 +122,6 @@ export class SynchronizedTranslator<T extends { [key: string]: unknown }> extend
   }
 
   @InitializedOnly
-  get targetElement() {
-    return window.frameElement!;
-  }
-
-  @InitializedOnly
   changeLanguage(language: Language) {
     window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
   }
@@ -143,5 +138,19 @@ export class SynchronizedTranslator<T extends { [key: string]: unknown }> extend
   }
 }
 
+export class StandaloneTranslator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
+  @InitializedOnly
+  changeLanguage(language: Language) {
+    document.documentElement.setAttribute('lang', language);
+  }
+
+  override init(options: TranslatorInitOptions = {}) {
+    if (typeof window === 'undefined') {
+      throw new Error('Cannot initialize StandaloneTranslator outside of browser');
+    }
+    return super.init(options, document.documentElement);
+  }
+}
+
 /** @public */
-export class Translator<T extends { [key: string]: unknown }> extends SynchronizedTranslator<T> {}
+export class Translator<T extends { [key: string]: unknown }> extends StandaloneTranslator<T> {}
