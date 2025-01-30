@@ -2,7 +2,7 @@ import { get } from 'lodash-es';
 
 import type { Language } from './types/core.js';
 
-function InitializedOnly<T extends Translator, TArgs extends any[], TReturn>(
+function InitializedOnly<T extends BaseTranslator, TArgs extends any[], TReturn>(
   target: (this: T, ...args: TArgs) => TReturn,
   context: ClassGetterDecoratorContext<T> | ClassMethodDecoratorContext<T> | ClassSetterDecoratorContext<T>
 ) {
@@ -28,16 +28,27 @@ export type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> 
 /** @public */
 export type LanguageChangeHandler = (this: void, language: Language) => void;
 
-/** @public */
-export class Translator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
+export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
+  protected abstract currentDocumentLanguage: Language | null;
+  protected abstract fallbackLanguage: Language;
+  protected abstract handleLanguageChange: LanguageChangeHandler | null;
   isInitialized: boolean;
-  private currentDocumentLanguage: Language | null;
-  private fallbackLanguage: Language;
-  private handleLanguageChange: LanguageChangeHandler | null;
-  private translations: T;
+  protected abstract translations: T;
+
+  constructor() {
+    this.isInitialized = false;
+  }
+}
+
+/** @public */
+export class Translator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
+  protected currentDocumentLanguage: Language | null;
+  protected fallbackLanguage: Language;
+  protected handleLanguageChange: LanguageChangeHandler | null;
+  protected translations: T;
 
   constructor(options: { fallbackLanguage?: Language; translations: T }) {
-    this.isInitialized = false;
+    super();
     this.currentDocumentLanguage = null;
     this.fallbackLanguage = options.fallbackLanguage ?? 'en';
     this.handleLanguageChange = null;
