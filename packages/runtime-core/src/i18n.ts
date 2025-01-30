@@ -49,13 +49,6 @@ export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [k
     this.isInitialized = false;
     this.translations = translations;
   }
-}
-
-/** @public */
-export class Translator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
-  constructor(options: TranslatorOptions<T>) {
-    super(options);
-  }
 
   @InitializedOnly
   set onLanguageChange(handler: LanguageChangeHandler) {
@@ -65,6 +58,32 @@ export class Translator<T extends { [key: string]: unknown }> extends BaseTransl
   @InitializedOnly
   get resolvedLanguage() {
     return this.currentDocumentLanguage ?? this.fallbackLanguage;
+  }
+
+  @InitializedOnly
+  protected extractLanguageProperty(element: Element) {
+    const lang = element.getAttribute('lang');
+    if (lang === 'en' || lang === 'fr') {
+      return lang;
+    }
+    console.error(`Unexpected value for 'lang' attribute: '${lang}'`);
+    return null;
+  }
+
+  @InitializedOnly
+  t(key: TranslationKey<T>) {
+    const value = get(this.translations, key) as { [key: string]: string } | string | undefined;
+    if (typeof value === 'string') {
+      return value;
+    }
+    return value?.[this.resolvedLanguage] ?? value?.[this.fallbackLanguage] ?? key;
+  }
+}
+
+/** @public */
+export class Translator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
+  constructor(options: TranslatorOptions<T>) {
+    super(options);
   }
 
   @InitializedOnly
@@ -96,24 +115,5 @@ export class Translator<T extends { [key: string]: unknown }> extends BaseTransl
     });
 
     languageAttributeObserver.observe(window.frameElement, { attributes: true });
-  }
-
-  @InitializedOnly
-  t(key: TranslationKey<T>) {
-    const value = get(this.translations, key) as { [key: string]: string } | string | undefined;
-    if (typeof value === 'string') {
-      return value;
-    }
-    return value?.[this.resolvedLanguage] ?? value?.[this.fallbackLanguage] ?? key;
-  }
-
-  @InitializedOnly
-  private extractLanguageProperty(element: Element) {
-    const lang = element.getAttribute('lang');
-    if (lang === 'en' || lang === 'fr') {
-      return lang;
-    }
-    console.error(`Unexpected value for 'lang' attribute: '${lang}'`);
-    return null;
   }
 }
