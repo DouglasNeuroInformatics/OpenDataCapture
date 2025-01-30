@@ -2,7 +2,7 @@ import { get } from 'lodash-es';
 
 import type { Language } from './types/core.js';
 
-function InitializedOnly<T extends Translator, TArgs extends any[], TReturn>(
+function InitializedOnly<T extends BaseTranslator, TArgs extends any[], TReturn>(
   target: (this: T, ...args: TArgs) => TReturn,
   context: ClassGetterDecoratorContext<T> | ClassMethodDecoratorContext<T> | ClassSetterDecoratorContext<T>
 ) {
@@ -29,45 +29,65 @@ export type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> 
 export type LanguageChangeHandler = (this: void, language: Language) => void;
 
 /** @public */
-export class Translator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
-  isInitialized: boolean;
-  #fallbackLanguage: Language;
-  #handleLanguageChange: LanguageChangeHandler | null;
-  #resolvedLanguage: Language;
-  #translations: T;
+export type TranslatorOptions<T extends { [key: string]: unknown }> = {
+  fallbackLanguage?: Language;
+  translations: T;
+};
 
-  constructor(options: { fallbackLanguage?: Language; translations: T }) {
-    this.isInitialized = false;
-    this.#fallbackLanguage = options.fallbackLanguage ?? 'en';
-    this.#handleLanguageChange = null;
-    this.#resolvedLanguage = this.#fallbackLanguage;
-    this.#translations = options.translations;
+/** @public */
+export type TranslatorInitOptions = {
+  onLanguageChange?: LanguageChangeHandler | null;
+};
+
+/** @public */
+export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
+  protected currentDocumentLanguage: Language | null;
+  protected fallbackLanguage: Language;
+  protected handleLanguageChange: LanguageChangeHandler | null;
+  protected translations: T;
+  #isInitialized: boolean;
+
+  constructor({ fallbackLanguage, translations }: TranslatorOptions<T>) {
+    this.currentDocumentLanguage = null;
+    this.fallbackLanguage = fallbackLanguage ?? 'en';
+    this.handleLanguageChange = null;
+    this.#isInitialized = false;
+    this.translations = translations;
+  }
+
+  get isInitialized() {
+    return this.#isInitialized;
+  }
+
+  protected set isInitialized(value: boolean) {
+    this.#isInitialized = value;
   }
 
   @InitializedOnly
   set onLanguageChange(handler: LanguageChangeHandler) {
-    this.#handleLanguageChange = handler;
+    this.handleLanguageChange = handler;
   }
 
   @InitializedOnly
   get resolvedLanguage() {
-    return this.#resolvedLanguage;
+    return this.currentDocumentLanguage ?? this.fallbackLanguage;
   }
+
+  abstract changeLanguage(language: Language): void;
 
   @InitializedOnly
-  changeLanguage(language: Language) {
-    window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
+  protected extractLanguageProperty(element: Element) {
+    const lang = element.getAttribute('lang');
+    if (lang === 'en' || lang === 'fr') {
+      return lang;
+    }
+    console.error(`Unexpected value for 'lang' attribute: '${lang}'`);
+    return null;
   }
 
-  init(options?: { onLanguageChange?: LanguageChangeHandler | null }) {
-    if (typeof window === 'undefined') {
-      throw new Error('Cannot initialize Translator outside of browser');
-    } else if (!window.frameElement) {
-      throw new Error('Cannot initialize Translator in context where window.frameElement is null');
-    }
-
+  init(options: TranslatorInitOptions, targetElement: Element) {
     this.isInitialized = true;
-    this.#resolvedLanguage = this.extractLanguageProperty(window.frameElement);
+    this.currentDocumentLanguage = this.extractLanguageProperty(targetElement);
 
     if (options?.onLanguageChange) {
       this.onLanguageChange = options.onLanguageChange;
@@ -76,31 +96,69 @@ export class Translator<T extends { [key: string]: unknown } = { [key: string]: 
     const languageAttributeObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'lang') {
-          this.#resolvedLanguage = this.extractLanguageProperty(mutation.target as Element);
-          this.#handleLanguageChange?.(this.#resolvedLanguage);
+          this.currentDocumentLanguage = this.extractLanguageProperty(mutation.target as Element);
+          this.handleLanguageChange?.(this.resolvedLanguage);
         }
       });
     });
 
-    languageAttributeObserver.observe(window.frameElement, { attributes: true });
+    languageAttributeObserver.observe(targetElement, { attributes: true });
   }
 
   @InitializedOnly
   t(key: TranslationKey<T>) {
-    const value = get(this.#translations, key) as { [key: string]: string } | string | undefined;
+    const value = get(this.translations, key) as { [key: string]: string } | string | undefined;
     if (typeof value === 'string') {
       return value;
     }
-    return value?.[this.resolvedLanguage] ?? value?.[this.#fallbackLanguage] ?? key;
+    return value?.[this.resolvedLanguage] ?? value?.[this.fallbackLanguage] ?? key;
+  }
+}
+
+/** @public */
+export class SynchronizedTranslator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
+  constructor(options: TranslatorOptions<T>) {
+    super(options);
   }
 
   @InitializedOnly
-  private extractLanguageProperty(element: Element) {
-    const lang = element.getAttribute('lang');
-    if (lang === 'en' || lang === 'fr') {
-      return lang;
+  changeLanguage(language: Language) {
+    window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
+  }
+
+  override init(options: TranslatorInitOptions = {}) {
+    if (typeof window === 'undefined') {
+      throw new Error('Cannot initialize SynchronizedTranslator outside of browser');
+    } else if (!window.frameElement) {
+      throw new Error('Cannot initialize SynchronizedTranslator in context where window.frameElement is null');
+    } else if (window.frameElement.getAttribute('name') !== 'interactive-instrument') {
+      throw new Error('SynchronizedTranslator must be initialized in InstrumentRenderer');
     }
-    console.error(`Unexpected value for 'lang' attribute: '${lang}'`);
-    return this.#fallbackLanguage;
+    return super.init(options, window.frameElement);
   }
 }
+
+/** @public */
+export class StandaloneTranslator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
+  @InitializedOnly
+  changeLanguage(language: Language) {
+    document.documentElement.setAttribute('lang', language);
+  }
+
+  override init(options: TranslatorInitOptions = {}) {
+    if (typeof window === 'undefined') {
+      throw new Error('Cannot initialize StandaloneTranslator outside of browser');
+    }
+    return super.init(options, document.documentElement);
+  }
+}
+
+/** @public */
+let Translator: typeof BaseTranslator;
+if (typeof window === 'undefined' || window.self !== window.top) {
+  Translator = SynchronizedTranslator;
+} else {
+  Translator = StandaloneTranslator;
+}
+
+export { Translator };
