@@ -98,7 +98,7 @@ export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [k
 }
 
 /** @public */
-export class Translator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
+export class SynchronizedTranslator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
   constructor(options: TranslatorOptions<T>) {
     super(options);
   }
@@ -110,9 +110,11 @@ export class Translator<T extends { [key: string]: unknown }> extends BaseTransl
 
   init(options?: TranslatorInitOptions) {
     if (typeof window === 'undefined') {
-      throw new Error('Cannot initialize Translator outside of browser');
+      throw new Error('Cannot initialize SynchronizedTranslator outside of browser');
     } else if (!window.frameElement) {
-      throw new Error('Cannot initialize Translator in context where window.frameElement is null');
+      throw new Error('Cannot initialize SynchronizedTranslator in context where window.frameElement is null');
+    } else if (window.frameElement.getAttribute('name') !== 'interactive-instrument') {
+      throw new Error('SynchronizedTranslator must be initialized in InstrumentRenderer');
     }
 
     this.isInitialized = true;
@@ -134,3 +136,6 @@ export class Translator<T extends { [key: string]: unknown }> extends BaseTransl
     languageAttributeObserver.observe(window.frameElement, { attributes: true });
   }
 }
+
+/** @public */
+export class Translator<T extends { [key: string]: unknown }> extends SynchronizedTranslator<T> {}
