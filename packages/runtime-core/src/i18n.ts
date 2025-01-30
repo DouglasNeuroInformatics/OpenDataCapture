@@ -85,7 +85,25 @@ export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [k
     return null;
   }
 
-  abstract init(options?: TranslatorInitOptions): void;
+  init(options: TranslatorInitOptions, targetElement: Element) {
+    this.isInitialized = true;
+    this.currentDocumentLanguage = this.extractLanguageProperty(targetElement);
+
+    if (options?.onLanguageChange) {
+      this.onLanguageChange = options.onLanguageChange;
+    }
+
+    const languageAttributeObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'lang') {
+          this.currentDocumentLanguage = this.extractLanguageProperty(mutation.target as Element);
+          this.handleLanguageChange?.(this.resolvedLanguage);
+        }
+      });
+    });
+
+    languageAttributeObserver.observe(targetElement, { attributes: true });
+  }
 
   @InitializedOnly
   t(key: TranslationKey<T>) {
@@ -104,11 +122,16 @@ export class SynchronizedTranslator<T extends { [key: string]: unknown }> extend
   }
 
   @InitializedOnly
+  get targetElement() {
+    return window.frameElement!;
+  }
+
+  @InitializedOnly
   changeLanguage(language: Language) {
     window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
   }
 
-  init(options?: TranslatorInitOptions) {
+  override init(options: TranslatorInitOptions = {}) {
     if (typeof window === 'undefined') {
       throw new Error('Cannot initialize SynchronizedTranslator outside of browser');
     } else if (!window.frameElement) {
@@ -116,24 +139,7 @@ export class SynchronizedTranslator<T extends { [key: string]: unknown }> extend
     } else if (window.frameElement.getAttribute('name') !== 'interactive-instrument') {
       throw new Error('SynchronizedTranslator must be initialized in InstrumentRenderer');
     }
-
-    this.isInitialized = true;
-    this.currentDocumentLanguage = this.extractLanguageProperty(window.frameElement);
-
-    if (options?.onLanguageChange) {
-      this.onLanguageChange = options.onLanguageChange;
-    }
-
-    const languageAttributeObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'lang') {
-          this.currentDocumentLanguage = this.extractLanguageProperty(mutation.target as Element);
-          this.handleLanguageChange?.(this.resolvedLanguage);
-        }
-      });
-    });
-
-    languageAttributeObserver.observe(window.frameElement, { attributes: true });
+    return super.init(options, window.frameElement);
   }
 }
 
