@@ -31,27 +31,27 @@ export type LanguageChangeHandler = (this: void, language: Language) => void;
 /** @public */
 export class Translator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
   isInitialized: boolean;
-  #fallbackLanguage: Language;
-  #handleLanguageChange: LanguageChangeHandler | null;
-  #resolvedLanguage: Language;
-  #translations: T;
+  private currentDocumentLanguage: Language | null;
+  private fallbackLanguage: Language;
+  private handleLanguageChange: LanguageChangeHandler | null;
+  private translations: T;
 
   constructor(options: { fallbackLanguage?: Language; translations: T }) {
     this.isInitialized = false;
-    this.#fallbackLanguage = options.fallbackLanguage ?? 'en';
-    this.#handleLanguageChange = null;
-    this.#resolvedLanguage = this.#fallbackLanguage;
-    this.#translations = options.translations;
+    this.currentDocumentLanguage = null;
+    this.fallbackLanguage = options.fallbackLanguage ?? 'en';
+    this.handleLanguageChange = null;
+    this.translations = options.translations;
   }
 
   @InitializedOnly
   set onLanguageChange(handler: LanguageChangeHandler) {
-    this.#handleLanguageChange = handler;
+    this.handleLanguageChange = handler;
   }
 
   @InitializedOnly
   get resolvedLanguage() {
-    return this.#resolvedLanguage;
+    return this.currentDocumentLanguage ?? this.fallbackLanguage;
   }
 
   @InitializedOnly
@@ -67,7 +67,7 @@ export class Translator<T extends { [key: string]: unknown } = { [key: string]: 
     }
 
     this.isInitialized = true;
-    this.#resolvedLanguage = this.extractLanguageProperty(window.frameElement);
+    this.currentDocumentLanguage = this.extractLanguageProperty(window.frameElement);
 
     if (options?.onLanguageChange) {
       this.onLanguageChange = options.onLanguageChange;
@@ -76,8 +76,8 @@ export class Translator<T extends { [key: string]: unknown } = { [key: string]: 
     const languageAttributeObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'lang') {
-          this.#resolvedLanguage = this.extractLanguageProperty(mutation.target as Element);
-          this.#handleLanguageChange?.(this.#resolvedLanguage);
+          this.currentDocumentLanguage = this.extractLanguageProperty(mutation.target as Element);
+          this.handleLanguageChange?.(this.resolvedLanguage);
         }
       });
     });
@@ -87,11 +87,11 @@ export class Translator<T extends { [key: string]: unknown } = { [key: string]: 
 
   @InitializedOnly
   t(key: TranslationKey<T>) {
-    const value = get(this.#translations, key) as { [key: string]: string } | string | undefined;
+    const value = get(this.translations, key) as { [key: string]: string } | string | undefined;
     if (typeof value === 'string') {
       return value;
     }
-    return value?.[this.resolvedLanguage] ?? value?.[this.#fallbackLanguage] ?? key;
+    return value?.[this.resolvedLanguage] ?? value?.[this.fallbackLanguage] ?? key;
   }
 
   @InitializedOnly
@@ -101,6 +101,6 @@ export class Translator<T extends { [key: string]: unknown } = { [key: string]: 
       return lang;
     }
     console.error(`Unexpected value for 'lang' attribute: '${lang}'`);
-    return this.#fallbackLanguage;
+    return null;
   }
 }
