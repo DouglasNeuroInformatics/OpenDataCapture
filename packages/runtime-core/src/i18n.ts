@@ -44,15 +44,23 @@ export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [k
   protected currentDocumentLanguage: Language | null;
   protected fallbackLanguage: Language;
   protected handleLanguageChange: LanguageChangeHandler | null;
-  public isInitialized: boolean;
   protected translations: T;
+  #isInitialized: boolean;
 
   constructor({ fallbackLanguage, translations }: TranslatorOptions<T>) {
     this.currentDocumentLanguage = null;
     this.fallbackLanguage = fallbackLanguage ?? 'en';
     this.handleLanguageChange = null;
-    this.isInitialized = false;
+    this.#isInitialized = false;
     this.translations = translations;
+  }
+
+  get isInitialized() {
+    return this.#isInitialized;
+  }
+
+  protected set isInitialized(value: boolean) {
+    this.#isInitialized = value;
   }
 
   @InitializedOnly
