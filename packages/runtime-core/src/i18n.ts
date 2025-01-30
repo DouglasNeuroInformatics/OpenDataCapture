@@ -35,6 +35,11 @@ export type TranslatorOptions<T extends { [key: string]: unknown }> = {
 };
 
 /** @public */
+export type TranslatorInitOptions = {
+  onLanguageChange?: LanguageChangeHandler | null;
+};
+
+/** @public */
 export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
   protected currentDocumentLanguage: Language | null;
   protected fallbackLanguage: Language;
@@ -60,6 +65,8 @@ export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [k
     return this.currentDocumentLanguage ?? this.fallbackLanguage;
   }
 
+  abstract changeLanguage(language: Language): void;
+
   @InitializedOnly
   protected extractLanguageProperty(element: Element) {
     const lang = element.getAttribute('lang');
@@ -69,6 +76,8 @@ export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [k
     console.error(`Unexpected value for 'lang' attribute: '${lang}'`);
     return null;
   }
+
+  abstract init(options?: TranslatorInitOptions): void;
 
   @InitializedOnly
   t(key: TranslationKey<T>) {
@@ -91,7 +100,7 @@ export class Translator<T extends { [key: string]: unknown }> extends BaseTransl
     window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
   }
 
-  init(options?: { onLanguageChange?: LanguageChangeHandler | null }) {
+  init(options?: TranslatorInitOptions) {
     if (typeof window === 'undefined') {
       throw new Error('Cannot initialize Translator outside of browser');
     } else if (!window.frameElement) {
