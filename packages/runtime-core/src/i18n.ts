@@ -36,30 +36,25 @@ export type TranslatorOptions<T extends { [key: string]: unknown }> = {
 
 /** @public */
 export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
-  protected abstract currentDocumentLanguage: Language | null;
-  protected abstract fallbackLanguage: Language;
-  protected abstract handleLanguageChange: LanguageChangeHandler | null;
-  isInitialized: boolean;
-  protected abstract translations: T;
+  protected currentDocumentLanguage: Language | null;
+  protected fallbackLanguage: Language;
+  protected handleLanguageChange: LanguageChangeHandler | null;
+  public isInitialized: boolean;
+  protected translations: T;
 
-  constructor() {
+  constructor({ fallbackLanguage, translations }: TranslatorOptions<T>) {
+    this.currentDocumentLanguage = null;
+    this.fallbackLanguage = fallbackLanguage ?? 'en';
+    this.handleLanguageChange = null;
     this.isInitialized = false;
+    this.translations = translations;
   }
 }
 
 /** @public */
 export class Translator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
-  protected currentDocumentLanguage: Language | null;
-  protected fallbackLanguage: Language;
-  protected handleLanguageChange: LanguageChangeHandler | null;
-  protected translations: T;
-
   constructor(options: TranslatorOptions<T>) {
-    super();
-    this.currentDocumentLanguage = null;
-    this.fallbackLanguage = options.fallbackLanguage ?? 'en';
-    this.handleLanguageChange = null;
-    this.translations = options.translations;
+    super(options);
   }
 
   @InitializedOnly
