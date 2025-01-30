@@ -28,6 +28,13 @@ export type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> 
 /** @public */
 export type LanguageChangeHandler = (this: void, language: Language) => void;
 
+/** @public */
+export type TranslatorOptions<T extends { [key: string]: unknown }> = {
+  fallbackLanguage?: Language;
+  translations: T;
+};
+
+/** @public */
 export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
   protected abstract currentDocumentLanguage: Language | null;
   protected abstract fallbackLanguage: Language;
@@ -47,7 +54,7 @@ export class Translator<T extends { [key: string]: unknown }> extends BaseTransl
   protected handleLanguageChange: LanguageChangeHandler | null;
   protected translations: T;
 
-  constructor(options: { fallbackLanguage?: Language; translations: T }) {
+  constructor(options: TranslatorOptions<T>) {
     super();
     this.currentDocumentLanguage = null;
     this.fallbackLanguage = options.fallbackLanguage ?? 'en';
