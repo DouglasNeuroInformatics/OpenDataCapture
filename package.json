@@ -54,7 +54,7 @@
     "@types/github-script": "https://github.com/actions/github-script/archive/refs/tags/v7.0.1.tar.gz",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "22.x",
-    "@vitest/browser": "^2.0.5",
+    "@vitest/browser": "^2.1.9",
     "@vitest/coverage-v8": "^2.0.5",
     "dotenv": "^16.4.7",
     "env-cmd": "^10.1.0",
