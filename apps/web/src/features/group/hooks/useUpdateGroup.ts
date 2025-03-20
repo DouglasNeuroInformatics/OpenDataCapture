@@ -1,5 +1,6 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { $Group, type UpdateGroupData } from '@opendatacapture/schemas/group';
+import { $Group } from '@opendatacapture/schemas/group';
+import type { UpdateGroupData } from '@opendatacapture/schemas/group';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 

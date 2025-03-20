@@ -1,11 +1,9 @@
-import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
-import { type MockedInstance, MockFactory } from '@douglasneuroinformatics/libnest/testing';
+import { CryptoService, getModelToken, LoggingService, VirtualizationService } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
+import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
+import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-
-import type { Model } from '@/prisma/prisma.types';
-import { getModelToken } from '@/prisma/prisma.utils';
-import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { InstrumentsService } from '../instruments.service';
 
@@ -19,6 +17,7 @@ describe('InstrumentsService', () => {
         InstrumentsService,
         MockFactory.createForModelToken(getModelToken('Instrument')),
         MockFactory.createForService(CryptoService),
+        MockFactory.createForService(LoggingService),
         MockFactory.createForService(VirtualizationService)
       ]
     }).compile();

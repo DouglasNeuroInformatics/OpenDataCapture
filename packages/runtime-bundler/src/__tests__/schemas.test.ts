@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { $Config, type Config } from '../schemas.js';
+import { $Config } from '../schemas.js';
+
+import type { Config } from '../schemas.js';
 
 describe('$Config', () => {
   it('should parse an included package', () => {

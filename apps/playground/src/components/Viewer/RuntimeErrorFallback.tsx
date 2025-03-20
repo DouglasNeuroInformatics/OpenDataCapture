@@ -1,4 +1,6 @@
-import { ViewerErrorFallback, type ViewerErrorFallbackProps } from './ViewerErrorFallback';
+import { ViewerErrorFallback } from './ViewerErrorFallback';
+
+import type { ViewerErrorFallbackProps } from './ViewerErrorFallback';
 
 export const RuntimeErrorFallback = (props: Omit<ViewerErrorFallbackProps, 'title'>) => {
   return (

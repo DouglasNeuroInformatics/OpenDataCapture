@@ -1,4 +1,4 @@
-import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest';
 import { ApiProperty } from '@nestjs/swagger';
 import { $CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { Sex } from '@opendatacapture/schemas/subject';

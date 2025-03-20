@@ -1,3 +1,4 @@
+/* eslint-disable import/exports-last */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -1633,13 +1634,6 @@ function doReplace(
     stopEvent(e);
     const keyName = getEventKeyName(e);
     switch (keyName) {
-      case 'Y':
-        replace();
-        next();
-        break;
-      case 'N':
-        next();
-        break;
       case 'A':
         // replaceAll contains a call to close of its own. We don't want it
         // to fire too early or multiple times.
@@ -1652,11 +1646,18 @@ function doReplace(
       case 'L':
         replace();
       // fall through and exit.
-      case 'Q':
-      case 'Esc':
-      case 'Ctrl-C':
       case 'Ctrl-[':
+      case 'Ctrl-C':
+      case 'Esc':
+      case 'Q':
         stop(close);
+        break;
+      case 'N':
+        next();
+        break;
+      case 'Y':
+        replace();
+        next();
         break;
     }
     if (done) {

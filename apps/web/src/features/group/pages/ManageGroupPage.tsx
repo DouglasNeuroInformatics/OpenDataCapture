@@ -9,8 +9,10 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupState } from '@/hooks/useSetupState';
 import { useAppStore } from '@/store';
 
-import { type AvailableInstrumentOptions, ManageGroupForm } from '../components/ManageGroupForm';
+import { ManageGroupForm } from '../components/ManageGroupForm';
 import { useUpdateGroup } from '../hooks/useUpdateGroup';
+
+import type { AvailableInstrumentOptions } from '../components/ManageGroupForm';
 
 export const ManageGroupPage = () => {
   const { resolvedLanguage, t } = useTranslation('group');

@@ -22,10 +22,6 @@ describe('isZodType', () => {
 });
 
 describe('$BooleanString', () => {
-  it('should successfully parse boolean values', async () => {
-    await expect($BooleanString.parseAsync(true)).resolves.toBe(true);
-    await expect($BooleanString.parseAsync(false)).resolves.toBe(false);
-  });
   it('should successfully parse boolean strings', async () => {
     await expect($BooleanString.parseAsync('true')).resolves.toBe(true);
     await expect($BooleanString.parseAsync('false')).resolves.toBe(false);

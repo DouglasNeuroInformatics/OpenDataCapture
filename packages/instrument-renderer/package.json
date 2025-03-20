@@ -21,7 +21,7 @@
     "zod": "workspace:zod__3.23.x@*"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "catalog:",
+    "@douglasneuroinformatics/libjs": "^2.4.0",
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",

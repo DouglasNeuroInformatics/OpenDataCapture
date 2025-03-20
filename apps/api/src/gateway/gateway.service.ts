@@ -1,7 +1,7 @@
 import type { webcrypto } from 'node:crypto';
 
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
-import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { LoggingService } from '@douglasneuroinformatics/libnest';
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, HttpStatus, Injectable } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@opendatacapture/schemas/assignment';

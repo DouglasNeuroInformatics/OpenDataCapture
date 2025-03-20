@@ -1,11 +1,9 @@
-import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
+import { accessibleQuery, CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
-import { InjectModel } from '@/prisma/prisma.decorators';
-import type { Model } from '@/prisma/prisma.types';
 
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -56,8 +54,8 @@ export class UsersService {
         groups: {
           connect: groupIds.map((id) => ({ id }))
         },
+        hashedPassword,
         lastName,
-        password: hashedPassword,
         sex,
         username: username
       }

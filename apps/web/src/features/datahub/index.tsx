@@ -1,6 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { Navigate, type RouteObject } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
 
 import { config } from '@/config';
 

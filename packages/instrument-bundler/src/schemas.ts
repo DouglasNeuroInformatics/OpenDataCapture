@@ -2,17 +2,17 @@ import { z } from 'zod';
 
 import type { BuildFailure, Location, Message } from './vendor/esbuild.js';
 
-export const $BundlerInput = z.object({
+const $BundlerInput = z.object({
   content: z.union([z.string(), z.instanceof(Uint8Array)]),
   name: z.string()
 });
-export type BundlerInput = z.infer<typeof $BundlerInput>;
+type BundlerInput = z.infer<typeof $BundlerInput>;
 
-export const $BundleOptions = z.object({
+const $BundleOptions = z.object({
   inputs: z.array($BundlerInput),
   minify: z.boolean().optional()
 });
-export type BundleOptions = z.infer<typeof $BundleOptions>;
+type BundleOptions = z.infer<typeof $BundleOptions>;
 
 const $Location: z.ZodType<Location> = z.object({
   column: z.number(),
@@ -48,3 +48,6 @@ export const $BuildFailure = z.object({
   stack: z.string().optional(),
   warnings: z.array($Message)
 }) satisfies z.ZodType<BuildFailure>;
+
+export { $BundleOptions, $BundlerInput };
+export type { BundleOptions, BundlerInput };

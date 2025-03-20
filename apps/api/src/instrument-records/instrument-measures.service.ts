@@ -1,4 +1,4 @@
-import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { LoggingService } from '@douglasneuroinformatics/libnest';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import type {
   FormInstrument,
@@ -7,7 +7,7 @@ import type {
   InstrumentMeasureValue,
   Json
 } from '@opendatacapture/runtime-core';
-import type { Prisma } from '@prisma/generated-client';
+import type { Prisma } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 @Injectable()

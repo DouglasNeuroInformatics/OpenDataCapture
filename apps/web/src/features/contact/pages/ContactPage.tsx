@@ -4,7 +4,9 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';
 
-import { ContactForm, type ContactFormData } from '../components/ContactForm';
+import { ContactForm } from '../components/ContactForm';
+
+import type { ContactFormData } from '../components/ContactForm';
 
 export const ContactPage = () => {
   const { t } = useTranslation('contact');

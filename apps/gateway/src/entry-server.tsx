@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 
-import { Root, type RootProps } from './Root';
+import { Root } from './Root';
+
+import type { RootProps } from './Root';
 
 export type RenderFunction = (props: RootProps) => { html: string };
 

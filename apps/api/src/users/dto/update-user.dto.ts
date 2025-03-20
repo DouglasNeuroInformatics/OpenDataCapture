@@ -1,4 +1,4 @@
-import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest';
 import { PartialType } from '@nestjs/swagger';
 import { $UpdateUserData } from '@opendatacapture/schemas/user';
 

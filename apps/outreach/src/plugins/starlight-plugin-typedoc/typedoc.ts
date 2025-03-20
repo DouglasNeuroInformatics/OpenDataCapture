@@ -29,11 +29,7 @@ const markdownPluginConfig: TypeDocConfig = {
   hidePageTitle: true
 };
 
-export async function generateTypeDoc(
-  options: StarlightTypeDocOptions,
-  config: AstroConfig,
-  logger: AstroIntegrationLogger
-) {
+async function generateTypeDoc(options: StarlightTypeDocOptions, config: AstroConfig, logger: AstroIntegrationLogger) {
   const baseOutputDirectory = options.output ?? 'api';
   const outputDirectory = options.locale ? `${options.locale}/${baseOutputDirectory}` : baseOutputDirectory;
 
@@ -58,7 +54,7 @@ export async function generateTypeDoc(
   const outputPath = path.join(url.fileURLToPath(config.srcDir), 'content/docs', outputDirectory);
 
   if (options.watch) {
-    app.convertAndWatch(async (reflections) => {
+    await app.convertAndWatch(async (reflections) => {
       await app.generateDocs(reflections, outputPath);
     });
   } else {
@@ -157,3 +153,5 @@ function onRendererEnd(pagesToRemove: string[]) {
 }
 
 export type TypeDocConfig = Partial<Omit<TypeDocOptions, 'entryPoints' | 'tsconfig'> & PluginOptions>;
+
+export { generateTypeDoc };

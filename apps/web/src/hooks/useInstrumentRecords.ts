@@ -1,4 +1,5 @@
-import { $InstrumentRecord, type InstrumentRecordQueryParams } from '@opendatacapture/schemas/instrument-records';
+import { $InstrumentRecord } from '@opendatacapture/schemas/instrument-records';
+import type { InstrumentRecordQueryParams } from '@opendatacapture/schemas/instrument-records';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

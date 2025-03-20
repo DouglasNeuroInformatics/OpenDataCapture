@@ -1,6 +1,5 @@
-import { randomValue } from '@douglasneuroinformatics/libjs';
-import { toUpperCase } from '@douglasneuroinformatics/libjs';
-import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { randomValue, toUpperCase } from '@douglasneuroinformatics/libjs';
+import { LoggingService, PrismaService } from '@douglasneuroinformatics/libnest';
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
@@ -11,14 +10,13 @@ import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/for
 import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
 import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/happiness-questionnaire-with-consent.js';
 import type { FormInstrument } from '@opendatacapture/runtime-core';
-import { type Json, type Language, type WithID } from '@opendatacapture/schemas/core';
+import type { Json, Language, WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
-import { PrismaService } from '@/prisma/prisma.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
@@ -93,7 +91,7 @@ export class DemoService {
       let researchId = 1;
       for (let i = 0; i < dummySubjectCount; i++) {
         this.loggingService.debug(`Creating dummy subject ${i + 1}/${dummySubjectCount}`);
-        const group = randomValue(groups)!;
+        const group = randomValue(groups)._unsafeUnwrap();
         const subjectIdData = {
           dateOfBirth: faker.date.birthdate(),
           firstName: faker.person.firstName(),

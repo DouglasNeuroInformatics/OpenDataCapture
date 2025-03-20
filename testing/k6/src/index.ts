@@ -8,8 +8,11 @@ import type { Summary } from '@opendatacapture/schemas/summary';
 import { check, sleep } from 'k6';
 import { isMatch, random } from 'lodash-es';
 
-import { Client, type ClientParams } from './client';
-import { Config, type ConfigParams } from './config';
+import { Client } from './client';
+import { Config } from './config';
+
+import type { ClientParams } from './client';
+import type { ConfigParams } from './config';
 
 // these are injected via the build script during transpilation
 declare global {

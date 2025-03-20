@@ -1,6 +1,7 @@
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $CreateGroupData, type CreateGroupData } from '@opendatacapture/schemas/group';
+import { $CreateGroupData } from '@opendatacapture/schemas/group';
+import type { CreateGroupData } from '@opendatacapture/schemas/group';
 import { useNavigate } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';

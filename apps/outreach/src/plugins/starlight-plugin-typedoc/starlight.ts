@@ -1,3 +1,5 @@
+/* eslint-disable import/exports-last */
+
 import path from 'node:path';
 
 import type { StarlightPlugin } from '@astrojs/starlight/types';
@@ -233,6 +235,7 @@ function isReferenceReflectionGroup(group: ReflectionGroup) {
 }
 
 export type SidebarGroup =
+  | SidebarManualGroup
   | {
       autogenerate: {
         collapsed?: boolean;
@@ -240,17 +243,16 @@ export type SidebarGroup =
       };
       collapsed?: boolean;
       label: string;
-    }
-  | SidebarManualGroup;
+    };
 
 type SidebarManualGroup = {
   badge?:
+    | string
+    | undefined
     | {
         text: string;
         variant: 'caution' | 'danger' | 'default' | 'note' | 'success' | 'tip';
-      }
-    | string
-    | undefined;
+      };
   collapsed?: boolean;
   items: (LinkItem | SidebarGroup)[];
   label: string;

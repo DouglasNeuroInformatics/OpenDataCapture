@@ -1,16 +1,14 @@
-import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import { accessibleQuery, InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 import type { Group } from '@opendatacapture/schemas/group';
-import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
+import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { SubjectModel } from '@prisma/generated-client';
+import type { Session, Subject } from '@prisma/client';
 
-import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
-import { InjectModel } from '@/prisma/prisma.decorators';
-import type { Model } from '@/prisma/prisma.types';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 @Injectable()
@@ -30,7 +28,7 @@ export class SessionsService {
     let group: Group | null = null;
     if (groupId && !subject.groupIds.includes(groupId)) {
       group = await this.groupsService.findById(groupId);
-      await this.subjectsService.updateById(subject.id, { groupIds: { push: group.id } });
+      await this.subjectsService.addGroupForSubject(subject.id, group.id);
     }
 
     const { id } = await this.sessionModel.create({
@@ -86,7 +84,7 @@ export class SessionsService {
   /** Get the subject if they exist, otherwise create them */
   private async resolveSubject(subjectData: CreateSubjectData) {
     this.loggingService.debug({ message: 'Attempting to resolve subject', subjectData });
-    let subject: SubjectModel;
+    let subject: Subject;
     try {
       subject = await this.subjectsService.findById(subjectData.id);
     } catch (err) {

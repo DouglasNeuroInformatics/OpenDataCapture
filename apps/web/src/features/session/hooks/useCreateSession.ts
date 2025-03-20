@@ -1,5 +1,6 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { $Session, type CreateSessionData } from '@opendatacapture/schemas/session';
+import { $Session } from '@opendatacapture/schemas/session';
+import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 

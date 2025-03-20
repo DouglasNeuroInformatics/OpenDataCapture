@@ -1,3 +1,4 @@
+/* eslint-disable import/exports-last */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
 type Mode = 'insert' | 'normal' | 'replace' | 'visual';

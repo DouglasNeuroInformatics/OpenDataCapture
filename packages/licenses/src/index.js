@@ -422,16 +422,6 @@ const spdxLicenses = {
     name: 'BSD 3-Clause Sun Microsystems',
     reference: 'https://spdx.org/licenses/BSD-3-Clause-Sun.html'
   },
-  'BSD-4.3RENO': {
-    isOpenSource: false,
-    name: 'BSD 4.3 RENO License',
-    reference: 'https://spdx.org/licenses/BSD-4.3RENO.html'
-  },
-  'BSD-4.3TAHOE': {
-    isOpenSource: false,
-    name: 'BSD 4.3 TAHOE License',
-    reference: 'https://spdx.org/licenses/BSD-4.3TAHOE.html'
-  },
   'BSD-4-Clause': {
     isOpenSource: true,
     name: 'BSD 4-Clause "Original" or "Old" License',
@@ -446,6 +436,16 @@ const spdxLicenses = {
     isOpenSource: false,
     name: 'BSD-4-Clause (University of California-Specific)',
     reference: 'https://spdx.org/licenses/BSD-4-Clause-UC.html'
+  },
+  'BSD-4.3RENO': {
+    isOpenSource: false,
+    name: 'BSD 4.3 RENO License',
+    reference: 'https://spdx.org/licenses/BSD-4.3RENO.html'
+  },
+  'BSD-4.3TAHOE': {
+    isOpenSource: false,
+    name: 'BSD 4.3 TAHOE License',
+    reference: 'https://spdx.org/licenses/BSD-4.3TAHOE.html'
   },
   'BSD-Advertising-Acknowledgement': {
     isOpenSource: false,
@@ -536,6 +536,11 @@ const spdxLicenses = {
     isOpenSource: true,
     name: 'Computer Associates Trusted Open Source License 1.1',
     reference: 'https://spdx.org/licenses/CATOSL-1.1.html'
+  },
+  'CC0-1.0': {
+    isOpenSource: true,
+    name: 'Creative Commons Zero v1.0 Universal',
+    reference: 'https://spdx.org/licenses/CC0-1.0.html'
   },
   'CC-BY-1.0': {
     isOpenSource: false,
@@ -796,11 +801,6 @@ const spdxLicenses = {
     isOpenSource: false,
     name: 'Creative Commons Public Domain Dedication and Certification',
     reference: 'https://spdx.org/licenses/CC-PDDC.html'
-  },
-  'CC0-1.0': {
-    isOpenSource: true,
-    name: 'Creative Commons Zero v1.0 Universal',
-    reference: 'https://spdx.org/licenses/CC0-1.0.html'
   },
   'CDDL-1.0': {
     isOpenSource: true,

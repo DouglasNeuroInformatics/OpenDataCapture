@@ -1,10 +1,9 @@
+import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Prisma } from '@prisma/generated-client';
+import type { Prisma } from '@prisma/client';
 
-import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
-import { InjectModel } from '@/prisma/prisma.decorators';
-import type { Model, ModelUpdateData } from '@/prisma/prisma.types';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
 
@@ -12,7 +11,18 @@ import { CreateSubjectDto } from './dto/create-subject.dto';
 export class SubjectsService {
   constructor(@InjectModel('Subject') private readonly subjectModel: Model<'Subject'>) {}
 
-  async count(where: Prisma.SubjectModelWhereInput = {}, { ability }: EntityOperationOptions = {}) {
+  async addGroupForSubject(subjectId: string, groupId: string, { ability }: EntityOperationOptions = {}) {
+    return this.subjectModel.update({
+      data: {
+        groupIds: {
+          push: groupId
+        }
+      },
+      where: { ...accessibleQuery(ability, 'update', 'Subject'), id: subjectId }
+    });
+  }
+
+  async count(where: Prisma.SubjectWhereInput = {}, { ability }: EntityOperationOptions = {}) {
     return this.subjectModel.count({
       where: { AND: [accessibleQuery(ability, 'read', 'Subject'), where] }
     });
@@ -55,12 +65,5 @@ export class SubjectsService {
       throw new NotFoundException(`Failed to find subject with id: ${id}`);
     }
     return subject;
-  }
-
-  async updateById(id: string, data: ModelUpdateData<'Subject'>, { ability }: EntityOperationOptions = {}) {
-    return this.subjectModel.update({
-      data,
-      where: { id, ...accessibleQuery(ability, 'update', 'Subject') }
-    });
   }
 }

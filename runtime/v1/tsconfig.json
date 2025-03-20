@@ -1,9 +1,9 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "checkJs": false,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "rootDir": "../.."
   },
-  "extends": "../../tsconfig.base.json",
   "include": ["build.ts", "src/**/*", "*.js", "*.cjs", "env.d.ts"]
 }

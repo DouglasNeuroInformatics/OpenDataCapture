@@ -1,4 +1,4 @@
-import { type RouteObject } from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
 
 import { UploadPage } from './pages/UploadPage';
 import { UploadSelectPage } from './pages/UploadSelectPage';

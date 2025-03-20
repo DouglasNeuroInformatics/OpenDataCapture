@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import { Button, type ButtonProps } from '@douglasneuroinformatics/libui/components';
+import { Button } from '@douglasneuroinformatics/libui/components';
+import type { ButtonProps } from '@douglasneuroinformatics/libui/components';
 import { ClipboardCheckIcon, ClipboardListIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { match } from 'ts-pattern';

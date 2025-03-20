@@ -17,7 +17,7 @@ function InitializedOnly<T extends BaseTranslator, TArgs extends any[], TReturn>
 }
 
 /** @public */
-export type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> = Key extends string
+type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> = Key extends string
   ? T[Key] extends { [key: string]: unknown }
     ? T[Key] extends { [K in Language]: string }
       ? Key
@@ -26,21 +26,36 @@ export type TranslationKey<T extends { [key: string]: unknown }, Key = keyof T> 
   : never;
 
 /** @public */
-export type LanguageChangeHandler = (this: void, language: Language) => void;
+type LanguageChangeHandler = (this: void, language: Language) => void;
 
 /** @public */
-export type TranslatorOptions<T extends { [key: string]: unknown }> = {
+type TranslatorOptions<T extends { [key: string]: unknown }> = {
   fallbackLanguage?: Language;
   translations: T;
 };
 
 /** @public */
-export type TranslatorInitOptions = {
+type TranslatorInitOptions = {
   onLanguageChange?: LanguageChangeHandler | null;
 };
 
 /** @public */
-export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
+type TranslatorInstance<T extends { [key: string]: unknown }> = {
+  changeLanguage(language: Language): void;
+  init(options?: TranslatorInitOptions): void;
+  readonly isInitialized: boolean;
+  onLanguageChange: LanguageChangeHandler;
+  readonly resolvedLanguage: Language;
+  t(key: TranslationKey<T>): string;
+};
+
+/** @public */
+type TranslatorConstructor = new <T extends { [key: string]: unknown }>(
+  options: TranslatorOptions<T>
+) => TranslatorInstance<T>;
+
+/** @public */
+abstract class BaseTranslator<T extends { [key: string]: unknown } = { [key: string]: unknown }> {
   protected currentDocumentLanguage: Language | null;
   protected fallbackLanguage: Language;
   protected handleLanguageChange: LanguageChangeHandler | null;
@@ -107,7 +122,7 @@ export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [k
 
   @InitializedOnly
   t(key: TranslationKey<T>) {
-    const value = get(this.translations, key) as { [key: string]: string } | string | undefined;
+    const value = get(this.translations, key) as string | undefined | { [key: string]: string };
     if (typeof value === 'string') {
       return value;
     }
@@ -116,7 +131,10 @@ export abstract class BaseTranslator<T extends { [key: string]: unknown } = { [k
 }
 
 /** @public */
-export class SynchronizedTranslator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
+class SynchronizedTranslator<T extends { [key: string]: unknown }>
+  extends BaseTranslator<T>
+  implements TranslatorInstance<T>
+{
   constructor(options: TranslatorOptions<T>) {
     super(options);
   }
@@ -139,7 +157,10 @@ export class SynchronizedTranslator<T extends { [key: string]: unknown }> extend
 }
 
 /** @public */
-export class StandaloneTranslator<T extends { [key: string]: unknown }> extends BaseTranslator<T> {
+class StandaloneTranslator<T extends { [key: string]: unknown }>
+  extends BaseTranslator<T>
+  implements TranslatorInstance<T>
+{
   @InitializedOnly
   changeLanguage(language: Language) {
     document.documentElement.setAttribute('lang', language);
@@ -154,11 +175,19 @@ export class StandaloneTranslator<T extends { [key: string]: unknown }> extends 
 }
 
 /** @public */
-let Translator: typeof BaseTranslator;
+let Translator: TranslatorConstructor;
 if (typeof window === 'undefined' || window.self !== window.top) {
   Translator = SynchronizedTranslator;
 } else {
   Translator = StandaloneTranslator;
 }
 
-export { Translator };
+export { BaseTranslator, StandaloneTranslator, SynchronizedTranslator, Translator };
+export type {
+  LanguageChangeHandler,
+  TranslationKey,
+  TranslatorConstructor,
+  TranslatorInitOptions,
+  TranslatorInstance,
+  TranslatorOptions
+};

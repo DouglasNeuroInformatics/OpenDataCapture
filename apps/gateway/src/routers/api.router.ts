@@ -1,10 +1,10 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
-import {
-  $CreateRemoteAssignmentData,
-  $UpdateRemoteAssignmentData,
-  type RemoteAssignment
+import { $CreateRemoteAssignmentData, $UpdateRemoteAssignmentData } from '@opendatacapture/schemas/assignment';
+import type {
+  AssignmentStatus,
+  MutateAssignmentResponseBody,
+  RemoteAssignment
 } from '@opendatacapture/schemas/assignment';
-import type { AssignmentStatus, MutateAssignmentResponseBody } from '@opendatacapture/schemas/assignment';
 import type { GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gateway';
 import { Router } from 'express';
 

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { InstrumentInterpreter, type InterpretOptions } from '@opendatacapture/instrument-interpreter';
+import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
+import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import { translateInstrument } from '@opendatacapture/instrument-utils';
 import type { AnyInstrument, AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 

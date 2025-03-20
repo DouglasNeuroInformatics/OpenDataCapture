@@ -1,8 +1,8 @@
 import fs from 'fs/promises';
 
 import { deepFreeze } from '@douglasneuroinformatics/libjs';
-import { afterEach, beforeEach, describe, expect, it, type MockInstance } from 'vitest';
-import { vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 
 import { loadResource } from '../load-resource.js';
 import * as resolve from '../resolve.js';

@@ -1,11 +1,11 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
-import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
-import { Injectable, InternalServerErrorException, type OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService, LoggingService } from '@douglasneuroinformatics/libnest';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import type { OnApplicationBootstrap } from '@nestjs/common';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import { $Json } from '@opendatacapture/schemas/core';
 
 import { AssignmentsService } from '@/assignments/assignments.service';
-import { ConfigurationService } from '@/configuration/configuration.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
@@ -18,7 +18,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   private readonly refreshInterval: number;
 
   constructor(
-    configurationService: ConfigurationService,
+    configService: ConfigService,
     private readonly assignmentsService: AssignmentsService,
     private readonly gatewayService: GatewayService,
     private readonly instrumentsService: InstrumentsService,
@@ -27,7 +27,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     private readonly sessionsService: SessionsService,
     private readonly setupService: SetupService
   ) {
-    this.refreshInterval = configurationService.get('GATEWAY_REFRESH_INTERVAL');
+    this.refreshInterval = configService.get('GATEWAY_REFRESH_INTERVAL');
   }
 
   onApplicationBootstrap() {

@@ -1,10 +1,11 @@
 import { InstrumentBundlerError } from './error.js';
 import { plugin } from './plugin.js';
 import { resolveIndexInput } from './resolve.js';
-import { $BuildFailure, type BundlerInput } from './schemas.js';
+import { $BuildFailure } from './schemas.js';
 import { inferLoader } from './utils.js';
 import * as esbuild from './vendor/esbuild.js';
 
+import type { BundlerInput } from './schemas.js';
 import type { BuildOutput } from './types.js';
 import type { BuildResult } from './vendor/esbuild.js';
 

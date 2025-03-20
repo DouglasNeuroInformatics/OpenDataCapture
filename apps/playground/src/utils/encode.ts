@@ -1,7 +1,8 @@
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import { z } from 'zod';
 
-import { $EditorFile, type EditorFile } from '@/models/editor-file.model';
+import { $EditorFile } from '@/models/editor-file.model';
+import type { EditorFile } from '@/models/editor-file.model';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 
 type ShareURL = URL & { size: number };

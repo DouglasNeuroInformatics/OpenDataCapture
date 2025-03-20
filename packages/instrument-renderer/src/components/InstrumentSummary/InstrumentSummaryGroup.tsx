@@ -2,10 +2,10 @@ import { Heading } from '@douglasneuroinformatics/libui/components';
 import { match, P } from 'ts-pattern';
 
 export type InstrumentSummaryGroupProps = {
-  items: ({
+  items: (null | {
     label: string;
     value?: unknown;
-  } | null)[];
+  })[];
   title: string;
 };
 

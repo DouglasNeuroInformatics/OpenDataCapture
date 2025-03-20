@@ -1,3 +1,4 @@
+/* eslint-disable import/exports-last */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/unbound-method */
 /* eslint-disable no-dupe-class-members */
@@ -66,7 +67,6 @@ export class VimMode implements EventTarget {
     callback: EventHandler<FileEvent>,
     options?: AddEventListenerOptions | boolean
   ): void;
-
   addEventListener(type: 'clipboard', callback: EventHandler<Event>, options?: AddEventListenerOptions | boolean): void;
   addEventListener(
     type: string,
@@ -123,13 +123,11 @@ export class VimMode implements EventTarget {
     callback: EventHandler<FileEvent>,
     options?: AddEventListenerOptions | boolean
   ): void;
-
   removeEventListener(
     type: 'clipboard',
     callback: EventHandler<Event>,
     options?: AddEventListenerOptions | boolean
   ): void;
-
   removeEventListener(
     type: string,
     callback: EventHandler<Event> | EventHandler<FileEvent>,

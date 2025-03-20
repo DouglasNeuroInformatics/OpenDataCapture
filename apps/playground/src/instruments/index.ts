@@ -1,7 +1,8 @@
 import { $InstrumentKind } from '@opendatacapture/schemas/instrument';
 import { capitalize } from 'lodash-es';
 
-import { $InstrumentCategory, type InstrumentRepository } from '@/models/instrument-repository.model';
+import { $InstrumentCategory } from '@/models/instrument-repository.model';
+import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import { loadAssetAsBase64 } from '@/utils/load';
 
 // Instruments in development

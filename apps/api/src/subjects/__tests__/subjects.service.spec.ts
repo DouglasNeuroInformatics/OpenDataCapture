@@ -1,12 +1,11 @@
-import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
-import { type MockedInstance, MockFactory } from '@douglasneuroinformatics/libnest/testing';
+import { CryptoService, getModelToken } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
+import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
+import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { pick } from 'lodash-es';
 import { beforeEach, describe, expect, it } from 'vitest';
-
-import type { Model } from '@/prisma/prisma.types';
-import { getModelToken } from '@/prisma/prisma.utils';
 
 import { SubjectsService } from '../subjects.service';
 

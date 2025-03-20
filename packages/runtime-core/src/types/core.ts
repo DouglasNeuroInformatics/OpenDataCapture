@@ -5,6 +5,6 @@ type Language = 'en' | 'fr';
 type JsonLiteral = boolean | null | number | string;
 
 /** @public */
-type Json = { [key: string]: Json } | Json[] | JsonLiteral;
+type Json = Json[] | JsonLiteral | { [key: string]: Json };
 
 export type { Json, JsonLiteral, Language };

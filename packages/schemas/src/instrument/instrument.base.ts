@@ -19,7 +19,9 @@ import type {
 import type { Simplify } from 'type-fest';
 import { z } from 'zod';
 
-import { $Language, $LicenseIdentifier, $ZodTypeAny, type Language } from '../core/core.js';
+import { $Language, $LicenseIdentifier, $ZodTypeAny } from '../core/core.js';
+
+import type { Language } from '../core/core.js';
 
 const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'SERIES']) satisfies z.ZodType<InstrumentKind>;
 

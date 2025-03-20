@@ -1,6 +1,7 @@
 import type { PureAbility, RawRuleOf } from '@casl/ability';
 import { isObject } from '@douglasneuroinformatics/libjs';
-import { type LicenseIdentifier, licenses } from '@opendatacapture/licenses';
+import { licenses } from '@opendatacapture/licenses';
+import type { LicenseIdentifier } from '@opendatacapture/licenses';
 import type { Json, JsonLiteral, Language } from '@opendatacapture/runtime-core';
 import type { Simplify } from 'type-fest';
 import { z } from 'zod';
@@ -55,19 +56,17 @@ export function isZodObjectType(arg: z.ZodTypeAny): arg is z.AnyZodObject {
 
 export const $ZodTypeAny = z.custom<z.ZodTypeAny>((arg) => isZodType(arg));
 
-export const $BooleanString = z.preprocess((arg) => {
-  if (typeof arg !== 'string') {
-    return arg;
-  }
-  if (typeof arg === 'string') {
+export const $BooleanString = z
+  .string()
+  .transform((arg) => {
     if (arg.trim().toLowerCase() === 'true') {
       return true;
     } else if (arg.trim().toLowerCase() === 'false') {
       return false;
     }
-  }
-  return arg;
-}, z.boolean());
+    return arg;
+  })
+  .pipe(z.boolean());
 
 export const $Uint8Array: z.ZodType<Uint8Array, z.ZodTypeDef, number[] | Uint8Array> = z
   .union([z.array(z.number().int().min(0).max(255)), z.instanceof(Uint8Array)])
