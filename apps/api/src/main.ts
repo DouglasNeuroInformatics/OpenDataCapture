@@ -15,25 +15,23 @@ import { ConfiguredAuthModule } from './vendor/configured.auth.module';
 
 export default AppContainer.create({
   docs: {
-    config: {
-      contact: {
-        email: 'support@douglasneuroinformatics.ca',
-        name: 'Douglas Neuroinformatics',
-        url: 'https://douglasneuroinformatics.ca'
-      },
-      description: 'Documentation for the REST API for Open Data Capture',
-      externalDoc: {
-        description: 'Homepage',
-        url: 'https://opendatacapture.org'
-      },
-      license: {
-        name: 'Apache-2.0',
-        url: 'https://www.apache.org/licenses/LICENSE-2.0'
-      },
-      tags: ['Authentication', 'Groups', 'Instruments', 'Instrument Records', 'Subjects', 'Users'],
-      title: 'Open Data Capture'
+    contact: {
+      email: 'support@douglasneuroinformatics.ca',
+      name: 'Douglas Neuroinformatics',
+      url: 'https://douglasneuroinformatics.ca'
     },
-    path: '/spec.json'
+    description: 'Documentation for the REST API for Open Data Capture',
+    externalDoc: {
+      description: 'Homepage',
+      url: 'https://opendatacapture.org'
+    },
+    license: {
+      name: 'Apache-2.0',
+      url: 'https://www.apache.org/licenses/LICENSE-2.0'
+    },
+    path: '/',
+    tags: ['Authentication', 'Groups', 'Instruments', 'Instrument Records', 'Subjects', 'Users'],
+    title: 'Open Data Capture'
   },
   envSchema: $Env,
   imports: [
