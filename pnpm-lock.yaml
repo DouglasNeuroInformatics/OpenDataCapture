@@ -217,8 +217,8 @@ importers:
         specifier: ^2.4.0
         version: 2.4.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
       '@douglasneuroinformatics/libnest':
-        specifier: ^3.0.0
-        version: 3.0.0(@nestjs/common@11.0.11(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.0.11)(@nestjs/platform-express@11.0.11)(@nestjs/testing@11.0.11(@nestjs/common@11.0.11(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.0.11)(@nestjs/platform-express@11.0.11))(@prisma/client@6.5.0(prisma@6.5.0(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.19)(express@5.0.1)(mongodb@6.15.0(socks@2.8.4))(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rxjs@7.8.2)(typescript@5.6.3)(zod@vendor+zod@3.23.x)
+        specifier: ^3.0.1
+        version: 3.0.1(@nestjs/common@11.0.11(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.0.11)(@nestjs/platform-express@11.0.11)(@nestjs/testing@11.0.11(@nestjs/common@11.0.11(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.0.11)(@nestjs/platform-express@11.0.11))(@prisma/client@6.5.0(prisma@6.5.0(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.19)(express@5.0.1)(mongodb@6.15.0(socks@2.8.4))(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rxjs@7.8.2)(typescript@5.6.3)(zod@vendor+zod@3.23.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
         version: 0.0.3(typescript@5.6.3)
@@ -1947,9 +1947,9 @@ packages:
       neverthrow: ^8.2.0
       zod: ^3.22.6
 
-  '@douglasneuroinformatics/libnest@3.0.0':
+  '@douglasneuroinformatics/libnest@3.0.1':
     resolution:
-      { integrity: sha512-Id8mEyASmp9AU/mjZDyA72KOe+Pw0owj4kgq6ADp2hvcqkJT+SVyOZ5gJLv3uR3tiIVL9TTZxhncBwsLVqrKSw== }
+      { integrity: sha512-Icg2Sp1dSPNm1BqiTYKy0bpabqY2q/ymjbcQCYaGzRfQfFAKp1Aq4gK8zYEltLIYllJVDEFQmBp2G2ahzFEf4A== }
     engines: { node: 22.x }
     hasBin: true
     peerDependencies:
@@ -13605,7 +13605,7 @@ snapshots:
       type-fest: 4.37.0
       zod: link:vendor/zod@3.23.x
 
-  '@douglasneuroinformatics/libnest@3.0.0(@nestjs/common@11.0.11(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.0.11)(@nestjs/platform-express@11.0.11)(@nestjs/testing@11.0.11(@nestjs/common@11.0.11(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.0.11)(@nestjs/platform-express@11.0.11))(@prisma/client@6.5.0(prisma@6.5.0(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.19)(express@5.0.1)(mongodb@6.15.0(socks@2.8.4))(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rxjs@7.8.2)(typescript@5.6.3)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libnest@3.0.1(@nestjs/common@11.0.11(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.0.11)(@nestjs/platform-express@11.0.11)(@nestjs/testing@11.0.11(@nestjs/common@11.0.11(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.0.11)(@nestjs/platform-express@11.0.11))(@prisma/client@6.5.0(prisma@6.5.0(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.19)(express@5.0.1)(mongodb@6.15.0(socks@2.8.4))(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rxjs@7.8.2)(typescript@5.6.3)(zod@vendor+zod@3.23.x)':
     dependencies:
       '@casl/ability': 6.7.3
       '@casl/prisma': 1.5.1(@casl/ability@6.7.3)(@prisma/client@6.5.0(prisma@6.5.0(typescript@5.6.3))(typescript@5.6.3))
