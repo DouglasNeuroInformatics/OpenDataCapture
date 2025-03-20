@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 
-import { ListboxDropdown, type ListboxDropdownOption, SearchBar } from '@douglasneuroinformatics/libui/components';
+import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
+import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { InstrumentCard } from '../InstrumentCard';
 import { InstrumentKindDropdown } from './InstrumentKindDropdown';
-import { InstrumentLanguageDropdown, type InstrumentShowcaseLanguageOption } from './InstrumentLanguageDropdown';
+import { InstrumentLanguageDropdown } from './InstrumentLanguageDropdown';
 
 import type { InstrumentShowcaseKindOption } from './InstrumentKindDropdown';
+import type { InstrumentShowcaseLanguageOption } from './InstrumentLanguageDropdown';
 
 export const InstrumentShowcase: React.FC<{
   data: TranslatedInstrumentInfo[];

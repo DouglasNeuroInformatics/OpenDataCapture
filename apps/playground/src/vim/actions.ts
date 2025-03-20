@@ -1,3 +1,4 @@
+/* eslint-disable import/exports-last */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
@@ -10,8 +11,7 @@ import {
   cursorMax,
   cursorMin,
   findFirstNonWhiteSpaceCharacter,
-  makePos,
-  type Pos
+  makePos
 } from './common';
 import { vimGlobalState } from './global';
 import {
@@ -33,6 +33,7 @@ import {
 import { MacroModeState } from './macro-mode-state';
 import { motions } from './motions';
 
+import type { Pos } from './common';
 import type { ActionArgs, VimState } from './types';
 
 export type ActionFunc = (adapter: EditorAdapter, actionArgs: ActionArgs, vim: VimState) => void;

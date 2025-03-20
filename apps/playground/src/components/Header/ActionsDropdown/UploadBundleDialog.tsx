@@ -5,7 +5,8 @@ import { useEffect, useRef } from 'react';
 import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { AuthPayload } from '@opendatacapture/schemas/auth';
-import axios, { type AxiosResponse, isAxiosError } from 'axios';
+import axios, { isAxiosError } from 'axios';
+import type { AxiosResponse } from 'axios';
 import { z } from 'zod';
 
 import { useAppStore } from '@/store';

@@ -1,3 +1,5 @@
+/* eslint-disable import/exports-last */
+
 /**
  * Adapted from https://github.com/TomerAberbach/parse-imports
  * Rewrote in TypeScript and to be usable in the browser (removed/changed all Node.js-reliant code)

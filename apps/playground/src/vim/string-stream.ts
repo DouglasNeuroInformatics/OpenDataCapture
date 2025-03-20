@@ -73,9 +73,7 @@ export class StringStream {
   }
 
   match(pattern: string, consume?: boolean, caseInsensitive?: boolean): boolean | string;
-
   match(pattern: RegExp, consume?: boolean): RegExpMatchArray;
-
   match(
     pattern: RegExp | string,
     consume?: boolean,

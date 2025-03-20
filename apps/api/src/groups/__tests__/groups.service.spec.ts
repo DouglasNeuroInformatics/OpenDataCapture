@@ -1,11 +1,12 @@
-import { type MockedInstance, MockFactory } from '@douglasneuroinformatics/libnest/testing';
+import type { Model } from '@douglasneuroinformatics/libnest';
+import { getModelToken } from '@douglasneuroinformatics/libnest';
+import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
+import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { InstrumentsService } from '@/instruments/instruments.service';
-import type { Model } from '@/prisma/prisma.types';
-import { getModelToken } from '@/prisma/prisma.utils';
 
 import { GroupsService } from '../groups.service';
 

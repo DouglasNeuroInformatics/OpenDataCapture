@@ -1,3 +1,4 @@
+/* eslint-disable import/exports-last */
 /* eslint-disable no-fallthrough */
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -413,14 +414,14 @@ export default class EditorAdapter {
 
   getOption(key: string): any {
     switch (key) {
-      case 'readOnly':
-        return this.getConfiguration().readOnly;
       case 'firstLineNumber':
         return this.firstLine() + 1;
       case 'indentWithTabs': {
         const model = this.editor.getModel()!;
         return !model.getOptions().insertSpaces;
       }
+      case 'readOnly':
+        return this.getConfiguration().readOnly;
       case 'tabSize': {
         const model = this.editor.getModel()!;
         return model.getOptions().tabSize;
@@ -897,29 +898,17 @@ export default class EditorAdapter {
     event: 'status-prompt',
     handler: (prefix: string, desc: string, options: StatusBarInputOptions, id: string) => void
   ): void;
-
   on(event: 'status-close-prompt', handler: (id: string) => void): void;
-
   on(event: 'status-display', handler: (message: string, id: string) => void): void;
-
   on(event: 'status-close-display', handler: (id: string) => void): void;
-
   on(event: 'status-display' | 'status-notify', handler: (message: string) => void): void;
-
   on(event: 'cursorActivity', handler: (adapter: EditorAdapter) => void): void;
-
   on(event: 'change', handler: (adapter: EditorAdapter, change: Change) => void): void;
-
   on(event: 'dispose', handler: () => void): void;
-
   on(event: 'vim-command-done', handler: (reason?: string) => void): void;
-
   on(event: 'vim-set-clipboard-register', handler: () => void): void;
-
   on(event: 'vim-mode-change', handler: (mode: ModeChangeEvent) => void): void;
-
   on(event: 'vim-keypress', handler: (key: string) => void): void;
-
   on(event: string, handler: (...args: any) => void): void {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
@@ -1062,9 +1051,7 @@ export default class EditorAdapter {
   }
 
   setCursor(line: Pos, ch?: number): void;
-
   setCursor(line: number, ch: number): void;
-
   setCursor(line: number | Pos, ch: number) {
     const pos = typeof line === 'number' ? makePos(line, ch) : line;
 

@@ -15,7 +15,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "catalog:",
+    "@douglasneuroinformatics/libjs": "^2.4.0",
     "esbuild": "catalog:",
     "zod": "workspace:zod__3.23.x@*"
   }

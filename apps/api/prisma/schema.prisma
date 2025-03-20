@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  output        = "../node_modules/@prisma/generated-client"
+  // output        = "../node_modules/@prisma/generated-client"
   binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
@@ -27,22 +27,24 @@ type EncryptionKeyPair {
   privateKey Bytes
 }
 
-model AssignmentModel {
-  createdAt         DateTime               @default(now()) @db.Date
-  updatedAt         DateTime               @updatedAt @db.Date
-  id                String                 @id @map("_id")
+model Assignment {
+  createdAt         DateTime          @default(now()) @db.Date
+  updatedAt         DateTime          @updatedAt @db.Date
+  id                String            @id @map("_id")
   completedAt       DateTime?
   expiresAt         DateTime
-  group             GroupModel?            @relation(fields: [groupId], references: [id])
-  groupId           String?                @db.ObjectId
-  instrument        InstrumentModel        @relation(fields: [instrumentId], references: [id])
+  group             Group?            @relation(fields: [groupId], references: [id])
+  groupId           String?           @db.ObjectId
+  instrument        Instrument        @relation(fields: [instrumentId], references: [id])
   instrumentId      String
-  instrumentRecord  InstrumentRecordModel?
+  instrumentRecord  InstrumentRecord?
   status            AssignmentStatus
-  subject           SubjectModel           @relation(fields: [subjectId], references: [id])
+  subject           Subject           @relation(fields: [subjectId], references: [id])
   subjectId         String
   url               String
   encryptionKeyPair EncryptionKeyPair
+
+  @@map("AssignmentModel")
 }
 
 // Groups
@@ -68,44 +70,48 @@ type GroupSettings {
   idValidationRegexErrorMessage ErrorMessage?
 }
 
-model GroupModel {
-  createdAt               DateTime                @default(now()) @db.Date
-  updatedAt               DateTime                @updatedAt @db.Date
-  id                      String                  @id @default(auto()) @map("_id") @db.ObjectId
+model Group {
+  createdAt               DateTime           @default(now()) @db.Date
+  updatedAt               DateTime           @updatedAt @db.Date
+  id                      String             @id @default(auto()) @map("_id") @db.ObjectId
   accessibleInstrumentIds String[]
-  accessibleInstruments   InstrumentModel[]       @relation(fields: [accessibleInstrumentIds], references: [id])
-  assignments             AssignmentModel[]
-  instrumentRecords       InstrumentRecordModel[]
-  name                    String                  @unique
+  accessibleInstruments   Instrument[]       @relation(fields: [accessibleInstrumentIds], references: [id])
+  assignments             Assignment[]
+  instrumentRecords       InstrumentRecord[]
+  name                    String             @unique
   settings                GroupSettings
-  sessions                SessionModel[]
-  subjects                SubjectModel[]          @relation(fields: [subjectIds], references: [id])
+  sessions                Session[]
+  subjects                Subject[]          @relation(fields: [subjectIds], references: [id])
   subjectIds              String[]
   type                    GroupType
-  userIds                 String[]                @db.ObjectId
-  users                   UserModel[]             @relation(fields: [userIds], references: [id])
+  userIds                 String[]           @db.ObjectId
+  users                   User[]             @relation(fields: [userIds], references: [id])
+
+  @@map("GroupModel")
 }
 
 /// Instrument Records
 
-model InstrumentRecordModel {
-  createdAt        DateTime         @default(now()) @db.Date
-  updatedAt        DateTime         @updatedAt @db.Date
-  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+model InstrumentRecord {
+  createdAt        DateTime    @default(now()) @db.Date
+  updatedAt        DateTime    @updatedAt @db.Date
+  id               String      @id @default(auto()) @map("_id") @db.ObjectId
   /// [ComputedMeasures]
   computedMeasures Json?
   data             Json?
-  date             DateTime         @db.Date
-  group            GroupModel?      @relation(fields: [groupId], references: [id])
-  groupId          String?          @db.ObjectId
-  subject          SubjectModel     @relation(fields: [subjectId], references: [id])
+  date             DateTime    @db.Date
+  group            Group?      @relation(fields: [groupId], references: [id])
+  groupId          String?     @db.ObjectId
+  subject          Subject     @relation(fields: [subjectId], references: [id])
   subjectId        String
-  instrument       InstrumentModel  @relation(fields: [instrumentId], references: [id])
+  instrument       Instrument  @relation(fields: [instrumentId], references: [id])
   instrumentId     String
-  assignment       AssignmentModel? @relation(fields: [assignmentId], references: [id])
-  assignmentId     String?          @unique
-  session          SessionModel     @relation(fields: [sessionId], references: [id])
-  sessionId        String           @db.ObjectId
+  assignment       Assignment? @relation(fields: [assignmentId], references: [id])
+  assignmentId     String?     @unique
+  session          Session     @relation(fields: [sessionId], references: [id])
+  sessionId        String      @db.ObjectId
+
+  @@map("InstrumentRecordModel")
 }
 
 // Instruments 
@@ -121,15 +127,17 @@ type InstrumentInternal {
   edition Float
 }
 
-model InstrumentModel {
-  createdAt   DateTime                @default(now()) @db.Date
-  updatedAt   DateTime                @updatedAt @db.Date
-  id          String                  @id @map("_id")
-  assignments AssignmentModel[]
+model Instrument {
+  createdAt   DateTime           @default(now()) @db.Date
+  updatedAt   DateTime           @updatedAt @db.Date
+  id          String             @id @map("_id")
+  assignments Assignment[]
   bundle      String
-  groups      GroupModel[]            @relation(fields: [groupIds], references: [id])
-  groupIds    String[]                @db.ObjectId
-  records     InstrumentRecordModel[]
+  groups      Group[]            @relation(fields: [groupIds], references: [id])
+  groupIds    String[]           @db.ObjectId
+  records     InstrumentRecord[]
+
+  @@map("InstrumentModel")
 }
 
 // Subjects
@@ -139,19 +147,21 @@ enum Sex {
   FEMALE
 }
 
-model SubjectModel {
-  createdAt         DateTime                @default(now()) @db.Date
-  updatedAt         DateTime                @updatedAt @db.Date
-  id                String                  @id @map("_id")
-  dateOfBirth       DateTime?               @db.Date
+model Subject {
+  createdAt         DateTime           @default(now()) @db.Date
+  updatedAt         DateTime           @updatedAt @db.Date
+  id                String             @id @map("_id")
+  dateOfBirth       DateTime?          @db.Date
   firstName         String?
-  groupIds          String[]                @db.ObjectId
-  groups            GroupModel[]            @relation(fields: [groupIds], references: [id])
+  groupIds          String[]           @db.ObjectId
+  groups            Group[]            @relation(fields: [groupIds], references: [id])
   lastName          String?
-  sessions          SessionModel[]
+  sessions          Session[]
   sex               Sex?
-  instrumentRecords InstrumentRecordModel[]
-  assignments       AssignmentModel[]
+  instrumentRecords InstrumentRecord[]
+  assignments       Assignment[]
+
+  @@map("SubjectModel")
 }
 
 enum BasePermissionLevel {
@@ -184,7 +194,7 @@ type AuthRule {
   subject AppSubject
 }
 
-model UserModel {
+model User {
   createdAt             DateTime             @default(now()) @db.Date
   updatedAt             DateTime             @updatedAt @db.Date
   id                    String               @id @default(auto()) @map("_id") @db.ObjectId
@@ -192,12 +202,14 @@ model UserModel {
   additionalPermissions AuthRule[]
   firstName             String
   groupIds              String[]             @db.ObjectId
-  groups                GroupModel[]         @relation(fields: [groupIds], references: [id])
+  groups                Group[]              @relation(fields: [groupIds], references: [id])
   lastName              String
-  password              String
+  hashedPassword        String               @map("password")
   username              String
   sex                   Sex?
   dateOfBirth           DateTime?            @db.Date
+
+  @@map("UserModel")
 }
 
 enum SessionType {
@@ -206,26 +218,30 @@ enum SessionType {
   REMOTE
 }
 
-model SessionModel {
-  createdAt         DateTime                @default(now()) @db.Date
-  updatedAt         DateTime                @updatedAt @db.Date
-  id                String                  @id @default(auto()) @map("_id") @db.ObjectId
-  date              DateTime                @db.Date
-  group             GroupModel?             @relation(fields: [groupId], references: [id])
-  groupId           String?                 @db.ObjectId
-  instrumentRecords InstrumentRecordModel[]
-  subject           SubjectModel            @relation(fields: [subjectId], references: [id])
+model Session {
+  createdAt         DateTime           @default(now()) @db.Date
+  updatedAt         DateTime           @updatedAt @db.Date
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
+  date              DateTime           @db.Date
+  group             Group?             @relation(fields: [groupId], references: [id])
+  groupId           String?            @db.ObjectId
+  instrumentRecords InstrumentRecord[]
+  subject           Subject?           @relation(fields: [subjectId], references: [id])
   subjectId         String
   type              SessionType
+
+  @@map("SessionModel")
 }
 
 // Setup
 
-model SetupStateModel {
+model SetupState {
   createdAt                     DateTime @default(now()) @db.Date
   updatedAt                     DateTime @updatedAt @db.Date
   id                            String   @id @default(auto()) @map("_id") @db.ObjectId
   isDemo                        Boolean
   isExperimentalFeaturesEnabled Boolean?
   isSetup                       Boolean
+
+  @@map("SetupStateModel")
 }

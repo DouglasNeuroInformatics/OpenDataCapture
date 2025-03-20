@@ -1,44 +1,62 @@
-import path from 'node:path';
+import { AppContainer } from '@douglasneuroinformatics/libnest';
 
-import { ValidationPipe } from '@douglasneuroinformatics/libnest/core';
-import { JSONLogger } from '@douglasneuroinformatics/libnest/logging';
-import { VersioningType } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import { json } from 'express';
+import { AssignmentsModule } from './assignments/assignments.module';
+import { $Env } from './core/env.schema';
+import { GatewayModule } from './gateway/gateway.module';
+import { GroupsModule } from './groups/groups.module';
+import { InstrumentRecordsModule } from './instrument-records/instrument-records.module';
+import { InstrumentsModule } from './instruments/instruments.module';
+import { SessionsModule } from './sessions/sessions.module';
+import { SetupModule } from './setup/setup.module';
+import { SubjectsModule } from './subjects/subjects.module';
+import { SummaryModule } from './summary/summary.module';
+import { UsersModule } from './users/users.module';
+import { ConfiguredAuthModule } from './vendor/configured.auth.module';
 
-import { AppModule } from './app.module';
-import { ConfigurationService } from './configuration/configuration.service';
-import { setupDocs } from './docs';
-
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    bufferLogs: true
-  });
-  const configurationService = app.get(ConfigurationService);
-  const logger = new JSONLogger(null, {
-    debug: configurationService.get('DEBUG'),
-    verbose: configurationService.get('VERBOSE')
-  });
-  app.useLogger(logger);
-  app.enableCors();
-  app.enableShutdownHooks();
-  app.enableVersioning({
-    defaultVersion: '1',
-    type: VersioningType.URI
-  });
-  app.use(json({ limit: '50MB' }));
-  app.useGlobalPipes(new ValidationPipe());
-
-  app.useStaticAssets(path.resolve(import.meta.dirname, '..', 'public'));
-  setupDocs(app);
-
-  const isProduction = configurationService.get('NODE_ENV') === 'production';
-  const port = configurationService.get(isProduction ? 'API_PROD_SERVER_PORT' : 'API_DEV_SERVER_PORT');
-
-  await app.listen(port);
-
-  logger.log(`Application is running on: ${await app.getUrl()}`);
-}
-
-void bootstrap();
+export default AppContainer.create({
+  docs: {
+    config: {
+      contact: {
+        email: 'support@douglasneuroinformatics.ca',
+        name: 'Douglas Neuroinformatics',
+        url: 'https://douglasneuroinformatics.ca'
+      },
+      description: 'Documentation for the REST API for Open Data Capture',
+      externalDoc: {
+        description: 'Homepage',
+        url: 'https://opendatacapture.org'
+      },
+      license: {
+        name: 'Apache-2.0',
+        url: 'https://www.apache.org/licenses/LICENSE-2.0'
+      },
+      tags: ['Authentication', 'Groups', 'Instruments', 'Instrument Records', 'Subjects', 'Users'],
+      title: 'Open Data Capture'
+    },
+    path: '/spec.json'
+  },
+  envSchema: $Env,
+  imports: [
+    ConfiguredAuthModule,
+    GroupsModule,
+    InstrumentRecordsModule,
+    InstrumentsModule,
+    SessionsModule,
+    SetupModule,
+    SubjectsModule,
+    SummaryModule,
+    UsersModule,
+    {
+      module: AssignmentsModule,
+      when: 'GATEWAY_ENABLED'
+    },
+    {
+      module: GatewayModule,
+      when: 'GATEWAY_ENABLED'
+    }
+  ],
+  prisma: {
+    dbPrefix: 'data-capture'
+  },
+  version: '1'
+});

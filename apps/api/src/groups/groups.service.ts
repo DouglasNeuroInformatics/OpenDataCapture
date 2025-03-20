@@ -1,11 +1,10 @@
+import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 
-import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
-import { InjectModel } from '@/prisma/prisma.decorators';
-import type { Model } from '@/prisma/prisma.types';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -65,7 +64,7 @@ export class GroupsService {
     { accessibleInstrumentIds, settings, ...data }: UpdateGroupDto,
     { ability }: EntityOperationOptions = {}
   ) {
-    const where: Prisma.GroupModelWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };
+    const where: Prisma.GroupWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };
     const group = await this.groupModel.findFirst({ where });
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);

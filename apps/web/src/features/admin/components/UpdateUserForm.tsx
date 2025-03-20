@@ -2,7 +2,8 @@ import { isAllUndefined } from '@douglasneuroinformatics/libjs';
 import { Button, Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
-import { $UserPermission, type UserPermission } from '@opendatacapture/schemas/user';
+import { $UserPermission } from '@opendatacapture/schemas/user';
+import type { UserPermission } from '@opendatacapture/schemas/user';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 

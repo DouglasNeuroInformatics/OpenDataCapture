@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@casl/ability": "catalog:",
-    "@douglasneuroinformatics/libjs": "catalog:",
+    "@douglasneuroinformatics/libjs": "^2.4.0",
     "@douglasneuroinformatics/libpasswd": "catalog:",
     "@douglasneuroinformatics/libui": "catalog:",
     "@heroicons/react": "^2.2.0",

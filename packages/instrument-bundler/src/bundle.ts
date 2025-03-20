@@ -9,7 +9,7 @@ import type { BuildOutput } from './types.js';
 const GLOBALS = `
   globalThis.__import = async (moduleName) => {
     try {
-      return import(moduleName);
+      return import(typeof globalThis.__resolveImport === 'function' ? globalThis.__resolveImport(moduleName) : moduleName);
     } catch (err) {
       throw new Error('Failed to import module: ' + moduleName, { cause: err });
     }

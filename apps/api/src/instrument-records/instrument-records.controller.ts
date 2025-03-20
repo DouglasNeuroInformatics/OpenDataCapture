@@ -1,13 +1,11 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest/core';
+import { CurrentUser, ParseSchemaPipe, RouteAccess } from '@douglasneuroinformatics/libnest';
+import type { AppAbility } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { z } from 'zod';
-
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import type { AppAbility } from '@/core/types';
 
 import { CreateInstrumentRecordDto } from './dto/create-instrument-record.dto';
 import { UploadInstrumentRecordsDto } from './dto/upload-instrument-record.dto';

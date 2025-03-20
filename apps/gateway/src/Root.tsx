@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-import { NotificationHub } from '@douglasneuroinformatics/libui/components';
-import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { LanguageToggle, NotificationHub, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { InstrumentRenderer, type InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
+import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import type { InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
 import { Branding } from '@opendatacapture/react-core';
 import type { UpdateRemoteAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';

@@ -1,4 +1,4 @@
-import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { ApiProperty } from '@nestjs/swagger';
 import type { Sex } from '@opendatacapture/schemas/subject';

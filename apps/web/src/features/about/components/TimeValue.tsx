@@ -9,10 +9,16 @@ export type TimeValueProps = {
 
 export const TimeValue = ({ value }: TimeValueProps) => {
   const format = useCallback((uptime: number) => {
-    // eslint-disable-next-line prefer-const
-    let { days, hours, minutes, seconds } = parseDuration(uptime * 1000);
-    hours += days * 24;
-    return [hours, minutes, seconds].map((value) => (value < 10 ? '0' + value : value)).join(':');
+    return parseDuration(uptime * 1000).match(
+      ({ days, hours, minutes, seconds }) => {
+        hours += days * 24;
+        return [hours, minutes, seconds].map((value) => (value < 10 ? '0' + value : value)).join(':');
+      },
+      (err) => {
+        console.error(err);
+        return 'ERROR';
+      }
+    );
   }, []);
   const valueRef = useRef<number>(value);
 

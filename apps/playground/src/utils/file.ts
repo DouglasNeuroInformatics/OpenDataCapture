@@ -1,5 +1,6 @@
 import { sha256 } from '@douglasneuroinformatics/libcrypto';
-import { type BundlerInput, extractInputFileExtension, resolveIndexInput } from '@opendatacapture/instrument-bundler';
+import { extractInputFileExtension, resolveIndexInput } from '@opendatacapture/instrument-bundler';
+import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 import { match, P } from 'ts-pattern';
 
 import type { EditorFile } from '@/models/editor-file.model';

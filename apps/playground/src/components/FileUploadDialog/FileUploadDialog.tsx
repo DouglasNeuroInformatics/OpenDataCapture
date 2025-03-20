@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { CloudUploadIcon } from 'lucide-react';
-import { type FileRejection, useDropzone } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
+import type { FileRejection } from 'react-dropzone';
 import type { Promisable } from 'type-fest';
 
 type FileUploadValidateResult = { message: string; result: 'error' } | { result: 'success' };

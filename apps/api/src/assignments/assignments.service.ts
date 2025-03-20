@@ -1,15 +1,13 @@
 import crypto from 'node:crypto';
 
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
+import { accessibleQuery, ConfigService, InjectModel } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Assignment, UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 
-import { accessibleQuery } from '@/ability/ability.utils';
-import { ConfigurationService } from '@/configuration/configuration.service';
 import type { EntityOperationOptions } from '@/core/types';
 import { GatewayService } from '@/gateway/gateway.service';
-import { InjectModel } from '@/prisma/prisma.decorators';
-import type { Model } from '@/prisma/prisma.types';
 
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 
@@ -19,14 +17,14 @@ export class AssignmentsService {
 
   constructor(
     @InjectModel('Assignment') private readonly assignmentModel: Model<'Assignment'>,
-    configurationService: ConfigurationService,
+    configService: ConfigService,
     private readonly gatewayService: GatewayService
   ) {
-    if (configurationService.get('NODE_ENV') === 'production') {
-      const siteAddress = configurationService.get('GATEWAY_SITE_ADDRESS');
+    if (configService.get('NODE_ENV') === 'production') {
+      const siteAddress = configService.getOrThrow('GATEWAY_SITE_ADDRESS');
       this.assignmentBaseUrl = siteAddress.origin;
     } else {
-      const gatewayPort = configurationService.get('GATEWAY_DEV_SERVER_PORT');
+      const gatewayPort = configService.get('GATEWAY_DEV_SERVER_PORT');
       this.assignmentBaseUrl = `http://localhost:${gatewayPort}`;
     }
   }

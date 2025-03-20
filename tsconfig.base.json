@@ -11,5 +11,5 @@
     "resolveJsonModule": true
   },
   "include": ["vitest.config.ts", "vitest.workspace.ts"],
-  "exclude": ["docs/*", "**/dist", "**/node_modules", "**/vendor", "vendor/**/*"]
+  "exclude": ["docs/*", "**/dist", "**/node_modules", "vendor/**/*"]
 }

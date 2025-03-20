@@ -1,14 +1,9 @@
 import { useRef, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import {
-  ActionDropdown,
-  LineGraph,
-  ListboxDropdown,
-  type ListboxDropdownOption
-} from '@douglasneuroinformatics/libui/components';
-import { useDownload } from '@douglasneuroinformatics/libui/hooks';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { ActionDropdown, LineGraph, ListboxDropdown } from '@douglasneuroinformatics/libui/components';
+import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
+import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import html2canvas from 'html2canvas';
 import { useParams } from 'react-router-dom';

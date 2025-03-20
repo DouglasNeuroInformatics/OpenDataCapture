@@ -1,4 +1,4 @@
-import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest';
 import { $UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { GroupSettings, GroupType, UpdateGroupData } from '@opendatacapture/schemas/group';
 

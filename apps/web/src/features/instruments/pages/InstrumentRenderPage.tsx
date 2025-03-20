@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
 
 import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { InstrumentRenderer, type InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import type { InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
-import { type Location, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import type { Location } from 'react-router-dom';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';

@@ -1,9 +1,7 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest/core';
+import { CurrentUser, RouteAccess } from '@douglasneuroinformatics/libnest';
+import type { AppAbility } from '@douglasneuroinformatics/libnest';
 import { Controller, Get, Query } from '@nestjs/common';
 import type { Summary } from '@opendatacapture/schemas/summary';
-
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import type { AppAbility } from '@/core/types';
 
 import { SummaryService } from './summary.service';
 

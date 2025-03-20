@@ -3,7 +3,8 @@
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $BasePermissionLevel, $CreateUserData, type CreateUserData } from '@opendatacapture/schemas/user';
+import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
+import type { CreateUserData } from '@opendatacapture/schemas/user';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 

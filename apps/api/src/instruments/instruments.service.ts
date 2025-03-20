@@ -1,5 +1,11 @@
-import { CryptoService } from '@douglasneuroinformatics/libnest/crypto';
-import { LoggingService } from '@douglasneuroinformatics/libnest/logging';
+import {
+  accessibleQuery,
+  CryptoService,
+  InjectModel,
+  LoggingService,
+  VirtualizationService
+} from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
@@ -15,7 +21,7 @@ import type {
   SeriesInstrument,
   SomeInstrument
 } from '@opendatacapture/runtime-core';
-import { $Error, type WithID } from '@opendatacapture/schemas/core';
+import type { WithID } from '@opendatacapture/schemas/core';
 import { $AnyInstrument } from '@opendatacapture/schemas/instrument';
 import type {
   InstrumentBundleContainer,
@@ -23,13 +29,14 @@ import type {
   ScalarInstrumentBundleContainer
 } from '@opendatacapture/schemas/instrument';
 
-import { accessibleQuery } from '@/ability/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
-import { InjectModel } from '@/prisma/prisma.decorators';
-import type { Model } from '@/prisma/prisma.types';
-import { VirtualizationService } from '@/virtualization/virtualization.service';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
+
+type InstrumentVirtualizationContext = {
+  __resolveImport: (specifier: string) => string;
+  instruments: Map<string, WithID<AnyInstrument>>;
+};
 
 type InstrumentQuery<TKind extends InstrumentKind> = {
   kind?: TKind;
@@ -42,7 +49,7 @@ export class InstrumentsService {
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     private readonly cryptoService: CryptoService,
     private readonly loggingService: LoggingService,
-    private readonly virtualizationService: VirtualizationService
+    private readonly virtualizationService: VirtualizationService<InstrumentVirtualizationContext>
   ) {}
 
   async count<TKind extends InstrumentKind>(
@@ -53,23 +60,15 @@ export class InstrumentsService {
   }
 
   async create({ bundle }: CreateInstrumentDto): Promise<WithID<AnyInstrument>> {
-    let bundleReturn: unknown;
-    try {
-      bundleReturn = await this.virtualizationService.runInContext(bundle);
-    } catch (err) {
-      this.loggingService.error(err);
-      let cause: unknown;
-      const parsed = await $Error.safeParseAsync(err);
-      if (parsed.success) {
-        cause = { message: parsed.data.message, name: parsed.data.name };
-      }
+    const result = await this.virtualizationService.eval(bundle);
+    if (result.isErr()) {
+      this.loggingService.error(result.error);
       throw new UnprocessableEntityException({
-        cause,
+        cause: result.error,
         message: 'Failed to interpret instrument bundle'
       });
     }
-
-    const parseResult = await $AnyInstrument.safeParseAsync(bundleReturn);
+    const parseResult = await $AnyInstrument.safeParseAsync(result.value);
     if (!parseResult.success) {
       throw new UnprocessableEntityException({
         issues: parseResult.error.issues,
@@ -155,7 +154,7 @@ export class InstrumentsService {
     if (!instrument) {
       throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
     }
-    const instance = await this.virtualizationService.getInstrumentInstance(instrument);
+    const instance = await this.getInstrumentInstance(instrument);
     return { bundle: instrument.bundle, ...instance };
   }
 
@@ -190,10 +189,25 @@ export class InstrumentsService {
     return this.cryptoService.hash(instrument.content.map(({ edition, name }) => `${name}-${edition}`).join('--'));
   }
 
+  async getInstrumentInstance(instrument: Pick<InstrumentBundleContainer, 'bundle' | 'id'>) {
+    let instance = this.virtualizationService.context.instruments.get(instrument.id);
+    if (!instance) {
+      const result = await this.virtualizationService.eval(instrument.bundle);
+      if (result.isErr()) {
+        throw new InternalServerErrorException('Failed to evaluate instrument', {
+          cause: result.error
+        });
+      }
+      instance = { ...(result.value as AnyInstrument), id: instrument.id };
+      this.virtualizationService.context.instruments.set(instrument.id, instance);
+    }
+    return instance;
+  }
+
   private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {
     return Promise.all(
       instruments.map((instrument) => {
-        return this.virtualizationService.getInstrumentInstance(instrument);
+        return this.getInstrumentInstance(instrument);
       })
     );
   }
@@ -215,3 +229,5 @@ export class InstrumentsService {
     return { success: true };
   }
 }
+
+export type { InstrumentVirtualizationContext };

@@ -2,7 +2,9 @@ import type { StarlightPlugin } from '@astrojs/starlight/types';
 import type { TypeDocOptions } from 'typedoc';
 
 import { getSidebarFromReflections, getSidebarGroupPlaceholder } from './starlight';
-import { generateTypeDoc, type TypeDocConfig } from './typedoc';
+import { generateTypeDoc } from './typedoc';
+
+import type { TypeDocConfig } from './typedoc';
 
 export type StarlightTypeDocSidebarOptions = {
   /**

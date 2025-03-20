@@ -15,9 +15,11 @@ import { DeleteFileDialog } from './DeleteFileDialog';
 import { EditorAddFileButton } from './EditorAddFileButton';
 import { EditorButton } from './EditorButton';
 import { EditorFileButton } from './EditorFileButton';
-import { EditorPane, type EditorPaneRef } from './EditorPane';
+import { EditorPane } from './EditorPane';
 import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 import { EditorTab } from './EditorTab';
+
+import type { EditorPaneRef } from './EditorPane';
 
 import './setup';
 

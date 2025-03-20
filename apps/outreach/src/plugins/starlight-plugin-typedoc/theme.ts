@@ -9,13 +9,33 @@ import { getAsideMarkdown, getRelativeURL } from './starlight';
 const customBlockTagTypes = ['@deprecated'] as const;
 const customModifiersTagTypes = ['@alpha', '@beta', '@experimental'] as const;
 
-export class StarlightTypeDocTheme extends MarkdownTheme {
+class StarlightTypeDocTheme extends MarkdownTheme {
   override getRenderContext(event: MarkdownPageEvent<Reflection>): StarlightTypeDocThemeRenderContext {
     return new StarlightTypeDocThemeRenderContext(this, event, this.application.options);
   }
 }
 
 class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
+  #markdownThemeContext: MarkdownThemeContext;
+
+  #parseCommentDisplayPart = (part: CommentDisplayPart): CommentDisplayPart => {
+    if (
+      part.kind === 'inline-tag' &&
+      (part.tag === '@link' || part.tag === '@linkcode' || part.tag === '@linkplain') &&
+      part.target instanceof Reflection &&
+      typeof part.target.url === 'string'
+    ) {
+      return {
+        ...part,
+        target: this.getRelativeUrl(
+          path.posix.join(this.options.getValue('entryPointStrategy') === 'packages' ? '../..' : '..', part.target.url)
+        )
+      };
+    }
+
+    return part;
+  };
+
   override partials: MarkdownThemeContext['partials'] = {
     // @ts-expect-error https://github.com/tgreyuk/typedoc-plugin-markdown/blob/2bc4136a364c1d1ab44789d6148cd19c425ce63c/docs/pages/docs/customizing-output.mdx#custom-theme
     ...this.partials,
@@ -84,26 +104,6 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
     return customModifiersTagTypes.includes(tag as CustomModifierTagType);
   };
 
-  #markdownThemeContext: MarkdownThemeContext;
-
-  #parseCommentDisplayPart = (part: CommentDisplayPart): CommentDisplayPart => {
-    if (
-      part.kind === 'inline-tag' &&
-      (part.tag === '@link' || part.tag === '@linkcode' || part.tag === '@linkplain') &&
-      part.target instanceof Reflection &&
-      typeof part.target.url === 'string'
-    ) {
-      return {
-        ...part,
-        target: this.getRelativeUrl(
-          path.posix.join(this.options.getValue('entryPointStrategy') === 'packages' ? '../..' : '..', part.target.url)
-        )
-      };
-    }
-
-    return part;
-  };
-
   constructor(theme: MarkdownTheme, event: MarkdownPageEvent<Reflection>, options: Options) {
     super(theme, event, options);
     this.#markdownThemeContext = new MarkdownThemeContext(theme, event, options);
@@ -144,3 +144,5 @@ type CustomTag =
       type: CustomBlockTagType;
     }
   | { type: CustomModifierTagType };
+
+export { StarlightTypeDocTheme };

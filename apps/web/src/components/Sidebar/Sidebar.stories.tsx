@@ -8,12 +8,12 @@ import { Sidebar } from './Sidebar';
 
 type Story = StoryObj<typeof Sidebar>;
 
-export default { component: Sidebar } as Meta<typeof Sidebar>;
-
 useAppStore.setState({
   currentSession,
   currentUser
 });
+
+export default { component: Sidebar } as Meta<typeof Sidebar>;
 
 export const Default: Story = {
   decorators: [

@@ -1,7 +1,7 @@
+/* eslint-disable import/exports-last */
 import { pick } from 'lodash-es';
 import { create } from 'zustand';
-import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
-import { devtools } from 'zustand/middleware';
+import { createJSONStorage, devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { resolveIndexFilename } from '@/utils/file';

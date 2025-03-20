@@ -109,7 +109,7 @@ function extractRecordArrayEntry(entry: string) {
   return result[1];
 }
 
-export function reformatInstrumentData({
+function reformatInstrumentData({
   currentGroup,
   data,
   instrument
@@ -138,7 +138,7 @@ export function reformatInstrumentData({
   return reformatForSending;
 }
 
-export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
+function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   const def: unknown = schema._def;
   if (isZodTypeDef(def)) {
     if (isZodOptionalDef(def)) {
@@ -182,7 +182,7 @@ export function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodT
   return { message: 'Unexpected Error', success: false };
 }
 
-export function interpretZodArray(
+function interpretZodArray(
   schema: z.ZodTypeAny,
   originalName: z.ZodFirstPartyTypeKind.ZodArray,
   isOptional?: boolean
@@ -226,7 +226,7 @@ export function interpretZodArray(
   };
 }
 
-export function interpretZodValue(
+function interpretZodValue(
   entry: string,
   zType: Exclude<ZodTypeName, 'ZodArray' | 'ZodEffects' | 'ZodObject' | 'ZodOptional'>,
   isOptional: boolean
@@ -281,7 +281,7 @@ export function interpretZodValue(
   }
 }
 
-export function interpretZodObjectValue(
+function interpretZodObjectValue(
   entry: string,
   isOptional: boolean,
   zList: ZodTypeNameResult[],
@@ -601,3 +601,5 @@ export async function processInstrumentCSV(
     reader.readAsText(input);
   });
 }
+
+export { getZodTypeName, interpretZodArray, interpretZodObjectValue, interpretZodValue, reformatInstrumentData };

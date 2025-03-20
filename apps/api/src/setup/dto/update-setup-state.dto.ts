@@ -1,4 +1,4 @@
-import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest';
 import { ApiProperty } from '@nestjs/swagger';
 import { $UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 import type { UpdateSetupStateData } from '@opendatacapture/schemas/setup';

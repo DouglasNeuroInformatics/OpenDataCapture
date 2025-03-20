@@ -1,9 +1,11 @@
+/* eslint-disable import/exports-last */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /**
  * typedef {Object{line:number,ch:number}} Cursor An object containing the
  *     position of the cursor.
@@ -1123,10 +1125,10 @@ const symbolToMode: { [key: string]: SymbolMode } = {
   '/': 'comment',
   '[': 'section',
   ']': 'section',
-  '{': 'bracket',
-  '}': 'bracket',
   M: 'method',
-  m: 'method'
+  m: 'method',
+  '{': 'bracket',
+  '}': 'bracket'
 };
 
 type FindSymbolState = {

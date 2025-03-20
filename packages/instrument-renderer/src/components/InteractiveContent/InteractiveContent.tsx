@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, Separator } from '@douglasneuroinformatics/libui/components';
-import { type Theme, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/runtime-core';
-import { $Json, type Json } from '@opendatacapture/schemas/core';
+import { $Json } from '@opendatacapture/schemas/core';
+import type { Json } from '@opendatacapture/schemas/core';
 import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 

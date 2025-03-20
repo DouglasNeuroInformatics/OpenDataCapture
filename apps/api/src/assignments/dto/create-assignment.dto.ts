@@ -1,6 +1,7 @@
-import { ValidationSchema } from '@douglasneuroinformatics/libnest/core';
+import { ValidationSchema } from '@douglasneuroinformatics/libnest';
 import { ApiProperty } from '@nestjs/swagger';
-import { $CreateAssignmentData, type CreateAssignmentData } from '@opendatacapture/schemas/assignment';
+import { $CreateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 
 @ValidationSchema($CreateAssignmentData)
 export class CreateAssignmentDto implements CreateAssignmentData {
