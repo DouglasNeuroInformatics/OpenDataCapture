@@ -46,3 +46,9 @@ declare module '*.json' {
 declare module 'react/jsx-runtime' {
   export * from '/runtime/v1/react@18.x/jsx-runtime';
 }
+
+declare global {
+  type IsOpenDataCaptureRepo = typeof import('../../package.json') extends { __isODCRepo: NonNullable<unknown> }
+    ? true
+    : false;
+}
