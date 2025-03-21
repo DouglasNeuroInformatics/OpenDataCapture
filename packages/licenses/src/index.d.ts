@@ -649,6 +649,7 @@ export type ApprovedLicense = Extract<
   | 'BSD-2-Clause'
   | 'BSD-3-Clause'
   | 'CC0-1.0'
+  | 'CC-BY-4.0'
   | 'ISC'
   | 'MIT'
   | 'MIT-0'
