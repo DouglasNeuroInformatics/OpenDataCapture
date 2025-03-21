@@ -6,6 +6,14 @@ import type { InstrumentKind, InstrumentLanguage } from './types/instrument.base
 import type { FormInstrument } from './types/instrument.form.js';
 import type { InteractiveInstrument } from './types/instrument.interactive.js';
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-empty-object-type
+  interface OpenDataCaptureContext {}
+}
+
+/** @public */
+export type IsOpenDataCaptureRepo = OpenDataCaptureContext['isRepo'];
+
 /** @public */
 // prettier-ignore
 export type DiscriminatedInstrument<
