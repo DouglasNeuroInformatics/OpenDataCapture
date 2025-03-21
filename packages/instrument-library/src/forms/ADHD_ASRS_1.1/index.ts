@@ -106,7 +106,7 @@ export default defineInstrument({
   },
   internal: {
     edition: 1,
-    name: 'ADHD-ASRS-v1.1'
+    name: 'ADHD_ASRS_1.1'
   },
   kind: 'FORM',
   language: ['en', 'fr'],

@@ -6,7 +6,7 @@ export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
   internal: {
-    name: 'AUDIT-C',
+    name: 'AUDIT_C',
     edition: 1
   },
   tags: {
