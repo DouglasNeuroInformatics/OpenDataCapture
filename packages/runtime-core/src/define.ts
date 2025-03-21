@@ -1,3 +1,5 @@
+/// <reference types="../../../runtime/v1/global.d.ts" />
+
 import type { z } from 'zod';
 
 import type { InstrumentKind, InstrumentLanguage } from './types/instrument.base.js';
