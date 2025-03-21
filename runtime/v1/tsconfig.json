@@ -5,5 +5,5 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "rootDir": "../.."
   },
-  "include": ["build.ts", "src/**/*", "*.js", "*.cjs", "env.d.ts"]
+  "include": ["build.ts", "src/**/*", "*.js", "*.cjs", "env.d.ts", "global.d.ts"]
 }

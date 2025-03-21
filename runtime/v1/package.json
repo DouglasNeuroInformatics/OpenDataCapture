@@ -23,7 +23,8 @@
   },
   "files": [
     "dist",
-    "env.d.ts"
+    "env.d.ts",
+    "global.d.ts"
   ],
   "scripts": {
     "build": "pnpm exec runtime-bundler"
