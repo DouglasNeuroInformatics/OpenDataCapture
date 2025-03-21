@@ -1,5 +1,6 @@
 /// <reference types="../../../runtime/v1/global.d.ts" />
 
+import type { ApprovedLicense } from '@opendatacapture/licenses';
 import type { z } from 'zod';
 
 import type { InstrumentKind, InstrumentLanguage } from './types/instrument.base.js';
@@ -10,9 +11,6 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-empty-object-type
   interface OpenDataCaptureContext {}
 }
-
-/** @public */
-export type IsOpenDataCaptureRepo = OpenDataCaptureContext['isRepo'];
 
 /** @public */
 // prettier-ignore
@@ -42,7 +40,13 @@ export type InstrumentDef<
   kind: TKind;
   language: TLanguage;
   validationSchema: TSchema;
-};
+} & (OpenDataCaptureContext extends { isRepo: true }
+    ? {
+        details: {
+          license: ApprovedLicense;
+        };
+      }
+    : unknown);
 
 /** @public */
 export function defineInstrument<
