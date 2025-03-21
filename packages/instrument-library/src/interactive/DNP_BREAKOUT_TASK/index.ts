@@ -260,7 +260,7 @@ export default defineInstrument({
   },
   internal: {
     edition: 1,
-    name: 'BREAKOUT_TASK'
+    name: 'DNP_BREAKOUT_TASK'
   },
   kind: 'INTERACTIVE',
   language: 'en',
