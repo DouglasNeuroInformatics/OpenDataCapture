@@ -32,5 +32,11 @@ export default config(
     rules: {
       'jsx-a11y/media-has-caption': 'off'
     }
+  },
+  {
+    files: ['packages/instrument-library/**/*'],
+    rules: {
+      'perfectionist/sort-objects': 'off'
+    }
   }
 );

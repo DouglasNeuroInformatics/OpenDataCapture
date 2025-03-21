@@ -31,10 +31,22 @@ export default defineInstrument({
             fr: "À quelle fréquence avez-vous des difficultés à vous concentrer sur ce que les gens vous disent, même lorsqu'ils vous parlent directement?"
           }
         },
+        restlessInappropriately: {
+          label: {
+            en: 'How often do you leave your seat in meetings or other situations in which you are expected to remain seated?',
+            fr: "À quelle fréquence vous levez-vous pendant des réunions ou d'autres situations dans lesquelles vous êtes censé rester assis?"
+          }
+        },
         difficultyRelaxing: {
           label: {
             en: 'How often do you have difficulty unwinding and relaxing when you have time to yourself?',
             fr: 'À quelle fréquence avez-vous des difficultés à vous détendre et à vous relaxer pendant votre temps libre?'
+          }
+        },
+        sentenceCompletion: {
+          label: {
+            en: "When you're in a conversation, how often do you find yourself finishing the sentences of the people you are talking to before they can finish them themselves?",
+            fr: "À quelle fréquence vous surprenez-vous terminant les phrases des autres dans une discussion avant qu'ils aient pu le faire eux-mêmes?"
           }
         },
         procrastination: {
@@ -47,18 +59,6 @@ export default defineInstrument({
           label: {
             en: 'How often do you depend on others to keep your life in order and attend to details?',
             fr: "À quelle fréquence dépendez-vous des autres pour garder votre vie en ordre et s'occuper des détails?"
-          }
-        },
-        restlessInappropriately: {
-          label: {
-            en: 'How often do you leave your seat in meetings or other situations in which you are expected to remain seated?',
-            fr: "À quelle fréquence vous levez-vous pendant des réunions ou d'autres situations dans lesquelles vous êtes censé rester assis?"
-          }
-        },
-        sentenceCompletion: {
-          label: {
-            en: "When you're in a conversation, how often do you find yourself finishing the sentences of the people you are talking to before they can finish them themselves?",
-            fr: "À quelle fréquence vous surprenez-vous terminant les phrases des autres dans une discussion avant qu'ils aient pu le faire eux-mêmes?"
           }
         }
       },
