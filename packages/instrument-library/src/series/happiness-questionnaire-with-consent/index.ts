@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import type { SeriesInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 
 const instrument: SeriesInstrument = {
