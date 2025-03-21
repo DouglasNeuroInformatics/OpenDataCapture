@@ -18,7 +18,7 @@ export default defineInstrument({
   content: {},
   details: {
     description: '<PLACEHOLDER>',
-    license: 'UNLICENSED',
+    license: 'Apache-2.0',
     title: '<PLACEHOLDER>'
   },
   measures: {},
