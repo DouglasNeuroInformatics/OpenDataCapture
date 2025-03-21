@@ -10,7 +10,7 @@ export default defineInstrument({
   },
   internal: {
     edition: 1,
-    name: 'GENERAL_CONSENT_FORM'
+    name: 'DNP_GENERAL_CONSENT_FORM'
   },
   content: [
     {

@@ -11,7 +11,7 @@ export default defineInstrument({
   },
   internal: {
     edition: 1,
-    name: 'HAPPINESS_QUESTIONNAIRE'
+    name: 'DNP_HAPPINESS_QUESTIONNAIRE'
   },
   content: {
     personalLifeSatisfaction: {

@@ -592,7 +592,7 @@ export default defineInstrument({
   language: ['en', 'fr'],
   internal: {
     edition: 1,
-    name: 'ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE'
+    name: 'DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE'
   },
   tags: {
     en: ['Demographics'],
