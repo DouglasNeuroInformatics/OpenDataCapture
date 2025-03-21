@@ -6,7 +6,7 @@ import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
 import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/enhanced-demographics-questionnaire.js';
 import generalConsentForm from '@opendatacapture/instrument-library/forms/general-consent-form.js';
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/happiness-questionnaire.js';
-import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/patient-health-questionnaire-9.js';
+import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/PHQ-9.js';
 import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
 import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/happiness-questionnaire-with-consent.js';
 import type { FormInstrument } from '@opendatacapture/runtime-core';
