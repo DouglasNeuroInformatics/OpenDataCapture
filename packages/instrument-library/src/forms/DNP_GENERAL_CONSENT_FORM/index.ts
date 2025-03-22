@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { z } from '/runtime/v1/zod@3.23.x';
 
@@ -12,7 +10,7 @@ export default defineInstrument({
   },
   internal: {
     edition: 1,
-    name: 'GENERAL_CONSENT_FORM'
+    name: 'DNP_GENERAL_CONSENT_FORM'
   },
   content: [
     {

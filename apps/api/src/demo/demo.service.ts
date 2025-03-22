@@ -3,12 +3,12 @@ import { LoggingService, PrismaService } from '@douglasneuroinformatics/libnest'
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
-import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/enhanced-demographics-questionnaire.js';
-import generalConsentForm from '@opendatacapture/instrument-library/forms/general-consent-form.js';
-import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/happiness-questionnaire.js';
-import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/patient-health-questionnaire-9.js';
-import breakoutTask from '@opendatacapture/instrument-library/interactive/breakout-task.js';
-import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/happiness-questionnaire-with-consent.js';
+import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE.js';
+import generalConsentForm from '@opendatacapture/instrument-library/forms/DNP_GENERAL_CONSENT_FORM.js';
+import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_HAPPINESS_QUESTIONNAIRE.js';
+import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/PHQ_9.js';
+import breakoutTask from '@opendatacapture/instrument-library/interactive/DNP_BREAKOUT_TASK.js';
+import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/DNP_HAPPINESS_QUESTIONNAIRE_WITH_CONSENT.js';
 import type { FormInstrument } from '@opendatacapture/runtime-core';
 import type { Json, Language, WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';

@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import type { Language } from '/runtime/v1/@opendatacapture/runtime-core';
 import { z } from '/runtime/v1/zod@3.23.x';
@@ -594,7 +592,7 @@ export default defineInstrument({
   language: ['en', 'fr'],
   internal: {
     edition: 1,
-    name: 'ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE'
+    name: 'DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE'
   },
   tags: {
     en: ['Demographics'],

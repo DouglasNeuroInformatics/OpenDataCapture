@@ -639,3 +639,22 @@ export type License = {
 };
 
 export declare const licenses: Map<LicenseIdentifier, License>;
+
+/** A list of licenses approved for inclusion within the ODC repo */
+export type ApprovedLicense = Extract<
+  LicenseIdentifier,
+  | '0BSD'
+  | 'Apache-2.0'
+  | 'BSD-1-Clause'
+  | 'BSD-2-Clause'
+  | 'BSD-3-Clause'
+  | 'CC0-1.0'
+  | 'CC-BY-4.0'
+  | 'FREE-NOS'
+  | 'ISC'
+  | 'MIT'
+  | 'MIT-0'
+  | 'PUBLIC-DOMAIN'
+  | 'Unlicense'
+  | 'WTFPL'
+>;

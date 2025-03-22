@@ -26,7 +26,7 @@ export default defineInstrument({
   },
   internal: {
     edition: 1,
-    name: 'INTERACTIVE_INSTRUMENT'
+    name: 'DNP_STROOP_TASK'
   },
   kind: 'INTERACTIVE',
   language: 'en',

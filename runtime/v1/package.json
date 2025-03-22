@@ -1,7 +1,7 @@
 {
   "name": "@opendatacapture/runtime-v1",
   "type": "module",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "author": {
     "name": "Douglas Neuroinformatics",
     "email": "support@douglasneuroinformatics.ca"
@@ -23,7 +23,8 @@
   },
   "files": [
     "dist",
-    "env.d.ts"
+    "env.d.ts",
+    "global.d.ts"
   ],
   "scripts": {
     "build": "pnpm exec runtime-bundler"

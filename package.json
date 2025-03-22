@@ -97,5 +97,6 @@
         "@mdx-js/react>@types/react": "18.x"
       }
     }
-  }
+  },
+  "__isODCRepo": true
 }
