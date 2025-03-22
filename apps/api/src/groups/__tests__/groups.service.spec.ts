@@ -6,8 +6,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { InstrumentsService } from '@/instruments/instruments.service';
-
+import { InstrumentsService } from '../../instruments/instruments.service';
 import { GroupsService } from '../groups.service';
 
 describe('GroupsService', () => {
