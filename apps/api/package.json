@@ -15,8 +15,6 @@
     "test": "env-cmd -f ../../.env vitest"
   },
   "dependencies": {
-    "@casl/ability": "catalog:",
-    "@casl/prisma": "catalog:",
     "@douglasneuroinformatics/libcrypto": "catalog:",
     "@douglasneuroinformatics/libjs": "^2.4.0",
     "@douglasneuroinformatics/libnest": "^3.0.1",
@@ -25,10 +23,7 @@
     "@faker-js/faker": "^9.4.0",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^11.0.11",
-    "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.11",
-    "@nestjs/mapped-types": "^2.1.0",
-    "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.11",
     "@nestjs/swagger": "^11.0.6",
     "@opendatacapture/demo": "workspace:*",
@@ -45,27 +40,16 @@
     "lodash-es": "workspace:lodash-es__4.x@*",
     "mongodb": "^6.15.0",
     "neverthrow": "^8.2.0",
-    "passport": "^0.7.0",
-    "passport-jwt": "4.0.1",
     "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.2",
     "ts-pattern": "workspace:ts-pattern__5.x@*",
     "zod": "workspace:zod__3.23.x@*"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/esbuild-plugin-prisma": "catalog:",
     "@nestjs/testing": "^11.0.11",
-    "@opendatacapture/instrument-stubs": "workspace:*",
     "@types/express": "^5.0.0",
-    "@types/supertest": "^6.0.2",
-    "concurrently": "^9.1.2",
-    "esbuild": "catalog:",
-    "esbuild-plugin-tsc": "^0.4.0",
-    "nodemon": "catalog:",
     "prisma": "catalog:",
-    "prisma-json-types-generator": "^3.2.2",
-    "supertest": "^7.0.0",
-    "type-fest": "workspace:type-fest__4.x@*"
+    "prisma-json-types-generator": "^3.2.2"
   },
   "imports": {
     "#runtime/v1/*": {

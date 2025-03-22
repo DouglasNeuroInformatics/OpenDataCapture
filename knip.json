@@ -3,7 +3,8 @@
   "workspaces": {
     "apps/api": {
       "entry": ["src/main.ts", "libnest.config.ts"],
-      "project": "**/*.ts"
+      "project": "**/*.ts",
+      "ignoreDependencies": ["@opendatacapture/runtime-v1", "prisma-json-types-generator"]
     }
   }
 }
