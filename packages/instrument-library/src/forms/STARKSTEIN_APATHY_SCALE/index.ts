@@ -1,7 +1,7 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { z } from '/runtime/v1/zod@3.23.x';
 
-const $fieldOptionsValidation = z.number().int().gte(0).lte(3);
+const $FieldOptionsValidation = z.number().int().gte(0).lte(3);
 const fieldOptionsLikertScale = {
   en: {
     0: 'Not at all',
@@ -21,20 +21,20 @@ export default defineInstrument({
   kind: 'FORM',
   language: ['en', 'fr'],
   validationSchema: z.object({
-    interestedInLearningNewThings: $fieldOptionsValidation,
-    anythingInterestsYou: $fieldOptionsValidation,
-    concernedAboutOwnCondition: $fieldOptionsValidation,
-    putMuchEffortIntoThings: $fieldOptionsValidation,
-    alwaysLookForSomethingToDo: $fieldOptionsValidation,
-    havePlanAndGoalsForFuture: $fieldOptionsValidation,
-    haveMotivation: $fieldOptionsValidation,
-    haveEnergyForDailyActivities: $fieldOptionsValidation,
-    needToTellYouWhatToDoEveryday: $fieldOptionsValidation,
-    indifferentToThings: $fieldOptionsValidation,
-    unconcernedWithManyThings: $fieldOptionsValidation,
-    needPushToGetStarted: $fieldOptionsValidation,
-    notHappyOrSadJustNeutral: $fieldOptionsValidation,
-    areYouApathetic: $fieldOptionsValidation
+    interestedInLearningNewThings: $FieldOptionsValidation,
+    anythingInterestsYou: $FieldOptionsValidation,
+    concernedAboutOwnCondition: $FieldOptionsValidation,
+    putMuchEffortIntoThings: $FieldOptionsValidation,
+    alwaysLookForSomethingToDo: $FieldOptionsValidation,
+    havePlanAndGoalsForFuture: $FieldOptionsValidation,
+    haveMotivation: $FieldOptionsValidation,
+    haveEnergyForDailyActivities: $FieldOptionsValidation,
+    needToTellYouWhatToDoEveryday: $FieldOptionsValidation,
+    indifferentToThings: $FieldOptionsValidation,
+    unconcernedWithManyThings: $FieldOptionsValidation,
+    needPushToGetStarted: $FieldOptionsValidation,
+    notHappyOrSadJustNeutral: $FieldOptionsValidation,
+    areYouApathetic: $FieldOptionsValidation
   }),
   details: {
     description: {
