@@ -6,7 +6,6 @@
     "experimentalDecorators": true,
     "paths": {
       "@/*": ["src/*"],
-      "/runtime/v1/*": ["../../runtime/v1/dist/*"],
       "#runtime/v1/*": ["../../runtime/v1/dist/*"]
     },
     "strictPropertyInitialization": false
