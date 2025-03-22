@@ -1,0 +1,9 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    "apps/api": {
+      "entry": ["src/main.ts", "libnest.config.ts"],
+      "project": "**/*.ts"
+    }
+  }
+}
