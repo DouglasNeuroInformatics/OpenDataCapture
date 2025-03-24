@@ -46,6 +46,7 @@ type InstrumentQuery<TKind extends InstrumentKind> = {
 @Injectable()
 export class InstrumentsService {
   constructor(
+    @InjectModel('Group') private readonly groupModel: Model<'Group'>,
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     private readonly cryptoService: CryptoService,
     private readonly loggingService: LoggingService,
@@ -87,6 +88,21 @@ export class InstrumentsService {
       if (!result.success) {
         throw new UnprocessableEntityException(result.message);
       }
+    } else if (instance.internal.edition > 1) {
+      await this.groupModel.updateMany({
+        data: {
+          accessibleInstrumentIds: {
+            push: [id]
+          }
+        },
+        where: {
+          accessibleInstrumentIds: {
+            has: this.generateScalarInstrumentId({
+              internal: { edition: instance.internal.edition - 1, name: instance.internal.name }
+            })
+          }
+        }
+      });
     }
 
     await this.instrumentModel.create({ data: { bundle, id } });
