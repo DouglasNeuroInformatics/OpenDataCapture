@@ -43,6 +43,14 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
     {
       kind: 'text',
       label: t({
+        en: 'Edition',
+        fr: 'Édition'
+      }),
+      text: instrument.internal?.edition.toString()
+    },
+    {
+      kind: 'text',
+      label: t({
         en: 'Languages',
         fr: 'Langues'
       }),
